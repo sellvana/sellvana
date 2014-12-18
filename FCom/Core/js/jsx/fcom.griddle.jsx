@@ -12,7 +12,7 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
         console.log('config', config);
         var page_size_options = config.page_size_options;
         var totalResults = config.data.state.c;
-        var defaultColumns;
+        var initColumns;
         var tableClassName = 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable';
 
         var FComGriddleComponent = React.createClass({
@@ -22,9 +22,10 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
                 }
             },
             render: function () {
-                defaultColumns = _.pluck(config.columns, 'name');
+                initColumns = _.pluck(config.columns, 'name');
 
-                var content = <Griddle showTableHeading={false} columns={defaultColumns} tableClassName={tableClassName}
+                var content = <Griddle showTableHeading={false} tableClassName={tableClassName}
+                    columns={initColumns} columnMetadata={config.columns}
                     useCustomGrid={true} customGrid={FComGridBody}
                     getExternalResults={FComDataMethod} resultsPerPage={this.props.resultsPerPage}
                     useCustomPager="true" customPager={FComPager}
@@ -39,7 +40,7 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
         });
 
         /**
-         *
+         * callback to get data from external results
          * @param filterString
          * @param sortColumn
          * @param sortAscending
@@ -59,8 +60,6 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
                         results: response[1],
                         totalResults: response[0].c
                     };
-
-                    console.log('callback', callback);
 
                     callback(data);
                 },
@@ -401,31 +400,31 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
                 var selectedColumns = this.props.selectedColumns;
                 if(event.target.checked == true && _.contains(selectedColumns, event.target.dataset.name) == false){
                     selectedColumns.push(event.target.dataset.name);
-                    var diff = _.difference(defaultColumns, selectedColumns);
+                    var diff = _.difference(initColumns, selectedColumns);
                     if (diff.length > 0) {
-                        selectedColumns = defaultColumns;
+                        selectedColumns = initColumns;
                         for(var i=0; i < diff.length; i++) {
                             selectedColumns = _.without(selectedColumns, diff[i]);
                         }
                         this.props.setColumns(selectedColumns);
                     } else {
-                        this.props.setColumns(defaultColumns);
+                        this.props.setColumns(initColumns);
                     }
                 } else {
-                    /* redraw with the selected defaultColumns minus the one just unchecked */
+                    /* redraw with the selected initColumns minus the one just unchecked */
                     this.props.setColumns(_.without(selectedColumns, event.target.dataset.name));
                 }
             },
             render: function () {
                 var options = [];
-                for (var i = 0; i < defaultColumns.length; i++) {
-                    if (defaultColumns[i] != "0") {
-                        var checked = _.contains(this.props.selectedColumns, defaultColumns[i]);
+                for (var i = 0; i < initColumns.length; i++) {
+                    if (initColumns[i] != "0") {
+                        var checked = _.contains(this.props.selectedColumns, initColumns[i]);
                         options.push(
-                            <li data-id={defaultColumns[i]} className="dd-item dd3-item">
+                            <li data-id={initColumns[i]} className="dd-item dd3-item">
                                 <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                                 <div className="dd3-content">
-                                    <label><input type="checkbox" checked={checked} data-id={defaultColumns[i]} data-name={defaultColumns[i]} className="showhide_column" onChange={this.toggleColumn}/> {defaultColumns[i]}</label>
+                                    <label><input type="checkbox" checked={checked} data-id={initColumns[i]} data-name={initColumns[i]} className="showhide_column" onChange={this.toggleColumn}/> {initColumns[i]}</label>
                                 </div>
                             </li>
                         );

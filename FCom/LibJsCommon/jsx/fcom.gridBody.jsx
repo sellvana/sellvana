@@ -19,11 +19,40 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
         render: function () {
             var that = this;
 
-            var header = [];
-            var columns = that.props.columns;
-            for (var i=0; i<columns.length; i++) {
-                if (columns[i] == "0") {
-                    header.push(
+            var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn} sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata}/>;
+
+            var nodes = this.props.data.map(function (row, index) {
+                return <FComRow data={row} index={index} metadataColumns={that.props.metadataColumns} columnMetadata={that.props.columnMetadata} />
+            });
+
+            return (
+                <table className={this.props.className}>
+                    {title}
+                    {nodes}
+                </table>
+            );
+        }
+    });
+
+    var FComGridTitle = React.createClass({
+        getDefaultProps: function(){
+            return {
+                "columns":[],
+                "sortColumn": "",
+                "sortAscending": true
+            }
+        },
+        sort: function(event){
+            this.props.changeSort(event.target.dataset.title);
+        },
+        render: function(){
+            var that = this;
+
+            var nodes = this.props.columns.map(function(col, index){
+
+                //checkbox
+                if (col == '0') {
+                    return (
                         <th className="js-draggable ui-resizable" data-id="0">
                             <div className="dropdown f-grid-display-type">
                                 <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
@@ -42,25 +71,49 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
                             </div>
                         </th>
                     );
+                }
+
+                var columnSort = "";
+
+                if(that.props.sortColumn == col && that.props.sortAscending){
+                    columnSort = "sort-ascending"
+                }  else if (that.props.sortColumn == col && that.props.sortAscending == false){
+                    columnSort += "sort-descending"
+                }
+                var displayName = col;
+                var meta;
+                if (that.props.columnMetadata != null){
+                    meta = _.findWhere(that.props.columnMetadata, {name: col});
+                    //the weird code is just saying add the space if there's text in columnSort otherwise just set to metaclassname
+                    columnSort = meta == null ? columnSort : (columnSort && (columnSort + " ")||columnSort) + meta.cssClass;
+                    if (typeof meta !== "undefined" && typeof meta.label !== "undefined" && meta.label != null) {
+                        displayName = meta.label;
+                    }
+                }
+
+                if (typeof meta !== "undefined" && meta.name == 'btn_group') {
+                    return (
+                        <th data-title={col} className={columnSort}>
+                            {displayName}
+                            <div className="ui-resizable-handle ui-resizable-e" />
+                        </th>
+                    )
                 } else {
-                    header.push(
-                        <th className="js-draggable ui-resizable" data-id={columns[i]}>
-                            <a className="js-change-url">{columns[i]}</a>
-                            <div className="ui-resizable-handle ui-resizable-e"></div>
+                    return (
+                        <th /*onClick={that.sort} */ data-title={col} className={columnSort}>
+                            <a className="js-change-url"> {displayName} </a>
+                            <div className="ui-resizable-handle ui-resizable-e" />
                         </th>
                     );
                 }
-            }
-
-            var nodes = this.props.data.map(function (row, index) {
-                return <FComRow data={row} index={index} columns={columns} metadataColumns={that.props.metadataColumns} columnMetadata={that.props.columnMetadata} />
             });
 
-            return (
-                <table className={this.props.className}>
-                    <thead><tr>{header}</tr></thead>
+            return(
+                <thead>
+                    <tr>
                     {nodes}
-                </table>
+                    </tr>
+                </thead>
             );
         }
     });
