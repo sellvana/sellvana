@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'react', 'jquery', 'jsx!griddle', 'backbone', 'bootstrap', 'jsx!fcom.components'],
-function (_, React, $, Griddle, Backbone, Components) {
+define(['underscore', 'react', 'jquery', 'jsx!griddle.fcomGridBody', 'jsx!griddle', 'backbone', 'bootstrap', 'jsx!fcom.components'],
+function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
 
     /**
      *
@@ -13,6 +13,7 @@ function (_, React, $, Griddle, Backbone, Components) {
         var page_size_options = config.page_size_options;
         var totalResults = config.data.state.c;
         var defaultColumns;
+        var tableClassName = 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable';
 
         var FComGriddleComponent = React.createClass({
             getDefaultProps: function () {
@@ -23,12 +24,12 @@ function (_, React, $, Griddle, Backbone, Components) {
             render: function () {
                 defaultColumns = _.pluck(config.columns, 'name');
 
-                var content = <Griddle showTableHeading={false} useCustomGrid={true} columns={defaultColumns}
-                tableClassName="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable"
-                getExternalResults={FComDataMethod} resultsPerPage={this.props.resultsPerPage}
-                useCustomPager="true" customPager={FComPager}
-                showSettings={true} useCustomSettings={true} customSettings={FComSettings}
-                showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
+                var content = <Griddle showTableHeading={false} columns={defaultColumns} tableClassName={tableClassName}
+                    useCustomGrid={true} customGrid={FComGridBody}
+                    getExternalResults={FComDataMethod} resultsPerPage={this.props.resultsPerPage}
+                    useCustomPager="true" customPager={FComPager}
+                    showSettings={true} useCustomSettings={true} customSettings={FComSettings}
+                    //showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
                 />;
 
                 return (
@@ -59,6 +60,8 @@ function (_, React, $, Griddle, Backbone, Components) {
                         totalResults: response[0].c
                     };
 
+                    console.log('callback', callback);
+
                     callback(data);
                 },
                 error: function (xhr, status, err) {
@@ -68,7 +71,7 @@ function (_, React, $, Griddle, Backbone, Components) {
         };
 
         /**
-         *
+         * FCom Pager component
          */
         var FComPager = React.createClass({
             getDefaultProps: function () {
@@ -387,7 +390,6 @@ function (_, React, $, Griddle, Backbone, Components) {
                 );
             }
         });
-
 
         var FComSettings = React.createClass({
             getDefaultProps: function() {
