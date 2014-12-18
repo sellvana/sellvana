@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Model_Trait_Address
+ *
+ * @property BLayout $BLayout
+ * @property BLocale $BLocale
+ * @property BValidate $BValidate
+ */
 trait FCom_Sales_Model_Trait_Address
 {
     public function addressValidationRules($type, $country = null)
@@ -32,18 +39,7 @@ trait FCom_Sales_Model_Trait_Address
 
     public function addressAsHtml($atype)
     {
-        $countries = $this->BLocale->getAvailableCountries();
-        $country = $this->get($atype . '_country');
-        $html = '<div class="adr">'
-            . '<div class="street-address">' . $this->get($atype . '_street1') . '</div>'
-            . ($this->get($atype . '_street2') ? '<div class="extended-address">' . $this->get($atype . '_street2') . '</div>' : '')
-            //. (!empty($streetArr[2]) ? '<div class="extended-address">' .$this->get($atype . '_street3') . '</div>' : '')
-            . '<span class="locality">' . $this->get($atype . '_city') . '</span>, '
-            . '<span class="region">' . $this->get($atype . '_region') . '</span> '
-            . '<span class="postal-code">' . $this->get($atype . '_postcode') . '</span>'
-            . '<div class="country-name">' . (!empty($countries[$country]) ? $countries[$country] : $country) . '</div>'
-            . '</div>';
-        return $html;
+        return $this->BLayout->view('sales/address-card')->set(['model' => $this, 'atype' => $atype])->render();
     }
 
     public function addressAsArray($atype)

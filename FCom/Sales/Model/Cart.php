@@ -603,6 +603,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->set('shipping_method', $method)->set('shipping_service', $service);
         return $this;
     }
+
     /**
      * @return null|FCom_Sales_Method_Payment_Interface
      */

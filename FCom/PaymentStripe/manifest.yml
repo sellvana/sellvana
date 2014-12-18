@@ -10,10 +10,7 @@ modules:
 
             FCom_Frontend:
                 auto_use: [ layout, views ]
-                routing:
-                    - [ /stripe, FCom_PaymentStripe_Frontend_Controller ]
 
         default_config:
             api_url: "https://api.stripe.com"
             test: true
-            test_secret_key:

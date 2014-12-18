@@ -3263,6 +3263,15 @@ class BModel extends Model
         return $options;
     }
 
+    public function getFieldOptionLabel($field)
+    {
+        $value = $this->get($field);
+        if (!$value || empty(static::$_fieldOptions[$field][$value])) {
+            return null;
+        }
+        return static::$_fieldOptions[$field][$value];
+    }
+
     /**
      * @param $labelField
      * @param string $idField
