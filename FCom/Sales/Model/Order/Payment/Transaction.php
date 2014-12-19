@@ -62,6 +62,10 @@ class FCom_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abstrac
         return $this;
     }
 
+    /**
+     * @return $this
+     * @throws BException
+     */
     public function start()
     {
         $payment = $this->payment();

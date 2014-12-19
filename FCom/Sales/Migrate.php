@@ -619,9 +619,11 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_1_7__0_1_8()
     {
         $tOrder = $this->FCom_Sales_Model_Order->table();
-        $this->BDb->run("
-            ALTER TABLE {$tOrder} ADD `status_id` int(11) not null default 0
-        ");
+        $this->BDb->ddlTableDef($tOrder, [
+            BDb::COLUMNS => [
+                'status_id' => 'int(11) not null default 0',
+            ],
+        ]);
     }
 
     public function upgrade__0_1_8__0_1_9()

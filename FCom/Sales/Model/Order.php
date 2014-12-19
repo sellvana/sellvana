@@ -421,6 +421,30 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this->get('amount_due') > 0;
     }
 
+    /**
+     * @return null|FCom_Sales_Method_Shipping_Interface
+     */
+    public function getShippingMethod()
+    {
+        if (!$this->get('shipping_method')) {
+            return null;
+        }
+        $methods = $this->FCom_Sales_Main->getShippingMethods();
+        return $methods[$this->get('shipping_method')];
+    }
+
+    /**
+     * @return null|FCom_Sales_Method_Payment_Interface
+     */
+    public function getPaymentMethod()
+    {
+        if (!$this->get('payment_method')) {
+            return null;
+        }
+        $methods = $this->FCom_Sales_Main->getPaymentMethods();
+        return $methods[$this->get('payment_method')];
+    }
+
     public function __destruct()
     {
         unset($this->_cart, $this->_addresses);
