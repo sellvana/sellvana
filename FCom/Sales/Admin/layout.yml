@@ -31,4 +31,4 @@ base:
 /orderstatecustom:
     - { include: base }
     - { hook: main, views: order/orderstatecustom-form/state_custom }
-    - { view: admin/nav, do: [[ setNav, sales/orderstatecustom ]] }
+    - { view: admin/nav, do: [[ setNav, sales/orderstatecustom]] }

@@ -8,7 +8,7 @@
 abstract class FCom_Sales_Model_StateCustom_ConcreteAbstract extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected static $_entityType;
-    
+
     public function getAllValueLabels()
     {
         if (!$this->_valueLabels) {
