@@ -433,7 +433,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control"/></div>
-                    <div className="col-md-5"><Components.Button type="button" className="btn-primary"
+                    <div className="col-md-4"><Components.Button type="button" className="btn-primary"
                        ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button></div>
                 </ConditionsRow>
             );
@@ -764,7 +764,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume"
                             readOnly="readonly" value={this.state.value} className="form-control"/></div>
-                    <div className="col-md-5"> <Components.Button type="button" className="btn-primary pull-left" ref={this.props.configureId}
+                    <div className="col-md-4"> <Components.Button type="button" className="btn-primary pull-left" ref={this.props.configureId}
                         onClick={this.handleConfigure}>Configure</Components.Button></div>
                 </ConditionsRow>
             );
@@ -806,7 +806,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     var ConditionsShippingModalContent = React.createClass({
         render: function () {
-            var fieldUrl = this.props.baseUrl + this.props.urlField;
+            var fieldUrl = this.props.baseUrl + this.props.url;
             var paramObj = {};
             paramObj[this.props.idVar] = this.props.entityId;
             return (
@@ -923,10 +923,17 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 placeholder: self.props.fcLabel,
                 maximumSelectionSize: 4,
                 multiple: true,
+                selectOnBlur: true,
                 closeOnSelect: false,
                 query: self.select2query,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
+                createSearchChoice: function (term) {
+                    return {id: term, text: term}
+                },
+                createSearchChoicePosition: function (list, item) {
+                    list.unshift(item);
+                },
                 formatResult: function (item) {
                     var markup = '<div class="row-fluid" title="' + item.text + '">' +
                         '<div class="span2">ID: <em>' + item.id + '</em></div>' +
@@ -1237,6 +1244,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             params.o = params.limit || 100;
 
             params.searchedTerms = params.searchedTerms || {};
+            if(params.searchedTerms['*'] && params.searchedTerms['*'].loaded == 2) {
+                // if default search already returned all results, no need to go back to server
+                params.searchedTerms[params.term] = params.searchedTerms['*'];
+            }
             var termStatus = params.searchedTerms[params.term];
             if (termStatus == undefined || (termStatus.loaded == 1 && termStatus.page < params.page)) { // if this is first load, or there are more pages and we're looking for next page
                 if (termStatus == undefined) {

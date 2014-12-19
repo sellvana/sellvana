@@ -193,11 +193,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
             return;
         }
 
-        $r         = $this->BRequest;
-        $page      = $r->get('page')?: 1;
-        $fieldCode = explode('.', $r->get('field'), 2);
-        $limit     = $r->get('o')?: 30;
-        $offset    = ($page - 1) * $limit;
+        $fieldCode = explode('.', $this->BRequest->get('field'), 2);
 
         $field = $this->FCom_CustomField_Model_Field->load($fieldCode[1], 'field_code');
 
@@ -207,7 +203,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
             $options = [];
         }
 
-        $result = ['more' => false, 'items' => []];
+        $result = ['items' => []];
 
         foreach ($options as $id => $label) {
             $result['items'][] = [
@@ -215,6 +211,37 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
                 'text' => $label
             ];
         }
+
+        $result['total_count'] = count($result['items']);
+        $this->BResponse->json($result);
+    }
+
+    public function action_shipping()
+    {
+        $field = $this->BRequest->get('field');
+        switch ($field) {
+            case 'methods':
+                // todo
+                break;
+            case 'country':
+                // todo
+                break;
+            case 'state':
+                // todo
+                break;
+            case 'city':
+                // todo
+                break;
+            default :
+                // todo
+                break;
+        }
+        $result = [
+            'total_count' => 1,
+            'items'       => [
+                '_' => 'Not implemented yet!'
+            ]
+        ];
         $this->BResponse->json($result);
     }
 
