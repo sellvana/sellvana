@@ -603,6 +603,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->set('shipping_method', $method)->set('shipping_service', $service);
         return $this;
     }
+
     /**
      * @return null|FCom_Sales_Method_Payment_Interface
      */
@@ -620,7 +621,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      *
      * Check if provided code is valid payment method and apply it
      * @throws BException
-     * @param string $paymentMethod
+     * @param string $method
      * @return $this
      */
     public function setPaymentMethod($method)
@@ -637,12 +638,20 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function setPaymentDetails($data = [])
     {
-        if (!empty($data)) {
-            $paymentMethod = $this->getPaymentMethod();
-            if ($paymentMethod) {
-                $paymentMethod->setDetails($data);
-                $this->payment_details = $this->BUtil->toJson($paymentMethod->getPublicData());
-            }
+        if (empty($data)) {
+            return $this;
+        }
+        $paymentMethod = $this->getPaymentMethod();
+        if (!$paymentMethod) {
+            return $this;
+        }
+        $prefix = $paymentMethod->getCheckoutFormPrefix();
+        if (!empty($data[$prefix])) {
+            $paymentMethod->setPaymentFormData($data[$prefix]);
+        }
+        $data = $paymentMethod->getDataToSave();
+        if ($data && is_array($data)) {
+            $this->setData('payment_details', [$prefix => $data]);
         }
         return $this;
     }

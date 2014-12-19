@@ -79,6 +79,23 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $client;
     }
 
+    public function updateSessionId($fromSessionId, $toSessionId)
+    {
+        if (!empty(static::$_clientCache[$fromSessionId])) {
+            $client = static::$_clientCache[$fromSessionId];
+        } else {
+            $client = $this->load($fromSessionId, 'session_id');
+            if (!$client) {
+                return $this;
+            }
+        }
+        unset(static::$_clientCache[$fromSessionId]);
+        $client->set('session_id', $toSessionId)->save();
+        static::$_clientCache[$toSessionId] = $client;
+        static::$_clientCache[$client->id()] = $client;
+        return $this;
+    }
+
     /**
      * Get client by id or session_id
      * @param $clientId

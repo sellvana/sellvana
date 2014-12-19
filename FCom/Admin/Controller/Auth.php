@@ -18,14 +18,13 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         try {
             $r = $this->BRequest->post('login');
             if (empty($r['username']) || empty($r['password'])) {
-                $this->message('Username and password cannot be blank.', 'error');
+                throw new Exception($this->_('Username and password cannot be blank.'));
             }
 
             $user = $this->FCom_Admin_Model_User->authenticate($r['username'], $r['password']);
             if (!$user) {
-                $this->message('Invalid user name or password.', 'error');
+                throw new Exception($this->_('Invalid user name or password.'));
             }
-
             $user->login();
             if (!empty($r['remember_me'])) {
                 $days = $this->BConfig->get('cookie/remember_days');

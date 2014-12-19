@@ -38,7 +38,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         $chat = $this->FCom_AdminChat_Model_Chat->openWithUser($user);
         $participant = $this->FCom_AdminChat_Model_Participant->loadWhere([
             'chat_id' => $chat->id(),
-            'user_id' => $this->FCom_Admin_Model_User->sessionUserId(),
+            'NOT' => ['user_id' => $this->FCom_Admin_Model_User->sessionUserId()],
         ]);
         if ($participant->get('status') !== 'open') {
             $participant->set('status', 'open')->save();

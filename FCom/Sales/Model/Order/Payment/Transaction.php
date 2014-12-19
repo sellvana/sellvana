@@ -44,6 +44,10 @@ class FCom_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abstrac
 
     protected $_payment;
 
+    /**
+     * @return FCom_Sales_Model_Order_Payment
+     * @throws BException
+     */
     public function payment()
     {
         if (!$this->_payment) {
@@ -52,12 +56,16 @@ class FCom_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abstrac
         return $this->_payment;
     }
 
-    public function setPayment($payment)
+    public function setPayment(FCom_Sales_Model_Order_Payment $payment)
     {
         $this->_payment = $payment;
         return $this;
     }
 
+    /**
+     * @return $this
+     * @throws BException
+     */
     public function start()
     {
         $payment = $this->payment();

@@ -10,6 +10,7 @@
  * @property float $total
  * @property string $product_info
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
  * @property FCom_Sales_Model_Order_Item_State $FCom_Sales_Model_Order_Item_State
  */
@@ -22,6 +23,8 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     protected $_state;
 
+    protected $_product;
+
     /**
      * @return FCom_Sales_Model_Order_Item_State
      */
@@ -31,6 +34,14 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
             $this->_state = $this->FCom_Sales_Model_Order_Item_State->factory($this);
         }
         return $this->_state;
+    }
+
+    public function product()
+    {
+        if (!$this->_product) {
+            $this->_product = $this->FCom_Catalog_Model_Product->load($this->get('product_id'));
+        }
+        return $this->_product;
     }
 
     /**
@@ -51,6 +62,6 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
-        unset($this->_state, $this->_order);
+        unset($this->_state, $this->_order, $this->_product);
     }
 }

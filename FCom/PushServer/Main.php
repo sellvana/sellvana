@@ -69,6 +69,11 @@ FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
         //TODO: implement roster (online/offline) notifications
     }
 
+    public function onRegenerateSessionId($args)
+    {
+        $this->FCom_PushServer_Model_Client->updateSessionId($args['old_session_id'], $args['session_id']);
+    }
+
     /**
      * @param $channel
      * @param $callback
