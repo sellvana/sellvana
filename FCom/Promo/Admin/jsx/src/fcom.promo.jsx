@@ -422,7 +422,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 },
                 query: self.select2query
             });
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         }
     });
 
@@ -552,16 +552,17 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         render: function () {
             var inputType = this.props.input;
             var opts = this.props.opts;
-            var input = <input className="form-control required" type="text" id="fieldCombination" ref="fieldCombination"/>;
+            var fieldId = "fieldCombination." + this.props.id;
+            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId}/>;
             if(inputType == 'text') {
                 opts = opts.concat(this.props.opts_text);
             } else if(this.props.numeric_inputs.indexOf(inputType) != -1) {
                 opts = opts.concat(this.props.opts_numeric);
                 if (inputType == 'number') {
                     if(this.state.range === false) {
-                        input = <input className="form-control required" type="number" step="any" id="fieldCombination" ref="fieldCombination" style={{width: "auto"}}/>;
+                        input = <input className="form-control required" type="number" step="any" id={fieldId} ref={fieldId} style={{width: "auto"}}/>;
                     } else {
-                        input = <div id="fieldCombination" ref="fieldCombination" className="input-group">
+                        input = <div id={fieldId} ref={fieldId} className="input-group">
                             <input className="form-control required" type="number" step="any" placeholder="Min" style={{width: "50%"}}/>
                             <input className="form-control required" type="number" step="any" placeholder="Max" style={{width: "50%"}}/>
                         </div>;
@@ -573,19 +574,18 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     }
                     input = <div className="input-group">
                             <span className="input-group-addon"><i className="glyphicon glyphicon-calendar"></i></span>
-                            <input className="form-control required" type="text" id="fieldCombination" ref="fieldCombination" dataMode={singleMode} />
+                            <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} />
                         </div>
                 }
-
             } else if(inputType == 'select'){
-                input = <input className="form-control required" type="hidden" id="fieldCombination" ref="fieldCombination"/>;
+                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}/>;
             } else if(this.props.bool_inputs.indexOf(inputType) != -1) {
-                input = <Components.YesNo  id="fieldCombination" ref="fieldCombination" />;
+                input = <Components.YesNo  id={fieldId} ref={fieldId} />;
             }
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <ConditionsCompare opts={ opts } id="fieldCompare" ref="fieldCompare" onChange={this.onCompareChange}/>
+                        <ConditionsCompare opts={ opts } id={"fieldCompare." + this.props.id} ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{input}</div>
                 </ConditionsRow>
@@ -637,7 +637,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 default :
                     break;
             }
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         },
         componentDidUpdate: function () {
             this.componentDidMount();
@@ -654,7 +654,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         initDateInput: function () {
             var startDate = new Date();
             var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
-            var fieldCombination = this.refs.fieldCombination;
+            var fieldCombination = this.refs["fieldCombination." + this.props.id];
             var $input = $(fieldCombination.getDOMNode());
             var mode = fieldCombination.props.dataMode;
             var parent = $input.closest('.modal');
@@ -669,7 +669,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         },
         url:'',
         initSelectInput: function () {
-            var fieldCombination = this.refs.fieldCombination;
+            var fieldCombination = this.refs["fieldCombination." + this.props.id];
             var self = this;
             this.url = this.props.url;
             $(fieldCombination.getDOMNode()).select2({
@@ -847,9 +847,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             }
             var fields = this.state.fields;
             for(var i in fields) {
-                var f = fields[i];
-                if(f.field == fieldValue.id) {
-                    return;
+                if (fields.hasOwnProperty(i)) {
+                    var f = fields[i];
+                    if(f.field == fieldValue.id) {
+                        return;
+                    }
                 }
             }
             var field = {label: fieldValue.text, field: fieldValue.id};
@@ -873,27 +875,32 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     {label: Locale._("Method"), field: 'methods'},
                     {label: Locale._("Country"), field: 'country'},
                     {label: Locale._("State/Province"), field: 'state'},
-                    {label: Locale._("City"), field: 'city'}
+                    {label: Locale._("ZIP Code"), field: 'zipcode'}
                 ],
                 labelCombinationField: Locale._("Add a Field to Condition..."),
                 url: "conditions/shipping"
             };
         },
         componentDidMount: function () {
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         }
     });
 
     var ConditionsShippingModalField = React.createClass({
         mixins:[select2QueryMixin],
         render: function () {
+            var fieldId = "fieldCombination." + this.props.id;
+            var input = <input className="form-control" type="hidden" id={fieldId} key={fieldId} ref={fieldId}/>;
+            var helperBlock = '';
+            if(this.props.id == 'zipcode') {
+                helperBlock = <span key={fieldId + '.help'} className="help-block">{this.props.zipHelperText }</span>;
+            }
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
                         <ConditionsCompare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
                     </div>
-                    <div className="col-md-5"><input className="form-control" type="hidden" id="fieldCombination"
-                         ref="fieldCombination"/></div>
+                    <div className="col-md-5">{[input, helperBlock]}</div>
                 </ConditionsRow>
             );
         },
@@ -907,45 +914,44 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 label: Locale._("Unknown"),
                 url: "",
                 fcLabel: "",
+                zipHelperText: "Use .. (e.g. 90000..99999) to add range of zip codes",
                 opts: [
                     {id:"in", label: "is one of"},
-                    {id:"not_in", label: "is not one of"},
+                    {id:"not_in", label: "is not one of"}
                 ]
             };
         },
         url:'',
         componentDidMount: function () {
-            var fieldCombination = this.refs.fieldCombination;
+            var fieldCombination = this.refs['fieldCombination.' + this.props.id];
             var self = this;
             this.url = this.props.url;
-            console.log("About to select2");
-            $(fieldCombination.getDOMNode()).select2({
-                placeholder: self.props.fcLabel,
-                maximumSelectionSize: 4,
-                multiple: true,
-                selectOnBlur: true,
-                closeOnSelect: false,
-                query: self.select2query,
-                dropdownCssClass: "bigdrop",
-                dropdownAutoWidth: true,
-                createSearchChoice: function (term) {
-                    return {id: term, text: term}
-                },
-                createSearchChoicePosition: function (list, item) {
-                    list.unshift(item);
-                },
-                formatResult: function (item) {
-                    var markup = '<div class="row-fluid" title="' + item.text + '">' +
-                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
-                        '<div class="span2">Name: <strong>' + item.text.substr(0, 20);
-                    if (item.text.length > 20) {
-                        markup += '...';
+            if (this.props.id != 'zipcode') {
+                $(fieldCombination.getDOMNode()).select2({
+                    placeholder: self.props.fcLabel,
+                    maximumSelectionSize: 4,
+                    multiple: true,
+                    selectOnBlur: true,
+                    closeOnSelect: false,
+                    query: self.select2query,
+                    dropdownCssClass: "bigdrop",
+                    dropdownAutoWidth: true,
+                    createSearchChoice: function (term) {
+                        return {id: term, text: term}
+                    },
+                    createSearchChoicePosition: function (list, item) {
+                        list.unshift(item);
+                    },
+                    formatSelection: function (item) {
+                        return item.id;
                     }
-                    markup += '</strong></div></div>';
-
-                    return markup;
-                }
-            });
+                });
+            } else {
+                $(fieldCombination.getDOMNode()).select2({
+                    tags: [],
+                    tokenSeparators: [',']
+                });
+            }
         }
     });
 
@@ -996,7 +1002,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
             $('#' + this.props.newCondition).on('click', this.addCondition);
 
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         },
         addCondition: function () {
             // add condition data to state
