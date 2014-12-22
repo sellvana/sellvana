@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 'select2', 'bootstrap','moment', 'daterangepicker',], function (React, $, Griddle, Components, Locale) {
+define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo.actions','fcom.locale', 'select2', 'bootstrap','moment', 'daterangepicker'], function (React, $, Griddle, Components, Actions, Locale) {
     var labelClass = "col-md-3";
     var SingleCoupon = React.createClass({
         render: function () {
@@ -1044,6 +1044,16 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             var $modalContainer = $('<div/>').appendTo(document.body);
             this.initCouponApp(this.options.coupon_select_id, $modalContainer);
             this.initConditionsApp(this.options.condition_select_id, $modalContainer);
+            this.initActionsApp(this.options.actions_select_id, $modalContainer);
+        },
+        initActionsApp: function (selector, $modalContainer) {
+            var $actionsSelector = $('#' + selector);
+            if ($actionsSelector.length == 0) {
+                Promo.log("Actions drop-down not found");
+                return;
+            }
+            var $container = $("#" + this.options.actions_container_id);
+            React.render(<Actions />, $container.get(0));
         },
         initConditionsApp: function (selector, $modalContainer) {
             var $conditionSelector = $('#' + selector);
