@@ -554,11 +554,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function setDefaultAddress($address, $atype = null)
     {
         $addrHlp = $this->FCom_Customer_Model_Address;
-        if (is_object($address)) {
-            $addressId = $address->id();
-        } elseif (is_numeric($address)) {
-            $addressId = $address;
-            $address = $addrHlp->load($addressId);
+        if (is_numeric($address)) {
+            $address = $addrHlp->load($address);
         }
         /** @var FCom_Customer_Model_Address $address */
         if ($atype === 'billing' || $atype === true) {
@@ -568,16 +565,16 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $address->set('is_default_shipping', 1);
         }
         $resetUpdate = [];
-        if ($address->is_default_billing) {
+        if ($address->get('is_default_billing')) {
             $resetUpdate['is_default_billing'] = 0;
-            $this->set('default_billing_id', $addressId);
+            $this->set('default_billing_id', $address->id());
         }
-        if ($address->is_default_shipping) {
+        if ($address->get('is_default_shipping')) {
             $resetUpdate['is_default_shipping'] = 0;
-            $this->set('default_shipping_id', $addressId);
+            $this->set('default_shipping_id', $address->id());
         }
         if ($resetUpdate) {
-            $addrHlp->update_many($resetUpdate, ['customer_id' => $this->id(), 'NOT' => ['id' => $addressId]]);
+            $addrHlp->update_many($resetUpdate, ['customer_id' => $this->id(), 'NOT' => ['id' => $address->id()]]);
         }
         $this->save();
         $address->save();
@@ -585,11 +582,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function addAddress($data)
+    public function addAddress($data, $atype = null)
     {
         $data['customer_id'] = $this->id();
-        $address = $this->FCom_Customer_Model_Address->create($data);
-        $this->setDefaultAddress($address);
+        $address = $this->FCom_Customer_Model_Address->create($data)->save();
+        $this->setDefaultAddress($address, $atype);
         return $address;
     }
 

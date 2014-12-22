@@ -1,0 +1,17 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module: 'FCom_PaymentStripe' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{{ forms.accordion_start({id:'settings-FCom_PaymentStripe'}) }}
+     {{ forms.accordion_panel_start({label:'Stripe Settings'|_, id:'settings-FCom_PaymentStripe-group0', in:1}) }}
+        {{ forms.boolean(fieldData, {field:'active', label:'Enabled'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'test', label:'Test Mode'|_ }) }}
+        {{ forms.input(fieldData, {field:'title', label:'Display Title'|_ }) }}
+        {{ forms.input(fieldData, {field:'test_secret_key', label:'Test Secret Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'test_public_key', label:'Test Publishable Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'live_secret_key', label:'Live Secret Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'live_public_key', label:'Live Publishable Key'|_ }) }}
+        {{ forms.select(fieldData, {field:'order_status', label:'New Order Status'|_, options: {'':'Select One', 'processing':'Processing'} }) }}
+        {{ forms.input(fieldData, {field:'recent_day', label:'Orders Recent Days'|_, attr: 'data-rule-number="true"' }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+
