@@ -1271,7 +1271,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return false;
                 },
                 subButtonClicked: function (ev) {
-                    this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+                    console.log('this.$el', this.$el);
+                    $(ev.target).parents('div.dropdown:first').toggleClass('open');
+                    //this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
 
                     return false;
                 }
