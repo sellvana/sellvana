@@ -20,6 +20,7 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
         },
         componentWillMount: function () {
             this.initColumn();
+
             //todo: need change way to get right info
             dataUrl = this.props.config.data_url;
             gridId = this.props.config.id;
@@ -35,7 +36,7 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
             var show = _.difference(all, hide);
 
             this.props.columns = {all: all, show: show, hide: hide};
-            console.log('this.props.columns', this.props.columns);
+            //console.log('this.props.columns', this.props.columns);
             this.props.columnMetadata = columnsConfig;
         },
         getColumn: function (type) {
@@ -52,7 +53,7 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
             }
         },
         render: function () {
-            console.log('config', this.props.config);
+            //console.log('config', this.props.config);
 
             return (
                 <Griddle showTableHeading={false} tableClassName={this.props.tableClassName}
@@ -93,7 +94,7 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
                 callback(data);
             },
             error: function (xhr, status, err) {
-                console.error(this.props.url, status, err.toString());
+                //console.error(this.props.url, status, err.toString());
             }
         });
     };
@@ -132,14 +133,12 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
         },
         setPageSize: function (event) {
             event.preventDefault();
+
             var value = parseInt(event.target.getAttribute("data-value"));
+            pageSize = parseInt(value);
 
-            document.getElementById(gridId).innerHTML = '';
-            config.state.ps = value;
-
-            React.render(
-                <FComGriddleComponent resultsPerPage={pageSize} />, document.getElementById(gridId)
-            );
+            this.props.setPageSize(parseInt(value));
+            this.props.setPage(1);
         },
         render: function () {
             var first = "";
@@ -437,7 +436,7 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
             this.props.changeFilter(event.target.value);
         },
         getFieldName: function(field) {
-            console.log('columns', this.props.getConfig('columns'));
+            //console.log('columns', this.props.getConfig('columns'));
             var row = _.findWhere(this.props.getConfig('columns'), {name: field});
             return row ? row.label : field;
         },
@@ -446,7 +445,7 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
             var id = this.props.getConfig('id');
             var filters = this.state.filters;
 
-            console.log(filters);
+            //console.log(filters);
 
             //quick search
             var quickSearchId = id + '-quick-search';
