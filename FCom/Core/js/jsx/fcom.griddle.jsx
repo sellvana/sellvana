@@ -12,7 +12,9 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
     var FComGriddleComponent = React.createClass({
         getDefaultProps: function () {
             return {
-                "config": {},
+                "config": {
+                    page_size_options: 10
+                },
                 "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable'
             }
         },
@@ -50,17 +52,18 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
             }
         },
         render: function () {
-            var content = <Griddle showTableHeading={false} tableClassName={this.props.tableClassName}
-                columns={this.getColumn('show')} columnMetadata={this.props.columnMetadata}
-                useCustomGrid={true} customGrid={FComGridBody}
-                getExternalResults={FComDataMethod} resultsPerPage={pageSize}
-                useCustomPager="true" customPager={FComPager}
-                showSettings={true} useCustomSettings={true} customSettings={FComSettings}
-                //showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
-            />;
+            console.log('config', this.props.config);
 
             return (
-                <div>{content}</div>
+                <Griddle showTableHeading={false} tableClassName={this.props.tableClassName}
+                    config={this.props.config}
+                    columns={this.getColumn('show')} columnMetadata={this.props.columnMetadata}
+                    useCustomGrid={true} customGrid={FComGridBody}
+                    getExternalResults={FComDataMethod} resultsPerPage={pageSize}
+                    useCustomPager="true" customPager={FComPager}
+                    showSettings={true} useCustomSettings={true} customSettings={FComSettings}
+                    showFilter={true} useCustomFilter="true" customFilter={FComFilterNew} filterPlaceholderText={"Quick Search"}
+                />
             );
         }
     });
@@ -180,21 +183,19 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
                 </li>);
             }
 
+            var style = { margin: "0" };
             return (
-
-                <div className="col-sm-12 text-right">
+                <div className="col-sm-6 text-right pagination" style={style}>
                     <span className="f-grid-pagination">{this.props.totalResults} record(s)</span>
-
                     <ul className="pagination pagination-sm pagination-griddle pagesize">
-                            {pageSizeHtml}
+                        {pageSizeHtml}
                     </ul>
-
                     <ul className="pagination pagination-sm pagination-griddle page">
-                            {first}
-                            {previous}
-                            {options}
-                            {next}
-                            {last}
+                        {first}
+                        {previous}
+                        {options}
+                        {next}
+                        {last}
                     </ul>
                 </div>
             )
@@ -416,6 +417,136 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
         }
     });
 
+    var FComFilterNew = React.createClass({
+        getInitialState: function() {
+            var filters = this.props.getConfig('filters').map(function(f, index) {
+                f.checked = true;
+                f.show = true;
+                return f;
+            });
+            return {
+                filters: filters
+            }
+        },
+        getDefaultProps: function() {
+            return {
+                "placeholderText": "Quick Search"
+            }
+        },
+        handleChange: function(event) {
+            this.props.changeFilter(event.target.value);
+        },
+        getFieldName: function(field) {
+            console.log('columns', this.props.getConfig('columns'));
+            var row = _.findWhere(this.props.getConfig('columns'), {name: field});
+            return row ? row.label : field;
+        },
+        render: function() {
+            var that = this;
+            var id = this.props.getConfig('id');
+            var filters = this.state.filters;
+
+            console.log(filters);
+
+            //quick search
+            var quickSearchId = id + '-quick-search';
+            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder={this.props.placeholderText} id={quickSearchId} />;
+
+            var filterSettingNodes = filters.map(function(f, index) {
+                return (
+                    <li data-id="title" className="dd-item dd3-item">
+                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+                        <div className="dd3-content">
+                            <label>
+                                <input className="showhide_column" type="checkbox" datid="title" checked={f.checked ? 'checked' : ''} />
+                            {f.field}
+                            </label>
+                        </div>
+                    </li>
+                );
+            });
+
+            var filterSettings = (
+                <span className="FCom_CustomerGroups_Admin_Controller_CustomerGroups dropdown">
+                    <a data-toggle="dropdown" className="btn dropdown-toggle showhide_columns">
+                        Filters
+                    </a>
+                    <ul className="FCom_CustomerGroups_Admin_Controller_CustomerGroups dd-list dropdown-menu filters ui-sortable">
+                        {filterSettingNodes}
+                    </ul>
+                </span>
+            );
+
+            var operators = <ul className="dropdown-menu filter-sub">
+                <li>
+                    <a className="filter_op" data-id="contains" href="#">contains</a>
+                </li>
+                <li>
+                    <a className="filter_op" data-id="not" href="#">does not contain</a>
+                </li>
+                <li>
+                    <a className="filter_op" data-id="equal" href="#">is equal to</a>
+                </li>
+                <li>
+                    <a className="filter_op" data-id="start" href="#">start with</a>
+                </li>
+                <li>
+                    <a className="filter_op" data-id="end" href="#">end with</a>
+                </li>
+            </ul>;
+
+            var filterList = filters.map(function(f, index) {
+                return (
+                    <div className="btn-group dropdown f-grid-filter">
+                        <button className="btn dropdown-toggle filter-text-main" data-toggle="dropdown">
+                            <span className="f-grid-filter-field">{f.field}</span>:
+                            <span className="f-grid-filter-value"> All </span>
+                            <span className="caret"></span>
+                        </button>
+                        <ul className="dropdown-menu filter-box">
+                            <li>
+                                <div className="input-group">
+                                    <div className="input-group-btn dropdown">
+                                        <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
+                                            Contains
+                                            <span className="caret"></span>
+                                        </button>
+                                        {operators}
+                                    </div>
+                                    <input type="text" className="form-control" value="" />
+                                    <div className="input-group-btn">
+                                        <button type="button" className="btn btn-primary update">
+                                            Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <abbr className="select2-search-choice-close"></abbr>
+                    </div>
+                );
+            });
+
+            return (
+                <div>
+                    <div className="f-col-filters-selection pull-left">
+                        {quickSearch}
+                        {filterSettings}
+                    </div>
+                    <span className="FCom_CustomerGroups_Admin_Controller_CustomerGroups f-filter-btns">
+                        {filterList}
+                    </span>
+                </div>
+            );
+        }
+    });
+
+    var FComFilterOperations = React.createClass({
+        render: function() {
+            return (<div></div>);
+        }
+    });
+
     var FComSettings = React.createClass({
         getDefaultProps: function() {
             return {
@@ -456,14 +587,15 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
                     );
                 }
             }
+            var style = { display: 'inline' };
             return (
-                <div className="col-sm-12">
-                    <span className="dropdown dd dd-nestable columns-span">
+                <div className="col-sm-6">
+                    <span className="dropdown dd dd-nestable columns-span" style={style}>
                         <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">
                             Columns <b className="caret"></b>
                         </a>
                         <ol className="dd-list dropdown-menu columns ui-sortable">
-                                {options}
+                            {options}
                         </ol>
                     </span>
                     <a className="btn grid-mass-edit btn-success disabled" role="button" href="#" >Edit</a>
@@ -474,47 +606,4 @@ function (_, React, $, FComGridBody, Griddle, Backbone, Components) {
     });
 
     return FComGriddleComponent;
-
-    /**
-     *
-     * @param config
-     * @constructor
-     */
-    /*FCom.Griddle = function (config) {
-        console.log('config', config);
-        var page_size_options = config.page_size_options;
-        var totalResults = config.data.state.c;
-        var initColumns;
-        var tableClassName = 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable';
-
-        var FComGriddleComponent = React.createClass({
-            getDefaultProps: function () {
-                return {
-                    "resultsPerPage": config.state.ps
-                }
-            },
-            render: function () {
-                initColumns = _.pluck(config.columns, 'name');
-
-                var content = <Griddle showTableHeading={false} tableClassName={tableClassName}
-                    columns={initColumns} columnMetadata={config.columns}
-                    useCustomGrid={true} customGrid={FComGridBody}
-                    getExternalResults={FComDataMethod} resultsPerPage={this.props.resultsPerPage}
-                    useCustomPager="true" customPager={FComPager}
-                    showSettings={true} useCustomSettings={true} customSettings={FComSettings}
-                    //showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
-                />;
-
-                return (
-                    <div>{content}</div>
-                );
-            }
-        });
-
-
-
-        React.render(
-            <FComGriddleComponent resultsPerPage={config.state.ps} />, document.getElementById(config.id)
-        );
-    };*/
 });
