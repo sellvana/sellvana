@@ -5,10 +5,11 @@
  * User: pp
  * Date: 24.Nov14
  *
- * @property FCom_CustomField_Model_Field    $FCom_CustomField_Model_Field
- * @property FCom_Catalog_Model_Product      $FCom_Catalog_Model_Product
- * @property FCom_Catalog_Model_Category     $FCom_Catalog_Model_Category
- * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_CustomField_Model_Field       $FCom_CustomField_Model_Field
+ * @property FCom_Catalog_Model_Product         $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_Category        $FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_InventorySku    $FCom_Catalog_Model_InventorySku
+ * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
  */
 class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstract
 {
@@ -32,7 +33,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
 
         /** @var BORM $orm */
         $orm = $this->FCom_Catalog_Model_Product->orm('p')->select(['id', 'product_sku', 'product_name'], 'p');
-        if ($skuTerm) {
+        if ($skuTerm && $skuTerm != '*') {
             $orm->where(['OR' => [['product_sku LIKE ?', "%{$skuTerm}%"], ['product_name LIKE ?', "%{$skuTerm}%"]]]);
         }
 
@@ -75,7 +76,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
 
         /** @var BORM $orm */
         $orm = $this->FCom_Catalog_Model_Category->orm('c')->select(['id', 'full_name', 'node_name'], 'c');
-        if ($catTerm) {
+        if ($catTerm && $catTerm != '*') {
             $orm->where([['full_name LIKE ?', "%{$catTerm}%"]]);
         }
 
@@ -117,7 +118,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
 
         $orm = $this->FCom_CustomField_Model_Field->orm()->where('field_type', 'product');
 
-        if ($term) {
+        if ($term && $term != '*') {
             $orm->where(['OR' => [['field_code LIKE ?', "%{$term}%"], ['field_name LIKE ?', "%{$term}%"]]]);
         }
 
@@ -184,7 +185,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $this->BResponse->json($results);
     }
 
-    public function action_attribute_values()
+    public function action_attributes_field()
     {
         if (!$this->BRequest->xhr()) {
             $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
@@ -192,7 +193,56 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
             return;
         }
 
-        $r = $this->BRequest;
+        $fieldCode = explode('.', $this->BRequest->get('field'), 2);
+
+        $field = $this->FCom_CustomField_Model_Field->load($fieldCode[1], 'field_code');
+
+        if ($field) {
+            $options = $this->FCom_CustomField_Model_FieldOption->getListAssocbyId($field->id());
+        } else {
+            $options = [];
+        }
+
+        $result = ['items' => []];
+
+        foreach ($options as $id => $label) {
+            $result['items'][] = [
+                'id'   => $id,
+                'text' => $label
+            ];
+        }
+
+        $result['total_count'] = count($result['items']);
+        $this->BResponse->json($result);
+    }
+
+    public function action_shipping()
+    {
+        $field = $this->BRequest->get('field');
+        switch ($field) {
+            case 'methods':
+                // todo
+                break;
+            case 'country':
+                // todo
+                break;
+            case 'state':
+                // todo
+                break;
+            case 'city':
+                // todo
+                break;
+            default :
+                // todo
+                break;
+        }
+        $result = [
+            'total_count' => 1,
+            'items'       => [
+                '_' => 'Not implemented yet!'
+            ]
+        ];
+        $this->BResponse->json($result);
     }
 
     /**
@@ -268,8 +318,13 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
      */
     protected function searchTableFields($tableName, $term)
     {
-        $term = "%{$term}%";
-        $res = BORM::i()->raw_query("SHOW FIELDS FROM `{$tableName}` WHERE Field LIKE ?", [$term])->find_many_assoc('Field');
+        $sql = "SHOW FIELDS FROM `{$tableName}`";
+        if ($term != '*') {
+            $term = "%{$term}%";
+            $sql .= "WHERE Field LIKE ?";
+        }
+        $res = BORM::i()->raw_query($sql, [$term])->find_many_assoc('Field');
+
         return $res;
     }
 }
