@@ -167,7 +167,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         // integrate with Bootstrap or jQuery!
         componentDidMount: function () {
             // When the component is added, turn it into a modal
-            var modal =$(this.getDOMNode())
+            $(this.getDOMNode())
                 .modal({backdrop: 'static', keyboard: false, show: false});
             this.props.onLoad(this);
         },
