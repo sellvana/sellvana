@@ -39,12 +39,6 @@ class FCom_PayPal_PaymentMethod_ExpressCheckout extends FCom_Sales_Method_Paymen
 
     public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
-        $order = $payment->order();
-        $cart = $order->cart();
-
-        $paymentAction = $this->getConfig('payment_action');
-        $transType = ($paymentAction === 'Sale') ? 'capture' : ($paymentAction === 'Authorization' ? 'auth' : 'order');
-
         $result = $this->_callSetExpressCheckout($payment);
 
         if (!empty($result['error'])) {

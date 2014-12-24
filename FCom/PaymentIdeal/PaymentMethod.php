@@ -96,7 +96,7 @@ class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     public function getCheckoutFormView()
     {
         $banks = $this->getBanks();
-        return $this->BLayout->view('form')
+        return $this->BLayout->view('ideal/form')
                ->set('banks', $banks)
                ->set('key', 'ideal');
     }

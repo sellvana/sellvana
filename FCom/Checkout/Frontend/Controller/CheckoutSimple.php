@@ -12,6 +12,9 @@
 
 class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Controller_Abstract
 {
+    /**
+     * @var FCom_Sales_Model_Cart
+     */
     protected $_cart;
 
     public function beforeDispatch()
@@ -115,9 +118,17 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         if (!$this->FCom_Customer_Model_Customer->isLoggedIn()) {
             $this->FCom_Sales_Main->workflowAction('customerChoosesGuestCheckout', $args);
         }
+        if (!$this->_cart->hasCompleteAddress('billing')) {
+            $this->_cart->set('same_address', 1);
+        }
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingAddress', $args);
 
-        $args['cart']->calculateTotals()->saveAllDetails();
+        $this->_cart->calculateTotals()->saveAllDetails();
+
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+        if ($customer && !$customer->getDefaultShippingAddress()) {
+            $customer->addAddress($this->_cart->addressAsArray('shipping'), true);
+        }
 
         $this->BResponse->redirect('checkout');
     }
@@ -138,7 +149,7 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
         $this->FCom_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
 
-        $args['cart']->calculateTotals()->saveAllDetails();
+        $this->_cart->calculateTotals()->saveAllDetails();
 
         $this->FCom_Sales_Main->workflowAction('customerPlacesOrder', $args);
 
@@ -179,18 +190,8 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         $result = [];
         $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingAddress', $args);
-    }
 
-    public function action_xhr_shipping_method__POST()
-    {
-        if (!$this->BRequest->xhr()) {
-            $this->BResponse->redirect('checkout');
-            return;
-        }
-
-        $result = [];
-        $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
-        $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
+        $this->BResponse->json([]);
     }
 
     public function action_xhr_billing_address__POST()
@@ -203,5 +204,34 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         $result = [];
         $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
         $this->FCom_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
+
+        $this->BResponse->json([]);
+    }
+    public function action_xhr_shipping_method__POST()
+    {
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->redirect('checkout');
+            return;
+        }
+
+        $result = [];
+        $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
+        $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
+
+        $this->BResponse->json([]);
+    }
+
+    public function action_xhr_payment_method__POST()
+    {
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->redirect('checkout');
+            return;
+        }
+
+        $result = [];
+        $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
+        $this->FCom_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
+
+        $this->BResponse->json($result);
     }
 }

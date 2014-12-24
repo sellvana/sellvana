@@ -987,13 +987,15 @@ class BUtil extends BClass
      */
     static protected $_lastRemoteHttpInfo;
     /**
-    * Send simple POST request to external server and retrieve response
-    *
-    * @param string $method
-    * @param string $url
-    * @param array $data
-    * @return string
-    */
+     * Send simple POST request to external server and retrieve response
+     *
+     * @param string $method
+     * @param string $url
+     * @param array $data
+     * @param array $headers
+     * @param array $options
+     * @return string
+     */
     public function remoteHttp($method, $url, $data = [], $headers = [], $options = [])
     {
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
@@ -1028,7 +1030,6 @@ class BUtil extends BClass
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
-                CURLOPT_HTTPHEADER, ['Expect:'], //Fixes the HTTP/1.1 417 Expectation Failed
                 CURLOPT_HEADER => true,
             ];
             if (!ini_get('safe_mode') && !ini_get('open_basedir')) {
@@ -1057,15 +1058,30 @@ class BUtil extends BClass
                 ];
             }
 
-            if (!empty($headers)) {
-                $curlOpt += [
-                    CURLOPT_HTTPHEADER => array_values($headers),
-                ];
+            $found = false;
+            foreach ($headers as $h) {
+                if (stripos($h, 'expect:') === 0) {
+                    $found = true;
+                    break;
+                }
             }
+            if (!$found) {
+                $headers += ['Expect:']; //Fixes the HTTP/1.1 417 Expectation Failed
+            }
+            $curlOpt += [
+                CURLOPT_HTTPHEADER => array_values($headers),
+            ];
+
             if (!empty($options['proxy'])) {
                 $curlOpt += [
                     CURLOPT_PROXY => $options['proxy'],
                     CURLOPT_PROXYTYPE => !empty($options['proxytype']) ? $options['proxytype'] : CURLPROXY_HTTP,
+                ];
+            }
+
+            if (!empty($options['auth'])) {
+                $curlOpt += [
+                    CURLOPT_USERPWD => $options['auth'],
                 ];
             }
             $ch = curl_init();
@@ -1130,6 +1146,11 @@ class BUtil extends BClass
                 }
                 $streamOptions['http']['header'] .= "Content-Type: {$contentType}\r\n";
                     //."Content-Length: ".strlen($request)."\r\n";
+
+                if (!empty($options['auth'])) {
+                    $streamOptions['http']['header'] .= sprintf("Authorization: Basic %s", base64_encode($options['auth']));
+                }
+
                 if (preg_match('#^(ssl|ftps|https):#', $url)) {
                     $streamOptions['ssl'] = [
                         'verify_peer' => true,

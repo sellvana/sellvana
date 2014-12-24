@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Model_Trait_Address
+ *
+ * @property BLayout $BLayout
+ * @property BLocale $BLocale
+ * @property BValidate $BValidate
+ */
 trait FCom_Sales_Model_Trait_Address
 {
     public function addressValidationRules($type, $country = null)
@@ -32,18 +39,7 @@ trait FCom_Sales_Model_Trait_Address
 
     public function addressAsHtml($atype)
     {
-        $countries = $this->BLocale->getAvailableCountries();
-        $country = $this->get($atype . '_country');
-        $html = '<div class="adr">'
-            . '<div class="street-address">' . $this->get($atype . '_street1') . '</div>'
-            . ($this->get($atype . '_street2') ? '<div class="extended-address">' . $this->get($atype . '_street2') . '</div>' : '')
-            //. (!empty($streetArr[2]) ? '<div class="extended-address">' .$this->get($atype . '_street3') . '</div>' : '')
-            . '<span class="locality">' . $this->get($atype . '_city') . '</span>, '
-            . '<span class="region">' . $this->get($atype . '_region') . '</span> '
-            . '<span class="postal-code">' . $this->get($atype . '_postcode') . '</span>'
-            . '<div class="country-name">' . (!empty($countries[$country]) ? $countries[$country] : $country) . '</div>'
-            . '</div>';
-        return $html;
+        return $this->BLayout->view('sales/address-card')->set(['model' => $this, 'atype' => $atype])->render();
     }
 
     public function addressAsArray($atype)
@@ -51,19 +47,19 @@ trait FCom_Sales_Model_Trait_Address
         $country = $this->get($atype . '_country');
         $arr = [
             'atype'     => $atype,
-            'company'   => $atype . '_company',
-            'attn'      => $atype . '_attn',
-            'firstname' => $atype . '_firstname',
-            'lastname'  => $atype . '_lastname',
-            'street1'   => $atype . '_street1',
-            'street2'   => $atype . '_street2',
-            //'street3'   => $atype . '_street3',
-            'city'      => $atype . '_city',
-            'region'    => $atype . '_region',
-            'postcode'  => $atype . '_postcode',
+            'company'   => $this->get($atype . '_company'),
+            'attn'      => $this->get($atype . '_attn'),
+            'firstname' => $this->get($atype . '_firstname'),
+            'lastname'  => $this->get($atype . '_lastname'),
+            'street1'   => $this->get($atype . '_street1'),
+            'street2'   => $this->get($atype . '_street2'),
+            //'street3'   => $this->get($atype . '_street3'),
+            'city'      => $this->get($atype . '_city'),
+            'region'    => $this->get($atype . '_region'),
+            'postcode'  => $this->get($atype . '_postcode'),
             'country'   => !empty($countries[$country]) ? $countries[$country] : $country,
-            'phone'     => $atype . '_phone',
-            'fax'       => $atype . '_fax',
+            'phone'     => $this->get($atype . '_phone'),
+            'fax'       => $this->get($atype . '_fax'),
         ];
         return $arr;
     }
