@@ -79,6 +79,13 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
      * @constructor
      */
     var FComDataMethod = function (filterString, sortColumn, sortAscending, page, pageSize, callback) {
+
+        if (sortAscending == true) {
+            sortAscending = 'asc';
+        } else {
+            sortAscending = 'desc';
+        }
+        
         $.ajax({
             url: dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + filterString,
             dataType: 'json',
