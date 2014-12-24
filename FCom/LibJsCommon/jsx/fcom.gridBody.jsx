@@ -43,7 +43,15 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
             }
         },
         sort: function(event){
-            this.props.changeSort(event.target.dataset.title);
+            if (typeof event.target.dataset.title !== 'undefined') {
+                this.props.changeSort(event.target.dataset.title);
+            }
+        },
+        triggerSort: function(event){
+            event.preventDefault();
+
+            var selected = event.target;
+            $(selected).parents('th').trigger('click');
         },
         render: function(){
             var that = this;
@@ -100,8 +108,8 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
                     )
                 } else {
                     return (
-                        <th /*onClick={that.sort} */ data-title={col} className={columnSort}>
-                            <a className="js-change-url"> {displayName} </a>
+                        <th onClick={that.sort} data-title={col} className={columnSort}>
+                            <a href="#" className="js-change-url" onClick={that.triggerSort}> {displayName} </a>
                             <div className="ui-resizable-handle ui-resizable-e" />
                         </th>
                     );
