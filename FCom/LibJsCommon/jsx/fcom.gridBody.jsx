@@ -83,10 +83,10 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
 
                 var columnSort = "";
 
-                if(that.props.sortColumn == col && that.props.sortAscending){
-                    columnSort = "sort-ascending"
+                if (that.props.sortColumn == col && that.props.sortAscending){
+                    columnSort = "sort-ascending th-sorting-asc"
                 }  else if (that.props.sortColumn == col && that.props.sortAscending == false){
-                    columnSort += "sort-descending"
+                    columnSort += "sort-descending th-sorting-desc"
                 }
                 var displayName = col;
                 var meta;
