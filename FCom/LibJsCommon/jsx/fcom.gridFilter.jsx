@@ -18,6 +18,7 @@ define(['underscore', 'react'], function (_, React) {
         },
         componentDidMount: function() {
             var that = this;
+            var filterContainer = $('.f-filter-btns');
 
             //fix for grid filter
             $(document).
@@ -40,9 +41,25 @@ define(['underscore', 'react'], function (_, React) {
                             $(this).removeClass('open');
                         }
                     });
+                    e.preventDefault();
                     e.stopPropagation();
+                }).on('show.bs.dropdown', 'div.dropdown.f-grid-filter', function() { //fix when dropdown menu be hidden when reach right side windows
+                    var ulEle = $(this).find('ul.dropdown-menu:first');
+                    if ($(this).offset().left + ulEle.width() > $(window).width()) {
+                        ulEle.css({'right' : 0, 'left' : 'auto'});
+                    }
                 })
             ;
+
+            filterContainer.find('.filter-date-range').daterangepicker({ format: "YYYY-MM-DD" });
+            filterContainer.find(".datepicker").datetimepicker({ pickTime: false });
+
+            $('.daterangepicker').on('click', function (ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    return false;
+                }
+            );
         },
         /**
          * keep parents dropdown still be shown
@@ -120,7 +137,7 @@ define(['underscore', 'react'], function (_, React) {
                 if (!f.show) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} getFieldName={that.getFieldName} setFilter={that.filter} />);
+                return (<FComFilterNodeContainer filter={f} filterName={that.getFieldName(f.field)} setFilter={that.filter} />);
             });
 
             return (
@@ -129,9 +146,9 @@ define(['underscore', 'react'], function (_, React) {
                         {quickSearch}
                         {filterSettings}
                     </div>
-                    <span className={id + " f-filter-btns"}>
+                    <div className={id + " f-filter-btns"}>
                         {filterNodes}
-                    </span>
+                    </div>
                 </div>
             );
         }
@@ -178,7 +195,7 @@ define(['underscore', 'react'], function (_, React) {
             return (
                 <div className="btn-group dropdown f-grid-filter">
                     <button className="btn dropdown-toggle filter-text-main" data-toggle="dropdown">
-                        <span className="f-grid-filter-field">{this.props.getFieldName(this.props.filter.field)}</span>:
+                        <span className="f-grid-filter-field">{this.props.filterName}</span>:
                         <span className="f-grid-filter-value"> All </span>
                         <span className="caret"></span>
                     </button>
@@ -224,8 +241,78 @@ define(['underscore', 'react'], function (_, React) {
     });
 
     var FComFilterDateRange = React.createClass({
+        getInitialState: function() {
+            var filter = this.props.filter;
+            filter.range = true;
+            filter.val = "";
+            filter.op = "between";
+            return { filter: filter };
+        },
+        getOperations: function() {
+            return [
+                { name: 'between', label: 'Between', type: 'range' },
+                { name: 'from', label: 'From', type: 'not_range' },
+                { name: 'to', label: 'To', type: 'not_range' }
+            ];
+        },
         render: function() {
-            return null;
+            var filter = this.state.filter;
+            return (
+                <div className="btn-group dropdown f-grid-filter">
+                    <button className="btn dropdown-toggle filter-text-main" data-toggle='dropdown'>
+                        <span className='f-grid-filter-field'>{this.props.filterName}</span>:
+                        <span className='f-grid-filter-value'> All </span>
+                        <span className="caret"></span>
+                    </button>
+
+                    <ul className="dropdown-menu filter-box">
+                        <li>
+                            <div className="input-group">
+                                <div className="input-group-btn dropdown">
+                                    <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
+                                        Between
+                                        <span className="caret"></span>
+                                    </button>
+                                    <ul className="dropdown-menu filter-sub">
+                                        <li>
+                                            <a className="filter_op range" data-id="between" href="#">between</a>
+                                        </li>
+                                        <li>
+                                            <a className="filter_op not_range" data-id="from" href="#">from</a>
+                                        </li>
+                                        <li>
+                                            <a className="filter_op not_range" data-id="to" href="#">to</a>
+                                        </li>
+                                        <li>
+                                            <a className="filter_op not_range" data-id="equal" href="#">is equal to</a>
+                                        </li>
+                                        <li>
+                                            <a className="filter_op range" data-id="not_in" href="#">not in</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="input-group range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
+                                    <input id={'date-range-text-' + filter.field} type="text" placeholder="Select date range" className="form-control daterange" value="" />
+                                    <span id="daterange2" className="input-group-addon filter-date-range">
+                                        <i className="icon-calendar"></i>
+                                    </span>
+                                </div>
+                                <div className="datepicker input-group not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
+                                    <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" className="form-control" value="" />
+                                    <span className="input-group-addon">
+                                        <span data-time-icon="icon-time" data-date-icon="icon-calendar" className="icon-calendar"></span>
+                                    </span>
+                                </div>
+                                <div className="input-group-btn">
+                                    <button type="button" className="btn btn-primary update" onClick={this.props.setFilter}>
+                                        Update
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            );
         }
     });
 
