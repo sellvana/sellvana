@@ -102,22 +102,23 @@
                 </select>
             </div>
             <div class="col-md-1">
-                <button class="btn btn-link" type="button" id="condition_action_add">
+                <button class="btn btn-link" type="button" id="condition_action_add" style="float: left;">
                     <span aria-hidden="true" class="glyphicon glyphicon glyphicon-plus-sign"></span>
                 </button>
             </div>
         </div>
         <div id="conditions-options"></div>
+
         <div class="form-group">
             {{ forms.hidden({field:"actions_serialized", value: validator.fieldValue("actions_serialized")}) }}
-            <label class="control-label col-md-3" for="model-conditions">{{"Add Promo Actions"|_}}&nbsp;
-                    <a id="help-model-conditions" class="pull-right help-icon" href="#"
+            <label class="control-label col-md-3" for="model-actions">{{"Add Promo Actions"|_}}&nbsp;
+                    <a id="help-model-actions" class="pull-right help-icon" href="#"
                        data-toggle="popover" data-trigger="focus" data-content="{{"Configure promo actions"|_}}"
                        data-container="body">
                         <span class="glyphicon glyphicon-question-sign"></span></a>
             </label>
             <div class="col-md-4">
-                <select id="model-conditions" name="model[conditions]" class="form-control to-select2">
+                <select id="model-actions" name="model[actions]" class="form-control to-select2">
                     <option value="">{{"Add Promo Action..."|_}}</option>
                     <option value="get_discount">{{"Discount"|_}}</option>
                     <option value="get_shipping">{{"Shipping"|_}}</option>
@@ -125,12 +126,13 @@
                 </select>
             </div>
             <div class="col-md-1">
-                <button class="btn btn-link" type="button" id="action_add">
+                <button class="btn btn-link" type="button" id="action_add" style="float: left;">
                     <span aria-hidden="true" class="glyphicon glyphicon glyphicon-plus-sign"></span>
                 </button>
             </div>
         </div>
         <div id="actions-options"></div>
+
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
                 $('.to-select2').select2({minimumResultsForSearch:15});
