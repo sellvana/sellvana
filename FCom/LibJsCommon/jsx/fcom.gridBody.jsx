@@ -53,6 +53,9 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
             var selected = event.target;
             $(selected).parents('th').trigger('click');
         },
+        componentDidMount: function() {
+            $(".dataTable th").resizable({handles: 'e'});
+        },
         render: function(){
             var that = this;
 
@@ -103,14 +106,12 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
                     return (
                         <th data-title={col} className={columnSort}>
                             {displayName}
-                            <div className="ui-resizable-handle ui-resizable-e" />
                         </th>
                     )
                 } else {
                     return (
                         <th onClick={that.sort} data-title={col} className={columnSort}>
                             <a href="#" className="js-change-url" onClick={that.triggerSort}> {displayName} </a>
-                            <div className="ui-resizable-handle ui-resizable-e" />
                         </th>
                     );
                 }
@@ -125,6 +126,10 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
             );
         }
     });
+
+
+
+
 
     //module.exports = FComGridBody;
     return FComGridBody;
