@@ -3,12 +3,16 @@
 define(['underscore', 'react'], function (_, React) {
     var FComFilter = React.createClass({
         getInitialState: function() {
+            var that = this;
             var filters = this.props.getConfig('filters').map(function(f, index) {
                 f.show = true;
+                f.label = that.getFieldName(f.field);
                 return f;
             });
+
             return {
-                filters: filters
+                filters: filters, //filters as props
+                stateFilters: {} //temporary filters state
             }
         },
         getDefaultProps: function() {
@@ -43,7 +47,7 @@ define(['underscore', 'react'], function (_, React) {
                     });
                     e.preventDefault();
                     e.stopPropagation();
-                }).on('show.bs.dropdown', 'div.dropdown.f-grid-filter', function() { //fix when dropdown menu be hidden when reach right side windows
+                }).on('show.bs.dropdown', 'div.dropdown.f-grid-filter', function() { //fix dropdown menu is hidden when reach right side windows
                     var ulEle = $(this).find('ul.dropdown-menu:first');
                     if ($(this).offset().left + ulEle.width() > $(window).width()) {
                         ulEle.css({'right' : 0, 'left' : 'auto'});
@@ -51,6 +55,7 @@ define(['underscore', 'react'], function (_, React) {
                 })
             ;
 
+            //init datepicker + daterangepicker
             filterContainer.find('.filter-date-range').daterangepicker({ format: "YYYY-MM-DD" });
             filterContainer.find(".datepicker").datetimepicker({ pickTime: false });
 
@@ -60,6 +65,21 @@ define(['underscore', 'react'], function (_, React) {
                     return false;
                 }
             );
+        },
+        setStateFilter: function(field, key, value) {
+            if (typeof field === 'undefined' ||  typeof key === 'undefined') {
+                return;
+            }
+
+            var stateFilters = this.state.stateFilters;
+            if (typeof stateFilters[field] === 'undefined') {
+                stateFilters[field] = {};
+                stateFilters[field].field = field;
+            }
+            stateFilters[field][key] = value;
+
+            //console.log('setStateFilter', stateFilters);
+            this.setState({stateFilters: stateFilters});
         },
         /**
          * keep parents dropdown still be shown
@@ -93,12 +113,31 @@ define(['underscore', 'react'], function (_, React) {
             this.setState({filters: filters});
             this.keepShowDropDown(event.target);
         },
+        prepareFilter: function (event) {
+            //prepare data
+            var field = event.target.dataset.field;
+            var filter = _.findWhere(this.state.filters, {field: field});
+            this.setStateFilter(field, 'type', filter.type);
+            this.setStateFilter(field, 'submit', true);
+
+            //add submit filter
+            var stateFilters = this.state.stateFilters;
+            var submitFilters = {};
+            for (var f in stateFilters) {
+                if (typeof stateFilters[f] !== 'undefined' && stateFilters[f].submit == true) {
+                    submitFilters[f] = stateFilters[f];
+                }
+            }
+            return submitFilters;
+        },
         /**
          * filter data
          * @param event
          */
         filter: function (event) {
-            console.log('doing filter');
+            var submitFilters = this.prepareFilter(event);
+            //console.log('submitFilters', submitFilters);
+            this.props.changeFilter(JSON.stringify(submitFilters));
         },
         render: function() {
             var that = this;
@@ -115,7 +154,7 @@ define(['underscore', 'react'], function (_, React) {
                         <div className="dd3-content">
                             <label>
                                 <input className="showhide_column" data-field={f.field} onChange={that.toggleFilter} type="checkbox" defaultChecked={f.show ? 'checked' : ''} />
-                                {that.getFieldName(f.field)}
+                                {f.label}
                             </label>
                         </div>
                     </li>
@@ -137,7 +176,7 @@ define(['underscore', 'react'], function (_, React) {
                 if (!f.show) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} filterName={that.getFieldName(f.field)} setFilter={that.filter} />);
+                return (<FComFilterNodeContainer filter={f} setFilter={that.filter} setStateFilter={that.setStateFilter} />);
             });
 
             return (
@@ -191,11 +230,41 @@ define(['underscore', 'react'], function (_, React) {
     });
 
     var FComFilterText = React.createClass({
+        getInitialState: function () {
+            var filter = this.props.filter;
+            if (filter.op == '') {
+                filter.op = 'contains';
+                filter.val = '';
+            }
+            return { filter: filter };
+        },
+        getOperations: function () {
+            return [
+                { op: 'contains', name: 'contains' },
+                { op: 'not', name: 'does not contain' },
+                { op: 'equal', name: 'is equal to' },
+                { op: 'start', name: 'start with' },
+                { op: 'end', name: 'end with' }
+            ];
+        },
+        setStateOperation: function(event) {
+            this.props.setStateFilter(event.target.dataset.field, 'op', event.target.dataset.id);
+        },
+        setStateKeyword: function(event) {
+            this.props.setStateFilter(event.target.dataset.field, 'val', event.target.value);
+        },
         render: function() {
+            var that = this;
+            var filter = this.state.filter;
+
+            var operations = this.getOperations().map(function(item){
+                return ( <li> <a className="filter_op" data-id={item.op} data-field={filter.field} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+            });
+
             return (
-                <div className="btn-group dropdown f-grid-filter">
+                <div className="btn-group dropdown f-grid-filter" id={"f-grid-filter-" + filter.field}>
                     <button className="btn dropdown-toggle filter-text-main" data-toggle="dropdown">
-                        <span className="f-grid-filter-field">{this.props.filterName}</span>:
+                        <span className="f-grid-filter-field">{filter.label}</span>:
                         <span className="f-grid-filter-value"> All </span>
                         <span className="caret"></span>
                     </button>
@@ -208,26 +277,12 @@ define(['underscore', 'react'], function (_, React) {
                                         <span className="caret"></span>
                                     </button>
                                     <ul className="dropdown-menu filter-sub">
-                                        <li>
-                                            <a className="filter_op" data-id="contains" href="#">contains</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op" data-id="not" href="#">does not contain</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op" data-id="equal" href="#">is equal to</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op" data-id="start" href="#">start with</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op" data-id="end" href="#">end with</a>
-                                        </li>
+                                        {operations}
                                     </ul>
                                 </div>
-                                <input type="text" className="form-control" value="" />
+                                <input type="text" className="form-control" data-field={filter.field} onChange={this.setStateKeyword} />
                                 <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" onClick={this.props.setFilter}>
+                                    <button type="button" className="btn btn-primary update" data-field={filter.field} onClick={this.props.setFilter}>
                                         Update
                                     </button>
                                 </div>
@@ -258,9 +313,9 @@ define(['underscore', 'react'], function (_, React) {
         render: function() {
             var filter = this.state.filter;
             return (
-                <div className="btn-group dropdown f-grid-filter">
+                <div className="btn-group dropdown f-grid-filter" id={"f-grid-filter-" + filter.field}>
                     <button className="btn dropdown-toggle filter-text-main" data-toggle='dropdown'>
-                        <span className='f-grid-filter-field'>{this.props.filterName}</span>:
+                        <span className='f-grid-filter-field'>{filter.label}</span>:
                         <span className='f-grid-filter-value'> All </span>
                         <span className="caret"></span>
                     </button>
