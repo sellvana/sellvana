@@ -92,7 +92,7 @@ define(['underscore', 'react'], function (_, React) {
             stateFilters[field][key] = value;
 
             console.log('setStateFilter', stateFilters);
-            this.setState({stateFilters: stateFilters});
+            //this.setState({stateFilters: stateFilters});
             //todo: minimize re-render function when update stateFilters
         },
         /**
@@ -289,7 +289,7 @@ define(['underscore', 'react'], function (_, React) {
             var filter = this.state.filter;
             filter.val = event.target.value;
             this.props.setStateFilter(event.target.dataset.field, 'val', event.target.value);
-            this.setState({filter: filter});
+            //this.setState({filter: filter});
         },
         submitFilter: function (event) {
             var filter = this.state.filter;
@@ -301,20 +301,14 @@ define(['underscore', 'react'], function (_, React) {
             var that = this;
             var filter = this.state.filter;
 
-            console.log('filter', filter);
-
-            /*if (filter.field == 'firstname') {
-                console.log('begin render text filter');
-                console.log('state.filter', filter);
-            }*/
+            /*console.log('filter.' + filter.field, filter);
+            console.log('begin render filter: ' +  filter.field);*/
 
             var operations = this.getOperations().map(function(item) {
                 return ( <li> <a className="filter_op" data-id={item.op} data-field={filter.field} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
             });
 
-            /*if (filter.field == 'firstname') {
-                console.log('end render text filter');
-            }*/
+            /*console.log('end render filter: ' +  filter.field);*/
 
             return (
                 <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
