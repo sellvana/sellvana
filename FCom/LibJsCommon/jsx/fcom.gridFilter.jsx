@@ -39,7 +39,6 @@ define(['underscore', 'react'], function (_, React) {
                 }).on('click', 'ul.filter-sub a.filter_op', function (e) {
                     var operator = $(e.target);
                     var text = operator.html();
-                    $(this).parents('.input-group-btn').find('button.filter-text-sub').html(text.charAt(0).toUpperCase() + text.slice(1) + "<span class='caret'></span>");
                     $(this).parents('div.dropdown').each(function() {
                         if ($(this).hasClass('input-group-btn')) {
                             $(this).removeClass('open');
@@ -66,6 +65,21 @@ define(['underscore', 'react'], function (_, React) {
                 }
             );
         },
+        capitaliseFirstLetter: function(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        },
+        initStateFilter: function(field) {
+            var filter = _.findWhere(this.state.filters, {field: field});
+            return {
+                field: field,
+                opLabel: '',
+                op: '',
+                val: '',
+                range: true,
+                type: filter.type,
+                submit: false
+            }
+        },
         setStateFilter: function(field, key, value) {
             if (typeof field === 'undefined' ||  typeof key === 'undefined') {
                 return;
@@ -73,13 +87,13 @@ define(['underscore', 'react'], function (_, React) {
 
             var stateFilters = this.state.stateFilters;
             if (typeof stateFilters[field] === 'undefined') {
-                stateFilters[field] = {};
-                stateFilters[field].field = field;
+                stateFilters[field] = this.initStateFilter(field);
             }
             stateFilters[field][key] = value;
 
-            //console.log('setStateFilter', stateFilters);
+            console.log('setStateFilter', stateFilters);
             this.setState({stateFilters: stateFilters});
+            //todo: minimize re-render function when update stateFilters
         },
         /**
          * keep parents dropdown still be shown
@@ -114,12 +128,6 @@ define(['underscore', 'react'], function (_, React) {
             this.keepShowDropDown(event.target);
         },
         prepareFilter: function (event) {
-            //prepare data
-            var field = event.target.dataset.field;
-            var filter = _.findWhere(this.state.filters, {field: field});
-            this.setStateFilter(field, 'type', filter.type);
-            this.setStateFilter(field, 'submit', true);
-
             //add submit filter
             var stateFilters = this.state.stateFilters;
             var submitFilters = {};
@@ -135,11 +143,16 @@ define(['underscore', 'react'], function (_, React) {
          * @param event
          */
         filter: function (event) {
+            //prepare data
+            var field = event.target.dataset.field;
+            this.setStateFilter(field, 'submit', !(event.target.dataset.clear == '1'));
+
             var submitFilters = this.prepareFilter(event);
             //console.log('submitFilters', submitFilters);
             this.props.changeFilter(JSON.stringify(submitFilters));
         },
         render: function() {
+            //console.log('begin render filters');
             var that = this;
             var id = this.props.getConfig('id');
             var filters = this.state.filters;
@@ -176,8 +189,10 @@ define(['underscore', 'react'], function (_, React) {
                 if (!f.show) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} setFilter={that.filter} setStateFilter={that.setStateFilter} />);
+                return (<FComFilterNodeContainer filter={f} setFilter={that.filter} setStateFilter={that.setStateFilter} stateFilters={that.state.stateFilters} capitaliseFirstLetter={that.capitaliseFirstLetter} />);
             });
+
+            //console.log('end render filters');
 
             return (
                 <div>
@@ -232,15 +247,26 @@ define(['underscore', 'react'], function (_, React) {
     var FComFilterText = React.createClass({
         getInitialState: function () {
             var filter = this.props.filter;
-            if (filter.op == '') {
-                filter.op = 'contains';
+            if (typeof this.props.stateFilters[filter.field] === 'undefined') {
+                var operation = _.findWhere(this.getOperations(), {'default': true});
+                this.props.setStateFilter(filter.field, 'op', operation.op);
+                filter.op = operation.op;
+                filter.opLabel = this.props.capitaliseFirstLetter(operation.name);
                 filter.val = '';
+                filter.submit = false;
+            } else {
+                var data = this.props.stateFilters[filter.field];
+                filter.op = data.op;
+                filter.opLabel = data.opLabel;
+                filter.val = data.val;
+                filter.submit = data.submit;
             }
+
             return { filter: filter };
         },
         getOperations: function () {
             return [
-                { op: 'contains', name: 'contains' },
+                { op: 'contains', name: 'contains', 'default': true },
                 { op: 'not', name: 'does not contain' },
                 { op: 'equal', name: 'is equal to' },
                 { op: 'start', name: 'start with' },
@@ -248,24 +274,53 @@ define(['underscore', 'react'], function (_, React) {
             ];
         },
         setStateOperation: function(event) {
-            this.props.setStateFilter(event.target.dataset.field, 'op', event.target.dataset.id);
+            var filter = this.state.filter;
+            var operation = _.findWhere(this.getOperations(), {op: event.target.dataset.id});
+            var opLabel = this.props.capitaliseFirstLetter(operation.name);
+
+            filter.op = event.target.dataset.id;
+            filter.opLabel = opLabel;
+
+            this.props.setStateFilter(event.target.dataset.field, 'op', filter.op);
+            this.props.setStateFilter(event.target.dataset.field, 'opLabel', opLabel);
+            this.setState({filter: filter});
         },
-        setStateKeyword: function(event) {
+        setStateValue: function(event) {
+            var filter = this.state.filter;
+            filter.val = event.target.value;
             this.props.setStateFilter(event.target.dataset.field, 'val', event.target.value);
+            this.setState({filter: filter});
+        },
+        submitFilter: function (event) {
+            var filter = this.state.filter;
+            filter.submit = !(event.target.dataset.clear == "1");
+            this.setState({filter: filter});
+            this.props.setFilter(event);
         },
         render: function() {
             var that = this;
             var filter = this.state.filter;
 
-            var operations = this.getOperations().map(function(item){
+            console.log('filter', filter);
+
+            /*if (filter.field == 'firstname') {
+                console.log('begin render text filter');
+                console.log('state.filter', filter);
+            }*/
+
+            var operations = this.getOperations().map(function(item) {
                 return ( <li> <a className="filter_op" data-id={item.op} data-field={filter.field} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
             });
 
+            /*if (filter.field == 'firstname') {
+                console.log('end render text filter');
+            }*/
+
             return (
-                <div className="btn-group dropdown f-grid-filter" id={"f-grid-filter-" + filter.field}>
+                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
                     <button className="btn dropdown-toggle filter-text-main" data-toggle="dropdown">
                         <span className="f-grid-filter-field">{filter.label}</span>:
-                        <span className="f-grid-filter-value"> All </span>
+                        <span className="f-grid-filter-value"> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'}  </span>
                         <span className="caret"></span>
                     </button>
                     <ul className="dropdown-menu filter-box">
@@ -273,23 +328,23 @@ define(['underscore', 'react'], function (_, React) {
                             <div className="input-group">
                                 <div className="input-group-btn dropdown">
                                     <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
-                                        Contains
+                                        {filter.opLabel}
                                         <span className="caret"></span>
                                     </button>
                                     <ul className="dropdown-menu filter-sub">
                                         {operations}
                                     </ul>
                                 </div>
-                                <input type="text" className="form-control" data-field={filter.field} onChange={this.setStateKeyword} />
+                                <input type="text" className="form-control" data-field={filter.field} onChange={this.setStateValue} />
                                 <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" data-field={filter.field} onClick={this.props.setFilter}>
+                                    <button type="button" className="btn btn-primary update" data-field={filter.field} onClick={this.submitFilter}>
                                         Update
                                     </button>
                                 </div>
                             </div>
                         </li>
                     </ul>
-                    <abbr className="select2-search-choice-close"></abbr>
+                    <abbr className="select2-search-choice-close" data-field={filter.field} data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
                 </div>
             );
         }
