@@ -4,15 +4,23 @@ define(['underscore', 'react'], function (_, React) {
     var FComFilter = React.createClass({
         getInitialState: function() {
             var that = this;
-            var filters = this.props.getConfig('filters').map(function(f, index) {
-                f.show = true;
-                f.label = that.getFieldName(f.field);
-                return f;
+            var filters = {};
+            _.forEach(this.props.getConfig('filters'), function(f) {
+                _.extend(f, {
+                    show: true,
+                    label: that.getFieldName(f.field),
+                    opLabel: '',
+                    op: '',
+                    val: '',
+                    range: true,
+                    submit: false
+                });
+
+                filters[f.field] = f;
             });
 
             return {
-                filters: filters, //filters as props
-                stateFilters: {} //temporary filters state
+                filters: filters
             }
         },
         getDefaultProps: function() {
@@ -38,7 +46,6 @@ define(['underscore', 'react'], function (_, React) {
                     that.keepShowDropDown(this);
                 }).on('click', 'ul.filter-sub a.filter_op', function (e) {
                     var operator = $(e.target);
-                    var text = operator.html();
                     $(this).parents('div.dropdown').each(function() {
                         if ($(this).hasClass('input-group-btn')) {
                             $(this).removeClass('open');
@@ -68,30 +75,18 @@ define(['underscore', 'react'], function (_, React) {
         capitaliseFirstLetter: function(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         },
-        initStateFilter: function(field) {
-            var filter = _.findWhere(this.state.filters, {field: field});
-            return {
-                field: field,
-                opLabel: '',
-                op: '',
-                val: '',
-                range: true,
-                type: filter.type,
-                submit: false
-            }
-        },
         setStateFilter: function(field, key, value) {
             if (typeof field === 'undefined' ||  typeof key === 'undefined') {
                 return;
             }
 
-            var stateFilters = this.state.stateFilters;
-            if (typeof stateFilters[field] === 'undefined') {
-                stateFilters[field] = this.initStateFilter(field);
+            var filters = this.state.filters;
+            if (typeof filters[field] === 'undefined') {
+                return;
             }
-            stateFilters[field][key] = value;
+            filters[field][key] = value;
 
-            console.log('setStateFilter', stateFilters);
+            console.log('setStateFilter', filters);
             //this.setState({stateFilters: stateFilters});
             //todo: minimize re-render function when update stateFilters
         },
@@ -114,28 +109,25 @@ define(['underscore', 'react'], function (_, React) {
             var row = _.findWhere(this.props.getConfig('columns'), {name: field});
             return row ? row.label : field;
         },
-        toggleFilter: function(event) {// show/hide filter block
-            var field = event.target.dataset.field;
-            var checked = event.target.checked;
-            var filters = this.state.filters.map(function(f) {
-                if (f.field == field) {
-                    f.show = (checked == true);
-                }
-                return f;
-            });
-
+        /**
+         * show/hide filter block
+         * @param event
+         */
+        toggleFilter: function(event) {
+            var filters = this.state.filters;
+            filters[event.target.dataset.field].show = (event.target.checked == true);
             this.setState({filters: filters});
             this.keepShowDropDown(event.target);
         },
-        prepareFilter: function (event) {
+        prepareFilter: function () {
             //add submit filter
-            var stateFilters = this.state.stateFilters;
+            var filters = this.state.filters;
             var submitFilters = {};
-            for (var f in stateFilters) {
-                if (typeof stateFilters[f] !== 'undefined' && stateFilters[f].submit == true) {
-                    submitFilters[f] = stateFilters[f];
+            _.forEach(filters, function(f) {
+                if (f.submit == true) {
+                    submitFilters[f.field] = f;
                 }
-            }
+            });
             return submitFilters;
         },
         /**
@@ -147,8 +139,10 @@ define(['underscore', 'react'], function (_, React) {
             var field = event.target.dataset.field;
             this.setStateFilter(field, 'submit', !(event.target.dataset.clear == '1'));
 
-            var submitFilters = this.prepareFilter(event);
+            var submitFilters = this.prepareFilter();
             //console.log('submitFilters', submitFilters);
+
+            //call parent griddle function to handle filter
             this.props.changeFilter(JSON.stringify(submitFilters));
         },
         render: function() {
@@ -157,10 +151,12 @@ define(['underscore', 'react'], function (_, React) {
             var id = this.props.getConfig('id');
             var filters = this.state.filters;
 
+            console.log('filters', filters);
+
             //quick search
             var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder={this.props.placeholderText} onChange={this.handleChange} id={id + '-quick-search'} />;
 
-            var filterSettingNodes = filters.map(function(f, index) {
+            var filterSettingNodes = _.map(filters, function(f) {
                 return (
                     <li data-filter-id={f.field} className="dd-item dd3-item">
                         <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
@@ -185,11 +181,11 @@ define(['underscore', 'react'], function (_, React) {
                 </div>
             );
 
-            var filterNodes = filters.map(function(f, index) {
+            var filterNodes = _.map(filters, function(f) {
                 if (!f.show) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} setFilter={that.filter} setStateFilter={that.setStateFilter} stateFilters={that.state.stateFilters} capitaliseFirstLetter={that.capitaliseFirstLetter} />);
+                return (<FComFilterNodeContainer filter={f} setFilter={that.filter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} />);
             });
 
             //console.log('end render filters');
@@ -247,19 +243,17 @@ define(['underscore', 'react'], function (_, React) {
     var FComFilterText = React.createClass({
         getInitialState: function () {
             var filter = this.props.filter;
-            if (typeof this.props.stateFilters[filter.field] === 'undefined') {
+
+            if (filter.op == '') { //set default value operation
                 var operation = _.findWhere(this.getOperations(), {'default': true});
-                this.props.setStateFilter(filter.field, 'op', operation.op);
-                filter.op = operation.op;
-                filter.opLabel = this.props.capitaliseFirstLetter(operation.name);
-                filter.val = '';
-                filter.submit = false;
-            } else {
-                var data = this.props.stateFilters[filter.field];
-                filter.op = data.op;
-                filter.opLabel = data.opLabel;
-                filter.val = data.val;
-                filter.submit = data.submit;
+                _.extend(filter, {
+                    op: operation.op,
+                    opLabel: this.props.capitaliseFirstLetter(operation.name),
+                    val: '',
+                    submit: false
+                });
+                this.props.setStateFilter(filter.field, 'op', filter.op);
+                this.props.setStateFilter(filter.field, 'opLabel', filter.opLabel);
             }
 
             return { filter: filter };
