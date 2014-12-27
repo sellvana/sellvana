@@ -240,7 +240,29 @@ define(['underscore', 'react'], function (_, React) {
         }
     });
 
+    var FilterStateMixin = {
+        setStateOperation: function(event) {
+            var filter = this.state.filter;
+            var operation = _.findWhere(this.getOperations(), {op: event.target.dataset.id});
+            var opLabel = this.props.capitaliseFirstLetter(operation.name);
+
+            filter.op = event.target.dataset.id;
+            filter.opLabel = opLabel;
+
+            this.props.setStateFilter(field, 'op', filter.op);
+            this.props.setStateFilter(field, 'opLabel', opLabel);
+            this.setState({filter: filter});
+        },
+        setStateValue: function(event) {
+            var filter = this.state.filter;
+            filter.val = event.target.value;
+            this.props.setStateFilter(event.target.dataset.field, 'val', event.target.value);
+            this.setState({filter: filter});
+        }
+    };
+
     var FComFilterText = React.createClass({
+        mixins: [FilterStateMixin],
         getInitialState: function () {
             var filter = this.props.filter;
 
@@ -252,8 +274,8 @@ define(['underscore', 'react'], function (_, React) {
                     val: '',
                     submit: false
                 });
-                this.props.setStateFilter(filter.field, 'op', filter.op);
-                this.props.setStateFilter(filter.field, 'opLabel', filter.opLabel);
+                /*this.props.setStateFilter(filter.field, 'op', filter.op);
+                this.props.setStateFilter(filter.field, 'opLabel', filter.opLabel);*/
             }
 
             return { filter: filter };
@@ -266,24 +288,6 @@ define(['underscore', 'react'], function (_, React) {
                 { op: 'start', name: 'start with' },
                 { op: 'end', name: 'end with' }
             ];
-        },
-        setStateOperation: function(event) {
-            var filter = this.state.filter;
-            var operation = _.findWhere(this.getOperations(), {op: event.target.dataset.id});
-            var opLabel = this.props.capitaliseFirstLetter(operation.name);
-
-            filter.op = event.target.dataset.id;
-            filter.opLabel = opLabel;
-
-            this.props.setStateFilter(event.target.dataset.field, 'op', filter.op);
-            this.props.setStateFilter(event.target.dataset.field, 'opLabel', opLabel);
-            this.setState({filter: filter});
-        },
-        setStateValue: function(event) {
-            var filter = this.state.filter;
-            filter.val = event.target.value;
-            this.props.setStateFilter(event.target.dataset.field, 'val', event.target.value);
-            //this.setState({filter: filter});
         },
         submitFilter: function (event) {
             var filter = this.state.filter;
@@ -348,9 +352,11 @@ define(['underscore', 'react'], function (_, React) {
         },
         getOperations: function() {
             return [
-                { name: 'between', label: 'Between', type: 'range' },
-                { name: 'from', label: 'From', type: 'not_range' },
-                { name: 'to', label: 'To', type: 'not_range' }
+                { op: 'between', label: 'between', range: true, 'default': true },
+                { op: 'from', label: 'from', range: false },
+                { op: 'to', label: 'to', range: false },
+                { op: 'equal', label: 'is equal to', range: false },
+                { op: 'not_in', label: 'not in', range: true }
             ];
         },
         render: function() {
