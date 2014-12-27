@@ -39,7 +39,7 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
             return {
                 "columns":[],
                 "sortColumn": "",
-                "sortAscending": true
+                "sortAscending": "asc"
             }
         },
         sort: function(event){
@@ -86,11 +86,12 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
 
                 var columnSort = "";
 
-                if (that.props.sortColumn == col && that.props.sortAscending){
-                    columnSort = "sort-ascending th-sorting-asc"
-                }  else if (that.props.sortColumn == col && that.props.sortAscending == false){
+                if (that.props.sortColumn == col && that.props.sortAscending == 'asc'){
+                    columnSort += "sort-ascending th-sorting-asc"
+                }  else if (that.props.sortColumn == col && that.props.sortAscending == 'desc'){
                     columnSort += "sort-descending th-sorting-desc"
                 }
+
                 var displayName = col;
                 var meta;
                 if (that.props.columnMetadata != null){
