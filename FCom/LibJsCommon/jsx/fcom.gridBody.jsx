@@ -56,6 +56,52 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
         componentDidMount: function() {
             $(".dataTable th").resizable({handles: 'e'});
         },
+        showAll: function(event) {
+            event.preventDefault();
+
+            $(".standard-row").removeClass('hidden');
+        },
+        showSelected: function(event) {
+            event.preventDefault();
+
+            $(".standard-row").each(function() {
+                var row = this;
+
+                if ($(row).find(".select-row").is(":checked")) {
+                    $(row).removeClass("hidden");
+                } else {
+                    $(row).addClass("hidden");
+                }
+            });
+        },
+        selectVisible: function(event) {
+            event.preventDefault();
+
+            $(".standard-row").each(function() {
+                    var row = this;
+                if ($(row).hasClass('hidden')) {
+                    $(row).find(".select-row").prop("checked", false);
+                } else {
+                    $(row).find(".select-row").prop("checked", true);
+                }
+            });
+        },
+        unselectVisible: function(event) {
+            event.preventDefault();
+
+            $(".standard-row").each(function() {
+                var row = this;
+                if (!$(row).hasClass('hidden')) {
+                    $(row).find(".select-row").prop("checked", false);
+                }
+            });
+        },
+        unselectAll: function(event) {
+            event.preventDefault();
+
+            $(".select-row").prop('checked', false);
+            $(".standard-row").removeClass('hidden');
+        },
         render: function(){
             var that = this;
 
@@ -73,11 +119,11 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
                                     <span className="title">A</span>&nbsp;<span className="caret"></span>
                                 </button>
                                 <ul className="dropdown-menu js-sel">
-                                    <li><a href="#show_all">Show All</a></li>
-                                    <li><a href="#show_sel">Show Selected</a></li>
-                                    <li><a href="#upd_sel">Select Visible</a></li>
-                                    <li><a href="#upd_unsel">Unselect Visible</a></li>
-                                    <li><a href="#upd_clear">Unselect All</a></li>
+                                    <li><a href="#" onClick={that.showAll}>Show All</a></li>
+                                    <li><a href="#" onClick={that.showSelected}>Show Selected</a></li>
+                                    <li><a href="#" onClick={that.selectVisible}>Select Visible</a></li>
+                                    <li><a href="#" onClick={that.unselectVisible}>Unselect Visible</a></li>
+                                    <li><a href="#" onClick={that.unselectAll}>Unselect All</a></li>
                                 </ul>
                             </div>
                         </th>
