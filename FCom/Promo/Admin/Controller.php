@@ -89,6 +89,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             // todo initiate promo with status 'incomplete'
         }
     }
+/*
 
     /**
      * @param $view
@@ -100,8 +101,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
         if ($model && $model->id) {
-            $view->addTab("details", ['label' => $this->BLocale->_("Details"), 'pos' => 20, 'async' => true]);
-            $view->addTab("history", ['label' => $this->BLocale->_("History"), 'pos' => 40, 'async' => true]);
+            $view->addTab("tab-details", ['label' => $this->BLocale->_("Details"), 'pos' => 20, 'async' => true]);
+            $view->addTab("tab-history", ['label' => $this->BLocale->_("History"), 'pos' => 40, 'async' => true]);
         }
         return parent::processFormTabs($view, $model, $mode, $allowed);
     }
