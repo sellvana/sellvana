@@ -68,4 +68,5 @@ lib_griddle:
             - [ requireJs, griddle, @FCom_LibJsCommon/jsx/griddle/scripts/griddle ]
             #fcom custom
             - [ requireJs, griddle.fcomGridBody, @FCom_LibJsCommon/jsx/fcom.gridBody ]
+            - [ requireJs, griddle.fcomGridFilter, @FCom_LibJsCommon/jsx/fcom.gridFilter ]
             - [ requireJs, griddle.fcomRow, @FCom_LibJsCommon/jsx/fcom.row ]

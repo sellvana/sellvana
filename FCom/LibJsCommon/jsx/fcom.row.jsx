@@ -24,7 +24,7 @@ define(['underscore', 'react'], function (_, React) {
             }
         },
         handleClick: function () {
-            this.props.toggleChildren();
+            //this.props.toggleChildren();
         },
         render: function () {
             var that = this;

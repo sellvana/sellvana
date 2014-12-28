@@ -39,11 +39,68 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
             return {
                 "columns":[],
                 "sortColumn": "",
-                "sortAscending": true
+                "sortAscending": "asc"
             }
         },
         sort: function(event){
-            this.props.changeSort(event.target.dataset.title);
+            if (typeof event.target.dataset.title !== 'undefined') {
+                this.props.changeSort(event.target.dataset.title);
+            }
+        },
+        triggerSort: function(event){
+            event.preventDefault();
+
+            var selected = event.target;
+            $(selected).parents('th').trigger('click');
+        },
+        componentDidMount: function() {
+            $(".dataTable th").resizable({handles: 'e'});
+        },
+        showAll: function(event) {
+            event.preventDefault();
+
+            $(".standard-row").removeClass('hidden');
+        },
+        showSelected: function(event) {
+            event.preventDefault();
+
+            $(".standard-row").each(function() {
+                var row = this;
+
+                if ($(row).find(".select-row").is(":checked")) {
+                    $(row).removeClass("hidden");
+                } else {
+                    $(row).addClass("hidden");
+                }
+            });
+        },
+        selectVisible: function(event) {
+            event.preventDefault();
+
+            $(".standard-row").each(function() {
+                    var row = this;
+                if ($(row).hasClass('hidden')) {
+                    $(row).find(".select-row").prop("checked", false);
+                } else {
+                    $(row).find(".select-row").prop("checked", true);
+                }
+            });
+        },
+        unselectVisible: function(event) {
+            event.preventDefault();
+
+            $(".standard-row").each(function() {
+                var row = this;
+                if (!$(row).hasClass('hidden')) {
+                    $(row).find(".select-row").prop("checked", false);
+                }
+            });
+        },
+        unselectAll: function(event) {
+            event.preventDefault();
+
+            $(".select-row").prop('checked', false);
+            $(".standard-row").removeClass('hidden');
         },
         render: function(){
             var that = this;
@@ -62,11 +119,11 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
                                     <span className="title">A</span>&nbsp;<span className="caret"></span>
                                 </button>
                                 <ul className="dropdown-menu js-sel">
-                                    <li><a href="#show_all">Show All</a></li>
-                                    <li><a href="#show_sel">Show Selected</a></li>
-                                    <li><a href="#upd_sel">Select Visible</a></li>
-                                    <li><a href="#upd_unsel">Unselect Visible</a></li>
-                                    <li><a href="#upd_clear">Unselect All</a></li>
+                                    <li><a href="#" onClick={that.showAll}>Show All</a></li>
+                                    <li><a href="#" onClick={that.showSelected}>Show Selected</a></li>
+                                    <li><a href="#" onClick={that.selectVisible}>Select Visible</a></li>
+                                    <li><a href="#" onClick={that.unselectVisible}>Unselect Visible</a></li>
+                                    <li><a href="#" onClick={that.unselectAll}>Unselect All</a></li>
                                 </ul>
                             </div>
                         </th>
@@ -75,11 +132,12 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
 
                 var columnSort = "";
 
-                if(that.props.sortColumn == col && that.props.sortAscending){
-                    columnSort = "sort-ascending"
-                }  else if (that.props.sortColumn == col && that.props.sortAscending == false){
-                    columnSort += "sort-descending"
+                if (that.props.sortColumn == col && that.props.sortAscending == 'asc'){
+                    columnSort += "sort-ascending th-sorting-asc"
+                }  else if (that.props.sortColumn == col && that.props.sortAscending == 'desc'){
+                    columnSort += "sort-descending th-sorting-desc"
                 }
+
                 var displayName = col;
                 var meta;
                 if (that.props.columnMetadata != null){
@@ -95,14 +153,12 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
                     return (
                         <th data-title={col} className={columnSort}>
                             {displayName}
-                            <div className="ui-resizable-handle ui-resizable-e" />
                         </th>
                     )
                 } else {
                     return (
-                        <th /*onClick={that.sort} */ data-title={col} className={columnSort}>
-                            <a className="js-change-url"> {displayName} </a>
-                            <div className="ui-resizable-handle ui-resizable-e" />
+                        <th onClick={that.sort} data-title={col} className={columnSort}>
+                            <a href="#" className="js-change-url" onClick={that.triggerSort}> {displayName} </a>
                         </th>
                     );
                 }
@@ -117,6 +173,10 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
             );
         }
     });
+
+
+
+
 
     //module.exports = FComGridBody;
     return FComGridBody;
