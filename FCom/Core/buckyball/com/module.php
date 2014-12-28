@@ -1025,6 +1025,7 @@ if ($args['name']==="FCom_Referrals") {
     protected function _processThemes()
     {
         //TODO: automatically enable theme module when it is used
+#var_dump($this->name, $this->run_status, $this->themes); echo "<hr>";
         if ($this->run_status === BModule::PENDING && !empty($this->themes)) {
             foreach ($this->themes as $name => $params) {
                 if (!empty($params['name']) && !empty($params['area'])) {
