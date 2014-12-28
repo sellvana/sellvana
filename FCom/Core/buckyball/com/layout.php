@@ -2359,7 +2359,7 @@ if ($this->BDebug->is('DEBUG')) {
 #echo "<pre>"; print_r($this->_elements); echo "</pre>";
         }
 
-        if ($this->_headJs['enabled']) {
+        if (!empty($this->_headJs['enabled'])) {
             $basename = basename($name);
             if ($basename === 'head.js' || $basename === 'head.min.js' || $basename === 'head.load.min.js') {
                 $this->_headJs['loaded'] = $name;

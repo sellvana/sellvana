@@ -206,7 +206,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $fi = $this->getReadHandle($fromFile);
 
         if (!$fi) {
-            $msg = $this->BLocale->_("%s Could not find file to import. File: %s", [BDb::now(), $fromFile]);
+            $msg = $this->BLocale->_("%s Could not find file to import. File: %s", [$this->BDb->now(), $fromFile]);
             $channel->send([
                 'signal'  => 'problem',
                 'problem' => $msg
@@ -235,7 +235,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
         $this->import($batchData, $bs);
         if (!feof($fi)) {
-            $msg = $this->BLocale->_("%s Error: unexpected file fail", BDb::now());
+            $msg = $this->BLocale->_("%s Error: unexpected file fail", $this->BDb->now());
             $channel->send([
                 'signal'  => 'problem',
                 'problem' => $msg
@@ -824,7 +824,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     $importID = $meta[static::STORE_UNIQUE_ID_KEY];
                     $channel->send(['signal' => 'info', 'msg' => "Store id: $importID"]);
                 } else {
-                    $msg = $this->BLocale->_("%s Unique store id is not found, using '%s' as key", [BDb::now(), $importID]);
+                    $msg = $this->BLocale->_("%s Unique store id is not found, using '%s' as key", [$this->BDb->now(), $importID]);
                     $channel->send(
                         [
                             'signal'  => 'problem',
