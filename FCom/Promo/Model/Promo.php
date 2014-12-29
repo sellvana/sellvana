@@ -22,7 +22,6 @@
  * @property string $update_at
  * @property string $coupon
  *
- * DI
  * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
  * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
  * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
@@ -90,6 +89,9 @@ class FCom_Promo_Model_Promo extends BModel
         //todo: load vendors here
     }
 
+    /**
+     * @return FCom_Promo_Model_Group[]|null
+     */
     public function groups()
     {
         return $this->FCom_Promo_Model_Group->orm()
@@ -119,27 +121,31 @@ class FCom_Promo_Model_Promo extends BModel
         $grHlp = $this->FCom_Promo_Model_Group;
         $prodHlp = $this->FCom_Promo_Model_Product;
         $attHlp = $this->FCom_Promo_Model_Media;
+
         $clone = $this->create($this->as_array())->set([
             'id' => 'null',
             'status' => 'pending',
         ])->save();
+
         foreach ($this->groups() as $gr) {
             $clGr = $grHlp->create($gr->as_array())->set([
                 'id' => null,
-                'promo_id' => $clone->id,
+                'promo_id' => $clone->id(),
             ])->save();
+
             foreach ($gr->products() as $gp) {
-                $clProd = $prodHlp->create($gp->as_array())->set([
+                $prodHlp->create($gp->as_array())->set([
                     'id' => null,
-                    'promo_id' => $clone->id,
-                    'group_id' => $clGr->id,
+                    'promo_id' => $clone->id(),
+                    'group_id' => $clGr->id(),
                 ])->save();
             }
         }
+
         foreach ($this->media() as $att) {
             $attHlp->create($att->as_array())->set([
                 'id' => null,
-                'promo_id' => $clone->id,
+                'promo_id' => $clone->id(),
             ])->save();
         }
         return $clone;
@@ -159,6 +165,8 @@ class FCom_Promo_Model_Promo extends BModel
 
         $this->setDate($this->get("from_date"), 'from_date');
         $this->setDate($this->get("to_date"), 'to_date');
+        if (!$this->create_at) $this->create_at = $this->BDb->now();
+        $this->update_at = $this->BDb->now();
 
         return true;
     }

@@ -282,7 +282,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var AddFieldButton = React.createClass({
         render: function () {
             return (
-                <Components.Button onClick={this.props.onClick} className="btn-link" type="button" style={ {paddingRight:10, paddingLeft:10} }>
+                <Components.Button onClick={this.props.onClick} className="btn-link pull-left" type="button" style={ {paddingRight:10, paddingLeft:10} }>
                     <span aria-hidden="true" className="glyphicon glyphicon glyphicon-plus-sign"></span>
                 </Components.Button>
             );
@@ -296,16 +296,91 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             }
         }
     };
+
+    var select2QueryMixin = {
+        select2query: function (options) {
+            var self = this;
+            var $el = $(options.element);
+            var values = $el.data('searches') || [];
+            var flags = $el.data('flags') || {};
+            var term = options.term || '*';
+            var page = options.page;
+            console.log(page);
+            var data;
+            if (flags[term] != undefined && flags[term].loaded == 2) {
+                data = {results: self.searchLocal(term, values, page, 100), more: (flags[term].page > page)};
+                options.callback(data);
+            } else {
+                Promo.search({term: term, page: page, searchedTerms: flags}, this.url, function (result, params) {
+                    var more;
+                    if (result == 'local') {
+                        more = (params.searchedTerms[term].page > params.page) || (params.searchedTerms[term].loaded == 1);
+                        data = {results: self.searchLocal(params.term, values, params.page, params.o), more: more};
+                        options.callback(data);
+                    } else if (result.items !== undefined) {
+                        more = params.searchedTerms[term].loaded === 1;
+                        data = {results: result.items, more: more};
+                        flags[term] = params.searchedTerms[term];
+                        values = Promo.mergeResults(values, data.results, function (item, bitSet) {
+                            var inSet = true;
+                            if (!bitSet[item.id]) {
+                                inSet = false;
+                                bitSet[item.id] = 1;
+                            }
+                            return inSet;
+                        });
+                        $el.data({searches: values, flags: flags});
+
+                        options.callback(data);
+                    }
+                })
+            }
+        },
+        searchLocal: function (term, values, page, limit) {
+            page = page || 1;
+            limit = limit || 100;
+            var counted = 0;
+            var offset = (page - 1) * limit; // offset from which to start fetching results
+            var max = offset + limit;
+            var regex;
+            if (term != '*') { // * is match all, don't try to search
+                regex = new RegExp(term, 'i');
+            }
+            var matches = $.grep(values, function (val) {
+                if (counted >= max) { // if already reached goal, don't add any more matches
+                    return false;
+                }
+
+                var test;
+                if (regex) {
+                    test = regex.test(val['text']); // if regex and it matches a term
+                    if(!test && val.hasOwnProperty('sku')) {
+                        test = regex.test(val['sku']);
+                    }
+                    if (test) {
+//                                    console.log(term + ' matches ' + val.text);
+                        counted++; // up the counter
+                    }
+                } else {
+                    counted++; // no regex, just return matching items by position
+                    test = true;
+                }
+                return test && counted >= offset && counted < max;// if term is not for this page, skip it
+            });
+            return matches;
+        }
+    };
+
     // condition to apply to the selection of products
     var ConditionSkuCollection = React.createClass({
-        mixins: [removeConditionMixin],
+        mixins: [removeConditionMixin, select2QueryMixin],
         render: function () {
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="skuCollectionType" id="skuCollectionType"> of </ConditionsType>
                     <div className="col-md-2"><input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="skuCollectionCond" id="skuCollectionCond" /></div>
-                    <div className="col-md-1"><input className="form-control" ref="skuCollectionValue" id="skuCollectionValue" type="text"/></div>
+                    <div className="col-md-1"><input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue" type="text"/></div>
                 </ConditionsRow>
             );
         },
@@ -317,44 +392,18 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 type: 'skus'
             };
         },
+        url: '',
         componentDidMount: function () {
             var skuCollectionIds = this.refs.skuCollectionIds;
-            var url = this.props.options.base_url + this.props.url;
+            this.url = this.props.options.base_url + this.props.url;
+            var self = this;
             $(skuCollectionIds.getDOMNode()).select2({
                 placeholder: "Choose products",
-                minimumInputLength: 3,
                 multiple: true,
                 closeOnSelect: false,
-                ajax: {
-                    url: url,
-                    dataType: 'json',
-                    quietMillis: 250,
-                    data: function (term, page) {
-                        return {
-                            q: term,
-                            page: page,
-                            offset: 30
-                        };
-                    },
-                    results: function (data, page) {
-                        var more = (page * 30) < data.total_count;
-                        return {results: data.items, more: more};
-                    },
-                    cache: true
-                },
-                initSelection: function (element, callback) {
-                    var ids = this.state.productIds;
-                    if (ids) {
-                        $.ajax(url + "?ids=" + ids.join(','), {
-                            dataType: "json"
-                        }).done(function (data) {
-                            callback(data);
-                        });
-                    }
-                },
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
-                selectOnBlur: true,
+                selectOnBlur: false,
                 formatSelection: function (item) {
                     return item.sku;
                 },
@@ -370,8 +419,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                         '</div>';
 
                     return markup;
-                }
+                },
+                query: self.select2query
             });
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         }
     });
 
@@ -382,8 +433,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary"
-                       ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button>
+                    <div className="col-md-4"><Components.Button type="button" className="btn-primary"
+                       ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button></div>
                 </ConditionsRow>
             );
         },
@@ -421,6 +472,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     // content of the modal used to configure attribute combination
     var ConditionsAttributesModalContent = React.createClass({
+        mixins: [select2QueryMixin],
         render: function () {
             var fieldUrl = this.props.baseUrl + this.props.urlField;
             var paramObj = {};
@@ -477,31 +529,16 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 url: 'conditions/attributes_list'
             };
         },
+        url: '',
         componentDidMount: function () {
             var fieldCombination = this.refs.combinationField;
             var self = this;
-            var url = this.props.baseUrl + this.props.url;
+            this.url = this.props.baseUrl + this.props.url;
             $(fieldCombination.getDOMNode()).select2({
                 placeholder: self.props.labelCombinationField,
-                minimumInputLength: 2,
                 multiple: false,
                 closeOnSelect: false,
-                ajax: {
-                    url: url,
-                    dataType: 'json',
-                    quietMillis: 300,
-                    data: function (term, page) {
-                        return {
-                            q: term,
-                            page: page
-                        };
-                    },
-                    results: function (data, page) {
-                        var more = (page * 30) < data.total_count;
-                        return {results: data.items, more: more};
-                    },
-                    cache: true
-                },
+                query: self.select2query,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
                 selectOnBlur: true
@@ -511,6 +548,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     });
 
     var ConditionsAttributesModalField = React.createClass({
+        mixins:[select2QueryMixin],
         render: function () {
             var inputType = this.props.input;
             var opts = this.props.opts;
@@ -599,7 +637,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 default :
                     break;
             }
-
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         },
         componentDidUpdate: function () {
             this.componentDidMount();
@@ -629,69 +667,32 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 }
             );
         },
+        url:'',
         initSelectInput: function () {
             var fieldCombination = this.refs.fieldCombination;
             var self = this;
+            this.url = this.props.url;
             $(fieldCombination.getDOMNode()).select2({
                 placeholder: self.props.fcLabel,
-                minimumInputLength: 3,
                 maximumSelectionSize: 4,
                 multiple: true,
                 closeOnSelect: false,
-                ajax: {
-                    url: self.props.url,
-                    dataType: 'json',
-                    quietMillis: 300,
-                    data: function (term, page) {
-                        return {
-                            q: term,
-                            page: page,
-                            offset: 30
-                        };
-                    },
-                    results: function (data, page) {
-                        var more = (page * 30) < data.total_count;
-                        return {results: data.items, more: more};
-                    },
-                    cache: true
-                },
-                initSelection: function (element, callback) {
-                    var ids = this.state.ids;
-                    if (ids) {
-                        $.ajax(self.props.url + "?ids=" + ids.join(','), {
-                            dataType: "json"
-                        }).done(function (data) {
-                            callback(data);
-                        });
-                    }
-                },
+                query: this.select2query,
                 dropdownCssClass: "bigdrop",
-                dropdownAutoWidth: true,
-                selectOnBlur: true,
-                formatResult: function (item) {
-                    var markup = '<div class="row-fluid" title="' + item.text + '">' +
-                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
-                        '<div class="span2">Name: <strong>' + item.text.substr(0, 20);
-                    if (item.text.length > 20) {
-                        markup += '...';
-                    }
-                    markup += '</strong></div></div>';
-
-                    return markup;
-                }
+                dropdownAutoWidth: true
             });
         }
     });
 
     var ConditionCategories = React.createClass({
-        mixins: [removeConditionMixin],
+        mixins: [removeConditionMixin, select2QueryMixin],
         render: function () {
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
                     <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="catProductsCond" id="catProductsCond" /></div>
-                    <div className="col-md-1"><input ref="catProductsValue" id="catProductsValue" type="text" className="form-control"/></div>
+                    <div className="col-md-1"><input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left"/></div>
                 </ConditionsRow>
             );
         },
@@ -703,45 +704,18 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 type: 'cats'
             };
         },
+        url:'',
         componentDidMount: function () {
             var catProductsIds = this.refs.catProductsIds;
-            var url = this.props.options.base_url + this.props.url;
+            this.url = this.props.options.base_url + this.props.url;
             $(catProductsIds.getDOMNode()).select2({
                 placeholder: "Select categories",
-                minimumInputLength: 3,
                 maximumSelectionSize: 4,
                 multiple: true,
                 closeOnSelect: false,
-                ajax: {
-                    url: url,
-                    dataType: 'json',
-                    quietMillis: 250,
-                    data: function (term, page) {
-                        return {
-                            q: term,
-                            page: page,
-                            offset: 30
-                        };
-                    },
-                    results: function (data, page) {
-                        var more = (page * 30) < data.total_count;
-                        return {results: data.items, more: more};
-                    },
-                    cache: true
-                },
-                initSelection: function (element, callback) {
-                    var ids = this.state.categoryIds;
-                    if (ids) {
-                        $.ajax(url + "?ids=" + ids.join(','), {
-                            dataType: "json"
-                        }).done(function (data) {
-                            callback(data);
-                        });
-                    }
-                },
+                query: this.select2query,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
-                selectOnBlur: true,
                 formatResult: function (item) {
                     var markup = '<div class="row-fluid" title="' + item.full_name + '">' +
                         '<div class="span2">ID: <em>' + item.id + '</em></div>' +
@@ -755,6 +729,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     return markup;
                 }
             });
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         }
     });
 
@@ -765,7 +740,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType}/>
                     <div className="col-md-2"><ConditionsCompare ref="cartTotalCond" id="cartTotalCond" /></div>
-                    <div className="col-md-1"><input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control"/></div>
+                    <div className="col-md-1"><input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left"/></div>
                 </ConditionsRow>
             );
         },
@@ -776,6 +751,9 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 label: "Cart Total",
                 type: 'total'
             };
+        },
+        componentDidMount: function() {
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         }
     });
 
@@ -786,8 +764,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume"
                             readOnly="readonly" value={this.state.value} className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary" ref={this.props.configureId}
-                        onClick={this.handleConfigure}>Configure</Components.Button>
+                    <div className="col-md-4"> <Components.Button type="button" className="btn-primary pull-left" ref={this.props.configureId}
+                        onClick={this.handleConfigure}>Configure</Components.Button></div>
                 </ConditionsRow>
             );
         },
@@ -828,7 +806,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     var ConditionsShippingModalContent = React.createClass({
         render: function () {
-            var fieldUrl = this.props.baseUrl + this.props.urlField;
+            var fieldUrl = this.props.baseUrl + this.props.url;
             var paramObj = {};
             paramObj[this.props.idVar] = this.props.entityId;
             return (
@@ -855,7 +833,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     {this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
-                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
+                        return <ConditionsShippingModalField label={field.label} url={url} key={field.field}
                             id={field.field} removeField={this.removeField} />
                     }.bind(this))}
                 </div>
@@ -907,6 +885,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     });
 
     var ConditionsShippingModalField = React.createClass({
+        mixins:[select2QueryMixin],
         render: function () {
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
@@ -934,45 +913,27 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 ]
             };
         },
+        url:'',
         componentDidMount: function () {
             var fieldCombination = this.refs.fieldCombination;
             var self = this;
+            this.url = this.props.url;
+            console.log("About to select2");
             $(fieldCombination.getDOMNode()).select2({
                 placeholder: self.props.fcLabel,
-                minimumInputLength: 3,
                 maximumSelectionSize: 4,
                 multiple: true,
+                selectOnBlur: true,
                 closeOnSelect: false,
-                ajax: {
-                    url: self.props.url,
-                    dataType: 'json',
-                    quietMillis: 300,
-                    data: function (term, page) {
-                        return {
-                            q: term,
-                            page: page,
-                            offset: 30
-                        };
-                    },
-                    results: function (data, page) {
-                        var more = (page * 30) < data.total_count;
-                        return {results: data.items, more: more};
-                    },
-                    cache: true
-                },
-                initSelection: function (element, callback) {
-                    var ids = this.state.categoryIds;
-                    if (ids) {
-                        $.ajax(self.props.url + "?ids=" + ids.join(','), {
-                            dataType: "json"
-                        }).done(function (data) {
-                            callback(data);
-                        });
-                    }
-                },
+                query: self.select2query,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
-                selectOnBlur: true,
+                createSearchChoice: function (term) {
+                    return {id: term, text: term}
+                },
+                createSearchChoicePosition: function (list, item) {
+                    list.unshift(item);
+                },
                 formatResult: function (item) {
                     var markup = '<div class="row-fluid" title="' + item.text + '">' +
                         '<div class="span2">ID: <em>' + item.id + '</em></div>' +
@@ -1086,9 +1047,6 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 var $container = $("#" + this.options.condition_container_id);
                 React.render(<ConditionsApp conditionType={$conditionSelector} newCondition={this.options.condition_add_id}
                     options={this.options} modalContainer={$modalContainer}/>,$container.get(0));
-                /*
-                todo: initiate interface, load data from JSON (either from validator or as json string loaded via ajax)
-                */
             }
         },
         initCouponApp: function (selector, $modalContainer) {
@@ -1257,6 +1215,61 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         log: function (msg) {
             if(this.options.debug) {
                 console.log(msg);
+            }
+        },
+        mergeResults: function () {
+            var result = [], bitSet = {}, arr, len;
+            var checker = arguments[arguments.length - 1]; // function to check if item is in set
+            if(!$.isFunction(checker)) {
+                throw "Last argument must be a function.";
+            }
+            for(var i = 0; i < (arguments.length - 1); i++){
+                arr = arguments[i];
+                if(!arr instanceof Array) {
+                    continue;
+                }
+                len = arr.length;
+                while (len--) {
+                    var itm = arr[len];
+                    if (!checker(itm, bitSet)) {
+                        result.unshift(itm);
+                    }
+                }
+            }
+            return result;
+        },
+        search: function (params, url, callback) {
+            params.q = params.term || '*'; // '*' means default search
+            params.page = params.page || 1;
+            params.o = params.limit || 100;
+
+            params.searchedTerms = params.searchedTerms || {};
+            if(params.searchedTerms['*'] && params.searchedTerms['*'].loaded == 2) {
+                // if default search already returned all results, no need to go back to server
+                params.searchedTerms[params.term] = params.searchedTerms['*'];
+            }
+            var termStatus = params.searchedTerms[params.term];
+            if (termStatus == undefined || (termStatus.loaded == 1 && termStatus.page < params.page)) { // if this is first load, or there are more pages and we're looking for next page
+                if (termStatus == undefined) {
+                    params.searchedTerms[params.term] = {};
+                }
+                $.get(url, {page: params.page, q: params.q, o: params.o})
+                    .done(function (result) {
+                        if (result.hasOwnProperty('total_count')) {
+                            console.log(result['total_count']);
+                            var more = params.page * params.o < result['total_count'];
+                            params.searchedTerms[params.term].loaded = (more) ? 1 : 2; // 1 means more results to be fetched, 2 means all fetched
+                            params.searchedTerms[params.term].page = params.page; // 1 means more results to be fetched, 2 means all fetched
+                        }
+                        callback(result, params);
+                    })
+                    .fail(function (result) {
+                        callback(result, params);
+                    });
+            } else if (termStatus.loaded == 2 || (termStatus.page >= params.page)) {
+                callback('local', params); // find results from local storage
+            } else {
+                console.error("UNKNOWN search status.")
             }
         }
     };
