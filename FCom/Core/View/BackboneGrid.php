@@ -600,6 +600,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
      */
     public function getGridConfigData(array $options = [])
     {
+        //uncomment this code if we meet issue with stored value personalization, todo: need add this feature to Settings
+        //$this->_resetPersonalization();
         // fetch grid configuration
         $grid = $this->getGrid();
         $config = $grid['config'];

@@ -52,13 +52,11 @@ lib_tokeninput:
 lib_griddle:
     - view: head
         do:
+            #default griddle
             - [ requireJs, griddle.customFormatContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customFormatContainer ]
             - [ requireJs, griddle.customPaginationContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customPaginationContainer ]
             - [ requireJs, griddle.customFilterContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customFilterContainer ]
             - [ requireJs, griddle.customSettingsContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customSettingsContainer ]
-            - [ requireJs, griddle.customGridContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customGridContainer ]
-            - [ requireJs, griddle.customRowContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customRowContainer ]
-            - [ requireJs, griddle.customRow, @FCom_LibJsCommon/jsx/griddle/scripts/customRow ]
             - [ requireJs, griddle.gridBody, @FCom_LibJsCommon/jsx/griddle/scripts/gridBody ]
             - [ requireJs, griddle.gridFilter, @FCom_LibJsCommon/jsx/griddle/scripts/gridFilter ]
             - [ requireJs, griddle.gridNoData, @FCom_LibJsCommon/jsx/griddle/scripts/gridNoData ]
@@ -68,3 +66,7 @@ lib_griddle:
             - [ requireJs, griddle.gridSettings, @FCom_LibJsCommon/jsx/griddle/scripts/gridSettings ]
             - [ requireJs, griddle.gridTitle, @FCom_LibJsCommon/jsx/griddle/scripts/gridTitle ]
             - [ requireJs, griddle, @FCom_LibJsCommon/jsx/griddle/scripts/griddle ]
+            #fcom custom
+            - [ requireJs, griddle.fcomGridBody, @FCom_LibJsCommon/jsx/fcom.gridBody ]
+            - [ requireJs, griddle.fcomGridFilter, @FCom_LibJsCommon/jsx/fcom.gridFilter ]
+            - [ requireJs, griddle.fcomRow, @FCom_LibJsCommon/jsx/fcom.row ]
