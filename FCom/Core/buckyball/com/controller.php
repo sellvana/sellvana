@@ -1055,6 +1055,14 @@ class BRequest extends BClass
                     }
                     if ('*' !== $tags) {
                         $v = strip_tags($v, $tags);
+
+                        $v = preg_replace('/
+                            < [a-z:-]+ \s .*? (
+                                [a-z]+ \s* = \s* [\'"] \s* javascript \s* :   # src="javascript:..."
+                                |
+                                on[a-z]+ \s* = \s*   # onerror="..." onclick="..." onhover="..."
+                            ) .*? >
+                        /ix', '', $v);
                     }
                 }
             }

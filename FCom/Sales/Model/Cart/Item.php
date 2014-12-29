@@ -6,8 +6,10 @@
  * @property int $id
  * @property int $cart_id
  * @property int $product_id
- * @property string $local_sku
+ * @property string $product_sku
  * @property string $product_name
+ * @property string $inventory_sku
+ * @property string $inventory_id
  * @property float $qty
  * @property float $price
  * @property float $row_total
