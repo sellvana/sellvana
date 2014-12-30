@@ -291,8 +291,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
 
     var removeConditionMixin = {
         remove: function () {
-            if (this.props.removeAction) {
-                this.props.removeAction(this.props.id);
+            if (this.props.removeCondition) {
+                this.props.removeCondition(this.props.id);
             }
         }
     };
@@ -1052,21 +1052,21 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                         var key = field.id;
                         switch(field.type){
                             case 'skus':
-                                el = <ConditionSkuCollection options={this.props.options} key={key} id={key} removeCondition={this.removeAction}/>;
+                                el = <ConditionSkuCollection options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
                             case 'cats':
-                                el = <ConditionCategories options={this.props.options} key={key} id={key} removeCondition={this.removeAction}/>;
+                                el = <ConditionCategories options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
                             case 'total':
-                                el = <ConditionTotal options={this.props.options} key={key} id={key} removeCondition={this.removeAction}/>;
+                                el = <ConditionTotal options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
                             case 'comb':
                                 el = <ConditionAttributeCombination options={this.props.options}
-                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeAction}/>;
+                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
                             case 'shipping':
                                 el = <ConditionShipping options={this.props.options}
-                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeAction}/>;
+                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
 
                         }
@@ -1088,24 +1088,24 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 }
             }
 
-            $('#' + this.props.newCondition).on('click', this.addAction);
+            $('#' + this.props.newCondition).on('click', this.addCondition);
 
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         },
-        addAction: function () {
+        addCondition: function () {
             // add condition data to state
-            var $conditionTypes = this.props.actionType;
+            var $conditionTypes = this.props.conditionType;
             if($conditionTypes.length == 0) {
                 return;
             }
 
             var conditionType = $conditionTypes.val();
             var data = this.state.data;
-            var condition = {type: conditionType, id: conditionType + '-' + this.state.lastActionId};
+            var condition = {type: conditionType, id: conditionType + '-' + this.state.lastConditionId};
             data.push(condition);
-            this.setState({data: data, lastActionId: (this.state.lastActionId + 1)});
+            this.setState({data: data, lastConditionId: (this.state.lastConditionId + 1)});
         },
-        removeAction: function (conditionId) {
+        removeCondition: function (conditionId) {
             var data = this.state.data;
             data = data.filter(function (field) {
                 return field.id != conditionId;
@@ -1115,7 +1115,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         getInitialState: function () {
             return {
                 data: [],
-                lastActionId: 0
+                lastConditionId: 0
             };
         }
     });
