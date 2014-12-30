@@ -44,7 +44,6 @@ define(['underscore', 'react'], function (_, React) {
                 }).on('click', '.f-grid-filter button.filter-text-sub', function (e) {
                     that.keepShowDropDown(this);
                 }).on('click', 'ul.filter-sub a.filter_op', function (e) {
-                    var operator = $(e.target);
                     $(this).parents('div.dropdown').each(function() {
                         if ($(this).hasClass('input-group-btn')) {
                             $(this).removeClass('open');
@@ -143,7 +142,7 @@ define(['underscore', 'react'], function (_, React) {
             var id = this.props.getConfig('id');
             var filters = this.state.filters;
 
-            console.log('filters', filters);
+            //console.log('filters', filters);
 
             //quick search
             var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder={this.props.placeholderText} onChange={this.handleChange} id={id + '-quick-search'} />;
@@ -177,7 +176,7 @@ define(['underscore', 'react'], function (_, React) {
                 if (!f.show) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} />);
+                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} />);
             });
 
             //console.log('end render filters');
@@ -374,13 +373,20 @@ define(['underscore', 'react'], function (_, React) {
 
             //init datepicker + daterangepicker
             filterContainer.find('#daterange2').daterangepicker({
-                format: "YYYY-MM-DD"
+                format: "YYYY-MM-DD",
+                opens: 'left'
             }, function (start, end) {
                 var value = start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD");
                 $('#date-range-text-' + filter.field).val(value);
                 filter.val = value;
                 that.setState({filter: filter});
             });
+
+            filterContainer.find('#daterange2').on('click', function() {
+                return false;
+            });
+
+
             filterContainer.find(".datepicker").datetimepicker({ pickTime: false });
 
             $('.daterangepicker').on('click', function (ev) {
@@ -395,7 +401,7 @@ define(['underscore', 'react'], function (_, React) {
             var that = this;
 
             var operations = this.getOperations().map(function(item) {
-                return ( <li> <a className={"filter_op" + (item.range ? 'range' : 'not_range')} data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+                return ( <li> <a className={"filter_op " + (item.range ? 'range' : 'not_range')} data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
             });
 
             return (
