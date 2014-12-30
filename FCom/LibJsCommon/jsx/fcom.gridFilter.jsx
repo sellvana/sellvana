@@ -131,13 +131,17 @@ define(['underscore', 'react'], function (_, React) {
             return submitFilters;
         },
         /**
-         * filter data
-         * @param event
+         * do filter
+         * @param {} filter
+         * @param bool isClear
          */
-        filter: function (event) {
+        doFilter: function (filter, isClear) {
+            if (typeof isClear == 'undefined') {
+                isClear = false;
+            }
             //prepare data
-            var field = event.target.dataset.field;
-            this.setStateFilter(field, 'submit', !(event.target.dataset.clear == '1'));
+            var field = filter.field;
+            this.setStateFilter(field, 'submit', !isClear);
 
             var submitFilters = this.prepareFilter();
             //console.log('submitFilters', submitFilters);
@@ -185,7 +189,7 @@ define(['underscore', 'react'], function (_, React) {
                 if (!f.show) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} setFilter={that.filter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} />);
+                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} />);
             });
 
             //console.log('end render filters');
@@ -249,14 +253,14 @@ define(['underscore', 'react'], function (_, React) {
             filter.op = event.target.dataset.id;
             filter.opLabel = opLabel;
 
-            this.props.setStateFilter(field, 'op', filter.op);
-            this.props.setStateFilter(field, 'opLabel', opLabel);
+            this.props.setStateFilter(filter.field, 'op', filter.op);
+            this.props.setStateFilter(filter.field, 'opLabel', opLabel);
             this.setState({filter: filter});
         },
         setStateValue: function(event) {
             var filter = this.state.filter;
             filter.val = event.target.value;
-            this.props.setStateFilter(event.target.dataset.field, 'val', event.target.value);
+            this.props.setStateFilter(filter.field, 'val', event.target.value);
             this.setState({filter: filter});
         }
     };
@@ -291,9 +295,10 @@ define(['underscore', 'react'], function (_, React) {
         },
         submitFilter: function (event) {
             var filter = this.state.filter;
-            filter.submit = !(event.target.dataset.clear == "1");
+            var isClear = event.target.dataset.clear == "1";
+            filter.submit = !isClear;
             this.setState({filter: filter});
-            this.props.setFilter(event);
+            this.props.setFilter(filter, isClear);
         },
         render: function() {
             var that = this;
@@ -303,7 +308,7 @@ define(['underscore', 'react'], function (_, React) {
             console.log('begin render filter: ' +  filter.field);*/
 
             var operations = this.getOperations().map(function(item) {
-                return ( <li> <a className="filter_op" data-id={item.op} data-field={filter.field} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+                return ( <li> <a className="filter_op" data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
             });
 
             /*console.log('end render filter: ' +  filter.field);*/
@@ -327,16 +332,16 @@ define(['underscore', 'react'], function (_, React) {
                                         {operations}
                                     </ul>
                                 </div>
-                                <input type="text" className="form-control" data-field={filter.field} onChange={this.setStateValue} />
+                                <input type="text" className="form-control" onChange={this.setStateValue} />
                                 <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" data-field={filter.field} onClick={this.submitFilter}>
+                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
                                         Update
                                     </button>
                                 </div>
                             </div>
                         </li>
                     </ul>
-                    <abbr className="select2-search-choice-close" data-field={filter.field} data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
                 </div>
             );
         }
