@@ -473,7 +473,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     });
 
     var Shipping = React.createClass({
-        mixins: [Common.select2QueryMixin],
+        mixins: [Common.select2QueryMixin, Common.removeMixin],
         render: function () {
             var amount = '';
             if(this.state.type != 'free') {
@@ -539,14 +539,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                         var key = field.id;
                         switch(field.type){
                             case 'discount':
-                                el = <Discount options={this.props.options} key={key} id={key} removeCondition={this.removeAction}
+                                el = <Discount options={this.props.options} key={key} id={key} removeAction={this.removeAction}
                                     modalContainer={this.props.modalContainer}/>;
                                 break;
                             case 'free_product':
-                                el = <FreeProduct options={this.props.options} key={key} id={key} removeCondition={this.removeAction}/>;
+                                el = <FreeProduct options={this.props.options} key={key} id={key} removeAction={this.removeAction}/>;
                                 break;
                             case 'shipping':
-                                el = <Shipping label={Locale._("Shipping")} options={this.props.options} key={key} id={key} removeCondition={this.removeAction}/>;
+                                el = <Shipping label={Locale._("Shipping")} options={this.props.options} key={key} id={key} removeAction={this.removeAction}/>;
                                 break;
 
                         }

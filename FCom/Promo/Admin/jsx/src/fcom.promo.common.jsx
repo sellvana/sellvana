@@ -185,6 +185,15 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                 });
                 return matches;
             }
+        },
+        removeMixin: {
+            remove: function () {
+                if (this.props.removeAction) {
+                    this.props.removeAction(this.props.id);
+                } else if (this.props.removeCondition) {
+                    this.props.removeCondition(this.props.id);
+                }
+            }
         }
     };
     return Common;
