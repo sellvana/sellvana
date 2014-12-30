@@ -82,7 +82,7 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                             more = params.searchedTerms[term].loaded === 1;
                             data = {results: result.items, more: more};
                             flags[term] = params.searchedTerms[term];
-                            values = Promo.mergeResults(values, data.results, function (item, bitSet) {
+                            values = self.mergeResults(values, data.results, function (item, bitSet) {
                                 var inSet = true;
                                 if (!bitSet[item.id]) {
                                     inSet = false;
@@ -96,6 +96,27 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                         }
                     })
                 }
+            },
+            mergeResults: function () {
+                var result = [], bitSet = {}, arr, len;
+                var checker = arguments[arguments.length - 1]; // function to check if item is in set
+                if(!$.isFunction(checker)) {
+                    throw "Last argument must be a function.";
+                }
+                for(var i = 0; i < (arguments.length - 1); i++){
+                    arr = arguments[i];
+                    if(!arr instanceof Array) {
+                        continue;
+                    }
+                    len = arr.length;
+                    while (len--) {
+                        var itm = arr[len];
+                        if (!checker(itm, bitSet)) {
+                            result.unshift(itm);
+                        }
+                    }
+                }
+                return result;
             },
             search: function (params, url, callback) {
                 params.q = params.term || '*'; // '*' means default search

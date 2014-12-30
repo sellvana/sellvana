@@ -11,9 +11,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             }
             return (
                 <div className={this.props.containerClass}>
-                    <select className={cls}>
+                    <select className={cls} onChange={this.props.onChange} defaultValue={this.props.value}>
                         {this.props.totalType.map(function (type) {
-                            return <option value={type.id} key={type.id} {this.props.value == type.id?"selected":""}>{type.label}</option>
+                            return <option value={type.id} key={type.id}>{type.label}</option>
                         })}
                     </select>
                     {this.props.children}
@@ -24,8 +24,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             return {
                 totalType: [{id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount"}],
                 select2: true,
-                containerClass: "col-md-2"
+                containerClass: "col-md-2",
+                className: "form-control"
             };
+        }, componentDidMount: function () {
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15}).on('change', this.props.onChange);
         }
     });
     var DiscountDetailsCombination = React.createClass({
@@ -373,13 +376,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
 
     var DiscountDetails = React.createClass({
         render: function () {
-            var details = "";
+            var details = <span/>;
             if(this.props.type == 'other_prod') {
                 details = <input type="hidden" id="otherProd" ref="otherProd" key="otherProd" />
             } else if(this.props.type == 'attr_combination') {
                 details = <DiscountDetailsCombination id="attrCombination" ref="attrCombination" key="attrCombination"/>
             }
-            return ({details});
+            return details;
         }
     });
     var Discount = React.createClass({
@@ -450,11 +453,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                         <input type="hidden" className="form-control" id="productSku" ref="productSku"/>
                     </div>
                     <div className="col-md-3">
-                        <Components.Label input_id="productQty">{Locale._('Qty')}</Components.Label>
+                        <Components.ControlLabel input_id="productQty">{Locale._('Qty')}</Components.ControlLabel>
                         <input type="text" className="form-control" id="productQty" ref="productQty" defaultValue={this.state.qty}/>
                     </div>
                     <div className="col-md-3">
-                        <Components.Label input_id="productTerms">{Locale._('Terms')}</Components.Label>
+                        <Components.ControlLabel input_id="productTerms">{Locale._('Terms')}</Components.ControlLabel>
                         <input type="hidden" className="form-control" id="productTerms" ref="productTerms"/>
                     </div>
                 </Common.Row>
@@ -470,22 +473,41 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     });
 
     var Shipping = React.createClass({
+        mixins: [Common.select2QueryMixin],
         render: function () {
             var amount = '';
             if(this.state.type != 'free') {
-                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" />
+                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" className="form-control" />
             }
+            var type = <Type ref="shippingType" id="shippingType" onChange={this.onTypeChange} value={this.state.type}
+                    totalType={this.props.fields}/>;
+            var label = <Components.ControlLabel label_class="col-md-1" input_id="shippingMethods">{Locale._('For')}</Components.ControlLabel>;
+            var input = <input type="hidden" className="form-control" id="shippingMethods" ref="shippingMethods"/>;
             return (
-                <Common.Row>
-                    <Type ref="shippingType" id="shippingType"
-                        totalType={[{id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}, {id: "free", label:"Free"}]}/>
+                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                    {type}
                     <div className="col-md-6">
-                        {amount}
-                        <Components.Label input_id="shippingMethods">{Locale._('For')}</Components.Label>
-                        <input type="hidden" className="form-control" id="shippingMethods" ref="shippingMethods"/>
+                        <div className={amount? "col-md-2": ""}>{amount}</div>
+                        {label}
+                        <div className={amount? "col-md-9": "col-md-11"}>{input}</div>
+                        {/*if no amount field, make this wider*/}
                     </div>
                 </Common.Row>
             );
+        },
+        onTypeChange: function (ev) {
+            ev.preventDefault();
+            var newType = $(ev.target).val();
+            this.setState({type: newType});
+        },
+        getDefaultProps: function () {
+            return {
+                fields: [
+                    {id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}, {id: "free", label:"Free"}
+                ],
+                labelMethodsField: Locale._("Select shipping methods"),
+                url: "conditions/shipping"
+            };
         },
         getInitialState: function () {
             return {
@@ -493,6 +515,18 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 methods: [],
                 amount: 0
             }
+        },
+        url: '',
+        componentDidMount: function(){
+            var shippingMethods = this.refs.shippingMethods;
+            var self = this;
+            this.url = this.props.options.base_url + '/' + this.props.url + '?'+ $.param({field: 'methods'});
+            $(shippingMethods.getDOMNode()).select2({
+                placeholder: self.props.labelMethodsField,
+                multiple: true,
+                query: self.select2query,
+                dropdownAutoWidth: true
+            });
         }
     });
 
@@ -508,11 +542,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                                 el = <Discount options={this.props.options} key={key} id={key} removeCondition={this.removeAction}
                                     modalContainer={this.props.modalContainer}/>;
                                 break;
-                            case 'free_products':
+                            case 'free_product':
                                 el = <FreeProduct options={this.props.options} key={key} id={key} removeCondition={this.removeAction}/>;
                                 break;
                             case 'shipping':
-                                el = <Shipping options={this.props.options} key={key} id={key} removeCondition={this.removeAction}/>;
+                                el = <Shipping label={Locale._("Shipping")} options={this.props.options} key={key} id={key} removeCondition={this.removeAction}/>;
                                 break;
 
                         }
