@@ -30,7 +30,6 @@ define(['underscore', 'react'], function (_, React) {
         },
         componentDidMount: function() {
             var that = this;
-            var filterContainer = $('.f-filter-btns');
 
             //fix for grid filter
             $(document).
@@ -60,17 +59,6 @@ define(['underscore', 'react'], function (_, React) {
                     }
                 })
             ;
-
-            //init datepicker + daterangepicker
-            filterContainer.find('.filter-date-range').daterangepicker({ format: "YYYY-MM-DD" });
-            filterContainer.find(".datepicker").datetimepicker({ pickTime: false });
-
-            $('.daterangepicker').on('click', function (ev) {
-                    ev.stopPropagation();
-                    ev.preventDefault();
-                    return false;
-                }
-            );
         },
         capitaliseFirstLetter: function(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -249,12 +237,15 @@ define(['underscore', 'react'], function (_, React) {
             var filter = this.state.filter;
             var operation = _.findWhere(this.getOperations(), {op: event.target.dataset.id});
             var opLabel = this.props.capitaliseFirstLetter(operation.name);
+            var isRange = this.isRange(event);
 
             filter.op = event.target.dataset.id;
             filter.opLabel = opLabel;
+            filter.range = isRange;
 
             this.props.setStateFilter(filter.field, 'op', filter.op);
             this.props.setStateFilter(filter.field, 'opLabel', opLabel);
+            this.props.setStateFilter(filter.field, 'range', isRange);
             this.setState({filter: filter});
         },
         setStateValue: function(event) {
@@ -262,6 +253,16 @@ define(['underscore', 'react'], function (_, React) {
             filter.val = event.target.value;
             this.props.setStateFilter(filter.field, 'val', event.target.value);
             this.setState({filter: filter});
+        },
+        submitFilter: function (event) {
+            var filter = this.state.filter;
+            var isClear = event.target.dataset.clear == "1";
+            filter.submit = !isClear;
+            this.setState({filter: filter});
+            this.props.setFilter(filter, isClear);
+        },
+        isRange: function(event) {
+            return $(event.target).hasClass('range');
         }
     };
 
@@ -293,13 +294,6 @@ define(['underscore', 'react'], function (_, React) {
                 { op: 'end', name: 'end with' }
             ];
         },
-        submitFilter: function (event) {
-            var filter = this.state.filter;
-            var isClear = event.target.dataset.clear == "1";
-            filter.submit = !isClear;
-            this.setState({filter: filter});
-            this.props.setFilter(filter, isClear);
-        },
         render: function() {
             var that = this;
             var filter = this.state.filter;
@@ -317,7 +311,7 @@ define(['underscore', 'react'], function (_, React) {
                 <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
                     <button className="btn dropdown-toggle filter-text-main" data-toggle="dropdown">
                         <span className="f-grid-filter-field">{filter.label}</span>:
-                        <span className="f-grid-filter-value"> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'}  </span>
+                        <span className="f-grid-filter-value"> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
                         <span className="caret"></span>
                     </button>
                     <ul className="dropdown-menu filter-box">
@@ -348,29 +342,67 @@ define(['underscore', 'react'], function (_, React) {
     });
 
     var FComFilterDateRange = React.createClass({
+        mixins: [FilterStateMixin],
         getInitialState: function() {
             var filter = this.props.filter;
-            filter.range = true;
-            filter.val = "";
-            filter.op = "between";
+            if (filter.op == '') { //set default value operation
+                var operation = _.findWhere(this.getOperations(), {'default': true});
+                _.extend(filter, {
+                    op: operation.op,
+                    opLabel: this.props.capitaliseFirstLetter(operation.name),
+                    val: '',
+                    range: operation.range,
+                    submit: false
+                });
+            }
+
             return { filter: filter };
         },
         getOperations: function() {
             return [
-                { op: 'between', label: 'between', range: true, 'default': true },
-                { op: 'from', label: 'from', range: false },
-                { op: 'to', label: 'to', range: false },
-                { op: 'equal', label: 'is equal to', range: false },
-                { op: 'not_in', label: 'not in', range: true }
+                { op: 'between', name: 'between', range: true, 'default': true },
+                { op: 'from', name: 'from', range: false },
+                { op: 'to', name: 'to', range: false },
+                { op: 'equal', name: 'is equal to', range: false },
+                { op: 'not_in', name: 'not in', range: true }
             ];
+        },
+        componentDidMount: function() {
+            var filter = this.state.filter;
+            var that = this;
+            var filterContainer = $('#f-grid-filter-' + filter.field);
+
+            //init datepicker + daterangepicker
+            filterContainer.find('#daterange2').daterangepicker({
+                format: "YYYY-MM-DD"
+            }, function (start, end) {
+                var value = start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD");
+                $('#date-range-text-' + filter.field).val(value);
+                filter.val = value;
+                that.setState({filter: filter});
+            });
+            filterContainer.find(".datepicker").datetimepicker({ pickTime: false });
+
+            $('.daterangepicker').on('click', function (ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    return false;
+                }
+            );
         },
         render: function() {
             var filter = this.state.filter;
+            var that = this;
+
+            var operations = this.getOperations().map(function(item) {
+                return ( <li> <a className={"filter_op" + (item.range ? 'range' : 'not_range')} data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+            });
+
             return (
-                <div className="btn-group dropdown f-grid-filter" id={"f-grid-filter-" + filter.field}>
+                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
                     <button className="btn dropdown-toggle filter-text-main" data-toggle='dropdown'>
                         <span className='f-grid-filter-field'>{filter.label}</span>:
-                        <span className='f-grid-filter-value'> All </span>
+                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
                         <span className="caret"></span>
                     </button>
 
@@ -379,47 +411,34 @@ define(['underscore', 'react'], function (_, React) {
                             <div className="input-group">
                                 <div className="input-group-btn dropdown">
                                     <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
-                                        Between
+                                        {filter.opLabel}
                                         <span className="caret"></span>
                                     </button>
                                     <ul className="dropdown-menu filter-sub">
-                                        <li>
-                                            <a className="filter_op range" data-id="between" href="#">between</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op not_range" data-id="from" href="#">from</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op not_range" data-id="to" href="#">to</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op not_range" data-id="equal" href="#">is equal to</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op range" data-id="not_in" href="#">not in</a>
-                                        </li>
+                                        {operations}
                                     </ul>
                                 </div>
                                 <div className="input-group range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input id={'date-range-text-' + filter.field} type="text" placeholder="Select date range" className="form-control daterange" value="" />
-                                    <span id="daterange2" className="input-group-addon filter-date-range">
+                                    <input id={'date-range-text-' + filter.field} type="text" placeholder="Select date range" className="form-control daterange" onChange={this.setStateValue} />
+                                    <span id="daterange2" className="input-group-addon filter-date-range" data-input={'date-range-text-' + filter.field}>
                                         <i className="icon-calendar"></i>
                                     </span>
                                 </div>
                                 <div className="datepicker input-group not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" className="form-control" value="" />
+                                    <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" className="form-control" onChange={this.setStateValue} />
                                     <span className="input-group-addon">
                                         <span data-time-icon="icon-time" data-date-icon="icon-calendar" className="icon-calendar"></span>
                                     </span>
                                 </div>
                                 <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" onClick={this.props.setFilter}>
+                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
                                         Update
                                     </button>
                                 </div>
                             </div>
                         </li>
                     </ul>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
                 </div>
             );
         }
