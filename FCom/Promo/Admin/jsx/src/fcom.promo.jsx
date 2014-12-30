@@ -213,7 +213,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         }
     });
 
-    var ConditionsRow = React.createClass({
+    var Common = React.createClass({
         render: function () {
             var cls = "form-group condition";
             if(this.props.rowClass) {
@@ -376,12 +376,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         mixins: [removeConditionMixin, select2QueryMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                <Common rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="skuCollectionType" id="skuCollectionType"> of </ConditionsType>
                     <div className="col-md-2"><input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="skuCollectionCond" id="skuCollectionCond" /></div>
                     <div className="col-md-1"><input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue" type="text"/></div>
-                </ConditionsRow>
+                </Common>
             );
         },
         getDefaultProps: function () {
@@ -431,11 +431,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                <Common rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control" value={this.state.valueText}/></div>
                     <div className="col-md-4"><Components.Button type="button" className="btn-primary"
                        ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button></div>
-                </ConditionsRow>
+                </Common>
             );
         },
         getInitialState: function () {
@@ -648,12 +648,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 input = <Components.YesNo  id={fieldId} ref={fieldId} />;
             }
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                <Common rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
                         <ConditionsCompare opts={ opts } id={"fieldCompare." + this.props.id} ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{input}</div>
-                </ConditionsRow>
+                </Common>
             );
         },
         getOpts: function () {
@@ -776,12 +776,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         mixins: [removeConditionMixin, select2QueryMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                <Common rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
                     <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="catProductsCond" id="catProductsCond" /></div>
                     <div className="col-md-1"><input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left"/></div>
-                </ConditionsRow>
+                </Common>
             );
         },
         getDefaultProps: function () {
@@ -825,11 +825,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                <Common rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType}/>
                     <div className="col-md-2"><ConditionsCompare ref="cartTotalCond" id="cartTotalCond" /></div>
                     <div className="col-md-1"><input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left"/></div>
-                </ConditionsRow>
+                </Common>
             );
         },
         getDefaultProps: function () {
@@ -849,12 +849,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                <Common rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume"
                             readOnly="readonly" value={this.state.value} className="form-control"/></div>
                     <div className="col-md-4"> <Components.Button type="button" className="btn-primary pull-left" ref={this.props.configureId}
                         onClick={this.handleConfigure}>Configure</Components.Button></div>
-                </ConditionsRow>
+                </Common>
             );
         },
         getDefaultProps: function () {
@@ -984,12 +984,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 helperBlock = <span key={fieldId + '.help'} className="help-block">{this.props.zipHelperText }</span>;
             }
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                <Common rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
                         <ConditionsCompare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
                     </div>
                     <div className="col-md-5">{[input, helperBlock]}</div>
-                </ConditionsRow>
+                </Common>
             );
         },
         remove: function () {
