@@ -30,7 +30,6 @@ define(['underscore', 'react'], function (_, React) {
         },
         componentDidMount: function() {
             var that = this;
-            var filterContainer = $('.f-filter-btns');
 
             //fix for grid filter
             $(document).
@@ -45,7 +44,6 @@ define(['underscore', 'react'], function (_, React) {
                 }).on('click', '.f-grid-filter button.filter-text-sub', function (e) {
                     that.keepShowDropDown(this);
                 }).on('click', 'ul.filter-sub a.filter_op', function (e) {
-                    var operator = $(e.target);
                     $(this).parents('div.dropdown').each(function() {
                         if ($(this).hasClass('input-group-btn')) {
                             $(this).removeClass('open');
@@ -60,17 +58,6 @@ define(['underscore', 'react'], function (_, React) {
                     }
                 })
             ;
-
-            //init datepicker + daterangepicker
-            filterContainer.find('.filter-date-range').daterangepicker({ format: "YYYY-MM-DD" });
-            filterContainer.find(".datepicker").datetimepicker({ pickTime: false });
-
-            $('.daterangepicker').on('click', function (ev) {
-                    ev.stopPropagation();
-                    ev.preventDefault();
-                    return false;
-                }
-            );
         },
         capitaliseFirstLetter: function(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -131,13 +118,17 @@ define(['underscore', 'react'], function (_, React) {
             return submitFilters;
         },
         /**
-         * filter data
-         * @param event
+         * do filter
+         * @param {} filter
+         * @param bool isClear
          */
-        filter: function (event) {
+        doFilter: function (filter, isClear) {
+            if (typeof isClear == 'undefined') {
+                isClear = false;
+            }
             //prepare data
-            var field = event.target.dataset.field;
-            this.setStateFilter(field, 'submit', !(event.target.dataset.clear == '1'));
+            var field = filter.field;
+            this.setStateFilter(field, 'submit', !isClear);
 
             var submitFilters = this.prepareFilter();
             //console.log('submitFilters', submitFilters);
@@ -151,7 +142,7 @@ define(['underscore', 'react'], function (_, React) {
             var id = this.props.getConfig('id');
             var filters = this.state.filters;
 
-            console.log('filters', filters);
+            //console.log('filters', filters);
 
             //quick search
             var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder={this.props.placeholderText} onChange={this.handleChange} id={id + '-quick-search'} />;
@@ -185,7 +176,7 @@ define(['underscore', 'react'], function (_, React) {
                 if (!f.show) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} setFilter={that.filter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} />);
+                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} />);
             });
 
             //console.log('end render filters');
@@ -245,19 +236,32 @@ define(['underscore', 'react'], function (_, React) {
             var filter = this.state.filter;
             var operation = _.findWhere(this.getOperations(), {op: event.target.dataset.id});
             var opLabel = this.props.capitaliseFirstLetter(operation.name);
+            var isRange = this.isRange(event);
 
             filter.op = event.target.dataset.id;
             filter.opLabel = opLabel;
+            filter.range = isRange;
 
-            this.props.setStateFilter(field, 'op', filter.op);
-            this.props.setStateFilter(field, 'opLabel', opLabel);
+            this.props.setStateFilter(filter.field, 'op', filter.op);
+            this.props.setStateFilter(filter.field, 'opLabel', opLabel);
+            this.props.setStateFilter(filter.field, 'range', isRange);
             this.setState({filter: filter});
         },
         setStateValue: function(event) {
             var filter = this.state.filter;
             filter.val = event.target.value;
-            this.props.setStateFilter(event.target.dataset.field, 'val', event.target.value);
+            this.props.setStateFilter(filter.field, 'val', event.target.value);
             this.setState({filter: filter});
+        },
+        submitFilter: function (event) {
+            var filter = this.state.filter;
+            var isClear = event.target.dataset.clear == "1";
+            filter.submit = !isClear;
+            this.setState({filter: filter});
+            this.props.setFilter(filter, isClear);
+        },
+        isRange: function(event) {
+            return $(event.target).hasClass('range');
         }
     };
 
@@ -289,12 +293,6 @@ define(['underscore', 'react'], function (_, React) {
                 { op: 'end', name: 'end with' }
             ];
         },
-        submitFilter: function (event) {
-            var filter = this.state.filter;
-            filter.submit = !(event.target.dataset.clear == "1");
-            this.setState({filter: filter});
-            this.props.setFilter(event);
-        },
         render: function() {
             var that = this;
             var filter = this.state.filter;
@@ -303,7 +301,7 @@ define(['underscore', 'react'], function (_, React) {
             console.log('begin render filter: ' +  filter.field);*/
 
             var operations = this.getOperations().map(function(item) {
-                return ( <li> <a className="filter_op" data-id={item.op} data-field={filter.field} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+                return ( <li> <a className="filter_op" data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
             });
 
             /*console.log('end render filter: ' +  filter.field);*/
@@ -312,7 +310,7 @@ define(['underscore', 'react'], function (_, React) {
                 <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
                     <button className="btn dropdown-toggle filter-text-main" data-toggle="dropdown">
                         <span className="f-grid-filter-field">{filter.label}</span>:
-                        <span className="f-grid-filter-value"> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'}  </span>
+                        <span className="f-grid-filter-value"> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
                         <span className="caret"></span>
                     </button>
                     <ul className="dropdown-menu filter-box">
@@ -327,45 +325,90 @@ define(['underscore', 'react'], function (_, React) {
                                         {operations}
                                     </ul>
                                 </div>
-                                <input type="text" className="form-control" data-field={filter.field} onChange={this.setStateValue} />
+                                <input type="text" className="form-control" onChange={this.setStateValue} />
                                 <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" data-field={filter.field} onClick={this.submitFilter}>
+                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
                                         Update
                                     </button>
                                 </div>
                             </div>
                         </li>
                     </ul>
-                    <abbr className="select2-search-choice-close" data-field={filter.field} data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
                 </div>
             );
         }
     });
 
     var FComFilterDateRange = React.createClass({
+        mixins: [FilterStateMixin],
         getInitialState: function() {
             var filter = this.props.filter;
-            filter.range = true;
-            filter.val = "";
-            filter.op = "between";
+            if (filter.op == '') { //set default value operation
+                var operation = _.findWhere(this.getOperations(), {'default': true});
+                _.extend(filter, {
+                    op: operation.op,
+                    opLabel: this.props.capitaliseFirstLetter(operation.name),
+                    val: '',
+                    range: operation.range,
+                    submit: false
+                });
+            }
+
             return { filter: filter };
         },
         getOperations: function() {
             return [
-                { op: 'between', label: 'between', range: true, 'default': true },
-                { op: 'from', label: 'from', range: false },
-                { op: 'to', label: 'to', range: false },
-                { op: 'equal', label: 'is equal to', range: false },
-                { op: 'not_in', label: 'not in', range: true }
+                { op: 'between', name: 'between', range: true, 'default': true },
+                { op: 'from', name: 'from', range: false },
+                { op: 'to', name: 'to', range: false },
+                { op: 'equal', name: 'is equal to', range: false },
+                { op: 'not_in', name: 'not in', range: true }
             ];
+        },
+        componentDidMount: function() {
+            var filter = this.state.filter;
+            var that = this;
+            var filterContainer = $('#f-grid-filter-' + filter.field);
+
+            //init datepicker + daterangepicker
+            filterContainer.find('#daterange2').daterangepicker({
+                format: "YYYY-MM-DD",
+                opens: 'left'
+            }, function (start, end) {
+                var value = start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD");
+                $('#date-range-text-' + filter.field).val(value);
+                filter.val = value;
+                that.setState({filter: filter});
+            });
+
+            filterContainer.find('#daterange2').on('click', function() {
+                return false;
+            });
+
+
+            filterContainer.find(".datepicker").datetimepicker({ pickTime: false });
+
+            $('.daterangepicker').on('click', function (ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    return false;
+                }
+            );
         },
         render: function() {
             var filter = this.state.filter;
+            var that = this;
+
+            var operations = this.getOperations().map(function(item) {
+                return ( <li> <a className={"filter_op " + (item.range ? 'range' : 'not_range')} data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+            });
+
             return (
-                <div className="btn-group dropdown f-grid-filter" id={"f-grid-filter-" + filter.field}>
+                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
                     <button className="btn dropdown-toggle filter-text-main" data-toggle='dropdown'>
                         <span className='f-grid-filter-field'>{filter.label}</span>:
-                        <span className='f-grid-filter-value'> All </span>
+                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
                         <span className="caret"></span>
                     </button>
 
@@ -374,47 +417,34 @@ define(['underscore', 'react'], function (_, React) {
                             <div className="input-group">
                                 <div className="input-group-btn dropdown">
                                     <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
-                                        Between
+                                        {filter.opLabel}
                                         <span className="caret"></span>
                                     </button>
                                     <ul className="dropdown-menu filter-sub">
-                                        <li>
-                                            <a className="filter_op range" data-id="between" href="#">between</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op not_range" data-id="from" href="#">from</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op not_range" data-id="to" href="#">to</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op not_range" data-id="equal" href="#">is equal to</a>
-                                        </li>
-                                        <li>
-                                            <a className="filter_op range" data-id="not_in" href="#">not in</a>
-                                        </li>
+                                        {operations}
                                     </ul>
                                 </div>
                                 <div className="input-group range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input id={'date-range-text-' + filter.field} type="text" placeholder="Select date range" className="form-control daterange" value="" />
-                                    <span id="daterange2" className="input-group-addon filter-date-range">
+                                    <input id={'date-range-text-' + filter.field} type="text" placeholder="Select date range" className="form-control daterange" onChange={this.setStateValue} />
+                                    <span id="daterange2" className="input-group-addon filter-date-range" data-input={'date-range-text-' + filter.field}>
                                         <i className="icon-calendar"></i>
                                     </span>
                                 </div>
                                 <div className="datepicker input-group not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" className="form-control" value="" />
+                                    <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" className="form-control" onChange={this.setStateValue} />
                                     <span className="input-group-addon">
                                         <span data-time-icon="icon-time" data-date-icon="icon-calendar" className="icon-calendar"></span>
                                     </span>
                                 </div>
                                 <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" onClick={this.props.setFilter}>
+                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
                                         Update
                                     </button>
                                 </div>
                             </div>
                         </li>
                     </ul>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
                 </div>
             );
         }
