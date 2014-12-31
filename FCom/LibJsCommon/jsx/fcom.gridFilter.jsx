@@ -176,7 +176,7 @@ define(['underscore', 'react'], function (_, React) {
                 if (!f.show) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} />);
+                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} getConfig={that.props.getConfig} />);
             });
 
             //console.log('end render filters');
@@ -457,8 +457,71 @@ define(['underscore', 'react'], function (_, React) {
     });
 
     var FComFilterMultiSelect = React.createClass({
+        mixins: [FilterStateMixin],
+        getInitialState: function() {
+            var filter = this.props.filter;
+            filter.valName = '';
+            //get data to build select2
+            var column = _.findWhere(this.props.getConfig('columns'), {name: filter.field});
+            var data = [];
+            _.forEach(column.options, function(value, key) {
+                data.push({ id: key, text: value });
+            });
+
+            return { filter: filter, filterData: data };
+        },
+        getValueName: function(value) {
+            var data = _.findWhere(this.state.filterData, { id: value });
+            return data ? data.text : value;
+        },
+        componentDidMount: function() {
+            var that = this;
+            var filter = this.state.filter;
+            var filterContainer = $('#f-grid-filter-' + filter.field);
+
+            filterContainer.find('#multi_hidden').select2({
+                multiple: true,
+                data: this.state.filterData,
+                placeholder: 'All'
+                //closeOnSelect: true
+            });
+
+            filterContainer.find('#multi_hidden').on('change', function(e) {
+                filter.val = e.val.join(',');
+                var valName = [];
+                _.forEach(e.val, function(value) {
+                    valName.push(that.getValueName(value));
+                });
+                filter.valName = valName.join(',');
+            });
+
+            filterContainer.find('.select2-container').on('click', function() {
+                return false;
+            });
+        },
         render: function() {
-            return null;
+            var filter = this.state.filter;
+
+            return (
+                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
+                    <button className='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
+                        <span className='f-grid-filter-field'> {filter.label} </span>
+                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + ": " + filter.valName : 'All'} </span>
+                        <span className="caret"></span>
+                    </button>
+                    <ul className="dropdown-menu filter-box">
+                        <li>
+                            <div className="input-group">
+                                <input type="hidden" id="multi_hidden" style={{width: '100%', minWidth: '120px'}} />
+                                <div className="input-group-btn">
+                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}> Update </button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
+                </div>
+            );
         }
     });
 
