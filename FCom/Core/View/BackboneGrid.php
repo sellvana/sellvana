@@ -544,7 +544,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
         $grid = $this->grid;
         $gridId = !empty($grid['personalize']['id']) ? $grid['personalize']['id'] : $grid['config']['id'];
-        $reset = ['state' => ['p' => null, 'ps' => null, 's' => null, 'sd' => null, 'q' => null]];
+        $reset = ['state' => ['p' => null, 'ps' => null, 's' => null, 'sd' => null, 'q' => null, 'filters' => null], 'filters' => null];
         $this->FCom_Admin_Model_User->personalize(['grid' => [$gridId => $reset]]);
     }
 
@@ -1072,7 +1072,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 break;
 
             case 'multiselect':
-                $vals = explode(',', $filters[$fId]['val']);
+                if (!is_array($filters[$fId]['val'])) {
+                    $vals = explode(',', $filters[$fId]['val']);
+                }
                 $this->_processGridFiltersOne($f, 'in', $vals, $orm);
                 break;
             }

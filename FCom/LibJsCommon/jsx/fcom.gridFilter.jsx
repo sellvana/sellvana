@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'react'], function (_, React) {
+define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], function (_, React) {
     var FComFilter = React.createClass({
         getInitialState: function() {
             var that = this;
@@ -176,7 +176,7 @@ define(['underscore', 'react'], function (_, React) {
                 if (!f.show) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} />);
+                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} getConfig={that.props.getConfig} />);
             });
 
             //console.log('end render filters');
@@ -222,8 +222,8 @@ define(['underscore', 'react'], function (_, React) {
                 case 'multiselect':
                     node = <FComFilterMultiSelect {...this.props} />;
                     break;
-                case 'select':
-                    node = <FComFilterSelect {...this.props} />;
+                default:
+                    console.log('Does not support filter type: ' + filter.type);
                     break;
             }
 
@@ -328,7 +328,7 @@ define(['underscore', 'react'], function (_, React) {
                                 <input type="text" className="form-control" onChange={this.setStateValue} />
                                 <div className="input-group-btn">
                                     <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        Update
+                                        <i className="icon-check-sign"></i> Update
                                     </button>
                                 </div>
                             </div>
@@ -438,7 +438,7 @@ define(['underscore', 'react'], function (_, React) {
                                 </div>
                                 <div className="input-group-btn">
                                     <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        Update
+                                        <i className="icon-check-sign"></i> Update
                                     </button>
                                 </div>
                             </div>
@@ -451,20 +451,158 @@ define(['underscore', 'react'], function (_, React) {
     });
 
     var FComFilterNumberRange = React.createClass({
+        mixins: [FilterStateMixin],
+        getInitialState: function() {
+            var filter = this.props.filter;
+            if (filter.op == '') { //set default value operation
+                var operation = _.findWhere(this.getOperations(), {'default': true});
+                _.extend(filter, {
+                    op: operation.op,
+                    opLabel: this.props.capitaliseFirstLetter(operation.name),
+                    val: '',
+                    from: '',
+                    to: '',
+                    range: operation.range,
+                    submit: false
+                });
+            }
+
+            return { filter: filter };
+        },
+        getOperations: function() {
+            return [
+                { op: 'between', name: 'between', range: true, 'default': true },
+                { op: 'from', name: 'from', range: false },
+                { op: 'to', name: 'to', range: false },
+                { op: 'equal', name: 'is equal to', range: false },
+                { op: 'not_in', name: 'not in', range: true }
+            ];
+        },
+        setStateRangeValue: function(event) {
+            var filter = this.state.filter;
+            filter[event.target.dataset.type] = event.target.value;
+            filter.val = filter.from + '~' + filter.to;
+            this.props.setStateFilter(filter.field, 'val', filter.val);
+            this.setState({filter: filter});
+        },
         render: function() {
-            return null;
+            var that = this;
+            var filter = this.state.filter;
+
+            var operations = this.getOperations().map(function(item) {
+                return ( <li> <a className={"filter_op " + (item.range ? 'range' : 'not_range')} data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+            });
+
+            return (
+                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
+                    <button className="btn dropdown-toggle filter-text-main" data-toggle='dropdown'>
+                        <span className='f-grid-filter-field'>{filter.label}</span>:
+                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
+                        <span className="caret"></span>
+                    </button>
+
+                    <ul className="dropdown-menu filter-box">
+                        <li>
+                            <div className="input-group">
+                                <div className="input-group-btn dropdown">
+                                    <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
+                                        {filter.opLabel}
+                                        <span className="caret"></span>
+                                    </button>
+                                    <ul className="dropdown-menu filter-sub">
+                                        {operations}
+                                    </ul>
+                                </div>
+                                <div className="input-group-btn range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
+                                    <input type="text" data-type="from" placeholder="From" className="form-control js-number1" style={{width: '45%'}} onChange={this.setStateRangeValue} />
+                                    &nbsp;<i className="icon-resize-horizontal"></i>&nbsp;
+                                    <input type="text" data-type="to" placeholder="To" className="form-control js-number2" style={{width: '45%'}} onChange={this.setStateRangeValue} />
+                                </div>
+                                <div className="input-group-btn not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
+                                    <input type="text" placeholder="Number" className="form-control js-number" onChange={this.setStateValue} />
+                                </div>
+                                <div className="input-group-btn">
+                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
+                                        <i className="icon-check-sign"></i> Update
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
+                </div>
+            );
         }
     });
 
     var FComFilterMultiSelect = React.createClass({
-        render: function() {
-            return null;
-        }
-    });
+        mixins: [FilterStateMixin],
+        getInitialState: function() {
+            var filter = this.props.filter;
+            filter.valName = '';
+            //get data to build select2
+            var column = _.findWhere(this.props.getConfig('columns'), {name: filter.field});
+            var data = [];
+            _.forEach(column.options, function(value, key) {
+                data.push({ id: key, text: value });
+            });
 
-    var FComFilterSelect = React.createClass({
+            return { filter: filter, filterData: data };
+        },
+        getValueName: function(value) {
+            var data = _.findWhere(this.state.filterData, { id: value });
+            return data ? data.text : value;
+        },
+        componentDidMount: function() {
+            var that = this;
+            var filter = this.state.filter;
+            var filterContainer = $('#f-grid-filter-' + filter.field);
+
+            filterContainer.find('#multi_hidden').select2({
+                multiple: true,
+                data: this.state.filterData,
+                placeholder: 'All'
+                //closeOnSelect: true
+            });
+
+            filterContainer.find('#multi_hidden').on('change', function(e) {
+                filter.val = e.val.join(',');
+                var valName = [];
+                _.forEach(e.val, function(value) {
+                    valName.push(that.getValueName(value));
+                });
+                filter.valName = valName.join(',');
+            });
+
+            filterContainer.find('.select2-container').on('click', function() {
+                return false;
+            });
+        },
         render: function() {
-            return null;
+            var filter = this.state.filter;
+
+            return (
+                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
+                    <button className='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
+                        <span className='f-grid-filter-field'> {filter.label} </span>
+                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + ": " + filter.valName : 'All'} </span>
+                        <span className="caret"></span>
+                    </button>
+                    <ul className="dropdown-menu filter-box">
+                        <li>
+                            <div className="input-group">
+                                <input type="hidden" id="multi_hidden" style={{width: '100%', minWidth: '120px'}} />
+                                <div className="input-group-btn">
+                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
+                                        <i className="icon-check-sign"></i> Update
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
+                </div>
+            );
         }
     });
 

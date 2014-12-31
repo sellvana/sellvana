@@ -35,7 +35,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
             var show = _.difference(all, hide);
 
             this.props.columns = {all: all, show: show, hide: hide};
-            console.log('this.props.columns', this.props.columns);
+            //console.log('this.props.columns', this.props.columns);
             this.props.columnMetadata = columnsConfig;
         },
         getColumn: function (type) {
@@ -52,7 +52,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
             }
         },
         render: function () {
-            console.log('config', this.props.config);
+            //console.log('config', this.props.config);
 
             return (
                 <Griddle showTableHeading={false} tableClassName={this.props.tableClassName}
