@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'react'], function (_, React) {
+define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], function (_, React) {
     var FComFilter = React.createClass({
         getInitialState: function() {
             var that = this;
