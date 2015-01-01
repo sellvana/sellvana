@@ -723,46 +723,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     }
 
-    /*
-    public function onMediaGridConfig($args)
-    {
-        array_splice($args['config']['grid']['colModel'], -1, 0, [
-            ['name' => 'manuf_vendor_name', 'label' => 'Manufacturer', 'width' => 150, 'index' => 'v.vendor_name', 'editable' => true],
-        ]);
-    }
-
-    public function onMediaGridGetORM($args)
-    {
-        $args['orm']->join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'a.id',  ], 'pa')
-            ->where_null('pa.product_id')->where('media_type', $args['type'])
-            ->select(['pa.manuf_vendor_id']);
-    }
-
-    public function onMediaGridUpload($args)
-    {
-        $hlp = $this->FCom_Catalog_Model_ProductMedia;
-        $id = $args['model']->id;
-        if (!$hlp->loadWhere(['product_id' => null, 'file_id' => $id])) {
-            $hlp->create(['file_id' => $id, 'media_type' => $args['type']])->save();
-        }
-    }
-
-    public function onMediaGridEdit($args)
-    {
-        $r = $this->BRequest;
-        $m = Denteva_Model_Vendor::i()->loadWhere([
-            'is_manuf' => 1,
-            'vendor_name' => $r->post('manuf_vendor_name')
-        ]);
-        $this->FCom_Catalog_Model_ProductMedia
-            ->loadWhere(['product_id' => null, 'file_id' => $args['model']->id])
-            ->set([
-                'manuf_vendor_id' => $m ? $m->id : null,
-            ])
-            ->save();
-    }
-    */
-
     /**
      * process duplicate product
      * @param $id
