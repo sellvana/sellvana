@@ -446,19 +446,27 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     });
 
     var FreeProduct = React.createClass({
+        mixins: [Common.select2QueryMixin, Common.removeMixin],
         render: function () {
             return (
-                <Common.Row >
+                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-3">
                         <input type="hidden" className="form-control" id="productSku" ref="productSku"/>
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-3 form-group">
                         <Components.ControlLabel input_id="productQty">{Locale._('Qty')}</Components.ControlLabel>
-                        <input type="text" className="form-control" id="productQty" ref="productQty" defaultValue={this.state.qty}/>
+                        <div className="col-md-10">
+                            <input type="text" className="form-control" id="productQty" ref="productQty" defaultValue={this.state.qty}/>
+                        </div>
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-3 form-group">
                         <Components.ControlLabel input_id="productTerms">{Locale._('Terms')}</Components.ControlLabel>
-                        <input type="hidden" className="form-control" id="productTerms" ref="productTerms"/>
+                        <div className="col-md-10">
+                            <select className="form-control to-select2" id="productTerms" ref="productTerms" multiple="multiple">
+                                <option value="tax">{Locale._("Charge tax")}</option>
+                                <option value="sah">{Locale._("Charge S & H")}</option>
+                            </select>
+                        </div>
                     </div>
                 </Common.Row>
             );
@@ -469,6 +477,24 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 terms: [],
                 qty: 0
             }
+        },
+        getDefaultProps: function () {
+            return {
+                url: "conditions/products",
+                labelSkuField: Locale._("Select product sku")
+            }
+        },
+        url: '',
+        componentDidMount: function () {
+            var productSku = this.refs['productSku'];
+            var self = this;
+            this.url = this.props.options.base_url + '/' + this.props.url;
+            $(productSku.getDOMNode()).select2({
+                placeholder: self.props.labelSkuField,
+                query: self.select2query,
+                dropdownAutoWidth: true
+            });
+            $(this.refs['productTerms'].getDOMNode()).select2({minimumResultsForSearch:15})
         }
     });
 
@@ -517,10 +543,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             }
         },
         url: '',
-        componentDidMount: function(){
+        componentDidMount: function () {
             var shippingMethods = this.refs.shippingMethods;
             var self = this;
-            this.url = this.props.options.base_url + '/' + this.props.url + '?'+ $.param({field: 'methods'});
+            this.url = this.props.options.base_url + '/' + this.props.url + '?' + $.param({field: 'methods'});
             $(shippingMethods.getDOMNode()).select2({
                 placeholder: self.props.labelMethodsField,
                 multiple: true,
@@ -539,11 +565,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                         var key = field.id;
                         switch(field.type){
                             case 'discount':
-                                el = <Discount options={this.props.options} key={key} id={key} removeAction={this.removeAction}
+                                el = <Discount label={Locale._("Discount")} options={this.props.options} key={key} id={key} removeAction={this.removeAction}
                                     modalContainer={this.props.modalContainer}/>;
                                 break;
                             case 'free_product':
-                                el = <FreeProduct options={this.props.options} key={key} id={key} removeAction={this.removeAction}/>;
+                                el = <FreeProduct label={Locale._("Auto Add Product To Cart")} options={this.props.options}
+                                        key={key} id={key} removeAction={this.removeAction}/>;
                                 break;
                             case 'shipping':
                                 el = <Shipping label={Locale._("Shipping")} options={this.props.options} key={key} id={key} removeAction={this.removeAction}/>;
