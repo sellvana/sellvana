@@ -11,24 +11,26 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             }
             return (
                 <div className={this.props.containerClass}>
+                    <div className="col-md-10">
                     <select className={cls} onChange={this.props.onChange} defaultValue={this.props.value}>
                         {this.props.totalType.map(function (type) {
                             return <option value={type.id} key={type.id}>{type.label}</option>
                         })}
                     </select>
+                    </div>
                     {this.props.children}
                 </div>
             );
         },
         getDefaultProps: function () {
             return {
-                totalType: [{id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount"}],
+                totalType: [{id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}],
                 select2: true,
                 containerClass: "col-md-2",
                 className: "form-control"
             };
         }, componentDidMount: function () {
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15}).on('change', this.props.onChange);
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15, dropdownAutoWidth: true}).on('change', this.props.onChange);
         }
     });
     var DiscountDetailsCombination = React.createClass({
@@ -374,34 +376,91 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         }
     });
 
+    var DiscountSkuCombination = React.createClass({
+        mixins: [Common.select2QueryMixin],
+        render: function () {
+            return (
+                <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                url: 'conditions/products',
+            };
+        },
+        url: '',
+        componentDidMount: function () {
+            this.buildSelect();
+        },
+        componentWillUnmount: function () {
+            var skuCollectionIds = this.refs['skuCollectionIds'];
+            $(skuCollectionIds.getDOMNode()).select2('destroy');
+        },
+        buildSelect: function () {
+            var skuCollectionIds = this.refs['skuCollectionIds'];
+            this.url = this.props.options.base_url + this.props.url;
+            var self = this;
+            $(skuCollectionIds.getDOMNode()).select2({
+                placeholder: "Choose products",
+                multiple: true,
+                closeOnSelect: true,
+                dropdownCssClass: "bigdrop",
+                dropdownAutoWidth: true,
+                selectOnBlur: false,
+                formatSelection: function (item) {
+                    return item.sku;
+                },
+                formatResult: function (item) {
+                    var markup = '<div class="row-fluid" title="' + item.text + '">' +
+                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">Name: ' + item.text.substr(0, 20);
+                    if(item.text.length > 20) {
+                        markup += '...';
+                    }
+                    markup += '</div>' +
+                    '<div class="span2">SKU: <strong>' + item.sku + '</strong></div>' +
+                    '</div>';
+
+                    return markup;
+                },
+                query: self.select2query
+            });
+        }
+    });
+
     var DiscountDetails = React.createClass({
         render: function () {
             var details = <span/>;
-            if(this.props.type == 'other_prod') {
-                details = <input type="hidden" id="otherProd" ref="otherProd" key="otherProd" />
-            } else if(this.props.type == 'attr_combination') {
-                details = <DiscountDetailsCombination id="attrCombination" ref="attrCombination" key="attrCombination"/>
+            if(this.props.type == 'attr_combination') {
+                details = <DiscountDetailsCombination id="attrCombination" ref="attrCombination" key="attrCombination"
+                    options={this.props.options} modalContainer={this.props.modalContainer}/>
+            } else if(this.props.type == 'other_prod') {
+                details = <DiscountSkuCombination id="skuCombination" ref="skuCombination" key="skuCombination"
+                    options={this.props.options}/>;
             }
             return details;
         }
     });
+
     var Discount = React.createClass({
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <Type ref="discountType" id="discountType" value={this.state.type} onChange={this.onTypeChange}> of </Type>
-                    <div className="col-md-3">
-                        <input className="form-control pull-left" ref="discountValue" id="discountValue" type="text" defaultValue={this.state.discountValue}/>
-                    </div>
-                    <div className="col-md-3">
-                        <select className="to-select2" ref="discountScope" id="discountScope" onChange={this.onScopeChange}>
-                        {this.props.scopeOptions.map(function (type) {
-                            return <option value={type.id} key={type.id}>{type.label}</option>
-                        })}
-                        </select>
-                    </div>
-                    <div className="col-md-3">
-                        <DiscountDetails type={this.state.scope} />
+                    <Type ref="discountType" id="discountType" value={this.state.type} onChange={this.onTypeChange}/>
+                    <div className="col-md-7">
+                        <div className="col-md-2">
+                            <input className="form-control pull-left" ref="discountValue" id="discountValue" type="text" defaultValue={this.state.discountValue}/>
+                        </div>
+                        <div className={"col-md-" + this.state.scopeElementWidth}>
+                            <select className="to-select2 form-control" ref="discountScope" id="discountScope" onChange={this.onScopeChange}>
+                                {this.props.scopeOptions.map(function (type) {
+                                    return <option value={type.id} key={type.id}>{type.label}</option>
+                                })}
+                            </select>
+                        </div>
+                        <div className={"col-md-" + this.state.detailsElementWidth}>
+                            <DiscountDetails type={this.state.scope} options={this.props.options} modalContainer={this.props.modalContainer}/>
+                        </div>
                     </div>
                 </Common.Row>
             );
@@ -430,18 +489,33 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             return {
                 discountValue: 0,
                 type: '',
-                scope: 'whole_order'
+                scope: 'whole_order',
+                scopeElementWidth: 9,
+                detailsElementWidth: 1
             };
         },
         onScopeChange: function (ev) {
             ev.preventDefault();
             var newScope = $(ev.target).val();
-            this.setState({scope: newScope});
+            var scopeWidth = 9, detailsWidth = 1;
+            if(newScope == 'other_prod' || newScope == 'attr_combination') {
+                scopeWidth = 3;
+                detailsWidth = 7;
+            }
+            this.setState({
+                scope: newScope,
+                scopeElementWidth: scopeWidth,
+                detailsElementWidth: detailsWidth
+            });
         },
         onTypeChange: function (ev) {
             ev.preventDefault();
             var newType = $(ev.target).val();
             this.setState({type: newType});
+        },
+        componentDidMount: function () {
+
+            $(this.refs['discountScope'].getDOMNode()).select2({minimumResultsForSearch:15}).on('change', this.onScopeChange)
         }
     });
 
@@ -512,7 +586,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     {type}
-                    <div className="col-md-6">
+                    <div className="col-md-7">
                         <div className={amount? "col-md-2": ""}>{amount}</div>
                         {label}
                         <div className={amount? "col-md-9": "col-md-11"}>{input}</div>
