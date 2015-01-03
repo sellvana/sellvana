@@ -2,7 +2,10 @@ base:
     - { view: admin/nav, do: [[ addNav, catalog/promo, { label: Promotions, href: /promo } ]] }
     - view: head
         do:
+            - [ requireJs, fcom.promo.common, @FCom_Promo/Admin/jsx/src/fcom.promo.common ]
             - [ requireJs, fcom.promo, @FCom_Promo/Admin/jsx/src/fcom.promo ]
+            - [ requireJs, fcom.promo.actions, @FCom_Promo/Admin/jsx/src/fcom.promo.actions, [react, fcom.promo.common] ]
+
     - { include: lib_griddle }
 
 promo_form_tabs:
