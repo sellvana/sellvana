@@ -249,6 +249,9 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                     {id:"neq", label: "is not equal to"}
                 ]
             };
+        },
+        componentDidMount: function () {
+            $(this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.props.onChange);
         }
     });
 
@@ -528,25 +531,28 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         },
         serializeText: function () {
             // todo serialize text for human display
-            var text = '';
+            var text = '', glue, fieldTexts = [];
             var allShouldMatch = $(this.refs['combinationType'].getDOMNode()).val(); // && or ||
             if(allShouldMatch == 1) {
-                text += "Any of: ";
+                glue = " and ";
             } else {
-                text += "all of: ";
+                glue = " or ";
             }
 
             for(var field in this.refs) {
                 if(field == 'combinationType' || field == 'combinationField') {
                     continue;
                 }
-                if(this.refs.hasOwnProperty(field)) {
+                if(this.refs[field]) {
                     var ref = this.refs[field];
-                    text += ref.serializeText();
+                    var refValue = this.state.values["fieldCombination." + field];
+                    var refText = ref.serializeText();
+                    fieldTexts.push(refText);
                 }
             }
 
-            text += " should match";
+            text = fieldTexts.join(glue);
+
             return text;
         },
         addField: function () {
@@ -578,7 +584,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         },
         url: '',
         componentDidMount: function () {
-            var fieldCombination = this.refs.combinationField;
+            var fieldCombination = this.refs['combinationField'];
             var self = this;
             this.url = this.props.baseUrl + this.props.url;
             $(fieldCombination.getDOMNode()).select2({
@@ -621,15 +627,15 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             var inputType = this.props.input;
             var opts = this.getOpts();
             var fieldId = "fieldCombination." + this.props.id;
-            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId}/>;
+            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId} onChange={this.onChange}/>;
             if(this.props.numeric_inputs.indexOf(inputType) != -1) {
                 if (inputType == 'number') {
                     if(this.state.range === false) {
-                        input = <input className="form-control required" type="number" step="any" id={fieldId} ref={fieldId} style={{width: "auto"}}/>;
+                        input = <input className="form-control required" type="number" step="any" id={fieldId} ref={fieldId} style={{width: "auto"}} onChange={this.onChange}/>;
                     } else {
                         input = <div id={fieldId} ref={fieldId} className="input-group">
-                            <input className="form-control required" type="number" step="any" placeholder="Min" style={{width: "50%"}}/>
-                            <input className="form-control required" type="number" step="any" placeholder="Max" style={{width: "50%"}}/>
+                            <input className="form-control required" type="number" step="any" placeholder="Min" style={{width: "50%"}} onChange={this.onChange}/>
+                            <input className="form-control required" type="number" step="any" placeholder="Max" style={{width: "50%"}} onChange={this.onChange}/>
                         </div>;
                     }
                 } else if (inputType == 'date' || inputType == 'time') {
@@ -639,13 +645,13 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                     }
                     input = <div className="input-group">
                             <span className="input-group-addon"><i className="glyphicon glyphicon-calendar"></i></span>
-                            <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} />
+                            <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} onChange={this.onChange}/>
                         </div>
                 }
             } else if(inputType == 'select'){
                 input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}/>;
             } else if(this.props.bool_inputs.indexOf(inputType) != -1) {
-                input = <Components.YesNo  id={fieldId} ref={fieldId} />;
+                input = <Components.YesNo  id={fieldId} ref={fieldId} onChange={this.onChange}/>;
             }
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
@@ -656,6 +662,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 </ConditionsRow>
             );
         },
+        values: {},
         getOpts: function () {
             var opts = this.props.opts;
             if(this.props.input == 'text') {
@@ -663,6 +670,9 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             }
 
             return opts;
+        },
+        serialize: function () {
+            return this.values;
         },
         serializeText: function () {
             var text = this.props.label;
@@ -676,6 +686,14 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 }
             }
 
+            var value = this.values['fieldCombination'];
+            if(value) {
+                if($.isArray(value)) {
+                    value = value.join(", ");
+                }
+
+                text += " " + value;
+            }
 
             return text;
         },
@@ -725,12 +743,25 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 default :
                     break;
             }
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15}).on('change', this.props.onChange);
+            //$('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.onCompareChange);
         },
         componentDidUpdate: function () {
             this.componentDidMount();
         },
+        onChange: function (e) {
+            // only select2 event has e.val, for dom inputs it must be added
+            if(!e.val) { // for native inputs, use blur event to capture value
+                var $elem = $(e.target);
+                e.val = $elem.val();
+            }
+            //console.log(e);
+            this.values['fieldCombination'] = e.val;
+            if(this.props.onChange) {
+                this.props.onChange(e);
+            }
+        },
         onCompareChange: function (e) {
+            this.values['fieldCompare'] = e.val;
             if(this.props.numeric_inputs.indexOf(this.props.input) == -1){
                 return;
             }
@@ -738,6 +769,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             var state = {range: false};
             state.range = (target.value =='between');
             this.setState(state);
+
         },
         initDateInput: function () {
             var startDate = new Date();
@@ -768,7 +800,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 query: this.select2query,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true
-            }).on('change', this.props.onChange);
+            }).on('change', this.onChange);
         }
     });
 
