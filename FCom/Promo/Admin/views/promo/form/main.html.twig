@@ -120,9 +120,9 @@
             <div class="col-md-4">
                 <select id="model-actions" name="model[actions]" class="form-control to-select2">
                     <option value="">{{"Add Promo Action..."|_}}</option>
-                    <option value="get_discount">{{"Discount"|_}}</option>
-                    <option value="get_shipping">{{"Shipping"|_}}</option>
-                    <option value="get_products">{{"Free Products"|_}}</option>
+                    <option value="discount">{{"Discount"|_}}</option>
+                    <option value="shipping">{{"Shipping"|_}}</option>
+                    <option value="free_product">{{"Free Products"|_}}</option>
                 </select>
             </div>
             <div class="col-md-1">
@@ -139,9 +139,12 @@
                 var options = {
                     coupon_select_id: 'model-use_coupon',
                     condition_select_id: 'model-conditions_type',
+                    actions_select_id: "model-actions",
                     coupon_container_id: 'coupon-options',
                     condition_container_id: 'conditions-options',
+                    actions_container_id: "actions-options",
                     condition_add_id: 'condition_action_add',
+                    actions_add_id: 'action_add',
                     conditions_serialized: 'conditions_serialized',
                     showCouponsUrl: "{{ APP.href('promo/coupons/view?id=') ~ m.id() }}", // "/admin/promo/coupons/view?id=1",
                     generateCouponsUrl: "{{ APP.href('promo/coupons/generate?id=') ~ m.id() }}", // "/admin/promo/coupons/generate?id=1",

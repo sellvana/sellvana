@@ -10,6 +10,7 @@
  * @property FCom_Catalog_Model_Category        $FCom_Catalog_Model_Category
  * @property FCom_Catalog_Model_InventorySku    $FCom_Catalog_Model_InventorySku
  * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
+ * @property FCom_Sales_Main                    $FCom_Sales_Main
  */
 class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstract
 {
@@ -194,13 +195,18 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         }
 
         $fieldCode = explode('.', $this->BRequest->get('field'), 2);
+        $fieldType = $fieldCode[0];
+        $fieldCode = $fieldCode[1];
 
-        $field = $this->FCom_CustomField_Model_Field->load($fieldCode[1], 'field_code');
+        $field = $this->FCom_CustomField_Model_Field->load($fieldCode, 'field_code');
+        $options = [];
 
-        if ($field) {
-            $options = $this->FCom_CustomField_Model_FieldOption->getListAssocbyId($field->id());
-        } else {
-            $options = [];
+        if ($fieldType == 'field') {
+            if ($field) {
+                $options = $this->FCom_CustomField_Model_FieldOption->getListAssocbyId($field->id());
+            } else {
+                $options = [];
+            }
         }
 
         $result = ['items' => []];
@@ -219,29 +225,38 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
     public function action_shipping()
     {
         $field = $this->BRequest->get('field');
+        $result['items'] = [];
         switch ($field) {
             case 'methods':
-                // todo
+                $methods = $this->FCom_Sales_Main->getShippingMethods();
+                foreach ($methods as $code => $method) {
+                    /** @var FCom_Sales_Method_Shipping_Abstract $method */
+                    $name              = $method->getName();
+                    $result['items'][] = ['id' => $code, 'text' => $name];
+                }
                 break;
             case 'country':
-                // todo
+                $countries = $this->FCom_Core_Main->getAllowedCountries();
+                foreach ($countries as $code => $country) {
+                    $result['items'][] = ['id' => $code, 'text' => $country];
+                }
                 break;
             case 'state':
-                // todo
-                break;
-            case 'city':
-                // todo
+                $regions = $this->FCom_Core_Main->getAllowedRegions();
+                foreach ($regions as $country => $region) {
+                    $countryRegions = ['text' => trim($country, '@'), 'children' => []];
+                    foreach ($region as $code => $r) {
+                        $countryRegions['children'][] = ['id' => $code, 'text' => $r];
+                    }
+                    $result['items'][] = $countryRegions;
+                }
                 break;
             default :
                 // todo
                 break;
         }
-        $result = [
-            'total_count' => 1,
-            'items'       => [
-                '_' => 'Not implemented yet!'
-            ]
-        ];
+        $result['total_count'] = 1;
+
         $this->BResponse->json($result);
     }
 
