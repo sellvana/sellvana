@@ -1,0 +1,19 @@
+modules:
+    FCom_SalesTax:
+        version: 0.1.0
+        require: { module: { FCom_Sales: 0.3.11 } }
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views ]
+
+        observe:
+            - [ FCom_Sales_Model_Cart_Total_Tax::calculate, FCom_SalesTax_Main.onCartTaxCalculate ]
+
+        default_config:
+            modules:
+                FCom_SalesTax:
+                    default_guest_class_id: 1
+                    default_customer_class_id: 1
+                    default_product_class_id: 1
+                    default_country: US

@@ -381,7 +381,7 @@ class BDb
                     } else {
                         if (isset($v[0]) && is_array($v[0])) { // `field` IN (?)
                             $v = $v[0];
-                            $sql = str_replace('(?)', '(' . str_pad('', sizeof($v) * 2-1, '?,') . ')', $sql);
+                            $sql = str_replace('(?)', '(' . str_pad('', sizeof($v)*2-1, '?,') . ')', $sql);
                         }
                         $where[] = '(' . $sql . ')';
                         $params = array_merge($params, $v);
@@ -405,7 +405,7 @@ class BDb
                 $params = array_merge($params, $p);
             } elseif (is_array($v)) {
                 $f = static::sanitizeFieldName($f);
-                $where[] = "({$f} IN (" . str_pad('', sizeof($v) * 2-1, '?,') . "))";
+                $where[] = "({$f} IN (" . str_pad('', sizeof($v)*2-1, '?,') . "))";
                 $params = array_merge($params, $v);
             } elseif (null === $v) {
                 $f = static::sanitizeFieldName($f);
@@ -416,7 +416,7 @@ class BDb
                 $params[] = $v;
             }
         }
-        $where = join($or ? " OR " : " AND ", $where);
+        $where = '(' . join($or ? " OR " : " AND ", $where) . ')';
         // Additional protection against multiple queries separator
         if (sizeof(static::splitQueries($where)) > 1) {
             throw new BException('Invalid SQL query');
@@ -1253,7 +1253,7 @@ class BORM extends ORMWrapper
      */
     public function where($column_name, $value = null)
     {
-        if (is_array($column_name) && null === $value) {
+        if (is_array($column_name) && (null === $value || false === $value || true === $value)) {
             return $this->where_complex($column_name, !!$value);
         }
         return parent::where($column_name, $value);
