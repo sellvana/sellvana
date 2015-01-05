@@ -109,10 +109,6 @@
     <script>
         require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
             var url = '{{ APP.href("promo/coupons/import")|raw}}';
-            {% if m.config.promoId %}
-            {{ dump(m.config.promoId) }}
-            url +=  '?id={{  m.config.promoId}}';
-            {% endif %}
             $('#f-import-upload').fileupload({
                 url: url,
                 multiple: false,
