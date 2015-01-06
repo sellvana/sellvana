@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo.actions', 'jsx!fcom.promo.coupon', 'fcom.locale',
-    'select2', 'bootstrap', 'moment', 'daterangepicker'], function (React, $, Griddle, Components, Actions, CouponApp, Locale) {
+define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo.actions', 'jsx!fcom.promo.coupon', 'fcom.locale', 'store',
+    'select2', 'bootstrap', 'moment', 'daterangepicker'], function (React, $, Griddle, Components, Actions, CouponApp, Locale, store) {
     var DelBtn = React.createClass({
         render: function () {
             return (
@@ -1108,7 +1108,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         postGenerate: function (e) {
             var $formContainer = $('#coupon-generate-container');
             Promo.log(e, $formContainer);
-            var url = this.options.generateCouponsUrl;
+            var url = this.options['generateCouponsUrl'];
             var $progress = $formContainer.find('.loading');
             var $result = $formContainer.find('.result').hide();
             $progress.show();
@@ -1130,6 +1130,18 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                     var status = result.status;
                     var message = result.message;
                     $result.text(message);
+                    if (status != 'error') {
+                        var newRows = result['codes'].map(function (e, i) {
+                            console.log(e, i);
+                            return {
+                                code: e,
+                                total_used: 0
+                            }
+                        });
+                        console.log(newRows);
+                        var grid_id = result['grid_id'];
+                        Promo.updateGrid(grid_id, newRows);
+                    }
                 })
                 .always(function (r) {
                     $progress.hide();
@@ -1150,7 +1162,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             modal.open();
             //this.refs.importModal.open();
             var $modalBody = $('.modal-body', modal.getDOMNode());
-            this.loadModalContent($modalBody, this.options.importCouponsUrl);
+            this.loadModalContent($modalBody, this.options['importCouponsUrl']);
+            $(document).on("coupon_import", function (event) {
+                console.log(event.codes);
+                Promo.updateGrid(event.grid_id, event.codes);
+            });
         },
         log: function (msg) {
             if(this.options.debug) {
@@ -1211,6 +1227,40 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             } else {
                 console.error("UNKNOWN search status.")
             }
+        },
+        updateGrid: function (grid_id, newRows) {
+            var grid = window[grid_id];
+            if (grid) {
+                Promo.addGridRows(grid, newRows)
+            } else {
+                store.set('promo.coupons', JSON.stringify(newRows));
+            }
+        },
+        addGridRows: function (grid, rows) {
+            /** @type Backbone.Collection */
+            var gridRows = grid.getRows();
+            var lastId = 0;
+            if(gridRows.size()) {
+                lastId = gridRows.at(gridRows.size() - 1).get('id') - 0;
+            }
+            lastId++;
+            var newRows = rows.map(function (row, idx) {
+                row._new = true;
+                row.id = lastId + idx;
+                return row;
+            });
+            gridRows.add(newRows, {merge: true}).trigger('build');
+        }
+    };
+    window.couponsGridRegister = function (grid) {
+        //console.log(grid);
+        window[grid.id] = grid;
+        var newRows = store.get('promo.coupons');
+        store.remove('promo.coupons');
+        //console.log(newRows);
+        if(newRows) {
+            newRows = JSON.parse(newRows);
+            Promo.addGridRows(grid, newRows);
         }
     };
     return Promo;

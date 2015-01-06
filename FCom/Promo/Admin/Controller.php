@@ -525,7 +525,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             'filters' => [
                 ['field' => 'code', 'type' => 'text'],
                 ['field' => 'total_used', 'type' => 'number-range'],
-            ]
+            ],
+            'grid_after_built' => 'couponsGridRegister'
         ];
         $view = $this->view($this->_gridViewName)->set('grid',['config' => $config]);
         return $view;
@@ -582,6 +583,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $result = ['status' => $status, 'message' => $message];
         if (!empty($generated['codes'])) {
             $result['codes'] = $generated['codes'];
+            $result['grid_id'] = $this->getCouponGridId();
         }
         $this->BResponse->json($result);
     }

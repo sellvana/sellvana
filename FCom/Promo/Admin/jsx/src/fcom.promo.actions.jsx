@@ -630,21 +630,21 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         }
     });
 
-    return React.createClass({
+    var ActionsApp = React.createClass({
         render: function () {
             return (<div className="actions panel panel-default">
                     {this.state.data.map(function (field) {
                         //todo make a field based on field
                         var el;
                         var key = field.id;
-                        switch(field.type){
+                        switch (field.type) {
                             case 'discount':
                                 el = <Discount label={Locale._("Discount")} options={this.props.options} key={key} id={key} removeAction={this.removeAction}
                                     modalContainer={this.props.modalContainer}/>;
                                 break;
                             case 'free_product':
                                 el = <FreeProduct label={Locale._("Auto Add Product To Cart")} options={this.props.options}
-                                        key={key} id={key} removeAction={this.removeAction}/>;
+                                    key={key} id={key} removeAction={this.removeAction}/>;
                                 break;
                             case 'shipping':
                                 el = <Shipping label={Locale._("Shipping")} options={this.props.options} key={key} id={key} removeAction={this.removeAction}/>;
@@ -656,7 +656,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             </div> );
         },
         componentDidMount: function () {
-            var $conditionsSerialized = $('#'+this.props.options.conditions_serialized);
+            var $conditionsSerialized = $('#' + this.props.options.conditions_serialized);
             var data = this.state.data;
 
             if ($conditionsSerialized.length > 0) {
@@ -671,12 +671,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
 
             $('#' + this.props.newAction).on('click', this.addAction);
 
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         },
         addAction: function () {
             // add condition data to state
             var $actionTypes = this.props.actionType;
-            if($actionTypes.length == 0) {
+            if ($actionTypes.length == 0) {
                 return;
             }
 
@@ -700,4 +700,5 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             };
         }
     });
+    return ActionsApp;
 });

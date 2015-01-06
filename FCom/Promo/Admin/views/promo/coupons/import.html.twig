@@ -107,28 +107,24 @@
         {% endverbatim %}
     </div>
     <script>
-        require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
+        require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport',
+            'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
             var url = '{{ APP.href("promo/coupons/import")|raw}}';
             $('#f-import-upload').fileupload({
                 url: url,
                 multiple: false,
                 acceptFileTypes: /(\.|\/)(csv|txt)$/i
             }).bind('fileuploadalways', function (e, data) {
-                if (data.result.id) {
-                    var newRow = data.result;
-
-                    //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
-                    {% if config.multiSelAllowed %}
-                    newRow.selected = true;
-                    {{config.id}}_grid.getSelectedRows().add(data.result);
-                    {% endif %}
-
-                    {{config.id}}_grid.getRows().add(newRow, {merge: true}).trigger('render');
-
-                    $('td.name span').each(function (i) {
-                        if ($(this).html() === data.result.file_name) {
-                            $(this).parents('tr:first').remove();
-                        }
+                if(data.result && data.result.files) {
+                    data.result.files.map(function (file) {
+                        var codes = file.imported.codes.map(function (code) {
+                            return {
+                                code: code,
+                                total_used: 0
+                            };
+                        });
+                        console.log(codes);
+                        $(document).trigger({type: "coupon_import", codes: codes, grid_id: '{{config.id}}_grid'});
                     });
                 }
             });
