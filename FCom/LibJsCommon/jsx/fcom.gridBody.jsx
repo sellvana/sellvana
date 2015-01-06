@@ -22,7 +22,7 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn} sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata}/>;
 
             var nodes = this.props.data.map(function (row, index) {
-                return <FComRow data={row} index={index} metadataColumns={that.props.metadataColumns} columnMetadata={that.props.columnMetadata} />
+                return <FComRow row={row} index={index} columnMetadata={that.props.columnMetadata} getConfig={that.props.getConfig} />
             });
 
             return (
