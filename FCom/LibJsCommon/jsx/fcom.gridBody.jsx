@@ -54,7 +54,7 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
             $(selected).parents('th').trigger('click');
         },
         componentDidMount: function() {
-            $(".dataTable th").resizable({handles: 'e'});
+            //$(".dataTable th").resizable({handles: 'e'});
         },
         showAll: function(event) {
             event.preventDefault();
