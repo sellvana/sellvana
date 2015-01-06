@@ -574,12 +574,16 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
              ]);
             $status = 'success';
             $message = $this->_("%d coupons generated.", $generated['generated']);
-            if ($generated < $couponCount) {
+            if ($generated['generated'] < $couponCount) {
                 $status = 'warning';
                 $message .= $this->_("\nFailed to generate %d coupons", $generated['failed']);
             }
         }
-        $this->BResponse->json(['status' => $status, 'message' => $message]);
+        $result = ['status' => $status, 'message' => $message];
+        if (!empty($generated['codes'])) {
+            $result['codes'] = $generated['codes'];
+        }
+        $this->BResponse->json($result);
     }
 
     public function action_coupons_import__POST()
