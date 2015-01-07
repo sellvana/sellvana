@@ -232,6 +232,8 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
         },
         render: function () {
             var options = [];
+            var id = this.props.getConfig('id');
+
             for (var i = 0; i < initColumns.length; i++) {
                 if (initColumns[i] != "0") {
                     var checked = _.contains(this.props.selectedColumns, initColumns[i]);
@@ -245,9 +247,13 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                     );
                 }
             }
+
+            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} />;
+
             var style = { display: 'inline' };
             return (
                 <div className="col-sm-6">
+                    {quickSearch}
                     <span className="dropdown dd dd-nestable columns-span" style={style}>
                         <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">
                             Columns <b className="caret"></b>
