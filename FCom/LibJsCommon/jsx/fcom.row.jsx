@@ -14,7 +14,8 @@ define(['underscore', 'react'], function (_, React) {
             return {
                 "row": {},
                 "columnMetadata": null,
-                "index": 0
+                "index": 0,
+                "doButtonAction": null
             }
         },
         fileSizeFormat: function (size) {
@@ -83,7 +84,11 @@ define(['underscore', 'react'], function (_, React) {
             var that = this;
             var id = this.props.getConfig('id');
 
-            if (this.props.index == 0) console.log('fcom.row.columnMetadata', this.props.columnMetadata);
+            //don't render if don't have id
+            if (!this.props.row.id) {
+                return null;
+            }
+            //if (this.props.index == 0) console.log('fcom.row.columnMetadata', this.props.columnMetadata);
 
             var nodes = this.props.columnMetadata.map(function(col, index){
                 if (typeof col.hidden != 'undefined' && col.hidden) {
@@ -107,8 +112,8 @@ define(['underscore', 'react'], function (_, React) {
                                 );
                             } else {
                                 return (
-                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button">
-                                        <i className={btn.icon}></i>
+                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button" onClick={that.props.doButtonAction}>
+                                        <i className={btn.icon} data-action={btn.name} data-row={that.props.row.id}></i>
                                         {btn.caption}
                                     </button>
                                 );
@@ -134,21 +139,11 @@ define(['underscore', 'react'], function (_, React) {
                         break;
                 }
 
-                /*var node = "";
-                if (typeof col.type != 'undefined') {
-
-                } else {
-                    node = typeof (that.props.row[col.name]) != 'undefined' ? that.props.row[col.name] : "";
-                }*/
-
                 return <td data-col={col.name}>{node}</td>;
             });
 
-            //this is kind of hokey - make it better
-            var className = "standard-row " + (this.props.index % 2 ? 'odd' : 'even');
-
             return (
-                <tr className={className}>
+                <tr className={"standard-row " + (this.props.index % 2 ? 'odd' : 'even')} id={this.props.row.id}>
                     {nodes}
                 </tr>
             );

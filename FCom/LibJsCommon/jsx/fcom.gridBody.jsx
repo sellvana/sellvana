@@ -16,13 +16,42 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
                 "className": ""
             }
         },
+        doButtonAction: function(event) {
+            var that = this;
+            //data
+            var action = event.target.dataset.action;
+            var rowId = event.target.dataset.row;
+
+            switch (action) {
+                case 'delete':
+                    var confirm = false;
+                    if ($(event.target).hasClass('noconfirm')) {
+                        confirm = true;
+                    } else {
+                        confirm = window.confirm("Do you want to really delete?");
+                    }
+
+                    if (confirm) {
+                        var editUrl = this.props.getConfig('edit_url');
+                        if (editUrl.length > 0 && rowId) {
+                            $.post(editUrl, {id: rowId, oper: 'del'}, function() {
+                                that.props.refresh();
+                            });
+                        }
+                    }
+                    break;
+                default:
+                    console.log('doButtonAction');
+                    break;
+            }
+        },
         render: function () {
             var that = this;
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn} sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata}/>;
 
             var nodes = this.props.data.map(function (row, index) {
-                return <FComRow row={row} index={index} columnMetadata={that.props.columnMetadata} getConfig={that.props.getConfig} />
+                return <FComRow row={row} index={index} columnMetadata={that.props.columnMetadata} getConfig={that.props.getConfig} doButtonAction={that.doButtonAction} />
             });
 
             return (

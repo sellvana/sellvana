@@ -119,8 +119,8 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         },
         /**
          * do filter
-         * @param {} filter
-         * @param bool isClear
+         * @param {Object} filter
+         * @param {Boolean} isClear
          */
         doFilter: function (filter, isClear) {
             if (typeof isClear == 'undefined') {
