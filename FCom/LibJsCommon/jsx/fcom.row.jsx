@@ -88,10 +88,10 @@ define(['underscore', 'react'], function (_, React) {
             if (!this.props.row.id) {
                 return null;
             }
-            //if (this.props.index == 0) console.log('fcom.row.columnMetadata', this.props.columnMetadata);
 
-            var nodes = this.props.columnMetadata.map(function(col, index){
-                if (typeof col.hidden != 'undefined' && col.hidden) {
+            var nodes = this.props.columns.map(function(column, index){
+                var col = _.findWhere(that.props.columnMetadata, {name: column});
+                if (!col) {
                     return null;
                 }
 

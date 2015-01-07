@@ -12,7 +12,7 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
         getDefaultProps: function () {
             return {
                 "data": [],
-                "metadataColumns": [],
+                "columnMetadata": [],
                 "className": ""
             }
         },
@@ -47,11 +47,13 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
         },
         render: function () {
             var that = this;
+            console.log('FComGridBody.columnMetadata', this.props.columnMetadata);
+            console.log('FComGridBody.columns', this.props.columns);
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn} sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata}/>;
 
             var nodes = this.props.data.map(function (row, index) {
-                return <FComRow row={row} index={index} columnMetadata={that.props.columnMetadata} getConfig={that.props.getConfig} doButtonAction={that.doButtonAction} />
+                return <FComRow row={row} index={index} columns={that.props.columns} columnMetadata={that.props.columnMetadata} getConfig={that.props.getConfig} doButtonAction={that.doButtonAction} />
             });
 
             return (
