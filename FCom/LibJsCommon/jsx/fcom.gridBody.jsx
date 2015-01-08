@@ -59,7 +59,9 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
             return (
                 <table className={this.props.className}>
                     {title}
-                    {nodes}
+                    <tbody>
+                        {nodes}
+                    </tbody>
                 </table>
             );
         }

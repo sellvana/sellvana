@@ -80,7 +80,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
      */
     var FComDataMethod = function (filterString, sortColumn, sortAscending, page, pageSize, callback) {
         $.ajax({
-            url: dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + filterString,
+            url: dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}'),
             dataType: 'json',
             type: 'GET',
             data: {},
@@ -199,12 +199,6 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
         }
     });
 
-    var FComFilterOperations = React.createClass({
-        render: function() {
-            return (<div></div>);
-        }
-    });
-
     var FComSettings = React.createClass({
         getDefaultProps: function() {
             return {
@@ -230,6 +224,9 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                 this.props.setColumns(_.without(selectedColumns, event.target.dataset.name));
             }
         },
+        quickSearch: function(event) {
+            this.props.searchWithinResults(event.target.value);
+        },
         render: function () {
             var options = [];
             var id = this.props.getConfig('id');
@@ -248,7 +245,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                 }
             }
 
-            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} />;
+            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} onChange={this.quickSearch} />;
 
             var style = { display: 'inline' };
             return (
