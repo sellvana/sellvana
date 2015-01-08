@@ -669,7 +669,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 }
             }
 
-            $('#' + this.props.newAction).on('click', this.addAction);
+            if (this.props.actionType.length) {
+                this.props.actionType.on('change', this.addAction);
+            }
 
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         },
@@ -681,6 +683,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             }
 
             var actionType = $actionTypes.val();
+            if(actionType == "-1") {
+                return;
+            }
+            $actionTypes.select2('val', "-1", false);// reset to placeholder value and do NOT trigger change event
             var data = this.state.data;
             var condition = {type: actionType, id: actionType + '-' + this.state.lastActionId};
             data.push(condition);

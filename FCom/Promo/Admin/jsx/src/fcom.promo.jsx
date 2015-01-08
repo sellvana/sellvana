@@ -673,7 +673,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             };
         },
         componentDidMount: function() {
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         }
     });
 
@@ -920,7 +920,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 }
             }
 
-            $('#' + this.props.newCondition).on('click', this.addCondition);
+            this.props.conditionType.on('change', this.addCondition);
 
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         },
@@ -932,6 +932,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             }
 
             var conditionType = $conditionTypes.val();
+            if(conditionType == -1) {
+                return;
+            }
+            $conditionTypes.select2('val', "-1", false);// reset to placeholder value and do NOT trigger change event
             var data = this.state.data;
             var condition = {type: conditionType, id: conditionType + '-' + this.state.lastConditionId};
             data.push(condition);
@@ -973,7 +977,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 return;
             }
             var $container = $("#" + this.options.actions_container_id);
-            React.render(<Actions actionType={$actionsSelector} newAction={this.options.actions_add_id}
+            React.render(<Actions actionType={$actionsSelector}
                             options={this.options} modalContainer={$modalContainer}/>, $container.get(0));
         },
         initConditionsApp: function (selector, $modalContainer) {
@@ -982,7 +986,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 this.log("Conditions drop-down not found");
             } else {
                 var $container = $("#" + this.options.condition_container_id);
-                React.render(<ConditionsApp conditionType={$conditionSelector} newCondition={this.options.condition_add_id}
+                React.render(<ConditionsApp conditionType={$conditionSelector}
                     options={this.options} modalContainer={$modalContainer}/>,$container.get(0));
             }
         },
