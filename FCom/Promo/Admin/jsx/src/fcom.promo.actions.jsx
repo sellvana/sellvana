@@ -564,6 +564,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             var self = this;
             this.url = this.props.options.base_url + '/' + this.props.url;
             $(productSku.getDOMNode()).select2({
+                multiple: true,
                 placeholder: self.props.labelSkuField,
                 query: self.select2query,
                 dropdownAutoWidth: true
