@@ -180,9 +180,8 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                 </li>);
             }
 
-            var style = { margin: "0" };
             return (
-                <div className="col-sm-6 text-right pagination" style={style}>
+                <div className="col-sm-6 text-right pagination" style={{ margin: "0" }}>
                     <span className="f-grid-pagination">{this.props.totalResults} record(s)</span>
                     <ul className="pagination pagination-sm pagination-griddle pagesize">
                         {pageSizeHtml}
@@ -202,7 +201,10 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
     var FComSettings = React.createClass({
         getDefaultProps: function() {
             return {
-                "className": ""
+                "className": "",
+                "getConfig": null,
+                "selectedColumns": []
+
             }
         },
         toggleColumn: function(event) {
@@ -223,42 +225,50 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                 /* redraw with the selected initColumns minus the one just unchecked */
                 this.props.setColumns(_.without(selectedColumns, event.target.dataset.name));
             }
+
+            //don't close dropdown after toggle column
+            $(event.target).parents('div.dropdown').addClass('open');
         },
         quickSearch: function(event) {
             this.props.searchWithinResults(event.target.value);
         },
         render: function () {
-            var options = [];
+            var that = this;
             var id = this.props.getConfig('id');
 
-            for (var i = 0; i < initColumns.length; i++) {
-                if (initColumns[i] != "0") {
-                    var checked = _.contains(this.props.selectedColumns, initColumns[i]);
-                    options.push(
-                        <li data-id={initColumns[i]} className="dd-item dd3-item">
-                            <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
-                            <div className="dd3-content">
-                                <label><input type="checkbox" checked={checked} data-id={initColumns[i]} data-name={initColumns[i]} className="showhide_column" onChange={this.toggleColumn}/> {initColumns[i]}</label>
-                            </div>
-                        </li>
-                    );
+            var options = _.map(initColumns, function(column) {
+                if (column == '0') {
+                    return false;
                 }
-            }
 
+                var checked = _.contains(that.props.selectedColumns, column);
+                var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
+                return (
+                    <li data-id={column} className="dd-item dd3-item">
+                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+                        <div className="dd3-content">
+                            <label>
+                                <input type="checkbox" checked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn}/> {colInfo ?  colInfo.label : column}
+                            </label>
+                        </div>
+                    </li>
+                )
+            });
+
+            //quick search
             var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} onChange={this.quickSearch} />;
 
-            var style = { display: 'inline' };
             return (
                 <div className="col-sm-6">
                     {quickSearch}
-                    <span className="dropdown dd dd-nestable columns-span" style={style}>
+                    <div className="dropdown dd dd-nestable columns-span" style={{ display: 'inline' }}>
                         <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">
                             Columns <b className="caret"></b>
                         </a>
                         <ol className="dd-list dropdown-menu columns ui-sortable">
                             {options}
                         </ol>
-                    </span>
+                    </div>
                     <a className="btn grid-mass-edit btn-success disabled" role="button" href="#" >Edit</a>
                     <button className="btn grid-mass-delete btn-danger disabled" type="button">Delete</button>
                 </div>
