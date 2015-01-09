@@ -23,7 +23,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         getDefaultProps: function () {
             return {
-                totalType: [{id:"qty", label:"TOTAL QTY"}, {id:"amt", label:"TOTAL $Amount"}],
+                totalType: [{id: "qty", label: "TOTAL QTY"}, {id: "amt", label: "TOTAL $Amount"}],
                 select2: true,
                 containerClass: "col-md-2"
             };
@@ -37,9 +37,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="skuCollectionType" id="skuCollectionType"> of </ConditionsType>
-                    <div className="col-md-2"><input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/></div>
-                    <div className="col-md-2"><Common.Compare ref="skuCollectionCond" id="skuCollectionCond" /></div>
-                    <div className="col-md-1"><input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue" type="text"/></div>
+                    <div className="col-md-2">
+                        <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/>
+                    </div>
+                    <div className="col-md-2">
+                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" />
+                    </div>
+                    <div className="col-md-1">
+                        <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue" type="text"/>
+                    </div>
                 </Common.Row>
             );
         },
@@ -70,18 +76,18 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     var markup = '<div class="row-fluid" title="' + item.text + '">' +
                         '<div class="span2">ID: <em>' + item.id + '</em></div>' +
                         '<div class="span2">Name: ' + item.text.substr(0, 20);
-                        if(item.text.length > 20) {
-                            markup += '...';
-                        }
-                        markup += '</div>' +
-                        '<div class="span2">SKU: <strong>' + item.sku + '</strong></div>' +
-                        '</div>';
+                    if (item.text.length > 20) {
+                        markup += '...';
+                    }
+                    markup += '</div>' +
+                    '<div class="span2">SKU: <strong>' + item.sku + '</strong></div>' +
+                    '</div>';
 
                     return markup;
                 },
                 query: self.select2query
             });
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         }
     });
 
@@ -91,9 +97,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control" value={this.state.valueText}/></div>
-                    <div className="col-md-4"><Components.Button type="button" className="btn-primary"
-                       ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button></div>
+                    <div className="col-md-5">
+                        <textarea ref="attributesResume" id="attributesResume"
+                            readOnly="readonly" value={this.state.valueText} className="form-control"/>
+                    </div>
+                    <div className="col-md-4">
+                        <Components.Button type="button" className="btn-primary"
+                            ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button>
+                    </div>
                 </Common.Row>
             );
         },
@@ -171,30 +182,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             );
         },
         serialize: function () {
-            //todo serialize form data
-            //var $data = $('input, select', this.getDOMNode());
-            //var result = {};
-            //$data.each(function (elem) {
-            //    //
-            //});
-            //return result;
             return this.state.values;
         },
         serializeText: function () {
-            // todo serialize text for human display
-            var text = '', glue, fieldTexts = [];
+            var text, glue, fieldTexts = [];
             var allShouldMatch = $(this.refs['combinationType'].getDOMNode()).val(); // && or ||
-            if(allShouldMatch == 1) {
+            if (allShouldMatch == 1) {
                 glue = " or ";
             } else {
                 glue = " and ";
             }
 
-            for(var field in this.refs) {
-                if(field == 'combinationType' || field == 'combinationField') {
+            for (var field in this.refs) {
+                if (field == 'combinationType' || field == 'combinationField') {
                     continue;
                 }
-                if(this.refs[field]) {
+                if (this.refs[field]) {
                     var ref = this.refs[field];
                     var refText = ref.serializeText();
                     fieldTexts.push(refText);
@@ -208,7 +211,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         addField: function () {
             var fieldCombination = this.refs['combinationField'].getDOMNode();
             var fieldValue = $(fieldCombination).select2("data");
-            if(null == fieldValue || fieldValue == []) {
+            if (null == fieldValue || fieldValue == []) {
                 return;
             }
             var fields = this.state.fields;
@@ -255,7 +258,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         shouldUpdate: true,
         shouldComponentUpdate: function () {
             var upd = this.shouldUpdate;
-            if(!upd) { // shouldUpdate is one time flag that should be set only specifically and then dismissed
+            if (!upd) { // shouldUpdate is one time flag that should be set only specifically and then dismissed
                 this.shouldUpdate = true;
             }
             return upd;
@@ -265,7 +268,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var val = e.val;
             var values = this.state.values;
             values[target.id] = val;
-            if(val) {
+            if (val) {
                 this.shouldUpdate = false; // no update needed, just capturing values
                 this.setState({values: values});
             }
@@ -273,15 +276,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     });
 
     var ConditionsAttributesModalField = React.createClass({
-        mixins:[Common.select2QueryMixin],
+        mixins: [Common.select2QueryMixin],
         render: function () {
             var inputType = this.props.input;
             var opts = this.getOpts();
             var fieldId = "fieldCombination." + this.props.id;
             var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId} onChange={this.onChange}/>;
-            if(this.props.numeric_inputs.indexOf(inputType) != -1) {
+            if (this.props.numeric_inputs.indexOf(inputType) != -1) {
                 if (inputType == 'number') {
-                    if(this.state.range === false) {
+                    if (this.state.range === false) {
                         input = <input className="form-control required" type="number" step="any" id={fieldId} ref={fieldId} style={{width: "auto"}} onChange={this.onChange}/>;
                     } else {
                         input = <div id={fieldId} ref={fieldId} className="input-group">
@@ -295,19 +298,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         singleMode = false;
                     }
                     input = <div className="input-group">
-                            <span className="input-group-addon"><i className="glyphicon glyphicon-calendar"></i></span>
-                            <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} onChange={this.onChange}/>
-                        </div>
+                        <span className="input-group-addon">
+                            <i className="glyphicon glyphicon-calendar"></i>
+                        </span>
+                        <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} onChange={this.onChange}/>
+                    </div>
                 }
-            } else if(inputType == 'select'){
+            } else if (inputType == 'select') {
                 input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}/>;
-            } else if(this.props.bool_inputs.indexOf(inputType) != -1) {
+            } else if (this.props.bool_inputs.indexOf(inputType) != -1) {
                 input = <Components.YesNo  id={fieldId} ref={fieldId} onChange={this.onChange}/>;
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id} ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
+                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id}
+                            ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{input}</div>
                 </Common.Row>
@@ -334,22 +340,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var opts = this.getOpts();
             var opt = this.refs["fieldCompare." + this.props.id];
             var optext = $(opt.getDOMNode()).val();// getting compare operator from element because it might not of been changed
-            for(var i = 0; i < opts.length; i++) {
+            for (var i = 0; i < opts.length; i++) {
                 var o = opts[i];
-                if(o.id == optext) {
+                if (o.id == optext) {
                     text += " " + o.label;
                     break;
                 }
             }
 
             var value = this.values["fieldCombination." + this.props.id];
-            if(value) {
-                if($.isArray(value)) {
+            if (value) {
+                if ($.isArray(value)) {
                     value = value.join(", ");
                 }
 
-                if(type == 'bool') {
-                    value = (value == 0)? Locale._("No"): Locale._("Yes");
+                if (type == 'bool') {
+                    value = (value == 0) ? Locale._("No") : Locale._("Yes");
                 }
                 // todo handle numeric ranges and dates
 
@@ -359,7 +365,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return text;
         },
         remove: function () {
-            if(this.props.removeField) {
+            if (this.props.removeField) {
                 this.props.removeField(this.props.id);
             }
         },
@@ -374,12 +380,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 url: "",
                 fcLabel: "",
                 opts: [ // base options, for bool and select fields
-                    {id:"is", label: "is"},
-                    {id:"is_not", label: "is not"},
-                    {id:"empty", label: "has no value"}
+                    {id: "is", label: "is"},
+                    {id: "is_not", label: "is not"},
+                    {id: "empty", label: "has no value"}
                 ],
-                opts_text:[ // add to base for text fields
-                    {id:"contains", label: "contains"}
+                opts_text: [ // add to base for text fields
+                    {id: "contains", label: "contains"}
                 ],
                 opts_numeric: [ // add to base for numeral fields
                     {id: "lt", label: "is less than"},
@@ -428,31 +434,31 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var type = this.getInputType();
 
             // only select2 event has e.val, for dom inputs it must be added
-            if(!e.val) { // for native inputs, use blur event to capture value
+            if (!e.val) { // for native inputs, use blur event to capture value
                 var $elem = $(e.target);
                 e.value = $elem.val();
             } else {
                 e.value = e.val;
             }
             //console.log(e);
-            if(this.state.range && type == 'numeric') {
+            if (this.state.range && type == 'numeric') {
                 // possibly have min/max value handle them
-            }else if(type == 'date' && !this.state.range) {
+            } else if (type == 'date' && !this.state.range) {
                 // potentially range of dates
             }
             this.values["fieldCombination." + this.props.id] = e.value;
-            if(this.props.onChange) {
+            if (this.props.onChange) {
                 this.props.onChange(e);
             }
         },
         onCompareChange: function (e) {
             this.values["fieldCompare." + this.props.id] = e.val;
-            if(this.props.numeric_inputs.indexOf(this.props.input) == -1){
+            if (this.props.numeric_inputs.indexOf(this.props.input) == -1) {
                 return;
             }
             var target = e.target;
             var state = {range: false};
-            state.range = (target.value =='between');
+            state.range = (target.value == 'between');
             this.setState(state);
 
         },
@@ -472,7 +478,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 }
             );
         },
-        url:'',
+        url: '',
         initSelectInput: function () {
             var fieldCombination = this.refs["fieldCombination." + this.props.id];
             var self = this;
@@ -495,9 +501,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
-                    <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/></div>
-                    <div className="col-md-2"><Common.Compare ref="catProductsCond" id="catProductsCond" /></div>
-                    <div className="col-md-1"><input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left"/></div>
+                    <div className="col-md-2">
+                        <input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/>
+                    </div>
+                    <div className="col-md-2">
+                        <Common.Compare ref="catProductsCond" id="catProductsCond" />
+                    </div>
+                    <div className="col-md-1">
+                        <input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left"/>
+                    </div>
                 </Common.Row>
             );
         },
@@ -509,7 +521,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 type: 'cats'
             };
         },
-        url:'',
+        url: '',
         componentDidMount: function () {
             var catProductsIds = this.refs.catProductsIds;
             this.url = this.props.options.base_url + this.props.url;
@@ -544,20 +556,24 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType}/>
-                    <div className="col-md-2"><Common.Compare ref="cartTotalCond" id="cartTotalCond" /></div>
-                    <div className="col-md-1"><input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left"/></div>
+                    <div className="col-md-2">
+                        <Common.Compare ref="cartTotalCond" id="cartTotalCond" />
+                    </div>
+                    <div className="col-md-1">
+                        <input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left"/>
+                    </div>
                 </Common.Row>
             );
         },
         getDefaultProps: function () {
             return {
                 rowClass: "cart-total",
-                totalType: [{id:"qty", label:"QTY OF ITEMS"}, {id:"amt", label:"$Value/Amount OF ITEMS"}],
+                totalType: [{id: "qty", label: "QTY OF ITEMS"}, {id: "amt", label: "$Value/Amount OF ITEMS"}],
                 label: "Cart Total",
                 type: 'total'
             };
         },
-        componentDidMount: function() {
+        componentDidMount: function () {
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         }
     });
@@ -567,10 +583,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume"
-                            readOnly="readonly" value={this.state.value} className="form-control"/></div>
-                    <div className="col-md-4"> <Components.Button type="button" className="btn-primary pull-left" ref={this.props.configureId}
-                        onClick={this.handleConfigure}>Configure</Components.Button></div>
+                    <div className="col-md-5">
+                        <textarea ref="shippingResume" id="shippingResume"
+                            readOnly="readonly" value={this.state.valueText} className="form-control"/>
+                    </div>
+                    <div className="col-md-4">
+                        <Components.Button type="button" className="btn-primary pull-left" ref={this.props.configureId}
+                            onClick={this.handleConfigure}>Configure</Components.Button>
+                    </div>
                 </Common.Row>
             );
         },
@@ -583,24 +603,35 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
         },
         getInitialState: function () {
-            return {value: ""};
+            return {value: "", valueText: ""};
         },
         modal: null,
+        modalContent: null,
         handleConfigure: function (e) {
             var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
                 title={this.props.modalTitle} onLoad={this.openModal} onUpdate={this.openModal}>
                 <ConditionsShippingModalContent baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
-                    entityId={this.props.options.entity_id}/>
+                    entityId={this.props.options.entity_id} onLoad={this.registerModalContent} />
             </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
         },
         handleShippingConfirm: function (modal) {
+            var mc = this.modalContent;
+            var value = mc.serialize();
+            var valueText = mc.serializeText();
+            this.setState({
+                valueText: valueText,
+                value: value
+            });
             modal.close();
         },
         registerModal: function (modal) {
             this.modal = modal;
             this.openModal(modal);
+        },
+        registerModalContent: function (content) {
+            this.modalContent = content;
         },
         openModal: function (modal) {
             modal.open();
@@ -634,23 +665,51 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         return <ConditionsShippingModalField label={field.label} url={url} key={field.field}
-                            id={field.field} removeField={this.removeField} />
+                            id={field.field} ref={field.field} removeField={this.removeField}  onChange={this.elementChange}/>
                     }.bind(this))}
                 </div>
             );
         },
+        serialize: function () {
+            return this.state.values;
+        },
+        serializeText: function () {
+            // todo serialize text for human display
+            var text, glue, fieldTexts = [];
+            var allShouldMatch = $(this.refs['combinationType'].getDOMNode()).val(); // && or ||
+            if (allShouldMatch == 1) {
+                glue = " or ";
+            } else {
+                glue = " and ";
+            }
+
+            for (var field in this.refs) {
+                if (field == 'combinationType' || field == 'combinationField') {
+                    continue;
+                }
+                if (this.refs[field]) {
+                    var ref = this.refs[field];
+                    var refText = ref.serializeText();
+                    fieldTexts.push(refText);
+                }
+            }
+
+            text = fieldTexts.join(glue);
+
+            return text;
+        },
         addField: function () {
             var fieldCombination = this.refs['combinationField'].getDOMNode();
             var fieldValue = $(fieldCombination).select2("data"); // get selected entry as object
-            if(null == fieldValue || fieldValue == [] || fieldValue.id == "-1") {
+            if (null == fieldValue || fieldValue == [] || fieldValue.id == "-1") {
                 return;
             }
             $(fieldCombination).select2("val", "-1", false);// reset to default prompt
             var fields = this.state.fields;
-            for(var i in fields) { // loop current state fields and check if new one matches existing one, if so skip it
+            for (var i in fields) { // loop current state fields and check if new one matches existing one, if so skip it
                 if (fields.hasOwnProperty(i)) {
                     var f = fields[i];
-                    if(f.field == fieldValue.id) {
+                    if (f.field == fieldValue.id) {
                         return;
                     }
                 }
@@ -668,7 +727,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             this.setState({fields: fields});
         },
         getInitialState: function () {
-            return {fields: []};
+            return {fields: [], values: {}};
         },
         getDefaultProps: function () {
             return {
@@ -683,31 +742,97 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
         },
         componentDidMount: function () {
-            $(this.refs['combinationField'].getDOMNode()).select2({minimumResultsForSearch:15}).on("change", this.addField);
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+            $(this.refs['combinationField'].getDOMNode()).select2({minimumResultsForSearch: 15}).on("change", this.addField);
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            if (typeof this.props.onLoad == 'function') {
+                this.props.onLoad(this);
+            }
+        },
+        shouldUpdate: true,
+        shouldComponentUpdate: function () {
+            var upd = this.shouldUpdate;
+            if (!upd) { // shouldUpdate is one time flag that should be set only specifically and then dismissed
+                this.shouldUpdate = true;
+            }
+            return upd;
+        },
+        elementChange: function (e) {
+            var target = e.target;
+            var val = e.val;
+            var values = this.state.values;
+            values[target.id] = val;
+            if (val) {
+                this.shouldUpdate = false; // no update needed, just capturing values
+                this.setState({values: values});
+            }
         }
     });
 
     var ConditionsShippingModalField = React.createClass({
-        mixins:[Common.select2QueryMixin],
+        mixins: [Common.select2QueryMixin],
         render: function () {
             var fieldId = "fieldCombination." + this.props.id;
             var input = <input className="form-control" type="hidden" id={fieldId} key={fieldId} ref={fieldId}/>;
             var helperBlock = '';
-            if(this.props.id == 'zipcode') {
+            if (this.props.id == 'zipcode') {
                 helperBlock = <span key={fieldId + '.help'} className="help-block">{this.props.zipHelperText }</span>;
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <Common.Compare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
+                        <Common.Compare opts={this.props.opts} id={"fieldCompare." + this.props.id}
+                            ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{[input, helperBlock]}</div>
                 </Common.Row>
             );
         },
+        values: {},
+        serialize: function () {
+            return this.values;
+        },
+        serializeText: function () {
+            var text = this.props.label;
+            var opts = this.props.opts;
+            var opt = this.refs["fieldCompare." + this.props.id];
+            var optext = $(opt.getDOMNode()).val();// getting compare operator from element because it might not of been changed
+            for (var i = 0; i < opts.length; i++) {
+                var o = opts[i];
+                if (o.id == optext) {
+                    text += " " + o.label;
+                    break;
+                }
+            }
+
+            var value = this.values["fieldCombination." + this.props.id];
+            if (value) {
+                if ($.isArray(value)) {
+                    value = value.join(", ");
+                }
+                text += " " + value;
+            }
+
+            return text;
+        },
+        onChange: function (e) {
+            // only select2 event has e.val, for dom inputs it must be added
+            if (!e.val) { // for native inputs, use blur event to capture value
+                var $elem = $(e.target);
+                e.value = $elem.val();
+            } else {
+                e.value = e.val;
+            }
+
+            this.values["fieldCombination." + this.props.id] = e.value;
+            if (this.props.onChange) {
+                this.props.onChange(e);
+            }
+        },
+        onCompareChange: function (e) {
+            this.values["fieldCompare." + this.props.id] = e.val;
+        },
         remove: function () {
-            if(this.props.removeField) {
+            if (this.props.removeField) {
                 this.props.removeField(this.props.id);
             }
         },
@@ -718,12 +843,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 fcLabel: "",
                 zipHelperText: "Use .. (e.g. 90000..99999) to add range of zip codes",
                 opts: [
-                    {id:"in", label: "is one of"},
-                    {id:"not_in", label: "is not one of"}
+                    {id: "in", label: "is one of"},
+                    {id: "not_in", label: "is not one of"}
                 ]
             };
         },
-        url:'',
+        url: '',
         componentDidMount: function () {
             var fieldCombination = this.refs['fieldCombination.' + this.props.id];
             var self = this;
@@ -747,12 +872,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     formatSelection: function (item) {
                         return item.id;
                     }
-                });
+                }).on('change', this.onChange);
             } else {
                 $(fieldCombination.getDOMNode()).select2({
                     tags: [],
                     tokenSeparators: [',']
-                });
+                }).on('change', this.onChange);
             }
         }
     });
@@ -764,7 +889,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         //todo make a field based on field
                         var el;
                         var key = field.id;
-                        switch(field.type){
+                        switch (field.type) {
                             case 'skus':
                                 el = <ConditionSkuCollection options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
@@ -786,10 +911,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         }
                         return el;
                     }, this)}
-                </div> );
+            </div> );
         },
         componentDidMount: function () {
-            var $conditionsSerialized = $('#'+this.props.options.conditions_serialized);
+            var $conditionsSerialized = $('#' + this.props.options.conditions_serialized);
             var data = this.state.data;
 
             if ($conditionsSerialized.length > 0) {
@@ -804,17 +929,17 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
 
             this.props.conditionType.on('change', this.addCondition);
 
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         },
         addCondition: function () {
             // add condition data to state
             var $conditionTypes = this.props.conditionType;
-            if($conditionTypes.length == 0) {
+            if ($conditionTypes.length == 0) {
                 return;
             }
 
             var conditionType = $conditionTypes.val();
-            if(conditionType == -1) {
+            if (conditionType == -1) {
                 return;
             }
             $conditionTypes.select2('val', "-1", false);// reset to placeholder value and do NOT trigger change event
