@@ -15,23 +15,36 @@ class FCom_Sales_Model_Cart_Total_Tax extends FCom_Sales_Model_Cart_Total_Abstra
         $result = [];
 
         $this->BEvents->fire(__METHOD__, ['cart' => $this->_cart, 'result' => &$result]);
-
         /*
-        $this->_cart->setData('tax_details', $result);
+         * Expecting the following $result structure:
+         *  - tax_amount: total tax amount
+         *  - items: tax info per item
+         *      - row_tax: amount of tax per item
+         *      - details: $item->setData('tax_details', $details)
+         *  - details: tax info for cart, to be set as $cart->setData('tax_details', $details)
+         */
 
-        foreach ($this->_cart->items() as $item) {
-            if (!empty($result['items'][$item->id()])) {
-                $r = $result['items'][$item->id()];
-                $item->set([
-                    'row_tax' => $r['row_tax'],
-                ]);
+        $this->_value = !empty($result['tax_amount']) ? $result['tax_amount'] : 0;
+
+        $this->_cart->set('tax_amount', $this->_value);
+        $this->_cart->add('grand_total', $this->_value);
+        $this->_cart->setData('tax_details', !empty($result['details']) ? $result['details'] : []);
+
+        if (!empty($result['items'])) {
+            foreach ($this->_cart->items() as $item) {
+                $itemId = $item->id();
+                if (!empty($result['items'][$itemId]['row_tax'])) {
+                    $item->set('row_tax', $result['items'][$itemId]['row_tax']);
+                } else {
+                    $item->set('row_tax', 0);
+                }
+                if (!empty($result['items'][$itemId]['details'])) {
+                    $item->setData('tax_details', $result['items'][$itemId]['details']);
+                } else {
+                    $item->setData('tax_details', []);
+                }
             }
         }
-        */
-
-        $this->_value = $this->_cart->get('tax_amount'); //$result['tax_amount'];
-        //$this->_cart->set('tax_amount', $this->_value);
-        //$this->_cart->add('grand_total', $this->_value);
 
         return $this;
     }

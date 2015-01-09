@@ -607,6 +607,12 @@ EOT
     */
     public static function ddlTableDef($fullTableName, $def, $connectionName = null)
     {
+        /*
+        // disabled for now because too many other changes required
+        if (class_exists($fullTableName) && method_exists($fullTableName, 'table')) {
+            $fullTableName = $fullTableName::table();
+        }
+        */
         $fields = !empty($def['COLUMNS']) ? $def['COLUMNS'] : null;
         $primary = !empty($def['PRIMARY']) ? $def['PRIMARY'] : null;
         $indexes = !empty($def['KEYS']) ? $def['KEYS'] : null;

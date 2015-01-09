@@ -236,7 +236,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         //todo: setup unique uniq_id
         if (!$this->get('product_sku')) {
-            $this->set('product_sku', $this->id);
+            $this->set('product_sku', $this->id());
             $saveAgain = true;
         }
         if (!$this->get('position')) {

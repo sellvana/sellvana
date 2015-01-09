@@ -17,7 +17,7 @@
  */
 class FCom_SalesTax_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_2()
     {
         $tCustomerClass = $this->FCom_SalesTax_Model_CustomerClass->table();
         $tCustomerTax = $this->FCom_SalesTax_Model_CustomerTax->table();
@@ -121,7 +121,9 @@ class FCom_SalesTax_Migrate extends BClass
                 'match_all_product_classes' => 'tinyint not null default 0',
                 'compound_priority' => 'smallint not null default 0',
                 'sort_order' => 'smallint not null default 0',
+                'apply_to_shipping' => 'tinyint not null default 0',
                 'rule_rate_percent' => 'decimal(10,4) default null',
+                'fpt_amount' => 'decimal(12,2) default null',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
@@ -180,18 +182,19 @@ class FCom_SalesTax_Migrate extends BClass
         ]);
 
         // Default tax classes
-        $custClass = $this->FCom_SalesTax_Model_CustomerClass->create(['id' => 1, 'title' => 'Retail'])->save();
-        $prodClass = $this->FCom_SalesTax_Model_ProductClass->create(['id' => 1, 'title' => 'Standard'])->save();
+        $retailClass = $this->FCom_SalesTax_Model_CustomerClass->create(['title' => 'Retail'])->save();
+        $taxableClass = $this->FCom_SalesTax_Model_ProductClass->create(['title' => 'Taxable Goods'])->save();
+        $exemptClass = $this->FCom_SalesTax_Model_ProductClass->create(['title' => 'Exempt'])->save();
 
         // Sample tax rule for NY State
         $rule = $this->FCom_SalesTax_Model_Rule->create(['title' => 'NY State', 'rule_rate_percent' => 4])->save();
         $zone = $this->FCom_SalesTax_Model_Zone->create(['country' => 'US', 'region' => 'NY'])->save();
         $this->FCom_SalesTax_Model_RuleZone->create(['rule_id' => $rule->id(), 'zone_id' => $zone->id()])->save();
-        $this->FCom_SalesTax_Model_RuleCustomerClass->create(['rule_id' => $rule->id(), 'customer_class_id' => $custClass->id()])->save();
-        $this->FCom_SalesTax_Model_RuleProductClass->create(['rule_id' => $rule->id(), 'product_class_id' => $prodClass->id()])->save();
+        $this->FCom_SalesTax_Model_RuleCustomerClass->create(['rule_id' => $rule->id(), 'customer_class_id' => $retailClass->id()])->save();
+        $this->FCom_SalesTax_Model_RuleProductClass->create(['rule_id' => $rule->id(), 'product_class_id' => $taxableClass->id()])->save();
 
         // Sample tax rule for NY City
-        $rule = $this->FCom_SalesTax_Model_Rule->create(['title' => 'NY City', 'rule_rate_percent' => 4.875])->save();
+        $rule = $this->FCom_SalesTax_Model_Rule->create(['title' => 'NY City', 'rule_rate_percent' => 8.875])->save();
         $zoneHlp = $this->FCom_SalesTax_Model_Zone;
         $ruleZoneHlp = $this->FCom_SalesTax_Model_RuleZone;
         foreach ([[10001, 10292], 11217, 11411, [11416, 11417], 11429, 11692] as $postcode) {
@@ -204,7 +207,30 @@ class FCom_SalesTax_Migrate extends BClass
             ])->save();
             $ruleZoneHlp->create(['rule_id' => $rule->id(), 'zone_id' => $zone->id()])->save();
         }
-        $this->FCom_SalesTax_Model_RuleCustomerClass->create(['rule_id' => $rule->id(), 'customer_class_id' => $custClass->id()])->save();
-        $this->FCom_SalesTax_Model_RuleProductClass->create(['rule_id' => $rule->id(), 'product_class_id' => $prodClass->id()])->save();
+        $this->FCom_SalesTax_Model_RuleCustomerClass->create(['rule_id' => $rule->id(), 'customer_class_id' => $retailClass->id()])->save();
+        $this->FCom_SalesTax_Model_RuleProductClass->create(['rule_id' => $rule->id(), 'product_class_id' => $taxableClass->id()])->save();
+    }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        $tRule = $this->FCom_SalesTax_Model_Rule->table();
+        $this->BDb->ddlTableDef($tRule, [
+            BDb::COLUMNS => [
+                'apply_to_shipping' => 'tinyint not null default 0',
+            ],
+        ]);
+        $this->FCom_SalesTax_Model_ProductClass->load('Standard', 'title')->set('title', 'Taxable Goods')->save();
+        $this->FCom_SalesTax_Model_ProductClass->create(['title' => 'Exempt'])->save();
+        $this->FCom_SalesTax_Model_Rule->load('NY City', 'title')->set('rule_rate_percent', 8.875)->save();
+    }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $tRule = $this->FCom_SalesTax_Model_Rule->table();
+        $this->BDb->ddlTableDef($tRule, [
+            BDb::COLUMNS => [
+                'fpt_amount' => 'decimal(12,2) default null',
+            ],
+        ]);
     }
 }
