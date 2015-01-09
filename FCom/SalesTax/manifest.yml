@@ -1,11 +1,13 @@
 modules:
     FCom_SalesTax:
-        version: 0.1.1
+        version: 0.1.2
         require: { module: { FCom_Sales: 0.3.11 } }
 
         areas:
             FCom_Admin:
-                auto_use: [ views ]
+                auto_use: [ views, layout ]
+                observe:
+                    - [ FCom_Catalog_Model_Product::onAfterSave, FCom_SalesTax_Main.onProductAfterSave ]
 
         observe:
             - [ FCom_Sales_Model_Cart_Total_Tax::calculate, FCom_SalesTax_Main.onCartTaxCalculate ]

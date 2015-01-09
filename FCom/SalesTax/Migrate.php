@@ -17,7 +17,7 @@
  */
 class FCom_SalesTax_Migrate extends BClass
 {
-    public function install__0_1_1()
+    public function install__0_1_2()
     {
         $tCustomerClass = $this->FCom_SalesTax_Model_CustomerClass->table();
         $tCustomerTax = $this->FCom_SalesTax_Model_CustomerTax->table();
@@ -123,6 +123,7 @@ class FCom_SalesTax_Migrate extends BClass
                 'sort_order' => 'smallint not null default 0',
                 'apply_to_shipping' => 'tinyint not null default 0',
                 'rule_rate_percent' => 'decimal(10,4) default null',
+                'fpt_amount' => 'decimal(12,2) default null',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
@@ -221,5 +222,15 @@ class FCom_SalesTax_Migrate extends BClass
         $this->FCom_SalesTax_Model_ProductClass->load('Standard', 'title')->set('title', 'Taxable Goods')->save();
         $this->FCom_SalesTax_Model_ProductClass->create(['title' => 'Exempt'])->save();
         $this->FCom_SalesTax_Model_Rule->load('NY City', 'title')->set('rule_rate_percent', 8.875)->save();
+    }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $tRule = $this->FCom_SalesTax_Model_Rule->table();
+        $this->BDb->ddlTableDef($tRule, [
+            BDb::COLUMNS => [
+                'fpt_amount' => 'decimal(12,2) default null',
+            ],
+        ]);
     }
 }

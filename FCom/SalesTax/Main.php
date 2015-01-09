@@ -241,9 +241,13 @@ class FCom_SalesTax_Main extends BClass
             foreach ($rulesPerItem[$itemId] as $compoundPriority => $itemRules) {
                 $compoundAmount = 0;
                 foreach ($itemRules as $rId => $rule) {
-                    $rate = $rule->get('rule_rate_percent') ?: $rule->get('zone')->get('zone_rate_percent');
-                    $ratesByRule[$rId][] = $rate;
-                    $itemRuleAmount = ceil($taxableAmount * $rate) / 100;
+                    if ($rule->get('fpt_amount')) {
+                        $itemRuleAmount = $rule->get('fpt_amount');
+                    } else {
+                        $rate = $rule->get('rule_rate_percent') ?: $rule->get('zone')->get('zone_rate_percent');
+                        $ratesByRule[$rId][] = $rate;
+                        $itemRuleAmount = ceil($taxableAmount * $rate) / 100;
+                    }
                     if (empty($result['details']['rules'][$rId])) {
                         $result['details']['rules'][$rId] = ['amount' => 0];
                     } else {
@@ -265,5 +269,34 @@ class FCom_SalesTax_Main extends BClass
         }
 
         return $result;
+    }
+
+    public function onProductAfterSave($args)
+    {
+        $model = $args['model'];
+        $pId = $model->id();
+        $hlp = $this->FCom_SalesTax_Model_ProductTax;
+        $existingTaxIds = $hlp->orm()->where('product_id', $pId)->find_many_assoc('product_class_id', 'id');
+        $newTaxIds = array_flip($model->get('tax_class_ids'));
+
+        if ($existingTaxIds) {
+            $deleteIds = [];
+            foreach ($existingTaxIds as $tcId => $tId) {
+                if (empty($newTaxIds[$tcId])) {
+                    $deleteIds[] = $tId;
+                }
+            }
+            if ($deleteIds) {
+                $hlp->delete_many(['id' => $deleteIds]);
+            }
+        }
+
+        if ($newTaxIds) {
+            foreach ($newTaxIds as $tcId => $i) {
+                if (empty($existingTaxIds[$tcId])) {
+                    $hlp->create(['product_id' => $pId, 'product_class_id' => $tcId])->save();
+                }
+            }
+        }
     }
 }
