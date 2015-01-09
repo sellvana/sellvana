@@ -28,7 +28,7 @@ class FCom_Sales_Model_Cart_Total_Tax extends FCom_Sales_Model_Cart_Total_Abstra
 
         $this->_cart->set('tax_amount', $this->_value);
         $this->_cart->add('grand_total', $this->_value);
-        $this->_cart->setData('tax_details', !empty($result['tax_details']) ? $result['tax_details'] : []);
+        $this->_cart->setData('tax_details', !empty($result['details']) ? $result['details'] : []);
 
         if (!empty($result['items'])) {
             foreach ($this->_cart->items() as $item) {

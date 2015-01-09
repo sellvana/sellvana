@@ -18,4 +18,3 @@ modules:
                     default_guest_class_id: 1
                     default_customer_class_id: 1
                     default_product_class_id: 1
-                    default_country: US

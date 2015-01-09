@@ -56,7 +56,7 @@ class FCom_SalesTax_Main extends BClass
     {
         $country = $cart->get('shipping_country');
         if (!$country) {
-            $defCountry = $this->BConfig->get('modules/FCom_SalesTax/default_country');
+            $defCountry = $this->BConfig->get('modules/FCom_Core/default_country');
             if ($defCountry) {
                 $country = $defCountry;
             } else {
@@ -244,15 +244,14 @@ class FCom_SalesTax_Main extends BClass
                     if ($rule->get('fpt_amount')) {
                         $itemRuleAmount = $rule->get('fpt_amount');
                     } else {
-                        $rate = $rule->get('rule_rate_percent') ?: $rule->get('zone')->get('zone_rate_percent');
+                        $rate = (float)($rule->get('rule_rate_percent') ?: $rule->get('zone')->get('zone_rate_percent'));
                         $ratesByRule[$rId][] = $rate;
                         $itemRuleAmount = ceil($taxableAmount * $rate) / 100;
                     }
                     if (empty($result['details']['rules'][$rId])) {
                         $result['details']['rules'][$rId] = ['amount' => 0];
-                    } else {
-                        $result['details']['rules'][$rId]['amount'] += $itemRuleAmount;
                     }
+                    $result['details']['rules'][$rId]['amount'] += $itemRuleAmount;
                     $result['items'][$itemId]['details']['rules'][$rId] = ['rate' => $rate, 'amount' => $itemRuleAmount];
                     $compoundAmount += $itemRuleAmount;
                 }
@@ -277,12 +276,12 @@ class FCom_SalesTax_Main extends BClass
         $pId = $model->id();
         $hlp = $this->FCom_SalesTax_Model_ProductTax;
         $existingTaxIds = $hlp->orm()->where('product_id', $pId)->find_many_assoc('product_class_id', 'id');
-        $newTaxIds = array_flip($model->get('tax_class_ids'));
+        $newTaxIds = $model->get('tax_class_ids');
 
         if ($existingTaxIds) {
             $deleteIds = [];
             foreach ($existingTaxIds as $tcId => $tId) {
-                if (empty($newTaxIds[$tcId])) {
+                if (!in_array($tcId, $newTaxIds)) {
                     $deleteIds[] = $tId;
                 }
             }
@@ -292,7 +291,7 @@ class FCom_SalesTax_Main extends BClass
         }
 
         if ($newTaxIds) {
-            foreach ($newTaxIds as $tcId => $i) {
+            foreach ($newTaxIds as $tcId) {
                 if (empty($existingTaxIds[$tcId])) {
                     $hlp->create(['product_id' => $pId, 'product_class_id' => $tcId])->save();
                 }
