@@ -498,6 +498,8 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         parent::onAfterCreate();
 
         $this->set('same_address', 1);
+        $defCountry = $this->BConfig->get('modules/FCom_Core/default_country');
+        $this->set('shipping_country', $defCountry)->set('billing_country', $defCountry);
         $this->setShippingMethod(true);
         $this->setPaymentMethod(true);
         $this->state()->overall()->setActive();

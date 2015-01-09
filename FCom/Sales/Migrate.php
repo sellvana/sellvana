@@ -23,6 +23,7 @@
  * @property FCom_Sales_Model_Order_Return_Item $FCom_Sales_Model_Order_Return_Item
  * @property FCom_Sales_Model_Order_Shipment $FCom_Sales_Model_Order_Shipment
  * @property FCom_Sales_Model_Order_Shipment_Item $FCom_Sales_Model_Order_Shipment_Item
+ * @property FCom_Sales_Model_Order_Shipment_Package $FCom_Sales_Model_Order_Shipment_Package
  * @property FCom_Sales_Model_Order_Cancel $FCom_Sales_Model_Order_Cancel
  * @property FCom_Sales_Model_Order_Cancel_Item $FCom_Sales_Model_Order_Cancel_Item
  * @property FCom_Sales_Model_StateCustom $FCom_Sales_Model_StateCustom
@@ -31,8 +32,9 @@
 class FCom_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_7()
+    public function install__0_3_12()
     {
+        $tCustomer = $this->FCom_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
         $tProduct = $this->FCom_Catalog_Model_Product->table();
         $tInventorySku = $this->FCom_Catalog_Model_InventorySku->table();
@@ -44,9 +46,11 @@ class FCom_Sales_Migrate extends BClass
 
         $tOrderShipment = $this->FCom_Sales_Model_Order_Shipment->table();
         $tOrderShipmentItem = $this->FCom_Sales_Model_Order_Shipment_Item->table();
+        $tOrderShipmentPackage = $this->FCom_Sales_Model_Order_Shipment_Package->table();
 
         $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
         $tOrderPaymentItem = $this->FCom_Sales_Model_Order_Payment_Item->table();
+        $tOrderPaymentTransaction = $this->FCom_Sales_Model_Order_Payment_Transaction->table();
 
         $tOrderReturn = $this->FCom_Sales_Model_Order_Return->table();
         $tOrderReturnItem = $this->FCom_Sales_Model_Order_Return_Item->table();
@@ -81,15 +85,16 @@ class FCom_Sales_Migrate extends BClass
                 'payment_method' => "VARCHAR(50) NULL ",
                 'payment_details' => "TEXT CHARACTER SET utf8   NULL",
                 'coupon_code' => "VARCHAR(50) default NULL",
-                'status' => "ENUM('new', 'finished') NOT NULL DEFAULT 'new'",
                 'create_at' => "DATETIME NULL",
                 'update_at' => "DATETIME NULL",
                 'data_serialized' => "text NULL",
                 'last_calc_at' => "int unsigned",
+                'recalc_shipping_rates' => 'tinyint not null default 0',
                 'admin_id' => "int(10) unsigned  NULL",
                 'same_address' => "tinyint(1) not null default 0",
 
                 'state_overall' => "varchar(10) not null default ''",
+                'state_payment' => 'varchar(20)',
 
                 'billing_company' => 'varchar(50)',
                 'billing_attn' => 'varchar(50)',
@@ -120,8 +125,10 @@ class FCom_Sales_Migrate extends BClass
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
-                'customer_id' => "(`customer_id`)",
-                'status' => "(`status`)",
+                'IDX_state_payment' => '(state_payment)',
+            ],
+            BDb::CONSTRAINTS => [
+                'customer' => ['customer_id', $tCustomer, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
 
@@ -235,6 +242,10 @@ class FCom_Sales_Migrate extends BClass
             BDb::KEYS => [
                 'UNQ_cart_id' => 'UNIQUE (cart_id)',
             ],
+            BDb::CONSTRAINTS => [
+                'cart' => ['cart_id', $tCart, 'id', 'CASCADE', 'SET NULL'],
+                'customer' => ['customer_id', $tCustomer, 'id', 'CASCADE', 'SET NULL'],
+            ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderItem, [
@@ -314,12 +325,32 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
 
+        $this->BDb->ddlTableDef($tOrderShipmentPackage, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'shipment_id' => 'int unsigned not null',
+                'tracking_number' => 'varchar(50) default null',
+                'carrier_status' => 'varchar(10) default null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_tracking_number' => '(tracking_number)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'shipment' => ['shipment_id', $tOrderShipment],
+            ],
+        ]);
+
         $this->BDb->ddlTableDef($tOrderShipmentItem, [
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned not null',
                 'order_item_id' => 'int unsigned not null',
                 'shipment_id' => 'int unsigned not null',
+                'package_id' => 'int unsigned default null',
                 'qty' => 'int unsigned not null',
                 'data_serialized' => 'text',
             ],
@@ -328,6 +359,7 @@ class FCom_Sales_Migrate extends BClass
                 'order' => ['order_id', $tOrder],
                 'order_item' => ['order_item_id', $tOrderItem],
                 'shipment' => ['shipment_id', $tOrderShipment],
+                'package' => ['package_Id', $tOrderShipmentPackage],
             ],
         ]);
 
@@ -345,6 +377,7 @@ class FCom_Sales_Migrate extends BClass
                 'amount_refunded'  => 'decimal(12,2)',
                 'data_serialized'  => 'text',
                 'transaction_status' => 'varchar(50)',
+                'transaction_token' => 'varchar(50)',
                 'transaction_id'   => 'varchar(50)',
                 'transaction_type' => 'varchar(50)',
                 'transaction_fee'  => 'decimal(12,2)',
@@ -360,6 +393,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_state_custom' => '(state_custom)',
                 'IDX_transaction_id' => '(transaction_id)',
                 'IDX_transaction_type' => '(transaction_type)',
+                'IDX_transaction_token' => '(transaction_token)',
             ],
             BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
@@ -380,6 +414,35 @@ class FCom_Sales_Migrate extends BClass
                 'order' => ['order_id', $tOrder],
                 'order_item' => ['order_item_id', $tOrderItem],
                 'payment' => ['payment_id', $tOrderPayment],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderPaymentTransaction, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'payment_id' => 'int unsigned default null',
+                'order_id' => 'int unsigned default null',
+                'parent_id' => 'int unsigned default null',
+                'payment_method' => 'varchar(20)',
+                'transaction_type' => 'varchar(20) not null',
+                'transaction_id' => 'varchar(50) default null',
+                'parent_transaction_id' => 'varchar(50) default null',
+                'transaction_fee' => 'decimal(12,2) default 0',
+                'transaction_status' => 'varchar(20) default null',
+                'amount' => 'decimal(12,2) not null',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'data_serialized' => 'text default null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_transaction_type_method_order' => '(transaction_type, payment_method, order_id)',
+                'IDX_transaction_id_method_order' => '(transaction_id, payment_method, order_id)',
+            ],
+            BDb::CONSTRAINTS => [
+                'payment' => ['payment_id', $tOrderPayment, 'id', 'CASCADE', 'SET NULL'],
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
+                'parent' => ['parent_id', $tOrderPaymentTransaction],
             ],
         ]);
 
@@ -422,6 +485,7 @@ class FCom_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
+                'payment_id' => 'int unsigned default null',
                 'state_overall' => "varchar(10) not null default 'new'",
                 'state_custom' => "varchar(10) not null default ''",
                 'data_serialized' => 'text',
@@ -433,6 +497,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
+                'payment' => ['payment_id', $tOrderPayment],
             ],
         ]);
 
@@ -1696,6 +1761,47 @@ class FCom_Sales_Migrate extends BClass
             ],
             BDb::CONSTRAINTS => [
                 'payment' => ['payment_id', $tOrderPayment],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_11__0_3_12()
+    {
+        #$tCartItem = $this->FCom_Sales_Model_CartItem->table();
+
+        $tOrder = $this->FCom_Sales_Model_Order->table();
+        #$tOrderItem = $this->FCom_Sales_Model_OrderItem->table();
+
+        $tOrderShipment = $this->FCom_Sales_Model_Order_Shipment->table();
+        $tOrderShipmentItem = $this->FCom_Sales_Model_Order_Shipment_Item->table();
+        $tOrderShipmentPackage = $this->FCom_Sales_Model_Order_Shipment_Package->table();
+
+
+        $this->BDb->ddlTableDef($tOrderShipmentPackage, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'shipment_id' => 'int unsigned not null',
+                'tracking_number' => 'varchar(50) default null',
+                'carrier_status' => 'varchar(10) default null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_tracking_number' => '(tracking_number)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'shipment' => ['shipment_id', $tOrderShipment],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipmentItem, [
+            BDb::COLUMNS => [
+                'package_id' => 'int unsigned default null',
+            ],
+            BDb::CONSTRAINTS => [
+                'package' => ['package_Id', $tOrderShipmentPackage],
             ],
         ]);
     }
