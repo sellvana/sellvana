@@ -26,6 +26,6 @@ foreach ($modules as $modName => $mod) {
     }
     echo $targetFile . "\n";
     chmod($targetFile, 0777);
-    FCom_Dev_Translations::collectTranslations($viewDir, $targetFile);
+    FCom_Dev_Translations::i()->collectTranslations($viewDir, $targetFile);
 }
 echo "Done" . PHP_EOL;
