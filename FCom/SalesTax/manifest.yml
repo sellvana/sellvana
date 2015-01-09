@@ -8,6 +8,11 @@ modules:
                 auto_use: [ views, layout ]
                 observe:
                     - [ FCom_Catalog_Model_Product::onAfterSave, FCom_SalesTax_Main.onProductAfterSave ]
+                routing:
+                    - [ /salestax/customer-classes/?.action, FCom_SalesTax_Admin_Controller_CustomerClasses ]
+                    - [ /salestax/product-classes/?.action, FCom_SalesTax_Admin_Controller_ProductClasses ]
+                    - [ /salestax/zones/?.action, FCom_SalesTax_Admin_Controller_Zones ]
+                    - [ /salestax/rules/?.action, FCom_SalesTax_Admin_Controller_Rules ]
 
         observe:
             - [ FCom_Sales_Model_Cart_Total_Tax::calculate, FCom_SalesTax_Main.onCartTaxCalculate ]

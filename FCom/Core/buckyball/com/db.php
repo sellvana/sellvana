@@ -1789,7 +1789,8 @@ class BORM extends ORMWrapper
             $s['p'] = $s['mp']; // limit to max page
         }
         if ($s['s']) {
-            $this->{'order_by_' . $s['sd']}($s['s']); // sort rows if requested
+            $ord = 'asc' === $s['sd'] || 'desc' === $s['sd'] ? $s['sd'] : 'asc';
+            $this->{'order_by_' . $ord}($s['s']); // sort rows if requested
         }
         $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p'] - 1) * $s['ps']); // start from requested row or page
         if (empty($d['donotlimit'])) {
