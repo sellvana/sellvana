@@ -33,6 +33,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15, dropdownAutoWidth: true}).on('change', this.props.onChange);
         }
     });
+
     var DiscountDetailsCombination = React.createClass({
         render: function () {
             return (
@@ -131,26 +132,25 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             return this.state.values;
         },
         serializeText: function () {
-            // todo serialize text for human display
-            var text = '';
+            var text, glue, fieldTexts = [];
             var allShouldMatch = $(this.refs['combinationType'].getDOMNode()).val(); // && or ||
             if(allShouldMatch == 1) {
-                text += "Any of: ";
+                glue = " or ";
             } else {
-                text += "all of: ";
+                glue = " and ";
             }
-
             for(var field in this.refs) {
                 if(field == 'combinationType' || field == 'combinationField') {
                     continue;
                 }
-                if(this.refs.hasOwnProperty(field)) {
+                if(this.refs[field]) {
                     var ref = this.refs[field];
-                    text += ref.serializeText();
+                    var refText = ref.serializeText();
+                    fieldTexts.push(refText);
                 }
             }
 
-            text += " should match";
+            text = fieldTexts.join(glue);
             return text;
         },
         addField: function () {
@@ -385,7 +385,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         },
         getDefaultProps: function () {
             return {
-                url: 'conditions/products',
+                url: 'conditions/products'
             };
         },
         url: '',

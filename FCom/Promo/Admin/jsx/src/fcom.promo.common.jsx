@@ -47,6 +47,9 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                         {id:"neq", label: "is not equal to"}
                     ]
                 };
+            },
+            componentDidMount: function () {
+                $(this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.props.onChange);
             }
         }),
         AddFieldButton: React.createClass({
