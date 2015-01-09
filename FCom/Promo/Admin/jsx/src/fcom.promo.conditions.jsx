@@ -205,7 +205,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
 
             text = fieldTexts.join(glue);
-
             return text;
         },
         addField: function () {
@@ -460,7 +459,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var state = {range: false};
             state.range = (target.value == 'between');
             this.setState(state);
-
         },
         initDateInput: function () {
             var startDate = new Date();
@@ -674,7 +672,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return this.state.values;
         },
         serializeText: function () {
-            // todo serialize text for human display
             var text, glue, fieldTexts = [];
             var allShouldMatch = $(this.refs['combinationType'].getDOMNode()).val(); // && or ||
             if (allShouldMatch == 1) {
