@@ -31,7 +31,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     });
 
     // condition to apply to the selection of products
-    var ConditionSkuCollection = React.createClass({
+    var ConditionsSkuCollection = React.createClass({
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
             return (
@@ -70,7 +70,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 dropdownAutoWidth: true,
                 selectOnBlur: false,
                 formatSelection: function (item) {
-                    return item.sku;
+                    return item['sku'];
                 },
                 formatResult: function (item) {
                     var markup = '<div class="row-fluid" title="' + item.text + '">' +
@@ -92,7 +92,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     });
 
     // condition to apply to products which match the attributes condition configured here
-    var ConditionAttributeCombination = React.createClass({
+    var ConditionsAttributeCombination = React.createClass({
         mixins: [Common.removeMixin],
         render: function () {
             return (
@@ -495,7 +495,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         }
     });
 
-    var ConditionCategories = React.createClass({
+    var ConditionsCategories = React.createClass({
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
             return (
@@ -578,7 +578,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         }
     });
 
-    var ConditionShipping = React.createClass({
+    var ConditionsShipping = React.createClass({
         mixins: [Common.removeMixin],
         render: function () {
             return (
@@ -891,20 +891,20 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         var key = field.id;
                         switch (field.type) {
                             case 'skus':
-                                el = <ConditionSkuCollection options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                el = <ConditionsSkuCollection options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
                             case 'cats':
-                                el = <ConditionCategories options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                el = <ConditionsCategories options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
                             case 'total':
                                 el = <ConditionTotal options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
                             case 'comb':
-                                el = <ConditionAttributeCombination options={this.props.options}
+                                el = <ConditionsAttributeCombination options={this.props.options}
                                     modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
                             case 'shipping':
-                                el = <ConditionShipping options={this.props.options}
+                                el = <ConditionsShipping options={this.props.options}
                                     modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
                                 break;
 

@@ -567,7 +567,23 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 multiple: true,
                 placeholder: self.props.labelSkuField,
                 query: self.select2query,
-                dropdownAutoWidth: true
+                dropdownAutoWidth: true,
+                formatSelection: function (item) {
+                    return item['sku'];
+                },
+                formatResult: function (item) {
+                    var markup = '<div class="row-fluid" title="' + item.text + '">' +
+                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">Name: ' + item.text.substr(0, 20);
+                    if (item.text.length > 20) {
+                        markup += '...';
+                    }
+                    markup += '</div>' +
+                    '<div class="span2">SKU: <strong>' + item.sku + '</strong></div>' +
+                    '</div>';
+
+                    return markup;
+                },
             });
             $(this.refs['productTerms'].getDOMNode()).select2({minimumResultsForSearch:15})
         }
