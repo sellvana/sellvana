@@ -506,7 +506,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
         $config = [
-            'id' => $this->FCom_Promo_Model_Coupon->origClass(),
+            'id' => $this->getCouponGridId(),
             'orm' => $this->FCom_Promo_Model_Coupon->orm('pc'),
             'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,
@@ -525,7 +525,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             'filters' => [
                 ['field' => 'code', 'type' => 'text'],
                 ['field' => 'total_used', 'type' => 'number-range'],
-            ]
+            ],
+            'grid_after_built' => 'couponsGridRegister'
         ];
         $view = $this->view($this->_gridViewName)->set('grid',['config' => $config]);
         return $view;
@@ -534,15 +535,15 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function action_coupons_grid()
     {
         $r = $this->BRequest;
-        $id = $r->get('id');
-        if(!$id){
-            $html = $this->_("Promotion id not found");
-            $status = 'error';
-            $this->BResponse->status(400, $html, false);
-        } else {
+        //$id = $r->get('id');
+        //if(!$id){
+        //    $html = $this->_("Promotion id not found");
+        //    $status = 'error';
+        //    $this->BResponse->status(400, $html, false);
+        //} else {
             $status = "success";
             $html = $this->couponGridView()->render();
-        }
+        //}
         $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
 
@@ -550,7 +551,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         $r = $this->BRequest;
 
-        $id = $r->get('id');
+        //$id = $r->get('id');
         $data = $r->post('model');
 
         if (empty($data)) {
@@ -565,7 +566,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $couponCount = isset($data['coupon_count'])? $data['coupon_count']: 1;
             $model = $this->FCom_Promo_Model_Coupon;
             $generated = $model->generateCoupons([
-                 'promo_id' => $id,
+                 //'promo_id' => $id,
                  'pattern' => $pattern,
                  'length' => $length,
                  'uses_per_customer' => $usesPerCustomer,
@@ -574,17 +575,22 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
              ]);
             $status = 'success';
             $message = $this->_("%d coupons generated.", $generated['generated']);
-            if ($generated < $couponCount) {
+            if ($generated['generated'] < $couponCount) {
                 $status = 'warning';
                 $message .= $this->_("\nFailed to generate %d coupons", $generated['failed']);
             }
         }
-        $this->BResponse->json(['status' => $status, 'message' => $message]);
+        $result = ['status' => $status, 'message' => $message];
+        if (!empty($generated['codes'])) {
+            $result['codes'] = $generated['codes'];
+            $result['grid_id'] = $this->getCouponGridId();
+        }
+        $this->BResponse->json($result);
     }
 
     public function action_coupons_import__POST()
     {
-        $id = $this->BRequest->get('id');
+        //$id = $this->BRequest->get('id');
         if (empty($_FILES) || !isset($_FILES['upload'])) {
             $this->BResponse->json(['msg' => "Nothing found"]);
             return;
@@ -603,20 +609,20 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 $path = $this->BApp->storageRandomDir() . '/import/coupons';
                 $this->BUtil->ensureDir($path);
                 $fullFileName = $path . '/' . trim($fileName, '\\/');
-                $realpath = str_replace('\\', '/', realpath(dirname($fullFileName)));
+                $realPath = str_replace('\\', '/', realpath(dirname($fullFileName)));
                 $imported = 0;
 
                 $this->BUtil->ensureDir(dirname($fullFileName));
                 $fileSize = 0;
-                if (strpos($realpath, $path) !== 0) {
-                    $error = $this->_("Weird file path." . $realpath . '|' . $path);
+                if (strpos($realPath, $path) !== 0) {
+                    $error = $this->_("Weird file path." . $realPath . '|' . $path);
                 } else if ($uploads['error'][$i]) {
                     $error = $uploads['error'][$i];
                 } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);
-                    $imported = $importer->importFromFile($fullFileName, $id);
+                    $imported = $importer->importFromFile($fullFileName);
                     $error = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
@@ -644,9 +650,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function action_coupons_import()
     {
         $r  = $this->BRequest;
-        $id = $r->get('id');
+        //$id = $r->get('id');
         $m  = [
-            'config' => ['max_import_file_size' => $this->_getMaxUploadSize(), 'promoId' => $id],
+            'config' => ['max_import_file_size' => $this->_getMaxUploadSize(), 'id' => $this->getCouponGridId()],
         ];
 
         $status = "success";
@@ -660,5 +666,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $u = ini_get('upload_max_filesize');
         $max = min($p, $u);
         return $max;
+    }
+
+    public function getCouponGridId()
+    {
+        return $this->FCom_Promo_Model_Coupon->origClass() . '_grid';
     }
 }

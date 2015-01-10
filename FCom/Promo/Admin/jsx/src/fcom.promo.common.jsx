@@ -47,6 +47,9 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                         {id:"neq", label: "is not equal to"}
                     ]
                 };
+            },
+            componentDidMount: function () {
+                $(this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.props.onChange);
             }
         }),
         AddFieldButton: React.createClass({
@@ -66,7 +69,7 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                 var flags = $el.data('flags') || {};
                 var term = options.term || '*';
                 var page = options.page;
-                console.log(page);
+                //console.log(page);
                 var data;
                 if (flags[term] != undefined && flags[term].loaded == 2) {
                     data = {results: self.searchLocal(term, values, page, 100), more: (flags[term].page > page)};
@@ -136,7 +139,7 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                     $.get(url, {page: params.page, q: params.q, o: params.o})
                         .done(function (result) {
                             if (result.hasOwnProperty('total_count')) {
-                                console.log(result['total_count']);
+                                //console.log(result['total_count']);
                                 var more = params.page * params.o < result['total_count'];
                                 params.searchedTerms[params.term].loaded = (more) ? 1 : 2; // 1 means more results to be fetched, 2 means all fetched
                                 params.searchedTerms[params.term].page = params.page; // 1 means more results to be fetched, 2 means all fetched
