@@ -1,5 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Blog_Migrate
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Blog_Model_Category $FCom_Blog_Model_Category
+ * @property FCom_Blog_Model_Post $FCom_Blog_Model_Post
+ * @property FCom_Blog_Model_PostCategory $FCom_Blog_Model_PostCategory
+ * @property FCom_Blog_Model_PostTag $FCom_Blog_Model_PostTag
+ * @property FCom_Blog_Model_Tag $FCom_Blog_Model_Tag
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ */
+
 class FCom_Blog_Migrate extends BClass
 {
     public function install__0_1_4()
@@ -16,7 +28,7 @@ class FCom_Blog_Migrate extends BClass
         $tPostCategory = $this->FCom_Blog_Model_PostCategory->table();
 
         $this->BDb->ddlTableDef($tPost, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'author_user_id' => 'int unsigned not null',
                 'status' => "varchar(10) not null default 'pending'",
@@ -32,69 +44,69 @@ class FCom_Blog_Migrate extends BClass
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_url_key' => 'UNIQUE (url_key)',
                 'IDX_status_create_at' => '(status, create_at)',
                 'IDX_create_ym' => '(status, create_ym)',
             ],
-            'CONSTRAINTS' => [
-                "FK_{$tPost}_author" => "FOREIGN KEY (author_user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            BDb::CONSTRAINTS => [
+                'author' => ['author_user_id', $tUser],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tTag, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'tag_key' => 'varchar(50)',
                 'tag_name' => 'varchar(50)',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_tag_key' => 'UNIQUE (tag_key)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tPostTag, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'tag_id' => 'int unsigned not null',
                 'post_id' => 'int unsigned not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_post_tag' => '(post_id, tag_id)',
             ],
-            'CONSTRAINTS' => [
-                "FK_{$tPostTag}_post" => "FOREIGN KEY (post_id) REFERENCES {$tPost} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tPostTag}_tag" => "FOREIGN KEY (tag_id) REFERENCES {$tTag} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            BDb::CONSTRAINTS => [
+                'post' => ['post_id', $tPost],
+                'tag' => ['tag_id', $tTag],
             ],
         ]);
 
 
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'name'    => 'varchar(255) NOT NULL',
                 'url_key'    => 'varchar(255) NOT NULL',
                 'description'    => 'text NULL',
             ],
-            'PRIMARY' => '(id)',
+            BDb::PRIMARY => '(id)',
         ]);
         $this->BDb->ddlTableDef($tPostCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'category_id'    => 'INT(10) UNSIGNED NOT NULL',
                 'post_id'   => 'INT(10) UNSIGNED NOT NULL',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'post_id' => 'UNIQUE (`post_id`,`category_id`)',
                 'category_id__post_id' => '(`category_id`,`post_id`)',
             ],
-            'CONSTRAINTS' => [
-                "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tPostCategory}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+            BDb::CONSTRAINTS => [
+                'category' => ['category_id', $tCategory],
+                'post' => ['post_id', $tPost],
             ],
         ]);
     }
@@ -118,28 +130,28 @@ SET FOREIGN_KEY_CHECKS=1;
         $tPostCategory = $this->FCom_Blog_Model_PostCategory->table();
 
         $this->BDb->ddlTableDef($tCategory, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'name'    => 'varchar(255) NOT NULL',
                     'url_key'    => 'varchar(255) NOT NULL',
                     'description'    => 'text NULL',
                 ],
-                'PRIMARY' => '(id)',
+                BDb::PRIMARY => '(id)',
             ]);
         $this->BDb->ddlTableDef($tPostCategory, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'category_id'    => 'INT(10) UNSIGNED NOT NULL',
                     'post_id'   => 'INT(10) UNSIGNED NOT NULL',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'post_id' => 'UNIQUE (`post_id`,`category_id`)',
                     'category_id__post_id' => '(`category_id`,`post_id`)',
                 ],
-                'CONSTRAINTS' => [
-                    "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
-                    "FK_{$tPostCategory}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                BDb::CONSTRAINTS => [
+                    'category' => ['category_id', $tCategory],
+                    'post' => ['post_id', $tPost],
                 ],
             ]);
     }

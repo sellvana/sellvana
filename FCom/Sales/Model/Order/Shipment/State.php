@@ -2,6 +2,10 @@
 
 class FCom_Sales_Model_Order_Shipment_State extends FCom_Core_Model_Abstract_State_Context
 {
+    const OVERALL = 'overall',
+        CARRIER = 'carrier',
+        CUSTOM = 'custom';
+
     /**
      * Order linked
      *
@@ -15,18 +19,36 @@ class FCom_Sales_Model_Order_Shipment_State extends FCom_Core_Model_Abstract_Sta
      * @var array
      */
     static protected $_defaultStateClasses = [
-        'overall' => 'FCom_Sales_Model_Order_Shipment_State_Overall',
-        'custom' => 'FCom_Sales_Model_Order_Shipment_State_Custom',
+        self::OVERALL => 'FCom_Sales_Model_Order_Shipment_State_Overall',
+        self::CARRIER => 'FCom_Sales_Model_Order_Shipment_State_Carrier',
+        self::CUSTOM => 'FCom_Sales_Model_Order_Shipment_State_Custom',
     ];
 
+    /**
+     * @return FCom_Sales_Model_Order_Shipment_State_Overall
+     * @throws BException
+     */
     public function overall()
     {
-        return $this->_getStateObject('overall');
+        return $this->_getStateObject(self::OVERALL);
     }
 
+    /**
+     * @return FCom_Sales_Model_Order_Shipment_State_Carrier
+     * @throws BException
+     */
+    public function carrier()
+    {
+        return $this->_getStateObject(self::CARRIER);
+    }
+
+    /**
+     * @return FCom_Sales_Model_Order_Shipment_State_Custom
+     * @throws BException
+     */
     public function custom()
     {
-        return $this->_getStateObject('custom');
+        return $this->_getStateObject(self::CUSTOM);
     }
 
 }

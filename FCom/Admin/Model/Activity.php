@@ -22,6 +22,7 @@
  * DI
  * @property FCom_Admin_Model_ActivityUser $FCom_Admin_Model_ActivityUser
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
 {

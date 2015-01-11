@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Admin_Controller_OrderStatus
+ *
+ * @property FCom_Sales_Model_Order_StateCustom $FCom_Sales_Model_Order_StateCustom
+ */
+
 class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -55,7 +61,7 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
             }
             $key = $this->BDb->sanitizeFieldName($data['key']);
             $value = $data['value'];
-            $exists = $this->FCom_Sales_Model_Order_CustomStatus->load($value, $key);
+            $exists = $this->FCom_Sales_Model_Order_StateCustom->load($value, $key);
             $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
         } catch (Exception $e) {
             $result = ['error' => $e->getMessage()];

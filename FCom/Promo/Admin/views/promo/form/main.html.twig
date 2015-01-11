@@ -1,0 +1,153 @@
+<!--{ label: Reviews }-->
+<!--{ pos: 10 }-->
+{% set m = THIS.get('model') %}
+{% set promo = APP.instance('FCom_Promo_Model_Promo') %}
+{% set validator = THIS.get('validator') %}
+{% set labelClass = "col-md-3" %}
+
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+{% if APP.m('FCom_CustomerGroups').run_status == 'LOADED' %}
+    {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+
+{% if APP.m('FCom_MultiSite').run_status == 'LOADED' %}
+    {% set sites = APP.instance('FCom_MultiSite_Model_Site').siteOptions() %}
+{% endif %}
+
+<fieldset class="adm-section-group">
+    <div class="f-section">
+        {{ forms.input({label: 'Admin Summary'|_, required: 1, name: "model[admin_summary]",
+            value: validator.fieldValue('admin_summary'), label_class: labelClass,
+            id: "model-admin_summary", help_icon: 1, help_text: 'Admin Summary'|_ }) }}
+        {{ forms.textarea({label: 'Internal Notes'|_, name: "model[admin_notes]",
+            value: validator.fieldValue('admin_notes'),label_class: labelClass,
+            id: "model-admin_notes", help_icon: 1, help_text: 'Internal Notes'|_ }) }}
+        {{ forms.input({label: 'Customer Label'|_, required: 1, name: "model[customer_label]",
+            value: validator.fieldValue('customer_label'),label_class: labelClass,
+            id: "model-customer_label", help_icon: 1, help_text: 'Customer Label'|_ }) }}
+        {{ forms.textarea({label: 'Details for Customers'|_, name: "model[customer_details]",
+            value: validator.fieldValue('customer_details'),label_class: labelClass,
+            id: "model-customer_details", help_icon: 1, help_text: 'Details for Customers'|_ }) }}
+
+        {{ forms.select({
+            label: 'Status'|_,label_class: labelClass,
+            name: "model[status]",
+            value: validator.fieldValue('status'),
+            id: "model-status", help_icon: 1,
+            help_text: "Promotion status"|_,
+            select2: 1, options: ['Pending'|_, 'Active'|_, 'Expired'|_],
+            input_div_class: "col-md-2"
+        }) }}
+
+
+        {{ forms.input({label: 'Date Range'|_, required: 1, name: "model[date_range]",
+            value: validator.fieldValue('date_range'),label_class: labelClass,
+            id: "model-date_range", help_icon: 1, help_text: 'Date Range'|_ }) }}
+        <div id="testbed"></div>
+        <script type="text/javascript">
+            require(['jquery', 'moment', 'daterangepicker', 'bootstrap'], function ($) {
+                var startDate = new Date();
+                var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+                $('#model-date_range').daterangepicker(
+                    {
+                        format: 'YYYY-MM-DD',
+                        startDate: s
+                    }
+                );
+                var $help = $('.help-icon');
+                $help.popover({placement: 'auto', trigger: 'hover focus'});
+                $help.on('click', function (e) {
+                    e.preventDefault();
+                });
+            });
+
+//            require(['react', 'jsx!fcom.promo'], function(React, Promo) {
+//                Promo.createGrid();
+//                console.log(Promo);
+//            })
+        </script>
+        {{ forms.select({
+            label: "Coupon Code Enter For Validity"|_,label_class: labelClass,
+            name: "model[use_coupon]",
+            value: validator.fieldValue("use_coupon"),
+            id: "model-use_coupon", help_icon: 1,
+            help_text: "Require coupon code"|_,
+            select2: 1, options: ["No coupon code required"|_, "Single coupon code"|_, "Multiple coupon codes"|_]
+        }) }}
+        <div id="coupon-options"></div>
+        <div class="form-group">
+            {{ forms.hidden({field:"conditions_serialized", value: validator.fieldValue("conditions_serialized")}) }}
+            <label class="control-label col-md-3" for="model-conditions">{{"Conditions"|_}}&nbsp;
+                    <a id="help-model-conditions" class="pull-right help-icon" href="#"
+                       data-toggle="popover" data-trigger="focus" data-content="{{"Configure conditions"|_}}"
+                       data-container="body">
+                        <span class="glyphicon glyphicon-question-sign"></span></a>
+            </label>
+            <div class="col-md-5">
+                <select id="model-conditions" name="model[conditions]" class="form-control to-select2">
+                    <option value="0">{{"All Conditions Have to Match"|_}}</option>
+                    <option value="1">{{"Any Condition Has to Match"|_}}</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="model-conditions_type" class="sr-only">{{ "Condition type"|_ }}</label>
+                <select id="model-conditions_type" name="model[conditions_type]" class="form-control to-select2">
+                    <option value="-1">{{ "Add Condition Type..."|_ }}</option>
+                    <option value="skus">{{ "Products"|_ }}</option>
+                    <option value="cats">{{ "Categories"|_ }}</option>
+                    <option value="total">{{ "Cart Total"|_ }}</option>
+                    <option value="comb">{{ "Combination"|_ }}</option>
+                    <option value="shipping">{{ "Shipping Destination"|_ }}</option>
+                </select>
+            </div>
+        </div>
+        <div id="conditions-options"></div>
+
+        <div class="form-group">
+            {{ forms.hidden({field:"actions_serialized", value: validator.fieldValue("actions_serialized")}) }}
+            <label class="control-label col-md-3" for="model-actions">{{"Promo Actions"|_}}&nbsp;
+                    <a id="help-model-actions" class="pull-right help-icon" href="#"
+                       data-toggle="popover" data-trigger="focus" data-content="{{"Configure promo actions"|_}}"
+                       data-container="body">
+                        <span class="glyphicon glyphicon-question-sign"></span></a>
+            </label>
+            <div class="col-md-5">
+                <select id="model-actions" name="model[actions]" class="form-control to-select2">
+                    <option value="-1">{{"Add Promo Action..."|_}}</option>
+                    <option value="discount">{{"Discount"|_}}</option>
+                    <option value="shipping">{{"Shipping"|_}}</option>
+                    <option value="free_product">{{"Free Products"|_}}</option>
+                </select>
+            </div>
+        </div>
+        <div id="actions-options"></div>
+
+        <script type="text/javascript">
+            require(['react', 'jsx!fcom.promo'], function (React, Promo) {
+                $('.to-select2').select2({minimumResultsForSearch:15});
+                var options = {
+                    coupon_select_id: 'model-use_coupon',
+                    condition_select_id: 'model-conditions_type',
+                    actions_select_id: "model-actions",
+                    coupon_container_id: 'coupon-options',
+                    condition_container_id: 'conditions-options',
+                    actions_container_id: "actions-options",
+                    conditions_serialized: 'conditions_serialized',
+                    showCouponsUrl: "{{ APP.href('promo/coupons/view?id=') ~ m.id() }}", // "/admin/promo/coupons/view?id=1",
+                    generateCouponsUrl: "{{ APP.href('promo/coupons/generate?id=') ~ m.id() }}", // "/admin/promo/coupons/generate?id=1",
+                    importCouponsUrl: "{{ APP.href('promo/coupons/import?id=') ~ m.id() }}", // "/admin/promo/coupons/import?id=1",
+                    valueUpc: '{{validator.fieldValue("uses_per_customer")}}',
+                    valueUt: '{{validator.fieldValue("uses_total")}}',
+                    singleCouponValue: '',
+                    labelClass: '{{ labelClass }}',
+                    debug: true,
+                    base_url: "{{ APP.href('promo/') }}",
+                    id_var: 'id',
+                    entity_id: '{{ m.id() }}'
+                };
+                Promo.init(options);
+            });
+        </script>
+    </div>
+</fieldset>

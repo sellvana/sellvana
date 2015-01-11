@@ -8,16 +8,16 @@ require(['jquery','underscore','backbone', 'jquery.validate', 'unique'], functio
     var json = {
             rows: [],
             remove_ids: []
-        }
+        };
     window.tierPricesGridRegister = function(grid) {
         pricesGrid = grid;
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
             this.$el.find(inputQty).addClass('unique');
             this.$el.find(selectGroupId).addClass('unique');
-        }
+        };
         grid.build();
         originIds = grid.getRows().pluck('id');
-    }
+    };
 
     var bodyPrice = $('#tier-prices tbody');
     var prices, submiting = true;

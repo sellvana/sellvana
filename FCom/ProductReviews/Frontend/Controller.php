@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_ProductReviews_Frontend_Controller
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
+ * @property FCom_ProductReviews_Model_ReviewFlag $FCom_ProductReviews_Model_ReviewFlag
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
 class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public $formId = 'product-review';
@@ -123,6 +131,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 'customer_id' => $customer->id(),
                 'review_id' => $review->id(),
             ]);
+            /** @var FCom_ProductReviews_Model_ReviewFlag $record */
 
             if (!$record) {
                 $review->helpful($mark);
@@ -154,6 +163,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             'customer_id' => $customer->id(),
             'review_id' => $review->id(),
         ]);
+        /** @var FCom_ProductReviews_Model_ReviewFlag $record */
         if (!$record) {
             $review->offensive++;
             $review->save();
@@ -207,6 +217,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
     {
         $r = $this->BRequest->get();
         $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
+        /** @var FCom_ProductReviews_Model_Review $pr */
         $pr = $this->FCom_ProductReviews_Model_Review->loadWhere([
             'id'          => $r['rid'],
             'customer_id' => $customerId
@@ -239,6 +250,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
     {
         $post = $this->BRequest->post();
         $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
+        /** @var FCom_ProductReviews_Model_Review $pr */
         $pr = $this->FCom_ProductReviews_Model_Review->loadWhere([
             'id'          => (int)$post['rid'],
             'customer_id' => $customerId

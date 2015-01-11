@@ -37,9 +37,6 @@ customer_account_sidebar:
             - [ addNavItem, dashboard, { label: Dashboard, position: 1, href: customer/myaccount } ]
             - [ addNavItem, edit, { label: Edit Account, position: 10, href: customer/myaccount/edit } ]
             - [ addNavItem, addresses, { label: Address Book, position: 10, href: customer/address } ]
-            - [ addNavItem, orders, { label: My Orders, position: 20, href: customer/order } ]
-            #- [ addNavItem, downloads, { label: Downloads, position: 40, href: customer/downloads } ]
-            #- [ addNavItem, returns, { label: Returns, position: 50, href: customer/returns } ]
             #- [ addNavItem, newsletters, { label: Newsletters, position: 60, href: email/subscriptions } ]
 
 /customer/account:
@@ -71,14 +68,3 @@ customer_account_sidebar:
     - { include: base }
     - { hook: main, views: customer/address/choose }
     - { include: customer_account_sidebar }
-
-/customer/order/list:
-    - { include: base }
-    - { hook: main, views: customer/order/list }
-    - { include: customer_account_sidebar }
-
-/customer/order/view:
-    - { include: base }
-    - { hook: main, views: customer/order/view }
-    - { include: customer_account_sidebar }
-

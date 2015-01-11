@@ -2,10 +2,24 @@
 
 /**
  * Class FCom_PushServer_Model_Client
+ *
+ * @property int $id
+ * @property string $session_id
+ * @property string $status
+ * @property int $admin_user_id
+ * @property int $customer_id
+ * @property string $remote_ip
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $data_serialized
+ *
+ * DI
  * @property FCom_PushServer_Main $FCom_PushServer_Main
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
  * @property FCom_PushServer_Model_Message $FCom_PushServer_Model_Message
  * @property FCom_PushServer_Model_Subscriber $FCom_PushServer_Model_Subscriber
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 {
@@ -16,17 +30,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     static protected $_windowName;
     static protected $_connId;
 
-    protected $_messages = [];
     /**
-     * - id
-     * - session_id
-     * - status
-     * - handover
-     * - admin_user_id
-     * - customer_id
-     * - create_at
-     * - update_at
+     * @var FCom_PushServer_Model_Message[]
      */
+    protected $_messages = [];
 
     /**
      * Get or create client record for current browser session
@@ -72,8 +79,28 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $client;
     }
 
+    public function updateSessionId($fromSessionId, $toSessionId)
+    {
+        if (!empty(static::$_clientCache[$fromSessionId])) {
+            $client = static::$_clientCache[$fromSessionId];
+        } else {
+            $client = $this->load($fromSessionId, 'session_id');
+            if (!$client) {
+                return $this;
+            }
+        }
+        unset(static::$_clientCache[$fromSessionId]);
+        $client->set('session_id', $toSessionId)->save();
+        static::$_clientCache[$toSessionId] = $client;
+        static::$_clientCache[$client->id()] = $client;
+        return $this;
+    }
+
     /**
      * Get client by id or session_id
+     * @param $clientId
+     * @throws BException
+     * @return $this|bool
      */
     public function getClient($clientId)
     {
@@ -93,16 +120,26 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $client;
     }
 
+    /**
+     * @return mixed
+     */
     public function getWindowName()
     {
         return static::$_windowName;
     }
 
+    /**
+     * @return mixed
+     */
     public function getConnId()
     {
         return static::$_connId;
     }
 
+    /**
+     * @param int|FCom_Admin_Model_User $user
+     * @return FCom_PushServer_Model_Client[]
+     */
     public function findByAdminUser($user)
     {
         if (is_object($user)) {
@@ -112,6 +149,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @param int|FCom_Customer_Model_Customer $customer
+     * @return array
+     */
     public function findByCustomer($customer)
     {
         if (is_object($customer)) {
@@ -130,6 +171,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }*/
     }
 
+    /**
+     * @param $request
+     * @return $this
+     */
     public function processRequest($request)
     {
         $client = $this->sessionClient();
@@ -259,6 +304,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function waitForMessages()
     {
         $delay = $this->BConfig->get('modules/FCom_PushServer/delay_microsec', 100000);
@@ -351,6 +399,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return $this
+     * @throws BException
+     */
     public function fetchCustomData()
     {
         $clientUpdate = $this->orm()->select('data_serialized')->where('id', $this->get('id'))->find_one();
@@ -361,6 +413,11 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $status
+     * @return $this
+     * @throws BException
+     */
     public function setStatus($status)
     {
         $this->set('status', $status);
@@ -370,6 +427,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     /**
      * Subscribe the client to a channel
+     * @param null $channel
+     * @throws BException
+     * @return $this
      */
     public function subscribe($channel = null)
     {
@@ -404,7 +464,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     }
 
     /**
-     * Unsubscribe the client from the channel
+     * Un-subscribe the client from the channel
      */
     public function unsubscribe($channel)
     {
@@ -425,6 +485,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     /**
      * Send a message to the client
+     * @param $message
+     * @return $this
      */
     public function send($message)
     {
@@ -432,11 +494,18 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return $this
+     * @throws BException
+     */
     public function getChannel()
     {
         return $this->FCom_PushServer_Model_Channel->getChannel('client:' . $this->id(), true, true);
     }
 
+    /**
+     * @return array
+     */
     public function getMessages()
     {
         return $this->_messages;

@@ -1,16 +1,21 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cms_Model_FormData
+ *
+ * @property int $id
+ * @property int $form_id
+ * @property int $customer_id
+ * @property string $session_id
+ * @property string $remote_ip
+ * @property string $post_status
+ * @property string $email
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $data_serialized
+ */
 class FCom_Cms_Model_FormData extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_cms_form_data';
     static protected $_origClass = __CLASS__;
-    /*
-    id int unsigned not null auto_increment primary key
-    form_name int unsigned
-    data_serialized text
-    create_dt datetime
-    remote_ip varchar(40)
-    email varchar(100)
-    status varchar(20)
-    */
 }

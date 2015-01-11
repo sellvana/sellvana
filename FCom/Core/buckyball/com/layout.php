@@ -273,7 +273,7 @@ class BLayout extends BClass
         }
         $cacheKey = 'ALL_VIEWS-' . $area;
         $cacheConfig = $this->BConfig->get('core/cache/view_files');
-        $useCache = !$cacheConfig && $this->BDebug->is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
+        $useCache = !$cacheConfig && $this->BDebug->is(['STAGING', 'PRODUCTION']) || $cacheConfig === 'enable';
         if ($useCache) {
             $data = $this->BCache->load($cacheKey);
         }
@@ -661,10 +661,21 @@ class BLayout extends BClass
         }
         BDebug::debug('LAYOUT.LOAD: ' . $layoutFilename);
         switch ($ext) {
-            case 'yml': case 'yaml': $layoutData = $this->BYAML->load($layoutFilename); break;
-            case 'json': $layoutData = json_decode(file_get_contents($layoutFilename)); break;
-            case 'php': $layoutData = include($layoutFilename); break;
-            default: throw new BException('Unknown layout file type: ' . $layoutFilename);
+            case 'yml':
+            case 'yaml':
+                $layoutData = $this->BYAML->load($layoutFilename);
+                break;
+            case 'json':
+                $layoutData = json_decode(file_get_contents($layoutFilename));
+                break;
+            case 'php':
+                if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT']) && function_exists('opcache_invalidate')) {
+                    opcache_invalidate($layoutFilename);
+                }
+                $layoutData = include($layoutFilename);
+                break;
+            default:
+                throw new BException('Unknown layout file type: ' . $layoutFilename);
         }
         //$this->_layoutDataCache[$layoutFilename] = $layoutData;
         $this->addLayout($layoutData);
@@ -704,7 +715,7 @@ class BLayout extends BClass
         $t = BDebug::debug(__METHOD__);
         $cacheKey = 'LAYOUTS-' . $this->BRequest->area(); //TODO: more flexible key
         $cacheConfig = $this->BConfig->get('core/cache/layout_files');
-        $useCache = !$cacheConfig && $this->BDebug->is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
+        $useCache = !$cacheConfig && $this->BDebug->is(['STAGING', 'PRODUCTION']) || $cacheConfig === 'enable';
         if ($useCache) {
             $data = $this->BCache->load($cacheKey);
         }
@@ -831,7 +842,7 @@ class BLayout extends BClass
      */
     public function metaDirectiveCallback($d)
     {
-        $this->BUtil->call($d['name'], $d);
+        $this->BUtil->call($d['name'], !empty($d['args']) ? $d['args'] : [], true);
     }
 
     /**
@@ -1629,13 +1640,16 @@ class BView extends BClass
             $this->_params['args'][$k] = $v;
         }
         if (($modName = $this->param('module_name'))) {
-            $this->BModuleRegistry->pushModule($modName);
+            //$this->BModuleRegistry->pushModule($modName);
         }
         $result = '';
         if (!$this->_beforeRender()) {
             BDebug::debug('BEFORE.RENDER failed');
             if ($debug) {
                 $result .= "<!-- FAILED VIEW: {$viewName} -->\n";
+            }
+            if ($modName) {
+                //$this->BModuleRegistry->popModule();
             }
             return $result;
         }
@@ -1670,7 +1684,7 @@ class BView extends BClass
 
         $this->_afterRender();
         if ($modName) {
-            $this->BModuleRegistry->popModule();
+            //$this->BModuleRegistry->popModule();
         }
 
         return $result;
@@ -2341,7 +2355,7 @@ if ($this->BDebug->is('DEBUG')) {
 #echo "<pre>"; print_r($this->_elements); echo "</pre>";
         }
 
-        if ($this->_headJs['enabled']) {
+        if (!empty($this->_headJs['enabled'])) {
             $basename = basename($name);
             if ($basename === 'head.js' || $basename === 'head.min.js' || $basename === 'head.load.min.js') {
                 $this->_headJs['loaded'] = $name;
@@ -2384,6 +2398,8 @@ if ($this->BDebug->is('DEBUG')) {
             if ($ts && file_exists($fsFile)) {
                 $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
             }
+        } elseif (!preg_match('#^(http|/)#', $file)) {
+            //echo ' ***** '; var_dump($file);
         }
         return $file;
     }
@@ -2406,7 +2422,7 @@ if ($this->BDebug->is('DEBUG')) {
         if (strpos($file, 'http:') === false && strpos($file, 'https:') === false && $file[0] !== '/') {
             $module  = !empty($args['module_name']) ? $this->BModuleRegistry->module($args['module_name']) : null;
             $baseUrl = $module ? $module->baseSrc() : $this->BApp->baseUrl();
-            $file    = $baseUrl . '/' . $file;
+            $file    = rtrim($baseUrl, '/') . '/' . $file;
         }
 
         if ($type === 'js' && $this->_headJs['loaded'] && $this->_headJs['loaded'] !== $name

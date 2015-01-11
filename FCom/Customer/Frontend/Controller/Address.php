@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Frontend_Controller_Address
+ *
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Geo_Model_Country $FCom_Geo_Model_Country
+ */
 class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
@@ -135,6 +144,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
 
         if (!empty($id)) {
+            /** @var FCom_Sales_Model_Cart $cart */
             $cart = $this->FCom_Sales_Model_Cart->sessionCart();
             $address = $this->FCom_Customer_Model_Address->load($id);
             //you can't change address for empty cart
@@ -156,13 +166,11 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             if ('s' == $type) {
                 $customer->default_shipping_id = $address->id();
                 $customer->default_shipping    = $address;
-                $cart->setAddressByType('shipping', $address);
-                //$this->FCom_Sales_Model_Cart_Address->newShipping($cart->id(), $customer->defaultShipping());
+                $cart->importAddressFromObject($address, 'shipping');
             } else {
                 $customer->default_billing_id = $address->id();
                 $customer->default_billing    = $address;
-                $cart->setAddressByType('billing', $address);
-                //$this->FCom_Sales_Model_Cart_Address->newBilling($cart->id(), $customer->getDefaultBillingAddress(), $customer->email);
+                $cart->importAddressFromObject($address, 'billing');
             }
             $customer->save();
 

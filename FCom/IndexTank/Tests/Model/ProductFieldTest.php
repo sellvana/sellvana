@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Tests_Model_ProductFieldTest
+ *
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
+ */
+
 class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()

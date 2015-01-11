@@ -1,0 +1,56 @@
+{% set counts = THIS.get('counts') %}
+{% set orders = THIS.get('orders') %}
+{% set status = THIS.get('status') %}
+<div class="row f-mb-slideout-menu">
+    <div class="col-sm-9 f-col-main">
+        <header class="f-page-header">
+            <h1 class="f-page-title">{{ "Orders History" | _ }}</h1>
+            <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">
+                {{  'Menu'|_ }}
+            </a>
+        </header>
+        {% if counts.all %}
+            <ul class="nav nav-tabs">
+                <li role="presentation" {{ status == 'all' ? 'class="active"' }}><a href="{{ APP.href('orders') }}">{{ 'Orders'|_ }} <span class="badge">{{ counts.all }}</span></a></li>
+                <li role="presentation" {{ status == 'open' ? 'class="active"' }}><a href="{{ APP.href('orders?status=open') }}">{{ 'Open Orders'|_ }} <span class="badge">{{ counts.open }}</span></a></li>
+                <li role="presentation" {{ status == 'closed' ? 'class="active"' }}><a href="{{ APP.href('orders?status=closed') }}">{{ 'Closed Orders'|_ }} <span class="badge">{{ counts.closed }}</span></a></li>
+                <li role="presentation" {{ status == 'canceled' ? 'class="active"' }}><a href="{{ APP.href('orders?status=canceled') }}">{{ 'Canceled Orders'|_ }} <span class="badge">{{ counts.canceled }}</span></a></li>
+            </ul>
+            <table class="table">
+              <thead>
+                <tr>
+                    <th>{{ "ID" }}</th>
+                    <th>{{ "Status" | _ }}</th>
+                    <th>{{ "Shipping" | _ }}</th>
+                    <th>{{ "Payment" | _ }}</th>
+                    <th class="text-right">{{ "Total" | _ }}</th>
+                    <th class="text-right">{{ "Balance" | _ }}</th>
+                </tr>
+              </thead>
+                {% for order in orders  %}
+                    <tr>
+                        <td>
+                            <a href="{{ APP.href('orders/view') }}?id={{ order.get('unique_id') }}">
+                                {{ order.get('unique_id') }}
+                            </a>
+                        </td>
+                        <td>{{ order.state().overall().getValueLabel() }} </td>
+                        <td>{{ order.getShippingMethod().getName() }} ({{ order.state().delivery().getValueLabel() }})</td>
+                        <td>{{ order.getPaymentMethod().getName() }} ({{ order.state().payment().getValueLabel() }})</td>
+                        <td class="text-right">{{ order.get('grand_total') | currency }} </td>
+                        <td class="text-right">{{ order.get('amount_due') | currency  }} </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+    {{ THIS.view('customer/account/sidebar').set('current', 'orders') | raw }}
+</div>
+
+<script>
+    require(['jquery'], function($) {
+        $( "#button" ).click(function() {
+            $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
+        });
+    });
+</script>

@@ -1,6 +1,6 @@
 modules:
     FCom_CustomField:
-        version: 0.2.0
+        version: 0.2.3
         channel: beta
         require: { module: { FCom_Catalog: 0.2.1 } }
         translations: { en: en.php }
@@ -23,14 +23,15 @@ modules:
                     - [ /customfields/products/.action, FCom_CustomField_Admin_Controller_Products ]
                 observe:
                     - [ "FCom_Catalog_Admin_Controller_Products::gridColumns", FCom_CustomField_Admin.onProductGridColumns ]
-                    - [ "FCom_Catalog_Admin_Controller_Products::formViewBefore", FCom_CustomField_Admin_Controller_Products.onProductsFormViewBefore ]
+                    - [ "FCom_Catalog_Admin_Controller_Products::formViewBefore", FCom_CustomField_Admin.onProductsFormViewBefore ]
+                    - [ "FCom_Catalog_Admin_Controller_Products::formPostAfter:afterValidate", FCom_CustomField_Admin.onProductFormPostAfterValidate ]
                 security:
                     request_fields_whitelist:
                         /catalog/products/form:
-                            POST/custom_fields: "*"
+                            POST/custom_fields: "+"
 
             FCom_Frontend:
                 auto_use: [ views ]
                 observe:
                     - [ "BLayout::hook:custom-fields-filters", FCom_CustomField_Main.hookCustomFieldFilters ]
-                    - [ "FCom_Checkout_Frontend_Controller_Cart::action_add__POST:validate", FCom_CustomField_Frontend.onCheckoutCartAddValidate ]
+                    - [ "FCom_Sales_Workflow_Cart::customerAddsItemsToCart:calcDetails", FCom_CustomField_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]

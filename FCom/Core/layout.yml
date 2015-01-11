@@ -7,3 +7,20 @@ common_js_libs:
             - [ js, "@FCom_Core/js/lib/require.js" ]
 
             - [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery, "@FCom_Core/js/lib/jquery.min" ], { exports: [ $, jQuery ] } ]
+
+base:
+    - view: head
+        do:
+            #- [ css, initialize.css ]
+            #- [ js, initialize.js ]
+
+/initialize.js:
+    - { include: base }
+    - { callback: BResponse.setContentType, args: [ text/javascript ] }
+    - { root: head_script }
+
+
+/initialize.css:
+    - { include: base }
+    - { callback: BResponse.setContentType, args: [ text/css ] }
+    - { root: head_css }

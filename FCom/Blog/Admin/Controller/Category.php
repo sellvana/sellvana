@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Blog_Admin_Controller_Category
+ *
+ * @property FCom_Blog_Model_PostCategory $FCom_Blog_Model_PostCategory
+ * @property FCom_Blog_Model_Category $FCom_Blog_Model_Category
+ */
 class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -67,7 +73,25 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
         $cp = $this->FCom_Blog_Model_PostCategory;
         $model = $args['model'];
         $data = $this->BRequest->post();
-        if (!empty($data['grid']['post_category']['del'])) {
+
+        if (isset($data['grid']['post_category']['add'])) {
+            $cp->delete_many(['category_id' => $model->id()]);
+
+            $postAddIds = $data['grid']['post_category']['add'];
+
+            if (!empty($postAddIds)) {
+                $postAddIds = explode(',', $postAddIds);
+
+                foreach ($postAddIds as $postId) {
+                    $cp->create([
+                        'post_id' => $postId,
+                        'category_id' => $model->id(),
+                    ])->save();
+                }
+            }
+        }
+
+        /*if (!empty($data['grid']['post_category']['del'])) {
             $cp->delete_many([
                 'category_id' => $model->id(),
                 'post_id' => explode(',', $data['grid']['post_category']['del']),
@@ -84,7 +108,7 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
                     ])->save();
                 }
             }
-        }
+        }*/
     }
 
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)

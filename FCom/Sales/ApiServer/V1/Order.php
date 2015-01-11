@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_ApiServer_V1_Order
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ */
+
 class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
 {
     public function action_index()
@@ -74,7 +82,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
             $orderItem['total'] = $item['total'];
             $orderItem['product_info'] = $this->BUtil->toJson($product->as_array());
 
-            $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
+            $this->FCom_Sales_Model_Order_Item->create($orderItem)->save();
         }
 
         $this->created(['id' => $order->id]);
@@ -123,9 +131,9 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
 
                 $testItem = $this->FCom_Sales_Model_Order_Item->isItemExist($order->id(), $item['product_id']);
                 if ($testItem) {
-                    $testItem->update($orderItem);
+                    $testItem->set($orderItem)->save();
                 } else {
-                    $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
+                    $this->FCom_Sales_Model_Order_Item->create($orderItem)->save();
                 }
             }
         }

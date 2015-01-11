@@ -36,39 +36,49 @@ class FCom_Admin_Admin extends BClass
 
     public function layout()
     {
-        if (($head = $this->BLayout->view('head'))) {
-            /** @type FCom_Core_View_Head $head */
-            $head->js_raw('admin_init', '
+        /** @var FCom_Core_View_Head $head */
+        $head = $this->BLayout->view('head');
+        /** @var FCom_Core_View_Text $script */
+        $script = $this->BLayout->view('head_script');
+        /** @var FCom_Core_View_Text $css */
+        $css = $this->BLayout->view('head_css');
+
+        $text = '
 FCom.Admin = {};
 FCom.Admin.base_url = "' . rtrim($this->BConfig->get('web/base_src'), '/') . '/' . '";
 FCom.Admin.code_mirror_base_url = "' . $this->BApp->src('@FCom_Admin/Admin/js/codemirror') . '";
 FCom.Admin.upload_href = "' . $this->BApp->href('upload') . '";
 FCom.Admin.personalize_href = "' . $this->BApp->href('my_account/personalize') . '";
 FCom.Admin.current_mode = "'.$this->BDebug->mode().'";
-            ');
+        ';
+        $head->js_raw('admin_init', $text);
+        $script->addText('FCom_Admin:init', $text);
 
-            $config = $this->BConfig->get('modules/FCom_Admin');
-            if (!empty($config['add_js_files'])) {
-                foreach (explode("\n", $config['add_js_files']) as $js) {
-                    $head->js(trim($js));
-                }
-            }
-            if (!empty($config['add_js_code'])) {
-                $head->js_raw('add_js_code', $config['add_js_code']);
-            }
-            if (!empty($config['add_css_files'])) {
-                foreach (explode("\n", $config['add_css_files']) as $css) {
-                    $head->css(trim($css));
-                }
-            }
-            if (!empty($config['add_css_style'])) {
-                $head->css_raw('add_css_code', $config['add_css_style']);
-            }
+        if (!empty($config['add_js_code'])) {
+            $head->js_raw('add_css_code', $config['add_js_code']);
+            $script->addText('FCom_Admin:add_js', $config['add_js_code']);
+        }
 
-            $pers = $this->FCom_Admin_Model_User->personalize();
-            if (!empty($pers['nav']['collapsed'])) {
-                $this->BLayout->view('root')->addBodyClass('main-nav-closed');
+        if (!empty($config['add_css_style'])) {
+            $head->css_raw('add_css_style', $config['add_css_style']);
+            $css->addText('FCom_Admin:add_css', $config['add_css_style']);
+        }
+
+        $config = $this->BConfig->get('modules/FCom_Admin');
+        if (!empty($config['add_js_files'])) {
+            foreach (explode("\n", $config['add_js_files']) as $js) {
+                $head->js(trim($js));
             }
+        }
+        if (!empty($config['add_css_files'])) {
+            foreach (explode("\n", $config['add_css_files']) as $css) {
+                $head->css(trim($css));
+            }
+        }
+
+        $pers = $this->FCom_Admin_Model_User->personalize();
+        if (!empty($pers['nav']['collapsed'])) {
+            $this->BLayout->view('root')->addBodyClass('main-nav-closed');
         }
     }
 
@@ -94,6 +104,7 @@ FCom.Admin.current_mode = "'.$this->BDebug->mode().'";
     public function onGetDashboardWidgets($args)
     {
         $view = $args['view'];
+        /** @var FCom_Admin_View_Dashboard $view */
         $view->addWidget('visitors-totals', [
             'title' => 'Visitors',
             'icon' => 'group',

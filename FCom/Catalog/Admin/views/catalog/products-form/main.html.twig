@@ -4,30 +4,35 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
-  <div class="f-section">
-    {{ forms.input(fieldData, {field:'product_name', required:1, label:'Product Name'|_, form_group_class:'has-multilang'}) }}
-    <div id="main-product-name-lang"></div>
+    <div class="f-section">
+        {{ forms.input(fieldData, {field:'product_name', required:1, label:'Product Name'|_, form_group_class:'has-multilang'}) }}
+        <div id="main-product-name-lang"></div>
 
-    {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_ ~ ' (' ~ 'optional'|_ ~ ')'}) }}
+        {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_ ~ ' (' ~ 'optional'|_ ~ ')'}) }}
 
-    {{ forms.input(fieldData, {field:'local_sku', required:1, label:'SKU'|_}) }}
+        {{ forms.input(fieldData, {field:'product_sku', required:1, label:'Product SKU'|_}) }}
+        {#
+        {% if CONFIG.get('modules/FCom_Catalog/separate_inventory_sku') %}
+            {{ forms.input(fieldData, {field:'inventory_sku', label:'Inventory SKU (leave empty to use Product SKU)'|_}) }}
+        {% endif %}
+        #}
 
-    {{ forms.textarea(fieldData, {field:'short_description', required:1, label:'Short Description'|_, form_group_class:'has-multilang'}) }}
-    <div id="main-product-shortdesc-lang"></div>
+        {{ forms.textarea(fieldData, {field:'short_description', required:1, label:'Short Description'|_, form_group_class:'has-multilang'}) }}
+        <div id="main-product-shortdesc-lang"></div>
 
-    {{ forms.wysiwyg(fieldData, {field:'description', required:1, label:'Long Description'|_, form_group_class:'has-multilang', input_div_class:'col-md-10', raw:1}) }}
-    <div id="main-product-desc-lang"></div>
+        {{ forms.wysiwyg(fieldData, {field:'description', required:1, label:'Long Description'|_, form_group_class:'has-multilang', input_div_class:'col-md-10', raw:1}) }}
+        <div id="main-product-desc-lang"></div>
 
-    {{ forms.input(fieldData, {field:'net_weight', label:'Net Weight'|_}) }}
+        {{ forms.input(fieldData, {field:'net_weight', label:'Net Weight'|_}) }}
 
-    {{ forms.input(fieldData, {field:'ship_weight', label:'Shipping Weight'|_}) }}
+        {{ forms.input(fieldData, {field:'ship_weight', label:'Shipping Weight'|_}) }}
 
-    {{ forms.boolean(fieldData, {field:'is_hidden', label:'Hide Product'|_}) }}
+        {{ forms.boolean(fieldData, {field:'is_hidden', label:'Hide Product'|_}) }}
 
-    <input type='hidden' id='name_lang_fields' name='name_lang_fields'/>
-    <input type='hidden' id='short_desc_lang_fields' name='short_desc_lang_fields'/>
-    <input type='hidden' id='desc_lang_fields' name='desc_lang_fields'/>
-  </div>
+        <input type='hidden' id='name_lang_fields' name='name_lang_fields'/>
+        <input type='hidden' id='short_desc_lang_fields' name='short_desc_lang_fields'/>
+        <input type='hidden' id='desc_lang_fields' name='desc_lang_fields'/>
+    </div>
 </fieldset>
 
 

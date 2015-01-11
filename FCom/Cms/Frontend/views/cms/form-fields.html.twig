@@ -1,0 +1,67 @@
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldOptions = THIS.getParam("fieldOptions") %}
+{% set formElements = ['text','hidden', 'select', 'boolean', 'textarea', 'wysiwyg'] %}
+{% set inputElements = ['number','email', 'url', 'date', 'time', 'password'] %}
+
+<form class="cms-block-form" method="{{ THIS.getFormMethod() }}" action="{{ THIS.getFormAction() }}" enctype="{{ THIS.getFormEncType() }}">
+    {% for field in fieldOptions %}
+        {% set nm = field.name %}
+        {% set lbl = field.label %}
+        {% set typ = field.input_type %}
+        {% set req = field.required %}
+        {% set options = field.options %}
+        {% set id = options.field_id %}
+        {% set val = options.field_default_value %}
+        {% set ph = options.field_placeholder %}
+        {% set auto = options.autocomplete %}
+        {% set ro = options.readonly %}
+        {% set atr = options.attributes %}
+        {% set cls = options.css_class|replace({',': ' '}) %}
+        {% if typ in formElements %}
+            {% if typ == 'text' %}
+                {{ forms.input({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                    placeholder: ph, input_class: cls, autocomplete: auto, readonly: ro, attr: atr}) }}
+            {% elseif typ == 'hidden' %}
+                {{ forms.hidden({id: id, name: nm, type: typ, value: val}) }}
+            {% elseif typ == 'select' %}
+                {% set opts = options.options %}
+                {{ forms.select({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                    input_class: cls, readonly: ro, attr: atr, options: opts}) }}
+            {% elseif typ == 'boolean' %}
+                {{ forms.boolean({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val}) }}
+            {% elseif typ == 'textarea' %}
+                {% set rws = options.rows %}
+                {% set cols = options.cols %}
+                {{ forms.textarea({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val, placeholder: ph,
+                    input_class: cls, readonly: ro, attr: atr, rows: rws, cols:cols }) }}
+            {% elseif typ == 'wysiwyg' %}
+                {% set rws = options.rows %}
+                {{ forms.wysiwyg({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val, placeholder: ph,
+                        input_class: cls, readonly: ro, attr: atr, rows: rws, cols:cols }) }}
+            {% endif %}
+        {% elseif typ in inputElements %}
+            {{ forms.input({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                placeholder: ph, input_class: cls, autocomplete: auto, readonly: ro, attr: atr}) }}
+        {% elseif typ == 'image' %}
+            {% set s = options.src %}
+            {{ forms.image({id: id, src: s, label: lbl|_, input_class: cls}) }}
+        {% elseif typ == 'select-multi' %}
+            {% set opts = options.options %}
+            {% set st = options.style %}
+            {{ forms.select({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                input_class: cls, readonly: ro, attr: atr, options: opts, multiple: 1, style:st}) }}
+        {% elseif typ == 'file' %}
+            {{ forms.upload({id: id, required: req, label: lbl|_, name: nm, input_class: cls, readonly: ro, attr: atr}) }}
+        {% elseif typ == 'checkbox' %}
+            {% set opts = options.options %}
+            {{ forms.checkbox({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                input_class: cls, readonly: ro, attr: atr, options: opts}) }}
+        {% elseif typ == 'radio' %}
+            {% set opts = options.options %}
+            {{ forms.radio({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                input_class: cls, readonly: ro, attr: atr, options: opts}) }}
+        {% endif %}
+    {% endfor %}
+    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+    <input type="submit" value="Submit" class="btn btn-default"/>
+</form>

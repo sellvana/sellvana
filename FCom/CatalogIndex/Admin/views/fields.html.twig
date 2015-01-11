@@ -69,16 +69,17 @@
                 modalForm.render();
                 $('#index-field-grid-modal').modal('show');
                 return true;
-            }
+            };
 
             BackboneGrid.Views.ModalForm.prototype.render = function () {
                 var header;
                 switch (this.modalType) {
                     case 'addable':
+                    default:
                         header = 'Create Form';
                         BackboneGrid.currentRow = false;
                         break;
-                    case 'mass-editable':
+                    case 'multirow_edit':
                         BackboneGrid.currentRow = false;
                         header = 'Mass Edit Form';
                         break;
@@ -111,7 +112,7 @@
 
                 $(BackboneGrid.modalFormId).find('h4').html(header);
                 BackboneGrid.modalElementVals = {};
-                if (this.modalType === 'mass-editable') {
+                if (this.modalType === 'multirow_edit') {
                     var elementView = new BackboneGrid.Views.ModalMassGridElement({collection: this.collection});
                     $(BackboneGrid.modalFormId).find('.modal-header').after(elementView.render({ modalType: this.modalType}).el);
                     $(BackboneGrid.modalFormId).find('.well select').select2({
@@ -122,7 +123,7 @@
                     this.collection.each(this.addElementDiv, this);
                 }
 
-                if (this.modalType === 'mass-editable') {
+                if (this.modalType === 'multirow_edit') {
                     $(BackboneGrid.modalFormId).find('select').val('');
                 }
                 if (this.$el.is("form")) {
@@ -147,7 +148,7 @@
                 });
 
                 return this;
-            }
+            };
 
             BackboneGrid.Views.ModalForm.prototype.addElementDiv = function(model) {
                 if (model.has(this.modalType) && model.get(this.modalType)) {
@@ -174,7 +175,7 @@
                         elementView.$el.find('#' + name).val(text2html(val));
                     }
                 }
-            }
+            };
 
             function text2html(val) {
                 var text = $.parseHTML(val);
@@ -187,7 +188,7 @@
             cols = indexFieldGrid.getCols();
             rowsCollection = indexFieldGrid.getRows();
 
-        }
+        };
 
         function validateUnique(element, model ,editInline) {
             var url = model.get('validation').unique;

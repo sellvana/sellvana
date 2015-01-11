@@ -1,5 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Blog_Model_Category
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $url_key
+ * @property string $description
+ *
+ * DI
+ * @property FCom_Blog_Model_Category $FCom_Blog_Model_Category
+ */
 class FCom_Blog_Model_Category extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;

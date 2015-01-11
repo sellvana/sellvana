@@ -20,7 +20,7 @@
                             <col width="70"/>
                             <thead>
                                 <tr>
-                                    <th>{{ "Remove" | _ }}</th>
+                                    <th>{{ "Select" | _ }}</th>
                                     <th colspan="2">{{ "Product" | _ }}</th>
                                     <th>{{ "Price" | _ }}</th>
                                 </tr>
@@ -30,7 +30,7 @@
                                     {% set p = item.product() %}
                                     <tr id="f-product-row-{{ p.get('id')}}">
                                         <td>
-                                            <label><input type="checkbox" name="remove[]" class="remove-checkbox" value="{{ item.get('id')}}"></label>
+                                            <label><input type="checkbox" name="selected[]" class="selected-checkbox" value="{{ item.get('id')}}"></label>
                                         </td>
                                         <td>
                                             <img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img" alt="{{ p.get('product_name') }}"/>
@@ -47,10 +47,10 @@
                                 {% endfor %}
                             </tbody>
                             <tfoot>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td><input type="submit" class="btn btn-default btn-xs" value="{{ "Update Wishlist" | _ }}"/></td>
+                                <td colspan="4">
+                                    <button type="submit" class="btn btn-primary btn-xs" name="do" value="add_to_cart">{{ "Add Selected To Cart" | _ }}</button>
+                                    <button type="submit" class="btn btn-warning btn-xs" name="do" value="remove">{{ "Remove Selected" | _ }}</button>
+                                </td>
                             </tfoot>
                         </table>
                     </div>

@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cms_Frontend_Controller
+ *
+ * @property FCom_Cms_Model_Block $FCom_Cms_Model_Block
+ * @property FCom_Cms_Model_Nav $FCom_Cms_Model_Nav
+ * @property FCom_Cms_Frontend_View_Block $FCom_Cms_Frontend_View_Block
+ */
 class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_page()
@@ -13,6 +20,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $block = $this->FCom_Cms_Model_Block->load($pageHandle, 'handle');
             }
         }
+        /** @var FCom_Cms_Model_Block $block */
         if (empty($block) || !$block->validateBlock()) {
             $this->forward(false);
             return;
@@ -29,6 +37,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
 
         if (($head = $this->BLayout->view('head'))) {
+            /** @var BViewHead $head */
             $head->addTitle($block->page_title);
             foreach (['title', 'description', 'keywords'] as $f) {
                 if (($v = $block->get('meta_' . $f))) {
@@ -49,8 +58,8 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
     public function action_page__POST()
     {
+        $pageUrl = $this->BRequest->param('page');
         try {
-            $pageUrl = $this->BRequest->param('page');
             if (!($pageUrl === '' || is_null($pageUrl))) {
                 $block = $this->FCom_Cms_Model_Block->loadWhere(['page_enabled' => 1, 'page_url' => (string)$pageUrl]);
             }
@@ -58,14 +67,18 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $this->forward(false);
                 return;
             }
+            // todo save form data to fcom_cms_form_data ?
+            // send email
         } catch (Exception $e) {
-
+            $this->BDebug->logException($e);
         }
+        $this->BResponse->redirect($pageUrl);
     }
 
     public function action_nav()
     {
-        $handle = $this->BRequest->params('nav');
+        $handle = $this->BRequest->param('nav');
+        /** @var FCom_Cms_Model_Nav $nav */
         $nav = $this->FCom_Cms_Model_Nav->load($handle, 'url_path');
         if (!$nav || !$nav->validateNav()) {
             $this->forward(false);

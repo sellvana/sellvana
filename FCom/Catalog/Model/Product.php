@@ -5,7 +5,7 @@
  *
  * The followings are the available columns in table 'fcom_product':
  * @property string  $id
- * @property string  $local_sku
+ * @property string  $product_sku
  * @property string  $product_name
  * @property string  $short_description
  * @property string  $description
@@ -38,11 +38,16 @@
  * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
  * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
  * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  */
 class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product';
+
+    protected static $_cacheAuto = true;
 
     protected static $_fieldOptions = [
         'stock_status' => [
@@ -59,9 +64,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     protected static $_validationRules = [
         ['product_name', '@required'],
         ['base_price', '@required'],
-        ['local_sku', '@required'],
-        ['local_sku', '@string', null, ['max' => 100]],
-        ['local_sku', 'FCom_Catalog_Model_Product::validateDupSku'],
+        ['product_sku', '@required'],
+        ['product_sku', '@string', null, ['max' => 100]],
+        ['product_sku', 'FCom_Catalog_Model_Product::validateDupSku'],
         ['url_key', 'FCom_Catalog_Model_Product::validateDupUrlKey'],
         //TODO validation fails on is_hidden field
         /*array('is_hidden', '@required'),*/
@@ -88,24 +93,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'indextank_indexed',
             'indextank_indexed_at',
         ],
-        'unique_key' => 'local_sku'
+        'unique_key' => 'product_sku'
     ];
 
     protected $_importErrors = null;
     protected $_dataImport = [];
 
     protected static $_urlPrefix;
-
-    /**
-     * Shortcut to help with IDE autocompletion
-     * @param bool  $new
-     * @param array $args
-     * @return FCom_Catalog_Model_Product
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
-    }
 
     public function validateDupSku($data, $args)
     {
@@ -115,7 +109,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
-        $orm = $this->orm('p')->where('local_sku', $data[$args['field']]);
+        $orm = $this->orm('p')->where('product_sku', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('p.id', $data['id']);
         }
@@ -241,8 +235,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $saveAgain = false;
 
         //todo: setup unique uniq_id
-        if (!$this->get('local_sku')) {
-            $this->set('local_sku', $this->id);
+        if (!$this->get('product_sku')) {
+            $this->set('product_sku', $this->id());
             $saveAgain = true;
         }
         if (!$this->get('position')) {
@@ -268,7 +262,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function generateUrlKey()
     {
-        //$key = $this->manuf()->manuf_name.'-'.$this->local_sku.'-'.$this->product_name;
+        //$key = $this->manuf()->manuf_name.'-'.$this->product_sku.'-'.$this->product_name;
         $key = $this->product_name;
         $urlKey = $this->BLocale->transliterate($key);
         $t = static::$_table;
@@ -327,7 +321,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $result[$i] = [
                 'id'                => $product->id,
                 'product_name'      => $product->product_name,
-                'sku'               => $product->local_sku,
+                'sku'               => $product->product_sku,
                 'price'             => $product->base_price,
                 'url'               => $product->url_key,
                 'weight'            => $product->weight,
@@ -349,7 +343,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $data['product_name'] = $post['product_name'];
         }
         if (!empty($post['sku'])) {
-            $data['local_sku'] = $post['sku'];
+            $data['product_sku'] = $post['sku'];
         }
         if (!empty($post['price'])) {
             $data['base_price'] = $post['price'];
@@ -439,7 +433,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $and = [];
         if ($qs) {
             foreach ($qs as $k) $and[] = ['product_name like ?', '%' . (string)$k . '%'];
-            $productsORM->where(['OR' => ['local_sku' => (string)$q, 'AND' => $and]]);
+            $productsORM->where(['OR' => ['product_sku' => (string)$q, 'AND' => $and]]);
         }
 
         if (!empty($filter)) {
@@ -569,8 +563,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $relatedProducts = [];
         for ($i = 0, $c = count($data); $i < $c; $i++) {
             $d = $data[$i];
-            //if must have fields not defined then skip the record
-            if (empty($d['product_name']) && empty($d['local_sku']) && empty($d['url_key'])) {
+            // if must have fields not defined, then skip the record
+            if (empty($d['product_name']) || empty($d['product_sku'])) {
+                $errors[] = sprintf("Missing product name or product sku: %s ...", substr(print_r($d, 1), 0, 50));
                 continue;
             }
 
@@ -629,8 +624,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             if ('create_or_update' == $config['import']['actions'] ||
                     'update' == $config['import']['actions']
                     ) {
-                if (isset($d['local_sku'])) {
-                    $p = $this->orm()->where("local_sku", $d['local_sku'])->find_one();
+                if (isset($d['product_sku'])) {
+                    $p = $this->orm()->where("product_sku", $d['product_sku'])->find_one();
                 }
 //                if (!$p && isset($d['product_name'])) {
 //                    $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
@@ -1007,13 +1002,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
                 if (!empty($temp)) {
                     // fetch related sku objects
-                    $related = $this->orm()->where_in("local_sku", $temp)
+                    $related = $this->orm()->where_in("product_sku", $temp)
                                     ->find_many();
 
                     foreach ($related as $r) {
                         /* @var FCom_Catalog_Model_Product $r */
                         $linked[] = $r->id();
-                        $relatedIds[$r->local_sku] = $r->id();
+                        $relatedIds[$r->product_sku] = $r->id();
                     }
                 }
 
@@ -1097,7 +1092,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 try {
                     $productMedia->create([
                         'product_id' => $p->id(),
-                        'media_type' => 'images',
+                        'media_type' => FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG,
                         'file_id'    => $att->id(),
                         'main_thumb' => $isThumb ? 1 : 0
                     ])->save();
@@ -1134,19 +1129,29 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return mixed
+     * @return FCom_Catalog_Model_InventorySku
+     * @throws BException
      */
-    public function getFrontendFields()
+    public function getInventoryModel()
     {
-        $frontendFields = $this->getData('frontend_fields');
-        if ($frontendFields) {
-            usort($frontendFields, function ($a, $b) {
-                if ($a['position'] == $b['position']) {
-                    return 0;
-                }
-                return ($a['position'] < $b['position'])? -1: 1;
-            });
+        $invModel = $this->get('inventory_model');
+        if ($invModel) {
+            return $invModel;
         }
-        return $frontendFields;
+        // get inventory SKU from inventory SKU or product SKU if not specified
+        $invSku = $this->get('inventory_sku');
+        if (null === $invSku || '' === $invSku) {
+            $invSku = $this->get('product_sku');
+            $this->set('inventory_sku', $invSku);
+        }
+        // find inventory model
+        $invHlp = $this->FCom_Catalog_Model_InventorySku;
+        $invModel = $invHlp->load($invSku, 'inventory_sku');
+        // if doesn't exist yet, create
+        if (!$invModel) {
+            $invModel = $invHlp->create(['inventory_sku' => $invSku])->save();
+        }
+        $this->set('inventory_model', $invModel);
+        return $invModel;
     }
 }

@@ -4,8 +4,8 @@
 
     <fcom_compare_set cookie_token="abcd" customer_id="1" />
 
-    <fcom_product id="1" product_name="Product 1" local_sku="product_1" url_key="product-1" />
-    <fcom_product id="2" product_name="Product 2" local_sku="product_2" url_key="product-2" />
+    <fcom_product id="1" product_name="Product 1" product_sku="product_1" url_key="product-1" />
+    <fcom_product id="2" product_name="Product 2" product_sku="product_2" url_key="product-2" />
 
     <fcom_compare_item id="1" set_id="1" product_id="1" />
 </dataset>

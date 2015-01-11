@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MarketClient_Admin_Controller_Module
+ *
+ * @property FCom_MarketClient_RemoteApi $FCom_MarketClient_RemoteApi
+ * @property FCom_MarketClient_Main $FCom_MarketClient_Main
+ */
 class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Abstract
 {
     protected $_permission = 'market_client/install';
@@ -17,8 +23,9 @@ class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Ab
     {
         $this->BResponse->startLongResponse(false);
 
-        $modules = $this->BRequest->post('modules');
-        $redirectUrl = $this->BRequest->request('redirect_to');
+        $r = $this->BRequest;
+        $modules = $r->post('modules');
+        $redirectUrl = $r->request('redirect_to');
 
         if (!$r->isUrlLocal($redirectUrl)) {
             $redirectUrl = '';

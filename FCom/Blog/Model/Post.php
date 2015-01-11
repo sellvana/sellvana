@@ -1,5 +1,29 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Blog_Model_Post
+ *
+ * @property int $id
+ * @property int $author_user_id
+ * @property string $status
+ * @property string $title
+ * @property string $url_key
+ * @property string $preview
+ * @property string $content
+ * @property string $meta_title
+ * @property string $meta_description
+ * @property string $meta_keywords
+ * @property string $create_ym
+ * @property string $create_at
+ * @property string $update_at
+ *
+ * DI
+ * @property FCom_Blog_Model_Post $FCom_Blog_Model_Post
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Blog_Model_Category $FCom_Blog_Model_Category
+ * @property FCom_Blog_Model_PostTag $FCom_Blog_Model_PostTag
+ * @property FCom_Blog_Model_Tag $FCom_Blog_Model_Tag
+ */
 class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_blog_post';

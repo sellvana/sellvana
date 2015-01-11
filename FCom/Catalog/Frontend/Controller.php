@@ -4,6 +4,7 @@
  * Class FCom_Catalog_Frontend_Controller
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -86,14 +87,15 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
     public function action_product__POST()
     {
-        $r = explode('/', $this->BRequest->params('product'));
+        $r = explode('/', $this->BRequest->param('product'));
         $href = $r[0];
 
         $p = array_pop($r);
         $product = $this->FCom_Catalog_Model_Product->load($p, 'url_key');
         if (!$product) {
-            $this->BResponse->redirect($href);
-            return;
+            $this->forward(false);
+            //$this->BResponse->redirect($href);
+            return $this;
         }
 
         $post = $this->BRequest->post();

@@ -4,6 +4,10 @@
  * Created by pp
  * @project fulleron
  * @package FCom_CustomerGroups
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CustomerGroups_Model_Group $FCom_CustomerGroups_Model_Group
+ * @property FCom_CustomerGroups_Model_TierPrice $FCom_CustomerGroups_Model_TierPrice
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 
 class FCom_CustomerGroups_Migrate extends BClass
@@ -14,13 +18,13 @@ class FCom_CustomerGroups_Migrate extends BClass
 
         $this->BDb->ddlTableDef($tableCustomerGroup,
             [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                   'id'    => 'int(10) unsigned auto_increment',
                   'title' => 'varchar(100) not null',
                   'code'  => 'varchar(50) not null',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS'    => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS    => [
                   'cg_code' => 'UNIQUE (code)'
                 ],
             ]
@@ -33,11 +37,11 @@ class FCom_CustomerGroups_Migrate extends BClass
 
         $this->BDb->ddlTableDef($this->FCom_Customer_Model_Customer->table(),
             [
-                 'COLUMNS' => [
+                 BDb::COLUMNS => [
                      'customer_group' => 'int(10) unsigned null default null'
                  ],
-                 'CONSTRAINTS'    => [
-                     'fk_customer_group' => "FOREIGN KEY (customer_group) REFERENCES {$tableCustomerGroup}(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                 BDb::CONSTRAINTS    => [
+                     'group' => ['customer_group', $tableCustomerGroup],
                  ],
             ]
         );
@@ -47,7 +51,7 @@ class FCom_CustomerGroups_Migrate extends BClass
         $tableProduct = $this->FCom_Catalog_Model_Product->table();
         $this->BDb->ddlTableDef($tableTierPrices,
             [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id'         => 'int(10) unsigned not null auto_increment',
                     'product_id' => 'int(10) unsigned not null',
                     'group_id'   => 'int(10) unsigned not null',
@@ -55,13 +59,13 @@ class FCom_CustomerGroups_Migrate extends BClass
                     'sale_price' => 'decimal(12,2) not null',
                     'qty'        => 'int(10) unsigned not null default 1',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'UNQ_prod_group_qty' => 'UNIQUE (product_id, group_id, qty)',
                 ], // should we add unique key from product_id + group_id + qty ???
-                'CONSTRAINTS' => [
-                    "FK_{$tableTierPrices}_product" => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    "FK_{$tableTierPrices}_group" => "FOREIGN KEY (group_id) REFERENCES {$tableCustomerGroup}(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                BDb::CONSTRAINTS => [
+                    'product' => ['product_id', $tableProduct],
+                    'group' => ['group_id', $tableCustomerGroup],
                 ],
             ]
         );
@@ -79,7 +83,7 @@ class FCom_CustomerGroups_Migrate extends BClass
         $tableCustGroups = $this->FCom_CustomerGroups_Model_Group->table();
         $this->BDb->ddlTableDef($tableTierPrices,
             [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id'         => 'int(10) unsigned not null auto_increment',
                     'product_id' => 'int(10) unsigned not null',
                     'group_id'   => 'int(10) unsigned not null',
@@ -87,13 +91,13 @@ class FCom_CustomerGroups_Migrate extends BClass
                     'sale_price' => 'decimal(12,2) not null',
                     'qty'        => 'int(10) unsigned not null default 1',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'UNQ_prod_group_qty' => 'UNIQUE (product_id, group_id, qty)',
                 ], // should we add unique key from product_id + group_id + qty ???
-                'CONSTRAINTS' => [
-                    "FK_{$tableTierPrices}_product" => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    "FK_{$tableTierPrices}_group" => "FOREIGN KEY (group_id) REFERENCES {$tableCustGroups}(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                BDb::CONSTRAINTS => [
+                    'product' => ['product_id', $tableProduct],
+                    'group' => ['group_id', $tableCustGroups],
                 ],
             ]
         );

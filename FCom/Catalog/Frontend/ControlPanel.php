@@ -1,9 +1,20 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Frontend_ControlPanel
+ */
 class FCom_Catalog_Frontend_ControlPanel extends BClass
 {
+    /**
+     * @var FCom_Core_Model_Abstract[]
+     */
     static protected $_models = [];
 
+    /**
+     * @param $class
+     * @param $id
+     * @return mixed
+     */
     public function getModel($class, $id)
     {
         if (empty(static::$_models[$class][$id])) {
@@ -12,6 +23,10 @@ class FCom_Catalog_Frontend_ControlPanel extends BClass
         return static::$_models[$class][$id];
     }
 
+    /**
+     * @param $params
+     * @return array
+     */
     public function productEntityHandler($params)
     {
         $model = $this->getModel('FCom_Catalog_Model_Product', $params['data']['model_id']);
@@ -36,6 +51,10 @@ class FCom_Catalog_Frontend_ControlPanel extends BClass
         return ['success' => true];
     }
 
+    /**
+     * @param $params
+     * @return array
+     */
     public function categoryEntityHandler($params)
     {
         $model = $this->getModel('FCom_Catalog_Model_Category', $params['data']['model_id']);
@@ -48,6 +67,9 @@ class FCom_Catalog_Frontend_ControlPanel extends BClass
         return ['success' => true];
     }
 
+    /**
+     * @param $args
+     */
     public function onAfterUpdate($args)
     {
         foreach (static::$_models as $entity => $models) {

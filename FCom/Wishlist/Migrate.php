@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Wishlist_Migrate
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Wishlist_Model_Wishlist $FCom_Wishlist_Model_Wishlist
+ * @property FCom_Wishlist_Model_WishlistItem $FCom_Wishlist_Model_WishlistItem
+ */
+
 class FCom_Wishlist_Migrate extends BClass
 {
     public function install__0_1_2()
@@ -10,7 +19,7 @@ class FCom_Wishlist_Migrate extends BClass
         $tProduct = $this->FCom_Catalog_Model_Product->table();
 
         $this->BDb->ddlTableDef($tWishlist, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'customer_id' => 'int unsigned default null',
                 'cookie_token' => 'varchar(40) default null',
@@ -18,26 +27,26 @@ class FCom_Wishlist_Migrate extends BClass
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime default null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_customer_id' => '(customer_id)',
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
             ],
-            'CONSTRAINTS' => [
-                "FK_{$tWishlist}_customer" => "foreign key (customer_id) references {$tCustomer} (id) on update cascade on delete cascade",
+            BDb::CONSTRAINTS => [
+                'customer' => ['customer_id', $tCustomer],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tWishlistItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'wishlist_id' => 'int unsigned not null',
                 'product_id' => 'int unsigned not null',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
-                "FK_{$tWishlistItem}_wishlist" => "foreign key (wishlist_id) references {$tWishlist} (id) on update cascade on delete cascade",
-                "FK_{$tWishlistItem}_product" => "foreign key (wishlist_id) references {$tProduct} (id) on update cascade on delete cascade",
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'wishlist' => ['wishlist_id', $tWishlist],
+                'product' => ['wishlist_id', $tProduct],
             ],
         ]);
     }
@@ -45,7 +54,7 @@ class FCom_Wishlist_Migrate extends BClass
     public function upgrade__0_1_0__0_1_1()
     {
         $this->BDb->ddlTableDef($this->FCom_Wishlist_Model_Wishlist->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'user_id' => 'RENAME customer_id int(10) unsigned not null',
             ],
         ]);
@@ -61,26 +70,26 @@ class FCom_Wishlist_Migrate extends BClass
         $this->FCom_Wishlist_Model_WishlistItem->delete_many("wishlist_id not in (select id from {$tWishlist})");
 
         $this->BDb->ddlTableDef($tWishlist, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'customer_id' => 'int unsigned default null',
                 'cookie_token' => 'varchar(40) default null',
                 'remote_ip' => 'varchar(50) default null',
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime default null',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_customer_id' => '(customer_id)',
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
             ],
-            'CONSTRAINTS' => [
-                "FK_{$tWishlist}_customer" => "foreign key (customer_id) references {$tCustomer} (id) on update cascade on delete cascade",
+            BDb::CONSTRAINTS => [
+                'customer' => ['customer_id', $tCustomer],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tWishlistItem, [
-            'CONSTRAINTS' => [
-                "FK_{$tWishlistItem}_wishlist" => "foreign key (wishlist_id) references {$tWishlist} (id) on update cascade on delete cascade",
-                "FK_{$tWishlistItem}_product" => "foreign key (wishlist_id) references {$tProduct} (id) on update cascade on delete cascade",
+            BDb::CONSTRAINTS => [
+                'wishlist' => ['wishlist_id', $tWishlist],
+                'product' => ['wishlist_id', $tProduct],
             ],
         ]);
 

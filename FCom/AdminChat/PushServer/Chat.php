@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AdminChat_PushServer_Chat
+ *
+ * @property FCom_AdminChat_Model_Chat $FCom_AdminChat_Model_Chat
+ * @property FCom_AdminChat_Model_Participant $FCom_AdminChat_Model_Participant
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
 class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
 {
     public function onBeforeDispatch()
@@ -14,9 +22,12 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         return true;
     }
 
+    /**
+     * start the chat, receive initial history
+     * @throws BException
+     */
     public function signal_open()
     {
-        // start the chat, receive initial history
 
         //$this->_client->send($this->_message);
         $user = $this->FCom_Admin_Model_User->load($this->_message['user'], 'username');
@@ -27,7 +38,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         $chat = $this->FCom_AdminChat_Model_Chat->openWithUser($user);
         $participant = $this->FCom_AdminChat_Model_Participant->loadWhere([
             'chat_id' => $chat->id(),
-            'user_id' => $this->FCom_Admin_Model_User->sessionUserId(),
+            'NOT' => ['user_id' => $this->FCom_Admin_Model_User->sessionUserId()],
         ]);
         if ($participant->get('status') !== 'open') {
             $participant->set('status', 'open')->save();
@@ -46,11 +57,17 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         ]);
     }
 
+    /**
+     *
+     */
     public function signal_invite()
     {
 
     }
 
+    /**
+     *
+     */
     public function signal_say()
     {
         $chan = $this->_message['channel'];
@@ -72,11 +89,17 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         ]);
     }
 
+    /**
+     *
+     */
     public function signal_kick()
     {
 
     }
 
+    /**
+     * @throws BException
+     */
     public function signal_window_status()
     {
         $channel = $this->_message['channel'];

@@ -1,9 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AuthorizeNet_PaymentMethod_Aim
+ *
+ * @property FCom_AuthorizeNet_AimApi $FCom_AuthorizeNet_AimApi
+ * @property FCom_AuthorizeNet_Model_Settings $FCom_AuthorizeNet_Model_Settings
+ * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
+ */
+
 class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abstract
 {
-
-    const PAYMENT_METHOD_KEY = "authorizenet_aim";
+    static protected $_methodKey = "authorizenet_aim";
 
     function __construct()
     {
@@ -15,10 +22,10 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
 
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('authorizenet/aim')->set('key', static::PAYMENT_METHOD_KEY);
+        return $this->BLayout->view('authorizenet/aim')->set('key', static::$_methodKey);
     }
 
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         $config = $this->config();
         if (!$config['active']) {
@@ -27,15 +34,17 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
         }
         $action = $config['payment_action'];
 
-        /* @var $api FCom_AuthorizeNet_AimApi */
         $api = $this->FCom_AuthorizeNet_AimApi;
 
+        $result = [];
         switch ($action) {
             case 'AUTH_ONLY':
-                $response = $api->authorize($this);
+                $transaction = $payment->createTransaction('auth')->start();
+                $response = $api->authorize($transaction, $this);
                 break;
             case 'AUTH_CAPTURE':
-                $response = $api->sale($this);
+                $transaction = $payment->createTransaction('sale')->start();
+                $response = $api->sale($transaction, $this);
                 break;
             default :
                 // log and show message
@@ -44,53 +53,29 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
         }
         $success = $response['response_code'] == 1;
         if ($success) {
-            $this->setDetail($response['transaction_id'], $response);
-            $this->setDetail('transaction_id', $response['transaction_id']);
-            $status = $action == 'AUTH_ONLY' ? 'authorized' : 'paid';
+            $this->set($response['transaction_id'], $response);
+            $this->set('transaction_id', $response['transaction_id']);
+            $transaction->complete();
         } else {
-            $status = 'error';
+            $result['error']['message'] = 'There has been an issue with your transaction';
         }
-        $paymentData = [
-            'method'           => static::PAYMENT_METHOD_KEY,
-            'parent_id'        => $response['transaction_id'],
-            'order_id'         => $this->getOrder()->id(),
-            'amount'           => $this->getDetail('amount_due'),
-            'status'           => $status,
-            'transaction_id'   => $response['transaction_id'],
-            'transaction_type' => $action == 'AUTH_ONLY' ? 'authorize' : 'sale',
-            'online'           => 1,
-        ];
+        $result['response'] = $response;
         $this->clear();
-        $paymentModel = $this->FCom_Sales_Model_Order_Payment->addNew($paymentData);
-        $paymentModel->setData('response', $response);
-        $paymentModel->save();
-        return $response;
+        $transaction->setData('result', $result)->save();
+        return $result;
     }
 
     public function getOrder()
     {
-        return $this->salesEntity;
+        return $this->_order;
     }
 
     public function getCardNumber()
     {
-        if (isset($this->details['cc_num'])) {
-            return $this->details['cc_num'];
+        if (isset($this->_details['cc_num'])) {
+            return $this->_details['cc_num'];
         }
         return null;
-    }
-
-    public function getDetail($key)
-    {
-        if (isset($this->details[$key])) {
-            return $this->details[$key];
-        }
-        return null;
-    }
-
-    public function setDetail($key, $value)
-    {
-        $this->details[$key] = $value;
     }
 
     /**
@@ -110,52 +95,42 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
         return $config->get('modules/FCom_AuthorizeNet/aim');
     }
 
-    public function setDetails($details)
+    public function setPaymentFormData(array $data)
     {
-        $details = isset($details[static::PAYMENT_METHOD_KEY]) ? $details[static::PAYMENT_METHOD_KEY] : [];
-
-        if (isset($details['expire'], $details['expire']['month'], $details['expire']['year'])) {
-            $details['card_exp_date'] = $details['expire']['month'] . '/' . $details['expire']['year'];
+        if (isset($data['expire'], $data['expire']['month'], $data['expire']['year'])) {
+            $data['card_exp_date'] = $data['expire']['month'] . '/' . $data['expire']['year'];
         }
 
-        return parent::setDetails($details);
+        return parent::setPaymentFormData($data);
     }
 
-    public function setSalesEntity($order, $options)
+    public function getDataToSave()
     {
-        $this->setDetail('amount_due', $order->balance);
-        return parent::setSalesEntity($order, $options);
-    }
-
-    public function getPublicData()
-    {
-        $data = $this->details;
+        $data = $this->_details;
         if (!empty($data) && isset($data['cc_num'])) {
             $data['last_four'] = $this->lastFour();
+            unset($data['cc_num']);
         }
         return $data;
     }
 
+    public function getPublicData()
+    {
+        return $this->getDataToSave();
+    }
+
     protected function lastFour()
     {
-        $lastFour = $this->getDetail('last_four');
-        $ccNum    = $this->getDetail('cc_num');
+        $lastFour = $this->get('last_four');
+        $ccNum    = $this->get('cc_num');
         if (!$lastFour && $ccNum) {
-            $this->setDetail('last_four', substr($ccNum, -4));
+            $this->set('last_four', substr($ccNum, -4));
         }
-        return $this->getDetail('last_four');
+        return $this->get('last_four');
     }
     protected function clear()
     {
         $this->lastFour();
-        unset($this->details['cc_num']);
+        unset($this->_details['cc_num']);
     }
-
-    public function asArray()
-    {
-        $data = parent::asArray();
-        $data = $this->BUtil->arrayMerge($data, $this->getPublicData());
-        return [static::PAYMENT_METHOD_KEY => $data];
-    }
-
 }

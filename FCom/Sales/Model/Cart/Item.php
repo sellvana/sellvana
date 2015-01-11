@@ -1,15 +1,42 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * @property mixed product_id
- * @property mixed qty
+ * Class FCom_Sales_Model_Cart_Item
+ *
+ * @property int $id
+ * @property int $cart_id
+ * @property int $product_id
+ * @property string $product_sku
+ * @property string $product_name
+ * @property string $inventory_sku
+ * @property string $inventory_id
+ * @property float $qty
+ * @property float $price
+ * @property float $row_total
+ * @property float $tax
+ * @property float $discount
+ * @property int $promo_id_buy //todo: ??? why varchar in db
+ * @property int $promo_id_get
+ * @property float $promo_qty_used
+ * @property float $promo_amt_used
+ * @property datetime $create_at
+ * @property datetime $update_at
+ * @property string $data_serialized
+ *
+ * @property data
  */
 class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_cart_item';
 
+    /**
+     * @var null|FCom_Catalog_Model_Product
+     */
     public $product;
 
+    /**
+     * @return FCom_Catalog_Model_Product
+     */
     public function product()
     {
         if (!$this->product) {
@@ -18,21 +45,37 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $this->product;
     }
 
-    public function rowTotal($variantId = null)
+    /**
+     * @param null $variantId
+     * @return mixed
+     */
+    public function calcRowTotal()
     {
-        $variants = $this->getData('variants');
-        if ($variants && !is_null($variantId)) {
-            $variant = $variants[$variantId];
-            return $variant['variant_price'] * $variant['variant_qty'];
-        }
-        return $this->get('row_total') ? $this->get('row_total') : $this->get('price') * $this->get('qty');
+        return $this->get('price') * $this->get('qty');
     }
 
-    public function isGroupAble()
+    /**
+     * @return bool
+     * @todo implement
+     */
+    public function isGroupable()
     {
-        return  true;
+        return true;
     }
 
+    /**
+     * @return bool
+     * @todo implement
+     */
+    public function isShippable()
+    {
+        return true;
+    }
+
+    /**
+     * @param bool $ship
+     * @return bool
+     */
     public function getItemWeight($ship = true)
     {
         $p = $this->product();
@@ -42,6 +85,10 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $p->get($ship ? 'ship_weight' : 'net_weight');
     }
 
+    /**
+     * @param bool $ship
+     * @return bool|float
+     */
     public function getRowWeight($ship = true)
     {
         $w = $this->getItemWeight($ship);
@@ -51,6 +98,9 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $this->getQty() * $w;
     }
 
+    /**
+     * @return float
+     */
     public function getQty()
     {
         return $this->qty;
@@ -60,6 +110,11 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     {
         parent::onAfterLoad();
         $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
+    }
+
+    public function calcUniqueHash($signature)
+    {
+
     }
 }
 

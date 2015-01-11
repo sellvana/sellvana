@@ -2,27 +2,42 @@
 
 interface FCom_Sales_Method_Payment_Interface
 {
-    public function payOnCheckout();
+    public function getCheckoutFormView();
 
-    /**
-     * @param $order
-     * @param $options
-     * @return $this
-     */
-    public function setSalesEntity($order, $options);
+    public function getCheckoutFormPrefix();
 
-    /**
-     * Set any details gathered during checkout process
-     * @param array $details
-     * @return $this
-     */
-    public function setDetails($details);
+    public function setPaymentFormData(array $data);
 
-    /**
-     * Get public data
-     *
-     * Get data which can be saved, should not include any sensitive data such as credit card numbers, personal ids, etc.
-     * @return array
-     */
+    public function set($name, $value = null);
+
+    public function get($name, $default = null);
+
+    public function asArray();
+
+    public function can($capability);
+
+    public function getName();
+
+    public function getSortOrder();
+
     public function getPublicData();
+
+    public function getDataToSave();
+
+    /**
+     * @param FCom_Sales_Model_Order_Payment $payment
+     * @return mixed
+     */
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment);
+
+    public function authorize(FCom_Sales_Model_Order_Payment_Transaction $transaction);
+
+    public function reauthorize(FCom_Sales_Model_Order_Payment_Transaction $transaction);
+
+    public function void(FCom_Sales_Model_Order_Payment_Transaction $transaction);
+
+    public function capture(FCom_Sales_Model_Order_Payment_Transaction $transaction);
+
+    public function refund(FCom_Sales_Model_Order_Payment_Transaction $transaction);
+
 }

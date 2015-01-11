@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_ApiServer_Controller_Abstract
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
+
 class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
 {
     protected static $_origClass;

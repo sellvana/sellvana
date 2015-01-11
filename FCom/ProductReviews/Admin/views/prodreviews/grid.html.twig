@@ -11,7 +11,7 @@
   </div>
 
   <div class="f-admin-main">
-      {{ THIS.view('core/backbonegrid').set('grid', {config: grid['config']}) | raw }}
+      {{ THIS.view('core/griddle').set('grid', {config: grid['config']}) | raw }}
   </div>
 </div>
 <script>
@@ -28,10 +28,10 @@ require(["jquery", "underscore", "jquery.validate"], function($, _) {
                 btnApprove.addClass('disabled');
                 btnDeny.addClass('disabled');
             }
-        }
+        };
         grid.build();
 
-    }
+    };
 
     var btnApprove = $('#prod-reviews-approve');
     var btnDeny = $('#prod-reviews-deny');

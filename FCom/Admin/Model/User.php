@@ -27,6 +27,9 @@
  * @property string $api_password_hash
  * @property string $data_serialized
  * @property string $password_session_token
+ * @property FCom_Admin_Model_Personalize $FCom_Admin_Model_Personalize
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 {
@@ -328,6 +331,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
         $this->set('last_login', $this->BDb->now())->save();
 
+        $this->BSession->regenerateId();
         $this->BSession->set('admin_user_id', $this->id());
         static::$_sessionUser = $this;
 
@@ -398,6 +402,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
      */
     public function resetPassword($password)
     {
+        $this->BSession->regenerateId();
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
         $this->BLayout->view('email/admin/user-password-reset')->set('user', $this)->email();
         return $this;

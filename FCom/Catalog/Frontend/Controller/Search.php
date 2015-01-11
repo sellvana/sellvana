@@ -7,6 +7,7 @@
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_SearchAlias $FCom_Catalog_Model_SearchAlias
  * @property FCom_Catalog_Model_SearchHistory $FCom_Catalog_Model_SearchHistory
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
 {
@@ -15,11 +16,12 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $q = $this->BRequest->get('q');
         $filter = $this->BRequest->get('f');
 
-        $catName = $this->BRequest->params('category');
+        $catName = $this->BRequest->param('category');
         if ($catName === '' || is_null($catName)) {
             $this->forward(false);
             return;
         }
+        /** @var FCom_Catalog_Model_Category $category */
         $category = $this->FCom_Catalog_Model_Category->load($catName, 'url_path');
         if (!$category) {
             $this->forward(false);
