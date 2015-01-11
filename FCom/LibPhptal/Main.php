@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-require_once __DIR__ . 'lib/PHPTAL.php';
+require_once __DIR__ . '/lib/PHPTAL.php';
 
 class FCom_LibPhptal_Main extends BClass
 {
