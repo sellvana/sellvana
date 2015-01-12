@@ -97,7 +97,7 @@ Using custom id/name:
     {% if p.select2 is defined %}
         <script>
             require(['jquery', 'select2'], function($) {
-                $('#{{ view.getInputId(p) }}').select2({{ p.select2 is iterable ? UTIL.toJson(p.select2) : '{}' }});
+                $('#{{ view.getInputId(p) }}').select2({{ p.select2 is iterable ? UTIL.toJson(p.select2)|raw : '{}' }});
             })
         </script>
     {% endif %}

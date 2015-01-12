@@ -284,20 +284,26 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             if (grid) {
                 Promo.addGridRows(grid, newRows)
             } else {
+                var codes = store.get('promo.coupons'); // check of there are other codes stored and if yes, merge them
+                if(codes) {
+                    codes = JSON.parse(codes);
+                    newRows = codes.concat(newRows);
+                }
                 store.set('promo.coupons', JSON.stringify(newRows));
             }
         },
         addGridRows: function (grid, rows) {
             /** @type Backbone.Collection */
             var gridRows = grid.getRows();
-            var lastId = 0;
-            if(gridRows.size()) {
-                lastId = gridRows.at(gridRows.size() - 1).get('id') - 0;
-            }
-            lastId++;
+            //var lastId = 0;
+            //if(gridRows.size()) {
+            //    lastId = gridRows.at(gridRows.size() - 1).get('id') - 0;
+            //}
+            //lastId++;
             var newRows = rows.map(function (row, idx) {
-                row._new = true;
-                row.id = lastId + idx;
+                //row._new = true;
+                //row.id = lastId + idx;
+                row.id = row.code; // instead of worrying for duplicate codes, make the code the id and effectively update the duplicates instead of detecting them
                 return row;
             });
             gridRows.add(newRows, {merge: true}).trigger('build');
