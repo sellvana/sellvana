@@ -145,7 +145,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var id = this.props.getConfig('id');
             var filters = this.state.filters;
 
-            console.log('filters', filters);
+            //console.log('filters', filters);
 
             var filterSettingNodes = _.map(filters, function(f) {
                 return (
