@@ -855,7 +855,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     placeholder: self.props.fcLabel,
                     maximumSelectionSize: 4,
                     multiple: true,
-                    selectOnBlur: true,
+                    selectOnBlur: false,
                     closeOnSelect: true,
                     query: self.select2query,
                     dropdownCssClass: "bigdrop",
