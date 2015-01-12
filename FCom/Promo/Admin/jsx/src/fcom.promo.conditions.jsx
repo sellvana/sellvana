@@ -247,7 +247,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 query: self.select2query,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
-                selectOnBlur: true
+                selectOnBlur: false
             }).on('change', this.addField);
             $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.elementChange);
             if (typeof this.props.onLoad == 'function') {
