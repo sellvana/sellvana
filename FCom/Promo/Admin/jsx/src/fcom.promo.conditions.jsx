@@ -87,7 +87,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 },
                 query: self.select2query
             });
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2();
         }
     });
 
@@ -249,7 +249,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 dropdownAutoWidth: true,
                 selectOnBlur: false
             }).on('change', this.addField);
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.elementChange);
+            $('.to-select2', this.getDOMNode()).select2().on('change', this.elementChange);
             if (typeof this.props.onLoad == 'function') {
                 this.props.onLoad(this);
             }
@@ -409,7 +409,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 default :
                     break;
             }
-            //$('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.onCompareChange);
+            //$('select.to-select2', this.getDOMNode()).select2().on('change', this.onCompareChange);
         },
         //componentDidUpdate: function () {
         //    this.componentDidMount();
@@ -498,8 +498,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
-                    <div className="col-md-2">
+                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3"> of products in </ConditionsType>
+                    <div className="col-md-3">
                         <input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/>
                     </div>
                     <div className="col-md-2">
@@ -544,7 +544,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     return markup;
                 }
             });
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2();
         }
     });
 
@@ -572,7 +572,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
         },
         componentDidMount: function () {
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2();
         }
     });
 
@@ -739,8 +739,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
         },
         componentDidMount: function () {
-            $(this.refs['combinationField'].getDOMNode()).select2({minimumResultsForSearch: 15}).on("change", this.addField);
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $(this.refs['combinationField'].getDOMNode()).select2().on("change", this.addField);
+            $('select.to-select2', this.getDOMNode()).select2();
             if (typeof this.props.onLoad == 'function') {
                 this.props.onLoad(this);
             }
@@ -926,7 +926,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
 
             this.props.conditionType.on('change', this.addCondition);
 
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2();
         },
         addCondition: function () {
             // add condition data to state
