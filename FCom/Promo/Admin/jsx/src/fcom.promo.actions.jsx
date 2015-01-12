@@ -30,7 +30,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 className: "form-control"
             };
         }, componentDidMount: function () {
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15, dropdownAutoWidth: true}).on('change', this.props.onChange);
+            $('select.to-select2', this.getDOMNode()).select2().on('change', this.props.onChange);
         }
     });
 
@@ -183,9 +183,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 query: self.select2query,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
-                selectOnBlur: true
             }).on('change', this.addField);
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.elementChange);
+            $('.to-select2', this.getDOMNode()).select2().on('change', this.elementChange);
             if (typeof this.props.onLoad == 'function') {
                 this.props.onLoad(this);
             }
@@ -457,7 +456,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 closeOnSelect: true,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
-                selectOnBlur: false,
                 formatSelection: function (item) {
                     return item.sku;
                 },
@@ -494,6 +492,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     });
 
     var Discount = React.createClass({
+        mixins: [Common.removeMixin],
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
@@ -566,7 +565,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         },
         componentDidMount: function () {
 
-            $(this.refs['discountScope'].getDOMNode()).select2({minimumResultsForSearch:15}).on('change', this.onScopeChange)
+            $(this.refs['discountScope'].getDOMNode()).select2().on('change', this.onScopeChange)
         }
     });
 
@@ -636,7 +635,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                     return markup;
                 },
             });
-            $(this.refs['productTerms'].getDOMNode()).select2({minimumResultsForSearch:15})
+            $(this.refs['productTerms'].getDOMNode()).select2()
         }
     });
 
@@ -741,7 +740,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 this.props.actionType.on('change', this.addAction);
             }
 
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2();
         },
         addAction: function () {
             // add condition data to state
