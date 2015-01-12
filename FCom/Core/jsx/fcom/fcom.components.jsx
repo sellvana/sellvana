@@ -150,6 +150,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
                 optNo: "no",
                 value: "1"
             };
+        },
+        componentDidMount: function () {
+            $(this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.props.onChange);
         }
     });
 

@@ -42,6 +42,7 @@ modules:
                 FCom_PushServer: 0.1.0
                 FCom_Referrals: 0.1.0
                 FCom_Sales: 0.1.0
+                FCom_SalesTax: 0.1.0
                 FCom_SampleData: 0.1.0
                 FCom_Seo: 0.1.0
                 FCom_ShippingPlain: 0.1.0

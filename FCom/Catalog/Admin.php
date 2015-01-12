@@ -64,11 +64,6 @@ class FCom_Catalog_Admin extends BClass
         ]);
     }
 
-    public function onProductsEditPost($args)
-    {
-print_r($args); exit;
-    }
-
     public function onNavTreeForm($args)
     {
         $args['node_types']['category'] = 'Category';

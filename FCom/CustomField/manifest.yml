@@ -28,7 +28,7 @@ modules:
                 security:
                     request_fields_whitelist:
                         /catalog/products/form:
-                            POST/custom_fields: "*"
+                            POST/custom_fields: "+"
 
             FCom_Frontend:
                 auto_use: [ views ]

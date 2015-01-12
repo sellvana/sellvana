@@ -79,6 +79,10 @@ class FCom_CustomField_Admin extends BClass
             $model->setData('custom_fields', $data['custom_fields']);
         }
 
+        if (empty($data['vfields']) && empty($data['variants'])) {
+            return;
+        }
+
         // get new variant fields data from form
         $varFieldsData = [];
         if (!empty($data['vfields'])) {
@@ -195,7 +199,11 @@ class FCom_CustomField_Admin extends BClass
             $prodVariantHlp->delete_many($where);
 
             $invHlp = $this->FCom_Catalog_Model_InventorySku;
-            $invModels = $invHlp->orm()->where_in('inventory_sku', $variantInventorySkus)->find_many_assoc('inventory_sku');
+            if ($variantInventorySkus) {
+                $invModels = $invHlp->orm()->where_in('inventory_sku', $variantInventorySkus)->find_many_assoc('inventory_sku');
+            } else {
+                $invModels = [];
+            }
 
             // update matched variant models and create new variants
             foreach ($variantsData as $i => $vd) {

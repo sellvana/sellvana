@@ -381,7 +381,7 @@ class BDb
                     } else {
                         if (isset($v[0]) && is_array($v[0])) { // `field` IN (?)
                             $v = $v[0];
-                            $sql = str_replace('(?)', '(' . str_pad('', sizeof($v) * 2-1, '?,') . ')', $sql);
+                            $sql = str_replace('(?)', '(' . str_pad('', sizeof($v)*2-1, '?,') . ')', $sql);
                         }
                         $where[] = '(' . $sql . ')';
                         $params = array_merge($params, $v);
@@ -405,7 +405,7 @@ class BDb
                 $params = array_merge($params, $p);
             } elseif (is_array($v)) {
                 $f = static::sanitizeFieldName($f);
-                $where[] = "({$f} IN (" . str_pad('', sizeof($v) * 2-1, '?,') . "))";
+                $where[] = "({$f} IN (" . str_pad('', sizeof($v)*2-1, '?,') . "))";
                 $params = array_merge($params, $v);
             } elseif (null === $v) {
                 $f = static::sanitizeFieldName($f);
@@ -416,7 +416,7 @@ class BDb
                 $params[] = $v;
             }
         }
-        $where = join($or ? " OR " : " AND ", $where);
+        $where = '(' . join($or ? " OR " : " AND ", $where) . ')';
         // Additional protection against multiple queries separator
         if (sizeof(static::splitQueries($where)) > 1) {
             throw new BException('Invalid SQL query');
@@ -607,6 +607,12 @@ EOT
     */
     public static function ddlTableDef($fullTableName, $def, $connectionName = null)
     {
+        /*
+        // disabled for now because too many other changes required
+        if (class_exists($fullTableName) && method_exists($fullTableName, 'table')) {
+            $fullTableName = $fullTableName::table();
+        }
+        */
         $fields = !empty($def['COLUMNS']) ? $def['COLUMNS'] : null;
         $primary = !empty($def['PRIMARY']) ? $def['PRIMARY'] : null;
         $indexes = !empty($def['KEYS']) ? $def['KEYS'] : null;
@@ -1253,7 +1259,7 @@ class BORM extends ORMWrapper
      */
     public function where($column_name, $value = null)
     {
-        if (is_array($column_name) && null === $value) {
+        if (is_array($column_name) && (null === $value || false === $value || true === $value)) {
             return $this->where_complex($column_name, !!$value);
         }
         return parent::where($column_name, $value);
@@ -1783,7 +1789,8 @@ class BORM extends ORMWrapper
             $s['p'] = $s['mp']; // limit to max page
         }
         if ($s['s']) {
-            $this->{'order_by_' . $s['sd']}($s['s']); // sort rows if requested
+            $ord = 'asc' === $s['sd'] || 'desc' === $s['sd'] ? $s['sd'] : 'asc';
+            $this->{'order_by_' . $ord}($s['s']); // sort rows if requested
         }
         $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p'] - 1) * $s['ps']); // start from requested row or page
         if (empty($d['donotlimit'])) {
