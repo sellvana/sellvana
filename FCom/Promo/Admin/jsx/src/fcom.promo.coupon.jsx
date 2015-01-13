@@ -39,11 +39,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                     <div className="well well-sm help-block" style={{fontSize:12}}>
                         <p>{Locale._("You can have unique coupon codes generated for you automatically if you input simple patterns.")}</p>
                         <p>{Locale._("Pattern examples:")}</p>
-                        <p><code>&#123;U8&#125;</code>{Locale._(" - 8 upper case alpha chars - will result to something like ")}<code>DKABWJKQ</code></p>
-                        <p><code>&#123;l6&#125;</code>{Locale._(" - 6 lower case alpha chars - will result to something like ")}<code>dkabkq</code></p>
+                        <p><code>&#123;U8&#125;</code>{Locale._(" - 8 alpha chars - will result to something like ")}<code>DKABWJKQ</code></p>
                         <p><code>&#123;D4&#125;</code>{Locale._(" - 4 digits - will result to something like ")}<code>5640</code></p>
-                        <p><code>&#123;UD5&#125;</code>{Locale._(" - 5 alphanumeric (upper case) - will result to something like ")}<code>GHG76</code></p>
-                        <p><code>&#123;ULD5&#125;</code>{Locale._(" - 5 alphanumeric (mixed case) - will result to something like ")}<code>GhG76</code></p>
+                        <p><code>&#123;UD5&#125;</code>{Locale._(" - 5 alphanumeric - will result to something like ")}<code>GHG76</code></p>
                         <p><code>CODE-&#123;U4&#125;-&#123;UD6&#125;</code> - <code>CODE-HQNB-8A1NO3</code></p>
                         <p>Locale._("Note: dynamic parts of the code MUST be enclosed in &#123;&#125;")</p>
                     </div>
@@ -84,20 +82,34 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
             return (
                 <div className="multi-coupon form-group" style={{margin: "15px 0"}}>
                     <div className="btn-group col-md-offset-3">
-                        <Components.Button onClick={this.props.onShowCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onShowCodes} className="btn-primary" type="button">{this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel}</Components.Button>
                         <Components.Button onClick={this.props.onGenerateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
                         <Components.Button onClick={this.props.onImportCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
                     </div>
                 </div>
             );
         },
+        componentDidMount: function () {
+            var self = this;
+            $(document).on("grid_count_update", function (ev) {
+                var count = ev.numCodes;
+                if(count) {
+                    var newLabel = self.props.buttonViewLabelTemplate.replace('%d%', count);
+                    self.setState({buttonViewLabel: newLabel});
+                }
+            });
+        },
         getDefaultProps: function () {
             // component default properties
             return {
-                buttonViewLabel: Locale._("View (100) codes"),
+                buttonViewLabel: Locale._("View Codes"),
                 buttonGenerateLabel: Locale._("Generate New Codes"),
-                buttonImportLabel: Locale._("Import Existing Codes")
+                buttonImportLabel: Locale._("Import Existing Codes"),
+                buttonViewLabelTemplate: Locale._("View (%d%) Codes")
             }
+        },
+        getInitialState: function () {
+            return {};
         }
     });
 
@@ -156,6 +168,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
         render: function () {
             //noinspection BadExpressionStatementJS
             var child = "";
+            var viewLabel = this.props.options.buttonViewLabel || this.props.buttonViewLabel;
 
             if (this.state.mode == 1) {
                 child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
@@ -164,9 +177,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                 var onShowCodes = this.onShowCodes ||'',
                     onGenerateCodes = this.onGenerateCodes ||'',
                     onImportCodes = this.onImportCodes ||'';
-                child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
-                    <MultiCoupon key="multi-coupon" options={this.props.options} onImportCodes={onImportCodes}
-                    onGenerateCodes={onGenerateCodes} onShowCodes={onShowCodes} labelClass={this.props.labelClass}/>]
+                child = <MultiCoupon key="multi-coupon" options={this.props.options} onImportCodes={onImportCodes}
+                    onGenerateCodes={onGenerateCodes} onShowCodes={onShowCodes} labelClass={this.props.labelClass}
+                    buttonViewLabel={viewLabel}/>;
             }
             return (
                 <div className="coupon-app">
@@ -179,7 +192,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
         getDefaultProps: function () {
             // component default properties
             return {
-                labelClass: labelClass
+                labelClass: labelClass,
+                buttonViewDefaultLabel: Locale._("View Codes")
             }
         },
         getInitialState: function () {
