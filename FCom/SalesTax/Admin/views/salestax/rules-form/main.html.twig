@@ -1,0 +1,16 @@
+<!--{ label: {{ 'Tax Rule Info'|_ }} }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% set fieldData = { validator:validator } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<fieldset name="main-product">
+    <div class="f-section">
+        {{ forms.input(fieldData, {field:'title', required:1, label:'Title'|_}) }}
+        {{ forms.boolean(fieldData, {field:'match_all_product_classes', label:'Match All Product Classes'}) }}
+        {{ forms.boolean(fieldData, {field:'match_all_customer_classes', label:'Match All Customer Classes'}) }}
+        {{ forms.boolean(fieldData, {field:'match_all_zones', label:'Match All Zones'}) }}
+    </div>
+</fieldset>

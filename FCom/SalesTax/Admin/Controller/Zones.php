@@ -15,7 +15,10 @@ class FCom_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abstrac
     protected $_recordName = 'Tax Zone';
     protected $_mainTableAlias = 'z';
     protected $_navPath = 'sales/tax/zones';
-    protected $_permission = 'salestax_zones';
+    protected $_permission = 'sales/tax/zones';
+
+    #protected $_gridPageViewName = 'admin/griddle';
+    #protected $_gridViewName = 'core/griddle';
 
     public function gridConfig()
     {
@@ -27,20 +30,19 @@ class FCom_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abstrac
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 50],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title',
-                'validation' => ['required' => true, 'unique' => $this->BApp->href('salestax/zones/unique')],
+            ['name' => 'title', 'label' => 'Title',
                 'editable' => true, 'addable' => true],
-            ['type' => 'select', 'name' => 'zone_type', 'label' => 'Type',
-                'options' => $zoneTypeOptions, 'editable' => true, 'addable' => true],
-            ['type' => 'select', 'name' => 'country', 'label' => 'Country',
-                'options' => $countries, 'editable' => true, 'addable' => true],
-            ['type' => 'text', 'name' => 'region', 'label' => 'Region',
+            ['name' => 'zone_type', 'label' => 'Zone Type', 'options' => $zoneTypeOptions,
+                'editor' => 'select', 'editable' => true, 'addable' => true, 'type' => 'select'],
+            ['name' => 'country', 'label' => 'Country', 'options' => $countries,
+                'editor' => 'select', 'editable' => true, 'addable' => true, 'type' => 'select'],
+            ['name' => 'region', 'label' => 'Region',
                 'editable' => true, 'addable' => true],
-            ['type' => 'text', 'name' => 'postcode_from', 'label' => 'From Postcode',
+            ['name' => 'postcode_from', 'label' => 'From Postcode',
                 'editable' => true, 'addable' => true],
-            ['type' => 'text', 'name' => 'postcode_to', 'label' => 'To Postcode',
+            ['name' => 'postcode_to', 'label' => 'To Postcode',
                 'editable' => true, 'addable' => true],
-            ['type' => 'input', 'name' => 'zone_rate_percent', 'label' => 'Zone Rate',
+            ['name' => 'zone_rate_percent', 'label' => 'Zone Rate',
                 'editable' => true, 'addable' => true],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
@@ -58,6 +60,14 @@ class FCom_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abstrac
             ['field' => 'zone_rate_percent', 'type' => 'number-range'],
         ];
         $config['new_button'] = '#add_new_zone';
+
+        if (!empty($config['orm'])) {
+            if (is_string($config['orm'])) {
+                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
+            }
+            $this->gridOrmConfig($config['orm']);
+        }
+
         return $config;
     }
 
