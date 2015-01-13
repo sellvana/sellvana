@@ -226,7 +226,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
                                 <button type="button" className="close" onClick={this.handleCancel}>
                                 &times;
                                 </button>
-                                <h3>{this.props.title}</h3>
+                                <h4 className="modal-title">{this.props.title}</h4>
                             </div>
                             <div className="modal-body">
                                 {this.props.children}

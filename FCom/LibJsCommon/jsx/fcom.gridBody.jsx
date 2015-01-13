@@ -13,28 +13,26 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
         getDefaultProps: function () {
             return {
                 "data": [],
+                "originalData": [],
                 "columnMetadata": [],
                 "className": ""
             }
-        },
-        componentDidMount: function () {
-            //add modal form
-            console.log('dom node', this.getDOMNode());
         },
         doButtonAction: function(event) {
             var that = this;
             var action = event.target.dataset.action;
             var rowId = event.target.dataset.row;
             var gridId = this.props.getConfig('id');
+            var data = this.props.originalData ? this.props.originalData : this.props.data;
 
             switch (action) {
                 case 'edit':
                     console.log('render modal');
-                    var row = _.findWhere(this.props.data, {id: rowId});
+                    var row = _.findWhere(data, {id: rowId});
                     var modalEleContainer = document.getElementById(gridId + '-modal');
-                    React.unmountComponentAtNode(modalEleContainer);
+                    React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        <Components.Modal show={true}>
+                        <Components.Modal show={true} title="Edit Form" confirm="Save changes" cancel="Close">
                             <FComModalForm columnMetadata={that.props.columnMetadata} row={row} id={gridId} />
                         </Components.Modal>,
                         modalEleContainer
@@ -208,7 +206,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                 } else {
                     return (
                         <th onClick={that.sort} data-title={col} className={columnSort}>
-                            <a href="#" className="js-change-url" onClick={that.triggerSort}> {displayName} </a>
+                            <a href="#" className="js-change-url" onClick={that.triggerSort}>{displayName}</a>
                         </th>
                     );
                 }
@@ -239,6 +237,21 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                 isNew: (this.props.row.id > 0)
             }
         },
+        componentDidMount: function () {
+            console.log('row', this.props.row);
+            var that = this;
+
+            //update value for element is rendered as element_print
+            $(this.getDOMNode()).find('.element_print').find('input, select, textarea').each(function() {
+                var name = $(this).attr('name');
+                var value = (typeof that.props.row[name] !== 'undefined') ? that.props.row[name] : '';
+                $(this).val(that.text2html(value));
+            });
+        },
+        text2html: function (val) { //todo: separate as mixins if need
+            var text = $.parseHTML(val);
+            return (text != null) ? text[0].data: null;
+        },
         render: function () {
             var that = this;
             var gridId = this.props.id;
@@ -263,9 +276,11 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
 
                 var input = '';
                 if (typeof column.element_print != 'undefined') { //custom html for element_print
-                    input = '<div class="form-group"><div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                    if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
+                        input = '<div class="form-group"><div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                    }
                     input += '<div class="controls col-sm-8">' + column.element_print + '</div></div>';
-                    return <div className="form-group" dangerouslySetInnerHTML={{__html: input}}></div>
+                    return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
                 } else {
                     switch (column.editor) {
                         case 'select':
