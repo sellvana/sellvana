@@ -91,7 +91,7 @@ class ImageResizer
         $regex = '#^(https?:)?//' . preg_quote($httpHost . $webFolder, '#') . '#';
         $referrer = $_SERVER['HTTP_REFERER'];
         if (!$httpHost || !preg_match($regex, $referrer)) {
-            $this->restrict($msg);
+            $this->restrict();
         }
     }
 

@@ -15,7 +15,7 @@ class FCom_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Controlle
     protected $_recordName = 'Product Tax Class';
     protected $_mainTableAlias = 'tp';
     protected $_navPath = 'sales/tax/product-classes';
-    protected $_permission = 'salestax_product_classes';
+    protected $_permission = 'sales/tax/product_classes';
 
     public function gridConfig()
     {

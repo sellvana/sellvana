@@ -15,7 +15,7 @@ class FCom_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Controll
     protected $_recordName = 'Customer Tax Class';
     protected $_mainTableAlias = 'tc';
     protected $_navPath = 'sales/tax/customer-classes';
-    protected $_permission = 'salestax_customer_classes';
+    protected $_permission = 'sales/tax/customer_classes';
 
     public function gridConfig()
     {
