@@ -140,7 +140,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
             // component default properties
             return {
                 labelUpc: Locale._("Uses Per Customer"),
-                labelUt: Locale._("Total Uses"),
+                labelUt: Locale._("Total Uses Per Coupon Code"),
                 idUpc: "coupon_uses_per_customer",
                 idUt: "coupon_uses_total",
                 helpTextUpc: Locale._("How many times a user can use a coupon?"),
