@@ -165,6 +165,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         }
     });
 
+    /**
+     * {@link https://github.com/facebook/react/blob/master/examples/jquery-bootstrap/js/app.js}
+     */
     FCom.Components.Modal = React.createClass({
         // The following methods are the only places we need to
         // integrate with Bootstrap or jQuery!
@@ -172,9 +175,17 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             // When the component is added, turn it into a modal
             $(this.getDOMNode())
                 .modal({backdrop: 'static', keyboard: false, show: false});
-            this.props.onLoad(this);
+            if (this.props.show) {
+                this.open();
+            }
+            if (this.props.onLoad) {
+                this.props.onLoad(this);
+            }
         },
         componentDidUpdate: function (prevProps, prevState) {
+            if (this.props.show) {
+                this.open();
+            }
             if (this.props.onUpdate) {
                 this.props.onUpdate(this, prevProps, prevState);
             }
@@ -208,14 +219,14 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             }
 
             return (
-                <div className="modal">
+                <div className="modal" id={this.props.id}>
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <button type="button" className="close" onClick={this.handleCancel}>
                                 &times;
                                 </button>
-                                <h3>{this.props.title}</h3>
+                                <h4 className="modal-title">{this.props.title}</h4>
                             </div>
                             <div className="modal-body">
                                 {this.props.children}
@@ -248,7 +259,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             return {
                 confirm: Locale._("OK"),
                 cancel: Locale._("Cancel"),
-                title: Locale._("Title")
+                title: Locale._("Title"),
+                id: 'fcom-modal-form-wrapper',
+                show: false //show modal after render
             }
         }
     });

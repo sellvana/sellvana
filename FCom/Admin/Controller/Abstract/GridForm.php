@@ -76,8 +76,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'edit_url' => $gridDataUrl,
             'grid_url' => $gridHtmlUrl,
             'form_url' => $formUrl,
-            'columns' => [
-            ],
+            'columns' => [],
         ];
         $config = array_merge($config, $this->_gridConfig);
         return $config;

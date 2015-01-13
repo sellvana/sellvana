@@ -3,7 +3,8 @@
 /**
  * FCom GridBody Component
  */
-define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
+define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React, FComRow, Components) {
+
     /*
      var React = require('react');
      var GridRowContainer = require('./gridRowContainer.jsx');
@@ -12,23 +13,70 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
         getDefaultProps: function () {
             return {
                 "data": [],
-                "metadataColumns": [],
+                "originalData": [],
+                "columnMetadata": [],
                 "className": ""
+            }
+        },
+        doButtonAction: function(event) {
+            var that = this;
+            var action = event.target.dataset.action;
+            var rowId = event.target.dataset.row;
+            var gridId = this.props.getConfig('id');
+            var data = this.props.originalData ? this.props.originalData : this.props.data;
+
+            switch (action) {
+                case 'edit':
+                    console.log('render modal');
+                    var row = _.findWhere(data, {id: rowId});
+                    var modalEleContainer = document.getElementById(gridId + '-modal');
+                    React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
+                    React.render(
+                        <Components.Modal show={true} title="Edit Form" confirm="Save changes" cancel="Close">
+                            <FComModalForm columnMetadata={that.props.columnMetadata} row={row} id={gridId} />
+                        </Components.Modal>,
+                        modalEleContainer
+                    );
+                    break;
+                case 'delete':
+                    var confirm = false;
+                    if ($(event.target).hasClass('noconfirm')) {
+                        confirm = true;
+                    } else {
+                        confirm = window.confirm("Do you want to really delete?");
+                    }
+
+                    if (confirm) {
+                        var editUrl = this.props.getConfig('edit_url');
+                        if (editUrl.length > 0 && rowId) {
+                            $.post(editUrl, {id: rowId, oper: 'del'}, function() {
+                                that.props.refresh();
+                            });
+                        }
+                    }
+                    break;
+                default:
+                    console.log('doButtonAction');
+                    break;
             }
         },
         render: function () {
             var that = this;
+            /*console.log('FComGridBody.columnMetadata', this.props.columnMetadata);
+            console.log('FComGridBody.columns', this.props.columns);*/
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn} sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata}/>;
 
             var nodes = this.props.data.map(function (row, index) {
-                return <FComRow data={row} index={index} metadataColumns={that.props.metadataColumns} columnMetadata={that.props.columnMetadata} />
+                return <FComRow row={row} index={index} columns={that.props.columns} columnMetadata={that.props.columnMetadata} getConfig={that.props.getConfig} doButtonAction={that.doButtonAction} />
             });
 
             return (
                 <table className={this.props.className}>
                     {title}
-                    {nodes}
+                    <tbody>
+                        {nodes}
+                    </tbody>
                 </table>
             );
         }
@@ -158,7 +206,7 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
                 } else {
                     return (
                         <th onClick={that.sort} data-title={col} className={columnSort}>
-                            <a href="#" className="js-change-url" onClick={that.triggerSort}> {displayName} </a>
+                            <a href="#" className="js-change-url" onClick={that.triggerSort}>{displayName}</a>
                         </th>
                     );
                 }
@@ -174,9 +222,101 @@ define(['react', 'jsx!griddle.fcomRow'], function (React, FComRow) {
         }
     });
 
+    /**
+     * form content for modal
+     */
+    var FComModalForm = React.createClass({
+        getDefaultProps: function () {
+            return {
+                'row': {},
+                'id': 'modal-form'
+            }
+        },
+        getInitialState: function () {
+            return {
+                isNew: (this.props.row.id > 0)
+            }
+        },
+        componentDidMount: function () {
+            console.log('row', this.props.row);
+            var that = this;
+
+            //update value for element is rendered as element_print
+            $(this.getDOMNode()).find('.element_print').find('input, select, textarea').each(function() {
+                var name = $(this).attr('name');
+                var value = (typeof that.props.row[name] !== 'undefined') ? that.props.row[name] : '';
+                $(this).val(that.text2html(value));
+            });
+        },
+        text2html: function (val) { //todo: separate as mixins if need
+            var text = $.parseHTML(val);
+            return (text != null) ? text[0].data: null;
+        },
+        render: function () {
+            var that = this;
+            var gridId = this.props.id;
+
+            //console.log('row', this.props.row);
+
+            var nodes = this.props.columnMetadata.map(function(column) {
+                if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) {
+                    return null;
+                }
+
+                var label = '';
+                if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
+                    label = (
+                        <div className="control-label col-sm-3">
+                            <label for={column.name}>
+                                {column.label}
+                            </label>
+                        </div>
+                    );
+                }
+
+                var input = '';
+                if (typeof column.element_print != 'undefined') { //custom html for element_print
+                    if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
+                        input = '<div class="form-group"><div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                    }
+                    input += '<div class="controls col-sm-8">' + column.element_print + '</div></div>';
+                    return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
+                } else {
+                    switch (column.editor) {
+                        case 'select':
+                            var options = [];
+                            _.forEach(column.options, function(text, value) {
+                                options.push(<option value={value} defaultValue={that.props.row[column.name]}>{text}</option>);
+                            });
+                            input = <select name={column.name} id={column.name} className="form-control">{options}</select>;
+                            //console.log('options', options);
+                            break;
+                        case 'textarea':
+                            input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={that.props.row[column.name]} />;
+                            //console.log(column.name, that.props.row[column.name]);
+                            break;
+                        default:
+                            input = <input name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]} />;
+                            //console.log(column.name, that.props.row[column.name]);
+                            break;
+                    }
+                }
+
+                return (
+                    <div className="form-group">
+                        {label} <div className="controls col-sm-8">{input}</div>
+                    </div>
+                )
+            });
 
 
-
+            return (
+                <form className="form form-horizontal validate-form" id={gridId + '-modal-form'}>
+                    {nodes}
+                </form>
+            )
+        }
+    });
 
     //module.exports = FComGridBody;
     return FComGridBody;
