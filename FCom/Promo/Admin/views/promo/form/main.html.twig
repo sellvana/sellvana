@@ -4,6 +4,7 @@
 {% set promo = APP.instance('FCom_Promo_Model_Promo') %}
 {% set validator = THIS.get('validator') %}
 {% set labelClass = "col-md-3" %}
+{% set numCodes = 100 %}
 
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
@@ -144,7 +145,8 @@
                     debug: true,
                     base_url: "{{ APP.href('promo/') }}",
                     id_var: 'id',
-                    entity_id: '{{ m.id() }}'
+                    entity_id: '{{ m.id() }}',
+                    buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "View no codes" }}'
                 };
                 Promo.init(options);
             });

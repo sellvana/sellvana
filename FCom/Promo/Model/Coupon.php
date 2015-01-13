@@ -39,7 +39,7 @@ class FCom_Promo_Model_Coupon extends BModel
         $paramsCount = empty($params['count'])? 1: (int)$params['count'];
         if (empty($params['pattern'])) { // no pattern supplied, first generate a random pattern
             $length = empty($params['length'])? 8: (int)$params['length'];
-            $pattern = '{UDL' . $length . '}';
+            $pattern = '{UD' . $length . '}';
         } else {
             $pattern = $params['pattern'];
         }

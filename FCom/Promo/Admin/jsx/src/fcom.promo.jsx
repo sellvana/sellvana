@@ -282,8 +282,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         updateGrid: function (grid_id, newRows) {
             var grid = window[grid_id];
             if (grid) {
+                console.log("grid found, adding to grid");
                 Promo.addGridRows(grid, newRows)
             } else {
+                console.log("grid not loaded yet, adding to store");
                 var codes = store.get('promo.coupons'); // check of there are other codes stored and if yes, merge them
                 if(codes) {
                     codes = JSON.parse(codes);
@@ -307,6 +309,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 return row;
             });
             gridRows.add(newRows, {merge: true}).trigger('build');
+            $(document).trigger({ // trigger event which will upgrade the grid
+                type: "grid_count_update",
+                numCodes: gridRows.size()
+            });
         }
     };
     window.couponsGridRegister = function (grid) {

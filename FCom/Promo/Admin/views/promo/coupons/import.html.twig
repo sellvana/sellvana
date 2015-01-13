@@ -20,6 +20,7 @@
                         <div class="form-group">
                             <button class="btn btn-primary" type="button"
                                     id="promo-import-paste-codes-btn">{{ "Import codes"|_ }}</button>
+                            <span style="display: none;margin-left: 20px;" class="result"></span>
                         </div>
                     </form>
                 </div>
@@ -171,6 +172,7 @@
                         $("#promo-import-paste-codes-btn").on('click', function (ev) {
                             ev.preventDefault();
                             console.log("validating");
+                            var $result = $(this).parent().find('span.result').hide();
                             if ($pasteForm.valid()) {
                                 codes = []; // nullify codes, only push to grid new codes
                                 console.log("parsing");
@@ -192,13 +194,17 @@
                                     }
                                 });
                                 if (codes.length) {
+                                    $result.text("Found " + codes.length + " new " + (codes.length > 1 ? "codes." : "code."));
                                     $(document).trigger({ // trigger event which will upgrade the grid
                                         type: "coupon_import",
                                         codes: codes,
                                         grid_id: '{{config.id}}_grid'
                                     });
+                                } else {
+                                    $result.text("No new codes found.")
                                 }
                             }
+                            $result.show();
                         });
                     });
                 </script>

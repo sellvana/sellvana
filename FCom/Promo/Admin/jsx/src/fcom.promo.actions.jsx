@@ -704,7 +704,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
 
     var ActionsApp = React.createClass({
         render: function () {
-            return (<div className="actions panel panel-default">
+            return (<div className="actions">
                     {this.state.data.map(function (field) {
                         //todo make a field based on field
                         var el;
