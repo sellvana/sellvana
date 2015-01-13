@@ -62,12 +62,17 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         modal: null,
         modalContent: null,
         handleConfigure: function () {
-            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm}
+            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm} onCancel={this.handleConditionsCancel}
                 title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
                 <DiscountDetailsCombinationsModalContent  baseUrl={this.props.options.base_url} onLoad={this.registerModalContent} />
             </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
+        },
+        handleConditionsCancel: function (modal) {
+            modal.close();
+            var mc = this.modalContent;
+            mc.setState({fields: [], values:{}});
         },
         handleConditionsConfirm: function (modal) {
             var mc = this.modalContent;
