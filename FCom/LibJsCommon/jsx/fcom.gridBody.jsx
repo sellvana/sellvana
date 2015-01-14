@@ -18,6 +18,38 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                 "className": ""
             }
         },
+        modalSaveChange: function(modal) {
+            var that = this;
+            var url = this.props.getConfig('edit_url');
+            if (url) {
+                var hash = { oper: 'edit' };
+                var form = $(modal.getDOMNode()).find('form');
+                form.find('textarea, input, select').each(function() {
+                    var key = $(this).attr('id');
+                    var val = $(this).val();
+                    hash[key] = $('<div/>').text(val).html();
+                });
+
+                console.log('hash', hash);
+
+                //validate action
+                var validate = true;
+
+                if (validate) {
+                    $.post(url, hash, function(data) {
+                        if (data) {
+                            that.props.refresh();
+                            modal.close();
+                        } else {
+                            console.log('error when save')
+                        }
+                    });
+                } else {
+                    //error
+                    console.log('error');
+                }
+            }
+        },
         doButtonAction: function(event) {
             var that = this;
             var action = event.target.dataset.action;
@@ -32,7 +64,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        <Components.Modal show={true} title="Edit Form" confirm="Save changes" cancel="Close">
+                        <Components.Modal show={true} title="Edit Form" confirm="Save changes" cancel="Close" onConfirm={this.modalSaveChange}>
                             <FComModalForm columnMetadata={that.props.columnMetadata} row={row} id={gridId} />
                         </Components.Modal>,
                         modalEleContainer
@@ -248,10 +280,6 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                 $(this).val(that.text2html(value));
             });
         },
-        text2html: function (val) { //todo: separate as mixins if need
-            var text = $.parseHTML(val);
-            return (text != null) ? text[0].data: null;
-        },
         render: function () {
             var that = this;
             var gridId = this.props.id;
@@ -277,18 +305,18 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                 var input = '';
                 if (typeof column.element_print != 'undefined') { //custom html for element_print
                     if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
-                        input = '<div class="form-group"><div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                        input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
                     }
-                    input += '<div class="controls col-sm-8">' + column.element_print + '</div></div>';
+                    input += '<div class="controls col-sm-8">' + column.element_print + '</div>';
                     return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
                 } else {
                     switch (column.editor) {
                         case 'select':
                             var options = [];
                             _.forEach(column.options, function(text, value) {
-                                options.push(<option value={value} defaultValue={that.props.row[column.name]}>{text}</option>);
+                                options.push(<option value={value}>{text}</option>);
                             });
-                            input = <select name={column.name} id={column.name} className="form-control">{options}</select>;
+                            input = <select name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]}>{options}</select>;
                             //console.log('options', options);
                             break;
                         case 'textarea':
@@ -309,6 +337,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                 )
             });
 
+            nodes.push(<input type="hidden" name="id" id="id" value={this.props.row.id} />);
 
             return (
                 <form className="form form-horizontal validate-form" id={gridId + '-modal-form'}>

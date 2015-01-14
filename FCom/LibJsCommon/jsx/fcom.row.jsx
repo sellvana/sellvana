@@ -124,6 +124,26 @@ define(['underscore', 'react'], function (_, React) {
                         );
                         break;
                     case 'input':
+                        if (col.editable !== 'inline') {
+                            switch (col.editor) {
+                                case 'checkbox':
+                                case 'radio':
+                                    node = that.props.row[col.name] ? 'Yes' : 'No';
+                                    break;
+                                case 'select':
+                                    console.log('select');
+                                    console.log('that.props.row[col.name]', that.props.row[col.name]);
+                                    console.log('col.options', col.options);
+                                    node = col.options && col.options[that.props.row[col.name]] ? col.options[that.props.row[col.name]] : that.props.row[col.name];
+                                    break;
+                                default:
+                                    node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                                    break;
+                            }
+                        } else { //todo: add inline row
+                            node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                        }
+                        break;
                     default:
                         if (col.display == 'eval') {
                             //use rc for compatibility old backbone grid
