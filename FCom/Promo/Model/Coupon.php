@@ -45,8 +45,11 @@ class FCom_Promo_Model_Coupon extends BModel
         }
         $codes = $this->prepareCodes($pattern, $paramsCount);
 
-        //$count = $this->createCouponCodes($codes, $promo->id());
-        $count = count($codes);
+        if (isset($promo)) {
+            $count = $this->createCouponCodes($codes, $promo->id());
+        } else {
+            $count = count($codes);
+        }
 
         return ['generated' => $count, 'failed' => ($paramsCount - $count), 'codes' => $codes];
     }
@@ -118,10 +121,11 @@ class FCom_Promo_Model_Coupon extends BModel
     }
 
     /**
-     * @param $fileName
+     * @param      $fileName
+     * @param null $promoId
      * @return bool|int
      */
-    public function importFromFile($fileName, $promoId)
+    public function importFromFile($fileName, $promoId = null)
     {
         $fh = fopen($fileName, 'r');
         if (!$fh) {
@@ -143,8 +147,11 @@ class FCom_Promo_Model_Coupon extends BModel
 
         $codes = $this->filterOutExistingCodes($codes); // do not allow duplicate codes?
 
-        //$count = $this->createCouponCodes($codes, $promoId);
-        $count = count($codes);
+        if (null != $promoId) {
+            $count = $this->createCouponCodes($codes, $promoId);
+        } else {
+            $count = count($codes);
+        }
 
         return ['generated' => $count, 'failed' => ($paramsCount - $count), 'codes' => array_keys($codes)];
     }

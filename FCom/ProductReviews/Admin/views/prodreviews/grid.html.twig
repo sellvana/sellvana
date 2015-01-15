@@ -11,7 +11,8 @@
   </div>
 
   <div class="f-admin-main">
-      {{ THIS.view('core/backbonegrid').set('grid', {config: grid['config']}) | raw }}
+      {#{{ THIS.view('core/backbonegrid').set('grid', {config: grid['config']}) | raw }}#}
+      {{ THIS.view('core/griddle').set('grid', {config: grid['config']}) | raw }}
   </div>
 </div>
 <script>

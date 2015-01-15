@@ -199,8 +199,9 @@ class FCom_Core_Main extends BClass
         }
 
         $configDir = $config->get('fs/config_dir');
-        if (file_exists($configDir . '/core.php')) {
-            $config->addFile('core.php', true);
+        $coreConfigFile = $config->get('fs/config_file_core', $configDir . '/' . 'core.php');
+        if (file_exists($coreConfigFile)) {
+            $config->addFile($coreConfigFile, true);
         }
 
         $randomDirName = $config->get('core/storage_random_dir');
@@ -359,8 +360,9 @@ class FCom_Core_Main extends BClass
         $modReg = $this->BModuleRegistry;
 
         //TODO: Figure out how to load db config only once
-        if (file_exists($configDir . '/db.php')) {
-            $config->addFile('db.php', true);
+        $dbConfigFile = $config->get('fs/config_file_db', $configDir . '/' . 'db.php');
+        if (file_exists($dbConfigFile)) {
+            $config->addFile($dbConfigFile, true);
         }
         $cacheConfig = $config->get('core/cache/manifest_files');
         $useProductionCache = $cacheConfig === 'enable'
@@ -407,11 +409,13 @@ class FCom_Core_Main extends BClass
             $modReg->saveManifestCache(); //TODO: call explicitly
         }
 
-        if (file_exists($configDir . '/db.php')) {
-            $config->addFile('db.php', true);
+        if (file_exists($dbConfigFile)) {
+            $config->addFile($dbConfigFile, true);
         }
-        if (file_exists($configDir . '/local.php')) {
-            $config->addFile('local.php', true);
+
+        $localConfigFile = $config->get('fs/config_file_local', $configDir . '/' . 'local.php');
+        if (file_exists($localConfigFile)) {
+            $config->addFile($localConfigFile, true);
         }
 
         $this->BClassAutoload->addPath($dirConf['local_dir']);

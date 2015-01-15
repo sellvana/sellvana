@@ -19,7 +19,7 @@ class FCom_Sales_Model_StateCustom extends FCom_Core_Model_Abstract
         'entity_type' => [
            "order" => "Order",
            "payment" => "Payment",
-           "shipment" => "shipment", 
+           "shipment" => "Shipment",
            "return" => "Return",
            "refund" => "Refund"
           ]
