@@ -103,7 +103,8 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
         if (true) {
             echo $this->_('<p>Assigning products to categories...</p>');
 
-            $this->BDb->run("TRUNCATE fcom_category_product");
+            $tCategoryProduct = $this->FCom_Catalog_Model_CategoryProduct->table();
+            $this->BDb->run("TRUNCATE {$tCategoryProduct}");
             $categories = $this->FCom_Catalog_Model_Category->orm()->where_raw("id_path like '1/%/%'")
                 ->find_many_assoc('id', 'url_path');
             $catIds = array_keys($categories);
