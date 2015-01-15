@@ -25,6 +25,7 @@ modules:
             - [ core/griddle, { view_class: FCom_Core_View_BackboneGrid } ]
             - [ core/medialib, { view_class: FCom_Core_View_Base } ]
             - [ core/attachmentgrid, { view_class: FCom_Core_View_Base } ]
+            - [ text, { view_class: FCom_Core_View_Text } ]
 
         routing:
             - [ /initialize.js, FCom_Core_Controller_Main.initialize_js ]
@@ -32,6 +33,7 @@ modules:
 
         observe:
             - [ "FCom_LibTwig_Main::init", FCom_Core_Main.onTwigInit ]
+            - [ "FCom_Core_LayoutEditor::fetchLibrary", "FCom_Core_LayoutEditor.onFetchLibrary" ]
 
         default_config:
             db:
