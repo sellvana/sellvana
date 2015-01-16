@@ -30,24 +30,21 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                     var val = $(this).val();
                     hash[key] = that.html2text(val);
                 });
-
-                //console.log('hash', hash);
-
-                //validate action
-                var validate = true;
-
-                if (validate) {
+                form.validate();
+                if (form.valid()) {
                     $.post(url, hash, function(data) {
                         if (data) {
                             that.props.refresh();
                             modal.close();
                         } else {
-                            alert('error when save')
+                            alert('error when save');
+                            return false;
                         }
                     });
                 } else {
                     //error
                     console.log('error');
+                    return false;
                 }
             }
         },
@@ -259,7 +256,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
      * form content for modal
      */
     var FComModalForm = React.createClass({
-        mixins: [FCom.Mixin],
+        mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function () {
             return {
                 'row': {},
@@ -285,25 +282,24 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
         render: function () {
             var that = this;
             var gridId = this.props.id;
-
             //console.log('row', this.props.row);
 
             var nodes = this.props.columnMetadata.map(function(column) {
-                if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) {
-                    return null;
-                }
+                if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
 
                 var label = '';
+                var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
                 if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
                     label = (
                         <div className="control-label col-sm-3">
                             <label for={column.name}>
-                                {column.label}
+                                {column.label} {iconRequired}
                             </label>
                         </div>
                     );
                 }
 
+                var validationRules = that.validationRules(column.validation);
                 var input = '';
                 if (typeof column.element_print != 'undefined') { //custom html for element_print
                     if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
@@ -318,27 +314,25 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                             _.forEach(column.options, function(text, value) {
                                 options.push(<option value={value}>{text}</option>);
                             });
-                            input = <select name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]}>{options}</select>;
-                            //console.log('options', options);
+                            input = <select name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]} {...validationRules}>{options}</select>;
                             break;
                         case 'textarea':
-                            input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={that.props.row[column.name]} />;
-                            //console.log(column.name, that.props.row[column.name]);
+                            input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={that.props.row[column.name]} {...validationRules} />;
                             break;
                         default:
-                            input = <input name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]} />;
-                            //console.log(column.name, that.props.row[column.name]);
+                            input = <input name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]} {...validationRules} />;
                             break;
                     }
                 }
 
                 return (
                     <div className="form-group">
-                        {label} <div className="controls col-sm-8">{input}</div>
+                        {label}<div className="controls col-sm-8">{input}</div>
                     </div>
                 )
             });
 
+            //add id
             nodes.push(<input type="hidden" name="id" id="id" value={this.props.row.id} />);
 
             return (

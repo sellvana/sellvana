@@ -65,53 +65,58 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             }
             return name;
         },
-        validationRules: function(rules) {
-            var str = '';
-            for (var key in rules) {
+        validationRules: function(data) {
+            var rules = {};
+            for (var key in data) {
+                if (!data.hasOwnProperty(key)) {
+                    continue;
+                }
                 switch (key) {
                     case 'required':
-                        str += 'data-rule-required="true" ';
+                        rules['data-rule-required'] = 'true';
                         break;
                     case 'email':
-                        str += 'data-rule-email="true" ';
+                        rules['data-rule-email'] = 'true';
                         break;
                     case 'number':
-                        str += 'data-rule-number="true" ';
+                        rules['data-rule-number'] = 'true';
                         break;
                     case 'digits':
-                        str += 'data-rule-digits="true" ';
+                        rules['data-rule-digits'] = 'true';
                         break;
                     case 'ip':
-                        str += 'data-rule-ipv4="true" ';
+                        rules['data-rule-ipv4'] = 'true';
                         break;
                     case 'url':
-                        str += 'data-rule-url="true" ';
+                        rules['data-rule-url'] = 'true';
                         break;
                     case 'phoneus':
-                        str += 'data-rule-phoneus="true" ';
+                        rules['data-rule-phoneus'] = 'true';
                         break;
                     case 'minlength':
-                        str += 'data-rule-minlength="' + rules[key] + '" ';
+                        rules['data-rule-minlength'] = data[key];
                         break;
                     case 'maxlength':
-                        str += 'data-rule-maxlength="' + rules[key] + '" ';
+                        rules['data-rule-maxlength'] = data[key];
                         break;
                     case 'max':
-                        str += 'data-rule-max="' + rules[key] + '" ';
+                        rules['data-rule-max'] = data[key];
                         break;
                     case 'min':
-                        str += 'data-rule-min="' + rules[key] + '" ';
+                        rules['data-rule-min'] = data[key];
                         break;
                     case 'range':
-                        str += 'data-rule-range="[' + rules[key][0] + ',' + rules[key][1] + ']" ';
+                        rules['data-rule-range'] = '[' + data[key][0] + ',' + data[key][1] + ']';
                         break;
                     case 'date':
-                        str += 'data-rule-dateiso="true" data-mask="9999-99-99" placeholder="YYYY-MM-DD" ';
+                        rules['data-rule-dateiso'] = 'true';
+                        rules['data-mask'] = '9999-99-99';
+                        rules['placeholder'] = 'YYYY-MM-DD';
                         break;
                 }
             }
 
-            return str;
+            return rules;
         }
     };
 
