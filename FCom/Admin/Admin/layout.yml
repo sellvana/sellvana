@@ -95,6 +95,11 @@ common_js_libs:
             - [ requireJs, fcom.core, "@FCom_Core/js/fcom.core" ]
             - [ requireJs, fcom.backbonegrid, "@FCom_Core/js/fcom/fcom.backbonegrid" ]
 
+            - [ requireJs, fcom.griddle, @FCom_Core/jsx/fcom/fcom.griddle, { deps : [ react, griddle ]} ]
+            - [ requireJs, griddle.fcomGridBody, @FCom_Core/jsx/fcom/fcom.gridBody, { deps : [ react, griddle ]} ]
+            - [ requireJs, griddle.fcomGridFilter, @FCom_Core/jsx/fcom/fcom.gridFilter, { deps : [ react, griddle ]} ]
+            - [ requireJs, griddle.fcomRow, @FCom_Core/jsx/fcom/fcom.row, { deps : [ react, griddle ]} ]
+
 lib_admin_theme1:
     - view: head
         do:
