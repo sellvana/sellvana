@@ -95,7 +95,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         $text = [];
         foreach ($history as $msg) {
             $text[] = [
-                'time' => gmdate("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
+                'time' => date("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
                 'username' => $msg->get('username'),
                 'text' => $msg->get('text'),
             ];

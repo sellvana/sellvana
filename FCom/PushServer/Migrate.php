@@ -11,7 +11,7 @@
 
 class FCom_PushServer_Migrate extends BClass
 {
-    public function install__0_1_5()
+    public function install__0_1_4()
     {
         $tChannel = $this->FCom_PushServer_Model_Channel->table();
         $tClient = $this->FCom_PushServer_Model_Client->table();
