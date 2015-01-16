@@ -10,12 +10,42 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
      var GridRowContainer = require('./gridRowContainer.jsx');
      */
     var FComGridBody = React.createClass({ //replace gridBody.jsx
+        mixins: [FCom.Mixin],
         getDefaultProps: function () {
             return {
                 "data": [],
                 "originalData": [],
                 "columnMetadata": [],
                 "className": ""
+            }
+        },
+        modalSaveChange: function(modal) {
+            var that = this;
+            var url = this.props.getConfig('edit_url');
+            if (url) {
+                var hash = { oper: 'edit' };
+                var form = $(modal.getDOMNode()).find('form');
+                form.find('textarea, input, select').each(function() {
+                    var key = $(this).attr('id');
+                    var val = $(this).val();
+                    hash[key] = that.html2text(val);
+                });
+                form.validate();
+                if (form.valid()) {
+                    $.post(url, hash, function(data) {
+                        if (data) {
+                            that.props.refresh();
+                            modal.close();
+                        } else {
+                            alert('error when save');
+                            return false;
+                        }
+                    });
+                } else {
+                    //error
+                    console.log('error');
+                    return false;
+                }
             }
         },
         doButtonAction: function(event) {
@@ -27,12 +57,12 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
 
             switch (action) {
                 case 'edit':
-                    console.log('render modal');
+                    //console.log('render modal');
                     var row = _.findWhere(data, {id: rowId});
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        <Components.Modal show={true} title="Edit Form" confirm="Save changes" cancel="Close">
+                        <Components.Modal show={true} title="Edit Form" confirm="Save changes" cancel="Close" onConfirm={this.modalSaveChange}>
                             <FComModalForm columnMetadata={that.props.columnMetadata} row={row} id={gridId} />
                         </Components.Modal>,
                         modalEleContainer
@@ -226,6 +256,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
      * form content for modal
      */
     var FComModalForm = React.createClass({
+        mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function () {
             return {
                 'row': {},
@@ -238,7 +269,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
             }
         },
         componentDidMount: function () {
-            console.log('row', this.props.row);
+            //console.log('row', this.props.row);
             var that = this;
 
             //update value for element is rendered as element_print
@@ -248,67 +279,61 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                 $(this).val(that.text2html(value));
             });
         },
-        text2html: function (val) { //todo: separate as mixins if need
-            var text = $.parseHTML(val);
-            return (text != null) ? text[0].data: null;
-        },
         render: function () {
             var that = this;
             var gridId = this.props.id;
-
             //console.log('row', this.props.row);
 
             var nodes = this.props.columnMetadata.map(function(column) {
-                if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) {
-                    return null;
-                }
+                if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
 
                 var label = '';
+                var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
                 if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
                     label = (
                         <div className="control-label col-sm-3">
                             <label for={column.name}>
-                                {column.label}
+                                {column.label} {iconRequired}
                             </label>
                         </div>
                     );
                 }
 
+                var validationRules = that.validationRules(column.validation);
                 var input = '';
                 if (typeof column.element_print != 'undefined') { //custom html for element_print
                     if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
-                        input = '<div class="form-group"><div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                        input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
                     }
-                    input += '<div class="controls col-sm-8">' + column.element_print + '</div></div>';
+                    input += '<div class="controls col-sm-8">' + column.element_print + '</div>';
                     return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
                 } else {
                     switch (column.editor) {
                         case 'select':
                             var options = [];
                             _.forEach(column.options, function(text, value) {
-                                options.push(<option value={value} defaultValue={that.props.row[column.name]}>{text}</option>);
+                                options.push(<option value={value}>{text}</option>);
                             });
-                            input = <select name={column.name} id={column.name} className="form-control">{options}</select>;
-                            //console.log('options', options);
+                            input = <select name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]} {...validationRules}>{options}</select>;
                             break;
                         case 'textarea':
-                            input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={that.props.row[column.name]} />;
-                            //console.log(column.name, that.props.row[column.name]);
+                            input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={that.props.row[column.name]} {...validationRules} />;
                             break;
                         default:
-                            input = <input name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]} />;
-                            //console.log(column.name, that.props.row[column.name]);
+                            input = <input name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]} {...validationRules} />;
                             break;
                     }
                 }
 
                 return (
                     <div className="form-group">
-                        {label} <div className="controls col-sm-8">{input}</div>
+                        {label}<div className="controls col-sm-8">{input}</div>
                     </div>
                 )
             });
 
+            //add id
+            nodes.push(<input type="hidden" name="id" id="id" value={this.props.row.id} />);
 
             return (
                 <form className="form form-horizontal validate-form" id={gridId + '-modal-form'}>

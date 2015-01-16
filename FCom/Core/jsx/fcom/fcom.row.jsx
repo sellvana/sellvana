@@ -10,6 +10,7 @@ define(['underscore', 'react'], function (_, React) {
      */
 
     var FComRow = React.createClass({
+        mixins: [FCom.Mixin],
         getDefaultProps: function () {
             return {
                 "row": {},
@@ -17,68 +18,6 @@ define(['underscore', 'react'], function (_, React) {
                 "index": 0,
                 "doButtonAction": null
             }
-        },
-        fileSizeFormat: function (size) {
-            var size = parseInt(size);
-            if (size / (1024 * 1024) > 1) {
-                size = size / (1024 * 1024);
-                size = size.toFixed(2) + ' MB';
-            } else if (size / 1024 > 1) {
-                size = size / 1024;
-                size = size.toFixed(2) + ' KB';
-            } else {
-                size = size + ' Byte';
-            }
-
-            return size;
-        },
-        validationRules: function(rules) {
-            var str = '';
-            for (var key in rules) {
-                switch (key) {
-                    case 'required':
-                        str += 'data-rule-required="true" ';
-                        break;
-                    case 'email':
-                        str += 'data-rule-email="true" ';
-                        break;
-                    case 'number':
-                        str += 'data-rule-number="true" ';
-                        break;
-                    case 'digits':
-                        str += 'data-rule-digits="true" ';
-                        break;
-                    case 'ip':
-                        str += 'data-rule-ipv4="true" ';
-                        break;
-                    case 'url':
-                        str += 'data-rule-url="true" ';
-                        break;
-                    case 'phoneus':
-                        str += 'data-rule-phoneus="true" ';
-                        break;
-                    case 'minlength':
-                        str += 'data-rule-minlength="' + rules[key] + '" ';
-                        break;
-                    case 'maxlength':
-                        str += 'data-rule-maxlength="' + rules[key] + '" ';
-                        break;
-                    case 'max':
-                        str += 'data-rule-max="' + rules[key] + '" ';
-                        break;
-                    case 'min':
-                        str += 'data-rule-min="' + rules[key] + '" ';
-                        break;
-                    case 'range':
-                        str += 'data-rule-range="[' + rules[key][0] + ',' + rules[key][1] + ']" ';
-                        break;
-                    case 'date':
-                        str += 'data-rule-dateiso="true" data-mask="9999-99-99" placeholder="YYYY-MM-DD" ';
-                        break;
-                }
-            }
-
-            return str;
         },
         render: function () {
             var that = this;
@@ -124,6 +63,23 @@ define(['underscore', 'react'], function (_, React) {
                         );
                         break;
                     case 'input':
+                        if (col.editable !== 'inline') {
+                            switch (col.editor) {
+                                case 'checkbox':
+                                case 'radio':
+                                    node = that.props.row[col.name] ? 'Yes' : 'No';
+                                    break;
+                                case 'select':
+                                    node = col.options && col.options[that.props.row[col.name]] ? col.options[that.props.row[col.name]] : that.props.row[col.name];
+                                    break;
+                                default:
+                                    node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                                    break;
+                            }
+                        } else { //todo: add inline row
+                            node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                        }
+                        break;
                     default:
                         if (col.display == 'eval') {
                             //use rc for compatibility old backbone grid
