@@ -25,6 +25,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         //$formUrl = $this->BApp->href("prodreviews/form");
         $reviewConfigs = $this->FCom_ProductReviews_Model_Review->config();
         $config = parent::gridConfig();
+        unset($config['form_url']); //unset this to use modal
         $columns = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 55, 'hidden' => true],
@@ -134,8 +135,9 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                 ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
         }
 
-        $config['columns'][] = ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-            'buttons' => [['name' => 'edit'], ['name' => 'delete']]];
+        /*$config['columns'][] = ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+            'buttons' => [['name' => 'edit'], ['name' => 'delete']]];*/
+        $config['columns'][] = ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]];
 
         $callbacks = '$(".rateit").rateit();
             $("#' . $config['id'] . '-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
@@ -186,9 +188,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     public function inputRatingHtml($name)
     {
         $config = $this->FCom_ProductReviews_Model_Review->config();
-        return '<input name="' . $name . '" id="' . $name . '" type="range" min="' . $config['min'] . '"
-            max="' . $config['max'] . '" step="' . $config['step'] . '" value="" />
-            <div class="rateit" data-rateit-backingfld="#' . $name . '"></div>';
+        return '<input name="' . $name . '" id="' . $name . '" type="range" min="' . $config['min'] . '" max="' . $config['max'] . '" step="' . $config['step'] . '" value="" /> <div class="rateit" data-rateit-backingfld="#' . $name . '"></div>';
     }
 
     /**

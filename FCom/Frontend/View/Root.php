@@ -33,4 +33,14 @@ class FCom_Frontend_View_Root extends FCom_Core_View_Root
         return $cols;
     }
 
+    public function setLayoutColumns($cols)
+    {
+        $defLeft = $this->get('col_left_default') ?: 3;
+        $defRight = $this->get('col_right_default') ?: 3;
+        switch ($cols) {
+
+            #case '2col_left':
+                #$this->set('col_left')
+        }
+    }
 }

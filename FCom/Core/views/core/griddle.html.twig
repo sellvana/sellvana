@@ -2,7 +2,11 @@
 
 {#{{ dump(config) }}#}
 
-<div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
+<div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;"> </div>
+
+{# modal body template #}
+<div id="{{ config.id }}-modal">
+    <a class="btn" id="{{ config.id }}-modal-form-show" role="button" href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;"> </a>
 </div>
 
 {#<script type="text/javascript">

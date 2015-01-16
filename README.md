@@ -18,6 +18,15 @@ Installation
 7. Open **admin** at `{webroot}/sellvana/admin` (should be already logged in with user info from the wizard)
 8. Go to **Modules > Manage Modules**, set modules you'd like to use to `REQUESTED` run level, click **Save**
 
+Test Data
+---------
+
+If you'd like to generate test catalog data, please open this URL (replace 127.0.0.1/sellvana with your location):
+
+        http://127.0.0.1/sellvana/admin/index.php/catalogindex/test
+        
+This is a simple test script and should be ran only once.
+
 Issues
 -------
 

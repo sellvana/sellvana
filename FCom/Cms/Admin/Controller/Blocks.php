@@ -151,4 +151,12 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     {
         $this->_processGridDataPost('FCom_Cms_Model_BlockHistory');
     }
+
+    public function formPostBefore($args)
+    {
+        parent::formPostBefore($args);
+
+        $m = $args['model'];
+        $m->setData('layout', $this->FCom_Core_LayoutEditor->processFormPost());
+    }
 }

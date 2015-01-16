@@ -188,7 +188,7 @@ class FCom_SalesTax_Migrate extends BClass
 
         // Sample tax rule for NY State
         $rule = $this->FCom_SalesTax_Model_Rule->create(['title' => 'NY State', 'rule_rate_percent' => 4])->save();
-        $zone = $this->FCom_SalesTax_Model_Zone->create(['country' => 'US', 'region' => 'NY'])->save();
+        $zone = $this->FCom_SalesTax_Model_Zone->create(['zone_type' => 'region', 'country' => 'US', 'region' => 'NY'])->save();
         $this->FCom_SalesTax_Model_RuleZone->create(['rule_id' => $rule->id(), 'zone_id' => $zone->id()])->save();
         $this->FCom_SalesTax_Model_RuleCustomerClass->create(['rule_id' => $rule->id(), 'customer_class_id' => $retailClass->id()])->save();
         $this->FCom_SalesTax_Model_RuleProductClass->create(['rule_id' => $rule->id(), 'product_class_id' => $taxableClass->id()])->save();

@@ -36,6 +36,8 @@ common_js_libs:
             #- [ css, "@FCom_LibJsCommon/js/css/select2.css" ]
             #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]
 
+            - [ requireJs, sortable, @FCom_LibJsCommon/js/sortable.min ]
+
 lib_visualsearch:
     - view: head
         do:
@@ -66,7 +68,3 @@ lib_griddle:
             - [ requireJs, griddle.gridSettings, @FCom_LibJsCommon/jsx/griddle/scripts/gridSettings ]
             - [ requireJs, griddle.gridTitle, @FCom_LibJsCommon/jsx/griddle/scripts/gridTitle ]
             - [ requireJs, griddle, @FCom_LibJsCommon/jsx/griddle/scripts/griddle ]
-            #fcom custom
-            - [ requireJs, griddle.fcomGridBody, @FCom_LibJsCommon/jsx/fcom.gridBody ]
-            - [ requireJs, griddle.fcomGridFilter, @FCom_LibJsCommon/jsx/fcom.gridFilter ]
-            - [ requireJs, griddle.fcomRow, @FCom_LibJsCommon/jsx/fcom.row ]
