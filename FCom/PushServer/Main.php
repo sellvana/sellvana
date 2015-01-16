@@ -24,7 +24,7 @@ class FCom_PushServer_Main extends BCLass
             //->addService('/^./', 'FCom_PushServer_Main::catchAll')
             ->addService('client', 'FCom_PushServer_Service_Client')
         ;
-        static::$_debug = true;
+        #static::$_debug = true;
     }
 
     /**

@@ -69,9 +69,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         parent::gridOrmConfig($orm);
 
         //load attachments
-        $orm->select("(select group_concat(a.file_name separator ', ') from " .
-            $this->FCom_Promo_Model_Media->table() .
-            " pa inner join fcom_media_library a on a.id=pa.file_id where pa.promo_id=p.id)",
+        $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
+        $tPromoMedia = $this->FCom_Promo_Model_Media->table();
+        $orm->select("(select group_concat(a.file_name separator ', ')
+            from {$tPromoMedia} pa inner join {$tMediaLibrary} a on a.id=pa.file_id where pa.promo_id=p.id)",
             'attachments')
         ;
     }

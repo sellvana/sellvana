@@ -1,0 +1,266 @@
+{% set hlp = APP.instance('FCom_Core_LayoutEditor') %}
+{% set library = hlp.fetchLibrary() %}
+{% set layout = hlp.normalizeLayoutData(THIS.get('layout')) %}
+
+<style>
+    .f-layout-editor ul { border:dashed 1px gray; padding:5px; }
+    #layout-editor-area-header, #layout-editor-area-footer { min-height:100px }
+    #layout-editor-area-col_left, #layout-editor-area-main, #layout-editor-area-col_right { min-height: 400px }
+
+    .js-library-container .box { margin: 3px 0; }
+    .js-library-container .box-header { display: none }
+    .widget-actual { display: none }
+    .widget-preview { cursor: pointer }
+    .js-area-container { background:#FAFAFA }
+    .js-area-container .widget-preview { display: none }
+    .js-area-container .widget-actual { display: block }
+    .js-area-container .box { background:#F0F0F0; border: dotted 1px #CCC; margin:3px; padding:3px; }
+    .js-area-container .box-main-contents { background: #888888; }
+    .js-area-container .box-main-contents .title { color:#FFFFFF; }
+    .widget-actual input, .widget-actual textarea, .widget-actual select { width:100% }
+</style>
+
+{% macro widget(w, library) %}
+
+    {% if w.source_view %}
+        {% import LAYOUT.view(w.source_view).twigName() as source %}
+    {% else %}
+        {% import _self as source %}
+    {% endif %}
+    {% set macro = w.macro ?: 'widget_' ~ w.type %}
+    <li>
+        <div class="box {{ w.box_class }}">
+            <div class="box-header js-sortable-handle {{ w.header_class }}">
+                <div class="title"><i class="icon-{{ w.icon }}"></i>{{ w.title }}</div>
+                <div class="actions">
+                    <!--<a class="btn box-collapse btn-link js-collapse" href="#"><i class="icon-chevron-down"></i></a>-->
+                    {% if not w.persistent %}
+                        <a class="btn box-remove btn-link js-remove" href="#"><i class="icon-remove"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+            <input type="hidden" name="layout[widgets][area][]" value="{{ w.area }}" rel="widget-area">
+            <input type="hidden" name="layout[widgets][type][]" value="{{ w.type }}">
+            <div class="widget-contents widget-preview js-sortable-handle">{{ w.title }}</div>
+            <div class="widget-contents widget-actual">
+                {{ attribute(source, macro, [w, library]) }}
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </li>
+
+{% endmacro %}
+
+{% macro widget_main_contents(w, library) %}
+    <input type="hidden" name="layout[widgets][value][]" value="">
+{% endmacro %}
+
+{% macro widget_cms_block(w, library) %}
+    <select name="layout[widgets][value][]" class="_select2">
+        <option value="">{{ 'CMS Block...'|_ }}</option>
+        {% if library.heap.cms_blocks %}
+            {{ UTIL.optionsHtml(library.heap.cms_blocks, w.value) | raw }}
+        {% endif %}
+    </select>
+{% endmacro %}
+
+{% macro widget_template(w, library) %}
+    <select name="layout[widgets][value][]" class="_select2">
+        <option value="">{{ 'Template...'|_ }}</option>
+        {% if library.heap.templates %}
+            {{ UTIL.optionsHtml(library.heap.templates, w.value) | raw }}
+        {% endif %}
+    </select>
+{% endmacro %}
+
+{% macro widget_banner(w, library) %}
+    <select name="layout[widgets][value][]" class="_select2">
+        <option value="">{{ 'Banner...'|_ }}</option>
+        {% if library.heap.banners %}
+            {{ UTIL.optionsHtml(library.heap.banners, w.value) | raw }}
+        {% endif %}
+    </select>
+{% endmacro %}
+
+{% macro widget_text(w, library) %}
+    <textarea name="layout[widgets][value][]">{{ w.value }}</textarea>
+{% endmacro %}
+
+{% macro widget_remove(w, library) %}
+    <input name="layout[widgets][value][]" value="{{ w.value }}">
+{% endmacro %}
+
+<div class="row f-layout-editor">
+    <div class="col-md-2">
+        <h4>{{ 'Widget Library'|_ }}</h4>
+        <ul id="layout-editor-library" class="js-library-container js-sortable-container">
+            {% for w in library.widgets %}
+                {% if not w.hidden %}
+                    {{ _self.widget(w, library) }}
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <!--
+        <ul id="layout-editor-trash" class="js-trash-container js-sortable-container">
+            <li><div class="box">{{ 'Trash'|_ }}</div></li>
+        </ul>
+        -->
+    </div>
+
+    <div id="layout-editor-container" class="col-md-10">
+<!--
+        <div class="btn-group">
+            <label class="btn btn-default active">
+                <input id="layout_show_header" name="layout_show_header" checked value="1" type="checkbox" autocomplete="off"> Show Header
+            </label>
+            <label class="btn btn-default active">
+                <input id="layout_show_footer" name="layout_show_footer" checked value="1" type="checkbox" autocomplete="off"> Show Footer
+            </label>
+        </div>
+
+        <div id="layout-editor-layout_type-container" class="btn-group">
+            <label class="btn btn-default active">
+                <input id="layout_type-3col" name="layout_type" value="3col" type="radio" checked> 3 Columns
+            </label>
+            <label class="btn btn-default">
+                <input id="layout_type-2col_left" name="layout_type" value="2col_left" type="radio"> 2 Columns - Left
+            </label>
+            <label class="btn btn-default">
+                <input id="layout_type-2col_right" name="layout_type" value="2col_right" type="radio"> 2 Columns - Right
+            </label>
+            <label class="btn btn-default">
+                <input id="layout_type-1col" name="layout_type" value="1col" type="radio"> 1 Column
+            </label>
+        </div>
+-->
+        <div id="layout-editor-header_footer-container" class="btn-group">
+            <button type="button" class="btn btn-default {{ layout.show_header ? 'active' }}" id="layout_show_header"
+                    value="{{ layout.show_header }}" data-target="header">{{ 'Show Header'|_ }}</button>
+            <button type="button" class="btn btn-default {{ layout.show_footer ? 'active' }}" id="layout_show_footer"
+                    value="{{ layout.show_footer }}" data-target="footer">{{ 'Show Footer'|_ }}</button>
+            <input type="hidden" id="layout_show_header_value" name="layout[show_header]" value="{{ layout.show_header }}">
+            <input type="hidden" id="layout_show_footer_value" name="layout[show_footer]" value="{{ layout.show_footer }}">
+            <!--
+            <button type="button" class="btn btn-default {{ layout.show_footer ? 'active' }}" id="layout_show_footer" name="layout[show_footer]"
+                    value="{{ layout.show_footer }}" data-target="footer">{{ 'Show Left Column'|_ }}</button>
+            <button type="button" class="btn btn-default {{ layout.show_footer ? 'active' }}" id="layout_show_footer" name="layout[show_footer]"
+                    value="{{ layout.show_footer }}" data-target="footer">{{ 'Show Right Column'|_ }}</button>
+-->
+        </div>
+
+        <div id="layout-editor-layout_type-container" class="btn-group">
+            <button type="button" class="btn btn-default {{ layout.columns == '3col' ? 'active' }}" value="3col">{{ '3 Columns'|_ }}</button>
+            <button type="button" class="btn btn-default {{ layout.columns == '2col_left' ? 'active' }}" value="2col_left">{{ '2 Columns (Left)'|_ }}</button>
+            <button type="button" class="btn btn-default {{ layout.columns == '2col_right' ? 'active' }}" value="2col_right">{{ '2 Columns (Right)'|_ }}</button>
+            <button type="button" class="btn btn-default {{ layout.columns == '1col' ? 'active' }}" value="1col">{{ '1 Column'|_ }}</button>
+            <input type="hidden" id="layout_columns_value" name="layout[columns]" value="{{ layout.columns }}">
+        </div>
+
+        <div class="row {{ not layout.show_header ? 'hidden' }}" id="layout-editor-container-header">
+            <div class="col-md-12">
+                <ul id="layout-editor-area-header" class="js-area-container js-sortable-container" data-area="header">
+                    {% for w in layout.widgets %}{% if w.area == 'header' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="row" id="layout-editor-container-middle">
+            <div class="col-md-3" id="layout-editor-area-col_left">
+                <ul id="layout-editor-area-col_left" class="js-area-container js-sortable-container" data-area="col_left">
+                    {% for w in layout.widgets %}{% if w.area == 'col_left' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-6" id="layout-editor-area-main">
+                <ul id="layout-editor-area-main" class="js-area-container js-sortable-container" data-area="main">
+                    {% for w in layout.widgets %}{% if w.area == 'main' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-3" id="layout-editor-area-col_right">
+                <ul id="layout-editor-area-col_right" class="js-area-container js-sortable-container" data-area="col_right">
+                    {% for w in layout.widgets %}{% if w.area == 'col_right' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="row {{ not layout.show_footer ? 'hidden' }}" id="layout-editor-container-footer">
+            <div class="col-md-12">
+                <ul id="layout-editor-area-footer" class="js-area-container js-sortable-container" data-area="footer">
+                    {% for w in layout.widgets %}{% if w.area == 'footer' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    require(['jquery', 'sortable', 'select2'], function($, Sortable) {
+
+        function updateLayoutAreas(columns) {
+            switch (columns) {
+                case '3col':
+                    $('#layout-editor-area-col_left,#layout-editor-area-col_right').removeClass('hidden');
+                    $('#layout-editor-area-main').removeClass('col-md-9 col-md-12').addClass('col-md-6');
+                    break;
+                case '2col_left':
+                    $('#layout-editor-area-col_left').removeClass('hidden');
+                    $('#layout-editor-area-col_right').addClass('hidden');
+                    $('#layout-editor-area-main').removeClass('col-md-6 col-md-12').addClass('col-md-9');
+                    break;
+                case '2col_right':
+                    $('#layout-editor-area-col_left').addClass('hidden');
+                    $('#layout-editor-area-col_right').removeClass('hidden');
+                    $('#layout-editor-area-main').removeClass('col-md-6 col-md-12').addClass('col-md-9');
+                    break;
+                case '1col':
+                    $('#layout-editor-area-col_left,#layout-editor-area-col_right').addClass('hidden');
+                    $('#layout-editor-area-main').removeClass('col-md-6 col-md-9').addClass('col-md-12');
+                    break;
+            }
+        }
+
+        function updateWidgetAreaField(evt) {
+            var $item = $(evt.item), $area = $item.parents('.js-area-container'), $field = $item.find('[rel=widget-area]');
+            $field.val($area.data('area'));
+        }
+
+        $('.js-library-container').each(function(idx, el) {
+            Sortable.create(el, {
+                group: { name: 'widgets', put: false, pull: 'clone'},
+                sort: false,
+                handle: '.js-sortable-handle'
+            });
+        });
+
+        $('.js-area-container').each(function(idx, el) {
+            Sortable.create(el, {
+                group: 'widgets',
+                handle: '.js-sortable-handle',
+                //animation: 150,
+                onAdd: updateWidgetAreaField,
+                onUpdate: updateWidgetAreaField
+            });
+        });
+
+        $('#layout-editor-layout_type-container button').click(function(ev) {
+            var $el = $(ev.target);
+            $el.siblings().removeClass('active');
+            $el.addClass('active');
+            updateLayoutAreas($el.val());
+            $('#layout_columns_value').val($el.val());
+        });
+
+        $('#layout-editor-header_footer-container button').click(function(ev) {
+            var $el = $(ev.target), $container = $('#layout-editor-container-' + $el.data('target'));
+            $el.val(1 - $el.val());
+            $el.toggleClass('active');
+            if ($el.val() == 1) {
+                $container.removeClass('hidden')
+            } else {
+                $container.addClass('hidden');
+            }
+            $('#show_' + $el.data('target') + '_value').val($el.val());
+        });
+
+        updateLayoutAreas('{{ layout.columns }}');
+
+        //$('.select2').select2();
+    });
+</script>

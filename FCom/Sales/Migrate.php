@@ -181,7 +181,7 @@ class FCom_Sales_Migrate extends BClass
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'customer_id' => "int(10) unsigned DEFAULT NULL",
                 'customer_email' => "varchar(100) DEFAULT NULL",
-                'cart_id' => "int(10) unsigned NOT NULL",
+                'cart_id' => "int(10) unsigned DEFAULT NULL",
                 'status' => "varchar(50) NOT NULL",
                 'item_qty' => "int(10) unsigned NOT NULL",
                 'subtotal' => "decimal(12,2) NOT NULL DEFAULT '0.00'",

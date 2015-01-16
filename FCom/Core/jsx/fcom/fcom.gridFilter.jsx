@@ -6,6 +6,9 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var that = this;
             var filters = {};
             _.forEach(this.props.getConfig('filters'), function(f) {
+                if (!f.field) {
+                    return false;
+                }
                 _.extend(f, {
                     show: true,
                     label: that.getFieldName(f.field),
@@ -119,8 +122,8 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         },
         /**
          * do filter
-         * @param {} filter
-         * @param bool isClear
+         * @param {Object} filter
+         * @param {Boolean} isClear
          */
         doFilter: function (filter, isClear) {
             if (typeof isClear == 'undefined') {
@@ -143,9 +146,6 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var filters = this.state.filters;
 
             //console.log('filters', filters);
-
-            //quick search
-            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder={this.props.placeholderText} onChange={this.handleChange} id={id + '-quick-search'} />;
 
             var filterSettingNodes = _.map(filters, function(f) {
                 return (
@@ -184,7 +184,6 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             return (
                 <div>
                     <div className="f-col-filters-selection pull-left">
-                        {quickSearch}
                         {filterSettings}
                     </div>
                     <div className={id + " f-filter-btns"}>
@@ -584,7 +583,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             return (
                 <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
                     <button className='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-                        <span className='f-grid-filter-field'> {filter.label} </span>
+                        <span className='f-grid-filter-field'> {filter.label}: </span>
                         <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + ": " + filter.valName : 'All'} </span>
                         <span className="caret"></span>
                     </button>

@@ -708,11 +708,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
         foreach ($rows as $rowId => $row) {
             $r = is_array($row) ? $row : $row->as_array();
+            /*
             foreach ($r as $k => $v) {
                 if (!empty($options[$k][$v])) {
                     $r[$k] = $options[$k][$v];
                 }
             }
+            */
             $data[] = $r;
         }
 
@@ -763,7 +765,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 $oldValue = $value = $row->get($field);
 
                 if (!empty($options[$field][$value])) {
-                    $value = $options[$field][$value];
+                    #$value = $options[$field][$value];
                 }
 
                 if (!empty($col['cell'])) {

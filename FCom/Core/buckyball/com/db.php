@@ -1789,7 +1789,8 @@ class BORM extends ORMWrapper
             $s['p'] = $s['mp']; // limit to max page
         }
         if ($s['s']) {
-            $this->{'order_by_' . $s['sd']}($s['s']); // sort rows if requested
+            $ord = 'asc' === $s['sd'] || 'desc' === $s['sd'] ? $s['sd'] : 'asc';
+            $this->{'order_by_' . $ord}($s['s']); // sort rows if requested
         }
         $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p'] - 1) * $s['ps']); // start from requested row or page
         if (empty($d['donotlimit'])) {
@@ -2503,7 +2504,7 @@ class BModel extends Model
     */
     public function load($id, $field = null, $cache = false)
     {
-        if (true !== $field && is_array($id)) {
+        if (is_array($id) && true !== $field) {
             throw new BException('Invalid ID parameter');
         }
 
@@ -3434,7 +3435,7 @@ class BCollection extends ArrayIterator
     public function setData($data)
     {
         //TODO: clear dbplus_first(relation, tuple)
-        foreach ($rows as $k => $row) {
+        foreach ($data as $k => $row) {
             $this->offsetSet($k, $row);
         }
         return $this;
