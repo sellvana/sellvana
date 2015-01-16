@@ -794,6 +794,14 @@ class BLayout extends BClass
                 if (!empty($d[0])) {
                     $d['type'] = $d[0];
                 } else {
+                    reset($d);
+                    $d['type'] = key($d);
+                    $d['name'] = current($d);
+                    if (empty(static::$_metaDirectives[$d['type']])) {
+                        BDebug::error('Unknown directive: ' . print_r($d, 1));
+                        continue;
+                    }
+                    /*
                     foreach ($d as $k => $n) {
                         if (!empty(static::$_metaDirectives[$k])) {
                             $d['type'] = $k;
@@ -801,6 +809,7 @@ class BLayout extends BClass
                             break;
                         }
                     }
+                    */
                 }
                 if (empty($d['type'])) {
                     BDebug::error('Unknown directive: ' . print_r($d, 1));
@@ -821,7 +830,7 @@ class BLayout extends BClass
 
             if ($d['type'] === 'remove') {
                 if ($d['name'] === 'ALL') { //TODO: allow removing specific instructions
-                    BDebug::debug('LAYOUT.REMOVE');
+                    BDebug::debug('LAYOUT.REMOVE ALL');
                     $callbacks = [];
                 }
             } else {
@@ -912,6 +921,10 @@ class BLayout extends BClass
      */
     public function metaDirectiveViewCallback($d)
     {
+        if (!empty($d['view_class'])) {
+            $this->addView($d['name'], ['view_class' => $d['view_class']]);
+        }
+
         $view = $this->getView($d['name']);
         if (!empty($d['set'])) {
             foreach ($d['set'] as $k => $v) {

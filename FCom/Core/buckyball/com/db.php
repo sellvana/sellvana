@@ -2504,7 +2504,7 @@ class BModel extends Model
     */
     public function load($id, $field = null, $cache = false)
     {
-        if (true !== $field && is_array($id)) {
+        if (is_array($id) && true !== $field) {
             throw new BException('Invalid ID parameter');
         }
 
@@ -3435,7 +3435,7 @@ class BCollection extends ArrayIterator
     public function setData($data)
     {
         //TODO: clear dbplus_first(relation, tuple)
-        foreach ($rows as $k => $row) {
+        foreach ($data as $k => $row) {
             $this->offsetSet($k, $row);
         }
         return $this;

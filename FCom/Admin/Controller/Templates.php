@@ -150,10 +150,4 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             $this->BResponse->redirect('templates');
         }
     }
-
-    public function action_layout_test()
-    {
-        $this->layout('base');
-        $this->BLayout->hookView('main', 'admin/layout-editor');
-    }
 }

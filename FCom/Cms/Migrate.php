@@ -275,4 +275,16 @@ class FCom_Cms_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_1_5__0_1_6()
+    {
+
+        $tBlock = $this->FCom_Cms_Model_Block->table();
+        $this->BDb->ddlTableDef($tBlock, [
+            BDb::COLUMNS => [
+                'layout_update' => BDb::DROP,
+                'data_serialized' => 'text default null',
+            ],
+        ]);
+    }
 }
