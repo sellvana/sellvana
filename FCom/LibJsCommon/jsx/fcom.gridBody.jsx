@@ -10,6 +10,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
      var GridRowContainer = require('./gridRowContainer.jsx');
      */
     var FComGridBody = React.createClass({ //replace gridBody.jsx
+        mixins: [FCom.Mixin],
         getDefaultProps: function () {
             return {
                 "data": [],
@@ -27,10 +28,10 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                 form.find('textarea, input, select').each(function() {
                     var key = $(this).attr('id');
                     var val = $(this).val();
-                    hash[key] = $('<div/>').text(val).html();
+                    hash[key] = that.html2text(val);
                 });
 
-                console.log('hash', hash);
+                //console.log('hash', hash);
 
                 //validate action
                 var validate = true;
@@ -41,7 +42,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
                             that.props.refresh();
                             modal.close();
                         } else {
-                            console.log('error when save')
+                            alert('error when save')
                         }
                     });
                 } else {
@@ -59,7 +60,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
 
             switch (action) {
                 case 'edit':
-                    console.log('render modal');
+                    //console.log('render modal');
                     var row = _.findWhere(data, {id: rowId});
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
@@ -258,6 +259,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
      * form content for modal
      */
     var FComModalForm = React.createClass({
+        mixins: [FCom.Mixin],
         getDefaultProps: function () {
             return {
                 'row': {},
@@ -270,7 +272,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
             }
         },
         componentDidMount: function () {
-            console.log('row', this.props.row);
+            //console.log('row', this.props.row);
             var that = this;
 
             //update value for element is rendered as element_print

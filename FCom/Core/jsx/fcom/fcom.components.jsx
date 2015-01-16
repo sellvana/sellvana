@@ -1,7 +1,39 @@
 define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Locale) {
     FCom.Components = {};
 
-    var formMixin = {
+    /**
+     * common mixin can be used in both of grid and form
+     * @type {{text2html: Function, html2text: Function, fileSizeFormat: Function}}
+     */
+    FCom.Mixin = {
+        text2html: function (val) {
+            var text = $.parseHTML(val);
+            return (text != null) ? text[0].data: null;
+        },
+        html2text: function (val) {
+            return $('<div/>').text(val).html();
+        },
+        fileSizeFormat: function (size) {
+            var size = parseInt(size);
+            if (size / (1024 * 1024) > 1) {
+                size = size / (1024 * 1024);
+                size = size.toFixed(2) + ' MB';
+            } else if (size / 1024 > 1) {
+                size = size / 1024;
+                size = size.toFixed(2) + ' KB';
+            } else {
+                size = size + ' Byte';
+            }
+
+            return size;
+        }
+    };
+
+    /**
+     * form mixin
+     * @type {{getInputId: Function, getInputName: Function, validationRules: Function}}
+     */
+    FCom.FormMixin = {
         getInputId: function () {
             var field = this.props.field;
             if (this.props.id) {
@@ -32,6 +64,54 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
                 name += '[]';
             }
             return name;
+        },
+        validationRules: function(rules) {
+            var str = '';
+            for (var key in rules) {
+                switch (key) {
+                    case 'required':
+                        str += 'data-rule-required="true" ';
+                        break;
+                    case 'email':
+                        str += 'data-rule-email="true" ';
+                        break;
+                    case 'number':
+                        str += 'data-rule-number="true" ';
+                        break;
+                    case 'digits':
+                        str += 'data-rule-digits="true" ';
+                        break;
+                    case 'ip':
+                        str += 'data-rule-ipv4="true" ';
+                        break;
+                    case 'url':
+                        str += 'data-rule-url="true" ';
+                        break;
+                    case 'phoneus':
+                        str += 'data-rule-phoneus="true" ';
+                        break;
+                    case 'minlength':
+                        str += 'data-rule-minlength="' + rules[key] + '" ';
+                        break;
+                    case 'maxlength':
+                        str += 'data-rule-maxlength="' + rules[key] + '" ';
+                        break;
+                    case 'max':
+                        str += 'data-rule-max="' + rules[key] + '" ';
+                        break;
+                    case 'min':
+                        str += 'data-rule-min="' + rules[key] + '" ';
+                        break;
+                    case 'range':
+                        str += 'data-rule-range="[' + rules[key][0] + ',' + rules[key][1] + ']" ';
+                        break;
+                    case 'date':
+                        str += 'data-rule-dateiso="true" data-mask="9999-99-99" placeholder="YYYY-MM-DD" ';
+                        break;
+                }
+            }
+
+            return str;
         }
     };
 
@@ -60,7 +140,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
     });
 
     FCom.Components.Input = React.createClass({
-        mixins:[formMixin],
+        mixins:[FCom.FormMixin],
         render: function () {
             var { formGroupClass, inputDivClass, inputClass, inputValue, ...other } = this.props;
             var className = "form-control";
