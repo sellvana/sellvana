@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /*
  * This file is part of Twig.
@@ -16,6 +16,8 @@
  * key is generated each time a template content "changes" (the cache key being the
  * source code of the template). If you don't want to see your cache grows out of
  * control, you need to take care of clearing the old cache file by yourself.
+ *
+ * This loader should only be used for unit testing.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
