@@ -1,5 +1,5 @@
 {% set popular = APP.instance('FCom_Catalog_Frontend').getPopularProducts(THIS.get('cnt')) %}
-CNT: {{ THIS.get('cnt') }}
+
 {% if popular %}
     <div class="f-widget f-widget-featured-prods">
         <header class="f-widget-header">
