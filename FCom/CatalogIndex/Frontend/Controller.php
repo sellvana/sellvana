@@ -9,6 +9,7 @@
  * @property FCom_Catalog_Model_SearchAlias $FCom_Catalog_Model_SearchAlias
  * @property FCom_Catalog_Model_SearchHistory $FCom_Catalog_Model_SearchHistory
  * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 
 class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abstract
@@ -94,12 +95,12 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
 
-        if ($category->layout_update) {
-            $layoutUpdate = $this->BYAML->parse($category->layout_update);
-            if (!is_null($layoutUpdate)) {
+        $layoutData = $category->getData('layout');
+        if ($layoutData) {
+            $context = ['type' => 'category', 'main_view' => 'catalog/category'];
+            $layoutUpdate = $this->FCom_Core_LayoutEditor->compileLayout($layoutData, $context);
+            if ($layoutUpdate) {
                 $this->BLayout->addLayout('category_page', $layoutUpdate)->applyLayout('category_page');
-            } else {
-                $this->BDebug->warning('Invalid layout update for CMS page');
             }
         }
     }

@@ -13,6 +13,7 @@
  * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -140,9 +141,16 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      */
     public function formPostBefore($args)
     {
+        parent::formPostBefore($args);
+
         if ($args['do'] == 'DUPLICATE') {
             $this->duplicateProduct($args['id']);
             exit();
+        }
+
+        $layout = $this->FCom_Core_LayoutEditor->processFormPost();
+        if ($layout) {
+            $args['model']->setData('layout', $layout);
         }
     }
 
