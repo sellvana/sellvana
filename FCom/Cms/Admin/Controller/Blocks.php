@@ -6,6 +6,7 @@
  * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
  * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -156,7 +157,6 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     {
         parent::formPostBefore($args);
 
-        $m = $args['model'];
-        $m->setData('layout', $this->FCom_Core_LayoutEditor->processFormPost());
+        $args['model']->setData('layout', $this->FCom_Core_LayoutEditor->processFormPost());
     }
 }

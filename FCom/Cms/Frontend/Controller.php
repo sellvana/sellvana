@@ -50,12 +50,10 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         $layoutData = $block->getData('layout');
         if ($layoutData) {
-            $context = ['main_view' => $viewName];
+            $context = ['type' => 'cms_page', 'main_view' => $viewName];
             $layoutUpdate = $this->FCom_Core_LayoutEditor->compileLayout($layoutData, $context);
-            if (!is_null($layoutUpdate)) {
+            if ($layoutUpdate) {
                 $this->BLayout->addLayout('cms_page', $layoutUpdate)->applyLayout('cms_page');
-            } else {
-                $this->BDebug->warning('Invalid layout update for CMS page');
             }
         }
     }
