@@ -17,14 +17,20 @@ class FCom_Catalog_Frontend extends BClass
         }
     }
 
-    public function getFeaturedProducts()
+    public function getFeaturedProducts($cnt = null)
     {
-        return $this->FCom_Catalog_Model_Product->orm()->where('is_featured', 1)->limit(6)->find_many();
+        if (!$cnt) {
+            $cnt = 6;
+        }
+        return $this->FCom_Catalog_Model_Product->orm()->where('is_featured', 1)->limit($cnt)->find_many();
     }
 
-    public function getPopularProducts()
+    public function getPopularProducts($cnt = null)
     {
-        return $this->FCom_Catalog_Model_Product->orm()->where('is_popular', 1)->limit(6)->find_many();
+        if (!$cnt) {
+            $cnt = 6;
+        }
+        return $this->FCom_Catalog_Model_Product->orm()->where('is_popular', 1)->limit($cnt)->find_many();
     }
 
     public function getRecentlyViewedProducts()

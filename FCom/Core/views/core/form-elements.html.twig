@@ -63,6 +63,7 @@ Using custom id/name:
                 placeholder="{{ p.placeholder }}"
                 {{ p.autocomplete ? 'autocomplete="' ~ p.autocomplete ~ '"' }}
                 {{ p.readonly ? 'readonly' }}
+                {{ p.disabled ? 'disabled' }}
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ view.attributes(p.attr) | raw }}
             />
@@ -86,6 +87,7 @@ Using custom id/name:
                 class="form-control {{ p.input_class }} {{ p.required ? 'required' }}"
                 style="{{ p.style }}"
                 {{ p.readonly ? 'readonly' }}
+                {{ p.disabled ? 'disabled' }}
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ view.attributes(p.attr) | raw }}
                 {{ p.multiple ? 'multiple'}}
@@ -136,6 +138,7 @@ Using custom id/name:
                 style="{{ p.style }}"
                 placeholder="{{ p.placeholder }}"
                 {{ p.readonly ? 'readonly' }}
+                {{ p.disabled ? 'disabled' }}
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ p.attr | raw }}
            >{{ p.raw ? value|raw : value }}</textarea>
@@ -294,6 +297,7 @@ Using custom id/name:
                     style="{{ p.style }}"
                     value="{{ cb }}"
                     {{ p.readonly ? 'readonly' }}
+                    {{ p.disabled ? 'disabled' }}
                     {{ p.required ? 'data-rule-required="true"' }}
                     {{ view.attributes(p.attr) | raw }}
                     {{ p.value == cb? "checked": "" }}
@@ -322,6 +326,7 @@ Using custom id/name:
                     style="{{ p.style }}"
                     value="{{ cb }}"
                     {{ p.readonly ? 'readonly' }}
+                    {{ p.disabled ? 'disabled' }}
                     {{ p.required ? 'data-rule-required="true"' }}
                     {{ view.attributes(p.attr) | raw }}
                     {{ p.value == cb? "checked": "" }}

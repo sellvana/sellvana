@@ -1,226 +1,146 @@
 {% set hlp = APP.instance('FCom_Core_LayoutEditor') %}
 {% set library = hlp.fetchLibrary() %}
-{% set layout = hlp.normalizeLayoutData(THIS.get('layout')) %}
+{% set context = { prefix: THIS.get('prefix')|default('layout') } %}
+{% set layout = hlp.normalizeLayoutData(THIS.get('layout'), THIS.get('type')) %}
+{% set structureLayoutOptions = { '': 'No Change'|_, 'show': 'Force Show'|_, 'hide': 'Force Hide'|_ } %}
 
-<style>
-    .f-layout-editor ul { border:dashed 1px gray; padding:5px; }
-    #layout-editor-area-header, #layout-editor-area-footer { min-height:100px }
-    #layout-editor-area-col_left, #layout-editor-area-main, #layout-editor-area-col_right { min-height: 400px }
-
-    .js-library-container .box { margin: 3px 0; }
-    .js-library-container .box-header { display: none }
-    .widget-actual { display: none }
-    .widget-preview { cursor: pointer }
-    .js-area-container { background:#FAFAFA }
-    .js-area-container .widget-preview { display: none }
-    .js-area-container .widget-actual { display: block }
-    .js-area-container .box { background:#F0F0F0; border: dotted 1px #CCC; margin:3px; padding:3px; }
-    .js-area-container .box-main-contents { background: #888888; }
-    .js-area-container .box-main-contents .title { color:#FFFFFF; }
-    .widget-actual input, .widget-actual textarea, .widget-actual select { width:100% }
-</style>
-
-{% macro widget(w, library) %}
-
-    {% if w.source_view %}
-        {% import LAYOUT.view(w.source_view).twigName() as source %}
-    {% else %}
-        {% import _self as source %}
-    {% endif %}
-    {% set macro = w.macro ?: 'widget_' ~ w.type %}
-    <li>
-        <div class="box {{ w.box_class }}">
-            <div class="box-header js-sortable-handle {{ w.header_class }}">
-                <div class="title"><i class="icon-{{ w.icon }}"></i>{{ w.title }}</div>
-                <div class="actions">
-                    <!--<a class="btn box-collapse btn-link js-collapse" href="#"><i class="icon-chevron-down"></i></a>-->
-                    {% if not w.persistent %}
-                        <a class="btn box-remove btn-link js-remove" href="#"><i class="icon-remove"></i></a>
-                    {% endif %}
-                </div>
-            </div>
-            <input type="hidden" name="layout[widgets][area][]" value="{{ w.area }}" rel="widget-area">
-            <input type="hidden" name="layout[widgets][type][]" value="{{ w.type }}">
-            <div class="widget-contents widget-preview js-sortable-handle">{{ w.title }}</div>
-            <div class="widget-contents widget-actual">
-                {{ attribute(source, macro, [w, library]) }}
-                <div class="clearfix"></div>
-            </div>
-        </div>
-    </li>
-
-{% endmacro %}
-
-{% macro widget_main_contents(w, library) %}
-    <input type="hidden" name="layout[widgets][value][]" value="">
-{% endmacro %}
-
-{% macro widget_cms_block(w, library) %}
-    <select name="layout[widgets][value][]" class="_select2">
-        <option value="">{{ 'CMS Block...'|_ }}</option>
-        {% if library.heap.cms_blocks %}
-            {{ UTIL.optionsHtml(library.heap.cms_blocks, w.value) | raw }}
-        {% endif %}
-    </select>
-{% endmacro %}
-
-{% macro widget_template(w, library) %}
-    <select name="layout[widgets][value][]" class="_select2">
-        <option value="">{{ 'Template...'|_ }}</option>
-        {% if library.heap.templates %}
-            {{ UTIL.optionsHtml(library.heap.templates, w.value) | raw }}
-        {% endif %}
-    </select>
-{% endmacro %}
-
-{% macro widget_banner(w, library) %}
-    <select name="layout[widgets][value][]" class="_select2">
-        <option value="">{{ 'Banner...'|_ }}</option>
-        {% if library.heap.banners %}
-            {{ UTIL.optionsHtml(library.heap.banners, w.value) | raw }}
-        {% endif %}
-    </select>
-{% endmacro %}
-
-{% macro widget_text(w, library) %}
-    <textarea name="layout[widgets][value][]">{{ w.value }}</textarea>
-{% endmacro %}
-
-{% macro widget_remove(w, library) %}
-    <input name="layout[widgets][value][]" value="{{ w.value }}">
-{% endmacro %}
-
-<div class="row f-layout-editor">
+<div class="row f-layout-editor" id="layout-editor--{{ context.prefix }}">
     <div class="col-md-2">
         <h4>{{ 'Widget Library'|_ }}</h4>
-        <ul id="layout-editor-library" class="js-library-container js-sortable-container">
-            {% for w in library.widgets %}
-                {% if not w.hidden %}
-                    {{ _self.widget(w, library) }}
+        <ul class="js-library-container js-sortable-container js-layout-editor-library">
+            {% for widget in library.widgets %}
+                {% if not widget.persistent %}
+                    {{ _self.widget(widget, library, context) }}
                 {% endif %}
             {% endfor %}
         </ul>
-        <!--
-        <ul id="layout-editor-trash" class="js-trash-container js-sortable-container">
-            <li><div class="box">{{ 'Trash'|_ }}</div></li>
-        </ul>
-        -->
     </div>
 
-    <div id="layout-editor-container" class="col-md-10">
-<!--
-        <div class="btn-group">
-            <label class="btn btn-default active">
-                <input id="layout_show_header" name="layout_show_header" checked value="1" type="checkbox" autocomplete="off"> Show Header
-            </label>
-            <label class="btn btn-default active">
-                <input id="layout_show_footer" name="layout_show_footer" checked value="1" type="checkbox" autocomplete="off"> Show Footer
-            </label>
+    <div class="col-md-10 js-layout-editor-container">
+        <div class="js-layout-structure-control">
+            <label for="{{ context.prefix }}--area-header">{{ 'Header:'|_ }}</label>
+            <select id="{{ context.prefix }}--area-header" name="{{ context.prefix }}[area][header]">
+                {{ UTIL.optionsHtml(structureLayoutOptions, layout.area.header) | raw }}
+            </select>
+            <label for="{{ context.prefix }}--area-footer">{{ 'Footer:'|_ }}</label>
+            <select id="{{ context.prefix }}--area-footer" name="{{ context.prefix }}[area][footer]">
+                {{ UTIL.optionsHtml(structureLayoutOptions, layout.area.footer) | raw }}
+            </select>
+            <label for="{{ context.prefix }}--area-left">{{ 'Left Column:'|_ }}</label>
+            <select id="{{ context.prefix }}--area-left" name="{{ context.prefix }}[area][left]">
+                {{ UTIL.optionsHtml(structureLayoutOptions, layout.area.left) | raw }}
+            </select>
+            <label for="{{ context.prefix }}--area-right">{{ 'Right Column:'|_ }}</label>
+            <select id="{{ context.prefix }}--area-right" name="{{ context.prefix }}[area][right]">
+                {{ UTIL.optionsHtml(structureLayoutOptions, layout.area.right) | raw }}
+            </select>
         </div>
 
-        <div id="layout-editor-layout_type-container" class="btn-group">
-            <label class="btn btn-default active">
-                <input id="layout_type-3col" name="layout_type" value="3col" type="radio" checked> 3 Columns
-            </label>
-            <label class="btn btn-default">
-                <input id="layout_type-2col_left" name="layout_type" value="2col_left" type="radio"> 2 Columns - Left
-            </label>
-            <label class="btn btn-default">
-                <input id="layout_type-2col_right" name="layout_type" value="2col_right" type="radio"> 2 Columns - Right
-            </label>
-            <label class="btn btn-default">
-                <input id="layout_type-1col" name="layout_type" value="1col" type="radio"> 1 Column
-            </label>
-        </div>
--->
-        <div id="layout-editor-header_footer-container" class="btn-group">
-            <button type="button" class="btn btn-default {{ layout.show_header ? 'active' }}" id="layout_show_header"
-                    value="{{ layout.show_header }}" data-target="header">{{ 'Show Header'|_ }}</button>
-            <button type="button" class="btn btn-default {{ layout.show_footer ? 'active' }}" id="layout_show_footer"
-                    value="{{ layout.show_footer }}" data-target="footer">{{ 'Show Footer'|_ }}</button>
-            <input type="hidden" id="layout_show_header_value" name="layout[show_header]" value="{{ layout.show_header }}">
-            <input type="hidden" id="layout_show_footer_value" name="layout[show_footer]" value="{{ layout.show_footer }}">
-            <!--
-            <button type="button" class="btn btn-default {{ layout.show_footer ? 'active' }}" id="layout_show_footer" name="layout[show_footer]"
-                    value="{{ layout.show_footer }}" data-target="footer">{{ 'Show Left Column'|_ }}</button>
-            <button type="button" class="btn btn-default {{ layout.show_footer ? 'active' }}" id="layout_show_footer" name="layout[show_footer]"
-                    value="{{ layout.show_footer }}" data-target="footer">{{ 'Show Right Column'|_ }}</button>
--->
-        </div>
-
-        <div id="layout-editor-layout_type-container" class="btn-group">
-            <button type="button" class="btn btn-default {{ layout.columns == '3col' ? 'active' }}" value="3col">{{ '3 Columns'|_ }}</button>
-            <button type="button" class="btn btn-default {{ layout.columns == '2col_left' ? 'active' }}" value="2col_left">{{ '2 Columns (Left)'|_ }}</button>
-            <button type="button" class="btn btn-default {{ layout.columns == '2col_right' ? 'active' }}" value="2col_right">{{ '2 Columns (Right)'|_ }}</button>
-            <button type="button" class="btn btn-default {{ layout.columns == '1col' ? 'active' }}" value="1col">{{ '1 Column'|_ }}</button>
-            <input type="hidden" id="layout_columns_value" name="layout[columns]" value="{{ layout.columns }}">
-        </div>
-
-        <div class="row {{ not layout.show_header ? 'hidden' }}" id="layout-editor-container-header">
+        <div class="row js-layout-editor-header">
             <div class="col-md-12">
-                <ul id="layout-editor-area-header" class="js-area-container js-sortable-container" data-area="header">
-                    {% for w in layout.widgets %}{% if w.area == 'header' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+                <ul class="js-area-container js-sortable-container js-layout-editor-area-header" data-area="header">
+                    {% for w in layout.widgets %}{% if w.area == 'header' %}{{ _self.widget(w, library, context) }}{% endif %}{% endfor %}
                 </ul>
             </div>
         </div>
-        <div class="row" id="layout-editor-container-middle">
-            <div class="col-md-3" id="layout-editor-area-col_left">
-                <ul id="layout-editor-area-col_left" class="js-area-container js-sortable-container" data-area="col_left">
-                    {% for w in layout.widgets %}{% if w.area == 'col_left' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+        <div class="row js-layout-editor-container-middle">
+            <div class="col-md-3 js-layout-editor-left">
+                <ul class="js-area-container js-sortable-container js-layout-editor-area-left" data-area="left">
+                    {% for w in layout.widgets %}{% if w.area == 'left' %}{{ _self.widget(w, library, context) }}{% endif %}{% endfor %}
                 </ul>
             </div>
-            <div class="col-md-6" id="layout-editor-area-main">
-                <ul id="layout-editor-area-main" class="js-area-container js-sortable-container" data-area="main">
-                    {% for w in layout.widgets %}{% if w.area == 'main' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+            <div class="col-md-6 js-layout-editor-center">
+                <ul class="js-area-container js-sortable-container js-layout-editor-area-main" data-area="main">
+                    {% for w in layout.widgets %}{% if w.area == 'main' %}{{ _self.widget(w, library, context) }}{% endif %}{% endfor %}
                 </ul>
             </div>
-            <div class="col-md-3" id="layout-editor-area-col_right">
-                <ul id="layout-editor-area-col_right" class="js-area-container js-sortable-container" data-area="col_right">
-                    {% for w in layout.widgets %}{% if w.area == 'col_right' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+            <div class="col-md-3 js-layout-editor-right">
+                <ul class="js-area-container js-sortable-container js-layout-editor-area-right" data-area="right">
+                    {% for w in layout.widgets %}{% if w.area == 'right' %}{{ _self.widget(w, library, context) }}{% endif %}{% endfor %}
                 </ul>
             </div>
         </div>
-        <div class="row {{ not layout.show_footer ? 'hidden' }}" id="layout-editor-container-footer">
+        <div class="row js-layout-editor-footer">
             <div class="col-md-12">
-                <ul id="layout-editor-area-footer" class="js-area-container js-sortable-container" data-area="footer">
-                    {% for w in layout.widgets %}{% if w.area == 'footer' %}{{ _self.widget(w, library) }}{% endif %}{% endfor %}
+                <ul class="js-area-container js-sortable-container js-layout-editor-area-footer" data-area="footer">
+                    {% for w in layout.widgets %}{% if w.area == 'footer' %}{{ _self.widget(w, library, context) }}{% endif %}{% endfor %}
                 </ul>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    require(['jquery', 'sortable', 'select2'], function($, Sortable) {
+<div class="js-widget-declared-params-templates hidden">
+    {% for key, widget in library.declared %}
+        <div id="{{ context.prefix }}--declared-params--{{ key }}">
+            {{ _self.widget_declared_params_template(widget, library, context) }}
+        </div>
+    {% endfor %}
+</div>
 
-        function updateLayoutAreas(columns) {
-            switch (columns) {
-                case '3col':
-                    $('#layout-editor-area-col_left,#layout-editor-area-col_right').removeClass('hidden');
-                    $('#layout-editor-area-main').removeClass('col-md-9 col-md-12').addClass('col-md-6');
-                    break;
-                case '2col_left':
-                    $('#layout-editor-area-col_left').removeClass('hidden');
-                    $('#layout-editor-area-col_right').addClass('hidden');
-                    $('#layout-editor-area-main').removeClass('col-md-6 col-md-12').addClass('col-md-9');
-                    break;
-                case '2col_right':
-                    $('#layout-editor-area-col_left').addClass('hidden');
-                    $('#layout-editor-area-col_right').removeClass('hidden');
-                    $('#layout-editor-area-main').removeClass('col-md-6 col-md-12').addClass('col-md-9');
-                    break;
-                case '1col':
-                    $('#layout-editor-area-col_left,#layout-editor-area-col_right').addClass('hidden');
-                    $('#layout-editor-area-main').removeClass('col-md-6 col-md-9').addClass('col-md-12');
-                    break;
+<script>
+    require(['jquery', 'sortable'/*, 'select2'*/], function($, Sortable) {
+
+        var prefix = '{{ context.prefix }}', nextWidgetId = 0, nextCustomParamId = 0;
+
+        var $container = $('#layout-editor--' + prefix),
+            $header = $container.find('.js-layout-editor-header'),
+            $footer = $container.find('.js-layout-editor-footer'),
+            $left = $container.find('.js-layout-editor-left'),
+            $center = $container.find('.js-layout-editor-center'),
+            $right = $container.find('.js-layout-editor-right');
+
+        var idPrefix = '#' + prefix + '--area-',
+            $fHeader = $(idPrefix + 'header'),
+            $fFooter = $(idPrefix + 'footer'),
+            $fLeft = $(idPrefix + 'left'),
+            $fRight = $(idPrefix + 'right');
+
+        function updateLayoutAreas() {
+            if ($fHeader.val() == 'hide') {
+                $header.addClass('hidden');
+            } else {
+                $header.removeClass('hidden');
+            }
+            if ($fFooter.val() == 'hide') {
+                $footer.addClass('hidden');
+            } else {
+                $footer.removeClass('hidden');
+            }
+            if ($fLeft.val() == 'hide' && $fRight.val() == 'hide') {
+                $left.addClass('hidden');
+                $right.addClass('hidden');
+                $center.removeClass('col-md-6 col-md-9').addClass('col-md-12');
+            } else if ($fLeft.val() == 'hide') {
+                $left.addClass('hidden');
+                $right.removeClass('hidden');
+                $center.removeClass('col-md-6 col-md-12').addClass('col-md-9');
+            } else if ($fRight.val() == 'hide') {
+                $left.removeClass('hidden');
+                $right.addClass('hidden');
+                $center.removeClass('col-md-6 col-md-12').addClass('col-md-9');
+            } else {
+                $left.removeClass('hidden');
+                $right.removeClass('hidden');
+                $center.removeClass('col-md-9 col-md-12').addClass('col-md-6');
             }
         }
 
-        function updateWidgetAreaField(evt) {
-            var $item = $(evt.item), $area = $item.parents('.js-area-container'), $field = $item.find('[rel=widget-area]');
-            $field.val($area.data('area'));
+        function updateWidget(evt, added) {
+            var $widget = $(evt.item),
+                $area = $widget.parents('.js-area-container'),
+                $fArea = $widget.find('[rel=widget-area]');
+            $fArea.val($area.data('area'));
+            if (added) {
+                nextWidgetId--;
+                $widget.data('id', nextWidgetId);
+                $widget.find('input,textarea,select').each(function(idx, el) {
+                    var $el = $(el);
+                    $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + nextWidgetId + ']'))
+                });
+            }
         }
-
+        
         $('.js-library-container').each(function(idx, el) {
             Sortable.create(el, {
                 group: { name: 'widgets', put: false, pull: 'clone'},
@@ -234,33 +154,226 @@
                 group: 'widgets',
                 handle: '.js-sortable-handle',
                 //animation: 150,
-                onAdd: updateWidgetAreaField,
-                onUpdate: updateWidgetAreaField
+                onAdd: function (evt) { updateWidget(evt, true) },
+                onUpdate: function (evt) { updateWidget(evt, false) }
             });
         });
 
-        $('#layout-editor-layout_type-container button').click(function(ev) {
-            var $el = $(ev.target);
-            $el.siblings().removeClass('active');
-            $el.addClass('active');
-            updateLayoutAreas($el.val());
-            $('#layout_columns_value').val($el.val());
+        $container.on('click', '.js-widget-custom-param-add', function(e) {
+            var $newParam = $(this).siblings('.js-widget-custom-param-template').clone();
+            $newParam.removeClass('hidden');
+            $newParam.find('input').prop('disabled', false);
+
+            nextCustomParamId--;
+            $newParam.find('input').each(function(idx, el) {
+                var $el = $(el);
+                $el.prop('name', $el.prop('name').replace(/[\[]TEMPLATE[\]]/, '[' + nextCustomParamId + ']'))
+            });
+            $(this).siblings('.js-widget-custom-param-container').append($newParam);
+            return false;
         });
 
-        $('#layout-editor-header_footer-container button').click(function(ev) {
-            var $el = $(ev.target), $container = $('#layout-editor-container-' + $el.data('target'));
-            $el.val(1 - $el.val());
-            $el.toggleClass('active');
-            if ($el.val() == 1) {
-                $container.removeClass('hidden')
+        $container.on('click', '.js-widget-custom-param-remove', function(e) {
+            $(this).parents('.js-widget-custom-param').remove();
+            return false;
+        });
+
+        $container.on('change', '.js-widget-declared-type', function(e) {
+            var $template = $('#' + prefix + '--declared-params--' + $(this).val()),
+                $widget = $(this).parents('.js-widget-box');
+            if ($template) {
+                var $newParams = $template.clone(), widgetId = $widget.data('id');
+                $newParams.find('input,textarea,select').each(function(idx, el) {
+                    var $el = $(el);
+                    $el.prop('disabled', false);
+                    $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + widgetId + ']'))
+                });
             } else {
-                $container.addClass('hidden');
+                $newParams = '';
             }
-            $('#show_' + $el.data('target') + '_value').val($el.val());
+            $widget.find('.js-widget-declared-params').html($newParams);
         });
 
-        updateLayoutAreas('{{ layout.columns }}');
+        updateLayoutAreas();
+        $container.find('.js-layout-structure-control').find('select').change(updateLayoutAreas);
 
         //$('.select2').select2();
     });
 </script>
+
+
+{% macro widget(widget, library, context) %}
+
+    {% if widget.source_view %}
+        {% import LAYOUT.view(widget.source_view).twigName() as source %}
+    {% else %}
+        {% import _self as source %}
+    {% endif %}
+    {% set macro = widget.macro ?: 'widget__' ~ widget.type %}
+    <li>
+        <div class="box {{ widget.box_class }} js-widget-box" data-id="{{ widget.id }}">
+            <div class="box-header js-sortable-handle {{ widget.header_class }}">
+                <div class="title"><i class="icon-{{ widget.icon }}"></i>{{ widget.title }}</div>
+                <div class="actions">
+                    <!--<a class="btn box-collapse btn-link js-collapse" href="#"><i class="icon-chevron-down"></i></a>-->
+                    {% if not widget.persistent %}
+                        <a class="btn box-remove btn-link js-remove" href="#"><i class="icon-remove"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+            <input type="hidden" name="{{ context.prefix }}[widgets][{{ widget.id }}][area]" value="{{ widget.area }}" rel="widget-area">
+            <input type="hidden" name="{{ context.prefix }}[widgets][{{ widget.id }}][type]" value="{{ widget.type }}">
+            <div class="widget-contents widget-preview js-sortable-handle">{{ widget.title }}</div>
+            <div class="widget-contents widget-actual">
+                {{ attribute(source, macro, [widget, library, context]) }}
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </li>
+
+{% endmacro %}
+
+
+{% macro widget_custom_params(widget, library, context) %}
+
+    {% set fieldDefaults = {
+        id_prefix: context.prefix ~ '-widgets-' ~ widget.id ~ '-custom_params',
+        name_prefix: context.prefix ~ '[widgets][' ~ widget.id ~ '][custom_params]',
+    } %}
+
+    <div class="js-widget-custom-param-template hidden">
+        {{ _self.widget_custom_params_row('TEMPLATE', { template: true }, fieldDefaults) }}
+    </div>
+
+    <div class="js-widget-custom-param-container">
+        {% if widget.custom_params %}
+            {% for i, param in widget.custom_params %}
+                {{ _self.widget_custom_params_row(i, param, fieldDefaults) }}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <a class="js-widget-custom-param-add" href="#">{{ 'Add custom param'|_ }}</a>
+
+{% endmacro %}
+
+
+{% macro widget_custom_params_row(i, param, fieldDefaults) %}
+
+    <div class="js-widget-custom-param form-group row">
+        <div class="col-md-12">
+
+            <input type="text" class="form-control"
+                   id="{{ fieldDefaults.id_prefix }}-{{ i }}-k"
+                   name="{{ fieldDefaults.name_prefix }}[{{ i }}][k]"
+                   value="{{ param.k }}"
+                   {{ param.template ? 'disabled' }}
+                   placeholder="{{ 'Param'|_ }}">
+
+            <input type="text" class="form-control"
+                   id="{{ fieldDefaults.id_prefix }}-{{ i }}-v"
+                   name="{{ fieldDefaults.name_prefix }}[{{ i }}][v]"
+                   value="{{ param.v }}"
+                   {{ param.template ? 'disabled' }}
+                   placeholder="{{ 'Value'|_ }}">
+
+            <a class="js-widget-custom-param-remove" href="#"><i class="icon-remove"></i></a>
+        </div>
+    </div>
+
+{% endmacro %}
+
+
+{% macro widget_declared_params_template(widget, library, context) %}
+
+    {% import LAYOUT.view('core/form-elements').twigName() as forms %}
+
+    {% set fieldDefaults = {
+        id_prefix: context.prefix ~ '-widgets-TEMPLATE-params',
+        name_prefix: context.prefix ~ '[widgets][-ID-][params]',
+        label_class: 'col-md-6',
+        input_div_class: 'col-md-6',
+    } %}
+
+    {% if widget.params %}
+        {% for key, param in widget.params %}
+            {% set args = param.args | merge({disabled: true}) %}
+            {{ attribute(forms, param.type, [fieldDefaults, args]) }}
+        {% endfor %}
+    {% endif %}
+
+{% endmacro %}
+
+
+{% macro widget_declared_params(widget, library, context) %}
+    {% import LAYOUT.view('core/form-elements').twigName() as forms %}
+
+    {% set fieldDefaults = {
+        id_prefix: context.prefix ~ '-widgets-' ~ widget.id ~ '-params',
+        name_prefix: context.prefix ~ '[widgets][' ~ widget.id ~ '][params]',
+        label_class: 'col-md-6',
+        input_div_class: 'col-md-6',
+    } %}
+
+    {% set declaredParams = widget.value ? library.declared[widget.value].params : [] %}
+
+    <div class="js-widget-declared-params">
+        {% if declaredParams %}
+            {% for key, param in declaredParams %}
+                {% set args = param.args %}
+                {% if widget.params[key] is not empty %}
+                    {% set args = args|merge({value: widget.params[key]}) %}
+                {% endif %}
+                {{ attribute(forms, param.type, [fieldDefaults, args]) }}
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% macro widget__main_contents(widget, library, context) %}
+    <input type="hidden" name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" value="">
+{% endmacro %}
+
+
+{% macro widget__cms_block(widget, library, context) %}
+    <select name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control _select2">
+        <option value="">{{ 'CMS Block...'|_ }}</option>
+        {% if library.widgets.cms_block.options %}
+            {{ UTIL.optionsHtml(library.widgets.cms_block.options, widget.value) | raw }}
+        {% endif %}
+    </select>
+    {{ _self.widget_custom_params(widget, library, context) }}
+{% endmacro %}
+
+
+{% macro widget__template(widget, library, context) %}
+    <select name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control _select2">
+        <option value="">{{ 'Template...'|_ }}</option>
+        {% if library.widgets.template.options %}
+            {{ UTIL.optionsHtml(library.widgets.template.options, widget.value) | raw }}
+        {% endif %}
+    </select>
+    {{ _self.widget_custom_params(widget, library, context) }}
+{% endmacro %}
+
+
+{% macro widget__declared(widget, library, context) %}
+    <select name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control js-widget-declared-type _select2">
+        <option value="">{{ 'Widget...'|_ }}</option>
+        {% if library.widgets.declared.options %}
+            {{ UTIL.optionsHtml(library.widgets.declared.options, widget.value) | raw }}
+        {% endif %}
+    </select>
+    {{ _self.widget_declared_params(widget, library, context) }}
+    {{ _self.widget_custom_params(widget, library, context) }}
+{% endmacro %}
+
+
+{% macro widget__text(widget, library, context) %}
+    <textarea name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control">{{ widget.value }}</textarea>
+{% endmacro %}
+
+
+{% macro widget__remove(widget, library, context) %}
+    <input name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control" value="{{ widget.value }}">
+{% endmacro %}
