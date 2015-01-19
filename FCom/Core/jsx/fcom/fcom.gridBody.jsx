@@ -3,7 +3,7 @@
 /**
  * FCom GridBody Component
  */
-define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React, FComRow, Components) {
+define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], function (React, FComRow, Components) {
 
     /*
      var React = require('react');
@@ -132,7 +132,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components'], function (React,
             $(selected).parents('th').trigger('click');
         },
         componentDidMount: function() {
-            //$(".dataTable th").resizable({handles: 'e'});
+            $(".dataTable th").resizable({handles: 'e'});
         },
         showAll: function(event) {
             event.preventDefault();
