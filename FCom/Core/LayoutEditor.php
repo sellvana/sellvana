@@ -262,5 +262,21 @@ class FCom_Core_LayoutEditor extends BClass
                 $args['layout'][] = ['hook' => $w['area'], 'clear' => $w['value']];
             },
         ]);
+
+        $this->addWidgetType('split2', [
+            'title' => 'Split 2 Columns',
+            'pos' => 50,
+            'compile' => function ($args) {
+
+            },
+        ]);
+
+        $this->addWidgetType('split3', [
+            'title' => 'Split 3 Columns',
+            'pos' => 50,
+            'compile' => function ($args) {
+
+            },
+        ]);
     }
 }
