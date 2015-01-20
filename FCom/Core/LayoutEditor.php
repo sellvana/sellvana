@@ -8,10 +8,22 @@
  */
 class FCom_Core_LayoutEditor extends BClass
 {
+    /**
+     * Library of all available widget types
+     *
+     * @var array
+     */
     protected $_library = [
         'widgets' => [],
     ];
 
+    /**
+     * Add a widget type, called from fetchLibrary event
+     *
+     * @param string $type
+     * @param array $widget
+     * @return $this
+     */
     public function addWidgetType($type, $widget)
     {
         $widget['type'] = $type;
@@ -19,6 +31,13 @@ class FCom_Core_LayoutEditor extends BClass
         return $this;
     }
 
+    /**
+     * Add a declared widget, with named parameters
+     *
+     * @param string $name
+     * @param array $data
+     * @return $this
+     */
     public function addDeclaredWidget($name, $data)
     {
         $this->_library['widgets']['declared']['options'][$name] = $data['title'];
@@ -35,12 +54,24 @@ class FCom_Core_LayoutEditor extends BClass
         return $this;
     }
 
+    /**
+     * Add a layout type, for specific default layout. Ex: product, category, cms_page
+     *
+     * @param string $type
+     * @param array $layout
+     * @return $this
+     */
     public function addLayoutType($type, $layout)
     {
         $this->_library['layout'][$type] = $layout;
         return $this;
     }
 
+    /**
+     * Fetch library information and cache it
+     *
+     * @return array
+     */
     public function fetchLibrary()
     {
         if (empty($this->_library['widgets'])) {
@@ -60,19 +91,33 @@ class FCom_Core_LayoutEditor extends BClass
         return $this->_library;
     }
 
+    /**
+     * Retrieve a widget template from library
+     *
+     * @param string $type
+     * @return array|null
+     */
     public function getLibraryWidget($type)
     {
         $library = $this->fetchLibrary();
         return !empty($library['widgets'][$type]) ? $library['widgets'][$type] : null;
     }
 
-    public function normalizeLayoutData($layoutData, $type = null)
+    /**
+     * Make sure layout is normalized before using in admin editor or frontend compilation
+     *
+     * @param array $layoutData
+     * @param array $context
+     * @return array
+     */
+    public function normalizeLayoutData($layoutData, $context = [])
     {
         if (!empty($layoutData['normalized'])) {
             return $layoutData;
         }
 
         if (!$layoutData) {
+            $type = !empty($context['layout_type']) ? $context['layout_type'] : null;
             $layoutData = $this->getDefaultLayoutData($type);
         }
 
@@ -90,6 +135,12 @@ class FCom_Core_LayoutEditor extends BClass
         return $layoutData;
     }
 
+    /**
+     * Get default layout structure by type
+     *
+     * @param string|null $type
+     * @return array
+     */
     public function getDefaultLayoutData($type = null)
     {
         $default = [
@@ -105,10 +156,104 @@ class FCom_Core_LayoutEditor extends BClass
         return $default;
     }
 
+    /**
+     * Collect frontend layout instructions and return as layout structure to be displayed in admin
+     *
+     * @todo applyTheme
+     * @todo create central normalization of layout data and apply before converting
+     *
+     * @param string|array $layoutName
+     * @return array
+     */
+    public function collectExistingLayout($layoutName)
+    {
+        if (!$layoutName) {
+            return [];
+        }
+
+        $result = [];
+        // TODO: figure out how to load all possible programmatically applied layouts
+        $frontendLayout = $this->FCom_Frontend_Main->getLayout();
+        $loadedModules = $this->BModuleRegistry->getAllModules();
+        foreach ($loadedModules as $m) {
+            $frontendLayout->addModuleViewsDirsAndLayouts($m, 'FCom_Frontend');
+        }
+        $frontendLayout->loadLayoutFilesFromAllModules();
+        $collectedLayout = [];
+        foreach ((array)$layoutName as $ln) {
+            $layout = $frontendLayout->getLayout($ln);
+            if (!$layout) {
+                continue;
+            }
+            foreach ($layout as $lp) {
+                if (!empty($lp['include'])) {
+                    foreach ((array)$lp['include'] as $ln1) {
+                        $layout1 = $frontendLayout->getLayout($ln1);
+                        if (!$layout1) {
+                            continue;
+                        }
+                        $collectedLayout = array_merge($collectedLayout, $layout1);
+                    }
+                }
+            }
+            #$this->BDebug->dump($layout);
+            $collectedLayout = array_merge($collectedLayout, $layout);
+        }
+
+        #$this->BDebug->dump($collectedLayout);
+        $views = [];
+        $widgets = [];
+        foreach ($collectedLayout as $lp) {
+            if (empty($lp['hook'])) {
+                continue;
+            }
+            $area = $lp['hook'];
+            if (!in_array($area, ['header', 'footer', 'col_left', 'main', 'col_right'])) {
+                continue;
+            }
+            foreach ((array)$lp['views'] as $viewName) {
+                $views[$viewName] = 1;
+                $widgets[] = [
+                    'area' => $area,
+                    'type' => 'template',
+                    'value' => $viewName,
+                ];
+            }
+        }
+        foreach ($collectedLayout as $lp) {
+            if (empty($lp['view']) || empty($lp['set'])) {
+                continue;
+            }
+            $viewName = $lp['view'];
+            if (empty($views[$viewName])) {
+                continue;
+            }
+            foreach ($widgets as &$w) {
+                if ($w['value'] !== $viewName) {
+                    continue;
+                }
+                foreach ($lp['set'] as $k => $v) {
+                    $w['custom_params'][] = ['k' => $k, 'v' => $v];
+                }
+            }
+            unset($w);
+        }
+        $result['widgets'] = $widgets;
+
+        return $result;
+    }
+
+    /**
+     * Compile layout structure from admin editor into system layout to be applied on frontend
+     *
+     * @param array $layoutData
+     * @param array $context
+     * @return array
+     */
     public function compileLayout($layoutData, $context = [])
     {
         $layoutType = !empty($context['type']) ? $context['type'] : null;
-        $layoutData = $this->normalizeLayoutData($layoutData, $layoutType);
+        $layoutData = $this->normalizeLayoutData($layoutData, ['layout_type' => $layoutType]);
 
         $layout = [
             ['hook' => 'main', 'clear' => $context['main_view']],
@@ -147,6 +292,13 @@ class FCom_Core_LayoutEditor extends BClass
         return $layout;
     }
 
+    /**
+     * Process admin layout editor form post and convert it into storable layout structure
+     *
+     * @param array|null $post
+     * @return array
+     * @throws BException
+     */
     public function processFormPost($post = null)
     {
         if (is_string($post)) {
@@ -180,6 +332,11 @@ class FCom_Core_LayoutEditor extends BClass
         return $layout;
     }
 
+    /**
+     * Base fetchLibrary event observer that declares system widget types
+     *
+     * @param array $args
+     */
     public function onFetchLibrary($args)
     {
         $templates = [];
