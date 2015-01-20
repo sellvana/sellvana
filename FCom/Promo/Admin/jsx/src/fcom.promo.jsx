@@ -12,10 +12,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         },
         init: function (options) {
             $.extend(this.options, options);
-            var $modalContainer = $('<div/>').appendTo(document.body);
-            this.initCouponApp(this.options.coupon_select_id, $modalContainer);
-            this.initConditionsApp(this.options.condition_select_id, $modalContainer);
-            this.initActionsApp(this.options.actions_select_id, $modalContainer);
+            var $modalContainerCoupons = $('<div/>').appendTo(document.body);
+            var $modalContainerConditions = $('<div/>').appendTo(document.body);
+            var $modalContainerActions = $('<div/>').appendTo(document.body);
+            this.initCouponApp(this.options.coupon_select_id, $modalContainerCoupons);
+            this.initConditionsApp(this.options.condition_select_id, $modalContainerConditions);
+            this.initActionsApp(this.options.actions_select_id, $modalContainerActions);
         },
         initActionsApp: function (selector, $modalContainer) {
             var $actionsSelector = $('#' + selector);
