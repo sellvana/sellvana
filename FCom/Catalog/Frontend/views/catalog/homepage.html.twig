@@ -1,21 +1,2 @@
-{% set hlp = APP.instance('FCom_Catalog_Frontend') %}
-{% set featured = hlp.getFeaturedProducts() %}
-{% set popular = hlp.getPopularProducts() %}
-
-{% if featured %}
-  <div class="f-widget f-widget-featured-prods">
-    <header class="f-widget-header">
-      <strong class="f-widget-title">{{ 'Featured Products'|_ }}</strong>
-    </header>
-    {{ THIS.view('catalog/product/grid-tiles').set('products', featured) | raw }}
-  </div><!-- /.widget-featured-prods -->
-{% endif %}
-
-{% if popular %}
-  <div class="f-widget f-widget-featured-prods">
-    <header class="f-widget-header">
-      <strong class="f-widget-title">{{ 'Popular Products'|_ }}</strong>
-    </header>
-    {{ THIS.view('catalog/product/grid-tiles').set('products', popular) | raw }}
-  </div><!-- /.f-widget-featured-prods -->
-{% endif %}
+{{ THIS.view('catalog/featured-products') | raw }}
+{{ THIS.view('catalog/popular-products') | raw }}

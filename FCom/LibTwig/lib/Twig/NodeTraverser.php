@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /*
  * This file is part of Twig.
@@ -70,7 +70,7 @@ class Twig_NodeTraverser
     protected function traverseForVisitor(Twig_NodeVisitorInterface $visitor, Twig_NodeInterface $node = null)
     {
         if (null === $node) {
-            return null;
+            return;
         }
 
         $node = $visitor->enterNode($node, $this->env);
