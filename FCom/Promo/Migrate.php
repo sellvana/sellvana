@@ -1,14 +1,18 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * @property FCom_Promo_Model_Coupon $FCom_Promo_Model_Coupon
- * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
- * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
- * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
- * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
- * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
+ * @property FCom_Promo_Model_Coupon         $FCom_Promo_Model_Coupon
+ * @property FCom_Promo_Model_Promo          $FCom_Promo_Model_Promo
+ * @property FCom_Promo_Model_Group          $FCom_Promo_Model_Group
+ * @property FCom_Promo_Model_Media          $FCom_Promo_Model_Media
+ * @property FCom_Promo_Model_Product        $FCom_Promo_Model_Product
+ * @property FCom_Promo_Model_Cart           $FCom_Promo_Model_Cart
  * @property FCom_Promo_Model_CustomerCoupon $FCom_Promo_Model_CustomerCoupon
- * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Customer_Model_Customer    $FCom_Customer_Model_Customer
+ * @property FCom_Promo_Model_Order          $FCom_Promo_Model_Order
+ * @property FCom_Sales_Model_Cart           $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Model_Order          $FCom_Sales_Model_Order
+ * @property FCom_Catalog_Model_Product      $FCom_Catalog_Model_Product
  */
 class FCom_Promo_Migrate extends BClass
 {
@@ -197,29 +201,60 @@ class FCom_Promo_Migrate extends BClass
         $tPromo = $this->FCom_Promo_Model_Promo->table();
         $BDb->ddlTableDef($tPromo, [
             BDb::COLUMNS => [
-                'coupon_use_coupon' => 'TINYINT UNSIGNED DEFAULT 0 COMMENT 0 = Do not use, 1 = Single code, 2 = multiple codes',
+                'description'              => BDb::DROP,
+                'details'                  => BDb::DROP,
+                'manuf_vendor_id'          => BDb::DROP,
+                'buy_type'                 => BDb::DROP,
+                'buy_group'                => BDb::DROP,
+                'buy_amount'               => BDb::DROP,
+                'get_type'                 => BDb::DROP,
+                'get_group'                => BDb::DROP,
+                'get_amount'               => BDb::DROP,
+                'originator'               => BDb::DROP,
+                'fulfillment'              => BDb::DROP,
+                'coupon'                   => BDb::DROP,
+                'summary'                  => "VARCHAR(255) NOT NULL",
+                'internal_notes'           => "TEXT NULL",
+                'customer_label'           => "VARCHAR NULL",
+                'customer_details'         => "TEXT NULL",
+                'promo_type'               => "ENUM('catalog','cart') NOT NULL DEFAULT 'cart'",
+                'coupon_use_coupon'        => 'TINYINT UNSIGNED DEFAULT 0 COMMENT 0 = Do not use, 1 = Single code, 2 = multiple codes',
                 'coupon_uses_per_customer' => "INT(10) UNSIGNED NULL DEFAULT 0",
-                'coupon_uses_total' => "INT(10) UNSIGNED NULL DEFAULT 0",
+                'coupon_uses_total'        => "INT(10) UNSIGNED NULL DEFAULT 0",
+                'data_serialized'          => "TEXT",
+            ],
+            BDb::KEYS => [
+                'status_idx'     => "(status)",
+                'start_date_idx' => "(start_date)",
+                'end_date_idx'   => "(end_date)"
             ]
         ]);
 
-        $tCustomerCoupon = $this->FCom_Promo_Model_CustomerCoupon->table();
+        $tPromoOrder = $this->FCom_Promo_Model_Order->table();
 
-        $BDb->ddlTableDef($tCustomerCoupon, [
+        BDb::ddlTableDef($tPromoOrder, [
             BDb::COLUMNS => [
-                'id' => "INT(10) unsigned not null auto_increment",
-                'promo_id' => "INT(10) UNSIGNED NOT NULL",
-                'customer_id' => "INT(10) UNSIGNED NOT NULL",
-                'coupon_id' => "INT(10) UNSIGNED NOT NULL",
-                'created_at' => "DATETIME NOT NULL",
-                'updated_at' => "DATETIME NULL",
-                'action' => "VARCHAR(10) NOT NULL COMMENT 'apply' or 'cancel'",
+                'id'                 => "INT(10) unsigned not null auto_increment",
+                'promo_id'           => "INT(10) UNSIGNED NOT NULL",
+                'cart_id'            => "INT(10) UNSIGNED NOT NULL",
+                'order_id'           => "INT(10) UNSIGNED NULL",
+                'coupon_id'          => "INT(10) UNSIGNED NULL",
+                'free_cart_item_id'  => "INT(10) UNSIGNED NULL",
+                'free_order_item_id' => "INT(10) UNSIGNED NULL",
+                'subtotal_discount'  => "DECIMAL(12,2) NULL",
+                'shipping_discount'  => "DECIMAL(12,2) NULL",
+                'created_at'         => "DATETIME NOT NULL",
+                'updated_at'         => "DATETIME NULL",
+                'action'             => "VARCHAR(10) NOT NULL COMMENT 'apply' or 'cancel'",
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
-                "FK_{$tCustomerCoupon}_promo" => ["promo_id", $this->FCom_Promo_Model_Promo->table()],
-                "FK_{$tCustomerCoupon}_customer" => ["customer_id", $this->FCom_Customer_Model_Customer->table()],
-                "FK_{$tCustomerCoupon}_coupon" => ["coupon_id", $this->FCom_Promo_Model_Coupon->table()],
+                "FK_{$tPromoOrder}_promo" => ["promo_id", $this->FCom_Promo_Model_Promo->table()],
+                "FK_{$tPromoOrder}_cart" => ["cart_id", $this->FCom_Sales_Model_Cart->table()],
+                "FK_{$tPromoOrder}_order" => ["order_id", $this->FCom_Sales_Model_Order->table()],
+                "FK_{$tPromoOrder}_coupon" => ["coupon_id", $this->FCom_Promo_Model_Coupon->table()],
+                "FK_{$tPromoOrder}_cart_product" => ["free_cart_item_id", $this->FCom_Catalog_Model_Product->table()],
+                "FK_{$tPromoOrder}_order_product" => ["free_order_item_id", $this->FCom_Catalog_Model_Product->table()],
             ]
         ]);
     }
