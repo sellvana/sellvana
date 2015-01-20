@@ -2,7 +2,6 @@
 {% set library = hlp.fetchLibrary() %}
 {% set context = { prefix: THIS.get('prefix')|default('layout') } %}
 {% set layout = hlp.normalizeLayoutData(THIS.get('layout'), THIS.get('type')) %}
-{% set structureLayoutOptions = { '': 'No Change'|_, 'show': 'Force Show'|_, 'hide': 'Force Hide'|_ } %}
 
 <div class="row f-layout-editor" id="layout-editor--{{ context.prefix }}">
     <div class="col-md-2">
@@ -18,21 +17,17 @@
 
     <div class="col-md-10 js-layout-editor-container">
         <div class="js-layout-structure-control">
-            <label for="{{ context.prefix }}--area-header">{{ 'Header:'|_ }}</label>
-            <select id="{{ context.prefix }}--area-header" name="{{ context.prefix }}[area][header]">
-                {{ UTIL.optionsHtml(structureLayoutOptions, layout.area.header) | raw }}
+            <select name="{{ context.prefix }}[area][header]" class="form-control input-sm">
+                {{ UTIL.optionsHtml({ '': 'Inherit Header Visibility'|_, 'show': 'Show Header'|_, 'hide': 'Hide Header'|_ }, layout.area.header) | raw }}
             </select>
-            <label for="{{ context.prefix }}--area-footer">{{ 'Footer:'|_ }}</label>
-            <select id="{{ context.prefix }}--area-footer" name="{{ context.prefix }}[area][footer]">
-                {{ UTIL.optionsHtml(structureLayoutOptions, layout.area.footer) | raw }}
+            <select id="{{ context.prefix }}--area-footer" name="{{ context.prefix }}[area][footer]" class="form-control input-sm">
+                {{ UTIL.optionsHtml({ '': 'Inherit Footer Visibility'|_, 'show': 'Show Footer'|_, 'hide': 'Hide Footer'|_ }, layout.area.footer) | raw }}
             </select>
-            <label for="{{ context.prefix }}--area-left">{{ 'Left Column:'|_ }}</label>
-            <select id="{{ context.prefix }}--area-left" name="{{ context.prefix }}[area][left]">
-                {{ UTIL.optionsHtml(structureLayoutOptions, layout.area.left) | raw }}
+            <select id="{{ context.prefix }}--area-left" name="{{ context.prefix }}[area][left]" class="form-control input-sm">
+                {{ UTIL.optionsHtml({ '': 'Inherit Left Column Visibility'|_, 'show': 'Show Left Column'|_, 'hide': 'Hide Left Column'|_ }, layout.area.left) | raw }}
             </select>
-            <label for="{{ context.prefix }}--area-right">{{ 'Right Column:'|_ }}</label>
-            <select id="{{ context.prefix }}--area-right" name="{{ context.prefix }}[area][right]">
-                {{ UTIL.optionsHtml(structureLayoutOptions, layout.area.right) | raw }}
+            <select id="{{ context.prefix }}--area-right" name="{{ context.prefix }}[area][right]" class="form-control input-sm">
+                {{ UTIL.optionsHtml({ '': 'Inherit Right Column Visibility'|_, 'show': 'Show Right Column'|_, 'hide': 'Hide Right Column'|_ }, layout.area.right) | raw }}
             </select>
         </div>
 
@@ -239,6 +234,7 @@
     {% set fieldDefaults = {
         id_prefix: context.prefix ~ '-widgets-' ~ widget.id ~ '-custom_params',
         name_prefix: context.prefix ~ '[widgets][' ~ widget.id ~ '][custom_params]',
+        input_class: 'input-sm',
     } %}
 
     <div class="js-widget-custom-param-template hidden">
@@ -252,32 +248,28 @@
             {% endfor %}
         {% endif %}
     </div>
-    <a class="js-widget-custom-param-add" href="#">{{ 'Add custom param'|_ }}</a>
+    <button type="button" class="js-widget-custom-param-add btn btn-default btn-sm">{{ 'Add custom param'|_ }}</button>
 
 {% endmacro %}
 
 
 {% macro widget_custom_params_row(i, param, fieldDefaults) %}
 
-    <div class="js-widget-custom-param form-group row">
-        <div class="col-md-12">
-
-            <input type="text" class="form-control"
-                   id="{{ fieldDefaults.id_prefix }}-{{ i }}-k"
-                   name="{{ fieldDefaults.name_prefix }}[{{ i }}][k]"
-                   value="{{ param.k }}"
-                   {{ param.template ? 'disabled' }}
-                   placeholder="{{ 'Param'|_ }}">
-
-            <input type="text" class="form-control"
-                   id="{{ fieldDefaults.id_prefix }}-{{ i }}-v"
-                   name="{{ fieldDefaults.name_prefix }}[{{ i }}][v]"
-                   value="{{ param.v }}"
-                   {{ param.template ? 'disabled' }}
-                   placeholder="{{ 'Value'|_ }}">
-
-            <a class="js-widget-custom-param-remove" href="#"><i class="icon-remove"></i></a>
-        </div>
+    <div class="js-widget-custom-param input-group input-group-sm">
+        <input type="text" class="form-control {{ fieldDefaults.input_class }}"
+               id="{{ fieldDefaults.id_prefix }}-{{ i }}-k"
+               name="{{ fieldDefaults.name_prefix }}[{{ i }}][k]"
+               value="{{ param.k }}"
+               {{ param.template ? 'disabled' }}
+               placeholder="{{ 'Param'|_ }}">
+        <span class="input-group-addon"> = </span>
+        <input type="text" class="form-control {{ fieldDefaults.input_class }}"
+               id="{{ fieldDefaults.id_prefix }}-{{ i }}-v"
+               name="{{ fieldDefaults.name_prefix }}[{{ i }}][v]"
+               value="{{ param.v }}"
+               {{ param.template ? 'disabled' }}
+               placeholder="{{ 'Value'|_ }}">
+        <a class="js-widget-custom-param-remove input-group-addon" href="#"><i class="icon-remove"></i></a>
     </div>
 
 {% endmacro %}
@@ -292,6 +284,7 @@
         name_prefix: context.prefix ~ '[widgets][-ID-][params]',
         label_class: 'col-md-6',
         input_div_class: 'col-md-6',
+        input_class: 'input-sm',
     } %}
 
     {% if widget.params %}
@@ -312,6 +305,7 @@
         name_prefix: context.prefix ~ '[widgets][' ~ widget.id ~ '][params]',
         label_class: 'col-md-6',
         input_div_class: 'col-md-6',
+        input_class: 'input-sm',
     } %}
 
     {% set declaredParams = widget.value ? library.declared[widget.value].params : [] %}
@@ -336,7 +330,7 @@
 
 
 {% macro widget__cms_block(widget, library, context) %}
-    <select name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control _select2">
+    <select name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control input-sm_select2">
         <option value="">{{ 'CMS Block...'|_ }}</option>
         {% if library.widgets.cms_block.options %}
             {{ UTIL.optionsHtml(library.widgets.cms_block.options, widget.value) | raw }}
@@ -347,7 +341,7 @@
 
 
 {% macro widget__template(widget, library, context) %}
-    <select name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control _select2">
+    <select name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control input-sm _select2">
         <option value="">{{ 'Template...'|_ }}</option>
         {% if library.widgets.template.options %}
             {{ UTIL.optionsHtml(library.widgets.template.options, widget.value) | raw }}
@@ -358,7 +352,7 @@
 
 
 {% macro widget__declared(widget, library, context) %}
-    <select name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control js-widget-declared-type _select2">
+    <select name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control input-sm js-widget-declared-type _select2">
         <option value="">{{ 'Widget...'|_ }}</option>
         {% if library.widgets.declared.options %}
             {{ UTIL.optionsHtml(library.widgets.declared.options, widget.value) | raw }}
@@ -370,10 +364,47 @@
 
 
 {% macro widget__text(widget, library, context) %}
-    <textarea name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control">{{ widget.value }}</textarea>
+    <textarea name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control input-sm">{{ widget.value }}</textarea>
 {% endmacro %}
 
 
 {% macro widget__remove(widget, library, context) %}
     <input name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" class="form-control" value="{{ widget.value }}">
+{% endmacro %}
+
+
+{% macro widget__split2(widget, library, context) %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="js-area-container js-sortable-container" style="min-height:100px">
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="js-area-container js-sortable-container" style="min-height:100px">
+
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro widget__split3(widget, library, context) %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="js-area-container js-sortable-container" style="min-height:100px">
+
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="js-area-container js-sortable-container" style="min-height:100px">
+
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="js-area-container js-sortable-container" style="min-height:100px">
+
+            </div>
+        </div>
+    </div>
 {% endmacro %}

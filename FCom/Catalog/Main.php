@@ -28,6 +28,12 @@ class FCom_Catalog_Main extends BClass
                             'value' => 6,
                         ],
                     ],
+                    'auto_scroll' => [
+                        'type' => 'boolean',
+                        'args' => [
+                            'label' => 'Auto Scroll',
+                        ]
+                    ]
                 ],
             ])
             ->addDeclaredWidget('popular_products', [
