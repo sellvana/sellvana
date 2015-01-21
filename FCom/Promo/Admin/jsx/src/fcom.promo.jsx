@@ -12,6 +12,20 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         },
         init: function (options) {
             $.extend(this.options, options);
+
+            var $promoOptions = $('#' + this.options.promo_serialized);
+            if($promoOptions.length) {
+                var val = $promoOptions.val();
+                if (val) {
+                    try {
+                        this.options.promoOptions = JSON.parse(val);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                this.options.promoOptionsEl = $promoOptions;
+            }
+
             var $modalContainerCoupons = $('<div/>').appendTo(document.body);
             var $modalContainerConditions = $('<div/>').appendTo(document.body);
             var $modalContainerActions = $('<div/>').appendTo(document.body);
@@ -26,7 +40,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 return;
             }
             var $container = $("#" + this.options.actions_container_id);
-            React.render(<Actions actionType={$actionsSelector}
+            var promoActions = this.options.promoOptions['actions'] || {};
+            React.render(<Actions actionType={$actionsSelector} actions={promoActions} onUpdate={this.onActionsUpdate}
                             options={this.options} modalContainer={$modalContainer}/>, $container.get(0));
         },
         initConditionsApp: function (selector, $modalContainer) {
@@ -35,7 +50,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 this.log("Conditions drop-down not found");
             } else {
                 var $container = $("#" + this.options.condition_container_id);
-                React.render(<ConditionsApp conditionType={$conditionSelector}
+                var promoConditions = this.options.promoOptions['conditions'] || {};
+                React.render(<ConditionsApp conditionType={$conditionSelector} conditions={promoConditions} onUpdate={this.onConditionsUpdate}
                     options={this.options} modalContainer={$modalContainer}/>,$container.get(0));
             }
         },
@@ -65,7 +81,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             }
         },
         createCouponApp: function (appContainer, modalContainer, callBacks, mode, options) {
-            React.render(<CouponApp.App {...callBacks} mode={mode} options={options}/>, appContainer);
+            React.render(<CouponApp.App {...callBacks} mode={mode} options={options} onUpdate={this.onCouponsUpdate}/>, appContainer);
             React.render(
                 <div className="modals-container">
                     <Components.Modal title="Coupon grid" onLoad={this.addShowCodes.bind(this)}/>
@@ -84,7 +100,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             condition_container_id: 'conditions-options',
             actions_add_id: 'action_add',
             condition_add_id: 'condition_action_add',
-            conditions_serialized: 'conditions_serialized',
+            promo_serialized: '',
+            promoOptions: {},
             debug: false
         },
         showCodesModal: null,
@@ -283,6 +300,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         },
         updateGrid: function (grid_id, newRows) {
             var grid = window[grid_id];
+            this.onCouponsUpdate(newRows);
             if (grid) {
                 console.log("grid found, adding to grid");
                 Promo.addGridRows(grid, newRows)
@@ -315,6 +333,30 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 type: "grid_count_update",
                 numCodes: gridRows.size()
             });
+        },
+        onActionsUpdate: function (e) {
+            console.log(e);
+            this.updatePromoOptions();
+        },
+        onConditionsUpdate: function (e) {
+            console.log(e);
+            this.updatePromoOptions();
+        },
+        onCouponsUpdate: function (newRows) {
+            console.log(newRows);
+            if (this.options.promoOptions['coupons'] == undefined) {
+                this.options.promoOptions['coupons'] = [];
+            }
+            this.options.promoOptions['coupons'] = this.options.promoOptions['coupons'].concat(newRows);
+            this.updatePromoOptions();
+        },
+        updatePromoOptions: function () {
+            if(this.options.promoOptionsEl) {
+                var values = this.options.promoOptions;
+                this.options.promoOptionsEl.val(JSON.stringify(values));
+            } else {
+                console.error("Cannot find serialized options element");
+            }
         }
     };
     window.couponsGridRegister = function (grid) {

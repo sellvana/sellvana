@@ -880,6 +880,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     });
 
     var ConditionsApp = React.createClass({
+        displayName: 'ConditionsApp',
         render: function () {
             return (<div className="conditions panel panel-default">
                     {this.state.data.map(function (field, i) {
