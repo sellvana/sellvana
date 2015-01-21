@@ -258,6 +258,8 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
             //quick search
             var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} onChange={this.quickSearch} />;
 
+            var disabledClass = !this.props.getSelectedRows().length ? ' disabled' : '';
+
             return (
                 <div className="col-sm-6">
                     {quickSearch}
@@ -269,8 +271,8 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                             {options}
                         </ol>
                     </div>
-                    <a className="btn grid-mass-edit btn-success disabled" role="button" href="#" >Edit</a>
-                    <button className="btn grid-mass-delete btn-danger disabled" type="button">Delete</button>
+                    <a className={"btn grid-mass-edit btn-success" + disabledClass} role="button" href="#" >Edit</a>
+                    <button className={"btn grid-mass-delete btn-danger" + disabledClass} type="button">Delete</button>
                 </div>
             )
         }

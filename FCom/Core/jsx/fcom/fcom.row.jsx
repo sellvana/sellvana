@@ -14,10 +14,16 @@ define(['underscore', 'react'], function (_, React) {
         getDefaultProps: function () {
             return {
                 "row": {},
-                "columnMetadata": null,
+                "origRow": {},
                 "index": 0,
-                "doButtonAction": null
+                "columnMetadata": null,
+                "doButtonAction": null,
+                "updateSelectedRow": null,
+                "getSelectedRows": null
             }
+        },
+        selectRow: function(event) {
+            this.props.updateSelectedRow(this.props.origRow, !event.target.checked);
         },
         render: function () {
             var that = this;
@@ -37,7 +43,7 @@ define(['underscore', 'react'], function (_, React) {
                 var node = "";
                 switch (col.type) {
                     case 'row_select':
-                        node = <input type="checkbox" name={id + "[checked][" + that.props.row.id + "]"} className="select-row" />;
+                        node = <input type="checkbox" name={id + "[checked][" + that.props.row.id + "]"} className="select-row" onChange={that.selectRow} />;
                         break;
                     case 'btn_group':
                         var actions = col.buttons.map(function(btn) {
