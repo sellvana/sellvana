@@ -88,6 +88,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 query: self.select2query
             });
             $('select.to-select2', this.getDOMNode()).select2();
+        },
+        onChange: function () {
+            //todo collect values
+            if(this.props.onUpdate) {
+                this.props.onUpdate({"category": value});
+            }
         }
     });
 
@@ -139,6 +145,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 value: value
             });
             modal.close();
+            if(this.props.onUpdate) {
+                this.props.onUpdate({"condition": value});
+            }
         },
         registerModal: function (modal) {
             this.modal = modal;
@@ -545,6 +554,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 }
             });
             $('select.to-select2', this.getDOMNode()).select2();
+        },
+        onChange: function () {
+            //todo collect values
+            if(this.props.onUpdate) {
+                this.props.onUpdate({"category": value});
+            }
         }
     });
 
@@ -553,12 +568,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType}/>
+                    <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType} onChange={this.onChange}/>
                     <div className="col-md-2">
-                        <Common.Compare ref="cartTotalCond" id="cartTotalCond" />
+                        <Common.Compare ref="cartTotalCond" id="cartTotalCond" onChange={this.onChange}/>
                     </div>
                     <div className="col-md-1">
-                        <input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left"/>
+                        <input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left" onChange={this.onChange}/>
                     </div>
                 </Common.Row>
             );
@@ -566,13 +581,23 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         getDefaultProps: function () {
             return {
                 rowClass: "cart-total",
-                totalType: [{id: "qty", label: "QTY OF ITEMS"}, {id: "amt", label: "$Value/Amount OF ITEMS"}],
+                totalType: [{id: "qty", label: "QTY OF ITEMS"}, {id: "amt", label: "$ Value/Amount OF ITEMS"}],
                 label: "Cart Total",
                 type: 'total'
             };
         },
         componentDidMount: function () {
             $('select.to-select2', this.getDOMNode()).select2();
+        },
+        onChange: function () {
+            var value = {};
+            value.type = $(this.refs['cartTotalType'].getDOMNode()).val();
+            value.filter = $(this.refs['cartTotalCond'].getDOMNode()).val();
+            value.value = $(this.refs['cartTotalValue'].getDOMNode()).val();
+
+            if(this.props.onUpdate) {
+                this.props.onUpdate({'total': value});
+            }
         }
     });
 
@@ -623,6 +648,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 value: value
             });
             modal.close();
+            if(this.props.onUpdate) {
+                this.props.onUpdate({"shipping": value});
+            }
         },
         registerModal: function (modal) {
             this.modal = modal;
