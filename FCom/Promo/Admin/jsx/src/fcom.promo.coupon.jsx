@@ -164,7 +164,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
     });
 
     var App = React.createClass({
-        displayName: 'CouponApp',
+        displayName: 'CouponsApp',
         render: function () {
             //noinspection BadExpressionStatementJS
             var child = "";

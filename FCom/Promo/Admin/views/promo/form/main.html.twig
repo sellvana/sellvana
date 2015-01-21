@@ -77,8 +77,8 @@
             select2: {minimumResultsForSearch: 15}, options: ["No coupon code required"|_, "Single coupon code"|_, "Multiple coupon codes"|_]
         }) }}
         <div id="coupon-options"></div>
+        {{ forms.hidden({field:"promo_serialized", value: validator.fieldValue("promo_serialized")}) }}
         <div class="form-group">
-            {{ forms.hidden({field:"conditions_serialized", value: validator.fieldValue("conditions_serialized")}) }}
             <label class="control-label col-md-3" for="model-conditions">{{"Conditions"|_}}&nbsp;
                     <a id="help-model-conditions" class="pull-right help-icon" href="#"
                        data-toggle="popover" data-trigger="focus" data-content="{{"Configure conditions"|_}}"
@@ -106,7 +106,6 @@
         <div id="conditions-options"></div>
 
         <div class="form-group">
-            {{ forms.hidden({field:"actions_serialized", value: validator.fieldValue("actions_serialized")}) }}
             <label class="control-label col-md-3" for="model-actions">{{"Promo Actions"|_}}&nbsp;
                     <a id="help-model-actions" class="pull-right help-icon" href="#"
                        data-toggle="popover" data-trigger="focus" data-content="{{"Configure promo actions"|_}}"
@@ -123,7 +122,7 @@
             </div>
         </div>
         <div id="actions-options"></div>
-
+{% set elView = LAYOUT.view('core/form-elements') %}
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
                 $('select.to-select2').select2();
@@ -134,7 +133,7 @@
                     coupon_container_id: 'coupon-options',
                     condition_container_id: 'conditions-options',
                     actions_container_id: "actions-options",
-                    conditions_serialized: 'conditions_serialized',
+                    promo_serialized: "{{ elView.getInputId({'field':'promo_serialized'}) }}",
                     showCouponsUrl: "{{ APP.href('promo/coupons/view?id=') ~ m.id() }}", // "/admin/promo/coupons/view?id=1",
                     generateCouponsUrl: "{{ APP.href('promo/coupons/generate?id=') ~ m.id() }}", // "/admin/promo/coupons/generate?id=1",
                     importCouponsUrl: "{{ APP.href('promo/coupons/import?id=') ~ m.id() }}", // "/admin/promo/coupons/import?id=1",

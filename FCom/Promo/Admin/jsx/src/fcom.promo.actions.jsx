@@ -703,6 +703,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     });
 
     var ActionsApp = React.createClass({
+        displayName: 'ActionsApp',
         render: function () {
             return (<div className="actions">
                     {this.state.data.map(function (field) {
