@@ -96,7 +96,8 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             /*console.log('FComGridBody.columnMetadata', this.props.columnMetadata);
             console.log('FComGridBody.columns', this.props.columns);*/
 
-            var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn} sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata}/>;
+            var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn}
+                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} getSelectedRows={that.props.getSelectedRows} />;
 
             var nodes = this.props.data.map(function (row, index) {
                 var origRow = _.findWhere(that.props.originalData, {id: row.id});
@@ -186,27 +187,46 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
         },
         render: function(){
             var that = this;
+            var selectedRows = this.props.getSelectedRows();
 
             var nodes = this.props.columns.map(function(col, index){
 
                 //checkbox
                 if (col == '0') {
+
+                    var selectionButtonText = (
+                        <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
+                            <span className="icon-placeholder">
+                                <i className="glyphicon glyphicon-list"></i>
+                            </span>
+                            <span className="title">A</span>&nbsp;<span className="caret"></span>
+                        </button>
+                    );
+
+                    var selectionDropdownNodes = [];
+                    selectionDropdownNodes.push(<li><a href="#" onClick={that.showAll}>Show All</a></li>);
+
+                    if (selectedRows.length) {
+                        selectionButtonText = (
+                            <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
+                                <span className="icon-placeholder">
+                                    <i className="glyphicon glyphicon-check"></i>
+                                </span>
+                                <span className="title">{selectedRows.length + (selectedRows.length ? ' rows' : ' row')}</span>&nbsp;<span className="caret"></span>
+                            </button>
+                        );
+
+                        selectionDropdownNodes.push(<li><a href="#" onClick={that.showSelected}>Show Selected</a></li>);
+                        selectionDropdownNodes.push(<li><a href="#" onClick={that.selectVisible}>Select Visible</a></li>);
+                        selectionDropdownNodes.push(<li><a href="#" onClick={that.unselectVisible}>Unselect Visible</a></li>);
+                        selectionDropdownNodes.push(<li><a href="#" onClick={that.unselectAll}>Unselect All</a></li>);
+                    }
+
                     return (
                         <th className="js-draggable ui-resizable" data-id="0">
                             <div className="dropdown f-grid-display-type">
-                                <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
-                                    <span className="icon-placeholder">
-                                        <i className="glyphicon glyphicon-list"></i>
-                                    </span>
-                                    <span className="title">A</span>&nbsp;<span className="caret"></span>
-                                </button>
-                                <ul className="dropdown-menu js-sel">
-                                    <li><a href="#" onClick={that.showAll}>Show All</a></li>
-                                    <li><a href="#" onClick={that.showSelected}>Show Selected</a></li>
-                                    <li><a href="#" onClick={that.selectVisible}>Select Visible</a></li>
-                                    <li><a href="#" onClick={that.unselectVisible}>Unselect Visible</a></li>
-                                    <li><a href="#" onClick={that.unselectAll}>Unselect All</a></li>
-                                </ul>
+                                {selectionButtonText}
+                                <ul className="dropdown-menu js-sel">{selectionDropdownNodes}</ul>
                             </div>
                         </th>
                     );
