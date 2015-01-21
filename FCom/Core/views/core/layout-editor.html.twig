@@ -1,7 +1,13 @@
 {% set hlp = APP.instance('FCom_Core_LayoutEditor') %}
 {% set library = hlp.fetchLibrary() %}
-{% set context = { prefix: THIS.get('prefix')|default('layout') } %}
-{% set layout = hlp.normalizeLayoutData(THIS.get('layout'), THIS.get('type')) %}
+{% set context = {
+    prefix: THIS.get('prefix')|default('layout'),
+    layout_type: THIS.get('type'),
+} %}
+{#% set existingLayout = hlp.normalizeLayoutData(hlp.collectExistingLayout(THIS.get('frontend_layout_name')), context) %#}
+{% set newLayout = hlp.normalizeLayoutData(THIS.get('layout'), context) %}
+{#% set layout = UTIL.arrayMerge(existingLayout, newLayout) %#}
+{% set layout = newLayout %}
 
 <div class="row f-layout-editor" id="layout-editor--{{ context.prefix }}">
     <div class="col-md-2">
