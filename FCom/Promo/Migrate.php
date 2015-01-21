@@ -201,32 +201,37 @@ class FCom_Promo_Migrate extends BClass
         $tPromo = $this->FCom_Promo_Model_Promo->table();
         $BDb->ddlTableDef($tPromo, [
             BDb::COLUMNS => [
-                'description'              => BDb::DROP,
-                'details'                  => BDb::DROP,
-                'manuf_vendor_id'          => BDb::DROP,
-                'buy_type'                 => BDb::DROP,
-                'buy_group'                => BDb::DROP,
-                'buy_amount'               => BDb::DROP,
-                'get_type'                 => BDb::DROP,
-                'get_group'                => BDb::DROP,
-                'get_amount'               => BDb::DROP,
-                'originator'               => BDb::DROP,
-                'fulfillment'              => BDb::DROP,
-                'coupon'                   => BDb::DROP,
+                'description'     => BDb::DROP,
+                'details'         => BDb::DROP,
+                'manuf_vendor_id' => BDb::DROP,
+                'buy_type'        => BDb::DROP,
+                'buy_group'       => BDb::DROP,
+                'buy_amount'      => BDb::DROP,
+                'get_type'        => BDb::DROP,
+                'get_group'       => BDb::DROP,
+                'get_amount'      => BDb::DROP,
+                'originator'      => BDb::DROP,
+                'fulfillment'     => BDb::DROP,
+                'coupon'          => BDb::DROP,
+            ]
+        ]);
+
+        $BDb->ddlTableDef($tPromo, [
+            BDb::COLUMNS => [
                 'summary'                  => "VARCHAR(255) NOT NULL",
                 'internal_notes'           => "TEXT NULL",
-                'customer_label'           => "VARCHAR NULL",
+                'customer_label'           => "VARCHAR(255) NULL",
                 'customer_details'         => "TEXT NULL",
                 'promo_type'               => "ENUM('catalog','cart') NOT NULL DEFAULT 'cart'",
-                'coupon_use_coupon'        => 'TINYINT UNSIGNED DEFAULT 0 COMMENT 0 = Do not use, 1 = Single code, 2 = multiple codes',
+                'coupon_use_coupon'        => 'TINYINT UNSIGNED DEFAULT 0 COMMENT "0 = Do not use, 1 = Single code, 2 = multiple codes"',
                 'coupon_uses_per_customer' => "INT(10) UNSIGNED NULL DEFAULT 0",
                 'coupon_uses_total'        => "INT(10) UNSIGNED NULL DEFAULT 0",
                 'data_serialized'          => "TEXT",
             ],
             BDb::KEYS => [
                 'status_idx'     => "(status)",
-                'start_date_idx' => "(start_date)",
-                'end_date_idx'   => "(end_date)"
+                'from_date_idx' => "(from_date)",
+                'to_date_idx'   => "(to_date)"
             ]
         ]);
 
@@ -245,7 +250,7 @@ class FCom_Promo_Migrate extends BClass
                 'shipping_discount'  => "DECIMAL(12,2) NULL",
                 'created_at'         => "DATETIME NOT NULL",
                 'updated_at'         => "DATETIME NULL",
-                'action'             => "VARCHAR(10) NOT NULL COMMENT 'apply' or 'cancel'",
+                'action'             => "VARCHAR(10) NOT NULL COMMENT \"'apply' or 'cancel'\"",
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
