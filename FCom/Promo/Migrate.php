@@ -223,15 +223,14 @@ class FCom_Promo_Migrate extends BClass
                 'customer_label'           => "VARCHAR(255) NULL",
                 'customer_details'         => "TEXT NULL",
                 'promo_type'               => "ENUM('catalog','cart') NOT NULL DEFAULT 'cart'",
-                'coupon_use_coupon'        => 'TINYINT UNSIGNED DEFAULT 0 COMMENT "0 = Do not use, 1 = Single code, 2 = multiple codes"',
+                'coupon_type'              => 'TINYINT UNSIGNED DEFAULT 0 COMMENT "0 = Do not use, 1 = Single code, 2 = multiple codes"',
                 'coupon_uses_per_customer' => "INT(10) UNSIGNED NULL DEFAULT 0",
                 'coupon_uses_total'        => "INT(10) UNSIGNED NULL DEFAULT 0",
                 'data_serialized'          => "TEXT",
             ],
             BDb::KEYS => [
-                'status_idx'     => "(status)",
-                'from_date_idx' => "(from_date)",
-                'to_date_idx'   => "(to_date)"
+                'IDX_promo_status'     => "(status)",
+                'IDX_promo_from_to_date' => "(from_date, to_date)",
             ]
         ]);
 
