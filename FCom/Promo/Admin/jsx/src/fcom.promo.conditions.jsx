@@ -92,7 +92,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         onChange: function () {
             //todo collect values
             if(this.props.onUpdate) {
-                this.props.onUpdate({"category": value});
+                this.props.onUpdate({"sku": value});
             }
         }
     });
