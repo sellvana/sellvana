@@ -40,7 +40,27 @@
             select2: 1, options: ['Pending'|_, 'Active'|_, 'Expired'|_],
             input_div_class: "col-md-2"
         }) }}
+        {% if customerGroups %}
+            {{ forms.select({
+                label: 'Customer Groups'|_,label_class: labelClass,
+                field: "customer-groups",
+                value: validator.fieldValue('customer-groups'), help_icon: 1,
+                help_text: "Promotion Customer Groups"|_,
+                multiple: 'multiple',
+                select2: {minimumResultsForSearch: 15}, options: customerGroups,
+            }) }}
+        {% endif %}
 
+        {% if sites %}
+            {{ forms.select({
+                label: 'Websites'|_,label_class: labelClass,
+                field: "websites",
+                value: validator.fieldValue('websites'), help_icon: 1,
+                multiple: 'multiple',
+                help_text: "Promotion websites"|_,
+                select2: {minimumResultsForSearch: 15}, options: sites,
+            }) }}
+        {% endif %}
 
         {{ forms.input({label: 'Date Range'|_, required: 1, name: "model[date_range]",
             value: validator.fieldValue('date_range'),label_class: labelClass,
@@ -63,10 +83,6 @@
                 });
             });
 
-//            require(['react', 'jsx!fcom.promo'], function(React, Promo) {
-//                Promo.createGrid();
-//                console.log(Promo);
-//            })
         </script>
         {{ forms.select({
             label: "Coupon Code Enter For Validity"|_,label_class: labelClass,
