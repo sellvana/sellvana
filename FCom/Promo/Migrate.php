@@ -236,30 +236,49 @@ class FCom_Promo_Migrate extends BClass
         ]);
 
         $tPromoOrder = $this->FCom_Promo_Model_Order->table();
+        $tPromoCart = $this->FCom_Promo_Model_Cart->table();
 
         BDb::ddlTableDef($tPromoOrder, [
             BDb::COLUMNS => [
                 'id'                 => "INT(10) unsigned not null auto_increment",
                 'promo_id'           => "INT(10) UNSIGNED NOT NULL",
-                'cart_id'            => "INT(10) UNSIGNED NOT NULL",
                 'order_id'           => "INT(10) UNSIGNED NULL",
                 'coupon_id'          => "INT(10) UNSIGNED NULL",
-                'free_cart_item_id'  => "INT(10) UNSIGNED NULL",
                 'free_order_item_id' => "INT(10) UNSIGNED NULL",
+                'coupon_code'        => "INT(10) UNSIGNED NULL",
                 'subtotal_discount'  => "DECIMAL(12,2) NULL",
                 'shipping_discount'  => "DECIMAL(12,2) NULL",
                 'created_at'         => "DATETIME NOT NULL",
                 'updated_at'         => "DATETIME NULL",
-                'action'             => "VARCHAR(10) NOT NULL COMMENT \"'apply' or 'cancel'\"",
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
                 "FK_{$tPromoOrder}_promo" => ["promo_id", $this->FCom_Promo_Model_Promo->table()],
-                "FK_{$tPromoOrder}_cart" => ["cart_id", $this->FCom_Sales_Model_Cart->table()],
                 "FK_{$tPromoOrder}_order" => ["order_id", $this->FCom_Sales_Model_Order->table()],
                 "FK_{$tPromoOrder}_coupon" => ["coupon_id", $this->FCom_Promo_Model_Coupon->table()],
-                "FK_{$tPromoOrder}_cart_product" => ["free_cart_item_id", $this->FCom_Catalog_Model_Product->table()],
                 "FK_{$tPromoOrder}_order_product" => ["free_order_item_id", $this->FCom_Catalog_Model_Product->table()],
+            ]
+        ]);
+
+        BDb::ddlTableDef($tPromoCart, [
+            BDb::COLUMNS => [
+                'id'                 => "INT(10) unsigned not null auto_increment",
+                'promo_id'           => "INT(10) UNSIGNED NOT NULL",
+                'cart_id'            => "INT(10) UNSIGNED NOT NULL",
+                'coupon_id'          => "INT(10) UNSIGNED NULL",
+                'free_cart_item_id'  => "INT(10) UNSIGNED NULL",
+                'coupon_code'        => "INT(10) UNSIGNED NULL",
+                'subtotal_discount'  => "DECIMAL(12,2) NULL",
+                'shipping_discount'  => "DECIMAL(12,2) NULL",
+                'created_at'         => "DATETIME NOT NULL",
+                'updated_at'         => "DATETIME NULL",
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                "FK_{$tPromoCart}_promo" => ["promo_id", $this->FCom_Promo_Model_Promo->table()],
+                "FK_{$tPromoCart}_cart" => ["cart_id", $this->FCom_Sales_Model_Cart->table()],
+                "FK_{$tPromoCart}_coupon" => ["coupon_id", $this->FCom_Promo_Model_Coupon->table()],
+                "FK_{$tPromoCart}_cart_product" => ["free_cart_item_id", $this->FCom_Catalog_Model_Product->table()],
             ]
         ]);
     }
