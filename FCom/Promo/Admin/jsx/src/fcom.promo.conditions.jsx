@@ -631,10 +631,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         modal: null,
         modalContent: null,
         handleConfigure: function (e) {
-            var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
+            var modal = <Components.Modal onConfirm={this.handleShippingConfirm} id={"modal-" + this.props.id} key={"modal-" + this.props.id}
                 title={this.props.modalTitle} onLoad={this.openModal} onUpdate={this.openModal}>
-                <ConditionsShippingModalContent baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
-                    entityId={this.props.options.entity_id} onLoad={this.registerModalContent} />
+                <ConditionsShippingModalContent baseUrl={this.props.options.base_url} onLoad={this.registerModalContent}
+                    key={"modal-content-" + this.props.id} />
             </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
@@ -773,6 +773,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 this.props.onLoad(this);
             }
         },
+        componentWillMount: function () {
+            // todo load fields
+        },
         shouldUpdate: true,
         shouldComponentUpdate: function () {
             var upd = this.shouldUpdate;
@@ -910,52 +913,62 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     var ConditionsApp = React.createClass({
         displayName: 'ConditionsApp',
         render: function () {
-            return (<div className="conditions panel panel-default">
-                    {this.state.data.map(function (field, i) {
-                        //todo make a field based on field
-                        var el;
-                        var key = field.id;
-                        switch (field.type) {
-                            case 'skus':
-                                el = <ConditionsSkuCollection options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-                            case 'cats':
-                                el = <ConditionsCategories options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-                            case 'total':
-                                el = <ConditionTotal options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-                            case 'comb':
-                                el = <ConditionsAttributeCombination options={this.props.options}
-                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-                            case 'shipping':
-                                el = <ConditionsShipping options={this.props.options}
-                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-
-                        }
-                        return el;
-                    }, this)}
-            </div> );
-        },
-        componentDidMount: function () {
-            var $conditionsSerialized = $('#' + this.props.options.conditions_serialized);
-            var data = this.state.data;
-
-            if ($conditionsSerialized.length > 0) {
-                try {
-                    data = JSON.parse($conditionsSerialized.val());
-                    this.setProps({data: data});
-                    // todo actually update state
-                } catch (e) {
-                    console.log(e);
+            var children = [];
+            var options = this.props.options;
+            var mc = this.props.modalContainer;
+            var rc = this.removeCondition;
+            var cu = this.conditionUpdate;
+            for(var type in this.state.data.rules) {
+                if(this.state.data.rules.hasOwnProperty(type)) {
+                    var rules = this.state.data.rules[type];
+                    if($.isFunction(rules.map)) {
+                        rules.map(function (field, idx) {
+                            var el;
+                            var key = type + '-' + idx;
+                            switch (type) {
+                                case 'sku':
+                                    el = <ConditionsSkuCollection onUpdate={cu} data={field} options={options} key={key} id={key} removeCondition={rc}/>;
+                                    break;
+                                case 'category':
+                                    el = <ConditionsCategories onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                    break;
+                                case 'total':
+                                    el = <ConditionTotal onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                    break;
+                                case 'combination':
+                                    el = <ConditionsAttributeCombination onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                    break;
+                                case 'shipping':
+                                    el = <ConditionsShipping onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                    break;
+                            }
+                            if (el) {
+                                children.push(el);
+                            }
+                        })
+                    } else {
+                        console.log(rules, "is not an array");
+                    }
                 }
             }
-
+            return (
+                <div className="conditions">
+                    {children}
+                </div>
+            );
+        },
+        componentDidMount: function () {
             this.props.conditionType.on('change', this.addCondition);
 
             $('select.to-select2', this.getDOMNode()).select2();
+        },
+        componentWillMount: function () {
+            var data = this.state.data;
+
+            if (this.props.conditions.length) {
+                data = this.props.conditions;
+                this.setState({data: data});
+            }
         },
         addCondition: function () {
             // add condition data to state
@@ -970,8 +983,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
             $conditionTypes.select2('val', "-1", false);// reset to placeholder value and do NOT trigger change event
             var data = this.state.data;
-            var condition = {type: conditionType, id: conditionType + '-' + this.state.lastConditionId};
-            data.push(condition);
+            if(!data.rules[conditionType]) {
+                data.rules[conditionType] = [];
+            }
+            //var rule = {type: conditionType, id: conditionType + '-' + this.state.lastConditionId};
+            data.rules[conditionType].push({}); // push new empty rule
             this.setState({data: data, lastConditionId: (this.state.lastConditionId + 1)});
         },
         removeCondition: function (conditionId) {
@@ -981,9 +997,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             });
             this.setState({data: data});
         },
+        conditionUpdate: function (data) {
+            //todo
+        },
         getInitialState: function () {
             return {
-                data: [],
+                data: {
+                    match: '0',
+                    rules: {}
+                },
                 lastConditionId: 0
             };
         }
