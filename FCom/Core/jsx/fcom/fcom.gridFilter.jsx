@@ -38,12 +38,6 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             $(document).
                 on('click', '.f-grid-filter input', function (e) {
                     e.stopPropagation();
-                }).on('keyup', '.f-grid-filter input', function (e) {
-                    var evt = e || window.event;
-                    var charCode = evt.keyCode || evt.which;
-                    if (charCode === 13) {
-                        that.filter(e);
-                    }
                 }).on('click', '.f-grid-filter button.filter-text-sub', function (e) {
                     that.keepShowDropDown(this);
                 }).on('click', 'ul.filter-sub a.filter_op', function (e) {
@@ -78,7 +72,6 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
 
             console.log('setStateFilter', filters);
             //this.setState({stateFilters: stateFilters});
-            //todo: minimize re-render function when update stateFilters
         },
         /**
          * keep parents dropdown still be shown
@@ -261,6 +254,15 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         },
         isRange: function(event) {
             return $(event.target).hasClass('range');
+        },
+        handleEnter: function(event) {
+            if (event.which == 13) {
+                var filter = this.state.filter;
+                var isClear = false
+                filter.submit = !isClear;
+                this.setState({filter: filter});
+                this.props.setFilter(filter, isClear);
+            }
         }
     };
 
@@ -324,7 +326,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                         {operations}
                                     </ul>
                                 </div>
-                                <input type="text" className="form-control" onChange={this.setStateValue} />
+                                <input type="text" className="form-control" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
                                 <div className="input-group-btn">
                                     <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
                                         <i className="icon-check-sign"></i> Update
@@ -424,13 +426,13 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                     </ul>
                                 </div>
                                 <div className="input-group range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input id={'date-range-text-' + filter.field} type="text" placeholder="Select date range" className="form-control daterange" onChange={this.setStateValue} />
+                                    <input id={'date-range-text-' + filter.field} type="text" placeholder="Select date range" className="form-control daterange" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
                                     <span id="daterange2" className="input-group-addon filter-date-range" data-input={'date-range-text-' + filter.field}>
                                         <i className="icon-calendar"></i>
                                     </span>
                                 </div>
                                 <div className="datepicker input-group not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" className="form-control" onChange={this.setStateValue} />
+                                    <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" className="form-control" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
                                     <span className="input-group-addon">
                                         <span data-time-icon="icon-time" data-date-icon="icon-calendar" className="icon-calendar"></span>
                                     </span>
@@ -513,12 +515,12 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                     </ul>
                                 </div>
                                 <div className="input-group-btn range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input type="text" data-type="from" placeholder="From" className="form-control js-number1" style={{width: '45%'}} onChange={this.setStateRangeValue} />
+                                    <input type="text" data-type="from" placeholder="From" className="form-control js-number1" style={{width: '45%'}} onChange={this.setStateRangeValue} onKeyUp={this.handleEnter} />
                                     &nbsp;<i className="icon-resize-horizontal"></i>&nbsp;
-                                    <input type="text" data-type="to" placeholder="To" className="form-control js-number2" style={{width: '45%'}} onChange={this.setStateRangeValue} />
+                                    <input type="text" data-type="to" placeholder="To" className="form-control js-number2" style={{width: '45%'}} onChange={this.setStateRangeValue} onKeyUp={this.handleEnter} />
                                 </div>
                                 <div className="input-group-btn not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input type="text" placeholder="Number" className="form-control js-number" onChange={this.setStateValue} />
+                                    <input type="text" placeholder="Number" className="form-control js-number" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
                                 </div>
                                 <div className="input-group-btn">
                                     <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
