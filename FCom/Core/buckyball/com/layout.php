@@ -2438,10 +2438,10 @@ if ($this->BDebug->is('DEBUG')) {
             $file    = rtrim($baseUrl, '/') . '/' . $file;
         }
 
-        if ($type === 'js' && $this->_headJs['loaded'] && $this->_headJs['loaded'] !== $name
+        if ($type === 'js' && !empty($this->_headJs['loaded']) && $this->_headJs['loaded'] !== $name
             && empty($args['separate']) && empty($args['tag']) && empty($args['params']) && empty($args['if'])
         ) {
-            if (!$this->_headJs['jquery'] && strpos($name, 'jquery') !== false) {
+            if (empty($this->_headJs['jquery']) && strpos($name, 'jquery') !== false) {
                 $this->_headJs['jquery'] = $file;
             } else {
                 $this->_headJs['scripts'][] = $file;
