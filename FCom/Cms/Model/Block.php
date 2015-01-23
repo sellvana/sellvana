@@ -139,4 +139,14 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         }
         return $content;
     }
+
+    public function getAllBlocksAsOptions()
+    {
+        $blocks = $this->orm()->order_by_asc('handle')->find_many();
+        $result = [];
+        foreach ($blocks as $block) {
+            $result[$block->get('handle')] = "[{$block->get('handle')}] {$block->get('description')}";
+        }
+        return $result;
+    }
 }

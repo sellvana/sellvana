@@ -3,9 +3,11 @@
 /**
  * Class FCom_Admin_Admin
  *
+ * @property FCom_Frontend_Main $FCom_Frontend_Main
  * @property FCom_Admin_Main $FCom_Admin_Main
  * @property FCom_Admin_Controller_MediaLibrary $FCom_Admin_Controller_MediaLibrary
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 class FCom_Admin_Admin extends BClass
 {

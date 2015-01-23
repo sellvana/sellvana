@@ -15,17 +15,19 @@ class FCom_Sales_Main extends BClass
 
     public function bootstrap()
     {
-        foreach (['Subtotal', 'Shipping', 'Discount', 'GrandTotal'] as $total) {
-            $this->FCom_Sales_Model_Cart->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
-        }
-
         $this->FCom_Admin_Model_Role->createPermission([
             'sales' => 'Sales',
             'sales/orders' => 'Orders',
             'sales/order_status' => 'Order Status',
+            'sales/order_custom_state' => 'Order Custom State',
             'sales/carts' => 'Carts',
             'sales/reports' => 'Reports'
+
         ]);
+
+        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal'] as $total) {
+            $this->FCom_Sales_Model_Cart->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
+        }
 
         foreach (['Cart', 'Checkout', 'Order', 'OrderItem', 'Payment', 'Shipment', 'Cancel', 'Return', 'Refund', 'Comment'] as $workflow) {
             $this->{'FCom_Sales_Workflow_' . $workflow}->registerWorkflow();

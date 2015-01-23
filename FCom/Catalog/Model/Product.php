@@ -236,7 +236,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         //todo: setup unique uniq_id
         if (!$this->get('product_sku')) {
-            $this->set('product_sku', $this->id);
+            $this->set('product_sku', $this->id());
             $saveAgain = true;
         }
         if (!$this->get('position')) {
@@ -1138,14 +1138,19 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($invModel) {
             return $invModel;
         }
+        $invHlp = $this->FCom_Catalog_Model_InventorySku;
         // get inventory SKU from inventory SKU or product SKU if not specified
         $invSku = $this->get('inventory_sku');
         if (null === $invSku || '' === $invSku) {
             $invSku = $this->get('product_sku');
+            if (!$invSku) {
+                $invModel = $invHlp->create();
+                $this->set('inventory_model', $invModel);
+                return $invModel;
+            }
             $this->set('inventory_sku', $invSku);
         }
         // find inventory model
-        $invHlp = $this->FCom_Catalog_Model_InventorySku;
         $invModel = $invHlp->load($invSku, 'inventory_sku');
         // if doesn't exist yet, create
         if (!$invModel) {

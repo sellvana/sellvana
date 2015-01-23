@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /*
  * This file is part of Twig.
@@ -16,7 +16,7 @@
  */
 class Twig_Environment
 {
-    const VERSION = '1.15.1';
+    const VERSION = '1.17.1-DEV';
 
     protected $charset;
     protected $loader;
@@ -72,6 +72,7 @@ class Twig_Environment
      *                  * false: disable auto-escaping
      *                  * true: equivalent to html
      *                  * html, js: set the autoescaping to one of the supported strategies
+     *                  * filename: set the autoescaping strategy based on the template filename extension
      *                  * PHP callback: a PHP callback that returns an escaping strategy based on the template "filename"
      *
      *  * optimizations: A flag that indicates which optimizations to apply
@@ -154,7 +155,7 @@ class Twig_Environment
     /**
      * Checks if debug mode is enabled.
      *
-     * @return Boolean true if debug mode is enabled, false otherwise
+     * @return bool    true if debug mode is enabled, false otherwise
      */
     public function isDebug()
     {
@@ -180,7 +181,7 @@ class Twig_Environment
     /**
      * Checks if the auto_reload option is enabled.
      *
-     * @return Boolean true if auto_reload is enabled, false otherwise
+     * @return bool    true if auto_reload is enabled, false otherwise
      */
     public function isAutoReload()
     {
@@ -206,7 +207,7 @@ class Twig_Environment
     /**
      * Checks if the strict_variables option is enabled.
      *
-     * @return Boolean true if strict_variables is enabled, false otherwise
+     * @return bool    true if strict_variables is enabled, false otherwise
      */
     public function isStrictVariables()
     {
@@ -223,12 +224,12 @@ class Twig_Environment
         return $this->cache;
     }
 
-     /**
-      * Sets the cache directory or false if cache is disabled.
-      *
-      * @param string|false $cache The absolute path to the compiled templates,
-      *                            or false to disable cache
-      */
+    /**
+     * Sets the cache directory or false if cache is disabled.
+     *
+     * @param string|false $cache The absolute path to the compiled templates,
+     *                            or false to disable cache
+     */
     public function setCache($cache)
     {
         $this->cache = $cache ? $cache : false;
@@ -256,7 +257,7 @@ class Twig_Environment
      * Gets the template class associated with the given string.
      *
      * @param string  $name  The name for which to calculate the template class name
-     * @param integer $index The index if it is an embedded template
+     * @param int     $index The index if it is an embedded template
      *
      * @return string The template class name
      */
@@ -311,7 +312,7 @@ class Twig_Environment
      * Loads a template by name.
      *
      * @param string  $name  The template name
-     * @param integer $index The index if it is an embedded template
+     * @param int     $index The index if it is an embedded template
      *
      * @return Twig_TemplateInterface A template instance representing the given template name
      *
@@ -353,9 +354,9 @@ class Twig_Environment
      * not changed.
      *
      * @param string    $name The template name
-     * @param timestamp $time The last modification time of the cached template
+     * @param int       $time The last modification time of the cached template
      *
-     * @return Boolean true if the template is fresh, false otherwise
+     * @return bool    true if the template is fresh, false otherwise
      */
     public function isTemplateFresh($name, $time)
     {
@@ -626,7 +627,7 @@ class Twig_Environment
      *
      * @param string $name The extension name
      *
-     * @return Boolean Whether the extension is registered or not
+     * @return bool    Whether the extension is registered or not
      */
     public function hasExtension($name)
     {
@@ -1232,8 +1233,11 @@ class Twig_Environment
     {
         $dir = dirname($file);
         if (!is_dir($dir)) {
-            if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                throw new RuntimeException(sprintf("Unable to create the cache directory (%s).", $dir));
+            if (false === @mkdir($dir, 0777, true)) {
+                clearstatcache(false, $dir);
+                if (!is_dir($dir)) {
+                    throw new RuntimeException(sprintf("Unable to create the cache directory (%s).", $dir));
+                }
             }
         } elseif (!is_writable($dir)) {
             throw new RuntimeException(sprintf("Unable to write in the cache directory (%s).", $dir));

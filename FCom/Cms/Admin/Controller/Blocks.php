@@ -6,6 +6,7 @@
  * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
  * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -150,5 +151,12 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     public function action_history_grid_data__POST()
     {
         $this->_processGridDataPost('FCom_Cms_Model_BlockHistory');
+    }
+
+    public function formPostBefore($args)
+    {
+        parent::formPostBefore($args);
+
+        $args['model']->setData('layout', $this->FCom_Core_LayoutEditor->processFormPost());
     }
 }

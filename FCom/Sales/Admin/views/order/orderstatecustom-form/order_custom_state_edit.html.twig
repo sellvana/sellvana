@@ -6,8 +6,10 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set fieldData = { validator: validator} %}
 <fieldset class="adm-section-group">
-    {{ forms.input(fieldData, {field:'name', label:'Name'|_}) }}
-    {{ forms.input(fieldData, {field:'code', label:'Code'|_}) }}
+    {{ forms.input(fieldData, {field:'entity_type', label:'Entity Type'|_}) }}
+    {{ forms.input(fieldData, {field:'state_code', label:'Code'|_}) }}
+    {{ forms.input(fieldData, {field:'state_label', label:'Label'|_}) }}
+    {{ forms.input(fieldData, {field:'concrete_class', label:'Class'|_}) }}    
 </fieldset>
 
 <script>

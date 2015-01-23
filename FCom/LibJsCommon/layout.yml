@@ -36,6 +36,8 @@ common_js_libs:
             #- [ css, "@FCom_LibJsCommon/js/css/select2.css" ]
             #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]
 
+            - [ requireJs, sortable, @FCom_LibJsCommon/js/sortable.min ]
+
 lib_visualsearch:
     - view: head
         do:
@@ -52,9 +54,11 @@ lib_tokeninput:
 lib_griddle:
     - view: head
         do:
+            #default griddle
             - [ requireJs, griddle.customFormatContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customFormatContainer ]
             - [ requireJs, griddle.customPaginationContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customPaginationContainer ]
             - [ requireJs, griddle.customFilterContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customFilterContainer ]
+            - [ requireJs, griddle.customSettingsContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customSettingsContainer ]
             - [ requireJs, griddle.gridBody, @FCom_LibJsCommon/jsx/griddle/scripts/gridBody ]
             - [ requireJs, griddle.gridFilter, @FCom_LibJsCommon/jsx/griddle/scripts/gridFilter ]
             - [ requireJs, griddle.gridNoData, @FCom_LibJsCommon/jsx/griddle/scripts/gridNoData ]

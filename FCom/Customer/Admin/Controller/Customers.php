@@ -13,13 +13,14 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     protected $_gridHref = 'customers';
     protected $_modelClass = 'FCom_Customer_Model_Customer';
     protected $_gridTitle = 'Customers';
+    //protected $_gridPageViewName = 'admin/griddle';
     protected $_recordName = 'Customer';
     protected $_mainTableAlias = 'c';
     protected $_permission = 'customers/manage';
     protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
 
-    protected $_gridViewName = 'core/griddle';
+    //protected $_gridViewName = 'core/griddle';
 
     public function gridConfig()
     {
@@ -37,14 +38,14 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
                   'options' => $this->FCom_Customer_Model_Customer->fieldOptions('status'),
                   'editable' => true, 'multirow_edit' => true, 'validation' => ['required' => true]],
             ['name' => 'street1', 'label' => 'Address', 'index' => 'a.street1'],
-            ['name' => 'city', 'label' => 'City', 'index' => 'a.city'],
-            ['name' => 'region', 'label' => 'Region', 'index' => 'a.region'],
-            ['name' => 'postcode', 'label' => 'Postal Code', 'index' => 'a.postcode'],
-            ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select',
+            ['name' => 'city', 'label' => 'City', 'index' => 'a.city', 'hidden' => true],
+            ['name' => 'region', 'label' => 'Region', 'index' => 'a.region', 'hidden' => true],
+            ['name' => 'postcode', 'label' => 'Postal Code', 'index' => 'a.postcode', 'hidden' => true],
+            ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select', 'hidden' => true,
                     'options' => $this->BLocale->getAvailableCountries()],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at'],
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
-            ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login'],
+            ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login', 'hidden' => true],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'delete'],
