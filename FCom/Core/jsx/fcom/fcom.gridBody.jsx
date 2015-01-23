@@ -48,7 +48,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                 }
             }
         },
-        doButtonAction: function(event) {
+        doRowAction: function(event) {
             var that = this;
             var action = event.target.dataset.action;
             var rowId = event.target.dataset.row;
@@ -86,24 +86,31 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                     }
                     break;
                 default:
-                    console.log('doButtonAction');
+                    console.log('doRowAction');
                     break;
             }
         },
         render: function () {
             var that = this;
+            var headerSelection = this.props.getHeaderSelection();
+            var selectedRows = this.props.getSelectedRows();
             //console.log('selectedRows', this.props.getSelectedRows());
             /*console.log('FComGridBody.columnMetadata', this.props.columnMetadata);
             console.log('FComGridBody.columns', this.props.columns);*/
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn}
-                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} getSelectedRows={that.props.getSelectedRows} />;
+                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} getSelectedRows={that.props.getSelectedRows}
+                setHeaderSelection={that.props.setHeaderSelection}
+            />;
 
             var nodes = this.props.data.map(function (row, index) {
-                var origRow = _.findWhere(that.props.originalData, {id: row.id});
-                return <FComRow row={row} index={index} origRow={origRow} columns={that.props.columns} columnMetadata={that.props.columnMetadata}
-                    getConfig={that.props.getConfig} doButtonAction={that.doButtonAction}
-                    updateSelectedRow={that.props.updateSelectedRow} getSelectedRows={that.props.getSelectedRows} />
+                if (headerSelection == 'show_all' || _.findWhere(selectedRows, {id: row.id})) {
+                    var origRow = _.findWhere(that.props.originalData, {id: row.id});
+                    return <FComRow row={row} index={index} origRow={origRow} columns={that.props.columns} columnMetadata={that.props.columnMetadata}
+                        getConfig={that.props.getConfig} doRowAction={that.doRowAction}
+                        updateSelectedRow={that.props.updateSelectedRow} getSelectedRows={that.props.getSelectedRows} />
+                }
+                return false;
             });
 
             return (
@@ -122,8 +129,26 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             return {
                 "columns":[],
                 "sortColumn": "",
-                "sortAscending": "asc"
+                "sortAscending": "asc",
+                "setHeaderSelection": null
             }
+        },
+        getHeaderSelectionOptions: function() {
+            return [
+                { select: 'show_all', label: 'Show All', icon: 'list' },
+                { select: 'show_selected', label: 'Show Selected', icon: 'list', visibleOnSelected: true },
+                { select: 'select_visible', label: 'Select Visible', icon: 'list', visibleOnSelected: true, action: this.selectVisible },
+                { select: 'unselect_visible', label: 'Unselect Visible', icon: 'list', visibleOnSelected: true, action: this.unselectVisible },
+                { select: 'unselect_all', label: 'Unselect All', icon: 'list', visibleOnSelected: true, action: this.unselectAll }
+            ];
+        },
+        updateHeaderSelect: function(event) {
+            var select = event.target.dataset.select;
+            console.log('operation', select);
+            if (!_.findWhere(this.getHeaderSelectionOptions(), {select: select})) {
+                select = 'show_all';
+            }
+            this.props.setHeaderSelection(select);
         },
         sort: function(event){
             if (typeof event.target.dataset.title !== 'undefined') {
@@ -139,7 +164,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
         componentDidMount: function() {
             $(".dataTable th").resizable({handles: 'e'});
         },
-        showAll: function(event) {
+        /*showAll: function(event) {
             event.preventDefault();
 
             $(".standard-row").removeClass('hidden');
@@ -156,7 +181,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                     $(row).addClass("hidden");
                 }
             });
-        },
+        },*/
         selectVisible: function(event) {
             event.preventDefault();
 
@@ -203,8 +228,11 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                         </button>
                     );
 
-                    var selectionDropdownNodes = [];
-                    selectionDropdownNodes.push(<li><a href="#" onClick={that.showAll}>Show All</a></li>);
+                    var headerSelectionNodes = that.getHeaderSelectionOptions().map(function(option) {
+                        if (!option.visibleOnSelected || selectedRows.length) {
+                            return (<li> <a href="#" data-select={option.select} onClick={option.action ? option.action : that.updateHeaderSelect}>{option.label}</a></li>)
+                        }
+                    });
 
                     if (selectedRows.length) {
                         selectionButtonText = (
@@ -215,18 +243,13 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                                 <span className="title">{selectedRows.length + (selectedRows.length ? ' rows' : ' row')}</span>&nbsp;<span className="caret"></span>
                             </button>
                         );
-
-                        selectionDropdownNodes.push(<li><a href="#" onClick={that.showSelected}>Show Selected</a></li>);
-                        selectionDropdownNodes.push(<li><a href="#" onClick={that.selectVisible}>Select Visible</a></li>);
-                        selectionDropdownNodes.push(<li><a href="#" onClick={that.unselectVisible}>Unselect Visible</a></li>);
-                        selectionDropdownNodes.push(<li><a href="#" onClick={that.unselectAll}>Unselect All</a></li>);
                     }
 
                     return (
                         <th className="js-draggable ui-resizable" data-id="0">
                             <div className="dropdown f-grid-display-type">
                                 {selectionButtonText}
-                                <ul className="dropdown-menu js-sel">{selectionDropdownNodes}</ul>
+                                <ul className="dropdown-menu js-sel">{headerSelectionNodes}</ul>
                             </div>
                         </th>
                     );

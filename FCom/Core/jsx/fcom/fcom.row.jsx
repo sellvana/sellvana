@@ -17,7 +17,7 @@ define(['underscore', 'react'], function (_, React) {
                 "origRow": {},
                 "index": 0,
                 "columnMetadata": null,
-                "doButtonAction": null,
+                "doRowAction": null,
                 "updateSelectedRow": null,
                 "getSelectedRows": null
             }
@@ -57,7 +57,7 @@ define(['underscore', 'react'], function (_, React) {
                                 );
                             } else {
                                 return (
-                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button" onClick={that.props.doButtonAction}>
+                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button" onClick={that.props.doRowAction}>
                                         <i className={btn.icon} data-action={btn.name} data-row={that.props.row.id}></i>
                                         {btn.caption}
                                     </button>

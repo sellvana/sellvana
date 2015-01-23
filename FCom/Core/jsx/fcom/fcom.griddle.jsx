@@ -203,9 +203,40 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
             return {
                 "className": "",
                 "getConfig": null,
-                "selectedColumns": []
-
+                "selectedColumns": [],
+                "refresh": null
             }
+        },
+        doMassAction: function(event) { //top mass action
+            var that = this;
+            var action = event.target.dataset.action;
+            var dataUrl = this.props.getConfig('data_url');
+
+            switch (action) {
+                case 'mass-delete':
+                    var confirm = false;
+                    if ($(event.target).hasClass('noconfirm')) {
+                        confirm = true;
+                    } else {
+                        confirm = window.confirm("Do you really want to delete selected rows?");
+                    }
+
+                    if (confirm) {
+                        var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
+                        $.post(dataUrl, { oper: action, id: ids }, function() {
+                            that.props.refresh();
+                        });
+                    }
+
+                    break;
+                case 'mass-edit': //mass-edit with modal
+                    console.log('mass-edit');
+                    break;
+                default:
+                    console.log('mass-action');
+                    break;
+            }
+
         },
         toggleColumn: function(event) {
             var selectedColumns = this.props.selectedColumns;
@@ -282,7 +313,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                             break;
                         case 'delete':
                             //todo: option noconfirm
-                            node = <button className={"btn grid-mass-delete btn-danger" + disabledClass} type="button">Delete</button>;
+                            node = <button className={"btn grid-mass-delete btn-danger" + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction}>Delete</button>;
                             break;
                         case 'add':
                             node = <button className="btn grid-add btn-primary" type="button">Add</button>;
