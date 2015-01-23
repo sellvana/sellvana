@@ -634,7 +634,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var modal = <Components.Modal onConfirm={this.handleShippingConfirm} id={"modal-" + this.props.id} key={"modal-" + this.props.id}
                 title={this.props.modalTitle} onLoad={this.openModal} onUpdate={this.openModal}>
                 <ConditionsShippingModalContent baseUrl={this.props.options.base_url} onLoad={this.registerModalContent}
-                    key={"modal-content-" + this.props.id} />
+                    key={"modal-content-" + this.props.id} data={this.state.value}/>
             </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
@@ -648,6 +648,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 value: value
             });
             modal.close();
+            //console.log(this.state);
             if(this.props.onUpdate) {
                 this.props.onUpdate({"shipping": value});
             }
@@ -661,6 +662,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         openModal: function (modal) {
             modal.open();
+        },
+        componentWillMount: function() {
+            var data = this.props.data;
+            console.warn("Use provided data to load content", data);
         }
     });
 
@@ -673,7 +678,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 <div className="shipping-combinations form-horizontal">
                     <div className="form-group">
                         <div className="col-md-5">
-                            <select ref="combinationType" className="form-control to-select2">
+                            <select ref="combinationType" className="form-control to-select2" defaultValue={this.state.match}>
                                 <option value="0">All Conditions Have to Match</option>
                                 <option value="1">Any Condition Has to Match</option>
                             </select>
@@ -690,14 +695,32 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     {this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
-                        return <ConditionsShippingModalField label={field.label} url={url} key={field.field}
-                            id={field.field} ref={field.field} removeField={this.removeField}  onChange={this.elementChange}/>
+                        var data = field.value || [];
+                        return <ConditionsShippingModalField label={field.label} url={url} key={field.field} data={data}
+                            id={field.field} ref={field.field} removeField={this.removeField} onChange={this.elementChange}/>
                     }.bind(this))}
                 </div>
             );
         },
         serialize: function () {
-            return this.state.values;
+            var data = {}, fields = [];
+            for (var field in this.refs) {
+                if(!this.refs.hasOwnProperty(field) || field == 'combinationField') {
+                    continue;
+                }
+                if (field == 'combinationType') {
+                    data.match = $(this.refs[field].getDOMNode()).select2('val');
+                    continue;
+                }
+                if (this.refs[field]) {
+                    var ref = this.refs[field];
+                    fields.push(ref.serialize());
+                }
+            }
+            if(fields.length) {
+                data.fields = fields;
+            }
+            return data;
         },
         serializeText: function () {
             var text, glue, fieldTexts = [];
@@ -730,16 +753,26 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 return;
             }
             $(fieldCombination).select2("val", "-1", false);// reset to default prompt
+            this.updateFields(fieldValue);
+        },
+        updateFields: function (fieldValue) {
             var fields = this.state.fields;
             for (var i in fields) { // loop current state fields and check if new one matches existing one, if so skip it
                 if (fields.hasOwnProperty(i)) {
                     var f = fields[i];
                     if (f.field == fieldValue.id) {
+                        if(fieldValue.compare) { // if field is the compare field, update and return
+                            f.filter = fieldValue.value;
+                            this.setState({fields: fields});
+                        }
                         return;
                     }
                 }
             }
             var field = {label: fieldValue.text, field: fieldValue.id};
+            if(fieldValue.value) {
+                field.value = fieldValue.value;
+            }
             //console.log(fields.indexOf(field));
             fields.push(field);
             this.setState({fields: fields});
@@ -752,7 +785,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             this.setState({fields: fields});
         },
         getInitialState: function () {
-            return {fields: [], values: {}};
+            return {fields: [], values: {}, match: 0};
         },
         getDefaultProps: function () {
             return {
@@ -774,7 +807,35 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
         },
         componentWillMount: function () {
-            // todo load fields
+            // load fields from data, they come in form of plain js object
+            // key is in form fieldCombination.methods: [value1, value2]
+            console.log(this.props.data);
+            this.setState({values: this.props.data || {}});
+            for(var field in this.props.data) {
+                if(this.props.data.hasOwnProperty(field)) {
+                    if(field == 'fields') {
+                        var defaultFields = this.props.fields;
+                        var fields = this.props.data[field].map(function (field) {
+                            var fieldId = field['field'];
+                            var fieldText = defaultFields.filter(function (el) {
+                                return el.field == fieldId;
+                            });
+                            if (fieldText.length) {
+                                fieldText = fieldText[0]['label'];
+                            } else {
+                                fieldText = 'N/A';
+                            }
+                            field.label = fieldText;
+                            return field;
+                        });
+                        fields = this.state.fields.concat(fields);
+                        this.setState({fields: fields});
+                    } else if(field == 'match') {
+                        // condition should match
+                        this.setState({match: this.props.data[field]});
+                    }
+                }
+            }
         },
         shouldUpdate: true,
         shouldComponentUpdate: function () {
@@ -800,7 +861,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         mixins: [Common.select2QueryMixin],
         render: function () {
             var fieldId = "fieldCombination." + this.props.id;
-            var input = <input className="form-control" type="hidden" id={fieldId} key={fieldId} ref={fieldId}/>;
+            var value;
+            if(this.props.data && this.props.data.length) {
+                value = this.props.data.join(",");
+            }
+            var input = <input className="form-control" type="hidden" id={fieldId} key={fieldId} ref={fieldId} defaultValue={value}/>;
             var helperBlock = '';
             if (this.props.id == 'zipcode') {
                 helperBlock = <span key={fieldId + '.help'} className="help-block">{this.props.zipHelperText }</span>;
@@ -817,7 +882,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         values: {},
         serialize: function () {
-            return this.values;
+            var data = {
+                field: this.props.id
+            };
+            data.filter = this.values["fieldCompare." + this.props.id] || $(this.refs["fieldCompare." + this.props.id].getDOMNode()).val();
+            data.value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
+
+            return data;
         },
         serializeText: function () {
             var text = this.props.label;
@@ -858,6 +929,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         onCompareChange: function (e) {
             this.values["fieldCompare." + this.props.id] = e.val;
+
+            if (this.props.onChange) {
+                this.props.onChange(e);
+            }
         },
         remove: function () {
             if (this.props.removeField) {
@@ -899,6 +974,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     },
                     formatSelection: function (item) {
                         return item.id;
+                    },
+                    initSelection: function (el, callback) {
+                        var data = [];
+                        $(el.val().split(",")).each(function () {
+                            data.push({id: this, text: this});
+                        });
+                        callback(data);
                     }
                 }).on('change', this.onChange);
             } else {
@@ -992,9 +1074,19 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         removeCondition: function (conditionId) {
             var data = this.state.data;
-            data = data.filter(function (field) {
-                return field.id != conditionId;
-            });
+            var condArray = conditionId.split("-");
+            if(condArray.length == 2) {
+                var rule = condArray[0], idx = condArray[1];
+                data.rules[rule].splice(idx, 1);
+                if(data.rules[rule].length == 0) {
+                    delete data.rules[rule];
+                }
+            } else {
+                console.log("wrong condition id: " + conditionId);
+            }
+            //data = data.filter(function (field) {
+            //    return field.id != conditionId;
+            //});
             this.setState({data: data});
         },
         conditionUpdate: function (data) {
