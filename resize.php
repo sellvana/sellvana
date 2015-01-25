@@ -29,6 +29,8 @@ class ImageResizer
 
     protected $cacheDir = 'media/thumb_cache';
     protected $useCache = true;
+    
+    protected $config;
 
     protected $file;
     protected $default;
@@ -47,6 +49,7 @@ class ImageResizer
 
     public function __construct($p)
     {
+        $this->readConfig();
         $this->validateEnvironment();
 
         $this->file    = !empty($p['f']) ? $p['f'] : null;
@@ -76,6 +79,14 @@ class ImageResizer
         $this->outputFile();
     }
 
+    protected function readConfig()
+    {
+        $configFile = __DIR__ . '/storage/config/local.php';
+        if (file_exists($configFile)) {
+            $this->config = include($configFile);
+        }
+    }
+    
     protected function validateEnvironment()
     {
         if (empty($_SERVER['HTTP_REFERER'])) {
@@ -86,11 +97,22 @@ class ImageResizer
         if (!$scriptName) {
             $this->restrict();
         }
-        $httpHost = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
-        $webFolder = preg_replace('#' . preg_quote(basename(__FILE__), '#') . '$#', '', $scriptName);
-        $regex = '#^(https?:)?//' . preg_quote($httpHost . $webFolder, '#') . '#';
+        if (!empty($this->config['resize.php']['allowed_hosts'])) {
+            $hosts = $this->config['resize.php']['allowed_hosts'];
+            foreach ($hosts as $i => $h) {
+                $hosts[$i] = preg_quote($h, '#');
+            }
+            $regex = '#^(https?:)?//(' . join('|', $hosts) . ')/#';
+        } else {
+            $httpHost = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
+            if (!$httpHost) {
+                $this->restrict();
+            }
+            $webFolder = preg_replace('#' . preg_quote(basename(__FILE__), '#') . '$#', '', $scriptName);
+            $regex = '#^(https?:)?//' . preg_quote($httpHost . $webFolder, '#') . '#';
+        }
         $referrer = $_SERVER['HTTP_REFERER'];
-        if (!$httpHost || !preg_match($regex, $referrer)) {
+        if (!preg_match($regex, $referrer)) {
             $this->restrict();
         }
     }
