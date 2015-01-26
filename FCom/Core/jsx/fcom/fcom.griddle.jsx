@@ -273,7 +273,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                 }
 
                 var checked = _.contains(that.props.selectedColumns(), column);
-                console.log(column + '.checked', checked);
+                //console.log(column + '.checked', checked);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
                 return (
                     <li data-id={column} className="dd-item dd3-item">
