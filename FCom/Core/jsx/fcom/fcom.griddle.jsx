@@ -239,7 +239,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
 
         },
         toggleColumn: function(event) {
-            var selectedColumns = this.props.selectedColumns;
+            var selectedColumns = this.props.selectedColumns();
             if(event.target.checked == true && _.contains(selectedColumns, event.target.dataset.name) == false){
                 selectedColumns.push(event.target.dataset.name);
                 var diff = _.difference(initColumns, selectedColumns);
@@ -272,14 +272,16 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                     return false;
                 }
 
-                var checked = _.contains(that.props.selectedColumns, column);
+                var checked = _.contains(that.props.selectedColumns(), column);
+                console.log(column + '.checked', checked);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
                 return (
                     <li data-id={column} className="dd-item dd3-item">
                         <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                         <div className="dd3-content">
                             <label>
-                                <input type="checkbox" checked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn}/> {colInfo ?  colInfo.label : column}
+                                <input type="checkbox" checked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
+                                {colInfo ?  colInfo.label : column}
                             </label>
                         </div>
                     </li>
