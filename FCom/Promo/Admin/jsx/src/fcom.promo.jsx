@@ -51,7 +51,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             } else {
                 var $container = $("#" + this.options.condition_container_id);
                 var promoConditions = this.options.promoOptions['conditions'] || {};
-                React.render(<ConditionsApp conditionType={$conditionSelector} conditions={promoConditions} onUpdate={this.onConditionsUpdate}
+                React.render(<ConditionsApp conditionType={$conditionSelector} conditions={promoConditions} onUpdate={this.onConditionsUpdate.bind(this)}
                     options={this.options} modalContainer={$modalContainer}/>,$container.get(0));
             }
         },
@@ -340,6 +340,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         },
         onConditionsUpdate: function (e) {
             console.log(e);
+            if (this.options.promoOptions['conditions'] == undefined) {
+                this.options.promoOptions['conditions'] = {};
+            }
+            this.options.promoOptions['conditions']['rules'] = e['rules'];
             this.updatePromoOptions();
         },
         onCouponsUpdate: function (newRows) {
