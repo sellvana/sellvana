@@ -991,23 +991,7 @@ if ($args['name']==="FCom_Referrals") {
                 $this->bootstrap = ['callback' => $this->name . '::bootstrap'];
             }
         }
-        $layout = $this->BLayout;
-        if (isset($auto['all']) || isset($auto['views'])) {
-            if (is_dir($this->root_dir . '/views')) {
-                $layout->addAllViewsDir($this->root_dir . '/views');
-            }
-            if (is_dir($this->root_dir . '/' . $areaDir . '/views')) {
-                $layout->addAllViewsDir($this->root_dir . '/' . $areaDir . '/views');
-            }
-        }
-        if (isset($auto['all']) || isset($auto['layout'])) {
-            if (file_exists($this->root_dir . '/layout.yml')) {
-                $layout->loadLayoutAfterTheme($this->root_dir . '/layout.yml');
-            }
-            if (file_exists($this->root_dir . '/' . $areaDir . '/layout.yml')) {
-                $layout->loadLayoutAfterTheme($this->root_dir . '/' . $areaDir . '/layout.yml');
-            }
-        }
+        $this->BLayout->addModuleViewsDirsAndLayouts($this, $area);
     }
 
     protected function _processAutoload()
@@ -1025,6 +1009,7 @@ if ($args['name']==="FCom_Referrals") {
     protected function _processThemes()
     {
         //TODO: automatically enable theme module when it is used
+#var_dump($this->name, $this->run_status, $this->themes); echo "<hr>";
         if ($this->run_status === BModule::PENDING && !empty($this->themes)) {
             foreach ($this->themes as $name => $params) {
                 if (!empty($params['name']) && !empty($params['area'])) {

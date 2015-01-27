@@ -52,7 +52,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
             }
         },
         render: function () {
-            //console.log('config', this.props.config);
+            console.log('config', this.props.config);
 
             return (
                 <Griddle showTableHeading={false} tableClassName={this.props.tableClassName}
@@ -203,9 +203,40 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
             return {
                 "className": "",
                 "getConfig": null,
-                "selectedColumns": []
-
+                "selectedColumns": [],
+                "refresh": null
             }
+        },
+        doMassAction: function(event) { //top mass action
+            var that = this;
+            var action = event.target.dataset.action;
+            var dataUrl = this.props.getConfig('data_url');
+
+            switch (action) {
+                case 'mass-delete':
+                    var confirm = false;
+                    if ($(event.target).hasClass('noconfirm')) {
+                        confirm = true;
+                    } else {
+                        confirm = window.confirm("Do you really want to delete selected rows?");
+                    }
+
+                    if (confirm) {
+                        var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
+                        $.post(dataUrl, { oper: action, id: ids }, function() {
+                            that.props.refresh();
+                        });
+                    }
+
+                    break;
+                case 'mass-edit': //mass-edit with modal
+                    console.log('mass-edit');
+                    break;
+                default:
+                    console.log('mass-action');
+                    break;
+            }
+
         },
         toggleColumn: function(event) {
             var selectedColumns = this.props.selectedColumns;
@@ -258,6 +289,45 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
             //quick search
             var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} onChange={this.quickSearch} />;
 
+            var disabledClass = !this.props.getSelectedRows().length ? ' disabled' : '';
+            var configActions = this.props.getConfig('actions');
+            var buttonActions = [];
+            if (configActions) {
+                _.forEach(configActions, function(action, name) {
+                    /*console.log('action', action);
+                    console.log('name', name);*/
+                    //todo: get action caption
+                    var node = '';
+                    switch (name) {
+                        case 'refresh':
+                            node = <a href="#" className="js-change-url grid-refresh btn">Refresh</a>;
+                            break;
+                        case 'export':
+                            node = <button className={"grid-export btn" + disabledClass}>Export</button>;
+                            break;
+                        case 'link_to_page':
+                            node = <a href="#" className="grid-link_to_page btn">Link</a>;
+                            break;
+                        case 'edit':
+                            node = <a href={'#' + id + '-mass-edit'} className={"btn grid-mass-edit btn-success" + disabledClass} data-toggle="modal" role="button">Edit</a>;
+                            break;
+                        case 'delete':
+                            //todo: option noconfirm
+                            node = <button className={"btn grid-mass-delete btn-danger" + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction}>Delete</button>;
+                            break;
+                        case 'add':
+                            node = <button className="btn grid-add btn-primary" type="button">Add</button>;
+                            break;
+                        case 'new':
+                            //todo: option modal
+                            node = <button className="btn grid-new btn-primary" type="button">New</button>;
+                            break;
+                    }
+
+                    buttonActions.push(node);
+                });
+            }
+
             return (
                 <div className="col-sm-6">
                     {quickSearch}
@@ -269,8 +339,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                             {options}
                         </ol>
                     </div>
-                    <a className="btn grid-mass-edit btn-success disabled" role="button" href="#" >Edit</a>
-                    <button className="btn grid-mass-delete btn-danger disabled" type="button">Delete</button>
+                    {buttonActions}
                 </div>
             )
         }

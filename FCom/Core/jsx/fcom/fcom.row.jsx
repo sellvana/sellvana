@@ -14,10 +14,16 @@ define(['underscore', 'react'], function (_, React) {
         getDefaultProps: function () {
             return {
                 "row": {},
-                "columnMetadata": null,
+                "origRow": {},
                 "index": 0,
-                "doButtonAction": null
+                "columnMetadata": null,
+                "doRowAction": null,
+                "updateSelectedRow": null,
+                "getSelectedRows": null
             }
+        },
+        selectRow: function(event) {
+            this.props.updateSelectedRow(this.props.origRow, !event.target.checked);
         },
         render: function () {
             var that = this;
@@ -37,7 +43,7 @@ define(['underscore', 'react'], function (_, React) {
                 var node = "";
                 switch (col.type) {
                     case 'row_select':
-                        node = <input type="checkbox" name={id + "[checked][" + that.props.row.id + "]"} className="select-row" />;
+                        node = <input type="checkbox" name={id + "[checked][" + that.props.row.id + "]"} className="select-row" onChange={that.selectRow} />;
                         break;
                     case 'btn_group':
                         var actions = col.buttons.map(function(btn) {
@@ -51,7 +57,7 @@ define(['underscore', 'react'], function (_, React) {
                                 );
                             } else {
                                 return (
-                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button" onClick={that.props.doButtonAction}>
+                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button" onClick={that.props.doRowAction}>
                                         <i className={btn.icon} data-action={btn.name} data-row={that.props.row.id}></i>
                                         {btn.caption}
                                     </button>
