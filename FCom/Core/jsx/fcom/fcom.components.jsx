@@ -304,7 +304,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             }
 
             return (
-                <div className="modal" id={this.props.id}>
+                <div className="modal fade" id={this.props.id}>
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -358,7 +358,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function() {
             return {
-                'row': {}, //model contains value
+                'value': '', //default value
                 'column': {}, //column info and option,
                 'removeFieldDisplay': false, //remove field button for mass-edit
                 'removeFieldHandle': null
@@ -389,20 +389,19 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
                 input += '<div class="controls col-sm-8">' + column.element_print + '</div>';
                 return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
             } else {
-                var defaultValue = (typeof that.props.row[column.name] != 'undefined') ? that.props.row[column.name] : '';
                 switch (column.editor) {
                     case 'select':
                         var options = [];
                         _.forEach(column.options, function(text, value) {
                             options.push(<option value={value}>{text}</option>);
                         });
-                        input = <select name={column.name} id={column.name} className="form-control" defaultValue={defaultValue} {...validationRules}>{options}</select>;
+                        input = <select name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules}>{options}</select>;
                         break;
                     case 'textarea':
-                        input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={defaultValue} {...validationRules} />;
+                        input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={this.props.value} {...validationRules} />;
                         break;
                     default:
-                        input = <input name={column.name} id={column.name} className="form-control" defaultValue={defaultValue} {...validationRules} />;
+                        input = <input name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules} />;
                         break;
                 }
             }

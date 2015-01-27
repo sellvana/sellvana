@@ -334,7 +334,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
 
             var nodes = this.props.columnMetadata.map(function(column) {
                 if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
-                return <Components.ModalElement column={column} row={that.props.row} />
+                return <Components.ModalElement column={column} value={that.props.row[column.name]} />
             });
 
             //add id
