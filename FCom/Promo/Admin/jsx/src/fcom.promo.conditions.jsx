@@ -108,14 +108,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                             readOnly="readonly" value={this.state.valueText} className="form-control"/>
                     </div>
                     <div className="col-md-4">
-                        <Components.Button type="button" className="btn-primary"
-                            ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button>
+                        <Components.Button type="button" className="btn-primary" ref={this.props.configureId}
+                            onClick={this.handleConfigure}>Configure</Components.Button>
                     </div>
                 </Common.Row>
             );
         },
         getInitialState: function () {
-            return {value: ''};
+            return {value: "", valueText: ""};
         },
         getDefaultProps: function () {
             return {
@@ -128,10 +128,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         modal: null,
         modalContent: null,
         handleConfigure: function (e) {
-            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm}
+            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm} id={"modal-" + this.props.id} key={"modal-" + this.props.id}
                 title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
                 <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
-                    entityId={this.props.options.entity_id} onLoad={this.registerModalContent} />
+                    entityId={this.props.options.entity_id} onLoad={this.registerModalContent} key={"modal-content-" + this.props.id} />
             </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
@@ -172,7 +172,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 <div className="attribute-combinations form-horizontal">
                     <div className="form-group">
                         <div className="col-md-6">
-                            <select ref="combinationType" className="form-control to-select2" id="attribute-combination-type">
+                            <select ref="combinationType" className="form-control to-select2" id="attribute-combination-type" defaultValue={this.state.match}>
                                 <option value="0">All Conditions Have to Match</option>
                                 <option value="1">Any Condition Has to Match</option>
                             </select>
@@ -191,7 +191,25 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             );
         },
         serialize: function () {
-            return this.state.values;
+            // serialize all values each time when its requested
+            var data = {}, fields = [];
+            for (var field in this.refs) {
+                if(!this.refs.hasOwnProperty(field) || field == 'combinationField') { // condition name field is reset after each selection, so we can ignore it
+                    continue;
+                }
+                if (field == 'combinationType') {
+                    data.match = $(this.refs[field].getDOMNode()).select2('val'); // all || any
+                    continue;
+                }
+                if (this.refs[field]) {
+                    var ref = this.refs[field];
+                    fields.push(ref.serialize());
+                }
+            }
+            if(fields.length) {
+                data.fields = fields;
+            }
+            return data;
         },
         serializeText: function () {
             var text, glue, fieldTexts = [];
@@ -223,7 +241,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 return;
             }
             var fields = this.state.fields;
-            fields.push({label: fieldValue.text, field: fieldValue.id, input: fieldValue.input});
+            var field = {label: fieldValue.text, field: fieldValue.id, input: fieldValue.input};
+            if(fieldValue.value) {
+                field.value = fieldValue.value;
+            }
+            fields.push(field);
             $(fieldCombination).select2("val", "", false);
             this.setState({fields: fields});
         },
@@ -258,9 +280,39 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 dropdownAutoWidth: true,
                 selectOnBlur: false
             }).on('change', this.addField);
-            $('.to-select2', this.getDOMNode()).select2().on('change', this.elementChange);
+            $('select.to-select2', this.getDOMNode()).select2().on('change', this.elementChange);
             if (typeof this.props.onLoad == 'function') {
                 this.props.onLoad(this);
+            }
+        },
+        componentWillMount: function () {
+            // load fields from data, they come in form of plain js object
+            console.log(this.props.data);
+            this.setState({values: this.props.data || {}});
+            for(var field in this.props.data) {
+                if(this.props.data.hasOwnProperty(field)) {
+                    if(field == 'fields') {
+                        var defaultFields = this.props.fields;
+                        var fields = this.props.data[field].map(function (field) {
+                            var fieldId = field['field'];
+                            var fieldText = defaultFields.filter(function (el) {
+                                return el.field == fieldId;
+                            });
+                            if (fieldText.length) {
+                                fieldText = fieldText[0]['label'];
+                            } else {
+                                fieldText = 'N/A';
+                            }
+                            field.label = fieldText;
+                            return field;
+                        });
+                        fields = this.state.fields.concat(fields);
+                        this.setState({fields: fields});
+                    } else if(field == 'match') {
+                        // condition should match
+                        this.setState({match: this.props.data[field]});
+                    }
+                }
             }
         },
         shouldUpdate: true,
@@ -289,15 +341,28 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var inputType = this.props.input;
             var opts = this.getOpts();
             var fieldId = "fieldCombination." + this.props.id;
-            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId} onChange={this.onChange}/>;
+            var value;
+            if(this.props.data && this.props.data.length) {
+                value = this.props.data.join(",");
+            }
+            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId} onChange={this.onChange} defaultValue={value}/>;
             if (this.props.numeric_inputs.indexOf(inputType) != -1) {
                 if (inputType == 'number') {
                     if (this.state.range === false) {
-                        input = <input className="form-control required" type="number" step="any" id={fieldId} ref={fieldId} style={{width: "auto"}} onChange={this.onChange}/>;
+                        input = <input className="form-control required" type="number" step="any" id={fieldId} ref={fieldId} style={{width: "auto"}} onChange={this.onChange} defaultValue={value}/>;
                     } else {
+                        value = this.props.data;
+                        var min, max;
+                        if(value.length > 0) {
+                            min = value[0]
+                        }
+
+                        if(value.length > 1) {
+                            max = value[1];
+                        }
                         input = <div id={fieldId} ref={fieldId} className="input-group">
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".min"} placeholder="Min" style={{width: "50%"}} onChange={this.onChange}/>
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".max"} placeholder="Max" style={{width: "50%"}} onChange={this.onChange}/>
+                            <input className="form-control required" type="number" step="any" id={fieldId + ".min"} placeholder="Min" style={{width: "50%"}} onChange={this.onChange} defaultValue={min}/>
+                            <input className="form-control required" type="number" step="any" id={fieldId + ".max"} placeholder="Max" style={{width: "50%"}} onChange={this.onChange} defaultValue={max}/>
                         </div>;
                     }
                 } else if (inputType == 'date' || inputType == 'time') {
@@ -309,13 +374,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         <span className="input-group-addon">
                             <i className="glyphicon glyphicon-calendar"></i>
                         </span>
-                        <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} onChange={this.onChange}/>
+                        <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} onChange={this.onChange} defaultValue={value}/>
                     </div>
                 }
             } else if (inputType == 'select') {
-                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}/>;
+                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId} defaultValue={value}/>;
             } else if (this.props.bool_inputs.indexOf(inputType) != -1) {
-                input = <Components.YesNo  id={fieldId} ref={fieldId} onChange={this.onChange}/>;
+                input = <Components.YesNo  id={fieldId} ref={fieldId} onChange={this.onChange} defaultValue={value}/>;
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
@@ -339,7 +404,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return opts;
         },
         serialize: function () {
-            return this.values;
+            var data = {
+                field: this.props.id
+            };
+            data.filter = this.values["fieldCompare." + this.props.id] || $(this.refs["fieldCompare." + this.props.id].getDOMNode()).val();
+            data.value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
+
+            return data;
         },
         serializeText: function () {
             var type = this.getInputType();
@@ -484,6 +555,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     parentEl: parent
                 }
             );
+            //todo set setStartDate and setEndDate
         },
         url: '',
         initSelectInput: function () {
@@ -497,7 +569,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 closeOnSelect: true,
                 query: this.select2query,
                 dropdownCssClass: "bigdrop",
-                dropdownAutoWidth: true
+                dropdownAutoWidth: true,
+                initSelection: function (el, callback) {
+                    var data = [];
+                    $(el.val().split(",")).each(function () {
+                        data.push({id: this, text: this});
+                    });
+                    callback(data);
+                }
             }).on('change', this.onChange);
         }
     });
@@ -808,7 +887,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         componentWillMount: function () {
             // load fields from data, they come in form of plain js object
-            // key is in form fieldCombination.methods: [value1, value2]
             console.log(this.props.data);
             this.setState({values: this.props.data || {}});
             for(var field in this.props.data) {
