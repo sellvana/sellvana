@@ -21,12 +21,25 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 </div>
             );
         },
+        value: null,
+        onChange: function (e) {
+            this.value = $('select', this.getDOMNode()).select2('val');
+            if(this.props.onChange) {
+                this.props.onChange(e);
+            }
+        },
+        serialize: function () {
+            return this.value || $('select', this.getDOMNode()).select2('val');
+        },
         getDefaultProps: function () {
             return {
                 totalType: [{id: "qty", label: "TOTAL QTY"}, {id: "amt", label: "TOTAL $Amount"}],
                 select2: true,
                 containerClass: "col-md-2"
             };
+        },
+        componentDidMount: function () {
+            $('select', this.getDOMNode()).select2().on('change', this.onChange);
         }
     });
 
@@ -36,15 +49,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="skuCollectionType" id="skuCollectionType"> of </ConditionsType>
+                    <ConditionsType ref="skuCollectionType" id="skuCollectionType" onChange={this.onChange}> of </ConditionsType>
                     <div className="col-md-2">
                         <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/>
                     </div>
                     <div className="col-md-2">
-                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" />
+                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" onChange={this.onChange}/>
                     </div>
                     <div className="col-md-1">
-                        <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue" type="text"/>
+                        <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue" type="text" onBlur={this.onChange}/>
                     </div>
                 </Common.Row>
             );
@@ -86,13 +99,19 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     return markup;
                 },
                 query: self.select2query
-            });
+            }).on('change', this.onChange);
             $('select.to-select2', this.getDOMNode()).select2();
         },
         onChange: function () {
-            //todo collect values
+            var value = {};
+            value.type = this.refs['skuCollectionType'].serialize();
+            value.product_id = $(this.refs['skuCollectionIds'].getDOMNode()).select2('val');
+            value.filter = $(this.refs['skuCollectionCond'].getDOMNode()).val();
+            value.value = $(this.refs['skuCollectionValue'].getDOMNode()).val();
             if(this.props.onUpdate) {
-                this.props.onUpdate({"sku": value});
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
             }
         }
     });
@@ -145,8 +164,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 value: value
             });
             modal.close();
-            if(this.props.onUpdate) {
-                this.props.onUpdate({"condition": value});
+            if(this.props.onUpdate) {// update main data field
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
             }
         },
         registerModal: function (modal) {
@@ -586,15 +607,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3"> of products in </ConditionsType>
+                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" onChange={this.onChange}> of products in </ConditionsType>
                     <div className="col-md-3">
                         <input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/>
                     </div>
                     <div className="col-md-2">
-                        <Common.Compare ref="catProductsCond" id="catProductsCond" />
+                        <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange}/>
                     </div>
                     <div className="col-md-1">
-                        <input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left"/>
+                        <input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left" onBlur={this.onChange}/>
                     </div>
                 </Common.Row>
             );
@@ -635,9 +656,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             $('select.to-select2', this.getDOMNode()).select2();
         },
         onChange: function () {
-            //todo collect values
+            var value = {};
+            value.type = this.refs['catProductsType'].serialize();
+            value.category_id = $(this.refs['catProductsIds'].getDOMNode()).select2('val');
+            value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();
+            value.value = $(this.refs['catProductsValue'].getDOMNode()).val();
             if(this.props.onUpdate) {
-                this.props.onUpdate({"category": value});
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
             }
         }
     });
@@ -652,7 +679,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         <Common.Compare ref="cartTotalCond" id="cartTotalCond" onChange={this.onChange}/>
                     </div>
                     <div className="col-md-1">
-                        <input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left" onChange={this.onChange}/>
+                        <input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left" onBlur={this.onChange}/>
                     </div>
                 </Common.Row>
             );
@@ -670,12 +697,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         onChange: function () {
             var value = {};
-            value.type = $(this.refs['cartTotalType'].getDOMNode()).val();
+            value.type = this.refs['cartTotalType'].serialize();
             value.filter = $(this.refs['cartTotalCond'].getDOMNode()).val();
             value.value = $(this.refs['cartTotalValue'].getDOMNode()).val();
 
             if(this.props.onUpdate) {
-                this.props.onUpdate({'total': value});
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
+
             }
         }
     });
@@ -729,7 +759,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             modal.close();
             //console.log(this.state);
             if(this.props.onUpdate) {
-                this.props.onUpdate({"shipping": value});
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
             }
         },
         registerModal: function (modal) {
@@ -1175,11 +1207,34 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         conditionUpdate: function (data) {
             //todo
+            console.log(data);
+            var localData = this.state.data;
+            for(var type in data) {
+                if(data.hasOwnProperty(type)) {
+                    var condArray = type.split("-"); // to keep track of multiple conditions of same type shipping-0, shipping-1 ...
+                    if(condArray.length == 2) {
+                        var rule = condArray[0], idx = condArray[1];
+                        localData.rules[rule][idx] = data[type];
+                    } else {
+                        console.log("wrong condition id: " + type);
+                    }
+                }
+            }
+            this.shouldUpdate = false;
+            this.props.onUpdate(localData);
+            this.setState({data: localData});
+        },
+        shouldUpdate: true,
+        shouldComponentUpdate: function () {
+            var upd = this.shouldUpdate;
+            if (!upd) { // shouldUpdate is one time flag that should be set only specifically and then dismissed
+                this.shouldUpdate = true;
+            }
+            return upd;
         },
         getInitialState: function () {
             return {
                 data: {
-                    match: '0',
                     rules: {}
                 },
                 lastConditionId: 0
