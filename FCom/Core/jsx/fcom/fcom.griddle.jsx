@@ -199,12 +199,44 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
     });
 
     var FComSettings = React.createClass({
+        mixins: [FCom.Mixin],
         getDefaultProps: function() {
             return {
                 "className": "",
                 "getConfig": null,
                 "selectedColumns": [],
                 "refresh": null
+            }
+        },
+        modalSaveMassChanges: function(modal) {
+            //todo: combine this with FComGridBody::modalSaveChange()
+            var that = this;
+            var url = this.props.getConfig('edit_url');
+            if (url) {
+                var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
+                var hash = { oper: 'mass-edit', id: ids };
+                var form = $(modal.getDOMNode()).find('form');
+                form.find('textarea, input, select').each(function() {
+                    var key = $(this).attr('id');
+                    var val = $(this).val();
+                    hash[key] = that.html2text(val);
+                });
+                form.validate();
+                if (form.valid()) {
+                    $.post(url, hash, function(data) {
+                        if (data) {
+                            that.props.refresh();
+                            modal.close();
+                        } else {
+                            alert('error when save');
+                            return false;
+                        }
+                    });
+                } else {
+                    //error
+                    console.log('error');
+                    return false;
+                }
             }
         },
         doMassAction: function(event) { //top mass action
@@ -235,7 +267,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" cancel="Close">
+                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" cancel="Close" onConfirm={this.modalSaveMassChanges}>
                             <FComModalMassEditForm editUrl={editUrl} columnMetadata={this.props.columnMetadata} id={gridId} />
                         </Components.Modal>,
                         modalEleContainer
@@ -444,7 +476,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                             </div>
                         </div>
                     </div>
-                    <form className="form form-horizontal validate-form" id={gridId + '-modal-form'}>
+                    <form className="form form-horizontal validate-form" id={gridId + '-modal-mass-form'}>
                         {formElements}
                     </form>
                 </div>
