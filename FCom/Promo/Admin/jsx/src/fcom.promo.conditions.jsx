@@ -130,7 +130,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         handleConfigure: function (e) {
             var modal = <Components.Modal onConfirm={this.handleConditionsConfirm} id={"modal-" + this.props.id} key={"modal-" + this.props.id}
                 title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
-                <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
+                <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} idVar={this.props.options.id_var} data={this.state.value}
                     entityId={this.props.options.entity_id} onLoad={this.registerModalContent} key={"modal-content-" + this.props.id} />
             </Components.Modal>;
 
@@ -184,7 +184,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     {this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
-                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
+                        var data = field.value || [];
+                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field} data={data} filter={field.filter}
                             id={field.field} input={field.input} removeField={this.removeField} ref={field.field} onChange={this.elementChange}/>
                     }.bind(this))}
                 </div>
@@ -292,18 +293,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             for(var field in this.props.data) {
                 if(this.props.data.hasOwnProperty(field)) {
                     if(field == 'fields') {
-                        var defaultFields = this.props.fields;
                         var fields = this.props.data[field].map(function (field) {
-                            var fieldId = field['field'];
-                            var fieldText = defaultFields.filter(function (el) {
-                                return el.field == fieldId;
-                            });
-                            if (fieldText.length) {
-                                fieldText = fieldText[0]['label'];
-                            } else {
-                                fieldText = 'N/A';
+                            if(!field.label) {
+                                var fieldId = field['field'].split('.');
+                                field.label = fieldId[1] || fieldId[0]; // if label is missing use field code instead
                             }
-                            field.label = fieldText;
                             return field;
                         });
                         fields = this.state.fields.concat(fields);
@@ -343,7 +337,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var fieldId = "fieldCombination." + this.props.id;
             var value;
             if(this.props.data && this.props.data.length) {
-                value = this.props.data.join(",");
+                if ($.isArray(this.props.data)) {
+                    value = this.props.data.join(",");
+                } else {
+                    value = this.props.data;
+                }
             }
             var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId} onChange={this.onChange} defaultValue={value}/>;
             if (this.props.numeric_inputs.indexOf(inputType) != -1) {
@@ -385,7 +383,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id}
+                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id} value={this.props.filter}
                             ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{input}</div>
@@ -409,6 +407,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
             data.filter = this.values["fieldCompare." + this.props.id] || $(this.refs["fieldCompare." + this.props.id].getDOMNode()).val();
             data.value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
+            data.label = this.props.label;
+            data.input = this.props.input;
 
             return data;
         },
@@ -775,7 +775,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         var data = field.value || [];
-                        return <ConditionsShippingModalField label={field.label} url={url} key={field.field} data={data}
+                        return <ConditionsShippingModalField label={field.label} url={url} key={field.field} data={data} filter={field.filter}
                             id={field.field} ref={field.field} removeField={this.removeField} onChange={this.elementChange}/>
                     }.bind(this))}
                 </div>
@@ -894,16 +894,18 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     if(field == 'fields') {
                         var defaultFields = this.props.fields;
                         var fields = this.props.data[field].map(function (field) {
-                            var fieldId = field['field'];
-                            var fieldText = defaultFields.filter(function (el) {
-                                return el.field == fieldId;
-                            });
-                            if (fieldText.length) {
-                                fieldText = fieldText[0]['label'];
-                            } else {
-                                fieldText = 'N/A';
+                            if (!field.label) {
+                                var fieldId = field['field'];
+                                var fieldText = defaultFields.filter(function (el) {
+                                    return el.field == fieldId;
+                                });
+                                if (fieldText.length) {
+                                    fieldText = fieldText[0]['label'];
+                                } else {
+                                    fieldText = 'N/A';
+                                }
+                                field.label = fieldText;
                             }
-                            field.label = fieldText;
                             return field;
                         });
                         fields = this.state.fields.concat(fields);
@@ -941,7 +943,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var fieldId = "fieldCombination." + this.props.id;
             var value;
             if(this.props.data && this.props.data.length) {
-                value = this.props.data.join(",");
+                if ($.isArray(this.props.data)) {
+                    value = this.props.data.join(",");
+                } else {
+                    value = this.props.data;
+                }
             }
             var input = <input className="form-control" type="hidden" id={fieldId} key={fieldId} ref={fieldId} defaultValue={value}/>;
             var helperBlock = '';
@@ -951,7 +957,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <Common.Compare opts={this.props.opts} id={"fieldCompare." + this.props.id}
+                        <Common.Compare opts={this.props.opts} id={"fieldCompare." + this.props.id} value={this.props.filter}
                             ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{[input, helperBlock]}</div>
@@ -965,7 +971,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
             data.filter = this.values["fieldCompare." + this.props.id] || $(this.refs["fieldCompare." + this.props.id].getDOMNode()).val();
             data.value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
-
+            data.label = this.props.label;
             return data;
         },
         serializeText: function () {
