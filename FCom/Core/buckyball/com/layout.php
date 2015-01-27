@@ -1126,6 +1126,10 @@ class BLayout extends BClass
             }
             return $this;
         }
+        if (empty($this->_themes[$themeName])) {
+            BDebug::error('Invalid theme supplied: ' . $themeName);
+            return $this;
+        }
         BDebug::debug('THEME.APPLY ' . $themeName);
         $this->BEvents->fire('BLayout::applyTheme:before', ['theme_name' => $themeName]);
 
