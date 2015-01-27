@@ -351,5 +351,76 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         }
     });
 
+    /**
+     * render modal elements, only support for fcom grid
+     */
+    FCom.Components.ModalElement = React.createClass({
+        mixins: [FCom.Mixin, FCom.FormMixin],
+        getDefaultProps: function() {
+            return {
+                'row': {}, //model contains value
+                'column': {}, //column info and option,
+                'removeFieldDisplay': false, //remove field button for mass-edit
+                'removeFieldHandle': null
+            }
+        },
+        render: function() {
+            var that = this;
+            var column = this.props.column;
+
+            var label = '';
+            var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
+            if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
+                label = (
+                    <div className="control-label col-sm-3">
+                        <label for={column.name}>
+                            {column.label} {iconRequired}
+                        </label>
+                    </div>
+                );
+            }
+
+            var validationRules = that.validationRules(column.validation);
+            var input = '';
+            if (typeof column.element_print != 'undefined') { //custom html for element_print
+                if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
+                    input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                }
+                input += '<div class="controls col-sm-8">' + column.element_print + '</div>';
+                return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
+            } else {
+                var defaultValue = (typeof that.props.row[column.name] != 'undefined') ? that.props.row[column.name] : '';
+                switch (column.editor) {
+                    case 'select':
+                        var options = [];
+                        _.forEach(column.options, function(text, value) {
+                            options.push(<option value={value}>{text}</option>);
+                        });
+                        input = <select name={column.name} id={column.name} className="form-control" defaultValue={defaultValue} {...validationRules}>{options}</select>;
+                        break;
+                    case 'textarea':
+                        input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={defaultValue} {...validationRules} />;
+                        break;
+                    default:
+                        input = <input name={column.name} id={column.name} className="form-control" defaultValue={defaultValue} {...validationRules} />;
+                        break;
+                }
+            }
+
+            var removeFieldButton = '';
+            if (this.props.removeFieldDisplay) {
+                removeFieldButton = (<button className="btn box-remove btn-xs btn-link btn-remove remove-field" type="button" onClick={this.props.removeFieldHandle}>
+                                        <i className="icon-remove" data-field={column.name}></i>
+                                    </button>);
+            }
+
+            return (
+                <div className="form-group">
+                    {label}<div className="controls col-sm-8">{input}</div>{removeFieldButton}
+                </div>
+            )
+        }
+    });
+
     return FCom.Components;
 });
