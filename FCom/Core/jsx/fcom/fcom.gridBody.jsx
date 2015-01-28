@@ -99,8 +99,8 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             console.log('FComGridBody.columns', this.props.columns);*/
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn}
-                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata}
-                getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows}
+                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} data={this.props.data} originalData={this.props.originalData}
+                getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows} updateSelectedRow={this.props.updateSelectedRow}
                 setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
             />;
 
@@ -166,43 +166,24 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             //resize column, todo: personalization
             $(".dataTable th").resizable({handles: 'e'});
         },
-        /*showAll: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").removeClass('hidden');
-        },
-        showSelected: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").each(function() {
-                var row = this;
-
-                if ($(row).find(".select-row").is(":checked")) {
-                    $(row).removeClass("hidden");
-                } else {
-                    $(row).addClass("hidden");
-                }
-            });
-        },*/
         selectVisible: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").each(function() {
-                    var row = this;
-                if ($(row).hasClass('hidden')) {
-                    $(row).find(".select-row").prop("checked", false);
-                } else {
-                    $(row).find(".select-row").prop("checked", true);
-                }
+            var that = this;
+            _.forEach(this.props.data, function(row) {
+                var origRow = _.findWhere(that.props.originalData, {id: row.id});
+                that.props.updateSelectedRow(origRow, false);
             });
+
+            event.preventDefault();
         },
-        unselectVisible: function() { //todo: check with Boris about this logic
+        unselectVisible: function(event) { //todo: check with Boris about this logic
             this.props.clearSelectedRows();
             this.props.setHeaderSelection('show_all');
+            event.preventDefault();
         },
-        unselectAll: function() {
+        unselectAll: function(event) {
             this.props.clearSelectedRows();
             this.props.setHeaderSelection('show_all');
+            event.preventDefault();
         },
         render: function(){
             var that = this;
