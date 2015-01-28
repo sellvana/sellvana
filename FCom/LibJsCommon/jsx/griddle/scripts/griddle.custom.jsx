@@ -402,7 +402,7 @@ var Griddle = React.createClass({
             this.props.useCustomSettings
             ? <this.props.customSettings columnMetadata={this.props.columnMetadata} selectedColumns={this.getColumns} setColumns={this.setColumns}
                 getConfig={this.getConfig} searchWithinResults={this.searchWithinResults} getSelectedRows={this.getSelectedRows} refresh={this.refresh}
-                setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} />
+                setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState} />
             : <span className="settings" onClick={this.toggleColumnChooser}>{this.props.settingsText} <i className="glyphicon glyphicon-cog"></i></span>
         ) : "";
 
@@ -623,6 +623,13 @@ var Griddle = React.createClass({
     },
     getHeaderSelection: function() {
         return this.state.headerSelect;
+    },
+    /**
+     * get all state in this griddle
+     * @returns {ReactCompositeComponent.state|*}
+     */
+    getGriddleState: function() {
+        return this.state;
     }
 });
 

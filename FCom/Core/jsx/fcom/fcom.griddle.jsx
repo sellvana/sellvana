@@ -7,7 +7,10 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         gridId,
         pageSize,
         pageSizeOptions,
-        initColumns;
+        initColumns,
+        buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
+            return dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+        };
 
     var FComGriddleComponent = React.createClass({
         getDefaultProps: function () {
@@ -27,7 +30,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             pageSizeOptions = this.props.config.page_size_options;
             initColumns = this.getColumn();
         },
-        initColumn: function () {
+        initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
 
             var all = _.pluck(columnsConfig, 'name');
@@ -80,7 +83,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
      */
     var FComDataMethod = function (filterString, sortColumn, sortAscending, page, pageSize, callback) {
         $.ajax({
-            url: dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}'),
+            url: buildGridDataUrl(filterString, sortColumn, sortAscending, page, pageSize),
             dataType: 'json',
             type: 'GET',
             data: {},
@@ -273,6 +276,11 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                         modalEleContainer
                     );
                     break;
+                case 'export':
+                    var griddleState = this.props.getGriddleState();
+                    var exportUrl = buildGridDataUrl(griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
+                    window.location.href = exportUrl + '&export=true';
+                    break;
                 default:
                     console.log('mass-action');
                     break;
@@ -346,7 +354,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                             node = <a href="#" className="js-change-url grid-refresh btn">Refresh</a>;
                             break;
                         case 'export':
-                            node = <button className={"grid-export btn" + disabledClass}>Export</button>;
+                            node = <button className={"grid-export btn"} data-action='export' onClick={that.doMassAction}>Export</button>;
                             break;
                         case 'link_to_page':
                             node = <a href="#" className="grid-link_to_page btn">Link</a>;
