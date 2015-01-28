@@ -43,7 +43,11 @@ define(['underscore', 'react'], function (_, React) {
                 var node = "";
                 switch (col.type) {
                     case 'row_select':
-                        node = <input type="checkbox" name={id + "[checked][" + that.props.row.id + "]"} className="select-row" onChange={that.selectRow} />;
+                        var defaultChecked = false;
+                        if (_.findWhere(that.props.getSelectedRows(), {id: that.props.row.id})) {
+                            defaultChecked = true;
+                        }
+                        node = <input type="checkbox" name={id + "[checked][" + that.props.row.id + "]"} className="select-row" checked={defaultChecked} onChange={that.selectRow} />;
                         break;
                     case 'btn_group':
                         var actions = col.buttons.map(function(btn) {
@@ -65,7 +69,7 @@ define(['underscore', 'react'], function (_, React) {
                             }
                         });
                         node = (
-                            <div className="table-actions-btns-group"> {actions} </div>
+                            <div className="table-actions-btns-group">{actions}</div>
                         );
                         break;
                     case 'input':

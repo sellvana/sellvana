@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'react', 'jquery', 'jsx!griddle.fcomGridBody', 'jsx!griddle.fcomGridFilter', 'jsx!griddle', 'backbone', 'bootstrap', 'jsx!fcom.components'],
-function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) {
+define(['underscore', 'react', 'jquery', 'jsx!griddle.fcomGridBody', 'jsx!griddle.fcomGridFilter', 'jsx!fcom.components', 'jsx!griddle', 'backbone', 'bootstrap'],
+function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) {
 
     var dataUrl,
         gridId,
@@ -199,6 +199,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
     });
 
     var FComSettings = React.createClass({
+        mixins: [FCom.Mixin],
         getDefaultProps: function() {
             return {
                 "className": "",
@@ -207,10 +208,43 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                 "refresh": null
             }
         },
+        modalSaveMassChanges: function(modal) {
+            //todo: combine this with FComGridBody::modalSaveChange()
+            var that = this;
+            var url = this.props.getConfig('edit_url');
+            if (url) {
+                var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
+                var hash = { oper: 'mass-edit', id: ids };
+                var form = $(modal.getDOMNode()).find('form');
+                form.find('textarea, input, select').each(function() {
+                    var key = $(this).attr('id');
+                    var val = $(this).val();
+                    hash[key] = that.html2text(val);
+                });
+                form.validate();
+                if (form.valid()) {
+                    $.post(url, hash, function(data) {
+                        if (data) {
+                            that.props.refresh();
+                            modal.close();
+                        } else {
+                            alert('error when save');
+                            return false;
+                        }
+                    });
+                } else {
+                    //error
+                    console.log('error');
+                    return false;
+                }
+            }
+        },
         doMassAction: function(event) { //top mass action
             var that = this;
             var action = event.target.dataset.action;
             var dataUrl = this.props.getConfig('data_url');
+            var editUrl = this.props.getConfig('edit_url');
+            var gridId = this.props.getConfig('id');
 
             switch (action) {
                 case 'mass-delete':
@@ -230,7 +264,14 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
 
                     break;
                 case 'mass-edit': //mass-edit with modal
-                    console.log('mass-edit');
+                    var modalEleContainer = document.getElementById(gridId + '-modal');
+                    React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
+                    React.render(
+                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" cancel="Close" onConfirm={this.modalSaveMassChanges}>
+                            <FComModalMassEditForm editUrl={editUrl} columnMetadata={this.props.columnMetadata} id={gridId} />
+                        </Components.Modal>,
+                        modalEleContainer
+                    );
                     break;
                 default:
                     console.log('mass-action');
@@ -239,7 +280,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
 
         },
         toggleColumn: function(event) {
-            var selectedColumns = this.props.selectedColumns;
+            var selectedColumns = this.props.selectedColumns();
             if(event.target.checked == true && _.contains(selectedColumns, event.target.dataset.name) == false){
                 selectedColumns.push(event.target.dataset.name);
                 var diff = _.difference(initColumns, selectedColumns);
@@ -273,13 +314,15 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                 }
 
                 var checked = _.contains(that.props.selectedColumns, column);
+                //console.log(column + '.checked', checked);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
                 return (
                     <li data-id={column} className="dd-item dd3-item">
                         <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                         <div className="dd3-content">
                             <label>
-                                <input type="checkbox" checked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn}/> {colInfo ?  colInfo.label : column}
+                                <input type="checkbox" checked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
+                                {colInfo ?  colInfo.label : column}
                             </label>
                         </div>
                     </li>
@@ -309,7 +352,7 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                             node = <a href="#" className="grid-link_to_page btn">Link</a>;
                             break;
                         case 'edit':
-                            node = <a href={'#' + id + '-mass-edit'} className={"btn grid-mass-edit btn-success" + disabledClass} data-toggle="modal" role="button">Edit</a>;
+                            node = <a href='#' className={"btn grid-mass-edit btn-success" + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button">Edit</a>;
                             break;
                         case 'delete':
                             //todo: option noconfirm
@@ -321,6 +364,9 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                         case 'new':
                             //todo: option modal
                             node = <button className="btn grid-new btn-primary" type="button">New</button>;
+                            break;
+                        default:
+                            node = <span dangerouslySetInnerHTML={{__html: action.html}}></span>;
                             break;
                     }
 
@@ -342,6 +388,99 @@ function (_, React, $, FComGridBody, FComFilter, Griddle, Backbone, Components) 
                     {buttonActions}
                 </div>
             )
+        }
+    });
+
+    var FComModalMassEditForm = React.createClass({
+        getInitialState: function() {
+            var fields = [];
+            var shownFields = [];
+            _.forEach(this.props.columnMetadata, function(column) {
+                if (column.multirow_edit) {
+                    fields.push(column);
+                }
+            });
+            /*if (fields.length == 1) {
+                shownFields.push(fields[0].name);
+            }*/
+            return {
+                'shownFields': shownFields,
+                'fields': fields
+            }
+        },
+        getDefaultProps: function() {
+            return {
+                'columnMetadata': [],
+                'editUrl': '',
+                'id': 'modal-mass-form'
+            };
+        },
+        componentDidMount: function() {
+            var that = this;
+            var domNode = this.getDOMNode();
+            $(domNode).find('.well select').select2({
+                placeholder: "Select a Field",
+                allowClear: true
+            });
+            $(domNode).find('.well select').on('change', function(e) {
+                that.addField(e);
+                $(this).select2('data', null);
+            });
+        },
+        addField: function(event) { //render field is selected in dropdown
+            if (event.target.value != '') {
+                var shownFields = this.state.shownFields;
+                shownFields.push(event.target.value);
+                this.setState({shownFields: shownFields});
+            }
+        },
+        removeField: function(event) {
+            var fieldName = event.target.dataset.field;
+            console.log('removeField.field', fieldName);
+            console.log('removeField.dataset', event.target.dataset);
+            if (fieldName && _.contains(this.state.shownFields, fieldName)) {
+                var shownFields = _.without(this.state.shownFields, fieldName);
+                this.setState({shownFields: shownFields});
+            }
+        },
+        render: function() {
+            console.log('state.fields', this.state.fields);
+            console.log('state.shownFields', this.state.shownFields);
+            //todo: we have 2 types of render mass-edit, refer https://fulleron.atlassian.net/browse/SC-306
+
+            if (!this.props.editUrl) return null;
+            var that = this;
+            var gridId = this.props.id;
+
+            var fieldDropDownNodes = this.state.fields.map(function(column) {
+                if (!_.contains(that.state.shownFields, column.name)) {
+                    return <option value={column.name}>{column.label}</option>;
+                }
+                return null;
+            });
+            fieldDropDownNodes.unshift(<option value=""></option>);
+
+            var formElements = this.state.shownFields.map(function(fieldName) {
+                var column = _.findWhere(that.state.fields, {name: fieldName});
+                return <Components.ModalElement column={column} removeFieldDisplay={true} removeFieldHandle={that.removeField} />
+            });
+
+            return (
+                <div>
+                    <div className="well">
+                        <div className="row">
+                            <div className="col-sm-12">
+                                <select className="select2 form-control" id={gridId + '-form-select'} style={{width: '150px'}}>
+                                    {fieldDropDownNodes}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <form className="form form-horizontal validate-form" id={gridId + '-modal-mass-form'}>
+                        {formElements}
+                    </form>
+                </div>
+            );
         }
     });
 
