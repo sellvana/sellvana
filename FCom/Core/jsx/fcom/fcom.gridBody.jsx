@@ -99,8 +99,9 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             console.log('FComGridBody.columns', this.props.columns);*/
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn}
-                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} getSelectedRows={that.props.getSelectedRows}
-                setHeaderSelection={that.props.setHeaderSelection}
+                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata}
+                getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows}
+                setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
             />;
 
             var nodes = this.props.data.map(function (row, index) {
@@ -162,6 +163,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             $(selected).parents('th').trigger('click');
         },
         componentDidMount: function() {
+            //resize column, todo: personalization
             $(".dataTable th").resizable({handles: 'e'});
         },
         /*showAll: function(event) {
@@ -194,21 +196,13 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                 }
             });
         },
-        unselectVisible: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").each(function() {
-                var row = this;
-                if (!$(row).hasClass('hidden')) {
-                    $(row).find(".select-row").prop("checked", false);
-                }
-            });
+        unselectVisible: function() { //todo: check with Boris about this logic
+            this.props.clearSelectedRows();
+            this.props.setHeaderSelection('show_all');
         },
-        unselectAll: function(event) {
-            event.preventDefault();
-
-            $(".select-row").prop('checked', false);
-            $(".standard-row").removeClass('hidden');
+        unselectAll: function() {
+            this.props.clearSelectedRows();
+            this.props.setHeaderSelection('show_all');
         },
         render: function(){
             var that = this;
@@ -228,13 +222,16 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                         </button>
                     );
 
-                    var headerSelectionNodes = that.getHeaderSelectionOptions().map(function(option) {
-                        if (!option.visibleOnSelected || selectedRows.length) {
-                            return (<li> <a href="#" data-select={option.select} onClick={option.action ? option.action : that.updateHeaderSelect}>{option.label}</a></li>)
-                        }
-                    });
-
-                    if (selectedRows.length) {
+                    if (that.props.getHeaderSelection() == 'show_selected') {
+                        selectionButtonText = (
+                            <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
+                                <span className="icon-placeholder">
+                                    <i className="glyphicon glyphicon-th-list"></i>
+                                </span>
+                                <span className="title">S</span>&nbsp;<span className="caret"></span>
+                            </button>
+                        );
+                    } else if (selectedRows.length) {
                         selectionButtonText = (
                             <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
                                 <span className="icon-placeholder">
@@ -244,6 +241,12 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                             </button>
                         );
                     }
+
+                    var headerSelectionNodes = that.getHeaderSelectionOptions().map(function(option) {
+                        if (!option.visibleOnSelected || selectedRows.length) {
+                            return (<li> <a href="#" data-select={option.select} onClick={option.action ? option.action : that.updateHeaderSelect}>{option.label}</a></li>)
+                        }
+                    });
 
                     return (
                         <th className="js-draggable ui-resizable" data-id="0">
