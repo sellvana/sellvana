@@ -99,8 +99,9 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             console.log('FComGridBody.columns', this.props.columns);*/
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn}
-                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} getSelectedRows={that.props.getSelectedRows}
-                setHeaderSelection={that.props.setHeaderSelection}
+                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} data={this.props.data} originalData={this.props.originalData}
+                getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows} updateSelectedRow={this.props.updateSelectedRow}
+                setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
             />;
 
             var nodes = this.props.data.map(function (row, index) {
@@ -162,53 +163,49 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             $(selected).parents('th').trigger('click');
         },
         componentDidMount: function() {
+            var that = this;
+
+            //resize column, todo: personalization
             $(".dataTable th").resizable({handles: 'e'});
-        },
-        /*showAll: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").removeClass('hidden');
-        },
-        showSelected: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").each(function() {
-                var row = this;
-
-                if ($(row).find(".select-row").is(":checked")) {
-                    $(row).removeClass("hidden");
-                } else {
-                    $(row).addClass("hidden");
+            $(".dd-list").sortable({
+                connectWith: ".dd-list",
+                handle: ".dd3-handle",
+                cancel: ".portlet-toggle",
+                placeholder: "portlet-placeholder ui-corner-all",
+                update: function (event, ui) {
+                    that.props.changeSort('');
                 }
             });
-        },*/
+            $( ".dd-item" )
+                .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" )
+                .find( ".dd3-handle" )
+                .addClass( "ui-widget-header ui-corner-all" )
+                .prepend( "<span class='ui-icon ui-icon-minusthick portlet-toggle'></span>");
+
+            $( ".portlet-toggle" ).click(function() {
+                var icon = $( this );
+                icon.toggleClass( "ui-icon-minusthick ui-icon-plusthick" );
+                icon.closest( ".dd-item" ).find( ".dd3-content" ).toggle();
+            });
+        },
         selectVisible: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").each(function() {
-                    var row = this;
-                if ($(row).hasClass('hidden')) {
-                    $(row).find(".select-row").prop("checked", false);
-                } else {
-                    $(row).find(".select-row").prop("checked", true);
-                }
+            var that = this;
+            _.forEach(this.props.data, function(row) {
+                var origRow = _.findWhere(that.props.originalData, {id: row.id});
+                that.props.updateSelectedRow(origRow, false);
             });
+
+            event.preventDefault();
         },
-        unselectVisible: function(event) {
+        unselectVisible: function(event) { //todo: check with Boris about this logic
+            this.props.clearSelectedRows();
+            this.props.setHeaderSelection('show_all');
             event.preventDefault();
-
-            $(".standard-row").each(function() {
-                var row = this;
-                if (!$(row).hasClass('hidden')) {
-                    $(row).find(".select-row").prop("checked", false);
-                }
-            });
         },
         unselectAll: function(event) {
+            this.props.clearSelectedRows();
+            this.props.setHeaderSelection('show_all');
             event.preventDefault();
-
-            $(".select-row").prop('checked', false);
-            $(".standard-row").removeClass('hidden');
         },
         render: function(){
             var that = this;
@@ -228,13 +225,16 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                         </button>
                     );
 
-                    var headerSelectionNodes = that.getHeaderSelectionOptions().map(function(option) {
-                        if (!option.visibleOnSelected || selectedRows.length) {
-                            return (<li> <a href="#" data-select={option.select} onClick={option.action ? option.action : that.updateHeaderSelect}>{option.label}</a></li>)
-                        }
-                    });
-
-                    if (selectedRows.length) {
+                    if (that.props.getHeaderSelection() == 'show_selected') {
+                        selectionButtonText = (
+                            <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
+                                <span className="icon-placeholder">
+                                    <i className="glyphicon glyphicon-th-list"></i>
+                                </span>
+                                <span className="title">S</span>&nbsp;<span className="caret"></span>
+                            </button>
+                        );
+                    } else if (selectedRows.length) {
                         selectionButtonText = (
                             <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
                                 <span className="icon-placeholder">
@@ -244,6 +244,12 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                             </button>
                         );
                     }
+
+                    var headerSelectionNodes = that.getHeaderSelectionOptions().map(function(option) {
+                        if (!option.visibleOnSelected || selectedRows.length) {
+                            return (<li> <a href="#" data-select={option.select} onClick={option.action ? option.action : that.updateHeaderSelect}>{option.label}</a></li>)
+                        }
+                    });
 
                     return (
                         <th className="js-draggable ui-resizable" data-id="0">
@@ -307,7 +313,8 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
         getDefaultProps: function () {
             return {
                 'row': {},
-                'id': 'modal-form'
+                'id': 'modal-form',
+                'columnMetadata': []
             }
         },
         getInitialState: function () {
@@ -333,50 +340,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
 
             var nodes = this.props.columnMetadata.map(function(column) {
                 if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
-
-                var label = '';
-                var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
-                if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
-                    label = (
-                        <div className="control-label col-sm-3">
-                            <label for={column.name}>
-                                {column.label} {iconRequired}
-                            </label>
-                        </div>
-                    );
-                }
-
-                var validationRules = that.validationRules(column.validation);
-                var input = '';
-                if (typeof column.element_print != 'undefined') { //custom html for element_print
-                    if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
-                        input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
-                    }
-                    input += '<div class="controls col-sm-8">' + column.element_print + '</div>';
-                    return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
-                } else {
-                    switch (column.editor) {
-                        case 'select':
-                            var options = [];
-                            _.forEach(column.options, function(text, value) {
-                                options.push(<option value={value}>{text}</option>);
-                            });
-                            input = <select name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]} {...validationRules}>{options}</select>;
-                            break;
-                        case 'textarea':
-                            input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={that.props.row[column.name]} {...validationRules} />;
-                            break;
-                        default:
-                            input = <input name={column.name} id={column.name} className="form-control" defaultValue={that.props.row[column.name]} {...validationRules} />;
-                            break;
-                    }
-                }
-
-                return (
-                    <div className="form-group">
-                        {label}<div className="controls col-sm-8">{input}</div>
-                    </div>
-                )
+                return <Components.ModalElement column={column} value={that.props.row[column.name]} />
             });
 
             //add id
