@@ -187,6 +187,13 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                     return test && counted >= offset && counted < max;// if term is not for this page, skip it
                 });
                 return matches;
+            },
+            initSelection: function (el, callback) {
+                var data = [];
+                $(el.val().split(",")).each(function () {
+                    data.push({id: this, text: this});
+                });
+                callback(data);
             }
         },
         removeMixin: {

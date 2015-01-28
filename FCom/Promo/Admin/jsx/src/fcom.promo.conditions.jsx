@@ -12,7 +12,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
             return (
                 <div className={this.props.containerClass}>
-                    <select className={cls}>
+                    <select className={cls} defaultValue={this.props.value}>
                         {this.props.totalType.map(function (type) {
                             return <option value={type.id} key={type.id}>{type.label}</option>
                         })}
@@ -364,11 +364,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     value = this.props.data;
                 }
             }
-            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId} onChange={this.onChange} defaultValue={value}/>;
+            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId}
+                onChange={this.onChange} defaultValue={value}/>;
             if (this.props.numeric_inputs.indexOf(inputType) != -1) {
                 if (inputType == 'number') {
                     if (this.state.range === false) {
-                        input = <input className="form-control required" type="number" step="any" id={fieldId} ref={fieldId} style={{width: "auto"}} onChange={this.onChange} defaultValue={value}/>;
+                        input = <input className="form-control required" type="number" step="any" id={fieldId}
+                            ref={fieldId} style={{width: "auto"}} onChange={this.onChange} defaultValue={value}/>;
                     } else {
                         value = this.props.data;
                         var min, max;
@@ -380,8 +382,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                             max = value[1];
                         }
                         input = <div id={fieldId} ref={fieldId} className="input-group">
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".min"} placeholder="Min" style={{width: "50%"}} onChange={this.onChange} defaultValue={min}/>
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".max"} placeholder="Max" style={{width: "50%"}} onChange={this.onChange} defaultValue={max}/>
+                            <input className="form-control required" type="number" step="any" id={fieldId + ".min"}
+                                placeholder="Min" style={{width: "50%"}} onChange={this.onChange} defaultValue={min}/>
+                            <input className="form-control required" type="number" step="any" id={fieldId + ".max"}
+                                placeholder="Max" style={{width: "50%"}} onChange={this.onChange} defaultValue={max}/>
                         </div>;
                     }
                 } else if (inputType == 'date' || inputType == 'time') {
@@ -393,11 +397,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         <span className="input-group-addon">
                             <i className="glyphicon glyphicon-calendar"></i>
                         </span>
-                        <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} onChange={this.onChange} defaultValue={value}/>
+                        <input className="form-control required" type="text" id={fieldId} ref={fieldId}
+                            dataMode={singleMode} onChange={this.onChange} defaultValue={value}/>
                     </div>
                 }
             } else if (inputType == 'select') {
-                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId} defaultValue={value}/>;
+                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}
+                    defaultValue={value}/>;
             } else if (this.props.bool_inputs.indexOf(inputType) != -1) {
                 input = <Components.YesNo  id={fieldId} ref={fieldId} onChange={this.onChange} defaultValue={value}/>;
             }
@@ -542,7 +548,25 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
             //console.log(e);
             if (this.state.range && type == 'numeric') {
-                // possibly have min/max value handle them
+                var id = $elem.attr('id');
+                var idArray = id.split('.');
+                if (idArray.length > 1) { // id is like field.min/max
+                    var minMax = idArray[1]; // min || max
+                    // if value is already set in non range mode, it will be scalar, or null if this is first time
+                    var value = this.values["fieldCombination." + this.props.id] || [null, null];
+                    if (!$.isArray(value)) {
+                        //if scalar, dump it and set again
+                        value = [null, null];
+                    }
+                    // min is at index 0, max index 1
+                    if ('min' == minMax) {
+                        value[0] = e.value;
+                    } else {
+                        value[1] = e.value;
+                    }
+
+                    e.value = value;
+                }
             } else if (type == 'date' && !this.state.range) {
                 // potentially range of dates
             }
@@ -591,13 +615,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 query: this.select2query,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
-                initSelection: function (el, callback) {
-                    var data = [];
-                    $(el.val().split(",")).each(function () {
-                        data.push({id: this, text: this});
-                    });
-                    callback(data);
-                }
+                initSelection: self.initSelection
             }).on('change', this.onChange);
         }
     });
@@ -1119,7 +1137,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             for(var type in this.state.data.rules) {
                 if(this.state.data.rules.hasOwnProperty(type)) {
                     var rules = this.state.data.rules[type];
-                    if($.isFunction(rules.map)) {
+                    if($.isArray(rules)) {
                         rules.map(function (field, idx) {
                             var el;
                             var key = type + '-' + idx;
