@@ -313,7 +313,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     return false;
                 }
 
-                var checked = _.contains(that.props.selectedColumns(), column);
+                var checked = _.contains(that.props.selectedColumns, column);
                 //console.log(column + '.checked', checked);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
                 return (

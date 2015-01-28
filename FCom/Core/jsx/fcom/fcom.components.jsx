@@ -408,9 +408,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
 
             var removeFieldButton = '';
             if (this.props.removeFieldDisplay) {
-                removeFieldButton = (<button className="btn box-remove btn-xs btn-link btn-remove remove-field" type="button" onClick={this.props.removeFieldHandle}>
-                                        <i className="icon-remove" data-field={column.name}></i>
-                                    </button>);
+                removeFieldButton = (<button className="btn box-remove btn-xs btn-link btn-remove remove-field icon-remove" type="button" onClick={this.props.removeFieldHandle} data-field={column.name}></button>);
             }
 
             return (
