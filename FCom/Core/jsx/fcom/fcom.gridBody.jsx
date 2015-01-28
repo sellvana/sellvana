@@ -99,8 +99,9 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             console.log('FComGridBody.columns', this.props.columns);*/
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn}
-                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} getSelectedRows={that.props.getSelectedRows}
-                setHeaderSelection={that.props.setHeaderSelection}
+                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} data={this.props.data} originalData={this.props.originalData}
+                getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows} updateSelectedRow={this.props.updateSelectedRow}
+                setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
             />;
 
             var nodes = this.props.data.map(function (row, index) {
@@ -164,6 +165,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
         componentDidMount: function() {
             var that = this;
 
+            //resize column, todo: personalization
             $(".dataTable th").resizable({handles: 'e'});
             $(".dd-list").sortable({
                 connectWith: ".dd-list",
@@ -186,51 +188,24 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                 icon.closest( ".dd-item" ).find( ".dd3-content" ).toggle();
             });
         },
-        /*showAll: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").removeClass('hidden');
-        },
-        showSelected: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").each(function() {
-                var row = this;
-
-                if ($(row).find(".select-row").is(":checked")) {
-                    $(row).removeClass("hidden");
-                } else {
-                    $(row).addClass("hidden");
-                }
-            });
-        },*/
         selectVisible: function(event) {
-            event.preventDefault();
-
-            $(".standard-row").each(function() {
-                    var row = this;
-                if ($(row).hasClass('hidden')) {
-                    $(row).find(".select-row").prop("checked", false);
-                } else {
-                    $(row).find(".select-row").prop("checked", true);
-                }
+            var that = this;
+            _.forEach(this.props.data, function(row) {
+                var origRow = _.findWhere(that.props.originalData, {id: row.id});
+                that.props.updateSelectedRow(origRow, false);
             });
+
+            event.preventDefault();
         },
-        unselectVisible: function(event) {
+        unselectVisible: function(event) { //todo: check with Boris about this logic
+            this.props.clearSelectedRows();
+            this.props.setHeaderSelection('show_all');
             event.preventDefault();
-
-            $(".standard-row").each(function() {
-                var row = this;
-                if (!$(row).hasClass('hidden')) {
-                    $(row).find(".select-row").prop("checked", false);
-                }
-            });
         },
         unselectAll: function(event) {
+            this.props.clearSelectedRows();
+            this.props.setHeaderSelection('show_all');
             event.preventDefault();
-
-            $(".select-row").prop('checked', false);
-            $(".standard-row").removeClass('hidden');
         },
         render: function(){
             var that = this;
@@ -250,13 +225,16 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                         </button>
                     );
 
-                    var headerSelectionNodes = that.getHeaderSelectionOptions().map(function(option) {
-                        if (!option.visibleOnSelected || selectedRows.length) {
-                            return (<li> <a href="#" data-select={option.select} onClick={option.action ? option.action : that.updateHeaderSelect}>{option.label}</a></li>)
-                        }
-                    });
-
-                    if (selectedRows.length) {
+                    if (that.props.getHeaderSelection() == 'show_selected') {
+                        selectionButtonText = (
+                            <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
+                                <span className="icon-placeholder">
+                                    <i className="glyphicon glyphicon-th-list"></i>
+                                </span>
+                                <span className="title">S</span>&nbsp;<span className="caret"></span>
+                            </button>
+                        );
+                    } else if (selectedRows.length) {
                         selectionButtonText = (
                             <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
                                 <span className="icon-placeholder">
@@ -266,6 +244,12 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                             </button>
                         );
                     }
+
+                    var headerSelectionNodes = that.getHeaderSelectionOptions().map(function(option) {
+                        if (!option.visibleOnSelected || selectedRows.length) {
+                            return (<li> <a href="#" data-select={option.select} onClick={option.action ? option.action : that.updateHeaderSelect}>{option.label}</a></li>)
+                        }
+                    });
 
                     return (
                         <th className="js-draggable ui-resizable" data-id="0">
