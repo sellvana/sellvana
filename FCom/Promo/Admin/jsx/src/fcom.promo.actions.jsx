@@ -12,7 +12,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             return (
                 <div className={this.props.containerClass}>
                     <div className="col-md-10">
-                    <select className={cls} onChange={this.props.onChange} defaultValue={this.props.value}>
+                    <select className={cls} onChange={this.onChange} defaultValue={this.props.value}>
                         {this.props.totalType.map(function (type) {
                             return <option value={type.id} key={type.id}>{type.label}</option>
                         })}
@@ -22,6 +22,16 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 </div>
             );
         },
+        value: null,
+        onChange: function (e) {
+            this.value = $('select', this.getDOMNode()).select2('val');
+            if(this.props.onChange) {
+                this.props.onChange(e);
+            }
+        },
+        serialize: function () {
+            return this.value || $('select', this.getDOMNode()).select2('val');
+        },
         getDefaultProps: function () {
             return {
                 totalType: [{id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}],
@@ -30,7 +40,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 className: "form-control"
             };
         }, componentDidMount: function () {
-            $('select.to-select2', this.getDOMNode()).select2().on('change', this.props.onChange);
+            $('select.to-select2', this.getDOMNode()).select2().on('change', this.onChange);
         }
     });
 
@@ -220,15 +230,36 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             var inputType = this.props.input;
             var opts = this.getOpts();
             var fieldId = "fieldCombination." + this.props.id;
-            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId} onChange={this.onChange}/>;
+            var value;
+            if (this.props.data && this.props.data.length) {
+                if ($.isArray(this.props.data)) {
+                    value = this.props.data.join(",");
+                } else {
+                    value = this.props.data;
+                }
+            }
+            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId}
+                onChange={this.onChange} defaultValue={value}/>;
             if(this.props.numeric_inputs.indexOf(inputType) != -1) {
                 if (inputType == 'number') {
                     if(this.state.range === false) {
-                        input = <input className="form-control required" type="number" step="any" id={fieldId} ref={fieldId} style={{width: "auto"}} onChange={this.onChange}/>;
+                        input = <input className="form-control required" type="number" step="any" id={fieldId}
+                            ref={fieldId} style={{width: "auto"}} onChange={this.onChange} defaultValue={value}/>;
                     } else {
+                        value = this.props.data;
+                        var min, max;
+                        if (value.length > 0) {
+                            min = value[0]
+                        }
+
+                        if (value.length > 1) {
+                            max = value[1];
+                        }
                         input = <div id={fieldId} ref={fieldId} className="input-group">
-                            <input className="form-control required" type="number" step="any" placeholder="Min" style={{width: "50%"}} onChange={this.onChange}/>
-                            <input className="form-control required" type="number" step="any" placeholder="Max" style={{width: "50%"}} onChange={this.onChange}/>
+                            <input className="form-control required" type="number" step="any" placeholder="Min"
+                                style={{width: "50%"}} onChange={this.onChange} defaultValue={min} id={fieldId + ".min"}/>
+                            <input className="form-control required" type="number" step="any" placeholder="Max"
+                                style={{width: "50%"}} onChange={this.onChange} defaultValue={max} id={fieldId + ".max"}/>
                         </div>;
                     }
                 } else if (inputType == 'date' || inputType == 'time') {
@@ -238,18 +269,20 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                     }
                     input = <div className="input-group">
                         <span className="input-group-addon"><i className="glyphicon glyphicon-calendar"></i></span>
-                        <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} onChange={this.onChange}/>
+                        <input className="form-control required" type="text" id={fieldId} ref={fieldId}
+                            dataMode={singleMode} onChange={this.onChange} defaultValue={value}/>
                     </div>
                 }
             } else if(inputType == 'select'){
-                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}/>;
+                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}
+                    defaultValue={value}/>;
             } else if(this.props.bool_inputs.indexOf(inputType) != -1) {
-                input = <Components.YesNo  id={fieldId} ref={fieldId}  onChange={this.onChange}/>;
+                input = <Components.YesNo  id={fieldId} ref={fieldId}  onChange={this.onChange} defaultValue={value}/>;
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id}
+                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id} value={this.props.filter}
                             ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{input}</div>
@@ -268,7 +301,21 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             return opts;
         },
         serialize: function () {
-            return this.values;
+            var data = {
+                field: this.props.id
+            };
+            data.filter = this.values["fieldCompare." + this.props.id] || $(this.refs["fieldCompare." + this.props.id].getDOMNode()).val();
+            var $fieldComb = $(this.refs["fieldCombination." + this.props.id].getDOMNode());
+            try{
+                $fieldComb.val();
+            } catch (e){
+                $('input', $fieldComb).trigger('change'); // will it work?
+            }
+            data.value = this.values["fieldCombination." + this.props.id] || $fieldComb.val();
+            data.label = this.props.label;
+            data.input = this.props.input;
+
+            return data;
         },
         serializeText: function () {
             var type = this.getInputType();
@@ -380,16 +427,34 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         onChange: function (e) {
             var type = this.getInputType();
 
+            var $elem = $(e.target);
             // only select2 event has e.val, for dom inputs it must be added
             if (!e.val) { // for native inputs, use blur event to capture value
-                var $elem = $(e.target);
                 e.value = $elem.val();
             } else {
                 e.value = e.val;
             }
             //console.log(e);
             if (this.state.range && type == 'numeric') {
-                // possibly have min/max value handle them
+                var id = $elem.attr('id');
+                var idArray = id.split('.');
+                if(idArray.length > 1) { // id is like field.min/max
+                    var minMax = idArray[1]; // min || max
+                    // if value is already set in non range mode, it will be scalar, or null if this is first time
+                    var value = this.values["fieldCombination." + this.props.id] || [null, null];
+                    if (!$.isArray(value)) {
+                        //if scalar, dump it and set again
+                        value = [null, null];
+                    }
+                    // min is at index 0, max index 1
+                    if ('min' == minMax) {
+                        value[0] = e.value;
+                    } else {
+                        value[1] = e.value;
+                    }
+
+                    e.value = value;
+                }
             } else if (type == 'date' && !this.state.range) {
                 // potentially range of dates
             }
@@ -426,7 +491,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 closeOnSelect: true,
                 query: this.select2query,
                 dropdownCssClass: "bigdrop",
-                dropdownAutoWidth: true
+                dropdownAutoWidth: true,
+                initSelection: self.initSelection
             }).on('change', this.onChange);
         }
     });
@@ -434,8 +500,16 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     var DiscountSkuCombination = React.createClass({
         mixins: [Common.select2QueryMixin],
         render: function () {
+            var value;
+            if(this.props.data) {
+                if($.isArray(this.props.data)) {
+                    value = this.props.data.join(",");
+                } else {
+                    value = this.props.data;
+                }
+            }
             return (
-                <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/>
+                <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control" defaultValue={value}/>
             );
         },
         getDefaultProps: function () {
@@ -477,8 +551,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
 
                     return markup;
                 },
+                initSelection: self.initSelection,
                 query: self.select2query
             });
+        },
+        getSelectedProducts: function () {
+            return $(this.refs['skuCollectionIds'].getDOMNode()).select2('val');
         }
     });
 
@@ -487,12 +565,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             var details = <span/>;
             if(this.props.type == 'attr_combination') {
                 details = <DiscountDetailsCombination id="attrCombination" ref="attrCombination" key="attrCombination"
-                    options={this.props.options} modalContainer={this.props.modalContainer}/>
+                    options={this.props.options} modalContainer={this.props.modalContainer} data={this.props.combination}/>
             } else if(this.props.type == 'other_prod') {
                 details = <DiscountSkuCombination id="skuCombination" ref="skuCombination" key="skuCombination"
-                    options={this.props.options}/>;
+                    options={this.props.options} data={this.props.product_ids}/>;
             }
             return details;
+        },
+        serialize: function () {
+            // todo serialize
+            var value = {};
+            if(this.props.type == 'other_prod') {
+                value.product_ids = this.refs['skuCombination'].getSelectedProducts();
+            } else if(this.props.type == 'attr_combination') {
+                value.combination = this.refs['attrCombination'].serialize();
+            }
+            return value;
         }
     });
 
@@ -501,32 +589,29 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <Type ref="discountType" id="discountType" value={this.state.type} onChange={this.onTypeChange}/>
+                    <Type ref="discountType" id="discountType" value={this.state.type} onChange={this.onChange}/>
                     <div className="col-md-7">
                         <div className="col-md-2">
-                            <input className="form-control pull-left" ref="discountValue" id="discountValue" type="text" defaultValue={this.state.discountValue}/>
+                            <input className="form-control pull-left" ref="discountValue" id="discountValue" type="text" defaultValue={this.state.value}/>
                         </div>
-                        <div className={"col-md-" + this.state.scopeElementWidth}>
-                            <select className="to-select2 form-control" ref="discountScope" id="discountScope" onChange={this.onScopeChange}>
+                        <div>
+                            <select className="to-select2 form-control" ref="discountScope" id="discountScope" onChange={this.onChange}>
                                 {this.props.scopeOptions.map(function (type) {
                                     return <option value={type.id} key={type.id}>{type.label}</option>
                                 })}
                             </select>
                         </div>
-                        <div className={"col-md-" + this.state.detailsElementWidth}>
-                            <DiscountDetails type={this.state.scope} options={this.props.options} modalContainer={this.props.modalContainer}/>
+                        <div>
+                            <DiscountDetails type={this.state.scope} options={this.props.options} ref="discountDetails" id="discountDetails"
+                                modalContainer={this.props.modalContainer}
+                                data={{product_ids: this.state.product_ids, combination: this.state.combination}}/>
                         </div>
                     </div>
                 </Common.Row>
             );
         },
         componentDidMount: function () {
-            $('select.to-select', this.getDOMNode()).select2().on('change', function (e) {
-                var id = e.target.id;
-                if(id == 'discountScope') {
-                    this.setState({scope: e.val});
-                }
-            });
+            $(this.refs['discountScope'].getDOMNode()).select2().on('change', this.onChange)
         },
         getDefaultProps: function () {
             return {
@@ -542,45 +627,65 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         },
         getInitialState: function () {
             return {
-                discountValue: 0,
+                value: 0,
                 type: '',
                 scope: 'whole_order',
-                scopeElementWidth: 9,
-                detailsElementWidth: 1
+                product_ids: [],
+                combination: {}
             };
-        },
-        onScopeChange: function (ev) {
-            ev.preventDefault();
-            var newScope = $(ev.target).val();
-            var scopeWidth = 9, detailsWidth = 1;
-            if(newScope == 'other_prod' || newScope == 'attr_combination') {
-                scopeWidth = 3;
-                detailsWidth = 7;
-            }
-            this.setState({
-                scope: newScope,
-                scopeElementWidth: scopeWidth,
-                detailsElementWidth: detailsWidth
-            });
         },
         onTypeChange: function (ev) {
             ev.preventDefault();
             var newType = $(ev.target).val();
+            this.onChange();
             this.setState({type: newType});
         },
-        componentDidMount: function () {
+        onChange: function () {
+            var value = {};
+            value.value = $(this.refs['discountValue'].getDOMNode()).val();
+            value.type = $(this.refs['discountType'].getDOMNode()).val();
 
-            $(this.refs['discountScope'].getDOMNode()).select2().on('change', this.onScopeChange)
+            var details = this.refs['discountType'].serialize();
+            for(var d in details) {
+                if(details.hasOwnProperty(d)) {
+                    value[d] = details[d];
+                }
+            }
+
+            //this.setState(value);
+
+            if(this.props.onUpdate) {
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
+
+            }
         }
     });
 
     var FreeProduct = React.createClass({
         mixins: [Common.select2QueryMixin, Common.removeMixin],
         render: function () {
+            var productIds;
+            if(this.state.product_ids) {
+                if($.isArray(this.state.product_ids)) {
+                    productIds = this.state.product_ids.join(",");
+                } else {
+                    productIds = this.state.product_ids;
+                }
+            }
+            var terms;
+            if(this.state.terms) {
+                if($.isArray(this.state.terms)) {
+                    terms = this.state.terms.join(",");
+                } else {
+                    terms = this.state.terms;
+                }
+            }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-3">
-                        <input type="hidden" className="form-control" id="productSku" ref="productSku"/>
+                        <input type="hidden" className="form-control" id="productSku" ref="productSku" defaultValue={productIds}/>
                     </div>
                     <div className="col-md-3 form-group">
                         <Components.ControlLabel input_id="productQty">{Locale._('Qty')}</Components.ControlLabel>
@@ -591,7 +696,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                     <div className="col-md-3 form-group">
                         <Components.ControlLabel input_id="productTerms">{Locale._('Terms')}</Components.ControlLabel>
                         <div className="col-md-10">
-                            <select className="form-control to-select2" id="productTerms" ref="productTerms" multiple="multiple">
+                            <select className="form-control to-select2" id="productTerms" ref="productTerms" multiple="multiple" defaultValue={terms}>
                                 <option value="tax">{Locale._("Charge tax")}</option>
                                 <option value="sah">{Locale._("Charge S & H")}</option>
                             </select>
@@ -602,7 +707,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         },
         getInitialState: function () {
             return {
-                skus: [],
+                product_ids: [],
                 terms: [],
                 qty: 0
             }
@@ -639,8 +744,24 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
 
                     return markup;
                 },
+                initSelection: self.initSelection
             });
-            $(this.refs['productTerms'].getDOMNode()).select2()
+            $(this.refs['productTerms'].getDOMNode()).select2({initSelection: self.initSelection})
+        },
+        onChange: function () {
+            var value = {};
+            value.qty = $(this.refs['productQty'].getDOMNode()).val();
+            value.product_ids = $(this.refs['productSku'].getDOMNode()).val();
+            value.terms = $(this.refs['productTerms'].getDOMNode()).val();
+
+            //this.setState(value);
+
+            if(this.props.onUpdate) {
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
+
+            }
         }
     });
 
@@ -649,9 +770,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         render: function () {
             var amount = '';
             if(this.state.type != 'free') {
-                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" className="form-control" />
+                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" ref="shippingAmount" className="form-control" />
             }
-            var type = <Type ref="shippingType" id="shippingType" onChange={this.onTypeChange} value={this.state.type}
+            var type = <Type ref="shippingType" id="shippingType" onChange={this.onChange} value={this.state.type}
                     totalType={this.props.fields}/>;
             var label = <Components.ControlLabel label_class="col-md-1" input_id="shippingMethods">{Locale._('For')}</Components.ControlLabel>;
             var input = <input type="hidden" className="form-control" id="shippingMethods" ref="shippingMethods"/>;
@@ -690,43 +811,90 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         },
         url: '',
         componentDidMount: function () {
-            var shippingMethods = this.refs.shippingMethods;
+            var shippingMethods = this.refs['shippingMethods'];
             var self = this;
             this.url = this.props.options.base_url + '/' + this.props.url + '?' + $.param({field: 'methods'});
             $(shippingMethods.getDOMNode()).select2({
                 placeholder: self.props.labelMethodsField,
                 multiple: true,
                 query: self.select2query,
-                dropdownAutoWidth: true
-            });
+                dropdownAutoWidth: true,
+                initSelection: self.initSelection
+            }).on('change', this.onChange);
+        },
+        onChange: function () {
+            var value = {};
+            value.type = this.refs['shippingType'].serialize();
+            value.methods = $(this.refs['shippingMethods'].getDOMNode()).val();
+            if (this.refs['shippingAmount']) {
+                value.value = $(this.refs['shippingAmount'].getDOMNode()).val();
+            }
+
+            //this.setState(value);
+
+            if(this.props.onUpdate) {
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
+
+            }
         }
     });
 
     var ActionsApp = React.createClass({
         displayName: 'ActionsApp',
         render: function () {
-            return (<div className="actions">
-                    {this.state.data.map(function (field) {
-                        //todo make a field based on field
-                        var el;
-                        var key = field.id;
-                        switch (field.type) {
-                            case 'discount':
-                                el = <Discount label={Locale._("Discount")} options={this.props.options} key={key} id={key} removeAction={this.removeAction}
-                                    modalContainer={this.props.modalContainer}/>;
-                                break;
-                            case 'free_product':
-                                el = <FreeProduct label={Locale._("Auto Add Product To Cart")} options={this.props.options}
-                                    key={key} id={key} removeAction={this.removeAction}/>;
-                                break;
-                            case 'shipping':
-                                el = <Shipping label={Locale._("Shipping")} options={this.props.options} key={key} id={key} removeAction={this.removeAction}/>;
-                                break;
+            var children = [];
+            var options = this.props.options;
+            var mc = this.props.modalContainer;
+            var ra = this.removeAction;
+            var au = this.actionUpdate;
+            for(var action in this.state.data) {
+                if(this.state.data.hasOwnProperty(action)) {
+                    var actions = this.state.data[action];
+                    if($.isArray(actions)) {
+                        actions.map(function (field, idx) {
+                            //todo make a field based on field
+                            var el;
+                            var key = action + '-' + idx;
+                            switch (action) {
+                                case 'discount':
+                                    el = <Discount label={Locale._("Discount")} options={options}
+                                        key={key} id={key} removeAction={ra} data={field}
+                                        modalContainer={mc} onUpdate={au}/>;
+                                    break;
+                                case 'free_product':
+                                    el = <FreeProduct label={Locale._("Auto Add Product To Cart")} options={options}
+                                        key={key} id={key} removeAction={ra} onUpdate={au} date={field}/>;
+                                    break;
+                                case 'shipping':
+                                    el = <Shipping label={Locale._("Shipping")} options={options}
+                                        key={key} id={key} removeAction={ra} onUpdate={au} date={field}/>;
+                                    break;
 
-                        }
-                        return el;
-                    }, this)}
-            </div> );
+                            }
+                            if(el) {
+                                children.push(el);
+                            }
+                        })
+                    } else {
+                        console.log(actions, "is not an array");
+                    }
+                }
+            }
+            return (
+                <div className="actions">
+                    {children}
+                </div>
+            );
+        },
+        componentWillMount: function () {
+            var data = this.state.data;
+
+            if (this.props.actions.length) {
+                data = this.props.actions;
+                this.setState({data: data});
+            }
         },
         componentDidMount: function () {
             var $conditionsSerialized = $('#' + this.props.options.conditions_serialized);
@@ -772,9 +940,28 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             });
             this.setState({data: data});
         },
+        actionUpdate: function (data) {
+            //todo
+            console.log(data);
+            var localData = this.state.data;
+            for(var type in data) {
+                if(data.hasOwnProperty(type)) {
+                    var condArray = type.split("-"); // to keep track of multiple conditions of same type shipping-0, shipping-1 ...
+                    if(condArray.length == 2) {
+                        var rule = condArray[0], idx = condArray[1];
+                        localData.rules[rule][idx] = data[type];
+                    } else {
+                        console.log("wrong condition id: " + type);
+                    }
+                }
+            }
+            this.shouldUpdate = false;
+            this.props.onUpdate(localData);
+            this.setState({data: localData});
+        },
         getInitialState: function () {
             return {
-                data: [],
+                data: {},
                 lastActionId: 0
             };
         }
