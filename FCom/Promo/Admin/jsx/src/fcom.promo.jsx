@@ -41,7 +41,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             }
             var $container = $("#" + this.options.actions_container_id);
             var promoActions = this.options.promoOptions['actions'] || {};
-            React.render(<Actions actionType={$actionsSelector} actions={promoActions} onUpdate={this.onActionsUpdate}
+            React.render(<Actions actionType={$actionsSelector} actions={promoActions} onUpdate={this.onActionsUpdate.bind(this)}
                             options={this.options} modalContainer={$modalContainer}/>, $container.get(0));
         },
         initConditionsApp: function (selector, $modalContainer) {
@@ -336,6 +336,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         },
         onActionsUpdate: function (e) {
             console.log(e);
+            if (this.options.promoOptions['actions'] == undefined) {
+                this.options.promoOptions['actions'] = {};
+            }
+            this.options.promoOptions['actions']['rules'] = e['rules'];
             this.updatePromoOptions();
         },
         onConditionsUpdate: function (e) {

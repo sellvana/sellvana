@@ -146,14 +146,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         modal: null,
         modalContent: null,
-        handleConfigure: function (e) {
-            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm} id={"modal-" + this.props.id} key={"modal-" + this.props.id}
-                title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
-                <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} idVar={this.props.options.id_var} data={this.state.value}
-                    entityId={this.props.options.entity_id} onLoad={this.registerModalContent} key={"modal-content-" + this.props.id} />
+        handleConfigure: function () {
+            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm} onCancel={this.handleConditionsCancel}
+                    id={"modal-" + this.props.id} key={"modal-" + this.props.id}
+                    title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
+                <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} data={this.state.value}
+                    onLoad={this.registerModalContent} key={"modal-content-" + this.props.id} />
             </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
+        },
+        handleConditionsCancel: function (modal) {
+            modal.close();
+            var mc = this.modalContent;
+            if (this.state.value == "" || this.state.value == []) {
+                mc.setState({fields: [], values: {}});
+            }
         },
         handleConditionsConfirm: function (modal) {
             var mc = this.modalContent;
@@ -188,12 +196,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             var fieldUrl = this.props.baseUrl + this.props.urlField;
             var paramObj = {};
-            paramObj[this.props.idVar] = this.props.entityId;
             return (
                 <div className="attribute-combinations form-horizontal">
                     <div className="form-group">
                         <div className="col-md-6">
-                            <select ref="combinationType" className="form-control to-select2" id="attribute-combination-type" defaultValue={this.state.match}>
+                            <select ref="combinationType" className="form-control to-select2"
+                                    id="attribute-combination-type" defaultValue={this.state.match}>
                                 <option value="0">All Conditions Have to Match</option>
                                 <option value="1">Any Condition Has to Match</option>
                             </select>
@@ -206,7 +214,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         var data = field.value || [];
-                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field} data={data} filter={field.filter}
+                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
+                            data={data} filter={field.filter}
                             id={field.field} input={field.input} removeField={this.removeField} ref={field.field} onChange={this.elementChange}/>
                     }.bind(this))}
                 </div>
@@ -243,7 +252,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
 
             for (var field in this.refs) {
-                if (field == 'combinationType' || field == 'combinationField') {
+                if (!this.refs.hasOwnProperty(field) || field == 'combinationType' || field == 'combinationField') {
                     continue;
                 }
                 if (this.refs[field]) {
@@ -310,7 +319,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         componentWillMount: function () {
             // load fields from data, they come in form of plain js object
             console.log(this.props.data);
-            this.setState({values: this.props.data || {}});
+            var state = {values: this.props.data || {}};
             for(var field in this.props.data) {
                 if(this.props.data.hasOwnProperty(field)) {
                     if(field == 'fields') {
@@ -322,13 +331,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                             return field;
                         });
                         fields = this.state.fields.concat(fields);
-                        this.setState({fields: fields});
+                        state.fields = fields;
                     } else if(field == 'match') {
                         // condition should match
-                        this.setState({match: this.props.data[field]});
+                        state.match = this.props.data[field];
                     }
                 }
             }
+            this.setState(state);
         },
         shouldUpdate: true,
         shouldComponentUpdate: function () {
