@@ -60,6 +60,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 </div>
             );
         },
+        componentWillMount: function () {
+            this.setState({
+                value: this.props.data
+            });
+        },
         getInitialState: function () {
             return {value: "", valueText: ""};
         },
@@ -633,11 +638,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 details = <DiscountDetailsCombination id={"attrCombination" + this.props.id}
                         ref={"attrCombination" + this.props.id} key={"attrCombination" + this.props.id}
                     options={this.props.options} modalContainer={this.props.modalContainer}
-                    data={this.props.combination}  onChange={this.props.onChange}/>
+                    data={this.props.data.combination}  onChange={this.props.onChange}/>
             } else if(this.props.type == 'other_prod') {
                 details = <DiscountSkuCombination id={"skuCombination" + this.props.id}
                         ref={"skuCombination" + this.props.id} key={"skuCombination" + this.props.id}
-                    options={this.props.options} data={this.props.product_ids} onChange={this.props.onChange}/>;
+                    options={this.props.options} data={this.props.data.product_ids} onChange={this.props.onChange}/>;
             }
             return details;
         },
@@ -683,6 +688,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                     </div>
                 </Common.Row>
             );
+        },
+        componentWillMount: function () {
+            var data = this.props.data;
+            this.setState(data);
         },
         componentDidMount: function () {
             $(this.refs['discountScope' + this.props.id].getDOMNode()).select2().on('change', this.onScopeChange)

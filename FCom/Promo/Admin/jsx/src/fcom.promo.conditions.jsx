@@ -47,17 +47,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     var ConditionsSkuCollection = React.createClass({
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
+            var productId = this.state.product_ids;
+            if($.isArray(productId)) {
+                productId = productId.join(",");
+            }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="skuCollectionType" id="skuCollectionType" onChange={this.onChange}> of </ConditionsType>
+                    <ConditionsType ref="skuCollectionType" id="skuCollectionType" onChange={this.onChange} value={this.state.type}> of </ConditionsType>
                     <div className="col-md-2">
-                        <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/>
+                        <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control" defaultValue={productId}/>
                     </div>
                     <div className="col-md-2">
-                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" onChange={this.onChange}/>
+                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" onChange={this.onChange} value={this.state.filter}/>
                     </div>
                     <div className="col-md-1">
-                        <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue" type="text" onBlur={this.onChange}/>
+                        <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue"
+                            defaultValue={this.state.value} type="text" onBlur={this.onChange}/>
                     </div>
                 </Common.Row>
             );
@@ -71,8 +76,18 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
         },
         url: '',
+        componentWillMount: function () {
+            var propData = this.props.data;
+            var state = {
+                type: propData.type || null,
+                product_ids: propData.product_id || [],
+                filter: propData.filter || null,
+                value: propData.value || 0
+            };
+            this.setState(state);
+        },
         componentDidMount: function () {
-            var skuCollectionIds = this.refs.skuCollectionIds;
+            var skuCollectionIds = this.refs['skuCollectionIds'];
             this.url = this.props.options.base_url + this.props.url;
             var self = this;
             $(skuCollectionIds.getDOMNode()).select2({
@@ -98,6 +113,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
 
                     return markup;
                 },
+                initSelection: self.initSelection,
                 query: self.select2query
             }).on('change', this.onChange);
             $('select.to-select2', this.getDOMNode()).select2();

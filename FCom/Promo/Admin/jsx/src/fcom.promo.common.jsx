@@ -190,9 +190,10 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
             },
             initSelection: function (el, callback) {
                 var data = [];
-                $(el.val().split(",")).each(function () {
-                    data.push({id: this, text: this});
-                });
+                var val = el.val().split(",");
+                for(var i in val) {
+                    data.push({id: val[i], text: val[i]});
+                }
                 callback(data);
             }
         },
