@@ -237,7 +237,7 @@ class FCom_Promo_Migrate extends BClass
         $tPromoOrder = $this->FCom_Promo_Model_Order->table();
         $tPromoCart = $this->FCom_Promo_Model_Cart->table();
 
-        BDb::ddlTableDef($tPromoOrder, [
+        $BDb->ddlTableDef($tPromoOrder, [
             BDb::COLUMNS => [
                 'id'                 => "INT(10) unsigned not null auto_increment",
                 'promo_id'           => "INT(10) UNSIGNED NOT NULL",
@@ -259,7 +259,7 @@ class FCom_Promo_Migrate extends BClass
             ]
         ]);
 
-        BDb::ddlTableDef($tPromoCart, [
+        $BDb->ddlTableDef($tPromoCart, [
             BDb::COLUMNS => [
                 'id'                 => "INT(10) unsigned not null auto_increment",
                 'promo_id'           => "INT(10) UNSIGNED NOT NULL",
