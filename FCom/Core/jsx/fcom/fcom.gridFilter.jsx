@@ -12,11 +12,11 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 _.extend(f, {
                     show: true,
                     label: that.getFieldName(f.field),
-                    opLabel: '',
-                    op: '',
-                    val: '',
-                    range: true,
-                    submit: false
+                    opLabel: f.opLabel? f.opLabel : '',
+                    op: f.op ? f.op : '',
+                    val: f.val ? f.val : '',
+                    range: f.range ? f.range : true,
+                    submit: f.val ? true : false
                 });
 
                 filters[f.field] = f;
@@ -70,7 +70,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             }
             filters[field][key] = value;
 
-            console.log('setStateFilter', filters);
+            //console.log('setStateFilter', filters);
             //this.setState({stateFilters: stateFilters});
         },
         /**
@@ -107,8 +107,10 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var filters = this.state.filters;
             var submitFilters = {};
             _.forEach(filters, function(f) {
-                if (f.submit == true) {
-                    submitFilters[f.field] = f;
+                submitFilters[f.field] = f;
+                if (!f.submit) {
+                    submitFilters[f.field].val = '';
+                    $('#f-grid-filter-' + f.field).find('input').val('');
                 }
             });
             return submitFilters;
@@ -169,6 +171,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 if (!f.show) {
                     return false;
                 }
+                //console.log('filter', f);
                 return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} getConfig={that.props.getConfig} />);
             });
 
@@ -279,8 +282,6 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     val: '',
                     submit: false
                 });
-                /*this.props.setStateFilter(filter.field, 'op', filter.op);
-                this.props.setStateFilter(filter.field, 'opLabel', filter.opLabel);*/
             }
 
             return { filter: filter };
@@ -540,13 +541,21 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         mixins: [FilterStateMixin],
         getInitialState: function() {
             var filter = this.props.filter;
-            filter.valName = '';
+
             //get data to build select2
             var column = _.findWhere(this.props.getConfig('columns'), {name: filter.field});
             var data = [];
+
+            var filterValueArr = filter.val.split(',');
+            var valName = [];
             _.forEach(column.options, function(value, key) {
                 data.push({ id: key, text: value });
+                //add value label name
+                if (_.contains(filterValueArr, key)) {
+                    valName.push(value);
+                }
             });
+            filter.valName = valName.length ? valName.join(', ') : '';
 
             return { filter: filter, filterData: data };
         },
@@ -572,7 +581,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 _.forEach(e.val, function(value) {
                     valName.push(that.getValueName(value));
                 });
-                filter.valName = valName.join(',');
+                filter.valName = valName.join(', ');
             });
 
             filterContainer.find('.select2-container').on('click', function() {
@@ -586,7 +595,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
                     <button className='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
                         <span className='f-grid-filter-field'> {filter.label}: </span>
-                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + ": " + filter.valName : 'All'} </span>
+                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + " " + filter.valName : 'All'} </span>
                         <span className="caret"></span>
                     </button>
                     <ul className="dropdown-menu filter-box">

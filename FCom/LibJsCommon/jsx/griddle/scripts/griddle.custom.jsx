@@ -404,7 +404,7 @@ var Griddle = React.createClass({
         var filter = this.props.showFilter ?
             (
                 this.props.useCustomFilter
-                ? <this.props.customFilter changeFilter={this.setFilter} placeholderText={this.props.filterPlaceholderText} customFilter={this.props.customFilter} getConfig={this.getConfig} />
+                ? <this.props.customFilter changeFilter={this.setFilter} customFilter={this.props.customFilter} getConfig={this.getConfig} />
                 : <GridFilter changeFilter={this.setFilter} placeholderText={this.props.filterPlaceholderText} />
             ) : "";
         var settings = this.props.showSettings ?
