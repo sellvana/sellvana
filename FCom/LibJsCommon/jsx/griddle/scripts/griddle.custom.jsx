@@ -110,6 +110,13 @@ var Griddle = React.createClass({
         }
     },
     getExternalResults: function(state, callback) {
+        // use init data in grid config
+        if (this.state.isInit) {
+            var fcomData = this.getConfig('data');
+            callback({ results: fcomData.data, totalResults: fcomData.state.c });
+            return false;
+        }
+
         var filter,
             sortColumn,
             sortAscending,
@@ -154,12 +161,14 @@ var Griddle = React.createClass({
             state.results = externalResults.results;
             state.totalResults = externalResults.totalResults;
             state.isLoading = false;
+            state.isInit = false;
 
             //fix pagination when get data from external results
             that.setState({
                 results: externalResults.results,
                 totalResults: externalResults.totalResults,
-                isLoading: false
+                isLoading: false,
+                isInit: false
             });
 
             callback(state);
@@ -306,6 +315,7 @@ var Griddle = React.createClass({
             showColumnChooser: false,
             isLoading: false,
             //fcom custom
+            isInit: true,
             selectedRows: [],
             headerSelect: 'show_all' //select value in header dropdown
         };
