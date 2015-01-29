@@ -13,8 +13,8 @@ final class FCom_MarketClient_RemoteApi extends BClass
     /**
      * @var string
      */
-    #protected $_apiUrl = 'http://market.sellvana.com/';
-    protected $_apiUrl = 'http://127.0.0.1/sellvana/';
+    protected $_apiUrl = 'http://market.sellvana.com/';
+    #protected $_apiUrl = 'http://127.0.0.1/sellvana/';
 
     /**
      * @param string $path
