@@ -29,7 +29,7 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
         Compare: React.createClass({
             render: function () {
                 return (
-                    <select className="to-select2 form-control" onChange={this.props.onChange} id={this.props.id}>
+                    <select className="to-select2 form-control" onChange={this.props.onChange} id={this.props.id} defaultValue={this.props.value}>
                     {this.props.opts.map(function(type){
                         return <option value={type.id} key={type.id}>{type.label}</option>
                     })}
@@ -49,7 +49,7 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                 };
             },
             componentDidMount: function () {
-                $(this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.props.onChange);
+                $(this.getDOMNode()).select2().on('change', this.props.onChange);
             }
         }),
         AddFieldButton: React.createClass({
@@ -187,6 +187,14 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                     return test && counted >= offset && counted < max;// if term is not for this page, skip it
                 });
                 return matches;
+            },
+            initSelection: function (el, callback) {
+                var data = [];
+                var val = el.val().split(",");
+                for(var i in val) {
+                    data.push({id: val[i], text: val[i]});
+                }
+                callback(data);
             }
         },
         removeMixin: {

@@ -64,15 +64,7 @@ class FCom_Promo_Model_Promo extends BModel
         ],
     ];
 
-    protected static $_validationRules = [
-        ['description', '@required'],
-//        array('manuf_vendor_id', '@required'),
-
-        ['description', '@string', null, ['max' => 255]],
-
-        ['buy_amount', '@integer'],
-        ['get_amount', '@integer'],
-    ];
+    protected static $_validationRules = [];
 
     public function getPromosByCart($cartId)
     {
