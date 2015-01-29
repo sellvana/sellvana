@@ -1047,7 +1047,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 }
             }
 
-            var value = this.values["fieldCombination." + this.props.id];
+            var value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
             if (value) {
                 if ($.isArray(value)) {
                     value = value.join(", ");
@@ -1214,7 +1214,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
             //var rule = {type: conditionType, id: conditionType + '-' + this.state.lastConditionId};
             data.rules[conditionType].push({}); // push new empty rule
-            this.setState({data: data, lastConditionId: (this.state.lastConditionId + 1)});
+            this.setState({data: data, lastConditionId: (this.state.lastConditionId + 1)}, function () {
+                this.props.onUpdate(this.state.data);
+            });
         },
         removeCondition: function (conditionId) {
             var data = this.state.data;
@@ -1231,7 +1233,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             //data = data.filter(function (field) {
             //    return field.id != conditionId;
             //});
-            this.setState({data: data});
+            this.setState({data: data}, function () {
+                this.props.onUpdate(this.state.data);
+            });
         },
         conditionUpdate: function (data) {
             //todo
