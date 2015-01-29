@@ -10,11 +10,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
      */
     protected static $_modulesVersionsCacheKey = 'marketclient_modules_versions';
 
-    #protected $_apiUrl = 'https://market.sellvana.com/';
     /**
      * @var string
      */
-    protected $_apiUrl = 'http://market.sellvana.com/';
+    #protected $_apiUrl = 'http://market.sellvana.com/';
+    protected $_apiUrl = 'http://127.0.0.1/sellvana/';
 
     /**
      * @param string $path
@@ -82,32 +82,36 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'site_key' => $siteKey,
         ]);
         $response = $this->BUtil->remoteHttp("GET", $url);
-        $modResult = $this->BUtil->fromJson($response);
-        if (!empty($modResult['error'])) {
+        $remoteModResult = $this->BUtil->fromJson($response);
+        if (!empty($remoteModResult['error'])) {
             $this->BCache->delete(static::$_modulesVersionsCacheKey);
-            throw new BException($modResult['message']);
+            throw new BException($remoteModResult['message']);
         }
-        if (empty($modResult['modules'])) {
+        if (empty($remoteModResult['modules'])) {
             //throw new BException('Unable to retrieve marketplace modules information');
             return []; //TODO: proper notifications and errors handling
         }
-        foreach ($modResult['modules'] as $modName => $mod) {
-            if ($mod && empty($mod['name'])) {
-                $mod['name'] = $modName;
+        foreach ($remoteModResult['modules'] as $remoteModName => $remoteMod) {
+            if ($remoteMod && empty($remoteMod['name'])) {
+                $remoteMod['name'] = $remoteModName;
             }
-            if (!empty($mod['status']) && $mod['status'] === 'mine') {
-                $localMod = $this->BApp->m($modName);
-                $remChannelVer = $mod['channels'][$localMod->channel]['version_uploaded'];
-                $mod['can_update'] = version_compare($remChannelVer, $localMod->version, '<');
+            if (!empty($remoteMod['status']) && $remoteMod['status'] === 'mine') {
+                $localMod = $this->BApp->m($remoteModName);
+                if (!empty($remoteMod['channels'][$localMod->channel])) {
+                    $remoteChannelVer = $remoteMod['channels'][$localMod->channel]['version_uploaded'];
+                    $remoteMod['can_update'] = version_compare($remoteChannelVer, $localMod->version, '<');
+                } else {
+                    $remoteMod['can_update'] = false;
+                }
             }
-            $cached[$modName] = $mod;
+            $cached[$remoteModName] = $remoteMod;
         }
         if (!empty($cached)) {
             $this->BCache->save(static::$_modulesVersionsCacheKey, $cached, 86400);
         }
         $result = [];
-        foreach ($modules as $modName) {
-            $result[$modName] = $cached[$modName];
+        foreach ($modules as $remoteModName) {
+            $result[$remoteModName] = $cached[$remoteModName];
         }
         return $result;
     }
@@ -179,7 +183,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         }
         $packageDir = $this->BApp->storageRandomDir() . '/marketclient/upload';
         $this->BUtil->ensureDir($packageDir);
-        $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}.zip";
+        $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}-{$mod->getChannel()}.zip";
         @unlink($packageFilename);
         $this->BUtil->zipCreateFromDir($packageFilename, $mod->root_dir);
         $siteKey = $this->BConfig->get('modules/FCom_MarketClient/site_key');
@@ -215,8 +219,9 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'channel' => $channel,
         ]);
         $response = $this->BUtil->remoteHttp("GET", $url);
+        $reqInfo = $this->BUtil->lastRemoteHttpInfo();
         if (!$response) {
-            throw new BException("Problem downloading the package ({$moduleName})");
+            throw new BException("Problem downloading the package ({$moduleName}) <pre>{$url}: " . print_r($reqInfo, 1) . '</pre>');
         }
         $dir = $this->BApp->storageRandomDir() . '/marketclient/download';
         $this->BUtil->ensureDir($dir);
@@ -225,7 +230,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         }
 
         $filename = $moduleName . '.zip';
-        $reqInfo = $this->BUtil->lastRemoteHttpInfo();
+        if (empty($reqInfo['headers']['content-disposition'])) {
+            var_dump($reqInfo);
+            var_dump($response);
+            exit;
+        }
         if (preg_match('#;\s*filename=(.*)$#i', $reqInfo['headers']['content-disposition'], $m)) {
             $filename = $m[1];
         }
