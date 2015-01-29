@@ -312,6 +312,37 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         quickSearch: function(event) {
             this.props.searchWithinResults(event.target.value);
         },
+        componentDidMount: function() {
+            var that = this;
+
+            $(".dd-list").sortable({
+                connectWith: ".dd-list",
+                handle: ".dd3-handle",
+                cancel: ".portlet-toggle",
+                placeholder: "portlet-placeholder ui-corner-all",
+                update: function (event, ui) {
+                    var selectedColumns = [0];
+                    $('.columns .showhide_column').each(function() {
+                        var target = $(this);
+                        if (target.checked == true) {
+                            selectedColumns.push(target.dataset.name);
+                        }
+                    });
+                    that.props.setColumns(selectedColumns);
+                }
+            });
+            $( ".dd-item" )
+                .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" )
+                .find( ".dd3-handle" )
+                .addClass( "ui-widget-header ui-corner-all" )
+                .prepend( "<span class='ui-icon ui-icon-minusthick portlet-toggle'></span>");
+
+            $( ".portlet-toggle" ).click(function() {
+                var icon = $( this );
+                icon.toggleClass( "ui-icon-minusthick ui-icon-plusthick" );
+                icon.closest( ".dd-item" ).find( ".dd3-content" ).toggle();
+            });
+        },
         render: function () {
             var that = this;
             var id = this.props.getConfig('id');
