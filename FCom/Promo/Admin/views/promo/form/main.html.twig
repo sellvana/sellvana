@@ -18,24 +18,23 @@
 
 <fieldset class="adm-section-group">
     <div class="f-section">
-        {{ forms.input({label: 'Admin Summary'|_, required: 1, name: "model[admin_summary]",
-            value: validator.fieldValue('admin_summary'), label_class: labelClass,
-            id: "model-admin_summary", help_icon: 1, help_text: 'Admin Summary'|_ }) }}
-        {{ forms.textarea({label: 'Internal Notes'|_, name: "model[admin_notes]",
-            value: validator.fieldValue('admin_notes'),label_class: labelClass,
-            id: "model-admin_notes", help_icon: 1, help_text: 'Internal Notes'|_ }) }}
-        {{ forms.input({label: 'Customer Label'|_, required: 1, name: "model[customer_label]",
+        {{ forms.input({label: 'Admin Summary'|_, required: 1, field: "summary",
+            value: validator.fieldValue('summary'), label_class: labelClass,
+            help_icon: 1, help_text: 'Admin Summary'|_ }) }}
+        {{ forms.textarea({label: 'Internal Notes'|_, field: "internal_notes",
+            value: validator.fieldValue('internal_notes'),label_class: labelClass,
+            help_icon: 1, help_text: 'Internal Notes'|_ }) }}
+        {{ forms.input({label: 'Customer Label'|_, required: 1, field: "customer_label",
             value: validator.fieldValue('customer_label'),label_class: labelClass,
-            id: "model-customer_label", help_icon: 1, help_text: 'Customer Label'|_ }) }}
-        {{ forms.textarea({label: 'Details for Customers'|_, name: "model[customer_details]",
+            help_icon: 1, help_text: 'Customer Label'|_ }) }}
+        {{ forms.textarea({label: 'Details for Customers'|_, field: "customer_details",
             value: validator.fieldValue('customer_details'),label_class: labelClass,
-            id: "model-customer_details", help_icon: 1, help_text: 'Details for Customers'|_ }) }}
+            help_icon: 1, help_text: 'Details for Customers'|_ }) }}
 
         {{ forms.select({
             label: 'Status'|_,label_class: labelClass,
-            name: "model[status]",
             value: validator.fieldValue('status'),
-            id: "model-status", help_icon: 1,
+            field: "status", help_icon: 1,
             help_text: "Promotion status"|_,
             select2: 1, options: ['Pending'|_, 'Active'|_, 'Expired'|_],
             input_div_class: "col-md-2"
@@ -62,9 +61,9 @@
             }) }}
         {% endif %}
 
-        {{ forms.input({label: 'Date Range'|_, required: 1, name: "model[date_range]",
+        {{ forms.input({label: 'Date Range'|_, required: 1, field: "date_range",
             value: validator.fieldValue('date_range'),label_class: labelClass,
-            id: "model-date_range", help_icon: 1, help_text: 'Date Range'|_ }) }}
+            help_icon: 1, help_text: 'Date Range'|_ }) }}
         <div id="testbed"></div>
         <script type="text/javascript">
             require(['jquery', 'moment', 'daterangepicker', 'bootstrap'], function ($) {
@@ -86,14 +85,14 @@
         </script>
         {{ forms.select({
             label: "Coupon Code Enter For Validity"|_,label_class: labelClass,
-            name: "model[use_coupon]",
+            field: "coupon_use_coupon",
             value: validator.fieldValue("use_coupon"),
-            id: "model-use_coupon", help_icon: 1,
+            help_icon: 1,
             help_text: "Require coupon code"|_,
             select2: {minimumResultsForSearch: 15}, options: ["No coupon code required"|_, "Single coupon code"|_, "Multiple coupon codes"|_]
         }) }}
         <div id="coupon-options"></div>
-        {{ forms.hidden({field:"promo_serialized", value: validator.fieldValue("promo_serialized")}) }}
+        {{ forms.hidden({field:"data_serialized", value: validator.fieldValue("data_serialized")}) }}
         <div class="form-group">
             <label class="control-label col-md-3" for="model-conditions">{{"Conditions"|_}}&nbsp;
                     <a id="help-model-conditions" class="pull-right help-icon" href="#"
@@ -138,29 +137,27 @@
             </div>
         </div>
         <div id="actions-options"></div>
-{% set elView = LAYOUT.view('core/form-elements') %}
+        {% set elView = LAYOUT.view('core/form-elements') %}
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
                 $('select.to-select2').select2();
                 var options = {
-                    coupon_select_id: 'model-use_coupon',
+                    coupon_select_id: '{{ elView.getInputId({'field':'coupon_use_coupon'}) }}',
                     condition_select_id: 'model-conditions_type',
                     actions_select_id: "model-actions",
                     coupon_container_id: 'coupon-options',
                     condition_container_id: 'conditions-options',
                     actions_container_id: "actions-options",
-                    promo_serialized: "{{ elView.getInputId({'field':'promo_serialized'}) }}",
-                    showCouponsUrl: "{{ APP.href('promo/coupons/view?id=') ~ m.id() }}", // "/admin/promo/coupons/view?id=1",
-                    generateCouponsUrl: "{{ APP.href('promo/coupons/generate?id=') ~ m.id() }}", // "/admin/promo/coupons/generate?id=1",
-                    importCouponsUrl: "{{ APP.href('promo/coupons/import?id=') ~ m.id() }}", // "/admin/promo/coupons/import?id=1",
+                    promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
+                    showCouponsUrl: "{{ APP.href('promo/coupons/view')}}", // "/admin/promo/coupons/view?id=1",
+                    generateCouponsUrl: "{{ APP.href('promo/coupons/generate')}}", // "/admin/promo/coupons/generate?id=1",
+                    importCouponsUrl: "{{ APP.href('promo/coupons/import')}}", // "/admin/promo/coupons/import?id=1",
                     valueUpc: '{{validator.fieldValue("uses_per_customer")}}',
                     valueUt: '{{validator.fieldValue("uses_total")}}',
                     singleCouponValue: '',
                     labelClass: '{{ labelClass }}',
                     debug: true,
                     base_url: "{{ APP.href('promo/') }}",
-                    id_var: 'id',
-                    entity_id: '{{ m.id() }}',
                     buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "View no codes" }}'
                 };
                 Promo.init(options);

@@ -1191,7 +1191,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         componentWillMount: function () {
             var data = this.state.data;
 
-            if (this.props.conditions.length) {
+            if (this.props.conditions.rules) {
                 data = this.props.conditions;
                 this.setState({data: data});
             }
