@@ -1652,6 +1652,7 @@ class BClassAutoload extends BClass
                 }
                 if (file_exists($file)) {
                     include ($file);
+                    break;
                 }
             }
         }

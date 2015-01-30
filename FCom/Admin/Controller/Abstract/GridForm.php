@@ -308,7 +308,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 $model->delete();
                 $this->message('The record has been deleted');
             } else {
-                $model->set($data);
+                if ($data) {
+                    $model->set($data);
+                }
 
                 if ($model->validate($model->as_array(), [], $formId)) {
                     $model->save();

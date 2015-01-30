@@ -12,7 +12,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
             return (
                 <div className={this.props.containerClass}>
-                    <select className={cls}>
+                    <select className={cls} defaultValue={this.props.value}>
                         {this.props.totalType.map(function (type) {
                             return <option value={type.id} key={type.id}>{type.label}</option>
                         })}
@@ -21,12 +21,25 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 </div>
             );
         },
+        value: null,
+        onChange: function (e) {
+            this.value = $('select', this.getDOMNode()).select2('val');
+            if(this.props.onChange) {
+                this.props.onChange(e);
+            }
+        },
+        serialize: function () {
+            return this.value || $('select', this.getDOMNode()).select2('val');
+        },
         getDefaultProps: function () {
             return {
                 totalType: [{id: "qty", label: "TOTAL QTY"}, {id: "amt", label: "TOTAL $Amount"}],
                 select2: true,
                 containerClass: "col-md-2"
             };
+        },
+        componentDidMount: function () {
+            $('select', this.getDOMNode()).select2().on('change', this.onChange);
         }
     });
 
@@ -34,17 +47,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     var ConditionsSkuCollection = React.createClass({
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
+            var productId = this.state.product_ids;
+            if($.isArray(productId)) {
+                productId = productId.join(",");
+            }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="skuCollectionType" id="skuCollectionType"> of </ConditionsType>
+                    <ConditionsType ref="skuCollectionType" id="skuCollectionType" onChange={this.onChange} value={this.state.type}> of </ConditionsType>
                     <div className="col-md-2">
-                        <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/>
+                        <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control" defaultValue={productId}/>
                     </div>
                     <div className="col-md-2">
-                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" />
+                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" onChange={this.onChange} value={this.state.filter}/>
                     </div>
                     <div className="col-md-1">
-                        <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue" type="text"/>
+                        <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue"
+                            defaultValue={this.state.value} type="text" onBlur={this.onChange}/>
                     </div>
                 </Common.Row>
             );
@@ -58,8 +76,18 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
         },
         url: '',
+        componentWillMount: function () {
+            var propData = this.props.data;
+            var state = {
+                type: propData.type || null,
+                product_ids: propData.product_id || [],
+                filter: propData.filter || null,
+                value: propData.value || 0
+            };
+            this.setState(state);
+        },
         componentDidMount: function () {
-            var skuCollectionIds = this.refs.skuCollectionIds;
+            var skuCollectionIds = this.refs['skuCollectionIds'];
             this.url = this.props.options.base_url + this.props.url;
             var self = this;
             $(skuCollectionIds.getDOMNode()).select2({
@@ -85,9 +113,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
 
                     return markup;
                 },
+                initSelection: self.initSelection,
                 query: self.select2query
-            });
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            }).on('change', this.onChange);
+            $('select.to-select2', this.getDOMNode()).select2();
+        },
+        onChange: function () {
+            var value = {};
+            value.type = this.refs['skuCollectionType'].serialize();
+            value.product_id = $(this.refs['skuCollectionIds'].getDOMNode()).select2('val');
+            value.filter = $(this.refs['skuCollectionCond'].getDOMNode()).val();
+            value.value = $(this.refs['skuCollectionValue'].getDOMNode()).val();
+            if(this.props.onUpdate) {
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
+            }
         }
     });
 
@@ -102,14 +143,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                             readOnly="readonly" value={this.state.valueText} className="form-control"/>
                     </div>
                     <div className="col-md-4">
-                        <Components.Button type="button" className="btn-primary"
-                            ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button>
+                        <Components.Button type="button" className="btn-primary" ref={this.props.configureId}
+                            onClick={this.handleConfigure}>Configure</Components.Button>
                     </div>
                 </Common.Row>
             );
         },
         getInitialState: function () {
-            return {value: ''};
+            return {value: "", valueText: ""};
         },
         getDefaultProps: function () {
             return {
@@ -121,14 +162,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         modal: null,
         modalContent: null,
-        handleConfigure: function (e) {
-            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm}
-                title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
-                <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
-                    entityId={this.props.options.entity_id} onLoad={this.registerModalContent} />
+        handleConfigure: function () {
+            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm} onCancel={this.handleConditionsCancel}
+                    id={"modal-" + this.props.id} key={"modal-" + this.props.id}
+                    title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
+                <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} data={this.state.value}
+                    onLoad={this.registerModalContent} key={"modal-content-" + this.props.id} />
             </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
+        },
+        handleConditionsCancel: function (modal) {
+            modal.close();
+            var mc = this.modalContent;
+            if (this.state.value == "" || this.state.value == []) {
+                mc.setState({fields: [], values: {}});
+            }
         },
         handleConditionsConfirm: function (modal) {
             var mc = this.modalContent;
@@ -139,6 +188,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 value: value
             });
             modal.close();
+            if(this.props.onUpdate) {// update main data field
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
+            }
         },
         registerModal: function (modal) {
             this.modal = modal;
@@ -158,12 +212,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             var fieldUrl = this.props.baseUrl + this.props.urlField;
             var paramObj = {};
-            paramObj[this.props.idVar] = this.props.entityId;
             return (
                 <div className="attribute-combinations form-horizontal">
                     <div className="form-group">
                         <div className="col-md-6">
-                            <select ref="combinationType" className="form-control to-select2" id="attribute-combination-type">
+                            <select ref="combinationType" className="form-control to-select2"
+                                    id="attribute-combination-type" defaultValue={this.state.match}>
                                 <option value="0">All Conditions Have to Match</option>
                                 <option value="1">Any Condition Has to Match</option>
                             </select>
@@ -175,14 +229,34 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     {this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
+                        var data = field.value || [];
                         return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
+                            data={data} filter={field.filter}
                             id={field.field} input={field.input} removeField={this.removeField} ref={field.field} onChange={this.elementChange}/>
                     }.bind(this))}
                 </div>
             );
         },
         serialize: function () {
-            return this.state.values;
+            // serialize all values each time when its requested
+            var data = {}, fields = [];
+            for (var field in this.refs) {
+                if(!this.refs.hasOwnProperty(field) || field == 'combinationField') { // condition name field is reset after each selection, so we can ignore it
+                    continue;
+                }
+                if (field == 'combinationType') {
+                    data.match = $(this.refs[field].getDOMNode()).select2('val'); // all || any
+                    continue;
+                }
+                if (this.refs[field]) {
+                    var ref = this.refs[field];
+                    fields.push(ref.serialize());
+                }
+            }
+            if(fields.length) {
+                data.fields = fields;
+            }
+            return data;
         },
         serializeText: function () {
             var text, glue, fieldTexts = [];
@@ -194,7 +268,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
 
             for (var field in this.refs) {
-                if (field == 'combinationType' || field == 'combinationField') {
+                if (!this.refs.hasOwnProperty(field) || field == 'combinationType' || field == 'combinationField') {
                     continue;
                 }
                 if (this.refs[field]) {
@@ -214,7 +288,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 return;
             }
             var fields = this.state.fields;
-            fields.push({label: fieldValue.text, field: fieldValue.id, input: fieldValue.input});
+            var field = {label: fieldValue.text, field: fieldValue.id, input: fieldValue.input};
+            if(fieldValue.value) {
+                field.value = fieldValue.value;
+            }
+            fields.push(field);
             $(fieldCombination).select2("val", "", false);
             this.setState({fields: fields});
         },
@@ -247,12 +325,36 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 query: self.select2query,
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,
-                selectOnBlur: true
+                selectOnBlur: false
             }).on('change', this.addField);
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.elementChange);
+            $('select.to-select2', this.getDOMNode()).select2().on('change', this.elementChange);
             if (typeof this.props.onLoad == 'function') {
                 this.props.onLoad(this);
             }
+        },
+        componentWillMount: function () {
+            // load fields from data, they come in form of plain js object
+            console.log(this.props.data);
+            var state = {values: this.props.data || {}};
+            for(var field in this.props.data) {
+                if(this.props.data.hasOwnProperty(field)) {
+                    if(field == 'fields') {
+                        var fields = this.props.data[field].map(function (field) {
+                            if(!field.label) {
+                                var fieldId = field['field'].split('.');
+                                field.label = fieldId[1] || fieldId[0]; // if label is missing use field code instead
+                            }
+                            return field;
+                        });
+                        fields = this.state.fields.concat(fields);
+                        state.fields = fields;
+                    } else if(field == 'match') {
+                        // condition should match
+                        state.match = this.props.data[field];
+                    }
+                }
+            }
+            this.setState(state);
         },
         shouldUpdate: true,
         shouldComponentUpdate: function () {
@@ -280,15 +382,36 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var inputType = this.props.input;
             var opts = this.getOpts();
             var fieldId = "fieldCombination." + this.props.id;
-            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId} onChange={this.onChange}/>;
+            var value;
+            if(this.props.data && this.props.data.length) {
+                if ($.isArray(this.props.data)) {
+                    value = this.props.data.join(",");
+                } else {
+                    value = this.props.data;
+                }
+            }
+            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId}
+                onChange={this.onChange} defaultValue={value}/>;
             if (this.props.numeric_inputs.indexOf(inputType) != -1) {
                 if (inputType == 'number') {
                     if (this.state.range === false) {
-                        input = <input className="form-control required" type="number" step="any" id={fieldId} ref={fieldId} style={{width: "auto"}} onChange={this.onChange}/>;
+                        input = <input className="form-control required" type="number" step="any" id={fieldId}
+                            ref={fieldId} style={{width: "auto"}} onChange={this.onChange} defaultValue={value}/>;
                     } else {
+                        value = this.props.data;
+                        var min, max;
+                        if(value.length > 0) {
+                            min = value[0]
+                        }
+
+                        if(value.length > 1) {
+                            max = value[1];
+                        }
                         input = <div id={fieldId} ref={fieldId} className="input-group">
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".min"} placeholder="Min" style={{width: "50%"}} onChange={this.onChange}/>
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".max"} placeholder="Max" style={{width: "50%"}} onChange={this.onChange}/>
+                            <input className="form-control required" type="number" step="any" id={fieldId + ".min"}
+                                placeholder="Min" style={{width: "50%"}} onChange={this.onChange} defaultValue={min}/>
+                            <input className="form-control required" type="number" step="any" id={fieldId + ".max"}
+                                placeholder="Max" style={{width: "50%"}} onChange={this.onChange} defaultValue={max}/>
                         </div>;
                     }
                 } else if (inputType == 'date' || inputType == 'time') {
@@ -300,18 +423,20 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         <span className="input-group-addon">
                             <i className="glyphicon glyphicon-calendar"></i>
                         </span>
-                        <input className="form-control required" type="text" id={fieldId} ref={fieldId} dataMode={singleMode} onChange={this.onChange}/>
+                        <input className="form-control required" type="text" id={fieldId} ref={fieldId}
+                            dataMode={singleMode} onChange={this.onChange} defaultValue={value}/>
                     </div>
                 }
             } else if (inputType == 'select') {
-                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}/>;
+                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}
+                    defaultValue={value}/>;
             } else if (this.props.bool_inputs.indexOf(inputType) != -1) {
-                input = <Components.YesNo  id={fieldId} ref={fieldId} onChange={this.onChange}/>;
+                input = <Components.YesNo  id={fieldId} ref={fieldId} onChange={this.onChange} defaultValue={value}/>;
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id}
+                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id} value={this.props.filter}
                             ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{input}</div>
@@ -330,7 +455,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return opts;
         },
         serialize: function () {
-            return this.values;
+            var data = {
+                field: this.props.id
+            };
+            data.filter = this.values["fieldCompare." + this.props.id] || $(this.refs["fieldCompare." + this.props.id].getDOMNode()).val();
+            data.value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
+            data.label = this.props.label;
+            data.input = this.props.input;
+
+            return data;
         },
         serializeText: function () {
             var type = this.getInputType();
@@ -409,7 +542,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 default :
                     break;
             }
-            //$('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.onCompareChange);
+            //$('select.to-select2', this.getDOMNode()).select2().on('change', this.onCompareChange);
         },
         //componentDidUpdate: function () {
         //    this.componentDidMount();
@@ -441,7 +574,25 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
             //console.log(e);
             if (this.state.range && type == 'numeric') {
-                // possibly have min/max value handle them
+                var id = $elem.attr('id');
+                var idArray = id.split('.');
+                if (idArray.length > 1) { // id is like field.min/max
+                    var minMax = idArray[1]; // min || max
+                    // if value is already set in non range mode, it will be scalar, or null if this is first time
+                    var value = this.values["fieldCombination." + this.props.id] || [null, null];
+                    if (!$.isArray(value)) {
+                        //if scalar, dump it and set again
+                        value = [null, null];
+                    }
+                    // min is at index 0, max index 1
+                    if ('min' == minMax) {
+                        value[0] = e.value;
+                    } else {
+                        value[1] = e.value;
+                    }
+
+                    e.value = value;
+                }
             } else if (type == 'date' && !this.state.range) {
                 // potentially range of dates
             }
@@ -475,6 +626,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     parentEl: parent
                 }
             );
+            //todo set setStartDate and setEndDate
         },
         url: '',
         initSelectInput: function () {
@@ -488,7 +640,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 closeOnSelect: true,
                 query: this.select2query,
                 dropdownCssClass: "bigdrop",
-                dropdownAutoWidth: true
+                dropdownAutoWidth: true,
+                initSelection: self.initSelection
             }).on('change', this.onChange);
         }
     });
@@ -498,15 +651,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
-                    <div className="col-md-2">
+                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" onChange={this.onChange}> of products in </ConditionsType>
+                    <div className="col-md-3">
                         <input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/>
                     </div>
                     <div className="col-md-2">
-                        <Common.Compare ref="catProductsCond" id="catProductsCond" />
+                        <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange}/>
                     </div>
                     <div className="col-md-1">
-                        <input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left"/>
+                        <input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left" onBlur={this.onChange}/>
                     </div>
                 </Common.Row>
             );
@@ -544,7 +697,19 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     return markup;
                 }
             });
-            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2();
+        },
+        onChange: function () {
+            var value = {};
+            value.type = this.refs['catProductsType'].serialize();
+            value.category_id = $(this.refs['catProductsIds'].getDOMNode()).select2('val');
+            value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();
+            value.value = $(this.refs['catProductsValue'].getDOMNode()).val();
+            if(this.props.onUpdate) {
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
+            }
         }
     });
 
@@ -553,12 +718,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType}/>
+                    <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType} onChange={this.onChange}/>
                     <div className="col-md-2">
-                        <Common.Compare ref="cartTotalCond" id="cartTotalCond" />
+                        <Common.Compare ref="cartTotalCond" id="cartTotalCond" onChange={this.onChange}/>
                     </div>
                     <div className="col-md-1">
-                        <input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left"/>
+                        <input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left" onBlur={this.onChange}/>
                     </div>
                 </Common.Row>
             );
@@ -566,13 +731,26 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         getDefaultProps: function () {
             return {
                 rowClass: "cart-total",
-                totalType: [{id: "qty", label: "QTY OF ITEMS"}, {id: "amt", label: "$Value/Amount OF ITEMS"}],
+                totalType: [{id: "qty", label: "QTY OF ITEMS"}, {id: "amt", label: "$ Value/Amount OF ITEMS"}],
                 label: "Cart Total",
                 type: 'total'
             };
         },
         componentDidMount: function () {
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2();
+        },
+        onChange: function () {
+            var value = {};
+            value.type = this.refs['cartTotalType'].serialize();
+            value.filter = $(this.refs['cartTotalCond'].getDOMNode()).val();
+            value.value = $(this.refs['cartTotalValue'].getDOMNode()).val();
+
+            if(this.props.onUpdate) {
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
+
+            }
         }
     });
 
@@ -606,10 +784,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         modal: null,
         modalContent: null,
         handleConfigure: function (e) {
-            var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
+            var modal = <Components.Modal onConfirm={this.handleShippingConfirm} id={"modal-" + this.props.id} key={"modal-" + this.props.id}
                 title={this.props.modalTitle} onLoad={this.openModal} onUpdate={this.openModal}>
-                <ConditionsShippingModalContent baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
-                    entityId={this.props.options.entity_id} onLoad={this.registerModalContent} />
+                <ConditionsShippingModalContent baseUrl={this.props.options.base_url} onLoad={this.registerModalContent}
+                    key={"modal-content-" + this.props.id} data={this.state.value}/>
             </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
@@ -623,6 +801,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 value: value
             });
             modal.close();
+            //console.log(this.state);
+            if(this.props.onUpdate) {
+                var updateData = {};
+                updateData[this.props.id] = value;
+                this.props.onUpdate(updateData);
+            }
         },
         registerModal: function (modal) {
             this.modal = modal;
@@ -633,6 +817,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         openModal: function (modal) {
             modal.open();
+        },
+        componentWillMount: function() {
+            var data = this.props.data;
+            console.warn("Use provided data to load content", data);
         }
     });
 
@@ -645,7 +833,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 <div className="shipping-combinations form-horizontal">
                     <div className="form-group">
                         <div className="col-md-5">
-                            <select ref="combinationType" className="form-control to-select2">
+                            <select ref="combinationType" className="form-control to-select2" defaultValue={this.state.match}>
                                 <option value="0">All Conditions Have to Match</option>
                                 <option value="1">Any Condition Has to Match</option>
                             </select>
@@ -662,14 +850,32 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     {this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
-                        return <ConditionsShippingModalField label={field.label} url={url} key={field.field}
-                            id={field.field} ref={field.field} removeField={this.removeField}  onChange={this.elementChange}/>
+                        var data = field.value || [];
+                        return <ConditionsShippingModalField label={field.label} url={url} key={field.field} data={data} filter={field.filter}
+                            id={field.field} ref={field.field} removeField={this.removeField} onChange={this.elementChange}/>
                     }.bind(this))}
                 </div>
             );
         },
         serialize: function () {
-            return this.state.values;
+            var data = {}, fields = [];
+            for (var field in this.refs) {
+                if(!this.refs.hasOwnProperty(field) || field == 'combinationField') {
+                    continue;
+                }
+                if (field == 'combinationType') {
+                    data.match = $(this.refs[field].getDOMNode()).select2('val');
+                    continue;
+                }
+                if (this.refs[field]) {
+                    var ref = this.refs[field];
+                    fields.push(ref.serialize());
+                }
+            }
+            if(fields.length) {
+                data.fields = fields;
+            }
+            return data;
         },
         serializeText: function () {
             var text, glue, fieldTexts = [];
@@ -702,16 +908,26 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 return;
             }
             $(fieldCombination).select2("val", "-1", false);// reset to default prompt
+            this.updateFields(fieldValue);
+        },
+        updateFields: function (fieldValue) {
             var fields = this.state.fields;
             for (var i in fields) { // loop current state fields and check if new one matches existing one, if so skip it
                 if (fields.hasOwnProperty(i)) {
                     var f = fields[i];
                     if (f.field == fieldValue.id) {
+                        if(fieldValue.compare) { // if field is the compare field, update and return
+                            f.filter = fieldValue.value;
+                            this.setState({fields: fields});
+                        }
                         return;
                     }
                 }
             }
             var field = {label: fieldValue.text, field: fieldValue.id};
+            if(fieldValue.value) {
+                field.value = fieldValue.value;
+            }
             //console.log(fields.indexOf(field));
             fields.push(field);
             this.setState({fields: fields});
@@ -724,7 +940,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             this.setState({fields: fields});
         },
         getInitialState: function () {
-            return {fields: [], values: {}};
+            return {fields: [], values: {}, match: 0};
         },
         getDefaultProps: function () {
             return {
@@ -739,10 +955,42 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
         },
         componentDidMount: function () {
-            $(this.refs['combinationField'].getDOMNode()).select2({minimumResultsForSearch: 15}).on("change", this.addField);
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $(this.refs['combinationField'].getDOMNode()).select2().on("change", this.addField);
+            $('select.to-select2', this.getDOMNode()).select2();
             if (typeof this.props.onLoad == 'function') {
                 this.props.onLoad(this);
+            }
+        },
+        componentWillMount: function () {
+            // load fields from data, they come in form of plain js object
+            console.log(this.props.data);
+            this.setState({values: this.props.data || {}});
+            for(var field in this.props.data) {
+                if(this.props.data.hasOwnProperty(field)) {
+                    if(field == 'fields') {
+                        var defaultFields = this.props.fields;
+                        var fields = this.props.data[field].map(function (field) {
+                            if (!field.label) {
+                                var fieldId = field['field'];
+                                var fieldText = defaultFields.filter(function (el) {
+                                    return el.field == fieldId;
+                                });
+                                if (fieldText.length) {
+                                    fieldText = fieldText[0]['label'];
+                                } else {
+                                    fieldText = 'N/A';
+                                }
+                                field.label = fieldText;
+                            }
+                            return field;
+                        });
+                        fields = this.state.fields.concat(fields);
+                        this.setState({fields: fields});
+                    } else if(field == 'match') {
+                        // condition should match
+                        this.setState({match: this.props.data[field]});
+                    }
+                }
             }
         },
         shouldUpdate: true,
@@ -769,7 +1017,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         mixins: [Common.select2QueryMixin],
         render: function () {
             var fieldId = "fieldCombination." + this.props.id;
-            var input = <input className="form-control" type="hidden" id={fieldId} key={fieldId} ref={fieldId}/>;
+            var value;
+            if(this.props.data && this.props.data.length) {
+                if ($.isArray(this.props.data)) {
+                    value = this.props.data.join(",");
+                } else {
+                    value = this.props.data;
+                }
+            }
+            var input = <input className="form-control" type="hidden" id={fieldId} key={fieldId} ref={fieldId} defaultValue={value}/>;
             var helperBlock = '';
             if (this.props.id == 'zipcode') {
                 helperBlock = <span key={fieldId + '.help'} className="help-block">{this.props.zipHelperText }</span>;
@@ -777,7 +1033,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <Common.Compare opts={this.props.opts} id={"fieldCompare." + this.props.id}
+                        <Common.Compare opts={this.props.opts} id={"fieldCompare." + this.props.id} value={this.props.filter}
                             ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{[input, helperBlock]}</div>
@@ -786,7 +1042,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         values: {},
         serialize: function () {
-            return this.values;
+            var data = {
+                field: this.props.id
+            };
+            data.filter = this.values["fieldCompare." + this.props.id] || $(this.refs["fieldCompare." + this.props.id].getDOMNode()).val();
+            data.value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
+            data.label = this.props.label;
+            return data;
         },
         serializeText: function () {
             var text = this.props.label;
@@ -801,7 +1063,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 }
             }
 
-            var value = this.values["fieldCombination." + this.props.id];
+            var value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
             if (value) {
                 if ($.isArray(value)) {
                     value = value.join(", ");
@@ -827,6 +1089,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         onCompareChange: function (e) {
             this.values["fieldCompare." + this.props.id] = e.val;
+
+            if (this.props.onChange) {
+                this.props.onChange(e);
+            }
         },
         remove: function () {
             if (this.props.removeField) {
@@ -855,7 +1121,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     placeholder: self.props.fcLabel,
                     maximumSelectionSize: 4,
                     multiple: true,
-                    selectOnBlur: true,
+                    selectOnBlur: false,
                     closeOnSelect: true,
                     query: self.select2query,
                     dropdownCssClass: "bigdrop",
@@ -868,6 +1134,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     },
                     formatSelection: function (item) {
                         return item.id;
+                    },
+                    initSelection: function (el, callback) {
+                        var data = [];
+                        $(el.val().split(",")).each(function () {
+                            data.push({id: this, text: this});
+                        });
+                        callback(data);
                     }
                 }).on('change', this.onChange);
             } else {
@@ -880,53 +1153,64 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     });
 
     var ConditionsApp = React.createClass({
+        displayName: 'ConditionsApp',
         render: function () {
-            return (<div className="conditions panel panel-default">
-                    {this.state.data.map(function (field, i) {
-                        //todo make a field based on field
-                        var el;
-                        var key = field.id;
-                        switch (field.type) {
-                            case 'skus':
-                                el = <ConditionsSkuCollection options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-                            case 'cats':
-                                el = <ConditionsCategories options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-                            case 'total':
-                                el = <ConditionTotal options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-                            case 'comb':
-                                el = <ConditionsAttributeCombination options={this.props.options}
-                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-                            case 'shipping':
-                                el = <ConditionsShipping options={this.props.options}
-                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
-                                break;
-
-                        }
-                        return el;
-                    }, this)}
-            </div> );
-        },
-        componentDidMount: function () {
-            var $conditionsSerialized = $('#' + this.props.options.conditions_serialized);
-            var data = this.state.data;
-
-            if ($conditionsSerialized.length > 0) {
-                try {
-                    data = JSON.parse($conditionsSerialized.val());
-                    this.setProps({data: data});
-                    // todo actually update state
-                } catch (e) {
-                    console.log(e);
+            var children = [];
+            var options = this.props.options;
+            var mc = this.props.modalContainer;
+            var rc = this.removeCondition;
+            var cu = this.conditionUpdate;
+            for(var type in this.state.data.rules) {
+                if(this.state.data.rules.hasOwnProperty(type)) {
+                    var rules = this.state.data.rules[type];
+                    if($.isArray(rules)) {
+                        rules.map(function (field, idx) {
+                            var el;
+                            var key = type + '-' + idx;
+                            switch (type) {
+                                case 'sku':
+                                    el = <ConditionsSkuCollection onUpdate={cu} data={field} options={options} key={key} id={key} removeCondition={rc}/>;
+                                    break;
+                                case 'category':
+                                    el = <ConditionsCategories onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                    break;
+                                case 'total':
+                                    el = <ConditionTotal onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                    break;
+                                case 'combination':
+                                    el = <ConditionsAttributeCombination onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                    break;
+                                case 'shipping':
+                                    el = <ConditionsShipping onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                    break;
+                            }
+                            if (el) {
+                                children.push(el);
+                            }
+                        })
+                    } else {
+                        console.log(rules, "is not an array");
+                    }
                 }
             }
-
+            return (
+                <div className="conditions">
+                    {children}
+                </div>
+            );
+        },
+        componentDidMount: function () {
             this.props.conditionType.on('change', this.addCondition);
 
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2();
+        },
+        componentWillMount: function () {
+            var data = this.state.data;
+
+            if (this.props.conditions.rules) {
+                data = this.props.conditions;
+                this.setState({data: data});
+            }
         },
         addCondition: function () {
             // add condition data to state
@@ -941,20 +1225,66 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
             $conditionTypes.select2('val', "-1", false);// reset to placeholder value and do NOT trigger change event
             var data = this.state.data;
-            var condition = {type: conditionType, id: conditionType + '-' + this.state.lastConditionId};
-            data.push(condition);
-            this.setState({data: data, lastConditionId: (this.state.lastConditionId + 1)});
+            if(!data.rules[conditionType]) {
+                data.rules[conditionType] = [];
+            }
+            //var rule = {type: conditionType, id: conditionType + '-' + this.state.lastConditionId};
+            data.rules[conditionType].push({}); // push new empty rule
+            this.setState({data: data, lastConditionId: (this.state.lastConditionId + 1)}, function () {
+                this.props.onUpdate(this.state.data);
+            });
         },
         removeCondition: function (conditionId) {
             var data = this.state.data;
-            data = data.filter(function (field) {
-                return field.id != conditionId;
+            var condArray = conditionId.split("-");
+            if(condArray.length == 2) {
+                var rule = condArray[0], idx = condArray[1];
+                data.rules[rule].splice(idx, 1);
+                if(data.rules[rule].length == 0) {
+                    delete data.rules[rule];
+                }
+            } else {
+                console.log("wrong condition id: " + conditionId);
+            }
+            //data = data.filter(function (field) {
+            //    return field.id != conditionId;
+            //});
+            this.setState({data: data}, function () {
+                this.props.onUpdate(this.state.data);
             });
-            this.setState({data: data});
+        },
+        conditionUpdate: function (data) {
+            //todo
+            console.log(data);
+            var localData = this.state.data;
+            for(var type in data) {
+                if(data.hasOwnProperty(type)) {
+                    var condArray = type.split("-"); // to keep track of multiple conditions of same type shipping-0, shipping-1 ...
+                    if(condArray.length == 2) {
+                        var rule = condArray[0], idx = condArray[1];
+                        localData.rules[rule][idx] = data[type];
+                    } else {
+                        console.log("wrong condition id: " + type);
+                    }
+                }
+            }
+            this.shouldUpdate = false;
+            this.props.onUpdate(localData);
+            this.setState({data: localData});
+        },
+        shouldUpdate: true,
+        shouldComponentUpdate: function () {
+            var upd = this.shouldUpdate;
+            if (!upd) { // shouldUpdate is one time flag that should be set only specifically and then dismissed
+                this.shouldUpdate = true;
+            }
+            return upd;
         },
         getInitialState: function () {
             return {
-                data: [],
+                data: {
+                    rules: {}
+                },
                 lastConditionId: 0
             };
         }

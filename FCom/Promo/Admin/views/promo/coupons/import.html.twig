@@ -1,51 +1,78 @@
 {% set m = THIS.get('model') %}
-<div class='tab-pane' id='f-import-upload'>
-    <div class="panel-body">
-        <h2>{{ "Upload and import files" }}</h2>
+<div class="row">
+    <div class="tabbable">
+        <ul class="nav nav-tabs f-horiz-nav-tabs promo-import-coupons-tabs">
+            <li class="active"><a data-toggle="tab" href="#promo-import-paste-codes">{{ "Paste codes"|_ }}</a></li>
+            <li><a data-toggle="tab" href="#promo-import-upload-codes">{{ "Upload codes"|_ }}</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="promo-import-paste-codes">
+                <div class="panel-body">
+                    <form id="promo-import-paste-codes-form">
+                        <div class="form-group">
+                            <label for="promo-import-paste-codes-text"
+                                   class="required control-label">{{ "Paste codes here:" }}</label>
+                            <textarea class="form-control required" id="promo-import-paste-codes-text" rows="10"
+                                      data-rule-required="true"></textarea>
 
-        <div class="help-block">{{ "Max file size allowed:"|_ }} <span
-                    id="max_import_file_size">{{ m.config.max_import_file_size }}</span></div>
-        <div class='box-content'>
-            <div class='row fileupload-buttonbar'>
-                <div class='col-sm-12'>
+                            <p class="help-block">{{ "Paste list of code in the area above. Each code must be on a line by itself"|_ }}</p>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="button"
+                                    id="promo-import-paste-codes-btn">{{ "Import codes"|_ }}</button>
+                            <span style="display: none;margin-left: 20px;" class="result"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class='tab-pane' id='promo-import-upload-codes'>
+                <div class="panel-body">
+                    <h2>{{ "Upload and import files" }}</h2>
+
+                    <div class="help-block">{{ "Max file size allowed:"|_ }} <span
+                                id="max_import_file_size">{{ m.config.max_import_file_size }}</span></div>
+                    <div class='box-content'>
+                        <div class='row fileupload-buttonbar'>
+                            <div class='col-sm-12'>
                     <span class='btn btn-success fileinput-button'>
                         <i class='icon-plus icon-white'></i>
                         <span>{{ "Add files..."|_ }}</span>
                         <input data-bfi-disabled='' multiple='' name='upload[]' type='file'>
                     </span>
-                    <button class='btn btn-primary start' type='submit'>
-                        <i class='icon-upload icon-white'></i>
-                        <span>{{ "Upload and import"|_ }}</span>
-                    </button>
-                    <button class='btn btn-warning cancel' type='reset'>
-                        <i class='icon-ban-circle icon-white'></i>
-                        <span>{{ "Cancel"|_ }}</span>
-                    </button>
-                </div>
-                <div class='col-sm-5 fileupload-progress fade'>
-                    <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active'
-                         role='progressbar'>
-                        <div class='bar' style='width:0%;'></div>
+                                <button class='btn btn-primary start' type='submit'>
+                                    <i class='icon-upload icon-white'></i>
+                                    <span>{{ "Upload and import"|_ }}</span>
+                                </button>
+                                <button class='btn btn-warning cancel' type='reset'>
+                                    <i class='icon-ban-circle icon-white'></i>
+                                    <span>{{ "Cancel"|_ }}</span>
+                                </button>
+                            </div>
+                            <div class='col-sm-5 fileupload-progress fade'>
+                                <div aria-valuemax='100' aria-valuemin='0'
+                                     class='progress progress-success progress-striped active'
+                                     role='progressbar'>
+                                    <div class='bar' style='width:0%;'></div>
+                                </div>
+                                <div class='progress-extended'></div>
+                            </div>
+                        </div>
+                        <div class='fileupload-loading'></div>
+                        <br>
+                        <table class='table table-striped' role='presentation'>
+                            <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
+                        </table>
                     </div>
-                    <div class='progress-extended'></div>
-                </div>
-            </div>
-            <div class='fileupload-loading'></div>
-            <br>
-            <table class='table table-striped' role='presentation'>
-                <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
-            </table>
-        </div>
-        <div class="box-content">
-            <div id="ie-msg-log"></div>
-        </div>
-        <script>
-            var uploadTr = '{{ 'Upload'|_ }}';
-            var errorTr = '{{ 'Error'|_ }}';
-            var cancelTr = '{{ 'Cancel'|_ }}';
-        </script>
-        {% verbatim %}
-        <script id="template-upload" type="text/x-tmpl">
+                    <div class="box-content">
+                        <div id="ie-msg-log"></div>
+                    </div>
+                    <script>
+                        var uploadTr = '{{ 'Upload'|_ }}';
+                        var errorTr = '{{ 'Error'|_ }}';
+                        var cancelTr = '{{ 'Cancel'|_ }}';
+                    </script>
+                    {% verbatim %}
+                    <script id="template-upload" type="text/x-tmpl">
             {% for (var i=0, file; file=o.files[i]; i++) { %}
                 <tr class="template-upload fade">
                     <td class="name"><span>{%=file.name%}</span></td>
@@ -80,10 +107,11 @@
                     </td>
                 </tr>
             {% } %}
-        </script>
-    <!-- The template to display files available for download -->
 
-        <script id="template-download" type="text/x-tmpl">
+                    </script>
+                <!-- The template to display files available for download -->
+
+                    <script id="template-download" type="text/x-tmpl">
             {% for (var i=0, file; file=o.files[i]; i++) { %}
                 <tr class="template-download fade">
                    {% if (file.error) { %}
@@ -102,32 +130,85 @@
                 </tr>
             {% } %}
 
-
-        </script>
-        {% endverbatim %}
-    </div>
-    <script>
-        require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport',
-            'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
-            var url = '{{ APP.href("promo/coupons/import")|raw}}';
-            $('#f-import-upload').fileupload({
-                url: url,
-                multiple: false,
-                acceptFileTypes: /(\.|\/)(csv|txt)$/i
-            }).bind('fileuploadalways', function (e, data) {
-                if(data.result && data.result.files) {
-                    data.result.files.map(function (file) {
-                        var codes = file.imported.codes.map(function (code) {
-                            return {
-                                code: code,
-                                total_used: 0
-                            };
+                    </script>
+                    {% endverbatim %}
+                </div>
+                <script>
+                    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport',
+                        'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'jquery.validate'], function () {
+                        var url = '{{ APP.href("promo/coupons/import")|raw}}';
+                        $('#promo-import-upload-codes').fileupload({
+                            url: url,
+                            multiple: false,
+                            acceptFileTypes: /(\.|\/)(csv|txt)$/i
+                        }).bind('fileuploadalways', function (e, data) {
+                            if (data.result && data.result.files) {
+                                data.result.files.map(function (file) {
+                                    var codes = file.imported.codes.map(function (code) {
+                                        return {
+                                            code: code,
+                                            total_used: 0
+                                        };
+                                    });
+                                    console.log(codes);
+                                    if (codes.length) {
+                                        $(document).trigger({
+                                            type: "coupon_import",
+                                            codes: codes,
+                                            grid_id: '{{config.id}}_grid'
+                                        });
+                                    }
+                                });
+                            }
                         });
-                        console.log(codes);
-                        $(document).trigger({type: "coupon_import", codes: codes, grid_id: '{{config.id}}_grid'});
+                        // end uploader
+
+                        var $pasteForm = $("#promo-import-paste-codes-form");
+                        var $codeTexts = $pasteForm.find('textarea');
+                        $pasteForm.validate();
+                        var matcher = /(\S.+\S)\s*$/gm; // match any string before end of line, seems to be more reliable than splitting the string
+                        var codes, codeKeys = {}; //
+
+                        $("#promo-import-paste-codes-btn").on('click', function (ev) {
+                            ev.preventDefault();
+                            console.log("validating");
+                            var $result = $(this).parent().find('span.result').hide();
+                            if ($pasteForm.valid()) {
+                                codes = []; // nullify codes, only push to grid new codes
+                                console.log("parsing");
+                                var data = $codeTexts.val();
+                                var matched = null;
+                                while (matched = matcher.exec(data)) {
+                                    console.log(matched[1]);
+                                    var code = $.trim(matched[1]); // make sure to skip some empty entries if matched
+                                    if (code && code !== '' && undefined == codeKeys[code]) { // if codeKeys has entry for this code, it is already imported, skip it
+                                        codes.push(code);
+                                        codeKeys[code] = 1;
+                                    }
+                                }
+                                console.log(codes);
+                                codes = codes.map(function (code) { // create objects for the grid
+                                    return {
+                                        code: code,
+                                        total_used: 0
+                                    }
+                                });
+                                if (codes.length) {
+                                    $result.text("Found " + codes.length + " new " + (codes.length > 1 ? "codes." : "code."));
+                                    $(document).trigger({ // trigger event which will upgrade the grid
+                                        type: "coupon_import",
+                                        codes: codes,
+                                        grid_id: '{{config.id}}_grid'
+                                    });
+                                } else {
+                                    $result.text("No new codes found.")
+                                }
+                            }
+                            $result.show();
+                        });
                     });
-                }
-            });
-        });
-    </script>
+                </script>
+            </div>
+        </div>
+    </div>
 </div>

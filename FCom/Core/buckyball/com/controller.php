@@ -1317,7 +1317,6 @@ class BResponse extends BClass
      * @param        $source
      * @param null   $fileName
      * @param string $disposition
-     * @internal param string $filename
      * @return exit
      */
     public function sendFile($source, $fileName = null, $disposition = 'attachment')
