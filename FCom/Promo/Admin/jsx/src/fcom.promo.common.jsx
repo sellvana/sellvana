@@ -192,7 +192,8 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                 var data = [];
                 var val = el.val().split(",");
                 for(var i in val) {
-                    data.push({id: val[i], text: val[i]});
+                    var val2 = val[i];
+                    data.push({id: val2, text: val2});
                 }
                 callback(data);
             }

@@ -98,18 +98,16 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 dropdownAutoWidth: true,
                 selectOnBlur: false,
                 formatSelection: function (item) {
-                    return item['sku'];
+                    return item['id'];
                 },
                 formatResult: function (item) {
                     var markup = '<div class="row-fluid" title="' + item.text + '">' +
-                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">SKU: <em>' + item.id + '</em></div>' +
                         '<div class="span2">Name: ' + item.text.substr(0, 20);
                     if (item.text.length > 20) {
                         markup += '...';
                     }
-                    markup += '</div>' +
-                    '<div class="span2">SKU: <strong>' + item.sku + '</strong></div>' +
-                    '</div>';
+                    markup += '</div></div>';
 
                     return markup;
                 },
@@ -121,7 +119,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         onChange: function () {
             var value = {};
             value.type = this.refs['skuCollectionType'].serialize();
-            value.product_id = $(this.refs['skuCollectionIds'].getDOMNode()).select2('val');
+            value.sku = $(this.refs['skuCollectionIds'].getDOMNode()).select2('val');
             value.filter = $(this.refs['skuCollectionCond'].getDOMNode()).val();
             value.value = $(this.refs['skuCollectionValue'].getDOMNode()).val();
             if(this.props.onUpdate) {
@@ -218,8 +216,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         <div className="col-md-6">
                             <select ref="combinationType" className="form-control to-select2"
                                     id="attribute-combination-type" defaultValue={this.state.match}>
-                                <option value="0">All Conditions Have to Match</option>
-                                <option value="1">Any Condition Has to Match</option>
+                                <option value="all">All Conditions Have to Match</option>
+                                <option value="any">Any Condition Has to Match</option>
                             </select>
                         </div>
                         <div className="col-md-6">
@@ -260,8 +258,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         serializeText: function () {
             var text, glue, fieldTexts = [];
-            var allShouldMatch = $(this.refs['combinationType'].getDOMNode()).val(); // && or ||
-            if (allShouldMatch == 1) {
+            var allShouldMatch = $(this.refs['combinationType'].getDOMNode()).val(); // all or any
+            if (allShouldMatch === 'any') {
                 glue = " or ";
             } else {
                 glue = " and ";
@@ -653,8 +651,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" onChange={this.onChange}> of products in </ConditionsType>
                     <div className="col-md-3">
-                        <input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/>
+                        <input type="hidden" id="catProductsIds" ref="catProductsIds"/>
                     </div>
+                    <select id="catProductInclude" ref="catProductInclude" className="to-select2">
+                        <option value="only_this">{Locale._("Only This")}</option>
+                        <option value="include_subcategories">{Locale._("This and sub categories")}</option>
+                    </select>
                     <div className="col-md-2">
                         <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange}/>
                     </div>
@@ -669,12 +671,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 rowClass: "category-products",
                 label: "Categories",
                 url: 'conditions/categories',
-                type: 'cats'
+                type: 'cats',
+                include: 'only_this'
             };
         },
         url: '',
         componentDidMount: function () {
-            var catProductsIds = this.refs.catProductsIds;
+            var catProductsIds = this.refs['catProductsIds'];
             this.url = this.props.options.base_url + this.props.url;
             $(catProductsIds.getDOMNode()).select2({
                 placeholder: "Select categories",
@@ -697,7 +700,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     return markup;
                 }
             });
-            $('select.to-select2', this.getDOMNode()).select2();
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         },
         onChange: function () {
             var value = {};
@@ -705,6 +708,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             value.category_id = $(this.refs['catProductsIds'].getDOMNode()).select2('val');
             value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();
             value.value = $(this.refs['catProductsValue'].getDOMNode()).val();
+            value.include = $(this.refs['catProductInclude'].getDOMNode()).val();
             if(this.props.onUpdate) {
                 var updateData = {};
                 updateData[this.props.id] = value;
@@ -834,8 +838,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     <div className="form-group">
                         <div className="col-md-5">
                             <select ref="combinationType" className="form-control to-select2" defaultValue={this.state.match}>
-                                <option value="0">All Conditions Have to Match</option>
-                                <option value="1">Any Condition Has to Match</option>
+                                <option value="all">All Conditions Have to Match</option>
+                                <option value="any">Any Condition Has to Match</option>
                             </select>
                         </div>
                         <div className="col-md-5">
@@ -880,7 +884,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         serializeText: function () {
             var text, glue, fieldTexts = [];
             var allShouldMatch = $(this.refs['combinationType'].getDOMNode()).val(); // && or ||
-            if (allShouldMatch == 1) {
+            if (allShouldMatch == 'any') {
                 glue = " or ";
             } else {
                 glue = " and ";
@@ -947,8 +951,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 fields: [
                     {label: Locale._("Method"), field: 'methods'},
                     {label: Locale._("Country"), field: 'country'},
-                    {label: Locale._("State/Province"), field: 'state'},
-                    {label: Locale._("ZIP Code"), field: 'zipcode'}
+                    {label: Locale._("Region"), field: 'region'},
+                    {label: Locale._("Post Code"), field: 'postcode'}
                 ],
                 labelCombinationField: Locale._("Add a Field to Condition..."),
                 url: "conditions/shipping"
@@ -1027,8 +1031,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
             var input = <input className="form-control" type="hidden" id={fieldId} key={fieldId} ref={fieldId} defaultValue={value}/>;
             var helperBlock = '';
-            if (this.props.id == 'zipcode') {
-                helperBlock = <span key={fieldId + '.help'} className="help-block">{this.props.zipHelperText }</span>;
+            if (this.props.id == 'postcode') {
+                helperBlock = <span key={fieldId + '.help'} className="help-block">{this.props.postHelperText }</span>;
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
@@ -1104,7 +1108,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 label: Locale._("Unknown"),
                 url: "",
                 fcLabel: "",
-                zipHelperText: "Use .. (e.g. 90000..99999) to add range of zip codes",
+                postHelperText: "Use .. (e.g. 90000..99999) to add range of post codes",
                 opts: [
                     {id: "in", label: "is one of"},
                     {id: "not_in", label: "is not one of"}
@@ -1116,7 +1120,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var fieldCombination = this.refs['fieldCombination.' + this.props.id];
             var self = this;
             this.url = this.props.url;
-            if (this.props.id != 'zipcode') {
+            if (this.props.id != 'postcode') {
                 $(fieldCombination.getDOMNode()).select2({
                     placeholder: self.props.fcLabel,
                     maximumSelectionSize: 4,

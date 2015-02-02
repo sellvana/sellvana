@@ -136,8 +136,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                         <div className="col-md-5">
                             <select ref={"combinationType" + id} id={"combinationType" + id}
                                 key={"combinationType" + id} className="form-control to-select2" defaultValue={this.state.match}>
-                                <option value="0">All Conditions Have to Match</option>
-                                <option value="1">Any Condition Has to Match</option>
+                                <option value="all">All Conditions Have to Match</option>
+                                <option value="any">Any Condition Has to Match</option>
                             </select>
                         </div>
                         <div className="col-md-5">
@@ -181,7 +181,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         serializeText: function () {
             var text, glue, fieldTexts = [], id = this.props.id;
             var allShouldMatch = $(this.refs['combinationType' + id].getDOMNode()).val(); // && or ||
-            if(allShouldMatch == 1) {
+            if(allShouldMatch == 'any') {
                 glue = " or ";
             } else {
                 glue = " and ";
@@ -611,13 +611,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 },
                 formatResult: function (item) {
                     var markup = '<div class="row-fluid" title="' + item.text + '">' +
-                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">SKU: <em>' + item.id + '</em></div>' +
                         '<div class="span2">Name: ' + item.text.substr(0, 20);
                     if(item.text.length > 20) {
                         markup += '...';
                     }
                     markup += '</div>' +
-                    '<div class="span2">SKU: <strong>' + item.sku + '</strong></div>' +
                     '</div>';
 
                     return markup;
