@@ -8,6 +8,8 @@
  * @property string $group_type enum('buy','get')
  * @property string $group_name
  *
+ * @deprecated
+ *
  * DI
  * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
  */

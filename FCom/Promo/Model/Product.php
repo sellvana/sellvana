@@ -8,6 +8,8 @@
  * @property int $group_id
  * @property int $product_id
  * @property int $qty
+ *
+ * @deprecated
  */
 class FCom_Promo_Model_Product extends BModel
 {
