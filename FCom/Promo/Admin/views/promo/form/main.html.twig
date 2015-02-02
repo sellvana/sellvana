@@ -1,4 +1,4 @@
-<!--{ label: Reviews }-->
+<!--{ label: Promo Details }-->
 <!--{ pos: 10 }-->
 {% set m = THIS.get('model') %}
 {% set promo = APP.instance('FCom_Promo_Model_Promo') %}
@@ -8,11 +8,11 @@
 
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
-{% if APP.m('FCom_CustomerGroups').run_status == 'LOADED' %}
+{% if MODULES.isLoaded('FCom_CustomerGroups') %}
     {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
 {% endif %}
 
-{% if APP.m('FCom_MultiSite').run_status == 'LOADED' %}
+{% if MODULES.isLoaded('FCom_MultiSite') %}
     {% set sites = APP.instance('FCom_MultiSite_Model_Site').siteOptions() %}
 {% endif %}
 
@@ -61,7 +61,7 @@
             }) }}
         {% endif %}
 
-        {{ forms.input({label: 'Date Range'|_, required: 1, field: "date_range",
+        {{ forms.input({label: 'Date Range'|_, field: "date_range",
             value: validator.fieldValue('date_range'),label_class: labelClass,
             help_icon: 1, help_text: 'Date Range'|_ }) }}
         <div id="testbed"></div>

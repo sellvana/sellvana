@@ -86,7 +86,7 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         $map = (array)$this->getDomainMap();
         $site = null;
         foreach ($map as $pattern => $siteData) {
-            if (preg_match('#' . $pattern . '#', $domain)) {
+            if (preg_match('#' . $pattern . '#i', $domain)) {
                 $site = $siteData;
                 break;
             }
