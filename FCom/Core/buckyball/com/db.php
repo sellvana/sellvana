@@ -2423,7 +2423,10 @@ class BModel extends Model
                 }
             }
             if (!is_string($key)) {
-                throw new BException('Invalid key type' . print_r($key, 1));
+                ob_start();
+                var_dump($key);
+                $debug = ob_get_clean();
+                BDebug::error('Invalid key type: ' . $debug);
             }
             if (null === $flag || 'IFNULL' === $flag) {
                 if (null === $this->get($key)) {

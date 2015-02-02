@@ -1339,6 +1339,11 @@ if (!isset($o[0]) || !isset($o[1])) {
         }
         return $a;
     }
+
+    public function getChannel()
+    {
+        return $this->channel ?: 'alpha';
+    }
 }
 
 class BMigrate extends BClass

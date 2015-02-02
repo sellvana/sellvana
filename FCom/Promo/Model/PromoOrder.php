@@ -1,17 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Class FCom_Promo_Model_Cart
+ * Class FCom_Promo_Model_PromoOrder
  *
  * @property int $id
- * @property int $cart_id
+ * @property int $order_id
  * @property int $promo_id
  * @property string $update_at
  */
-class FCom_Promo_Model_Cart extends BModel
+class FCom_Promo_Model_PromoOrder extends BModel
 {
     protected static $_origClass = __CLASS__;
-    protected static $_table = 'fcom_promo_cart';
+    protected static $_table = 'fcom_promo_order';
 
-    
+
 }
