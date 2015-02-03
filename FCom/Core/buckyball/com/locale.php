@@ -1165,6 +1165,12 @@ class BLocale extends BClass
 
     public function currency($value, $decimals = 2)
     {
-        return sprintf('%s%s', static::$_currencySymbol, number_format($value, $decimals));
+        return sprintf('%s%s', static::$_currencySymbol, $this->roundCurrency($value, $decimals));
+    }
+
+    public function roundCurrency($value, $decimals = 2)
+    {
+        //TODO: currency specific number of digits
+        return number_format($value, $decimals);
     }
 }

@@ -1,7 +1,7 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Class FCom_Promo_Model_Product
+ * Class FCom_Promo_Model_PromoProduct
  *
  * @property int $id
  * @property int $promo_id
@@ -11,7 +11,7 @@
  *
  * @deprecated
  */
-class FCom_Promo_Model_Product extends BModel
+class FCom_Promo_Model_PromoProduct extends BModel
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo_product';

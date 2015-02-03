@@ -6,7 +6,7 @@
  * @property FCom_Promo_Model_PromoHistory   $FCom_Promo_Model_PromoHistory
  * @property FCom_Promo_Model_Group          $FCom_Promo_Model_Group
  * @property FCom_Promo_Model_PromoMedia     $FCom_Promo_Model_PromoMedia
- * @property FCom_Promo_Model_Product        $FCom_Promo_Model_Product
+ * @property FCom_Promo_Model_PromoProduct   $FCom_Promo_Model_PromoProduct
  * @property FCom_Promo_Model_PromoCart      $FCom_Promo_Model_PromoCart
  * @property FCom_Customer_Model_Customer    $FCom_Customer_Model_Customer
  * @property FCom_Promo_Model_PromoOrder     $FCom_Promo_Model_PromoOrder
@@ -371,6 +371,30 @@ class FCom_Promo_Migrate extends BClass
                 'customer' => ['customer_id', $tCustomer],
                 'cart' => ['cart_id', $tCart],
                 'order' => ['order_id', $tOrder],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_9__0_1_10()
+    {
+        $tProduct = $this->FCom_Catalog_Model_Product->table();
+        $tPromo = $this->FCom_Promo_Model_Promo->table();
+        $tPromoProduct = $this->FCom_Promo_Model_PromoProduct->table();
+
+        $this->BDb->ddlTableDef($tPromoProduct, [
+            BDb::COLUMNS => [
+                'group_id' => BDb::DROP,
+                'calc_status' => 'tinyint not null default 0',
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ],
+            BDb::KEYS => [
+                'IDX_calc_status' => '(calc_status)',
+            ],
+            BDb::CONSTRAINTS => [
+                'promo' => ['promo_id', $tPromo],
+                'product' => ['product_id', $tProduct],
             ],
         ]);
     }

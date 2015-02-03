@@ -18,10 +18,10 @@ class FCom_Sales_Model_Cart_Total_Tax extends FCom_Sales_Model_Cart_Total_Abstra
         /*
          * Expecting the following $result structure:
          *  - tax_amount: total tax amount
+         *  - details: tax info for cart, to be set as $cart->setData('tax_details', $details)
          *  - items: tax info per item
          *      - row_tax: amount of tax per item
          *      - details: $item->setData('tax_details', $details)
-         *  - details: tax info for cart, to be set as $cart->setData('tax_details', $details)
          */
 
         $this->_value = !empty($result['tax_amount']) ? $result['tax_amount'] : 0;
