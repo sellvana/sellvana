@@ -101,10 +101,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
      */
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
-        if ($model && $model->id) {
-            $view->addTab("tab-details", ['label' => $this->BLocale->_("Details"), 'pos' => 20, 'async' => true]);
-            $view->addTab("tab-history", ['label' => $this->BLocale->_("History"), 'pos' => 40, 'async' => true]);
-        }
         return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
@@ -120,6 +116,18 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 case 'template': $args['data']['model']['status'] = 'template'; break;
             }
         }
+        if (!empty($args['data']['date_range'])) {
+            $dates = explode(" - ", $args['data']['date_range']);
+            $args['data']['from_date'] = trim($dates[0]);
+            if (!empty($dates[1])) {
+                $args['data']['to_date'] = trim($dates[1]);
+            }
+        }
+
+        if (!empty($args['data']['customer_group_ids']) && is_array($args['data']['customer_group_ids'])) {
+            $args['data']['customer_group_ids'] = implode(",", $args['data']['customer_group_ids']);
+        }
+
         if (!empty($args['data']['model'])) {
             $args['data']['model'] = $this->BLocale->parseRequestDates($args['data']['model'], 'from_date,to_date');
             $args['model']->set($args['data']['model']);

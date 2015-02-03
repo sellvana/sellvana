@@ -88,6 +88,10 @@ class FCom_Promo_Model_Promo extends BModel
 
         $this->setDate('from_date', $this->get("from_date"));
         $this->setDate('to_date', $this->get("to_date"));
+        if (!$this->get("create_at")) {
+            $this->set("create_at", date("Y-m-d"));
+        }
+        $this->set("update_at", date("Y-m-d"));
 
         return true;
     }

@@ -87,7 +87,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         <Components.Button onClick={this.props.onImportCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
                         <div className="form-group"><label className="col-md-5" for="total_per_customer">{Locale._("Total Uses Per Coupon Code")}</label>
                             <div className="col-md-4"> <input type="number" className="form-control"
-                            step="1" min="0" id="total_per_customer" name="total_per_customer" ref="total_per_customer"/></div>
+                            step="1" min="0" id="total_per_customer" name="model[total_per_customer]" ref="total_per_customer"/></div>
                         </div>
                     </div>
 
@@ -126,7 +126,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         {this.props.labelUpc}<Components.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
                     </Components.ControlLabel>
                     <div className="col-md-2">
-                        <input type="text" id={this.props.idUpc} ref="uses_per_customer" name="uses_per_customer" className="form-control"
+                        <input type="text" id={this.props.idUpc} ref="coupon_uses_per_customer" name="model[coupon_uses_per_customer]" className="form-control"
                             defaultValue={this.state.valueUpc}/>
                     </div>
 
@@ -135,7 +135,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                     </Components.ControlLabel>
 
                     <div className="col-md-2">
-                        <input type="text" id={this.props.idUt} ref="uses_per_code" name="uses_per_code" className="form-control"
+                        <input type="text" id={this.props.idUt} ref="coupon_uses_total" name="model[coupon_uses_total]" className="form-control"
                             defaultValue={this.state.valueUt}/>
                     </div>
                 </div>
