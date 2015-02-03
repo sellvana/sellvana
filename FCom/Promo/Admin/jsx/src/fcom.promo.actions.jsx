@@ -872,9 +872,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" ref="shippingAmount" className="form-control" />
             }
             var type = <Type ref="shippingType" id="shippingType" onChange={this.onTypeChange} value={this.state.type}
-                    totalType={this.props.fields}/>;
+                    totalType={this.props.fields} value={this.state.type}/>;
             var label = <Components.ControlLabel label_class="col-md-1" input_id="shippingMethods">{Locale._('For')}</Components.ControlLabel>;
-            var input = <input type="hidden" className="form-control" id="shippingMethods" ref="shippingMethods"/>;
+            var methods = this.state.methods;
+            if($.isArray(methods)) {
+                methods = methods.join(",");
+            }
+            var input = <input type="hidden" className="form-control" id="shippingMethods" ref="shippingMethods" defaultValue={methods}/>;
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     {type}
@@ -910,6 +914,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             }
         },
         url: '',
+        componentWillMount: function () {
+            var state = {
+                amount: this.props.data.value,
+                methods: this.props.data.methods,
+                type: this.props.data.type
+            };
+
+            this.setState(state);
+        },
         componentDidMount: function () {
             var shippingMethods = this.refs['shippingMethods'];
             var self = this;
@@ -965,11 +978,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                                     break;
                                 case 'free_product':
                                     el = <FreeProduct label={Locale._("Auto Add Product To Cart")} options={options}
-                                        key={key} id={key} removeAction={ra} onUpdate={au} date={field}/>;
+                                        key={key} id={key} removeAction={ra} onUpdate={au} data={field}/>;
                                     break;
                                 case 'shipping':
                                     el = <Shipping label={Locale._("Shipping")} options={options}
-                                        key={key} id={key} removeAction={ra} onUpdate={au} date={field}/>;
+                                        key={key} id={key} removeAction={ra} onUpdate={au} data={field}/>;
                                     break;
 
                             }
