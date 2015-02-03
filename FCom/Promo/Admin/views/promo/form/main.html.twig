@@ -31,13 +31,26 @@
             value: validator.fieldValue('customer_details'),label_class: labelClass,
             help_icon: 1, help_text: 'Details for Customers'|_ }) }}
 
+        {{ forms.input({label: 'Priority'|_, field: "priority_order",
+            value: validator.fieldValue('priority_order'),label_class: labelClass,
+            placeholder:"Enter priority number", type: "number",
+            help_icon: 1, help_text: 'Execution priority for order, lower order is calculated first.'|_ }) }}
+
         {{ forms.select({
             label: 'Status'|_,label_class: labelClass,
             value: validator.fieldValue('status'),
             field: "status", help_icon: 1,
             help_text: "Promotion status"|_,
-            select2: 1, options: ['Pending'|_, 'Active'|_, 'Expired'|_],
+            select2: {minimumResultsForSearch: 15},
+            options: ['Pending'|_, 'Active'|_, 'Expired'|_],
             input_div_class: "col-md-2"
+        }) }}
+        {{ forms.boolean({
+            label: "Stop flag"|_, label_class: labelClass,
+            value: validator.fieldValue('stop_flag'),
+            field: 'stop_flag', help_icon: 1,
+            help_text: "Stop other promotions from processing."|_,
+            select2: {minimumResultsForSearch: 15}
         }) }}
         {% if customerGroups %}
             {{ forms.select({
@@ -63,6 +76,7 @@
 
         {{ forms.input({label: 'Date Range'|_, field: "date_range",
             value: validator.fieldValue('date_range'),label_class: labelClass,
+            placeholder: "From - To",
             help_icon: 1, help_text: 'Date Range'|_ }) }}
         <div id="testbed"></div>
         <script type="text/javascript">
@@ -102,8 +116,8 @@
             </label>
             <div class="col-md-5">
                 <select id="model-conditions" name="model[conditions]" class="form-control to-select2">
-                    <option value="0">{{"All Conditions Have to Match"|_}}</option>
-                    <option value="1">{{"Any Condition Has to Match"|_}}</option>
+                    <option value="all">{{"All Conditions Have to Match"|_}}</option>
+                    <option value="any">{{"Any Condition Has to Match"|_}}</option>
                 </select>
             </div>
             <div class="col-md-4">

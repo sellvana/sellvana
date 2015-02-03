@@ -49,7 +49,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $result = ['total_count' => $count, 'items' => []];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $result['items'][] = [
-                'id'   => $row['id'],
+                'id'   => $row['product_sku'],
                 'text' => $row['product_name'],
                 'sku'  => $row['product_sku'],
             ];
@@ -241,14 +241,16 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
                     $result['items'][] = ['id' => $code, 'text' => $country];
                 }
                 break;
+            case 'region':
             case 'state':
                 $regions = $this->FCom_Core_Main->getAllowedRegions();
                 foreach ($regions as $country => $region) {
                     $countryRegions = ['text' => trim($country, '@'), 'children' => []];
                     foreach ($region as $code => $r) {
-                        $countryRegions['children'][] = ['id' => $code, 'text' => $r];
+                        $result['items'][] = ['id' => $code, 'text' => $r];
+                        //$countryRegions['children'][] = ['id' => $code, 'text' => $r];
                     }
-                    $result['items'][] = $countryRegions;
+                    //$result['items'][] = $countryRegions;
                 }
                 break;
             default :
