@@ -684,10 +684,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             if (this.state.range && type == 'numeric') {
                 var id = $elem.attr('id');
                 var idArray = id.split('.');
-                if (idArray.length > 1) { // id is like field.min/max
-                    var minMax = idArray.pop(); // min || max
+                if(idArray.length > 1) { // id is like field.min/max
+                    var minMax = idArray[1]; // min || max
                     // if value is already set in non range mode, it will be scalar, or null if this is first time
-                    var value = this.values["fieldCombination." + this.props.id] || this.props.data || [null, null];
+                    var value = this.values["fieldCombination." + this.props.id] || [null, null];
                     if (!$.isArray(value)) {
                         //if scalar, dump it and set again
                         value = [null, null];
@@ -695,10 +695,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     // min is at index 0, max index 1
                     if ('min' == minMax) {
                         value[0] = e.value;
-                    } else if ('max' == minMax){
-                        value[1] = e.value;
                     } else {
-                        console.log("Unknown range field: " + minMax);
+                        value[1] = e.value;
                     }
 
                     e.value = value;
