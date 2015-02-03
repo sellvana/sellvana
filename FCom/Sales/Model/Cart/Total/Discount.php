@@ -16,20 +16,21 @@ class FCom_Sales_Model_Cart_Total_Discount extends FCom_Sales_Model_Cart_Total_A
         $this->BEvents->fire(__METHOD__, ['cart' => $this->_cart, 'result' => &$result]);
         /*
          * Expecting the following $result structure:
-         *  - tax_amount: total tax amount
+         *  - discount_amount: total discount amount
+         *  - discount_percent: total cart discount percentage
+         *  - details: tax info for cart, to be set as $cart->setData('discount_details', $details)
          *  - items: tax info per item
-         *      - row_tax: amount of tax per item
-         *      - details: $item->setData('tax_details', $details)
-         *  - details: tax info for cart, to be set as $cart->setData('tax_details', $details)
+         *      - row_discount: amount of tax per item
+         *      - row_discount_percent: percentage for each item
+         *      - details: $item->setData('discount_details', $details)
          */
 
         $this->_value = !empty($result['discount_amount']) ? $result['discount_amount'] : 0;
-        $this->_cart->set($this->_cartField, $this->_value);
-        $this->_cart->add('grand_total', -$this->_value);
-        $this->_cart->setData('discount_details', !empty($result['details']) ? $result['details'] : []);
+
+        $cart = $this->_cart;
 
         if (!empty($result['items'])) {
-            foreach ($this->_cart->items() as $item) {
+            foreach ($cart->items() as $item) {
                 $itemId = $item->id();
                 if (!empty($result['items'][$itemId]['row_discount'])) {
                     $item->set('row_discount', $result['items'][$itemId]['row_discount']);
@@ -43,6 +44,16 @@ class FCom_Sales_Model_Cart_Total_Discount extends FCom_Sales_Model_Cart_Total_A
                 }
             }
         }
+
+        if (!empty($result['free_items'])) {
+            foreach ($result['free_items'] as $item) {
+
+            }
+        }
+
+        $cart->set($this->_cartField, $this->_value);
+        $cart->add('grand_total', -$this->_value);
+        $cart->setData('discount_details', !empty($result['details']) ? $result['details'] : []);
 
         return $this;
     }
