@@ -63,6 +63,11 @@ abstract class FCom_Sales_Method_Shipping_Abstract extends BClass implements
         return [];
     }
 
+    public function getConditionallyFreeServices()
+    {
+        return [];
+    }
+
     public function getServicesSelected()
     {
         $allServices = $this->getServices();

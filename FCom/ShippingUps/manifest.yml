@@ -19,4 +19,5 @@ modules:
                     production_mode: 0
                     sort_order: 10
                     default_service: '03'
+                    conditionally_free_services: ['03', '11', '65']
                     services: ['02', '03', '07', '08', '11', '12', '13', '14', '54', '59', '65']

@@ -466,13 +466,9 @@ class FCom_Promo_Model_Promo extends BModel
     protected function _calcCartSubtotalDiscount(FCom_Sales_Model_Cart $cart, array $action,
                                                  array $conditionsResult, array &$actionsResult)
     {
-        $result = [
-            'discount_amount' => 0,
-            'items' => [],
-        ];
         //TODO: remove defaults
         $actionType = !empty($action['type']) ? $action['type'] : 'cart';
-        $amountType = !empty($action['amount_type']) ? $action['amount_type'] : 'percent'; //,amount
+        $amountType = !empty($action['amount_type']) ? $action['amount_type'] : 'pcnt'; //,amt
         $amount = !empty($action['amount']) ? $action['amount'] : 10;
         $localeHlp = $this->BLocale;
         $items = [];
@@ -514,39 +510,52 @@ class FCom_Promo_Model_Promo extends BModel
         foreach ($items as $item) {
             $totalAmount += $item->get('row_total');
         }
-        if ($amountType === 'percent') {
+        if ($amountType === 'pcnt') {
             $percent = $amount / 100;
         } else {
-            $percent = $amount / $totalAmount;
+            if ($totalAmount < $amount) {
+                $percent = 1;
+            } else {
+                $percent = $amount / $totalAmount;
+            }
         }
         $totalDiscount = (float)$localeHlp->roundCurrency($totalAmount * $percent);
         $result['discount_amount'] = $totalDiscount;
-        $lastItemIdx = null;
-        foreach ($items as $i => $item) {
+        $itemId = null;
+        foreach ($items as $item) {
             if ($item->get('auto_added')) {
                 continue;
             }
+            $itemId = $item->id();
             $rowDiscount = $localeHlp->roundCurrency($item->get('row_total') * $percent);
             $totalDiscount -= $rowDiscount;
-            $result['items'][$i]['row_discount_percent'] = $percent * 100;
-            $result['items'][$i]['row_discount'] = $rowDiscount;
-            $lastItemIdx = $i;
+            //TODO: figure out how to update existing discounts
+            $actionsResult['items'][$itemId]['row_discount_percent'] = $percent * 100;
+            $actionsResult['items'][$itemId]['row_discount'] = $rowDiscount;
         }
-        if ($lastItemIdx && $totalDiscount) {
-            $result['items'][$lastItemIdx]['row_discount'] += $totalDiscount; // rounding error fix
+        if ($itemId && $totalDiscount) {
+            $actionsResult['items'][$itemId]['row_discount'] += $totalDiscount; // rounding error fix
         }
 
-        return $result;
     }
 
     protected function _calcCartShippingDiscount(FCom_Sales_Model_Cart $cart, array $action,
                                                  array $conditionsResult, array &$actionsResult)
     {
-        $result = [
-            'shipping_discount' => 0,
-            'shipping_free' => 0,
-        ];
-        return $result;
+        switch ($action['type']) {
+            case 'free':
+                $actionsResult['shipping_free'] = 1;
+                break;
+
+            case 'pcnt':
+                $discount = $cart->get('shipping_price') * $action['value'] / 100;
+                $actionsResult['shipping_discount'] = $this->BLocale->roundCurrency($discount);
+                break;
+
+            case 'amt':
+                $actionsResult['shipping_discount'] = min($action['value'], $cart->get('shipping_price'));
+                break;
+        }
     }
 
     protected function _calcCartFreeProduct(FCom_Sales_Model_Cart $cart, array $action,
