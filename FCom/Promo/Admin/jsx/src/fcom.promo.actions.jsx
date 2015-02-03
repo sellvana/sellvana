@@ -764,12 +764,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     var FreeProduct = React.createClass({
         mixins: [Common.select2QueryMixin, Common.removeMixin],
         render: function () {
-            var productIds;
-            if(this.state.product_ids) {
-                if($.isArray(this.state.product_ids)) {
-                    productIds = this.state.product_ids.join(",");
+            var skus;
+            if(this.state.sku) {
+                if($.isArray(this.state.sku)) {
+                    skus = this.state.sku.join(",");
                 } else {
-                    productIds = this.state.product_ids;
+                    skus = this.state.sku;
                 }
             }
             var terms;
@@ -783,7 +783,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-3">
-                        <input type="hidden" className="form-control" id="productSku" ref="productSku" defaultValue={productIds}/>
+                        <input type="hidden" className="form-control" id="productSku" ref="productSku" defaultValue={skus}/>
                     </div>
                     <div className="col-md-3 form-group">
                         <Components.ControlLabel input_id="productQty">{Locale._('Qty')}</Components.ControlLabel>
@@ -807,7 +807,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         },
         getInitialState: function () {
             return {
-                product_ids: [],
+                sku: [],
                 terms: [],
                 qty: 0
             }
@@ -819,6 +819,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             }
         },
         url: '',
+        componentWillMount: function () {
+            var state = {
+                qty: this.props.data.qty,
+                sku: this.props.data.sku,
+                terms: this.props.data.terms
+            };
+
+            this.setState(state);
+        },
         componentDidMount: function () {
             var productSku = this.refs['productSku'];
             var self = this;
@@ -829,7 +838,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 query: self.select2query,
                 dropdownAutoWidth: true,
                 formatSelection: function (item) {
-                    return item['sku'];
+                    return item['id'];
                 },
                 formatResult: function (item) {
                     var markup = '<div class="row-fluid" title="' + item.text + '">' +
