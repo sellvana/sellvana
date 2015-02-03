@@ -1,34 +1,20 @@
-{% set p = THIS.get('product') %}
+{% set prod = THIS.get('product') %}
+{% set prices = prod.getFrontendPrices() %}
+{% set classByType = {
+  'msrp': 'f-old-price',
+  'reg': 'f-reg-price',
+  'new': 'f-special-price',
+  'old': 'f-old-price',
+} %}
 
-  <div class="f-price-group">
+<div class="f-price-group">
     <table>
-      {% if p.get('base_price') == 0 %}
-        <tr class="f-reg-price">
-          <th class="f-price-label">{{ 'Price:'|_ }}</th>
-          <td class="f-price f-final-price">{{ 'FREE'|_ }}</td>
-        </tr>
-      {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') is not null %}
-        {% if p.get('sale_price') == 0 %}
-          <tr class="f-reg-price">
-            <th class="f-price-label">{{ 'Price:'|_ }}</th>
-            <td class="f-price f-final-price">{{ 'FREE'|_ }}</td>
-          </tr>
-        {% else %}
-          <tr class="f-special-price">
-            <th class="f-price-label">{{ 'Price:'|_ }}</th>
-            <td class="f-price f-final-price">{{ p.get('sale_price') | currency }}</td>
-          </tr>
-        {% endif %}
-        <tr class="f-old-price">
-          <th class="f-price-label">{{ 'Was:'|_ }}</th>
-          <td class="f-price">{{ p.get('base_price') | currency }}</td>
-        </tr>
-      {% else %}
-        <tr class="f-reg-price">
-          <th class="f-price-label">{{ 'Price:'|_ }}</th>
-          <td class="f-price f-final-price">{{ p.get('base_price') | currency }}</td>
-        </tr>
-      {% endif %}
+{% for price in prices %}
+      <tr class="{{ classByType[price.type] }}">
+          <th class="f-price-label">{{ price.label|_ }}</th>
+          <td class="f-price {{ price.final ? 'f-final-price' }}">{{ price.formatted ?: (price.value ? price.value|currency : 'FREE'|_) }}</td>
+      </tr>
+{% endfor %}
     </table>
     {{ THIS.view('customer-groups/puct-tier-prices').set('product', p) | raw }}
-  </div> <!-- /.f-price-group -->
+</div> <!-- /.f-price-group -->

@@ -1117,6 +1117,34 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->get('base_price');
     }
 
+    public function getFrontendPrices()
+    {
+        /**
+         * - type: old, new, reg, msrp, extax
+         * - label: Old Price, New Price, Price, MSRP, Ex.Tax
+         * - value: 1234.56
+         * - formatted: $1,234.56
+         * - pos: 0,1,2,3
+         */
+        $prices = [];
+
+        if ($this->get('sale_price') !== null) {
+            $prices['base'] = ['type' => 'old', 'label' => 'Was', 'pos' => 10, 'value' => $this->get('base_price')];
+            $prices['sale'] = ['type' => 'new', 'label' => 'Price', 'pos' => 20, 'value' => $this->get('sale_price'), 'final' => 1];
+        } else {
+            $prices['base'] = ['type' => 'reg', 'label' => 'Price', 'pos' => 10, 'value' => $this->get('base_price'), 'final' => 1];
+        }
+
+        $this->BEvents->fire(__METHOD__, ['product' => $this, 'prices' => &$prices]);
+
+        uasort($prices, function($v1, $v2) {
+            $p1 = !empty($v1['pos']) ? $v1['pos'] : 999;
+            $p2 = !empty($v2['pos']) ? $v2['pos'] : 999;
+            return $p1 < $p2 ? -1 : ($p1 > $p2 ? 1 : 0);
+        });
+        return $prices;
+    }
+
     /**
      * @return array
      */
