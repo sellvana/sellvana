@@ -647,22 +647,17 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     var ConditionsCategories = React.createClass({
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
+            var values = this.props.data || {category_id: [], value: 0, type: 'qty', filter: 'gt', include: 'only_this'};
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" onChange={this.onChange}> of products in </ConditionsType>
-                    <div className="col-md-3">
-                        <input type="hidden" id="catProductsIds" ref="catProductsIds"/>
-                    </div>
-                    <select id="catProductInclude" ref="catProductInclude" className="to-select2">
+                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" onChange={this.onChange} value={values.type}> of products in </ConditionsType>
+                    <input type="hidden" id="catProductsIds" ref="catProductsIds" defaultValue={values.category_id.join(",")}/>
+                    <select id="catProductInclude" ref="catProductInclude" className="to-select2" defaultValue={values.include}>
                         <option value="only_this">{Locale._("Only This")}</option>
                         <option value="include_subcategories">{Locale._("This and sub categories")}</option>
                     </select>
-                    <div className="col-md-2">
-                        <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange}/>
-                    </div>
-                    <div className="col-md-1">
-                        <input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left" onBlur={this.onChange}/>
-                    </div>
+                    <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange} value={values.filter}/>
+                    <input ref="catProductsValue" id="catProductsValue" type="text" className="" onBlur={this.onChange} defaultValue={values.value}/>
                 </Common.Row>
             );
         },
@@ -676,6 +671,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
         },
         url: '',
+        componentWillMount: function () {
+            console.log(this.props.data);
+        },
         componentDidMount: function () {
             var catProductsIds = this.refs['catProductsIds'];
             this.url = this.props.options.base_url + this.props.url;
@@ -698,7 +696,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     '</div>';
 
                     return markup;
-                }
+                },
+                initSelection: this.initSelection
             });
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         },
@@ -879,7 +878,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             var fieldUrl = this.props.baseUrl + this.props.url;
             var paramObj = {};
-            paramObj[this.props.idVar] = this.props.entityId;
+            //paramObj[this.props.idVar] = this.props.entityId;
             return (
                 <div className="shipping-combinations form-horizontal">
                     <div className="form-group">
