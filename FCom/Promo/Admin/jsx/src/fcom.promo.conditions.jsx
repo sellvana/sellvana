@@ -47,7 +47,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     var ConditionsSkuCollection = React.createClass({
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
-            var productId = this.state.product_ids;
+            var productId = this.state.sku;
             if($.isArray(productId)) {
                 productId = productId.join(",");
             }
@@ -80,7 +80,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var propData = this.props.data;
             var state = {
                 type: propData.type || null,
-                product_ids: propData.product_id || [],
+                sku: propData.sku || [],
                 filter: propData.filter || null,
                 value: propData.value || 0
             };
@@ -787,7 +787,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         modal: null,
         modalContent: null,
-        handleConfigure: function (e) {
+        handleConfigure: function () {
             var modal = <Components.Modal onConfirm={this.handleShippingConfirm} id={"modal-" + this.props.id} key={"modal-" + this.props.id}
                 title={this.props.modalTitle} onLoad={this.openModal} onUpdate={this.openModal}>
                 <ConditionsShippingModalContent baseUrl={this.props.options.base_url} onLoad={this.registerModalContent}
@@ -823,8 +823,55 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             modal.open();
         },
         componentWillMount: function() {
-            var data = this.props.data;
-            console.warn("Use provided data to load content", data);
+            this.setState({value: this.props.data, valueText: this.serializeText(this.props.data)});
+            //var data = this.props.data;
+            //console.warn("Use provided data to load content", data);
+        },
+        serializeText: function (value) {
+            var text, glue, fieldTexts = [];
+            var allShouldMatch = value['match']; // && or ||
+            if (allShouldMatch == 'any') {
+                glue = " or ";
+            } else {
+                glue = " and ";
+            }
+
+            for (var field in value['fields']) {
+                if (!value['fields'].hasOwnProperty(field)) {
+                    continue;
+                }
+                if (value['fields'][field]) {
+                    var ref = value['fields'][field];
+                    var refText = this.serializeFieldText(ref);
+                    fieldTexts.push(refText);
+                }
+            }
+
+            text = fieldTexts.join(glue);
+
+            return text;
+        },
+        serializeFieldText: function (field) {
+            var text = field.label;
+            var opts = ConditionsShippingModalField.opts();
+            var optext = field.filter;
+            for (var i = 0; i < opts.length; i++) {
+                var o = opts[i];
+                if (o.id == optext) {
+                    text += " " + o.label;
+                    break;
+                }
+            }
+
+            var value = field.value;
+            if (value) {
+                if ($.isArray(value)) {
+                    value = value.join(", ");
+                }
+                text += " " + value;
+            }
+
+            return text;
         }
     });
 
@@ -856,7 +903,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         var data = field.value || [];
                         return <ConditionsShippingModalField label={field.label} url={url} key={field.field} data={data} filter={field.filter}
-                            id={field.field} ref={field.field} removeField={this.removeField} onChange={this.elementChange}/>
+                            id={field.field} ref={field.field} removeField={this.removeField} onChange={this.elementChange} opts={ConditionsShippingModalField.opts()}/>
                     }.bind(this))}
                 </div>
             );
@@ -1019,6 +1066,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
 
     var ConditionsShippingModalField = React.createClass({
         mixins: [Common.select2QueryMixin],
+        statics: {
+            opts: function () {
+                return [
+                    {id: "in", label: "is one of"},
+                    {id: "not_in", label: "is not one of"}
+                ];
+            }
+        },
         render: function () {
             var fieldId = "fieldCombination." + this.props.id;
             var value;
@@ -1109,10 +1164,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 url: "",
                 fcLabel: "",
                 postHelperText: "Use .. (e.g. 90000..99999) to add range of post codes",
-                opts: [
-                    {id: "in", label: "is one of"},
-                    {id: "not_in", label: "is not one of"}
-                ]
             };
         },
         url: '',

@@ -34,7 +34,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         },
         getDefaultProps: function () {
             return {
-                totalType: [{id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}],
+                totalType: [{id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}, {id: "fixed", label: "$ Only"}],
                 select2: true,
                 containerClass: "col-md-2",
                 className: "form-control"
@@ -649,7 +649,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             // todo serialize
             var value = {};
             if(this.props.type == 'other_prod') {
-                value.product_ids = this.refs['skuCombination' + this.props.id].getSelectedProducts();
+                value.sku = this.refs['skuCombination' + this.props.id].getSelectedProducts();
             } else if(this.props.type == 'attr_combination') {
                 value.combination = this.refs['attrCombination' + this.props.id].serialize();
             }
@@ -775,9 +775,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             var terms;
             if(this.state.terms) {
                 if($.isArray(this.state.terms)) {
-                    terms = this.state.terms.join(",");
-                } else {
                     terms = this.state.terms;
+                } else {
+                    terms = [this.state.terms];//The `defaultValue` prop supplied to <select> must be an array if `multiple` is true
                 }
             }
             return (
@@ -833,13 +833,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 },
                 formatResult: function (item) {
                     var markup = '<div class="row-fluid" title="' + item.text + '">' +
-                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">SKU: <em>' + item.id + '</em></div>' +
                         '<div class="span2">Name: ' + item.text.substr(0, 20);
                     if (item.text.length > 20) {
                         markup += '...';
                     }
                     markup += '</div>' +
-                    '<div class="span2">SKU: <strong>' + item.sku + '</strong></div>' +
                     '</div>';
 
                     return markup;
@@ -851,7 +850,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         onChange: function () {
             var value = {};
             value.qty = $(this.refs['productQty'].getDOMNode()).val();
-            value.product_ids = $(this.refs['productSku'].getDOMNode()).select2('val');
+            value.sku = $(this.refs['productSku'].getDOMNode()).select2('val');
             value.terms = $(this.refs['productTerms'].getDOMNode()).select2('val');
 
             //this.setState(value);
@@ -897,7 +896,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         getDefaultProps: function () {
             return {
                 fields: [
-                    {id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}, {id: "free", label:"Free"}
+                    {id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}, {id: "fixed", label: "$ Only"}, {id: "free", label:"Free"}
                 ],
                 labelMethodsField: Locale._("Select shipping methods"),
                 url: "conditions/shipping"
