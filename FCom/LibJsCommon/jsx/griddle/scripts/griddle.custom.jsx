@@ -206,7 +206,7 @@ var Griddle = React.createClass({
         var maxPage = this.getMaxPage();
         //re-render if we have new max page value
         if (this.state.maxPage != maxPage){
-            this.setState({ maxPage: maxPage, filteredColumns: this.props.columns });
+            this.setState({ maxPage: maxPage, filteredColumns: this.props.columns, initColumns: this.props.initColumns });
         }
     },
     setPage: function(number) {
@@ -315,6 +315,7 @@ var Griddle = React.createClass({
             showColumnChooser: false,
             isLoading: false,
             //fcom custom
+            initColumns: [], //init columns include all hide columns
             isInit: true,
             selectedRows: [],
             headerSelect: 'show_all' //select value in header dropdown
@@ -395,6 +396,8 @@ var Griddle = React.createClass({
     },
     render: function() {
         //console.log('this.state.filteredResults', this.state.filteredResults);
+        //console.log('this.state.filteredColumns', this.state.filteredColumns);
+        //console.log('this.state.initColumns', this.state.initColumns);
         var that = this,
             results = this.state.filteredResults || this.state.results; // Attempt to assign to the filtered results, if we have any.
 
@@ -412,7 +415,8 @@ var Griddle = React.createClass({
             this.props.useCustomSettings
             ? <this.props.customSettings columnMetadata={this.props.columnMetadata} selectedColumns={this.getColumns} setColumns={this.setColumns}
                 getConfig={this.getConfig} searchWithinResults={this.searchWithinResults} getSelectedRows={this.getSelectedRows} refresh={this.refresh}
-                setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState} />
+                setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState}
+                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} />
             : <span className="settings" onClick={this.toggleColumnChooser}>{this.props.settingsText} <i className="glyphicon glyphicon-cog"></i></span>
         ) : "";
 
@@ -640,6 +644,25 @@ var Griddle = React.createClass({
      */
     getGriddleState: function() {
         return this.state;
+    },
+    updateInitColumns: function(columns) {
+        var selectedColumns = this.getColumns();
+        var newSelectedColumns = [];
+
+        //update selected columns
+        _.forEach(columns, function(item) {
+            if (_.contains(selectedColumns, item)) {
+                newSelectedColumns.push(item);
+            }
+        });
+
+        this.setState({
+            initColumns: columns,
+            filteredColumns: newSelectedColumns
+        });
+    },
+    getInitColumns: function() {
+        return this.state.initColumns;
     }
 });
 

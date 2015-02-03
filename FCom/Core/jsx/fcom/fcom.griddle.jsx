@@ -7,7 +7,6 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         gridId,
         pageSize,
         pageSizeOptions,
-        initColumns,
         buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
             return dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
         };
@@ -28,7 +27,6 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             gridId = this.props.config.id;
             pageSize = this.props.config.state.ps;
             pageSizeOptions = this.props.config.page_size_options;
-            initColumns = this.getColumn();
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
@@ -59,7 +57,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             return (
                 <Griddle showTableHeading={false} tableClassName={this.props.tableClassName}
-                    config={this.props.config}
+                    config={this.props.config} initColumns={this.getColumn()}
                     columns={this.getColumn('show')} columnMetadata={this.props.columnMetadata}
                     useCustomGrid={true} customGrid={FComGridBody}
                     getExternalResults={FComDataMethod} resultsPerPage={pageSize}
@@ -288,6 +286,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
         },
         toggleColumn: function(event) {
+            var initColumns = this.props.getInitColumns();
             var selectedColumns = this.props.selectedColumns();
             if(event.target.checked == true && _.contains(selectedColumns, event.target.dataset.name) == false){
                 selectedColumns.push(event.target.dataset.name);
@@ -312,61 +311,53 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         quickSearch: function(event) {
             this.props.searchWithinResults(event.target.value);
         },
-        componentDidMount: function() {
+        sortColumns: function() {
+            var newPosColumns = $(this.getDOMNode()).find('.dd-list').sortable('toArray', {attribute: 'data-id'}); //new position columns array
+            newPosColumns.unshift(0); //add first column again
+            this.props.updateInitColumns(newPosColumns);
+            //todo: personalization
+        },
+        componentDidUpdate: function() {
+            this.renderDropdownColumnsSettings();
             var that = this;
-
-            $(".dd-list").sortable({
-                connectWith: ".dd-list",
-                handle: ".dd3-handle",
-                cancel: ".portlet-toggle",
-                placeholder: "portlet-placeholder ui-corner-all",
-                update: function (event, ui) {
-                    var selectedColumns = [0];
-                    $('.columns .showhide_column').each(function() {
-                        var target = $(this);
-                        if (target.checked == true) {
-                            selectedColumns.push(target.dataset.name);
-                        }
-                    });
-                    that.props.setColumns(selectedColumns);
+            $(this.getDOMNode()).find('.dd-list').sortable({
+                handle: '.dd-handle',
+                revert: true,
+                axis: 'y',
+                stop: function () {
+                    that.sortColumns();
                 }
             });
-            $( ".dd-item" )
-                .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" )
-                .find( ".dd3-handle" )
-                .addClass( "ui-widget-header ui-corner-all" )
-                .prepend( "<span class='ui-icon ui-icon-minusthick portlet-toggle'></span>");
-
-            $( ".portlet-toggle" ).click(function() {
-                var icon = $( this );
-                icon.toggleClass( "ui-icon-minusthick ui-icon-plusthick" );
-                icon.closest( ".dd-item" ).find( ".dd3-content" ).toggle();
-            });
         },
-        render: function () {
+        renderDropdownColumnsSettings: function() {
             var that = this;
-            var id = this.props.getConfig('id');
-
-            var options = _.map(initColumns, function(column) {
+            var options = _.map(this.props.getInitColumns(), function(column) {
                 if (column == '0') {
                     return false;
                 }
 
-                var checked = _.contains(that.props.selectedColumns, column);
-                //console.log(column + '.checked', checked);
+                var checked = _.contains(that.props.selectedColumns(), column);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
                 return (
-                    <li data-id={column} className="dd-item dd3-item">
+                    <li data-id={column} id={column} className="dd-item dd3-item">
                         <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                         <div className="dd3-content">
                             <label>
-                                <input type="checkbox" checked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
+                                <input type="checkbox" defaultChecked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
                                 {colInfo ?  colInfo.label : column}
                             </label>
                         </div>
                     </li>
                 )
             });
+
+            var mountNode = document.getElementById('column-settings');
+            React.unmountComponentAtNode(mountNode);
+            React.render(<ol className="dd-list dropdown-menu columns ui-sortable" style={{minWidth: '200px'}}>{options}</ol>, mountNode);
+        },
+        render: function () {
+            var that = this;
+            var id = this.props.getConfig('id');
 
             //quick search
             var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} onChange={this.quickSearch} />;
@@ -413,6 +404,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 });
             }
 
+            var styleColumnSettings = {position: 'absolute', top: 'auto', marginTop: '-2px', padding: '0', display: 'block', left: 0};
             return (
                 <div className="col-sm-6">
                     {quickSearch}
@@ -420,9 +412,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                         <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">
                             Columns <b className="caret"></b>
                         </a>
-                        <ol className="dd-list dropdown-menu columns ui-sortable">
-                            {options}
-                        </ol>
+                        <div id="column-settings" style={styleColumnSettings}></div>
                     </div>
                     {buttonActions}
                 </div>
