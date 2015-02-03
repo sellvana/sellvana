@@ -201,6 +201,72 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         openModal: function (modal) {
             modal.open();
+        },
+        componentWillMount: function () {
+            this.setState({
+                value: this.props.data,
+                valueText: this.serializeText(this.props.data)
+            });
+        },
+        serializeText: function (value) {
+            var text, glue, fieldTexts = [];
+            var allShouldMatch = value['match']; // && or ||
+            if (allShouldMatch == 'any') {
+                glue = " or ";
+            } else {
+                glue = " and ";
+            }
+
+            for (var field in value['fields']) {
+                if (!value['fields'].hasOwnProperty(field)) {
+                    continue;
+                }
+                if (value['fields'][field]) {
+                    var ref = value['fields'][field];
+                    var refText = this.serializeFieldText(ref);
+                    fieldTexts.push(refText);
+                }
+            }
+
+            text = fieldTexts.join(glue);
+
+            return text;
+        },
+        serializeFieldText: function (field) {
+            var text = field.label, type;
+            if(['number', 'date', 'time'].indexOf(field.input) != -1) {
+                type = 'numeric';
+            } else if(field.input == 'text') {
+                type = 'text';
+            } else if (field.input == 'select') {
+                type = 'select';
+            } else if (field.input == "yes_no") {
+                type = 'bool';
+            }
+
+            var opts = ConditionsAttributesModalField.opts(type);
+            var optext = field.filter;
+            for (var i = 0; i < opts.length; i++) {
+                var o = opts[i];
+                if (o.id == optext) {
+                    text += " " + o.label;
+                    break;
+                }
+            }
+
+            var value = field.value;
+            if (value) {
+                if ($.isArray(value)) {
+                    value = value.join(", ");
+                }
+
+                if (type == 'bool') {
+                    value = (value == 0) ? Locale._("No") : Locale._("Yes");
+                }
+                text += " " + value;
+            }
+
+            return text;
         }
     });
 
@@ -376,6 +442,32 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
 
     var ConditionsAttributesModalField = React.createClass({
         mixins: [Common.select2QueryMixin],
+        statics: {
+            opts: function (type) {
+                var opts = [ // base options, for bool and select fields
+                        {id: "is", label: "is"},
+                        {id: "is_not", label: "is not"},
+                        {id: "empty", label: "has no value"}
+                    ],
+                    opts_text = [ // add to base for text fields
+                        {id: "contains", label: "contains"}
+                    ],
+                    opts_numeric = [ // add to base for numeral fields
+                        {id: "lt", label: "is less than"},
+                        {id: "lte", label: "is less than or equal"},
+                        {id: "gt", label: "is greater than"},
+                        {id: "gte", label: "is greater than or equal"},
+                        {id: "between", label: "is between"}
+                    ];
+                if(type == 'text') {
+                    return opts.concat(opts_text);
+                } else if(type == 'numeric') {
+                    return opts.concat(opts_numeric);
+                }
+
+                return opts;
+            }
+        },
         render: function () {
             var inputType = this.props.input;
             var opts = this.getOpts();
@@ -406,9 +498,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                             max = value[1];
                         }
                         input = <div id={fieldId} ref={fieldId} className="input-group">
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".min"}
+                            <input className="form-control required" type="number" step="any" id={fieldId + ".min"} ref={"min"}
                                 placeholder="Min" style={{width: "50%"}} onChange={this.onChange} defaultValue={min}/>
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".max"}
+                            <input className="form-control required" type="number" step="any" id={fieldId + ".max"} ref={"max"}
                                 placeholder="Max" style={{width: "50%"}} onChange={this.onChange} defaultValue={max}/>
                         </div>;
                     }
@@ -453,11 +545,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             return opts;
         },
         serialize: function () {
+            var type = this.getInputType();
             var data = {
                 field: this.props.id
             };
             data.filter = this.values["fieldCompare." + this.props.id] || $(this.refs["fieldCompare." + this.props.id].getDOMNode()).val();
-            data.value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
+            if (this.state.range && type == 'numeric' && !this.values["fieldCombination." + this.props.id]) {
+                // if this is between value and there is no value saved for it
+                var $min = $(this.refs['min'].getDOMNode());
+                var $max = $(this.refs['max'].getDOMNode());
+                data.value = [
+                    $min.val(),
+                    $max.val()
+                ];
+            } else {
+                data.value = this.values["fieldCombination." + this.props.id] || $(this.refs["fieldCombination." + this.props.id].getDOMNode()).val();
+            }
             data.label = this.props.label;
             data.input = this.props.input;
 
@@ -478,7 +581,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 }
             }
 
-            var value = this.values["fieldCombination." + this.props.id];
+            var data = this.serialize();
+            var value = data.value;
             if (value) {
                 if ($.isArray(value)) {
                     value = value.join(", ");
@@ -528,6 +632,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 bool_inputs: ['yes_no']
             };
         },
+        componentWillMount: function () {
+            var state = {
+                range: this.props.filter == 'between'
+            };
+            this.setState(state);
+        },
         componentDidMount: function () {
             var inputType = this.props.input;
             switch (inputType) {
@@ -575,9 +685,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 var id = $elem.attr('id');
                 var idArray = id.split('.');
                 if (idArray.length > 1) { // id is like field.min/max
-                    var minMax = idArray[1]; // min || max
+                    var minMax = idArray.pop(); // min || max
                     // if value is already set in non range mode, it will be scalar, or null if this is first time
-                    var value = this.values["fieldCombination." + this.props.id] || [null, null];
+                    var value = this.values["fieldCombination." + this.props.id] || this.props.data || [null, null];
                     if (!$.isArray(value)) {
                         //if scalar, dump it and set again
                         value = [null, null];
@@ -585,8 +695,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     // min is at index 0, max index 1
                     if ('min' == minMax) {
                         value[0] = e.value;
-                    } else {
+                    } else if ('max' == minMax){
                         value[1] = e.value;
+                    } else {
+                        console.log("Unknown range field: " + minMax);
                     }
 
                     e.value = value;
@@ -610,20 +722,34 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             this.setState(state);
         },
         initDateInput: function () {
-            var startDate = new Date();
-            var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+            var data = this.props.data, s, e;
             var fieldCombination = this.refs["fieldCombination." + this.props.id];
-            var $input = $(fieldCombination.getDOMNode());
             var mode = fieldCombination.props.dataMode;
-            var parent = $input.closest('.modal');
-            $input.daterangepicker(
-                {
-                    format: 'YYYY-MM-DD',
-                    startDate: s,
-                    singleDatePicker: mode,
-                    parentEl: parent
+            if(!data) {
+                var startDate = new Date();
+                s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+            } else {
+                if(!mode) {
+                    // not single picker mode
+                    var dates = data.split(" - ");
+                    s = dates[0];
+                    e = dates[1] || dates[0];
+                } else {
+                    s = data;
                 }
-            );
+            }
+            var $input = $(fieldCombination.getDOMNode());
+            var parent = $input.closest('.modal');
+            var options = {
+                format: 'YYYY-MM-DD',
+                startDate: s,
+                singleDatePicker: mode,
+                parentEl: parent
+            };
+            if(e) {
+                options.endDate = e;
+            }
+            $input.daterangepicker(options);
             //todo set setStartDate and setEndDate
         },
         url: '',
@@ -671,9 +797,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             };
         },
         url: '',
-        componentWillMount: function () {
-            console.log(this.props.data);
-        },
         componentDidMount: function () {
             var catProductsIds = this.refs['catProductsIds'];
             this.url = this.props.options.base_url + this.props.url;
@@ -721,13 +844,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType} onChange={this.onChange}/>
-                    <div className="col-md-2">
-                        <Common.Compare ref="cartTotalCond" id="cartTotalCond" onChange={this.onChange}/>
-                    </div>
-                    <div className="col-md-1">
-                        <input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left" onBlur={this.onChange}/>
-                    </div>
+                    <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType} onChange={this.onChange} value={this.props.data.type}/>
+                    <Common.Compare ref="cartTotalCond" id="cartTotalCond" onChange={this.onChange} value={this.props.data.filter}/>
+                    <input ref="cartTotalValue" id="cartTotalValue" type="text" className="" onBlur={this.onChange} defaultValue={this.props.data.value}/>
                 </Common.Row>
             );
         },
