@@ -54,6 +54,8 @@ class FCom_Core_Model_Abstract extends BModel
 
     static protected $_importExportProfile;
 
+    protected $_readOnly = false;
+
     /**
      * Get custom data from serialized field
      *
@@ -127,9 +129,19 @@ class FCom_Core_Model_Abstract extends BModel
         }
     }
 
+    public function setReadOnly($flag = true)
+    {
+        $this->_readOnly = $flag;
+        return $this;
+    }
+
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
+
+        if ($this->_readOnly) {
+            return false;
+        }
 
         foreach (static::$_dataFieldsMap as $k => $v) {
             if (is_numeric($k)) {

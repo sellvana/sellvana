@@ -5,7 +5,7 @@
  * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
  * @project sellvana_core
  */
-class FCom_Promo_Model_Coupon extends BModel
+class FCom_Promo_Model_PromoCoupon extends BModel
 {
     static protected $_origClass = __CLASS__;
     protected $_table = 'fcom_promo_coupon';

@@ -5,7 +5,7 @@
  *
  * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
- * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
+ * @property FCom_Promo_Model_PromoCart $FCom_Promo_Model_PromoCart
  * @property FCom_Sales_Main $FCom_Sales_Main
  */
 class FCom_ShippingFree_Main extends BClass
@@ -22,7 +22,7 @@ class FCom_ShippingFree_Main extends BClass
 
             $promoCart = $this->FCom_Promo_Model_Promo->orm('p')
                                                ->where('p.get_type', FCom_ShippingPlain_ShippingMethod::FREE_SHIPPING)
-                                               ->join($this->FCom_Promo_Model_Cart->table(), 'pc.promo_id=p.id', 'pc')
+                                               ->join($this->FCom_Promo_Model_PromoCart->table(), 'pc.promo_id=p.id', 'pc')
                                                ->where('pc.cart_id', $cart->id())
                                                ->find_one();
             if ($promoCart) {
