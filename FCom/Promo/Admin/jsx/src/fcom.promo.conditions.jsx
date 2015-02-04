@@ -771,11 +771,15 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     var ConditionsCategories = React.createClass({
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
-            var values = this.props.data || {category_id: [], value: 0, type: 'qty', filter: 'gt', include: 'only_this'};
+            var values = this.props.data;
+            var categories = values.category_id;
+            if($.isArray(categories)) {
+                categories = categories.join(",");
+            }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" onChange={this.onChange} value={values.type}> of products in </ConditionsType>
-                    <input type="hidden" id="catProductsIds" ref="catProductsIds" defaultValue={values.category_id.join(",")}/>
+                    <input type="hidden" id="catProductsIds" ref="catProductsIds" defaultValue={categories}/>
                     <select id="catProductInclude" ref="catProductInclude" className="to-select2" defaultValue={values.include}>
                         <option value="only_this">{Locale._("Only This")}</option>
                         <option value="include_subcategories">{Locale._("This and sub categories")}</option>
