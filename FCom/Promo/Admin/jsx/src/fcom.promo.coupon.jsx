@@ -10,7 +10,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         {this.props.labelText}<Components.HelpIcon id={"help-" + this.props.id} content={this.props.helpText}/>
                     </Components.ControlLabel>
                     <div className="col-md-5">
-                        <input id={this.props.id} ref={this.props.name} className="form-control"/>
+                        <input id={this.props.id} ref={this.props.name} name={this.props.name} className="form-control"/>
                         <span className="help-block">{this.props.helpText}</span>
                     </div>
                 </div>
@@ -85,7 +85,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         <Components.Button onClick={this.props.onShowCodes} className="btn-primary" type="button">{this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel}</Components.Button>
                         <Components.Button onClick={this.props.onGenerateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
                         <Components.Button onClick={this.props.onImportCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
+                        <div className="form-group"><label className="col-md-5" for="total_per_customer">{Locale._("Total Uses Per Coupon Code")}</label>
+                            <div className="col-md-4"> <input type="number" className="form-control"
+                            step="1" min="0" id="total_per_customer" name="model[total_per_customer]" ref="total_per_customer"/></div>
+                        </div>
                     </div>
+
                 </div>
             );
         },
@@ -121,8 +126,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         {this.props.labelUpc}<Components.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
                     </Components.ControlLabel>
                     <div className="col-md-2">
-                        <input type="text" id={this.props.idUpc} ref="uses_pc" className="form-control"
-                            value={this.state.valueUpc}/>
+                        <input type="text" id={this.props.idUpc} ref="coupon_uses_per_customer" name="model[coupon_uses_per_customer]" className="form-control"
+                            defaultValue={this.state.valueUpc}/>
                     </div>
 
                     <Components.ControlLabel input_id={this.props.idUt}>
@@ -130,8 +135,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                     </Components.ControlLabel>
 
                     <div className="col-md-2">
-                        <input type="text" id={this.props.idUt} ref="uses_pc" className="form-control"
-                            value={this.state.valueUt}/>
+                        <input type="text" id={this.props.idUt} ref="coupon_uses_total" name="model[coupon_uses_total]" className="form-control"
+                            defaultValue={this.state.valueUt}/>
                     </div>
                 </div>
             );
