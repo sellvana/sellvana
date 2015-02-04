@@ -13,6 +13,7 @@
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_CustomField_Model_ProductVarfield $FCom_CustomField_Model_ProductVarfield
  * @property FCom_CustomField_Model_ProductVariantImage $FCom_CustomField_Model_ProductVariantImage
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  */
 class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
 {
@@ -179,6 +180,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         /** @var FCom_CustomField_Model_ProductVariant[] $variants */
         $variants = $this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $model->id())->find_many();
         $images = $this->FCom_CustomField_Model_ProductVariantImage->orm()->where('product_id', $model->id())->find_many();
+        $invSkus = [];
         if ($variants !== null) {
             foreach ($variants as $v) {
                 $fileIds = [];
@@ -196,6 +198,16 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $vField['variant_file_id'] = join(',', $fileIds);
                 $vField['id'] = $v->id();
                 $data[] = $vField;
+                if ($v->inventory_sku) {
+                    $invSkus[] = $vField['inventory_sku'];
+                }
+            }
+        }
+        $skus = $this->FCom_Catalog_Model_InventorySku->orm()
+            ->where_in('inventory_sku', $invSkus)->find_many_assoc('inventory_sku');
+        foreach ($data as $i => $v) {
+            if (!empty($skus[$v['inventory_sku']])) {
+                $data[$i]['variant_qty'] = $skus[$v['inventory_sku']]->qty_in_stock;
             }
         }
 
