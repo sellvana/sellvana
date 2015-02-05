@@ -85,7 +85,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             React.render(
                 <div className="modals-container">
                     <Components.Modal title="Coupon grid" onLoad={this.addShowCodes.bind(this)}/>
-                    <Components.Modal title="Generate coupons" onLoad={this.addGenerateCodes.bind(this)}>
+                    <Components.Modal title="Generate coupons" onLoad={this.addGenerateCodes.bind(this)} onConfirm={this.postGenerate.bind(this)}>
                         <CouponApp.GenerateForm onSubmit={this.postGenerate.bind(this)}/>
                     </Components.Modal>
                     <Components.Modal title="Import coupons" onLoad={this.addImportCodes.bind(this)}/>
@@ -177,13 +177,13 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         },
         postGenerate: function (e) {
             var $formContainer = $('#coupon-generate-container');
-            Promo.log(e, $formContainer);
+            //Promo.log(e, $formContainer);
             var url = this.options['generateCouponsUrl'];
             var $progress = $formContainer.find('.loading');
             var $result = $formContainer.find('.result').hide();
             $progress.show();
             //$button.click(function (e) {
-            e.preventDefault();
+
             var $meta = $('meta[name="csrf-token"]');
             var data = {};
             if($meta.length) {
@@ -216,10 +216,18 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 .always(function (r) {
                     $progress.hide();
                     $result.show();
+                    if ($.isFunction(e.close)) {
+                        // e is the modal object
+                        setTimeout(e.close, 2000);
+                        //e.close();//close it
+                    }
                     // hide notification
                     Promo.log(r);
                 });
             //});
+            if ($.isFunction(e.preventDefault)) {
+                e.preventDefault();
+            }
         },
         importCodes: function () {
             var modal = this.importCodesModal;

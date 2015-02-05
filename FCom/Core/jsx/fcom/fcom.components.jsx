@@ -196,7 +196,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         render: function () {
             return (
                 <a id={this.props.id} className="pull-right" href="#" ref="icon"
-                    data-toggle="popover" data-trigger="focus"
+                    data-toggle="popover" data-trigger="focus" tabIndex="-1"
                     data-content={this.props.content} data-container="body">
                     <span className="glyphicon glyphicon-question-sign"></span>
                 </a>
@@ -373,7 +373,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
                 label = (
                     <div className="control-label col-sm-3">
-                        <label for={column.name}>
+                        <label htmlFor={column.name}>
                             {column.label} {iconRequired}
                         </label>
                     </div>
@@ -384,7 +384,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             var input = '';
             if (typeof column.element_print != 'undefined') { //custom html for element_print
                 if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
-                    input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                    input = '<div class="control-label col-sm-3"><label htmlFor='+column.name+'>'+column.label+'</label></div>';
                 }
                 input += '<div class="controls col-sm-8">' + column.element_print + '</div>';
                 return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>

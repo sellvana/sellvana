@@ -4,7 +4,7 @@
 {% set promo = APP.instance('FCom_Promo_Model_Promo') %}
 {% set validator = THIS.get('validator') %}
 {% set labelClass = "col-md-3" %}
-{% set numCodes = 100 %}
+{% set numCodes = m.get('numCodes') %}
 {% set fromDate = validator.fieldValue('from_date') %}
 {% set toDate = validator.fieldValue('to_date') %}
 {% if fromDate and toDate %}
@@ -182,6 +182,8 @@
                     coupon_container_id: 'coupon-options',
                     condition_container_id: 'conditions-options',
                     actions_container_id: "actions-options",
+                    single_coupon_name: "{{ elView.getInputName({'field':'single_coupon_code'}) }}",
+                    single_coupon_code: "{{ validator.fieldValue("single_coupon_code") }}",
                     promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
                     showCouponsUrl: "{{ APP.href('promo/coupons/view')}}", // "/admin/promo/coupons/view?id=1",
                     generateCouponsUrl: "{{ APP.href('promo/coupons/generate')}}", // "/admin/promo/coupons/generate?id=1",
@@ -192,7 +194,7 @@
                     labelClass: '{{ labelClass }}',
                     debug: true,
                     base_url: "{{ APP.href('promo/') }}",
-                    buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "View no codes" }}'
+                    buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "No coupon codes" }}'
                 };
                 Promo.init(options);
             });

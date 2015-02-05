@@ -10,7 +10,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         {this.props.labelText}<Components.HelpIcon id={"help-" + this.props.id} content={this.props.helpText}/>
                     </Components.ControlLabel>
                     <div className="col-md-5">
-                        <input id={this.props.id} ref={this.props.name} name={this.props.name} className="form-control"/>
+                        <input id={this.props.id} ref={this.props.name} name={this.props.name} className="form-control" defaultValue={this.props.value}/>
                         <span className="help-block">{this.props.helpText}</span>
                     </div>
                 </div>
@@ -19,8 +19,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
         getDefaultProps: function () {
             // component default properties
             return {
-                id: "model-use_coupon_code_single",
-                name: "use_coupon_code_single",
+                id: "model-single_coupon_code",
+                name: "single_coupon_code",
                 helpText: Locale._("(Leave empty for auto-generate)"),
                 labelText: Locale._("Coupon Code")
             };
@@ -56,8 +56,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                             inputDivClass='col-md-8' label_class='col-md-4' inputValue="1" required/>
                         <div className={this.props.groupClass}>
                             <div className="col-md-offset-4">
-                                <Components.Button type="button" id="coupon-generate-btn" onClick={this.handleGenerateClick}
-                                    className="btn-danger btn-post">{Locale._("Generate")}</Components.Button>
                                 <span style={{display: 'none', marginLeft: 20}} className="loading">Loading ... </span>
                                 <span style={{display: 'none', marginLeft: 20}} className="result"></span>
                             </div>
@@ -85,7 +83,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         <Components.Button onClick={this.props.onShowCodes} className="btn-primary" type="button">{this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel}</Components.Button>
                         <Components.Button onClick={this.props.onGenerateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
                         <Components.Button onClick={this.props.onImportCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
-                        <div className="form-group"><label className="col-md-5" for="total_per_customer">{Locale._("Total Uses Per Coupon Code")}</label>
+                        <div className="form-group"><label className="col-md-5" htmlFor="total_per_customer">{Locale._("Total Uses Per Coupon Code")}</label>
                             <div className="col-md-4"> <input type="number" className="form-control"
                             step="1" min="0" id="total_per_customer" name="model[total_per_customer]" ref="total_per_customer"/></div>
                         </div>
@@ -177,7 +175,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
 
             if (this.state.mode == 1) {
                 child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
-                    <SingleCoupon key="single-coupon" options={this.props.options} labelClass={this.props.labelClass}/>];
+                    <SingleCoupon key="single-coupon" options={this.props.options} labelClass={this.props.labelClass}
+                        name={this.props.options.single_coupon_name} value={this.props.options.single_coupon_code}/>];
             } else if(this.state.mode == 2) {
                 var onShowCodes = this.onShowCodes ||'',
                     onGenerateCodes = this.onGenerateCodes ||'',
