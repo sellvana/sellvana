@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo.actions', 'jsx!fcom.promo.coupon', 'jsx!fcom.promo.conditions', 'store', 'select2'],
+define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo.actions', 'jsx!fcom.promo.coupon', 'jsx!fcom.promo.conditions', 'store', 'select2', 'jquery.bootstrap-growl'],
     function (React, $, Griddle, Components, Actions, CouponApp, ConditionsApp, store) {
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {minimumResultsForSearch: 15, dropdownAutoWidth: true});
     var Promo = {
@@ -199,6 +199,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 .done(function (result) {
                     var status = result.status;
                     var message = result.message;
+                    $.bootstrapGrowl(message, {type: 'success', align: 'center', width: 'auto'});
                     $result.text(message);
                     if (status != 'error') {
                         var newRows = result['codes'].map(function (e, i) {
