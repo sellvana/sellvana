@@ -172,7 +172,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
                         {this.props.label}
                     </FCom.Components.ControlLabel>
                     <div className={inputDivClass}>
-                        <input {...this.props}
+                        <input {...other}
                             id={inputId}
                             name={this.getInputName()}
                             className={className}
@@ -248,7 +248,10 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
 
     FCom.Components.Button = React.createClass({
         render: function () {
-            var { className, onClick, ...other } = this.props;
+            var className = this.props.className,
+                onClick = this.props.onClick,
+                other = _.omit(this.props, ['className', 'onClick']);
+
             return (
                 <button {...other} className={"btn " + className} onClick={onClick}>{this.props.children}</button>
             );
