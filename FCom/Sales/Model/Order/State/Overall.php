@@ -2,62 +2,89 @@
 
 class FCom_Sales_Model_Order_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
+    const PENDING = 'pending',
+        PLACED = 'placed',
+        REVIEW = 'review',
+        FRAUD = 'fraud',
+        LEGIT = 'legit',
+        PROCESSING = 'processing',
+        COMPLETE = 'complete',
+        CANCEL_REQUESTED = 'cancel_req',
+        CANCELED = 'canceled',
+        ARCHIVED = 'archived';
+
     protected $_valueLabels = [
-        'new' => 'New',
-        'review' => 'Under Review',
-        'fraud' => 'Fraud',
-        'legit' => 'Passed Verification',
-        'processing' => 'Processing',
-        'complete' => 'Complete',
-        'canceled' => 'Canceled',
-        'archived' => 'Archived',
+        self::PENDING => 'Pending',
+        self::PLACED => 'Placed',
+        self::REVIEW => 'Review',
+        self::FRAUD => 'Fraud',
+        self::LEGIT => 'Passed Verification',
+        self::PROCESSING => 'Processing',
+        self::COMPLETE => 'Complete',
+        self::CANCEL_REQUESTED => 'Cancel Requested',
+        self::CANCELED => 'Canceled',
+        self::ARCHIVED => 'Archived',
     ];
 
     protected $_setValueNotificationTemplates =[
-        'new' => 'email/sales/order-state-overall-new',
-        'review' => 'email/sales/order-state-overall-review',
-        'fraud' => 'email/sales/order-state-overall-fraud',
-        'legit' => 'email/sales/order-state-overall-legit',
-        'canceled' => 'email/sales/order-state-overall-canceled',
+        self::PLACED => [
+            'email/sales/order-state-overall-placed',
+            'email/sales/order-state-overall-placed-admin',
+        ],
+        self::REVIEW => 'email/sales/order-state-overall-review',
+        self::FRAUD => 'email/sales/order-state-overall-fraud',
+        self::LEGIT => 'email/sales/order-state-overall-legit',
+        self::CANCEL_REQUESTED => 'email/sales/order-state-overall-cancel_req-admin',
+        self::CANCELED => 'email/sales/order-state-overall-canceled',
     ];
 
-    public function setNew()
+    public function setPending()
     {
-        return $this->changeState('new');
+        return $this->changeState(self::PENDING);
+    }
+
+    public function setPlaced()
+    {
+        return $this->changeState(self::PLACED);
     }
 
     public function setReview()
     {
-        return $this->changeState('review');
+        return $this->changeState(self::REVIEW);
     }
 
     public function setLegit()
     {
-        return $this->changeState('legit');
+        return $this->changeState(self::LEGIT);
     }
 
     public function setFraud()
     {
-        return $this->changeState('fraud');
+        return $this->changeState(self::FRAUD);
     }
 
     public function setProcessing()
     {
-        return $this->changeState('processing');
+        return $this->changeState(self::PROCESSING);
     }
 
     public function setComplete()
     {
-        return $this->changeState('complete');
+        return $this->changeState(self::COMPLETE);
+    }
+
+    public function setCancelRequested()
+    {
+        return $this->changeState(self::CANCEL_REQUESTED);
     }
 
     public function setCanceled()
     {
-        return $this->changeState('canceled');
+        return $this->changeState(self::CANCELED);
     }
 
     public function setArchived()
     {
-        return $this->changeState('archived');
+        return $this->changeState(self::ARCHIVED);
     }
 }

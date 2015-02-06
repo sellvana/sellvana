@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_Auth
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
+
 class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 {
     public function authenticate($args = [])
@@ -11,21 +17,20 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
     {
         try {
             $r = $this->BRequest->post('login');
-            if (!empty($r['username']) && !empty($r['password'])) {
-                $user = $this->FCom_Admin_Model_User->authenticate($r['username'], $r['password']);
-                if ($user) {
-                    $this->BSession->regenerateId();
-                    $user->login();
-                    if (!empty($r['remember_me'])) {
-                        $days = $this->BConfig->get('cookie/remember_days');
-                        $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
-                    }
-                } else {
-                    $this->message('Invalid user name or password.', 'error');
-                }
-            } else {
-                $this->message('Username and password cannot be blank.', 'error');
+            if (empty($r['username']) || empty($r['password'])) {
+                throw new Exception($this->_('Username and password cannot be blank.'));
             }
+
+            $user = $this->FCom_Admin_Model_User->authenticate($r['username'], $r['password']);
+            if (!$user) {
+                throw new Exception($this->_('Invalid user name or password.'));
+            }
+            $user->login();
+            if (!empty($r['remember_me'])) {
+                $days = $this->BConfig->get('cookie/remember_days');
+                $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
+            }
+
             $url = $this->BSession->get('admin_login_orig_url');
         } catch (Exception $e) {
             $this->BDebug->logException($e);
@@ -122,7 +127,6 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         $sessData['password_reset_token'] = null;
 
         $user->resetPassword($password);
-        $this->BSession->regenerateId();
 
         $this->message('Password has been reset');
         $this->BResponse->redirect('');

@@ -6,6 +6,7 @@
  * @property FCom_AdminChat_Model_Chat $FCom_AdminChat_Model_Chat
  * @property FCom_AdminChat_Model_Participant $FCom_AdminChat_Model_Participant
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
 {
@@ -27,7 +28,6 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
      */
     public function signal_open()
     {
-
         //$this->_client->send($this->_message);
         $user = $this->FCom_Admin_Model_User->load($this->_message['user'], 'username');
         if (!$user) {
@@ -35,12 +35,11 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
             return;
         }
         $chat = $this->FCom_AdminChat_Model_Chat->openWithUser($user);
-        $participant = $this->FCom_AdminChat_Model_Participant->loadWhere([
-            'chat_id' => $chat->id(),
-            'user_id' => $this->FCom_Admin_Model_User->sessionUserId(),
-        ]);
-        if ($participant->get('status') !== 'open') {
-            $participant->set('status', 'open')->save();
+        $participants = $this->FCom_AdminChat_Model_Participant->orm()->where('chat_id', $chat->id())->find_many();
+        foreach ($participants as $participant) {
+            if ($participant->get('status') !== 'open') {
+                $participant->set('status', 'open')->save();
+            }
         }
         $channel = $chat->getChannel();
         $channel->send([

@@ -1,17 +1,24 @@
 modules:
     FCom_Promo:
-        version: 0.1.6
+        version: 0.1.9
         channel: beta
         require: { module: { FCom_Catalog: 0.1.0, FCom_Sales: 0.2.0 }}
         description: "Promotions module"
+
+        observe:
+            - [ FCom_Sales_Model_Cart_Total_Discount::calculate, FCom_Promo_Main.onCartDiscountCalculate ]
 
         areas:
             FCom_Admin:
                 auto_use: [ all ]
                 routing:
-                    - [ /promo, FCom_Promo_Admin_Controller.index ]
-                    - [ /promo/.action, FCom_Promo_Admin_Controller ]
+                    - [ "/promo", FCom_Promo_Admin_Controller.index ]
+                    - [ "/promo/coupons/view", FCom_Promo_Admin_Controller.coupons_grid ]
+                    - [ "/promo/coupons/generate", FCom_Promo_Admin_Controller.coupons_generate ]
+                    - [ "/promo/coupons/import", FCom_Promo_Admin_Controller.coupons_import ]
+                    - [ "/promo/.action", FCom_Promo_Admin_Controller ]
 
+                    - ["/promo/conditions/.action", FCom_Promo_Admin_Controller_Conditions]
                     - [ "/promo/form/:id/products", FCom_Promo_Admin_Controller.form_products ]
                     - [ "/promo/form/:id/group", FCom_Promo_Admin_Controller.form_group ]
 
@@ -19,6 +26,7 @@ modules:
                 auto_use: [ views, layout ]
                 routing:
                     - [ /promo/media, FCom_Promo_Frontend_Controller.media ]
+                    - [ /promo/add, FCom_Promo_Frontend_Controller.add ]
                 observe:
                     - [ "FCom_Sales_Model_Cart::calculateTotals", "FCom_Promo_Frontend::onPromoCartValidate" ]
                     - [ "FCom_Sales_Model_Cart::addProduct", "FCom_Promo_Frontend::onPromoCartAddProduct" ]

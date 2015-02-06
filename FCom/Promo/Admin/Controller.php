@@ -3,12 +3,15 @@
 /**
  * Class FCom_Promo_Admin_Controller
  *
- * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
- * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
- * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
- * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
- * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
- * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
+ * @property FCom_Promo_Model_Promo       $FCom_Promo_Model_Promo
+ * @property FCom_Promo_Model_PromoMedia  $FCom_Promo_Model_PromoMedia
+ * @property FCom_Promo_Model_Product     $FCom_Promo_Model_Product
+ * @property FCom_Promo_Model_Group       $FCom_Promo_Model_Group
+ * @property FCom_Catalog_Model_Category  $FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_Product   $FCom_Catalog_Model_Product
+ * @property FCom_Admin_View_Grid         $FCom_Admin_View_Grid
+ * @property FCom_Promo_Model_PromoCoupon $FCom_Promo_Model_PromoCoupon
+ *
  */
 class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -36,11 +39,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'from_date', 'label' => 'Start Date', 'index' => 'from_date', 'formatter' => 'date'],
             ['name' => 'to_date', 'label' => 'End Date', 'index' => 'to_date', 'formatter' => 'date'],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
-                'editable' => true, 'mass-editable' => true, 'editor' => 'select',
+                'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
                 'options' => $this->FCom_Promo_Model_Promo->fieldOptions('status')
             ],
             ['name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true],
-            ['name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'delete'],
@@ -67,9 +69,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         parent::gridOrmConfig($orm);
 
         //load attachments
-        $orm->select("(select group_concat(a.file_name separator ', ') from " .
-            $this->FCom_Promo_Model_Media->table() .
-            " pa inner join fcom_media_library a on a.id=pa.file_id where pa.promo_id=p.id)",
+        $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
+        $tPromoMedia = $this->FCom_Promo_Model_PromoMedia->table();
+        $orm->select("(select group_concat(a.file_name separator ', ')
+            from {$tPromoMedia} pa inner join {$tMediaLibrary} a on a.id=pa.file_id where pa.promo_id=p.id)",
             'attachments')
         ;
     }
@@ -80,18 +83,14 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
+        /** @var FCom_Promo_Model_Promo $m */
         $m = $args['model'];
-        /*
-        $actions = array('<input type="hidden" id="save_as" name="save_as" value=""/>');
-        if ($m->status==='template') {
-            $actions['save_as_new'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'copy\'); this.form.submit(); }"><span>Save as a New Promotion</span></button>';
-        } else {
-            $actions['save_as_tpl'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'template\'); this.form.submit(); }"><span>Save as a Template</span></button>';
+        $args['view']->title = $m->id() ? 'Edit Promo: ' . $m->description : 'Create New Promo';
+        if (!$m->id()) {
+            // todo initiate promo with status 'incomplete'
         }
-        $args['view']->actions = $this->BUtil->arrayMerge($args['view']->actions, $actions);
-        */
-        $args['view']->title = $m->id ? 'Edit Promo: ' . $m->description : 'Create New Promo';
     }
+/*
 
     /**
      * @param $view
@@ -102,10 +101,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
      */
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
-        if ($model && $model->id) {
-            $view->addTab("details", ['label' => $this->BLocale->_("Details"), 'pos' => 20, 'async' => true]);
-            $view->addTab("history", ['label' => $this->BLocale->_("History"), 'pos' => 40, 'async' => true]);
-        }
         return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
@@ -121,6 +116,18 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 case 'template': $args['data']['model']['status'] = 'template'; break;
             }
         }
+        if (!empty($args['data']['date_range'])) {
+            $dates = explode(" - ", $args['data']['date_range']);
+            $args['data']['from_date'] = trim($dates[0]);
+            if (!empty($dates[1])) {
+                $args['data']['to_date'] = trim($dates[1]);
+            }
+        }
+
+        if (!empty($args['data']['customer_group_ids']) && is_array($args['data']['customer_group_ids'])) {
+            $args['data']['customer_group_ids'] = implode(",", $args['data']['customer_group_ids']);
+        }
+
         if (!empty($args['data']['model'])) {
             $args['data']['model'] = $this->BLocale->parseRequestDates($args['data']['model'], 'from_date,to_date');
             $args['model']->set($args['data']['model']);
@@ -133,8 +140,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
-        $this->processGroupsPost($args['model'], $_POST);
-        $this->processMediaPost($args['model'], $_POST);
+        #$this->processGroupsPost($args['model'], $_POST);
+        #$this->processMediaPost($args['model'], $_POST);
     }
 
     /**
@@ -225,7 +232,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
      */
     public function processMediaPost($model, $data)
     {
-        $hlp = $this->FCom_Promo_Model_Media;
+        $hlp = $this->FCom_Promo_Model_PromoMedia;
         if (!empty($data['grid']['promo_attachments']['del'])) {
             $hlp->delete_many([
                 'promo_id' => $model->id,
@@ -262,7 +269,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $data = $this->FCom_Promo_Model_Product->orm()->table_alias('pp')
                 ->join('FCom_Catalog_Model_Product', ['p.id', '=', 'pp.product_id'], 'p')
                 ->select('pp.group_id')
-                ->select('p.id')->select('p.product_name')->select('p.local_sku')
+                ->select('p.id')->select('p.product_name')->select('p.product_sku')
                 ->where('promo_id', $model->id)->find_many();
             foreach ($data as $p) {
                 $groupData[$p->group_id][] = $p->as_array();
@@ -283,7 +290,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 40, 'hidden' => true],
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'product_name',
                 'width' => 450, 'addable' => true],
-            ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'local_sku', 'width' => 70],
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'product_sku', 'width' => 70],
         ];
         $actions = [
             'add'    => ['caption' => 'Add products'],
@@ -308,7 +315,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 //                'colModel'      => array(
 //                    array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>40, 'hidden'=>true),
 //                    array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
-//                    array('name'=>'local_sku', 'label'=>'Mfr Part #', 'index'=>'local_sku', 'width'=>70),
+//                    array('name'=>'product_sku', 'label'=>'Mfr Part #', 'index'=>'product_sku', 'width'=>70),
 //                ),
 //                'rowNum'        => 10,
 //                'sortname'      => 'p.product_name',
@@ -384,7 +391,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
      */
     public function onAttachmentsGridGetORM($args)
     {
-        $args['orm']->join('FCom_Promo_Model_Media', ['pa.file_id', '=', 'a.id',  ], 'pa')
+        $args['orm']->join('FCom_Promo_Model_PromoMedia', ['pa.file_id', '=', 'a.id',  ], 'pa')
             ->where_null('pa.promo_id')
             ->select(['pa.promo_status']);
     }
@@ -394,7 +401,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
      */
     public function onAttachmentsGridUpload($args)
     {
-        $hlp = $this->FCom_Promo_Model_Media;
+        $hlp = $this->FCom_Promo_Model_PromoMedia;
         $id = $args['model']->id;
         if (!$hlp->loadWhere(['promo_id' => null, 'file_id' => $id])) {
             $hlp->create(['file_id' => $id])->save();
@@ -408,7 +415,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function onAttachmentsGridEdit($args)
     {
         $r = $this->BRequest;
-        $this->FCom_Promo_Model_Media
+        $this->FCom_Promo_Model_PromoMedia
             ->loadWhere(['promo_id' => null, 'file_id' => $args['model']->id])
             ->set([
                 'promo_status' => $r->post('promo_status'),
@@ -427,7 +434,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 'id' => 'promo_attachments',
                 'caption' => 'Promotion Attachments',
                 'datatype' => 'local',
-                'data' => $this->BDb->many_as_array($model->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
+                'data' => $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->select('a.id')->select('a.file_name')->find_many()),
                 'colModel' => [
                     ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
@@ -441,5 +448,237 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ['navButtonAdd', 'caption' => 'Add', 'buttonicon' => 'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor' => 'pointer'],
             ['navButtonAdd', 'caption' => 'Remove', 'buttonicon' => 'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor' => 'pointer'],
         ];
+    }
+    public function action_coupons_grid_data__POST()
+    {
+        $this->_processGridDataPost('FCom_Promo_Model_PromoCoupon');
+    }
+
+    public function action_coupons_grid_data()
+    {
+        if ($this->BRequest->get('export')) {
+            if ($this->BRequest->csrf('referrer', 'GET')) {
+                $this->BResponse->status('403', 'Invalid referrer', 'Invalid referrer');
+                return;
+            }
+        } else {
+            if (!$this->BRequest->xhr()) {
+                $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+                return;
+            }
+        }
+        $view = $this->couponGridView();
+        $grid = $view->get('grid');
+        $mainTableAlias = 'pc';
+
+        if (isset($grid['config']['data']) && (!empty($grid['config']['data']))) {
+            $data = $grid['config']['data'];
+            $data = $this->gridDataAfter($data);
+            $this->BResponse->json([['c' => 1], $data]);
+        } else {
+            $r = $this->BRequest->get();
+            //TODO: clean up and remove
+            if (empty($grid['config']['orm'])) {
+                $grid['config']['orm'] = $this->FCom_Promo_Model_PromoCoupon->orm($mainTableAlias)
+                    ->select($mainTableAlias . '.*');
+                $view->set('grid', $grid);
+            }
+            if (isset($r['filters'])) {
+                $filters = $this->BUtil->fromJson($r['filters']);
+                if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
+                    $arr = explode(',', $filters['exclude_id']);
+                    $grid['config']['orm']->where_not_in($mainTableAlias . '.id', $arr);
+                }
+            }
+
+            $oc = $this->FCom_Promo_Model_PromoCoupon->origClass();
+            if ($this->BRequest->request('export')) {
+                $data = $view->generateOutputData(true);
+                $view->export($data['rows'], $oc);
+            } else {
+
+                //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
+                $data = $view->generateOutputData();
+                $data = $this->gridDataAfter($data);
+                $this->BResponse->json([
+                    ['c' => $data['state']['c']],
+                    $this->BDb->many_as_array($data['rows']),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @return FCom_Core_View_BackboneGrid
+     */
+    protected function couponGridView()
+    {
+        $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
+        $config = [
+            'id' => $this->getCouponGridId(),
+            'orm' => $this->FCom_Promo_Model_PromoCoupon->orm('pc'),
+            'data_url' => $gridDataUrl,
+            'edit_url' => $gridDataUrl,
+            'grid_url' => null,
+            'form_url' => null,
+            'columns' => [
+                ['type' => 'row_select', 'width'=>40],
+                ['name' => 'id', 'label' => 'ID', 'hidden' => true],
+                ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 400, 'sorttype' => 'string'],
+                ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number', 'width'=>40],
+                ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
+            ],
+            'actions' => [
+                'delete' => true,
+            ],
+            'filters' => [
+                ['field' => 'code', 'type' => 'text'],
+                ['field' => 'total_used', 'type' => 'number-range'],
+            ],
+            'grid_after_built' => 'couponsGridRegister'
+        ];
+        $view = $this->view($this->_gridViewName)->set('grid',['config' => $config]);
+        return $view;
+    }
+
+    public function action_coupons_grid()
+    {
+        $r = $this->BRequest;
+        //$id = $r->get('id');
+        //if(!$id){
+        //    $html = $this->_("Promotion id not found");
+        //    $status = 'error';
+        //    $this->BResponse->status(400, $html, false);
+        //} else {
+            $status = "success";
+            $html = $this->couponGridView()->render();
+        //}
+        $this->BResponse->json(['status' => $status, 'html' => $html]);
+    }
+
+    public function action_coupons_generate__POST()
+    {
+        $r = $this->BRequest;
+
+        //$id = $r->get('id');
+        $data = $r->post('model');
+
+        if (empty($data)) {
+            $status = "error";
+            $message = $this->_("No data received.");
+            $this->BResponse->status(400, $message, $message);
+        } else {
+            $pattern = isset($data['code_pattern'])? $data['code_pattern']: null;
+            $length = isset($data['code_length'])? $data['code_length']: 8;
+            $usesPerCustomer = isset($data['code_uses_per_customer'])? $data['code_uses_per_customer']: 1;
+            $usesTotal = isset($data['code_uses_total'])? $data['code_uses_total']: 1;
+            $couponCount = isset($data['coupon_count'])? $data['coupon_count']: 1;
+            $model = $this->FCom_Promo_Model_PromoCoupon;
+            $generated = $model->generateCoupons([
+                 //'promo_id' => $id,
+                 'pattern' => $pattern,
+                 'length' => $length,
+                 'uses_per_customer' => $usesPerCustomer,
+                 'uses_total' => $usesTotal,
+                 'count' => $couponCount
+             ]);
+            $status = 'success';
+            $message = $this->_("%d coupons generated.", $generated['generated']);
+            if ($generated['generated'] < $couponCount) {
+                $status = 'warning';
+                $message .= $this->_("\nFailed to generate %d coupons", $generated['failed']);
+            }
+        }
+        $result = ['status' => $status, 'message' => $message];
+        if (!empty($generated['codes'])) {
+            $result['codes'] = $generated['codes'];
+            $result['grid_id'] = $this->getCouponGridId();
+        }
+        $this->BResponse->json($result);
+    }
+
+    public function action_coupons_import__POST()
+    {
+        //$id = $this->BRequest->get('id');
+        if (empty($_FILES) || !isset($_FILES['upload'])) {
+            $this->BResponse->json(['msg' => "Nothing found"]);
+            return;
+        }
+        $this->BResponse->setContentType('application/json');
+        /** @var FCom_Promo_Model_PromoCoupon $importer */
+        $importer = $this->FCom_Promo_Model_PromoCoupon;
+        $uploads = $_FILES['upload'];
+        $rows = [];
+        try {
+            foreach ($uploads['name'] as $i => $fileName) {
+                if (!$fileName) {
+                    continue;
+                }
+                $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
+                $path = $this->BApp->storageRandomDir() . '/import/coupons';
+                $this->BUtil->ensureDir($path);
+                $fullFileName = $path . '/' . trim($fileName, '\\/');
+                $realPath = str_replace('\\', '/', realpath(dirname($fullFileName)));
+                $imported = 0;
+
+                $this->BUtil->ensureDir(dirname($fullFileName));
+                $fileSize = 0;
+                if (strpos($realPath, $path) !== 0) {
+                    $error = $this->_("Weird file path." . $realPath . '|' . $path);
+                } else if ($uploads['error'][$i]) {
+                    $error = $uploads['error'][$i];
+                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                    $error = $this->_("Problem storing uploaded file.");
+                } elseif ($importer->validateImportFile($fullFileName)) {
+                    $this->BResponse->startLongResponse(false);
+                    $imported = $importer->importFromFile($fullFileName);
+                    $error = '';
+                    $fileSize = $uploads['size'][$i];
+                } else {
+                    $error = $this->_("Invalid import file.");
+                }
+
+                $row = [
+                    'name' => $fileName,
+                    'size' => $fileSize,
+                    'folder' => '.../',
+                    'imported' => $imported
+                ];
+                if ($error) {
+                    $row['error'] = $error;
+                }
+                $rows[] = $row;
+            }
+        } catch(Exception $e) {
+            $this->BDebug->logException($e);
+            $this->BResponse->json(['error' => $e->getMessage()]);
+        }
+        $this->BResponse->json(['files' => $rows]);
+    }
+
+    public function action_coupons_import()
+    {
+        $r  = $this->BRequest;
+        //$id = $r->get('id');
+        $m  = [
+            'config' => ['max_import_file_size' => $this->_getMaxUploadSize(), 'id' => $this->getCouponGridId()],
+        ];
+
+        $status = "success";
+        $html   = $this->view('promo/coupons/import')->set('model', $m)->render();
+        $this->BResponse->json(['status' => $status, 'html' => $html]);
+    }
+
+    protected function _getMaxUploadSize()
+    {
+        $p = ini_get('post_max_size');
+        $u = ini_get('upload_max_filesize');
+        $max = min($p, $u);
+        return $max;
+    }
+
+    public function getCouponGridId()
+    {
+        return $this->FCom_Promo_Model_PromoCoupon->origClass() . '_grid';
     }
 }

@@ -241,6 +241,11 @@ class BLayout extends BClass
         return $this;
     }
 
+    /**
+     * @param string $rootDir
+     * @param BModule|null $curModule
+     * @return bool|mixed
+     */
     public function processRootDir($rootDir, $curModule = null)
     {
         if ($curModule && !$this->BUtil->isPathAbsolute($rootDir)) {
@@ -273,7 +278,7 @@ class BLayout extends BClass
         }
         $cacheKey = 'ALL_VIEWS-' . $area;
         $cacheConfig = $this->BConfig->get('core/cache/view_files');
-        $useCache = !$cacheConfig && $this->BDebug->is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
+        $useCache = !$cacheConfig && $this->BDebug->is(['STAGING', 'PRODUCTION']) || $cacheConfig === 'enable';
         if ($useCache) {
             $data = $this->BCache->load($cacheKey);
         }
@@ -390,7 +395,7 @@ class BLayout extends BClass
     /**
     * Get all views in this layout or filtered by pattern
     *
-    * @return array
+    * @return BView[]
     */
     public function getAllViews()
     {
@@ -661,10 +666,21 @@ class BLayout extends BClass
         }
         BDebug::debug('LAYOUT.LOAD: ' . $layoutFilename);
         switch ($ext) {
-            case 'yml': case 'yaml': $layoutData = $this->BYAML->load($layoutFilename); break;
-            case 'json': $layoutData = json_decode(file_get_contents($layoutFilename)); break;
-            case 'php': $layoutData = include($layoutFilename); break;
-            default: throw new BException('Unknown layout file type: ' . $layoutFilename);
+            case 'yml':
+            case 'yaml':
+                $layoutData = $this->BYAML->load($layoutFilename);
+                break;
+            case 'json':
+                $layoutData = $this->BUtil->fromJson(file_get_contents($layoutFilename));
+                break;
+            case 'php':
+                if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT']) && function_exists('opcache_invalidate')) {
+                    opcache_invalidate($layoutFilename);
+                }
+                $layoutData = include($layoutFilename);
+                break;
+            default:
+                throw new BException('Unknown layout file type: ' . $layoutFilename);
         }
         //$this->_layoutDataCache[$layoutFilename] = $layoutData;
         $this->addLayout($layoutData);
@@ -675,6 +691,7 @@ class BLayout extends BClass
     * Load layout update after theme has been initialized
     *
     * @param string $layoutFilename
+    * @param boolean $first
     * @return BLayout
     */
     public function loadLayoutAfterTheme($layoutFilename, $first = false)
@@ -704,7 +721,7 @@ class BLayout extends BClass
         $t = BDebug::debug(__METHOD__);
         $cacheKey = 'LAYOUTS-' . $this->BRequest->area(); //TODO: more flexible key
         $cacheConfig = $this->BConfig->get('core/cache/layout_files');
-        $useCache = !$cacheConfig && $this->BDebug->is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
+        $useCache = !$cacheConfig && $this->BDebug->is(['STAGING', 'PRODUCTION']) || $cacheConfig === 'enable';
         if ($useCache) {
             $data = $this->BCache->load($cacheKey);
         }
@@ -755,6 +772,17 @@ class BLayout extends BClass
     }
 
     /**
+     * Get raw layout instructions
+     *
+     * @param string $layoutName
+     * @return array
+     */
+    public function getLayout($layoutName)
+    {
+        return !empty($this->_layouts[$layoutName]) ? $this->_layouts[$layoutName] : [];
+    }
+
+    /**
      * @param $layoutName
      * @return $this
      */
@@ -783,12 +811,12 @@ class BLayout extends BClass
                 if (!empty($d[0])) {
                     $d['type'] = $d[0];
                 } else {
-                    foreach ($d as $k => $n) {
-                        if (!empty(static::$_metaDirectives[$k])) {
-                            $d['type'] = $k;
-                            $d['name'] = $n;
-                            break;
-                        }
+                    reset($d);
+                    $d['type'] = key($d);
+                    $d['name'] = current($d);
+                    if (empty(static::$_metaDirectives[$d['type']])) {
+                        BDebug::error('Unknown directive: ' . print_r($d, 1));
+                        continue;
                     }
                 }
                 if (empty($d['type'])) {
@@ -810,7 +838,7 @@ class BLayout extends BClass
 
             if ($d['type'] === 'remove') {
                 if ($d['name'] === 'ALL') { //TODO: allow removing specific instructions
-                    BDebug::debug('LAYOUT.REMOVE');
+                    BDebug::debug('LAYOUT.REMOVE ALL');
                     $callbacks = [];
                 }
             } else {
@@ -831,7 +859,7 @@ class BLayout extends BClass
      */
     public function metaDirectiveCallback($d)
     {
-        $this->BUtil->call($d['name'], $d);
+        $this->BUtil->call($d['name'], !empty($d['args']) ? $d['args'] : [], true);
     }
 
     /**
@@ -901,6 +929,10 @@ class BLayout extends BClass
      */
     public function metaDirectiveViewCallback($d)
     {
+        if (!empty($d['view_class'])) {
+            $this->addView($d['name'], ['view_class' => $d['view_class']]);
+        }
+
         $view = $this->getView($d['name']);
         if (!empty($d['set'])) {
             foreach ($d['set'] as $k => $v) {
@@ -1092,6 +1124,10 @@ class BLayout extends BClass
             foreach ($themeName as $n) {
                 $this->applyTheme($n);
             }
+            return $this;
+        }
+        if (empty($this->_themes[$themeName])) {
+            BDebug::error('Invalid theme supplied: ' . $themeName);
             return $this;
         }
         BDebug::debug('THEME.APPLY ' . $themeName);
@@ -1295,6 +1331,43 @@ class BLayout extends BClass
         echo "<pre>";
         print_r($this->_layouts);
         echo "</pre>";
+    }
+
+    /**
+     * Add all view dirs and layouts declared in module manifest
+     *
+     * @param BModule $module
+     * @param string $area
+     * @return $this
+     */
+    public function addModuleViewsDirsAndLayouts($module, $area)
+    {
+        $auto = array_flip((array)$module->auto_use);
+        $areaDir = str_replace('FCom_', '', $area);
+        $moduleRootDir = $module->root_dir;
+        if (isset($auto['all']) || isset($auto['views'])) {
+            if (is_dir($moduleRootDir . '/views')) {
+                $this->addAllViewsDir($moduleRootDir . '/views');
+            }
+            if (is_dir($moduleRootDir . '/' . $areaDir . '/views')) {
+                $this->addAllViewsDir($moduleRootDir . '/' . $areaDir . '/views');
+            }
+        }
+        if (isset($auto['all']) || isset($auto['layout'])) {
+            if (file_exists($moduleRootDir . '/layout.yml')) {
+                $this->loadLayoutAfterTheme($moduleRootDir . '/layout.yml');
+            }
+            if (file_exists($moduleRootDir . '/' . $areaDir . '/layout.yml')) {
+                $this->loadLayoutAfterTheme($moduleRootDir . '/' . $areaDir . '/layout.yml');
+            }
+        }
+        return $this;
+    }
+
+    public function addAllModuleLayouts($module, $area)
+    {
+
+        $areaDir = str_replace('FCom_', '', $area);
     }
 }
 
@@ -1629,13 +1702,16 @@ class BView extends BClass
             $this->_params['args'][$k] = $v;
         }
         if (($modName = $this->param('module_name'))) {
-            $this->BModuleRegistry->pushModule($modName);
+            //$this->BModuleRegistry->pushModule($modName);
         }
         $result = '';
         if (!$this->_beforeRender()) {
             BDebug::debug('BEFORE.RENDER failed');
             if ($debug) {
                 $result .= "<!-- FAILED VIEW: {$viewName} -->\n";
+            }
+            if ($modName) {
+                //$this->BModuleRegistry->popModule();
             }
             return $result;
         }
@@ -1670,7 +1746,7 @@ class BView extends BClass
 
         $this->_afterRender();
         if ($modName) {
-            $this->BModuleRegistry->popModule();
+            //$this->BModuleRegistry->popModule();
         }
 
         return $result;
@@ -2341,7 +2417,7 @@ if ($this->BDebug->is('DEBUG')) {
 #echo "<pre>"; print_r($this->_elements); echo "</pre>";
         }
 
-        if ($this->_headJs['enabled']) {
+        if (!empty($this->_headJs['enabled'])) {
             $basename = basename($name);
             if ($basename === 'head.js' || $basename === 'head.min.js' || $basename === 'head.load.min.js') {
                 $this->_headJs['loaded'] = $name;
@@ -2384,6 +2460,8 @@ if ($this->BDebug->is('DEBUG')) {
             if ($ts && file_exists($fsFile)) {
                 $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
             }
+        } elseif (!preg_match('#^(http|/)#', $file)) {
+            //echo ' ***** '; var_dump($file);
         }
         return $file;
     }
@@ -2406,13 +2484,13 @@ if ($this->BDebug->is('DEBUG')) {
         if (strpos($file, 'http:') === false && strpos($file, 'https:') === false && $file[0] !== '/') {
             $module  = !empty($args['module_name']) ? $this->BModuleRegistry->module($args['module_name']) : null;
             $baseUrl = $module ? $module->baseSrc() : $this->BApp->baseUrl();
-            $file    = $baseUrl . '/' . $file;
+            $file    = rtrim($baseUrl, '/') . '/' . $file;
         }
 
-        if ($type === 'js' && $this->_headJs['loaded'] && $this->_headJs['loaded'] !== $name
+        if ($type === 'js' && !empty($this->_headJs['loaded']) && $this->_headJs['loaded'] !== $name
             && empty($args['separate']) && empty($args['tag']) && empty($args['params']) && empty($args['if'])
         ) {
-            if (!$this->_headJs['jquery'] && strpos($name, 'jquery') !== false) {
+            if (empty($this->_headJs['jquery']) && strpos($name, 'jquery') !== false) {
                 $this->_headJs['jquery'] = $file;
             } else {
                 $this->_headJs['scripts'][] = $file;

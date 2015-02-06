@@ -10,10 +10,10 @@
     {{ gridConfig.caption | raw }}
 {% endif %}
 
-<div id="promo-group-type-{{ groupSuffix }}">
-    <label for="group-name-{{ groupSuffix }}">{{ "Group name" | _ }}</label>
-    <input id="group-name-{{ groupSuffix }}" type='text'
-           name='group[{{ groupId }}][group_name]' value='{{ gridConfig.group_name }}'>
+<div id="promo-group-type-{{ groupSuffix }}" class="form-group">
+    <label for="group-name-{{ groupSuffix }}" class="control-label col-md-2">{{ "Group name" | _ }}</label>
+    <div class="col-md-2"><input id="group-name-{{ groupSuffix }}" type='text'
+           name='group[{{ groupId }}][group_name]' value='{{ gridConfig.group_name }}' class="form-control"></div>
     <input type='hidden' name='group[{{ groupId }}][group_type]' value='{{ groupType }}'>
     <input type='hidden' name='_group_id' value='{{ groupId }}'>
     <input type='hidden' name='group[{{ groupId }}][product_ids_add]' id='product_ids_add-{{ groupSuffix }}'/>
@@ -23,9 +23,7 @@
                 onclick="return removeGroup('{{ gridConfig.config.id }}');">{{ "Remove" | _ }}</button>
     {% endif %}
 </div>
-
-
-
+<br/>
 <script>
 function removeGroup(el) {
     var grid = $(el);
@@ -46,7 +44,7 @@ require(['jquery','underscore','backbone'], function ($, _, Backbone) {
         $(mainGrid.getGridSkeleton().AddButton).click(function() {
             $('#btn-fieldset-grid-modal').trigger('click');
         });
-    }
+    };
     window.prodLibGridRegister = function(grid) {
         prodLibGrid = grid;
         grid.build();
@@ -55,7 +53,7 @@ require(['jquery','underscore','backbone'], function ($, _, Backbone) {
             prodLibGrid.getGridView().clearSelectedRows();
             $('.promo-prod-modal-close').trigger('click');
         });
-    }
+    };
 
     $('#promo-form').submit(function() {
         var addedIds = _.difference(mainGrid.getRows().pluck('id'), originIds);

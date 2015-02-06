@@ -25,6 +25,8 @@
  * DI
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
+ * @property FCom_Core_Model_ImportExport_Site $FCom_Core_Model_ImportExport_Site
  */
 class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 {
@@ -267,8 +269,9 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     {
         //after clone categories, add products associate
         $products = $this->products();
+        $tCategoryProduct = $this->FCom_Catalog_Model_CategoryProduct->table();
         if ($products) {
-            $sql = "INSERT INTO fcom_category_product (product_id, category_id) VALUES";
+            $sql = "INSERT INTO {$tCategoryProduct} (product_id, category_id) VALUES";
             foreach ($products as $product) {
                 /** @var FCom_Catalog_Model_Product */
                 $sql .= ' (' . $product->get('id') . ', ' . $cloneNode->id . '),';
@@ -306,12 +309,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $ids = array_keys($toUpdate);
         $importData = $this->FCom_Core_Model_ImportExport_Id->orm()
             ->join(
-              $this->FCom_Core_Model_ImportExport_Model->table(),
+              'FCom_Core_Model_ImportExport_Model',
               'iem.id=model_id and iem.model_name=\'' . $this->origClass() . '\'',
               'iem'
             )
-            ->where(['site_id' => $importSite->id()])
-            ->where(['local_id' => $ids])
+            ->where(['site_id' => $importSite->id(), 'local_id' => $ids], null)
             ->find_many();
 
         if (empty($importData)) {
@@ -340,12 +342,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         }
         $relatedData = $this->FCom_Core_Model_ImportExport_Id->orm()
             ->join(
-              $this->FCom_Core_Model_ImportExport_Model->table(),
+              'FCom_Core_Model_ImportExport_Model',
               'iem.id=model_id and iem.model_name=\'' . $this->origClass() . '\'',
               'iem'
             )
-            ->where(['site_id' => $importSite->id()])
-            ->where(['import_id' => array_keys($fetch)])
+            ->where(['site_id' => $importSite->id(), 'import_id' => array_keys($fetch)], null)
             ->find_many_assoc('import_id');
 
         foreach ($relations as $k => $v) {

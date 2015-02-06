@@ -753,6 +753,31 @@ class BLocale extends BClass
         $regionName = strtolower($regionName);
         return isset($regions[$regionName]) ? $regions[$regionName] : null;
     }
+    
+    public function postcodeRequired($country = null)
+    {
+        static $requiredFor = [
+            'DZ', 'AR', 'AM', 'AU', 'AT', 'AZ', 'A2', 'BD', 'BY', 'BE', 'BA', 'BR', 'BN', 'BG', 'CA', 'IC', 'CN', 'HR',
+            'CY', 'CZ', 'DK', 'EN', 'EE', 'FO', 'FI', 'FR', 'GE', 'DE', 'GR', 'GL', 'GU', 'GG', 'HO', 'HU', 'IN', 'ID',
+            'IL', 'IT', 'JP', 'JE', 'KZ', 'KR', 'KO', 'KG', 'LV', 'LI', 'LT', 'LU', 'MK', 'MG', 'M3', 'MY', 'MH', 'MQ',
+            'YT', 'MX', 'MN', 'ME', 'NL', 'NZ', 'NB', 'NO', 'PK', 'PH', 'PL', 'PO', 'PT', 'PR', 'RE', 'RU', 'SA', 'SF',
+            'CS', 'SG', 'SK', 'SI', 'ZA', 'ES', 'LK', 'NT', 'SX', 'UV', 'VL', 'SE', 'CH', 'TW', 'TJ', 'TH', 'TU', 'TN',
+            'TR', 'TM', 'VI', 'UA', 'GB', 'US', 'UY', 'UZ', 'VA', 'VN', 'WL', 'YA',
+        ];
+        if (is_null($country)) {
+            return $requiredFor;
+        }
+        return in_array($country, $requiredFor);
+    }
+
+    public function regionRequired($country = null)
+    {
+        static $requiredFor = ['US', 'CA', 'AU', 'CN', 'MX', 'MY', 'IT'];
+        if (is_null($country)) {
+            return $requiredFor;
+        }
+        return in_array($country, $requiredFor);
+    }
 
     public function setCurrentLanguage($lang)
     {
@@ -1140,6 +1165,12 @@ class BLocale extends BClass
 
     public function currency($value, $decimals = 2)
     {
-        return sprintf('%s%s', static::$_currencySymbol, number_format($value, $decimals));
+        return sprintf('%s%s', static::$_currencySymbol, $this->roundCurrency($value, $decimals));
+    }
+
+    public function roundCurrency($value, $decimals = 2)
+    {
+        //TODO: currency specific number of digits
+        return number_format($value, $decimals);
     }
 }

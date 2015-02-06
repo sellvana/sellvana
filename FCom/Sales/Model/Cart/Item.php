@@ -6,11 +6,13 @@
  * @property int $id
  * @property int $cart_id
  * @property int $product_id
- * @property string $local_sku
+ * @property string $product_sku
  * @property string $product_name
+ * @property string $inventory_sku
+ * @property string $inventory_id
  * @property float $qty
  * @property float $price
- * @property float $rowtotal
+ * @property float $row_total
  * @property float $tax
  * @property float $discount
  * @property int $promo_id_buy //todo: ??? why varchar in db
@@ -47,22 +49,27 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
      * @param null $variantId
      * @return mixed
      */
-    public function rowTotal($variantId = null)
+    public function calcRowTotal()
     {
-        $variants = $this->getData('variants');
-        if ($variants && !is_null($variantId)) {
-            $variant = $variants[$variantId];
-            return $variant['variant_price'] * $variant['variant_qty'];
-        }
-        return $this->get('row_total') ? $this->get('row_total') : $this->get('price') * $this->get('qty');
+        return $this->get('price') * $this->get('qty');
     }
 
     /**
      * @return bool
+     * @todo implement
      */
-    public function isGroupAble()
+    public function isGroupable()
     {
-        return  true;
+        return true;
+    }
+
+    /**
+     * @return bool
+     * @todo implement
+     */
+    public function isShippable()
+    {
+        return true;
     }
 
     /**
@@ -103,6 +110,11 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     {
         parent::onAfterLoad();
         $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
+    }
+
+    public function calcUniqueHash($signature)
+    {
+
     }
 }
 

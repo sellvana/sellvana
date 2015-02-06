@@ -669,6 +669,9 @@ class BConfig extends BClass
 
         switch ($ext) {
         case 'php':
+            if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT']) && function_exists('opcache_invalidate')) {
+                opcache_invalidate($filename);
+            }
             $config = include($filename);
             break;
 
@@ -1481,7 +1484,7 @@ class BClassDecorator
 
     public function __destruct()
     {
-        $this->_decoratedComponent = null;
+        unset($this->_decoratedComponent);
     }
 
     /**
@@ -1649,6 +1652,7 @@ class BClassAutoload extends BClass
                 }
                 if (file_exists($file)) {
                     include ($file);
+                    break;
                 }
             }
         }
@@ -2250,7 +2254,9 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
 
     public function regenerateId()
     {
+        $oldSessionId = session_id();
         @session_regenerate_id(true);
+        $this->BEvents->fire(__METHOD__, ['old_session_id' => $oldSessionId, 'session_id' => session_id()]);
         //$this->BSession->set('_regenerate_id', 1);
         //session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
         return $this;

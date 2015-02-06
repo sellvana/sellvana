@@ -2,6 +2,7 @@
 
 /**
  * Class FCom_Admin_View_Dashboard
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_Admin_View_Dashboard extends FCom_Admin_View_Abstract
 {

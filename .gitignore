@@ -17,3 +17,5 @@ index.local.php
 *.log
 *.sql
 composer.*
+notes.txt
+FCom/Test/Test/Unit/buckyball/com/db_test_config.php

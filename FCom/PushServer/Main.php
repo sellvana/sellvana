@@ -9,7 +9,7 @@
 class FCom_PushServer_Main extends BCLass
 {
     /**
-     * @var array
+     * @var FCom_PushServer_Service_Abstract[]
      */
     protected $_services = [];
 
@@ -24,7 +24,7 @@ class FCom_PushServer_Main extends BCLass
             //->addService('/^./', 'FCom_PushServer_Main::catchAll')
             ->addService('client', 'FCom_PushServer_Service_Client')
         ;
-        static::$_debug = true;
+        #static::$_debug = true;
     }
 
     /**
@@ -45,11 +45,17 @@ class FCom_PushServer_Main extends BCLass
      */
     public function layoutInit()
     {
+        /** @var FCom_Core_View_Head $head */
         $head = $this->BLayout->view('head');
-        if ($head && $this->FCom_Admin_Model_User->isLoggedIn()) {
-            $head->js_raw('pushserver_init', ['content' => "
+        /** @var FCom_Core_View_Text $script */
+        $script = $this->BLayout->view('head_script');
+
+        if ($this->FCom_Admin_Model_User->isLoggedIn()) {
+            $text = "
 FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
-            "]);
+";
+            $head->js_raw('pushserver_init', $text);
+            $script->addText('FCom_PushServer:init', $text);
         }
     }
 
@@ -61,6 +67,11 @@ FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
         $userId = $this->FCom_Admin_Model_User->sessionUserId();
         $this->FCom_PushServer_Model_Client->delete_many(['admin_user_id' => $userId]);
         //TODO: implement roster (online/offline) notifications
+    }
+
+    public function onRegenerateSessionId($args)
+    {
+        $this->FCom_PushServer_Model_Client->updateSessionId($args['old_session_id'], $args['session_id']);
     }
 
     /**

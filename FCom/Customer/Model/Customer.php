@@ -71,21 +71,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     protected $_addresses;
 
     /**
-     * @param bool  $new
-     * @param array $args
-     * @return FCom_Customer_Model_Customer
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return parent::i($new, $args);
-    }
-
-    /**
      * override default rules for login form
      */
-    public function setLoginRules()
+    public function getLoginRules()
     {
-        static::$_validationRules =  [
+        return [
             ['email', '@required'],
             ['password', '@required'],
             ['email', '@email'],
@@ -95,40 +85,42 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     /**
      * override default rules for password recover form
      */
-    public function setPasswordRecoverRules()
+    public function getPasswordRecoverRules()
     {
-        static::$_validationRules =  [
+        return [
             ['email', '@required'],
             ['email', '@email'],
         ];
     }
 
-    public function setAccountEditRules($incChangePassword = false)
+    public function getAccountEditRules($incChangePassword = false)
     {
-        static::$_validationRules = [
+        $rules = [
             ['email', '@required'],
             ['firstname', '@required'],
             ['lastname', '@required'],
         ];
 
         if ($incChangePassword) {
-            static::$_validationRules[] = ['password', '@required'];
-            static::$_validationRules[] = ['password_confirm', '@password_confirm'];
+            $rules[] = ['password', '@required'];
+            $rules[] = ['password_confirm', '@password_confirm'];
         }
+
+        return $rules;
     }
 
-    public function setChangePasswordRules()
+    public function getChangePasswordRules()
     {
-        static::$_validationRules = [
+        return [
             ['current_password', '@required'],
             ['password', '@required'],
             ['password_confirm', '@password_confirm'],
         ];
     }
 
-    public function setSimpleRegisterRules()
+    public function getSimpleRegisterRules()
     {
-        static::$_validationRules = [
+        return [
             ['email', '@required'],
             ['password', '@required'],
             ['password_confirm', '@password_confirm'],
@@ -189,6 +181,27 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $user;
     }
 
+    public function validateCustomerStatus()
+    {
+        $result = ['allow_login' => false];
+        $locale = $this->BLocale;
+        switch ($this->get('status')) {
+            case 'active':
+                $result['allow_login'] = true;
+                break;
+            case 'review':
+                $result['error']['message'] = $locale->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
+                break;
+            case 'disabled':
+                $result['error']['message'] = $locale->_('Your account is disabled. Please contact us for more details.');
+                break;
+            default:
+                $result['error']['message'] = $locale->_('Your account status have problem. Please contact us for more details.');
+                break;
+        }
+        return $result;
+    }
+
     /**
      * @param $password
      * @return $this
@@ -196,6 +209,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function resetPassword($password)
     {
+        $this->BSession->regenerateId();
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
         $this->BLayout->view('email/customer-password-reset')->set('customer', $this)->email();
         return $this;
@@ -340,6 +354,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             }
             $userId = $sessData['customer_id'];
             $user = static::$_sessionUser = $this->load($userId);
+            if (!$user) {
+                $sessData['customer_id'] = null;
+                return false;
+            }
             $token = $user->get('password_session_token');
             if (!$token) {
                 $token = $this->BUtil->randomString(16);
@@ -396,6 +414,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $this->set('last_login', $this->BDb->now())->save();
 
+        $this->BSession->regenerateId();
         $this->BSession->set('customer_id', $this->id());
         static::$_sessionUser = $this;
         if ($this->locale) {
@@ -535,11 +554,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function setDefaultAddress($address, $atype = null)
     {
         $addrHlp = $this->FCom_Customer_Model_Address;
-        if (is_object($address)) {
-            $addressId = $address->id();
-        } elseif (is_numeric($address)) {
-            $addressId = $address;
-            $address = $addrHlp->load($addressId);
+        if (is_numeric($address)) {
+            $address = $addrHlp->load($address);
         }
         /** @var FCom_Customer_Model_Address $address */
         if ($atype === 'billing' || $atype === true) {
@@ -549,16 +565,16 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $address->set('is_default_shipping', 1);
         }
         $resetUpdate = [];
-        if ($address->is_default_billing) {
+        if ($address->get('is_default_billing')) {
             $resetUpdate['is_default_billing'] = 0;
-            $this->set('default_billing_id', $addressId);
+            $this->set('default_billing_id', $address->id());
         }
-        if ($address->is_default_shipping) {
+        if ($address->get('is_default_shipping')) {
             $resetUpdate['is_default_shipping'] = 0;
-            $this->set('default_shipping_id', $addressId);
+            $this->set('default_shipping_id', $address->id());
         }
         if ($resetUpdate) {
-            $addrHlp->update_many($resetUpdate, ['customer_id' => $this->id(), 'NOT' => ['id' => $addressId]]);
+            $addrHlp->update_many($resetUpdate, ['customer_id' => $this->id(), 'NOT' => ['id' => $address->id()]]);
         }
         $this->save();
         $address->save();
@@ -566,11 +582,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function addAddress($data)
+    public function addAddress($data, $atype = null)
     {
         $data['customer_id'] = $this->id();
-        $address = $this->FCom_Customer_Model_Address->create($data);
-        $this->setDefaultAddress($address);
+        $address = $this->FCom_Customer_Model_Address->create($data)->save();
+        $this->setDefaultAddress($address, $atype);
         return $address;
     }
 
@@ -656,7 +672,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             if ($orders) {
                 $cntOrders = count($orders);
                 foreach ($orders as $order) {
-                    $statistics['lifetime'] += $order->grandtotal;
+                    $statistics['lifetime'] += $order->grand_total;
                 }
                 $statistics['avg'] = $statistics['lifetime'] / $cntOrders;
             }

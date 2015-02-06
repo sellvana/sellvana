@@ -2,48 +2,70 @@
 
 class FCom_Sales_Model_Order_State_Payment extends FCom_Core_Model_Abstract_State_Concrete
 {
-    protected $_valueLabels = [
-        'new' => 'New',
-        'free' => 'Free',
-        'processing' => 'Processing',
-        'partial' => 'Partial',
-        'paid' => 'Paid',
-        'outstanding' => 'Outstanding',
-        'canceled' => 'Canceled',
-    ];
+    const FREE = 'free',
+        UNPAID = 'unpaid',
+        PROCESSING = 'processing',
+        PARTIAL_PAID = 'partial_paid',
+        PAID = 'paid',
+        OUTSTANDING = 'outstanding',
+        CANCELED = 'canceled',
+        PARTIAL_REFUNDED = 'partial_refunded',
+        REFUNDED = 'refunded';
 
-    public function setNew()
-    {
-        return $this->changeState('new');
-    }
+    protected $_valueLabels = [
+        self::FREE => 'Free',
+        self::UNPAID => 'Unpaid',
+        self::PROCESSING => 'Processing',
+        self::PARTIAL_PAID => 'Partial Paid',
+        self::PAID => 'Paid',
+        self::OUTSTANDING => 'Outstanding',
+        self::CANCELED => 'Canceled',
+        self::PARTIAL_REFUNDED => 'Partial Refunded',
+        self::REFUNDED => 'Refunded',
+    ];
 
     public function setFree()
     {
-        return $this->changeState('free');
+        return $this->changeState(self::FREE);
+    }
+
+    public function setUnpaid()
+    {
+        return $this->changeState(self::UNPAID);
     }
 
     public function setProcessing()
     {
-        return $this->changeState('processing');
+        return $this->changeState(self::PROCESSING);
     }
 
-    public function setPartial()
+    public function setPartialPaid()
     {
-        return $this->changeState('partial');
+        return $this->changeState(self::PARTIAL_PAID);
     }
 
     public function setPaid()
     {
-        return $this->changeState('paid');
+        return $this->changeState(self::PAID);
     }
 
     public function setOutstanding()
     {
-        return $this->changeState('outstanding');
+        return $this->changeState(self::OUTSTANDING);
     }
 
     public function setCanceled()
     {
-        return $this->changeState('canceled');
+        return $this->changeState(self::CANCELED);
+    }
+
+    public function setPartialRefunded()
+    {
+        return $this->changeState(self::PARTIAL_REFUNDED);
+    }
+
+    public function setRefunded()
+    {
+        return $this->changeState(self::REFUNDED);
     }
 }

@@ -53,8 +53,8 @@ base:
         do:
             - [ addShortcut, system/users, { label: New User, href: /users/form } ]
 
-    - { callback: "FCom_Core_Main::defaultThemeCustomLayout" }
-    - { callback: "FCom_Admin_Admin::layout" }
+    - { callback: FCom_Core_Main.defaultThemeCustomLayout }
+    - { callback: FCom_Admin_Admin.layout }
 
 
 common_js_libs:
@@ -94,6 +94,11 @@ common_js_libs:
 
             - [ requireJs, fcom.core, "@FCom_Core/js/fcom.core" ]
             - [ requireJs, fcom.backbonegrid, "@FCom_Core/js/fcom/fcom.backbonegrid" ]
+
+            - [ requireJs, fcom.griddle, @FCom_Core/jsx/fcom/fcom.griddle, { deps : [ react, griddle ]} ]
+            - [ requireJs, griddle.fcomGridBody, @FCom_Core/jsx/fcom/fcom.gridBody, { deps : [ react, griddle ]} ]
+            - [ requireJs, griddle.fcomGridFilter, @FCom_Core/jsx/fcom/fcom.gridFilter, { deps : [ react, griddle ]} ]
+            - [ requireJs, griddle.fcomRow, @FCom_Core/jsx/fcom/fcom.row, { deps : [ react, griddle ]} ]
 
 lib_admin_theme1:
     - view: head
@@ -157,8 +162,10 @@ lib_admin_theme1:
             - [ requireJs, timeago, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/timeago/jquery.timeago", { deps: [ jquery ] } ]
             - [ requireJs, typeahead, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/typeahead/typeahead", { deps: [ jquery ] } ]
             - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/validate/jquery.validate.min", { deps: [ jquery ] } ]
+#            - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/validate/jquery.validate", { deps: [ jquery ] } ]
 
             - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.min.js", { alias: jquery } ]
+#            - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.js", { alias: jquery } ]
             - [ requireJs, jquery-mobile, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.mobile.custom.min", { deps: [ jquery ] } ]
             #- [ requireJs, jquery-ui, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-ui.min", { deps: [ jquery ] } ]
             - [ requireJs, jquery-migrate, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-migrate.min", { deps: [ jquery ] } ]

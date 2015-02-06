@@ -55,7 +55,9 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         }
         $sessData =& $this->BSession->dataToUpdate();
         if (!empty($sessData['pushserver']['channels'][$channelName])) {
-            static::$_channelCache[$channelName] = $this->create($sessData['pushserver']['channels'][$channelName], false);
+            $data = $sessData['pushserver']['channels'][$channelName];
+            $data['from_session_cache'] = true;
+            static::$_channelCache[$channelName] = $this->create($data, false);
             return static::$_channelCache[$channelName];
         }
         $channel = $this->load($channelName, 'channel_name');
@@ -130,6 +132,9 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
             $message['channel'] = $this->channel_name;
         }
 
+        if ($this->get('from_session_cache') && !$this->load($this->id())) {
+            $this->resave();
+        }
 
         if ($this->FCom_PushServer_Main->isDebugMode()) {
             $this->BDebug->log("SEND1: " . print_r($message, 1));

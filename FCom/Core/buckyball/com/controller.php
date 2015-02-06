@@ -1055,6 +1055,14 @@ class BRequest extends BClass
                     }
                     if ('*' !== $tags) {
                         $v = strip_tags($v, $tags);
+
+                        $v = preg_replace('/
+                            < [a-z:-]+ \s .*? (
+                                [a-z]+ \s* = \s* [\'"] \s* javascript \s* :   # src="javascript:..."
+                                |
+                                on[a-z]+ \s* = \s*   # onerror="..." onclick="..." onhover="..."
+                            ) .*? >
+                        /ix', '', $v);
                     }
                 }
             }
@@ -1226,17 +1234,17 @@ class BResponse extends BClass
         return $this;
     }
 
-    public function header($header, $replace = true)
+    public function header($header, $replace = true, $httpResponseCode = null)
     {
         if (headers_sent($file, $line)) {
             $this->BDebug->notice("Can't send header: '" . print_r($header, 1) . "', output started in {$file}:{$line}");
             return $this;
         }
         if (is_string($header)) {
-            header($header, $replace);
+            header($header, $replace, $httpResponseCode);
         } elseif (is_array($header)) {
             foreach ($header as $h) {
-                header($h, $replace);
+                header($h, $replace, $httpResponseCode);
             }
         }
         return $this;
@@ -1309,7 +1317,6 @@ class BResponse extends BClass
      * @param        $source
      * @param null   $fileName
      * @param string $disposition
-     * @internal param string $filename
      * @return exit
      */
     public function sendFile($source, $fileName = null, $disposition = 'attachment')
@@ -1470,7 +1477,7 @@ class BResponse extends BClass
         } elseif (!$this->BUtil->isUrlFull($url)) {
             $url = $this->BApp->href($url);
         }
-        header("Location: {$url}", null, $status);
+        $this->header("Location: {$url}", true, $status);
         $this->shutdown(__METHOD__);
     }
 
@@ -1577,7 +1584,7 @@ class BRouting extends BClass
     /**
     * Array of routes
     *
-    * @var array
+    * @var BRouteNode[]
     */
     protected $_routes = [];
 
@@ -2012,7 +2019,7 @@ class BRouteNode extends BClass
     /**
     * Route Observers
     *
-    * @var array(BRouteObserver)
+    * @var BRouteObserver[]
     */
     protected $_observers = [];
 
@@ -2288,7 +2295,7 @@ class BRouteObserver extends BClass
         }
 #var_dump($controllerName, $actionName);
         /** @var BActionController */
-        $controller = BClassRegistry::instance($controllerName, [], true);
+        $controller = $this->BClassRegistry->instance($controllerName, [], true);
 
         return $controller->dispatch($actionName, $this->args);
     }
@@ -2401,7 +2408,7 @@ class BActionController extends BClass
             return $this;
         }
         $actionMethod = $this->_actionMethodPrefix . $actionName;
-        $reqMethod = $this->BRequest->method();
+        $reqMethod = !empty($args['method']) ? $args['method'] : $this->BRequest->method();
         if ($reqMethod !== 'GET') {
             $tmpMethod = $actionMethod . '__' . $reqMethod;
             if (method_exists($this, $tmpMethod)) {

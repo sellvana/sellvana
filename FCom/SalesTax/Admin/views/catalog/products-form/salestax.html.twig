@@ -1,0 +1,16 @@
+<!--{ label: Sales Tax }-->
+<!--{ pos: 90 }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% set fieldData = { validator:validator } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set allTaxClasses = APP.instance('FCom_SalesTax_Model_ProductClass').getAllTaxClasses() %}
+{% set taxClassIds = APP.instance('FCom_SalesTax_Model_ProductTax').getProductTaxClassIds(m) %}
+
+<fieldset name="main-product">
+    <div class="f-section">
+        {{ forms.select(fieldData, {field:'tax_class_ids', label:'Tax Classes'|_, select2: true, multiple: true,
+                                    options: allTaxClasses, value:taxClassIds}) }}
+    </div>
+</fieldset>

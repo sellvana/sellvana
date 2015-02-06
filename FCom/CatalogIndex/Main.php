@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CatalogIndex_Main
+ *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_CatalogIndex_Indexer $FCom_CatalogIndex_Indexer
+ * @property FCom_CatalogIndex_Model_Doc $FCom_CatalogIndex_Model_Doc
+ * @property FCom_CatalogIndex_Model_Field $FCom_CatalogIndex_Model_Field
+ */
+
 class FCom_CatalogIndex_Main extends BClass
 {
     protected static $_autoReindex = true;

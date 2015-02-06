@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Admin_Controller_Carts
+ *
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ */
+
 class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -36,13 +42,13 @@ class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_G
             ['name' => 'grand_total', 'label' => 'Grand Total'],
             ['name' => 'shipping_method', 'label' => 'Shipping Method'],
             ['name' => 'payment_method', 'label' => 'Payment Method'],
-            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'editor' => 'select', 'editable' => true,
-                  'options' => $this->FCom_Sales_Model_Cart->fieldOptions('status')],
+            ['type' => 'input', 'name' => 'state_overall', 'label' => 'Status', 'editor' => 'select', 'editable' => true,
+                  'options' => $this->FCom_Sales_Model_Cart->fieldOptions('state_overall')],
             ['name' => 'create_at', 'label' => 'Created'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
-            ['field' => 'grandtotal', 'type' => 'number-range'],
+            ['field' => 'grand_total', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
         $config['orm'] = $config['orm']->where('customer_id', $customer->id);

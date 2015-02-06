@@ -5,32 +5,7 @@
  */
 class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
-    /**
-     * @var
-     */
-    protected $_cart;
-    /**
-     * @var
-     */
-    protected $_order;
-
-    /**
-     * construct
-     */
-    function __construct()
-    {
-        $this->_name = 'Check / Money Order';
-    }
-
-    /**
-     * @param $cart
-     * @return $this
-     */
-    public function initCart($cart)
-    {
-        $this->_cart = $cart;
-        return $this;
-    }
+    protected $_name = 'Check / Money Order';
 
     /**
      * @return BLayout|BView
@@ -41,27 +16,22 @@ class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     }
 
     /**
-     * @return $this
+     * @param FCom_Sales_Model_Order_Payment $payment
+     * @return array|mixed
      */
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
-        $this->authorize();
-        return $this;
-    }
+        // if using external checkout like paypal
+        // $this->FCom_Sales_Main->workflowAction('customerStartsExternalPayment', ['payment' => $this->_payment]);
 
-    /**
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
+        // call this when returning from external checkout
+        // $this->FCom_Sales_Main->workflowAction('customerReturnsFromExternalPayment', ['payment' => $payment]);
 
-    /**
-     * @return bool
-     */
-    public function capture()
-    {
-        return true;
+        $payment->state()->overall()->setPending();
+        $payment->save();
+
+        $result = [];
+
+        return $result;
     }
 }

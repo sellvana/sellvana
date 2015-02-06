@@ -89,7 +89,7 @@ class FCom_IndexTank_Search extends BClass
 
 
         $productsData = $this->FCom_IndexTank_Index_Product->paginate($productsORM, $r,
-                ['ps' => 25, 'c' => $this->FCom_IndexTank_Index_Product->totalFound()]);
+            ['ps' => 25, 'c' => $this->FCom_IndexTank_Index_Product->totalFound()]);
 
         //get all facets exclude categories
         $facetsData = $this->FCom_IndexTank_Index_Product->collectFacets($facets);
@@ -128,17 +128,5 @@ class FCom_IndexTank_Search extends BClass
             return $this->BConfig->get('modules/FCom_IndexTank/index_name');
         }
         return '';
-    }
-
-    /**
-     * Shortcut to help with IDE autocompletion
-     *
-     * @param bool $new
-     * @param array $args
-     * @return FCom_IndexTank_Search
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 }

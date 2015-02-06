@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Tests_Model_AddressTest
+ *
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
+
 class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()

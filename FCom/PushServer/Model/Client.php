@@ -19,6 +19,7 @@
  * @property FCom_PushServer_Model_Message $FCom_PushServer_Model_Message
  * @property FCom_PushServer_Model_Subscriber $FCom_PushServer_Model_Subscriber
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 {
@@ -30,7 +31,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     static protected $_connId;
 
     /**
-     * @var array
+     * @var FCom_PushServer_Model_Message[]
      */
     protected $_messages = [];
 
@@ -76,6 +77,23 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         static::$_clientCache[$sessId] = $client;
         static::$_clientCache[$client->id()] = $client;
         return $client;
+    }
+
+    public function updateSessionId($fromSessionId, $toSessionId)
+    {
+        if (!empty(static::$_clientCache[$fromSessionId])) {
+            $client = static::$_clientCache[$fromSessionId];
+        } else {
+            $client = $this->load($fromSessionId, 'session_id');
+            if (!$client) {
+                return $this;
+            }
+        }
+        unset(static::$_clientCache[$fromSessionId]);
+        $client->set('session_id', $toSessionId)->save();
+        static::$_clientCache[$toSessionId] = $client;
+        static::$_clientCache[$client->id()] = $client;
+        return $this;
     }
 
     /**
@@ -295,6 +313,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $timeout = $this->BConfig->get('modules/FCom_PushServer/poll_timeout', 50);
         $start = time();
         $this->_messages = $this->sync();
+        if ($this->_messages) {
+            return $this;
+        }
         while (true) {
             if (time() - $start > $timeout) { // timeout for connection to counteract default gateway timeouts
                 break;
@@ -318,15 +339,22 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function sync()
     {
         $msgHlp = $this->FCom_PushServer_Model_Message;
-        $where = ['client_id' => $this->get('id'), 'window_name' => (string)static::$_windowName, 'status' => 'published'];
+        $where = ['client_id' => $this->id(), 'window_name' => (string)static::$_windowName, 'status' => 'published'];
         $msgHlp->update_many(['status' => 'locked'], $where);
         $where['status'] = 'locked';
         $messageModels = $msgHlp->orm('m')->where($where)->find_many_assoc();
         $messages = [];
+
+        $logId = static::$_windowName . '!' . static::$_connId;
+
+        if (sizeof($messageModels) && $this->FCom_PushServer_Main->isDebugMode()) {
+            $this->BDebug->log("{$logId} SYNC START: " . sizeof($messageModels) . ' ' . print_r($where, 1));
+        }
+
         foreach ($messageModels as $msg) {
 
             if ($this->FCom_PushServer_Main->isDebugMode()) {
-                $this->BDebug->log("SYNC: " . print_r($msg->as_array(), 1));
+                #$this->BDebug->log("SYNC MSG: " . print_r($msg->as_array(), 1));
             }
 
             //$msg->set('status', 'sent')->save();
@@ -337,6 +365,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             //     $msg->delete();
             // }
         }
+        #$msgHlp->update_many(['status' => 'archived'], $where);
         $msgHlp->delete_many($where);
 
         $this->fetchCustomData();
@@ -346,6 +375,11 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             unset($connections[static::$_connId]);
             $this->setData($connKey, $connections);
             if (!$messages) {
+
+                if ($this->FCom_PushServer_Main->isDebugMode()) {
+                    $this->BDebug->log("{$logId} SYNC EMPTY: " . print_r($connections, 1));
+                }
+
                 $messages[] = ['channel' => 'client', 'signal' => 'noop'];
             }
         }
@@ -356,6 +390,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         //     }
         // }
 
+        if ($messages && $this->FCom_PushServer_Main->isDebugMode()) {
+            $this->BDebug->log("{$logId} SYNC END: " . print_r($messages, 1));
+        }
+#debug_print_backtrace(); var_dump($messages);
         return $messages;
     }
 
@@ -417,6 +455,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         if (null === $channel) {
             $channel = $this->getChannel();
+        }
+        if ($this->FCom_PushServer_Main->isDebugMode()) {
+            $this->BDebug->log("SUBSCRIBE: " . print_r($channel->get('channel_name'), 1));
         }
         $isSessionClient = $this->session_id === $this->BSession->sessionId();
         if (!is_object($channel)) {

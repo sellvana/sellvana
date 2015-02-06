@@ -2,6 +2,12 @@
 
 class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Context
 {
+    const OVERALL = 'overall',
+        DELIVERY = 'delivery',
+        PAYMENT = 'payment',
+        COMMENT = 'comment',
+        CUSTOM = 'custom';
+
     /**
      * Order linked
      *
@@ -15,46 +21,56 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
      * @var array
      */
     static protected $_defaultStateClasses = [
-        'overall' => 'FCom_Sales_Model_Order_State_Overall',
-        'delivery' => 'FCom_Sales_Model_Order_State_Delivery',
-        'payment' => 'FCom_Sales_Model_Order_State_Payment',
-        'custom' => 'FCom_Sales_Model_Order_State_Custom',
+        self::OVERALL => 'FCom_Sales_Model_Order_State_Overall',
+        self::DELIVERY => 'FCom_Sales_Model_Order_State_Delivery',
+        self::PAYMENT => 'FCom_Sales_Model_Order_State_Payment',
+        self::COMMENT => 'FCom_Sales_Model_Order_State_Comment',
+        self::CUSTOM => 'FCom_Sales_Model_Order_State_Custom',
     ];
 
     /**
-     * @return mixed
+     * @return FCom_Sales_Model_Order_State_Overall
      * @throws BException
      */
     public function overall()
     {
-        return $this->_getStateObject('overall');
+        return $this->_getStateObject(self::OVERALL);
     }
 
     /**
-     * @return mixed
+     * @return FCom_Sales_Model_Order_State_Delivery
      * @throws BException
      */
     public function delivery()
     {
-        return $this->_getStateObject('delivery');
+        return $this->_getStateObject(self::DELIVERY);
     }
 
     /**
-     * @return mixed
+     * @return FCom_Sales_Model_Order_State_Payment
      * @throws BException
      */
     public function payment()
     {
-        return $this->_getStateObject('payment');
+        return $this->_getStateObject(self::PAYMENT);
     }
 
     /**
-     * @return mixed
+     * @return FCom_Sales_Model_Order_State_Comment
+     * @throws BException
+     */
+    public function comment()
+    {
+        return $this->_getStateObject(self::COMMENT);
+    }
+
+    /**
+     * @return FCom_Sales_Model_Order_State_Custom
      * @throws BException
      */
     public function custom()
     {
-        return $this->_getStateObject('custom');
+        return $this->_getStateObject(self::CUSTOM);
     }
 
 }

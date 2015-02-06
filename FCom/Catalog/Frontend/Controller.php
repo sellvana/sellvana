@@ -4,6 +4,8 @@
  * Class FCom_Catalog_Frontend_Controller
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -36,7 +38,8 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $this->BEvents->fire('FCom_Catalog_Frontend_Controller::action_product:product', ['product' => &$product]);
         $this->BApp->set('current_product', $product);
 
-        $layout->view('catalog/product/details')->set('product', $product);
+        $viewName = 'catalog/product/details';
+        $layout->view($viewName)->set('product', $product);
         $head = $layout->view('head');
 
         $categoryPath = $this->BRequest->params('category');
@@ -50,7 +53,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
             $this->BApp->set('current_category', $category);
 
-            $layout->view('catalog/product/details')->set('category', $category);
+            $layout->view($viewName)->set('category', $category);
             $head->canonical($product->url());
             foreach ($category->ascendants() as $c) {
                 if ($c->get('node_name')) {
@@ -71,15 +74,14 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         if ($this->BApp->m('FCom_Customer')) {
             $user = $this->FCom_Customer_Model_Customer->sessionUser();
         }
-        $layout->view('catalog/product/details')->set('user', $user);
+        $layout->view($viewName)->set('user', $user);
 
-
-        if ($product->layout_update) {
-            $layoutUpdate = $this->BYAML->parse($product->layout_update);
-            if (!is_null($layoutUpdate)) {
+        $layoutData = $product->getData('layout');
+        if ($layoutData) {
+            $context = ['type' => 'product', 'main_view' => $viewName];
+            $layoutUpdate = $this->FCom_Core_LayoutEditor->compileLayout($layoutData, $context);
+            if ($layoutUpdate) {
                 $this->BLayout->addLayout('product_page', $layoutUpdate)->applyLayout('product_page');
-            } else {
-                $this->BDebug->warning('Invalid layout update for CMS page');
             }
         }
     }

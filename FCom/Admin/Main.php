@@ -12,6 +12,7 @@ class FCom_Admin_Main extends BClass
         $this->FCom_Admin_Model_User;
 
         $this->FCom_Admin_Model_Role->createPermission([
+            'system' => 'System',
             'system/users' => 'Manage Users',
             'system/roles' => 'Manage Roles and Permissions',
             'system/settings' => 'Update Settings',

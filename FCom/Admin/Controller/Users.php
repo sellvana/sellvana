@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_Users
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
+
 class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -25,7 +31,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['type' => 'input', 'name' => 'is_superadmin', 'label' => 'SuperAdmin', 'width' => 100, 'editable' => true,
                 'editor' => 'select', 'options' => $this->FCom_Admin_Model_User->fieldOptions('is_superadmin')],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 100, 'editor' => 'select',
-                'editable' => true, 'mass-editable' => true,
+                'editable' => true, 'multirow_edit' => true,
                 'options' => $this->FCom_Admin_Model_User->fieldOptions('status')],
             ['name' => 'create_at', 'label' => 'Created', 'width' => 100],
             ['name' => 'update_at', 'label' => 'Updated', 'width' => 100],
@@ -95,7 +101,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'username', 'label' => 'Username', 'index' => 'au.username', 'width' => 200],
             ['name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 200],
             ['name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 200, 'editable' => true,
-                'mass-editable' => true, 'editor' => 'select',
+                'multirow_edit' => true, 'editor' => 'select',
                 'options' => $this->FCom_Admin_Model_User->fieldOptions('status')]
         ];
         $config['actions'] = [
@@ -130,7 +136,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'username', 'label' => 'Name', 'index' => 'au.username', 'width' => 250],
             ['name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 100],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 100,
-                'editable' => true, 'mass-editable' => true, 'editor' => 'select',
+                'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
                 'options' => $this->FCom_Admin_Model_User->fieldOptions('status')]
         ];
         $config['actions'] = [

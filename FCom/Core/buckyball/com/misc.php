@@ -829,8 +829,8 @@ class BUtil extends BClass
         static $chars = ['L' => 'bcdfghjkmnpqrstvwxyz', 'U' => 'BCDFGHJKLMNPQRSTVWXYZ', 'D' => '123456789'];
 
         while (preg_match('#\{([ULD]+)([0-9]+)\}#i', $pattern, $m)) {
-            for ($i = 0, $c = ''; $i < strlen($m[1]); $i++) $c .= $chars[$m[1][$i]];
-            $pattern = preg_replace('#' . preg_quote($m[0], '#') . '#', $this->BUtil->randomString($m[2], $c), $pattern, 1);
+            for ($i = 0, $c = ''; $i < strlen($m[1]); $i++) $c .= $chars[strtoupper($m[1])[$i]];
+            $pattern = preg_replace('#' . preg_quote($m[0], '#') . '#', $this->randomString($m[2], $c), $pattern, 1);
         }
         return $pattern;
     }
@@ -987,13 +987,15 @@ class BUtil extends BClass
      */
     static protected $_lastRemoteHttpInfo;
     /**
-    * Send simple POST request to external server and retrieve response
-    *
-    * @param string $method
-    * @param string $url
-    * @param array $data
-    * @return string
-    */
+     * Send simple POST request to external server and retrieve response
+     *
+     * @param string $method
+     * @param string $url
+     * @param array $data
+     * @param array $headers
+     * @param array $options
+     * @return string
+     */
     public function remoteHttp($method, $url, $data = [], $headers = [], $options = [])
     {
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
@@ -1028,7 +1030,6 @@ class BUtil extends BClass
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
-                CURLOPT_HTTPHEADER, ['Expect:'], //Fixes the HTTP/1.1 417 Expectation Failed
                 CURLOPT_HEADER => true,
             ];
             if (!ini_get('safe_mode') && !ini_get('open_basedir')) {
@@ -1057,15 +1058,30 @@ class BUtil extends BClass
                 ];
             }
 
-            if (!empty($headers)) {
-                $curlOpt += [
-                    CURLOPT_HTTPHEADER => array_values($headers),
-                ];
+            $found = false;
+            foreach ($headers as $h) {
+                if (stripos($h, 'expect:') === 0) {
+                    $found = true;
+                    break;
+                }
             }
+            if (!$found) {
+                $headers += ['Expect:']; //Fixes the HTTP/1.1 417 Expectation Failed
+            }
+            $curlOpt += [
+                CURLOPT_HTTPHEADER => array_values($headers),
+            ];
+
             if (!empty($options['proxy'])) {
                 $curlOpt += [
                     CURLOPT_PROXY => $options['proxy'],
                     CURLOPT_PROXYTYPE => !empty($options['proxytype']) ? $options['proxytype'] : CURLPROXY_HTTP,
+                ];
+            }
+
+            if (!empty($options['auth'])) {
+                $curlOpt += [
+                    CURLOPT_USERPWD => $options['auth'],
                 ];
             }
             $ch = curl_init();
@@ -1130,6 +1146,11 @@ class BUtil extends BClass
                 }
                 $streamOptions['http']['header'] .= "Content-Type: {$contentType}\r\n";
                     //."Content-Length: ".strlen($request)."\r\n";
+
+                if (!empty($options['auth'])) {
+                    $streamOptions['http']['header'] .= sprintf("Authorization: Basic %s", base64_encode($options['auth']));
+                }
+
                 if (preg_match('#^(ssl|ftps|https):#', $url)) {
                     $streamOptions['ssl'] = [
                         'verify_peer' => true,
@@ -1201,22 +1222,25 @@ class BUtil extends BClass
      * @param int $flags
      * @return array
      */
-    public function globRecursive($dir, $pattern = null, $flags = 0)
+    public function globRecursive($dir, $pattern = null, $includeDirs = false)
     {
         /**/
         if (null === $pattern) {
             $pattern = '*';
         }
-        $files = glob($dir . '/' . $pattern, $flags);
-        if (!$files) {
+        $files = glob($dir . '/' . $pattern, GLOB_BRACE | GLOB_MARK);
+        $subDirs = glob($dir . '/*', GLOB_BRACE | GLOB_MARK | GLOB_ONLYDIR);
+        if (!$files && !$subDirs) {
             return [];
         }
-        $result = $files;
-        foreach ($files as $file) {
-            if (is_dir($file)) {
-                $subFiles = static::globRecursive($file, $pattern, $flags);
-                $result = array_merge($result, $subFiles);
-            }
+        if ($includeDirs) {
+            $result = array_unique(array_merge($files, $subDirs));
+        } else {
+            $result = array_diff($files, $subDirs);
+        }
+        foreach ($subDirs as $subDir) {
+            $subFiles = static::globRecursive(substr($subDir, 0, -1), $pattern, $includeDirs);
+            $result = array_merge($result, $subFiles);
         }
         return $result;
         /*
@@ -1360,14 +1384,13 @@ class BUtil extends BClass
             . '" class="' . $class . ' ' . ($state['s'] == $field ? $state['sd'] : '') . '"';
     }
 
-    /**
-     * @param string $tag
-     * @param array  $attrs
-     * @param null   $content
-     * @return string
-     */
-    public function tagHtml($tag, $attrs = [], $content = null)
+    public function tagAttributes($attrs)
     {
+        if (!$attrs) {
+            return '';
+        } elseif (is_string($attrs)) {
+            return $attrs;
+        }
         $attrsHtmlArr = [];
         foreach ($attrs as $k => $v) {
             if (null === $v || false === $v) {
@@ -1395,7 +1418,19 @@ class BUtil extends BClass
             }
             $attrsHtmlArr[] = $k . '="' . htmlspecialchars($v, ENT_QUOTES, 'UTF-8') . '"';
         }
-        return '<' . $tag . ' ' . join(' ', $attrsHtmlArr) . '>' . $content . '</' . $tag . '>';
+        return join(' ', $attrsHtmlArr);
+    }
+
+
+    /**
+     * @param string $tag
+     * @param array  $attrs
+     * @param null   $content
+     * @return string
+     */
+    public function tagHtml($tag, $attrs = [], $content = null)
+    {
+        return '<' . $tag . ' ' . $this->tagAttributes($attrs) . '>' . $content . '</' . $tag . '>';
     }
 
     /**
@@ -2719,9 +2754,9 @@ class BDebug extends BClass
      */
     public function registerErrorHandlers()
     {
-        set_error_handler('BDebug::errorHandler');
-        set_exception_handler('BDebug::exceptionHandler');
-        register_shutdown_function('BDebug::shutdownHandler');
+        set_error_handler([$this, 'errorHandler']);
+        set_exception_handler([$this, 'exceptionHandler']);
+        register_shutdown_function([$this, 'shutdownHandler']);
     }
 
     /**
@@ -2730,7 +2765,7 @@ class BDebug extends BClass
     public function startErrorLogger()
     {
         static::$_errorHandlerLog = [];
-        set_error_handler('BDebug::errorHandlerLogger');
+        set_error_handler([$this, 'errorHandlerLogger']);
     }
 
     /**
@@ -2738,7 +2773,7 @@ class BDebug extends BClass
      */
     public function stopErrorLogger()
     {
-        set_error_handler('BDebug::errorHandler');
+        set_error_handler([$this, 'errorHandlerLogger']);
         return static::$_errorHandlerLog;
     }
 
@@ -3124,8 +3159,7 @@ class BDebug extends BClass
      */
     public function is($modes)
     {
-        if (is_string($modes)) $modes = explode(',', $modes);
-        return in_array(static::$_mode, $modes);
+        return is_string($modes) ? (static::$_mode === $modes) : (in_array(static::$_mode, $modes));
     }
 
     /**
@@ -3538,13 +3572,24 @@ class BLoginThrottle extends BClass
 class BYAML extends BCLass
 {
     /**
-     * @var null
+     * @var boolean
      */
     static protected $_peclYaml = null;
+
     /**
-     * @var null
+     * @var boolean
      */
     static protected $_peclSyck = null;
+
+    /**
+     * @var boolean
+     */
+    static protected $_spyc = null;
+
+    /**
+     * @var boolean
+     */
+    static protected $_symfony = null;
 
     /**
      * @param $filename
@@ -3595,6 +3640,7 @@ class BYAML extends BCLass
 
             if (!static::$_peclYaml && !static::$_peclSyck) {
                 require_once(__DIR__ . '/lib/spyc.php');
+                static::$_spyc = true;
                 /*
                 require_once(__DIR__.'/Yaml/Exception/ExceptionInterface.php');
                 require_once(__DIR__.'/Yaml/Exception/RuntimeException.php');
@@ -3626,7 +3672,7 @@ class BYAML extends BCLass
             return syck_load($yamlData);
         }
 
-        if (class_exists('Spyc', false)) {
+        if (static::$_spyc) {
             return Spyc::YAMLLoadString($yamlData);
         } else {
             return Symfony\Component\Yaml\Yaml::parse($yamlData);
@@ -3647,7 +3693,7 @@ class BYAML extends BCLass
             return syck_dump($arrayData);
         }
 
-        if (class_exists('Spyc', false)) {
+        if (static::$_spyc) {
             return Spyc::YAMLDump($arrayData);
         } else {
             return Symfony\Component\Yaml\Yaml::dump($arrayData);
@@ -3976,7 +4022,14 @@ class BValidateViewHelper extends BClass
     /**
      * @param $args
      */
-    public function __construct($args)
+    public function __construct($args = null)
+    {
+        if ($args) {
+            $this->initialize($args);
+        }
+    }
+
+    public function initialize($args)
     {
         if (!isset($args['form'])) {
             return;
@@ -3999,6 +4052,7 @@ class BValidateViewHelper extends BClass
             $error['value']        = !empty($formData[$field]) ? $formData[$field] : null;
             $this->_errors[$field] = $error;
         }
+        return $this;
     }
 
     /**
@@ -4051,7 +4105,7 @@ class BValidateViewHelper extends BClass
      * @param string $fieldId form field ID
      * @return string
      */
-    public function errorHtml($field, $fieldId)
+    public function errorHtml($field, $fieldId = null)
     {
         $html = '';
 

@@ -1,6 +1,6 @@
 modules:
     FCom_Catalog:
-        version: 0.2.27
+        version: 0.3.2
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
@@ -9,6 +9,7 @@ modules:
         auto_use: [ bootstrap, views, layout ]
         observe:
             - [ "FCom_Core_ImportExport::import:afterModel:FCom_Catalog_Model_Category", "FCom_Catalog_Model_Category.onImportAfterModel" ]
+            - [ "FCom_Core_LayoutEditor::fetchLibrary", "FCom_Catalog_Main.onLayoutEditorFetchLibrary" ]
 
         default_config:
             modules/FCom_Catalog/allowed_locales: [ en_US ]
@@ -26,6 +27,8 @@ modules:
 
                     - [ /catalog/searchalias, FCom_Catalog_Admin_Controller_SearchAlias.index ]
                     - [ /catalog/searchalias/.action, FCom_Catalog_Admin_Controller_SearchAlias ]
+
+                    - [ "/catalog/inventory/?.action", FCom_Catalog_Admin_Controller_Inventory ]
                 observe:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, FCom_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, FCom_Catalog_Admin_Controller_Products.onGenerateSiteMap ]
@@ -65,6 +68,7 @@ modules:
                 observe:
                     - [ "FCom_FrontendCP_Frontend_Controller::action_update:after", "FCom_Catalog_Frontend_ControlPanel::onAfterUpdate" ]
                     - [ "FCom_Core_View_BackboneGrid::getPageRowsData", "FCom_Catalog_Admin_Controller_Products::processInitalData" ]
+                    - [ "FCom_Sales_Workflow::customerAddsItems:calcDetails", FCom_Catalog_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
                 views:
                     - [ catalog/product/pager, { view_class: FCom_Catalog_Frontend_View_Pager } ]
                     - [ catalog/product/price, { view_class: FCom_Catalog_Frontend_View_Price } ]

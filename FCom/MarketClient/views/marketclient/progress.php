@@ -1,6 +1,6 @@
 <?php $p = $this->progress ?>
 
-<?php if ($p['cnt'] > 0): ?>
+<?php if (!empty($p['cnt'])): ?>
 
 <div style="border:solid 1px #178d00; width:200px">
 <div style="background:#49a804; height:15px; line-height:15px; white-space:nowrap; overflow:visible; width:<?= ($p['cur'] / $p['cnt']) * 100 ?>%">
@@ -17,7 +17,7 @@
 <?php endif ?>
 
 <?php if ($p['status'] === 'DONE'): ?>
-<p style="color:#178d00;"><big><strong>All done.</strong></big></p>
+<p style="color:#178d00;"><strong>All done.</strong></p>
 <?php endif ?>
 
 <?php endif ?>

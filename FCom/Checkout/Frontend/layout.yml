@@ -10,15 +10,30 @@ checkout/base:
     - { hook: header-top-util, clear: ALL }
     - { hook: header-top-search, clear: ALL }
 
-/checkout/cart:
+
+/checkout-simple/step1:
+    - { include: checkout/base }
+    - { hook: main, views: checkout-simple/step1 }
+
+/checkout-simple/login:
+    - { include: checkout/base }
+    - { hook: main, views: customer/login }
+    - view: customer/login
+        set:
+            form_url: checkout/login
+            redirect_to: checkout
+            no_account_url: checkout
+            no_account_label: Proceed to Checkout
+
+/checkout-simple/step2:
+    - { include: checkout/base }
+    - { hook: main, views: checkout-simple/step2 }
+
+/checkout-simple/success:
     - { include: base }
-    - { hook: main, views: checkout/cart }
-    - { hook: cart_upsell, views: checkout/also-bought }
-    - { view: root, do: [[ addBodyClass, page-cart ]] }
-    - view: head
-        do:
-            - [ title, Shopping Cart ]
-            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: main, views: checkout-simple/success }
+
+
 
 /checkout/checkout:
     - { include: checkout/base }
@@ -63,4 +78,3 @@ checkout/base:
         do:
             - [ title, Checkout Success ]
     - { hook: main, views: checkout/success }
-

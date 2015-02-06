@@ -76,8 +76,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'edit_url' => $gridDataUrl,
             'grid_url' => $gridHtmlUrl,
             'form_url' => $formUrl,
-            'columns' => [
-            ],
+            'columns' => [],
         ];
         $config = array_merge($config, $this->_gridConfig);
         return $config;
@@ -304,22 +303,24 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $data = $r->post('model');
             $args = ['id' => $id, 'do' => $r->post('do'), 'data' => &$data, 'model' => &$model];
             $this->formPostBefore($args);
-            $args['validateFailed'] = false;
+            $args['validate_failed'] = false;
             if ($r->post('do') === 'DELETE') {
                 $model->delete();
                 $this->message('The record has been deleted');
             } else {
-                $model->set($data);
+                if ($data) {
+                    $model->set($data);
+                }
 
                 if ($model->validate($model->as_array(), [], $formId)) {
                     $model->save();
                     $this->message('Changes have been saved');
-                    if ($r->post('do') === 'saveAndContinue') {
+                    if ($r->post('do') === 'save_and_continue') {
                         $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $model->id();
                     }
                 } else {
                     $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
-                    $args['validateFailed'] = true;
+                    $args['validate_failed'] = true;
                     $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
                 }
 
@@ -328,7 +329,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         } catch (Exception $e) {
             //$this->BDebug->exceptionHandler($e);
             $this->formPostError($args);
-            $this->message($e->getMessage(), 'error');
+            #$trace = $e->getTrace();
+            #$traceMsg = print_r($trace[4], 1);
+            $traceMsg = $e->getTraceAsString();
+            $this->message($e->getMessage() . ': ' . $traceMsg, 'error');
             $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
         }
         if ($r->xhr()) {

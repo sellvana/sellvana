@@ -10,7 +10,8 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
 * named *AllTests.php and will add it to this suite to be executed.
 * Individual module suites can be run directly with the phpunit command.
 *
-*/
+ * @property FCom_Test_AllTests $FCom_Test_AllTests
+ */
 class FCom_Test_AllTests extends BClass
 {
 

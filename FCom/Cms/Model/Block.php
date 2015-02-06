@@ -31,6 +31,7 @@
  * DI
  * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
  * @property FCom_Cms_Frontend_View_Block $FCom_Cms_Frontend_View_Block
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
 {
@@ -137,5 +138,15 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
             $content = '';
         }
         return $content;
+    }
+
+    public function getAllBlocksAsOptions()
+    {
+        $blocks = $this->orm()->order_by_asc('handle')->find_many();
+        $result = [];
+        foreach ($blocks as $block) {
+            $result[$block->get('handle')] = "[{$block->get('handle')}] {$block->get('description')}";
+        }
+        return $result;
     }
 }

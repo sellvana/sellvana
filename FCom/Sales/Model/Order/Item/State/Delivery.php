@@ -2,49 +2,62 @@
 
 class FCom_Sales_Model_Order_Item_State_Delivery extends FCom_Core_Model_Abstract_State_Concrete
 {
+    const VIRTUAL = 'virtual',
+        PENDING = 'pending',
+        PACKED = 'packed',
+        SHIPPED = 'shipped',
+        DELIVERED = 'delivered',
+        RETURNED = 'returned',
+        PARTIAL = 'partial';
+
     protected $_valueLabels = [
-        'virtual' => 'Virtual',
-        'pending' => 'Pending',
-        'packed' => 'Packed',
-        'shipped' => 'Shipped',
-        'delivered' => 'Delivered',
-        'returned' => 'Returned',
-        'partial' => 'Partial',
+        self::VIRTUAL => 'Virtual',
+        self::PENDING => 'Pending',
+        self::PACKED => 'Packed',
+        self::SHIPPED => 'Shipped',
+        self::DELIVERED => 'Delivered',
+        self::RETURNED => 'Returned',
+        self::PARTIAL => 'Partial',
     ];
 
     protected $_setValueNotificationTemplates =[
-        'shipped' => 'email/sales/order-item-state-delivery-shipped',
-        'delivered' => 'email/sales/order-item-state-delivery-delivered',
-        'returned' => 'email/sales/order-item-state-delivery-returned',
+        self::SHIPPED => 'email/sales/order-item-state-delivery-shipped',
+        self::DELIVERED => 'email/sales/order-item-state-delivery-delivered',
+        self::RETURNED => 'email/sales/order-item-state-delivery-returned',
     ];
+
+    public function setVirtual()
+    {
+        return $this->changeState(self::VIRTUAL);
+    }
 
     public function setPending()
     {
-        return $this->changeState('pending');
+        return $this->changeState(self::PENDING);
     }
 
     public function setPacked()
     {
-        return $this->changeState('packed');
+        return $this->changeState(self::PACKED);
     }
 
     public function setShipped()
     {
-        return $this->changeState('shipped');
+        return $this->changeState(self::SHIPPED);
     }
 
     public function setDelivered()
     {
-        return $this->changeState('delivered');
+        return $this->changeState(self::DELIVERED);
     }
 
     public function setReturned()
     {
-        return $this->changeState('returned');
+        return $this->changeState(self::RETURNED);
     }
 
     public function setPartial()
     {
-        return $this->changeState('partial');
+        return $this->changeState(self::PARTIAL);
     }
 }

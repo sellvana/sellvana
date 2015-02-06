@@ -7,6 +7,8 @@
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_SearchAlias $FCom_Catalog_Model_SearchAlias
  * @property FCom_Catalog_Model_SearchHistory $FCom_Catalog_Model_SearchHistory
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
 {
@@ -61,12 +63,12 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $head->addTitle($category->node_name);
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 
-        if ($category->layout_update) {
-            $layoutUpdate = $this->BYAML->parse($category->layout_update);
-            if (!is_null($layoutUpdate)) {
+        $layoutData = $category->getData('layout');
+        if ($layoutData) {
+            $context = ['type' => 'category', 'main_view' => 'catalog/category'];
+            $layoutUpdate = $this->FCom_Core_LayoutEditor->compileLayout($layoutData, $context);
+            if ($layoutUpdate) {
                 $this->BLayout->addLayout('category_page', $layoutUpdate)->applyLayout('category_page');
-            } else {
-                $this->BDebug->warning('Invalid layout update for CMS page');
             }
         }
 
