@@ -823,7 +823,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     return markup;
                 },
                 initSelection: this.initSelection
-            });
+            }).on('change', this.onChange);
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         },
         onChange: function () {

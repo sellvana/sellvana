@@ -4,7 +4,7 @@
 {% set promo = APP.instance('FCom_Promo_Model_Promo') %}
 {% set validator = THIS.get('validator') %}
 {% set labelClass = "col-md-3" %}
-{% set numCodes = 100 %}
+{% set numCodes = m.get('numCodes') %}
 {% set fromDate = validator.fieldValue('from_date') %}
 {% set toDate = validator.fieldValue('to_date') %}
 {% if fromDate and toDate %}
@@ -142,7 +142,7 @@
             </div>
             <div class="col-md-4">
                 <label for="model-conditions_type" class="sr-only">{{ "Condition type"|_ }}</label>
-                <select id="model-conditions_type" name="model[conditions_type]" class="form-control to-select2">
+                <select id="model-conditions_type" class="form-control to-select2">
                     <option value="-1">{{ "Add Condition Type..."|_ }}</option>
                     <option value="sku">{{ "Products"|_ }}</option>
                     <option value="category">{{ "Categories"|_ }}</option>
@@ -162,7 +162,7 @@
                         <span class="glyphicon glyphicon-question-sign"></span></a>
             </label>
             <div class="col-md-5">
-                <select id="model-actions" name="model[actions]" class="form-control to-select2">
+                <select id="model-actions" class="form-control to-select2">
                     <option value="-1">{{"Add Promo Action..."|_}}</option>
                     <option value="discount">{{"Discount"|_}}</option>
                     <option value="shipping">{{"Shipping"|_}}</option>
@@ -182,17 +182,20 @@
                     coupon_container_id: 'coupon-options',
                     condition_container_id: 'conditions-options',
                     actions_container_id: "actions-options",
+                    single_coupon_name: "{{ elView.getInputName({'field':'single_coupon_code'}) }}",
+                    single_coupon_code: "{{ validator.fieldValue("single_coupon_code") }}",
                     promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
                     showCouponsUrl: "{{ APP.href('promo/coupons/view')}}", // "/admin/promo/coupons/view?id=1",
                     generateCouponsUrl: "{{ APP.href('promo/coupons/generate')}}", // "/admin/promo/coupons/generate?id=1",
                     importCouponsUrl: "{{ APP.href('promo/coupons/import')}}", // "/admin/promo/coupons/import?id=1",
-                    valueUpc: '{{validator.fieldValue("coupon_uses_per_customer")}}',
-                    valueUt: '{{validator.fieldValue("coupon_uses_total")}}',
+                    valueUpc: '{{validator.fieldValue("limit_per_customer")}}',
+                    valueUt: '{{validator.fieldValue("limit_per_promo")}}',
+                    limit_per_coupon: '{{validator.fieldValue("limit_per_coupon")}}',
                     singleCouponValue: '',
                     labelClass: '{{ labelClass }}',
                     debug: true,
                     base_url: "{{ APP.href('promo/') }}",
-                    buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "View no codes" }}'
+                    buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "No coupon codes" }}'
                 };
                 Promo.init(options);
             });
