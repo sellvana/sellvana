@@ -22,40 +22,22 @@
  * @property string $update_at
  * @property string $coupon
  *
- * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
- * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
- * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
- * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
- * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
+ * @property FCom_Promo_Model_PromoCart     $FCom_Promo_Model_PromoCart
+ * @property FCom_Promo_Model_PromoMedia    $FCom_Promo_Model_PromoMedia
+ * @property FCom_Core_Model_MediaLibrary   $FCom_Core_Model_MediaLibrary
+ * @property FCom_Promo_Model_Product       $FCom_Promo_Model_Product
+ * @property FCom_Customer_Model_Customer   $FCom_Customer_Model_Customer
+ * @property FCom_MultiSite_Main            $FCom_MultiSite_Main
+ * @property FCom_Promo_Model_PromoCoupon   $FCom_Promo_Model_PromoCoupon
+ * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
  */
 class FCom_Promo_Model_Promo extends BModel
 {
+    const MATCH_ALL = '0', MATCH_ANY = '1';
+
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo';
     protected static $_fieldOptions = [
-        'buy_type' => [
-            'qty' => 'Quantity',
-            '$' => '$ AMT',
-        ],
-        'buy_group' => [
-            'one' => 'Single Group',
-            'any' => 'ANY Group',
-            'all' => 'ALL Groups',
-            'cat' => 'Categories',
-            'anyp' => 'ANY Product'
-        ],
-        'get_type' => [
-            'qty' => 'Quantity',
-            '$' => '$ AMT',
-            '%' => '% OFF',
-            'free' => 'Free Shipping',
-        ],
-        'get_group' => [
-            'same_prod' => 'Same Product',
-            'same_group' => 'Same Group',
-            'any_group' => 'Any Group',
-            'diff_group' => 'Different Group',
-        ],
         'status' => [
             'template' => 'Template',
             'pending' => 'Pending',
@@ -64,91 +46,32 @@ class FCom_Promo_Model_Promo extends BModel
         ],
     ];
 
-    protected static $_validationRules = [
-        ['description', '@required'],
-//        array('manuf_vendor_id', '@required'),
-
-        ['description', '@string', null, ['max' => 255]],
-
-        ['buy_amount', '@integer'],
-        ['get_amount', '@integer'],
-    ];
+    protected static $_validationConditions = [];
 
     public function getPromosByCart($cartId)
     {
         return $this->orm('p')
-                ->join($this->FCom_Promo_Model_Cart->table(), "p.id = pc.promo_id", "pc")
-                ->where('cart_id', $cartId)
-                ->select('p.id')
-                ->select('p.description')
-                ->find_many();
-    }
-
-    public function manuf()
-    {
-        //todo: load vendors here
-    }
-
-    /**
-     * @return FCom_Promo_Model_Group[]|null
-     */
-    public function groups()
-    {
-        return $this->FCom_Promo_Model_Group->orm()
-            ->where('promo_id', $this->id)
-            ->order_by_asc('group_type')
-            ->find_many_assoc();
+            ->join($this->FCom_Promo_Model_PromoCart->table(), "p.id = pc.promo_id", "pc")
+            ->where('cart_id', $cartId)
+            ->select('p.id')
+            ->select('p.description')
+            ->find_many();
     }
 
     public function mediaORM()
     {
-        return $this->FCom_Promo_Model_Media->orm('pa')
+        return $this->FCom_Promo_Model_PromoMedia->orm('pa')
             ->join($this->FCom_Core_Model_MediaLibrary->table(), ['a.id', '=', 'pa.file_id'], 'a')
             ->select('a.id')->select('a.file_name')->select('a.folder')
             ->where('pa.promo_id', $this->id);
     }
 
     /**
-     * @return FCom_Promo_Model_Media[]
+     * @return FCom_Promo_Model_PromoMedia[]
      */
     public function media()
     {
         return $this->mediaORM()->find_many();
-    }
-
-    public function createClone()
-    {
-        $grHlp = $this->FCom_Promo_Model_Group;
-        $prodHlp = $this->FCom_Promo_Model_Product;
-        $attHlp = $this->FCom_Promo_Model_Media;
-
-        $clone = $this->create($this->as_array())->set([
-            'id' => 'null',
-            'status' => 'pending',
-        ])->save();
-
-        foreach ($this->groups() as $gr) {
-            $clGr = $grHlp->create($gr->as_array())->set([
-                'id' => null,
-                'promo_id' => $clone->id(),
-            ])->save();
-
-            foreach ($gr->products() as $gp) {
-                $prodHlp->create($gp->as_array())->set([
-                    'id' => null,
-                    'promo_id' => $clone->id(),
-                    'group_id' => $clGr->id(),
-                ])->save();
-            }
-        }
-
-        foreach ($this->media() as $att) {
-            $attHlp->create($att->as_array())->set([
-                'id' => null,
-                'promo_id' => $clone->id(),
-            ])->save();
-        }
-        return $clone;
     }
 
     public function onAfterCreate()
@@ -163,10 +86,12 @@ class FCom_Promo_Model_Promo extends BModel
     {
         parent::onBeforeSave();
 
-        $this->setDate($this->get("from_date"), 'from_date');
-        $this->setDate($this->get("to_date"), 'to_date');
-        if (!$this->create_at) $this->create_at = $this->BDb->now();
-        $this->update_at = $this->BDb->now();
+        $this->setDate('from_date', $this->get("from_date"));
+        $this->setDate('to_date', $this->get("to_date"));
+        if (!$this->get("create_at")) {
+            $this->set("create_at", date("Y-m-d"));
+        }
+        $this->set("update_at", date("Y-m-d"));
 
         return true;
     }
@@ -175,53 +100,17 @@ class FCom_Promo_Model_Promo extends BModel
      * Set date field
      * By default dates are returned as strings, therefore we need to convert them for mysql
      *
-     * @param $fieldDate
      * @param $field
+     * @param $fieldDate
+     * @return static
      */
-    public function setDate($fieldDate, $field)
+    public function setDate($field, $fieldDate)
     {
         $date = strtotime($fieldDate);
         if (-1 != $date) {
             $this->set($field, date("Y-m-d", $date));
         }
-    }
-
-    public function onAfterSave()
-    {
-        parent::onAfterSave();
-
-        $groups = [];
-        if (!$this->_newRecord) {
-            /** @var FCom_Promo_Model_Group[] $groupsRaw */
-            $groupsRaw = $this->FCom_Promo_Model_Group->orm()->where('promo_id', $this->id)->find_many();
-            foreach ($groupsRaw as $g) {
-                $groups[$g->group_type][] = $g;
-            }
-        }
-        $delete = [];
-        if (empty($groups['buy'])) {
-            $this->FCom_Promo_Model_Group->create([
-                'promo_id' => $this->id,
-                'group_type' => 'buy',
-                'group_name' => 'BUY Group',
-            ])->save();
-        } elseif ($this->buy_group === 'one' && sizeof($groups['buy']) > 1) {
-            foreach ($groups['buy'] as $i => $g) {
-                if ($i) $delete[] = $g->id;
-            }
-        }
-        if (empty($groups['get']) && $this->get_group === 'diff_group') {
-            $this->FCom_Promo_Model_Group->create([
-                'promo_id' => $this->id,
-                'group_type' => 'get',
-                'group_name' => 'GET Group',
-            ])->save();
-        } elseif (!empty($groups['get']) && $this->get_group !== 'diff_group') {
-            $delete[] = $groups['get'][0]->id;
-        }
-        if (!empty($delete)) {
-            $this->FCom_Promo_Model_Group->delete_many(['id' => $delete]);
-        }
+        return $this;
     }
 
     public function getActive()
@@ -229,5 +118,447 @@ class FCom_Promo_Model_Promo extends BModel
         return $this->orm()->where('status', 'active')
                 ->order_by_desc('buy_amount')
                 ->find_many();
+    }
+
+    /**
+     * @return BORM
+     */
+    public function findActiveOrm()
+    {
+        $now = $this->BDb->now();
+
+        $orm = $this->orm('p')
+            ->where('status', 'active')
+            ->where_raw('((from_date is null or from_date>?) and (to_date is null or to_date<?))', [$now, $now])
+            ->order_by_asc('priority_order')
+        ;
+
+        //TODO: move to each specific module event observers?
+        if ($this->BModuleRegistry->isLoaded('FCom_CustomerGroup')) {
+            $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+            if ($customer && ($custGroupId = $customer->get('customer_group'))) {
+                $orm->where_raw('FIND_IN_SET(?, customer_group_ids)', [$custGroupId]);
+            }
+        }
+
+        if ($this->BModuleRegistry->isLoaded('FCom_MultiSite')) {
+            $siteData = $this->FCom_MultiSite_Main->getCurrentSiteData();
+            if ($siteData) {
+                $orm->where_raw('FIND_IN_SET(?, site_ids)', [$siteData['id']]);
+            }
+        }
+
+        $this->BEvents->fire(__METHOD__, ['orm' => $orm]);
+
+        return $orm;
+    }
+
+    /**
+     * @param $couponCode
+     * @return static
+     * @throws BException
+     */
+    public function findByCouponCode($couponCode)
+    {
+        $coupon = $this->FCom_Promo_Model_PromoCoupon->orm()
+            ->where_in('coupon_type', [1, 2])
+            ->where('coupon_code', $couponCode)
+            ->find_one();
+        if (!$coupon) {
+            return false;
+        }
+        return $this->load($coupon->get('promo_id'));
+    }
+
+    protected function _compareValues($v1, $v2, $op)
+    {
+        switch ($op) {
+            case 'gt':          return $v1 > $v2;
+            case 'gte':         return $v1 >= $v2;
+            case 'lt':          return $v1 < $v2;
+            case 'lte':         return $v1 <= $v2;
+            case 'eq':          return $v1 == $v2;
+            case 'is':          return $v1 == $v2;
+            case 'neq':         return $v1 != $v2;
+            case 'is_not':      return $v1 != $v2;
+            case 'in':          return in_array($v1, (array)$v2, false);
+            case 'not_in':      return !in_array($v1, (array)$v2, false);
+            case 'empty':       return $v1 === null || $v1 === false || $v1 === '';
+            case 'contains':    return strpos($v1, $v2) !== false;
+            case 'between':     return $v1 >= $v2[0] && $v1 <= $v2[1];
+            default:            throw new BException('Invalid operator: '. $op);
+        }
+    }
+
+    protected function _validateProductConditionCombination(FCom_Catalog_Model_Product $product, array $condition)
+    {
+        $finalMatch = $condition['match'] === static::MATCH_ALL ? true : false;
+        foreach ($condition['fields'] as $fieldCond) {
+            list($fieldSource, $fieldCode) = explode('.', $fieldCond['field']);
+
+            switch ($fieldSource) {
+                case 'field':
+                case 'static':
+                    $value = $product->get($fieldCode);
+                    break;
+
+                case 'stock':
+                    $value = $product->getInventoryModel()->get($fieldCode);
+                    break;
+
+                default:
+                    throw new BException('Invalid field source: ' . $fieldSource);
+            }
+
+            $match = $this->_compareValues($value, $fieldCond['value'], $fieldCond['filter']);
+
+            if ($condition['match'] === static::MATCH_ANY && $match) {
+                $finalMatch = true;
+                break;
+            } elseif ($condition['match'] === static::MATCH_ALL && !$match) {
+                $finalMatch = false;
+                break;
+            }
+        }
+        return $finalMatch;
+    }
+
+    public function validateForCart(FCom_Sales_Model_Cart $cart)
+    {
+        if ($this->get('status') !== 'active' || $this->get('promo_type') !== 'cart') {
+            return false;
+        }
+        $now = $this->BDb->now();
+        if (($this->get('from_date') && $this->get('from_date') < $now)
+            || ($this->get('to_date') && $this->get('to_date') > $now)
+        ) {
+            return false;
+        }
+
+        $conditionRules = $cart->getData('conditions/rules');
+        if (!$conditionRules) {
+            return true;
+        }
+
+        $matchType = $cart->getData('conditions/match') ?: static::MATCH_ANY; //TODO: remove default after testing
+        $result = [
+            'match' => $matchType === static::MATCH_ALL ? true : false,
+            'items' => [],
+        ];
+        foreach ($conditionRules as $conditionType => $conditions) {
+            foreach ($conditions as $condition) {
+                #$conditionType = !empty($condition['type']) ? $condition['type'] : 'skus';
+                switch ($conditionType) {
+                    case 'skus':
+                        $match = $this->_validateCartConditionSkus($cart, $condition, $result);
+                        break;
+
+                    case 'categories':
+                        $match = $this->_validateCartConditionCategories($cart, $condition, $result);
+                        break;
+
+                    case 'total':
+                        $match = $this->_validateCartConditionTotal($cart, $condition, $result);
+                        break;
+
+                    case 'combination':
+                        $match = $this->_validateCartConditionCombination($cart, $condition, $result);
+                        break;
+
+                    case 'shipping':
+                        $match = $this->_validateCartConditionShipping($cart, $condition, $result);
+                        break;
+
+                    default:
+                        throw new BException('Invalid condition type: ' . $conditionType);
+                }
+                if ($matchType === static::MATCH_ANY && $match) {
+                    $result['match'] = true;
+                    #break; // don't stop loop to collect all matched products to use in actions
+                } elseif ($matchType === static::MATCH_ALL && !$match) {
+                    $result['match'] = false;
+                    #break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    protected function _validateCartConditionSkus(FCom_Sales_Model_Cart $cart, array $condition, array &$result)
+    {
+        #if (empty($condition['skus'])) { //TODO: fix the form and change to this
+        if (empty($condition['product_id'])) {
+            return false;
+        }
+        #$skus = array_flip((array)$condition['skus']); //TODO: fix the form and change to this
+        $prodIds = array_flip((array)$condition['product_id']);
+        $total = 0;
+        $items = [];
+        /** @var FCom_Sales_Model_Cart_Item $item */
+        foreach ($cart->items() as $item) {
+            #if (!isset($skus[$item->get('product_sku')])) { //TODO: fix the form and change to this
+            if (!isset($prodIds[$item->get('product_id')])) {
+                continue;
+            }
+            switch ($condition['type']) {
+                case 'qty':
+                    $total += $item->get('qty');
+                    break;
+
+                case 'amount':
+                    $total += $item->get('row_total');
+                    break;
+            }
+            $result['items'][$item->id()] = $item;
+        }
+        $conditionTotalValue = !empty($condition['value']) ? $condition['value'] : 0;
+        if ($this->_compareValues($total, $conditionTotalValue, $condition['filter'])) {
+            foreach ($items as $item) {
+                $result['items'][$item->id()] = $item;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected function _validateCartConditionCategories(FCom_Sales_Model_Cart $cart, array $condition, array &$result)
+    {
+        if (empty($condition['category_ids'])) {
+            return false;
+        }
+        $catIds = (array)$condition['category_id'];
+        $prodIds = [];
+        foreach ($cart->items() as $item) {
+            $prodIds[] = $item->get('product_id');
+        }
+        $catProdLinks = $this->FCom_Catalog_Model_CategoryProduct->orm()
+            ->where_in('category_id', $catIds)
+            ->where_in('product_id', $prodIds)
+            ->find_many_assoc('product_id');
+        if (!$catProdLinks) {
+            return $result;
+        }
+        $total = 0;
+        $items = [];
+        $foundProdIds = array_flip(array_keys($catProdLinks));
+        /** @var FCom_Sales_Model_Cart_Item $item */
+        foreach ($cart->items() as $item) {
+            if (!isset($foundProdIds[$item->get('product_id')])) {
+                continue;
+            }
+            switch ($condition['total_type']) {
+                case 'qty':
+                    $total += $item->get('qty');
+                    break;
+
+                case 'amount':
+                    $total += $item->get('row_total');
+                    break;
+            }
+            $items[$item->id()] = $item;
+        }
+        $conditionTotalValue = !empty($condition['value']) ? $condition['value'] : 0;
+        if ($this->_compareValues($total, $conditionTotalValue, $condition['filter'])) {
+            foreach ($items as $item) {
+                $result['items'][$item->id()] = $item;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected function _validateCartConditionTotal(FCom_Sales_Model_Cart $cart, array $condition, array &$result)
+    {
+        $conditionTotalValue = !empty($condition['value']) ? $condition['value'] : 0;
+        if ($this->_compareValues($cart->get('subtotal'), $conditionTotalValue, $condition['filter'])) {
+            foreach ($cart->items() as $item) {
+                $result['items'][$item->id()] = $item;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected function _validateCartConditionCombination(FCom_Sales_Model_Cart $cart, array $condition, array &$result)
+    {
+        if (empty($condition['fields'])) {
+            return false;
+        }
+
+        $cart->loadProducts();
+        $match = false;
+        foreach ($cart->items() as $item) {
+            $product = $item->product();
+            $variantFields = $item->getData('variant_fields');
+            if ($variantFields) {
+                $product->setReadOnly()->set($variantFields);
+            }
+            if ($this->_validateProductConditionCombination($product, $condition)) {
+                $result['items'][$item->id()] = $item;
+                $match = true;
+            }
+        }
+        return $match;
+    }
+
+    protected function _validateCartConditionShipping(FCom_Sales_Model_Cart $cart, array $condition, array &$result)
+    {
+        if (empty($condition['fields'])) {
+            return false;
+        }
+        $address = $cart->getShippingAddress();
+        foreach ($condition['fields'] as $fieldCond) {
+            switch ($fieldCond['field']) {
+                case 'methods':
+                    $res = $this->_compareValues($cart->get('shipping_method'), $fieldCond['value'], $fieldCond['filter']);
+                    break;
+
+                case 'country':
+                    $res = $this->_compareValues($address->get('country'), $fieldCond['value'], $fieldCond['filter']);
+                    break;
+
+                case 'state': //TODO: 'region'
+                    $res = $this->_compareValues($address->get('region'), $fieldCond['value'], $fieldCond['filter']);
+                    break;
+
+                case 'zipcode': //TODO: 'postcode'
+                    $res = $this->_compareValues($address->get('postcode'), $fieldCond['value'], $fieldCond['filter']);
+                    break;
+
+                default:
+                    throw new BException('Invalid condition field: ' . $fieldCond['field']);
+            }
+            if ($condition['match'] === static::MATCH_ANY && $res) {
+                return true;
+            } elseif ($condition['match'] === static::MATCH_ALL && !$res) {
+                return false;
+            }
+        }
+        return $condition['match'] === static::MATCH_ALL ? false : true;
+    }
+
+    public function calculateActionsForCart(FCom_Sales_Model_Cart $cart, array $conditionsResult, array &$actionsResult)
+    {
+        $actions = $cart->getData('actions/rules/discount');
+        if ($actions) {
+            $discountPercent = 0;
+            foreach ($actions as $action) {
+                $this->_calcCartSubtotalDiscount($cart, $action, $conditionsResult, $actionsResult);
+            }
+        }
+
+        $actions = $cart->getData('actions/rules/shipping');
+        if ($actions) {
+            foreach ($actions as $action) {
+                $this->_calcCartShippingDiscount($cart, $action, $conditionsResult, $actionsResult);
+            }
+        }
+
+        $actions = $cart->getData('actions/rules/free_product');
+        if ($actions) {
+            foreach ($actions as $action) {
+                $this->_calcCartFreeProduct($cart, $action, $conditionsResult, $actionsResult);
+            }
+        }
+        return $this;
+    }
+
+    protected function _calcCartSubtotalDiscount(FCom_Sales_Model_Cart $cart, array $action,
+                                                 array $conditionsResult, array &$actionsResult)
+    {
+        $result = [
+            'discount_amount' => 0,
+            'items' => [],
+        ];
+        //TODO: remove defaults
+        $actionType = !empty($action['type']) ? $action['type'] : 'cart';
+        $amountType = !empty($action['amount_type']) ? $action['amount_type'] : 'percent'; //,amount
+        $amount = !empty($action['amount']) ? $action['amount'] : 10;
+        $localeHlp = $this->BLocale;
+        $items = [];
+
+        switch ($actionType) {
+            case 'cart':
+                $items = $cart->items();
+                break;
+
+            case 'conditions':
+                $items = $conditionsResult['items'];
+                break;
+
+            case 'skus':
+                $skus = array_flip($action['skus']);
+                foreach ($cart->items() as $item) {
+                    if (in_array($item->get('product_sku'), $skus)) {
+                        $items[] = $item;
+                    }
+                }
+                break;
+
+            case 'combination':
+                $cart->loadProducts();
+                foreach ($cart->items() as $item) {
+                    $product = $item->product();
+                    $variantFields = $item->getData('variant_fields');
+                    if ($variantFields) {
+                        $product->setReadOnly()->set($variantFields);
+                    }
+                    if ($this->_validateProductConditionCombination($product, $action)) {
+                        $items[] = $item;
+                    }
+                }
+                break;
+        }
+
+        $totalAmount = 0;
+        foreach ($items as $item) {
+            $totalAmount += $item->get('row_total');
+        }
+        if ($amountType === 'percent') {
+            $percent = $amount / 100;
+        } else {
+            $percent = $amount / $totalAmount;
+        }
+        $totalDiscount = (float)$localeHlp->roundCurrency($totalAmount * $percent);
+        $result['discount_amount'] = $totalDiscount;
+        $lastItemIdx = null;
+        foreach ($items as $i => $item) {
+            if ($item->get('auto_added')) {
+                continue;
+            }
+            $rowDiscount = $localeHlp->roundCurrency($item->get('row_total') * $percent);
+            $totalDiscount -= $rowDiscount;
+            $result['items'][$i]['row_discount_percent'] = $percent * 100;
+            $result['items'][$i]['row_discount'] = $rowDiscount;
+            $lastItemIdx = $i;
+        }
+        if ($lastItemIdx && $totalDiscount) {
+            $result['items'][$lastItemIdx]['row_discount'] += $totalDiscount; // rounding error fix
+        }
+
+        return $result;
+    }
+
+    protected function _calcCartShippingDiscount(FCom_Sales_Model_Cart $cart, array $action,
+                                                 array $conditionsResult, array &$actionsResult)
+    {
+        $result = [
+            'shipping_discount' => 0,
+            'shipping_free' => 0,
+        ];
+        return $result;
+    }
+
+    protected function _calcCartFreeProduct(FCom_Sales_Model_Cart $cart, array $action,
+                                            array $conditionsResult, array &$actionsResult)
+    {
+        $result = [
+            'free_items' => [],
+        ];
+        return $result;
     }
 }

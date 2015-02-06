@@ -25,7 +25,7 @@
 {% set cat = THIS.get('category') %}
 {% set customFields = prod.getData('custom_fields') %}
 
-{% set productLink = prod.getProductLink() %}
+{% set productLinks = prod.getProductLinks() %}
 {% set recentlyViewed = APP.instance('FCom_Catalog_Frontend').getRecentlyViewedProducts() %}
 
 {{ THIS.view('breadcrumbs') | raw }}
@@ -145,14 +145,14 @@
     </div>
 </div><!-- /.f-prod-info -->
 <br/>
-{% for product in productLink %}
-    {% if product.product %}
+{% for link in productLinks %}
+    {% if link.products %}
         <div class="f-widget f-widget-featured-prods">
             <header class="f-widget-header">
-                <strong class="f-widget-title">{{ product.title }}</strong>
+                <strong class="f-widget-title">{{ link.title }}</strong>
             </header>
 
-            {{ THIS.view('catalog/product/grid-tiles').set('products', product.product) | raw }}
+            {{ THIS.view('catalog/product/grid-tiles').set('products', link.products) | raw }}
 
         </div><!-- /.f-widget -->
     {% endif %}

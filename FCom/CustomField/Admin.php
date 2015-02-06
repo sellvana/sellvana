@@ -72,6 +72,7 @@ class FCom_CustomField_Admin extends BClass
 
     public function onProductFormPostAfterValidate($args)
     {
+        /** @var FCom_Catalog_Model_Product $model */
         $model = $args['model'];
         $data = $args['data'];
 
@@ -104,6 +105,7 @@ class FCom_CustomField_Admin extends BClass
 
         // retrieve variant fields already associated to product
         $prodVarfieldHlp = $this->FCom_CustomField_Model_ProductVarfield;
+        /** @var FCom_CustomField_Model_ProductVarfield[] $prodVarfieldModels */
         $prodVarfieldModels = $prodVarfieldHlp->orm()->where('product_id', $pId)->find_many_assoc('field_id');
 
         // retrieve product variant models
@@ -123,11 +125,13 @@ class FCom_CustomField_Admin extends BClass
                 }
             }
         }
+        /** @var FCom_CustomField_Model_Field[] $fieldModels */
+        $fieldModels = [];
+        $fieldsByCode = [];
         if ($varFieldsData) {
             // retrieve custom fields
             $fieldHlp = $this->FCom_CustomField_Model_Field;
             $fieldModels = $fieldHlp->orm()->where_in('id', array_keys($varFieldsData))->find_many_assoc();
-            $fieldsByCode = [];
             foreach ($fieldModels as $m) {
                 $fieldsByCode[$m->get('field_code')] = $m->id();
             }
@@ -146,21 +150,28 @@ class FCom_CustomField_Admin extends BClass
         if ($variantsData) {
             // retrieve related custom fields options
             $fieldOptionHlp = $this->FCom_CustomField_Model_FieldOption;
+            /** @var FCom_CustomField_Model_FieldOption[] $fieldOptionsModels */
             $fieldOptionsModels = $fieldOptionHlp->orm()->where_in('field_id', array_keys($varFieldsData))->find_many();
-            $fieldOptionsById = [];
-            $fieldOptionsByLabel = [];
+            $fieldOptionLabelsById = [];
+            $fieldOptionIdsByLabel = [];
+            $fieldOptionIdsByCodeLabel = [];
             foreach ($fieldOptionsModels as $m) {
-                $fieldOptionsById[$m->get('field_id')][$m->id()] = $m->get('label');
-                $fieldOptionsByLabel[$m->get('field_id')][$m->get('label')] = $m->id();
+                $fieldId = $m->get('field_id');
+                $fieldCode = $fieldModels[$fieldId]->get('field_code');
+                $label = $m->get('label');
+                $fieldOptionLabelsById[$fieldId][$m->id()] = $label;
+                $fieldOptionIdsByLabel[$fieldId][$label] = $m->id();
+                $fieldOptionIdsByCodeLabel[$fieldCode][$label] = $m->id();
             }
 
             // retrieve related product variants field values and associate with variants
             $prodVariantFieldHlp = $this->FCom_CustomField_Model_ProductVariantField;
+            /** @var FCom_CustomField_Model_ProductVariantField[] $prodVariantFieldModels */
             $prodVariantFieldModels = $prodVariantFieldHlp->orm()->where('product_id', $pId)->find_many_assoc('id');
             $prodVariantFieldsArr = [];
             foreach ($prodVariantFieldModels as $m) {
                 $f = $fieldModels[$m->get('field_id')];
-                $v = $fieldOptionsById[$m->get('field_id')][$m->get('option_id')];
+                $v = $fieldOptionLabelsById[$m->get('field_id')][$m->get('option_id')];
                 // TODO: implement locates for field option labels
                 $prodVariantFieldsArr[$m->get('variant_id')][$f->get('field_code')] = ['label' => $v, 'id' => $m->id()];
             }
@@ -168,6 +179,7 @@ class FCom_CustomField_Admin extends BClass
             // match variants from form data to already existing variants by key fields values
             $matchedVariants = [];
             $variantInventorySkus = [];
+#echo "<pre>"; var_dump($variantsData); exit;
             foreach ($variantsData as $i => &$vd) {
                 if ($vd['inventory_sku'] !== '') {
                     $variantInventorySkus[$i] = $vd['inventory_sku'];
@@ -178,7 +190,9 @@ class FCom_CustomField_Admin extends BClass
                     }
                     $match = true;
                     foreach ($vd['field_values'] as $f => $fv) {
-                        if ($prodVariantFieldsArr[$vId][$f]['label'] !== $fv) {
+                        if (empty($prodVariantFieldsArr[$vId][$f]['label'])
+                            || $prodVariantFieldsArr[$vId][$f]['label'] !== $fv
+                        ) {
                             $match = false;
                             break;
                         }
@@ -200,7 +214,8 @@ class FCom_CustomField_Admin extends BClass
 
             $invHlp = $this->FCom_Catalog_Model_InventorySku;
             if ($variantInventorySkus) {
-                $invModels = $invHlp->orm()->where_in('inventory_sku', $variantInventorySkus)->find_many_assoc('inventory_sku');
+                $invModels = $invHlp->orm()->where_in('inventory_sku', $variantInventorySkus)
+                    ->find_many_assoc('inventory_sku');
             } else {
                 $invModels = [];
             }
@@ -212,7 +227,7 @@ class FCom_CustomField_Admin extends BClass
                 } else {
                     $m = $prodVariantHlp->create(['product_id' => $pId]);
                 }
-                if ($vd['variant_qty'] !== '') {
+                if (!empty($vd['inventory_sku']) && $vd['variant_qty'] !== '') {
                     if (empty($invModels[$vd['inventory_sku']])) {
                         $invModels[$vd['inventory_sku']] = $invHlp->create([
                             'inventory_sku' => $vd['inventory_sku'],
@@ -230,6 +245,19 @@ class FCom_CustomField_Admin extends BClass
                     'manage_inventory' => $vd['variant_qty'] !== '' ? 1 : 0,
                 ])->save();
                 if (empty($matchedVariants[$i])) {
+
+                    foreach ($vd['field_values'] as $f => $fv) {
+                        if (empty($fieldOptionIdsByCodeLabel[$f][$fv])) { // new field option value
+                            $fieldId = $fieldsByCode[$f];
+                            $newOption = $fieldOptionHlp->create(['field_id' => $fieldId, 'label' => $fv])->save();
+                            $newOptionId = $newOption->id();
+                            $fieldOptionsModels[$newOptionId] = $newOption;
+                            $fieldOptionLabelsById[$fieldId][$newOptionId] = $fv;
+                            $fieldOptionIdsByLabel[$fieldId][$fv] = $newOptionId;
+                            $fieldOptionIdsByCodeLabel[$f][$fv] = $newOptionId;
+                        }
+                    }
+
                     $prodVariantModels[$m->id()] = $m;
                     $matchedVariants[$i] = $m->id();
                     foreach ($vd['field_values'] as $f => $fv) {
@@ -239,7 +267,7 @@ class FCom_CustomField_Admin extends BClass
                             'variant_id'  => $m->id(),
                             'field_id'    => $fId,
                             'varfield_id' => $prodVarfieldModels[$fId]->id(),
-                            'option_id'   => $fieldOptionsByLabel[$fId][$fv],
+                            'option_id'   => $fieldOptionIdsByLabel[$fId][$fv],
                         ])->save();
                     }
                 } else {
@@ -247,7 +275,7 @@ class FCom_CustomField_Admin extends BClass
                         $prodVariantField = $prodVariantFieldModels[$prodVariantFieldsArr[$vId][$f]['id']];
                         $fId = $fieldsByCode[$f];
                         $prodVariantField->set([
-                            'option_id' => $fieldOptionsByLabel[$fId][$fv],
+                            'option_id' => $fieldOptionIdsByLabel[$fId][$fv],
                         ])->save();
                     }
                 }

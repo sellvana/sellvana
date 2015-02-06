@@ -10,7 +10,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         {this.props.labelText}<Components.HelpIcon id={"help-" + this.props.id} content={this.props.helpText}/>
                     </Components.ControlLabel>
                     <div className="col-md-5">
-                        <input id={this.props.id} ref={this.props.name} className="form-control"/>
+                        <input id={this.props.id} ref={this.props.name} name={this.props.name} className="form-control"/>
                         <span className="help-block">{this.props.helpText}</span>
                     </div>
                 </div>
@@ -39,11 +39,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                     <div className="well well-sm help-block" style={{fontSize:12}}>
                         <p>{Locale._("You can have unique coupon codes generated for you automatically if you input simple patterns.")}</p>
                         <p>{Locale._("Pattern examples:")}</p>
-                        <p><code>&#123;U8&#125;</code>{Locale._(" - 8 upper case alpha chars - will result to something like ")}<code>DKABWJKQ</code></p>
-                        <p><code>&#123;l6&#125;</code>{Locale._(" - 6 lower case alpha chars - will result to something like ")}<code>dkabkq</code></p>
+                        <p><code>&#123;U8&#125;</code>{Locale._(" - 8 alpha chars - will result to something like ")}<code>DKABWJKQ</code></p>
                         <p><code>&#123;D4&#125;</code>{Locale._(" - 4 digits - will result to something like ")}<code>5640</code></p>
-                        <p><code>&#123;UD5&#125;</code>{Locale._(" - 5 alphanumeric (upper case) - will result to something like ")}<code>GHG76</code></p>
-                        <p><code>&#123;ULD5&#125;</code>{Locale._(" - 5 alphanumeric (mixed case) - will result to something like ")}<code>GhG76</code></p>
+                        <p><code>&#123;UD5&#125;</code>{Locale._(" - 5 alphanumeric - will result to something like ")}<code>GHG76</code></p>
                         <p><code>CODE-&#123;U4&#125;-&#123;UD6&#125;</code> - <code>CODE-HQNB-8A1NO3</code></p>
                         <p>Locale._("Note: dynamic parts of the code MUST be enclosed in &#123;&#125;")</p>
                     </div>
@@ -84,20 +82,39 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
             return (
                 <div className="multi-coupon form-group" style={{margin: "15px 0"}}>
                     <div className="btn-group col-md-offset-3">
-                        <Components.Button onClick={this.props.onShowCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onShowCodes} className="btn-primary" type="button">{this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel}</Components.Button>
                         <Components.Button onClick={this.props.onGenerateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
                         <Components.Button onClick={this.props.onImportCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
+                        <div className="form-group"><label className="col-md-5" for="total_per_customer">{Locale._("Total Uses Per Coupon Code")}</label>
+                            <div className="col-md-4"> <input type="number" className="form-control"
+                            step="1" min="0" id="total_per_customer" name="model[total_per_customer]" ref="total_per_customer"/></div>
+                        </div>
                     </div>
+
                 </div>
             );
+        },
+        componentDidMount: function () {
+            var self = this;
+            $(document).on("grid_count_update", function (ev) {
+                var count = ev.numCodes;
+                if(count) {
+                    var newLabel = self.props.buttonViewLabelTemplate.replace('%d%', count);
+                    self.setState({buttonViewLabel: newLabel});
+                }
+            });
         },
         getDefaultProps: function () {
             // component default properties
             return {
-                buttonViewLabel: Locale._("View (100) codes"),
+                buttonViewLabel: Locale._("View Codes"),
                 buttonGenerateLabel: Locale._("Generate New Codes"),
-                buttonImportLabel: Locale._("Import Existing Codes")
+                buttonImportLabel: Locale._("Import Existing Codes"),
+                buttonViewLabelTemplate: Locale._("View (%d%) Codes")
             }
+        },
+        getInitialState: function () {
+            return {};
         }
     });
 
@@ -109,8 +126,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         {this.props.labelUpc}<Components.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
                     </Components.ControlLabel>
                     <div className="col-md-2">
-                        <input type="text" id={this.props.idUpc} ref="uses_pc" className="form-control"
-                            value={this.state.valueUpc}/>
+                        <input type="text" id={this.props.idUpc} ref="coupon_uses_per_customer" name="model[coupon_uses_per_customer]" className="form-control"
+                            defaultValue={this.state.valueUpc}/>
                     </div>
 
                     <Components.ControlLabel input_id={this.props.idUt}>
@@ -118,8 +135,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                     </Components.ControlLabel>
 
                     <div className="col-md-2">
-                        <input type="text" id={this.props.idUt} ref="uses_pc" className="form-control"
-                            value={this.state.valueUt}/>
+                        <input type="text" id={this.props.idUt} ref="coupon_uses_total" name="model[coupon_uses_total]" className="form-control"
+                            defaultValue={this.state.valueUt}/>
                     </div>
                 </div>
             );
@@ -128,7 +145,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
             // component default properties
             return {
                 labelUpc: Locale._("Uses Per Customer"),
-                labelUt: Locale._("Total Uses"),
+                labelUt: Locale._("Total Uses Per Coupon Code"),
                 idUpc: "coupon_uses_per_customer",
                 idUt: "coupon_uses_total",
                 helpTextUpc: Locale._("How many times a user can use a coupon?"),
@@ -152,10 +169,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
     });
 
     var App = React.createClass({
-        displayName: 'CouponApp',
+        displayName: 'CouponsApp',
         render: function () {
             //noinspection BadExpressionStatementJS
             var child = "";
+            var viewLabel = this.props.options.buttonViewLabel || this.props.buttonViewLabel;
 
             if (this.state.mode == 1) {
                 child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
@@ -164,9 +182,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                 var onShowCodes = this.onShowCodes ||'',
                     onGenerateCodes = this.onGenerateCodes ||'',
                     onImportCodes = this.onImportCodes ||'';
-                child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
-                    <MultiCoupon key="multi-coupon" options={this.props.options} onImportCodes={onImportCodes}
-                    onGenerateCodes={onGenerateCodes} onShowCodes={onShowCodes} labelClass={this.props.labelClass}/>]
+                child = <MultiCoupon key="multi-coupon" options={this.props.options} onImportCodes={onImportCodes}
+                    onGenerateCodes={onGenerateCodes} onShowCodes={onShowCodes} labelClass={this.props.labelClass}
+                    buttonViewLabel={viewLabel}/>;
             }
             return (
                 <div className="coupon-app">
@@ -179,7 +197,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
         getDefaultProps: function () {
             // component default properties
             return {
-                labelClass: labelClass
+                labelClass: labelClass,
+                buttonViewDefaultLabel: Locale._("View Codes")
             }
         },
         getInitialState: function () {

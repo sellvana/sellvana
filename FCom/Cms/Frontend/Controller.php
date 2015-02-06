@@ -6,6 +6,7 @@
  * @property FCom_Cms_Model_Block $FCom_Cms_Model_Block
  * @property FCom_Cms_Model_Nav $FCom_Cms_Model_Nav
  * @property FCom_Cms_Frontend_View_Block $FCom_Cms_Frontend_View_Block
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -29,7 +30,8 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $this->layout('cms_page');
 
         $view = $this->FCom_Cms_Frontend_View_Block->createView($block);
-        $this->BLayout->hookView('main', $view->param('view_name'));
+        $viewName = $view->param('view_name');
+        $this->BLayout->hookView('main', $viewName);
 
         if (($root = $this->BLayout->view('root'))) {
             $root->addBodyClass('cms-' . $block->handle)
@@ -46,12 +48,12 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             }
         }
 
-        if ($block->layout_update) {
-            $layoutUpdate = $this->BYAML->parse($block->layout_update);
-            if (!is_null($layoutUpdate)) {
+        $layoutData = $block->getData('layout');
+        if ($layoutData) {
+            $context = ['type' => 'cms_page', 'main_view' => $viewName];
+            $layoutUpdate = $this->FCom_Core_LayoutEditor->compileLayout($layoutData, $context);
+            if ($layoutUpdate) {
                 $this->BLayout->addLayout('cms_page', $layoutUpdate)->applyLayout('cms_page');
-            } else {
-                $this->BDebug->warning('Invalid layout update for CMS page');
             }
         }
     }

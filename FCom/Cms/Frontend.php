@@ -39,6 +39,10 @@ class FCom_Cms_Frontend extends BClass
 
     public function metaDirectiveCmsBlockCallback($d)
     {
-        $this->FCom_Cms_Frontend_View_Block->createView($d['name'], ['view_name' => $d['view_name']]);
+        $params = [];
+        if (!empty($d['view_name'])) {
+            $params['view_name'] = $d['view_name'];
+        }
+        $this->FCom_Cms_Frontend_View_Block->createView($d['name'], $params);
     }
 }

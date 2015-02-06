@@ -18,3 +18,4 @@ index.local.php
 *.sql
 composer.*
 notes.txt
+FCom/Test/Test/Unit/buckyball/com/db_test_config.php

@@ -23,6 +23,7 @@ catalog_product_form_tabs:
             - [ addTab, categories, { label: Categories, pos: 50, async: true } ]
             - [ addTab, images, { label: Images, pos: 60, async: true } ]
             - [ addTab, attachments, { label: Attachments, pos: 70, async: true } ]
+            - [ addTab, layout, { label: Layout, pos: 80, async: true } ]
 
 
 /catalog/products/form:
@@ -52,7 +53,7 @@ catalog_product_form_tabs:
             - [ addTab, content, { label: Page Content, pos: 20 } ]
             - [ addTab, images, { label: Images, pos: 30 } ]
             - [ addTab, products, { label: Products, pos: 40  } ]
-            #- [ addTab, advanced, { label: Advanced, pos: 50 } ]
+            - [ addTab, layout, { label: Layout, pos: 50 } ]
 
 /settings:
     - view: settings

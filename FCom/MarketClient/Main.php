@@ -17,8 +17,8 @@ class FCom_MarketClient_Main extends BClass
         $progress = !$reset ? $this->BCache->load('marketclient_progress') : [];
         if (!empty($data)) {
             $progress = $this->BUtil->arrayMerge($progress, $data);
-            $this->BCache->save('marketclient_progress', $progress);
         }
+        $this->BCache->save('marketclient_progress', $progress);
         return $progress;
     }
 
@@ -31,7 +31,10 @@ class FCom_MarketClient_Main extends BClass
     {
         $progress = $this->progress();
         if (!$force && !empty($progress['status']) && in_array($progress['status'], ['ACTIVE'])) {
-            return;
+            return [
+                'error' => true,
+                'message' => 'Installation already in progress: ' . $progress['status'],
+            ];
         }
         foreach ($modules as $modName => $modInfo) {
             if (!$modInfo || $modInfo === '-'
@@ -123,6 +126,9 @@ class FCom_MarketClient_Main extends BClass
         if ($configUpdated) {
             $this->BConfig->writeConfigFiles();
         }
+        return [
+            'success' => true,
+        ];
     }
 
     /**

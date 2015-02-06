@@ -13,14 +13,13 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     protected $_gridHref = 'customers';
     protected $_modelClass = 'FCom_Customer_Model_Customer';
     protected $_gridTitle = 'Customers';
-    protected $_gridPageViewName = 'admin/griddle';
+    /*protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';*/
     protected $_recordName = 'Customer';
     protected $_mainTableAlias = 'c';
     protected $_permission = 'customers/manage';
     protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
-
-    protected $_gridViewName = 'core/griddle';
 
     public function gridConfig()
     {

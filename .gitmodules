@@ -1,4 +1,0 @@
-[submodule "FCom/LibJsCommon/jsx/griddle"]
-	path = FCom/LibJsCommon/jsx/griddle
-	url = git@bitbucket.org:sellvana/griddle.git
-    branch = custom

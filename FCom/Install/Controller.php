@@ -142,13 +142,13 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step2()
     {
+        $this->BDb->connect();
         $userHlp = $this->FCom_Admin_Model_User;
         if ($this->BDb->ddlTableExists($userHlp->table()) && $userHlp->orm('u')->find_one()) {
             $this->BResponse->redirect('install/step3');
             return;
         } else {
             $this->BApp->m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
-            $this->BDb->connect();
             $this->FCom_Core_Model_Module->init();
             $this->BMigrate->migrateModules(['FCom_Core', 'FCom_Admin'], true);
         }

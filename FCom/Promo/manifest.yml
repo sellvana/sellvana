@@ -1,9 +1,12 @@
 modules:
     FCom_Promo:
-        version: 0.1.7
+        version: 0.1.9
         channel: beta
         require: { module: { FCom_Catalog: 0.1.0, FCom_Sales: 0.2.0 }}
         description: "Promotions module"
+
+        observe:
+            - [ FCom_Sales_Model_Cart_Total_Discount::calculate, FCom_Promo_Main.onCartDiscountCalculate ]
 
         areas:
             FCom_Admin:

@@ -67,6 +67,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
                 return $chat;
             }
         }
+        /** @var static $chat */
         $chat = $this->create([
             'owner_user_id' => $user->id(),
             'title' => $user->get('username') . ', ' . $remoteUser->get('username'),
@@ -94,7 +95,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         $text = [];
         foreach ($history as $msg) {
             $text[] = [
-                'time' => gmdate("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
+                'time' => date("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
                 'username' => $msg->get('username'),
                 'text' => $msg->get('text'),
             ];
@@ -139,8 +140,10 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
             $data = array_merge($data, $extraData);
             $participant = $hlp->create($data)->save();
             $this->add('num_participants');
-            $channel->send(['signal' => 'join', 'username' => $user->get('username')]);
+        } elseif ($participant->get('status') !== 'open') {
+            $participant->set('status', 'open')->save();
         }
+        $channel->send(['signal' => 'join', 'username' => $user->get('username')]);
 
         return $participant;
     }

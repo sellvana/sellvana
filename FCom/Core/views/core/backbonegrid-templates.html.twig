@@ -221,7 +221,7 @@
 
                      break;
                 default:
-                    %><%= rc.row[col.name] %><%
+                    %><%= col.options && col.options[rc.row[col.name]] ? col.options[rc.row[col.name]] : rc.row[col.name] %><%
                  }
 
                 break;

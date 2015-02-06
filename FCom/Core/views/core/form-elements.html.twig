@@ -19,9 +19,9 @@ Using custom id/name:
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
     {% if p.label %}
-    {% import _self as forms %}
-    <label class="control-label {{ p.label_class|default('col-md-2') }} {{ p.required ? 'required' }}"
-        for="{{ view.getInputId(p) }}">{{ p.label }}&nbsp;{{ forms.help_icon(p) }}</label>
+        {% import _self as forms %}
+        <label class="control-label {{ p.label_class|default('col-md-2') }} {{ p.required ? 'required' }}"
+            for="{{ view.getInputId(p) }}">{{ p.label }}&nbsp;{{ forms.help_icon(p) }}</label>
     {% endif %}
 {% endmacro %}
 
@@ -29,7 +29,8 @@ Using custom id/name:
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
     {% if p.help_icon %}
-        <a id="help-{{ view.getInputId(p) }}" class="pull-right help-icon" href="#" data-toggle="popover" data-trigger="focus"
+        <a tabindex="-1" id="help-{{ view.getInputId(p) }}" class="pull-right help-icon" href="#" data-toggle="popover"
+            data-trigger="focus"
                data-content="{{ p.help_text }}" data-container="body">
                 <span class="glyphicon glyphicon-question-sign"></span></a>
     {% endif %}
@@ -63,6 +64,7 @@ Using custom id/name:
                 placeholder="{{ p.placeholder }}"
                 {{ p.autocomplete ? 'autocomplete="' ~ p.autocomplete ~ '"' }}
                 {{ p.readonly ? 'readonly' }}
+                {{ p.disabled ? 'disabled' }}
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ view.attributes(p.attr) | raw }}
             />
@@ -86,6 +88,7 @@ Using custom id/name:
                 class="form-control {{ p.input_class }} {{ p.required ? 'required' }}"
                 style="{{ p.style }}"
                 {{ p.readonly ? 'readonly' }}
+                {{ p.disabled ? 'disabled' }}
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ view.attributes(p.attr) | raw }}
                 {{ p.multiple ? 'multiple'}}
@@ -97,7 +100,7 @@ Using custom id/name:
     {% if p.select2 is defined %}
         <script>
             require(['jquery', 'select2'], function($) {
-                $('#{{ view.getInputId(p) }}').select2({{ p.select2 is iterable ? UTIL.toJson(p.select2) : '{}' }});
+                $('#{{ view.getInputId(p) }}').select2({{ p.select2 is iterable ? UTIL.toJson(p.select2)|raw : '{}' }});
             })
         </script>
     {% endif %}
@@ -136,6 +139,7 @@ Using custom id/name:
                 style="{{ p.style }}"
                 placeholder="{{ p.placeholder }}"
                 {{ p.readonly ? 'readonly' }}
+                {{ p.disabled ? 'disabled' }}
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ p.attr | raw }}
            >{{ p.raw ? value|raw : value }}</textarea>
@@ -294,6 +298,7 @@ Using custom id/name:
                     style="{{ p.style }}"
                     value="{{ cb }}"
                     {{ p.readonly ? 'readonly' }}
+                    {{ p.disabled ? 'disabled' }}
                     {{ p.required ? 'data-rule-required="true"' }}
                     {{ view.attributes(p.attr) | raw }}
                     {{ p.value == cb? "checked": "" }}
@@ -322,6 +327,7 @@ Using custom id/name:
                     style="{{ p.style }}"
                     value="{{ cb }}"
                     {{ p.readonly ? 'readonly' }}
+                    {{ p.disabled ? 'disabled' }}
                     {{ p.required ? 'data-rule-required="true"' }}
                     {{ view.attributes(p.attr) | raw }}
                     {{ p.value == cb? "checked": "" }}

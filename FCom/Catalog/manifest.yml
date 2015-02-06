@@ -9,6 +9,7 @@ modules:
         auto_use: [ bootstrap, views, layout ]
         observe:
             - [ "FCom_Core_ImportExport::import:afterModel:FCom_Catalog_Model_Category", "FCom_Catalog_Model_Category.onImportAfterModel" ]
+            - [ "FCom_Core_LayoutEditor::fetchLibrary", "FCom_Catalog_Main.onLayoutEditorFetchLibrary" ]
 
         default_config:
             modules/FCom_Catalog/allowed_locales: [ en_US ]

@@ -32,7 +32,15 @@ class FCom_MarketClient_Controller_Download extends FCom_Core_Controller_Abstrac
         $modules = $this->BRequest->post('modules');
         $force = $this->BRequest->post('force');
 
-        $this->FCom_MarketClient_Main->downloadAndInstall($modules, $force);
+        try {
+            $result = $this->FCom_MarketClient_Main->downloadAndInstall($modules, $force);
+        } catch (Exception $e) {
+            $result = [
+                'error' => true,
+                'message' => $e->getMessage(),
+            ];
+        }
+        $this->BResponse->json($result);
     }
 
     public function action_stop__POST()

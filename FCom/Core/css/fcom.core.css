@@ -37,3 +37,37 @@ form label.required:after { color:#e32; content:' *'; display:inline; }
 .backgrid th:hover .drag-handle { visibility:visible; cursor: move; }
 .backgrid th .ui-resizable-handle { z-index:1000; right:0; width:5px; }
 
+
+
+
+.f-layout-editor ul {
+    border:solid 1px #EEE;
+    padding:5px;
+}
+.js-layout-editor-area-header, .js-layout-editor-area-footer { min-height:100px }
+.js-layout-editor-area-left, .js-layout-editor-area-main, .js-layout-editor-area-right { min-height: 300px }
+
+.js-library-container .box {
+    background:#F0F0F0;
+    margin: 3px 0;
+}
+.js-library-container .box-header { display: none }
+.widget-actual { display: none }
+.widget-preview { cursor: pointer }
+.js-area-container { background:#FAFAFA }
+.js-area-container .widget-preview { display: none }
+.js-area-container .widget-actual { display: block }
+.js-area-container .box {
+    background:#F0F0F0;
+    margin:6px 3px;
+    padding:3px;
+    border: solid 1px #CCC;
+}
+.js-area-container .box-main-contents { background: #888888; }
+.js-area-container .box-main-contents .box-header .title { color:#FFFFFF; }
+.widget-actual input, .widget-actual textarea, .widget-actual select { width:100% }
+
+.js-layout-structure-control select { width:auto; display:inline; }
+.js-widget-custom-param .form-control { width:40%; display:inline; }
+
+.js-widget-custom-param-remove i { color:#700000; }

@@ -15,18 +15,17 @@ class FCom_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abstrac
 {
     protected static $_origClass = __CLASS__;
 
-    protected $_gridHref = 'salestax/rules';
     protected $_modelClass = 'FCom_SalesTax_Model_Rule';
+    protected $_gridHref = 'salestax/rules';
     protected $_gridTitle = 'Tax Rules';
     protected $_recordName = 'Tax Rule';
     protected $_mainTableAlias = 'r';
     protected $_navPath = 'sales/tax/rules';
-    protected $_permission = 'salestax_rules';
+    protected $_permission = 'sales/tax/rules';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        unset($config['form_url']);
 
         $zones = $this->FCom_SalesTax_Model_Zone->getAllZones();
         $custClasses = $this->FCom_SalesTax_Model_CustomerClass->getAllTaxClasses();
@@ -62,7 +61,6 @@ class FCom_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abstrac
             ['field' => 'rule_rate_percent', 'type' => 'number-range'],
             ['field' => 'fpt_amount', 'type' => 'number-range'],
         ];
-        $config['new_button'] = '#add_new_rule';
         return $config;
     }
 
@@ -76,14 +74,6 @@ class FCom_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abstrac
         $orm->select("(select count(*) from {$tZone} where rule_id=r.id)", 'zones_cnt')
             ->select("(select count(*) from {$tCustClass} where rule_id=r.id)", 'cust_class_cnt')
             ->select("(select count(*) from {$tProdClass} where rule_id=r.id)", 'prod_class_cnt');
-    }
-
-    public function gridViewBefore($args)
-    {
-        parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(['actions' => [
-            'new' => '<button type="button" id="add_new_rule" class="btn grid-new btn-primary _modal">'
-                . $this->BLocale->_('Add New Tax Rule') . '</button>']]);
     }
 
     public function formViewBefore($args)
