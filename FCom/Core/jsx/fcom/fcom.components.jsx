@@ -1,4 +1,5 @@
-define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Locale) {
+//noinspection JSPotentiallyInvalidUsageOfThis
+define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (React, $, Locale) {
     FCom.Components = {};
 
     /**
@@ -147,7 +148,11 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
     FCom.Components.Input = React.createClass({
         mixins:[FCom.FormMixin],
         render: function () {
-            var { formGroupClass, inputDivClass, inputClass, inputValue, ...other } = this.props;
+            var formGroupClass = this.props.formGroupClass,
+                inputDivClass = this.props.inputDivClass,
+                inputClass = this.props.inputClass,
+                inputValue = this.props.inputValue,
+                other = _.omit(this.props, ['formGroupClass', 'inputDivClass', 'inputClass', 'inputValue']);
             var className = "form-control";
             if(inputClass) {
                 className += " " + inputClass;
@@ -156,8 +161,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
                 className += " required";
             }
             var helpBlock = <span/>;
-            if(this.props.helpBlockText) {
-                helpBlock = <FCom.Components.HelpBlock text={this.props.helpBlockText}/>;
+            if(this.props['helpBlockText']) {
+                helpBlock = <FCom.Components.HelpBlock text={this.props['helpBlockText']}/>;
             }
         var inputId = this.getInputId();
 

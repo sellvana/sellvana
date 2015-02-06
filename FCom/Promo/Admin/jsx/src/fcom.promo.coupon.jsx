@@ -79,16 +79,27 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
         render: function () {
             return (
                 <div className="multi-coupon form-group" style={{margin: "15px 0"}}>
-                    <div className="btn-group col-md-offset-3">
-                        <Components.Button onClick={this.props.onShowCodes} className="btn-primary" type="button">{this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel}</Components.Button>
-                        <Components.Button onClick={this.props.onGenerateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
-                        <Components.Button onClick={this.props.onImportCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
-                        <div className="form-group"><label className="col-md-5" htmlFor="total_per_customer">{Locale._("Total Uses Per Coupon Code")}</label>
-                            <div className="col-md-4"> <input type="number" className="form-control"
-                            step="1" min="0" id="total_per_customer" name="model[total_per_customer]" ref="total_per_customer"/></div>
+                    <div className="form-group">
+                        <Components.ControlLabel input_id='limit_per_coupon' label_class='col-md-3'>
+                            {Locale._("Limit Per Coupon Code")}
+                            <Components.HelpIcon id="help-limit_per_coupon"
+                                content={Locale._("Maximum number of uses per coupon code")}/>
+                        </Components.ControlLabel>
+
+                        <div className="col-md-1">
+                            <input type="text" id='limit_per_coupon' ref="limit_per_coupon"
+                                name="model[limit_per_coupon]" className="form-control"
+                                defaultValue={this.props.options.limit_per_coupon}/>
                         </div>
                     </div>
-
+                    <div className="btn-group col-md-offset-3">
+                        <Components.Button onClick={this.props.onShowCodes} className="btn-primary"
+                            type="button">{this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onGenerateCodes} className="btn-primary"
+                            type="button">{this.props.buttonGenerateLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onImportCodes} className="btn-primary"
+                            type="button">{this.props.buttonImportLabel}</Components.Button>
+                    </div>
                 </div>
             );
         },
@@ -121,19 +132,23 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
             return (
                 <div className="uses-block form-group" style={{clear: 'both'}}>
                     <Components.ControlLabel input_id={this.props.idUpc} label_class={this.props.labelClass}>
-                        {this.props.labelUpc}<Components.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
+                        {this.props.labelUpc}
+                        <Components.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
                     </Components.ControlLabel>
-                    <div className="col-md-2">
-                        <input type="text" id={this.props.idUpc} ref="coupon_uses_per_customer" name="model[coupon_uses_per_customer]" className="form-control"
+                    <div className="col-md-1">
+                        <input type="text" id={this.props.idUpc} ref={this.props.idUpc}
+                            name={"model[" + this.props.idUpc + "]"} className="form-control"
                             defaultValue={this.state.valueUpc}/>
                     </div>
 
-                    <Components.ControlLabel input_id={this.props.idUt}>
-                        {this.props.labelUt}<Components.HelpIcon id={"help-" + this.props.idUt} content={this.props.helpTextUt}/>
+                    <Components.ControlLabel input_id={this.props.idUt} label_class={this.props.labelClass}>
+                        {this.props.labelUt}
+                        <Components.HelpIcon id={"help-" + this.props.idUt} content={this.props.helpTextUt}/>
                     </Components.ControlLabel>
 
-                    <div className="col-md-2">
-                        <input type="text" id={this.props.idUt} ref="coupon_uses_total" name="model[coupon_uses_total]" className="form-control"
+                    <div className="col-md-1">
+                        <input type="text" id={this.props.idUt} ref={this.props.idUt}
+                            name={"model[" + this.props.idUt + "]"} className="form-control"
                             defaultValue={this.state.valueUt}/>
                     </div>
                 </div>
@@ -142,10 +157,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
         getDefaultProps: function () {
             // component default properties
             return {
-                labelUpc: Locale._("Uses Per Customer"),
-                labelUt: Locale._("Total Uses Per Coupon Code"),
-                idUpc: "coupon_uses_per_customer",
-                idUt: "coupon_uses_total",
+                labelUpc: Locale._("Limit Per Customer"),
+                labelUt: Locale._("Limit Per Promo"),
+                idUpc: "limit_per_customer",
+                idUt: "limit_per_promo",
                 helpTextUpc: Locale._("How many times a user can use a coupon?"),
                 helpTextUt: Locale._("How many total times a coupon can be used?")
             };
