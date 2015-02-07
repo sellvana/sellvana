@@ -49,4 +49,22 @@ class FCom_ProductCompare_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        $tSet = $this->FCom_ProductCompare_Model_Set->table();
+        $tSetItem = $this->FCom_ProductCompare_Model_SetItem->table();
+
+        $this->BDb->ddlTableDef($tSet, [
+            BDb::COLUMNS => [
+                'data_serialized' => 'text',
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tSetItem, [
+            BDb::COLUMNS => [
+                'data_serialized' => 'text',
+            ],
+        ]);
+
+    }
 }
