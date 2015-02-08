@@ -217,18 +217,25 @@ class FCom_SalesTax_Main extends BClass
     {
         $rulesPerItem = [];
         foreach ($rules as $rId => $rule) {
+            if (!$rule->get('product_classes')) {
+                continue;
+            }
             foreach ($rule->get('product_classes') as $pc) {
                 foreach ($pc->get('items') as $item) {
                     $rulesPerItem[$item->id()][$rule->get('compound_priority')][$rId] = $rule;
                 }
             }
         }
-
         $result = [
             'tax_amount' => 0,
             'details' => [],
             'items' => [],
         ];
+
+        if (!$rulesPerItem) {
+            return $result;
+        }
+
         $ratesByRule = [];
         foreach ($cart->items() as $item) {
             $itemId = $item->id();

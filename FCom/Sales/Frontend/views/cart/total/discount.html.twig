@@ -1,0 +1,9 @@
+{% set couponCodes = THIS.get('cart').getCouponCodes() %}
+
+{{ THIS.get('label') }}
+
+<form action="{{ APP.href('cart/remove_coupon') }}" method="post">
+{% for code in couponCodes %}
+    [<button type="submit" name="coupon_code" value="{{ code }}">X</button> {{ code }}]
+{% endfor %}
+</form>

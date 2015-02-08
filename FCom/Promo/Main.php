@@ -4,13 +4,24 @@
  * Class FCom_Promo_Main
  *
  * @property FCom_Promo_Model_Promo         $FCom_Promo_Model_Promo
- * @property FCom_Promo_Workflow_Promo      $FCom_Promo_Workflow_Promo
  */
 class FCom_Promo_Main extends BClass
 {
-    public function bootstrap()
+    public function onWorkflowCustomerAddsCouponCode($args)
     {
-        $this->FCom_Promo_Workflow_Promo->registerWorkflow();
+        $cart = $args['cart'];
+        $couponCode = $args['coupon_code'];
+
+        $promo = $this->FCom_Promo_Model_Promo->findByCouponCode($couponCode);
+        if (!$promo) {
+            $result['error']['message'] = 'Coupon not found';
+            return;
+        }
+        if (!$promo->validateForCart($cart)) {
+            $result['error']['message'] = "Coupon can't be applied to your cart";
+        }
+        $result['success'] = true;
+        unset($result['error']);
     }
 
     public function onCartDiscountCalculate($args)
@@ -57,4 +68,5 @@ class FCom_Promo_Main extends BClass
 
         }
     }
+
 }

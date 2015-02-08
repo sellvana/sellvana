@@ -6,11 +6,11 @@
 {% for total in totals %}
     <div class="row {{ total.getRowClass() }}">
         <div class="col-md-8 title">
-            {{ total.getLabelFormatted() }}
+            {{ total.getLabelFormatted() | raw }}
             {% if total.getError() %}<br/>(<span class="error">{{ total.getError() }}</span>){% endif %}
         </div>
         <div class="col-md-4">
-            {{ total.getValueFormatted() }}
+            {{ total.getValueFormatted() | raw }}
         </div>
     </div>
 {% endfor %}

@@ -85,8 +85,13 @@
                 {% for total in cart.getTotals() %}
                     {% if not total.isHidden() %}
                         <tr class="{{ total.getRowClass() }}">
-                            <td>{{ total.getLabelFormatted() }}</td>
-                            <td>{{ total.getValueFormatted() }}</td>
+                            <td>
+                                {{ total.getLabelFormatted() | raw }}
+                                {% if total.getError() %}<br/>(<span class="error">{{ total.getError() }}</span>){% endif %}
+                            </td>
+                            <td>
+                                {{ total.getValueFormatted() | raw }}
+                            </td>
                         </tr>
                     {% endif %}
                 {% endfor %}
@@ -112,7 +117,7 @@
             {{ THIS.view('cart/shipping-estimate-form') | raw }}
         </div>
         <div class="col-md-6">
-            {{ THIS.view('promo/coupon-form') | raw }}
+            {{ THIS.view('cart/coupon-form') | raw }}
         </div>
     </div>
     <div class="row">

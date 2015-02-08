@@ -1,5 +1,5 @@
-<form method="post" action="{{ APP.href('promo/add') }}">
+<form method="post" action="{{ APP.href('cart/add_coupon') }}">
     <label for="promo-coupon_code">{{ 'Coupon Code:'|_ }}</label>
-    <input type="text" id="promo-coupon_code" name="promo[coupon_code]" required>
+    <input type="text" id="promo-coupon_code" name="coupon_code" required>
     <button type="submit" class="btn btn-default btn-xs">{{ 'Apply'|_ }}</button>
 </form>
