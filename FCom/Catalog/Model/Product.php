@@ -855,6 +855,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getAverageStars()
     {
+        return $this->get('avg_rating');;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAverageRatingPercent()
+    {
         return $this->get('avg_rating') / 5 * 100;
     }
 

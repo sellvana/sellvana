@@ -44,7 +44,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $count    = $countRes[0]['count'];
 
-        $orm->limit((int) $limit)->offset($offset)->order_by_desc('product_name');
+        $orm->limit((int) $limit)->offset($offset)->order_by_asc('product_name');
         $stmt   = $orm->execute();
         $result = ['total_count' => $count, 'items' => []];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {

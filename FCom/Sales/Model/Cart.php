@@ -746,6 +746,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    public function getCouponCodes()
+    {
+        $codes = $this->get('coupon_code');
+        return $codes ? explode(',', $codes) : [];
+    }
+
     /**
      * @return FCom_Sales_Model_Cart_State
      */

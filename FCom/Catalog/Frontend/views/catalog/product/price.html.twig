@@ -7,12 +7,23 @@
   'old': 'f-old-price',
 } %}
 
-<div class="f-price-group">
+<div class="f-price-group" itemprop="offerDetails" itemscope itemtype="http://data-vocabulary.org/Offer">
     <table>
 {% for price in prices %}
       <tr class="{{ classByType[price.type] }}">
           <th class="f-price-label">{{ price.label|_ }}</th>
-          <td class="f-price {{ price.final ? 'f-final-price' }}">{{ price.formatted ?: (price.value ? price.value|currency : 'FREE'|_) }}</td>
+          <td class="f-price {{ price.final ? 'f-final-price' }}">
+              {{ price.formatted ?: (price.value ? price.value|currency : 'FREE'|_) }}
+              {% if price.final %}
+                  <meta itemprop="priceCurrency" content="{{ LOCALE.getCurrencyCode() }}"/>
+                  <meta itemprop="price" content="{{ price.value }}"/>
+                  <meta itemprop="availability" content="{{ prod.getInventoryModel().isInStock() ? 'in_stock' : 'out_of_stock' }}"/>
+                  <meta itemprop="offerUrl" content="{{ prod.url() }}"/>
+                  {% if price.to_date %}
+                      <meta itemprop="priceValidUntil" content="{{ price.to_date }}"/>
+                  {% endif %}
+              {% endif %}
+          </td>
       </tr>
 {% endfor %}
     </table>
