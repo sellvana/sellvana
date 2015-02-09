@@ -7,7 +7,7 @@
 {% if cartQty %}
     <div class="f-widget f-mini-cart">
       <header class="f-widget-header">
-        <strong class="f-widget-title">Recently added to cart</strong>
+        <strong class="f-widget-title">{{ 'Recently added to cart'|_ }}</strong>
       </header>
       <ul class="f-widget-content">
       {% for item in items %}{% set p = item.product() %}{% set pUrl = p.url() %}{% set pName = p.get('product_name')  %}
@@ -25,10 +25,10 @@
         </li>
         {% endfor %}
         <li class="f-subtotal f-price-group">
-          <span class="f-price">Subtotal: {{ cart.get('subtotal') | currency }}</span>
+          <span class="f-price">{{ 'Subtotal:'|_ }} <span>{{ cart.get('subtotal') | currency }}</span></span>
         </li>
         <li class="btn-group">
-          <a class="btn btn-primary" href="{{ APP.href('cart') }}">Go to Cart ({{ cartQty }} items)</a>
+          <a class="btn btn-primary" href="{{ APP.href('cart') }}">{{ 'Go to Cart'|_ }} ({{ '%s items'|_(cartQty) }})</a>
           {# checkoutButton.href #}
         </li>
       </ul>
@@ -36,10 +36,10 @@
 {% else %}
     <div class="f-widget f-mini-cart">
       <header class="f-widget-header">
-        <strong class="f-widget-title">Cart is empty</strong>
+        <strong class="f-widget-title">{{ 'Cart is empty'|_ }}</strong>
       </header>
       <div class="f-widget-content">
-        <p class="f-mini-cart-empty-text">Please, add some items to cart.</p>
+        <p class="f-mini-cart-empty-text">{{ 'Please, add some items to cart.'|_ }}</p>
       </div>
     </div>
 {% endif %}
