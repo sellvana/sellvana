@@ -2475,7 +2475,7 @@ class BModel extends Model
     public static function create($data = null, $new = true)
     {
         if (static::$_fieldDefaults) {
-            $data = array_merge(static::$_fieldDefaults, $data);
+            $data = $data ? array_merge(static::$_fieldDefaults, $data) : static::$_fieldDefaults;
         }
         $record = static::factory()->create($data, $new);
         $record->onAfterCreate();
