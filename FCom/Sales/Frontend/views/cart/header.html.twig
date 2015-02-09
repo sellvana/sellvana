@@ -3,7 +3,7 @@
 
 <li class="dropdown f-header-mini-cart-trigger">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-    <span class="glyphicon glyphicon-shopping-cart"></span><span class="f-header-util-links-label">Cart ({{ cartQty }}) <b class="caret"></b></span><span class="f-header-util-qty">{{ cartQty }}</span>
+    <span class="glyphicon glyphicon-shopping-cart"></span><span class="f-header-util-links-label">{{ 'Cart'|_ }} ({{ cartQty }}) <b class="caret"></b></span><span class="f-header-util-qty">{{ cartQty }}</span>
   </a>
   <ul class="dropdown-menu">
     <li role="presentation" class="dropdown-header">{{ cartQty ? 'Recently added to cart'|_ : 'Cart is empty'|_ }}</li>

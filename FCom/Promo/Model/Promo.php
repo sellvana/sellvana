@@ -154,19 +154,21 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @param $couponCode
-     * @return FCom_Promo_Model_Promo|boolean
+     * @param array $couponCodes
+     * @return FCom_Promo_Model_Promo[]
      * @throws BException
      */
-    public function findByCouponCode($couponCode)
+    public function findByCouponCodes(array $couponCodes)
     {
-        $coupon = $this->FCom_Promo_Model_PromoCoupon->orm()
-            ->where('code', $couponCode)
-            ->find_one();
-        if (!$coupon) {
-            return false;
+        $promos = $this->orm('p')->select('p.*')
+            ->join('FCom_Promo_Model_PromoCoupon', ['pc.promo_id', '=', 'p.id'], 'pc')
+            ->where_in('pc.code', $couponCodes)
+            ->order_by_asc('p.priority_order')
+            ->find_many();
+        if (!$promos) {
+            return [];
         }
-        return $this->load($coupon->get('promo_id'));
+        return $promos;
     }
 
     protected function _compareValues($v1, $v2, $op)
@@ -445,7 +447,6 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
     {
         $actions = $this->getData('actions/rules/discount');
         if ($actions) {
-            $discountPercent = 0;
             foreach ($actions as $action) {
                 $this->_calcCartSubtotalDiscount($cart, $action, $conditionsResult, $actionsResult);
             }
@@ -510,18 +511,22 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
         }
 
         $totalAmount = 0;
+        $percent = 0;
+        $totalDiscount = 0;
         foreach ($items as $item) {
             $totalAmount += $item->get('row_total');
         }
-        if ($amountType === 'pcnt') {
-            $percent = $amount / 100;
-            $totalDiscount = (float)$localeHlp->roundCurrency($totalAmount * $percent);
-        } elseif ($amountType === 'amt') {
-            $percent = $amount / $totalAmount;
-            $totalDiscount = $amount;
-        } elseif ($amountType === 'fixed') {
-            $percent = 1 - $amount / $totalAmount;
-            $totalDiscount = $totalAmount - $amount;
+        if ($totalAmount) {
+            if ($amountType === 'pcnt') {
+                $percent       = $amount / 100;
+                $totalDiscount = (float)$localeHlp->roundCurrency($totalAmount * $percent);
+            } elseif ($amountType === 'amt') {
+                $percent       = $amount / $totalAmount;
+                $totalDiscount = $amount;
+            } elseif ($amountType === 'fixed') {
+                $percent       = 1 - $amount / $totalAmount;
+                $totalDiscount = $totalAmount - $amount;
+            }
         }
         if (empty($actionsResult['discount_amount'])) {
             $actionsResult['discount_amount'] = $totalDiscount;

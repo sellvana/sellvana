@@ -110,9 +110,14 @@ class FCom_SalesTax_Main extends BClass
 
     protected function _collectCartProductTaxClasses($cart)
     {
+        $items = $cart->items();
+        if (!$items) {
+            return [];
+        }
+
         // Collect product IDs used in this cart
         $pIds = [];
-        foreach ($cart->items() as $item) {
+        foreach ($items as $item) {
             $pIds[] = $item->get('product_id');
         }
 
@@ -124,7 +129,7 @@ class FCom_SalesTax_Main extends BClass
 
         // Group cart items by tax class
         $itemsByProdClass = [];
-        foreach ($cart->items() as $item) {
+        foreach ($items as $item) {
             $assigned = false;
             foreach ($prodTaxClasses as $pt) {
                 if ($item->get('product_id') === $pt->get('product_id')) {
