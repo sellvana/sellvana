@@ -992,7 +992,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         render: function () {
             var amount = '';
             if(this.state.type != 'free') {
-                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" ref="shippingAmount" className="form-control" />
+                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" ref="shippingAmount" className="form-control" onChange={this.onChange}/>
             }
             var type = <Type ref="shippingType" id="shippingType" onChange={this.onTypeChange} value={this.state.type}
                     totalType={this.props.fields} value={this.state.type}/>;
