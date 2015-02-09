@@ -12,13 +12,16 @@ class FCom_Promo_Main extends BClass
         $cart = $args['cart'];
         $couponCode = $args['coupon_code'];
 
-        $promo = $this->FCom_Promo_Model_Promo->findByCouponCode($couponCode);
-        if (!$promo) {
+        $promos = $this->FCom_Promo_Model_Promo->findByCouponCodes([$couponCode]);
+        if (!$promos) {
             $result['error']['message'] = 'Coupon not found';
             return;
         }
-        if (!$promo->validateForCart($cart)) {
-            $result['error']['message'] = "Coupon can't be applied to your cart";
+        foreach ($promos as $promo) {
+            if (!$promo->validateForCart($cart)) {
+                $result['error']['message'] = "Coupon can't be applied to your cart";
+                return;
+            }
         }
         $result['success'] = true;
         unset($result['error']);
@@ -31,13 +34,17 @@ class FCom_Promo_Main extends BClass
         $result =& $args['result'];
         $stopFlag = 0;
 
-        $couponCode = $cart->get('coupon_code');
-        if ($couponCode) {
-            $couponPromo = $this->FCom_Promo_Model_Promo->findByCouponCode($couponCode);
-            if ($couponPromo && ($validateResult = $couponPromo->validateForCart($cart))) {
-                $couponPromo->calculateActionsForCart($cart, $validateResult, $result);
-                if ($couponPromo->get('stop_flag')) {
-                    $stopFlag = 1;
+        $couponCodes = $cart->getCouponCodes();
+        if ($couponCodes) {
+            $couponPromos = $this->FCom_Promo_Model_Promo->findByCouponCodes($couponCodes);
+            foreach ($couponPromos as $couponPromo) {
+                $validateResult = $couponPromo->validateForCart($cart);
+                if (!empty($validateResult['match'])) {
+                    $couponPromo->calculateActionsForCart($cart, $validateResult, $result);
+                    if ($couponPromo->get('stop_flag')) {
+                        $stopFlag = 1;
+                        break;
+                    }
                 }
             }
         }
@@ -48,7 +55,8 @@ class FCom_Promo_Main extends BClass
                 ->where('promo_type', 'cart')->where('coupon_type', 0)->find_many();
 
             foreach ($noCouponPromos as $promo) {
-                if (($validateResult = $promo->validateForCart($cart))) {
+                $validateResult = $promo->validateForCart($cart);
+                if (!empty($validateResult['match'])) {
                     $promo->calculateActionsForCart($cart, $validateResult, $result);
                     if ($promo->get('stop_flag')) {
                         break;
