@@ -2258,6 +2258,20 @@ class BModel extends Model
     protected $_diLocal = [];
 
     /**
+     * Options for each field
+     *
+     * @var array
+     */
+    protected static $_fieldOptions = [];
+
+    /**
+     * Set field defaults on create()
+     *
+     * @var array
+     */
+    protected static $_fieldDefaults = [];
+
+    /**
     * Retrieve original class name
     *
     * @return string
@@ -2460,6 +2474,9 @@ class BModel extends Model
     */
     public static function create($data = null, $new = true)
     {
+        if (static::$_fieldDefaults) {
+            $data = array_merge(static::$_fieldDefaults, $data);
+        }
         $record = static::factory()->create($data, $new);
         $record->onAfterCreate();
         return $record;

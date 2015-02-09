@@ -203,11 +203,13 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 }
             }
         }
-        $skus = $this->FCom_Catalog_Model_InventorySku->orm()
-            ->where_in('inventory_sku', $invSkus)->find_many_assoc('inventory_sku');
-        foreach ($data as $i => $v) {
-            if (!empty($skus[$v['inventory_sku']])) {
-                $data[$i]['variant_qty'] = $skus[$v['inventory_sku']]->qty_in_stock;
+        if ($invSkus) {
+            $skus = $this->FCom_Catalog_Model_InventorySku->orm()
+                ->where_in('inventory_sku', $invSkus)->find_many_assoc('inventory_sku');
+            foreach ($data as $i => $v) {
+                if (!empty($skus[$v['inventory_sku']])) {
+                    $data[$i]['variant_qty'] = $skus[$v['inventory_sku']]->qty_in_stock;
+                }
             }
         }
 

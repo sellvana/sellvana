@@ -471,10 +471,11 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
     protected function _calcCartSubtotalDiscount(FCom_Sales_Model_Cart $cart, array $action,
                                                  array $conditionsResult, array &$actionsResult)
     {
+        $combineStrategy = $this->BConfig->get('modules/FCom_Promo/combine_strategy', 'max'); //,compound
         //TODO: remove defaults
         $scope = !empty($action['scope']) ? $action['scope'] : 'whole_order';
         $amountType = !empty($action['type']) ? $action['type'] : 'pcnt'; //,amt,fixed
-        $amount = !empty($action['amount']) ? $action['amount'] : 10;
+        $amount = !empty($action['value']) ? $action['value'] : 10;
         $localeHlp = $this->BLocale;
         $items = [];
         switch ($scope) {
@@ -513,8 +514,13 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
         $totalAmount = 0;
         $percent = 0;
         $totalDiscount = 0;
-        foreach ($items as $item) {
-            $totalAmount += $item->get('row_total');
+        $rowTotals = [];
+        foreach ($items as $i => $item) {
+            $rowTotals[$i] = $item->get('row_total');
+            if (!empty($actionsResult['items'][$i]['row_discount'])) {
+                $rowTotals[$i] -= $actionsResult['items'][$i]['row_discount'];
+            }
+            $totalAmount += $rowTotals[$i];
         }
         if ($totalAmount) {
             if ($amountType === 'pcnt') {
@@ -538,11 +544,16 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
             if ($item->get('auto_added')) {
                 continue;
             }
-            $rowDiscount = $localeHlp->roundCurrency($item->get('row_total') * $percent);
-            $totalDiscount -= $rowDiscount;
-            $actionsResult['items'][$i]['row_discount_percent'] = $percent * 100;
-            $actionsResult['items'][$i]['row_discount'] = $rowDiscount;
+            $rowDiscount = $localeHlp->roundCurrency($rowTotals[$i] * $percent);
+            if (empty($actionsResult['items'][$i]['row_discount'])) {
+                $actionsResult['items'][$i]['row_discount_percent'] = $percent * 100;
+                $actionsResult['items'][$i]['row_discount']         = $rowDiscount;
+            } else {
+                $actionsResult['items'][$i]['row_discount_percent'] += min(100, $percent * 100);
+                $actionsResult['items'][$i]['row_discount']         += min($rowTotals[$i], $rowDiscount);
+            }
             $lastItemIdx = $i;
+            $totalDiscount -= $rowDiscount;
         }
         if ($lastItemIdx && $totalDiscount) {
             $actionsResult['items'][$lastItemIdx]['row_discount'] += $totalDiscount; // rounding error fix
