@@ -4,12 +4,9 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
     function (React, $, Griddle, Components, Actions, CouponApp, ConditionsApp, store) {
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {minimumResultsForSearch: 15, dropdownAutoWidth: true});
     var Promo = {
-        createButton: function () {
-            React.render(<Button label="Hello button"/>, document.getElementById('testbed'));
-        },
-        createGrid: function() {
-            React.render(<Griddle/>, document.getElementById('testbed'));
-        },
+        $modalContainerCoupons: null,
+        $modalContainerConditions: null,
+        $modalContainerActions: null,
         init: function (options) {
             $.extend(this.options, options);
 
@@ -26,12 +23,28 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 this.options.promoOptionsEl = $promoOptions;
             }
 
-            var $modalContainerCoupons = $('<div/>').appendTo(document.body);
-            var $modalContainerConditions = $('<div/>').appendTo(document.body);
-            var $modalContainerActions = $('<div/>').appendTo(document.body);
-            this.initCouponApp(this.options.coupon_select_id, $modalContainerCoupons);
-            this.initConditionsApp(this.options.condition_select_id, $modalContainerConditions);
-            this.initActionsApp(this.options.actions_select_id, $modalContainerActions);
+            if(this.options['promo_type_id']) {
+                var $promoType = $("#" + this.options['promo_type_id']);
+                if($promoType.length) {
+                    this.options.promo_type = $promoType.val();
+                    var promo = this;
+                    $promoType.on('change', function (e) {
+                        // on promo type element change, set resulting promo type to options and render form
+                        promo.options.promo_type = $(e.target).val();
+                        promo.initAll();
+                    });
+                }
+            }
+
+            this.$modalContainerCoupons = $('<div/>').appendTo(document.body);
+            this.$modalContainerConditions = $('<div/>').appendTo(document.body);
+            this.$modalContainerActions = $('<div/>').appendTo(document.body);
+            this.initAll()
+        },
+        initAll: function () {
+            this.initCouponApp(this.options.coupon_select_id, this.$modalContainerCoupons);
+            this.initConditionsApp(this.options.condition_select_id, this.$modalContainerConditions);
+            this.initActionsApp(this.options.actions_select_id, this.$modalContainerActions);
         },
         initActionsApp: function (selector, $modalContainer) {
             var $actionsSelector = $('#' + selector);
@@ -102,7 +115,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             condition_add_id: 'condition_action_add',
             promo_serialized: '',
             promoOptions: {},
-            debug: false
+            debug: false,
+            promo_type: 'cart' // default promotion type
         },
         showCodesModal: null,
         generateCodesModal: null,

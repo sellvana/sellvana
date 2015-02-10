@@ -1349,6 +1349,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             var children = [];
             var options = this.props.options;
+            var promoType = options.promo_type;
             var mc = this.props.modalContainer;
             var rc = this.removeCondition;
             var cu = this.conditionUpdate;
@@ -1367,13 +1368,21 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                                     el = <ConditionsCategories onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
                                     break;
                                 case 'total':
-                                    el = <ConditionTotal onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                    if(promoType == 'catalog') {
+                                        el = '';
+                                    } else {
+                                        el = <ConditionTotal onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                    }
                                     break;
                                 case 'combination':
                                     el = <ConditionsAttributeCombination onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
                                     break;
                                 case 'shipping':
-                                    el = <ConditionsShipping onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                    if(promoType == 'catalog') {
+                                        el = '';
+                                    } else {
+                                        el = <ConditionsShipping onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                    }
                                     break;
                             }
                             if (el) {
