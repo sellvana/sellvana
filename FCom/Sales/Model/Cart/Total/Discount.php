@@ -57,4 +57,18 @@ class FCom_Sales_Model_Cart_Total_Discount extends FCom_Sales_Model_Cart_Total_A
 
         return $this;
     }
+
+    public function getLabelFormatted()
+    {
+        $label = parent::getLabelFormatted();
+        $view = $this->BLayout->view('cart/total/discount');
+        if (!$view) {
+            return $label;
+        }
+        return $view->set([
+            'label' => $label,
+            'cart' => $this->_cart,
+            'details' => $this->_cart->getData('discount_details'),
+        ])->render();
+    }
 }

@@ -10,7 +10,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                         {this.props.labelText}<Components.HelpIcon id={"help-" + this.props.id} content={this.props.helpText}/>
                     </Components.ControlLabel>
                     <div className="col-md-5">
-                        <input id={this.props.id} ref={this.props.name} className="form-control"/>
+                        <input id={this.props.id} ref={this.props.name} name={this.props.name} className="form-control" defaultValue={this.props.value}/>
                         <span className="help-block">{this.props.helpText}</span>
                     </div>
                 </div>
@@ -19,8 +19,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
         getDefaultProps: function () {
             // component default properties
             return {
-                id: "model-use_coupon_code_single",
-                name: "use_coupon_code_single",
+                id: "model-single_coupon_code",
+                name: "single_coupon_code",
                 helpText: Locale._("(Leave empty for auto-generate)"),
                 labelText: Locale._("Coupon Code")
             };
@@ -56,8 +56,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
                             inputDivClass='col-md-8' label_class='col-md-4' inputValue="1" required/>
                         <div className={this.props.groupClass}>
                             <div className="col-md-offset-4">
-                                <Components.Button type="button" id="coupon-generate-btn" onClick={this.handleGenerateClick}
-                                    className="btn-danger btn-post">{Locale._("Generate")}</Components.Button>
                                 <span style={{display: 'none', marginLeft: 20}} className="loading">Loading ... </span>
                                 <span style={{display: 'none', marginLeft: 20}} className="result"></span>
                             </div>
@@ -81,10 +79,26 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
         render: function () {
             return (
                 <div className="multi-coupon form-group" style={{margin: "15px 0"}}>
+                    <div className="form-group">
+                        <Components.ControlLabel input_id='limit_per_coupon' label_class='col-md-3'>
+                            {Locale._("Limit Per Coupon Code")}
+                            <Components.HelpIcon id="help-limit_per_coupon"
+                                content={Locale._("Maximum number of uses per coupon code")}/>
+                        </Components.ControlLabel>
+
+                        <div className="col-md-1">
+                            <input type="text" id='limit_per_coupon' ref="limit_per_coupon"
+                                name="model[limit_per_coupon]" className="form-control"
+                                defaultValue={this.props.options.limit_per_coupon}/>
+                        </div>
+                    </div>
                     <div className="btn-group col-md-offset-3">
-                        <Components.Button onClick={this.props.onShowCodes} className="btn-primary" type="button">{this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel}</Components.Button>
-                        <Components.Button onClick={this.props.onGenerateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
-                        <Components.Button onClick={this.props.onImportCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onShowCodes} className="btn-primary"
+                            type="button">{this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onGenerateCodes} className="btn-primary"
+                            type="button">{this.props.buttonGenerateLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onImportCodes} className="btn-primary"
+                            type="button">{this.props.buttonImportLabel}</Components.Button>
                     </div>
                 </div>
             );
@@ -118,20 +132,24 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
             return (
                 <div className="uses-block form-group" style={{clear: 'both'}}>
                     <Components.ControlLabel input_id={this.props.idUpc} label_class={this.props.labelClass}>
-                        {this.props.labelUpc}<Components.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
+                        {this.props.labelUpc}
+                        <Components.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
                     </Components.ControlLabel>
-                    <div className="col-md-2">
-                        <input type="text" id={this.props.idUpc} ref="uses_pc" className="form-control"
-                            value={this.state.valueUpc}/>
+                    <div className="col-md-1">
+                        <input type="text" id={this.props.idUpc} ref={this.props.idUpc}
+                            name={"model[" + this.props.idUpc + "]"} className="form-control"
+                            defaultValue={this.state.valueUpc}/>
                     </div>
 
-                    <Components.ControlLabel input_id={this.props.idUt}>
-                        {this.props.labelUt}<Components.HelpIcon id={"help-" + this.props.idUt} content={this.props.helpTextUt}/>
+                    <Components.ControlLabel input_id={this.props.idUt} label_class={this.props.labelClass}>
+                        {this.props.labelUt}
+                        <Components.HelpIcon id={"help-" + this.props.idUt} content={this.props.helpTextUt}/>
                     </Components.ControlLabel>
 
-                    <div className="col-md-2">
-                        <input type="text" id={this.props.idUt} ref="uses_pc" className="form-control"
-                            value={this.state.valueUt}/>
+                    <div className="col-md-1">
+                        <input type="text" id={this.props.idUt} ref={this.props.idUt}
+                            name={"model[" + this.props.idUt + "]"} className="form-control"
+                            defaultValue={this.state.valueUt}/>
                     </div>
                 </div>
             );
@@ -139,10 +157,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
         getDefaultProps: function () {
             // component default properties
             return {
-                labelUpc: Locale._("Uses Per Customer"),
-                labelUt: Locale._("Total Uses Per Coupon Code"),
-                idUpc: "coupon_uses_per_customer",
-                idUt: "coupon_uses_total",
+                labelUpc: Locale._("Limit Per Customer"),
+                labelUt: Locale._("Limit Per Promo"),
+                idUpc: "limit_per_customer",
+                idUt: "limit_per_promo",
                 helpTextUpc: Locale._("How many times a user can use a coupon?"),
                 helpTextUt: Locale._("How many total times a coupon can be used?")
             };
@@ -172,7 +190,8 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'boo
 
             if (this.state.mode == 1) {
                 child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
-                    <SingleCoupon key="single-coupon" options={this.props.options} labelClass={this.props.labelClass}/>];
+                    <SingleCoupon key="single-coupon" options={this.props.options} labelClass={this.props.labelClass}
+                        name={this.props.options.single_coupon_name} value={this.props.options.single_coupon_code}/>];
             } else if(this.state.mode == 2) {
                 var onShowCodes = this.onShowCodes ||'',
                     onGenerateCodes = this.onGenerateCodes ||'',

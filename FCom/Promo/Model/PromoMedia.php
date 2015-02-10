@@ -9,7 +9,7 @@
  * @property int $manuf_vendor_id
  * @property string $promo_status
  */
-class FCom_Promo_Model_PromoMedia extends BModel
+class FCom_Promo_Model_PromoMedia extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo_media';

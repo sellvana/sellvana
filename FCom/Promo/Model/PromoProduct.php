@@ -11,7 +11,7 @@
  *
  * @deprecated
  */
-class FCom_Promo_Model_PromoProduct extends BModel
+class FCom_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo_product';

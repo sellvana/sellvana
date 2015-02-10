@@ -31,7 +31,7 @@
  * @property FCom_Promo_Model_PromoCoupon   $FCom_Promo_Model_PromoCoupon
  * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
  */
-class FCom_Promo_Model_Promo extends BModel
+class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
 {
     const MATCH_ALL = '0', MATCH_ANY = '1';
 
@@ -88,6 +88,10 @@ class FCom_Promo_Model_Promo extends BModel
 
         $this->setDate('from_date', $this->get("from_date"));
         $this->setDate('to_date', $this->get("to_date"));
+        if (!$this->get("create_at")) {
+            $this->set("create_at", date("Y-m-d"));
+        }
+        $this->set("update_at", date("Y-m-d"));
 
         return true;
     }
@@ -150,20 +154,21 @@ class FCom_Promo_Model_Promo extends BModel
     }
 
     /**
-     * @param $couponCode
-     * @return static
+     * @param array $couponCodes
+     * @return FCom_Promo_Model_Promo[]
      * @throws BException
      */
-    public function findByCouponCode($couponCode)
+    public function findByCouponCodes(array $couponCodes)
     {
-        $coupon = $this->FCom_Promo_Model_PromoCoupon->orm()
-            ->where_in('coupon_type', [1, 2])
-            ->where('coupon_code', $couponCode)
-            ->find_one();
-        if (!$coupon) {
-            return false;
+        $promos = $this->orm('p')->select('p.*')
+            ->join('FCom_Promo_Model_PromoCoupon', ['pc.promo_id', '=', 'p.id'], 'pc')
+            ->where_in('pc.code', $couponCodes)
+            ->order_by_asc('p.priority_order')
+            ->find_many();
+        if (!$promos) {
+            return [];
         }
-        return $this->load($coupon->get('promo_id'));
+        return $promos;
     }
 
     protected function _compareValues($v1, $v2, $op)
@@ -221,31 +226,33 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function validateForCart(FCom_Sales_Model_Cart $cart)
     {
-        if ($this->get('status') !== 'active' || $this->get('promo_type') !== 'cart') {
-            return false;
-        }
-        $now = $this->BDb->now();
-        if (($this->get('from_date') && $this->get('from_date') < $now)
-            || ($this->get('to_date') && $this->get('to_date') > $now)
-        ) {
-            return false;
-        }
-
-        $conditionRules = $cart->getData('conditions/rules');
-        if (!$conditionRules) {
-            return true;
-        }
-
         $matchType = $cart->getData('conditions/match') ?: static::MATCH_ANY; //TODO: remove default after testing
         $result = [
             'match' => $matchType === static::MATCH_ALL ? true : false,
             'items' => [],
         ];
+        if ($this->get('status') !== 'active' || $this->get('promo_type') !== 'cart') {
+            return $result;
+        }
+        $now = $this->BDb->now();
+        if (!(
+            ($this->BUtil->isEmptyDate($this->get('from_date')) || $this->get('from_date') < $now)
+            && ($this->BUtil->isEmptyDate($this->get('to_date')) || $this->get('to_date') > $now)
+        )) {
+            return $result;
+        }
+
+        $conditionRules = $this->getData('conditions/rules');
+        if (!$conditionRules) {
+            $result['match'] = true;
+            return $result;
+        }
+
         foreach ($conditionRules as $conditionType => $conditions) {
             foreach ($conditions as $condition) {
                 #$conditionType = !empty($condition['type']) ? $condition['type'] : 'skus';
                 switch ($conditionType) {
-                    case 'skus':
+                    case 'sku':
                         $match = $this->_validateCartConditionSkus($cart, $condition, $result);
                         break;
 
@@ -277,24 +284,23 @@ class FCom_Promo_Model_Promo extends BModel
                 }
             }
         }
-
         return $result;
     }
 
     protected function _validateCartConditionSkus(FCom_Sales_Model_Cart $cart, array $condition, array &$result)
     {
-        #if (empty($condition['skus'])) { //TODO: fix the form and change to this
-        if (empty($condition['product_id'])) {
+        if (empty($condition['sku'])) { //TODO: fix the form and change to this
+        #if (empty($condition['product_id'])) {
             return false;
         }
-        #$skus = array_flip((array)$condition['skus']); //TODO: fix the form and change to this
-        $prodIds = array_flip((array)$condition['product_id']);
+        $skus = array_flip((array)$condition['sku']); //TODO: fix the form and change to this
+        #$prodIds = array_flip((array)$condition['product_id']);
         $total = 0;
         $items = [];
         /** @var FCom_Sales_Model_Cart_Item $item */
         foreach ($cart->items() as $item) {
-            #if (!isset($skus[$item->get('product_sku')])) { //TODO: fix the form and change to this
-            if (!isset($prodIds[$item->get('product_id')])) {
+            if (!isset($skus[$item->get('product_sku')])) { //TODO: fix the form and change to this
+            #if (!isset($prodIds[$item->get('product_id')])) {
                 continue;
             }
             switch ($condition['type']) {
@@ -439,22 +445,21 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function calculateActionsForCart(FCom_Sales_Model_Cart $cart, array $conditionsResult, array &$actionsResult)
     {
-        $actions = $cart->getData('actions/rules/discount');
+        $actions = $this->getData('actions/rules/discount');
         if ($actions) {
-            $discountPercent = 0;
             foreach ($actions as $action) {
                 $this->_calcCartSubtotalDiscount($cart, $action, $conditionsResult, $actionsResult);
             }
         }
 
-        $actions = $cart->getData('actions/rules/shipping');
+        $actions = $this->getData('actions/rules/shipping');
         if ($actions) {
             foreach ($actions as $action) {
                 $this->_calcCartShippingDiscount($cart, $action, $conditionsResult, $actionsResult);
             }
         }
 
-        $actions = $cart->getData('actions/rules/free_product');
+        $actions = $this->getData('actions/rules/free_product');
         if ($actions) {
             foreach ($actions as $action) {
                 $this->_calcCartFreeProduct($cart, $action, $conditionsResult, $actionsResult);
@@ -466,27 +471,23 @@ class FCom_Promo_Model_Promo extends BModel
     protected function _calcCartSubtotalDiscount(FCom_Sales_Model_Cart $cart, array $action,
                                                  array $conditionsResult, array &$actionsResult)
     {
-        $result = [
-            'discount_amount' => 0,
-            'items' => [],
-        ];
+        $combineStrategy = $this->BConfig->get('modules/FCom_Promo/combine_strategy', 'max'); //,compound
         //TODO: remove defaults
-        $actionType = !empty($action['type']) ? $action['type'] : 'cart';
-        $amountType = !empty($action['amount_type']) ? $action['amount_type'] : 'percent'; //,amount
-        $amount = !empty($action['amount']) ? $action['amount'] : 10;
+        $scope = !empty($action['scope']) ? $action['scope'] : 'whole_order';
+        $amountType = !empty($action['type']) ? $action['type'] : 'pcnt'; //,amt,fixed
+        $amount = !empty($action['value']) ? $action['value'] : 10;
         $localeHlp = $this->BLocale;
         $items = [];
-
-        switch ($actionType) {
-            case 'cart':
+        switch ($scope) {
+            case 'whole_order':
                 $items = $cart->items();
                 break;
 
-            case 'conditions':
+            case 'cond_prod':
                 $items = $conditionsResult['items'];
                 break;
 
-            case 'skus':
+            case 'other_prod':
                 $skus = array_flip($action['skus']);
                 foreach ($cart->items() as $item) {
                     if (in_array($item->get('product_sku'), $skus)) {
@@ -495,7 +496,7 @@ class FCom_Promo_Model_Promo extends BModel
                 }
                 break;
 
-            case 'combination':
+            case 'attr_combination':
                 $cart->loadProducts();
                 foreach ($cart->items() as $item) {
                     $product = $item->product();
@@ -511,32 +512,52 @@ class FCom_Promo_Model_Promo extends BModel
         }
 
         $totalAmount = 0;
-        foreach ($items as $item) {
-            $totalAmount += $item->get('row_total');
+        $percent = 0;
+        $totalDiscount = 0;
+        $rowTotals = [];
+        foreach ($items as $i => $item) {
+            $rowTotals[$i] = $item->get('row_total');
+            if (!empty($actionsResult['items'][$i]['row_discount'])) {
+                $rowTotals[$i] -= $actionsResult['items'][$i]['row_discount'];
+            }
+            $totalAmount += $rowTotals[$i];
         }
-        if ($amountType === 'percent') {
-            $percent = $amount / 100;
+        if ($totalAmount) {
+            if ($amountType === 'pcnt') {
+                $percent       = $amount / 100;
+                $totalDiscount = (float)$localeHlp->roundCurrency($totalAmount * $percent);
+            } elseif ($amountType === 'amt') {
+                $percent       = $amount / $totalAmount;
+                $totalDiscount = $amount;
+            } elseif ($amountType === 'fixed') {
+                $percent       = 1 - $amount / $totalAmount;
+                $totalDiscount = $totalAmount - $amount;
+            }
+        }
+        if (empty($actionsResult['discount_amount'])) {
+            $actionsResult['discount_amount'] = $totalDiscount;
         } else {
-            $percent = $amount / $totalAmount;
+            $actionsResult['discount_amount'] += $totalDiscount;
         }
-        $totalDiscount = (float)$localeHlp->roundCurrency($totalAmount * $percent);
-        $result['discount_amount'] = $totalDiscount;
         $lastItemIdx = null;
         foreach ($items as $i => $item) {
             if ($item->get('auto_added')) {
                 continue;
             }
-            $rowDiscount = $localeHlp->roundCurrency($item->get('row_total') * $percent);
-            $totalDiscount -= $rowDiscount;
-            $result['items'][$i]['row_discount_percent'] = $percent * 100;
-            $result['items'][$i]['row_discount'] = $rowDiscount;
+            $rowDiscount = $localeHlp->roundCurrency($rowTotals[$i] * $percent);
+            if (empty($actionsResult['items'][$i]['row_discount'])) {
+                $actionsResult['items'][$i]['row_discount_percent'] = $percent * 100;
+                $actionsResult['items'][$i]['row_discount']         = $rowDiscount;
+            } else {
+                $actionsResult['items'][$i]['row_discount_percent'] += min(100, $percent * 100);
+                $actionsResult['items'][$i]['row_discount']         += min($rowTotals[$i], $rowDiscount);
+            }
             $lastItemIdx = $i;
+            $totalDiscount -= $rowDiscount;
         }
         if ($lastItemIdx && $totalDiscount) {
-            $result['items'][$lastItemIdx]['row_discount'] += $totalDiscount; // rounding error fix
+            $actionsResult['items'][$lastItemIdx]['row_discount'] += $totalDiscount; // rounding error fix
         }
-
-        return $result;
     }
 
     protected function _calcCartShippingDiscount(FCom_Sales_Model_Cart $cart, array $action,

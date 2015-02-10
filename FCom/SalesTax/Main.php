@@ -110,9 +110,14 @@ class FCom_SalesTax_Main extends BClass
 
     protected function _collectCartProductTaxClasses($cart)
     {
+        $items = $cart->items();
+        if (!$items) {
+            return [];
+        }
+
         // Collect product IDs used in this cart
         $pIds = [];
-        foreach ($cart->items() as $item) {
+        foreach ($items as $item) {
             $pIds[] = $item->get('product_id');
         }
 
@@ -124,7 +129,7 @@ class FCom_SalesTax_Main extends BClass
 
         // Group cart items by tax class
         $itemsByProdClass = [];
-        foreach ($cart->items() as $item) {
+        foreach ($items as $item) {
             $assigned = false;
             foreach ($prodTaxClasses as $pt) {
                 if ($item->get('product_id') === $pt->get('product_id')) {
@@ -217,18 +222,25 @@ class FCom_SalesTax_Main extends BClass
     {
         $rulesPerItem = [];
         foreach ($rules as $rId => $rule) {
+            if (!$rule->get('product_classes')) {
+                continue;
+            }
             foreach ($rule->get('product_classes') as $pc) {
                 foreach ($pc->get('items') as $item) {
                     $rulesPerItem[$item->id()][$rule->get('compound_priority')][$rId] = $rule;
                 }
             }
         }
-
         $result = [
             'tax_amount' => 0,
             'details' => [],
             'items' => [],
         ];
+
+        if (!$rulesPerItem) {
+            return $result;
+        }
+
         $ratesByRule = [];
         foreach ($cart->items() as $item) {
             $itemId = $item->id();

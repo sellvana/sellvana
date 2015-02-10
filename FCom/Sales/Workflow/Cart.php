@@ -25,6 +25,9 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
         'customerRequestsShippingEstimate',
 
+        'customerAddsCouponCode',
+        'customerRemovesCouponCode',
+
         'customerAbandonsCart',
     ];
 
@@ -295,6 +298,72 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         $cart = $this->_getCart($args);
         $cart->set(['shipping_postcode' => $postcode, 'recalc_shipping_rates' => 1])->calculateTotals()->saveAllDetails();
         $args['result']['status'] = 'success';
+    }
+
+
+    public function customerAddsCouponCode($args)
+    {
+        if (empty($args['post']['coupon_code'])) {
+            $args['result']['error']['message'] = 'No coupon code provided';
+            return;
+        }
+
+        /** @var FCom_Sales_Model_Cart $cart */
+        $cart = !empty($args['cart']) ? $args['cart'] : $this->FCom_Sales_Model_Cart->sessionCart();
+        $cartCouponCodes = $cart->get('coupon_code');
+        $cartCouponCodesArr = $cartCouponCodes ? explode(',', $cartCouponCodes) : [];
+
+        $post = $args['post'];
+        $couponCode = $post['coupon_code'];
+
+        if (in_array($couponCode, $cartCouponCodesArr)) {
+            $args['result']['error']['message'] = "Coupon code is already applied to your cart";
+            return;
+        }
+
+        $result = [];
+        $this->BEvents->fire(__METHOD__, [
+            'post' => $post,
+            'cart' => $cart,
+            'coupon_code' => $couponCode,
+            'result' => &$result,
+        ]);
+
+        if (!empty($result['error'])) {
+            $args['result']['error'] = $result['error'];
+            return;
+        }
+
+        $cartCouponCodesArr[] = $couponCode;
+        $cartCouponCodes = join(',', $cartCouponCodesArr);
+        $cart->set('coupon_code', $cartCouponCodes)->calculateTotals()->saveAllDetails();
+    }
+
+    public function customerRemovesCouponCode($args)
+    {
+        if (empty($args['post']['coupon_code'])) {
+            $args['result']['error']['message'] = 'No coupon code provided';
+            return;
+        }
+
+        /** @var FCom_Sales_Model_Cart $cart */
+        $cart = !empty($args['cart']) ? $args['cart'] : $this->FCom_Sales_Model_Cart->sessionCart();
+        $cartCouponCodes = $cart->get('coupon_code');
+        $cartCouponCodesArr = $cartCouponCodes ? explode(',', $cartCouponCodes) : [];
+
+        $post = $args['post'];
+        $couponCode = $post['coupon_code'];
+
+        $idx = array_search($couponCode, $cartCouponCodesArr);
+
+        if (false === $idx) {
+            $args['result']['error']['message'] = "Coupon code was already removed";
+            return;
+        }
+
+        unset($cartCouponCodesArr[$idx]);
+        $cartCouponCodes = join(',', $cartCouponCodesArr);
+        $cart->set('coupon_code', $cartCouponCodes)->calculateTotals()->saveAllDetails();
     }
 
     public function customerAbandonsCart($args)

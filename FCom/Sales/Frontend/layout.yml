@@ -14,6 +14,8 @@ customer_account_sidebar:
         do:
             - [ title, Shopping Cart ]
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: before_body_end, views: custom-tags }
+    - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_cart } }
 
 /orders/list:
     - { include: base }

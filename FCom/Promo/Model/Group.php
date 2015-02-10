@@ -13,7 +13,7 @@
  * DI
  * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
  */
-class FCom_Promo_Model_Group extends BModel
+class FCom_Promo_Model_Group extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo_group';

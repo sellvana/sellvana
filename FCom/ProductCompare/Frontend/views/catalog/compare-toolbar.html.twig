@@ -27,7 +27,7 @@
 <div class="overlay" id="compare-overlay"><div class="contentWrap"></div></div>
 <script>
 require(['jquery', 'fcom.productcompare'], function($) {
-    var compare = {{ compareJson | default('{}') | raw }};
+    var compare = {{ compareJson | default('[]') | raw }};
     $(function() { // let all checkboxes to load first
         $('.block-compare').data('compare', new FCom.CompareBlock({
             thumbContainer: '.f-widget-prods-compare',

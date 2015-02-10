@@ -8,7 +8,7 @@
  * @property int $promo_id
  * @property string $update_at
  */
-class FCom_Promo_Model_PromoOrder extends BModel
+class FCom_Promo_Model_PromoOrder extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo_order';

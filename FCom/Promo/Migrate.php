@@ -397,5 +397,13 @@ class FCom_Promo_Migrate extends BClass
                 'product' => ['product_id', $tProduct],
             ],
         ]);
+
+        $this->BDb->ddlTableDef($tPromo, [
+            BDb::COLUMNS => [
+                'limit_per_coupon'         => "INT(10) UNSIGNED NULL DEFAULT 1",
+                'coupon_uses_per_customer' => "RENAME limit_per_customer INT(10) UNSIGNED NULL DEFAULT 0",
+                'coupon_uses_total'        => "RENAME limit_per_promo INT(10) UNSIGNED NULL DEFAULT 0",
+            ]
+        ]);
     }
 }
