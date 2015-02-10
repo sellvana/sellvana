@@ -6,6 +6,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     // what type of condition we have, total amount or quantity
     var ConditionsType = React.createClass({
         render: function () {
+            if(this.props.promoType == 'catalog') {
+                return null;
+            }
             var cls = this.props.select2 ? "to-select2 " : "";
             if (this.props.className) {
                 cls += this.props.className;
@@ -29,16 +32,38 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
         },
         serialize: function () {
-            return this.value || $('select', this.getDOMNode()).select2('val');
+            var value = '';
+            if (this.props.promoType !== 'catalog') {
+                if (this.value) {
+                    value = this.value;
+                } else {
+                    var $sel = $('select', this.getDOMNode());
+                    if ($sel.length) {
+                        value = $sel.select2('val');
+                    }
+                }
+            }
+            return value;
         },
         getDefaultProps: function () {
             return {
                 totalType: [{id: "qty", label: "TOTAL QTY"}, {id: "amt", label: "TOTAL $Amount"}],
                 select2: true,
-                containerClass: "col-md-2"
+                containerClass: "col-md-2",
+                promoType: 'cart'
             };
         },
         componentDidMount: function () {
+            if(this.props.promoType !== 'catalog') {
+                this.registerSelect2();
+            }
+        },
+        componentDidUpdate: function () {
+            if (this.props.promoType !== 'catalog') {
+                this.registerSelect2();
+            }
+        },
+        registerSelect2: function () {
             $('select', this.getDOMNode()).select2().on('change', this.onChange);
         }
     });
@@ -48,12 +73,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
             var productId = this.state.sku;
+            var promoType = this.props.options.promo_type;
             if($.isArray(productId)) {
                 productId = productId.join(",");
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="skuCollectionType" id="skuCollectionType" onChange={this.onChange} value={this.state.type}> of </ConditionsType>
+                    <ConditionsType ref="skuCollectionType" id="skuCollectionType" onChange={this.onChange}
+                        value={this.state.type} promoType={promoType}> of </ConditionsType>
                     <div className="col-md-2">
                         <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control" defaultValue={productId}/>
                     </div>
@@ -773,12 +800,14 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             var values = this.props.data;
             var categories = values.category_id;
+            var promoType = this.props.options.promo_type;
             if($.isArray(categories)) {
                 categories = categories.join(",");
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" onChange={this.onChange} value={values.type}> of products in </ConditionsType>
+                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" promoType={promoType}
+                        onChange={this.onChange} value={values.type}> of products in </ConditionsType>
                     <input type="hidden" id="catProductsIds" ref="catProductsIds" defaultValue={categories}/>
                     <select id="catProductInclude" ref="catProductInclude" className="to-select2" defaultValue={values.include}>
                         <option value="only_this">{Locale._("Only This")}</option>
