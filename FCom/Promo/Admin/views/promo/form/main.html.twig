@@ -1,7 +1,8 @@
 <!--{ label: Promo Details }-->
 <!--{ pos: 10 }-->
 {% set m = THIS.get('model') %}
-{% set promo = APP.instance('FCom_Promo_Model_Promo') %}
+{% set promo_type = validator.fieldValue('promo_type') %}
+{#{% set promo = APP.instance('FCom_Promo_Model_Promo') %}#}
 {% set validator = THIS.get('validator') %}
 {% set labelClass = "col-md-3" %}
 {% set numCodes = m.get('numCodes') %}
@@ -25,6 +26,15 @@
 
 <fieldset class="adm-section-group">
     <div class="f-section">
+        {{ forms.select({
+            label: 'Type'|_,label_class: labelClass,
+            value: promo_type,
+            field: "promo_type", help_icon: 1,
+            help_text: "Promotion tyoe, catalog or cart. Once selected cannot be changed"|_,
+            select2: {minimumResultsForSearch: 15},
+            options: {'cart':'Cart'|_, 'catalog':'Catalog'|_},
+            required: 1, disabled: m.id()? 1: 0
+        }) }}
         {{ forms.input({label: 'Admin Summary'|_, required: 1, field: "summary",
             value: validator.fieldValue('summary'), label_class: labelClass,
             help_icon: 1, help_text: 'Admin Summary'|_ }) }}
@@ -123,7 +133,9 @@
             value: validator.fieldValue("coupon_type"),
             help_icon: 1,
             help_text: "Require coupon code"|_,
-            select2: {minimumResultsForSearch: 15}, options: ["No coupon code required"|_, "Single coupon code"|_, "Multiple coupon codes"|_]
+            select2: {minimumResultsForSearch: 15}, disabled: (promo_type == 'catalog')? 1: 0,
+            style: (promo_type == 'catalog')? "display: none": '',
+            options: ["No coupon code required"|_, "Single coupon code"|_, "Multiple coupon codes"|_]
         }) }}
         <div id="coupon-options"></div>
         {{ forms.hidden({field:"data_serialized", value: validator.fieldValue("data_serialized")}) }}
@@ -146,9 +158,10 @@
                     <option value="-1">{{ "Add Condition Type..."|_ }}</option>
                     <option value="sku">{{ "Products"|_ }}</option>
                     <option value="category">{{ "Categories"|_ }}</option>
-                    <option value="total">{{ "Cart Total"|_ }}</option>
-                    <option value="combination">{{ "Combination"|_ }}</option>
-                    <option value="shipping">{{ "Shipping Destination"|_ }}</option>
+                    <option value="combination">{{ "Attribute Combination"|_ }}</option>
+                    <option value="total" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">{{ "Cart Total"|_ }}</option>
+                    <option value="shipping" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">
+                        {{ "Shipping Destination"|_ }}</option>
                 </select>
             </div>
         </div>
@@ -165,8 +178,10 @@
                 <select id="model-actions" class="form-control to-select2">
                     <option value="-1">{{"Add Promo Action..."|_}}</option>
                     <option value="discount">{{"Discount"|_}}</option>
-                    <option value="shipping">{{"Shipping"|_}}</option>
-                    <option value="free_product">{{"Free Products"|_}}</option>
+                    <option value="shipping" {{ promo_type == 'catalog'? 'disabled':'' }}
+                            class="cart-only">{{"Shipping"|_}}</option>
+                    <option value="free_product" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">
+                        {{"Free Products"|_}}</option>
                 </select>
             </div>
         </div>
@@ -175,8 +190,47 @@
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
                 $('select.to-select2').select2();
+                var promo_type_id = '{{ elView.getInputId({'field':'promo_type'}) }}';
+                var coupon_type_id = '{{ elView.getInputId({'field':'coupon_type'}) }}';
+                var $promoType = $('#' + promo_type_id);
+                if ($promoType.length) {
+                    var promo_type = $promoType.val();
+                    var $cartOptions = $('option.cart-only');
+                    var $couponType = $('#' + coupon_type_id);
+                    var $action = $('#model-actions');
+                    var $condition = $('#model-conditions_type');
+                    $promoType.select2().on('change', function (e) {
+                        // on promo type element change, set resulting promo type to options and render form
+                        promo_type = $(e.target).val();
+                        if(promo_type == 'catalog') {
+                            // hide coupons type dropdown
+                            // disable total and shipping condition
+                            // disable all but discount action
+                            $couponType.select2('enable', false);
+
+                            $action.select2('destroy');
+                            $condition.select2('destroy');
+
+                            $cartOptions.attr('disabled', true);
+
+                            $action.select2();
+                            $condition.select2();
+                        } else {
+                            $couponType.select2('enable', true);
+
+                            $action.select2('destroy');
+                            $condition.select2('destroy');
+
+                            $cartOptions.attr('disabled', false);
+
+                            $action.select2();
+                            $condition.select2();
+                        }
+                    });
+                }
                 var options = {
-                    coupon_select_id: '{{ elView.getInputId({'field':'coupon_type'}) }}',
+                    promo_type_id: promo_type_id,
+                    coupon_select_id: coupon_type_id,
                     condition_select_id: 'model-conditions_type',
                     actions_select_id: "model-actions",
                     coupon_container_id: 'coupon-options',
