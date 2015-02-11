@@ -99,7 +99,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             console.log('FComGridBody.columns', this.props.columns);*/
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn}
-                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} data={this.props.data} originalData={this.props.originalData}
+                sortAscending={that.props.sortAscending ? 'asc' : 'desc'} columnMetadata={that.props.columnMetadata} data={this.props.data} originalData={this.props.originalData}
                 getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows} updateSelectedRow={this.props.updateSelectedRow}
                 setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
             />;
