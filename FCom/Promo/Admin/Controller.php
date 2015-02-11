@@ -539,10 +539,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
         $config = [
             'id' => $this->getCouponGridId(),
-            'datatype' => 'local',
+            'data_mode' => 'local',
             'data' => $this->BDb->many_as_array($this->FCom_Promo_Model_PromoCoupon->orm('pc')->find_many()),
-            'data_url' => $gridDataUrl,
-            'edit_url' => $gridDataUrl,
+            /*'data_url' => $gridDataUrl,
+            'edit_url' => $gridDataUrl,*/
             'grid_url' => null,
             'form_url' => null,
             'columns' => [
