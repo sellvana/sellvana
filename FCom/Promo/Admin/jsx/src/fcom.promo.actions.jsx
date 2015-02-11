@@ -992,7 +992,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         render: function () {
             var amount = '';
             if(this.state.type != 'free') {
-                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" ref="shippingAmount" className="form-control" />
+                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" ref="shippingAmount" className="form-control" onChange={this.onChange}/>
             }
             var type = <Type ref="shippingType" id="shippingType" onChange={this.onTypeChange} value={this.state.type}
                     totalType={this.props.fields} value={this.state.type}/>;
@@ -1055,7 +1055,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 multiple: true,
                 query: self.select2query,
                 dropdownAutoWidth: true,
-                initSelection: self.initSelection
+                initSelection: function (el, callback) {
+                    //var data = [];
+                    var val = el.val();
+
+                    $.get(self.url, {methods: val}).done(function (result) {
+                        //console.log(result);
+                        callback(result.items);
+                    });
+
+                    //var val = el.val().split(",");
+                    //for (var i in val) {
+                    //    var val2 = val[i];
+                    //    data.push({id: val2, text: val2});
+                    //}
+                    //callback(data);
+                }
             }).on('change', this.onChange);
         },
         onChange: function () {

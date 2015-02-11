@@ -4,6 +4,9 @@ class FCom_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_inventory_sku';
     static protected $_origClass = __CLASS__;
+    static protected $_fieldDefaults = [
+        "title" => "N/A"
+    ];
 
     public function getQtyAvailable()
     {

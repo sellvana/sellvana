@@ -802,6 +802,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         componentDidMount: function () {
             var catProductsIds = this.refs['catProductsIds'];
             this.url = this.props.options.base_url + this.props.url;
+            var self = this;
             $(catProductsIds.getDOMNode()).select2({
                 placeholder: "Select categories",
                 maximumSelectionSize: 4,
@@ -822,7 +823,23 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
 
                     return markup;
                 },
-                initSelection: this.initSelection
+                initSelection: function (el, callback) {
+                    //var data = [];
+                    var val = el.val();
+
+                    $.get(self.url, {cats: val}).done(function (result) {
+                        console.log(result);
+                        callback(result.items);
+                    });
+
+                    //var val = el.val().split(",");
+                    //for (var i in val) {
+                    //    var val2 = val[i];
+                    //    data.push({id: val2, text: val2});
+                    //}
+                    //callback(data);
+                }
+
             }).on('change', this.onChange);
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         },
