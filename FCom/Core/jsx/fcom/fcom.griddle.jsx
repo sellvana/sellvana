@@ -54,10 +54,12 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         },
         render: function () {
             console.log('config', this.props.config);
+            var config = this.props.config;
 
             return (
                 <Griddle showTableHeading={false} tableClassName={this.props.tableClassName}
-                    config={this.props.config} initColumns={this.getColumn()}
+                    config={config} initColumns={this.getColumn()}
+                    sortColumn={config.data.state.s} sortAscending={config.data.state.sd == 'asc'}
                     columns={this.getColumn('show')} columnMetadata={this.props.columnMetadata}
                     useCustomGrid={true} customGrid={FComGridBody}
                     getExternalResults={FComDataMethod} resultsPerPage={pageSize}

@@ -310,8 +310,8 @@ var Griddle = React.createClass({
             filteredResults: null,
             filteredColumns: [],
             filter: "",
-            sortColumn: "",
-            sortAscending: true,
+            sortColumn: this.props.sortColumn,
+            sortAscending: this.props.sortAscending,
             showColumnChooser: false,
             isLoading: false,
             //fcom custom
