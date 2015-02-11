@@ -781,20 +781,11 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         render: function () {
             var options = this.props.options;
             var promoType = options.promo_type;
-            var scope;
-            if(promoType == 'catalog') {
-                scope = <input type="hidden" ref={"discountScope" + this.props.id} value="cond_prod"
-                    id={"discountScope" + this.props.id} key={"discountScope" + this.props.id}/>;
-            } else {
-                scope =
-                <select className="to-select2 form-control"
-                    ref={"discountScope" + this.props.id} defaultValue={this.state.scope}
-                    id={"discountScope" + this.props.id} key={"discountScope" + this.props.id} onChange={this.onChange}>
-                        {this.props.scopeOptions.map(function (type) {
-                            return <option value={type.id} key={type.id}>{type.label}</option>
-                        })}
-                </select>;
-            }
+            var display = {
+                display: (promoType === 'catalog') ? 'none' : 'inherit'
+            };
+            var disabled = (promoType === 'catalog');
+
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <Type ref={"discountType" + this.props.id} id={"discountType" + this.props.id} promoType={promoType}
@@ -805,10 +796,16 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                                 id={"discountValue"+ this.props.id} key={"discountValue"+ this.props.id} type="text"
                                 defaultValue={this.state.value} onBlur={this.onChange}/>
                         </div>
-                        <div className="col-md-5">
-                        {scope}
+                        <div className="col-md-5" style={display}>
+                            <select className="to-select2 form-control" disabled={disabled}
+                                ref={"discountScope" + this.props.id} defaultValue={this.state.scope}
+                                id={"discountScope" + this.props.id} key={"discountScope" + this.props.id} onChange={this.onChange}>
+                                    {this.props.scopeOptions.map(function (type) {
+                                        return <option value={type.id} key={type.id}>{type.label}</option>
+                                    })}
+                            </select>
                         </div>
-                        <div className="col-md-5">
+                        <div className="col-md-5" style={display}>
                             <DiscountDetails type={this.state.scope} options={this.props.options} ref={"discountDetails" + this.props.id}
                                 id={"discountDetails" + this.props.id} key={"discountDetails" + this.props.id}
                                 modalContainer={this.props.modalContainer} onChange={this.onChange}
@@ -826,6 +823,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             if(this.props.options.promo_type != 'catalog') {
                 $(this.refs['discountScope' + this.props.id].getDOMNode()).select2().on('change', this.onScopeChange);
             }
+            this.onChange();
+        },
+        componentDidUpdate: function () {
+            this.onChange(); // on update set values
         },
         getDefaultProps: function () {
             return {
@@ -863,23 +864,26 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         onChange: function () {
             var value = {};
             value.value = $(this.refs['discountValue' + this.props.id].getDOMNode()).val();
-            value.scope = $(this.refs['discountScope' + this.props.id].getDOMNode()).select2('val');
             value.type = this.refs['discountType' + this.props.id].serialize();
 
-            var details = this.refs['discountDetails' + this.props.id].serialize();
-            for(var d in details) {
-                if(details.hasOwnProperty(d)) {
-                    value[d] = details[d];
+            if (this.props.options.promo_type !== 'catalog') {
+                value.scope = $(this.refs['discountScope' + this.props.id].getDOMNode()).select2('val');
+
+                var details = this.refs['discountDetails' + this.props.id].serialize();
+                for (var d in details) {
+                    if (details.hasOwnProperty(d)) {
+                        value[d] = details[d];
+                    }
                 }
-            }
 
-            // make sure to remove any invalid data
-            if(value.scope != "attr_combination") {
-                delete value['combination'];
-            }
+                // make sure to remove any invalid data
+                if (value.scope != "attr_combination") {
+                    delete value['combination'];
+                }
 
-            if(value.scope != "other_prod") {
-                delete value['product_ids'];
+                if (value.scope != "other_prod") {
+                    delete value['product_ids'];
+                }
             }
 
             //this.setState(value);
@@ -1111,6 +1115,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     });
 
     var ActionsApp = React.createClass({
+        mixins: [React.addons.PureRenderMixin], // use this to prevent unneeded component update
         displayName: 'ActionsApp',
         render: function () {
             var children = [];

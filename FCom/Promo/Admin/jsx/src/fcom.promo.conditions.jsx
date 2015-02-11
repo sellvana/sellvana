@@ -93,7 +93,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     </div>
                     <div className="col-md-1" style={display}>
                         <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue"
-                            defaultValue={this.state.value} type="text" onBlur={this.onChange} disabled={disabled}/>
+                            defaultValue={this.state.value} type="text" onChange={this.onChange} disabled={disabled}/>
                     </div>
                 </Common.Row>
             );
@@ -153,10 +153,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         onChange: function () {
             var value = {};
-            value.type = this.refs['skuCollectionType'].serialize();
             value.sku = $(this.refs['skuCollectionIds'].getDOMNode()).select2('val');
-            value.filter = $(this.refs['skuCollectionCond'].getDOMNode()).val();
-            value.value = $(this.refs['skuCollectionValue'].getDOMNode()).val();
+            if (this.props.options.promo_type !== 'catalog') {
+                value.type = this.refs['skuCollectionType'].serialize();
+                value.filter = $(this.refs['skuCollectionCond'].getDOMNode()).val();
+                value.value = $(this.refs['skuCollectionValue'].getDOMNode()).val();
+            }
             if(this.props.onUpdate) {
                 var updateData = {};
                 updateData[this.props.id] = value;
@@ -829,7 +831,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange}
                             value={values.filter} disabled={disabled}/>
                     </div>
-                    <input ref="catProductsValue" id="catProductsValue" type="text" className="" onBlur={this.onChange}
+                    <input ref="catProductsValue" id="catProductsValue" type="text" className="" onChange={this.onChange}
                         defaultValue={values.value} style={display} disabled={disabled}/>
                 </Common.Row>
             );
@@ -886,7 +888,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 }
 
             }).on('change', this.onChange);
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.onChange);
             this.onChange();
         },
         componentDidUpdate: function () {
@@ -894,11 +896,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         },
         onChange: function () {
             var value = {};
-            value.type = this.refs['catProductsType'].serialize();
             value.category_id = $(this.refs['catProductsIds'].getDOMNode()).select2('val');
-            value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();
-            value.value = $(this.refs['catProductsValue'].getDOMNode()).val();
             value.include = $(this.refs['catProductInclude'].getDOMNode()).val();
+            if(this.props.options.promo_type !== 'catalog') {
+                value.type = this.refs['catProductsType'].serialize();
+                value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();
+                value.value = $(this.refs['catProductsValue'].getDOMNode()).val();
+            }
             if(this.props.onUpdate) {
                 var updateData = {};
                 updateData[this.props.id] = value;
