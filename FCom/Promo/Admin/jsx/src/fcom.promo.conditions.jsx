@@ -74,6 +74,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             var productId = this.state.sku;
             var promoType = this.props.options.promo_type;
+            var display = {
+                display: promoType === 'catalog' ? 'none': 'inherit'
+            };
+            var disabled = promoType === 'catalog';
             if($.isArray(productId)) {
                 productId = productId.join(",");
             }
@@ -84,12 +88,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     <div className="col-md-2">
                         <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control" defaultValue={productId}/>
                     </div>
-                    <div className="col-md-2">
-                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" onChange={this.onChange} value={this.state.filter}/>
+                    <div className="col-md-2" style={display}>
+                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" onChange={this.onChange} value={this.state.filter} disabled={disabled}/>
                     </div>
-                    <div className="col-md-1">
+                    <div className="col-md-1" style={display}>
                         <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue"
-                            defaultValue={this.state.value} type="text" onBlur={this.onChange}/>
+                            defaultValue={this.state.value} type="text" onBlur={this.onChange} disabled={disabled}/>
                     </div>
                 </Common.Row>
             );
@@ -142,6 +146,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 query: self.select2query
             }).on('change', this.onChange);
             $('select.to-select2', this.getDOMNode()).select2();
+            this.onChange(); // make sure initial state is saved
+        },
+        componentDidUpdate: function () {
+            this.onChange();
         },
         onChange: function () {
             var value = {};
@@ -801,6 +809,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var values = this.props.data;
             var categories = values.category_id;
             var promoType = this.props.options.promo_type;
+            var display = {
+                display: (promoType === 'catalog')? 'none' : 'inherit'
+            };
+            var disabled = (promoType === 'catalog');
             if($.isArray(categories)) {
                 categories = categories.join(",");
             }
@@ -813,8 +825,12 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                         <option value="only_this">{Locale._("Only This")}</option>
                         <option value="include_subcategories">{Locale._("This and sub categories")}</option>
                     </select>
-                    <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange} value={values.filter}/>
-                    <input ref="catProductsValue" id="catProductsValue" type="text" className="" onBlur={this.onChange} defaultValue={values.value}/>
+                    <div style={display} >
+                        <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange}
+                            value={values.filter} disabled={disabled}/>
+                    </div>
+                    <input ref="catProductsValue" id="catProductsValue" type="text" className="" onBlur={this.onChange}
+                        defaultValue={values.value} style={display} disabled={disabled}/>
                 </Common.Row>
             );
         },
@@ -871,6 +887,10 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
 
             }).on('change', this.onChange);
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            this.onChange();
+        },
+        componentDidUpdate: function () {
+            this.onChange(); // on update set values
         },
         onChange: function () {
             var value = {};
