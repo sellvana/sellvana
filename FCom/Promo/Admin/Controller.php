@@ -35,7 +35,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'sorttype' => 'number'],
-            ['name' => 'description', 'label' => 'Description', 'index' => 'description', 'width' => 250],
+            ['name' => 'summary', 'label' => 'Description', 'index' => 'summary', 'width' => 250],
             ['name' => 'from_date', 'label' => 'Start Date', 'index' => 'from_date', 'formatter' => 'date'],
             ['name' => 'to_date', 'label' => 'End Date', 'index' => 'to_date', 'formatter' => 'date'],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
