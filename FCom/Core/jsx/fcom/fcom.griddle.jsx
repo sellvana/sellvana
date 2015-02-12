@@ -25,7 +25,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             //todo: need change way to get right info
             dataUrl = this.props.config.data_url;
             gridId = this.props.config.id;
-            pageSize = this.props.config.state.ps;
+            pageSize = this.props.config.data.state.ps;
             pageSizeOptions = this.props.config.page_size_options;
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
