@@ -446,7 +446,7 @@ var Griddle = React.createClass({
                     ? (<this.props.customGrid columnMetadata={this.props.columnMetadata} data={data} originalData={results} columns={cols} metadataColumns={meta}
                         className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
                         getConfig={this.getConfig} refresh={this.refresh} getSelectedRows={this.getSelectedRows} updateSelectedRow={this.updateSelectedRow} clearSelectedRows={this.clearSelectedRows}
-                        setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
+                        setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} removeSelectedRows={this.removeSelectedRows}
                     />)
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );
@@ -454,7 +454,7 @@ var Griddle = React.createClass({
             pagingContent = this.props.useCustomPager && this.props.customPager
                 ? (<this.props.customPager next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage}
                     setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText} totalResults={this.state.totalResults}
-                    getConfig={this.getConfig} setPageSize={this.setPageSize} resultsPerPage={this.props.resultsPerPage} />)
+                    getConfig={this.getConfig} setPageSize={this.setPageSize} resultsPerPage={this.props.resultsPerPage} getHeaderSelection={this.getHeaderSelection} />)
                 : (<GridPagination next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText}/>);
         } else {
             // Otherwise, display the loading content.
@@ -578,6 +578,10 @@ var Griddle = React.createClass({
             });
         }
     },
+    /**
+     * quick search in available data collection
+     * @param value
+     */
     searchWithinResults: function (value) {
         //todo: confirm with Boris about search within available columns or all columns
         if (value) {
@@ -611,9 +615,19 @@ var Griddle = React.createClass({
             });
         }
     },
+    /**
+     * get array selectedRows
+     * @returns {*}
+     */
     getSelectedRows: function() {
         return this.state.selectedRows;
     },
+    /**
+     * add or remove one row to array selectedRows
+     * @param row
+     * @param isRemove
+     * @returns {boolean}
+     */
     updateSelectedRow: function(row, isRemove) {
         if (typeof row.id == 'undefined') {
             console.log('griddle.updateSelectedRow: row.id is undefined', row);
@@ -632,12 +646,33 @@ var Griddle = React.createClass({
 
         this.setState({selectedRows: rows});
     },
+    /**
+     * remove multi rows from selectedRows
+     * @param rows
+     */
+    removeSelectedRows: function(rows) {
+        var newSelectedRows = _.reject(this.state.selectedRows, function(ele) {
+            return _.findWhere(rows, {id: ele.id});
+        });
+        this.setState({selectedRows: newSelectedRows});
+    },
+    /**
+     * empty selectedRows
+     */
     clearSelectedRows: function() {
         this.setState({selectedRows: []});
     },
+    /**
+     * set value header selection
+     * @param value
+     */
     setHeaderSelection: function(value) {
         this.setState({headerSelect: value});
     },
+    /**
+     * get value header selection
+     * @returns {string}
+     */
     getHeaderSelection: function() {
         return this.state.headerSelect;
     },
@@ -648,6 +683,10 @@ var Griddle = React.createClass({
     getGriddleState: function() {
         return this.state;
     },
+    /**
+     * update array init columns, almost use for re-order columns
+     * @param columns
+     */
     updateInitColumns: function(columns) {
         var selectedColumns = this.getColumns();
         var newSelectedColumns = [];
@@ -664,6 +703,10 @@ var Griddle = React.createClass({
             filteredColumns: newSelectedColumns
         });
     },
+    /**
+     * return array init columns
+     * @returns {*|Griddle.props.initColumns}
+     */
     getInitColumns: function() {
         return this.state.initColumns;
     }

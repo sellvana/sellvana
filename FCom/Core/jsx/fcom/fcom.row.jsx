@@ -14,7 +14,6 @@ define(['underscore', 'react'], function (_, React) {
         getDefaultProps: function () {
             return {
                 "row": {},
-                "origRow": {},
                 "index": 0,
                 "columnMetadata": null,
                 "doRowAction": null,
@@ -23,7 +22,7 @@ define(['underscore', 'react'], function (_, React) {
             }
         },
         selectRow: function(event) {
-            this.props.updateSelectedRow(this.props.origRow, !event.target.checked);
+            this.props.updateSelectedRow(this.props.row, !event.target.checked);
         },
         render: function () {
             var that = this;

@@ -104,7 +104,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "maxPage": 0,
                 "nextText": "",
                 "previousText": "",
-                "currentPage": 0
+                "currentPage": 0,
+                "getHeaderSelection": null
             }
         },
         pageChange: function (event) {
@@ -136,6 +137,10 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             this.props.setPage(0);
         },
         render: function () {
+            var headerSelection = this.props.getHeaderSelection();
+            if (headerSelection == 'show_selected') {
+                return false;
+            }
             var pageSizeOptions = this.props.getConfig('page_size_options');
             var pageSize = this.props.resultsPerPage;
 
