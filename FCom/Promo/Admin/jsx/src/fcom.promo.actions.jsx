@@ -1115,7 +1115,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     });
 
     var ActionsApp = React.createClass({
-        mixins: [React.addons.PureRenderMixin], // use this to prevent unneeded component update
         displayName: 'ActionsApp',
         render: function () {
             var children = [];
@@ -1254,6 +1253,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             this.shouldUpdate = false;
             this.props.onUpdate(localData);
             this.setState({data: localData});
+        },
+        shouldComponentUpdate: function () {
+            var upd = this.shouldUpdate;
+            if(!upd) { // shouldUpdate is one time flag that should be set only specifically and then dismissed
+                this.shouldUpdate = true;
+            }
+            return upd;
         },
         getInitialState: function () {
             return {
