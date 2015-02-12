@@ -62,7 +62,8 @@ var Griddle = React.createClass({
             "useCustomGrid": false,
             "customFilter": {},
             "customSettings": {},
-            "customGrid": {}
+            "customGrid": {},
+            "initPage": 0 //begin with 0 page
         };
     },
     /* if we have a filter display the max page and results accordingly */
@@ -306,7 +307,7 @@ var Griddle = React.createClass({
     getInitialState: function() {
         var state =  {
             maxPage: 0,
-            page: 0,
+            page: this.props.initPage,
             filteredResults: null,
             filteredColumns: [],
             filter: "",
@@ -450,7 +451,7 @@ var Griddle = React.createClass({
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );
 
-            pagingContent = this.props.useCustomPager
+            pagingContent = this.props.useCustomPager && this.props.customPager
                 ? (<this.props.customPager next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage}
                     setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText} totalResults={this.state.totalResults}
                     getConfig={this.getConfig} setPageSize={this.setPageSize} resultsPerPage={this.props.resultsPerPage} />)

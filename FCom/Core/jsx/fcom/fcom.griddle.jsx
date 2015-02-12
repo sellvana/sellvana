@@ -57,7 +57,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     columns={this.getColumn('show')} columnMetadata={this.props.columnMetadata}
                     useCustomGrid={true} customGrid={FComGridBody}
                     getExternalResults={FComDataMethod} resultsPerPage={config.data.state.ps}
-                    useCustomPager="true" customPager={FComPager}
+                    useCustomPager="true" customPager={FComPager} initPage={config.data.state.p - 1}
                     showSettings={true} useCustomSettings={true} customSettings={FComSettings}
                     showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
                 />
