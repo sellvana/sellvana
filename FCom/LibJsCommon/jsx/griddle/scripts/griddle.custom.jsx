@@ -451,7 +451,9 @@ var Griddle = React.createClass({
                 );
 
             pagingContent = this.props.useCustomPager
-                ? (<CustomPaginationContainer next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText} customPager={this.props.customPager} totalResults={this.state.totalResults} getConfig={this.getConfig} setPageSize={this.setPageSize} />)
+                ? (<this.props.customPager next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage}
+                    setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText} totalResults={this.state.totalResults}
+                    getConfig={this.getConfig} setPageSize={this.setPageSize} resultsPerPage={this.props.resultsPerPage} />)
                 : (<GridPagination next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText}/>);
         } else {
             // Otherwise, display the loading content.
