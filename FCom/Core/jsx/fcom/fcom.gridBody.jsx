@@ -101,7 +101,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn}
                 sortAscending={that.props.sortAscending ? 'asc' : 'desc'} columnMetadata={that.props.columnMetadata} data={this.props.data} originalData={this.props.originalData}
                 getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows} updateSelectedRow={this.props.updateSelectedRow}
-                setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
+                setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection} getConfig={that.props.getConfig}
             />;
 
             var nodes = this.props.data.map(function (row, index) {
@@ -164,9 +164,20 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
         },
         componentDidMount: function() {
             var that = this;
+            var gridId = this.props.getConfig('id');
+            var personalizeUrl = this.props.getConfig('personalize_url');
 
-            //resize column, todo: personalization
-            $(".dataTable th").resizable({handles: 'e'});
+            $(this.getDOMNode()).find("th").resizable({
+                handles: 'e',
+                minWidth: 20,
+                stop: function (ev, ui) {
+                    if (personalizeUrl) {
+                        var width = $(ev.target).width();
+                        var postData = { 'do': 'grid.col.width', grid: gridId, col: ev.target.dataset.title, width: width };
+                        $.post(personalizeUrl, postData);
+                    }
+                }
+            });
         },
         selectVisible: function(event) {
             var that = this;
@@ -251,7 +262,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
 
                 var displayName = col;
                 var meta;
-                if (that.props.columnMetadata != null){
+                if (that.props.columnMetadata != null) {
                     meta = _.findWhere(that.props.columnMetadata, {name: col});
                     //the weird code is just saying add the space if there's text in columnSort otherwise just set to metaclassname
                     columnSort = meta == null ? columnSort : (columnSort && (columnSort + " ")||columnSort) + meta.cssClass;
@@ -259,6 +270,8 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                         displayName = meta.label;
                     }
                 }
+
+                var width = meta && meta.width ? {width: meta.width} : {};
 
                 if (typeof meta !== "undefined" && meta.name == 'btn_group') {
                     return (
@@ -268,7 +281,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
                     )
                 } else {
                     return (
-                        <th onClick={that.sort} data-title={col} className={columnSort}>
+                        <th onClick={that.sort} data-title={col} className={columnSort} style={width}>
                             <a href="#" className="js-change-url" onClick={that.triggerSort}>{displayName}</a>
                         </th>
                     );
