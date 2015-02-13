@@ -855,6 +855,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getAverageStars()
     {
+        return $this->get('avg_rating');;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAverageRatingPercent()
+    {
         return $this->get('avg_rating') / 5 * 100;
     }
 
@@ -1182,7 +1190,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $invModel = $invHlp->load($invSku, 'inventory_sku');
         // if doesn't exist yet, create
         if (!$invModel) {
-            $invModel = $invHlp->create(['inventory_sku' => $invSku])->save();
+            $invModel = $invHlp->create(['inventory_sku' => $invSku, 'title' => $this->get('product_name')])->save();
         }
         $this->set('inventory_model', $invModel);
         return $invModel;

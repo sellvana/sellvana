@@ -473,6 +473,7 @@ class BLayout extends BClass
             $params['module_name'] = $moduleName;
         }
         $viewAlias = !empty($params['view_alias']) ? $params['view_alias'] : $viewName;
+        $viewFile = !empty($params['view_file']) ? $params['view_file'] : $viewName;
         if (!isset($this->_views[$viewAlias]) || !empty($params['view_class'])) {
             if (empty($params['view_class'])) {
                 /*
@@ -488,7 +489,7 @@ class BLayout extends BClass
                 }
             }
 
-            $this->_views[$viewAlias] = $this->BView->factory($viewName, $params);
+            $this->_views[$viewAlias] = $this->BView->factory($viewFile, $params);
             /*
             $this->BEvents->fire('BLayout::view:add:' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
@@ -929,8 +930,12 @@ class BLayout extends BClass
      */
     public function metaDirectiveViewCallback($d)
     {
-        if (!empty($d['view_class'])) {
-            $this->addView($d['name'], ['view_class' => $d['view_class']]);
+        if (!empty($d['view_class']) || !empty($d['view_file']) || !empty($d['view_alias'])) {
+            $this->addView($d['name'], [
+                'view_class' => !empty($d['view_class']) ? $d['view_class'] : null,
+                'view_file'  => !empty($d['view_file'])  ? $d['view_file']  : null,
+                'view_alias' => !empty($d['view_alias']) ? $d['view_alias'] : null,
+            ]);
         }
 
         $view = $this->getView($d['name']);

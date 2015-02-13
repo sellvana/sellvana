@@ -1163,6 +1163,11 @@ class BLocale extends BClass
         static::$_currencySymbol = $symbol;
     }
 
+    public function getCurrencyCode()
+    {
+        return static::$_currencyCode;
+    }
+
     public function currency($value, $decimals = 2)
     {
         return sprintf('%s%s', static::$_currencySymbol, $this->roundCurrency($value, $decimals));

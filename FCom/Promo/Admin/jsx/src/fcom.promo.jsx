@@ -1,15 +1,12 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo.actions', 'jsx!fcom.promo.coupon', 'jsx!fcom.promo.conditions', 'store', 'select2'],
+define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo.actions', 'jsx!fcom.promo.coupon', 'jsx!fcom.promo.conditions', 'store', 'select2', 'jquery.bootstrap-growl'],
     function (React, $, Griddle, Components, Actions, CouponApp, ConditionsApp, store) {
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {minimumResultsForSearch: 15, dropdownAutoWidth: true});
     var Promo = {
-        createButton: function () {
-            React.render(<Button label="Hello button"/>, document.getElementById('testbed'));
-        },
-        createGrid: function() {
-            React.render(<Griddle/>, document.getElementById('testbed'));
-        },
+        $modalContainerCoupons: null,
+        $modalContainerConditions: null,
+        $modalContainerActions: null,
         init: function (options) {
             $.extend(this.options, options);
 
@@ -26,12 +23,28 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 this.options.promoOptionsEl = $promoOptions;
             }
 
-            var $modalContainerCoupons = $('<div/>').appendTo(document.body);
-            var $modalContainerConditions = $('<div/>').appendTo(document.body);
-            var $modalContainerActions = $('<div/>').appendTo(document.body);
-            this.initCouponApp(this.options.coupon_select_id, $modalContainerCoupons);
-            this.initConditionsApp(this.options.condition_select_id, $modalContainerConditions);
-            this.initActionsApp(this.options.actions_select_id, $modalContainerActions);
+            if(this.options['promo_type_id']) {
+                var $promoType = $("#" + this.options['promo_type_id']);
+                if($promoType.length) {
+                    this.options.promo_type = $promoType.val();
+                    var promo = this;
+                    $promoType.on('change', function (e) {
+                        // on promo type element change, set resulting promo type to options and render form
+                        promo.options.promo_type = $(e.target).val();
+                        promo.initAll();
+                    });
+                }
+            }
+
+            this.$modalContainerCoupons = $('<div/>').appendTo(document.body);
+            this.$modalContainerConditions = $('<div/>').appendTo(document.body);
+            this.$modalContainerActions = $('<div/>').appendTo(document.body);
+            this.initAll()
+        },
+        initAll: function () {
+            this.initCouponApp(this.options.coupon_select_id, this.$modalContainerCoupons);
+            this.initConditionsApp(this.options.condition_select_id, this.$modalContainerConditions);
+            this.initActionsApp(this.options.actions_select_id, this.$modalContainerActions);
         },
         initActionsApp: function (selector, $modalContainer) {
             var $actionsSelector = $('#' + selector);
@@ -85,7 +98,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             React.render(
                 <div className="modals-container">
                     <Components.Modal title="Coupon grid" onLoad={this.addShowCodes.bind(this)}/>
-                    <Components.Modal title="Generate coupons" onLoad={this.addGenerateCodes.bind(this)}>
+                    <Components.Modal title="Generate coupons" onLoad={this.addGenerateCodes.bind(this)} onConfirm={this.postGenerate.bind(this)}>
                         <CouponApp.GenerateForm onSubmit={this.postGenerate.bind(this)}/>
                     </Components.Modal>
                     <Components.Modal title="Import coupons" onLoad={this.addImportCodes.bind(this)}/>
@@ -102,7 +115,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             condition_add_id: 'condition_action_add',
             promo_serialized: '',
             promoOptions: {},
-            debug: false
+            debug: false,
+            promo_type: 'cart' // default promotion type
         },
         showCodesModal: null,
         generateCodesModal: null,
@@ -177,13 +191,13 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
         },
         postGenerate: function (e) {
             var $formContainer = $('#coupon-generate-container');
-            Promo.log(e, $formContainer);
+            //Promo.log(e, $formContainer);
             var url = this.options['generateCouponsUrl'];
             var $progress = $formContainer.find('.loading');
             var $result = $formContainer.find('.result').hide();
             $progress.show();
             //$button.click(function (e) {
-            e.preventDefault();
+
             var $meta = $('meta[name="csrf-token"]');
             var data = {};
             if($meta.length) {
@@ -199,6 +213,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 .done(function (result) {
                     var status = result.status;
                     var message = result.message;
+                    $.bootstrapGrowl(message, {type: 'success', align: 'center', width: 'auto'});
                     $result.text(message);
                     if (status != 'error') {
                         var newRows = result['codes'].map(function (e, i) {
@@ -216,10 +231,18 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 .always(function (r) {
                     $progress.hide();
                     $result.show();
+                    if ($.isFunction(e.close)) {
+                        // e is the modal object
+                        setTimeout(e.close, 2000);
+                        //e.close();//close it
+                    }
                     // hide notification
                     Promo.log(r);
                 });
             //});
+            if ($.isFunction(e.preventDefault)) {
+                e.preventDefault();
+            }
         },
         importCodes: function () {
             var modal = this.importCodesModal;

@@ -44,7 +44,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $count    = $countRes[0]['count'];
 
-        $orm->limit((int) $limit)->offset($offset)->order_by_desc('product_name');
+        $orm->limit((int) $limit)->offset($offset)->order_by_asc('product_name');
         $stmt   = $orm->execute();
         $result = ['total_count' => $count, 'items' => []];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -74,20 +74,28 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $catTerm = $r->get('q');
         $limit   = $r->get('o')?: 30;
         $offset  = ($page - 1) * $limit;
+        $ids = $r->get('cats');
+        if ($ids) {
+            $ids = explode(",", $ids);
+        }
 
         /** @var BORM $orm */
         $orm = $this->FCom_Catalog_Model_Category->orm('c')->select(['id', 'full_name', 'node_name'], 'c');
-        if ($catTerm && $catTerm != '*') {
-            $orm->where([['full_name LIKE ?', "%{$catTerm}%"]]);
+        if (!$ids) {
+            if ($catTerm && $catTerm != '*') {
+                $orm->where([['full_name LIKE ?', "%{$catTerm}%"]]);
+            }
+
+            $countOrm = clone $orm;
+            $countOrm->select_expr('COUNT(*)', 'count');
+            $stmt     = $countOrm->execute();
+            $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $count    = $countRes[0]['count'];
+            $orm->limit((int) $limit)->offset($offset)->order_by_desc('node_name');
+        }  else {
+            $orm->where(["id" => $ids]);
+            $count = 0;
         }
-
-        $countOrm = clone $orm;
-        $countOrm->select_expr('COUNT(*)', 'count');
-        $stmt     = $countOrm->execute();
-        $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $count    = $countRes[0]['count'];
-
-        $orm->limit((int) $limit)->offset($offset)->order_by_desc('node_name');
         $stmt   = $orm->execute();
         $result = ['total_count' => $count, 'items' => []];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -228,26 +236,50 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $result['items'] = [];
         switch ($field) {
             case 'methods':
+                $methodCodes = $this->BRequest->get('methods');
+                if ($methodCodes) {
+                    $methodCodes = explode(",", $methodCodes);
+                }
                 $methods = $this->FCom_Sales_Main->getShippingMethods();
                 foreach ($methods as $code => $method) {
                     /** @var FCom_Sales_Method_Shipping_Abstract $method */
                     $name              = $method->getName();
-                    $result['items'][] = ['id' => $code, 'text' => $name];
+                    if (!$methodCodes) { // if looking for method codes, return just them
+                        $result['items'][] = ['id' => $code, 'text' => $name];
+                    } else if (in_array($code, $methodCodes)) {
+                        $result['items'][] = ['id' => $code, 'text' => $name];
+                    }
                 }
                 break;
             case 'country':
+                $countryCodes = $this->BRequest->get('countries');
+                if ($countryCodes) {
+                    $countryCodes = explode(",", $countryCodes);
+                }
                 $countries = $this->FCom_Core_Main->getAllowedCountries();
                 foreach ($countries as $code => $country) {
-                    $result['items'][] = ['id' => $code, 'text' => $country];
+                    if (!$countryCodes) { // if looking for method codes, return just them
+                        $result['items'][] = ['id' => $code, 'text' => $country];
+                    } else if (in_array($code, $countryCodes)) {
+                        $result['items'][] = ['id' => $code, 'text' => $country];
+                    }
                 }
                 break;
             case 'region':
             case 'state':
+                $regionCodes = $this->BRequest->get('regions');
+            if ($regionCodes) {
+                $regionCodes = explode(",", $regionCodes);
+                }
                 $regions = $this->FCom_Core_Main->getAllowedRegions();
                 foreach ($regions as $country => $region) {
-                    $countryRegions = ['text' => trim($country, '@'), 'children' => []];
+                    //$countryRegions = ['text' => trim($country, '@'), 'children' => []];
                     foreach ($region as $code => $r) {
-                        $result['items'][] = ['id' => $code, 'text' => $r];
+                        if (!$regionCodes) {
+                            $result['items'][] = ['id' => $code, 'text' => $r];
+                        } elseif(in_array($code, $regionCodes)){
+                            $result['items'][] = ['id' => $code, 'text' => $r];
+                        }
                         //$countryRegions['children'][] = ['id' => $code, 'text' => $r];
                     }
                     //$result['items'][] = $countryRegions;

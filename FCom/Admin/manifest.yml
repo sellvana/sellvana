@@ -73,6 +73,13 @@ modules:
                         /settings:
                             POST/config/modules/FCom_Admin/add_js_code: "*"
                             POST/config/modules/FCom_Frontend/add_js_code: "*"
+                            POST/config/modules/FCom_Frontend/custom_tags_homepage: "*"
+                            POST/config/modules/FCom_Frontend/custom_tags_category: "*"
+                            POST/config/modules/FCom_Frontend/custom_tags_search: "*"
+                            POST/config/modules/FCom_Frontend/custom_tags_product: "*"
+                            POST/config/modules/FCom_Frontend/custom_tags_cart: "*"
+                            POST/config/modules/FCom_Frontend/custom_tags_checkout: "*"
+                            POST/config/modules/FCom_Frontend/custom_tags_success: "*"
                         /templates/form:
                             POST/model/view_contents: "*"
                 uploads:

@@ -35,7 +35,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'sorttype' => 'number'],
-            ['name' => 'description', 'label' => 'Description', 'index' => 'description', 'width' => 250],
+            ['name' => 'summary', 'label' => 'Description', 'index' => 'summary', 'width' => 250],
             ['name' => 'from_date', 'label' => 'Start Date', 'index' => 'from_date', 'formatter' => 'date'],
             ['name' => 'to_date', 'label' => 'End Date', 'index' => 'to_date', 'formatter' => 'date'],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
@@ -88,6 +88,14 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $args['view']->title = $m->id() ? 'Edit Promo: ' . $m->description : 'Create New Promo';
         if (!$m->id()) {
             // todo initiate promo with status 'incomplete'
+            $args['view']->numCodes = 0;
+        } else {
+            $m->set('numCodes', $this->getPromoCouponCodesCount($m->id()));
+            if ($m->get('coupon_type') == 1) {
+                // load coupon code for view display
+                $coupon = $this->FCom_Promo_Model_PromoCoupon->load($m->id(), 'promo_id');
+                $m->set('single_coupon_code', $coupon->get('code'));
+            }
         }
     }
 /*
@@ -128,6 +136,20 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $args['data']['customer_group_ids'] = implode(",", $args['data']['customer_group_ids']);
         }
 
+        $serializedData = isset($args['data']['data_serialized'])? $args['data']['data_serialized']: null;
+        if ($serializedData) {
+            $serializedData = $this->BUtil->fromJson($serializedData);
+            $couponCodes = isset($serializedData['coupons'])? $serializedData['coupons']: null;
+            if (isset($args['data']['coupon_type']) && $args['data']['coupon_type'] == 2 && $couponCodes) {
+                // if coupon type is set and it is 2 == multiple codes, and multiple codes are passed, add them to
+                // model for reuse on post after, at this moment, model may not have an id
+                $args['model']->set("__multi_codes", $couponCodes);
+
+            }
+            unset($serializedData['coupons']);
+            $args['data']['data_serialized'] = $this->BUtil->toJson($serializedData);
+        }
+
         if (!empty($args['data']['model'])) {
             $args['data']['model'] = $this->BLocale->parseRequestDates($args['data']['model'], 'from_date,to_date');
             $args['model']->set($args['data']['model']);
@@ -140,6 +162,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
+        $this->processCoupons($args['model']);
         #$this->processGroupsPost($args['model'], $_POST);
         #$this->processMediaPost($args['model'], $_POST);
     }
@@ -516,9 +539,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
         $config = [
             'id' => $this->getCouponGridId(),
-            'orm' => $this->FCom_Promo_Model_PromoCoupon->orm('pc'),
-            'data_url' => $gridDataUrl,
-            'edit_url' => $gridDataUrl,
+            'data_mode' => 'local',
+            'data' => $this->BDb->many_as_array($this->FCom_Promo_Model_PromoCoupon->orm('pc')->find_many()),
+            /*'data_url' => $gridDataUrl,
+            'edit_url' => $gridDataUrl,*/
             'grid_url' => null,
             'form_url' => null,
             'columns' => [
@@ -570,20 +594,20 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         } else {
             $pattern = isset($data['code_pattern'])? $data['code_pattern']: null;
             $length = isset($data['code_length'])? $data['code_length']: 8;
-            $usesPerCustomer = isset($data['code_uses_per_customer'])? $data['code_uses_per_customer']: 1;
-            $usesTotal = isset($data['code_uses_total'])? $data['code_uses_total']: 1;
+            //$usesPerCustomer = isset($data['code_uses_per_customer'])? $data['code_uses_per_customer']: 1;
+            //$usesTotal = isset($data['code_uses_total'])? $data['code_uses_total']: 1;
             $couponCount = isset($data['coupon_count'])? $data['coupon_count']: 1;
             $model = $this->FCom_Promo_Model_PromoCoupon;
             $generated = $model->generateCoupons([
                  //'promo_id' => $id,
                  'pattern' => $pattern,
                  'length' => $length,
-                 'uses_per_customer' => $usesPerCustomer,
-                 'uses_total' => $usesTotal,
+                 //'uses_per_customer' => $usesPerCustomer,
+                 //'uses_total' => $usesTotal,
                  'count' => $couponCount
              ]);
             $status = 'success';
-            $message = $this->_("%d coupons generated.", $generated['generated']);
+            $message = $this->_("%d coupon(s) generated.", $generated['generated']);
             if ($generated['generated'] < $couponCount) {
                 $status = 'warning';
                 $message .= $this->_("\nFailed to generate %d coupons", $generated['failed']);
@@ -680,5 +704,95 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function getCouponGridId()
     {
         return $this->FCom_Promo_Model_PromoCoupon->origClass() . '_grid';
+    }
+
+    protected function getPromoCouponCodesCount($id)
+    {
+        $couponOrm = $this->FCom_Promo_Model_PromoCoupon->orm('pc');
+        $couponOrm->where('promo_id', $id);
+        return $couponOrm->count();
+    }
+
+    /**
+     * @param FCom_Promo_Model_Promo $model
+     * @return $this|bool
+     */
+    protected function processCoupons($model)
+    {
+        $this->_processSingleCoupon($model);
+        $this->_processMultiCoupons($model);
+    }
+
+    /**
+     * @param FCom_Promo_Model_Promo $model
+     * @return $this|bool
+     */
+    protected function _processSingleCoupon($model)
+    {
+        $data = $this->BRequest->post('model');
+        if (!$data || !array_key_exists('single_coupon_code', $data)) {
+            // if single_coupon_code is not provided, then nothing to do
+            return null;
+        }
+
+        $code   = $data['single_coupon_code'];
+        $coupon = $this->FCom_Promo_Model_PromoCoupon;
+
+        $promoId  = $model->id();
+        $params   = [
+            'promo_id' => $promoId
+        ];
+        $existing = $coupon->orm()->where_complex($params)->find_many();
+        // see if there is existing coupon code for the promo, if so,
+        // and new code is different - or auto generate, delete existing one
+        if (empty($code)) {
+            $params['count']  = 1;
+            $params['length'] = 5;// todo create setting for this?
+            $result           = $coupon->generateCoupons($params);
+            if ($existing) {
+                foreach ($existing as $ex) {
+                    $ex->delete();
+                }
+            }
+
+            return $result['generated'] == 1; // only one coupon should be auto generated
+        }
+        $same = null;
+        foreach ($existing as $ex) {
+            if ($ex->get('code') == $code) {
+                $same = $ex;
+            } else {
+                $ex->delete();
+            }
+        }
+
+        $params['code'] = $code;
+
+        return $same || $coupon->create($params)->save();
+    }
+
+    /**
+     * @param FCom_Promo_Model_Promo $model
+     * @return $this|bool
+     */
+    protected function _processMultiCoupons($model)
+    {
+        $couponData = $model->get('__multi_codes');
+        if (!$couponData) {
+            return null;
+        }
+
+        $codes = [];
+        foreach ($couponData as $cd) {
+            $codes[] = $cd['code'];
+        }
+        try {
+            $created = $this->FCom_Promo_Model_PromoCoupon->createCouponCodes($codes, $model->id());
+            $this->message($this->_("Created %d coupon codes.", $created));
+            return $created;
+        } catch(Exception $e) {
+            $this->message($e->getMessage(), 'error');
+            return false;
+        }
     }
 }

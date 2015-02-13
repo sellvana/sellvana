@@ -9,11 +9,16 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             if (this.props.className) {
                 cls += this.props.className;
             }
+            var promoType = this.props.promoType;
+            var types = this.props.totalType.filter(function (type) {
+                return !(promoType == 'catalog' && type.id == 'fixed');
+
+            });
             return (
                 <div className={this.props.containerClass}>
                     <div className="col-md-10">
                     <select className={cls} onChange={this.onChange} defaultValue={this.props.value}>
-                        {this.props.totalType.map(function (type) {
+                        {types.map(function (type) {
                             return <option value={type.id} key={type.id}>{type.label}</option>
                         })}
                     </select>
@@ -774,9 +779,16 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
     var Discount = React.createClass({
         mixins: [Common.removeMixin],
         render: function () {
+            var options = this.props.options;
+            var promoType = options.promo_type;
+            var display = {
+                display: (promoType === 'catalog') ? 'none' : 'inherit'
+            };
+            var disabled = (promoType === 'catalog');
+
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <Type ref={"discountType" + this.props.id} id={"discountType" + this.props.id}
+                    <Type ref={"discountType" + this.props.id} id={"discountType" + this.props.id} promoType={promoType}
                         key={"discountType" + this.props.id} value={this.state.type} onChange={this.onChange}/>
                     <div className="col-md-7">
                         <div className="col-md-2">
@@ -784,19 +796,20 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                                 id={"discountValue"+ this.props.id} key={"discountValue"+ this.props.id} type="text"
                                 defaultValue={this.state.value} onBlur={this.onChange}/>
                         </div>
-                        <div className="col-md-5">
-                            <select className="to-select2 form-control" ref={"discountScope" + this.props.id} defaultValue={this.state.scope}
+                        <div className="col-md-5" style={display}>
+                            <select className="to-select2 form-control" disabled={disabled}
+                                ref={"discountScope" + this.props.id} defaultValue={this.state.scope}
                                 id={"discountScope" + this.props.id} key={"discountScope" + this.props.id} onChange={this.onChange}>
-                                {this.props.scopeOptions.map(function (type) {
-                                    return <option value={type.id} key={type.id}>{type.label}</option>
-                                })}
+                                    {this.props.scopeOptions.map(function (type) {
+                                        return <option value={type.id} key={type.id}>{type.label}</option>
+                                    })}
                             </select>
                         </div>
-                        <div className="col-md-5">
+                        <div className="col-md-5" style={display}>
                             <DiscountDetails type={this.state.scope} options={this.props.options} ref={"discountDetails" + this.props.id}
                                 id={"discountDetails" + this.props.id} key={"discountDetails" + this.props.id}
                                 modalContainer={this.props.modalContainer} onChange={this.onChange}
-                                data={{sku: this.state.sku, combination: this.state.combination}}/>
+                                data={{sku: this.state.sku, combination: this.state.combination}} promoType={promoType}/>
                         </div>
                     </div>
                 </Common.Row>
@@ -807,7 +820,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             this.setState(data);
         },
         componentDidMount: function () {
-            $(this.refs['discountScope' + this.props.id].getDOMNode()).select2().on('change', this.onScopeChange)
+            if(this.props.options.promo_type != 'catalog') {
+                $(this.refs['discountScope' + this.props.id].getDOMNode()).select2().on('change', this.onScopeChange);
+            }
+            this.onChange();
+        },
+        componentDidUpdate: function () {
+            this.onChange(); // on update set values
         },
         getDefaultProps: function () {
             return {
@@ -825,7 +844,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             return {
                 value: 0,
                 type: '',
-                scope: 'whole_order',
+                scope: 'cond_prod',
                 sku: [],
                 combination: {}
             };
@@ -845,23 +864,26 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         onChange: function () {
             var value = {};
             value.value = $(this.refs['discountValue' + this.props.id].getDOMNode()).val();
-            value.scope = $(this.refs['discountScope' + this.props.id].getDOMNode()).select2('val');
             value.type = this.refs['discountType' + this.props.id].serialize();
 
-            var details = this.refs['discountDetails' + this.props.id].serialize();
-            for(var d in details) {
-                if(details.hasOwnProperty(d)) {
-                    value[d] = details[d];
+            if (this.props.options.promo_type !== 'catalog') {
+                value.scope = $(this.refs['discountScope' + this.props.id].getDOMNode()).select2('val');
+
+                var details = this.refs['discountDetails' + this.props.id].serialize();
+                for (var d in details) {
+                    if (details.hasOwnProperty(d)) {
+                        value[d] = details[d];
+                    }
                 }
-            }
 
-            // make sure to remove any invalid data
-            if(value.scope != "attr_combination") {
-                delete value['combination'];
-            }
+                // make sure to remove any invalid data
+                if (value.scope != "attr_combination") {
+                    delete value['combination'];
+                }
 
-            if(value.scope != "other_prod") {
-                delete value['product_ids'];
+                if (value.scope != "other_prod") {
+                    delete value['product_ids'];
+                }
             }
 
             //this.setState(value);
@@ -992,7 +1014,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         render: function () {
             var amount = '';
             if(this.state.type != 'free') {
-                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" ref="shippingAmount" className="form-control" />
+                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" ref="shippingAmount" className="form-control" onChange={this.onChange}/>
             }
             var type = <Type ref="shippingType" id="shippingType" onChange={this.onTypeChange} value={this.state.type}
                     totalType={this.props.fields} value={this.state.type}/>;
@@ -1055,7 +1077,22 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 multiple: true,
                 query: self.select2query,
                 dropdownAutoWidth: true,
-                initSelection: self.initSelection
+                initSelection: function (el, callback) {
+                    //var data = [];
+                    var val = el.val();
+
+                    $.get(self.url, {methods: val}).done(function (result) {
+                        //console.log(result);
+                        callback(result.items);
+                    });
+
+                    //var val = el.val().split(",");
+                    //for (var i in val) {
+                    //    var val2 = val[i];
+                    //    data.push({id: val2, text: val2});
+                    //}
+                    //callback(data);
+                }
             }).on('change', this.onChange);
         },
         onChange: function () {
@@ -1082,6 +1119,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
         render: function () {
             var children = [];
             var options = this.props.options;
+            var promoType = options.promo_type;
             var mc = this.props.modalContainer;
             var ra = this.removeAction;
             var au = this.actionUpdate;
@@ -1100,12 +1138,20 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                                         modalContainer={mc} onUpdate={au}/>;
                                     break;
                                 case 'free_product':
-                                    el = <FreeProduct label={Locale._("Auto Add Product To Cart")} options={options}
-                                        key={key} id={key} removeAction={ra} onUpdate={au} data={field}/>;
+                                    if (promoType == 'catalog') {
+                                        el = '';
+                                    } else {
+                                        el = <FreeProduct label={Locale._("Auto Add Product To Cart")} options={options}
+                                            key={key} id={key} removeAction={ra} onUpdate={au} data={field}/>;
+                                    }
                                     break;
                                 case 'shipping':
-                                    el = <Shipping label={Locale._("Shipping")} options={options}
-                                        key={key} id={key} removeAction={ra} onUpdate={au} data={field}/>;
+                                    if (promoType == 'catalog') {
+                                        el = '';
+                                    } else {
+                                        el = <Shipping label={Locale._("Shipping")} options={options}
+                                            key={key} id={key} removeAction={ra} onUpdate={au} data={field}/>;
+                                    }
                                     break;
 
                             }
@@ -1207,6 +1253,13 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             this.shouldUpdate = false;
             this.props.onUpdate(localData);
             this.setState({data: localData});
+        },
+        shouldComponentUpdate: function () {
+            var upd = this.shouldUpdate;
+            if(!upd) { // shouldUpdate is one time flag that should be set only specifically and then dismissed
+                this.shouldUpdate = true;
+            }
+            return upd;
         },
         getInitialState: function () {
             return {

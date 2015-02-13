@@ -6,6 +6,9 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
     // what type of condition we have, total amount or quantity
     var ConditionsType = React.createClass({
         render: function () {
+            if(this.props.promoType == 'catalog') {
+                return null;
+            }
             var cls = this.props.select2 ? "to-select2 " : "";
             if (this.props.className) {
                 cls += this.props.className;
@@ -29,16 +32,38 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             }
         },
         serialize: function () {
-            return this.value || $('select', this.getDOMNode()).select2('val');
+            var value = '';
+            if (this.props.promoType !== 'catalog') {
+                if (this.value) {
+                    value = this.value;
+                } else {
+                    var $sel = $('select', this.getDOMNode());
+                    if ($sel.length) {
+                        value = $sel.select2('val');
+                    }
+                }
+            }
+            return value;
         },
         getDefaultProps: function () {
             return {
                 totalType: [{id: "qty", label: "TOTAL QTY"}, {id: "amt", label: "TOTAL $Amount"}],
                 select2: true,
-                containerClass: "col-md-2"
+                containerClass: "col-md-2",
+                promoType: 'cart'
             };
         },
         componentDidMount: function () {
+            if(this.props.promoType !== 'catalog') {
+                this.registerSelect2();
+            }
+        },
+        componentDidUpdate: function () {
+            if (this.props.promoType !== 'catalog') {
+                this.registerSelect2();
+            }
+        },
+        registerSelect2: function () {
             $('select', this.getDOMNode()).select2().on('change', this.onChange);
         }
     });
@@ -48,21 +73,27 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
             var productId = this.state.sku;
+            var promoType = this.props.options.promo_type;
+            var display = {
+                display: promoType === 'catalog' ? 'none': 'inherit'
+            };
+            var disabled = promoType === 'catalog';
             if($.isArray(productId)) {
                 productId = productId.join(",");
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="skuCollectionType" id="skuCollectionType" onChange={this.onChange} value={this.state.type}> of </ConditionsType>
+                    <ConditionsType ref="skuCollectionType" id="skuCollectionType" onChange={this.onChange}
+                        value={this.state.type} promoType={promoType}> of </ConditionsType>
                     <div className="col-md-2">
                         <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control" defaultValue={productId}/>
                     </div>
-                    <div className="col-md-2">
-                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" onChange={this.onChange} value={this.state.filter}/>
+                    <div className="col-md-2" style={display}>
+                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" onChange={this.onChange} value={this.state.filter} disabled={disabled}/>
                     </div>
-                    <div className="col-md-1">
+                    <div className="col-md-1" style={display}>
                         <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue"
-                            defaultValue={this.state.value} type="text" onBlur={this.onChange}/>
+                            defaultValue={this.state.value} type="text" onChange={this.onChange} disabled={disabled}/>
                     </div>
                 </Common.Row>
             );
@@ -115,13 +146,19 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 query: self.select2query
             }).on('change', this.onChange);
             $('select.to-select2', this.getDOMNode()).select2();
+            this.onChange(); // make sure initial state is saved
+        },
+        componentDidUpdate: function () {
+            this.onChange();
         },
         onChange: function () {
             var value = {};
-            value.type = this.refs['skuCollectionType'].serialize();
             value.sku = $(this.refs['skuCollectionIds'].getDOMNode()).select2('val');
-            value.filter = $(this.refs['skuCollectionCond'].getDOMNode()).val();
-            value.value = $(this.refs['skuCollectionValue'].getDOMNode()).val();
+            if (this.props.options.promo_type !== 'catalog') {
+                value.type = this.refs['skuCollectionType'].serialize();
+                value.filter = $(this.refs['skuCollectionCond'].getDOMNode()).val();
+                value.value = $(this.refs['skuCollectionValue'].getDOMNode()).val();
+            }
             if(this.props.onUpdate) {
                 var updateData = {};
                 updateData[this.props.id] = value;
@@ -773,19 +810,29 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             var values = this.props.data;
             var categories = values.category_id;
+            var promoType = this.props.options.promo_type;
+            var display = {
+                display: (promoType === 'catalog')? 'none' : 'inherit'
+            };
+            var disabled = (promoType === 'catalog');
             if($.isArray(categories)) {
                 categories = categories.join(",");
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" onChange={this.onChange} value={values.type}> of products in </ConditionsType>
+                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" promoType={promoType}
+                        onChange={this.onChange} value={values.type}> of products in </ConditionsType>
                     <input type="hidden" id="catProductsIds" ref="catProductsIds" defaultValue={categories}/>
                     <select id="catProductInclude" ref="catProductInclude" className="to-select2" defaultValue={values.include}>
                         <option value="only_this">{Locale._("Only This")}</option>
                         <option value="include_subcategories">{Locale._("This and sub categories")}</option>
                     </select>
-                    <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange} value={values.filter}/>
-                    <input ref="catProductsValue" id="catProductsValue" type="text" className="" onBlur={this.onChange} defaultValue={values.value}/>
+                    <div style={display} >
+                        <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange}
+                            value={values.filter} disabled={disabled}/>
+                    </div>
+                    <input ref="catProductsValue" id="catProductsValue" type="text" className="" onChange={this.onChange}
+                        defaultValue={values.value} style={display} disabled={disabled}/>
                 </Common.Row>
             );
         },
@@ -802,6 +849,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         componentDidMount: function () {
             var catProductsIds = this.refs['catProductsIds'];
             this.url = this.props.options.base_url + this.props.url;
+            var self = this;
             $(catProductsIds.getDOMNode()).select2({
                 placeholder: "Select categories",
                 maximumSelectionSize: 4,
@@ -822,17 +870,39 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
 
                     return markup;
                 },
-                initSelection: this.initSelection
-            });
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+                initSelection: function (el, callback) {
+                    //var data = [];
+                    var val = el.val();
+
+                    $.get(self.url, {cats: val}).done(function (result) {
+                        console.log(result);
+                        callback(result.items);
+                    });
+
+                    //var val = el.val().split(",");
+                    //for (var i in val) {
+                    //    var val2 = val[i];
+                    //    data.push({id: val2, text: val2});
+                    //}
+                    //callback(data);
+                }
+
+            }).on('change', this.onChange);
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15}).on('change', this.onChange);
+            this.onChange();
+        },
+        componentDidUpdate: function () {
+            this.onChange(); // on update set values
         },
         onChange: function () {
             var value = {};
-            value.type = this.refs['catProductsType'].serialize();
             value.category_id = $(this.refs['catProductsIds'].getDOMNode()).select2('val');
-            value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();
-            value.value = $(this.refs['catProductsValue'].getDOMNode()).val();
             value.include = $(this.refs['catProductInclude'].getDOMNode()).val();
+            if(this.props.options.promo_type !== 'catalog') {
+                value.type = this.refs['catProductsType'].serialize();
+                value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();
+                value.value = $(this.refs['catProductsValue'].getDOMNode()).val();
+            }
             if(this.props.onUpdate) {
                 var updateData = {};
                 updateData[this.props.id] = value;
@@ -1332,6 +1402,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         render: function () {
             var children = [];
             var options = this.props.options;
+            var promoType = options.promo_type;
             var mc = this.props.modalContainer;
             var rc = this.removeCondition;
             var cu = this.conditionUpdate;
@@ -1350,13 +1421,21 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                                     el = <ConditionsCategories onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
                                     break;
                                 case 'total':
-                                    el = <ConditionTotal onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                    if(promoType == 'catalog') {
+                                        el = '';
+                                    } else {
+                                        el = <ConditionTotal onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                    }
                                     break;
                                 case 'combination':
                                     el = <ConditionsAttributeCombination onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
                                     break;
                                 case 'shipping':
-                                    el = <ConditionsShipping onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                    if(promoType == 'catalog') {
+                                        el = '';
+                                    } else {
+                                        el = <ConditionsShipping onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                    }
                                     break;
                             }
                             if (el) {

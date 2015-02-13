@@ -148,4 +148,40 @@ class FCom_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstr
 
         $this->BResponse->redirect($redirUrl);
     }
+
+    public function action_add_coupon__POST()
+    {
+        $post = $this->BRequest->post();
+        $result = [];
+
+        $this->FCom_Sales_Main->workflowAction('customerAddsCouponCode', [
+            'post' => $post,
+            'result' => &$result,
+        ]);
+
+        if (!empty($result['error'])) {
+            $this->message($result['message'], 'error');
+        } else {
+            $this->message('Coupon code has been applied to cart');
+        }
+        $this->BResponse->redirect('cart');
+    }
+
+    public function action_remove_coupon__POST()
+    {
+        $post = $this->BRequest->post();
+        $result = [];
+
+        $this->FCom_Sales_Main->workflowAction('customerRemovesCouponCode', [
+            'post' => $post,
+            'result' => &$result,
+        ]);
+
+        if (!empty($result['error'])) {
+            $this->message($result['message'], 'error');
+        } else {
+            $this->message('Coupon code has been removed from the cart');
+        }
+        $this->BResponse->redirect('cart');
+    }
 }

@@ -1,4 +1,5 @@
-define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Locale) {
+//noinspection JSPotentiallyInvalidUsageOfThis
+define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (React, $, Locale) {
     FCom.Components = {};
 
     /**
@@ -147,7 +148,11 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
     FCom.Components.Input = React.createClass({
         mixins:[FCom.FormMixin],
         render: function () {
-            var { formGroupClass, inputDivClass, inputClass, inputValue, ...other } = this.props;
+            var formGroupClass = this.props.formGroupClass,
+                inputDivClass = this.props.inputDivClass,
+                inputClass = this.props.inputClass,
+                inputValue = this.props.inputValue,
+                other = _.omit(this.props, ['formGroupClass', 'inputDivClass', 'inputClass', 'inputValue']);
             var className = "form-control";
             if(inputClass) {
                 className += " " + inputClass;
@@ -156,8 +161,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
                 className += " required";
             }
             var helpBlock = <span/>;
-            if(this.props.helpBlockText) {
-                helpBlock = <FCom.Components.HelpBlock text={this.props.helpBlockText}/>;
+            if(this.props['helpBlockText']) {
+                helpBlock = <FCom.Components.HelpBlock text={this.props['helpBlockText']}/>;
             }
         var inputId = this.getInputId();
 
@@ -167,7 +172,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
                         {this.props.label}
                     </FCom.Components.ControlLabel>
                     <div className={inputDivClass}>
-                        <input {...this.props}
+                        <input {...other}
                             id={inputId}
                             name={this.getInputName()}
                             className={className}
@@ -196,7 +201,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         render: function () {
             return (
                 <a id={this.props.id} className="pull-right" href="#" ref="icon"
-                    data-toggle="popover" data-trigger="focus"
+                    data-toggle="popover" data-trigger="focus" tabIndex="-1"
                     data-content={this.props.content} data-container="body">
                     <span className="glyphicon glyphicon-question-sign"></span>
                 </a>
@@ -243,7 +248,10 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
 
     FCom.Components.Button = React.createClass({
         render: function () {
-            var { className, onClick, ...other } = this.props;
+            var className = this.props.className,
+                onClick = this.props.onClick,
+                other = _.omit(this.props, ['className', 'onClick']);
+
             return (
                 <button {...other} className={"btn " + className} onClick={onClick}>{this.props.children}</button>
             );
@@ -373,7 +381,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
                 label = (
                     <div className="control-label col-sm-3">
-                        <label for={column.name}>
+                        <label htmlFor={column.name}>
                             {column.label} {iconRequired}
                         </label>
                     </div>
@@ -384,7 +392,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             var input = '';
             if (typeof column.element_print != 'undefined') { //custom html for element_print
                 if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
-                    input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                    input = '<div class="control-label col-sm-3"><label htmlFor='+column.name+'>'+column.label+'</label></div>';
                 }
                 input += '<div class="controls col-sm-8">' + column.element_print + '</div>';
                 return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
