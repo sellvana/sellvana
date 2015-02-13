@@ -539,8 +539,8 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
         } else {
             $actionsResult['discount_amount'] += $totalDiscount;
         }
-        $lastItemIdx = null;
-        foreach ($items as $i => $item) {
+        $itemId = null;
+        foreach ($items as $item) {
             if ($item->get('auto_added')) {
                 continue;
             }
@@ -563,11 +563,20 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
     protected function _calcCartShippingDiscount(FCom_Sales_Model_Cart $cart, array $action,
                                                  array $conditionsResult, array &$actionsResult)
     {
-        $result = [
-            'shipping_discount' => 0,
-            'shipping_free' => 0,
-        ];
-        return $result;
+        switch ($action['type']) {
+            case 'free':
+                $actionsResult['shipping_free'] = 1;
+                break;
+
+            case 'pcnt':
+                $discount = $cart->get('shipping_price') * $action['value'] / 100;
+                $actionsResult['shipping_discount'] = $this->BLocale->roundCurrency($discount);
+                break;
+
+            case 'amt':
+                $actionsResult['shipping_discount'] = min($action['value'], $cart->get('shipping_price'));
+                break;
+        }
     }
 
     protected function _calcCartFreeProduct(FCom_Sales_Model_Cart $cart, array $action,
