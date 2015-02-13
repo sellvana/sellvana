@@ -102,8 +102,8 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn} getConfig={that.props.getConfig}
                 sortAscending={that.props.sortAscending ? 'asc' : 'desc'} columnMetadata={that.props.columnMetadata} data={this.props.data}
-                originalData={this.props.originalData} getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows}
-                updateSelectedRow={this.props.updateSelectedRow} setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
+                originalData={this.props.originalData} setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
+                addSelectedRows={this.props.addSelectedRows} getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows}
                 removeSelectedRows={this.props.removeSelectedRows}
             />;
 
@@ -111,8 +111,8 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
 
             var nodes = dataForRender.map(function (row, index) {
                 return <FComRow row={row} index={index} columns={that.props.columns} columnMetadata={that.props.columnMetadata}
-                    getConfig={that.props.getConfig} doRowAction={that.doRowAction}
-                    updateSelectedRow={that.props.updateSelectedRow} getSelectedRows={that.props.getSelectedRows} />;
+                    getConfig={that.props.getConfig} doRowAction={that.doRowAction} removeSelectedRows={that.props.removeSelectedRows}
+                    addSelectedRows={that.props.addSelectedRows} getSelectedRows={that.props.getSelectedRows} />;
             });
 
             return (
@@ -182,11 +182,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
         },
         selectVisible: function(event) {
             var that = this;
-            _.forEach(this.props.data, function(row) {
-                var origRow = _.findWhere(that.props.originalData, {id: row.id});
-                that.props.updateSelectedRow(origRow, false);
-            });
-
+            that.props.addSelectedRows(this.props.data);
             event.preventDefault();
         },
         unselectVisible: function(event) {

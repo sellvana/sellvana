@@ -17,12 +17,16 @@ define(['underscore', 'react'], function (_, React) {
                 "index": 0,
                 "columnMetadata": null,
                 "doRowAction": null,
-                "updateSelectedRow": null,
+                "addSelectedRows": null,
                 "getSelectedRows": null
             }
         },
         selectRow: function(event) {
-            this.props.updateSelectedRow(this.props.row, !event.target.checked);
+            if (event.target.checked) {
+                this.props.addSelectedRows([this.props.row]);
+            } else {
+                this.props.removeSelectedRows([this.props.row]);
+            }
         },
         render: function () {
             var that = this;

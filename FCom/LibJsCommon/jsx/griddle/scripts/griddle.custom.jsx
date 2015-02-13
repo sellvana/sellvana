@@ -445,8 +445,8 @@ var Griddle = React.createClass({
                     this.props.useCustomGrid
                     ? (<this.props.customGrid columnMetadata={this.props.columnMetadata} data={data} originalData={results} columns={cols} metadataColumns={meta}
                         className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
-                        getConfig={this.getConfig} refresh={this.refresh} getSelectedRows={this.getSelectedRows} updateSelectedRow={this.updateSelectedRow} clearSelectedRows={this.clearSelectedRows}
-                        setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} removeSelectedRows={this.removeSelectedRows}
+                        getConfig={this.getConfig} refresh={this.refresh} setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
+                        getSelectedRows={this.getSelectedRows} addSelectedRows={this.addSelectedRows} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
                     />)
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );
@@ -623,28 +623,22 @@ var Griddle = React.createClass({
         return this.state.selectedRows;
     },
     /**
-     * add or remove one row to array selectedRows
-     * @param row
-     * @param isRemove
-     * @returns {boolean}
+     * add rows to array selectedRows
+     * @param rows
      */
-    updateSelectedRow: function(row, isRemove) {
-        if (typeof row.id == 'undefined') {
-            console.log('griddle.updateSelectedRow: row.id is undefined', row);
-            return false;
-        }
+    addSelectedRows: function(rows) {
+        var selectedRows = this.getSelectedRows();
+        _.forEach(rows, function(row) {
+            if (typeof row.id == 'undefined') {
+                console.log('griddle.addSelectedRow: row.id is undefined', row);
+            }
 
-        if (typeof isRemove == 'undefined') isRemove = false;
-        var rows = this.state.selectedRows;
-        if (!rows) rows = [];
+            if (!_.findWhere(selectedRows, { id: row.id })) {
+                selectedRows.push(row);
+            }
+        });
 
-        if (isRemove) {
-            rows = rows.filter(function(ele) { return ele.id != row.id });
-        } else if (!_.findWhere(rows, {id: row.id})) { //check duplicate
-            rows.push(row);
-        }
-
-        this.setState({selectedRows: rows});
+        this.setState({selectedRows: selectedRows});
     },
     /**
      * remove multi rows from selectedRows
