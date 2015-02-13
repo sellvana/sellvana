@@ -202,6 +202,9 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         }
     });
 
+    /**
+     * FCom Settings component
+     */
     var FComSettings = React.createClass({
         mixins: [FCom.Mixin],
         getDefaultProps: function() {
@@ -424,6 +427,9 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         }
     });
 
+    /**
+     * FCom Modal Mass Edit Form
+     */
     var FComModalMassEditForm = React.createClass({
         getInitialState: function() {
             var fields = [];

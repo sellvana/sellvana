@@ -168,6 +168,7 @@ define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], fun
             var gridId = this.props.getConfig('id');
             var personalizeUrl = this.props.getConfig('personalize_url');
 
+            //resize and callback to personalize
             $(this.getDOMNode()).find("th").resizable({
                 handles: 'e',
                 minWidth: 20,

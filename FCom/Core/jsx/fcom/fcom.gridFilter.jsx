@@ -10,21 +10,18 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     return false;
                 }
                 _.extend(f, {
-                    show: true,
                     label: that.getFieldName(f.field),
-                    opLabel: f.opLabel? f.opLabel : '',
-                    op: f.op ? f.op : '',
-                    val: f.val ? f.val : '',
-                    range: f.range ? f.range : true,
+                    opLabel: f.opLabel,
+                    op: f.op,
+                    val: f.val,
+                    range: f.range,
                     submit: f.val ? true : false
                 });
 
                 filters[f.field] = f;
             });
 
-            return {
-                filters: filters
-            }
+            return { filters: filters }
         },
         getDefaultProps: function() {
             return {
@@ -55,6 +52,80 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     }
                 })
             ;
+        },
+        componentDidUpdate: function() {
+            var that = this;
+            this.renderDropdownFilters();
+            this.renderListFilters();
+            $(this.getDOMNode()).find('.dd-list').sortable({
+                handle: '.dd-handle',
+                revert: true,
+                axis: 'y',
+                stop: function() {
+                    that.sortFilters();
+                }
+            });
+        },
+        sortFilters: function() {
+            var personalizeUrl = this.props.getConfig('personalize_url');
+            var id = this.props.getConfig('id');
+
+            var newPosFilters = $(this.getDOMNode()).find('.dd-list').sortable('toArray', { attribute: 'data-filter-id' });
+            var filters = this.state.filters;
+            var newFilters = {};
+
+            _.forEach(newPosFilters, function (filterField, index) {
+                if (typeof filters[filterField] !== 'undefined') {
+                    newFilters[filterField] = filters[filterField];
+                    newFilters[filterField].pos = index;
+                }
+            });
+
+            if (personalizeUrl) {
+                $.post(personalizeUrl, { 'do': 'grid.filter.orders', 'grid': id, 'cols': JSON.stringify(newFilters) });
+            }
+
+            //console.log('newFilters', newFilters);
+            this.setState({ filters: newFilters });
+        },
+        renderDropdownFilters: function() {
+            var that = this;
+            var id = this.props.getConfig('id');
+            var filters = this.state.filters;
+
+            var filterSettingNodes = _.map(filters, function(f) {
+                return (
+                    <li data-filter-id={f.field} className="dd-item dd3-item">
+                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+                        <div className="dd3-content">
+                            <label>
+                                <input className="showhide_column" data-field={f.field} onChange={that.toggleFilter} type="checkbox" defaultChecked={!f.hidden ? 'checked' : ''} />
+                                {f.label}
+                            </label>
+                        </div>
+                    </li>
+                );
+            });
+
+            var mountNode = document.getElementById('list-filters-setting');
+            React.unmountComponentAtNode(mountNode);
+            React.render(<ul className={id + " dd-list dropdown-menu filters ui-sortable"}>{filterSettingNodes}</ul>, mountNode);
+        },
+        renderListFilters: function() {
+            var that = this;
+            var id = this.props.getConfig('id');
+            var filters = this.state.filters;
+
+            var filterNodes = _.map(filters, function(f) {
+                if (f.hidden) {
+                    return false;
+                }
+                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} getConfig={that.props.getConfig} />);
+            });
+
+            var mountNode = document.getElementById('list-filters');
+            React.unmountComponentAtNode(mountNode);
+            React.render(<div className={id + " f-filter-btns"}>{filterNodes}</div>, mountNode);
         },
         capitaliseFirstLetter: function(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -98,7 +169,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
          */
         toggleFilter: function(event) {
             var filters = this.state.filters;
-            filters[event.target.dataset.field].show = (event.target.checked == true);
+            filters[event.target.dataset.field].hidden = !(event.target.checked == true);
             this.setState({filters: filters});
             this.keepShowDropDown(event.target);
         },
@@ -140,40 +211,16 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var id = this.props.getConfig('id');
             var filters = this.state.filters;
 
-            //console.log('filters', filters);
-
-            var filterSettingNodes = _.map(filters, function(f) {
-                return (
-                    <li data-filter-id={f.field} className="dd-item dd3-item">
-                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
-                        <div className="dd3-content">
-                            <label>
-                                <input className="showhide_column" data-field={f.field} onChange={that.toggleFilter} type="checkbox" defaultChecked={f.show ? 'checked' : ''} />
-                                {f.label}
-                            </label>
-                        </div>
-                    </li>
-                );
-            });
+            console.log('filters', filters);
 
             var filterSettings = (
                 <div className={id + ' dropdown'} style={{"display" : "inline-block"}}>
                     <a data-toggle="dropdown" className="btn dropdown-toggle showhide_columns">
                         Filters <b className="caret"></b>
                     </a>
-                    <ul className={id + " dd-list dropdown-menu filters ui-sortable"}>
-                        {filterSettingNodes}
-                    </ul>
+                    <div id="list-filters-setting"></div>
                 </div>
             );
-
-            var filterNodes = _.map(filters, function(f) {
-                if (!f.show) {
-                    return false;
-                }
-                //console.log('filter', f);
-                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} getConfig={that.props.getConfig} />);
-            });
 
             //console.log('end render filters');
 
@@ -182,9 +229,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     <div className="f-col-filters-selection pull-left">
                         {filterSettings}
                     </div>
-                    <div className={id + " f-filter-btns"}>
-                        {filterNodes}
-                    </div>
+                    <div id="list-filters"></div>
                 </div>
             );
         }
