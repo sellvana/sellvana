@@ -26,7 +26,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var columnsConfig = this.props.config.columns;
 
             var all = _.pluck(columnsConfig, 'name');
-            var hide = _.pluck(_.where(columnsConfig, {hidden: true}), 'name');
+            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden == true }), 'name');
             var show = _.difference(all, hide);
 
             this.props.columns = {all: all, show: show, hide: hide};
@@ -293,6 +293,9 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
         },
         toggleColumn: function(event) {
+            var personalizeUrl = this.props.getConfig('personalize_url');
+            var id = this.props.getConfig('id');
+
             var initColumns = this.props.getInitColumns();
             var selectedColumns = this.props.selectedColumns();
             if(event.target.checked == true && _.contains(selectedColumns, event.target.dataset.name) == false){
@@ -310,6 +313,10 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             } else {
                 /* redraw with the selected initColumns minus the one just unchecked */
                 this.props.setColumns(_.without(selectedColumns, event.target.dataset.name));
+            }
+
+            if (personalizeUrl) {
+                $.post(personalizeUrl, { 'do': 'grid.col.hidden', 'grid': id, 'col': event.target.dataset.name, hidden: !(event.target.checked == true) });
             }
 
             //don't close dropdown after toggle column

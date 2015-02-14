@@ -174,8 +174,17 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
          * @param event
          */
         toggleFilter: function(event) {
+            var personalizeUrl = this.props.getConfig('personalize_url');
+            var id = this.props.getConfig('id');
+
             var filters = this.state.filters;
-            filters[event.target.dataset.field].hidden = !(event.target.checked == true);
+            var hidden = !(event.target.checked == true);
+            filters[event.target.dataset.field].hidden = hidden;
+
+            if (personalizeUrl) {
+                $.post(personalizeUrl, { 'do': 'grid.filter.hidden', 'grid': id, 'col': event.target.dataset.field, 'hidden': hidden });
+            }
+
             this.setState({filters: filters});
             this.keepShowDropDown(event.target);
         },
