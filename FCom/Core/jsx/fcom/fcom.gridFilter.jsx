@@ -73,16 +73,22 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var newPosFilters = $(this.getDOMNode()).find('.dd-list').sortable('toArray', { attribute: 'data-filter-id' });
             var filters = this.state.filters;
             var newFilters = {};
+            var postFilters = []; //reduce amount post data
 
             _.forEach(newPosFilters, function (filterField, index) {
                 if (typeof filters[filterField] !== 'undefined') {
                     newFilters[filterField] = filters[filterField];
-                    newFilters[filterField].pos = index;
+                    newFilters[filterField].position = index;
+                    postFilters.push({
+                        field: filterField,
+                        position: index,
+                        hidden: filters[filterField].hidden
+                    });
                 }
             });
 
             if (personalizeUrl) {
-                $.post(personalizeUrl, { 'do': 'grid.filter.orders', 'grid': id, 'cols': JSON.stringify(newFilters) });
+                $.post(personalizeUrl, { 'do': 'grid.filter.orders', 'grid': id, 'cols': JSON.stringify(postFilters) });
             }
 
             //console.log('newFilters', newFilters);
