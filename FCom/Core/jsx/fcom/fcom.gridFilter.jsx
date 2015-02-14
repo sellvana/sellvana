@@ -10,11 +10,12 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     return false;
                 }
                 _.extend(f, {
+                    hidden: f.hidden ? f.hidden : false,
                     label: that.getFieldName(f.field),
-                    opLabel: f.opLabel,
-                    op: f.op,
-                    val: f.val,
-                    range: f.range,
+                    opLabel: f.opLabel? f.opLabel : '',
+                    op: f.op ? f.op : '',
+                    val: f.val ? f.val : '',
+                    range: f.range ? f.range : true,
                     submit: f.val ? true : false
                 });
 
