@@ -62,7 +62,8 @@ var Griddle = React.createClass({
             "useCustomGrid": false,
             "customFilter": {},
             "customSettings": {},
-            "customGrid": {}
+            "customGrid": {},
+            "initPage": 0 //begin with 0 page
         };
     },
     /* if we have a filter display the max page and results accordingly */
@@ -306,7 +307,7 @@ var Griddle = React.createClass({
     getInitialState: function() {
         var state =  {
             maxPage: 0,
-            page: 0,
+            page: this.props.initPage,
             filteredResults: null,
             filteredColumns: [],
             filter: "",
@@ -444,14 +445,16 @@ var Griddle = React.createClass({
                     this.props.useCustomGrid
                     ? (<this.props.customGrid columnMetadata={this.props.columnMetadata} data={data} originalData={results} columns={cols} metadataColumns={meta}
                         className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
-                        getConfig={this.getConfig} refresh={this.refresh} getSelectedRows={this.getSelectedRows} updateSelectedRow={this.updateSelectedRow} clearSelectedRows={this.clearSelectedRows}
-                        setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
+                        getConfig={this.getConfig} refresh={this.refresh} setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
+                        getSelectedRows={this.getSelectedRows} addSelectedRows={this.addSelectedRows} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
                     />)
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );
 
-            pagingContent = this.props.useCustomPager
-                ? (<CustomPaginationContainer next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText} customPager={this.props.customPager} totalResults={this.state.totalResults} getConfig={this.getConfig} setPageSize={this.setPageSize} />)
+            pagingContent = this.props.useCustomPager && this.props.customPager
+                ? (<this.props.customPager next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage}
+                    setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText} totalResults={this.state.totalResults}
+                    getConfig={this.getConfig} setPageSize={this.setPageSize} resultsPerPage={this.props.resultsPerPage} getHeaderSelection={this.getHeaderSelection} />)
                 : (<GridPagination next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText}/>);
         } else {
             // Otherwise, display the loading content.
@@ -575,6 +578,10 @@ var Griddle = React.createClass({
             });
         }
     },
+    /**
+     * quick search in available data collection
+     * @param value
+     */
     searchWithinResults: function (value) {
         //todo: confirm with Boris about search within available columns or all columns
         if (value) {
@@ -608,33 +615,58 @@ var Griddle = React.createClass({
             });
         }
     },
+    /**
+     * get array selectedRows
+     * @returns {*}
+     */
     getSelectedRows: function() {
         return this.state.selectedRows;
     },
-    updateSelectedRow: function(row, isRemove) {
-        if (typeof row.id == 'undefined') {
-            console.log('griddle.updateSelectedRow: row.id is undefined', row);
-            return false;
-        }
+    /**
+     * add rows to array selectedRows
+     * @param rows
+     */
+    addSelectedRows: function(rows) {
+        var selectedRows = this.getSelectedRows();
+        _.forEach(rows, function(row) {
+            if (typeof row.id == 'undefined') {
+                console.log('griddle.addSelectedRow: row.id is undefined', row);
+            }
 
-        if (typeof isRemove == 'undefined') isRemove = false;
-        var rows = this.state.selectedRows;
-        if (!rows) rows = [];
+            if (!_.findWhere(selectedRows, { id: row.id })) {
+                selectedRows.push(row);
+            }
+        });
 
-        if (isRemove) {
-            rows = rows.filter(function(ele) { return ele.id != row.id });
-        } else if (!_.findWhere(rows, {id: row.id})) { //check duplicate
-            rows.push(row);
-        }
-
-        this.setState({selectedRows: rows});
+        this.setState({selectedRows: selectedRows});
     },
+    /**
+     * remove multi rows from selectedRows
+     * @param rows
+     */
+    removeSelectedRows: function(rows) {
+        var newSelectedRows = _.reject(this.state.selectedRows, function(ele) {
+            return _.findWhere(rows, {id: ele.id});
+        });
+        this.setState({selectedRows: newSelectedRows});
+    },
+    /**
+     * empty selectedRows
+     */
     clearSelectedRows: function() {
         this.setState({selectedRows: []});
     },
+    /**
+     * set value header selection
+     * @param value
+     */
     setHeaderSelection: function(value) {
         this.setState({headerSelect: value});
     },
+    /**
+     * get value header selection
+     * @returns {string}
+     */
     getHeaderSelection: function() {
         return this.state.headerSelect;
     },
@@ -645,6 +677,10 @@ var Griddle = React.createClass({
     getGriddleState: function() {
         return this.state;
     },
+    /**
+     * update array init columns, almost use for re-order columns
+     * @param columns
+     */
     updateInitColumns: function(columns) {
         var selectedColumns = this.getColumns();
         var newSelectedColumns = [];
@@ -661,6 +697,10 @@ var Griddle = React.createClass({
             filteredColumns: newSelectedColumns
         });
     },
+    /**
+     * return array init columns
+     * @returns {*|Griddle.props.initColumns}
+     */
     getInitColumns: function() {
         return this.state.initColumns;
     }
