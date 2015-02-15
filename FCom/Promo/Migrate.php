@@ -72,7 +72,7 @@ class FCom_Promo_Migrate extends BClass
 ) ENGINE=INNODB DEFAULT CHARSET='utf8';
         ");
 
-        $tProduct = $this->FCom_Promo_Model_Product->table();
+        $tProduct = $this->FCom_Promo_Model_PromoProduct->table();
         $this->BDb->run("
             CREATE TABLE IF NOT EXISTS $tProduct(
     `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
