@@ -2,62 +2,47 @@
 
 class FCom_Sales_Model_Order_Item_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
+    const PENDING = 'pending',
+        BACKORDERED = 'backordered',
+        PROCESSING = 'processing',
+        COMPLETE = 'complete',
+        CANCELED = 'canceled';
+
     protected $_valueLabels = [
-        'new' => 'New',
-        'review' => 'Under Review',
-        'fraud' => 'Fraud',
-        'legit' => 'Passed Verification',
-        'processing' => 'Processing',
-        'complete' => 'Complete',
-        'canceled' => 'Canceled',
-        'archived' => 'Archived',
+        self::PENDING => 'Pending',
+        self::BACKORDERED => 'Backordered',
+        self::PROCESSING => 'Processing',
+        self::COMPLETE => 'Complete',
+        self::CANCELED => 'Canceled',
     ];
 
-    protected $_setValueNotificationTemplates =[
-        'new' => 'email/sales/order-item-state-overall-new',
-        'review' => 'email/sales/order-item-state-overall-review',
-        'fraud' => 'email/sales/order-item-state-overall-fraud',
-        'legit' => 'email/sales/order-item-state-overall-legit',
-        'canceled' => 'email/sales/order-item-state-overall-canceled',
+    protected $_setValueNotificationTemplates = [
+        self::BACKORDERED => 'email/sales/order-item-state-overall-backordered',
+        self::CANCELED => 'email/sales/order-item-state-overall-canceled',
     ];
 
-    public function setNew()
+    public function setPending()
     {
-        return $this->changeState('new');
+        return $this->changestate(self::PENDING);
     }
 
-    public function setReview()
+    public function setBackordered()
     {
-        return $this->changeState('review');
-    }
-
-    public function setLegit()
-    {
-        return $this->changeState('legit');
-    }
-
-    public function setFraud()
-    {
-        return $this->changeState('fraud');
+        return $this->changestate(self::BACKORDERED);
     }
 
     public function setProcessing()
     {
-        return $this->changeState('processing');
+        return $this->changestate(self::PROCESSING);
     }
 
     public function setComplete()
     {
-        return $this->changeState('complete');
+        return $this->changestate(self::COMPLETE);
     }
 
     public function setCanceled()
     {
-        return $this->changeState('canceled');
-    }
-
-    public function setArchived()
-    {
-        return $this->changeState('archived');
+        return $this->changestate(self::CANCELED);
     }
 }

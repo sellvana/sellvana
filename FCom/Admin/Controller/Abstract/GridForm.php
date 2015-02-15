@@ -44,6 +44,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     }
 
+    /**
+     * @return BView|FCom_Core_View_BackboneGrid
+     */
     public function gridView()
     {
         $view = $this->view($this->_gridViewName);
@@ -54,6 +57,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         return $view;
     }
 
+    /**
+     * return config to build grid
+     * @return array
+     */
     public function gridConfig()
     {
         $gridDataUrl = $this->BApp->href($this->_gridHref . '/grid_data');
@@ -69,13 +76,16 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'edit_url' => $gridDataUrl,
             'grid_url' => $gridHtmlUrl,
             'form_url' => $formUrl,
-            'columns' => [
-            ],
+            'columns' => [],
         ];
         $config = array_merge($config, $this->_gridConfig);
         return $config;
     }
 
+    /**
+     * return config to build simple grid
+     * @return array
+     */
     public function simpleGridConfig()
     {
         $config = [
@@ -99,10 +109,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $this->BResponse->set($this->gridView())->output();
         }
 
+        /** @var BViewHead $head */
         if (($head = $this->view('head'))) {
             $head->addTitle($this->_gridTitle);
         }
 
+        /** @var FCom_Admin_View_Nav $nav */
         if (($nav = $this->view('admin/nav'))) {
             $nav->setNav($this->_navPath);
         }
@@ -230,9 +242,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $this->formViewBefore(['view' => $view, 'model' => $model]);
 
         if ($this->_formTitle && ($head = $this->view('head'))) {
+            /** @var BViewHead $head */
             $head->addTitle($this->_formTitle);
         }
 
+        /** @var FCom_Admin_View_Nav $nav */
         if (($nav = $this->view('admin/nav'))) {
             $nav->setNav($this->_navPath);
         }
@@ -281,6 +295,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         try {
             $class = $this->_modelClass;
             $id = $r->param('id', true);
+            /** @var BModel $model */
             $model = $id ? $this->{$class}->load($id) : $this->{$class}->create();
             if (!$model) {
                 throw new BException("This item does not exist");
@@ -288,22 +303,24 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $data = $r->post('model');
             $args = ['id' => $id, 'do' => $r->post('do'), 'data' => &$data, 'model' => &$model];
             $this->formPostBefore($args);
-            $args['validateFailed'] = false;
+            $args['validate_failed'] = false;
             if ($r->post('do') === 'DELETE') {
                 $model->delete();
                 $this->message('The record has been deleted');
             } else {
-                $model->set($data);
+                if ($data) {
+                    $model->set($data);
+                }
 
                 if ($model->validate($model->as_array(), [], $formId)) {
                     $model->save();
                     $this->message('Changes have been saved');
-                    if ($r->post('do') === 'saveAndContinue') {
+                    if ($r->post('do') === 'save_and_continue') {
                         $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $model->id();
                     }
                 } else {
                     $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
-                    $args['validateFailed'] = true;
+                    $args['validate_failed'] = true;
                     $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
                 }
 
@@ -312,7 +329,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         } catch (Exception $e) {
             //$this->BDebug->exceptionHandler($e);
             $this->formPostError($args);
-            $this->message($e->getMessage(), 'error');
+            #$trace = $e->getTrace();
+            #$traceMsg = print_r($trace[4], 1);
+            $traceMsg = $e->getTraceAsString();
+            $this->message($e->getMessage() . ': ' . $traceMsg, 'error');
             $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
         }
         if ($r->xhr()) {

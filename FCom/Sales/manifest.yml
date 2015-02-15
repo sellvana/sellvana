@@ -1,6 +1,6 @@
 modules:
     FCom_Sales:
-        version: 0.2.13
+        version: 0.3.13
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"
@@ -21,12 +21,15 @@ modules:
                     - [ /orders, FCom_Sales_Admin_Controller_Orders.index ]
                     - [ /orders/.action, FCom_Sales_Admin_Controller_Orders ]
                     - [ /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
-                    - [ /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
+                    - [ /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]                    
+                    - [ /orderstatecustom, FCom_Sales_Admin_Controller_OrderStateCustom.index ]
+                    - [ /orderstatecustom/.action, FCom_Sales_Admin_Controller_OrderStateCustom ]
                 observe:
                     - [ "FCom_Admin_View_Header::getNotifications", FCom_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", FCom_Sales_Main.onGetDashboardWidgets ]
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", FCom_Sales_Admin_Controller_Orders.onSaveAdminSettings ]
                     - [ "FCom_Admin_Controller_HeaderSearch::action_index", FCom_Sales_Admin_Controller_Orders.onHeaderSearch  ]
+
             FCom_ApiServer:
                 routing:
                     - [ /v1/sales/order, FCom_Sales_ApiServer_V1_Order.index ]
@@ -35,12 +38,14 @@ modules:
             FCom_Frontend:
                 auto_use: [ layout, views ]
                 routing:
-                    - [ /orders, FCom_Sales_Admin_Controller_Orders.index ]
-                    - [ /orders/.action, FCom_Sales_Admin_Controller_Orders ]
+                    - [ "/cart/?.action", FCom_Sales_Frontend_Controller_Cart ]
+                    - [ /orders/?.action, FCom_Sales_Frontend_Controller_Orders ]
+                    - [ /guest/?.action, FCom_Sales_Frontend_Controller_Guest ]
 
-                    - [ /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
-                    - [ /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
                 observe:
-                    - [ "FCom_Customer_Model_Customer::login:after", "FCom_Sales_Model_Cart::onUserLogin" ]
-                    - [ "FCom_Customer_Model_Customer::logout:before", "FCom_Sales_Model_Cart::onUserLogout" ]
+                    - [ "FCom_Customer_Model_Customer::login:after", "FCom_Sales_Main::onCustomerLogIn" ]
+                    - [ "FCom_Customer_Model_Customer::logout:before", "FCom_Sales_Main::onCustomerLogOut" ]
                     - [ "FCom_Core_Model_Seq::getFirstSeqId", FCom_Sales_Model_Order.onGetFirstSeqId ]
+            FCom_Cron:
+                crontab:
+                    - [ "* * * * *", FCom_Sales_Cron::everyMinute ]

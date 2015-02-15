@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MultiLanguage_Migrate
+ *
+ * @property FCom_CatalogIndex_Model_Field $FCom_CatalogIndex_Model_Field
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
+ * @property FCom_MultiLanguage_Model_Translation $FCom_MultiLanguage_Model_Translation
+ */
+
 class FCom_MultiLanguage_Migrate extends BClass
 {
     public function install__0_1_1()
@@ -9,7 +18,7 @@ class FCom_MultiLanguage_Migrate extends BClass
         $tCustomField = $this->FCom_CustomField_Model_Field->table();
         $tCustomFieldOption = $this->FCom_CustomField_Model_FieldOption->table();
         $this->BDb->ddlTableDef($tTrans, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'INT UNSIGNED NOT NULL AUTO_INCREMENT',
                 'entity_type' => 'VARCHAR(30) NOT NULL',
                 'entity_id' => 'INT UNSIGNED NOT NULL',
@@ -18,26 +27,26 @@ class FCom_MultiLanguage_Migrate extends BClass
                 'field' => 'varchar(50) NOT NULL',
                 'value' => 'text NOT NULL'
             ],
-            'PRIMARY' => '(`id`)',
-            'KEYS' => [
+            BDb::PRIMARY => '(`id`)',
+            BDb::KEYS => [
                 'UNQ_type_id_locale_field' => 'UNIQUE (`entity_type`, `entity_id`, `locale`, `field`)'
             ],
         ]);
 
         $this->BDb->ddlTableDef($tIndexField, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'locale' => 'VARCHAR(10) NOT NULL DEFAULT "_"',
                 'multilanguage' => 'bool NOT NULL default 0'
             ],
         ]);
 
         $this->BDb->ddlTableDef($tCustomFieldOption, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'locale' => 'VARCHAR(10) NOT NULL DEFAULT "_"',
             ],
         ]);
         $this->BDb->ddlTableDef($tCustomField, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'multilanguage' => 'bool NOT NULL default 0'
             ],
         ]);
@@ -51,30 +60,30 @@ class FCom_MultiLanguage_Migrate extends BClass
         $tTrans = $this->FCom_MultiLanguage_Model_Translation->table();
 
         $this->BDb->ddlTableDef($tTrans, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                'field' => 'varchar(50) NOT NULL',
                'value' => 'text NOT NULL'
             ],
-            'KEYS' => [
-                'UNQ_id' => 'DROP',
+            BDb::KEYS => [
+                'UNQ_id' => BDb::DROP,
                 'UNQ_type_id_locale_field' => 'UNIQUE (`entity_type`, `entity_id`, `locale`, `field`)'
             ],
         ]);
 
         $this->BDb->ddlTableDef($tIndexField, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                'locale' => 'VARCHAR(10) NOT NULL DEFAULT "_"',
                'multilanguage' => 'bool NOT NULL default 0'
             ],
         ]);
 
         $this->BDb->ddlTableDef($tCustFieldOption, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                'locale' => 'VARCHAR(10) NOT NULL DEFAULT "_"',
             ],
         ]);
         $this->BDb->ddlTableDef($tCustField, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                'multilanguage' => 'bool NOT NULL default 0'
             ],
         ]);

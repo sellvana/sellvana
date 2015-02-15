@@ -3,6 +3,9 @@
 /**
  * Class FCom_Sales_Main
  *
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ *
  * @method FCom_Sales_Main i() static i($new=false, array $args=array())
  */
 class FCom_Sales_Main extends BClass
@@ -12,52 +15,95 @@ class FCom_Sales_Main extends BClass
 
     public function bootstrap()
     {
-        foreach (['Subtotal', 'Shipping', 'Discount', 'GrandTotal'] as $total) {
-            $this->FCom_Sales_Model_Cart->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
-        }
-
         $this->FCom_Admin_Model_Role->createPermission([
             'sales' => 'Sales',
             'sales/orders' => 'Orders',
             'sales/order_status' => 'Order Status',
+            'sales/order_custom_state' => 'Order Custom State',
             'sales/carts' => 'Carts',
             'sales/reports' => 'Reports'
+
         ]);
+
+        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal'] as $total) {
+            $this->FCom_Sales_Model_Cart->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
+        }
+
+        foreach (['Cart', 'Checkout', 'Order', 'OrderItem', 'Payment', 'Shipment', 'Cancel', 'Return', 'Refund', 'Comment'] as $workflow) {
+            $this->{'FCom_Sales_Workflow_' . $workflow}->registerWorkflow();
+        }
     }
 
+    /**
+     * @param $name
+     * @param null $class
+     * @return $this
+     */
     public function addPaymentMethod($name, $class = null)
     {
-        if (is_null($class)) $class = $name;
+        if (is_null($class)) {
+            $class = $name;
+        }
         $this->_registry['payment_method'][$name] = $class;
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param null $class
+     * @return $this
+     */
     public function addCheckoutMethod($name, $class = null)
     {
-        if (is_null($class)) $class = $name;
+        if (is_null($class)) {
+            $class = $name;
+        }
         $this->_registry['checkout_method'][$name] = $class;
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param null $class
+     * @return $this
+     */
     public function addShippingMethod($name, $class = null)
     {
-        if (is_null($class)) $class = $name;
+        if (is_null($class)) {
+            $class = $name;
+        }
         $this->_registry['shipping_method'][$name] = $class;
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param null $class
+     * @return $this
+     */
     public function addDiscountMethod($name, $class = null)
     {
-        if (is_null($class)) $class = $name;
+        if (is_null($class)) {
+            $class = $name;
+        }
         $this->_registry['discount_method'][$name] = $class;
         return $this;
     }
 
+    /**
+     * @param $name
+     * @return null
+     */
     public function getShippingMethodClassName($name)
     {
         return !empty($this->_registry['shipping_method'][$name]) ? $this->_registry['shipping_method'][$name] : null;
     }
 
+    /**
+     * @param $type
+     * @param null $name
+     * @return null
+     */
     protected function _getHeap($type, $name = null)
     {
         if (empty($this->_heap[$type])) {
@@ -75,27 +121,71 @@ class FCom_Sales_Main extends BClass
             (!empty($this->_heap[$type][$name]) ? $this->_heap[$type][$name] : null);
     }
 
+    /**
+     * @return null
+     */
     public function getPaymentMethods()
     {
         return $this->_getHeap('payment_method');
     }
 
+    /**
+     * @return null
+     */
     public function getCheckoutMethods()
     {
         return $this->_getHeap('checkout_method');
     }
 
+    /**
+     * @return null
+     */
     public function getShippingMethods()
     {
         return $this->_getHeap('shipping_method');
     }
 
+    /**
+     * @return null
+     */
     public function getDiscountMethods()
     {
         return $this->_getHeap('discount_method');
     }
 
+    public function getAllSelectedShippingServices()
+    {
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $estimates = $cart->getData('shipping_estimates');
 
+        $services = [];
+        foreach ($this->getShippingMethods() as $mKey => $method) {
+            if (!$method->getConfig('enabled')) {
+                continue;
+            }
+            foreach ($method->getServicesSelected() as $sKey => $sLabel) {
+                $services[$mKey]['services'][$sKey]['value'] = $mKey . ':' . $sKey;
+                $services[$mKey]['services'][$sKey]['label'] = $sLabel;
+                if ($estimates && !empty($estimates[$mKey][$sKey])) {
+                    $services[$mKey]['services'][$sKey]['estimate'] = $estimates[$mKey][$sKey];
+                }
+                //var_dump($mKey, $sKey, $cart->get('shipping_method'), $cart->get('shipping_service'), '<hr>');
+                if ($cart && $cart->get('shipping_method') == $mKey && $cart->get('shipping_service') == $sKey) {
+                    $services[$mKey]['services'][$sKey]['selected'] = true;
+                }
+            }
+            if (!empty($services[$mKey]['services'])) {
+                $services[$mKey]['name'] = $method->getName();
+                $services[$mKey]['description'] = $method->getDescription();
+            }
+        }
+        return $services;
+    }
+
+
+    /**
+     * @param $args
+     */
     public function checkDefaultShippingPayment($args)
     {
         if (!$this->getShippingMethods()) {
@@ -116,6 +206,9 @@ class FCom_Sales_Main extends BClass
         }
     }
 
+    /**
+     * @param $args
+     */
     public function onGetDashboardWidgets($args)
     {
         $view = $args['view'];
@@ -133,6 +226,21 @@ class FCom_Sales_Main extends BClass
             'async' => true,
             'filter' => true
         ]);
+    }
+
+    public function workflowAction($actionName, $args = [])
+    {
+        return $this->BEvents->fire('FCom_Sales_Workflow::' . $actionName, $args);
+    }
+
+    public function onCustomerLogIn($args)
+    {
+        $this->workflowAction('customerLogsIn', $args);
+    }
+
+    public function onCustomerLogOut($args)
+    {
+        $this->workflowAction('customerLogsOut', $args);
     }
 }
 

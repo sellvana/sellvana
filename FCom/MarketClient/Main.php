@@ -1,22 +1,40 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MarketClient_Main
+ *
+ * @property FCom_MarketClient_RemoteApi $FCom_MarketClient_RemoteApi
+ */
 class FCom_MarketClient_Main extends BClass
 {
+    /**
+     * @param null $data
+     * @param bool $reset
+     * @return array
+     */
     public function progress($data = null, $reset = false)
     {
         $progress = !$reset ? $this->BCache->load('marketclient_progress') : [];
         if (!empty($data)) {
             $progress = $this->BUtil->arrayMerge($progress, $data);
-            $this->BCache->save('marketclient_progress', $progress);
         }
+        $this->BCache->save('marketclient_progress', $progress);
         return $progress;
     }
 
+    /**
+     * @param $modules
+     * @param bool $force
+     * @throws BException
+     */
     public function downloadAndInstall($modules, $force = false)
     {
         $progress = $this->progress();
         if (!$force && !empty($progress['status']) && in_array($progress['status'], ['ACTIVE'])) {
-            return;
+            return [
+                'error' => true,
+                'message' => 'Installation already in progress: ' . $progress['status'],
+            ];
         }
         foreach ($modules as $modName => $modInfo) {
             if (!$modInfo || $modInfo === '-'
@@ -108,8 +126,14 @@ class FCom_MarketClient_Main extends BClass
         if ($configUpdated) {
             $this->BConfig->writeConfigFiles();
         }
+        return [
+            'success' => true,
+        ];
     }
 
+    /**
+     * @return $this
+     */
     public function stopDownloading()
     {
         $this->progress(['status' => 'STOP']);

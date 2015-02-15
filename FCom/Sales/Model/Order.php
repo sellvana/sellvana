@@ -17,7 +17,7 @@
  * @property string $balance
  * @property string $create_at
  * @property string $update_at
- * @property string $grandtotal
+ * @property string $grand_total
  * @property string $shipping_service_title
  * @property string $data_serialized
  * @property string $unique_id
@@ -27,30 +27,31 @@
  *
  * DI
  * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
- * @property FCom_Sales_Model_Order_CustomStatus $FCom_Sales_Model_Order_CustomStatus
- * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ * @property FCom_Sales_Model_Order_Comment $FCom_Sales_Model_Order_Comment
+ * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
+ * @property FCom_Sales_Model_Order_State $FCom_Sales_Model_Order_State
  */
 class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
+    use FCom_Sales_Model_Trait_Address;
+
     protected static $_table = 'fcom_sales_order';
 
     protected static $_origClass = __CLASS__;
 
-    protected $_addresses;
+    /** @var FCom_Sales_Model_Cart */
+    protected $_cart;
 
-    /**
-    * Fallback singleton/instance factory
-    *
-    * @param bool $new if true returns a new instance, otherwise singleton
-    * @param array $args
-    * @return FCom_Sales_Model_Order
-    */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(get_called_class(), $args, !$new);
-    }
+    protected $_state;
+
+    protected $_addresses;
 
     public function onBeforeSave()
     {
@@ -64,60 +65,58 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return null|FCom_Sales_Model_Order_Address
+     * @return FCom_Sales_Model_Order_State
      */
-    public function billing()
+    public function state()
     {
-        return $this->getBillingAddress();
+        if (!$this->_state) {
+            $this->_state = $this->FCom_Sales_Model_Order_State->factory($this);
+        }
+        return $this->_state;
     }
 
     /**
-     * @return null|FCom_Sales_Model_Order_Address
+     * @return FCom_Sales_Model_Cart|null
+     * @throws BException
      */
-    public function shipping()
+    public function cart()
     {
-        return $this->getShippingAddress();
+        if (!$this->_cart) {
+            if (!$this->get('cart_id')) {
+                return null;
+            }
+            $this->_cart = $this->FCom_Sales_Model_Cart->load($this->get('cart_id'));
+        }
+        return $this->_cart;
     }
 
-    public function addNew($data)
+    public function addHistoryEvent($type, $description, $params = null)
     {
-        $status = $this->FCom_Sales_Model_Order_CustomStatus->statusNew();
-        $data['status'] = $status->name;
-        $data['status_id'] = $status->id;
-        $this->BEvents->fire(__CLASS__ . '.addNew', ['order' => $data]);
-        return $this->create($data);//->save();
+        $history = $this->FCom_Sales_Model_Order_History->create([
+            'order_id' => $this->id(),
+            'entity_type' => 'order',
+            'entity_id' => $this->id(),
+            'event_type' => $type,
+            'event_description' => $description,
+            'event_at' => isset($params['event_at']) ? $params['event_at'] : $this->BDb->now(),
+            'user_id' => isset($params['user_id']) ? $params['user_id'] : $this->FCom_Admin_Model_User->sessionUserId(),
+        ]);
+        if (isset($params['data'])) {
+            $history->setData($params['data']);
+        }
+        $history->save();
+        return $this;
     }
 
-    public function update($data)
+    public function getBillingAddress()
     {
-        $this->BEvents->fire(__CLASS__ . '.update', ['order' => $data]);
-        return $this->set($data);//->save();
+        return $this->addressAsObject('billing');
     }
 
-    public function paid()
+    public function getShippingAddress()
     {
-        $status = $this->FCom_Sales_Model_Order_CustomStatus->statusPaid();
-        $data = [];
-        $data['status'] = $status->name;
-        $data['status_id'] = $status->id;
-        $data['update_at'] = date("Y-m-d H:i:s");
-        $this->set($data)->save();
+        return $this->addressAsObject('shipping');
     }
-
-    public function pending()
-    {
-        $status = $this->FCom_Sales_Model_Order_CustomStatus->statusPending();
-        $data = [];
-        $data['status'] = $status->name;
-        $data['status_id'] = $status->id;
-        $this->set($data)->save();
-    }
-
-    public function status()
-    {
-        return $this->FCom_Sales_Model_Order_CustomStatus->orm()->where('id', $this->status_id)->find_one();
-    }
-
 
     /**
      * Return the order items
@@ -130,7 +129,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $assoc ? $this->items : array_values($this->items);
     }
 
-    public function getOrders($customerId)
+    public function findCustomerOrders($customerId)
     {
         return $this->orm()->where('customer_id', $customerId)->find_many_assoc();
 
@@ -154,17 +153,17 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $result = [];
         foreach ($orders as $i => $order) {
             $result[$i] = [
-                'id'                => $order->id,
+                'id'               => $order->id,
                 'customer_id'      => $order->customer_id,
-                'status'               => $order->status,
-                'item_qty'             => $order->item_qty,
-                'subtotal'               => $order->subtotal,
-                'balance'            => $order->balance,
-                'tax'       => $order->tax,
-                'shipping_method' => $order->shipping_method,
-                'shipping_service'       => $order->shipping_service,
-                'payment_method'       => $order->payment_method,
-                'coupon_code'       => $order->coupon_code
+                'status'           => $order->status,
+                'item_qty'         => $order->item_qty,
+                'subtotal'         => $order->subtotal,
+                'amount_due'       => $order->amount_due,
+                'tax_amount'       => $order->tax_amount,
+                'shipping_method'  => $order->shipping_method,
+                'shipping_service' => $order->shipping_service,
+                'payment_method'   => $order->payment_method,
+                'coupon_code'      => $order->coupon_code
             ];
             if ($includeItems) {
                 $items = $order->items();
@@ -218,201 +217,155 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    /**
-     * @param FCom_Sales_Model_Cart $cart
-     * @return FCom_Sales_Model_Order
-     */
-    protected function _createFromCart($cart)
+    public function importDataFromCart($cart)
     {
-        $shippingMethod       = $cart->getShippingMethod();
-        $shippingServiceTitle = '';
-        if (is_object($shippingMethod)) {
-            $shippingServiceTitle = $shippingMethod->getService($cart->shipping_service);
-        }
+        $this->_cart = $cart;
+        $this
+            ->_importBasicFieldsFromCart()
+            ->save() // create unique id
 
-
-        $orderData                    = [];
-        $orderData['cart_id']         = $cart->id();
-        $orderData['admin_id']        = $cart->admin_id;
-        $orderData['customer_id']     = $cart->customer_id;
-        if ($cart->customer_email) {
-            $orderData['customer_email']  =  $cart->customer_email;
-        } else {
-            $billing = $this->FCom_Sales_Model_Cart_Address->loadWhere(['cart_id' => $cart->id(), 'atype' => 'billing']);
-            #var_dump($cart->id(), $billing);
-            $orderData['customer_email'] = $billing->email;
-            /*
-            $customer = $this->FCom_Customer_Model_Customer->load($cart->customer_id);
-            if ($customer) {
-                $orderData['customer_email']  =  $customer->email;
-            }
-            */
-        }
-        $orderData['item_qty']        = $cart->item_qty;
-        $orderData['subtotal']        = $cart->subtotal;
-        $orderData['shipping_method'] = $cart->shipping_method;
-        //        $orderData['shipping_service']       = $cart->shipping_service;
-        $orderData['shipping_service_title'] = $shippingServiceTitle;
-        $orderData['payment_method']         = $cart->payment_method;
-        $orderData['coupon_code']            = $cart->coupon_code;
-        $orderData['tax']                    = $cart->tax;
-        //        $orderData['total_json']             = $cart->total_json;
-        $orderData['balance']    = $cart->grand_total; // this has been calculated in cart
-        $orderData['grandtotal'] = $cart->grand_total; // full grand total
-        $orderData['create_at'] = $orderData['update_at'] = $this->BDb->now();
-
-        $data_ = [
-            'totals'           => $cart->data['totals'],
-            'shipping_service' => $cart->shipping_service
-        ];
-        $orderData[static::$_dataCustomField] = $data_;
-
-        /* @var $salesOrder FCom_Sales_Model_Order */
-        $salesOrder = $this->FCom_Sales_Model_Order->load($cart->id(), 'cart_id');
-        if ($salesOrder) {
-            $salesOrder->update($orderData);
-        } else {
-            $salesOrder = $this->FCom_Sales_Model_Order->addNew($orderData);
-        }
-        return $salesOrder;
+            ->_importAddressDataFromCart()
+            ->_importItemsDataFromCart()
+            ->_importTotalsDataFromCart()
+            ->_importShippingDataFromCart()
+            ->_importPaymentDataFromCart()
+            ->_importDiscountDataFromCart()
+            ->_setDefaultStates()
+            ->save()
+        ;
+        return $this;
     }
 
-    /**
-     * @param FCom_Sales_Model_Cart $cart
-     * @param array $options
-     * @return FCom_Sales_Model_Order
-     */
-    public function createFromCart($cart, $options = [])
+    protected function _importBasicFieldsFromCart()
     {
-        $cart->calculateTotals();
-        $salesOrder = $this->_createFromCart($cart);
-
-        $salesOrder->save(); // save to have valid unique_id
-        if (isset($options['all_components']) && $options['all_components']) {
-            $options['order_id'] = $salesOrder->id();
-            $this->createOrderItems($cart, $options);
-            $this->createOrderAddress($cart, $options);
-
-            //Made payment
-            $cart->setPaymentDetails($this->BUtil->fromJson($cart->payment_details));
-            $paymentMethod = $cart->getPaymentMethod();
-            $this->createOrderPayment($paymentMethod, $salesOrder, $options);
-        }
-        $this->BEvents->fire(__METHOD__ . ':after', [
-            'cart'           => $cart,
-            'options'        => $options,
-            'payment_method' => $paymentMethod,
-            'order'          => $salesOrder,
+        $cart = $this->_cart;
+        $this->set([
+            'cart_id' => $cart->id(),
+            'admin_id' => $cart->get('admin_id'),
+            'customer_id' => $cart->get('customer_id'),
+            'customer_email' => $cart->get('customer_email'),
         ]);
-        return $salesOrder;
+        return $this;
     }
 
-    /**
-     * @param FCom_Sales_Method_Payment_Abstract $payment
-     * @param FCom_Sales_Model_Order $salesOrder
-     * @param array $options
-     */
-    public function createOrderPayment($payment, $salesOrder, $options)
+    protected function _importAddressDataFromCart()
     {
-        if (!$payment instanceof FCom_Sales_Method_Payment_Interface) {
-            return;
+        $cart = $this->_cart;
+        foreach (['billing', 'shipping'] as $atype) {
+            foreach (['company', 'attn', 'firstname', 'lastname', 'street1', 'street2', 'city', 'region', 'postcode',
+                      'country', 'phone', 'fax'] as $f) {
+                $field = $atype . '_' . $f;
+                $this->set($field, $cart->get($field));
+            }
         }
-        /* @var $payment FCom_Sales_Method_Payment_Abstract */
-        $payment->setSalesEntity($salesOrder, $options)
-                ->payOnCheckout();
-        $salesOrder->setData('payment_details', $payment->asArray());
+        return $this;
     }
 
-    /**
-     * @param FCom_Sales_Model_Cart $cart
-     * @param array                 $options
-     */
-    public function createOrderAddress($cart, $options)
+    protected function _importItemsDataFromCart()
     {
-        $orderId = isset($options['order_id']) ? $options['order_id'] : $cart->id(); // ???
-        $shippingAddress = $cart->getShippingAddress();
-        if ($shippingAddress) {
-            $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $shippingAddress);
-        }
-        $billingAddress = $cart->getBillingAddress();
-        if ($billingAddress) {
-            $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $billingAddress);
-        }
-    }
+        $cart = $this->_cart;
 
-    public function getAddresses()
-    {
-        if (!$this->_addresses) {
-            $this->_addresses = $this->FCom_Sales_Model_Order_Address->orm()
-                               ->where("order_id", $this->id())
-                               ->find_many_assoc('atype');
-        }
-        return $this->_addresses;
-    }
-
-    public function getBillingAddress()
-    {
-        $addresses = $this->getAddresses();
-        return !empty($addresses['billing']) ? $addresses['billing'] : null;
-    }
-
-    public function getShippingAddress()
-    {
-        $addresses = $this->getAddresses();
-        if ($this->same_address) {
-            return $this->getBillingAddress();
-        }
-        return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
-    }
-
-    /**
-     * @param FCom_Sales_Model_Cart $cart
-     * @param array $options
-     */
-    public function createOrderItems($cart, $options)
-    {
         foreach ($cart->items() as $item) {
-            /* @var $item FCom_Sales_Model_Cart_Item */
-            if (!$this->itemAllowed($options, $item)) {
-                continue;
-            }
-
-            $product = $this->FCom_Catalog_Model_Product->load($item->product_id);
-            $orderId = isset($options['order_id']) ? $options['order_id'] : $cart->id(); // ???
+            $product = $item->product();
             if (!$product) {
-                continue;
+                throw new BException('Can not order product that does not exist');
             }
-            $productInfo = $product->as_array();
-            $productInfo['variants'] = $item->getData('variants');
-            $orderItem                 = [];
-            $orderItem['order_id']     = $orderId;
-            $orderItem['product_id']   = $item->product_id;
-            $orderItem['qty']          = $item->qty;
-            $orderItem['total']        = $item->rowTotal();
-            $orderItem['product_info'] = $this->BUtil->toJson($productInfo);
-
-            /* @var $testItem FCom_Sales_Model_Order_Item */
-            $testItem = $this->FCom_Sales_Model_Order_Item->isItemExist($orderId, $item->product_id);
-            if ($testItem) {
-                $testItem->update($orderItem);
-            } else {
-                $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
-            }
+            $orderItem = $this->FCom_Sales_Model_Order_Item->create([
+                'order_id' => $this->id(),
+                'cart_item_id' => $item->id(),
+                'product_id' => $item->get('product_id'),
+                'product_sku' => $item->get('product_sku'),
+                'inventory_id' => $item->get('inventory_id'),
+                'inventory_sku' => $item->get('inventory_sku'),
+                'product_name' => $item->get('product_name'),
+                'price' => $item->get('price'),
+                'qty_ordered' => $item->get('qty'),
+                'row_total' => $item->get('row_total'),
+                'row_tax' => $item->get('row_tax'),
+                'row_discount' => $item->get('row_discount'),
+                'pack_separate' => $item->get('pack_separate'),
+                'show_separate' => $item->get('show_separate'),
+                'shipping_size' => $item->get('shipping_size'),
+                'shipping_weight' => $item->get('shipping_weight'),
+                'data_serialized' => $item->get('data_serialized'),
+            ])->save();
         }
+        return $this;
     }
 
-    protected function itemAllowed($options, $item)
+    protected function _importTotalsDataFromCart()
     {
-        if (isset($options['items'])) {
-            foreach ($options['items'] as $i) {
-                if ($i['id'] == $item->id) {
-                    return true; // item id matches
-                }
-            }
-            return false; // item is not with passed filter
+        $cart = $this->_cart;
+
+        $this->set([
+            'item_qty' => $cart->get('item_qty'),
+            'subtotal' => $cart->get('subtotal'),
+            'tax_amount' => $cart->get('tax_amount'),
+            'discount_amount' => $cart->get('discount_amount'),
+            'grand_total' => $cart->get('grand_total'),
+            'amount_paid' => 0,
+            'amount_due' => $cart->get('grand_total'),
+        ]);
+
+        $this->setData('totals', $cart->getData('totals'));
+        return $this;
+    }
+
+    protected function _importShippingDataFromCart()
+    {
+        $cart = $this->_cart;
+
+        $method = $cart->get('shipping_method');
+        $service = $cart->get('shipping_service');
+        $methods = $this->FCom_Sales_Main->getShippingMethods();
+        $services = $methods[$method]->getServices();
+
+        $this->set([
+            'shipping_price' => $cart->get('shipping_price'),
+            'shipping_method' => $method,
+            'shipping_service' => $service,
+            'shipping_service_title' => $methods[$method]->getDescription() . ' - ' . $services[$service]
+        ]);
+
+        return $this;
+    }
+
+    protected function _importPaymentDataFromCart()
+    {
+        $cart = $this->_cart;
+
+        $this->set([
+            'payment_method' => $cart->get('payment_method'),
+        ]);
+
+        return $this;
+    }
+
+    protected function _importDiscountDataFromCart()
+    {
+        $cart = $this->_cart;
+
+        $this->set([
+            'coupon_code' => $cart->get('coupon_code'),
+        ]);
+
+        return $this;
+    }
+
+    protected function _setDefaultStates()
+    {
+        $state = $this->state();
+        $state->overall()->setPending();
+        $state->delivery()->setPending();
+
+        if ($this->isPayable()) {
+            $state->payment()->setUnpaid();
+        } else {
+            $state->payment()->setFree();
         }
 
-        return true; // no items filter passed
+        $state->custom()->setDefault();
+        return $this;
     }
 
     public function getTextDescription()
@@ -442,5 +395,58 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             //todo: confirm with Boris about add prefix 1 to order number.
             $args['seq_id'] =  '1' . $orderNumber;
         }
+    }
+
+    public function getLastCustomerComment()
+    {
+        return $this->FCom_Sales_Model_Order_Comment->orm()
+            ->where('order_id', $this->id())
+            ->where('from_admin', 0)
+            ->order_by_desc('create_at')
+            ->find_one();
+    }
+
+    public function isShippable()
+    {
+        foreach ($this->items() as $item) {
+            if ($item->isShippable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isPayable()
+    {
+        return $this->get('amount_due') > 0;
+    }
+
+    /**
+     * @return null|FCom_Sales_Method_Shipping_Interface
+     */
+    public function getShippingMethod()
+    {
+        if (!$this->get('shipping_method')) {
+            return null;
+        }
+        $methods = $this->FCom_Sales_Main->getShippingMethods();
+        return $methods[$this->get('shipping_method')];
+    }
+
+    /**
+     * @return null|FCom_Sales_Method_Payment_Interface
+     */
+    public function getPaymentMethod()
+    {
+        if (!$this->get('payment_method')) {
+            return null;
+        }
+        $methods = $this->FCom_Sales_Main->getPaymentMethods();
+        return $methods[$this->get('payment_method')];
+    }
+
+    public function __destruct()
+    {
+        unset($this->_cart, $this->_addresses);
     }
 }

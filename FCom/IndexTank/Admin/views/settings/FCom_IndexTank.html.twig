@@ -1,0 +1,20 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'FCom_IndexTank', } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<h2>{{ "IndexDen API Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-FCom_IndexTank'}) }}
+     {{ forms.accordion_panel_start({label:'General Settings'|_, id:'settings-FCom_IndexTank-group0', in:1}) }}
+        {{ forms.input(fieldData, {field:'api_url', label:'IndexDen API URL'|_ }) }}
+        <div class="form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-5">
+                <a href="http://indexden.com/pricing" title="{{ 'Get one'|_ }}" class="btn btn-primary">{{ 'Get one'|_ }}</a>
+            </div>
+        </div>
+        {{ forms.input(fieldData, {field:'index_name', label:'Index name'|_}) }}
+        {{ forms.boolean(fieldData, {field:'save_filter', label:'Save current filters on new search query'|_ }) }}
+        {{ forms.input(fieldData, {field:'index_products_limit', label:'How many product index per minute via cron (optimal 1000):'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'disable_auto_indexing', label:'Disable auto-indexing'|_ }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

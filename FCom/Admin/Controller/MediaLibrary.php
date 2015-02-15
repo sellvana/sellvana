@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_MediaLibrary
+ *
+ * @property FCom_Catalog_Model_ProductMedia $FCom_Catalog_Model_ProductMedia
+ * @property FCom_Core_View_BackboneGrid $FCom_Core_View_BackboneGrid
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ */
 class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 {
     protected $_allowedFolders = [];
@@ -7,12 +16,20 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
     const ERROR = 'ERROR';
 
+    /**
+     * @param string $folder
+     * @return $this
+     */
     public function allowFolder($folder)
     {
         $this->_allowedFolders[$folder] = 1;
         return $this;
     }
 
+    /**
+     * @return array|mixed|null|string
+     * @throws BException
+     */
     public function getFolder()
     {
         $folder = $this->BRequest->get('folder');
@@ -33,10 +50,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             throw new BException('Folder ' . $folder . ' is not allowed');
         }
 
-        if (strpos($folder, '{random}') !== false) {
-            $random = 'storage/' . $this->BConfig->get('core/storage_random_dir');
-            $folder = str_replace('{random}', $random, $folder);
-        }
+        $folder = $this->_parseFolder($folder);
         return $folder;
     }
 
@@ -47,7 +61,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     public function gridConfig($options = [])
     {
         $id = !empty($options['id']) ? $options['id'] : 'media_library';
-        $folder = $options['folder'];
+        $folder = $this->_parseFolder($options['folder']);
         $url = $this->BApp->href('/media/grid');
         $orm = $this->FCom_Core_Model_MediaLibrary->orm()->table_alias('a')
                 ->where('folder', $folder)
@@ -55,7 +69,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ->select_expr('(SELECT COUNT(*) FROM ' . $this->FCom_Catalog_Model_ProductMedia->table()
                     . ' pm WHERE pm.file_id = a.id)', 'associated_products')
-                ->order_by_expr('id asc');
+        //        ->order_by_expr('id asc')
+        ;
             ;
         $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
         $config = [
@@ -97,9 +112,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         ];
 
         if (!empty($options['config'])) {
-
             $config['config'] = $this->BUtil->arrayMerge($config['config'], $options['config']);
-
         }
 
         if ($options['mode'] && $options['mode'] === 'link') {
@@ -154,39 +167,39 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
             return;
         }
-        switch ($this->BRequest->params('do')) {
-        case 'data':
-            $folder = $this->getFolder();
-//            $r = $this->BRequest->get();
-            $orm = $this->FCom_Core_Model_MediaLibrary->orm()->table_alias('a')
-                ->where('folder', $folder)
-                ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
-                ->select_expr('(SELECT COUNT(*) FROM ' . $this->FCom_Catalog_Model_ProductMedia->table()
-                    . ' pm WHERE pm.file_id = a.id)', 'associated_products')
-                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
-            ;
-            /*if (isset($r['filters'])) {
-                $filters = $this->BUtil->fromJson($r['filters']);
-                if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
-                    $arr = explode(',', $filters['exclude_id']);
-                    $orm =  $orm->where_not_in('a.id', $arr);
-                }
-            }*/
-            $data = $this->FCom_Core_View_BackboneGrid->processORM($orm);
-            $this->BResponse->json([
-                    ['c' => $data['state']['c']],
-                    $this->BDb->many_as_array($data['rows']),
-                ]);
-            break;
+        switch ($this->BRequest->param('do')) {
+            case 'data':
+                $folder = $this->getFolder();
+    //            $r = $this->BRequest->get();
+                $orm = $this->FCom_Core_Model_MediaLibrary->orm()->table_alias('a')
+                    ->where('folder', $folder)
+                    ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
+                    ->select_expr('(SELECT COUNT(*) FROM ' . $this->FCom_Catalog_Model_ProductMedia->table()
+                        . ' pm WHERE pm.file_id = a.id)', 'associated_products')
+                    ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
+                ;
+                /*if (isset($r['filters'])) {
+                    $filters = $this->BUtil->fromJson($r['filters']);
+                    if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
+                        $arr = explode(',', $filters['exclude_id']);
+                        $orm =  $orm->where_not_in('a.id', $arr);
+                    }
+                }*/
+                $data = $this->FCom_Core_View_BackboneGrid->processORM($orm);
+                $this->BResponse->json([
+                        ['c' => $data['state']['c']],
+                        $this->BDb->many_as_array($data['rows']),
+                    ]);
+                break;
 
-        case 'download':
-            $folder = $this->getFolder();
-            $r = $this->BRequest;
-            $fileName = basename($r->get('file'));
-            $fullName = $this->FCom_Core_Main->dir($folder) . '/' . $fileName;
+            case 'download':
+                $folder = $this->getFolder();
+                $r = $this->BRequest;
+                $fileName = basename($r->get('file'));
+                $fullName = $this->FCom_Core_Main->dir($folder) . '/' . $fileName;
 
-            $this->BResponse->sendFile($fullName, $fileName, $r->get('inline') ? 'inline' : 'attachment');
-            break;
+                $this->BResponse->sendFile($fullName, $fileName, $r->get('inline') ? 'inline' : 'attachment');
+                break;
         }
     }
 
@@ -468,6 +481,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         }
     }
 
+    /**
+     * @param null $configId
+     * @return array
+     */
     public function uploadConfig($configId = null)
     {
         $uploadConfig         = [];
@@ -487,5 +504,18 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             }
         }
         return $uploadConfig;
+    }
+
+    /**
+     * @param string $folder
+     * @return mixed
+     */
+    protected function _parseFolder($folder)
+    {
+        if (strpos($folder, '{random}') !== false) {
+            $random = 'storage/' . $this->BConfig->get('core/storage_random_dir');
+            $folder = str_replace('{random}', $random, $folder);
+        }
+        return $folder;
     }
 }

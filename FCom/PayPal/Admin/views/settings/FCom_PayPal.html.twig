@@ -1,22 +1,34 @@
 {% set c = THIS.get('model') %}
-{% import THIS.view('core/form-elements').twigName() as forms %}
-<h2>{{ "Paypal Settings"|_}}</h2>
-{{ forms.accordion_start({id:'settings-FCom_Paypal'}) }}
+{% set paymentActionOptions = {
+    Order: 'Order (multiple authorizations)',
+    Authorization: 'Authorization (capture later)',
+    Sale: 'Sale (immediate capture)',
+} %}
 
-    {% set fieldData = { model: c, id_prefix:'FCom_Paypal-production', name_prefix:'config[modules][FCom_Paypal][production]', get_prefix:'modules/FCom_Paypal/production' } %}
-    {{ forms.accordion_panel_start({label:'Production'|_, id:'settings-FCom_Paypal-group0', in:1}) }}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<h2>{{ "Paypal Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-FCom_PayPal'}) }}
+
+    {% set fieldData = { model: c, id_prefix:'FCom_PayPal-sandbox', name_prefix:'config[modules][FCom_PayPal][sandbox]', get_prefix:'modules/FCom_PayPal/sandbox' } %}
+    {{ forms.accordion_panel_start({label:'Sandbox'|_, id:'settings-FCom_PayPal-group1', in:1}) }}
+        {{ forms.select(fieldData, {field:'mode', label:'Sandbox mode'|_, options:{on:'Always', ip:'By IP', off:'Off'} }) }}
+        {{ forms.input(fieldData, {field:'ip', label:'Sandbox from IPs' }) }}
         {{ forms.input(fieldData, {field:'username', label:'Username'|_, attr: 'size="50"' }) }}
         {{ forms.input(fieldData, {field:'password', label:'Password'|_, attr: 'size="50"', type: "password" }) }}
         {{ forms.input(fieldData, {field:'signature', label:'Signature'|_, attr: 'size="50"' }) }}
         {{ forms.boolean(fieldData, {field:'show_shipping', label:'Show shipping address on PayPal'|_ }) }}
+        {{ forms.select(fieldData, {field:'payment_action', label:'Payment Action', options:paymentActionOptions }) }}
     {{ forms.accordion_panel_end }}
 
-    {% set fieldData = { model: c, id_prefix:'FCom_Paypal-sandbox', name_prefix:'config[modules][FCom_Paypal][sandbox]', get_prefix:'modules/FCom_Paypal/sandbox' } %}
-    {{ forms.accordion_panel_start({label:'Sandbox'|_, id:'settings-FCom_Paypal-group1'}) }}
-        {{ forms.boolean(fieldData, {field:'mode', label:'Sandbox mode'|_ }) }}
+    {% set fieldData = { model: c, id_prefix:'FCom_PayPal-production', name_prefix:'config[modules][FCom_PayPal][production]', get_prefix:'modules/FCom_PayPal/production' } %}
+    {{ forms.accordion_panel_start({label:'Production'|_, id:'settings-FCom_PayPal-group0'}) }}
         {{ forms.input(fieldData, {field:'username', label:'Username'|_, attr: 'size="50"' }) }}
         {{ forms.input(fieldData, {field:'password', label:'Password'|_, attr: 'size="50"', type: "password" }) }}
         {{ forms.input(fieldData, {field:'signature', label:'Signature'|_, attr: 'size="50"' }) }}
+        {{ forms.boolean(fieldData, {field:'show_shipping', label:'Show shipping address on PayPal'|_ }) }}
+        {{ forms.select(fieldData, {field:'payment_action', label:'Payment Action', options:paymentActionOptions }) }}
     {{ forms.accordion_panel_end }}
+
 {{ forms.accordion_end }}
 

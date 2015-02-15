@@ -6,7 +6,10 @@ Current state: private alpha, not ready for demonstration.
 Installation
 ------------
 
-1. Checkout from bitbucket into web accessible folder e.g. `{webroot}/sellvana`
+1. Checkout from bitbucket into web accessible folder e.g. `{webroot}/sellvana`, make sure to clone submodules too:
+
+        git clone --recursive git@bitbucket.org:sellvana/core.git
+    
 2. Make sure `dlc/`, `storage/` and `media/` folders are recursively writable for web service
 3. Create database and db user for sellvana (make sure db collation is utf8_general_ci)
 4. Open the selvana folder in browser
@@ -14,6 +17,15 @@ Installation
 6. Once installed, you'll be redirected to frontend
 7. Open **admin** at `{webroot}/sellvana/admin` (should be already logged in with user info from the wizard)
 8. Go to **Modules > Manage Modules**, set modules you'd like to use to `REQUESTED` run level, click **Save**
+
+Test Data
+---------
+
+If you'd like to generate test catalog data, please open this URL (replace 127.0.0.1/sellvana with your location):
+
+        http://127.0.0.1/sellvana/admin/index.php/catalogindex/test
+        
+This is a simple test script and should be ran only once.
 
 Issues
 -------

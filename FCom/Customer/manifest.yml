@@ -2,7 +2,7 @@ modules:
     FCom_Customer:
         version: 0.1.12
         channel: beta
-        require: { module: { FCom_Core: 0.1.0, FCom_Geo: 0.1.0, FCom_PushServer: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.0 } }
         translations: { en: en.php }
         description: Customer Accounts and Management
         areas:
@@ -34,9 +34,6 @@ modules:
 
                     - [ /customer/myaccount, FCom_Customer_Frontend_Controller_Account.index ]
                     - [ /customer/myaccount/.action, FCom_Customer_Frontend_Controller_Account ]
-
-                    - [ /customer/order, FCom_Customer_Frontend_Controller_Order.index ]
-                    - [ /customer/order/.action, FCom_Customer_Frontend_Controller_Order ]
 
                     - [ /customer/address, FCom_Customer_Frontend_Controller_Address.index ]
                     - [ /customer/address/.action, FCom_Customer_Frontend_Controller_Address ]

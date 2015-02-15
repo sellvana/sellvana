@@ -7,6 +7,19 @@
  * @property string $channel_name
  * @property string $channel_out
  * @property string $data_serialized
+ *   - permissions
+ *     - can_subscribe
+ *       - everyone
+ *       - admin_user
+ *       - customer
+ *       - none
+ *     - can_publish
+ *       - everyone
+ *       - admin_user
+ *       - customer
+ *       - none
+ *   - subscribers
+ *   - message_queue
  * @property string $create_at
  * @property string $update_at
  *
@@ -23,27 +36,12 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     static protected $_channelCache = [];
 
     /**
-     * - id
-     * - channel_name
-     * - channel_out
-     * - create_at
-     * - update_at
-     * - data_serialized
-     *   - permissions
-     *     - can_subscribe
-     *       - everyone
-     *       - admin_user
-     *       - customer
-     *       - none
-     *     - can_publish
-     *       - everyone
-     *       - admin_user
-     *       - customer
-     *       - none
-     *   - subscribers
-     *   - message_queue
+     * @param $channel
+     * @param bool $create
+     * @param bool $session
+     * @return $this
+     * @throws BException
      */
-
     public function getChannel($channel, $create = false, $session = false)
     {
         if (is_object($channel) && ($channel instanceof FCom_PushServer_Model_Channel)) {
@@ -57,7 +55,9 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         }
         $sessData =& $this->BSession->dataToUpdate();
         if (!empty($sessData['pushserver']['channels'][$channelName])) {
-            static::$_channelCache[$channelName] = $this->create($sessData['pushserver']['channels'][$channelName], false);
+            $data = $sessData['pushserver']['channels'][$channelName];
+            $data['from_session_cache'] = true;
+            static::$_channelCache[$channelName] = $this->create($data, false);
             return static::$_channelCache[$channelName];
         }
         $channel = $this->load($channelName, 'channel_name');
@@ -132,6 +132,9 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
             $message['channel'] = $this->channel_name;
         }
 
+        if ($this->get('from_session_cache') && !$this->load($this->id())) {
+            $this->resave();
+        }
 
         if ($this->FCom_PushServer_Main->isDebugMode()) {
             $this->BDebug->log("SEND1: " . print_r($message, 1));

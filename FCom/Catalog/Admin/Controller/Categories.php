@@ -3,6 +3,8 @@
 /**
  * Class FCom_Catalog_Admin_Controller_Categories
  * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abstract_TreeForm
 {
@@ -16,12 +18,11 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
     public $formId = 'category_tree_form';
     /*public $imgDir = 'media/category/images';*/
 
-    public function action_upload__POST()
+    /*public function action_upload__POST()
     {
         try {
             $id = $this->BRequest->param('id', true);
             $model = $this->FCom_Catalog_Model_Category->load($id);
-            /** @var FCom_Catalog_Model_Category $model */
             if (!$model) {
                 throw new BException('Invalid Category ID.');
             }
@@ -49,7 +50,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
             $results = ['type' => 'error', 'msg' => $this->_($e->getMessage())];
         }
         $this->BResponse->json($results);
-    }
+    }*/
 
     public function onGenerateSiteMap($args)
     {
@@ -59,5 +60,15 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
             }
         };
         $this->FCom_Catalog_Model_Category->orm()->select(['url_path', 'parent_id'])->iterate($callback);
+    }
+
+    /**
+     * @param array $args
+     */
+    public function formPostBefore($args)
+    {
+        parent::formPostBefore($args);
+
+        $args['model']->setData('layout', $this->FCom_Core_LayoutEditor->processFormPost());
     }
 }

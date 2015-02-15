@@ -21,7 +21,7 @@
         {{ forms.select(fieldData,  {field:'payment_action', label:'Payment Action'|_, options: paymentActions }) }}
         {{ forms.select(fieldData,  {field:'order_status', label:'New Order Status'|_, options: orderStatuses }) }}
         {{ forms.boolean(fieldData, {field:'test', label:'Sandbox Mode'|_ }) }}
-        {{ forms.input(fieldData,   {field:'cgi_url', label:'Gateway URL'|_, attr: 'data-rule-number="true"', value: gatewayUrl }) }}
+        {{ forms.input(fieldData,   {field:'cgi_url', label:'Gateway URL'|_, value: gatewayUrl }) }}
         {{ forms.select(fieldData,  {field:'currency', label:'Accepted Currency'|_, options: currencies }) }}
         {{ forms.boolean(fieldData, {field:'email_customer', label:'Email Customer'|_ }) }}
         {{ forms.input(fieldData,   {field:'merchant_email', label:'Merchant\'s Email'|_, attr: 'data-rule-number="true"' }) }}

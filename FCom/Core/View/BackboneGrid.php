@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Core_View_BackboneGrid
+ *
+ * @property array $grid
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
 class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 {
     static protected $_defaultActions = [
@@ -13,6 +20,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         'export' => true
     ];
 
+    /**
+     * @param array $changeRequest
+     * @return string
+     */
     public function gridUrl($changeRequest = [])
     {
         if (!$changeRequest) {
@@ -21,22 +32,34 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $this->BUtil->setUrlQuery($this->grid['config']['grid_url'], $changeRequest);
     }
 
+    /**
+     * @return string
+     */
     public function pageSizeHref()
     {
         return $this->BUtil->setUrlQuery(true, ['ps' => '-VALUE-']);
     }
 
+    /**
+     * @return array
+     */
     public function pageSizeOptions()
     {
         $pageSizes = $this->grid['config']['page_size_options'];
         return array_combine($pageSizes, $pageSizes);
     }
 
+    /**
+     * @return string
+     */
     public function pageChangeHref()
     {
         return $this->BUtil->setUrlQuery(true, ['p' => '-VALUE-']);
     }
 
+    /**
+     * @return array
+     */
     public function gridActions()
     {
         if (empty($this->grid['config']['actions'])) {
@@ -45,11 +68,19 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $this->grid['config']['actions'];
     }
 
+    /**
+     * @param $cb
+     * @param $args
+     * @return mixed
+     */
     public function callUserFunc($cb, $args)
     {
         return $this->BUtil->call($cb, $args, true);
     }
 
+    /**
+     * @return array
+     */
     public function multiselectToggleOptions()
     {
         return [
@@ -70,12 +101,19 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         ];
     }
 
+    /**
+     * @return string
+     */
     public function multiselectCurrent()
     {
         $grid = $this->get('grid');
         return !empty($grid['request']['selected']) ? $grid['request']['selected'] : '';
     }
 
+    /**
+     * @param $col
+     * @return string
+     */
     public function sortHref($col)
     {
         $grid = $this->get('grid');
@@ -90,11 +128,19 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $this->BUtil->setUrlQuery(true, $change);
     }
 
+    /**
+     * @param $col
+     * @return string
+     */
     public function sortStyle($col)
     {
         return !empty($col['width']) ? "width:{$col['width']}px" : '';
     }
 
+    /**
+     * @param $col
+     * @return string
+     */
     public function sortClass($col)
     {
         $classArr = [];
@@ -110,11 +156,18 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return join(' ', $classArr);
     }
 
+    /**
+     * @param $col
+     * @return string
+     */
     public function colFilterHtml($col)
     {
         return '';
     }
 
+    /**
+     * process default value for grid config
+     */
     protected function _processDefaults()
     {
         //TODO: remember processed config
@@ -165,6 +218,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->grid = $grid;
     }
 
+    /**
+     * process column from grid config
+     */
     protected function _processColumnsConfig()
     {
         $grid = $this->grid;
@@ -298,6 +354,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->grid = $grid;
     }
 
+    /**
+     * process filter from grid config
+     */
     protected function _processFiltersConfig()
     {
         if (empty($this->grid['config']['filters'])) {
@@ -314,6 +373,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->grid = $grid;
     }
 
+    /**
+     * process action button from grid config
+     */
     protected function _processActionsConfig()
     {
         if (empty($this->grid['config']['actions'])) {
@@ -392,11 +454,18 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->grid = $grid;
     }
 
+    /**
+     * @param $state
+     * @return mixed
+     */
     protected function _personalizePageState($state)
     {
         return $state;
     }
 
+    /**
+     * process personalization of current user
+     */
     protected function _processPersonalization()
     {
         $grid = $this->grid;
@@ -468,14 +537,20 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->grid = $grid;
     }
 
+    /**
+     * reset personalization config
+     */
     protected function _resetPersonalization()
     {
         $grid = $this->grid;
         $gridId = !empty($grid['personalize']['id']) ? $grid['personalize']['id'] : $grid['config']['id'];
-        $reset = ['state' => ['p' => null, 'ps' => null, 's' => null, 'sd' => null, 'q' => null]];
+        $reset = ['state' => ['p' => null, 'ps' => null, 's' => null, 'sd' => null, 'q' => null, 'filters' => null], 'filters' => null];
         $this->FCom_Admin_Model_User->personalize(['grid' => [$gridId => $reset]]);
     }
 
+    /**
+     * @return array
+     */
     public function getGrid()
     {
         if (!empty($this->grid['_processed'])) {
@@ -500,6 +575,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $grid;
     }
 
+    /**
+     * @return mixed
+     * @throws BException
+     * @throws Exception
+     */
     public function getGridConfig()
     {
         //TODO: replace magic with science
@@ -512,8 +592,16 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $config;
     }
 
+    /**
+     * @param array $options
+     * @return array
+     * @throws BException
+     * @throws Exception
+     */
     public function getGridConfigData(array $options = [])
     {
+        //uncomment this code if we meet issue with stored value personalization, todo: need add this feature to Settings
+        //$this->_resetPersonalization();
         // fetch grid configuration
         $grid = $this->getGrid();
         $config = $grid['config'];
@@ -586,6 +674,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $grid;
     }
 
+    /**
+     * @return array
+     */
     public function getPageRowsData()
     {
 
@@ -606,19 +697,39 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         //var_dump($state);
 
+        $options = [];
+        foreach ($grid['config']['columns'] as $col) {
+            if (!empty($col['name']) && !empty($col['options'])) {
+                $options[$col['name']] = $col['options'];
+            }
+        }
+
         $data = [];
 
         foreach ($rows as $rowId => $row) {
-            $data[] = is_array($row) ? $row : $row->as_array();
+            $r = is_array($row) ? $row : $row->as_array();
+            /*
+            foreach ($r as $k => $v) {
+                if (!empty($options[$k][$v])) {
+                    $r[$k] = $options[$k][$v];
+                }
+            }
+            */
+            $data[] = $r;
         }
 
-        if (class_exists($gridId) && method_exists($gridId, 'afterInitialData')) {
-            $data = $this->{$gridId}->afterInitialData($data);
+        if (!empty($grid['config']['page_rows_data_callback'])) {
+            $callback = $this->BUtil->extCallback($grid['config']['page_rows_data_callback']);
+            $data = call_user_func($callback, $data);
         }
 
         return ['state' => $state, 'data' => $data];
     }
 
+    /**
+     * @param bool $export
+     * @return mixed
+     */
     public function generateOutputData($export = false)
     {
         $grid = $this->get('grid');
@@ -627,6 +738,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //TODO: add _processFilters and processORM
         //$orm = $this->grid['orm'];
         #$data = $this->grid['orm']->paginate();
+
+        $options = [];
+        foreach ($grid['config']['columns'] as $col) {
+            if (!empty($col['name']) && !empty($col['options'])) {
+                $options[$col['name']] = $col['options'];
+            }
+        }
 
         if (isset($config['orm'])) {
             $orm = $config['orm'];
@@ -640,26 +758,43 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
         foreach ($data['rows'] as $row) {
             foreach ($config['columns'] as $col) {
-                if (!empty($col['cell']) && !empty($col['name'])) {
-                    $field = $col['name'];
-                    $value = $row->get($field);
+                if (empty($col['name'])) {
+                    continue;
+                }
+                $field = $col['name'];
+                $oldValue = $value = $row->get($field);
+
+                if (!empty($options[$field][$value])) {
+                    #$value = $options[$field][$value];
+                }
+
+                if (!empty($col['cell'])) {
                     switch ($col['cell']) {
                         case 'number':
-                            $value1 = floatval($value);
+                            $value = floatval($value);
                             break;
                         case 'integer':
-                            $value1 = intval($value);
+                            $value = intval($value);
                             break;
                     }
-                    if (isset($value1) && $value !== $value1) {
-                        $row->set($field, $value1);
-                    }
+                }
+
+                if ($oldValue !== $value) {
+                    $row->set($field, $value);
                 }
             }
         }
         return $data;
     }
 
+    /**
+     * @param BORM $orm
+     * @param string $method
+     * @param string $stateKey
+     * @param array $forceRequest
+     * @param bool $export
+     * @return mixed
+     */
     public function processORM($orm, $method = null, $stateKey = null, $forceRequest = [], $export = false)
     {
         $grid = $this->get('grid');
@@ -723,6 +858,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $data;
     }
 
+    /**
+     * @param null|array $params
+     * @return string
+     */
     public function stateDescription($params = null)
     {
         $descrArr = [];
@@ -771,6 +910,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $descrArr ? join("; ", $descrArr) : '';
     }
 
+    /**
+     * @param array $config
+     * @param $mapColumns
+     * @param BORM $orm
+     * @param string $when
+     */
     protected function _processGridJoins(&$config, &$mapColumns, $orm, $when = 'before_count')
     {
         if (empty($config['join'])) {
@@ -811,6 +956,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
     }
 
+    /**
+     * @param array $config
+     * @param array $filters
+     * @param BORM $orm
+     */
     protected function _processGridFilters(&$config, $filters, $orm)
     {
         $configFilterFields = [];
@@ -924,13 +1074,21 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 break;
 
             case 'multiselect':
-                $vals = explode(',', $filters[$fId]['val']);
+                if (!is_array($filters[$fId]['val'])) {
+                    $vals = explode(',', $filters[$fId]['val']);
+                }
                 $this->_processGridFiltersOne($f, 'in', $vals, $orm);
                 break;
             }
         }
     }
 
+    /**
+     * @param array $filter
+     * @param string $op
+     * @param string $value
+     * @param BORM $orm
+     */
     protected function _processGridFiltersOne($filter, $op, $value, $orm)
     {
         $section = !empty($filter['having']) ? 'having' : 'where';
@@ -943,6 +1101,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
     }
 
+    /**
+     * @param array $rows
+     * @param null $class
+     */
     public function export($rows, $class = null)
     {
         /*if ($class) {

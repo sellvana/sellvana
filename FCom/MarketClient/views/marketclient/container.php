@@ -12,7 +12,7 @@
           function start() {
               $('#progress-stop').click(stop);
               $('#progress-restart').click(restart);
-              $.post(baseUrl + '/start', { modules: modules, 'X-CSRF-TOKEN': csrfToken });
+              $.post(baseUrl + '/start', { modules: modules, 'X-CSRF-TOKEN': csrfToken }, onStartSuccess);
               progress();
           }
 
@@ -37,7 +37,13 @@
           }
 
           function restart() {
-              $.post(baseUrl + '/start', { modules: modules, 'X-CSRF-TOKEN': csrfToken, force: true });
+              $.post(baseUrl + '/start', { modules: modules, 'X-CSRF-TOKEN': csrfToken, force: true }, onStartSuccess);
+          }
+
+          function onStartSuccess(response, status, xhr) {
+              if (response.error) {
+                  $('#status-container').html('ERROR: ' + response.message);
+              }
           }
 
           $(start);
@@ -63,5 +69,6 @@
     <button id="progress-restart" type="button"><?= $this->q('RESTART') ?></button>
     -->
     <div id="progress-container"></div>
+    <div id="status-container"></div>
 </body>
 

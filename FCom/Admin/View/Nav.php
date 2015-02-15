@@ -1,12 +1,25 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_View_Nav
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
 class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
 {
     protected static $_allPermissions;
 
+    /**
+     * @var array
+     */
     protected $_tree = [];
     protected $_curNav;
 
+    /**
+     * @param $path
+     * @param $node
+     * @return $this
+     */
     public function addNav($path, $node)
     {
         $root =& $this->_tree;
@@ -38,12 +51,21 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
         return $this;
     }
 
+    /**
+     * @param $path
+     * @return $this
+     */
     public function setNav($path)
     {
         $this->set('current_nav', $path);
         return $this;
     }
 
+    /**
+     * @param null $root
+     * @param string $path
+     * @return array
+     */
     public function getNodes($root = null, $path = '')
     {
 

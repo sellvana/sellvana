@@ -45,6 +45,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     */
                 } else {
                     $node = $this->{$class}->load($r->get('id'));
+                    /** @var FCom_Core_Model_TreeAbstract $node */
                     if ($node) {
                         $node->descendants();
                         $result = $this->_nodeChildren($node, 100);
@@ -65,6 +66,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     protected function _nodeChildren($node, $depth = 0)
     {
         $class = $this->_navModelClass;
+        /** @var FCom_Core_Model_TreeAbstract[] $nodeChildren */
         $nodeChildren = $node ? $node->children() : $this->{$class}->orm()->where_null('parent_id')->find_many();
         $children = [];
         foreach ($nodeChildren as $c) {
@@ -196,7 +198,13 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 throw new Exception('Invalid node ID');
             }
 
-            $model->set($this->BRequest->post('model'))
+            $data = $this->BRequest->post('model');
+
+            $args = ['id' => $id, 'data' => &$data, 'model' => &$model];
+            $this->formPostBefore($args);
+
+            /** @var FCom_Core_Model_TreeAbstract $model */
+            $model->set($data)
                 ->set(['url_path' => null, 'full_name' => null]);
 
             if ($this->BRequest->post('action') === 'clone') {
@@ -221,7 +229,10 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                 $result = ['status' => 'error', 'message' => $this->getErrorMessages()];
             }
+
+            $this->formPostAfter($args);
         } catch (Exception $e) {
+            $this->formPostError($args);
 //$this->BDebug->exceptionHandler($e);
 #print_r(BORM::get_last_query());
 #print_r($e); exit;
@@ -230,6 +241,24 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
         $this->BResponse->json($result);
     }
 
+    public function formPostBefore($args)
+    {
+        $this->BEvents->fire(static::$_origClass . '::formPostBefore', $args);
+    }
+
+    public function formPostAfter($args)
+    {
+        $this->BEvents->fire(static::$_origClass . '::formPostAfter', $args);
+    }
+
+    public function formPostError($args)
+    {
+        $this->BEvents->fire(static::$_origClass . '::formPostError', $args);
+    }
+
+    /**
+     * @return string
+     */
     public function getErrorMessages()
     {
         $messages = $this->BSession->messages('validator-errors:' . $this->formId);
@@ -252,7 +281,8 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     /**
      * @param FCom_Core_Model_TreeAbstract $node
      * @param string $recursiveType 0: only this node, 1: plus immediately children, 2: plus all descendant
-     * @return bool|FCom_Core_Model_TreeAbstract
+     * @param boolean $returnID
+     * @return int|FCom_Core_Model_TreeAbstract
      * @throws BException
      */
     public function cloneNode($node, $recursiveType, $returnID = false)

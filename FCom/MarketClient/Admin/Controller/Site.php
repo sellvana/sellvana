@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MarketClient_Admin_Controller_Site
+ *
+ * @property FCom_MarketClient_RemoteApi $FCom_MarketClient_RemoteApi
+ */
 class FCom_MarketClient_Admin_Controller_Site extends FCom_Admin_Controller_Abstract
 {
     protected $_permission = 'market_client';

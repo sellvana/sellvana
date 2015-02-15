@@ -1,5 +1,26 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Model_ProductField
+ *
+ * @property int $id
+ * @property int $product_id
+ * @property string $_fieldset_ids
+ * @property string $_add_field_ids
+ * @property string $_hide_field_ids
+ * @property string $_data_serialized
+ * @property string $Color
+ * @property string $size
+ * @property string $ColorABC
+ * @property string $storage
+ * @property string $test
+ * @property string $test1
+ * @property string $test2
+ *
+ * DI
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_CustomField_Model_SetField $FCom_CustomField_Model_SetField
+ */
 class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
@@ -54,8 +75,8 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         } else {
             $fields = $this->FCom_CustomField_Model_Field->orm('f')
                     ->select("f.*")
-                    ->left_outer_join($this->FCom_CustomField_Model_SetField->table(), 'f.id = sf.field_id', 'sf')
-                    ->where($where)
+                    ->left_outer_join($this->FCom_CustomField_Model_SetField->table(), 'f.id = sf.field_id', 'sf') //todo: implement override left_outer_join to IDE understand BORM::where
+                    ->where($where, null)
                     ->order_by_asc('sf.position')
                     ->find_many_assoc();
         }
@@ -90,6 +111,11 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @param $p
+     * @param $hide_field
+     * @throws BException
+     */
     public function removeField($p, $hide_field)
     {
         $field = $this->FCom_CustomField_Model_Field->load($hide_field);

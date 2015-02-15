@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Core_View_Root
+ *
+ * @property string $body_class
+ */
 class FCom_Core_View_Root extends FCom_Core_View_Abstract
 {
     protected $_htmlAttr = ['lang' => 'en'];
@@ -10,6 +15,10 @@ class FCom_Core_View_Root extends FCom_Core_View_Abstract
         $this->addBodyClass(strtolower(trim(preg_replace('#[^a-z0-9]+#i', '-', $req->rawPath()), '-')));
     }
 
+    /**
+     * @param $class
+     * @return $this
+     */
     public function addBodyClass($class)
     {
 //$this->BDebug->dump($class);
@@ -18,11 +27,17 @@ class FCom_Core_View_Root extends FCom_Core_View_Abstract
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getBodyClass()
     {
         return $this->body_class ? join(' ', (array)$this->body_class) : '';
     }
 
+    /**
+     * @return string
+     */
     public function getHtmlAttributes()
     {
         $xmlns = [];
@@ -32,6 +47,11 @@ class FCom_Core_View_Root extends FCom_Core_View_Abstract
         return join(' ', $xmlns);
     }
 
+    /**
+     * @param $ns
+     * @param $href
+     * @return $this
+     */
     public function xmlns($ns, $href)
     {
         $this->_htmlAttr['xmlns:' . $ns] = $href;

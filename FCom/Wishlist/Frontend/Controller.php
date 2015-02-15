@@ -1,5 +1,15 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Wishlist_Frontend_Controller
+ *
+ * @property FCom_Wishlist_Model_Wishlist $FCom_Wishlist_Model_Wishlist
+ * @property FCom_Wishlist_Model_WishlistItem $FCom_Wishlist_Model_WishlistItem
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ */
 class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_index()
@@ -51,9 +61,26 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
             $this->BResponse->json($result);
         } else {
-            if (!empty($post['remove'])) {
-                foreach ($post['remove'] as $id) {
-                    $wishlist->removeItem($id);
+            if (!empty($post['selected'])) {
+                switch ($post['do']) {
+                    case 'add_to_cart':
+                        $items = $this->FCom_Wishlist_Model_WishlistItem->orm()->where('wishlist_id', $wishlist->id())
+                            ->where_in('id', $post['selected'])->find_many();
+                        $addItems = [];
+                        foreach ($items as $item) {
+                            $addItems[] = ['id' => $item->get('product_id')];
+                        }
+                        $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['items' => $addItems]);
+                        foreach ($post['selected'] as $id) {
+                            $wishlist->removeItem($id);
+                        }
+                        break;
+
+                    case 'remove':
+                        foreach ($post['selected'] as $id) {
+                            $wishlist->removeItem($id);
+                        }
+                        break;
                 }
             }
             $this->BResponse->redirect($wishlistHref);
@@ -78,6 +105,9 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $this->BResponse->redirect('wishlist');
     }
 
+    /**
+     * @param $args
+     */
     public function onAddToWishlist($args)
     {
         $product = $args['product'];

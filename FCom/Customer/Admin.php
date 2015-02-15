@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Admin
+ *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_Admin_Controller_MediaLibrary $FCom_Admin_Controller_MediaLibrary
+ */
 class FCom_Customer_Admin extends BClass
 {
     public function bootstrap()
@@ -18,6 +24,7 @@ class FCom_Customer_Admin extends BClass
 
     public function onGetDashboardWidgets($args)
     {
+        /** @var FCom_Admin_View_Dashboard $view */
         $view = $args['view'];
         $view->addWidget('customers-list', [
             'title' => 'Recent Customers',

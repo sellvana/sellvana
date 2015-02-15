@@ -1,14 +1,19 @@
 modules:
     FCom_Cms:
-        version: 0.1.4
+        version: 0.1.6
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibTwig: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         translations: { en: en.php }
         description: "CMS for custom pages and blocks"
         auto_use: all
+
         default_config:
             modules/FCom_Cms/page_enable: true
             modules/FCom_Cms/nav_enable: true
+
+        observe:
+            - [ "FCom_Core_LayoutEditor::fetchLibrary", "FCom_Cms_Main.onLayoutEditorFetchLibrary" ]
+
         areas:
             FCom_Admin:
                 routing:
@@ -25,10 +30,14 @@ modules:
 
                     - [ /cms/forms, FCom_Cms_Admin_Controller_Forms.index ]
                     - [ /cms/forms/.action, FCom_Cms_Admin_Controller_Forms ]
+
                 security:
                     request_fields_whitelist:
                         /cms/blocks/form:
                             POST/model/content: "*"
             FCom_Frontend:
+                views:
+                    - [ cms/form-fields, { view_class: FCom_Cms_Frontend_View_FormFields } ]
+
                 observe:
                     - [ "FCom_Frontend_Controller::beforeDispatch", "FCom_Cms_Frontend.onFrontendIndexBeforeDispatch" ]

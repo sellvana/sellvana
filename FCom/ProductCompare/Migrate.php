@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_ProductCompare_Migrate
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_ProductCompare_Model_Set $FCom_ProductCompare_Model_Set
+ * @property FCom_ProductCompare_Model_SetItem $FCom_ProductCompare_Model_SetItem
+ */
+
 class FCom_ProductCompare_Migrate extends BClass
 {
     public function install__0_1_0()
@@ -10,34 +19,52 @@ class FCom_ProductCompare_Migrate extends BClass
         $tProduct = $this->FCom_Catalog_Model_Product->table();
 
         $this->BDb->ddlTableDef($tSet, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'cookie_token' => 'varchar(40) default null',
                 'customer_id' => 'int unsigned default null',
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
             ],
-            'CONSTRAINTS' => [
-                "FK_{$tSet}_customer" => "FOREIGN KEY (customer_id) REFERENCES {$tCustomer} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            BDb::CONSTRAINTS => [
+                'customer' => ['customer_id', $tCustomer],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tSetItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'set_id' => 'int unsigned not null',
                 'product_id' => 'int unsigned not null',
                 'create_at' => 'datetime not null',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
-                "FK_{$tSetItem}_set" => "FOREIGN KEY (set_id) REFERENCES {$tSet} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tSetItem}_product" => "FOREIGN KEY (product_id) REFERENCES {$tProduct} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'set' => ['set_id', $tSet],
+                'product' => ['product_id', $tProduct],
             ],
         ]);
+    }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        $tSet = $this->FCom_ProductCompare_Model_Set->table();
+        $tSetItem = $this->FCom_ProductCompare_Model_SetItem->table();
+
+        $this->BDb->ddlTableDef($tSet, [
+            BDb::COLUMNS => [
+                'data_serialized' => 'text',
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tSetItem, [
+            BDb::COLUMNS => [
+                'data_serialized' => 'text',
+            ],
+        ]);
+
     }
 }

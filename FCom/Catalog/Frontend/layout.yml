@@ -1,3 +1,6 @@
+base:
+    - { hook: header-top-search, views: catalog/header-search }
+
 catalog/product/pager:
     - view: catalog/product/pager
         set:
@@ -10,8 +13,8 @@ catalog/product/pager:
             sort_options:
                 'product_name asc': 'Product Name (A-Z)'
                 'product_name desc': 'Product Name (Z-A)'
-                'local_sku asc': 'SKU (A-Z)'
-                'local_sku desc': 'SKU (Z-A)'
+                'product_sku asc': 'SKU (A-Z)'
+                'product_sku desc': 'SKU (Z-A)'
                 'base_price asc': 'Price (Lower first)'
                 'base_price desc': 'Price (Higher first)'
             default_sort: "product_name asc"
@@ -27,6 +30,9 @@ catalog/product/pager:
     - { hook: main, views: catalog/product/quickview }
     - { hook: sidebar-left, views: catalog/category/sidebar }
     - { view: root, do: [[ addBodyClass, f-page-category ]] }
+    - { hook: before_body_end, views: custom-tags }
+    - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_category } }
+
 
 /catalog/search:
     - { include: base }
@@ -36,11 +42,15 @@ catalog/product/pager:
     - { hook: main, views: catalog/product/quickview }
     - { hook: sidebar-left, views: catalog/category/sidebar }
     - { view: root, do: [[ addBodyClass, f-page-category ]] }
+    - { hook: before_body_end, views: custom-tags }
+    - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_search } }
 
 /catalog/product:
     - { include: base }
     - { hook: main, views: catalog/product/details }
     - { view: root, do: [[ addBodyClass, f-page-product-view ]] }
+    - { hook: before_body_end, views: custom-tags }
+    - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_product } }
 
 /catalog/quickview:
     - { root: catalog/product/quickview-partial }

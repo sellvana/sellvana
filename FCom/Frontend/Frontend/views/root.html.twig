@@ -8,10 +8,14 @@
     </head>
     <body class="{{ THIS.getBodyClass() }}">
         {{ THIS.hook('body_start') | raw }}
-        {{ THIS.hook('header') | raw }}
-        {{ THIS.hook('after_header') | raw }}
+
+        {% if not THIS.get('hide_header') %}
+            {{ THIS.hook('header') | raw }}
+            {{ THIS.hook('after_header') | raw }}
+        {% endif %}
 
         <div class="f-site-main" role="main">
+
 {% if THIS.get('use_container') %}
             <div class="container">
 {% endif %}
@@ -47,10 +51,14 @@
 {% if THIS.get('use_container') %}
             </div>
 {% endif %}
+
         </div>
 
-        {{ THIS.hook('before_footer') | raw }}
-        {{ THIS.hook('footer') | raw }}
+        {% if not THIS.get('hide_footer') %}
+            {{ THIS.hook('before_footer') | raw }}
+            {{ THIS.hook('footer') | raw }}
+        {% endif %}
+
         {{ THIS.hook('before_body_end') | raw }}
     </body>
 </html>

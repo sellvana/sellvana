@@ -2,7 +2,7 @@
 INITIALIZATION:
 
 {% set fieldData = { model:model, validator:validator, id_prefix:'model', name_prefix:'model', get_prefix:'config/prefix' } %}
-{% include THIS.view('core/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 EXAMPLES:
 
@@ -18,8 +18,34 @@ Using custom id/name:
 {% macro label(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
-    <label class="control-label {{ p.label_class|default('col-md-2') }} {{ p.required ? 'required' }}"
-        for="{{ view.getInputId(p) }}">{{ p.label }}</label>
+    {% if p.label %}
+        {% import _self as forms %}
+        <label class="control-label {{ p.label_class|default('col-md-2') }} {{ p.required ? 'required' }}"
+            for="{{ view.getInputId(p) }}">{{ p.label }}&nbsp;{{ forms.help_icon(p) }}</label>
+    {% endif %}
+{% endmacro %}
+
+{% macro help_icon(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% if p.help_icon %}
+        <a tabindex="-1" id="help-{{ view.getInputId(p) }}" class="pull-right help-icon" href="#" data-toggle="popover"
+            data-trigger="focus"
+               data-content="{{ p.help_text }}" data-container="body">
+                <span class="glyphicon glyphicon-question-sign"></span></a>
+    {% endif %}
+{% endmacro %}
+
+{% macro help_block(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    <span class="help-block {{ p.help_block_class }}">{{ p.help_block_text }}</span>
+{% endmacro %}
+
+{% macro hidden(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    <input type="hidden" id="{{ view.getInputId(p) }}" name="{{ view.getInputName(p) }}" value="{{ view.getInputValue(p) }}"/>
 {% endmacro %}
 
 {% macro input(p1, p2) %}
@@ -38,9 +64,13 @@ Using custom id/name:
                 placeholder="{{ p.placeholder }}"
                 {{ p.autocomplete ? 'autocomplete="' ~ p.autocomplete ~ '"' }}
                 {{ p.readonly ? 'readonly' }}
+                {{ p.disabled ? 'disabled' }}
                 {{ p.required ? 'data-rule-required="true"' }}
-                {{ p.attr | raw }}
+                {{ view.attributes(p.attr) | raw }}
             />
+            {% if p.help_block_text %}
+            {{ forms.help_block(p) }}
+            {% endif %}
         </div>
     </div>
 {% endmacro %}
@@ -58,18 +88,19 @@ Using custom id/name:
                 class="form-control {{ p.input_class }} {{ p.required ? 'required' }}"
                 style="{{ p.style }}"
                 {{ p.readonly ? 'readonly' }}
+                {{ p.disabled ? 'disabled' }}
                 {{ p.required ? 'data-rule-required="true"' }}
-                {{ p.attr | raw }}
+                {{ view.attributes(p.attr) | raw }}
                 {{ p.multiple ? 'multiple'}}
             >
-                {{ UTIL.optionsHtml(p.options, view.getInputValue(p)) | raw }}
+                {{ UTIL.optionsHtml(p.options, view.getInputValue(p)|default(p.default)) | raw }}
             </select>
         </div>
     </div>
     {% if p.select2 is defined %}
         <script>
             require(['jquery', 'select2'], function($) {
-                $('#{{ view.getInputId(p) }}').select2({{ p.select2 is iterable ? UTIL.toJson(p.select2) : '{}' }});
+                $('#{{ view.getInputId(p) }}').select2({{ p.select2 is iterable ? UTIL.toJson(p.select2)|raw : '{}' }});
             })
         </script>
     {% endif %}
@@ -108,6 +139,7 @@ Using custom id/name:
                 style="{{ p.style }}"
                 placeholder="{{ p.placeholder }}"
                 {{ p.readonly ? 'readonly' }}
+                {{ p.disabled ? 'disabled' }}
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ p.attr | raw }}
            >{{ p.raw ? value|raw : value }}</textarea>
@@ -127,14 +159,14 @@ Using custom id/name:
                 class="form-control ckeditor js-desc-wysiwyg {{ p.input_class }}"
                 id="{{ view.getInputId(p) }}"
                 name="{{ view.getInputName(p) }}"
-                {{ p.attr_wysiwyg | raw }}
+                {{ view.attributes(p.attr_wysiwyg) | raw }}
             >{{ p.raw ? value|raw : value }}</textarea>
             <textarea
                 class="form-control js-desc-wysiwyg"
                 id="{{ view.getInputId(p) }}-validation"
                 style="display:none;"
                 {{ p.required ? 'data-rule-required="true"' }}
-                {{ p.attr | raw }}
+                {{ view.attributes(p.attr) | raw }}
             >{{ p.raw ? value|raw : value }}</textarea>
         </div>
     </div>
@@ -189,7 +221,7 @@ Using custom id/name:
                         <input class="model_image_url" type="hidden" name="model[{{ p.field }}]" value="{{ value }}"/>
                     </span>
                     <span class='btn btn-primary fileinput-button {{ configId }}_btn_remove_image'
-                          style='display: {% if value %} block; {% else %} none; {% endif %}'>
+                          style='display: {{ value ? 'block' : 'none' }}'>
                         × {{ 'Remove Image...'|_ }}
                     </span>
                         </div>
@@ -207,4 +239,124 @@ Using custom id/name:
             </div>
         </div>
     {% endfor %}
+{% endmacro %}
+
+{% macro image(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class="{{ p.input_div_class|default('col-md-5') }}">
+            <input type="image"
+                id="{{ view.getInputId(p) }}"
+                src="{{ p.src }}"
+                class="form-control {{ p.input_class }}"
+                alt="{{ view.getInputId(p) }}"
+                style="{{ p.style }}"
+                {{ view.attributes(p.attr) | raw }}
+            />
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro upload(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class="{{ p.input_div_class|default('col-md-5') }}">
+            <input type="file"
+                id="{{ view.getInputId(p) }}"
+                name="{{ view.getInputName(p) }}"
+                class="{{ p.input_class }} {{ p.required ? 'required' }}"
+                style="{{ p.style }}"
+                value="{{ view.getInputValue(p) }}"
+                {{ p.readonly ? 'readonly' }}
+                {{ p.required ? 'data-rule-required="true"' }}
+                {{ view.attributes(p.attr) | raw }}
+            />
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro checkbox(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class=" {{ p.input_div_class|default('col-md-5') }}">
+        {% for cb,k in p.options %}
+            <div class="checkbox">
+                <label>
+                <input type="checkbox"
+                    id="{{ view.getInputId(p) ~ '-' ~ k }}"
+                    name="{{ view.getInputName(p) ~ '-' ~ k }}"
+                    class="{{ p.input_class }} {{ p.required ? 'required' }}"
+                    style="{{ p.style }}"
+                    value="{{ cb }}"
+                    {{ p.readonly ? 'readonly' }}
+                    {{ p.disabled ? 'disabled' }}
+                    {{ p.required ? 'data-rule-required="true"' }}
+                    {{ view.attributes(p.attr) | raw }}
+                    {{ p.value == cb? "checked": "" }}
+                />{{ cb|capitalize }}
+                </label>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro radio(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class=" {{ p.input_div_class|default('col-md-5') }}">
+        {% for cb,k in p.options %}
+            <div class="radio">
+                <label>
+                <input type="radio"
+                    id="{{ view.getInputId(p) ~ '-' ~ k }}"
+                    name="{{ view.getInputName(p) }}"
+                    class="{{ p.input_class }} {{ p.required ? 'required' }}"
+                    style="{{ p.style }}"
+                    value="{{ cb }}"
+                    {{ p.readonly ? 'readonly' }}
+                    {{ p.disabled ? 'disabled' }}
+                    {{ p.required ? 'data-rule-required="true"' }}
+                    {{ view.attributes(p.attr) | raw }}
+                    {{ p.value == cb? "checked": "" }}
+                />{{ cb|capitalize }}
+                </label>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro button(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class="{{ p.input_div_class|default('col-md-5') }}">
+            <button type="{{ p.type|default('submit') }}"
+                   id="{{ view.getInputId(p) }}"
+                   name="{{ view.getInputName(p) }}"
+                   class="btn {{ p.button_class }}
+                   style="{{ p.style }}"
+                   value="{{ view.getInputValue(p) }}"
+                    {{ view.attributes(p.attr) | raw }}
+                    >{{ p.text }}</button>
+            {% if p.help_block_text %}
+                {{ forms.help_block(p) }}
+            {% endif %}
+        </div>
+    </div>
 {% endmacro %}

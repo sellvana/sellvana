@@ -12,14 +12,14 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
     /**
      * Concrete state objects for this model
      *
-     * @var array
+     * @var FCom_Core_Model_Abstract_State_Concrete[]
      */
     protected $_stateObjects = [];
 
     /**
      * Default classes for each type of model state
      *
-     * @var array
+     * @var string[]
      */
     static protected $_defaultStateClasses = [];
 
@@ -30,9 +30,14 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
      */
     static protected $_stateValues = [];
 
-    public function __construct($model)
+    public function __construct($model = null)
     {
         $this->_model = $model;
+    }
+
+    public function factory($model)
+    {
+        return $this->BClassRegistry->instance(get_class($this), [$model]);
     }
 
     public function getModel()
@@ -66,12 +71,14 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
         } else {
             throw new BException('Invalid state type: ' . $type);
         }
-        if (!$class instanceof FCom_Sales_Model_model_State_Abstract) {
+        $concreteState = $this->BClassRegistry->instance($class, [$this, $type, $value, $options]);
+        if (!$concreteState instanceof FCom_Core_Model_Abstract_State_Concrete) {
+            var_dump($class);
             throw new BException('Invalid state class: ' . $class);
         }
 
-        $this->_stateObjects[$type] = $this->BClassRegistry->instance($class, true, [$this, $type, $value, $options]);
-        return $this->_stateObjects[$type];
+        $this->_stateObjects[$type] = $concreteState;
+        return $concreteState;
     }
 
     protected function _getModelStateField($type)
@@ -104,6 +111,6 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
 
     public function __destruct()
     {
-        unset($this->_model, $this->_stateObjects, $this->_stateValues);
+        unset($this->_model, $this->_stateObjects);
     }
 }

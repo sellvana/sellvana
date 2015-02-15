@@ -12,6 +12,7 @@ class FCom_Admin_Main extends BClass
         $this->FCom_Admin_Model_User;
 
         $this->FCom_Admin_Model_Role->createPermission([
+            'system' => 'System',
             'system/users' => 'Manage Users',
             'system/roles' => 'Manage Roles and Permissions',
             'system/settings' => 'Update Settings',
@@ -22,11 +23,21 @@ class FCom_Admin_Main extends BClass
         ]);
     }
 
+    /**
+     * shortcut for $this->BApp->adminHref
+     * @param string $url
+     * @return string
+     */
     public function href($url = '')
     {
         return $this->BApp->adminHref($url);
     }
 
+    /**
+     * shortcut for $this->BApp->frontendHref
+     * @param string $url
+     * @return string
+     */
     public function frontendHref($url = '')
     {
         return $this->BApp->frontendHref($url);

@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_ProductReviews_Admin_Controller
+ *
+ * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
 class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -18,6 +25,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         //$formUrl = $this->BApp->href("prodreviews/form");
         $reviewConfigs = $this->FCom_ProductReviews_Model_Review->config();
         $config = parent::gridConfig();
+        unset($config['form_url']); //unset this to use modal
         $columns = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 55, 'hidden' => true],
@@ -44,7 +52,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'width' => 60, 'addable' => true,
                 'editable' => true, 'validation' => ['number' => true]],
             ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
-                'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
+                'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
             ['type' => 'input', 'name' => 'product_id', 'label' => 'Product', 'addable' => true, 'hidden' => true,
                 'options' => $this->FCom_Catalog_Model_Product->getOptionsData(), 'editor' => 'select',
                 'validation' => ['required' => true]],
@@ -127,8 +135,9 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                 ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
         }
 
-        $config['columns'][] = ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-            'buttons' => [['name' => 'edit'], ['name' => 'delete']]];
+        /*$config['columns'][] = ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+            'buttons' => [['name' => 'edit'], ['name' => 'delete']]];*/
+        $config['columns'][] = ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]];
 
         $callbacks = '$(".rateit").rateit();
             $("#' . $config['id'] . '-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
@@ -179,9 +188,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     public function inputRatingHtml($name)
     {
         $config = $this->FCom_ProductReviews_Model_Review->config();
-        return '<input name="' . $name . '" id="' . $name . '" type="range" min="' . $config['min'] . '"
-            max="' . $config['max'] . '" step="' . $config['step'] . '" value="" />
-            <div class="rateit" data-rateit-backingfld="#' . $name . '"></div>';
+        return '<input name="' . $name . '" id="' . $name . '" type="range" min="' . $config['min'] . '" max="' . $config['max'] . '" step="' . $config['step'] . '" value="" /> <div class="rateit" data-rateit-backingfld="#' . $name . '"></div>';
     }
 
     /**
@@ -219,7 +226,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'width' => 60, 'addable' => true,
                 'editable' => true, 'validation' => ['number' => true]],
             ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
-                'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
+                'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
             ['type' => 'input', 'name' => 'product_id', 'label' => 'Product', 'addable' => true, 'hidden' => true,
                   'options' => $this->FCom_Catalog_Model_Product->getOptionsData(), 'editor' => 'select',
                   'validation' => ['required' => true]],

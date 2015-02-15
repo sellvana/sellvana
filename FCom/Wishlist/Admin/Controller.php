@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Wishlist_Admin_Controller
+ *
+ * @property FCom_Wishlist_Model_Wishlist $FCom_Wishlist_Model_Wishlist
+ */
 class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -27,7 +32,7 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
             ['type' => 'row_select'],
             ['name' => 'wishlist_id', 'label' => 'Wishlist ID'],
             ['name' => 'product_name', 'label' => 'Product Name'],
-            ['name' => 'local_sku', 'label' => 'SKU'],
+            ['name' => 'product_sku', 'label' => 'SKU'],
             ['name' => 'base_price', 'label' => 'Base Price'],
             ['name' => 'sale_price', 'label' => 'Sale Price'],
         ];

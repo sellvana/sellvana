@@ -1,12 +1,26 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MarketClient_RemoteApi
+ */
 final class FCom_MarketClient_RemoteApi extends BClass
 {
+    /**
+     * @var string
+     */
     protected static $_modulesVersionsCacheKey = 'marketclient_modules_versions';
 
-    #protected $_apiUrl = 'https://market.sellvana.com/';
+    /**
+     * @var string
+     */
     protected $_apiUrl = 'http://market.sellvana.com/';
+    #protected $_apiUrl = 'http://127.0.0.1/sellvana/';
 
+    /**
+     * @param string $path
+     * @param array $params
+     * @return string
+     */
     public function getUrl($path = '', $params = [])
     {
         $url = $this->_apiUrl;
@@ -17,6 +31,9 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $url;
     }
 
+    /**
+     * @return array|mixed
+     */
     public function setupConnection()
     {
         $siteKey = $this->BConfig->get('modules/FCom_MarketClient/site_key');
@@ -40,6 +57,12 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $result;
     }
 
+    /**
+     * @param $modules
+     * @param bool $resetCache
+     * @return array
+     * @throws BException
+     */
     public function getModulesVersions($modules, $resetCache = false)
     {
         $cached = $this->BCache->load(static::$_modulesVersionsCacheKey);
@@ -59,36 +82,45 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'site_key' => $siteKey,
         ]);
         $response = $this->BUtil->remoteHttp("GET", $url);
-        $modResult = $this->BUtil->fromJson($response);
-        if (!empty($modResult['error'])) {
+        $remoteModResult = $this->BUtil->fromJson($response);
+        if (!empty($remoteModResult['error'])) {
             $this->BCache->delete(static::$_modulesVersionsCacheKey);
-            throw new BException($modResult['message']);
+            throw new BException($remoteModResult['message']);
         }
-        if (empty($modResult['modules'])) {
+        if (empty($remoteModResult['modules'])) {
             //throw new BException('Unable to retrieve marketplace modules information');
             return []; //TODO: proper notifications and errors handling
         }
-        foreach ($modResult['modules'] as $modName => $mod) {
-            if ($mod && empty($mod['name'])) {
-                $mod['name'] = $modName;
+        foreach ($remoteModResult['modules'] as $remoteModName => $remoteMod) {
+            if ($remoteMod && empty($remoteMod['name'])) {
+                $remoteMod['name'] = $remoteModName;
             }
-            if (!empty($mod['status']) && $mod['status'] === 'mine') {
-                $localMod = $this->BApp->m($modName);
-                $remChannelVer = $mod['channels'][$localMod->channel]['version_uploaded'];
-                $mod['can_update'] = version_compare($remChannelVer, $localMod->version, '<');
+            if (!empty($remoteMod['status']) && $remoteMod['status'] === 'mine') {
+                $localMod = $this->BApp->m($remoteModName);
+                if (!empty($remoteMod['channels'][$localMod->channel])) {
+                    $remoteChannelVer = $remoteMod['channels'][$localMod->channel]['version_uploaded'];
+                    $remoteMod['can_update'] = version_compare($remoteChannelVer, $localMod->version, '<');
+                } else {
+                    $remoteMod['can_update'] = false;
+                }
             }
-            $cached[$modName] = $mod;
+            $cached[$remoteModName] = $remoteMod;
         }
         if (!empty($cached)) {
             $this->BCache->save(static::$_modulesVersionsCacheKey, $cached, 86400);
         }
         $result = [];
-        foreach ($modules as $modName) {
-            $result[$modName] = $cached[$modName];
+        foreach ($modules as $remoteModName) {
+            $result[$remoteModName] = $cached[$remoteModName];
         }
         return $result;
     }
 
+    /**
+     * @param $modules
+     * @return mixed
+     * @throws BException
+     */
     public function getModuleInstallInfo($modules)
     {
         $url = $this->getUrl('api/v1/market/module/install_info', [
@@ -122,6 +154,10 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $modules;
     }
 
+    /**
+     * @param $modName
+     * @return array|mixed
+     */
     public function createModule($modName)
     {
         $siteKey = $this->BConfig->get('modules/FCom_MarketClient/site_key');
@@ -134,6 +170,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $this->BUtil->fromJson($response);
     }
 
+    /**
+     * @param $moduleName
+     * @return array|mixed
+     * @throws BException
+     */
     public function uploadPackage($moduleName)
     {
         $mod = $this->BModuleRegistry->module($moduleName);
@@ -142,7 +183,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         }
         $packageDir = $this->BApp->storageRandomDir() . '/marketclient/upload';
         $this->BUtil->ensureDir($packageDir);
-        $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}.zip";
+        $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}-{$mod->getChannel()}.zip";
         @unlink($packageFilename);
         $this->BUtil->zipCreateFromDir($packageFilename, $mod->root_dir);
         $siteKey = $this->BConfig->get('modules/FCom_MarketClient/site_key');
@@ -158,6 +199,12 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $this->BUtil->fromJson($response);
     }
 
+    /**
+     * @param $moduleName
+     * @param null $version
+     * @param null $channel
+     * @throws BException
+     */
     public function downloadPackage($moduleName, $version = null, $channel = null)
     {
         if ($version === '*') {
@@ -172,8 +219,9 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'channel' => $channel,
         ]);
         $response = $this->BUtil->remoteHttp("GET", $url);
+        $reqInfo = $this->BUtil->lastRemoteHttpInfo();
         if (!$response) {
-            throw new BException("Problem downloading the package ({$moduleName})");
+            throw new BException("Problem downloading the package ({$moduleName}) <pre>{$url}: " . print_r($reqInfo, 1) . '</pre>');
         }
         $dir = $this->BApp->storageRandomDir() . '/marketclient/download';
         $this->BUtil->ensureDir($dir);
@@ -182,7 +230,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         }
 
         $filename = $moduleName . '.zip';
-        $reqInfo = $this->BUtil->lastRemoteHttpInfo();
+        if (empty($reqInfo['headers']['content-disposition'])) {
+            var_dump($reqInfo);
+            var_dump($response);
+            exit;
+        }
         if (preg_match('#;\s*filename=(.*)$#i', $reqInfo['headers']['content-disposition'], $m)) {
             $filename = $m[1];
         }

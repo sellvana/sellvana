@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_FrontendCP_Frontend_Controller
+ *
+ * @property FCom_FrontendCP_Main $FCom_FrontendCP_Main
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Main $FCom_Core_Main
+ */
 class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
 {
     public function action_upload__POST()

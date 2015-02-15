@@ -1,9 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AuthorizeNet_PaymentMethod_Dpm
+ *
+ * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
+ */
+
 class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMethod_Aim
 {
-
-    const PAYMENT_METHOD_KEY = "authorizenet_dpm";
+    static protected $_methodKey = "authorizenet_dpm";
 
     function __construct()
     {
@@ -13,38 +18,20 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
 
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('authorizenet/dpm')->set('key', static::PAYMENT_METHOD_KEY);
+        return $this->BLayout->view('authorizenet/dpm')->set('key', static::$_methodKey);
     }
 
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         return [];
     }
 
-    public function getOrder()
-    {
-        return $this->salesEntity;
-    }
-
     public function getCardNumber()
     {
-        if (isset($this->details['cc_num'])) {
-            return $this->details['cc_num'];
+        if (isset($this->_details['cc_num'])) {
+            return $this->_details['cc_num'];
         }
         return null;
-    }
-
-    public function getDetail($key)
-    {
-        if (isset($this->details[$key])) {
-            return $this->details[$key];
-        }
-        return null;
-    }
-
-    public function setDetail($key, $value)
-    {
-        $this->details[$key] = $value;
     }
 
     /**
@@ -56,23 +43,14 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
         return $config->get('modules/FCom_AuthorizeNet/dpm');
     }
 
-    public function setDetails($details)
-    {
-        $details = isset($details[static::PAYMENT_METHOD_KEY]) ? $details[static::PAYMENT_METHOD_KEY] : [];
-
-        return parent::setDetails($details);
-    }
-
     public function getPublicData()
     {
-        return $this->details;
+        return $this->_details;
     }
 
-    public function asArray()
+    public function getDataToSave()
     {
-        $data = parent::asArray();
-        $data = array_merge($data, $this->getPublicData());
-        return [static::PAYMENT_METHOD_KEY => $data];
+        return $this->_details;
     }
 
     public function postUrl()
@@ -91,7 +69,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
             "x_version"        => "3.1",
             "x_delim_char"     => ",",
             "x_delim_data"     => "TRUE",
-            'x_amount'         => $this->getDetail('amount_due'),
+            'x_amount'         => $this->get('amount_due'),
             'x_fp_sequence'    => $order->unique_id,
             'x_fp_timestamp'   => $time,
             'x_relay_response' => "TRUE",
@@ -102,7 +80,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
         if (class_exists("AuthorizeNetSIM")) {
             $fields['x_fp_hash'] = AuthorizeNetSIM_Form::getFingerprint($config['login'],
                                                                         $config['trans_key'],
-                                                                        $this->getDetail('amount_due'),
+                                                                        $this->get('amount_due'),
                                                                         $order->unique_id, $time);
         }
         return $fields;
@@ -112,12 +90,9 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
     {
         $order = $this->getOrder();
         $data['order'] = $order->as_array();
-        if ($order->billing()) {
-            $data['billing']  = $order->billing()->as_array();
-        }
-        if ($order->shipping()) {
-            $data['shipping'] = $order->shipping()->as_array();
-        }
+        //TODO: check for duplicate fields, if necessary
+        $data['billing']  = $order->addressAsArray('billing');
+        $data['shipping'] = $order->addressAsArray('shipping');
         $data['x_fields'] = $this->hiddenFields();
         return $data;
     }
@@ -134,18 +109,18 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
             return null;
         }
         $action = $config['payment_action'];
-        $this->setDetail($response->transaction_id, $response);
-        $this->setDetail('transaction_id', $response->transaction_id);
+        $this->set($response->transaction_id, $response);
+        $this->set('transaction_id', $response->transaction_id);
         if ($response->approved) {
             $status = $action == 'AUTH_ONLY' ? 'authorized' : 'paid';
         } else {
             $status = 'error';
         }
         $paymentData = [
-            'method'           => static::PAYMENT_METHOD_KEY,
+            'method'           => static::$_methodKey,
             'parent_id'        => $response->transaction_id,
             'order_id'         => $response->fp_sequence,
-            'amount'           => $this->getDetail('amount_due'),
+            'amount'           => $this->get('amount_due'),
             'status'           => $status,
             'transaction_id'   => $response->transaction_id,
             'transaction_type' => $action == 'AUTH_ONLY' ? 'authorize' : 'sale',

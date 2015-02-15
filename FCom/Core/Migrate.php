@@ -1,15 +1,26 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Core_Migrate
+ *
+ * @property FCom_Core_ImportExport $FCom_Core_ImportExport
+ * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
+ * @property FCom_Core_Model_ImportExport_Model $FCom_Core_Model_ImportExport_Model
+ * @property FCom_Core_Model_ImportExport_Site $FCom_Core_Model_ImportExport_Site
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
+ */
+
 class FCom_Core_Migrate extends BClass
 {
-    public function install__0_1_6()
+    public function install__0_1_9()
     {
-        if (!$this->BDb->ddlTableExists('fcom_media_library')) {
-            $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
+        $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
+        if (!$this->BDb->ddlTableExists($tMediaLibrary)) {
             $this->BDb->run("
                 CREATE TABLE {$tMediaLibrary} (
                   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                  `folder` varchar(32) NOT NULL,
+                  `folder` varchar(255) NOT NULL,
                   `subfolder` varchar(32) DEFAULT NULL,
                   `file_name` varchar(255) NOT NULL,
                   `file_size` int(11) DEFAULT NULL,
@@ -23,20 +34,20 @@ class FCom_Core_Migrate extends BClass
             ");
         }
         $this->BDb->ddlTableDef($this->FCom_Core_Model_Seq->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'entity_type' => 'varchar(15) not null',
                 'current_seq_id' => 'varchar(15) not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_entity_type' => 'UNIQUE (entity_type)',
             ],
         ]);
         $this->BConfig->set('cookie/session_check_ip', 1, false, true);
         $this->BConfig->writeConfigFiles();
         $this->BDb->ddlTableDef($this->FCom_Core_ImportExport->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id'        => 'int(11)',
                 'store_id'  => 'char(32)',
                 'model'     => 'varchar(100)',
@@ -52,12 +63,12 @@ class FCom_Core_Migrate extends BClass
         $this->BDb->ddlTableDef(
             $tModel,
             [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id'         => 'int unsigned not null auto_increment',
                     'model_name' => 'varchar(255)',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'model_name' => 'UNIQUE(model_name)',
                 ]
             ]
@@ -67,12 +78,12 @@ class FCom_Core_Migrate extends BClass
         $this->BDb->ddlTableDef(
             $tSite,
             [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id'        => 'int unsigned not null auto_increment',
                     'site_code' => 'char(32)',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'site_code' => 'UNIQUE(site_code)',
                 ]
             ]
@@ -82,19 +93,23 @@ class FCom_Core_Migrate extends BClass
         $this->BDb->ddlTableDef(
             $this->FCom_Core_Model_ImportExport_Id->table(),
             [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id'        => 'int unsigned not null auto_increment',
                     'site_id'   => 'int unsigned',
                     'model_id'  => 'int unsigned',
                     'import_id' => 'int unsigned',
                     'local_id'  => 'int unsigned',
+                    'relations' => 'text null',
                     'create_at' => 'datetime',
                     'update_at' => 'datetime',
                 ],
-                'PRIMARY' => '(id)',
-                'CONSTRAINTS' => [
-                    'Ffk_import_fk_model_id' => "FOREIGN KEY (model_id) REFERENCES {$tModel}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    'Ffk_import_fk_site_id' => "FOREIGN KEY (site_id) REFERENCES {$tSite}(id) ON DELETE CASCADE ON UPDATE CASCADE",
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
+                    'uk_site_model_import_id' => "UNIQUE (site_id,model_id,import_id)",
+                ],
+                BDb::CONSTRAINTS => [
+                    'model' => ['model_id', $tModel],
+                    'site' => ['site_id', $tSite],
                 ],
             ]
         );
@@ -108,13 +123,13 @@ class FCom_Core_Migrate extends BClass
     public function upgrade__0_1_0__0_1_1()
     {
         $this->BDb->ddlTableDef($this->FCom_Core_Model_Seq->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'entity_type' => 'varchar(15) not null',
                 'current_seq_id' => 'varchar(15) not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_entity_type' => 'UNIQUE (entity_type)',
             ],
         ]);
@@ -123,13 +138,13 @@ class FCom_Core_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $this->BDb->ddlTableDef($this->FCom_Core_Model_MediaLibrary->table(), [
-            'COLUMNS' => [
-                'data_json' => 'DROP',
+            BDb::COLUMNS => [
+                'data_json' => BDb::DROP,
                 'data_serialized' => 'text',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_create_at' => '(create_at)',
             ],
         ]);
@@ -145,7 +160,7 @@ class FCom_Core_Migrate extends BClass
     {
         //Source, model, import id, local id
         $this->BDb->ddlTableDef($this->FCom_Core_ImportExport->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id'        => 'int(11)',
                 'store_id'  => 'char(32)',
                 'model'     => 'varchar(100)',
@@ -164,12 +179,12 @@ class FCom_Core_Migrate extends BClass
         $this->BDb->ddlTableDef(
             $tModel,
             [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id'         => 'int unsigned not null auto_increment',
                     'model_name' => 'varchar(255)',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'model_name' => 'UNIQUE(model_name)',
                 ]
             ]
@@ -179,12 +194,12 @@ class FCom_Core_Migrate extends BClass
         $this->BDb->ddlTableDef(
             $tSite,
             [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id'        => 'int unsigned not null auto_increment',
                     'site_code' => 'char(32)',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'site_code' => 'UNIQUE(site_code)',
                 ]
             ]
@@ -194,7 +209,7 @@ class FCom_Core_Migrate extends BClass
         $this->BDb->ddlTableDef(
             $this->FCom_Core_Model_ImportExport_Id->table(),
             [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id'        => 'int unsigned not null auto_increment',
                     'site_id'   => 'int unsigned',
                     'model_id'  => 'int unsigned',
@@ -203,10 +218,10 @@ class FCom_Core_Migrate extends BClass
                     'create_at' => 'datetime',
                     'update_at' => 'datetime',
                 ],
-                'PRIMARY' => '(id)',
-                'CONSTRAINTS' => [
-                    'Ffk_import_fk_model_id' => "FOREIGN KEY (model_id) REFERENCES {$tModel}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    'Ffk_import_fk_site_id' => "FOREIGN KEY (site_id) REFERENCES {$tSite}(id) ON DELETE CASCADE ON UPDATE CASCADE",
+                BDb::PRIMARY => '(id)',
+                BDb::CONSTRAINTS => [
+                    'model' => ['model_id', $tModel],
+                    'site' => ['site_id', $tSite],
                 ],
             ]
         );
@@ -223,17 +238,28 @@ class FCom_Core_Migrate extends BClass
 
     public function upgrade__0_1_6__0_1_7()
     {
-        $this->BDb->ddlTableDef(
-            $this->FCom_Core_Model_ImportExport_Id->table(),
-            [
-                'COLUMNS' => ['relations' => 'text null'],
-                'KEYS' => ['uk_site_model_import_id' => "UNIQUE (site_id,model_id,import_id)"],
-            ]
-        );
+        $this->BDb->ddlTableDef($this->FCom_Core_Model_ImportExport_Id->table(), [
+            BDb::COLUMNS => [
+                'relations' => 'text null',
+            ],
+            BDb::KEYS => [
+                'uk_site_model_import_id' => "UNIQUE (site_id,model_id,import_id)",
+            ],
+        ]);
     }
 
     public function upgrade__0_1_7__0_1_8()
     {
         $this->BCache->deleteAll();
+    }
+
+    public function upgrade__0_1_8__0_1_9()
+    {
+        $tMedia = $this->FCom_Core_Model_MediaLibrary->table();
+        $this->BDb->ddlTableDef($tMedia, [
+            BDb::COLUMNS => [
+                'folder' => 'varchar(255) NOT NULL',
+            ],
+        ]);
     }
 }

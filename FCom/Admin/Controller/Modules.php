@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_Modules
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ */
+
 class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_permission = 'system/modules';
@@ -13,6 +20,9 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     protected $_navPath = 'modules/installed';
     protected $_useDefaultLayout = false;
 
+    /**
+     * @return array
+     */
     public function getModulesData()
     {
         $config = $this->BConfig;
@@ -113,7 +123,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true],
             ['type' => 'input', 'name' => 'run_level_core', 'label' => "Run Level (Core)", 'overflow' => true,
                 'options' => $areaRunLevelOptions, 'width' => 200,  'validation' => ['required' => true],
-                'editable' => true, 'mass-editable-show' => true, 'mass-editable' => true, 'editor' => 'select'],
+                'editable' => true, 'multirow_edit_show' => true, 'multirow_edit' => true, 'editor' => 'select'],
             ['name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true],
             ['name' => 'required_by', 'label' => 'Required By', 'width' => 300, 'overflow' => true],
             ['name' => 'dep_errors', 'label' => 'Dependency Errors', 'width' => 300, 'overflow' => true,

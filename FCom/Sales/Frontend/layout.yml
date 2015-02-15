@@ -1,0 +1,32 @@
+customer_account_sidebar:
+    - view: customer/account/sidebar
+        do:
+            - [ addNavItem, orders, { label: My Orders, position: 20, href: orders } ]
+            #- [ addNavItem, downloads, { label: Downloads, position: 40, href: customer/downloads } ]
+            #- [ addNavItem, returns, { label: Returns, position: 50, href: customer/returns } ]
+
+/cart:
+    - { include: base }
+    - { hook: main, views: cart }
+    - { hook: cart_upsell, views: cart/also-bought }
+    - { view: root, do: [[ addBodyClass, page-cart ]] }
+    - view: head
+        do:
+            - [ title, Shopping Cart ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: before_body_end, views: custom-tags }
+    - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_cart } }
+
+/orders/list:
+    - { include: base }
+    - { hook: main, views: orders/list }
+    - { include: customer_account_sidebar }
+
+/orders/view:
+    - { include: base }
+    - { hook: main, views: orders/view }
+    - { include: customer_account_sidebar }
+
+/guest/find_order:
+    - { include: base }
+    - { hook: main, views: guest/find-order }

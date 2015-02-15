@@ -3,12 +3,45 @@ if (require.specified('ckeditor')) {
     fcomAdminDeps.push('ckeditor');
 }
 
+/**
+ * global object contains all modules, libraries, functions
+ * @name FCom
+ * @type {Object}
+ * @property base_href
+ */
+
+/**
+ * object contains all features for admin base
+ * @name FCom#Admin
+ * @type {Object}
+ * @property {String} base_url
+ * @property {String} code_mirror_base_url
+ * @property {String} upload_href - url for upload
+ * @property {String} personalize_href - url to store personalize info
+ * @property {String} current_mode current application mode
+ */
+
 define(fcomAdminDeps, function ($) {
     /*
      var myApp = angular.module("fcomApp", [], function($interpolateProvider) {
      $interpolateProvider.startSymbol("<%");
      $interpolateProvider.endSymbol("%>");
      });
+     */
+
+    /**
+     * log value to console in mode DEBUG
+     * @param {string} text
+     */
+    FCom.Admin.log = function (text) {
+        if (FCom.Admin.current_mode == 'DEBUG') {
+            console.log(text);
+        }
+    };
+
+    /**
+     * @param {String} containerId
+     * @param {Object} options
      */
     FCom.Admin.Accordion = function (containerId, options) {
         var $container = $('#' + containerId);
@@ -19,8 +52,20 @@ define(fcomAdminDeps, function ($) {
         $container.find('.accordion-body').each(function (i, bodyEl) {
             $(bodyEl).attr('id', containerId + '-group' + i).addClass('collapse');
         });
-    }
+    };
 
+    /**
+     * @callback tab_load_callback - call back function when tab load
+     * @param {Number} i
+     * @param {String} tabHtml
+     */
+    /**
+     * @param {String} containerSel container element
+     * @param {Object} options
+     * @param {String} options.cur_tab current tab id
+     * @param {String} options.url_get url to get content for tab
+     * @param {tab_load_callback} options.tab_load_callback
+     */
     FCom.Admin.Tabs = function (containerSel, options) {
         var $container = $(containerSel);
         $('.js-form-tab-toggle', $container).click(function (ev) {
@@ -45,18 +90,33 @@ define(fcomAdminDeps, function ($) {
         if (options.cur_tab) {
             $('[href="#tab-' + options.cur_tab + '"]').tab('show');
         }
-    }
+    };
 
+    /**
+     * media library
+     * @param options
+     * @returns {{setOptions: setOptions, getSelectedRows: getSelectedRows}}
+     * @constructor
+     */
     FCom.Admin.MediaLibrary = function (options) {
         var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();
         var baseUrl = options.url + '/download?folder=' + encodeURIComponent(options.folder) + '&file=';
 
+        /**
+         * set options
+         * @param opt
+         */
         function setOptions(opt) {
             for (i in opt) {
                 options[i] = opt[i];
             }
         }
 
+        /**
+         *
+         * @param ev
+         * @returns {boolean}
+         */
         function editAttachment(ev) {
             var el = $(ev.target), tr = el.parents('tr'), rowid = tr.attr('id');
             el.hide('fast');
@@ -85,6 +145,11 @@ define(fcomAdminDeps, function ($) {
             return false;
         }
 
+        /**
+         *
+         * @param ev
+         * @returns {boolean}
+         */
         function editAttachmentSave(ev) {
             var el = $(ev.target), tr = el.parents('tr'), rowid = tr.attr('id');
             ev.stopPropagation();
@@ -93,6 +158,11 @@ define(fcomAdminDeps, function ($) {
             return false;
         }
 
+        /**
+         *
+         * @param ev
+         * @returns {boolean}
+         */
         function editAttachmentCancel(ev) {
             var el = $(ev.target), tr = el.parents('tr'), rowid = tr.attr('id');
             ev.stopPropagation();
@@ -101,11 +171,21 @@ define(fcomAdminDeps, function ($) {
             return false;
         }
 
+        /**
+         *
+         * @param tr
+         */
         function editAttachmentRestore(tr) {
             $('.ui-icon-disk,.ui-icon-cancel', tr).hide('fast');
             $('.ui-icon-pencil', tr).show('fast');
         }
 
+        /**
+         *
+         * @param ev
+         * @param {Boolean} inline
+         * @returns {boolean}
+         */
         function downloadAttachment(ev, inline) {
             var href = baseUrl + $(ev.target).data('file');
             ev.stopPropagation();
@@ -117,6 +197,10 @@ define(fcomAdminDeps, function ($) {
             return false;
         }
 
+        /**
+         *
+         * @returns {(Array|Object)}
+         */
         function getSelectedRows() {
             if (grid.jqGrid('getGridParam', 'multiselect')) {
                 return grid.jqGrid('getGridParam', 'selarrrow');
@@ -126,6 +210,10 @@ define(fcomAdminDeps, function ($) {
             }
         }
 
+        /**
+         *
+         * @returns {boolean}
+         */
         function deleteAttachments() {
             if (!confirm('Are you sure?')) {
                 return false;
@@ -133,7 +221,7 @@ define(fcomAdminDeps, function ($) {
             var sel = getSelectedRows(), i, postData = {'delete[]': []};
             if (!sel.length) {
                 alert('Please select some attachments to delete.');
-                return;
+                return false;
             }
             for (i = sel.length - 1; i >= 0; i--) {
                 grid.jqGrid('setRowData', sel[i], {status: '...'});
@@ -147,7 +235,15 @@ define(fcomAdminDeps, function ($) {
             });
         }
 
+        /**
+         *
+         * @param val
+         * @param opt
+         * @param obj
+         * @returns {string|*}
+         */
         function fmtActions(val, opt, obj) {
+            var html = '';
             if (!obj.status) {
                 var file = $('<div/>').text(obj.file_name).html();
                 html = '<span class=\"ui-icon ui-icon-pencil\" title=\"Edit\"></span>'
@@ -171,10 +267,10 @@ define(fcomAdminDeps, function ($) {
             return editAttachmentCancel(ev);
         });
         $(grid).on('click', '.ui-icon-arrowthickstop-1-s', function (ev) {
-            return downloadAttachment(ev)
+            return downloadAttachment(ev, false);
         });
         $(grid).on('click', '.ui-icon-arrowreturnthick-1-e', function (ev) {
-            return downloadAttachment(ev, true)
+            return downloadAttachment(ev, true);
         });
 
         var colModel = grid[0].p.colModel;
@@ -183,7 +279,7 @@ define(fcomAdminDeps, function ($) {
                 case 'file_size':
                     colModel[i].formatter = function (val, opt, obj) {
                         return Math.round(val / 1024) + 'k';
-                    }
+                    };
                     break;
                 case 'act':
                     colModel[i].formatter = fmtActions;
@@ -196,11 +292,11 @@ define(fcomAdminDeps, function ($) {
         $(container).append('<iframe id="upload-target" name="upload-target" src="" style="width:0;height:0;border:0"></iframe>');
 
         $('#upload-input', container).change(function (ev) {
-            console.log(this.files);
+            FCom.Admin.log(this.files);
             var form = $(this).parents('form'), action = form.attr('action'), i, file;
             for (i = 0; i < this.files.length; i++) {
                 file = this.files[i];
-                console.log(file);
+                FCom.Admin.log(file);
                 grid.jqGrid('addRowData', file.fileName, {file_name: file.fileName, file_size: file.fileSize, status: '...'});
             }
             form.attr('action', options.url + '/upload?grid=' + grid.attr('id') + '&folder=' + encodeURIComponent(options.folder))
@@ -219,8 +315,14 @@ define(fcomAdminDeps, function ($) {
             setOptions: setOptions,
             getSelectedRows: getSelectedRows
         };
-    }
+    };
 
+    /**
+     *
+     * @param options
+     * @returns {{}}
+     * @constructor
+     */
     FCom.Admin.TargetGrid = function (options) {
         var source = $(options.source), target = $(options.target);
         var id = options.id || target.attr('id');
@@ -228,6 +330,9 @@ define(fcomAdminDeps, function ($) {
         var delInput = $('<input type="hidden" name="grid[' + id + '][del]" value=""/>');
         target.parents('.ui-jqgrid').append(addInput, delInput);
 
+        /**
+         * add rows
+         */
         function addRows() {
             var sel = source.jqGrid('getGridParam', 'selarrrow'), data = [], i;
             var targetData = target.jqGrid('getRowData'), existingIds = {};
@@ -251,6 +356,9 @@ define(fcomAdminDeps, function ($) {
             target.trigger('reloadGrid');
         }
 
+        /**
+         * remove rows
+         */
         function removeRows() {
             var sel = target.jqGrid('getGridParam', 'selarrrow'), i;
             if (!sel.length) {
@@ -264,6 +372,11 @@ define(fcomAdminDeps, function ($) {
             target.trigger('reloadGrid');
         }
 
+        /**
+         * update products
+         * @param action
+         * @param sel
+         */
         function updateProducts(action, sel) {
             target = $(target);
             var container = target.parents('.ui-jqgrid').parent();
@@ -287,20 +400,38 @@ define(fcomAdminDeps, function ($) {
         toolbar.find('.ui-icon-trash').parents('.ui-pg-button').click(removeRows);
 
         return {}
-    }
+    };
 
+    /**
+     *
+     * @param collection
+     * @param el
+     * @returns {*}
+     */
     FCom.Admin.load = function (collection, el) {
         el = $(el);
         var uid = el.data('uid');
         return FCom.Admin[collection][uid];
-    }
+    };
 
+    /**
+     *
+     * @param collection
+     * @param el
+     * @param object
+     */
     FCom.Admin.save = function (collection, el, object) {
         var uid = Math.random();
         el.data('uid', uid);
         FCom.Admin[collection][uid] = object || el;
-    }
+    };
 
+    /**
+     *
+     * @param id
+     * @param opt
+     * @returns {*|jQuery|HTMLElement}
+     */
     FCom.Admin.checkboxButton = function (id, opt) {
         var el = $(id);
         var cur = opt[opt.def ? 'on' : 'off'];
@@ -318,8 +449,14 @@ define(fcomAdminDeps, function ($) {
                 if (opt.click) opt.click.bind(this)(ev);
             });
         return el;
-    }
+    };
 
+    /**
+     *
+     * @param id
+     * @param opt
+     * @returns {*|jQuery|HTMLElement}
+     */
     FCom.Admin.buttonsetTabs = function (id, opt) {
         var el = $(id), id1 = id.replace(/^#/, ''), pane;
         opt = opt || {}
@@ -340,8 +477,18 @@ define(fcomAdminDeps, function ($) {
         });
         el.buttonset(el);
         return el;
-    }
+    };
 
+    /**
+     * process add image button in form - get / remove image from image library
+     * @param {Object} dataConfig
+     * @param {String} dataConfig.config_id
+     * @param {String} dataConfig.text_add_image
+     * @param {String} dataConfig.text_change_image
+     * @param {String} dataConfig.text_modal_change
+     * @param {String} dataConfig.text_modal_add
+     * @param {String} dataConfig.resize_url
+     */
     FCom.Admin.buttonAddImage = function (dataConfig) {
         var $buttonAddImage = $('.btn_'+ dataConfig.config_id +'_add');
         var textBtnAddImage = '.' + dataConfig.config_id + '_btn_add_image';
@@ -360,12 +507,11 @@ define(fcomAdminDeps, function ($) {
             }
             $('#'+ dataConfig.config_id +'_modal').modal();
 
-        });
-        $('body').on('click',textBtnRemoveImage, function() {
+        }).on('click', textBtnRemoveImage, function() {
             processImage(this, {
                 text: dataConfig.text_add_image,
                 display: 'none',
-                imageTag: '',
+                image_tag: '',
                 path: ''
             });
             $(this).parents('.form-group').find(textBtnAddImage).removeClass('data-change');
@@ -396,14 +542,29 @@ define(fcomAdminDeps, function ($) {
                 }
             })
         });
-    }
+    };
 
-    FCom.Admin.ajaxCacheStorage = {}
+    /**
+     * store multi ajax cache
+     * @type {{}}
+     */
+    FCom.Admin.ajaxCacheStorage = {};
+
+    /**
+     * call ajax and cache to variable
+     * @param url
+     * @param callback
+     */
     FCom.Admin.ajaxCache = function (url, callback) {
         if (callback === null) {
             delete FCom.Admin.ajaxCacheStorage[url];
         } else if (!FCom.Admin.ajaxCacheStorage[url]) {
-            $.ajax(url, {dataType: 'json', success: function (data) {
+            $.ajax(url, {dataType: 'json',
+                /**
+                 * @param {{}} data
+                 * @param {Array }data._eval
+                 */
+                success: function (data) {
                 if (data._eval) {
                     var path, node, parent, idx, pathArr, i;
                     for (path in data._eval) {
@@ -426,9 +587,21 @@ define(fcomAdminDeps, function ($) {
         } else {
             callback(FCom.Admin.ajaxCacheStorage[url]);
         }
-    }
+    };
 
-    FCom.Admin.layouts = {}
+    /**
+     *
+     * @type {{}}
+     */
+    FCom.Admin.layouts = {};
+
+    /**
+     *
+     * @param id
+     * @param {{}} opt
+     * @param {{}} opt.pub
+     * @returns {*}
+     */
     FCom.Admin.layout = function (id, opt) {
         var el = $(id);
         if (!opt) return FCom.Admin.load('layouts', el);
@@ -459,16 +632,33 @@ define(fcomAdminDeps, function ($) {
             $(window).resize(resize);
         }
         return layout;
-    }
+    };
 
-    FCom.Admin.trees = {}
+    /**
+     *
+     * @type {{}}
+     */
+    FCom.Admin.trees = {};
+    /**
+     * @callback callbackNode
+     * @param {{}} node
+     */
+    /**
+     *
+     * @param el
+     * @param {{lock_flag: Boolean, create_lock: Boolean, on_click: callbackNode, on_dblclick: callbackNode, on_select: callbackNode}} opt
+     * @returns {*}
+     */
     FCom.Admin.tree = function (el, opt) {
         var expanded = false, el = $(el);
 
         if (!opt) return FCom.Admin.load('trees', el);
 
-        function checkLock()
-        {
+        /**
+         *
+         * @returns {boolean}
+         */
+        function checkLock() {
             if (opt.lock_flag && $(opt.lock_flag).get(0).checked) {
                 alert('Locked');
                 return false;
@@ -476,8 +666,13 @@ define(fcomAdminDeps, function ($) {
             return true;
         }
 
-        function checkRoot(node, errorText)
-        {
+        /**
+         *
+         * @param node
+         * @param errorText
+         * @returns {boolean}
+         */
+        function checkRoot(node, errorText) {
             if (parseInt($(node).attr('id')) <= 1) {
                 alert(errorText);
                 return false;
@@ -485,8 +680,14 @@ define(fcomAdminDeps, function ($) {
             return true;
         }
 
-        function bsModalHtml(id, title)
-        {
+        /**
+         * get modal html
+         * @param id
+         * @param title
+         * @returns {string}
+         */
+        function bsModalHtml(id, title) {
+
             return '<div class="modal fade" id="' + id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
                 '   <div class="modal-dialog">' +
                 '       <div class="modal-content">' +
@@ -500,8 +701,12 @@ define(fcomAdminDeps, function ($) {
                 '</div>';
         }
 
+        /**
+         * reorder node
+         * @param node
+         */
         function reorder(node) {
-            console.log('node', node);
+            FCom.Admin.log('node', node);
             if (!checkLock()) return;
             function postReorder(recursive) {
                 $.post(opt.url, {
@@ -517,7 +722,10 @@ define(fcomAdminDeps, function ($) {
                 });
             }
 
-            //use boostraps modal box
+            /**
+             * use bootstraps modal box
+             * @type {string}
+             */
             var reorderModalContent = bsModalHtml('jstree-reorder', 'Reorder A-Z');
             //trigger modal dialog
             $(reorderModalContent).modal({ backdrop: 'static', keyboard: true })
@@ -546,22 +754,37 @@ define(fcomAdminDeps, function ($) {
                 });
         }
 
+        /**
+         * clone node
+         * @param node
+         */
         function clone(node) {
             if (!checkLock()) return;
             if (!checkRoot(node, 'Cannot clone ROOT')) return;
 
+            /**
+             * submit post data
+             * @param recursive
+             */
             function postClone(recursive) {
-                $.post(opt.url, {
-                    operation: 'clone',
-                    id: $(node).attr("id").replace("node_", ""),
-                    recursive: recursive
-                }, function(r){
-                    if (!r.status) {
-                        $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-                    } else {
-                        el.jstree('refresh', $.jstree._focused()._get_parent(), {idNode:  r.newNodeID});
-                    }
-                });
+                $.post(
+                    opt.url,
+                    {
+                        operation: 'clone',
+                        id: $(node).attr("id").replace("node_", ""),
+                        recursive: recursive
+                    },
+                    /**
+                     * success callback function
+                     * @param {{newNodeID:Number}} r node model
+                     */
+                    function (r) {
+                        if (!r.status) {
+                            $.bootstrapGrowl("Error:<br>" + r.message, {type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                        } else {
+                            el.jstree('refresh', $.jstree._focused()._get_parent(), {idNode: r.newNodeID});
+                        }
+                    });
             }
 
             var reorderModalContent = bsModalHtml('jstree-clone', 'Clone');
@@ -839,7 +1062,7 @@ define(fcomAdminDeps, function ($) {
                 if (!confirm('Are you sure you want to ' + (copy ? 'copy' : 'move') + ' ' + dd.count + ' row(s) to ' + e.target.innerText)) {
                     return;
                 }
-                console.log(dd, $(dd.drag).parents('.grid-container'));
+                FCom.Admin.log(dd, $(dd.drag).parents('.grid-container'));
                 for (var i = 0; i < dd.rows.length; i++) {
                     rowIDs.push(dd.grid.getDataItem(dd.rows[i]).id);
                 }
@@ -850,7 +1073,7 @@ define(fcomAdminDeps, function ($) {
                         'copy': copy
                     },
                     function (r) {
-                        console.log(r);
+                        FCom.Admin.log(r);
                     }
                 );
 
@@ -861,17 +1084,33 @@ define(fcomAdminDeps, function ($) {
 
         FCom.Admin.save('trees', el);
 
+        /**
+         * toggle expand node
+         */
         function toggleExpand() {
             $('#1 li', el).each(function (idx, li) {
-                console.log(idx, li);
+                FCom.Admin.log(idx, li);
                 el.jstree('toggle_node', li);
             });
         }
 
         return {toggleExpand: toggleExpand};
-    }
+    };
 
-    FCom.Admin.forms = {}
+    /**
+     *
+     * @type {{}}
+     */
+    FCom.Admin.forms = {};
+
+    /**
+     * init form for tab content
+     * @param {{}} options
+     * @param {{}} options.on_tab_load
+     * @param {String} options.panes
+     * @param {String} options.url_post
+     * @returns {{setOptions: setOptions, loadTabs: loadTabs, wysiwygInit: wysiwygInit, wysiwygCreate: wysiwygCreate, wysiwygDestroy: wysiwygDestroy, createSwitchButton: createSwitchButton, tabClass: tabClass, tabAction: tabAction, saveAll: saveAll, deleteForm: deleteForm}}
+     */
     FCom.Admin.form = function (options) {
         /* options = {
             tabs:'.adm-tabs-left li',
@@ -881,6 +1120,10 @@ define(fcomAdminDeps, function ($) {
         } */
         var tabs, panes, curLi, curPane, editors = {};
 
+        /**
+         *
+         * @param data
+         */
         function loadTabs(data) {
             for (var i in data.tabs) {
                 $('#tab-' + i).html(data.tabs[i]).data('loaded', true);
@@ -890,9 +1133,13 @@ define(fcomAdminDeps, function ($) {
             }
         }
 
+        /**
+         * convert textarea to wysiwyg with ckeditor
+         * @param id
+         */
         function wysiwygCreate(id) {
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
-                console.log(id, 'wysiwygcreate');
+                FCom.Admin.log(id, 'wysiwygcreate');
                 editors[id] = true; // prevent double loading
 
                 CKEDITOR.replace(id, {
@@ -913,7 +1160,9 @@ define(fcomAdminDeps, function ($) {
             }
         }
 
-        // this function almost use to init ckeditor after load ajax form
+        /**
+         * this function almost use to init ckeditor after load ajax form
+         */
         function wysiwygInit() {
             var form = this;
             $('textarea.ckeditor').each(function () {
@@ -927,6 +1176,10 @@ define(fcomAdminDeps, function ($) {
             });
         }
 
+        /**
+         * destroy ckeditor instance
+         * @param id
+         */
         function wysiwygDestroy(id) {
             if (editors[id]) {
                 try {
@@ -939,6 +1192,10 @@ define(fcomAdminDeps, function ($) {
             }
         }
 
+        /**
+         * create switch button
+         * @peprecated
+         */
         function createSwitchButton() { //todo: add options class to add switch button
             $('.switch-cbx').each(function () {
                 if ($(this).parents('.make-switch').hasClass('make-switch') == false) {
@@ -947,12 +1204,23 @@ define(fcomAdminDeps, function ($) {
             });
         }
 
+        /**
+         * process tab class
+         * @param id
+         * @param cls
+         */
         function tabClass(id, cls) {
             var tab = $('a[href=#tab-' + id + ']', tabs).parent('li');
             tab.removeClass('dirty error');
             if (cls) tab.addClass(cls);
         }
 
+        /**
+         *
+         * @param action
+         * @param el
+         * @returns {boolean}
+         */
         function tabAction(action, el) {
             var pane = $(el).parents(options.panes);
             var tabId = pane.attr('id').replace(/^tab-/, '');
@@ -989,12 +1257,17 @@ define(fcomAdminDeps, function ($) {
                     break;
 
                 case 'clean':
-                    $('a[href=#' + tabId + ']', tabs).removelass('changed');
+                    $('a[href=#' + tabId + ']', tabs).removeClass('changed');
                     break;
             }
             return false;
         }
 
+        /**
+         *
+         * @param el
+         * @returns {boolean}
+         */
         function saveAll(el) {
             return true;
             //TODO
@@ -1002,7 +1275,7 @@ define(fcomAdminDeps, function ($) {
             var postData = form.serializeArray();
             var url_post = options.url_get + (options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post + 'tabs=ALL&mode=view', postData, function (data, status, req) {
-                console.log(data);
+                FCom.Admin.log(data);
                 $.pnotify({
                     pnotify_title: data.message || 'The form has been saved',
                     pnotify_type: data.status == 'error' ? 'error' : null,
@@ -1017,6 +1290,11 @@ define(fcomAdminDeps, function ($) {
             return false;
         }
 
+        /**
+         *
+         * @param el
+         * @returns {boolean}
+         */
         function deleteForm(el) {
             if (!confirm('Are you sure?')) return false;
             var form = $(el).parents('form');
@@ -1024,6 +1302,11 @@ define(fcomAdminDeps, function ($) {
             return true;
         }
 
+        /**
+         *
+         * @param newOpt
+         * @returns {FCom.Admin.setOptions}
+         */
         function setOptions(newOpt) {
             $.extend(options, newOpt);
             return this;
@@ -1082,7 +1365,7 @@ define(fcomAdminDeps, function ($) {
             saveAll: saveAll,
             deleteForm: deleteForm
         };
-    }
+    };
 
     if ($.jgrid) {
         $.extend($.jgrid.defaults, {
@@ -1114,23 +1397,49 @@ define(fcomAdminDeps, function ($) {
         });
     }
 
-    FCom.Admin.jqGrid = {}
-
+    /**
+     *
+     * @type {{}}
+     */
+    FCom.Admin.jqGrid = {};
+    /**
+     *
+     * @param cellvalue
+     * @param options
+     * @param rowObject
+     * @returns {*}
+     */
     FCom.Admin.jqGrid.fmtHiddenInput = function (cellvalue, options, rowObject) {
-        console.log(cellvalue, options, rowObject);
+        FCom.Admin.log(cellvalue, options, rowObject);
         // do something here
         return cellvalue ? cellvalue : '';
-    }
+    };
 
+    /**
+     *
+     * @param val
+     * @param opt
+     * @param obj
+     * @returns {string}
+     */
     FCom.Admin.jqGrid.fmtNewWindow = function (val, opt, obj) {
         return "<a href='javascript:window.open(\"" + val + "\", \"vendor_website_url\", \"width=800,height=600\")'>" + val + "</a>";
-    }
+    };
 
+    /**
+     *
+     * @param val
+     * @param {{}} opt
+     * @param {{inputName: String}} opt.colModel
+     * @param {String} opt.gid
+     * @param obj
+     * @returns {string}
+     */
     FCom.Admin.jqGrid.fmtRadioButton = function (val, opt, obj) {
         var id = opt.colModel.inputId || opt.gid + '-' + opt.colModel.name + '-' + val;
         var name = opt.colModel.inputName || opt.gid + '[' + opt.colModel.name + ']';
         return '<input type="radio" id="' + id + '" name="' + name + '" value="' + val + '"/>';
-    }
+    };
 
     $.widget('ui.fcom_autocomplete', {
         _create: function () {
@@ -1192,12 +1501,19 @@ define(fcomAdminDeps, function ($) {
         }
     });
 
+    /**
+     *
+     * @type {{}}
+     */
     FCom.Admin.codeEditorThemeLoaded = {};
 
+    /**
+     * init code editors
+     */
     FCom.Admin.initCodeEditors = function () {
         if (typeof CodeMirror == 'undefined') return;
 
-        var scriptBaseUrl = FCom.Admin.codemirrorBaseUrl;
+        var scriptBaseUrl = FCom.Admin.code_mirror_base_url;
 
         CodeMirror.modeURL = scriptBaseUrl + '/mode/%N/%N.js';
 
@@ -1219,15 +1535,19 @@ define(fcomAdminDeps, function ($) {
             }
 
             var options = { lineNumbers: true, mode: mode, theme: theme };
-            editor = CodeMirror.fromTextArea(el, options);
+            var editor = CodeMirror.fromTextArea(el, options);
             if (mode) {
                 //editor.setOption('mode', mode);
                 CodeMirror.autoLoadMode(editor, mode);
             }
             $(el).data('editor', editor);
         });
-    }
+    };
 
+    /**
+     * resize width window
+     * @param options
+     */
     $.fn.resizeWithWindow = function (options) {
         var settings = $.extend({ x: false, y: true, dX: null, dX: null, initBy: null, jqGrid: null }, options || {});
         var $win = $(window), $el = this, isGrid = settings.jqGrid || $el.hasClass('ui-jqgrid-btable');
@@ -1270,7 +1590,7 @@ define(fcomAdminDeps, function ($) {
 
         resize();
         $win.resize(resize);
-    }
+    };
 
     $(function () {
         if ($.jgrid) {
@@ -1301,7 +1621,7 @@ define(fcomAdminDeps, function ($) {
         $('header .navbar .toggle-nav').click(function (ev) {
             var postData = { do: 'nav.collapse', collapsed: $('body').hasClass('main-nav-closed') ? 1 : 0 };
             $.post(FCom.Admin.personalize_href, postData, function (response, status, xhr) {
-                console.log(response);
+                FCom.Admin.log(response);
             });
         })
         $('.nav-group header').click(function (ev) {
@@ -1315,8 +1635,8 @@ define(fcomAdminDeps, function ($) {
 
         $('.js-resizable').each(function (idx, el) {
             $(el).resizable();
-        })
+        });
 
         $.fn.foundationCustomForms && $(".foundation-forms").foundationCustomForms();
     })
-})
+});

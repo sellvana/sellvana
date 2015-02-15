@@ -1,5 +1,38 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cms_Model_Block
+ *
+ * fields in table
+ * @property int $id
+ * @property string $handle
+ * @property string $description
+ * @property string $renderer
+ * @property string $content
+ * @property string $layout_update
+ * @property int $version
+ * @property string $create_at
+ * @property string $update_at
+ * @property int $page_enabled
+ * @property string $page_url
+ * @property string $page_title
+ * @property string $meta_title
+ * @property string $meta_description
+ * @property string $meta_keywords
+ * @property int $modified_time
+ * @property int $form_enable
+ * @property string $form_fields
+ * @property string $form_email
+ * @property string $form_custom_email
+ *
+ * other
+ * @property string $version_comments
+ *
+ * DI
+ * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
+ * @property FCom_Cms_Frontend_View_Block $FCom_Cms_Frontend_View_Block
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
 class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_cms_block';
@@ -15,6 +48,9 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         ['page_url', 'FCom_Cms_Model_Block::rulePageUrlUnique', 'Duplicate URL Key'],
     ];
 
+    /**
+     * @return bool
+     */
     public function validateBlock()
     {
         return true;
@@ -62,7 +98,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     }
 
     /**
-     * rule pageu url unique
+     * rule page url unique
      * @param $data
      * @param $args
      * @return bool
@@ -82,8 +118,35 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @param array $params
+     * @return FCom_Cms_Frontend_View_Block
+     * @throws BException
+     */
     public function createView($params = [])
     {
         return $this->FCom_Cms_Frontend_View_Block->createView($this, $params);
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        $content = $this->get('content');
+        if(empty($content)){
+            $content = '';
+        }
+        return $content;
+    }
+
+    public function getAllBlocksAsOptions()
+    {
+        $blocks = $this->orm()->order_by_asc('handle')->find_many();
+        $result = [];
+        foreach ($blocks as $block) {
+            $result[$block->get('handle')] = "[{$block->get('handle')}] {$block->get('description')}";
+        }
+        return $result;
     }
 }

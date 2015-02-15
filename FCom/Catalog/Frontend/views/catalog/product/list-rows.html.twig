@@ -17,29 +17,7 @@
     </div>
     <div class="caption col-sm-8">
       <a href="{{ productUrl }}" class="f-prod-name">{{ productName }}</a>
-      <table class="f-price-group">
-        {% if p.get('base_price') == 0 %}
-          <tr class="f-reg-price">
-            <th class="f-price-label">Price:</th>
-            <td class="f-price">{{ 'FREE'|_ }}</td>
-          </tr>
-        {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
-          <tr class="f-special-price">
-            <th class="f-price-label">Price:</th>
-            <td class="f-price">{{ p.get('sale_price') | currency }}</td>
-          </tr>
-          <tr class="f-old-price">
-            <th class="f-price-label">Was:</th>
-            <td class="f-price">{{ p.get('base_price') | currency }}</td>
-          </tr>
-        {% else %}
-          <tr class="f-reg-price">
-            <th class="f-price-label">Price:</th>
-            <td class="f-price">{{ p.get('base_price') | currency }}</td>
-          </tr>
-        {% endif %}
-      </table>
-      <!-- /.f-price-group -->
+      {{ THIS.view('catalog/product/price').set('product', p) | raw }}
       <div class="f-prod-short-description">
         {{ p.get('short_description') }}
       </div>

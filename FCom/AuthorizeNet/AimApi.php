@@ -11,127 +11,126 @@ class FCom_AuthorizeNet_AimApi extends BClass
     protected $api;
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_Sales_Model_Order_Payment_Transaction $transaction
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $paymentMethod
      * @return array
      */
-    public function sale($payment)
+    public function sale($transaction, $paymentMethod)
     {
         $api           = $this->getApi();
-        /* @var $order FCom_Sales_Model_Order */
-        $order         = $payment->getOrder();
-        $this->setSaleDetails($api, $payment, $order);
+        $this->setSaleDetails($transaction, $paymentMethod, $api);
         $response      = $api->authorizeAndCapture();
         return $this->responseAsArray($response);
     }
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_Sales_Model_Order_Payment_Transaction $transaction
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $paymentMethod
      * @return array
      */
-    public function authorize($payment)
+    public function authorize($transaction, $paymentMethod)
     {
         $api = $this->getApi();
-        /* @var $order FCom_Sales_Model_Order */
-        $order         = $payment->getOrder();
-        $this->setSaleDetails($api, $payment, $order);
+        $this->setSaleDetails($transaction, $paymentMethod, $api);
 
         $response = $api->authorizeOnly();
         return $this->responseAsArray($response);
     }
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_Sales_Model_Order_Payment_Transaction $transaction
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $paymentMethod
      * @return array
      */
-    public function capture($payment)
+    public function capture($transaction, $paymentMethod)
     {
         $api = $this->getApi();
-        /* @var $order FCom_Sales_Model_Order */
-        $order         = $payment->getOrder();
         // if we're going to allow multiple same method transactions, then we can namespace them with trans_id
-        $api->trans_id = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/transaction_id');
+        $api->trans_id = $transaction->get('parent_transaction_id');
         // todo add amount to capture if needed
         $response = $api->priorAuthCapture();
         return $this->responseAsArray($response);
     }
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_Sales_Model_Order_Payment_Transaction $transaction
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $paymentMethod
      * @return array
      */
-    public function credit($payment)
+    public function credit($transaction, $paymentMethod)
     {
         $api = $this->getApi();
-        /* @var $order FCom_Sales_Model_Order */
-        $order         = $payment->getOrder();
-        $trId = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/transaction_id');
+        $payment = $transaction->payment();
+        $trId = $transaction->getData('parent_transaction_id');
         $api->trans_id = $trId;
         // todo, get refund amount from order or credit object
-        $api->amount = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/' . $trId . '/amount');
-        $api->card_num = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/last_four');
-        $api->exp_date = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/card_exp_date');
+        $api->amount = $transaction->get('amount');
+        $api->card_num = $payment->getData('form/last_four');
+        $api->exp_date = $payment->getData('form/card_exp_date');
         $response = $api->credit();
         return $this->responseAsArray($response);
     }
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_Sales_Model_Order_Payment_Transaction $transaction
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $paymentMethod
      * @return array
      */
-    public function void($payment)
+    public function void($transaction, $paymentMethod)
     {
         $api = $this->getApi();
-        $order = $payment->getOrder();
-        $trId = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/transaction_id');
+        $trId = $transaction->get('parent_transaction_id');
         $response = $api->void($trId);
 
         return $this->responseAsArray($response);
     }
 
     /**
+     * @param FCom_Sales_Model_Order_Payment_Transaction $transaction
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $paymentMethod
      * @param AuthorizeNetAIM $api
-     * @param FCom_AuthorizeNet_PaymentMethod_Aim $payment
-     * @param FCom_Sales_Model_Order $order
      */
-    protected function setSaleDetails($api, $payment, $order)
+    protected function setSaleDetails($transaction, $paymentMethod, $api)
     {
-        $api->amount      = $payment->getDetail('amount_due');
-        $api->card_num    = $payment->getCardNumber();
-        $api->exp_date    = $payment->getDetail('card_exp_date');
+        $payment = $transaction->payment();
+        $order = $payment->order();
+        $api->amount      = $transaction->get('amount');
+        $api->card_num    = $paymentMethod->getCardNumber();
+        $api->exp_date    = $paymentMethod->get('card_exp_date');
         $api->invoice_num = $order->unique_id;
         $api->description = $order->getTextDescription();
 
         if ($this->BConfig->get('modules/FCom_AuthorizeNet/aim/useccv')) {
-            $api->card_code = $payment->getDetail('card_code');
+            $api->card_code = $paymentMethod->get('card_code');
         }
-        $billing = $order->billing();
-        if ($billing->firstname) {
-            $api->first_name = $billing->firstname;
+
+        if ($order->billing_firstname) {
+            $api->first_name = $order->billing_firstname;
         }
-        if ($billing->lastname) {
-            $api->last_name = $billing->lastname;
+        if ($order->billing_lastname) {
+            $api->last_name = $order->billing_lastname;
         }
-        if ($billing->company) {
-            $api->company = $billing->company;
+        if ($order->billing_company) {
+            $api->company = $order->billing_company;
         }
-        $api->address = $billing->getFullAddress();
-        if ($billing->city) {
-            $api->city = $billing->city;
+        $api->address = $order->get('billing_street1');
+        if ($order->billing_city) {
+            $api->city = $order->billing_city;
         }
-        if ($billing->region) {
-            $api->state = $billing->region;
+        if ($order->billing_region) {
+            $api->state = $order->billing_region;
         }
-        if ($billing->postcode) {
-            $api->zip = $billing->postcode;
+        if ($order->billing_postcode) {
+            $api->zip = $order->billing_postcode;
         }
-        if ($billing->country) {
-            $api->country = $billing->country;
+        if ($order->billing_country) {
+            $api->country = $order->billing_country;
         }
-        if ($billing->phone) {
-            $api->phone = $billing->phone;
+        if ($order->billing_phone) {
+            $api->phone = $order->billing_billing_phone;
         }
-        if ($billing->fax) {
-            $api->fax = $billing->fax;
+        if ($order->billing_fax) {
+            $api->fax = $order->billing_fax;
         }
         if ($order->customer_email) {
             $api->email = $order->customer_email;

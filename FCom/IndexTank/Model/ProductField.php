@@ -3,13 +3,22 @@
 /**
  * Class FCom_IndexTank_Model_ProductField
  *
- * @property string field_name
- * @property string field_nice_name
- * @property string field_type
- * @property int facets
- * @property int search
- * @property string source_type
- * @property string source_value
+ * @property int $id
+ * @property string $field_name
+ * @property string $field_nice_name
+ * @property string $field_type
+ * @property int $search
+ * @property int $facets
+ * @property int $scoring
+ * @property int $var_number
+ * @property int $priority
+ * @property string $filter enum('','inclusive','exclusive')
+ * @property string $source_type
+ * @property string $source_value
+ * @property int $sort_order
+ *
+ * DI
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
  */
 class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
 {
@@ -31,19 +40,11 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
     ];
 
     /**
-     * Shortcut to help with IDE autocompletion
-     *
-     * @param bool  $new
-     * @param array $args
-     * @return FCom_IndexTank_Model_ProductField
+     * @return array
      */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
-    }
-
     public function getList()
     {
+        /** @var FCom_IndexTank_Model_ProductField $productFields */
         $productFields = $this->FCom_IndexTank_Model_ProductField->orm()->find_many();
         $result = [];
         foreach ($productFields as $p) {
@@ -52,6 +53,9 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public function getFacetsList()
     {
         $productFields = $this->FCom_IndexTank_Model_ProductField->orm()
@@ -65,8 +69,12 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public function getSearchList()
     {
+        /** @var FCom_IndexTank_Model_ProductField $productFields */
         $productFields = $this->FCom_IndexTank_Model_ProductField->orm()
                 ->where('search', 1)->find_many();
         $result = [];
@@ -76,6 +84,9 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public function getVariablesList()
     {
         $productFields = $this->FCom_IndexTank_Model_ProductField->orm()
@@ -87,8 +98,12 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public function getInclusiveList()
     {
+        /** @var FCom_IndexTank_Model_ProductField $productFields */
         $productFields = $this->FCom_IndexTank_Model_ProductField->orm()
                 ->where('filter', 'inclusive')->find_many();
         $result = [];

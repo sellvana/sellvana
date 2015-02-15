@@ -1,10 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Created by pp
- * @project fulleron
+ * Class FCom_PaymentIdeal_Frontend_Controller
+ *
+ * @property FCom_PaymentIdeal_PaymentMethod $FCom_PaymentIdeal_PaymentMethod
  */
-
 class FCom_PaymentIdeal_Frontend_Controller
     extends FCom_Frontend_Controller_Abstract
 {

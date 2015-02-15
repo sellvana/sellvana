@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Twig_NodeVisitor_SafeAnalysis implements Twig_NodeVisitorInterface
 {

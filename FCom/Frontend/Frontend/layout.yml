@@ -31,11 +31,14 @@ base:
 
     - { include: common_js_libs }
 
-    - { callback: FCom_Core_Main::defaultThemeCustomLayout }
-    - { callback: FCom_Frontend_Frontend::layout }
+    - { callback: FCom_Core_Main.defaultThemeCustomLayout }
+    - { callback: FCom_Frontend_Frontend.layout }
 
     #- { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }
+    - { hook: header-components, views: [ header-top, header-nav, header-callouts ] }
+    - { hook: header-top-util, views: [ multilanguage/header, multicurrency/header, customer/header, cart/header ] }
+
     - { hook: footer, views: footer }
 
 404:
@@ -52,3 +55,5 @@ base:
     - { view: root, do: [[ addBodyClass, "f-page-home" ]] }
     - { view: head, do: [[ title, "Home Page" ]] }
     - { hook: main, views: index, use_meta: true }
+    - { hook: before_body_end, views: custom-tags }
+    - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_homepage } }

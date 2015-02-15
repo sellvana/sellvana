@@ -2,8 +2,31 @@
 
 /**
  * Class FCom_Catalog_Model_Category
+ *
+ * @property int $is_top_menu
+ * @property int $show_content
+ * @property string $content
+ * @property int $show_products
+ * @property int $show_sub_cat
+ * @property string $layout_update
+ * @property string $page_title
+ * @property string $description
+ * @property string $meta_description
+ * @property string $meta_keywords
+ * @property int $show_sidebar
+ * @property int $show_view
+ * @property string $view_name
+ * @property string $page_parts
+ * @property string $image_url
+ * @property int $is_featured
+ * @property string $featured_image_url
+ * @property string $nav_callout_image_url
+ *
+ * DI
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
+ * @property FCom_Core_Model_ImportExport_Site $FCom_Core_Model_ImportExport_Site
  */
 class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 {
@@ -30,11 +53,17 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             ->where('pc.category_id', $this->id);
     }
 
+    /**
+     * @return FCom_Catalog_Model_Product[]
+     */
     public function products()
     {
         return $this->productsORM()->find_many();
     }
 
+    /**
+     * @return mixed
+     */
     public function urlPrefix()
     {
         if (empty(static::$_urlPrefix)) {
@@ -43,12 +72,20 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return static::$_urlPrefix;
     }
 
+    /**
+     * @return string
+     */
     public function url()
     {
         $prefix = $this->urlPrefix();
         return $this->BApp->frontendHref($prefix . $this->url_path);
     }
 
+    /**
+     * @param $args
+     * @return bool
+     * @throws BException
+     */
     public function onReorderAZ($args)
     {
         $c = $this->load($args['id']);
@@ -71,6 +108,10 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $this->save();
     }
 
+    /**
+     * @param $categories
+     * @return array
+     */
     public function prepareApiData($categories)
     {
         $result = [];
@@ -87,6 +128,9 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public function parentNodeList()
     {
         $categories = self::orm()->find_many();
@@ -101,11 +145,18 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $result;
     }
 
+    /**
+     * @return int
+     */
     public function inMenu()
     {
         return $this->is_top_menu;
     }
 
+    /**
+     * @param int $maxLevel
+     * @return array
+     */
     public function getTopNavCategories($maxLevel = 1)
     {
         /** @var BORM $orm */
@@ -138,6 +189,9 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return array_values($categories);
     }
 
+    /**
+     * @return $this[]
+     */
     public function getFeaturedCategories()
     {
         return $this->orm()->where('is_featured', 1)->find_many();
@@ -177,21 +231,10 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $this->BEvents->fire(__METHOD__ . ':products', ['model' => $this, 'add_ids' => $addIds, 'remove_ids' => $removeIds]);
     }
 
-    public function imagePath()
-    {
-        return 'media/category/images/';
-    }
-
-    public function deleteImage()
-    {
-        $image = $this->image('fulldir');
-        if ($image) {
-            clearstatcache(true, $image);
-            return unlink($image);
-        }
-        return true;
-    }
-
+    /**
+     * @param bool $onlyEnabled
+     * @return array
+     */
     public function getPageParts($onlyEnabled = false)
     {
         $allParts = [
@@ -218,12 +261,17 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $result;
     }
 
+    /**
+     * @param $cloneNode
+     * @return $this
+     */
     public function onAfterClone(&$cloneNode)
     {
         //after clone categories, add products associate
         $products = $this->products();
+        $tCategoryProduct = $this->FCom_Catalog_Model_CategoryProduct->table();
         if ($products) {
-            $sql = "INSERT INTO fcom_category_product (product_id, category_id) VALUES";
+            $sql = "INSERT INTO {$tCategoryProduct} (product_id, category_id) VALUES";
             foreach ($products as $product) {
                 /** @var FCom_Catalog_Model_Product */
                 $sql .= ' (' . $product->get('id') . ', ' . $cloneNode->id . '),';
@@ -234,6 +282,10 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $this;
     }
 
+    /**
+     * @param $args
+     * @throws BException
+     */
     public function onImportAfterModel($args)
     {
         $importId = $args['import_id'];
@@ -257,12 +309,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $ids = array_keys($toUpdate);
         $importData = $this->FCom_Core_Model_ImportExport_Id->orm()
             ->join(
-              $this->FCom_Core_Model_ImportExport_Model->table(),
+              'FCom_Core_Model_ImportExport_Model',
               'iem.id=model_id and iem.model_name=\'' . $this->origClass() . '\'',
               'iem'
             )
-            ->where(['site_id' => $importSite->id()])
-            ->where(['local_id' => $ids])
+            ->where(['site_id' => $importSite->id(), 'local_id' => $ids], null)
             ->find_many();
 
         if (empty($importData)) {
@@ -291,12 +342,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         }
         $relatedData = $this->FCom_Core_Model_ImportExport_Id->orm()
             ->join(
-              $this->FCom_Core_Model_ImportExport_Model->table(),
+              'FCom_Core_Model_ImportExport_Model',
               'iem.id=model_id and iem.model_name=\'' . $this->origClass() . '\'',
               'iem'
             )
-            ->where(['site_id' => $importSite->id()])
-            ->where(['import_id' => array_keys($fetch)])
+            ->where(['site_id' => $importSite->id(), 'import_id' => array_keys($fetch)], null)
             ->find_many_assoc('import_id');
 
         foreach ($relations as $k => $v) {

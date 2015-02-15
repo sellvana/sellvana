@@ -10,6 +10,10 @@
  * @property FCom_Catalog_Model_ProductMedia $FCom_Catalog_Model_ProductMedia
  * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
  * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
 class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -33,7 +37,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
                 'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"'],
             ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
-            ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 100],
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
             ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
             ['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
             ['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
@@ -55,7 +59,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'local_sku', 'type' => 'text'],
+            ['field' => 'product_sku', 'type' => 'text'],
             ['field' => 'short_description', 'type' => 'text'],
             ['field' => 'base_price', 'type' => 'number-range'],
             ['field' => 'sale_price', 'type' => 'number-range'],
@@ -63,13 +67,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['field' => 'ship_weight', 'type' => 'number-range'],
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'update_at', 'type' => 'date-range'],
-            '_quick' => ['expr' => 'product_name like ? or local_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
+            '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
         ];
-        $config['format_callback'] = function($args) {
-            foreach ($args['rows'] as $row) {
-
-            }
-        };
+        $config['page_rows_data_callback'] = [$this, 'afterInitialData'];
         return $config;
     }
 
@@ -125,7 +125,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $newAction['duplicate'] = '<button type="submit" class="btn btn-primary ignore-validate" name="do" value="DUPLICATE" '
                 . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->_('Duplicate') . '</span></button>';
         }
-        $newAction['saveAndContinue'] = '<button type="submit" class="btn btn-primary" name="do" value="saveAndContinue"><span>'
+        $newAction['save_and_continue'] = '<button type="submit" class="btn btn-primary" name="do" value="save_and_continue"><span>'
             . $this->BLocale->_('Save And Continue') . '</span></button>';
         $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set([
@@ -141,9 +141,16 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      */
     public function formPostBefore($args)
     {
+        parent::formPostBefore($args);
+
         if ($args['do'] == 'DUPLICATE') {
             $this->duplicateProduct($args['id']);
             exit();
+        }
+
+        $layout = $this->FCom_Core_LayoutEditor->processFormPost();
+        if ($layout) {
+            $args['model']->setData('layout', $layout);
         }
     }
 
@@ -201,7 +208,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['name' => 'product_name', 'label'   => 'Name', 'index'   => 'p.product_name',
                    'width' => 450, 'addable' => true],
-            ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 70],
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 70],
         ];
 
 //        unset( $config[ 'columns' ][ 'product_name' ][ 'formatter' ], $config[ 'columns' ][ 'product_name' ][ 'formatoptions' ] );
@@ -231,7 +238,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'id' => 'product_attachments',
                 'caption' => 'Product Attachments',
                 'data_mode' => 'local',
-                'data' => $this->BDb->many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')
+                'data' => $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->order_by_expr('pa.position asc')
                     ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
                         'a.file_size', 'pa.create_at', 'pa.update_at'])
                     ->select('a.id', 'file_id')->find_many()),
@@ -274,7 +281,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
-        $data = $this->BDb->many_as_array($model->mediaORM('I')
+        $data = $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
                 ->order_by_expr('pa.position asc')
                 ->left_outer_join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
                 ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
@@ -357,15 +364,15 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 250],
-            ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 100],
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
         ];
         $config['actions'] = [
             'add' => ['caption' => 'Add selected products']
         ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'local_sku', 'type' => 'text'],
-            '_quick' => ['expr' => 'product_name like ? or local_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
+            ['field' => 'product_sku', 'type' => 'text'],
+            '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
         ];
 
         $config['grid_before_create'] = 'allProdGridRegister';
@@ -385,7 +392,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function getCatProdConfig($model)
     {
         $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
-            ->select(['p.id', 'p.product_name', 'p.local_sku'])
+            ->select(['p.id', 'p.product_name', 'p.product_sku'])
             ->join('FCom_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
             ->where('cp.category_id', $model ? $model->id : 0)
         ;
@@ -400,7 +407,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-            ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 200]
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200]
         ];
         $config['actions'] = [
             'add' => ['caption' => 'Add products'],
@@ -408,7 +415,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'local_sku', 'type' => 'text']
+            ['field' => 'product_sku', 'type' => 'text']
         ];
         $config['data_mode'] = 'local';
         $config['grid_before_create'] = 'catProdGridRegister';
@@ -424,7 +431,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function linkedProductGridConfig($model, $type)
     {
         $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
-            ->select(['p.id', 'p.product_name', 'p.local_sku', 'p.base_price', 'p.sale_price']);
+            ->select(['p.id', 'p.product_name', 'p.product_sku', 'p.base_price', 'p.sale_price']);
 
         switch ($type) {
         case 'related': case 'similar':case 'cross_sell':
@@ -452,7 +459,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
                     ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-                    ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 200],
+                    ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
                     ['name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price'],
                     ['name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price'],
                     ['name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position', 'width' => 50,
@@ -464,7 +471,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 ],
                 'filters' => [
                     ['field' => 'product_name', 'type' => 'text'],
-                    ['field' => 'local_sku', 'type' => 'text']
+                    ['field' => 'product_sku', 'type' => 'text']
                 ],
                 'events' => ['init', 'add', 'mass-delete'],
                 'grid_before_create' => $gridId . '_register'
@@ -496,19 +503,21 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $model = $args['model'];
         $data = $this->BRequest->post();
 
-
         if (isset($data['do']) && $data['do'] === 'DELETE') {
-            $this->deleteRelateInfo($model);
+            $this->deleteRelatedInfo($model);
         } else {
-            if (!$args['validateFailed']) {
-                $this->processCategoriesPost($model);
+            if (empty($args['validate_failed'])) {
+                $this->processCategoriesPost($model, $data);
                 $this->processLinkedProductsPost($model, $data);
                 $this->processMediaPost($model, $data);
-                $this->processCustomFieldPost($model, $data);
-                $this->processStockPolicyPost($model, $data);
-                $this->processVariantPost($model, $data);
+                $this->processInventoryPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
-                $this->processFrontendPost($model, $data);
+                // moved to FCom_CustomFields
+                #$this->processVariantPost($model, $data);
+                #$this->processCustomFieldPost($model, $data);
+                #$this->processFrontendPost($model, $data);
+                $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
+                $model->save();
             }
         }
     }
@@ -517,29 +526,30 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      * delete all associate info with this product
      * @param $model
      */
-    public function deleteRelateInfo($model)
+    public function deleteRelatedInfo($model)
     {
+        /*
         //delete Categories
         $this->FCom_Catalog_Model_CategoryProduct->delete_many([
-           'product_id' => $model->id
+           'product_id' => $model->id(),
         ]);
         //delete Product Link
         $this->FCom_Catalog_Model_ProductLink->delete_many([
-            'product_id' => $model->id
+            'product_id' => $model->id(),
         ]);
         //delete Product Media
         $this->FCom_Catalog_Model_ProductMedia->delete_many([
-            'product_id' => $model->id
+            'product_id' => $model->id(),
         ]);
+        */
         //todo: delete product reviews / wishlist
     }
 
     /**
      * @param $model FCom_Catalog_Model_Product
      */
-    public function processCategoriesPost($model)
+    public function processCategoriesPost($model, $post)
     {
-        $post = $this->BRequest->post();
         $categories = [];
         foreach ($post as $key => $value) {
             $matches = [];
@@ -690,78 +700,22 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      * @param FCom_Catalog_Model_Product $model
      * @param $data
      */
-    public function processCustomFieldPost($model, $data)
+    public function processInventoryPost($model, $data)
     {
-
-        if (!empty($data['custom_fields'])) {
-            $model->setData('custom_fields', $data['custom_fields']);
+        // update product inventory sku if needed
+        if (!empty($data['inventory']['inventory_sku'])) {
+            $model->set('inventory_sku', $data['inventory']['inventory_sku']);
         }
-
-        $model->save();
-    }
-
-    /**
-     * @param FCom_Catalog_Model_Product $model
-     * @param $data
-     */
-    public function processStockPolicyPost($model, $data)
-    {
-        if (!empty($data['stock_policy'])) {
-            $model->setData('stock_policy', $data['stock_policy']);
-            $model->save();
+        // find inventory model
+        $invModel = $model->getInventoryModel();
+        // update inventory model
+        if ($invModel && !empty($data['inventory'])) {
+            // unset key field data
+            unset($data['inventory']['id'], $data['inventory']['inventory_sku']);
+            // save inventory form data
+            $data['inventory']['manage_inventory'] = $model->get('manage_inventory');
+            $invModel->set($data['inventory'])->save();
         }
-    }
-
-    /**
-     * @param FCom_Catalog_Model_Product $model
-     * @param $data
-     */
-    public function processVariantPost($model, $data)
-    {
-        $hlp = $this->FCom_CustomField_Model_ProductVariant;
-        if (!empty($data['vfields'])) {
-            $modelFieldOption = $this->FCom_CustomField_Model_FieldOption;
-            $vfields = json_decode($data['vfields'], true);
-            foreach ($vfields as $f) {
-                $op = $this->FCom_CustomField_Model_FieldOption->getListAssocById($f['id']);
-                $arr_diff = array_diff($f['options'], $op);
-                foreach($arr_diff as $val) {
-                    $modelFieldOption->create(['field_id' => $f['id'], 'label' => $val])->save();
-                }
-            }
-
-            $model->setData('variants_fields', json_decode($data['vfields'], true));
-        }
-        if (isset($data['variants'])) {
-            $variantsData = array();
-            if ($data['variants'] != '') {
-                $variantsData = $this->BUtil->objectToArray(json_decode($data['variants']));
-            }
-            $hlp->delete_many(['product_id'=> $model->id()]);
-            if (count($variantsData) > 0) {
-                $variantIds = $this->BUtil->arrayToOptions($variantsData, 'id');
-                $variants = $hlp->orm()->where_in('id', $variantIds)->find_many_assoc();
-                foreach($variantsData as $arr) {
-                    $data = [
-                        'product_id' => $model->id(),
-                        'variant_sku' => $arr['variant_sku'],
-                        'variant_price' => $arr['variant_price'],
-                        'variant_qty' => $arr['variant_qty'],
-                        'field_values' => json_encode($arr['field_values']),
-                        'data_serialized' => json_encode(['variant_file_id' => $arr['variant_file_id']]),
-                    ];
-                    if (!empty($variants[$arr['id']])) {
-                        $variants[$arr['id']]->set($data)->save();
-                    } else {
-                        $hlp->create($data)->save();
-                    }
-                }
-            }
-//            $model->setData('variants', json_decode($data['variants'], true));
-        }
-
-        $model->save();
-
     }
 
     /**
@@ -773,61 +727,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $model->setData('name_lang_fields', $data['name_lang_fields']);
         $model->setData('short_desc_lang_fields', $data['short_desc_lang_fields']);
         $model->setData('desc_lang_fields', $data['desc_lang_fields']);
-        $model->save();
+        //$model->save();
 
     }
-
-    /**
-     * @param FCom_Catalog_Model_Product $model
-     * @param $data
-     */
-    public function processFrontendPost($model, $data)
-    {
-        if (!empty($data['prod_frontend_data'])) {
-            $model->setData('frontend_fields', json_decode($data['prod_frontend_data'], true));
-            $model->save();
-        }
-
-    }
-    /*
-    public function onMediaGridConfig($args)
-    {
-        array_splice($args['config']['grid']['colModel'], -1, 0, [
-            ['name' => 'manuf_vendor_name', 'label' => 'Manufacturer', 'width' => 150, 'index' => 'v.vendor_name', 'editable' => true],
-        ]);
-    }
-
-    public function onMediaGridGetORM($args)
-    {
-        $args['orm']->join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'a.id',  ], 'pa')
-            ->where_null('pa.product_id')->where('media_type', $args['type'])
-            ->select(['pa.manuf_vendor_id']);
-    }
-
-    public function onMediaGridUpload($args)
-    {
-        $hlp = $this->FCom_Catalog_Model_ProductMedia;
-        $id = $args['model']->id;
-        if (!$hlp->loadWhere(['product_id' => null, 'file_id' => $id])) {
-            $hlp->create(['file_id' => $id, 'media_type' => $args['type']])->save();
-        }
-    }
-
-    public function onMediaGridEdit($args)
-    {
-        $r = $this->BRequest;
-        $m = Denteva_Model_Vendor::i()->loadWhere([
-            'is_manuf' => 1,
-            'vendor_name' => $r->post('manuf_vendor_name')
-        ]);
-        $this->FCom_Catalog_Model_ProductMedia
-            ->loadWhere(['product_id' => null, 'file_id' => $args['model']->id])
-            ->set([
-                'manuf_vendor_id' => $m ? $m->id : null,
-            ])
-            ->save();
-    }
-    */
 
     /**
      * process duplicate product
@@ -847,10 +749,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 unset($data['id']);
                 $newModel = $this->FCom_Catalog_Model_Product->create($data);
                 /** @var $newModel FCom_Catalog_Model_Product */
-                $number = $this->getDuplicateSuffixNumber($oldModel->product_name, $oldModel->local_sku, $oldModel->url_key);
+                $number = $this->getDuplicateSuffixNumber($oldModel->product_name, $oldModel->product_sku, $oldModel->url_key);
                 $newModel->product_name = $newModel->product_name . '-' . $number;
                 $newModel->url_key = $newModel->url_key . '-' . $number;
-                $newModel->local_sku = $newModel->local_sku . '-' . $number;
+                $newModel->product_sku = $newModel->product_sku . '-' . $number;
                 $newModel->create_at = $newModel->update_at = date('Y-m-d H:i:s');
                 $newModel->is_hidden = 1;
                 if ($newModel->save()
@@ -885,7 +787,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $result = $this->FCom_Catalog_Model_Product->orm()
             ->where(['OR' => [
                 ['product_name REGEXP ?', (string)$oldName . '-[0-9]$'],
-                ['local_sku REGEXP ?', (string)$oldSku . '-[0-9]$'],
+                ['product_sku REGEXP ?', (string)$oldSku . '-[0-9]$'],
                 ['url_key REGEXP ?',(string) $oldUrlKey . '-[0-9]$'],
             ]])
             ->order_by_desc('id')->find_one();
@@ -893,7 +795,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         if ($result) {
             foreach ($result as $arr) {
                 $tmpName = explode($oldName . '-', $arr->get('product_name'));
-                $tmpSku = explode($oldSku . '-', $arr->get('local_sku'));
+                $tmpSku = explode($oldSku . '-', $arr->get('product_sku'));
                 $tmpKey = explode($oldUrlKey . '-', $arr->get('url_key'));
                 $max = $tmpName[1];
                 $tmpSku[1] = ($tmpSku[1] < $tmpKey[1]) ? $tmpKey[1] : $tmpSku[1];
@@ -1005,7 +907,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $result = $this->FCom_Catalog_Model_Product->orm('p')
                 ->where(['OR' => [
                     ['p.id like ?', (string)$value],
-                    ['p.local_sku like ?', (string)$value],
+                    ['p.product_sku like ?', (string)$value],
                     ['p.url_key like ?', (string)$value],
                     ['p.product_name like ?', (string)$value],
                 ]])->find_one();

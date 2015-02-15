@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Search
+ *
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
+ */
 class FCom_IndexTank_Search extends BClass
 {
     /**
@@ -83,7 +89,7 @@ class FCom_IndexTank_Search extends BClass
 
 
         $productsData = $this->FCom_IndexTank_Index_Product->paginate($productsORM, $r,
-                ['ps' => 25, 'c' => $this->FCom_IndexTank_Index_Product->totalFound()]);
+            ['ps' => 25, 'c' => $this->FCom_IndexTank_Index_Product->totalFound()]);
 
         //get all facets exclude categories
         $facetsData = $this->FCom_IndexTank_Index_Product->collectFacets($facets);
@@ -122,15 +128,5 @@ class FCom_IndexTank_Search extends BClass
             return $this->BConfig->get('modules/FCom_IndexTank/index_name');
         }
         return '';
-    }
-
-    /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return FCom_IndexTank_Search
-    */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 }

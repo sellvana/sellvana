@@ -587,11 +587,11 @@ class BDb_Test extends PHPUnit_Framework_TestCase
             $db->ddlTableDef($vo->table, $vo->tableFields);
         }
         $update = [
-            'COLUMNS' => [
-                'test_char' => 'DROP'
+            BDb::COLUMNS => [
+                'test_char' => BDb::DROP
             ],
-            'KEYS'    => [
-                'test_char' => 'DROP'
+            BDb::KEYS    => [
+                'test_char' => BDb::DROP
             ],
         ];
 
@@ -679,38 +679,38 @@ class Entity
     public $fTable = 'fk_test_table';
 
     public $tableFields = [
-        'COLUMNS'     => [
+        BDb::COLUMNS     => [
             'test_id'      => 'int(10) not null',
             'test_fk_id'   => 'int(10) not null',
             'test_varchar' => 'varchar(100) null',
             'test_char'    => 'char(10) null',
             'test_text'    => 'text null',
         ],
-        'PRIMARY'     => '(test_id)', // at the moment this HAS to be IN parenthesis or wrong SQL is generated
-        'KEYS'        => [
+        BDb::PRIMARY     => '(test_id)', // at the moment this HAS to be IN parenthesis or wrong SQL is generated
+        BDb::KEYS        => [
             'test_id'      => 'PRIMARY(test_id)',
             'test_fk_id'   => 'UNIQUE(test_fk_id)',
             'test_char'    => '(test_char)',
             'test_varchar' => '(test_varchar)',
         ],
-        'CONSTRAINTS' => [],
-//        'OPTIONS' => array(
+        BDb::CONSTRAINTS => [],
+//        BDb::OPTIONS => array(
 //            'engine' => 'InnoDB',
 //            'charset' => 'latin1',
 //            'collate' => 'latin1',// what will happen if they do not match?
 //        ),
     ];
     public $fkTableFields = [
-        'COLUMNS'     => [
+        BDb::COLUMNS     => [
             'fk_test_id'    => 'int(10) not null',
             'fk_test_fk_id' => 'int(10) not null',
         ],
-        'PRIMARY'     => '(fk_test_id)',
-        'KEYS'        => [
+        BDb::PRIMARY     => '(fk_test_id)',
+        BDb::KEYS        => [
             'fk_test_id'    => 'PRIMARY(fk_test_id)',
             'fk_test_fk_id' => 'UNIQUE(fk_test_fk_id)',
         ],
-//        'OPTIONS'     => array(
+//        BDb::OPTIONS     => array(
 //            'engine'  => 'InnoDB',
 //            'charset' => 'latin1',
 //            'collate' => 'latin1_swedish_ci', // what will happen if they do not match?

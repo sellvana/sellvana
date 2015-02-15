@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Promo_Frontend
+ *
+ * @property FCom_Promo_Model_PromoCart $FCom_Promo_Model_PromoCart
+ * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
+ * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
+ * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
+ * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
+ */
 class FCom_Promo_Frontend extends BClass
 {
     public function layout()
@@ -18,7 +27,7 @@ class FCom_Promo_Frontend extends BClass
 
         $items = $cart->items();
         if (!$items) {
-            $allCartPromo = $this->FCom_Promo_Model_Cart->orm()->where('cart_id', $cart->id)->find_many();
+            $allCartPromo = $this->FCom_Promo_Model_PromoCart->orm()->where('cart_id', $cart->id)->find_many();
             foreach ($allCartPromo as $cartPromo) {
                 $cartPromo->delete();
             }
@@ -247,7 +256,7 @@ class FCom_Promo_Frontend extends BClass
         }
 
         //check cart promos
-        $allCartPromo = $this->FCom_Promo_Model_Cart->orm()->where('cart_id', $cart->id)->find_many();
+        $allCartPromo = $this->FCom_Promo_Model_PromoCart->orm()->where('cart_id', $cart->id)->find_many();
         foreach ($allCartPromo as $cartPromo) {
             if (!in_array($cartPromo->promo_id, $activePromoIds)  || time() > strtotime($cartPromo->update_at) + 3600) {
                 $cartPromo->delete();
@@ -255,11 +264,11 @@ class FCom_Promo_Frontend extends BClass
         }
         if (!empty($activePromo)) {
             foreach ($activePromo as $promo) {
-                $promoCart = $this->FCom_Promo_Model_Cart->orm()->where('cart_id', $cart->id)
+                $promoCart = $this->FCom_Promo_Model_PromoCart->orm()->where('cart_id', $cart->id)
                         ->where('promo_id', $promo->id)
                     ->find_one();
                 if (!$promoCart) {
-                    $promoCart = $this->FCom_Promo_Model_Cart->create(['cart_id' => $cart->id, 'promo_id' => $promo->id]);
+                    $promoCart = $this->FCom_Promo_Model_PromoCart->create(['cart_id' => $cart->id, 'promo_id' => $promo->id]);
                 }
                 $promoCart->set('update_at', date("Y-m-d H:i:s"));
                 $promoCart->save();
@@ -394,6 +403,7 @@ class FCom_Promo_Frontend extends BClass
                             //if it is single item of product then mark it as promo
                             if ($currentItem->qty == 1) {
                                 $item = $currentItem;
+                                $item->show_separate = 1;
                                 $item->promo_id_get = $promo->id;
                                 $item->promo_id_buy = '';
                                 $item->price = 0;

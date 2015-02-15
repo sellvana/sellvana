@@ -33,11 +33,12 @@
   </div>
   <div class="tab-content col-sm-6">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#f-tab-summary" data-toggle="tab">Summary</a></li>
-      <li><a href="#f-tab-detail" data-toggle="tab">Details</a></li>
+      <li class="active"><a href="#f-tab-summary" data-toggle="tab">{{ 'Summary'|_ }}</a></li>
+      <li><a href="#f-tab-detail" data-toggle="tab">{{ 'Details'|_ }}</a></li>
     </ul>
     <div class="tab-pane active" id="f-tab-summary">
       <h4 class="f-prod-name"><a href="{{ m.url() }}">{{ m.get('product_name') }}</a></h4>
+        <p class="f-sku">{{ m.get('product_sku') }}</p>
 
 {% if MODULES.isLoaded('FCom_ProductReviews') %}
       <div class="f-prod-avg-rating">
@@ -54,7 +55,6 @@
       <form class="f-prod-select form-horizontal" role="form" method="post" action="{{ APP.href('cart/add') }}">
         <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
         <input type="hidden" name="id" value="{{ m.id() }}">
-        <input type="hidden" name="action" value="add">
 
         {{ THIS.view('catalog/product/variants').set('product', m) | raw }}
 
@@ -84,3 +84,4 @@
       </div>
     </div>
   </div>
+</div>

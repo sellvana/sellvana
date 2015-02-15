@@ -6,7 +6,7 @@
         $(function() {
             function onSortableStop(event, ui) {
                 var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
-                console.log(ui.item[0].id);
+                FCom.Admin.log(ui.item[0].id);
                 var handle = ui.item;
                 if (type=='tabs') handle = handle.children('h3');
                 handle.triggerHandler('focusout');

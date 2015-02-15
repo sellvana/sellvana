@@ -1,9 +1,20 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Frontend_View_Sidebar
+ */
 class FCom_Customer_Frontend_View_Sidebar extends FCom_Core_View_Abstract
 {
+    /**
+     * @var array
+     */
     protected $_navItems = [];
 
+    /**
+     * @param $itemKey
+     * @param $item
+     * @return $this
+     */
     public function addNavItem($itemKey, $item)
     {
         if (empty($item['position'])) {
@@ -17,6 +28,10 @@ class FCom_Customer_Frontend_View_Sidebar extends FCom_Core_View_Abstract
         return $this;
     }
 
+    /**
+     * @param $itemKey
+     * @return $this
+     */
     public function removeNavItem($itemKey)
     {
         $navItems = $this->get('items');
@@ -25,6 +40,9 @@ class FCom_Customer_Frontend_View_Sidebar extends FCom_Core_View_Abstract
         return $this;
     }
 
+    /**
+     * @return null
+     */
     public function getNavItems()
     {
         return $this->get('items');

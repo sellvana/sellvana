@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MarketClient_Admin
+ *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_MarketClient_RemoteApi $FCom_MarketClient_RemoteApi
+ */
 class FCom_MarketClient_Admin extends BClass
 {
     public function bootstrap()
@@ -11,6 +17,9 @@ class FCom_MarketClient_Admin extends BClass
         ]);
     }
 
+    /**
+     * @param $args
+     */
     public function onModulesGridViewBefore($args)
     {
         $view = $args['page_view'];
@@ -21,6 +30,9 @@ class FCom_MarketClient_Admin extends BClass
         $view->set('actions', $actions);
     }
 
+    /**
+     * @param $args
+     */
     public function onModulesGridView($args)
     {
         $grid = $args['view']->get('grid');

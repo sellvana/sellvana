@@ -1,0 +1,30 @@
+{% set m = THIS.get('model') %}
+{% set inv = m.getInventoryModel() %}
+{% set validator = THIS.get('validator') %}
+{% set prodFieldData = { model:m, label_class:'col-md-4' } %}
+{% set invFieldData = { model:inv, id_prefix: 'inventory', name_prefix: 'inventory', label_class:'col-md-4' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<fieldset name="main-product">
+    <div class="f-section">
+        <h4>{{ "Inventory & Shipping"|_ }}</h4>
+        <hr>
+        {{ forms.boolean(prodFieldData, { field: 'manage_inventory', label: 'Manage Inventory'|_ }) }}
+        {{ forms.input(prodFieldData,   { field: 'inventory_sku', label: 'Inventory SKU (leave empty to use Product SKU)'|_ }) }}
+
+        {{ forms.input(invFieldData,    { field: 'qty_in_stock', label: 'Qty In Stock'|_, type: 'number' }) }}
+        {{ forms.input(invFieldData,    { field: 'unit_cost', label: 'Inventory Unit Cost'|_ }) }}
+        {{ forms.boolean(invFieldData,  { field: 'allow_backorder', label: 'Allow Backorders'|_ }) }}
+        <hr>
+        {{ forms.input(invFieldData,    { field: 'qty_warn_customer', label: 'Minimal Qty to warn customer on frontend'|_, type: 'number'}) }}
+        {{ forms.input(invFieldData,    { field: 'qty_notify_admin', label: 'Minimal Qty to notify admin'|_, type: 'number' }) }}
+        {{ forms.input(invFieldData,    { field: 'qty_cart_min', label: 'Minimal Qty in Cart'|_, type: 'number' }) }}
+        {{ forms.input(invFieldData,    { field: 'qty_cart_inc', label: 'Qty in Cart Increment'|_, type: 'number' }) }}
+        {{ forms.input(invFieldData,    { field: 'qty_buffer', label: 'Buffer Qty In Stock'|_, type: 'number' }) }}
+        <hr>
+        {{ forms.boolean(invFieldData,  { field: 'pack_separate', label: 'Pack Separately for Shipment'|_}) }}
+        {{ forms.input(invFieldData,    { field: 'net_weight', label: 'Net Weight'|_ }) }}
+        {{ forms.input(invFieldData,    { field: 'shipping_weight', label: 'Shipping Weight'|_ }) }}
+        {{ forms.input(invFieldData,    { field: 'shipping_size', label: 'Shipping Size (WxDxH)'|_ }) }}
+    </div>
+</fieldset>

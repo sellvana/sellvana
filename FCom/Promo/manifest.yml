@@ -1,22 +1,30 @@
 modules:
     FCom_Promo:
-        version: 0.1.6
+        version: 0.1.10
         channel: beta
         require: { module: { FCom_Catalog: 0.1.0, FCom_Sales: 0.2.0 }}
         description: "Promotions module"
 
+        observe:
+            - [ FCom_Sales_Workflow_Cart::customerAddsCouponCode, FCom_Promo_Main.onWorkflowCustomerAddsCouponCode ]
+            - [ FCom_Sales_Model_Cart_Total_Discount::calculate, FCom_Promo_Main.onCartDiscountCalculate ]
+
+        auto_use: [ bootstrap, views, layout ]
+
         areas:
             FCom_Admin:
-                auto_use: [ all ]
                 routing:
-                    - [ /promo, FCom_Promo_Admin_Controller.index ]
-                    - [ /promo/.action, FCom_Promo_Admin_Controller ]
+                    - [ "/promo", FCom_Promo_Admin_Controller.index ]
+                    - [ "/promo/coupons/view", FCom_Promo_Admin_Controller.coupons_grid ]
+                    - [ "/promo/coupons/generate", FCom_Promo_Admin_Controller.coupons_generate ]
+                    - [ "/promo/coupons/import", FCom_Promo_Admin_Controller.coupons_import ]
+                    - [ "/promo/.action", FCom_Promo_Admin_Controller ]
 
+                    - ["/promo/conditions/.action", FCom_Promo_Admin_Controller_Conditions]
                     - [ "/promo/form/:id/products", FCom_Promo_Admin_Controller.form_products ]
                     - [ "/promo/form/:id/group", FCom_Promo_Admin_Controller.form_group ]
 
             FCom_Frontend:
-                auto_use: [ views, layout ]
                 routing:
                     - [ /promo/media, FCom_Promo_Frontend_Controller.media ]
                 observe:

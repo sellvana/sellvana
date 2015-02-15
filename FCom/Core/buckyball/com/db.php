@@ -29,6 +29,12 @@
 */
 class BDb
 {
+    const COLUMNS = 'COLUMNS',
+        PRIMARY = 'PRIMARY',
+        CONSTRAINTS = 'CONSTRAINTS',
+        KEYS = 'KEYS',
+        OPTIONS = 'OPTIONS',
+        DROP = 'DROP';
     /**
     * Collection of cached named DB connections
     *
@@ -375,7 +381,7 @@ class BDb
                     } else {
                         if (isset($v[0]) && is_array($v[0])) { // `field` IN (?)
                             $v = $v[0];
-                            $sql = str_replace('(?)', '(' . str_pad('', sizeof($v) * 2-1, '?,') . ')', $sql);
+                            $sql = str_replace('(?)', '(' . str_pad('', sizeof($v)*2-1, '?,') . ')', $sql);
                         }
                         $where[] = '(' . $sql . ')';
                         $params = array_merge($params, $v);
@@ -399,7 +405,7 @@ class BDb
                 $params = array_merge($params, $p);
             } elseif (is_array($v)) {
                 $f = static::sanitizeFieldName($f);
-                $where[] = "({$f} IN (" . str_pad('', sizeof($v) * 2-1, '?,') . "))";
+                $where[] = "({$f} IN (" . str_pad('', sizeof($v)*2-1, '?,') . "))";
                 $params = array_merge($params, $v);
             } elseif (null === $v) {
                 $f = static::sanitizeFieldName($f);
@@ -410,7 +416,7 @@ class BDb
                 $params[] = $v;
             }
         }
-        $where = join($or ? " OR " : " AND ", $where);
+        $where = '(' . join($or ? " OR " : " AND ", $where) . ')';
         // Additional protection against multiple queries separator
         if (sizeof(static::splitQueries($where)) > 1) {
             throw new BException('Invalid SQL query');
@@ -504,13 +510,14 @@ EOT
     }
 
     /**
-    * Get table field info
-    *
-    * @param string $fullTableName
-    * @param string $fieldName if null return all fields
-    * @throws BException
-    * @return mixed
-    */
+     * Get table field info
+     *
+     * @param string $fullTableName
+     * @param string $fieldName if null return all fields
+     * @param string|null $connectionName
+     * @return mixed
+     * @throws BException
+     */
     public static function ddlFieldInfo($fullTableName, $fieldName = null, $connectionName = null)
     {
         self::checkTable($fullTableName, $connectionName);
@@ -600,6 +607,12 @@ EOT
     */
     public static function ddlTableDef($fullTableName, $def, $connectionName = null)
     {
+        /*
+        // disabled for now because too many other changes required
+        if (class_exists($fullTableName) && method_exists($fullTableName, 'table')) {
+            $fullTableName = $fullTableName::table();
+        }
+        */
         $fields = !empty($def['COLUMNS']) ? $def['COLUMNS'] : null;
         $primary = !empty($def['PRIMARY']) ? $def['PRIMARY'] : null;
         $indexes = !empty($def['KEYS']) ? $def['KEYS'] : null;
@@ -664,20 +677,22 @@ EOT
     }
 
     /**
-    * Add or change table columns
-    *
-    * BDb::ddlTableColumns('my_table', array(
-    *   'field_to_create' => 'varchar(255) not null',
-    *   'field_to_update' => 'decimal(12,2) null',
-    *   'field_to_drop'   => 'DROP',
-    * ));
-    *
-    * @param string $fullTableName
-    * @param array $fields
-    * @param array $indexes
-    * @param array $fks
-    * @return array
-    */
+     * Add or change table columns
+     *
+     * BDb::ddlTableColumns('my_table', array(
+     *   'field_to_create' => 'varchar(255) not null',
+     *   'field_to_update' => 'decimal(12,2) null',
+     *   'field_to_drop'   => BDb::DROP,
+     * ));
+     *
+     * @param string $fullTableName
+     * @param array $fields
+     * @param array $indexes
+     * @param array $fks
+     * @param null $connectionName
+     * @throws BException
+     * @return array
+     */
     public static function ddlTableColumns($fullTableName, $fields, $indexes = null, $fks = null, $connectionName = null)
     {
         $tableFields = static::ddlFieldInfo($fullTableName, null, $connectionName);
@@ -733,6 +748,9 @@ EOT
             }
         }
         if ($fks) {
+            $tableArr = explode('.', $fullTableName);
+            $dbTableName = sizeof($tableArr) === 2 ? $tableArr[1] : $tableArr[0];
+
             $tableFKs = static::ddlForeignKeyInfo($fullTableName, null, $connectionName);
             $tableFKs = array_change_key_case($tableFKs, CASE_LOWER);
             // @see http://dev.mysql.com/doc/refman/5.5/en/innodb-foreign-key-constraints.html
@@ -741,13 +759,28 @@ EOT
             $dropArr = [];
             foreach ($fks as $idx => $def) {
                 $idxLower = strtolower($idx);
+                if (substr($idxLower, 0, 3) !== 'fk_') { // expand fk idx from 'name' to 'FK_{$table}_{$idx}'
+                    $idx = 'FK_' . $dbTableName . '_' . $idx;
+                    $idxLower = strtolower($idx);
+                }
+                if (is_array($def)) { // expand short array form of foreign key to full string
+                    if (empty($def[0]) || empty($def[1])) {
+                        throw new BException('Incomplete FK definition: ' . print_r($def));
+                    }
+                    $lk = $def[0];
+                    $ft = $def[1];
+                    $fk = !empty($def[2]) ? $def[2] : 'id';
+                    $ou = !empty($def[3]) ? $def[3] : 'CASCADE';
+                    $od = !empty($def[4]) ? $def[4] : 'CASCADE';
+                    $def = "FOREIGN KEY ({$lk}) REFERENCES {$ft} ({$fk}) ON UPDATE {$ou} ON DELETE {$od}";
+                }
                 if ($def === 'DROP') {
                     if (!empty($tableFKs[$idxLower])) {
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
                 } else {
                     if (!empty($tableFKs[$idxLower])) {
-                    // what if it is not foreign key constraint we do not doe anything to check for UNIQUE and PRIMARY constraint
+                    // what if it is not foreign key constraint we do not do anything to check for UNIQUE and PRIMARY constraint
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
                     $alterArr[] = "ADD CONSTRAINT `{$idx}` {$def}";
@@ -761,6 +794,15 @@ EOT
         $result = null;
         if ($alterArr) {
             $result = BORM::i()->raw_query("ALTER TABLE {$fullTableName} " . join(", ", $alterArr), [])->execute();
+            static::ddlClearCache(null, $connectionName);
+        }
+        return $result;
+    }
+
+    public function ddlDropTable($fullTableName, $connectionName = null)
+    {
+        if (static::ddlTableExists($fullTableName, $connectionName)) {
+            $result = BORM::i()->raw_query("DROP TABLE {$fullTableName}")->execute();
             static::ddlClearCache(null, $connectionName);
         }
         return $result;
@@ -1213,11 +1255,11 @@ class BORM extends ORMWrapper
      *
      * @param string|array $column_name if array - use where_complex() syntax
      * @param mixed        $value
-     * @return $this|\BORM
+     * @return BORM
      */
     public function where($column_name, $value = null)
     {
-        if (is_array($column_name) && null === $value) {
+        if (is_array($column_name) && (null === $value || false === $value || true === $value)) {
             return $this->where_complex($column_name, !!$value);
         }
         return parent::where($column_name, $value);
@@ -1258,7 +1300,7 @@ class BORM extends ORMWrapper
      * Find one row
      *
      * @param int|null $id
-     * @return $this
+     * @return static
      */
     public function find_one($id = null)
     {
@@ -1272,7 +1314,7 @@ class BORM extends ORMWrapper
     /**
     * Find many rows (SELECT)
     *
-    * @return $this[]
+    * @return static[]
     */
     public function find_many()
     {
@@ -1321,6 +1363,8 @@ class BORM extends ORMWrapper
     /**
      * Check whether the given field (or object itself) has been changed since this
      * object was saved.
+     * @param null $key
+     * @return bool
      */
     public function is_dirty($key = null) {
         return null === $key ? !empty($this->_dirty_fields) : isset($this->_dirty_fields[$key]);
@@ -1330,6 +1374,9 @@ class BORM extends ORMWrapper
      * Set a property to a particular value on this object.
      * Flags that property as 'dirty' so it will be saved to the
      * database when save() is called.
+     * @param $key
+     * @param $value
+     * @throws BException
      */
     public function set($key, $value) {
         if (!is_scalar($key)) {
@@ -1361,8 +1408,78 @@ class BORM extends ORMWrapper
 
     /**
      * Add a simple JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
      */
-    public function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
+    public function join($table, $constraint, $table_alias = null)
+    {
+        return parent::join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add an INNER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function inner_join($table, $constraint, $table_alias = null)
+    {
+        return parent::inner_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add a LEFT OUTER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function left_outer_join($table, $constraint, $table_alias = null)
+    {
+        return parent::left_outer_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add an RIGHT OUTER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return \ORM
+     */
+    public function right_outer_join($table, $constraint, $table_alias = null)
+    {
+        return parent::right_outer_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add an FULL OUTER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function full_outer_join($table, $constraint, $table_alias = null)
+    {
+        return parent::full_outer_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add a simple JOIN source to the query
+     * @param $join_operator
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    protected function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
         if (!isset(self::$_classTableMap[$table])) {
             if (class_exists($table) && is_subclass_of($table, 'BModel')) {
                 $class = BClassRegistry::className($table);
@@ -1398,6 +1515,11 @@ class BORM extends ORMWrapper
         return $this;
     }
 
+    /**
+     * @param $data
+     * @param null $isNew
+     * @return $this
+     */
     public function set_dirty_fields($data, $isNew = null)
     {
         $this->_dirty_fields = $data;
@@ -1438,6 +1560,8 @@ class BORM extends ORMWrapper
     /**
      * Save any fields which have been modified on this object
      * to the database.
+     * @param bool $replace
+     * @return bool
      */
     protected function _save($replace = false)
     {
@@ -1506,6 +1630,10 @@ class BORM extends ORMWrapper
         return $this->_dirty_fields;
     }
 
+    /**
+     * @param string $property
+     * @return array
+     */
     public function old_values($property = '')
     {
         if ($property && isset($this->_old_values[$property])) {
@@ -1527,8 +1655,10 @@ class BORM extends ORMWrapper
         return parent::delete();
     }
 
-     /**
+    /**
      * Add an ORDER BY expression DESC clause
+     * @param $expression
+     * @return $this
      */
      public function order_by_expr($expression) {
         $this->_order_by[] = "{$expression}";
@@ -1659,7 +1789,8 @@ class BORM extends ORMWrapper
             $s['p'] = $s['mp']; // limit to max page
         }
         if ($s['s']) {
-            $this->{'order_by_' . $s['sd']}($s['s']); // sort rows if requested
+            $ord = 'asc' === $s['sd'] || 'desc' === $s['sd'] ? $s['sd'] : 'asc';
+            $this->{'order_by_' . $ord}($s['s']); // sort rows if requested
         }
         $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p'] - 1) * $s['ps']); // start from requested row or page
         if (empty($d['donotlimit'])) {
@@ -1683,30 +1814,34 @@ class BORM extends ORMWrapper
     }
 
     /**
-    * Build the WHERE clause(s)
-    * Extended with argument for options skipping of values calculation
-    */
-    protected function _build_where($calculate_values = true) {
-            // If there are no WHERE clauses, return empty string
-            if (count($this->_where_conditions) === 0) {
-                return '';
-            }
+     * Build the WHERE clause(s)
+     * Extended with argument for options skipping of values calculation
+     * @param bool $calculate_values
+     * @return string
+     */
+    protected function _build_where($calculate_values = true)
+    {
+        // If there are no WHERE clauses, return empty string
+        if (count($this->_where_conditions) === 0) {
+            return '';
+        }
 
-            $where_conditions = [];
-            foreach ($this->_where_conditions as $condition) {
-                $where_conditions[] = $condition[static::WHERE_FRAGMENT];
-                if($calculate_values){
-                    $this->_values = array_merge($this->_values, $condition[static::WHERE_VALUES]);
-                }
+        $where_conditions = [];
+        foreach ($this->_where_conditions as $condition) {
+            $where_conditions[] = $condition[static::WHERE_FRAGMENT];
+            if ($calculate_values) {
+                $this->_values = array_merge($this->_values, $condition[static::WHERE_VALUES]);
             }
+        }
 
-            return "WHERE " . join(" AND ", $where_conditions);
+        return "WHERE " . join(" AND ", $where_conditions);
     }
 
     /**
     * Build the WHERE clause Values array if not build already inside _build_where()
     */
-    protected function _build_values() {
+    protected function _build_values()
+    {
         // If there are no WHERE clauses, return empty array
         if (count($this->_where_conditions) === 0) {
             return [];
@@ -1714,7 +1849,7 @@ class BORM extends ORMWrapper
 
         $values = [];
         foreach ($this->_where_conditions as $condition) {
-                $values[] = $condition[static::WHERE_VALUES][0];
+            $values[] = $condition[static::WHERE_VALUES][0];
         }
 
         return $values;
@@ -1723,58 +1858,167 @@ class BORM extends ORMWrapper
     const HAVING_FRAGMENT = 0;
     const HAVING_VALUES = 1;
     protected $_having_conditions = [];
-    public function having($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having($column_name, $value)
+    {
         return $this->having_equal($column_name, $value);
     }
-    public function having_equal($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_equal($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '=', $value);
     }
-    public function having_not_equal($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_not_equal($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '!=', $value);
     }
-    public function having_id_is($id) {
+
+    /**
+     * @param $id
+     * @return BORM
+     */
+    public function having_id_is($id)
+    {
         return $this->having($this->_get_id_column_name(), $id);
     }
-    public function having_like($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_like($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, 'LIKE', $value);
     }
-    public function having_not_like($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_not_like($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, 'NOT LIKE', $value);
     }
-    public function having_gt($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_gt($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '>', $value);
     }
-    public function having_lt($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_lt($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '<', $value);
     }
-    public function having_gte($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_gte($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '>=', $value);
     }
-    public function having_lte($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_lte($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '<=', $value);
     }
-    public function having_in($column_name, $values) {
+
+    /**
+     * @param $column_name
+     * @param $values
+     * @return BORM
+     */
+    public function having_in($column_name, $values)
+    {
         $column_name = $this->_quote_identifier($column_name);
         $placeholders = $this->_create_placeholders(count($values));
         return $this->_add_having("{$column_name} IN ({$placeholders})", $values);
     }
-    public function having_not_in($column_name, $values) {
+
+    /**
+     * @param $column_name
+     * @param $values
+     * @return BORM
+     */
+    public function having_not_in($column_name, $values)
+    {
         $column_name = $this->_quote_identifier($column_name);
         $placeholders = $this->_create_placeholders(count($values));
         return $this->_add_having("{$column_name} NOT IN ({$placeholders})", $values);
     }
-    public function having_null($column_name) {
+
+    /**
+     * @param $column_name
+     * @return BORM
+     */
+    public function having_null($column_name)
+    {
         $column_name = $this->_quote_identifier($column_name);
         return $this->_add_having("{$column_name} IS NULL");
     }
-    public function having_not_null($column_name) {
+
+    /**
+     * @param $column_name
+     * @return BORM
+     */
+    public function having_not_null($column_name)
+    {
         $column_name = $this->_quote_identifier($column_name);
         return $this->_add_having("{$column_name} IS NOT NULL");
     }
-    public function having_raw($clause, $parameters = []) {
+
+    /**
+     * @param $clause
+     * @param array $parameters
+     * @return BORM
+     */
+    public function having_raw($clause, $parameters = [])
+    {
         return $this->_add_having($clause, $parameters);
     }
-    protected function _add_having($fragment, $values = []) {
+
+    /**
+     * @param $fragment
+     * @param array $values
+     * @return $this
+     */
+    protected function _add_having($fragment, $values = [])
+    {
         if (!is_array($values)) {
             $values = [$values];
         }
@@ -1784,11 +2028,21 @@ class BORM extends ORMWrapper
         ];
         return $this;
     }
-    protected function _add_simple_having($column_name, $separator, $value) {
+
+    /**
+     * @param $column_name
+     * @param $separator
+     * @param $value
+     * @return BORM
+     */
+    protected function _add_simple_having($column_name, $separator, $value)
+    {
         $column_name = $this->_quote_identifier($column_name);
         return $this->_add_having("{$column_name} {$separator} ?", $value);
     }
-    protected function _build_having() {
+
+    protected function _build_having()
+    {
         if (count($this->_having_conditions) === 0) {
             return '';
         }
@@ -1801,6 +2055,11 @@ class BORM extends ORMWrapper
         return "HAVING " . join(" AND ", $having_conditions);
     }
 
+    /**
+     * @param null $data
+     * @param bool $new
+     * @return static|bool
+     */
     public function create($data = null, $new = true)
     {
         $model = parent::create($data);
@@ -1999,6 +2258,20 @@ class BModel extends Model
     protected $_diLocal = [];
 
     /**
+     * Options for each field
+     *
+     * @var array
+     */
+    protected static $_fieldOptions = [];
+
+    /**
+     * Set field defaults on create()
+     *
+     * @var array
+     */
+    protected static $_fieldDefaults = [];
+
+    /**
     * Retrieve original class name
     *
     * @return string
@@ -2145,7 +2418,7 @@ class BModel extends Model
      * @param mixed $value
      * @param mixed $flag if true or 'ADD', add to existing value; if null or 'IFNULL', update only if currently not set
      * @throws BException
-     * @return $this
+     * @return static
      */
     public function set($key, $value = null, $flag = false)
     {
@@ -2164,7 +2437,10 @@ class BModel extends Model
                 }
             }
             if (!is_string($key)) {
-                throw new BException('Invalid key type' . print_r($key, 1));
+                ob_start();
+                var_dump($key);
+                $debug = ob_get_clean();
+                BDebug::error('Invalid key type: ' . $debug);
             }
             if (null === $flag || 'IFNULL' === $flag) {
                 if (null === $this->get($key)) {
@@ -2182,7 +2458,7 @@ class BModel extends Model
      *
      * @param string $key
      * @param int    $increment
-     * @return $this
+     * @return static
      */
     public function add($key, $increment = 1)
     {
@@ -2194,10 +2470,13 @@ class BModel extends Model
     *
     * @param null|array $data
     * @param boolean $new is new record
-    * @return $this
+    * @return BModel
     */
     public static function create($data = null, $new = true)
     {
+        if (static::$_fieldDefaults) {
+            $data = $data ? array_merge(static::$_fieldDefaults, $data) : static::$_fieldDefaults;
+        }
         $record = static::factory()->create($data, $new);
         $record->onAfterCreate();
         return $record;
@@ -2240,12 +2519,12 @@ class BModel extends Model
     * @param int|string|array $id
     * @param string $field
     * @param boolean $cache
-    * @return $this
+    * @return static
     * @throws BException
     */
     public function load($id, $field = null, $cache = false)
     {
-        if (true !== $field && is_array($id)) {
+        if (is_array($id) && true !== $field) {
             throw new BException('Invalid ID parameter');
         }
 
@@ -2294,6 +2573,9 @@ class BModel extends Model
 
     /**
      * Temporary implementation using load()
+     * @param $where
+     * @throws BException
+     * @return static
      */
     public function loadWhere($where)
     {
@@ -2306,7 +2588,7 @@ class BModel extends Model
      * @param int|string|array $where
      * @param string $field
      * @param boolean $cache
-     * @return $this
+     * @return static
      */
     public function loadOrCreate($where, $field = null, $cache = false)
     {
@@ -2670,7 +2952,8 @@ class BModel extends Model
     * @param string $class_name
     * @return string
     */
-    protected static function _get_table_name($class_name) {
+    protected static function _get_table_name($class_name)
+    {
         return BDb::t(parent::_get_table_name($class_name));
     }
 
@@ -3007,6 +3290,15 @@ class BModel extends Model
         return $options;
     }
 
+    public function getFieldOptionLabel($field)
+    {
+        $value = $this->get($field);
+        if (!$value || empty(static::$_fieldOptions[$field][$value])) {
+            return null;
+        }
+        return static::$_fieldOptions[$field][$value];
+    }
+
     /**
      * @param $labelField
      * @param string $idField
@@ -3031,6 +3323,11 @@ class BModel extends Model
         return $values;
     }
 
+    protected function _validationRules()
+    {
+        return static::$_validationRules;
+    }
+
     /**
      * Model validation
      *
@@ -3043,14 +3340,17 @@ class BModel extends Model
      * @param array $data
      * @param array $rules
      * @param string $formName
+     * @param boolean $ignoreModelRules
      * @return bool
      */
-    public function validate($data = [], $rules = [], $formName = 'admin')
+    public function validate($data = [], $rules = [], $formName = 'admin', $ignoreModelRules = false)
     {
         if (!$data && $this->orm) {
             $data = $this->as_array();
         }
-        $rules = array_merge(static::$_validationRules, $rules);
+        if (!$ignoreModelRules) {
+            $rules = array_merge($this->_validationRules(), $rules);
+        }
         $this->BEvents->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
         $valid = $this->BValidate->validateInput($data, $rules, $formName);
         if (!$valid) {
@@ -3155,7 +3455,7 @@ class BCollection extends ArrayIterator
     public function setData($data)
     {
         //TODO: clear dbplus_first(relation, tuple)
-        foreach ($rows as $k => $row) {
+        foreach ($data as $k => $row) {
             $this->offsetSet($k, $row);
         }
         return $this;
