@@ -2,4 +2,74 @@
 <!--{ pos: 30 }-->
 <!--{ model_new_hide: true }-->
 
-Frontend display, todo
+{% set m = THIS.get('model') %}
+{% set promo_type = validator.fieldValue('promo_type') %}
+{% set validator = THIS.get('validator') %}
+{% set labelClass = "col-md-3" %}
+{% set data = UTIL.fromJson(validator.fieldValue("data_serialized")) %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+{% if MODULES.isLoaded('FCom_CustomerGroups') %}
+    {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+
+<fieldset class="adm-section-group">
+    <div class="f-section">dynamic
+    {#{{ dump(data) }}#}
+    </div>
+    <div class="f-section">
+        {{ forms.boolean({
+            label: "Display Promotion on Central Promotions Page"|_, label_class: labelClass,
+            value: validator.fieldValue('display_on_central_page'),
+            field: 'display_on_central_page', help_icon: 1,
+            help_text: "Wether or not to display promotion on central promotions page."|_,
+            select2: {minimumResultsForSearch: 15}
+        }) }}
+        {{ forms.boolean({
+            label: "Show Exp Date"|_, label_class: labelClass,
+            value: data['show_expiration'],
+            field: 'show_expiration', help_icon: 1,
+            help_text: "Wether or not to show promo expiration date."|_,
+            select2: {minimumResultsForSearch: 15}
+        }) }}
+        {{ forms.select({
+            label: "Location On Page"|_,label_class: labelClass,
+            field: "page_location",
+            value: data['page_location'],
+            help_icon: 1,
+            help_text: "Where to place this promo on central promotions page."|_,
+            select2: {minimumResultsForSearch: 15},
+            style: (promo_type == 'catalog')? "display: none": '',
+            options: {
+                "featured": "Featured"|_,
+                "this_month": "This Month"|_,
+                "this_week": "This Week"|_,
+                "today": "Today Only"|_}
+        }) }}
+        {{ forms.select({
+            label: "Display Type"|_,label_class: labelClass,
+            field: "display_type",
+            value: data['display_type'],
+            help_icon: 1,
+            help_text: "What should be displayed for this promo."|_,
+            select2: {minimumResultsForSearch: 15},
+            style: (promo_type == 'catalog')? "display: none": '',
+            options: {"text": "Text"|_, "cms_block": "CMS BLOCK"|_}
+        }) }}
+        <div id="display_type_details">Loading ...</div>
+        {% set elView = LAYOUT.view('core/form-elements') %}
+        <script>
+            require(['jquery', 'jsx!fcom.promo.details'], function ($, PromoDetails) {
+                var $displayTypeContainer = $("#display_type_details");
+                var $displayTypeSelector = $("#{{ elView.getInputId({'field':'display_type'}) }}");
+//                console.log(PromoDetails);
+                var centralPageOptions = {
+                    container: $displayTypeContainer[0],
+                    selector: $displayTypeSelector
+                };
+                PromoDetails.initCentralPageApp(centralPageOptions);
+            });
+        </script>
+    </div>
+</fieldset>
+
