@@ -25,7 +25,6 @@
  * @property FCom_Promo_Model_PromoCart     $FCom_Promo_Model_PromoCart
  * @property FCom_Promo_Model_PromoMedia    $FCom_Promo_Model_PromoMedia
  * @property FCom_Core_Model_MediaLibrary   $FCom_Core_Model_MediaLibrary
- * @property FCom_Promo_Model_Product       $FCom_Promo_Model_Product
  * @property FCom_Customer_Model_Customer   $FCom_Customer_Model_Customer
  * @property FCom_MultiSite_Main            $FCom_MultiSite_Main
  * @property FCom_Promo_Model_PromoCoupon   $FCom_Promo_Model_PromoCoupon
