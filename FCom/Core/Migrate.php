@@ -13,14 +13,14 @@
 
 class FCom_Core_Migrate extends BClass
 {
-    public function install__0_1_6()
+    public function install__0_1_9()
     {
         $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
         if (!$this->BDb->ddlTableExists($tMediaLibrary)) {
             $this->BDb->run("
                 CREATE TABLE {$tMediaLibrary} (
                   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                  `folder` varchar(32) NOT NULL,
+                  `folder` varchar(255) NOT NULL,
                   `subfolder` varchar(32) DEFAULT NULL,
                   `file_name` varchar(255) NOT NULL,
                   `file_size` int(11) DEFAULT NULL,
@@ -99,10 +99,14 @@ class FCom_Core_Migrate extends BClass
                     'model_id'  => 'int unsigned',
                     'import_id' => 'int unsigned',
                     'local_id'  => 'int unsigned',
+                    'relations' => 'text null',
                     'create_at' => 'datetime',
                     'update_at' => 'datetime',
                 ],
                 BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
+                    'uk_site_model_import_id' => "UNIQUE (site_id,model_id,import_id)",
+                ],
                 BDb::CONSTRAINTS => [
                     'model' => ['model_id', $tModel],
                     'site' => ['site_id', $tSite],
@@ -234,17 +238,28 @@ class FCom_Core_Migrate extends BClass
 
     public function upgrade__0_1_6__0_1_7()
     {
-        $this->BDb->ddlTableDef(
-            $this->FCom_Core_Model_ImportExport_Id->table(),
-            [
-                BDb::COLUMNS => ['relations' => 'text null'],
-                BDb::KEYS => ['uk_site_model_import_id' => "UNIQUE (site_id,model_id,import_id)"],
-            ]
-        );
+        $this->BDb->ddlTableDef($this->FCom_Core_Model_ImportExport_Id->table(), [
+            BDb::COLUMNS => [
+                'relations' => 'text null',
+            ],
+            BDb::KEYS => [
+                'uk_site_model_import_id' => "UNIQUE (site_id,model_id,import_id)",
+            ],
+        ]);
     }
 
     public function upgrade__0_1_7__0_1_8()
     {
         $this->BCache->deleteAll();
+    }
+
+    public function upgrade__0_1_8__0_1_9()
+    {
+        $tMedia = $this->FCom_Core_Model_MediaLibrary->table();
+        $this->BDb->ddlTableDef($tMedia, [
+            BDb::COLUMNS => [
+                'folder' => 'varchar(255) NOT NULL',
+            ],
+        ]);
     }
 }

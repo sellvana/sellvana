@@ -5,8 +5,6 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
     var dataUrl,
         gridId,
-        pageSize,
-        pageSizeOptions,
         buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
             return dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
         };
@@ -14,9 +12,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
     var FComGriddleComponent = React.createClass({
         getDefaultProps: function () {
             return {
-                "config": {
-                    page_size_options: 10
-                },
+                "config": {},
                 "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable'
             }
         },
@@ -25,14 +21,12 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             //todo: need change way to get right info
             dataUrl = this.props.config.data_url;
             gridId = this.props.config.id;
-            pageSize = this.props.config.state.ps;
-            pageSizeOptions = this.props.config.page_size_options;
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
 
             var all = _.pluck(columnsConfig, 'name');
-            var hide = _.pluck(_.where(columnsConfig, {hidden: true}), 'name');
+            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden == true }), 'name');
             var show = _.difference(all, hide);
 
             this.props.columns = {all: all, show: show, hide: hide};
@@ -62,8 +56,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     sortColumn={config.data.state.s} sortAscending={config.data.state.sd == 'asc'}
                     columns={this.getColumn('show')} columnMetadata={this.props.columnMetadata}
                     useCustomGrid={true} customGrid={FComGridBody}
-                    getExternalResults={FComDataMethod} resultsPerPage={pageSize}
-                    useCustomPager="true" customPager={FComPager}
+                    getExternalResults={FComDataMethod} resultsPerPage={config.data.state.ps}
+                    useCustomPager="true" customPager={FComPager} initPage={config.data.state.p - 1}
                     showSettings={true} useCustomSettings={true} customSettings={FComSettings}
                     showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
                 />
@@ -110,7 +104,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "maxPage": 0,
                 "nextText": "",
                 "previousText": "",
-                "currentPage": 0
+                "currentPage": 0,
+                "getHeaderSelection": null
             }
         },
         pageChange: function (event) {
@@ -136,27 +131,29 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         setPageSize: function (event) {
             event.preventDefault();
             var value = event.target.dataset.value;
-            pageSize = parseInt(value);
+            //pageSize = parseInt(value);
 
             this.props.setPageSize(parseInt(value));
             this.props.setPage(0);
         },
         render: function () {
-            var first = "";
-            var previous = "";
-            var next = "";
-            var last = "";
+            var headerSelection = this.props.getHeaderSelection();
+            if (headerSelection == 'show_selected') {
+                return false;
+            }
+            var pageSizeOptions = this.props.getConfig('page_size_options');
+            var pageSize = this.props.resultsPerPage;
 
-            first = <li className="first">
+            var first = <li className="first">
                 <a href="#" className="js-change-url" onClick={this.pageFirst}>«</a>
             </li>;
-            previous = <li className="prev">
+            var previous = <li className="prev">
                 <a href="#" className="js-change-url" onClick={this.pagePrevious}>‹</a>
             </li>;
-            next = <li className="next">
+            var next = <li className="next">
                 <a className="js-change-url" href="#" onClick={this.pageNext}>›</a>
             </li>;
-            last = <li className="last">
+            var last = <li className="last">
                 <a className="js-change-url" href="#" onClick={this.pageLast}>{this.props.maxPage} »</a>
             </li>;
 
@@ -170,17 +167,21 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             for (var i = startIndex; i < endIndex; i++) {
                 var selected = this.props.currentPage == i ? "page active" : "page";
-                options.push(<li className={selected}>
-                    <a href="#" data-value={i} onClick={this.pageChange} className="js-change-url">{i + 1}</a>
-                </li>);
+                options.push(
+                    <li className={selected}>
+                        <a href="#" data-value={i} onClick={this.pageChange} className="js-change-url">{i + 1}</a>
+                    </li>
+                );
             }
 
             var pageSizeHtml = [];
             for (var j = 0; j < pageSizeOptions.length; j++) {
-                var selected = pageSizeOptions[j] == pageSize ? "active" : "";
-                pageSizeHtml.push(<li className={selected}>
-                    <a href="#" data-value={pageSizeOptions[j]} onClick={this.setPageSize} className="js-change-url page-size">{pageSizeOptions[j]}</a>
-                </li>);
+                selected = pageSizeOptions[j] == pageSize ? "active" : "";
+                pageSizeHtml.push(
+                    <li className={selected}>
+                        <a href="#" data-value={pageSizeOptions[j]} onClick={this.setPageSize} className="js-change-url page-size">{pageSizeOptions[j]}</a>
+                    </li>
+                );
             }
 
             return (
@@ -201,6 +202,9 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         }
     });
 
+    /**
+     * FCom Settings component
+     */
     var FComSettings = React.createClass({
         mixins: [FCom.Mixin],
         getDefaultProps: function() {
@@ -248,6 +252,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var dataUrl = this.props.getConfig('data_url');
             var editUrl = this.props.getConfig('edit_url');
             var gridId = this.props.getConfig('id');
+            var pageSize = this.props.resultsPerPage;
 
             switch (action) {
                 case 'mass-delete':
@@ -288,6 +293,9 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
         },
         toggleColumn: function(event) {
+            var personalizeUrl = this.props.getConfig('personalize_url');
+            var id = this.props.getConfig('id');
+
             var initColumns = this.props.getInitColumns();
             var selectedColumns = this.props.selectedColumns();
             if(event.target.checked == true && _.contains(selectedColumns, event.target.dataset.name) == false){
@@ -305,6 +313,10 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             } else {
                 /* redraw with the selected initColumns minus the one just unchecked */
                 this.props.setColumns(_.without(selectedColumns, event.target.dataset.name));
+            }
+
+            if (personalizeUrl) {
+                $.post(personalizeUrl, { 'do': 'grid.col.hidden', 'grid': id, 'col': event.target.dataset.name, hidden: !(event.target.checked == true) });
             }
 
             //don't close dropdown after toggle column
@@ -422,6 +434,9 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         }
     });
 
+    /**
+     * FCom Modal Mass Edit Form
+     */
     var FComModalMassEditForm = React.createClass({
         getInitialState: function() {
             var fields = [];
