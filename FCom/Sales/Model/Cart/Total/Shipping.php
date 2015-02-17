@@ -19,10 +19,12 @@ class FCom_Sales_Model_Cart_Total_Shipping extends FCom_Sales_Model_Cart_Total_A
             $methods = $this->FCom_Sales_Main->getShippingMethods();
             $weight = 0;
             $rates = [];
-            foreach ($methods as $methodCode => $method) {
-                $rates[$methodCode] = $method->fetchCartRates($cart);
-                if (!empty($rates[$methodCode]['weight'])) {
-                    $weight = $rates[$methodCode]['weight'];
+            if ($methods) {
+                foreach ($methods as $methodCode => $method) {
+                    $rates[$methodCode] = $method->fetchCartRates($cart);
+                    if (!empty($rates[$methodCode]['weight'])) {
+                        $weight = $rates[$methodCode]['weight'];
+                    }
                 }
             }
             $cart->set([
