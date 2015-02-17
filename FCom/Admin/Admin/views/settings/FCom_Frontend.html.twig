@@ -28,6 +28,17 @@
         {{ forms.select(fieldData, {field:'allowed_locales', label:'Enabled Frontend UI Locales', select2: {},
             multiple: true, options:locales }) }}
     {{ forms.accordion_panel_end }}
+
+    {{ forms.accordion_panel_start({label:'Custom Tags'|_, id:'settings-FCom_Frontend-group2'}) }}
+        {{ forms.textarea(fieldData, {field:'custom_tags_homepage', label:'Home Page'|_, help_block_test:'test' }) }}
+        {{ forms.textarea(fieldData, {field:'custom_tags_category', label:'Category Page'|_ }) }}
+        {{ forms.textarea(fieldData, {field:'custom_tags_search', label:'Search Page'|_ }) }}
+        {{ forms.textarea(fieldData, {field:'custom_tags_product', label:'Product Page'|_ }) }}
+        {{ forms.textarea(fieldData, {field:'custom_tags_cart', label:'Shopping Cart'|_ }) }}
+        {{ forms.textarea(fieldData, {field:'custom_tags_checkout', label:'Checkout Page'|_ }) }}
+        {{ forms.textarea(fieldData, {field:'custom_tags_success', label:'Checkout Success Page'|_ }) }}
+   {{ forms.accordion_panel_end }}
+
 {{ forms.accordion_end }}
 
 <script  type="text/javascript">

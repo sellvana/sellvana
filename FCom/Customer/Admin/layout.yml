@@ -19,9 +19,9 @@ base:
 
 /customers:
     - { include: base }
-    - { hook: main, views: ['customer/customers', 'admin/grid'] }
+    #- { hook: main, views: ['customer/customers', 'admin/grid'] }
     # please also comment above hook if you want to test griddle
-    #- { hook: main, views: ['customer/customers', 'admin/griddle'] }
+    - { hook: main, views: ['customer/customers', 'admin/griddle'] }
 
 /header_search:
     - { hook: main, views: 'header-search/FCom_Customer' }

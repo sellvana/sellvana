@@ -225,9 +225,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             //todo: fix bug for ambigious field ID
             //$this->FCom_Catalog_Model_Product->cachePreloadFrom(array_keys($productIds));
         }
+        /*
         foreach ($items as $item) {
             $item->product = $this->FCom_Catalog_Model_Product->load($item->product_id);
         }
+        */
         return $this;
     }
 
@@ -747,6 +749,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
 
         return $result;
+    }
+
+    public function getCouponCodes()
+    {
+        $codes = $this->get('coupon_code');
+        return $codes ? explode(',', $codes) : [];
     }
 
     /**

@@ -29,7 +29,8 @@ Using custom id/name:
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
     {% if p.help_icon %}
-        <a id="help-{{ view.getInputId(p) }}" class="pull-right help-icon" href="#" data-toggle="popover" data-trigger="focus"
+        <a tabindex="-1" id="help-{{ view.getInputId(p) }}" class="pull-right help-icon" href="#" data-toggle="popover"
+            data-trigger="focus"
                data-content="{{ p.help_text }}" data-container="body">
                 <span class="glyphicon glyphicon-question-sign"></span></a>
     {% endif %}

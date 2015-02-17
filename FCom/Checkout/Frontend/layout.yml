@@ -9,6 +9,8 @@ checkout/base:
     - { hook: header-components, clear: [ header-nav, header-callouts ] }
     - { hook: header-top-util, clear: ALL }
     - { hook: header-top-search, clear: ALL }
+    - { hook: before_body_end, views: custom-tags }
+    - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_checkout } }
 
 
 /checkout-simple/step1:
@@ -32,49 +34,5 @@ checkout/base:
 /checkout-simple/success:
     - { include: base }
     - { hook: main, views: checkout-simple/success }
-
-
-
-/checkout/checkout:
-    - { include: checkout/base }
-    - view: head
-        do:
-            - [ title, Checkout ]
-            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
-    - { hook: main, views: checkout/checkout }
-
-/checkout/login:
-    - { include: checkout/base }
-    - view: head
-        do:
-            - [ title, Checkout Login ]
-            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
-    - { hook: main, views: checkout/login }
-
-/checkout/payment:
-    - { include: checkout/base }
-    - view: head
-        do:
-            - [ title, Checkout Payment Method ]
-    - { hook: main, views: checkout/payment }
-
-/checkout/shipping:
-    - { include: checkout/base }
-    - view: head
-        do:
-            - [ title, Checkout Shipping Method ]
-    - { hook: main, views: checkout/shipping }
-
-/checkout/address:
-    - { include: checkout/base }
-    - view: head
-        do:
-            - [ title, Checkout Address ]
-    - { hook: main, views: checkout/address }
-
-/checkout/success:
-    - { include: base }
-    - view: head
-        do:
-            - [ title, Checkout Success ]
-    - { hook: main, views: checkout/success }
+    - { hook: before_body_end, views: custom-tags }
+    - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_success } }

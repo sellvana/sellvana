@@ -32,118 +32,122 @@
 
 {{ THIS.view('core/messages') | raw }}
 
-<div class="row">
-    <!-- Product Image Column -->
-    <div class="col-md-5 f-col-prod-img">
-        <div class="f-rslides-container">
-            <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
+<div itemscope itemtype="http://data-vocabulary.org/Product">
+    <div class="row">
+        <!-- Product Image Column -->
+        <div class="col-md-5 f-col-prod-img">
+            <div class="f-rslides-container">
+                <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
+                    {% for img in images %}
+                        <li><img data-id="{{ img.id() }}" class="f-prod-img img-responsive" src="{{ img.imageUrl(1) }}"
+                                 alt="" itemprop="image"/></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <p class="text-center">
+                <small>{{ 'Mouse move on Image to zoom'|_ }}</small>
+            </p>
+            <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
                 {% for img in images %}
-                    <li><img data-id="{{ img.id() }}" class="f-prod-img img-responsive" src="{{ img.imageUrl(1) }}"
-                             alt=""/></li>
+                    <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.thumbUrl(90) }}"
+                                                                                            alt="" title=""></a></li>
                 {% endfor %}
             </ul>
+            <a href="#" hidden id="display-all-images"><i
+                        class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
         </div>
-        <p class="text-center">
-            <small>{{ 'Mouse move on Image to zoom'|_ }}</small>
-        </p>
-        <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
-            {% for img in images %}
-                <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.thumbUrl(90) }}"
-                                                                                        alt="" title=""></a></li>
-            {% endfor %}
-        </ul>
-        <a href="#" hidden id="display-all-images"><i
-                    class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
-    </div>
-    <!-- /.f-col-prod-img -->
+        <!-- /.f-col-prod-img -->
 
-    <!-- Product Select Column-->
-    <div class="col-md-7 f-col-prod-select">
-        <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="">
-            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-            <input type="hidden" name="id" value="{{ prod.id() }}">
+        <!-- Product Select Column-->
+        <div class="col-md-7 f-col-prod-select">
+            <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="">
+                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                <input type="hidden" name="id" value="{{ prod.id() }}">
 
-            <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
-            <p class="f-sku">{{ m.get('product_sku') }}</p>
+                <h1 class="f-prod-name" itemprop="name">{{ prod.get('product_name') }}</h1>
+                <p class="f-sku" itemprop="identifier" content="sku:{{ m.get('product_sku') }}">{{ m.get('product_sku') }}</p>
 
-            {% if prod.getAverageStars() %}
-                <div class="f-prod-avg-rating">
-                    <div class="glyphicon f-rating-stars f-sm-stars">
-                        <span class="f-filled-stars" style="width:{{ prod.getAverageStars() }}%;"></span>
-                        <span class="f-empty-stars"></span>
-                    </div>
-                    <a href="#f-prod-tab-reviews">{{ '%s Review(s)'|_(prod.getNumReviews()) }}</a>
-                </div>
-            {% endif %}
-
-            {{ THIS.view('catalog/product/price').set('product', prod) | raw }}
-
-            <div class="f-prod-select">
-
-                {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
-
-                <div class="f-prod-add-cart">
-
-                    {{ THIS.view('catalog/product/variants').set('product', prod) | raw }}
-
-                    {{ THIS.view('catalog/product/shopper_fields').set('product', prod) | raw }}
-
-                    <p class="f-stock-notice f-in-stock" {{ not inventory.isInStock ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
-
-                    <p class="f-stock-notice f-out-of-stock" {{ inventory.isInStock ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
-
-                    <div class="form-group overflow-hidden">
-                        <label class="col-md-3 control-label">{{ 'Quantity:' |_ }}</label>
-
-                        <div class="col-md-2">
-                            <input type="text" name="qty" class="form-control col-md-3" value="1"/>
+                {% if prod.getAverageStars() %}
+                    <div class="f-prod-avg-rating" itemprop="review" itemscope itemtype="http://data-vocabulary.org/Review-aggregate">
+                        <meta itemprop="rating" content="{{ prod.getAverageStars() }}"/>
+                        <meta itemprop="count" content="{{ prod.getNumReviews() }}"/>
+                        <div class="glyphicon f-rating-stars f-sm-stars">
+                            <span class="f-filled-stars" style="width:{{ prod.getAverageRatingPercent() }}%;"></span>
+                            <span class="f-empty-stars"></span>
                         </div>
+                        <a href="#f-prod-tab-reviews">{{ '%s Review(s)'|_(prod.getNumReviews()) }}</a>
                     </div>
+                {% endif %}
 
-                    <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}"
-                            id="prod-add-to-cart">
-                        <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
-                    <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
-                       rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
+                {{ THIS.view('catalog/product/price').set('product', prod) | raw }}
 
-                    {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
+                <div class="f-prod-select">
 
-                </div>
-            </div>
-            <!-- /.f-prod-select -->
-        </form>
-    </div>
-    <!-- /.f-col-prod-select -->
-</div> <!-- /.row -->
-<div class="f-prod-info">
-    <div class="tab-content">
+                    {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
 
-        <section class="tab-pane active" id="f-prod-tab-description">
-            <div class="f-tab-heading">
-                <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>
-            </div>
-            {{ prod.get('description') | raw }}
-            {% if customFields %}
-                <div class="f-tab-heading">
-                    <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
-                </div>
-                {% for cf in customFields %}
-                    <div class="form-group" style="overflow: hidden">
-                        <label class="col-md-2 control-label">{{ cf.set_name |_ }}</label> <br>
-                        {% for field in cf.fields %}
-                            <div class="col-md-12">
-                                <label class="control-label">{{ field.field_name ~": "~ field.value |_ }}</label>
+                    <div class="f-prod-add-cart">
+
+                        {{ THIS.view('catalog/product/variants').set('product', prod) | raw }}
+
+                        {{ THIS.view('catalog/product/shopper_fields').set('product', prod) | raw }}
+
+                        <p class="f-stock-notice f-in-stock" {{ not inventory.isInStock ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
+
+                        <p class="f-stock-notice f-out-of-stock" {{ inventory.isInStock ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
+
+                        <div class="form-group overflow-hidden">
+                            <label class="col-md-3 control-label">{{ 'Quantity:' |_ }}</label>
+
+                            <div class="col-md-2">
+                                <input type="text" name="qty" class="form-control col-md-3" value="1"/>
                             </div>
-                        {% endfor %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}"
+                                id="prod-add-to-cart">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
+                        <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
+                           rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
+
+                        {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
+
                     </div>
-                {% endfor %}
-            {% endif %}
-        </section>
+                </div>
+                <!-- /.f-prod-select -->
+            </form>
+        </div>
+        <!-- /.f-col-prod-select -->
+    </div> <!-- /.row -->
+    <div class="f-prod-info">
+        <div class="tab-content">
 
-        {{ THIS.view('prodreviews/product-details').set('prod', prod) | raw }}
+            <section class="tab-pane active" id="f-prod-tab-description">
+                <div class="f-tab-heading">
+                    <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>
+                </div>
+                <div itemprop="description">{{ prod.get('description') | raw }}</div>
+                {% if customFields %}
+                    <div class="f-tab-heading">
+                        <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
+                    </div>
+                    {% for cf in customFields %}
+                        <div class="form-group" style="overflow: hidden">
+                            <label class="col-md-2 control-label">{{ cf.set_name |_ }}</label> <br>
+                            {% for field in cf.fields %}
+                                <div class="col-md-12">
+                                    <label class="control-label">{{ field.field_name ~": "~ field.value |_ }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </section>
 
-    </div>
-</div><!-- /.f-prod-info -->
+            {{ THIS.view('prodreviews/product-details').set('prod', prod) | raw }}
+
+        </div>
+    </div><!-- /.f-prod-info -->
+</div>
 <br/>
 {% for link in productLinks %}
     {% if link.products %}

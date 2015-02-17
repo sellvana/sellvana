@@ -1,0 +1,18 @@
+{% set configPath = THIS.get('config') %}
+{% if configPath %}
+    {% set debugInfo = 'FROM CONFIG ' ~ configPath %}
+    {% set tagsHtml = CONFIG.get(configPath) %}
+{% else %}
+    {% set debugInfo = 'CUSTOM HTML' %}
+    {% set tagsHtml = THIS.get('html') %}
+{% endif %}
+
+{% set showDebug = DEBUG.is(['DEBUG']) %}
+
+{% if showDebug %}<!-- {{ debugInfo }} -->{% endif %}
+
+{% if tagsHtml %}
+    {{ tagsHtml | raw }}
+{% elseif showDebug %}
+    <!-- {{ 'EMPTY'|_ }} -->
+{% endif %}

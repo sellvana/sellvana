@@ -5,9 +5,6 @@
  * @property FCom_Catalog_Model_Product FCom_Catalog_Model_Product
  * @property FCom_Core_Main FCom_Core_Main
  * @property FCom_ProductCompare_Model_SetItem FCom_ProductCompare_Model_SetItem
- * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
- * @property FCom_Core_Main $FCom_Core_Main
- * @property FCom_ProductCompare_Model_Set $FCom_ProductCompare_Model_Set
  */
 class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {

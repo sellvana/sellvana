@@ -32,7 +32,7 @@ class FCom_CustomerGroups_Migrate extends BClass
 
         $this->BDb->run("
         replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
-        VALUES (1, 'General', 'general'), (2, 'NOT LOGGED IN', 'guest'), (3, 'Retailer', 'retailer')
+        VALUES (1, 'General', 'general'), (2, 'NOT LOGGED IN', 'guest'), (3, 'Retail', 'retail')
         ");
 
         $this->BDb->ddlTableDef($this->FCom_Customer_Model_Customer->table(),

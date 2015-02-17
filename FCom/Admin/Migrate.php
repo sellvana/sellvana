@@ -14,7 +14,7 @@
 
 class FCom_Admin_Migrate extends BClass
 {
-    public function install__0_1_8()
+    public function install__0_1_10()
     {
         $tRole = $this->FCom_Admin_Model_Role->table();
         $this->BDb->run("
@@ -293,11 +293,11 @@ class FCom_Admin_Migrate extends BClass
 
     public function upgrade__0_1_8__0_1_9()
     {
-        $tMedia = $this->FCom_Core_Model_MediaLibrary->table();
-        $this->BDb->ddlTableDef($tMedia, [
-            BDb::COLUMNS => [
-                'folder' => 'varchar(255) NOT NULL',
-            ],
-        ]);
+        // Moved MediaLibrary update to FCom_Core
+    }
+
+    public function upgrade__0_1_9__0_1_10()
+    {
+        $this->FCom_Admin_Model_Personalize->delete_many('1');
     }
 }

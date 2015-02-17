@@ -29,7 +29,8 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
         Compare: React.createClass({
             render: function () {
                 return (
-                    <select className="to-select2 form-control" onChange={this.props.onChange} id={this.props.id} defaultValue={this.props.value}>
+                    <select className="to-select2" onChange={this.props.onChange} id={this.props.id}
+                        defaultValue={this.props.value} disabled={this.props.disabled} style={this.props.style}>
                     {this.props.opts.map(function(type){
                         return <option value={type.id} key={type.id}>{type.label}</option>
                     })}
@@ -192,7 +193,8 @@ define(['react', 'jsx!fcom.components'], function (React, Components) {
                 var data = [];
                 var val = el.val().split(",");
                 for(var i in val) {
-                    data.push({id: val[i], text: val[i]});
+                    var val2 = val[i];
+                    data.push({id: val2, text: val2});
                 }
                 callback(data);
             }

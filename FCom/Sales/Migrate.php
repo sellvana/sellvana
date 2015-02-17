@@ -6,6 +6,7 @@
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_Sales_Migrate_Model_Cart_Address $FCom_Sales_Migrate_Model_Cart_Address
  * @property FCom_Sales_Migrate_Model_Order_Address $FCom_Sales_Migrate_Model_Order_Address
  * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
@@ -32,7 +33,7 @@
 class FCom_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_12()
+    public function install__0_3_13()
     {
         $tCustomer = $this->FCom_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
@@ -75,13 +76,16 @@ class FCom_Sales_Migrate extends BClass
                 'subtotal' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
                 'tax_amount' => "decimal(12,2) NOT NULL default 0",
                 'discount_amount' => "decimal(12,2) NOT NULL default 0",
+                'discount_percent' => 'decimal(5,2) not null default 0',
                 'grand_total' => "decimal(12,2) NOT NULL default 0",
                 'cookie_token' => 'varchar(40) default null',
                 'customer_id' => "int unsigned default NULL",
                 'customer_email' => "varchar(100) NULL",
                 'shipping_method' => "VARCHAR(50)  NULL ",
-                'shipping_price' => "DECIMAL(10, 2) NULL ",
                 'shipping_service' => "CHAR(2)  NULL",
+                'shipping_price' => "DECIMAL(10, 2) NULL ",
+                'shipping_discount' => 'decimal(12,2) not null default 0',
+                'shipping_free' => 'tinyint not null default 0',
                 'payment_method' => "VARCHAR(50) NULL ",
                 'payment_details' => "TEXT CHARACTER SET utf8   NULL",
                 'coupon_code' => "VARCHAR(50) default NULL",
@@ -147,6 +151,8 @@ class FCom_Sales_Migrate extends BClass
                 'row_total' => "decimal(12,2) NULL",
                 'row_tax' => "decimal(12,2) NOT NULL default 0",
                 'row_discount' => "decimal(12,2) NOT NULL default 0",
+                'row_discount_percent' => 'decimal(5,2) not null default 0',
+                'auto_added' => 'tinyint not null default 0',
 
                 'promo_id_buy' => "VARCHAR(50) default NULL",
                 'promo_id_get' => "INT(10) UNSIGNED default NULL",
@@ -187,15 +193,17 @@ class FCom_Sales_Migrate extends BClass
                 'subtotal' => "decimal(12,2) NOT NULL DEFAULT '0.00'",
                 'shipping_method' => "varchar(50) DEFAULT NULL",
                 'shipping_service' => "varchar(50) DEFAULT NULL",
+                'shipping_price' => 'decimal(12,2) not null default 0',
+                'shipping_discount' => 'decimal(12,2) not null default 0',
+                'shipping_free' => 'tinyint not null default 0',
                 'payment_method' => "varchar(50) DEFAULT NULL",
                 'coupon_code' => "varchar(50) DEFAULT NULL",
-                'shipping_price' => 'decimal(12,2) not null default 0',
                 'tax_amount' => "decimal(12,2) DEFAULT NULL",
                 'discount_amount' => 'decimal(12,2) default null',
+                'discount_percent' => 'decimal(5,2) not null default 0',
                 'create_at' => "datetime DEFAULT NULL",
                 'update_at' => "datetime DEFAULT NULL",
                 'grand_total' => "decimal(12,2) NOT NULL",
-                'shipping_service_title' => "varchar(100) DEFAULT NULL",
                 'data_serialized' => "text",
                 'unique_id' => "varchar(15) NOT NULL",
                 'admin_id' => "int(10) unsigned DEFAULT NULL",
@@ -264,6 +272,8 @@ class FCom_Sales_Migrate extends BClass
                 'row_total' => 'decimal(12,2) NOT NULL DEFAULT 0',
                 'row_tax' => 'decimal(12,2) not null default 0',
                 'row_discount' => 'decimal(12,2) not null default 0',
+                'row_discount_percent' => 'decimal(5,2) not null default 0',
+                'auto_added' => 'tinyint not null default 0',
 
                 'data_serialized' => 'text null',
 
@@ -1776,7 +1786,6 @@ class FCom_Sales_Migrate extends BClass
         $tOrderShipmentItem = $this->FCom_Sales_Model_Order_Shipment_Item->table();
         $tOrderShipmentPackage = $this->FCom_Sales_Model_Order_Shipment_Package->table();
 
-
         $this->BDb->ddlTableDef($tOrderShipmentPackage, [
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
@@ -1802,6 +1811,44 @@ class FCom_Sales_Migrate extends BClass
             ],
             BDb::CONSTRAINTS => [
                 'package' => ['package_Id', $tOrderShipmentPackage],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_12__0_3_13()
+    {
+        $tCart = $this->FCom_Sales_Model_Cart->table();
+        $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
+        $tOrder = $this->FCom_Sales_Model_Order->table();
+        $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'shipping_discount' => 'decimal(12,2) not null default 0',
+                'shipping_free' => 'tinyint not null default 0',
+                'discount_percent' => 'decimal(5,2) not null default 0',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDb::COLUMNS => [
+                'shipping_discount' => 'decimal(12,2) not null default 0',
+                'shipping_free' => 'tinyint not null default 0',
+                'discount_percent' => 'decimal(5,2) not null default 0',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tCartItem, [
+            BDb::COLUMNS => [
+                'row_discount_percent' => 'decimal(5,2) not null default 0',
+                'auto_added' => 'tinyint not null default 0',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'row_discount_percent' => 'decimal(5,2) not null default 0',
+                'auto_added' => 'tinyint not null default 0',
             ],
         ]);
     }

@@ -55,6 +55,10 @@ class FCom_CustomField_Frontend extends BClass
         $variantHlp = $this->FCom_CustomField_Model_ProductVariant;
 
         foreach ($args['items'] as &$item) {
+            if (empty($item['product'])) {
+                BDebug::notice('Empty product id, no variants calculation');
+                continue;
+            }
             $p = $item['product'];
             $variants = $variantHlp->orm()->where('product_id', $p->id())->find_many();
             if ($variants) {
