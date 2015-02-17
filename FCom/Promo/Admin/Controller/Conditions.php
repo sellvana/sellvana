@@ -11,6 +11,7 @@
  * @property FCom_Catalog_Model_InventorySku    $FCom_Catalog_Model_InventorySku
  * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
  * @property FCom_Sales_Main                    $FCom_Sales_Main
+ * @property FCom_Cms_Model_Block               $FCom_Cms_Model_Block
  */
 class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstract
 {
@@ -290,6 +291,47 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
                 break;
         }
         $result['total_count'] = 1;
+
+        $this->BResponse->json($result);
+    }
+
+    public function action_cmsblocks()
+    {
+        $r       = $this->BRequest;
+        $page    = $r->get('page')?: 1;
+        $cmsblocksTerm = $r->get('q');
+        $limit   = $r->get('o')?: 30;
+        $offset  = ($page - 1) * $limit;
+        $ids     = $r->get('cmsblocks');
+        if ($ids) {
+            $ids = explode(",", $ids);
+        }
+
+        /** @var BORM $orm */
+        $orm = $this->FCom_Cms_Model_Block->orm('c')->select(['id', 'handle'], 'c');
+        if (!$ids) {
+            if ($cmsblocksTerm && $cmsblocksTerm != '*') {
+                $orm->where([['handle LIKE ?', "%{$cmsblocksTerm}%"]]);
+            }
+
+            $countOrm = clone $orm;
+            $countOrm->select_expr('COUNT(*)', 'count');
+            $stmt     = $countOrm->execute();
+            $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $count    = $countRes[0]['count'];
+            $orm->limit((int) $limit)->offset($offset)->order_by_asc('handle');
+        } else {
+            $orm->where(["id" => $ids]);
+            $count = 0;
+        }
+        $stmt   = $orm->execute();
+        $result = ['total_count' => $count, 'items' => []];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $result['items'][] = [
+                'id'        => $row['id'],
+                'text'      => $row['handle'],
+            ];
+        }
 
         $this->BResponse->json($result);
     }

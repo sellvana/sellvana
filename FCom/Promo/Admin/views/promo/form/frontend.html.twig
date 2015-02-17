@@ -65,7 +65,9 @@
 //                console.log(PromoDetails);
                 var centralPageOptions = {
                     container: $displayTypeContainer[0],
-                    selector: $displayTypeSelector
+                    selector: $displayTypeSelector,
+                    promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
+                    base_url: "{{ APP.href('promo/') }}"
                 };
                 PromoDetails.initCentralPageApp(centralPageOptions);
             });
