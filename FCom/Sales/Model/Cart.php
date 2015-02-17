@@ -500,7 +500,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->set('same_address', 1);
         $defCountry = $this->BConfig->get('modules/FCom_Core/default_country');
         $this->set('shipping_country', $defCountry)->set('billing_country', $defCountry);
-        $this->setShippingMethod(true);
+        $this->setShippingMethod(true, null, true);
         $this->setPaymentMethod(true);
         $this->state()->overall()->setActive();
 
@@ -589,18 +589,23 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      * @param string $service
      * @return $this
      */
-    public function setShippingMethod($method, $service = null)
+    public function setShippingMethod($method, $service = null, $ignoreInvalid = false)
     {
         $methods = $this->FCom_Sales_Main->getShippingMethods();
         if (true === $method) {
             $method = $this->BConfig->get('modules/FCom_Sales/default_shipping_method');
         }
-        if (empty($methods[$method])) {
+        if (!$ignoreInvalid && empty($methods[$method])) {
             throw new BException('Invalid shipping method: '. $method);
         }
-        $services = $methods[$method]->getServices();
-        if (null !== $service && empty($services[$service])) {
-            throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
+        if (!empty($methods[$method])) {
+            $services = $methods[$method]->getServices();
+            if (null !== $service && empty($services[$service])) {
+                throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
+            }
+        } else {
+            $method = null;
+            $service = null;
         }
         $this->set('shipping_method', $method)->set('shipping_service', $service);
         return $this;
