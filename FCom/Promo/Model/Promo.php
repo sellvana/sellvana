@@ -587,4 +587,41 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
         ];
         return $result;
     }
+
+    public function getPromoDisplayData()
+    {
+        // todo
+
+        return [
+            [
+                'id'              => 1,
+                'promo_id'        => 1,
+                'page_type'       => 'home_page',
+                'page_location'   => 'below_product_name',
+                'content_type'    => 'html',
+                'data_serialized' => json_encode([
+                    'html_content' => '<h1>Content</h1>',
+                    'match'        => 'always',
+                    'conditions'   => [
+                        'promo_conditions_match' => 0,
+                        'customer_groups'        => 'general'
+                    ]
+                ])
+            ],
+            [
+                'id'              => 2,
+                'promo_id'        => 1,
+                'page_type'       => 'cart',
+                'page_location'   => 'above_description',
+                'content_type'    => 'cms_block',
+                'data_serialized' => json_encode([
+                    'cms_block_handle' => 'block1',
+                    'match'            => 'all',
+                    'conditions'       => [
+                        'customer_groups' => 'all'
+                    ]
+                ])
+            ],
+        ];
+    }
 }

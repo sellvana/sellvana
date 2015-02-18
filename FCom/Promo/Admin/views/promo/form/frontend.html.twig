@@ -6,6 +6,7 @@
 {% set promo_type = validator.fieldValue('promo_type') %}
 {% set validator = THIS.get('validator') %}
 {% set labelClass = "col-md-3" %}
+{% set promoDisplayData = m.getPromoDisplayData() %}
 {% set data = UTIL.fromJson(validator.fieldValue("data_serialized")) %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
@@ -14,10 +15,20 @@
 {% endif %}
 
 <fieldset class="adm-section-group">
-    <div class="f-section">dynamic
+    <div class="f-section">
+        <h4>{{ "Add Promotions Display"|_ }}&nbsp;
+            <a tabindex="-1" class="help-icon" href="#" data-toggle="popover"
+               data-trigger="focus" data-content="{{ "Add Promotions Display"|_ }}" data-container="body">
+                <span class="icon-question-sign"></span></a>&nbsp;
+            <a href="#" class="btn-add" id="add_promo_display_btn">
+                <span class="icon-plus-sign"></span></a>
+        </h4>
+        <hr/>
     {#{{ dump(data) }}#}
     </div>
     <div class="f-section">
+        <h4>{{ "Display On Central Promotion Page"|_ }}</h4>
+        <hr/>
         {{ forms.boolean({
             label: "Display Promotion on Central Promotions Page"|_, label_class: labelClass,
             value: validator.fieldValue('display_on_central_page'),
@@ -58,20 +69,24 @@
         }) }}
         <div id="display_type_details">Loading ...</div>
         {% set elView = LAYOUT.view('core/form-elements') %}
-        <script>
-            require(['jquery', 'jsx!fcom.promo.details'], function ($, PromoDetails) {
-                var $displayTypeContainer = $("#display_type_details");
-                var $displayTypeSelector = $("#{{ elView.getInputId({'field':'display_type'}) }}");
-//                console.log(PromoDetails);
-                var centralPageOptions = {
-                    container: $displayTypeContainer[0],
-                    selector: $displayTypeSelector,
-                    promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
-                    base_url: "{{ APP.href('promo/') }}"
-                };
-                PromoDetails.initCentralPageApp(centralPageOptions);
-            });
-        </script>
     </div>
+    <script>
+        require(['jquery', 'jsx!fcom.promo.details'], function ($, PromoDetails) {
+            var $displayTypeContainer = $("#display_type_details");
+            var $displayTypeSelector = $("#{{ elView.getInputId({'field':'display_type'}) }}");
+//                console.log(PromoDetails);
+            var centralPageOptions = {
+                container: $displayTypeContainer[0],
+                selector: $displayTypeSelector,
+                promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
+                base_url: "{{ APP.href('promo/') }}"
+            };
+            PromoDetails.initCentralPageApp(centralPageOptions);
+            var promoDisplayOptions = {
+                addDisplayBtn: $('#add_promo_display_btn')
+            };
+            PromoDetails.initAddPromoDisplayApp();
+        });
+    </script>
 </fieldset>
 

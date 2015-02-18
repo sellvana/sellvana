@@ -112,7 +112,7 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                 cmsOptions:{
                     label: "Block Handle",
                     id: "block-handle",
-                    help: "Select a cms block handle",
+                    help: "Select a cms block handle"
                 },
                 textOptions: {
                     titleLabel: "Promotion Title",

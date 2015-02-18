@@ -203,7 +203,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
                 <a id={this.props.id} className="pull-right" href="#" ref="icon"
                     data-toggle="popover" data-trigger="focus" tabIndex="-1"
                     data-content={this.props.content} data-container="body">
-                    <span className="glyphicon glyphicon-question-sign"></span>
+                    <span className="icon-question-sign"></span>
                 </a>
             );
         },
