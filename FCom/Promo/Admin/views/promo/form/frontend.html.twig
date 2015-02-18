@@ -6,7 +6,7 @@
 {% set promo_type = validator.fieldValue('promo_type') %}
 {% set validator = THIS.get('validator') %}
 {% set labelClass = "col-md-3" %}
-{% set promoDisplayData = m.getPromoDisplayData() %}
+{% set promoDisplayData = m.getPromoDisplayData(true) %}
 {% set data = UTIL.fromJson(validator.fieldValue("data_serialized")) %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
@@ -24,7 +24,8 @@
                 <span class="icon-plus-sign"></span></a>
         </h4>
         <hr/>
-    {#{{ dump(data) }}#}
+        <div id="add_promo_display_details"><div style="width: 100px;margin:10px auto;">{{"Loading ..."|_}}</div></div>
+        {#{{ dump(promoDisplayData) }}#}
     </div>
     <div class="f-section">
         <h4>{{ "Display On Central Promotion Page"|_ }}</h4>
@@ -67,25 +68,30 @@
             style: (promo_type == 'catalog')? "display: none": '',
             options: {"text": "Text"|_, "cms_block": "CMS BLOCK"|_}
         }) }}
-        <div id="display_type_details">Loading ...</div>
+        <div id="display_type_details">
+            <div style="width: 100px;margin:10px auto;">{{ "Loading ..."|_ }}</div></div>
         {% set elView = LAYOUT.view('core/form-elements') %}
+        {% set base_url = APP.href('promo/') %}
     </div>
     <script>
         require(['jquery', 'jsx!fcom.promo.details'], function ($, PromoDetails) {
-            var $displayTypeContainer = $("#display_type_details");
-            var $displayTypeSelector = $("#{{ elView.getInputId({'field':'display_type'}) }}");
+            var $displayTypeContainer = $('#display_type_details');
+            var $displayTypeSelector = $('#{{ elView.getInputId({field:"display_type"}) }}');
 //                console.log(PromoDetails);
             var centralPageOptions = {
                 container: $displayTypeContainer[0],
                 selector: $displayTypeSelector,
                 promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
-                base_url: "{{ APP.href('promo/') }}"
+                base_url: "{{ base_url }}"
             };
             PromoDetails.initCentralPageApp(centralPageOptions);
             var promoDisplayOptions = {
-                addDisplayBtn: $('#add_promo_display_btn')
+                container: $('#add_promo_display_details')[0],
+                addDisplayBtn: $('#add_promo_display_btn'),
+                promoDisplayData: {{ promoDisplayData|raw }},
+                base_url: "{{ base_url }}"
             };
-            PromoDetails.initAddPromoDisplayApp();
+            PromoDetails.initAddPromoDisplayApp(promoDisplayOptions);
         });
     </script>
 </fieldset>

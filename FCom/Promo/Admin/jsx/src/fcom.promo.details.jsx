@@ -1,15 +1,17 @@
 define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Components) {
     var cmsBlocks, customerGroups;
+
     function getCmsBlocks(url, callback) {
         $.get(url).done(callback);
     }
+
     var CentralPageApp = React.createClass({
-        getCmsOptions: function() {
+        getCmsOptions: function () {
             if (!cmsBlocks) {
                 var self = this;
                 var url = this.props.base_url + '/' + this.props.cmsBlocksUrl;
                 getCmsBlocks(url, function (result) {
-                    if(result.items) {
+                    if (result.items) {
                         cmsBlocks = result.items.map(function (item) {
                             return <option key={item.id} value={item.text}>{item.text}</option>
                         });
@@ -23,7 +25,7 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
         },
         render: function () {
             var types;
-            if(this.props.type === 'cms_block') {
+            if (this.props.type === 'cms_block') {
                 var cmsOptions = this.getCmsOptions(), value;
                 if (this.props.values) {
                     value = this.props.values[this.props.cmsOptions.id];
@@ -32,8 +34,9 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                     <div>
                         <Components.ControlLabel input_id={this.props.cmsOptions.id}
                             label_class={this.props.labelClass}>
-                            {this.props.cmsOptions.label}<Components.HelpIcon id={"help-" + this.props.cmsOptions.id}
-                            content={this.props.cmsOptions.help}/>
+                            {this.props.cmsOptions.label}
+                            <Components.HelpIcon id={"help-" + this.props.cmsOptions.id}
+                                content={this.props.cmsOptions.help}/>
                         </Components.ControlLabel>
                         <div className="col-md-5">
                             <select ref={this.props.cmsOptions.id} id={this.props.cmsOptions.id}
@@ -41,19 +44,20 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                         </div>
                     </div>
             } else {
-                var titleVal,applicationVal, conditionsVal,descriptionVal;
-                if(this.props.values) {
+                var titleVal, applicationVal, conditionsVal, descriptionVal;
+                if (this.props.values) {
                     titleVal = this.props.values['text_options'][this.props.textOptions.titleId];
                     applicationVal = this.props.values['text_options'][this.props.textOptions.applicationId];
                     conditionsVal = this.props.values['text_options'][this.props.textOptions.conditionsId];
                     descriptionVal = this.props.values['text_options'][this.props.textOptions.descriptionId];
                 }
-                types =[
+                types = [
                     <div className="form-group" key={this.props.textOptions.titleId}>
                         <Components.ControlLabel input_id={this.props.textOptions.titleId}
                             label_class={this.props.labelClass}>
-                            {this.props.textOptions.titleLabel}<Components.HelpIcon id={"help-" + this.props.textOptions.titleId}
-                            content={this.props.textOptions.titleHelp}/>
+                            {this.props.textOptions.titleLabel}
+                            <Components.HelpIcon id={"help-" + this.props.textOptions.titleId}
+                                content={this.props.textOptions.titleHelp}/>
                         </Components.ControlLabel>
                         <div className="col-md-5">
                             <input id={this.props.textOptions.titleId} ref={this.props.textOptions.titleId}
@@ -65,8 +69,9 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                     <div className="form-group" key={this.props.textOptions.applicationId}>
                         <Components.ControlLabel input_id={this.props.textOptions.applicationId}
                             label_class={this.props.labelClass}>
-                            {this.props.textOptions.applicationLabel}<Components.HelpIcon id={"help-" + this.props.textOptions.applicationId}
-                            content={this.props.textOptions.applicationHelp}/>
+                            {this.props.textOptions.applicationLabel}
+                            <Components.HelpIcon id={"help-" + this.props.textOptions.applicationId}
+                                content={this.props.textOptions.applicationHelp}/>
                         </Components.ControlLabel>
                         <div className="col-md-5">
                             <input id={this.props.textOptions.applicationId} ref={this.props.textOptions.applicationId}
@@ -78,8 +83,9 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                     <div className="form-group" key={this.props.textOptions.conditionsId}>
                         <Components.ControlLabel input_id={this.props.textOptions.conditionsId}
                             label_class={this.props.labelClass}>
-                            {this.props.textOptions.conditionsLabel}<Components.HelpIcon id={"help-" + this.props.textOptions.conditionsId}
-                            content={this.props.textOptions.conditionsHelp}/>
+                            {this.props.textOptions.conditionsLabel}
+                            <Components.HelpIcon id={"help-" + this.props.textOptions.conditionsId}
+                                content={this.props.textOptions.conditionsHelp}/>
                         </Components.ControlLabel>
                         <div className="col-md-5">
                             <input id={this.props.textOptions.conditionsId} ref={this.props.textOptions.conditionsId}
@@ -91,8 +97,9 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                     <div className="form-group" key={this.props.textOptions.descriptionId}>
                         <Components.ControlLabel input_id={this.props.textOptions.descriptionId}
                             label_class={this.props.labelClass}>
-                            {this.props.textOptions.descriptionLabel}<Components.HelpIcon id={"help-" + this.props.textOptions.descriptionId}
-                            content={this.props.textOptions.descriptionHelp}/>
+                            {this.props.textOptions.descriptionLabel}
+                            <Components.HelpIcon id={"help-" + this.props.textOptions.descriptionId}
+                                content={this.props.textOptions.descriptionHelp}/>
                         </Components.ControlLabel>
                         <div className="col-md-5">
                             <input id={this.props.textOptions.descriptionId} ref={this.props.textOptions.descriptionId}
@@ -109,7 +116,7 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
         },
         getDefaultProps: function () {
             return {
-                cmsOptions:{
+                cmsOptions: {
                     label: "Block Handle",
                     id: "block-handle",
                     help: "Select a cms block handle"
@@ -151,17 +158,148 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
             }
         }
     });
+
+    var AddPromoDisplayApp = React.createClass({
+        render: function () {
+            return (
+                <div id="add-promo-display">
+                    {this.props.data.map(function (item) {
+                        $.extend(item, JSON.parse(item.data_serialized));
+                        return <AddPromoDisplayItem data={item} key={item.id} id={"add-promo-item" + item.id} />
+                    })}
+                </div>
+            );
+        }
+    });
+
+    var AddPromoDisplayItem = React.createClass({
+        render: function () {
+            return (
+                <div className="add-promo-display-item">
+                    <div className="form-group">
+                        <Components.ControlLabel input_id={"display-page_type-" + this.props.data.id}
+                            label_class={this.props.labelClass}>
+                                {this.props.typeLabel}
+                            <Components.HelpIcon id={"display-page_type-help-" + this.props.data.id}
+                                content={this.props.typeHelp}/>
+                        </Components.ControlLabel>
+                        <div style={divStyle}>
+                            <select id={"display-page_type-" + this.props.data.id}
+                                ref={"display-page_type-" + this.props.data.id} className="form-control"
+                                name={"display[" + this.props.data.id + "][page_type]"}
+                                defaultValue={this.props.data.page_type}>
+                                <option value="home_page">Home Page</option>
+                                <option value="category_page">Category Page</option>
+                                <option value="product_page">Product Page</option>
+                                <option value="cart_page">Cart</option>
+                                <option value="success_page">Success Page</option>
+                                <option value="custom_hook">Custom Hook</option>
+                            </select>
+                        </div>
+                        <div style={divStyle}>
+                            <select id={"display-page_location-" + this.props.data.id} className="form-control"
+                                name={"display[" + this.props.data.id + "][page_location]"}
+                                defaultValue={this.props.data.page_location}>
+                                    {this.props.locationPageOptions[this.state.page_type].map(function (option) {
+                                        return <option key={option}>{option}</option>
+                                    })}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <Components.ControlLabel input_id={"display-content_type-" + this.props.data.id}
+                            label_class={this.props.labelClass}>
+                                {this.props.contentTypeLabel}
+                            <Components.HelpIcon id={"display-content_type-help-" + this.props.data.id}
+                                content={this.props.contentTypeHelp}/>
+                        </Components.ControlLabel>
+                        <div style={divStyle}>
+                            <select id={"display-content_type-" + this.props.data.id}
+                                ref={"display-content_type-" + this.props.data.id} className="form-control"
+                                name={"display[" + this.props.data.id + "][content_type]"}
+                                defaultValue={this.props.data.content_type}>
+                                <option value="html">Text (Html)</option>
+                                <option value="md">Text (Markdown)</option>
+                                <option value="cms_block">CMS Block</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="col-md-offset-1">content</div>
+                    <div className="form-group">
+                        <Components.ControlLabel input_id={"display-match-" + this.props.data.id}
+                            label_class={this.props.labelClass}>
+                                {this.props.conditionsLabel}
+                            <Components.HelpIcon id={"display-match-help-" + this.props.data.id}
+                                content={this.props.conditionsHelp}/>
+                        </Components.ControlLabel>
+                        <div style={divStyle}>
+                            <select id={"display-match-" + this.props.data.id}
+                                ref={"display-match-" + this.props.data.id} className="form-control"
+                                name={"display[" + this.props.data.id + "][data][match]"}
+                                defaultValue={this.props.data.match}>
+                                <option value="always">Show Always</option>
+                                <option value="all">When ALL Conditions Match</option>
+                                <option value="any">When ANY Conditions Match</option>
+                            </select>
+                        </div>
+                        <div style={divStyle}>
+                            <select id={"display-add-condition-" + this.props.data.id}
+                                ref={"display-add-condition-" + this.props.data.id} className="form-control">
+                                <option value="">Add Condition...</option>
+                                <option value="promo_conditions_match">Promo Conditions Met</option>
+                                <option value="customer_groups">Customer Group</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="col-md-offset-1">conditions</div>
+                </div>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                labelClass: "col-md-3",
+                typeLabel: "Type & Location",
+                typeHelp: "On which page and where on the page to place promo details.",
+                contentTypeLabel: "What to Show",
+                contentTypeHelp: "What to show as details",
+                conditionsLabel: "CONDITIONS",
+                conditionsHelp: "Conditions when to show promo details",
+                locationPageOptions: {
+                    home_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "home"],
+                    category_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "category"],
+                    product_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "product"],
+                    cart_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "cart"],
+                    success_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "success"],
+                    custom_hook: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "hook"]
+                }
+            }
+        },
+        componentDidMount: function () {
+            $('select', this.getDOMNode()).select2({minimumResultsForSearch: 15, dropdownAutoWidth: true});
+            $(this.refs["display-page_type-" + this.props.data.id].getDOMNode()).on("change", function (e) {
+                this.setState({page_type: e.val});
+            }.bind(this));
+        },
+        componentWillMount: function () {
+            this.setState({page_type: this.props.data.page_type});
+        }
+    });
+
     function renderCentralPageApp(properties, container) {
         React.render(<CentralPageApp {...properties} id="central-page-app"/>, container);
+    }
+
+    function renderAddPromoDisplayApp(properties, container) {
+        React.render(<AddPromoDisplayApp {...properties} id="add-promo-display-app"/>, container);
     }
 
     return {
         initCentralPageApp: function (options) {
             var $selector = options.selector, $dataSerialized = $('#' + options.promo_serialized);
-            if(!$selector.length) {
+            if (!$selector.length) {
                 console.warn("Display type selector not found");
                 return;
-            } else if(!$dataSerialized.length) {
+            } else if (!$dataSerialized.length) {
                 console.warn("Data serialized field not found");
                 return;
             }
@@ -174,6 +312,7 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                     console.log(e);
                 }
             }
+
             function updateDataSerialized() {
                 if ($dataSerialized.length) {
                     var values = options.data;
@@ -191,7 +330,7 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                 onCmsChange: function (e) {
                     console.log(e);
                     var val = e.val; // select2 sets new value in val field of event
-                    if(!val) {
+                    if (!val) {
                         val = $(e.target).val();
                     }
                     if (options.data['display_type_details']) {
@@ -217,17 +356,7 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                     updateDataSerialized();
                 }
             };
-            /*
-            {
-                display_type_details: {
-                    block-handle: handle
-                    promotion-title:
-                    show-application:
-                    show-conditions:
-                    show-description:
-                }
-            }
-            */
+
             renderCentralPageApp(centralAppProps, options.container);
             $selector.on('change', function (e) {
                 e.preventDefault();
@@ -235,6 +364,17 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                 centralAppProps.values = options.data['display_type_details'];
                 renderCentralPageApp(centralAppProps, options.container);
             });
+        },
+        initAddPromoDisplayApp: function (options) {
+            console.log(options);
+            var $addDisplayBtn = options.addDisplayBtn
+            /*
+             todo:
+             populate forms from saved data
+             on click delete button replace form with hidden delete field
+             */
+            renderAddPromoDisplayApp({data: options.promoDisplayData, base_url: options.base_url}, options.container);
         }
     }
 });
+var divStyle = {float: 'left', marginLeft: 5};

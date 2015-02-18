@@ -588,11 +588,11 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function getPromoDisplayData()
+    public function getPromoDisplayData($asJson = false)
     {
         // todo
 
-        return [
+        $result = [
             [
                 'id'              => 1,
                 'promo_id'        => 1,
@@ -611,7 +611,7 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
             [
                 'id'              => 2,
                 'promo_id'        => 1,
-                'page_type'       => 'cart',
+                'page_type'       => 'cart_page',
                 'page_location'   => 'above_description',
                 'content_type'    => 'cms_block',
                 'data_serialized' => json_encode([
@@ -623,5 +623,7 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
                 ])
             ],
         ];
+
+        return $asJson? $this->BUtil->toJson($result): $result;
     }
 }
