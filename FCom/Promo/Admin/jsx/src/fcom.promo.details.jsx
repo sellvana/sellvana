@@ -1,4 +1,4 @@
-define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Components) {
+define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], function ($, React, Components, _) {
     var cmsBlocks, customerGroups;
 
     function getCmsBlocks(url, callback) {
@@ -161,21 +161,33 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
 
     var AddPromoDisplayApp = React.createClass({
         render: function () {
+            var other = _.omit(this.props, ['data']);
             return (
                 <div id="add-promo-display">
                     {this.props.data.map(function (item) {
                         $.extend(item, JSON.parse(item.data_serialized));
-                        return <AddPromoDisplayItem data={item} key={item.id} id={"add-promo-item" + item.id} />
-                    })}
+                        return <AddPromoDisplayItem {...other} data={item} key={item.id} id={"add-promo-item" + item.id}/>
+                    }.bind(this))}
                 </div>
             );
+        },
+        getDefaultProps: function () {
+            return {cmsBlocksUrl: 'conditions/cmsblocks'}
         }
     });
 
     var AddPromoDisplayItem = React.createClass({
         render: function () {
+            var contentValue;
+            if(this.props.data.content_type == 'cms_block') {
+                contentValue = this.props.data.cms_block_handle;
+            } else if(this.props.data.content_type == 'html') {
+                contentValue = this.props.data.html_content
+            } else if(this.props.data.content_type == 'md') {
+                contentValue = this.props.data.text_content;
+            }
             return (
-                <div className="add-promo-display-item">
+                <div className="add-promo-display-item" style={{position: "relative"}}>
                     <div className="form-group">
                         <Components.ControlLabel input_id={"display-page_type-" + this.props.data.id}
                             label_class={this.props.labelClass}>
@@ -200,7 +212,7 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                             <select id={"display-page_location-" + this.props.data.id} className="form-control"
                                 name={"display[" + this.props.data.id + "][page_location]"}
                                 defaultValue={this.props.data.page_location}>
-                                    {this.props.locationPageOptions[this.state.page_type].map(function (option) {
+                                    {this.props.locationPageOptions[this.state.page_type? this.state.page_type: this.props.data.page_type].map(function (option) {
                                         return <option key={option}>{option}</option>
                                     })}
                             </select>
@@ -224,7 +236,11 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                             </select>
                         </div>
                     </div>
-                    <div className="col-md-offset-1">content</div>
+                    <div className="form-group">
+                        <AddPromoDisplayItemContent id={"display-content-" + this.props.data.id} ref={"display-content-" + this.props.data.id}
+                            data_id={this.props.data.id} value={contentValue} base_url={this.props.base_url} cmsBlocksUrl={this.props.cmsBlocksUrl}
+                            type={this.state.content_type? this.state.content_type: this.props.data.content_type}/>
+                    </div>
                     <div className="form-group">
                         <Components.ControlLabel input_id={"display-match-" + this.props.data.id}
                             label_class={this.props.labelClass}>
@@ -274,14 +290,101 @@ define(['jquery', 'react', 'jsx!fcom.components'], function ($, React, Component
                 }
             }
         },
+        getInitialState: function () {
+            return {};
+        },
         componentDidMount: function () {
             $('select', this.getDOMNode()).select2({minimumResultsForSearch: 15, dropdownAutoWidth: true});
             $(this.refs["display-page_type-" + this.props.data.id].getDOMNode()).on("change", function (e) {
                 this.setState({page_type: e.val});
             }.bind(this));
+            $(this.refs["display-content_type-" + this.props.data.id].getDOMNode()).on("change", function (e) {
+                this.setState({content_type: e.val});
+            }.bind(this));
+        }
+    });
+
+    var AddPromoDisplayItemContent = React.createClass({
+        render: function () {
+            var content = '';
+            switch(this.props.type) {
+                case 'html':
+                    content = <div><textarea rows="5" key={'wysywig-' + this.props.id}
+                        className="form-control ckeditor js-desc-wysiwyg"
+                        id={this.props.id}
+                        name={"display[" + this.props.data_id + "][data][html_content]"} defaultValue={this.props.value}></textarea>
+                        <textarea className="form-control js-desc-wysiwyg" id={this.props.id + "-validation"} key={'wysywig-val-' + this.props.id}
+                            style={{display: "none"}} defaultValue={this.props.value}></textarea>
+                    </div>;
+                    break;
+                case 'cms_block':
+                    var cmsOptions = this.getCmsOptions();
+                    content =
+                        <div>
+                            <Components.ControlLabel input_id={this.props.id}
+                                label_class={this.props.labelClass}>Block Handle
+                                <Components.HelpIcon id={"help-" + this.props.id}
+                                    content="Select a cms block handle"/>
+                            </Components.ControlLabel>
+                            <div className="col-md-5">
+                                <select ref={this.props.id} id={this.props.id} key={'cms-block-' + this.props.id}
+                                    name={"display[" + this.props.data_id + "][data][cms_block_handle]"}
+                                    defaultValue={this.props.value} className="form-control">{cmsOptions}</select>
+                            </div>
+                        </div>;
+                    break;
+                case 'md':
+                    content = <textarea rows="5"
+                        id={this.props.id}
+                        name={"display[" + this.props.data_id + "][data][text_content]"}
+                        className="form-control"
+                        placeholder="Text content here ..." defaultValue={this.props.value}></textarea>;
+                    break;
+            }
+
+            return (
+                <div className="col-md-offset-3">
+                    {content}
+                </div>
+            );
         },
-        componentWillMount: function () {
-            this.setState({page_type: this.props.data.page_type});
+        initCmsBlockSelect: function () {
+            if (this.props.type == 'cms_block') {
+                var $cmsSelect = $('#' + this.props.id);
+                if ($cmsSelect.length) {
+                    $cmsSelect.select2({minimumResultsForSearch: 15})
+                        .val(this.props.value);
+                }
+            }
+        },
+        initRichEditor: function () {
+            if (this.props.type == 'html') {
+                CKEDITOR.replace(this.props.id);
+            }
+        },
+        componentDidMount: function () {
+            this.initRichEditor();
+            this.initCmsBlockSelect();
+        },
+        componentDidUpdate: function () {
+            this.initRichEditor();
+            this.initCmsBlockSelect();
+        },
+        getCmsOptions: function () {
+            if (!cmsBlocks) {
+                //cmsBlocks = [];
+                var self = this;
+                var url = this.props.base_url + '/' + this.props.cmsBlocksUrl;
+                getCmsBlocks(url, function (result) {
+                    if (result.items) {
+                        cmsBlocks = result.items.map(function (item) {
+                            return <option key={item.id} value={item.text}>{item.text}</option>
+                        });
+                        self.forceUpdate();
+                    }
+                });
+            }
+            return cmsBlocks;
         }
     });
 

@@ -24,7 +24,9 @@
                 <span class="icon-plus-sign"></span></a>
         </h4>
         <hr/>
-        <div id="add_promo_display_details"><div style="width: 100px;margin:10px auto;">{{"Loading ..."|_}}</div></div>
+        <div id="add_promo_display_details">
+            <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+        </div>
         {#{{ dump(promoDisplayData) }}#}
     </div>
     <div class="f-section">
@@ -69,7 +71,10 @@
             options: {"text": "Text"|_, "cms_block": "CMS BLOCK"|_}
         }) }}
         <div id="display_type_details">
-            <div style="width: 100px;margin:10px auto;">{{ "Loading ..."|_ }}</div></div>
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
+        </div>
         {% set elView = LAYOUT.view('core/form-elements') %}
         {% set base_url = APP.href('promo/') %}
     </div>
