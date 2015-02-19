@@ -14,6 +14,7 @@
  * @property FCom_CatalogIndex_Model_Term $FCom_CatalogIndex_Model_Term
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_CustomField_Main $FCom_CustomField_Main
+ * @property FCom_CustomField_Model_ProductVariant $FCom_CustomField_Model_ProductVariant
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  */
 class FCom_CatalogIndex_Indexer extends BClass
@@ -142,29 +143,32 @@ class FCom_CatalogIndex_Indexer extends BClass
 
     protected function _indexFetchVariantsData($products)
     {
-        if (!$this->BModuleRegistry->isLoaded('FCom_CatalogIndex')) {
+        if (!$this->BModuleRegistry->isLoaded('FCom_CatalogIndex')
+            || !$this->BModuleRegistry->isLoaded('FCom_CustomField')
+        ) {
             return;
         }
+        $pIds = [];
         foreach ($products as $p) {
-            $pId = $p->id();
-            $vFields = $p->getData('variants_fields');
-            $variants = $p->getData('variants');
-            if ($variants) {
-                foreach ($variants as $variant) {
-                    $fValues = [];
-                    foreach ($variant['fields'] as $field => $value) {
-                        if (empty($fValues[$field])) {
-                            if (empty(static::$_indexData[$pId][$field])) {
-                                $fValues[$field] = [];
-                            } else {
-                                $fValues[$field] = (array)static::$_indexData[$pId][$field];
-                            }
-                        }
-                        $fValues[$field][] = $value;
+            $pIds[] = $p->id();
+        }
+        $variants = $this->FCom_CustomField_Model_ProductVariant->orm()
+            ->where_in('product_id', $pIds)->find_many();
+        if ($variants) {
+            foreach ($variants as $v) {
+                $pId = $v->get('product_id');
+                $vFieldValues = $this->BUtil->fromJson($v->get('field_values'));
+                $fValues = [];
+                foreach ($vFieldValues as $field => $value) {
+                    if (empty(static::$_indexData[$pId][$field])) {
+                        $fValues[$field] = [];
+                    } else {
+                        $fValues[$field] = (array)static::$_indexData[$pId][$field];
                     }
-                    foreach ($fValues as $field => $values) {
-                        static::$_indexData[$pId][$field] = array_unique($values);
-                    }
+                    $fValues[$field][] = $value;
+                }
+                foreach ($fValues as $field => $values) {
+                    static::$_indexData[$pId][$field] = array_unique($values);
                 }
             }
         }

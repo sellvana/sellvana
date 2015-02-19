@@ -33,7 +33,7 @@
 class FCom_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_13()
+    public function install__0_3_14()
     {
         $tCustomer = $this->FCom_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
@@ -1851,6 +1851,22 @@ class FCom_Sales_Migrate extends BClass
                 'auto_added' => 'tinyint not null default 0',
             ],
         ]);
+    }
+
+    public function upgrade__0_3_13__0_3_14()
+    {
+        // make sure the previous updates were run, excluding 0.3.2-0.3.4
+        $this->upgrade__0_3_0__0_3_1();
+        $this->upgrade__0_3_1__0_3_2();
+        $this->upgrade__0_3_4__0_3_5();
+        $this->upgrade__0_3_5__0_3_6();
+        $this->upgrade__0_3_6__0_3_7();
+        $this->upgrade__0_3_7__0_3_8();
+        $this->upgrade__0_3_8__0_3_9();
+        $this->upgrade__0_3_9__0_3_10();
+        $this->upgrade__0_3_10__0_3_11();
+        $this->upgrade__0_3_11__0_3_12();
+        $this->upgrade__0_3_12__0_3_13();
     }
 }
 

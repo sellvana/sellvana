@@ -33,7 +33,7 @@
  */
 class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
 {
-    const MATCH_ALL = '0', MATCH_ANY = '1';
+    const MATCH_ALL = 'all', MATCH_ANY = 'any';
 
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo';
@@ -129,7 +129,7 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
 
         $orm = $this->orm('p')
             ->where('status', 'active')
-            ->where_raw('((from_date is null or from_date>?) and (to_date is null or to_date<?))', [$now, $now])
+            ->where_raw('((from_date is null or from_date<?) and (to_date is null or to_date>?))', [$now, $now])
             ->order_by_asc('priority_order')
         ;
 
@@ -179,10 +179,10 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
             case 'lt':          return $v1 < $v2;
             case 'lte':         return $v1 <= $v2;
             case 'eq':          return $v1 == $v2;
-            case 'is':          return $v1 == $v2;
             case 'neq':         return $v1 != $v2;
-            case 'is_not':      return $v1 != $v2;
+            case 'is':          return in_array($v1, (array)$v2, false);
             case 'in':          return in_array($v1, (array)$v2, false);
+            case 'is_not':      return !in_array($v1, (array)$v2, false);
             case 'not_in':      return !in_array($v1, (array)$v2, false);
             case 'empty':       return $v1 === null || $v1 === false || $v1 === '';
             case 'contains':    return strpos($v1, $v2) !== false;
@@ -245,6 +245,7 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
         $conditionRules = $this->getData('conditions/rules');
         if (!$conditionRules) {
             $result['match'] = true;
+            $result['items'] = $cart->items();
             return $result;
         }
 
@@ -256,7 +257,7 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
                         $match = $this->_validateCartConditionSkus($cart, $condition, $result);
                         break;
 
-                    case 'categories':
+                    case 'category':
                         $match = $this->_validateCartConditionCategories($cart, $condition, $result);
                         break;
 
@@ -289,18 +290,15 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
 
     protected function _validateCartConditionSkus(FCom_Sales_Model_Cart $cart, array $condition, array &$result)
     {
-        if (empty($condition['sku'])) { //TODO: fix the form and change to this
-        #if (empty($condition['product_id'])) {
+        if (empty($condition['sku'])) {
             return false;
         }
-        $skus = array_flip((array)$condition['sku']); //TODO: fix the form and change to this
-        #$prodIds = array_flip((array)$condition['product_id']);
+        $skus = array_flip((array)$condition['sku']);
         $total = 0;
         $items = [];
         /** @var FCom_Sales_Model_Cart_Item $item */
         foreach ($cart->items() as $item) {
-            if (!isset($skus[$item->get('product_sku')])) { //TODO: fix the form and change to this
-            #if (!isset($prodIds[$item->get('product_id')])) {
+            if (!isset($skus[$item->get('product_sku')])) {
                 continue;
             }
             switch ($condition['type']) {
@@ -327,7 +325,7 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
 
     protected function _validateCartConditionCategories(FCom_Sales_Model_Cart $cart, array $condition, array &$result)
     {
-        if (empty($condition['category_ids'])) {
+        if (empty($condition['category_id'])) {
             return false;
         }
         $catIds = (array)$condition['category_id'];
@@ -350,7 +348,7 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
             if (!isset($foundProdIds[$item->get('product_id')])) {
                 continue;
             }
-            switch ($condition['total_type']) {
+            switch ($condition['type']) {
                 case 'qty':
                     $total += $item->get('qty');
                     break;
