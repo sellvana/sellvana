@@ -13,13 +13,21 @@ class FCom_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         return $this->get('qty_in_stock') - $this->get('qty_buffer') - $this->get('qty_reserved');
     }
 
+    public function getManageInventory()
+    {
+        return $this->get('manage_inventory');
+    }
+
     public function isInStock()
     {
-        return $this->getQtyAvailable() > 0;
+        return !$this->getManageInventory() || $this->getQtyAvailable() > 0;
     }
 
     public function reserveUnits($qty)
     {
+        if (!$this->getManageInventory()) {
+            return $this;
+        }
         $qtyReserved = $this->get('qty_reserved');
         $this->set('qty_reserved', $qtyReserved + $qty);
         return $this;
@@ -27,6 +35,9 @@ class FCom_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
 
     public function pickReservedUnits($qty)
     {
+        if (!$this->getManageInventory()) {
+            return $this;
+        }
         $qtyReserved = $this->get('qty_reserved');
         $qtyInStock = $this->get('qty_in_stock');
         $this->set([
@@ -38,6 +49,9 @@ class FCom_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
 
     public function restockUnits($qty)
     {
+        if (!$this->getManageInventory()) {
+            return $this;
+        }
         $this->add('qty_in_stock', $qty);
         return $this;
     }
