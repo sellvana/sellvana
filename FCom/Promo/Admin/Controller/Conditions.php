@@ -134,7 +134,10 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
 
         $countOrm = clone $orm;
         $count    = $countOrm->count();
-        $results  = ['total_count' => $count, 'items' => []];
+        $results  = ['total_count' => $count, 'items' => [
+            ['id' => 'cart.qty', 'text' => 'Total Qty (cart)', 'input' => 'number'],
+            ['id' => 'cart.amt', 'text' => 'Total Amount (cart)', 'input' => 'number'],
+        ]];
         $orm->limit((int) $limit)->offset($offset)->order_by_desc('frontend_label');
 
         $orm->iterate(function ($model) use (&$results) {
