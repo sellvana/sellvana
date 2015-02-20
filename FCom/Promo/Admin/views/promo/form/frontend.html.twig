@@ -25,7 +25,9 @@
         </h4>
         <hr/>
         <div id="add_promo_display_details">
-            <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
         </div>
         {#{{ dump(promoDisplayData) }}#}
     </div>
@@ -80,6 +82,14 @@
     </div>
     <script>
         require(['jquery', 'jsx!fcom.promo.details'], function ($, PromoDetails) {
+            var promoDisplayOptions = {
+                container: $('#add_promo_display_details')[0],
+                addDisplayBtn: $('#add_promo_display_btn'),
+                promoDisplayData: {{ promoDisplayData|raw }},
+                base_url: "{{ base_url }}"
+            };
+            PromoDetails.initAddPromoDisplayApp(promoDisplayOptions);
+
             var $displayTypeContainer = $('#display_type_details');
             var $displayTypeSelector = $('#{{ elView.getInputId({field:"display_type"}) }}');
 //                console.log(PromoDetails);
@@ -90,13 +100,6 @@
                 base_url: "{{ base_url }}"
             };
             PromoDetails.initCentralPageApp(centralPageOptions);
-            var promoDisplayOptions = {
-                container: $('#add_promo_display_details')[0],
-                addDisplayBtn: $('#add_promo_display_btn'),
-                promoDisplayData: {{ promoDisplayData|raw }},
-                base_url: "{{ base_url }}"
-            };
-            PromoDetails.initAddPromoDisplayApp(promoDisplayOptions);
         });
     </script>
 </fieldset>
