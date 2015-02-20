@@ -1349,7 +1349,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 label: Locale._("Unknown"),
                 url: "",
                 fcLabel: "",
-                postHelperText: "Use .. (e.g. 90000..99999) to add range of post codes",
+                postHelperText: "Use .. (e.g. 90000..99999) to add range of post codes"
             };
         },
         url: '',

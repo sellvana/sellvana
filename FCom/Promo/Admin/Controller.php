@@ -11,6 +11,7 @@
  * @property FCom_Catalog_Model_Product   $FCom_Catalog_Model_Product
  * @property FCom_Admin_View_Grid         $FCom_Admin_View_Grid
  * @property FCom_Promo_Model_PromoCoupon $FCom_Promo_Model_PromoCoupon
+ * @property FCom_Promo_Model_PromoDisplay $FCom_Promo_Model_PromoDisplay
  *
  */
 class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
@@ -163,6 +164,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         parent::formPostAfter($args);
         $this->processCoupons($args['model']);
+        $this->processFrontendDisplay($args['model']);
         #$this->processGroupsPost($args['model'], $_POST);
         #$this->processMediaPost($args['model'], $_POST);
     }
@@ -721,6 +723,37 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         $this->_processSingleCoupon($model);
         $this->_processMultiCoupons($model);
+    }
+
+    /**
+     * @param FCom_Promo_Model_Promo $model
+     * @throws BException
+     */
+    protected function processFrontendDisplay($model)
+    {
+        $data = $this->BRequest->post('display');
+        if(!$data) {
+            return;
+        }
+        $displayModel = $this->FCom_Promo_Model_PromoDisplay;
+        foreach ($data as $id => $displayData) {
+            $serialData = $displayData['data'];
+            unset($displayData['data']);
+            $displayData['promo_id'] = $model->id();
+            /** @var FCom_Promo_Model_PromoDisplay $dModel */
+            if(is_numeric($id)) {
+                $dModel = $displayModel->load($id);
+                if(!$dModel) {
+                    throw new BException("Wrong id: " . $id);
+                }
+            } else {
+                $dModel = $displayModel->create();
+            }
+            $dModel->set($displayData)
+                ->setData($serialData)
+                ->save();
+        }
+
     }
 
     /**

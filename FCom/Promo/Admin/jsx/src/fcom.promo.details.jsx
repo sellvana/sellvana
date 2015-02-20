@@ -62,8 +62,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                         <div className="col-md-5">
                             <input id={this.props.textOptions.titleId} ref={this.props.textOptions.titleId}
                                 placeholder={this.props.textOptions.titlePlaceholder} className="form-control"
-                                onChange={this.props.onTextChange}
-                                name={this.props.textOptions.titleId} defaultValue={titleVal}/>
+                                onChange={this.props.onTextChange} defaultValue={titleVal}/>
                         </div>
                     </div>,
                     <div className="form-group" key={this.props.textOptions.applicationId}>
@@ -76,8 +75,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                         <div className="col-md-5">
                             <input id={this.props.textOptions.applicationId} ref={this.props.textOptions.applicationId}
                                 placeholder={this.props.textOptions.applicationPlaceholder} className="form-control"
-                                onChange={this.props.onTextChange}
-                                name={this.props.textOptions.applicationId} defaultValue={applicationVal}/>
+                                onChange={this.props.onTextChange} defaultValue={applicationVal}/>
                         </div>
                     </div>,
                     <div className="form-group" key={this.props.textOptions.conditionsId}>
@@ -90,8 +88,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                         <div className="col-md-5">
                             <input id={this.props.textOptions.conditionsId} ref={this.props.textOptions.conditionsId}
                                 placeholder={this.props.textOptions.conditionsPlaceholder} className="form-control"
-                                onChange={this.props.onTextChange}
-                                name={this.props.textOptions.conditionsId} defaultValue={conditionsVal}/>
+                                onChange={this.props.onTextChange} defaultValue={conditionsVal}/>
                         </div>
                     </div>,
                     <div className="form-group" key={this.props.textOptions.descriptionId}>
@@ -104,8 +101,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                         <div className="col-md-5">
                             <input id={this.props.textOptions.descriptionId} ref={this.props.textOptions.descriptionId}
                                 placeholder={this.props.textOptions.descriptionPlaceholder} className="form-control"
-                                onChange={this.props.onTextChange}
-                                name={this.props.textOptions.descriptionId} defaultValue={descriptionVal}/>
+                                onChange={this.props.onTextChange} defaultValue={descriptionVal}/>
                         </div>
                     </div>
                 ]
@@ -167,6 +163,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                     {this.props.data.map(function (item) {
                         if (item['data_serialized']) {
                             $.extend(item, JSON.parse(item['data_serialized']));
+                            delete item['data_serialized'];
                         }
                         return <AddPromoDisplayItem {...other} data={item} key={item.id} id={"add-promo-item" + item.id}/>
                     }.bind(this))}
@@ -193,14 +190,22 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                     contentValue = this.props.data.text_content;
                 }
 
-                for(var c in this.props.data.conditions) {
-                    if(this.props.data.conditions.hasOwnProperty(c)) {
-                        conditions.push(<AddPromoDisplayCondition key={c + '-' + this.props.data.id} customerGroups={this.props.customerGroups}
-                            data_id={this.props.data.id} type={c} value={this.props.data.conditions[c]}/>)
+                //for(var c in this.props.data.conditions) {
+                //    if(this.props.data.conditions.hasOwnProperty(c)) {
+                //        conditions.push(<AddPromoDisplayCondition key={c + '-' + this.props.data.id} customerGroups={this.props.customerGroups}
+                //            data_id={this.props.data.id} type={c} value={this.props.data.conditions[c]}/>)
+                //    }
+                //}
+                conditions = this.props.data.conditions.map(function (condition, idx) {
+                    //console.log(condition);
+                    for (var c in condition) {
+                        return <AddPromoDisplayCondition key={c + '-' + idx + '-' + this.props.data.id} customerGroups={this.props.customerGroups}
+                            data_id={this.props.data.id} type={c} value={condition[c]} onRemove={this.props.removeCondition}/>;
                     }
-                }
+                }.bind(this));
                 content =
                     <div key={'add-promo-' + this.props.data.id} className="add-promo-display-item" style={{position: "relative"}}>
+                        <hr/>
                         <a href="#" className="btn-remove" id={"remove_promo_display_btn_" + this.props.data.id}>
                             <span className="icon-remove-sign"></span>
                         </a>
@@ -277,7 +282,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                             <div style={divStyle}>
                                 <select id={"display-add-condition-" + this.props.data.id}
                                     ref={"display-add-condition-" + this.props.data.id} className="form-control">
-                                    <option value="">Add Condition...</option>
+                                    <option value="-1">Add Condition...</option>
                                     <option value="promo_conditions_match">Promo Conditions Met</option>
                                     <option value="customer_groups">Customer Group</option>
                                 </select>
@@ -317,14 +322,26 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
             if (!this.state.delete) {
                 $('select', this.getDOMNode()).select2({minimumResultsForSearch: 15, dropdownAutoWidth: true});
 
+                // handle page type change, home_page, product_page etc.
                 $(this.refs["display-page_type-" + this.props.data.id].getDOMNode()).on("change", function (e) {
                     this.setState({page_type: e.val});
                 }.bind(this));
 
+                // handle display content type change html, md, cms_block
                 $(this.refs["display-content_type-" + this.props.data.id].getDOMNode()).on("change", function (e) {
                     this.setState({content_type: e.val});
                 }.bind(this));
 
+                $(this.refs["display-add-condition-" + this.props.data.id].getDOMNode()).on("change", function (e) {
+                    var val = e.val;
+                    if($.trim(val) === '') {
+                        return; // empty value, do nothing
+                    }
+                    $(e.target).select2('val', '-1', false); // reset to placeholder value without change event
+                    this.props.addCondition(this.props.data.id, val);
+                }.bind(this));
+
+                // handle remove display item, set it to be deleted
                 $("#remove_promo_display_btn_" + this.props.data.id).on('click', function (e) {
                     e.preventDefault();
                     //console.log(this);
@@ -338,12 +355,18 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
     var AddPromoDisplayCondition = React.createClass({
         render: function () {
             var condition = '', type= this.props.type, val = this.props.value, id = this.props.data_id;
-            var inputName = "display[" + this.props.data_id + "][data][conditions][" + type + "]";
+            var inputName = "display[" + this.props.data_id + "][data][conditions][][" + type + "]";
             var labelFor = "label-for-" + type + "-" + id, key = "value-for-" + type + "-" + id;
+            var delBtn =
+                <Components.Button className="btn-link btn-delete" onClick={this.onRemove}
+                    type="button" style={ {paddingRight: 10, paddingLeft: 10} } key={"rm-for-" + type + "-" + id}>
+                    <span className="icon-trash"></span>
+                </Components.Button>;
             if(type === 'promo_conditions_match') {
                 condition = [
                     <Components.ControlLabel input_id={type + "-" + id} key={ labelFor }
                         label_class="col-md-4">
+                                {delBtn}
                                 {this.props.promoMetLabel}
                     </Components.ControlLabel>,
                     <div key={key} style={divStyle}>
@@ -357,6 +380,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                 condition = [
                     <Components.ControlLabel input_id={type + "-" + id} key={ labelFor }
                         label_class="col-md-4">
+                                {delBtn}
                                 {this.props.customerGroupLabel}
                     </Components.ControlLabel>,
                     <div key={key} style={divStyle}>
@@ -373,6 +397,9 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                 promoMetLabel: "Display when promo conditions have been met",
                 customerGroupLabel: "Display when customer group is"
             };
+        },
+        onRemove: function () {
+            return this.props.onRemove(this.props.data_id, this.props.type, this.props.value);
         }
     });
     var AddPromoDisplayItemContent = React.createClass({
@@ -527,7 +554,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                 base_url: options.base_url,
                 values: options.data['display_type_details'],
                 onCmsChange: function (e) {
-                    console.log(e);
+                    //console.log(e);
                     var val = e.val; // select2 sets new value in val field of event
                     if (!val) {
                         val = $(e.target).val();
@@ -543,7 +570,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                     var $el = $(e.target);
                     var id = $el.attr('id');
                     var val = $el.val();
-                    console.log(id, val);
+                    //console.log(id, val);
                     var data = options.data['display_type_details'] || {};
                     var textOptions = data['text_options'] || {};
                     textOptions[id] = val;
@@ -570,7 +597,31 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
             var properties = {
                 data: options.promoDisplayData,
                 base_url: options.base_url,
-                customerGroups: options.customerGroups
+                customerGroups: options.customerGroups,
+                addCondition: function (id, conditionType) {
+                    var newCond = {};
+                    newCond[conditionType] = '';
+                    _.each(options.promoDisplayData, function (item) {
+                        if(item.id == id) {
+                            item.conditions.push(newCond);
+                        }
+                    });
+                    renderAddPromoDisplayApp(properties, options.container);
+                },
+                removeCondition: function (id, conditionType, value) {
+                    _.each(options.promoDisplayData, function (item) {
+                        if (item.id == id) {
+                            for(var i = 0; i < item.conditions.length; i++) {
+                                var cond = item.conditions[i];
+                                if(cond[conditionType] !== undefined && cond[conditionType] == value) {
+                                    item.conditions.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                    renderAddPromoDisplayApp(properties, options.container);
+                }
             };
             options.addDisplayBtn.on("click", function (e) {
                 e.preventDefault();
