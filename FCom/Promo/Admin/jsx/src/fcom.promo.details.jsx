@@ -180,7 +180,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
 
     var AddPromoDisplayItem = React.createClass({
         render: function () {
-            var contentValue, content;
+            var contentValue, content, conditions = [];
 
             if(this.state.delete) {
                 content = <input key={'delete' + this.props.data.id} type="hidden" name={"display[" + this.props.data.id + "][delete]"} value="1"/>
@@ -191,6 +191,13 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                     contentValue = this.props.data.html_content
                 } else if (this.props.data.content_type == 'md') {
                     contentValue = this.props.data.text_content;
+                }
+
+                for(var c in this.props.data.conditions) {
+                    if(this.props.data.conditions.hasOwnProperty(c)) {
+                        conditions.push(<AddPromoDisplayCondition key={c + '-' + this.props.data.id} customerGroups={this.props.customerGroups}
+                            data_id={this.props.data.id} type={c} value={this.props.data.conditions[c]}/>)
+                    }
                 }
                 content =
                     <div key={'add-promo-' + this.props.data.id} className="add-promo-display-item" style={{position: "relative"}}>
@@ -276,7 +283,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                                 </select>
                             </div>
                         </div>
-                        <div className="col-md-offset-1">conditions</div>
+                        <div className="col-md-offset-1" ref={"display-add-conditions-container" + this.props.data.id}>{conditions}</div>
                     </div>;
             }
 
@@ -328,7 +335,46 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
             }
         }
     });
-
+    var AddPromoDisplayCondition = React.createClass({
+        render: function () {
+            var condition = '', type= this.props.type, val = this.props.value, id = this.props.data_id;
+            var inputName = "display[" + this.props.data_id + "][data][conditions][" + type + "]";
+            var labelFor = "label-for-" + type + "-" + id, key = "value-for-" + type + "-" + id;
+            if(type === 'promo_conditions_match') {
+                condition = [
+                    <Components.ControlLabel input_id={type + "-" + id} key={ labelFor }
+                        label_class="col-md-4">
+                                {this.props.promoMetLabel}
+                    </Components.ControlLabel>,
+                    <div key={key} style={divStyle}>
+                        <Components.YesNo name={inputName} value={val}/>
+                    </div>
+                ];
+            } else if(type === 'customer_groups') {
+                var customerOptions = _.map(this.props.customerGroups, function (groupName, groupCode) {
+                    return <option key={groupCode + id} value={groupCode}>{groupName}</option>;
+                });
+                condition = [
+                    <Components.ControlLabel input_id={type + "-" + id} key={ labelFor }
+                        label_class="col-md-4">
+                                {this.props.customerGroupLabel}
+                    </Components.ControlLabel>,
+                    <div key={key} style={divStyle}>
+                        <select name={inputName} defaultValue={val} className="form-control">
+                            {customerOptions}
+                        </select>
+                    </div>
+                ];
+            }
+            return (<div id={type + '-' + id} className="form-group">{condition}</div>);
+        },
+        getDefaultProps: function () {
+            return {
+                promoMetLabel: "Display when promo conditions have been met",
+                customerGroupLabel: "Display when customer group is"
+            };
+        }
+    });
     var AddPromoDisplayItemContent = React.createClass({
         render: function () {
             var content = '';
@@ -524,6 +570,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
             var properties = {
                 data: options.promoDisplayData,
                 base_url: options.base_url,
+                customerGroups: options.customerGroups
             };
             options.addDisplayBtn.on("click", function (e) {
                 e.preventDefault();

@@ -11,7 +11,7 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 {% if MODULES.isLoaded('FCom_CustomerGroups') %}
-    {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
+    {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptionsByCode() %}
 {% endif %}
 
 <fieldset class="adm-section-group">
@@ -86,7 +86,8 @@
                 container: $('#add_promo_display_details')[0],
                 addDisplayBtn: $('#add_promo_display_btn'),
                 promoDisplayData: {{ promoDisplayData|raw }},
-                base_url: "{{ base_url }}"
+                base_url: "{{ base_url }}",
+                customerGroups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'false' }}
             };
             PromoDetails.initAddPromoDisplayApp(promoDisplayOptions);
 

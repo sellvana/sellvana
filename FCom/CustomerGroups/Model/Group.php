@@ -27,8 +27,27 @@ class FCom_CustomerGroups_Model_Group extends FCom_Core_Model_Abstract
         $groupModels = $this->orm()->find_many();
         $groups = [];
         foreach ($groupModels as $model) {
-            $key = $model->id;
-            $groups[$key] = $model->title;
+            $key = $model->id();
+            $groups[$key] = $model->get('title');
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Get groups in format suitable for select drop down list
+     * use group code instead of id
+     *
+     * @return array
+     */
+    public function groupsOptionsByCode()
+    {
+        /** @var FCom_CustomerGroups_Model_Group[] $groupModels */
+        $groupModels = $this->orm()->find_many();
+        $groups = [];
+        foreach ($groupModels as $model) {
+            $key = $model->get('code');
+            $groups[$key] = $model->get('title');
         }
 
         return $groups;
