@@ -203,7 +203,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
                 <a id={this.props.id} className="pull-right" href="#" ref="icon"
                     data-toggle="popover" data-trigger="focus" tabIndex="-1"
                     data-content={this.props.content} data-container="body">
-                    <span className="glyphicon glyphicon-question-sign"></span>
+                    <span className="icon-question-sign"></span>
                 </a>
             );
         },
@@ -227,7 +227,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
     FCom.Components.YesNo = React.createClass({
         render: function () {
             return (
-                <select id={this.props.id} className={"form-control to-select2 " + this.props.className} style={this.props.style} defaultValue={this.props.value}>
+                <select name={this.props.name} id={this.props.id}
+                    className={"form-control to-select2 " + this.props.className} style={this.props.style}
+                    defaultValue={this.props.value}>
                     <option value="0">{this.props.optNo}</option>
                     <option value="1">{this.props.optYes}</option>
                 </select>

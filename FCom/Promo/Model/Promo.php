@@ -30,6 +30,7 @@
  * @property FCom_MultiSite_Main            $FCom_MultiSite_Main
  * @property FCom_Promo_Model_PromoCoupon   $FCom_Promo_Model_PromoCoupon
  * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ * @property FCom_Promo_Model_PromoDisplay $FCom_Promo_Model_PromoDisplay
  */
 class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
 {
@@ -584,5 +585,16 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
             'free_items' => [],
         ];
         return $result;
+    }
+
+    public function getPromoDisplayData($asJson = false)
+    {
+        $results = $this->FCom_Promo_Model_PromoDisplay->orm()->where('promo_id', $this->id())->find_many();
+        $result = [];
+        foreach ($results as $r) {
+            $result[] = $r->as_array();
+        }
+
+        return $asJson? $this->BUtil->toJson($result): $result;
     }
 }

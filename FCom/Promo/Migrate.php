@@ -16,6 +16,7 @@
  * @property FCom_Sales_Model_Order_Item     $FCom_Sales_Model_Order_Item
  * @property FCom_Catalog_Model_Product      $FCom_Catalog_Model_Product
  * @property FCom_Admin_Model_User           $FCom_Admin_Model_User
+ * @property FCom_Promo_Model_PromoDisplay   $FCom_Promo_Model_PromoDisplay
  */
 class FCom_Promo_Migrate extends BClass
 {
@@ -406,4 +407,38 @@ class FCom_Promo_Migrate extends BClass
             ]
         ]);
     }
+
+    public function upgrade__0_1_10__0_1_11()
+    {
+        //todo
+        $tPromoDisplay = $this->FCom_Promo_Model_PromoDisplay->table();
+        $tPromo = $this->FCom_Promo_Model_Promo->table();
+        $this->BDb->ddlTableDef($tPromoDisplay, [
+            BDb::COLUMNS     => [
+                'id'              => 'int unsigned not null auto_increment',
+                'promo_id'        => 'int unsigned not null',
+                'page_type'       => 'varchar(50) not null default "home_page"',
+                'page_location'   => 'varchar(50) not null default ""',
+                'content_type'    => 'varchar(20) not null default "html"',
+                'data_serialized' => 'text',
+                'create_at'       => 'datetime not null',
+                'update_at'       => 'datetime'
+            ],
+            BDb::PRIMARY     => '(id)',
+            BDb::CONSTRAINTS => [
+                'promo' => ['promo_id', $tPromo],
+            ]
+        ]);
+
+        $this->BDb->ddlTableDef($tPromo, [
+            BDb::COLUMNS => [
+                'display_on_central_page' => 'bool not null default 0'
+            ]
+        ]);
+    }
 }
+/*
+ * Text (Html)
+ CMS Block
+ Text (Markdown)
+ */

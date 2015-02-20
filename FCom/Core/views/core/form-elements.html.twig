@@ -28,11 +28,11 @@ Using custom id/name:
 {% macro help_icon(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
-    {% if p.help_icon %}
+    {% if p.help_text %}
         <a tabindex="-1" id="help-{{ view.getInputId(p) }}" class="pull-right help-icon" href="#" data-toggle="popover"
             data-trigger="focus"
                data-content="{{ p.help_text }}" data-container="body">
-                <span class="glyphicon glyphicon-question-sign"></span></a>
+                <span class="icon-question-sign"></span></a>
     {% endif %}
 {% endmacro %}
 

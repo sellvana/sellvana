@@ -165,8 +165,11 @@
                 </select>
             </div>
         </div>
-        <div id="conditions-options">{{ "Loading ..."|_ }}</div>
-
+        <div id="conditions-options">
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
+        </div>
         <div class="form-group">
             <label class="control-label col-md-3" for="model-actions">{{"Promo Actions"|_}}&nbsp;
                     <a id="help-model-actions" class="pull-right help-icon" href="#"
@@ -185,7 +188,11 @@
                 </select>
             </div>
         </div>
-        <div id="actions-options">{{ "Loading ..."|_ }}</div>
+        <div id="actions-options">
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
+        </div>
         {% set elView = LAYOUT.view('core/form-elements') %}
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
