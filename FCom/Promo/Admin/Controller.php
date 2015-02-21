@@ -95,7 +95,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             if ($m->get('coupon_type') == 1) {
                 // load coupon code for view display
                 $coupon = $this->FCom_Promo_Model_PromoCoupon->load($m->id(), 'promo_id');
-                $m->set('single_coupon_code', $coupon->get('code'));
+                if ($coupon) {
+                    $m->set('single_coupon_code', $coupon->get('code'));
+                }
             }
         }
     }

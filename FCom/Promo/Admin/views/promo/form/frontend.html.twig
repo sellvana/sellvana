@@ -51,7 +51,7 @@
         {{ forms.select({
             label: "Location On Page"|_,label_class: labelClass,
             field: "page_location",
-            value: data['page_location'],
+            value: data['page_location']? data['page_location']:"featured",
             help_icon: 1,
             help_text: "Where to place this promo on central promotions page."|_,
             select2: {minimumResultsForSearch: 15},
