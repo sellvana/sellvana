@@ -150,7 +150,11 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
             if (cmsSelect) {
                 $(cmsSelect.getDOMNode())
                     .select2({minimumResultsForSearch: 15})
-                    .on('change', this.props.onCmsChange).select2('val', this.props.values[this.props.cmsOptions.id]);
+                    .on('change', this.props.onCmsChange);
+
+                if (this.props.values) {
+                    $(cmsSelect.getDOMNode()).select2('val', this.props.values[this.props.cmsOptions.id]);
+                }
             }
         }
     });
@@ -196,16 +200,17 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                 //            data_id={this.props.data.id} type={c} value={this.props.data.conditions[c]}/>)
                 //    }
                 //}
-                conditions = this.props.data.conditions.map(function (condition, idx) {
-                    //console.log(condition);
-                    for (var c in condition) {
-                        return <AddPromoDisplayCondition key={c + '-' + idx + '-' + this.props.data.id} customerGroups={this.props.customerGroups}
-                            data_id={this.props.data.id} type={c} value={condition[c]} onRemove={this.props.removeCondition}/>;
-                    }
-                }.bind(this));
+                if (this.props.data.conditions !== undefined) {
+                    conditions = this.props.data.conditions.map(function (condition, idx) {
+                        //console.log(condition);
+                        for (var c in condition) {
+                            return <AddPromoDisplayCondition key={c + '-' + idx + '-' + this.props.data.id} customerGroups={this.props.customerGroups}
+                                data_id={this.props.data.id} type={c} value={condition[c]} onRemove={this.props.removeCondition}/>;
+                        }
+                    }.bind(this));
+                }
                 content =
                     <div key={'add-promo-' + this.props.data.id} className="add-promo-display-item" style={{position: "relative"}}>
-                        <hr/>
                         <a href="#" className="btn-remove" id={"remove_promo_display_btn_" + this.props.data.id}>
                             <span className="icon-remove-sign"></span>
                         </a>
@@ -289,6 +294,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                             </div>
                         </div>
                         <div className="col-md-offset-1" ref={"display-add-conditions-container" + this.props.data.id}>{conditions}</div>
+                        <hr/>
                     </div>;
             }
 
@@ -603,7 +609,11 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                     newCond[conditionType] = '';
                     _.each(options.promoDisplayData, function (item) {
                         if(item.id == id) {
-                            item.conditions.push(newCond);
+                            if (item.conditions) {
+                                item.conditions.push(newCond);
+                            } else {
+                                item.conditions = [newCond];
+                            }
                         }
                     });
                     renderAddPromoDisplayApp(properties, options.container);
