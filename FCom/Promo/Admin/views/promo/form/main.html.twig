@@ -8,6 +8,9 @@
 {% set numCodes = m.get('numCodes') %}
 {% set fromDate = validator.fieldValue('from_date') %}
 {% set toDate = validator.fieldValue('to_date') %}
+{% set priority = validator.fieldValue('priority_order')? :0 %}
+
+
 {% if fromDate and toDate %}
     {% set daterange = fromDate ~ " - " ~ toDate %}
 {% else %}
@@ -49,7 +52,7 @@
             help_icon: 1, help_text: 'Details for Customers'|_ }) }}
 
         {{ forms.input({label: 'Priority'|_, field: "priority_order",
-            value: validator.fieldValue('priority_order'),label_class: labelClass,
+            value: priority,label_class: labelClass,
             placeholder:"Enter priority number", type: "number",
             help_icon: 1, help_text: 'Execution priority for order, lower order is calculated first.'|_ }) }}
 
