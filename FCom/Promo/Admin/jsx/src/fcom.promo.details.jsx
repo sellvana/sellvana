@@ -542,7 +542,10 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                     options.data = JSON.parse(val);
                 } catch (e) {
                     console.log(e);
+                    options.data = {};
                 }
+            } else {
+                options.data = {}; // no previous serialized data
             }
 
             function updateDataSerialized() {
@@ -599,7 +602,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
         },
         initAddPromoDisplayApp: function (options) {
             console.log(options);
-            var $addDisplayBtn = options.addDisplayBtn
+            var $addDisplayBtn = options.addDisplayBtn;
             var properties = {
                 data: options.promoDisplayData,
                 base_url: options.base_url,
