@@ -44,7 +44,7 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
                 $items = $wishlist->items();
                 if ($items) {
                     foreach ($items as $item) {
-                        $arr = $item->product()->as_array();
+                        $arr = $item->getProduct()->as_array();
                         $arr['wishlist_id'] = $wishlist->id;
                         $data[] = $arr;
                     }

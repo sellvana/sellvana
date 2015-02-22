@@ -82,10 +82,14 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BClass implements FC
     }
 
     /**
+     * @param boolean $calculated return only the calculated value
      * @return int
      */
-    public function getValue()
+    public function getValue($calculated = false)
     {
+        if ($calculated) {
+            return $this->_value;
+        }
         return $this->_cartField ? $this->_cart->get($this->_cartField) : $this->_value;
     }
 
