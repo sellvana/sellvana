@@ -10,6 +10,7 @@ class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstr
      */
     protected $_name = 'Plain Shipping';
     protected $_code = 'plain';
+    protected $_configPath = 'modules/FCom_ShippingPlain';
     /**
      *
      */
@@ -34,6 +35,9 @@ class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstr
      */
     public function getServices()
     {
-        return ['01' => 'Air', '02' => 'Ground'];
+        return [
+            '01' => 'Air',
+            '02' => 'Ground',
+        ];
     }
 }

@@ -266,7 +266,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $cart = $this->_cart;
 
         foreach ($cart->items() as $item) {
-            $product = $item->product();
+            $product = $item->getProduct();
             if (!$product) {
                 throw new BException('Can not order product that does not exist');
             }

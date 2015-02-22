@@ -43,8 +43,9 @@ class FCom_Sales_Model_Cart_Total_Shipping extends FCom_Sales_Model_Cart_Total_A
             'shipping_method' => $selMethod,
             'shipping_service' => $selService,
             'shipping_price' => $this->_value,
-            'grand_total' => $cart->get('grand_total') + $this->_value,
         ]);
+
+        $this->_cart->getTotalByType('grand_total')->addComponent($this->_value, 'shipping');
 
         return $this;
     }
@@ -99,5 +100,13 @@ class FCom_Sales_Model_Cart_Total_Shipping extends FCom_Sales_Model_Cart_Total_A
         }
 
         return [$selMethod, $selService];
+    }
+
+    public function isHidden()
+    {
+        if ($this->_cart->get('shipping_free')) {
+            return false;
+        }
+        return parent::isHidden();
     }
 }
