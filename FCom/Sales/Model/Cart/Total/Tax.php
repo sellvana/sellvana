@@ -1,5 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Model_Cart_Total_Tax
+ *
+ */
 class FCom_Sales_Model_Cart_Total_Tax extends FCom_Sales_Model_Cart_Total_Abstract
 {
     protected $_code = 'tax';
@@ -45,6 +49,8 @@ class FCom_Sales_Model_Cart_Total_Tax extends FCom_Sales_Model_Cart_Total_Abstra
                 }
             }
         }
+
+        $this->_cart->getTotalByType('grand_total')->addComponent($this->_value, 'tax');
 
         return $this;
     }

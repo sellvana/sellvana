@@ -82,7 +82,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         if (!$this->items || $refresh) {
             $items = $this->FCom_Wishlist_Model_WishlistItem->orm()->where('wishlist_id', $this->id())->find_many_assoc();
             foreach ($items as $ik => $item) {
-                if (!$item->product()) {
+                if (!$item->getProduct()) {
                     $this->removeItem($item);
                     unset($items[$ik]);
                 }

@@ -12,17 +12,22 @@ class FCom_Wishlist_Model_WishlistItem extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_wishlist_items';
     protected static $_origClass = __CLASS__;
 
-    protected $product;
+    protected $_product;
 
     /**
      * get related product
      * @return FCom_Catalog_Model_Product
      */
-    public function product()
+    public function getProduct()
     {
-        if (!$this->product) {
-            $this->product = $this->relatedModel('FCom_Catalog_Model_Product', $this->product_id);
+        if (!$this->_product) {
+            $this->_product = $this->relatedModel('FCom_Catalog_Model_Product', $this->get('product_id'));
         }
-        return $this->product;
+        return $this->_product;
+    }
+
+    public function __destruct()
+    {
+        unset($this->_product);
     }
 }

@@ -8,6 +8,7 @@
  * @property FCom_Promo_Model_PromoMedia     $FCom_Promo_Model_PromoMedia
  * @property FCom_Promo_Model_PromoProduct   $FCom_Promo_Model_PromoProduct
  * @property FCom_Promo_Model_PromoCart      $FCom_Promo_Model_PromoCart
+ * @property FCom_Promo_Model_PromoCartItem  $FCom_Promo_Model_PromoCartItem
  * @property FCom_Customer_Model_Customer    $FCom_Customer_Model_Customer
  * @property FCom_Promo_Model_PromoOrder     $FCom_Promo_Model_PromoOrder
  * @property FCom_Sales_Model_Cart           $FCom_Sales_Model_Cart
@@ -434,6 +435,46 @@ class FCom_Promo_Migrate extends BClass
             BDb::COLUMNS => [
                 'display_on_central_page' => 'bool not null default 0'
             ]
+        ]);
+    }
+
+    public function upgrade__0_1_11__0_1_12()
+    {
+        $tPromo = $this->FCom_Promo_Model_Promo->table();
+        $tCart = $this->FCom_Sales_Model_Cart->table();
+        $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
+
+        $tPromoCart = $this->FCom_Promo_Model_PromoCart->table();
+        $tPromoCartItem = $this->FCom_Promo_Model_PromoCartItem->table();
+
+        $this->BDb->ddlTableDef($tPromoCart, [
+            BDb::COLUMNS => [
+                'shipping_free' => 'tinyint not null default 0',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tPromoCartItem, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'promo_cart_id' => 'int unsigned not null',
+                'promo_id' => 'int unsigned not null',
+                'cart_id' => 'int unsigned not null',
+                'cart_item_id' => 'int unsigned not null',
+                'item_type' => 'tinyint not null default 0',
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_promo_cart_item' => '(promo_id, cart_id, cart_item_id, item_type)',
+            ],
+            BDb::CONSTRAINTS => [
+                'promo_cart' => ['promo_cart_id', $tPromoCart],
+                'promo' => ['promo_id', $tPromo],
+                'cart' => ['cart_id', $tCart],
+                'cart_item' => ['cart_item_id', $tCartItem],
+            ],
         ]);
     }
 }

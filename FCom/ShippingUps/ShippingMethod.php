@@ -149,9 +149,4 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
             '65' => 'UPS Saver'
         ];
     }
-
-    public function getConditionallyFreeServices()
-    {
-        return $this->BConfig->get('modules/FCom_ShippingUps/conditionally_free_services');
-    }
 }

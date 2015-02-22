@@ -1,5 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Model_Cart_Total_Discount
+ *
+ */
 class FCom_Sales_Model_Cart_Total_Discount extends FCom_Sales_Model_Cart_Total_Abstract
 {
     protected $_label = 'Discount';
@@ -23,6 +27,7 @@ class FCom_Sales_Model_Cart_Total_Discount extends FCom_Sales_Model_Cart_Total_A
          *      - row_discount: amount of tax per item
          *      - row_discount_percent: percentage for each item
          *      - details: $item->setData('discount_details', $details)
+         *  - free_items: information about eligible free items
          */
 
         $this->_value = !empty($result['discount_amount']) ? $result['discount_amount'] : 0;
@@ -45,15 +50,26 @@ class FCom_Sales_Model_Cart_Total_Discount extends FCom_Sales_Model_Cart_Total_A
             }
         }
 
-        if (!empty($result['free_items'])) {
-            foreach ($result['free_items'] as $item) {
+        $shippingPrice = $cart->getTotalByType('shipping')->getValue();
+        if (!empty($result['shipping_free'])) {
+            $cart->getTotalByType('grand_total')->addComponent(-$shippingPrice, 'shipping_discount');
+            $cart->set('shipping_free', 1);
+            $cart->set('shipping_price', 0);
 
-            }
+        } elseif (!empty($result['shipping_discount'])) {
+            $cart->getTotalByType('grand_total')->addComponent(-$result['shipping_discount'], 'shipping_discount');
+            $cart->set('shipping_discount', $result['shipping_discount']);
+            $cart->set('shipping_free', $shippingPrice == $result['shipping_discount']);
+            $cart->add('shipping_price', -$result['shipping_discount']);
         }
 
-        $cart->set($this->_cartField, $this->_value);
-        $cart->add('grand_total', -$this->_value);
         $cart->setData('discount_details', !empty($result['details']) ? $result['details'] : []);
+
+        $cart->set($this->_cartField, $this->_value);
+
+        if ($this->_value) {
+            $cart->getTotalByType('grand_total')->addComponent(-$this->_value, 'discount');
+        }
 
         return $this;
     }
