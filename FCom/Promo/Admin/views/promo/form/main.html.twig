@@ -35,7 +35,7 @@
             field: "promo_type", help_icon: 1,
             help_text: "Promotion tyoe, catalog or cart. Once selected cannot be changed"|_,
             select2: {minimumResultsForSearch: 15},
-            options: {'cart':'Cart'|_, 'catalog':'Catalog'|_},
+            options: m.fieldOptions('promo_type'),
             required: 1, disabled: m.id()? 1: 0
         }) }}
         {{ forms.input({label: 'Admin Summary'|_, required: 1, field: "summary",
@@ -62,7 +62,7 @@
             field: "status", help_icon: 1,
             help_text: "Promotion status"|_,
             select2: {minimumResultsForSearch: 15},
-            options: {'pending':'Pending'|_, 'active':'Active'|_, 'expired':'Expired'|_, 'template':'Template'|_},
+            options: m.fieldOptions('status'),
             input_div_class: "col-md-2"
         }) }}
 
@@ -138,7 +138,7 @@
             help_text: "Require coupon code"|_,
             select2: {minimumResultsForSearch: 15}, disabled: (promo_type == 'catalog')? 1: 0,
             style: (promo_type == 'catalog')? "display: none": '',
-            options: ["No coupon code required"|_, "Single coupon code"|_, "Multiple coupon codes"|_]
+            options: m.fieldOptions('coupon_type')
         }) }}
         <div id="coupon-options"></div>
         {{ forms.hidden({field:"data_serialized", value: validator.fieldValue("data_serialized")}) }}
@@ -151,6 +151,7 @@
             </label>
             <div class="col-md-5">
                 <select id="model-conditions" name="model[conditions]" class="form-control to-select2">
+                    <option value="">{{ "Apply Always"|_ }}</option>
                     <option value="all">{{"All Conditions Have to Match"|_}}</option>
                     <option value="any">{{"Any Condition Has to Match"|_}}</option>
                 </select>

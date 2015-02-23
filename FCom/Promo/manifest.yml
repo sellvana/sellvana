@@ -1,6 +1,6 @@
 modules:
     FCom_Promo:
-        version: 0.1.12
+        version: 0.1.13
         channel: beta
         require: { module: { FCom_Catalog: 0.1.0, FCom_Sales: 0.2.0 }}
         description: "Promotions module"
@@ -26,8 +26,8 @@ modules:
 
             FCom_Frontend:
                 routing:
-                    - [ /promo/media, FCom_Promo_Frontend_Controller.media ]
-                    - [ /promo/cart/.action, FCom_Promo_Frontend_Controller_Cart ]
+                    - [ /promo/?.action, FCom_Promo_Frontend_Controller ]
+                    - [ /promo/cart/?.action, FCom_Promo_Frontend_Controller_Cart ]
                 observe:
                     - [ "FCom_Sales_Model_Cart::calculateTotals", "FCom_Promo_Frontend::onPromoCartValidate" ]
                     - [ "FCom_Sales_Model_Cart::addProduct", "FCom_Promo_Frontend::onPromoCartAddProduct" ]

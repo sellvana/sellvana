@@ -33,17 +33,25 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         $config = parent::gridConfig();
 
+        $hlp = $this->FCom_Promo_Model_Promo;
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'sorttype' => 'number'],
-            ['name' => 'summary', 'label' => 'Description', 'index' => 'summary', 'width' => 250],
-            ['name' => 'from_date', 'label' => 'Start Date', 'index' => 'from_date', 'formatter' => 'date'],
-            ['name' => 'to_date', 'label' => 'End Date', 'index' => 'to_date', 'formatter' => 'date'],
+            ['name' => 'id', 'label' => 'ID', 'width' => 55, 'sorttype' => 'number'],
+            ['name' => 'summary', 'label' => 'Summary', 'width' => 250],
+            ['name' => 'promo_type', 'label' => 'Promo Type', 'options' => $hlp->fieldOptions('promo_type') ],
+            ['name' => 'coupon_type', 'label' => 'Coupon Type', 'options' => $hlp->fieldOptions('coupon_type') ],
+            ['name' => 'internal_notes', 'label' => 'Admin Notes', 'width' => 250, 'hidden' => 1],
+            ['name' => 'customer_label', 'label' => 'Customer Label', 'width' => 250, 'hidden' => 1],
+            ['name' => 'customer_details', 'label' => 'Customer Details', 'width' => 250, 'hidden' => 1],
+            ['name' => 'from_date', 'label' => 'Start Date', 'formatter' => 'date'],
+            ['name' => 'to_date', 'label' => 'End Date', 'formatter' => 'date'],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
                 'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
-                'options' => $this->FCom_Promo_Model_Promo->fieldOptions('status')
+                'options' => $hlp->fieldOptions('status')
             ],
-            ['name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true],
+            ['name' => 'details', 'label' => 'Details', 'hidden' => true],
+            ['name' => 'create_at', 'label' => 'Created', 'formatter' => 'date'],
+            ['name' => 'update_at', 'label' => 'Updated', 'formatter' => 'date'],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'delete'],
