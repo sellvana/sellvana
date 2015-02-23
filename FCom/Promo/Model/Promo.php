@@ -64,7 +64,7 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
             'today' => 'Today Only',
         ],
         'display_index_type' => [
-            'text' => 'Text', 
+            'text' => 'Text',
             'cms_block' => 'CMS BLOCK',
         ],
     ];

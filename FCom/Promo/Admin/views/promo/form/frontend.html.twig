@@ -8,6 +8,7 @@
 {% set labelClass = "col-md-3" %}
 {% set promoDisplayData = m.getPromoDisplayData(true) %}
 {% set data = UTIL.fromJson(validator.fieldValue("data_serialized")) %}
+{% set displayOptions = CONFIG.get("modules/FCom_Promo/display") %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 {% if MODULES.isLoaded('FCom_CustomerGroups') %}
@@ -29,7 +30,7 @@
                 <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
             </div>
         </div>
-        {#{{ dump(promoDisplayData) }}#}
+        {#{{ dump(displayOptions) }}#}
     </div>
     <div class="f-section">
         <h4>{{ "Display On Central Promotion Page"|_ }}</h4>
@@ -90,6 +91,15 @@
                 base_url: "{{ base_url }}",
                 customerGroups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'false' }}
             };
+            var locationPages = {{ displayOptions.locationPages ? UTIL.toJson(displayOptions.locationPages)|raw: 'false' }};
+            var locationPageOptions = {{ displayOptions.locationPageOptions ? UTIL.toJson(displayOptions.locationPageOptions)|raw: 'false' }};
+            if(locationPages) {
+                promoDisplayOptions['locationPages'] = locationPages;
+            }
+            if(locationPageOptions) {
+                promoDisplayOptions['locationPageOptions'] = locationPageOptions;
+            }
+
             PromoDetails.initAddPromoDisplayApp(promoDisplayOptions);
 
             var $displayTypeContainer = $('#display_type_details');
