@@ -147,8 +147,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $args['data']['customer_group_ids'] = implode(",", $args['data']['customer_group_ids']);
         }
 
-        $serializedData = isset($args['data']['data_serialized'])? $args['data']['data_serialized']: null;
-        if ($serializedData) {
+        $serializedData = isset($args['data']['data_serialized'])? $args['data']['data_serialized']: [];
+        if (!empty($serializedData) && is_string($serializedData)) {
             $serializedData = $this->BUtil->fromJson($serializedData);
             $couponCodes = isset($serializedData['coupons'])? $serializedData['coupons']: null;
             if (isset($args['data']['coupon_type']) && $args['data']['coupon_type'] == 2 && $couponCodes) {
