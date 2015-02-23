@@ -36,39 +36,42 @@
         <hr/>
         {{ forms.boolean({
             label: "Display Promotion on Central Promotions Page"|_, label_class: labelClass,
-            value: validator.fieldValue('display_on_central_page'),
-            field: 'display_on_central_page', help_icon: 1,
-            help_text: "Wether or not to display promotion on central promotions page."|_,
+            value: validator.fieldValue('display_index'),
+            field: 'display_index',
+            help_icon: 1, help_text: "Wether or not to display promotion on central promotions page."|_,
             select2: {minimumResultsForSearch: 15}
+        }) }}
+        {{ forms.input({
+            label: "Central Promotions Page Sort Order"|_, label_class: labelClass,
+            value: validator.fieldValue('display_index_order'),
+            field: 'display_index_order',
+            help_icon: 1, help_text: "Where to display the promotion on central promotions page."|_,
+            type: 'number',
         }) }}
         {{ forms.boolean({
             label: "Show Exp Date"|_, label_class: labelClass,
-            value: data['show_expiration'],
-            field: 'show_expiration', help_icon: 1,
-            help_text: "Wether or not to show promo expiration date."|_,
+            value: validator.fieldValue('display_index_showexp'),
+            field: 'display_index_showexp',
+            help_icon: 1, help_text: "Wether or not to show promo expiration date."|_,
             select2: {minimumResultsForSearch: 15}
         }) }}
         {{ forms.select({
             label: "Location On Page"|_,label_class: labelClass,
-            field: "page_location",
-            value: data['page_location']? data['page_location']:"featured",
-            help_icon: 1,
-            help_text: "Where to place this promo on central promotions page."|_,
+            field: "display_index_section",
+            value: validator.fieldValue('display_index_section'),
+            help_icon: 1, help_text: "Where to place this promo on central promotions page."|_,
             select2: {minimumResultsForSearch: 15},
-            options: {
-                "featured": "Featured"|_,
-                "this_month": "This Month"|_,
-                "this_week": "This Week"|_,
-                "today": "Today Only"|_}
+            style: (promo_type == 'catalog')? "display: none": '',
+            options: m.fieldOptions('display_index_section')
         }) }}
         {{ forms.select({
             label: "Display Type"|_,label_class: labelClass,
-            field: "display_type",
-            value: data['display_type'],
-            help_icon: 1,
-            help_text: "What should be displayed for this promo."|_,
+            field: "display_index_type",
+            value: validator.fieldValue('display_index_type'),
+            help_icon: 1, help_text: "What should be displayed for this promo."|_,
             select2: {minimumResultsForSearch: 15},
-            options: {"text": "Text"|_, "cms_block": "CMS BLOCK"|_}
+            style: (promo_type == 'catalog')? "display: none": '',
+            options: m.fieldOptions('display_index_type')
         }) }}
         <div id="display_type_details">
             <div style="width: 200px;margin:10px auto;" class="progress">
@@ -90,7 +93,7 @@
             PromoDetails.initAddPromoDisplayApp(promoDisplayOptions);
 
             var $displayTypeContainer = $('#display_type_details');
-            var $displayTypeSelector = $('#{{ elView.getInputId({field:"display_type"}) }}');
+            var $displayTypeSelector = $('#{{ elView.getInputId({field:"display_index_type"}) }}');
 //                console.log(PromoDetails);
             var centralPageOptions = {
                 container: $displayTypeContainer[0],

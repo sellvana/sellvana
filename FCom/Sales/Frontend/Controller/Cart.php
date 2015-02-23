@@ -160,7 +160,7 @@ class FCom_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstr
         ]);
 
         if (!empty($result['error'])) {
-            $this->message($result['message'], 'error');
+            $this->message($result['error']['message'], 'error');
         } else {
             $this->message('Coupon code has been applied to cart');
         }

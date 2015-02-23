@@ -280,7 +280,7 @@ class FCom_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
     }
 
     protected function _calcSubtotalDiscount(FCom_Promo_Model_Promo $promo, FCom_Sales_Model_Cart $cart, array $action,
-                                                 array $conditionsResult, array &$actionsResult)
+                                             array $conditionsResult, array &$actionsResult)
     {
         $combineStrategy = $this->BConfig->get('modules/FCom_Promo/combine_strategy', 'max'); //,compound
         //TODO: remove defaults
@@ -382,7 +382,7 @@ class FCom_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
     }
 
     protected function _calcShippingDiscount(FCom_Promo_Model_Promo $promo, FCom_Sales_Model_Cart $cart, array $action,
-                                                 array $conditionsResult, array &$actionsResult)
+                                             array $conditionsResult, array &$actionsResult)
     {
         if (!empty($action['methods'])) {
             if (!in_array($cart->get('shipping_method'), $action['methods'])) {
@@ -412,7 +412,7 @@ class FCom_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
     }
 
     protected function _calcFreeProduct(FCom_Promo_Model_Promo $promo, FCom_Sales_Model_Cart $cart, array $action,
-                                            array $conditionsResult, array &$actionsResult)
+                                        array $conditionsResult, array &$actionsResult)
     {
         /*
         #foreach ($conditionsResult['items'] as $item) {
@@ -439,8 +439,8 @@ class FCom_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
         $promoCartRows = $this->orm()->where('cart_id', $cart->id())->find_many_assoc('promo_id');
 
         $pcIdsToDelete = [];
-        foreach ($promoCartRows as $row) {
-            if (empty($actionsResult['promos'][$row->id()])) {
+        foreach ($promoCartRows as $promoId => $row) {
+            if (empty($actionsResult['promos'][$promoId])) {
                 $pcIdsToDelete[] = $row->id();
             }
         }
@@ -474,49 +474,54 @@ class FCom_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
             }
         }
 
-        $pcItemIdsToDelete = [];
-        foreach ($actionsResult['promos'] as $promoId => $action) {
-            if (empty($promoCartRows[$promoId])) {
-                $action['promo_id'] = $promoId;
-                $action['cart_id'] = $cart->id();
-                $promoCart = $this->create($action);
-            } else {
-                $freeItems = $promoCartRows[$promoId]->getData('free_items');
-                $newSkusLength = !empty($freeItems['sku']) ? sizeof($freeItems['sku']) : 0;
-                $oldSkusLength = !empty($promoCartItems[$promoId][$itemTypeAdded]) ? sizeof($promoCartItems[$promoId][$itemTypeAdded]) : 0;
-                if ($newSkusLength > $oldSkusLength) {
-                    $action['details']['all_added'] = false;
+        if (!empty($actionsResult['promos'])) {
+            $pcItemIdsToDelete = [];
+            foreach ($actionsResult['promos'] as $promoId => $action) {
+                if (empty($promoCartRows[$promoId])) {
+                    $action['promo_id'] = $promoId;
+                    $action['cart_id'] = $cart->id();
+                    $promoCart = $this->create($action);
+                } else {
+                    $freeItems = $promoCartRows[$promoId]->getData('free_items');
+                    $newSkusLength = !empty($freeItems['sku']) ? sizeof($freeItems['sku']) : 0;
+                    $oldSkusLength = !empty($promoCartItems[$promoId][$itemTypeAdded])
+                        ? sizeof($promoCartItems[$promoId][$itemTypeAdded]) : 0;
+                    if ($newSkusLength > $oldSkusLength) {
+                        $action['details']['all_added'] = false;
+                    }
+                    unset($action['id'], $action['promo_id'], $action['promo_cart_id'],
+                        $action['cart_id'], $action['cart_item_id']);
+                    $promoCart = $promoCartRows[$promoId]->set($action);
                 }
-                $promoCart = $promoCartRows[$promoId]->set($action);
-            }
 
-            if (!empty($action['details'])) {
-                $promoCart->setData($action['details']);
-            }
-            $promoCart->save();
+                if (!empty($action['details'])) {
+                    $promoCart->setData($action['details']);
+                }
+                $promoCart->save();
 
-            if (!empty($promoCartItems[$promoId][$itemTypeMatched])) {
-                foreach ($promoCartItems[$promoId][$itemTypeMatched] as $cartItemId => $pci) {
-                    if (empty($action['matched_items'][$cartItemId])) {
-                        $pcItemIdsToDelete[] = $pci->id();
+                if (!empty($promoCartItems[$promoId][$itemTypeMatched])) {
+                    foreach ($promoCartItems[$promoId][$itemTypeMatched] as $cartItemId => $pci) {
+                        if (empty($action['matched_items'][$cartItemId])) {
+                            $pcItemIdsToDelete[] = $pci->id();
+                        }
+                    }
+                }
+                foreach ($action['matched_items'] as $itemId) {
+                    if (empty($promoCartItems[$promoId][$itemTypeMatched][$itemId])) {
+                        $pciHlp->create([
+                            'promo_cart_id' => $promoCart->id(),
+                            'promo_id' => $promoId,
+                            'cart_id' => $cart->id(),
+                            'cart_item_id' => $itemId,
+                            'item_type' => $itemTypeMatched,
+                        ])->save();
                     }
                 }
             }
-            foreach ($action['matched_items'] as $itemId) {
-                if (empty($promoCartItems[$promoId][$itemTypeMatched][$itemId])) {
-                    $pciHlp->create([
-                        'promo_cart_id' => $promoCart->id(),
-                        'promo_id' => $promoId,
-                        'cart_id' => $cart->id(),
-                        'cart_item_id' => $itemId,
-                        'item_type' => $itemTypeMatched,
-                    ])->save();
-                }
-            }
-        }
 
-        if (!empty($pcItemIdsToDelete)) {
-            $pciHlp->delete_many(['id' => $pcItemIdsToDelete]);
+            if (!empty($pcItemIdsToDelete)) {
+                $pciHlp->delete_many(['id' => $pcItemIdsToDelete]);
+            }
         }
 
         return $this;

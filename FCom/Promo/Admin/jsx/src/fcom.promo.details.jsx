@@ -114,24 +114,24 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
             return {
                 cmsOptions: {
                     label: "Block Handle",
-                    id: "block-handle",
+                    id: "block_handle",
                     help: "Select a cms block handle"
                 },
                 textOptions: {
                     titleLabel: "Promotion Title",
-                    titleId: "promotion-title",
+                    titleId: "title",
                     titleHelp: "Add custom title or leave empty for default",
                     titlePlaceholder: "(USE MAIN TITLE)",
                     applicationLabel: "Show Application Type",
-                    applicationId: "show-application",
+                    applicationId: "application",
                     applicationHelp: "?",
                     applicationPlaceholder: "Coupon Code vs Auto Apply (Show Code if applies)",
                     conditionsLabel: "Show Conditions",
-                    conditionsId: "show-conditions",
+                    conditionsId: "conditions",
                     conditionsHelp: "(USE MAIN DESC) or add custom text",
                     conditionsPlaceholder: "(USE MAIN DESC)",
                     descriptionLabel: "Show Description",
-                    descriptionId: "show-description",
+                    descriptionId: "description",
                     descriptionHelp: "(USE MAIN DESC) or add custom text",
                     descriptionPlaceholder: "(USE MAIN DESC)"
                 },
@@ -569,7 +569,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                         val = $(e.target).val();
                     }
                     if (options.data['display_type_details']) {
-                        options.data['display_type_details']['block-handle'] = val;
+                        options.data['display_type_details']['block_handle'] = val;
                     } else {
                         options.data['display_type_details'] = {'block-handle': val};
                     }
