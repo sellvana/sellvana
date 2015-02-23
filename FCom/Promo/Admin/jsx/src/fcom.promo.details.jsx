@@ -571,7 +571,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                     if (options.data['display_type_details']) {
                         options.data['display_type_details']['block_handle'] = val;
                     } else {
-                        options.data['display_type_details'] = {'block-handle': val};
+                        options.data['display_type_details'] = {'block_handle': val};
                     }
                     updateDataSerialized();
                 },
