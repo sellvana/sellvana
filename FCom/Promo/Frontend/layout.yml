@@ -1,3 +1,7 @@
+/promo:
+    - { include: base }
+    - { hook: main, views: promo/index }
+
 /promo/media:
     - { hook: main, views: promo/media }
 

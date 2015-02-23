@@ -477,6 +477,24 @@ class FCom_Promo_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_1_12__0_1_13()
+    {
+        $tPromo = $this->FCom_Promo_Model_Promo->table();
+
+        $this->BDb->ddlTableDef($tPromo, [
+            BDb::COLUMNS => [
+                'display_on_central_page' => 'RENAME display_index tinyint not null default 0',
+                'display_index_order' => 'int unsigned not null default 0',
+                'display_index_section' => "varchar(10) not null default 'regular'",
+                'display_index_type' => "varchar(10) not null default 'text'",
+                'display_index_showexp' => 'tinyint unsigned not null default 1',
+            ],
+            BDb::KEYS => [
+                'IDX_display_index' => '(display_index, display_index_order)',
+            ],
+        ]);
+    }
 }
 /*
  * Text (Html)

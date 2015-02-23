@@ -36,15 +36,48 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
 {
     const MATCH_ALL = 'all', MATCH_ANY = 'any';
 
+    const COUPON_TYPE_NONE = 0, COUPON_TYPE_SINGLE = 1, COUPON_TYPE_MULTI = 2;
+
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo';
     protected static $_fieldOptions = [
+        'promo_type' => [
+            'cart' => 'Cart',
+            'catalog' => 'Catalog',
+        ],
+        'coupon_type' => [
+            0 => "No coupon code required",
+            1 => "Single coupon code",
+            2 => "Multiple coupon codes",
+        ],
         'status' => [
             'template' => 'Template',
             'pending' => 'Pending',
             'active' => 'Active',
             'expired' => 'Expired',
         ],
+        'display_index_section' => [
+            'regular' => 'Regular',
+            'featured' => 'Featured',
+            'this_month' => 'This Month',
+            'this_week' => 'This Week',
+            'today' => 'Today Only',
+        ],
+        'display_index_type' => [
+            'text' => 'Text', 
+            'cms_block' => 'CMS BLOCK',
+        ],
+    ];
+
+    protected static $_fieldDefaults = [
+        'promo_type' => 'cart',
+        'status' => 'pending',
+        'coupon_type' => 0,
+        'display_index' => 0,
+        'display_index_order' => 0,
+        'display_index_showexp' => 1,
+        'display_index_section' => 'regular',
+        'display_index_type' => 'text',
     ];
 
     protected static $_validationConditions = [];
