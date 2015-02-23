@@ -139,19 +139,33 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $args['data']['customer_group_ids'] = implode(",", $args['data']['customer_group_ids']);
         }
 
-        $serializedData = isset($args['data']['data_serialized'])? $args['data']['data_serialized']: null;
-        if ($serializedData) {
+        $serializedData = isset($args['data']['data_serialized'])? $args['data']['data_serialized']: [];
+        if (!empty($serializedData) && is_string($serializedData)) {
             $serializedData = $this->BUtil->fromJson($serializedData);
-            $couponCodes = isset($serializedData['coupons'])? $serializedData['coupons']: null;
-            if (isset($args['data']['coupon_type']) && $args['data']['coupon_type'] == 2 && $couponCodes) {
-                // if coupon type is set and it is 2 == multiple codes, and multiple codes are passed, add them to
-                // model for reuse on post after, at this moment, model may not have an id
-                $args['model']->set("__multi_codes", $couponCodes);
-
-            }
-            unset($serializedData['coupons']);
-            $args['data']['data_serialized'] = $this->BUtil->toJson($serializedData);
         }
+        $couponCodes = isset($serializedData['coupons'])? $serializedData['coupons']: null;
+        if (isset($args['data']['coupon_type']) && $args['data']['coupon_type'] == 2 && $couponCodes) {
+            // if coupon type is set and it is 2 == multiple codes, and multiple codes are passed, add them to
+            // model for reuse on post after, at this moment, model may not have an id
+            $args['model']->set("__multi_codes", $couponCodes);
+
+        }
+        unset($serializedData['coupons']);
+        $frontendAttributes = [ // these are direct fields in the database
+            'display_on_central_page',
+            'show_expiration',
+            'page_location',
+            'display_type'
+        ];
+
+        foreach ($frontendAttributes as $attr) {
+            if(isset($args['data'][$attr])) {
+                $serializedData[$attr] = $args['data'][$attr];
+                unset($args['data'][$attr]);
+            }
+        }
+
+        $args['data']['data_serialized'] = $this->BUtil->toJson($serializedData);
 
         if (!empty($args['data']['model'])) {
             $args['data']['model'] = $this->BLocale->parseRequestDates($args['data']['model'], 'from_date,to_date');
