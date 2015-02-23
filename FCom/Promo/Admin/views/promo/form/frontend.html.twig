@@ -44,7 +44,7 @@
         }) }}
         {{ forms.input({
             label: "Central Promotions Page Sort Order"|_, label_class: labelClass,
-            value: validator.fieldValue('display_index_order'),
+            value: validator.fieldValue('display_index_order')? :0,
             field: 'display_index_order',
             help_icon: 1, help_text: "Where to display the promotion on central promotions page."|_,
             type: 'number',

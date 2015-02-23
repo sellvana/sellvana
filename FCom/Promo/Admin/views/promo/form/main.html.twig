@@ -150,10 +150,8 @@
                         <span class="glyphicon glyphicon-question-sign"></span></a>
             </label>
             <div class="col-md-5">
-                <select id="model-conditions" name="model[conditions]" class="form-control to-select2">
-                    <option value="">{{ "Apply Always"|_ }}</option>
-                    <option value="all">{{"All Conditions Have to Match"|_}}</option>
-                    <option value="any">{{"Any Condition Has to Match"|_}}</option>
+                <select id="model-conditions_operator" name="model[conditions_operator]" class="form-control to-select2">
+                    {{ UTIL.optionsHtml(m.fieldOptions('conditions_operator'), validator.fieldValue("conditions_operator"))|raw }}
                 </select>
             </div>
             <div class="col-md-4">
@@ -242,6 +240,7 @@
                 var options = {
                     promo_type_id: promo_type_id,
                     coupon_select_id: coupon_type_id,
+                    condition_match_id: 'model-conditions_operator',
                     condition_select_id: 'model-conditions_type',
                     actions_select_id: "model-actions",
                     coupon_container_id: 'coupon-options',

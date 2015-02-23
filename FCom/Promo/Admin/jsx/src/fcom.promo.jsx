@@ -36,6 +36,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
                 }
             }
 
+
             this.$modalContainerCoupons = $('<div/>').appendTo(document.body);
             this.$modalContainerConditions = $('<div/>').appendTo(document.body);
             this.$modalContainerActions = $('<div/>').appendTo(document.body);
@@ -45,6 +46,13 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             this.initCouponApp(this.options.coupon_select_id, this.$modalContainerCoupons);
             this.initConditionsApp(this.options.condition_select_id, this.$modalContainerConditions);
             this.initActionsApp(this.options.actions_select_id, this.$modalContainerActions);
+
+            var $conditionsMatch = $('#' + this.options.condition_match_id);
+            if ($conditionsMatch.length) {
+                $conditionsMatch.on("change", function (e) {
+                    this.initConditionsApp(this.options.condition_select_id, this.$modalContainerConditions);
+                }.bind(this))
+            }
         },
         initActionsApp: function (selector, $modalContainer) {
             var $actionsSelector = $('#' + selector);
@@ -62,10 +70,23 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo
             if ($conditionSelector.length == 0) {
                 this.log("Conditions drop-down not found");
             } else {
+                var match = true;
+                var $conditionsMatch = $('#' + this.options.condition_match_id);
                 var $container = $("#" + this.options.condition_container_id);
                 var promoConditions = this.options.promoOptions['conditions'] || {};
+
+                if ($conditionsMatch.length) {
+                    match = $conditionsMatch.val();
+                }
+                var hidden = (match === 'always') || false;
+
+                if (hidden) {
+                    $conditionSelector.attr('disabled', true);
+                } else {
+                    $conditionSelector.attr('disabled', false);
+                }
                 React.render(<ConditionsApp conditionType={$conditionSelector} conditions={promoConditions} onUpdate={this.onConditionsUpdate.bind(this)}
-                    options={this.options} modalContainer={$modalContainer}/>,$container.get(0));
+                    options={this.options} modalContainer={$modalContainer} hidden={hidden}/>,$container.get(0));
             }
         },
         initCouponApp: function (selector, $modalContainer) {

@@ -1,6 +1,6 @@
 modules:
     FCom_Promo:
-        version: 0.1.13
+        version: 0.1.14
         channel: beta
         require: { module: { FCom_Catalog: 0.1.0, FCom_Sales: 0.2.0 }}
         description: "Promotions module"
