@@ -1,4 +1,4 @@
-define(['react', 'jsx!fcom.components'], function (React, Components) {
+define(['react', 'fcom.components'], function (React, Components) {
     var Common = {
         DelBtn: React.createClass({displayName: "DelBtn",
             render: function () {

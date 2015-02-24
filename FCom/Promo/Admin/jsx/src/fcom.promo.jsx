@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'jsx!fcom.promo.actions', 'jsx!fcom.promo.coupon', 'jsx!fcom.promo.conditions', 'store', 'select2', 'jquery.bootstrap-growl'],
-    function (React, $, Griddle, Components, Actions, CouponApp, ConditionsApp, store) {
+define(['react', 'jquery', 'fcom.components', 'fcom.promo.actions', 'fcom.promo.coupon', 'fcom.promo.conditions', 'store', 'select2', 'jquery.bootstrap-growl'],
+    function (React, $, Components, Actions, CouponApp, ConditionsApp, store) {
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {minimumResultsForSearch: 15, dropdownAutoWidth: true});
     var Promo = {
         $modalContainerCoupons: null,

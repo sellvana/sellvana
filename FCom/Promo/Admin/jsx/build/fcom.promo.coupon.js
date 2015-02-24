@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'select2', 'bootstrap'], function (React, $, Components, Locale) {
+define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'select2', 'bootstrap'], function (React, $, Components, Locale) {
     var labelClass = "col-md-3";
     var SingleCoupon = React.createClass({displayName: "SingleCoupon",
         render: function () {

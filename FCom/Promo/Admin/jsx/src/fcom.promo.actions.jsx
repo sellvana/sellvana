@@ -2,7 +2,7 @@
  * Created by pp on 22.Dec14.
  */
 
-define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom.locale', 'select2'], function (React, $, Components, Common, Locale) {
+define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale', 'select2'], function (React, $, Components, Common, Locale) {
     var Type = React.createClass({
         render: function () {
             var cls = this.props.select2 ? "to-select2 " : "";

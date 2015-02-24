@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo.common',
+define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common',
     'select2', 'bootstrap', 'moment', 'daterangepicker'], function (React, $, Components, Locale, Common) {
 
     // what type of condition we have, total amount or quantity

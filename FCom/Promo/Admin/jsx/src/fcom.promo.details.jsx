@@ -1,4 +1,4 @@
-define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'fcom.locale', 'ckeditor'], function ($, React, Components, _, Locale) {
+define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'ckeditor'], function ($, React, Components, _, Locale) {
     var cmsBlocks, customerGroups;
 
     function getCmsBlocks(url, callback) {
