@@ -1402,6 +1402,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
             var mc = this.props.modalContainer;
             var rc = this.removeCondition;
             var cu = this.conditionUpdate;
+
             for(var type in this.state.data.rules) {
                 if(this.state.data.rules.hasOwnProperty(type)) {
                     var rules = this.state.data.rules[type];
@@ -1444,7 +1445,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 }
             }
             return (
-                <div className="conditions">
+                <div className="conditions col-md-offset-1" style={{display: this.props.hidden?"none": "block"}}>
                     {children}
                 </div>
             );

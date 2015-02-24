@@ -1,6 +1,6 @@
 modules:
     FCom_Promo:
-        version: 0.1.13
+        version: 0.1.14
         channel: beta
         require: { module: { FCom_Catalog: 0.1.0, FCom_Sales: 0.2.0 }}
         description: "Promotions module"
@@ -10,6 +10,20 @@ modules:
             - [ FCom_Sales_Model_Cart_Total_Discount::calculate, FCom_Promo_Main.onCartDiscountCalculate ]
 
         auto_use: [ bootstrap, views, layout ]
+
+        default_config:
+            modules:
+                FCom_Promo:
+                    display:
+                        locationPages: { home_page: "Home Page", category_page: "Category Page", product_page: "Product Page", cart_page: "Cart", success_page: "Success Page", custom_hook: "Custom Hook" }
+                        locationPageOptions:
+                            home_page:     {below_product_name: "Below Product Name", below_add_to_cart_block: "Below Add To Cart Block", above_description_block: "Above Description  Block", above_add_to_cart_button: "Above Add To Cart Button", home: "home"}
+                            category_page: {below_product_name: "Below Product Name", below_add_to_cart_block: "Below Add To Cart Block", above_description_block: "Above Description  Block", above_add_to_cart_button: "Above Add To Cart Button", category: "category"}
+                            product_page:  {below_product_name: "Below Product Name", below_add_to_cart_block: "Below Add To Cart Block", above_description_block: "Above Description  Block", above_add_to_cart_button: "Above Add To Cart Button", product: "product"}
+                            cart_page:     {below_product_name: "Below Product Name", below_add_to_cart_block: "Below Add To Cart Block", above_description_block: "Above Description  Block", above_add_to_cart_button: "Above Add To Cart Button", cart: "cart"}
+                            success_page:  {below_product_name: "Below Product Name", below_add_to_cart_block: "Below Add To Cart Block", above_description_block: "Above Description  Block", above_add_to_cart_button: "Above Add To Cart Button", success: "success"}
+                            custom_hook:   {below_product_name: "Below Product Name", below_add_to_cart_block: "Below Add To Cart Block", above_description_block: "Above Description  Block", above_add_to_cart_button: "Above Add To Cart Button", hook: "hook"}
+
 
         areas:
             FCom_Admin:
