@@ -326,10 +326,27 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             this.props.searchWithinResults(event.target.value);
         },
         sortColumns: function() {
+            var personalizeUrl = this.props.getConfig('personalize_url');
             var newPosColumns = $(this.getDOMNode()).find('.dd-list').sortable('toArray', {attribute: 'data-id'}); //new position columns array
+
+            if (personalizeUrl) {
+                var id = this.props.getConfig('id');
+                var selectedColumns = this.props.selectedColumns();
+                var postColumns = [];
+
+                _.forEach(newPosColumns, function(col, index) {
+                    postColumns.push({
+                        name: col,
+                        position: index + 1, //plus 1 because pos 0 always is header-dropdown-selection
+                        hidden: !_.contains(selectedColumns, col)
+                    })
+                });
+
+                $.post(personalizeUrl, { 'do': 'grid.col.orders', 'grid': id, 'cols': JSON.stringify(postColumns) });
+            }
+
             newPosColumns.unshift(0); //add first column again
             this.props.updateInitColumns(newPosColumns);
-            //todo: personalization
         },
         componentDidUpdate: function() {
             this.renderDropdownColumnsSettings();
