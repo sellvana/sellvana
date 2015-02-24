@@ -10,7 +10,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     return false;
                 }
                 _.extend(f, {
-                    hidden: f.hidden ? f.hidden : false,
+                    hidden: f.hidden == true || f.hidden == 'true',
                     label: that.getFieldName(f.field),
                     opLabel: f.opLabel? f.opLabel : '',
                     op: f.op ? f.op : '',
@@ -56,6 +56,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         },
         componentDidUpdate: function() {
             var that = this;
+            //todo: find another way to avoid re-render filters component after main component didUpdate
             this.renderDropdownFilters();
             this.renderListFilters();
             $(this.getDOMNode()).find('.dd-list').sortable({

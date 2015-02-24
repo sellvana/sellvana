@@ -63,8 +63,10 @@ define(['underscore', 'react'], function (_, React) {
                                     </a>
                                 );
                             } else {
+                                //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
-                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button" onClick={that.props.doRowAction}>
+                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button"
+                                        data-action={btn.name} data-row={that.props.row.id} onClick={that.props.doRowAction}>
                                         <i className={btn.icon} data-action={btn.name} data-row={that.props.row.id}></i>
                                         {btn.caption}
                                     </button>
