@@ -167,6 +167,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         if (!$this->items) {
             $this->items = $this->FCom_Sales_Model_Cart_Item->orm()->where('cart_id', $this->id())->find_many_assoc();
+            foreach ($this->items as $item) {
+                $item->setCart($this);
+            }
         }
         return $assoc ? $this->items : array_values($this->items);
     }
@@ -216,7 +219,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         foreach ($items as $item) {
             if ($item->product) continue;
             if (($cached = $this->FCom_Catalog_Model_Product->cacheFetch('id', $item->product_id))) {
-                $item->product = $cached;
+                $item->setProduct($cached);
             } else {
                 $productIds[$item->product_id] = $item->id;
             }
@@ -289,7 +292,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      *      - qty
      *      - price
      *      - is_separate
-     * @return FCom_Sales_Model_Cart
+     * @return FCom_Sales_Model_Cart_Item
      */
     public function addProduct($product, $params = [])
     {
@@ -344,12 +347,14 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'cart_id' => $this->id(),
                 'product_id' => $productId,
                 'product_name' => $product->get('product_name'),
-                'product_sku' => !empty($params['product_sku']) ? $params['product_sku'] : $this->get('product_sku'),
+                'product_sku' => !empty($params['product_sku']) ? $params['product_sku'] : $product->get('product_sku'),
                 'inventory_sku' => $product->get('inventory_sku'),
                 'show_separate' => !empty($params['show_separate']) ? $params['show_separate'] : false,
                 'qty' => $params['qty'],
                 'price' => $params['price'],
                 'unique_hash' => $hash,
+                'auto_added' => !empty($params['auto_added']) ? $params['auto_added'] : 0,
+                'parent_item_id' => !empty($params['parent_item_id']) ? $params['parent_item_id'] : null,
             ];
             if ($skuModel) {
                 $itemData = array_merge($itemData, [
@@ -372,7 +377,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
         $this->BEvents->fire(__METHOD__, ['model' => $this, 'item' => $item]);
 
-        return $this;
+        return $item;
     }
 
     /**
@@ -436,19 +441,34 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return array
+     * @return FCom_Sales_Model_Cart_Total_Abstract[]
      */
     public function getTotalRowInstances()
     {
         if (!$this->totals) {
             $this->totals = [];
             foreach (static::$_totalRowHandlers as $name => $class) {
+                /** @var FCom_Sales_Model_Cart_Total_Abstract $inst */
                 $inst = $this->BClassRegistry->instance($class)->init($this);
                 $this->totals[$inst->getCode()] = $inst;
             }
             uasort($this->totals, function($a, $b) { return $a->getSortOrder() - $b->getSortOrder(); });
         }
         return $this->totals;
+    }
+
+    /**
+     * @param string $type
+     * @return FCom_Sales_Model_Cart_Total_Abstract
+     * @throws BException
+     */
+    public function getTotalByType($type)
+    {
+        $totals = $this->getTotalRowInstances();
+        if (empty($totals[$type])) {
+            throw new BException('Invalid total type: ' . $type);
+        }
+        return $totals[$type];
     }
 
     /**
@@ -467,7 +487,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return array
+     * @return FCom_Sales_Model_Cart_Total_Abstract[]
      */
     public function getTotals()
     {
@@ -502,7 +522,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->set('same_address', 1);
         $defCountry = $this->BConfig->get('modules/FCom_Core/default_country');
         $this->set('shipping_country', $defCountry)->set('billing_country', $defCountry);
-        $this->setShippingMethod(true);
+        $this->setShippingMethod(true, null, true);
         $this->setPaymentMethod(true);
         $this->state()->overall()->setActive();
 
@@ -591,18 +611,23 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      * @param string $service
      * @return $this
      */
-    public function setShippingMethod($method, $service = null)
+    public function setShippingMethod($method, $service = null, $ignoreInvalid = false)
     {
         $methods = $this->FCom_Sales_Main->getShippingMethods();
         if (true === $method) {
             $method = $this->BConfig->get('modules/FCom_Sales/default_shipping_method');
         }
-        if (empty($methods[$method])) {
+        if (!$ignoreInvalid && empty($methods[$method])) {
             throw new BException('Invalid shipping method: '. $method);
         }
-        $services = $methods[$method]->getServices();
-        if (null !== $service && empty($services[$service])) {
-            throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
+        if (!empty($methods[$method])) {
+            $services = $methods[$method]->getServices();
+            if (null !== $service && empty($services[$service])) {
+                throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
+            }
+        } else {
+            $method = null;
+            $service = null;
         }
         $this->set('shipping_method', $method)->set('shipping_service', $service);
         return $this;
@@ -762,6 +787,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
         return $this->_state;
     }
+
 
     public function __destruct()
     {

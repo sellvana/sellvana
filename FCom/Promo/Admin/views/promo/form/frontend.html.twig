@@ -1,0 +1,108 @@
+<!--{ label: Frontend Display }-->
+<!--{ pos: 30 }-->
+<!--{ model_new_hide: true }-->
+
+{% set m = THIS.get('model') %}
+{% set promo_type = validator.fieldValue('promo_type') %}
+{% set validator = THIS.get('validator') %}
+{% set labelClass = "col-md-3" %}
+{% set promoDisplayData = m.getPromoDisplayData(true) %}
+{% set data = UTIL.fromJson(validator.fieldValue("data_serialized")) %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+{% if MODULES.isLoaded('FCom_CustomerGroups') %}
+    {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptionsByCode() %}
+{% endif %}
+
+<fieldset class="adm-section-group">
+    <div class="f-section">
+        <h4>{{ "Add Promotions Display"|_ }}&nbsp;
+            <a tabindex="-1" class="help-icon" href="#" data-toggle="popover"
+               data-trigger="focus" data-content="{{ "Add Promotions Display"|_ }}" data-container="body">
+                <span class="icon-question-sign"></span></a>&nbsp;
+            <a href="#" class="btn-add" id="add_promo_display_btn">
+                <span class="icon-plus-sign"></span></a>
+        </h4>
+        <hr/>
+        <div id="add_promo_display_details">
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
+        </div>
+        {#{{ dump(promoDisplayData) }}#}
+    </div>
+    <div class="f-section">
+        <h4>{{ "Display On Central Promotion Page"|_ }}</h4>
+        <hr/>
+        {{ forms.boolean({
+            label: "Display Promotion on Central Promotions Page"|_, label_class: labelClass,
+            value: validator.fieldValue('display_index'),
+            field: 'display_index',
+            help_icon: 1, help_text: "Wether or not to display promotion on central promotions page."|_,
+            select2: {minimumResultsForSearch: 15}
+        }) }}
+        {{ forms.input({
+            label: "Central Promotions Page Sort Order"|_, label_class: labelClass,
+            value: validator.fieldValue('display_index_order'),
+            field: 'display_index_order',
+            help_icon: 1, help_text: "Where to display the promotion on central promotions page."|_,
+            type: 'number',
+        }) }}
+        {{ forms.boolean({
+            label: "Show Exp Date"|_, label_class: labelClass,
+            value: validator.fieldValue('display_index_showexp'),
+            field: 'display_index_showexp',
+            help_icon: 1, help_text: "Wether or not to show promo expiration date."|_,
+            select2: {minimumResultsForSearch: 15}
+        }) }}
+        {{ forms.select({
+            label: "Location On Page"|_,label_class: labelClass,
+            field: "display_index_section",
+            value: validator.fieldValue('display_index_section'),
+            help_icon: 1, help_text: "Where to place this promo on central promotions page."|_,
+            select2: {minimumResultsForSearch: 15},
+            style: (promo_type == 'catalog')? "display: none": '',
+            options: m.fieldOptions('display_index_section')
+        }) }}
+        {{ forms.select({
+            label: "Display Type"|_,label_class: labelClass,
+            field: "display_index_type",
+            value: validator.fieldValue('display_index_type'),
+            help_icon: 1, help_text: "What should be displayed for this promo."|_,
+            select2: {minimumResultsForSearch: 15},
+            style: (promo_type == 'catalog')? "display: none": '',
+            options: m.fieldOptions('display_index_type')
+        }) }}
+        <div id="display_type_details">
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
+        </div>
+        {% set elView = LAYOUT.view('core/form-elements') %}
+        {% set base_url = APP.href('promo/') %}
+    </div>
+    <script>
+        require(['jquery', 'jsx!fcom.promo.details'], function ($, PromoDetails) {
+            var promoDisplayOptions = {
+                container: $('#add_promo_display_details')[0],
+                addDisplayBtn: $('#add_promo_display_btn'),
+                promoDisplayData: {{ promoDisplayData|raw }},
+                base_url: "{{ base_url }}",
+                customerGroups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'false' }}
+            };
+            PromoDetails.initAddPromoDisplayApp(promoDisplayOptions);
+
+            var $displayTypeContainer = $('#display_type_details');
+            var $displayTypeSelector = $('#{{ elView.getInputId({field:"display_index_type"}) }}');
+//                console.log(PromoDetails);
+            var centralPageOptions = {
+                container: $displayTypeContainer[0],
+                selector: $displayTypeSelector,
+                promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
+                base_url: "{{ base_url }}"
+            };
+            PromoDetails.initCentralPageApp(centralPageOptions);
+        });
+    </script>
+</fieldset>
+

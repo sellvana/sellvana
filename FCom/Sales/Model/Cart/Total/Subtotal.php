@@ -1,5 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Model_Cart_Total_Subtotal
+ *
+ */
 class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_Abstract
 {
     protected $_code = 'subtotal';
@@ -18,7 +22,7 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
         foreach ($this->_cart->items() as $item) {
             /*
             // TODO: figure out handling cart items of products removed from catalog
-            if (!$item->product()) {
+            if (!$item->getProduct()) {
                 $this->_cart->removeProduct($item->product_id);
             }
             */
@@ -34,8 +38,10 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
             'item_num' => $itemNum,
             'item_qty' => $itemQty,
             'subtotal' => $subtotal,
-            'grand_total' => $subtotal,
         ]);
+
+        $this->_cart->getTotalByType('grand_total')->addComponent($this->_value, 'subtotal');
+
         return $this;
     }
 }

@@ -23,26 +23,65 @@
  * @property datetime $update_at
  * @property string $data_serialized
  *
- * @property data
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  */
 class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_cart_item';
 
     /**
-     * @var null|FCom_Catalog_Model_Product
+     * @var FCom_Catalog_Model_Product
      */
-    public $product;
+    protected $_product;
+
+    /**
+     * @var FCom_Sales_Model_Cart
+     */
+    protected $_cart;
+
+    protected $_relatedItemsCache = [];
+
+    /**
+     * @param FCom_Catalog_Model_Product $product
+     * @return $this
+     */
+    public function setProduct(FCom_Catalog_Model_Product $product)
+    {
+        $this->_product = $product;
+        return $this;
+    }
 
     /**
      * @return FCom_Catalog_Model_Product
      */
-    public function product()
+    public function getProduct()
     {
-        if (!$this->product) {
-            $this->product = $this->relatedModel('FCom_Catalog_Model_Product', $this->product_id);
+        if (!$this->_product) {
+            $this->_product = $this->relatedModel('FCom_Catalog_Model_Product', $this->get('product_id'));
         }
-        return $this->product;
+        return $this->_product;
+    }
+
+    /**
+     * @param FCom_Sales_Model_Cart $cart
+     * @return $this
+     */
+    public function setCart(FCom_Sales_Model_Cart $cart)
+    {
+        $this->_cart = $cart;
+        return $this;
+    }
+
+    /**
+     * @return FCom_Sales_Model_Cart
+     */
+    public function getCart()
+    {
+        if (!$this->_cart) {
+            $this->_cart = $this->FCom_Sales_Model_Cart->load($this->get('cart_id'));
+        }
+        return $this->_cart;
     }
 
     /**
@@ -78,7 +117,7 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
      */
     public function getItemWeight($ship = true)
     {
-        $p = $this->product();
+        $p = $this->getProduct();
         if (!$p) {
             return false;
         }
@@ -103,18 +142,25 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
      */
     public function getQty()
     {
-        return $this->qty;
-    }
-
-    public function onAfterLoad()
-    {
-        parent::onAfterLoad();
-        $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
+        return $this->get('qty');
     }
 
     public function calcUniqueHash($signature)
     {
 
+    }
+
+    public function getCartTemplateViewName()
+    {
+        if ($this->get('auto_added')) {
+            return 'cart/item/auto-added';
+        }
+        return 'cart/item/default';
+    }
+
+    public function __destruct()
+    {
+        unset($this->_product, $this->_cart, $this->_relatedSkuProductCache);
     }
 }
 

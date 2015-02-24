@@ -67,7 +67,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
 
             $url = $r->request('redirect_to');
-            if (!$r->isUrlLocal($url)) {
+            if ($url && !$r->isUrlLocal($url)) {
                 $url = '';
             }
             if ($url) {

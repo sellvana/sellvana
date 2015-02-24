@@ -1,2 +1,9 @@
+/promo:
+    - { include: base }
+    - { hook: main, views: promo/index }
+
 /promo/media:
     - { hook: main, views: promo/media }
+
+/cart:
+    - { hook: cart_item_related, views: promo/cart/free-items }
