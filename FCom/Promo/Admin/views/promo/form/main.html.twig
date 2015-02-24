@@ -8,6 +8,9 @@
 {% set numCodes = m.get('numCodes') %}
 {% set fromDate = validator.fieldValue('from_date') %}
 {% set toDate = validator.fieldValue('to_date') %}
+{% set priority = validator.fieldValue('priority_order')? :0 %}
+
+
 {% if fromDate and toDate %}
     {% set daterange = fromDate ~ " - " ~ toDate %}
 {% else %}
@@ -32,7 +35,7 @@
             field: "promo_type", help_icon: 1,
             help_text: "Promotion tyoe, catalog or cart. Once selected cannot be changed"|_,
             select2: {minimumResultsForSearch: 15},
-            options: {'cart':'Cart'|_, 'catalog':'Catalog'|_},
+            options: m.fieldOptions('promo_type'),
             required: 1, disabled: m.id()? 1: 0
         }) }}
         {{ forms.input({label: 'Admin Summary'|_, required: 1, field: "summary",
@@ -49,7 +52,7 @@
             help_icon: 1, help_text: 'Details for Customers'|_ }) }}
 
         {{ forms.input({label: 'Priority'|_, field: "priority_order",
-            value: validator.fieldValue('priority_order'),label_class: labelClass,
+            value: priority,label_class: labelClass,
             placeholder:"Enter priority number", type: "number",
             help_icon: 1, help_text: 'Execution priority for order, lower order is calculated first.'|_ }) }}
 
@@ -59,7 +62,7 @@
             field: "status", help_icon: 1,
             help_text: "Promotion status"|_,
             select2: {minimumResultsForSearch: 15},
-            options: {'pending':'Pending'|_, 'active':'Active'|_, 'expired':'Expired'|_, 'template':'Template'|_},
+            options: m.fieldOptions('status'),
             input_div_class: "col-md-2"
         }) }}
 
@@ -135,7 +138,7 @@
             help_text: "Require coupon code"|_,
             select2: {minimumResultsForSearch: 15}, disabled: (promo_type == 'catalog')? 1: 0,
             style: (promo_type == 'catalog')? "display: none": '',
-            options: ["No coupon code required"|_, "Single coupon code"|_, "Multiple coupon codes"|_]
+            options: m.fieldOptions('coupon_type')
         }) }}
         <div id="coupon-options"></div>
         {{ forms.hidden({field:"data_serialized", value: validator.fieldValue("data_serialized")}) }}
@@ -148,6 +151,7 @@
             </label>
             <div class="col-md-5">
                 <select id="model-conditions" name="model[conditions]" class="form-control to-select2">
+                    <option value="">{{ "Apply Always"|_ }}</option>
                     <option value="all">{{"All Conditions Have to Match"|_}}</option>
                     <option value="any">{{"Any Condition Has to Match"|_}}</option>
                 </select>
@@ -165,8 +169,11 @@
                 </select>
             </div>
         </div>
-        <div id="conditions-options">{{ "Loading ..."|_ }}</div>
-
+        <div id="conditions-options">
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
+        </div>
         <div class="form-group">
             <label class="control-label col-md-3" for="model-actions">{{"Promo Actions"|_}}&nbsp;
                     <a id="help-model-actions" class="pull-right help-icon" href="#"
@@ -185,7 +192,11 @@
                 </select>
             </div>
         </div>
-        <div id="actions-options">{{ "Loading ..."|_ }}</div>
+        <div id="actions-options">
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
+        </div>
         {% set elView = LAYOUT.view('core/form-elements') %}
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {

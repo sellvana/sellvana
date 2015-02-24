@@ -823,10 +823,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                     <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" promoType={promoType}
                         onChange={this.onChange} value={values.type}> of products in </ConditionsType>
                     <input type="hidden" id="catProductsIds" ref="catProductsIds" defaultValue={categories}/>
-                    <select id="catProductInclude" ref="catProductInclude" className="to-select2" defaultValue={values.include}>
-                        <option value="only_this">{Locale._("Only This")}</option>
-                        <option value="include_subcategories">{Locale._("This and sub categories")}</option>
-                    </select>
                     <div style={display} >
                         <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange}
                             value={values.filter} disabled={disabled}/>
@@ -897,7 +893,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
         onChange: function () {
             var value = {};
             value.category_id = $(this.refs['catProductsIds'].getDOMNode()).select2('val');
-            value.include = $(this.refs['catProductInclude'].getDOMNode()).val();
+            //value.include = $(this.refs['catProductInclude'].getDOMNode()).val();
             if(this.props.options.promo_type !== 'catalog') {
                 value.type = this.refs['catProductsType'].serialize();
                 value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();
@@ -1353,7 +1349,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'fcom.locale', 'jsx!fcom.promo
                 label: Locale._("Unknown"),
                 url: "",
                 fcLabel: "",
-                postHelperText: "Use .. (e.g. 90000..99999) to add range of post codes",
+                postHelperText: "Use .. (e.g. 90000..99999) to add range of post codes"
             };
         },
         url: '',

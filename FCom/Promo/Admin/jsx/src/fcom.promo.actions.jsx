@@ -918,19 +918,23 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             }
             return (
                 <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <div className="col-md-3">
+                    <div style={this.props.divStyle}>
                         <input type="hidden" className="form-control" id="productSku" ref="productSku" defaultValue={skus}/>
                     </div>
-                    <div className="col-md-3 form-group">
-                        <Components.ControlLabel input_id="productQty">{Locale._('Qty')}</Components.ControlLabel>
-                        <div className="col-md-10">
+                    <div style={this.props.divStyle}>
+                        <div style={this.props.divStyle}>
+                            <Components.ControlLabel input_id="productQty"
+                                label_class="">{Locale._('Qty')}</Components.ControlLabel></div>
+                        <div style={{float: 'left', marginLeft: 5}}>
                             <input type="text" className="form-control" id="productQty" ref="productQty"
-                                defaultValue={this.state.qty} onBlur={this.onChange}/>
+                                defaultValue={this.state.qty} onChange={this.onChange}/>
                         </div>
                     </div>
-                    <div className="col-md-3 form-group">
-                        <Components.ControlLabel input_id="productTerms">{Locale._('Terms')}</Components.ControlLabel>
-                        <div className="col-md-10">
+                    <div style={this.props.divStyle}>
+                        <div style={this.props.divStyle}>
+                            <Components.ControlLabel input_id="productTerms" label_class="">{Locale._('Terms')}</Components.ControlLabel>
+                        </div>
+                        <div style={this.props.divStyle}>
                             <select className="form-control to-select2" id="productTerms" ref="productTerms"
                                 multiple="multiple" defaultValue={terms}>
                                 <option value="tax">{Locale._("Charge tax")}</option>
@@ -945,19 +949,20 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             return {
                 sku: [],
                 terms: [],
-                qty: 0
+                qty: 1
             }
         },
         getDefaultProps: function () {
             return {
                 url: "conditions/products",
-                labelSkuField: Locale._("Select product sku")
+                labelSkuField: Locale._("Select product sku"),
+                divStyle: {float: 'left', marginLeft: 5}
             }
         },
         url: '',
         componentWillMount: function () {
             var state = {
-                qty: this.props.data.qty,
+                qty: this.props.data.qty || this.state.qty,
                 sku: this.props.data.sku,
                 terms: this.props.data.terms
             };
@@ -1254,6 +1259,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             this.props.onUpdate(localData);
             this.setState({data: localData});
         },
+        shouldUpdate: true,
         shouldComponentUpdate: function () {
             var upd = this.shouldUpdate;
             if(!upd) { // shouldUpdate is one time flag that should be set only specifically and then dismissed

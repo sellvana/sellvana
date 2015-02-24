@@ -80,7 +80,7 @@ class FCom_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstr
                     $result = ['error' => $item['error']];
                 } else {
                     $cart = $this->FCom_Sales_Model_Cart->sessionCart();
-                    $p = $result['items'][0]->product();
+                    $p = $result['items'][0]->getProduct();
                     $result = [
                         'title' => 'Added to cart',
                         'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> '
@@ -160,7 +160,7 @@ class FCom_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstr
         ]);
 
         if (!empty($result['error'])) {
-            $this->message($result['message'], 'error');
+            $this->message($result['error']['message'], 'error');
         } else {
             $this->message('Coupon code has been applied to cart');
         }

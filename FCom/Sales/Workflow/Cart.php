@@ -209,6 +209,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
                 $cart->addProduct($item['product'], $item['details']);
                 $item['status'] = 'added';
             } else {
+                //TODO: handle item error
             }
         }
         unset($item);
@@ -245,7 +246,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
                 $variants = $item->getData('variants');
                 if (null === $variants || count($variants) == 1) { //TODO: explain and improve logic
                     $cart->removeItem($id);
-                    $items[$id] = ['id' => $id, 'status' => 'removed', 'name' => $item->product()->get('product_name')];
+                    $items[$id] = ['id' => $id, 'status' => 'removed', 'name' => $item->getProduct()->get('product_name')];
                 }
             }
         }
@@ -278,11 +279,11 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
                 }
                 if ($totalQty > 0) {
                     $item->set('qty', $totalQty)->setData('variants', $variants)->save();
-                    $items[] = ['id' => $id, 'status' => 'updated', 'name' => $item->product()->get('product_name')];
+                    $items[] = ['id' => $id, 'status' => 'updated', 'name' => $item->getProduct()->get('product_name')];
                 } elseif ($totalQty <= 0 || empty($variants)) {
                     $item->delete();
                     unset($cartItems[$id]);
-                    $items[] = ['id' => $id, 'status' => 'deleted', 'name' => $item->product()->get('product_name')];
+                    $items[] = ['id' => $id, 'status' => 'deleted', 'name' => $item->getProduct()->get('product_name')];
                 }
             }
         }

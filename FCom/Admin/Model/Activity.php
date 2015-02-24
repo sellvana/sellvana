@@ -30,7 +30,7 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
     static protected $_origClass = __CLASS__;
     protected static $_usersRestrictionsCache;
 
-    protected $_fieldOptions = [
+    protected static $_fieldOptions = [
         'status' => [
             'new' => 'New',
             'recent' => 'Recent',
