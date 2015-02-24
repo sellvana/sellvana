@@ -9,7 +9,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             return dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
         };
 
-    var FComGriddleComponent = React.createClass({
+    var FComGriddleComponent = React.createClass({displayName: "FComGriddleComponent",
         getDefaultProps: function () {
             return {
                 "config": {},
@@ -51,16 +51,16 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var config = this.props.config;
 
             return (
-                <Griddle showTableHeading={false} tableClassName={this.props.tableClassName}
-                    config={config} initColumns={this.getColumn()}
-                    sortColumn={config.data.state.s} sortAscending={config.data.state.sd == 'asc'}
-                    columns={this.getColumn('show')} columnMetadata={this.props.columnMetadata}
-                    useCustomGrid={true} customGrid={FComGridBody}
-                    getExternalResults={FComDataMethod} resultsPerPage={config.data.state.ps}
-                    useCustomPager="true" customPager={FComPager} initPage={config.data.state.p - 1}
-                    showSettings={true} useCustomSettings={true} customSettings={FComSettings}
-                    showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
-                />
+                React.createElement(Griddle, {showTableHeading: false, tableClassName: this.props.tableClassName, 
+                    config: config, initColumns: this.getColumn(), 
+                    sortColumn: config.data.state.s, sortAscending: config.data.state.sd == 'asc', 
+                    columns: this.getColumn('show'), columnMetadata: this.props.columnMetadata, 
+                    useCustomGrid: true, customGrid: FComGridBody, 
+                    getExternalResults: FComDataMethod, resultsPerPage: config.data.state.ps, 
+                    useCustomPager: "true", customPager: FComPager, initPage: config.data.state.p - 1, 
+                    showSettings: true, useCustomSettings: true, customSettings: FComSettings, 
+                    showFilter: true, useCustomFilter: "true", customFilter: FComFilter, filterPlaceholderText: "Quick Search"}
+                )
             );
         }
     });
@@ -98,7 +98,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
     /**
      * FCom Pager component
      */
-    var FComPager = React.createClass({
+    var FComPager = React.createClass({displayName: "FComPager",
         getDefaultProps: function () {
             return {
                 "maxPage": 0,
@@ -144,18 +144,18 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var pageSizeOptions = this.props.getConfig('page_size_options');
             var pageSize = this.props.resultsPerPage;
 
-            var first = <li className="first">
-                <a href="#" className="js-change-url" onClick={this.pageFirst}>«</a>
-            </li>;
-            var previous = <li className="prev">
-                <a href="#" className="js-change-url" onClick={this.pagePrevious}>‹</a>
-            </li>;
-            var next = <li className="next">
-                <a className="js-change-url" href="#" onClick={this.pageNext}>›</a>
-            </li>;
-            var last = <li className="last">
-                <a className="js-change-url" href="#" onClick={this.pageLast}>{this.props.maxPage} »</a>
-            </li>;
+            var first = React.createElement("li", {className: "first"}, 
+                React.createElement("a", {href: "#", className: "js-change-url", onClick: this.pageFirst}, "«")
+            );
+            var previous = React.createElement("li", {className: "prev"}, 
+                React.createElement("a", {href: "#", className: "js-change-url", onClick: this.pagePrevious}, "‹")
+            );
+            var next = React.createElement("li", {className: "next"}, 
+                React.createElement("a", {className: "js-change-url", href: "#", onClick: this.pageNext}, "›")
+            );
+            var last = React.createElement("li", {className: "last"}, 
+                React.createElement("a", {className: "js-change-url", href: "#", onClick: this.pageLast}, this.props.maxPage, " »")
+            );
 
             var options = [];
 
@@ -168,9 +168,9 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             for (var i = startIndex; i < endIndex; i++) {
                 var selected = this.props.currentPage == i ? "page active" : "page";
                 options.push(
-                    <li className={selected}>
-                        <a href="#" data-value={i} onClick={this.pageChange} className="js-change-url">{i + 1}</a>
-                    </li>
+                    React.createElement("li", {className: selected}, 
+                        React.createElement("a", {href: "#", "data-value": i, onClick: this.pageChange, className: "js-change-url"}, i + 1)
+                    )
                 );
             }
 
@@ -178,26 +178,26 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             for (var j = 0; j < pageSizeOptions.length; j++) {
                 selected = pageSizeOptions[j] == pageSize ? "active" : "";
                 pageSizeHtml.push(
-                    <li className={selected}>
-                        <a href="#" data-value={pageSizeOptions[j]} onClick={this.setPageSize} className="js-change-url page-size">{pageSizeOptions[j]}</a>
-                    </li>
+                    React.createElement("li", {className: selected}, 
+                        React.createElement("a", {href: "#", "data-value": pageSizeOptions[j], onClick: this.setPageSize, className: "js-change-url page-size"}, pageSizeOptions[j])
+                    )
                 );
             }
 
             return (
-                <div className="col-sm-6 text-right pagination" style={{ margin: "0" }}>
-                    <span className="f-grid-pagination">{this.props.totalResults} record(s)</span>
-                    <ul className="pagination pagination-sm pagination-griddle pagesize">
-                        {pageSizeHtml}
-                    </ul>
-                    <ul className="pagination pagination-sm pagination-griddle page">
-                        {first}
-                        {previous}
-                        {options}
-                        {next}
-                        {last}
-                    </ul>
-                </div>
+                React.createElement("div", {className: "col-sm-6 text-right pagination", style: { margin: "0"}}, 
+                    React.createElement("span", {className: "f-grid-pagination"}, this.props.totalResults, " record(s)"), 
+                    React.createElement("ul", {className: "pagination pagination-sm pagination-griddle pagesize"}, 
+                        pageSizeHtml
+                    ), 
+                    React.createElement("ul", {className: "pagination pagination-sm pagination-griddle page"}, 
+                        first, 
+                        previous, 
+                        options, 
+                        next, 
+                        last
+                    )
+                )
             )
         }
     });
@@ -205,7 +205,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
     /**
      * FCom Settings component
      */
-    var FComSettings = React.createClass({
+    var FComSettings = React.createClass({displayName: "FComSettings",
         mixins: [FCom.Mixin],
         getDefaultProps: function() {
             return {
@@ -275,9 +275,9 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" cancel="Close" onConfirm={this.modalSaveMassChanges}>
-                            <FComModalMassEditForm editUrl={editUrl} columnMetadata={this.props.columnMetadata} id={gridId} />
-                        </Components.Modal>,
+                        React.createElement(Components.Modal, {show: true, title: "Mass Edit Form", confirm: "Save changes", cancel: "Close", onConfirm: this.modalSaveMassChanges}, 
+                            React.createElement(FComModalMassEditForm, {editUrl: editUrl, columnMetadata: this.props.columnMetadata, id: gridId})
+                        ),
                         modalEleContainer
                     );
                     break;
@@ -326,10 +326,27 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             this.props.searchWithinResults(event.target.value);
         },
         sortColumns: function() {
+            var personalizeUrl = this.props.getConfig('personalize_url');
             var newPosColumns = $(this.getDOMNode()).find('.dd-list').sortable('toArray', {attribute: 'data-id'}); //new position columns array
+
+            if (personalizeUrl) {
+                var id = this.props.getConfig('id');
+                var selectedColumns = this.props.selectedColumns();
+                var postColumns = [];
+
+                _.forEach(newPosColumns, function(col, index) {
+                    postColumns.push({
+                        name: col,
+                        position: index + 1, //plus 1 because pos 0 always is header-dropdown-selection
+                        hidden: !_.contains(selectedColumns, col)
+                    })
+                });
+
+                $.post(personalizeUrl, { 'do': 'grid.col.orders', 'grid': id, 'cols': JSON.stringify(postColumns) });
+            }
+
             newPosColumns.unshift(0); //add first column again
             this.props.updateInitColumns(newPosColumns);
-            //todo: personalization
         },
         componentDidUpdate: function() {
             this.renderDropdownColumnsSettings();
@@ -353,28 +370,28 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 var checked = _.contains(that.props.selectedColumns(), column);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
                 return (
-                    <li data-id={column} id={column} className="dd-item dd3-item">
-                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
-                        <div className="dd3-content">
-                            <label>
-                                <input type="checkbox" defaultChecked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
-                                {colInfo ?  colInfo.label : column}
-                            </label>
-                        </div>
-                    </li>
+                    React.createElement("li", {"data-id": column, id: column, className: "dd-item dd3-item"}, 
+                        React.createElement("div", {className: "icon-ellipsis-vertical dd-handle dd3-handle"}), 
+                        React.createElement("div", {className: "dd3-content"}, 
+                            React.createElement("label", null, 
+                                React.createElement("input", {type: "checkbox", defaultChecked: checked, "data-id": column, "data-name": column, className: "showhide_column", onChange: that.toggleColumn}), 
+                                colInfo ?  colInfo.label : column
+                            )
+                        )
+                    )
                 )
             });
 
             var mountNode = document.getElementById('column-settings');
             React.unmountComponentAtNode(mountNode);
-            React.render(<ol className="dd-list dropdown-menu columns ui-sortable" style={{minWidth: '200px'}}>{options}</ol>, mountNode);
+            React.render(React.createElement("ol", {className: "dd-list dropdown-menu columns ui-sortable", style: {minWidth: '200px'}}, options), mountNode);
         },
         render: function () {
             var that = this;
             var id = this.props.getConfig('id');
 
             //quick search
-            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} onChange={this.quickSearch} />;
+            var quickSearch = React.createElement("input", {type: "text", className: "f-grid-quick-search form-control", placeholder: "Search within results", id: id + '-quick-search', onChange: this.quickSearch});
 
             var disabledClass = !this.props.getSelectedRows().length ? ' disabled' : '';
             var configActions = this.props.getConfig('actions');
@@ -387,30 +404,30 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     var node = '';
                     switch (name) {
                         case 'refresh':
-                            node = <a href="#" className="js-change-url grid-refresh btn">Refresh</a>;
+                            node = React.createElement("a", {href: "#", className: "js-change-url grid-refresh btn"}, "Refresh");
                             break;
                         case 'export':
-                            node = <button className={"grid-export btn"} data-action='export' onClick={that.doMassAction}>Export</button>;
+                            node = React.createElement("button", {className: "grid-export btn", "data-action": "export", onClick: that.doMassAction}, "Export");
                             break;
                         case 'link_to_page':
-                            node = <a href="#" className="grid-link_to_page btn">Link</a>;
+                            node = React.createElement("a", {href: "#", className: "grid-link_to_page btn"}, "Link");
                             break;
                         case 'edit':
-                            node = <a href='#' className={"btn grid-mass-edit btn-success" + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button">Edit</a>;
+                            node = React.createElement("a", {href: "#", className: "btn grid-mass-edit btn-success" + disabledClass, "data-action": "mass-edit", onClick: that.doMassAction, role: "button"}, "Edit");
                             break;
                         case 'delete':
                             //todo: option noconfirm
-                            node = <button className={"btn grid-mass-delete btn-danger" + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction}>Delete</button>;
+                            node = React.createElement("button", {className: "btn grid-mass-delete btn-danger" + disabledClass, type: "button", "data-action": "mass-delete", onClick: that.doMassAction}, "Delete");
                             break;
                         case 'add':
-                            node = <button className="btn grid-add btn-primary" type="button">Add</button>;
+                            node = React.createElement("button", {className: "btn grid-add btn-primary", type: "button"}, "Add");
                             break;
                         case 'new':
                             //todo: option modal
-                            node = <button className="btn grid-new btn-primary" type="button">New</button>;
+                            node = React.createElement("button", {className: "btn grid-new btn-primary", type: "button"}, "New");
                             break;
                         default:
-                            node = <span dangerouslySetInnerHTML={{__html: action.html}}></span>;
+                            node = React.createElement("span", {dangerouslySetInnerHTML: {__html: action.html}});
                             break;
                     }
 
@@ -420,16 +437,16 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             var styleColumnSettings = {position: 'absolute', top: 'auto', marginTop: '-2px', padding: '0', display: 'block', left: 0};
             return (
-                <div className="col-sm-6">
-                    {quickSearch}
-                    <div className="dropdown dd dd-nestable columns-span" style={{ display: 'inline' }}>
-                        <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">
-                            Columns <b className="caret"></b>
-                        </a>
-                        <div id="column-settings" style={styleColumnSettings}></div>
-                    </div>
-                    {buttonActions}
-                </div>
+                React.createElement("div", {className: "col-sm-6"}, 
+                    quickSearch, 
+                    React.createElement("div", {className: "dropdown dd dd-nestable columns-span", style: { display: 'inline'}}, 
+                        React.createElement("a", {href: "#", className: "btn dropdown-toggle showhide_columns", "data-toggle": "dropdown"}, 
+                            "Columns ", React.createElement("b", {className: "caret"})
+                        ), 
+                        React.createElement("div", {id: "column-settings", style: styleColumnSettings})
+                    ), 
+                    buttonActions
+                )
             )
         }
     });
@@ -437,7 +454,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
     /**
      * FCom Modal Mass Edit Form
      */
-    var FComModalMassEditForm = React.createClass({
+    var FComModalMassEditForm = React.createClass({displayName: "FComModalMassEditForm",
         getInitialState: function() {
             var fields = [];
             var shownFields = [];
@@ -500,32 +517,32 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             var fieldDropDownNodes = this.state.fields.map(function(column) {
                 if (!_.contains(that.state.shownFields, column.name)) {
-                    return <option value={column.name}>{column.label}</option>;
+                    return React.createElement("option", {value: column.name}, column.label);
                 }
                 return null;
             });
-            fieldDropDownNodes.unshift(<option value=""></option>);
+            fieldDropDownNodes.unshift(React.createElement("option", {value: ""}));
 
             var formElements = this.state.shownFields.map(function(fieldName) {
                 var column = _.findWhere(that.state.fields, {name: fieldName});
-                return <Components.ModalElement column={column} removeFieldDisplay={true} removeFieldHandle={that.removeField} />
+                return React.createElement(Components.ModalElement, {column: column, removeFieldDisplay: true, removeFieldHandle: that.removeField})
             });
 
             return (
-                <div>
-                    <div className="well">
-                        <div className="row">
-                            <div className="col-sm-12">
-                                <select className="select2 form-control" id={gridId + '-form-select'} style={{width: '150px'}}>
-                                    {fieldDropDownNodes}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <form className="form form-horizontal validate-form" id={gridId + '-modal-mass-form'}>
-                        {formElements}
-                    </form>
-                </div>
+                React.createElement("div", null, 
+                    React.createElement("div", {className: "well"}, 
+                        React.createElement("div", {className: "row"}, 
+                            React.createElement("div", {className: "col-sm-12"}, 
+                                React.createElement("select", {className: "select2 form-control", id: gridId + '-form-select', style: {width: '150px'}}, 
+                                    fieldDropDownNodes
+                                )
+                            )
+                        )
+                    ), 
+                    React.createElement("form", {className: "form form-horizontal validate-form", id: gridId + '-modal-mass-form'}, 
+                        formElements
+                    )
+                )
             );
         }
     });

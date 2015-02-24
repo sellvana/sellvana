@@ -9,7 +9,7 @@ define(['underscore', 'react'], function (_, React) {
      var _ = require('underscore');
      */
 
-    var FComRow = React.createClass({
+    var FComRow = React.createClass({displayName: "FComRow",
         mixins: [FCom.Mixin],
         getDefaultProps: function () {
             return {
@@ -50,29 +50,31 @@ define(['underscore', 'react'], function (_, React) {
                         if (_.findWhere(that.props.getSelectedRows(), {id: that.props.row.id})) {
                             defaultChecked = true;
                         }
-                        node = <input type="checkbox" name={id + "[checked][" + that.props.row.id + "]"} className="select-row" checked={defaultChecked} onChange={that.selectRow} />;
+                        node = React.createElement("input", {type: "checkbox", name: id + "[checked][" + that.props.row.id + "]", className: "select-row", checked: defaultChecked, onChange: that.selectRow});
                         break;
                     case 'btn_group':
                         var actions = col.buttons.map(function(btn) {
                             //var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
                             if (btn.type == 'link') {
                                 return (
-                                    <a className={"btn btn-link " + btn.cssClass} href={btn.href + that.props.row[btn.col]} title={btn.title ? btn.title : ""}>
-                                        <i className={btn.icon}></i>
-                                        {btn.caption}
-                                    </a>
+                                    React.createElement("a", {className: "btn btn-link " + btn.cssClass, href: btn.href + that.props.row[btn.col], title: btn.title ? btn.title : ""}, 
+                                        React.createElement("i", {className: btn.icon}), 
+                                        btn.caption
+                                    )
                                 );
                             } else {
+                                //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
-                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button" onClick={that.props.doRowAction}>
-                                        <i className={btn.icon} data-action={btn.name} data-row={that.props.row.id}></i>
-                                        {btn.caption}
-                                    </button>
+                                    React.createElement("button", {className: "btn btn-link " + btn.cssClass, title: btn.title ? btn.title : "", type: "button", 
+                                        "data-action": btn.name, "data-row": that.props.row.id, onClick: that.props.doRowAction}, 
+                                        React.createElement("i", {className: btn.icon, "data-action": btn.name, "data-row": that.props.row.id}), 
+                                        btn.caption
+                                    )
                                 );
                             }
                         });
                         node = (
-                            <div className="table-actions-btns-group">{actions}</div>
+                            React.createElement("div", {className: "table-actions-btns-group"}, actions)
                         );
                         break;
                     case 'input':
@@ -108,13 +110,13 @@ define(['underscore', 'react'], function (_, React) {
                         break;
                 }
 
-                return <td data-col={col.name}>{node}</td>;
+                return React.createElement("td", {"data-col": col.name}, node);
             });
 
             return (
-                <tr className={"standard-row " + (this.props.index % 2 ? 'odd' : 'even')} id={this.props.row.id}>
-                    {nodes}
-                </tr>
+                React.createElement("tr", {className: "standard-row " + (this.props.index % 2 ? 'odd' : 'even'), id: this.props.row.id}, 
+                    nodes
+                )
             );
         }
     });

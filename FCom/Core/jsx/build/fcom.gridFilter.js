@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], function (_, React) {
-    var FComFilter = React.createClass({
+    var FComFilter = React.createClass({displayName: "FComFilter",
         getInitialState: function() {
             var that = this;
             var filters = {};
@@ -10,7 +10,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     return false;
                 }
                 _.extend(f, {
-                    hidden: f.hidden ? f.hidden : false,
+                    hidden: f.hidden == true || f.hidden == 'true',
                     label: that.getFieldName(f.field),
                     opLabel: f.opLabel? f.opLabel : '',
                     op: f.op ? f.op : '',
@@ -56,6 +56,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         },
         componentDidUpdate: function() {
             var that = this;
+            //todo: find another way to avoid re-render filters component after main component didUpdate
             this.renderDropdownFilters();
             this.renderListFilters();
             $(this.getDOMNode()).find('.dd-list').sortable({
@@ -102,21 +103,21 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
 
             var filterSettingNodes = _.map(filters, function(f) {
                 return (
-                    <li data-filter-id={f.field} className="dd-item dd3-item">
-                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
-                        <div className="dd3-content">
-                            <label>
-                                <input className="showhide_column" data-field={f.field} onChange={that.toggleFilter} type="checkbox" defaultChecked={!f.hidden ? 'checked' : ''} />
-                                {f.label}
-                            </label>
-                        </div>
-                    </li>
+                    React.createElement("li", {"data-filter-id": f.field, className: "dd-item dd3-item"}, 
+                        React.createElement("div", {className: "icon-ellipsis-vertical dd-handle dd3-handle"}), 
+                        React.createElement("div", {className: "dd3-content"}, 
+                            React.createElement("label", null, 
+                                React.createElement("input", {className: "showhide_column", "data-field": f.field, onChange: that.toggleFilter, type: "checkbox", defaultChecked: !f.hidden ? 'checked' : ''}), 
+                                f.label
+                            )
+                        )
+                    )
                 );
             });
 
             var mountNode = document.getElementById('list-filters-setting');
             React.unmountComponentAtNode(mountNode);
-            React.render(<ul className={id + " dd-list dropdown-menu filters ui-sortable"}>{filterSettingNodes}</ul>, mountNode);
+            React.render(React.createElement("ul", {className: id + " dd-list dropdown-menu filters ui-sortable"}, filterSettingNodes), mountNode);
         },
         renderListFilters: function() {
             var that = this;
@@ -127,12 +128,12 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 if (f.hidden) {
                     return false;
                 }
-                return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} getConfig={that.props.getConfig} />);
+                return (React.createElement(FComFilterNodeContainer, {filter: f, setFilter: that.doFilter, setStateFilter: that.setStateFilter, capitaliseFirstLetter: that.capitaliseFirstLetter, keepShowDropDown: that.keepShowDropDown, getConfig: that.props.getConfig}));
             });
 
             var mountNode = document.getElementById('list-filters');
             React.unmountComponentAtNode(mountNode);
-            React.render(<div className={id + " f-filter-btns"}>{filterNodes}</div>, mountNode);
+            React.render(React.createElement("div", {className: id + " f-filter-btns"}, filterNodes), mountNode);
         },
         capitaliseFirstLetter: function(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -230,28 +231,28 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             console.log('filters', filters);
 
             var filterSettings = (
-                <div className={id + ' dropdown'} style={{"display" : "inline-block"}}>
-                    <a data-toggle="dropdown" className="btn dropdown-toggle showhide_columns">
-                        Filters <b className="caret"></b>
-                    </a>
-                    <div id="list-filters-setting"></div>
-                </div>
+                React.createElement("div", {className: id + ' dropdown', style: {"display" : "inline-block"}}, 
+                    React.createElement("a", {"data-toggle": "dropdown", className: "btn dropdown-toggle showhide_columns"}, 
+                        "Filters ", React.createElement("b", {className: "caret"})
+                    ), 
+                    React.createElement("div", {id: "list-filters-setting"})
+                )
             );
 
             //console.log('end render filters');
 
             return (
-                <div>
-                    <div className="f-col-filters-selection pull-left">
-                        {filterSettings}
-                    </div>
-                    <div id="list-filters"></div>
-                </div>
+                React.createElement("div", null, 
+                    React.createElement("div", {className: "f-col-filters-selection pull-left"}, 
+                        filterSettings
+                    ), 
+                    React.createElement("div", {id: "list-filters"})
+                )
             );
         }
     });
 
-    var FComFilterNodeContainer = React.createClass({
+    var FComFilterNodeContainer = React.createClass({displayName: "FComFilterNodeContainer",
         getDefaultProps: function() {
             return {
                 'filter': {}
@@ -267,16 +268,16 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
 
             switch (filter.type) {
                 case 'text':
-                    node = <FComFilterText {...this.props} />;
+                    node = React.createElement(FComFilterText, React.__spread({},  this.props));
                     break;
                 case 'date-range':
-                    node = <FComFilterDateRange {...this.props} />;
+                    node = React.createElement(FComFilterDateRange, React.__spread({},  this.props));
                     break;
                 case 'number-range':
-                    node = <FComFilterNumberRange {...this.props} />;
+                    node = React.createElement(FComFilterNumberRange, React.__spread({},  this.props));
                     break;
                 case 'multiselect':
-                    node = <FComFilterMultiSelect {...this.props} />;
+                    node = React.createElement(FComFilterMultiSelect, React.__spread({},  this.props));
                     break;
                 default:
                     console.log('Does not support filter type: ' + filter.type);
@@ -330,7 +331,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         }
     };
 
-    var FComFilterText = React.createClass({
+    var FComFilterText = React.createClass({displayName: "FComFilterText",
         mixins: [FilterStateMixin],
         getInitialState: function () {
             var filter = this.props.filter;
@@ -364,46 +365,46 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             console.log('begin render filter: ' +  filter.field);*/
 
             var operations = this.getOperations().map(function(item) {
-                return ( <li> <a className="filter_op" data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+                return ( React.createElement("li", null, " ", React.createElement("a", {className: "filter_op", "data-id": item.op, onClick: that.setStateOperation, href: "#"}, item.name), " ") )
             });
 
             /*console.log('end render filter: ' +  filter.field);*/
 
             return (
-                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
-                    <button className="btn dropdown-toggle filter-text-main" data-toggle="dropdown">
-                        <span className="f-grid-filter-field">{filter.label}</span>:
-                        <span className="f-grid-filter-value"> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
-                        <span className="caret"></span>
-                    </button>
-                    <ul className="dropdown-menu filter-box">
-                        <li>
-                            <div className="input-group">
-                                <div className="input-group-btn dropdown">
-                                    <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
-                                        {filter.opLabel}
-                                        <span className="caret"></span>
-                                    </button>
-                                    <ul className="dropdown-menu filter-sub">
-                                        {operations}
-                                    </ul>
-                                </div>
-                                <input type="text" className="form-control" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
-                                <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        <i className="icon-check-sign"></i> Update
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
-                </div>
+                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field}, 
+                    React.createElement("button", {className: "btn dropdown-toggle filter-text-main", "data-toggle": "dropdown"}, 
+                        React.createElement("span", {className: "f-grid-filter-field"}, filter.label), ":", 
+                        React.createElement("span", {className: "f-grid-filter-value"}, " ", filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All', " "), 
+                        React.createElement("span", {className: "caret"})
+                    ), 
+                    React.createElement("ul", {className: "dropdown-menu filter-box"}, 
+                        React.createElement("li", null, 
+                            React.createElement("div", {className: "input-group"}, 
+                                React.createElement("div", {className: "input-group-btn dropdown"}, 
+                                    React.createElement("button", {className: "btn btn-default dropdown-toggle filter-text-sub", "data-toggle": "dropdown"}, 
+                                        filter.opLabel, 
+                                        React.createElement("span", {className: "caret"})
+                                    ), 
+                                    React.createElement("ul", {className: "dropdown-menu filter-sub"}, 
+                                        operations
+                                    )
+                                ), 
+                                React.createElement("input", {type: "text", className: "form-control", onChange: this.setStateValue, onKeyUp: this.handleEnter}), 
+                                React.createElement("div", {className: "input-group-btn"}, 
+                                    React.createElement("button", {type: "button", className: "btn btn-primary update", onClick: this.submitFilter}, 
+                                        React.createElement("i", {className: "icon-check-sign"}), " Update"
+                                    )
+                                )
+                            )
+                        )
+                    ), 
+                    React.createElement("abbr", {className: "select2-search-choice-close", "data-clear": "1", style: filter.submit ? {display: 'block'} : {display: 'none'}, onClick: this.submitFilter})
+                )
             );
         }
     });
 
-    var FComFilterDateRange = React.createClass({
+    var FComFilterDateRange = React.createClass({displayName: "FComFilterDateRange",
         mixins: [FilterStateMixin],
         getInitialState: function() {
             var filter = this.props.filter;
@@ -464,56 +465,56 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var that = this;
 
             var operations = this.getOperations().map(function(item) {
-                return ( <li> <a className={"filter_op " + (item.range ? 'range' : 'not_range')} data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+                return ( React.createElement("li", null, " ", React.createElement("a", {className: "filter_op " + (item.range ? 'range' : 'not_range'), "data-id": item.op, onClick: that.setStateOperation, href: "#"}, item.name), " ") )
             });
 
             return (
-                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
-                    <button className="btn dropdown-toggle filter-text-main" data-toggle='dropdown'>
-                        <span className='f-grid-filter-field'>{filter.label}</span>:
-                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
-                        <span className="caret"></span>
-                    </button>
+                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field}, 
+                    React.createElement("button", {className: "btn dropdown-toggle filter-text-main", "data-toggle": "dropdown"}, 
+                        React.createElement("span", {className: "f-grid-filter-field"}, filter.label), ":", 
+                        React.createElement("span", {className: "f-grid-filter-value"}, " ", filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All', " "), 
+                        React.createElement("span", {className: "caret"})
+                    ), 
 
-                    <ul className="dropdown-menu filter-box">
-                        <li>
-                            <div className="input-group">
-                                <div className="input-group-btn dropdown">
-                                    <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
-                                        {filter.opLabel}
-                                        <span className="caret"></span>
-                                    </button>
-                                    <ul className="dropdown-menu filter-sub">
-                                        {operations}
-                                    </ul>
-                                </div>
-                                <div className="input-group range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input id={'date-range-text-' + filter.field} type="text" placeholder="Select date range" className="form-control daterange" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
-                                    <span id="daterange2" className="input-group-addon filter-date-range" data-input={'date-range-text-' + filter.field}>
-                                        <i className="icon-calendar"></i>
-                                    </span>
-                                </div>
-                                <div className="datepicker input-group not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" className="form-control" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
-                                    <span className="input-group-addon">
-                                        <span data-time-icon="icon-time" data-date-icon="icon-calendar" className="icon-calendar"></span>
-                                    </span>
-                                </div>
-                                <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        <i className="icon-check-sign"></i> Update
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
-                </div>
+                    React.createElement("ul", {className: "dropdown-menu filter-box"}, 
+                        React.createElement("li", null, 
+                            React.createElement("div", {className: "input-group"}, 
+                                React.createElement("div", {className: "input-group-btn dropdown"}, 
+                                    React.createElement("button", {className: "btn btn-default dropdown-toggle filter-text-sub", "data-toggle": "dropdown"}, 
+                                        filter.opLabel, 
+                                        React.createElement("span", {className: "caret"})
+                                    ), 
+                                    React.createElement("ul", {className: "dropdown-menu filter-sub"}, 
+                                        operations
+                                    )
+                                ), 
+                                React.createElement("div", {className: "input-group range", style: !filter.range ? {display: 'none'} : {display: 'table'}}, 
+                                    React.createElement("input", {id: 'date-range-text-' + filter.field, type: "text", placeholder: "Select date range", className: "form-control daterange", onChange: this.setStateValue, onKeyUp: this.handleEnter}), 
+                                    React.createElement("span", {id: "daterange2", className: "input-group-addon filter-date-range", "data-input": 'date-range-text-' + filter.field}, 
+                                        React.createElement("i", {className: "icon-calendar"})
+                                    )
+                                ), 
+                                React.createElement("div", {className: "datepicker input-group not_range", style: filter.range ? {display: 'none'} : {display: 'table'}}, 
+                                    React.createElement("input", {type: "text", placeholder: "Select date", "data-format": "yyyy-MM-dd", className: "form-control", onChange: this.setStateValue, onKeyUp: this.handleEnter}), 
+                                    React.createElement("span", {className: "input-group-addon"}, 
+                                        React.createElement("span", {"data-time-icon": "icon-time", "data-date-icon": "icon-calendar", className: "icon-calendar"})
+                                    )
+                                ), 
+                                React.createElement("div", {className: "input-group-btn"}, 
+                                    React.createElement("button", {type: "button", className: "btn btn-primary update", onClick: this.submitFilter}, 
+                                        React.createElement("i", {className: "icon-check-sign"}), " Update"
+                                    )
+                                )
+                            )
+                        )
+                    ), 
+                    React.createElement("abbr", {className: "select2-search-choice-close", "data-clear": "1", style: filter.submit ? {display: 'block'} : {display: 'none'}, onClick: this.submitFilter})
+                )
             );
         }
     });
 
-    var FComFilterNumberRange = React.createClass({
+    var FComFilterNumberRange = React.createClass({displayName: "FComFilterNumberRange",
         mixins: [FilterStateMixin],
         getInitialState: function() {
             var filter = this.props.filter;
@@ -553,52 +554,52 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var filter = this.state.filter;
 
             var operations = this.getOperations().map(function(item) {
-                return ( <li> <a className={"filter_op " + (item.range ? 'range' : 'not_range')} data-id={item.op} onClick={that.setStateOperation} href="#">{item.name}</a> </li> )
+                return ( React.createElement("li", null, " ", React.createElement("a", {className: "filter_op " + (item.range ? 'range' : 'not_range'), "data-id": item.op, onClick: that.setStateOperation, href: "#"}, item.name), " ") )
             });
 
             return (
-                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
-                    <button className="btn dropdown-toggle filter-text-main" data-toggle='dropdown'>
-                        <span className='f-grid-filter-field'>{filter.label}</span>:
-                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
-                        <span className="caret"></span>
-                    </button>
+                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field}, 
+                    React.createElement("button", {className: "btn dropdown-toggle filter-text-main", "data-toggle": "dropdown"}, 
+                        React.createElement("span", {className: "f-grid-filter-field"}, filter.label), ":", 
+                        React.createElement("span", {className: "f-grid-filter-value"}, " ", filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All', " "), 
+                        React.createElement("span", {className: "caret"})
+                    ), 
 
-                    <ul className="dropdown-menu filter-box">
-                        <li>
-                            <div className="input-group">
-                                <div className="input-group-btn dropdown">
-                                    <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
-                                        {filter.opLabel}
-                                        <span className="caret"></span>
-                                    </button>
-                                    <ul className="dropdown-menu filter-sub">
-                                        {operations}
-                                    </ul>
-                                </div>
-                                <div className="input-group-btn range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input type="text" data-type="from" placeholder="From" className="form-control js-number1" style={{width: '45%'}} onChange={this.setStateRangeValue} onKeyUp={this.handleEnter} />
-                                    &nbsp;<i className="icon-resize-horizontal"></i>&nbsp;
-                                    <input type="text" data-type="to" placeholder="To" className="form-control js-number2" style={{width: '45%'}} onChange={this.setStateRangeValue} onKeyUp={this.handleEnter} />
-                                </div>
-                                <div className="input-group-btn not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
-                                    <input type="text" placeholder="Number" className="form-control js-number" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
-                                </div>
-                                <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        <i className="icon-check-sign"></i> Update
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
-                </div>
+                    React.createElement("ul", {className: "dropdown-menu filter-box"}, 
+                        React.createElement("li", null, 
+                            React.createElement("div", {className: "input-group"}, 
+                                React.createElement("div", {className: "input-group-btn dropdown"}, 
+                                    React.createElement("button", {className: "btn btn-default dropdown-toggle filter-text-sub", "data-toggle": "dropdown"}, 
+                                        filter.opLabel, 
+                                        React.createElement("span", {className: "caret"})
+                                    ), 
+                                    React.createElement("ul", {className: "dropdown-menu filter-sub"}, 
+                                        operations
+                                    )
+                                ), 
+                                React.createElement("div", {className: "input-group-btn range", style: !filter.range ? {display: 'none'} : {display: 'table'}}, 
+                                    React.createElement("input", {type: "text", "data-type": "from", placeholder: "From", className: "form-control js-number1", style: {width: '45%'}, onChange: this.setStateRangeValue, onKeyUp: this.handleEnter}), 
+                                    " ", React.createElement("i", {className: "icon-resize-horizontal"}), " ", 
+                                    React.createElement("input", {type: "text", "data-type": "to", placeholder: "To", className: "form-control js-number2", style: {width: '45%'}, onChange: this.setStateRangeValue, onKeyUp: this.handleEnter})
+                                ), 
+                                React.createElement("div", {className: "input-group-btn not_range", style: filter.range ? {display: 'none'} : {display: 'table'}}, 
+                                    React.createElement("input", {type: "text", placeholder: "Number", className: "form-control js-number", onChange: this.setStateValue, onKeyUp: this.handleEnter})
+                                ), 
+                                React.createElement("div", {className: "input-group-btn"}, 
+                                    React.createElement("button", {type: "button", className: "btn btn-primary update", onClick: this.submitFilter}, 
+                                        React.createElement("i", {className: "icon-check-sign"}), " Update"
+                                    )
+                                )
+                            )
+                        )
+                    ), 
+                    React.createElement("abbr", {className: "select2-search-choice-close", "data-clear": "1", style: filter.submit ? {display: 'block'} : {display: 'none'}, onClick: this.submitFilter})
+                )
             );
         }
     });
 
-    var FComFilterMultiSelect = React.createClass({
+    var FComFilterMultiSelect = React.createClass({displayName: "FComFilterMultiSelect",
         mixins: [FilterStateMixin],
         getInitialState: function() {
             var filter = this.props.filter;
@@ -653,26 +654,26 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var filter = this.state.filter;
 
             return (
-                <div className={"btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : "")} id={"f-grid-filter-" + filter.field}>
-                    <button className='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-                        <span className='f-grid-filter-field'> {filter.label}: </span>
-                        <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + " " + filter.valName : 'All'} </span>
-                        <span className="caret"></span>
-                    </button>
-                    <ul className="dropdown-menu filter-box">
-                        <li>
-                            <div className="input-group">
-                                <input type="hidden" id="multi_hidden" style={{width: '100%', minWidth: '120px'}} />
-                                <div className="input-group-btn">
-                                    <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        <i className="icon-check-sign"></i> Update
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
-                </div>
+                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field}, 
+                    React.createElement("button", {className: "btn dropdown-toggle filter-text-main", "data-toggle": "dropdown"}, 
+                        React.createElement("span", {className: "f-grid-filter-field"}, " ", filter.label, ": "), 
+                        React.createElement("span", {className: "f-grid-filter-value"}, " ", filter.submit ? filter.opLabel + " " + filter.valName : 'All', " "), 
+                        React.createElement("span", {className: "caret"})
+                    ), 
+                    React.createElement("ul", {className: "dropdown-menu filter-box"}, 
+                        React.createElement("li", null, 
+                            React.createElement("div", {className: "input-group"}, 
+                                React.createElement("input", {type: "hidden", id: "multi_hidden", style: {width: '100%', minWidth: '120px'}}), 
+                                React.createElement("div", {className: "input-group-btn"}, 
+                                    React.createElement("button", {type: "button", className: "btn btn-primary update", onClick: this.submitFilter}, 
+                                        React.createElement("i", {className: "icon-check-sign"}), " Update"
+                                    )
+                                )
+                            )
+                        )
+                    ), 
+                    React.createElement("abbr", {className: "select2-search-choice-close", "data-clear": "1", style: filter.submit ? {display: 'block'} : {display: 'none'}, onClick: this.submitFilter})
+                )
             );
         }
     });
