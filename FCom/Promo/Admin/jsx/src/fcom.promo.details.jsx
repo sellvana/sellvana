@@ -1,6 +1,5 @@
 define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'ckeditor'], function ($, React, Components, _, Locale) {
-    var cmsBlocks, customerGroups;
-
+    var cmsBlocks;
     function getCmsBlocks(url, callback) {
         $.get(url).done(callback);
     }
