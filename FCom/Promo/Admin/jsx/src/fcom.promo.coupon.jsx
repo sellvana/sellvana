@@ -89,7 +89,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'select2', 'bootstr
                         <div className="col-md-1">
                             <input type="text" id='limit_per_coupon' ref="limit_per_coupon"
                                 name="model[limit_per_coupon]" className="form-control"
-                                defaultValue={this.props.options.limit_per_coupon}/>
+                                defaultValue={this.props.options['limit_per_coupon']}/>
                         </div>
                     </div>
                     <div className="btn-group col-md-offset-3">
@@ -191,7 +191,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'select2', 'bootstr
             if (this.state.mode == 1) {
                 child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
                     <SingleCoupon key="single-coupon" options={this.props.options} labelClass={this.props.labelClass}
-                        name={this.props.options.single_coupon_name} value={this.props.options.single_coupon_code}/>];
+                        name={this.props.options['single_coupon_name']} value={this.props.options['single_coupon_code']}/>];
             } else if(this.state.mode == 2) {
                 var onShowCodes = this.onShowCodes ||'',
                     onGenerateCodes = this.onGenerateCodes ||'',
@@ -235,6 +235,6 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'select2', 'bootstr
         }
     });
 
-    var CouponApp = {App, GenerateForm};
+    var CouponApp = {App: App, GenerateForm: GenerateForm};
     return CouponApp;
 });

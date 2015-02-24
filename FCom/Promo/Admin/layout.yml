@@ -10,6 +10,7 @@ base:
 #            - [ requireJs, fcom.promo.conditions, @FCom_Promo/Admin/jsx/src/fcom.promo.conditions, [react, fcom.promo.common] ]
 #            - [ requireJs, fcom.promo.details, @FCom_Promo/Admin/jsx/src/fcom.promo.details, [react, fcom.promo.common] ]
 #            production files
+            - [ requireJs, fcom.components, @FCom_Core/jsx/build/fcom.components ]
             - [ requireJs, fcom.promo.common, @FCom_Promo/Admin/jsx/build/fcom.promo.common ]
             - [ requireJs, fcom.promo, @FCom_Promo/Admin/jsx/build/fcom.promo ]
             - [ requireJs, fcom.promo.actions, @FCom_Promo/Admin/jsx/build/fcom.promo.actions, [react, fcom.promo.common] ]
