@@ -58,6 +58,36 @@ require(["jquery", "underscore", "jquery.validate"], function($, _) {
         }
         $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
     }
+
+    /* list functions for griddle callback */
+    window.approveReviews = function(grid) {
+        updateMassStatus(grid, 1);
+    };
+    window.denyReviews = function(grid) {
+        updateMassStatus(grid, 0);
+    };
+
+    function updateMassStatus(grid, approve)
+    {
+        var selectedRows = grid.getSelectedRows();
+        var editUrl = grid.getConfig('edit_url');
+        if (editUrl) {
+            var post = {
+                oper: 'mass-edit',
+                id: (_.pluck(selectedRows, 'id')).join(','),
+                approved: approve
+            };
+
+            $.post(editUrl, post, function(resp) {
+                if (resp.success) {
+                    $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+                    grid.refresh(); //re-render grid
+                } else {
+                    $.bootstrapGrowl("Fail saved.", { type: 'danger', align: 'center', width: 'auto' });
+                }
+            })
+        }
+    }
 });
 
 </script>

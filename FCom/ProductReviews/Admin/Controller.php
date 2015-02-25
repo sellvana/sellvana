@@ -82,8 +82,22 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config['actions'] = [
             'export'  => true,
             'delete'  => true,
-            'deny'    => ['class' => 'btn btn-warning disabled', 'id' => "prod-reviews-deny", 'caption' => 'Deny'],
-            'approve' => ['class' => 'btn btn-primary disabled', 'id' => "prod-reviews-approve", 'caption' => 'Approve'],
+            'deny' => [
+                'class'        => 'btn btn-warning',
+                'id'           => "prod-reviews-deny",
+                'caption'      => 'Deny',
+                'type'         => 'button',
+                'callback'     => 'denyReviews',
+                'isMassAction' => true,
+            ],
+            'approve' => [
+                'class'        => 'btn btn-primary',
+                'id'           => "prod-reviews-approve",
+                'caption'      => 'Approve',
+                'type'         => 'button',
+                'callback'     => 'approveReviews',
+                'isMassAction' => true
+            ],
         ];
 
 

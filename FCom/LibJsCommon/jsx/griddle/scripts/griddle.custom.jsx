@@ -417,7 +417,7 @@ var Griddle = React.createClass({
             ? <this.props.customSettings columnMetadata={this.props.columnMetadata} selectedColumns={this.getColumns} setColumns={this.setColumns}
                 getConfig={this.getConfig} searchWithinResults={this.searchWithinResults} getSelectedRows={this.getSelectedRows} refresh={this.refresh}
                 setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState}
-                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} />
+                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} getCurrentGrid={this.getCurrentGrid} />
             : <span className="settings" onClick={this.toggleColumnChooser}>{this.props.settingsText} <i className="glyphicon glyphicon-cog"></i></span>
         ) : "";
 
@@ -703,6 +703,9 @@ var Griddle = React.createClass({
      */
     getInitColumns: function() {
         return this.state.initColumns;
+    },
+    getCurrentGrid: function() {
+        return this;
     }
 });
 

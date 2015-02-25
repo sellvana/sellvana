@@ -386,6 +386,11 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             React.unmountComponentAtNode(mountNode);
             React.render(<ol className="dd-list dropdown-menu columns ui-sortable" style={{minWidth: '200px'}}>{options}</ol>, mountNode);
         },
+        handleCustom: function(callback, event) {
+            if (typeof window[callback] === 'function') {
+                return window[callback](this.props.getCurrentGrid());
+            }
+        },
         render: function () {
             var that = this;
             var id = this.props.getConfig('id');
@@ -422,9 +427,19 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                             node = <button className={action.class} type="button">{action.caption}</button>;
                             break;
                         default:
-                            if (action.html) {
+                            if (action.type) {
+                                switch (action.type) {
+                                    case 'button':
+                                    default:
+                                        //compatibility with old backbone grid
+                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} id={action.id}
+                                            type="button" onClick={that.handleCustom.bind(this, action.callback)}>{action.caption}</button>;
+                                        break;
+                                }
+                            } else if (action.html) {
                                 node = <span dangerouslySetInnerHTML={{__html: action.html}}></span>;
                             }
+
                             break;
                     }
 
