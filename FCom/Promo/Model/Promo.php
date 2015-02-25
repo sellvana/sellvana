@@ -34,7 +34,7 @@
  */
 class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
 {
-    const MATCH_ALL = 'all', MATCH_ANY = 'any';
+    const MATCH_ALL = 'all', MATCH_ANY = 'any', MATCH_ALWAYS = 'always';
 
     const COUPON_TYPE_NONE = 0, COUPON_TYPE_SINGLE = 1, COUPON_TYPE_MULTI = 2;
 
@@ -64,9 +64,14 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
             'today' => 'Today Only',
         ],
         'display_index_type' => [
-            'text' => 'Text', 
+            'text' => 'Text',
             'cms_block' => 'CMS BLOCK',
         ],
+        'conditions_operator' => [
+            "always" => "Apply Always",
+            "all" => "All Conditions Have to Match",
+            "any" => "Any Condition Has to Match",
+        ]
     ];
 
     protected static $_fieldDefaults = [
@@ -78,6 +83,7 @@ class FCom_Promo_Model_Promo extends FCom_Core_Model_Abstract
         'display_index_showexp' => 1,
         'display_index_section' => 'regular',
         'display_index_type' => 'text',
+        'conditions_operator' => self::MATCH_ALWAYS
     ];
 
     protected static $_validationConditions = [];

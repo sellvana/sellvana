@@ -1170,7 +1170,7 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 }
             }
             return (
-                <div className="actions">
+                <div className="actions col-md-offset-1">
                     {children}
                 </div>
             );
@@ -1191,7 +1191,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
                 try {
                     data = JSON.parse($conditionsSerialized.val());
                     this.setProps({data: data});
-                    // todo actually update state
                 } catch (e) {
                     console.log(e);
                 }
@@ -1241,7 +1240,6 @@ define(['react', 'jquery', 'jsx!fcom.components', 'jsx!fcom.promo.common', 'fcom
             });
         },
         actionUpdate: function (data) {
-            //todo
             console.log(data);
             var localData = this.state.data;
             for(var type in data) {

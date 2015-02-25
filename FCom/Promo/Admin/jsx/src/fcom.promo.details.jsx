@@ -1,4 +1,4 @@
-define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], function ($, React, Components, _) {
+define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'fcom.locale', 'ckeditor'], function ($, React, Components, _, Locale) {
     var cmsBlocks, customerGroups;
 
     function getCmsBlocks(url, callback) {
@@ -15,11 +15,11 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                         cmsBlocks = result.items.map(function (item) {
                             return <option key={item.id} value={item.text}>{item.text}</option>
                         });
-                        //cmsBlocks.unshift(<option key="0" value="">Select block handle</option>);
+                        //cmsBlocks.unshift(<option key="0" value="">{Locale._("Select block handle")}</option>);
                         self.forceUpdate();
                     }
                 });
-                //cmsBlocks = [<option key="1">Test</option>];
+                //cmsBlocks = [<option key="1">{Locale._("Test")}</option>];
             }
             return cmsBlocks;
         },
@@ -113,27 +113,27 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
         getDefaultProps: function () {
             return {
                 cmsOptions: {
-                    label: "Block Handle",
+                    label: Locale._("Block Handle"),
                     id: "block_handle",
-                    help: "Select a cms block handle"
+                    help: Locale._("Select a cms block handle")
                 },
                 textOptions: {
-                    titleLabel: "Promotion Title",
+                    titleLabel: Locale._("Promotion Title"),
                     titleId: "title",
-                    titleHelp: "Add custom title or leave empty for default",
-                    titlePlaceholder: "(USE MAIN TITLE)",
-                    applicationLabel: "Show Application Type",
+                    titleHelp: Locale._("Add custom title or leave empty for default"),
+                    titlePlaceholder: Locale._("(USE MAIN TITLE)"),
+                    applicationLabel: Locale._("Show Application Type"),
                     applicationId: "application",
-                    applicationHelp: "?",
-                    applicationPlaceholder: "Coupon Code vs Auto Apply (Show Code if applies)",
-                    conditionsLabel: "Show Conditions",
+                    applicationHelp: Locale._("?"),
+                    applicationPlaceholder: Locale._("Coupon Code vs Auto Apply (Show Code if applies)"),
+                    conditionsLabel: Locale._("Show Conditions"),
                     conditionsId: "conditions",
-                    conditionsHelp: "(USE MAIN DESC) or add custom text",
-                    conditionsPlaceholder: "(USE MAIN DESC)",
-                    descriptionLabel: "Show Description",
+                    conditionsHelp: Locale._("(USE MAIN DESC) or add custom text"),
+                    conditionsPlaceholder: Locale._("(USE MAIN DESC)"),
+                    descriptionLabel: Locale._("Show Description"),
                     descriptionId: "description",
-                    descriptionHelp: "(USE MAIN DESC) or add custom text",
-                    descriptionPlaceholder: "(USE MAIN DESC)"
+                    descriptionHelp: Locale._("(USE MAIN DESC) or add custom text"),
+                    descriptionPlaceholder: Locale._("(USE MAIN DESC)")
                 },
                 labelClass: "col-md-3",
                 cmsBlocksUrl: 'conditions/cmsblocks'
@@ -226,21 +226,22 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                                     ref={"display-page_type-" + this.props.data.id} className="form-control"
                                     name={"display[" + this.props.data.id + "][page_type]"}
                                     defaultValue={this.props.data.page_type}>
-                                    <option value="home_page">Home Page</option>
-                                    <option value="category_page">Category Page</option>
-                                    <option value="product_page">Product Page</option>
-                                    <option value="cart_page">Cart</option>
-                                    <option value="success_page">Success Page</option>
-                                    <option value="custom_hook">Custom Hook</option>
+                                    {
+                                        _.map(this.props.locationPages, function (label, val) {
+                                            return <option value={val} key={val}>{label}</option>
+                                        })
+                                    }
                                 </select>
                             </div>
                             <div style={divStyle}>
                                 <select id={"display-page_location-" + this.props.data.id} className="form-control"
                                     name={"display[" + this.props.data.id + "][page_location]"}
                                     defaultValue={this.props.data.page_location}>
-                                    {this.props.locationPageOptions[this.state.page_type ? this.state.page_type : this.props.data.page_type].map(function (option) {
-                                        return <option key={option}>{option}</option>
-                                    })}
+                                    {
+                                        _.map(this.props.locationPageOptions[this.state.page_type ? this.state.page_type : this.props.data.page_type], function (label, val) {
+                                            return <option value={val} key={val}>{label}</option>
+                                        })
+                                    }
                                 </select>
                             </div>
                         </div>
@@ -256,9 +257,9 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                                     ref={"display-content_type-" + this.props.data.id} className="form-control"
                                     name={"display[" + this.props.data.id + "][content_type]"}
                                     defaultValue={this.props.data.content_type}>
-                                    <option value="html">Text (Html)</option>
-                                    <option value="md">Text (Markdown)</option>
-                                    <option value="cms_block">CMS Block</option>
+                                    <option value="html">{Locale._("Text (Html)")}</option>
+                                    <option value="md">{Locale._("Text (Markdown)")}</option>
+                                    <option value="cms_block">{Locale._("CMS Block")}</option>
                                 </select>
                             </div>
                         </div>
@@ -279,17 +280,17 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                                     ref={"display-match-" + this.props.data.id} className="form-control"
                                     name={"display[" + this.props.data.id + "][data][match]"}
                                     defaultValue={this.props.data.match}>
-                                    <option value="always">Show Always</option>
-                                    <option value="all">When ALL Conditions Match</option>
-                                    <option value="any">When ANY Conditions Match</option>
+                                    <option value="always">{Locale._("Show Always")}</option>
+                                    <option value="all">{Locale._("When ALL Conditions Match")}</option>
+                                    <option value="any">{Locale._("When ANY Conditions Match")}</option>
                                 </select>
                             </div>
                             <div style={divStyle}>
                                 <select id={"display-add-condition-" + this.props.data.id}
                                     ref={"display-add-condition-" + this.props.data.id} className="form-control">
-                                    <option value="-1">Add Condition...</option>
-                                    <option value="promo_conditions_match">Promo Conditions Met</option>
-                                    <option value="customer_groups">Customer Group</option>
+                                    <option value="-1">{Locale._("Add Condition...")}</option>
+                                    <option value="promo_conditions_match">{Locale._("Promo Conditions Met")}</option>
+                                    <option value="customer_groups">{Locale._("Customer Group")}</option>
                                 </select>
                             </div>
                         </div>
@@ -305,12 +306,20 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
         getDefaultProps: function () {
             return {
                 labelClass: "col-md-3",
-                typeLabel: "Type & Location",
-                typeHelp: "On which page and where on the page to place promo details.",
-                contentTypeLabel: "What to Show",
-                contentTypeHelp: "What to show as details",
-                conditionsLabel: "CONDITIONS",
-                conditionsHelp: "Conditions when to show promo details",
+                typeLabel: Locale._("Type & Location"),
+                typeHelp: Locale._("On which page and where on the page to place promo details."),
+                contentTypeLabel: Locale._("What to Show"),
+                contentTypeHelp: Locale._("What to show as details"),
+                conditionsLabel: Locale._("CONDITIONS"),
+                conditionsHelp: Locale._("Conditions when to show promo details"),
+                locationPages: {
+                    home_page: Locale._("Home Page"),
+                    category_page: Locale._("Category Page"),
+                    product_page: Locale._("Product Page"),
+                    cart_page: Locale._("Cart"),
+                    success_page: Locale._("Success Page"),
+                    custom_hook: Locale._("Custom Hook")
+                },
                 locationPageOptions: {
                     home_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "home"],
                     category_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "category"],
@@ -351,7 +360,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                 $("#remove_promo_display_btn_" + this.props.data.id).on('click', function (e) {
                     e.preventDefault();
                     //console.log(this);
-                    if (confirm("Do you really want to remove display settings?")) {
+                    if (confirm(Locale._("Do you really want to remove display settings?"))) {
                         this.setState({"delete": true});
                     }
                 }.bind(this));
@@ -400,8 +409,8 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
         },
         getDefaultProps: function () {
             return {
-                promoMetLabel: "Display when promo conditions have been met",
-                customerGroupLabel: "Display when customer group is"
+                promoMetLabel: Locale._("Display when promo conditions have been met"),
+                customerGroupLabel: Locale._("Display when customer group is")
             };
         },
         onRemove: function () {
@@ -428,7 +437,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                             <Components.ControlLabel input_id={this.props.id}
                                 label_class={this.props.labelClass}>Block Handle
                                 <Components.HelpIcon id={"help-" + this.props.id}
-                                    content="Select a cms block handle"/>
+                                    content={Locale._("Select a cms block handle")}/>
                             </Components.ControlLabel>
                             <div className="col-md-5">
                                 <select ref={this.props.id} id={this.props.id} key={'cms-block-' + this.props.id}
@@ -442,7 +451,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                         id={this.props.id}
                         name={"display[" + this.props.data_id + "][data][text_content]"}
                         className="form-control"
-                        placeholder="Text content here ..." defaultValue={this.props.value}></textarea>;
+                        placeholder={Locale._("Text content here ...")} defaultValue={this.props.value}></textarea>;
                     break;
             }
 
@@ -529,10 +538,10 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
         initCentralPageApp: function (options) {
             var $selector = options.selector, $dataSerialized = $('#' + options.promo_serialized);
             if (!$selector.length) {
-                console.warn("Display type selector not found");
+                console.warn(Locale._("Display type selector not found"));
                 return;
             } else if (!$dataSerialized.length) {
-                console.warn("Data serialized field not found");
+                console.warn(Locale._("Data serialized field not found"));
                 return;
             }
 
@@ -553,7 +562,7 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                     var values = options.data;
                     $dataSerialized.val(JSON.stringify(values));
                 } else {
-                    console.error("Cannot find serialized options element");
+                    console.error(Locale._("Cannot find serialized options element"));
                 }
             }
 
@@ -636,6 +645,14 @@ define(['jquery', 'react', 'jsx!fcom.components', 'underscore', 'ckeditor'], fun
                     renderAddPromoDisplayApp(properties, options.container);
                 }
             };
+
+            if (options.locationPages) {
+                properties['locationPages'] = options.locationPages;
+            }
+            if (options.locationPageOptions) {
+                properties['locationPageOptions'] = options.locationPageOptions;
+            }
+
             options.addDisplayBtn.on("click", function (e) {
                 e.preventDefault();
                 var item = newItem();

@@ -495,6 +495,17 @@ class FCom_Promo_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_1_13__0_1_14()
+    {
+        $tPromo = $this->FCom_Promo_Model_Promo->table();
+
+        $this->BDb->ddlTableDef($tPromo, [
+            BDb::COLUMNS => [
+                'conditions_operator' => "varchar(6) not null default 'always'",
+            ]
+        ]);
+    }
 }
 /*
  * Text (Html)
