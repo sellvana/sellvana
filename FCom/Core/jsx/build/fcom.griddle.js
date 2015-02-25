@@ -287,7 +287,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     window.location.href = exportUrl + '&export=true';
                     break;
                 default:
-                    console.log('mass-action');
+                    console.log('do-mass-action');
                     break;
             }
 
@@ -398,36 +398,33 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var buttonActions = [];
             if (configActions) {
                 _.forEach(configActions, function(action, name) {
-                    /*console.log('action', action);
-                    console.log('name', name);*/
-                    //todo: get action caption
                     var node = '';
                     switch (name) {
                         case 'refresh':
-                            node = React.createElement("a", {href: "#", className: "js-change-url grid-refresh btn"}, "Refresh");
+                            node = React.createElement("a", {href: "#", className: action.class}, action.caption);
                             break;
                         case 'export':
-                            node = React.createElement("button", {className: "grid-export btn", "data-action": "export", onClick: that.doMassAction}, "Export");
+                            node = React.createElement("button", {className: action.class, "data-action": "export", onClick: that.doMassAction}, action.caption);
                             break;
                         case 'link_to_page':
-                            node = React.createElement("a", {href: "#", className: "grid-link_to_page btn"}, "Link");
+                            node = React.createElement("a", {href: "#", className: action.class}, action.caption);
                             break;
                         case 'edit':
-                            node = React.createElement("a", {href: "#", className: "btn grid-mass-edit btn-success" + disabledClass, "data-action": "mass-edit", onClick: that.doMassAction, role: "button"}, "Edit");
+                            node = React.createElement("a", {href: "#", className: action.class + disabledClass, "data-action": "mass-edit", onClick: that.doMassAction, role: "button"}, action.caption);
                             break;
                         case 'delete':
-                            //todo: option noconfirm
-                            node = React.createElement("button", {className: "btn grid-mass-delete btn-danger" + disabledClass, type: "button", "data-action": "mass-delete", onClick: that.doMassAction}, "Delete");
+                            node = React.createElement("button", {className: action.class + disabledClass, type: "button", "data-action": "mass-delete", onClick: that.doMassAction}, action.caption);
                             break;
                         case 'add':
-                            node = React.createElement("button", {className: "btn grid-add btn-primary", type: "button"}, "Add");
+                            node = React.createElement("button", {className: action.class, type: "button"}, action.caption);
                             break;
                         case 'new':
-                            //todo: option modal
-                            node = React.createElement("button", {className: "btn grid-new btn-primary", type: "button"}, "New");
+                            node = React.createElement("button", {className: action.class, type: "button"}, action.caption);
                             break;
                         default:
-                            node = React.createElement("span", {dangerouslySetInnerHTML: {__html: action.html}});
+                            if (action.html) {
+                                node = React.createElement("span", {dangerouslySetInnerHTML: {__html: action.html}});
+                            }
                             break;
                     }
 

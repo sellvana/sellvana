@@ -75,15 +75,15 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             ['field' => 'create_at', 'type' => 'date-range'],
             '_quick' => ['expr' => 'title like ? or id=?', 'args' => ['%?%', '?']]
         ];
-        $config['actions'] = [];
+        /*$config['actions'] = [];
         if (!$productModel) {
-//            $config['actions']['new'] = array('caption' => 'New Product Review', 'modal' => true);
-        }
+            $config['actions']['new'] = array('caption' => 'New Product Review', 'modal' => true);
+        }*/
         $config['actions'] = [
             'export'  => true,
             'delete'  => true,
             'deny'    => ['class' => 'btn btn-warning disabled', 'id' => "prod-reviews-deny", 'caption' => 'Deny'],
-            'approve' => ['class' => "btn btn-primary disabled", 'id' => "prod-reviews-approve", 'caption' => 'Approve'],
+            'approve' => ['class' => 'btn btn-primary disabled', 'id' => "prod-reviews-approve", 'caption' => 'Approve'],
         ];
 
 
