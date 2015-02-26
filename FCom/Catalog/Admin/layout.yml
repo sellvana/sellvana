@@ -29,6 +29,10 @@ catalog_product_form_tabs:
 /catalog/products/form:
     - { include: jstree }
     - { include: catalog_product_form_tabs }
+    - view: head
+        do:
+            - [ requireJs, fcom.catalog.product.price, @FCom_Catalog/Admin/jsx/build/fcom.catalog.product.price, [jquery, react]]
+#            - [ requireJs, fcom.catalog.product.price, @FCom_Catalog/Admin/jsx/src/fcom.catalog.product.price, [jquery, react]]
 
 /catalog/products/import:
     - { include: base }

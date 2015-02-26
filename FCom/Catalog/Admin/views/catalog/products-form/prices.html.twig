@@ -19,4 +19,57 @@
   </div>
 </fieldset>
 
+{% set prices = m.getAllPrices() %}
+
+
+<fieldset name="product-prices">
+    <div class="f-section">
+    <div class="form-group">
+        {% if MODULES.isLoaded('FCom_CustomerGroups') %}
+            {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptionsByCode() %}
+                <label for="prices-customer_groups" class="col-md-2 control-label">{{ "Customer group"|_ }}</label>
+                <div class="" style="float: left; margin-left: 15px;">
+                    <select id="prices-customer_groups" name="prices[customer_groups]" class="form-control to-select2">
+                        <option value="*">{{ "Any (*)"|_ }}</option>
+                        {{ UTIL.optionsHtml(customerGroups)|raw }}
+                    </select>
+                </div>
+        {% endif %}
+        {% if MODULES.isLoaded('FCom_MultiSite') %}
+            {% set sites = APP.instance('FCom_MultiSite_Model_Site').siteOptions() %}
+                <label for="prices-sites" class="control-label {{ customerGroups? 'col-md-1': 'col-md-2' }}">{{ "Site"|_ }}</label>
+
+                <div class="" style="float: left; margin-left: 15px;">
+                    <select id="prices-sites" name="prices[sites]" class="form-control to-select2">
+                        <option value="*">{{ "Any (*)"|_ }}</option>
+                        {{ UTIL.optionsHtml(sites)|raw }}
+                    </select>
+                </div>
+        {% endif %}
+        {% if MODULES.isLoaded('FCom_MultiCurrency') %}
+            {# todo replace with actual currency config #}
+            {% set currencies = APP.instance('FCom_MultiSite_Model_Site').siteOptions() %}
+                <label for="prices-currencies" class="control-label {{ (customerGroups or sites)? 'col-md-1': 'col-md-2' }}">{{ "Currency"|_ }}</label>
+
+                <div class="" style="float: left; margin-left: 15px;">
+                    <select id="prices-currencies" name="prices[currencies]" class="form-control to-select2">
+                        <option value="*">{{ "Any (*)"|_ }}</option>
+                        {{ UTIL.optionsHtml(currencies)|raw }}
+                    </select>
+                </div>
+        {% endif %}
+    </div>
+    </div>
+</fieldset>
+<script type="text/javascript">
+    require(['jquery', 'fcom.catalog.product.price'], function ($, Price) {
+        $('select.to-select2').select2({minimumResultsForSearch: 15});
+        var options = {
+            prices: {{ UTIL.toJson(prices) }}
+        };
+
+        Price.init(options);
+    })
+</script>
+
 {{ THIS.hook('catalog/products-form/prices', {'model' : m}) | raw }}

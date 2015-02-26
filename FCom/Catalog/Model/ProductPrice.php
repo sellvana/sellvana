@@ -21,17 +21,19 @@ class FCom_Catalog_Model_ProductPrice
      * @return FCom_Catalog_Model_ProductPrice[]
      * @throws BException
      */
-    public function getProductTiers($product)
+    public function getProductPrices($product)
     {
-        $tiers = $this->orm('tp')->where('product_id', $product->id())->find_many();
-        $salePrice = (float)$product->get('sale_price');
-        $basePrice = (float)$product->get('base_price');
-        $price = $salePrice ? $salePrice : $basePrice;
-        #$this->BDebug->dump($tiers);
-        #var_dump($salePrice, $basePrice, $price);
-        foreach ($tiers as $tier) {
-            $tier->set('save_percent', ceil((1 - $tier->get('price') / $price) * 100));
+        $prices = $this->orm('tp')->where('product_id', $product->id())->find_many();
+        if (!empty($prices)) {
+            $salePrice = (float) $product->get('sale_price');
+            $basePrice = (float) $product->get('base_price');
+            $price     = $salePrice? $salePrice: $basePrice;
+            #$this->BDebug->dump($tiers);
+            #var_dump($salePrice, $basePrice, $price);
+            foreach ($prices as $p) {
+                $p->set('save_percent', ceil((1 - $p->get('price') / $price) * 100));
+            }
         }
-        return $tiers ? $this->BDb->many_as_array($tiers) : [];
+        return $prices ? $this->BDb->many_as_array($prices) : [];
     }
 }

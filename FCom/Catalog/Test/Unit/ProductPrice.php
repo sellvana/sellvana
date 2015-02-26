@@ -26,7 +26,7 @@ class FCom_CustomerGroups_Test_Unit_TierPriceTest
     {
         $product = FCom_Catalog_Model_Product::i()->load(1);
 
-        $productTiers = $this->model->getProductTiers($product);
+        $productTiers = $this->model->getProductPrices($product);
 
         $this->assertTrue(is_array($productTiers));
     }
