@@ -3,7 +3,7 @@
  */
 
 define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale', 'select2'], function (React, $, Components, Common, Locale) {
-    var Type = React.createClass({
+    var Type = React.createClass({displayName: "Type",
         render: function () {
             var cls = this.props.select2 ? "to-select2 " : "";
             if (this.props.className) {
@@ -15,16 +15,16 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
 
             });
             return (
-                <div className={this.props.containerClass}>
-                    <div className="col-md-10">
-                    <select className={cls} onChange={this.onChange} defaultValue={this.props.value}>
-                        {types.map(function (type) {
-                            return <option value={type.id} key={type.id}>{type.label}</option>
-                        })}
-                    </select>
-                    </div>
-                    {this.props.children}
-                </div>
+                React.createElement("div", {className: this.props.containerClass}, 
+                    React.createElement("div", {className: "col-md-10"}, 
+                    React.createElement("select", {className: cls, onChange: this.onChange, defaultValue: this.props.value}, 
+                        types.map(function (type) {
+                            return React.createElement("option", {value: type.id, key: type.id}, type.label)
+                        })
+                    )
+                    ), 
+                    this.props.children
+                )
             );
         },
         value: null,
@@ -49,20 +49,20 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
         }
     });
 
-    var DiscountDetailsCombination = React.createClass({
+    var DiscountDetailsCombination = React.createClass({displayName: "DiscountDetailsCombination",
         render: function () {
             return (
-                <div>
-                    <div className="col-md-8">
-                        <input type="text" readOnly="readonly" ref={"attributesResume" + this.props.id}
-                            key={"attributesResume" + this.props.id} id={"attributesResume" + this.props.id}
-                            className="form-control" value={this.state.valueText}/>
-                    </div>
-                    <div className="col-md-4">
-                        <Components.Button type="button" className="btn-primary"
-                            ref={this.props.configureId + this.props.id} onClick={this.handleConfigure}>Configure</Components.Button>
-                    </div>
-                </div>
+                React.createElement("div", null, 
+                    React.createElement("div", {className: "col-md-8"}, 
+                        React.createElement("input", {type: "text", readOnly: "readonly", ref: "attributesResume" + this.props.id, 
+                            key: "attributesResume" + this.props.id, id: "attributesResume" + this.props.id, 
+                            className: "form-control", value: this.state.valueText})
+                    ), 
+                    React.createElement("div", {className: "col-md-4"}, 
+                        React.createElement(Components.Button, {type: "button", className: "btn-primary", 
+                            ref: this.props.configureId + this.props.id, onClick: this.handleConfigure}, "Configure")
+                    )
+                )
             );
         },
         getInitialState: function () {
@@ -79,12 +79,12 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
         modal: null,
         modalContent: null,
         handleConfigure: function () {
-            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm} onCancel={this.handleConditionsCancel}
-                    id={"modal-" + this.props.id} key={"modal-" + this.props.id}
-                    title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
-                <DiscountDetailsCombinationsModalContent  baseUrl={this.props.options.base_url} data={this.state.value}
-                    onLoad={this.registerModalContent} key={"modal-content-" + this.props.id} id={"modal-content-" + this.props.id}/>
-            </Components.Modal>;
+            var modal = React.createElement(Components.Modal, {onConfirm: this.handleConditionsConfirm, onCancel: this.handleConditionsCancel, 
+                    id: "modal-" + this.props.id, key: "modal-" + this.props.id, 
+                    title: "Product Combination Configuration", onLoad: this.registerModal, onUpdate: this.registerModal}, 
+                React.createElement(DiscountDetailsCombinationsModalContent, {baseUrl: this.props.options.base_url, data: this.state.value, 
+                    onLoad: this.registerModalContent, key: "modal-content-" + this.props.id, id: "modal-content-" + this.props.id})
+            );
 
             React.render(modal, this.props.modalContainer.get(0));
         },
@@ -190,37 +190,37 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
         }
     });
 
-    var DiscountDetailsCombinationsModalContent = React.createClass({
+    var DiscountDetailsCombinationsModalContent = React.createClass({displayName: "DiscountDetailsCombinationsModalContent",
         mixins: [Common.select2QueryMixin],
         render: function () {
             var fieldUrl = this.props.baseUrl + this.props.urlField;
             var paramObj = {};
             var id = this.props.id;
             return (
-                <div className="attribute-combinations form-horizontal">
-                    <div className="form-group">
-                        <div className="col-md-5">
-                            <select ref={"combinationType" + id} id={"combinationType" + id}
-                                key={"combinationType" + id} className="form-control to-select2" defaultValue={this.state.match}>
-                                <option value="all">All Conditions Have to Match</option>
-                                <option value="any">Any Condition Has to Match</option>
-                            </select>
-                        </div>
-                        <div className="col-md-5">
-                            <input ref={"combinationField" + id} key={"combinationField" + id}
-                                id={"combinationField" + id} className="form-control"/>
-                        </div>
-                    </div>
-                    {this.state.fields.map(function (field) {
+                React.createElement("div", {className: "attribute-combinations form-horizontal"}, 
+                    React.createElement("div", {className: "form-group"}, 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("select", {ref: "combinationType" + id, id: "combinationType" + id, 
+                                key: "combinationType" + id, className: "form-control to-select2", defaultValue: this.state.match}, 
+                                React.createElement("option", {value: "all"}, "All Conditions Have to Match"), 
+                                React.createElement("option", {value: "any"}, "Any Condition Has to Match")
+                            )
+                        ), 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("input", {ref: "combinationField" + id, key: "combinationField" + id, 
+                                id: "combinationField" + id, className: "form-control"})
+                        )
+                    ), 
+                    this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         var data = field.value || [];
-                        return <DiscountDetailsCombinationsModalField label={field.label} url={url}
-                            key={field.field + id} id={field.field + id} ref={field.field + id}
-                            data={data} filter={field.filter} field={field.field}
-                            input={field.input} removeField={this.removeField} onChange={this.elementChange}/>
-                    }.bind(this))}
-                </div>
+                        return React.createElement(DiscountDetailsCombinationsModalField, {label: field.label, url: url, 
+                            key: field.field + id, id: field.field + id, ref: field.field + id, 
+                            data: data, filter: field.filter, field: field.field, 
+                            input: field.input, removeField: this.removeField, onChange: this.elementChange})
+                    }.bind(this))
+                )
             );
         },
         serialize: function () {
@@ -360,7 +360,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
         }
     });
 
-    var DiscountDetailsCombinationsModalField = React.createClass({
+    var DiscountDetailsCombinationsModalField = React.createClass({displayName: "DiscountDetailsCombinationsModalField",
         mixins:[Common.select2QueryMixin],
         statics: {
             opts: function (type) {
@@ -400,13 +400,13 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
                     value = this.props.data;
                 }
             }
-            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId} key={fieldId}
-                onChange={this.onChange} defaultValue={value}/>;
+            var input = React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, key: fieldId, 
+                onChange: this.onChange, defaultValue: value});
             if(this.props.numeric_inputs.indexOf(inputType) != -1) {
                 if (inputType == 'number') {
                     if(this.state.range === false) {
-                        input = <input className="form-control required" type="number" step="any" id={fieldId}
-                            ref={fieldId} key={fieldId} style={{width: "auto"}} onChange={this.onChange} defaultValue={value}/>;
+                        input = React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId, 
+                            ref: fieldId, key: fieldId, style: {width: "auto"}, onChange: this.onChange, defaultValue: value});
                     } else {
                         value = this.props.data;
                         var min, max;
@@ -417,38 +417,38 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
                         if (value.length > 1) {
                             max = value[1];
                         }
-                        input = <div id={fieldId} ref={fieldId} key={fieldId} className="input-group">
-                            <input className="form-control required" type="number" step="any" placeholder="Min"
-                                style={{width: "50%"}} onChange={this.onChange} defaultValue={min} id={fieldId + ".min"}/>
-                            <input className="form-control required" type="number" step="any" placeholder="Max"
-                                style={{width: "50%"}} onChange={this.onChange} defaultValue={max} id={fieldId + ".max"}/>
-                        </div>;
+                        input = React.createElement("div", {id: fieldId, ref: fieldId, key: fieldId, className: "input-group"}, 
+                            React.createElement("input", {className: "form-control required", type: "number", step: "any", placeholder: "Min", 
+                                style: {width: "50%"}, onChange: this.onChange, defaultValue: min, id: fieldId + ".min"}), 
+                            React.createElement("input", {className: "form-control required", type: "number", step: "any", placeholder: "Max", 
+                                style: {width: "50%"}, onChange: this.onChange, defaultValue: max, id: fieldId + ".max"})
+                        );
                     }
                 } else if (inputType == 'date' || inputType == 'time') {
                     var singleMode = true;
                     if (this.state.range === true) {
                         singleMode = false;
                     }
-                    input = <div className="input-group">
-                        <span className="input-group-addon"><i className="glyphicon glyphicon-calendar"></i></span>
-                        <input className="form-control required" type="text" id={fieldId} ref={fieldId} key={fieldId}
-                            dataMode={singleMode} onChange={this.onChange} defaultValue={value}/>
-                    </div>
+                    input = React.createElement("div", {className: "input-group"}, 
+                        React.createElement("span", {className: "input-group-addon"}, React.createElement("i", {className: "glyphicon glyphicon-calendar"})), 
+                        React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, key: fieldId, 
+                            dataMode: singleMode, onChange: this.onChange, defaultValue: value})
+                    )
                 }
             } else if(inputType == 'select'){
-                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId} key={fieldId}
-                    defaultValue={value}/>;
+                input = React.createElement("input", {className: "form-control required", type: "hidden", id: fieldId, ref: fieldId, key: fieldId, 
+                    defaultValue: value});
             } else if(this.props.bool_inputs.indexOf(inputType) != -1) {
-                input = <Components.YesNo  id={fieldId} ref={fieldId} key={fieldId} onChange={this.onChange} defaultValue={value}/>;
+                input = React.createElement(Components.YesNo, {id: fieldId, ref: fieldId, key: fieldId, onChange: this.onChange, defaultValue: value});
             }
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <div className="col-md-4">
-                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id} value={this.props.filter}
-                            ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
-                    </div>
-                    <div className="col-md-5">{input}</div>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement("div", {className: "col-md-4"}, 
+                        React.createElement(Common.Compare, {opts: opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
+                            ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
+                    ), 
+                    React.createElement("div", {className: "col-md-5"}, input)
+                )
             );
         },
         values: {},
@@ -686,7 +686,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
         }
     });
 
-    var DiscountSkuCombination = React.createClass({
+    var DiscountSkuCombination = React.createClass({displayName: "DiscountSkuCombination",
         mixins: [Common.select2QueryMixin],
         render: function () {
             var value;
@@ -698,8 +698,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
                 }
             }
             return (
-                <input type="hidden" id={"skuCollectionIds" + this.props.id} ref={"skuCollectionIds" + this.props.id}
-                    key={"skuCollectionIds" + this.props.id} className="form-control" defaultValue={value}/>
+                React.createElement("input", {type: "hidden", id: "skuCollectionIds" + this.props.id, ref: "skuCollectionIds" + this.props.id, 
+                    key: "skuCollectionIds" + this.props.id, className: "form-control", defaultValue: value})
             );
         },
         getDefaultProps: function () {
@@ -749,18 +749,18 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
         }
     });
 
-    var DiscountDetails = React.createClass({
+    var DiscountDetails = React.createClass({displayName: "DiscountDetails",
         render: function () {
-            var details = <span/>;
+            var details = React.createElement("span", null);
             if(this.props.type == 'attr_combination') {
-                details = <DiscountDetailsCombination id={"attrCombination" + this.props.id}
-                        ref={"attrCombination" + this.props.id} key={"attrCombination" + this.props.id}
-                    options={this.props.options} modalContainer={this.props.modalContainer}
-                    data={this.props.data.combination}  onChange={this.props.onChange}/>
+                details = React.createElement(DiscountDetailsCombination, {id: "attrCombination" + this.props.id, 
+                        ref: "attrCombination" + this.props.id, key: "attrCombination" + this.props.id, 
+                    options: this.props.options, modalContainer: this.props.modalContainer, 
+                    data: this.props.data.combination, onChange: this.props.onChange})
             } else if(this.props.type == 'other_prod') {
-                details = <DiscountSkuCombination id={"skuCombination" + this.props.id}
-                        ref={"skuCombination" + this.props.id} key={"skuCombination" + this.props.id}
-                    options={this.props.options} data={this.props.data.sku} onChange={this.props.onChange}/>;
+                details = React.createElement(DiscountSkuCombination, {id: "skuCombination" + this.props.id, 
+                        ref: "skuCombination" + this.props.id, key: "skuCombination" + this.props.id, 
+                    options: this.props.options, data: this.props.data.sku, onChange: this.props.onChange});
             }
             return details;
         },
@@ -776,7 +776,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
         }
     });
 
-    var Discount = React.createClass({
+    var Discount = React.createClass({displayName: "Discount",
         mixins: [Common.removeMixin],
         render: function () {
             var options = this.props.options;
@@ -787,32 +787,32 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
             var disabled = (promoType === 'catalog');
 
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <Type ref={"discountType" + this.props.id} id={"discountType" + this.props.id} promoType={promoType}
-                        key={"discountType" + this.props.id} value={this.state.type} onChange={this.onChange}/>
-                    <div className="col-md-7">
-                        <div className="col-md-2">
-                            <input className="form-control pull-left" ref={"discountValue"+ this.props.id}
-                                id={"discountValue"+ this.props.id} key={"discountValue"+ this.props.id} type="text"
-                                defaultValue={this.state.value} onBlur={this.onChange}/>
-                        </div>
-                        <div className="col-md-5" style={display}>
-                            <select className="to-select2 form-control" disabled={disabled}
-                                ref={"discountScope" + this.props.id} defaultValue={this.state.scope}
-                                id={"discountScope" + this.props.id} key={"discountScope" + this.props.id} onChange={this.onChange}>
-                                    {this.props.scopeOptions.map(function (type) {
-                                        return <option value={type.id} key={type.id}>{type.label}</option>
-                                    })}
-                            </select>
-                        </div>
-                        <div className="col-md-5" style={display}>
-                            <DiscountDetails type={this.state.scope} options={this.props.options} ref={"discountDetails" + this.props.id}
-                                id={"discountDetails" + this.props.id} key={"discountDetails" + this.props.id}
-                                modalContainer={this.props.modalContainer} onChange={this.onChange}
-                                data={{sku: this.state.sku, combination: this.state.combination}} promoType={promoType}/>
-                        </div>
-                    </div>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement(Type, {ref: "discountType" + this.props.id, id: "discountType" + this.props.id, promoType: promoType, 
+                        key: "discountType" + this.props.id, value: this.state.type, onChange: this.onChange}), 
+                    React.createElement("div", {className: "col-md-7"}, 
+                        React.createElement("div", {className: "col-md-2"}, 
+                            React.createElement("input", {className: "form-control pull-left", ref: "discountValue"+ this.props.id, 
+                                id: "discountValue"+ this.props.id, key: "discountValue"+ this.props.id, type: "text", 
+                                defaultValue: this.state.value, onBlur: this.onChange})
+                        ), 
+                        React.createElement("div", {className: "col-md-5", style: display}, 
+                            React.createElement("select", {className: "to-select2 form-control", disabled: disabled, 
+                                ref: "discountScope" + this.props.id, defaultValue: this.state.scope, 
+                                id: "discountScope" + this.props.id, key: "discountScope" + this.props.id, onChange: this.onChange}, 
+                                    this.props.scopeOptions.map(function (type) {
+                                        return React.createElement("option", {value: type.id, key: type.id}, type.label)
+                                    })
+                            )
+                        ), 
+                        React.createElement("div", {className: "col-md-5", style: display}, 
+                            React.createElement(DiscountDetails, {type: this.state.scope, options: this.props.options, ref: "discountDetails" + this.props.id, 
+                                id: "discountDetails" + this.props.id, key: "discountDetails" + this.props.id, 
+                                modalContainer: this.props.modalContainer, onChange: this.onChange, 
+                                data: {sku: this.state.sku, combination: this.state.combination}, promoType: promoType})
+                        )
+                    )
+                )
             );
         },
         componentWillMount: function () {
@@ -897,7 +897,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
         }
     });
 
-    var FreeProduct = React.createClass({
+    var FreeProduct = React.createClass({displayName: "FreeProduct",
         mixins: [Common.select2QueryMixin, Common.removeMixin],
         render: function () {
             var skus;
@@ -917,32 +917,32 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
                 }
             }
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <div style={this.props.divStyle}>
-                        <input type="hidden" className="form-control" id="productSku" ref="productSku" defaultValue={skus}/>
-                    </div>
-                    <div style={this.props.divStyle}>
-                        <div style={this.props.divStyle}>
-                            <Components.ControlLabel input_id="productQty"
-                                label_class="">{Locale._('Qty')}</Components.ControlLabel></div>
-                        <div style={{float: 'left', marginLeft: 5}}>
-                            <input type="text" className="form-control" id="productQty" ref="productQty"
-                                defaultValue={this.state.qty} onChange={this.onChange}/>
-                        </div>
-                    </div>
-                    <div style={this.props.divStyle}>
-                        <div style={this.props.divStyle}>
-                            <Components.ControlLabel input_id="productTerms" label_class="">{Locale._('Terms')}</Components.ControlLabel>
-                        </div>
-                        <div style={this.props.divStyle}>
-                            <select className="form-control to-select2" id="productTerms" ref="productTerms"
-                                multiple="multiple" defaultValue={terms}>
-                                <option value="tax">{Locale._("Charge tax")}</option>
-                                <option value="sah">{Locale._("Charge S & H")}</option>
-                            </select>
-                        </div>
-                    </div>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement("div", {style: this.props.divStyle}, 
+                        React.createElement("input", {type: "hidden", className: "form-control", id: "productSku", ref: "productSku", defaultValue: skus})
+                    ), 
+                    React.createElement("div", {style: this.props.divStyle}, 
+                        React.createElement("div", {style: this.props.divStyle}, 
+                            React.createElement(Components.ControlLabel, {input_id: "productQty", 
+                                label_class: ""}, Locale._('Qty'))), 
+                        React.createElement("div", {style: {float: 'left', marginLeft: 5}}, 
+                            React.createElement("input", {type: "text", className: "form-control", id: "productQty", ref: "productQty", 
+                                defaultValue: this.state.qty, onChange: this.onChange})
+                        )
+                    ), 
+                    React.createElement("div", {style: this.props.divStyle}, 
+                        React.createElement("div", {style: this.props.divStyle}, 
+                            React.createElement(Components.ControlLabel, {input_id: "productTerms", label_class: ""}, Locale._('Terms'))
+                        ), 
+                        React.createElement("div", {style: this.props.divStyle}, 
+                            React.createElement("select", {className: "form-control to-select2", id: "productTerms", ref: "productTerms", 
+                                multiple: "multiple", defaultValue: terms}, 
+                                React.createElement("option", {value: "tax"}, Locale._("Charge tax")), 
+                                React.createElement("option", {value: "sah"}, Locale._("Charge S & H"))
+                            )
+                        )
+                    )
+                )
             );
         },
         getInitialState: function () {
@@ -1014,31 +1014,31 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
         }
     });
 
-    var Shipping = React.createClass({
+    var Shipping = React.createClass({displayName: "Shipping",
         mixins: [Common.select2QueryMixin, Common.removeMixin],
         render: function () {
             var amount = '';
             if(this.state.type != 'free') {
-                amount = <input type="number" defaultValue={this.state.amount} id="shippingAmount" ref="shippingAmount" className="form-control" onChange={this.onChange}/>
+                amount = React.createElement("input", {type: "number", defaultValue: this.state.amount, id: "shippingAmount", ref: "shippingAmount", className: "form-control", onChange: this.onChange})
             }
-            var type = <Type ref="shippingType" id="shippingType" onChange={this.onTypeChange} value={this.state.type}
-                    totalType={this.props.fields} value={this.state.type}/>;
-            var label = <Components.ControlLabel label_class="col-md-1" input_id="shippingMethods">{Locale._('For')}</Components.ControlLabel>;
+            var type = React.createElement(Type, {ref: "shippingType", id: "shippingType", onChange: this.onTypeChange, value: this.state.type, 
+                    totalType: this.props.fields, value: this.state.type});
+            var label = React.createElement(Components.ControlLabel, {label_class: "col-md-1", input_id: "shippingMethods"}, Locale._('For'));
             var methods = this.state.methods;
             if($.isArray(methods)) {
                 methods = methods.join(",");
             }
-            var input = <input type="hidden" className="form-control" id="shippingMethods" ref="shippingMethods" defaultValue={methods}/>;
+            var input = React.createElement("input", {type: "hidden", className: "form-control", id: "shippingMethods", ref: "shippingMethods", defaultValue: methods});
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    {type}
-                    <div className="col-md-7">
-                        <div className={amount? "col-md-2": ""}>{amount}</div>
-                        {label}
-                        <div className={amount? "col-md-9": "col-md-11"}>{input}</div>
-                        {/*if no amount field, make this wider*/}
-                    </div>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    type, 
+                    React.createElement("div", {className: "col-md-7"}, 
+                        React.createElement("div", {className: amount? "col-md-2": ""}, amount), 
+                        label, 
+                        React.createElement("div", {className: amount? "col-md-9": "col-md-11"}, input)
+                        /*if no amount field, make this wider*/
+                    )
+                )
             );
         },
         onTypeChange: function (ev) {
@@ -1138,24 +1138,24 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
                             var key = action + '-' + idx;
                             switch (action) {
                                 case 'discount':
-                                    el = <Discount label={Locale._("Discount")} options={options}
-                                        key={key} id={key} removeAction={ra} data={field}
-                                        modalContainer={mc} onUpdate={au}/>;
+                                    el = React.createElement(Discount, {label: Locale._("Discount"), options: options, 
+                                        key: key, id: key, removeAction: ra, data: field, 
+                                        modalContainer: mc, onUpdate: au});
                                     break;
                                 case 'free_product':
                                     if (promoType == 'catalog') {
                                         el = '';
                                     } else {
-                                        el = <FreeProduct label={Locale._("Auto Add Product To Cart")} options={options}
-                                            key={key} id={key} removeAction={ra} onUpdate={au} data={field}/>;
+                                        el = React.createElement(FreeProduct, {label: Locale._("Auto Add Product To Cart"), options: options, 
+                                            key: key, id: key, removeAction: ra, onUpdate: au, data: field});
                                     }
                                     break;
                                 case 'shipping':
                                     if (promoType == 'catalog') {
                                         el = '';
                                     } else {
-                                        el = <Shipping label={Locale._("Shipping")} options={options}
-                                            key={key} id={key} removeAction={ra} onUpdate={au} data={field}/>;
+                                        el = React.createElement(Shipping, {label: Locale._("Shipping"), options: options, 
+                                            key: key, id: key, removeAction: ra, onUpdate: au, data: field});
                                     }
                                     break;
 
@@ -1170,9 +1170,9 @@ define(['react', 'jquery', 'fcom.components', 'fcom.promo.common', 'fcom.locale'
                 }
             }
             return (
-                <div className="actions col-md-offset-1">
-                    {children}
-                </div>
+                React.createElement("div", {className: "actions col-md-offset-1"}, 
+                    children
+                )
             );
         },
         componentWillMount: function () {

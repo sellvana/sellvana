@@ -4,7 +4,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
     'select2', 'bootstrap', 'moment', 'daterangepicker'], function (React, $, Components, Locale, Common) {
 
     // what type of condition we have, total amount or quantity
-    var ConditionsType = React.createClass({
+    var ConditionsType = React.createClass({displayName: "ConditionsType",
         render: function () {
             if(this.props.promoType == 'catalog') {
                 return null;
@@ -14,14 +14,14 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
                 cls += this.props.className;
             }
             return (
-                <div className={this.props.containerClass}>
-                    <select className={cls} defaultValue={this.props.value}>
-                        {this.props.totalType.map(function (type) {
-                            return <option value={type.id} key={type.id}>{type.label}</option>
-                        })}
-                    </select>
-                    {this.props.children}
-                </div>
+                React.createElement("div", {className: this.props.containerClass}, 
+                    React.createElement("select", {className: cls, defaultValue: this.props.value}, 
+                        this.props.totalType.map(function (type) {
+                            return React.createElement("option", {value: type.id, key: type.id}, type.label)
+                        })
+                    ), 
+                    this.props.children
+                )
             );
         },
         value: null,
@@ -69,7 +69,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
     });
 
     // condition to apply to the selection of products
-    var ConditionsSkuCollection = React.createClass({
+    var ConditionsSkuCollection = React.createClass({displayName: "ConditionsSkuCollection",
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
             var productId = this.state.sku;
@@ -82,20 +82,20 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
                 productId = productId.join(",");
             }
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="skuCollectionType" id="skuCollectionType" onChange={this.onChange}
-                        value={this.state.type} promoType={promoType}> of </ConditionsType>
-                    <div className="col-md-2">
-                        <input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control" defaultValue={productId}/>
-                    </div>
-                    <div className="col-md-2" style={display}>
-                        <Common.Compare ref="skuCollectionCond" id="skuCollectionCond" onChange={this.onChange} value={this.state.filter} disabled={disabled}/>
-                    </div>
-                    <div className="col-md-1" style={display}>
-                        <input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue"
-                            defaultValue={this.state.value} type="text" onChange={this.onChange} disabled={disabled}/>
-                    </div>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement(ConditionsType, {ref: "skuCollectionType", id: "skuCollectionType", onChange: this.onChange, 
+                        value: this.state.type, promoType: promoType}, " of "), 
+                    React.createElement("div", {className: "col-md-2"}, 
+                        React.createElement("input", {type: "hidden", id: "skuCollectionIds", ref: "skuCollectionIds", className: "form-control", defaultValue: productId})
+                    ), 
+                    React.createElement("div", {className: "col-md-2", style: display}, 
+                        React.createElement(Common.Compare, {ref: "skuCollectionCond", id: "skuCollectionCond", onChange: this.onChange, value: this.state.filter, disabled: disabled})
+                    ), 
+                    React.createElement("div", {className: "col-md-1", style: display}, 
+                        React.createElement("input", {className: "form-control pull-left", ref: "skuCollectionValue", id: "skuCollectionValue", 
+                            defaultValue: this.state.value, type: "text", onChange: this.onChange, disabled: disabled})
+                    )
+                )
             );
         },
         getDefaultProps: function () {
@@ -168,20 +168,20 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
     });
 
     // condition to apply to products which match the attributes condition configured here
-    var ConditionsAttributeCombination = React.createClass({
+    var ConditionsAttributeCombination = React.createClass({displayName: "ConditionsAttributeCombination",
         mixins: [Common.removeMixin],
         render: function () {
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <div className="col-md-5">
-                        <textarea ref="attributesResume" id="attributesResume"
-                            readOnly="readonly" value={this.state.valueText} className="form-control"/>
-                    </div>
-                    <div className="col-md-4">
-                        <Components.Button type="button" className="btn-primary" ref={this.props.configureId}
-                            onClick={this.handleConfigure}>Configure</Components.Button>
-                    </div>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement("div", {className: "col-md-5"}, 
+                        React.createElement("textarea", {ref: "attributesResume", id: "attributesResume", 
+                            readOnly: "readonly", value: this.state.valueText, className: "form-control"})
+                    ), 
+                    React.createElement("div", {className: "col-md-4"}, 
+                        React.createElement(Components.Button, {type: "button", className: "btn-primary", ref: this.props.configureId, 
+                            onClick: this.handleConfigure}, "Configure")
+                    )
+                )
             );
         },
         getInitialState: function () {
@@ -198,12 +198,12 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
         modal: null,
         modalContent: null,
         handleConfigure: function () {
-            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm} onCancel={this.handleConditionsCancel}
-                    id={"modal-" + this.props.id} key={"modal-" + this.props.id}
-                    title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
-                <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} data={this.state.value}
-                    onLoad={this.registerModalContent} key={"modal-content-" + this.props.id} />
-            </Components.Modal>;
+            var modal = React.createElement(Components.Modal, {onConfirm: this.handleConditionsConfirm, onCancel: this.handleConditionsCancel, 
+                    id: "modal-" + this.props.id, key: "modal-" + this.props.id, 
+                    title: "Product Combination Configuration", onLoad: this.registerModal, onUpdate: this.registerModal}, 
+                React.createElement(ConditionsAttributesModalContent, {baseUrl: this.props.options.base_url, data: this.state.value, 
+                    onLoad: this.registerModalContent, key: "modal-content-" + this.props.id})
+            );
 
             React.render(modal, this.props.modalContainer.get(0));
         },
@@ -308,34 +308,34 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
     });
 
     // content of the modal used to configure attribute combination
-    var ConditionsAttributesModalContent = React.createClass({
+    var ConditionsAttributesModalContent = React.createClass({displayName: "ConditionsAttributesModalContent",
         mixins: [Common.select2QueryMixin],
         render: function () {
             var fieldUrl = this.props.baseUrl + this.props.urlField;
             var paramObj = {};
             return (
-                <div className="attribute-combinations form-horizontal">
-                    <div className="form-group">
-                        <div className="col-md-6">
-                            <select ref="combinationType" className="form-control to-select2"
-                                    id="attribute-combination-type" defaultValue={this.state.match}>
-                                <option value="all">All Conditions Have to Match</option>
-                                <option value="any">Any Condition Has to Match</option>
-                            </select>
-                        </div>
-                        <div className="col-md-6">
-                            <input ref="combinationField" className="form-control"/>
-                        </div>
-                    </div>
-                    {this.state.fields.map(function (field) {
+                React.createElement("div", {className: "attribute-combinations form-horizontal"}, 
+                    React.createElement("div", {className: "form-group"}, 
+                        React.createElement("div", {className: "col-md-6"}, 
+                            React.createElement("select", {ref: "combinationType", className: "form-control to-select2", 
+                                    id: "attribute-combination-type", defaultValue: this.state.match}, 
+                                React.createElement("option", {value: "all"}, "All Conditions Have to Match"), 
+                                React.createElement("option", {value: "any"}, "Any Condition Has to Match")
+                            )
+                        ), 
+                        React.createElement("div", {className: "col-md-6"}, 
+                            React.createElement("input", {ref: "combinationField", className: "form-control"})
+                        )
+                    ), 
+                    this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         var data = field.value || [];
-                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
-                            data={data} filter={field.filter}
-                            id={field.field} input={field.input} removeField={this.removeField} ref={field.field} onChange={this.elementChange}/>
-                    }.bind(this))}
-                </div>
+                        return React.createElement(ConditionsAttributesModalField, {label: field.label, url: url, key: field.field, 
+                            data: data, filter: field.filter, 
+                            id: field.field, input: field.input, removeField: this.removeField, ref: field.field, onChange: this.elementChange})
+                    }.bind(this))
+                )
             );
         },
         serialize: function () {
@@ -477,7 +477,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
         }
     });
 
-    var ConditionsAttributesModalField = React.createClass({
+    var ConditionsAttributesModalField = React.createClass({displayName: "ConditionsAttributesModalField",
         mixins: [Common.select2QueryMixin],
         statics: {
             opts: function (type) {
@@ -517,13 +517,13 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
                     value = this.props.data;
                 }
             }
-            var input = <input className="form-control required" type="text" id={fieldId} ref={fieldId}
-                onChange={this.onChange} defaultValue={value}/>;
+            var input = React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, 
+                onChange: this.onChange, defaultValue: value});
             if (this.props.numeric_inputs.indexOf(inputType) != -1) {
                 if (inputType == 'number') {
                     if (this.state.range === false) {
-                        input = <input className="form-control required" type="number" step="any" id={fieldId}
-                            ref={fieldId} style={{width: "auto"}} onChange={this.onChange} defaultValue={value}/>;
+                        input = React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId, 
+                            ref: fieldId, style: {width: "auto"}, onChange: this.onChange, defaultValue: value});
                     } else {
                         value = this.props.data;
                         var min, max;
@@ -534,40 +534,40 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
                         if(value.length > 1) {
                             max = value[1];
                         }
-                        input = <div id={fieldId} ref={fieldId} className="input-group">
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".min"} ref={"min"}
-                                placeholder="Min" style={{width: "50%"}} onChange={this.onChange} defaultValue={min}/>
-                            <input className="form-control required" type="number" step="any" id={fieldId + ".max"} ref={"max"}
-                                placeholder="Max" style={{width: "50%"}} onChange={this.onChange} defaultValue={max}/>
-                        </div>;
+                        input = React.createElement("div", {id: fieldId, ref: fieldId, className: "input-group"}, 
+                            React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId + ".min", ref: "min", 
+                                placeholder: "Min", style: {width: "50%"}, onChange: this.onChange, defaultValue: min}), 
+                            React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId + ".max", ref: "max", 
+                                placeholder: "Max", style: {width: "50%"}, onChange: this.onChange, defaultValue: max})
+                        );
                     }
                 } else if (inputType == 'date' || inputType == 'time') {
                     var singleMode = true;
                     if (this.state.range === true) {
                         singleMode = false;
                     }
-                    input = <div className="input-group">
-                        <span className="input-group-addon">
-                            <i className="glyphicon glyphicon-calendar"></i>
-                        </span>
-                        <input className="form-control required" type="text" id={fieldId} ref={fieldId}
-                            dataMode={singleMode} onChange={this.onChange} defaultValue={value}/>
-                    </div>
+                    input = React.createElement("div", {className: "input-group"}, 
+                        React.createElement("span", {className: "input-group-addon"}, 
+                            React.createElement("i", {className: "glyphicon glyphicon-calendar"})
+                        ), 
+                        React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, 
+                            dataMode: singleMode, onChange: this.onChange, defaultValue: value})
+                    )
                 }
             } else if (inputType == 'select') {
-                input = <input className="form-control required" type="hidden" id={fieldId} ref={fieldId}
-                    defaultValue={value}/>;
+                input = React.createElement("input", {className: "form-control required", type: "hidden", id: fieldId, ref: fieldId, 
+                    defaultValue: value});
             } else if (this.props.bool_inputs.indexOf(inputType) != -1) {
-                input = <Components.YesNo  id={fieldId} ref={fieldId} onChange={this.onChange} defaultValue={value}/>;
+                input = React.createElement(Components.YesNo, {id: fieldId, ref: fieldId, onChange: this.onChange, defaultValue: value});
             }
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <div className="col-md-4">
-                        <Common.Compare opts={ opts } id={"fieldCompare." + this.props.id} value={this.props.filter}
-                            ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
-                    </div>
-                    <div className="col-md-5">{input}</div>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement("div", {className: "col-md-4"}, 
+                        React.createElement(Common.Compare, {opts: opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
+                            ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
+                    ), 
+                    React.createElement("div", {className: "col-md-5"}, input)
+                )
             );
         },
         values: {},
@@ -805,7 +805,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
         }
     });
 
-    var ConditionsCategories = React.createClass({
+    var ConditionsCategories = React.createClass({displayName: "ConditionsCategories",
         mixins: [Common.removeMixin, Common.select2QueryMixin],
         render: function () {
             var values = this.props.data;
@@ -819,17 +819,17 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
                 categories = categories.join(",");
             }
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="catProductsType" id="catProductsType" containerClass="col-md-3" promoType={promoType}
-                        onChange={this.onChange} value={values.type}> of products in </ConditionsType>
-                    <input type="hidden" id="catProductsIds" ref="catProductsIds" defaultValue={categories}/>
-                    <div style={display} >
-                        <Common.Compare ref="catProductsCond" id="catProductsCond"  onChange={this.onChange}
-                            value={values.filter} disabled={disabled}/>
-                    </div>
-                    <input ref="catProductsValue" id="catProductsValue" type="text" className="" onChange={this.onChange}
-                        defaultValue={values.value} style={display} disabled={disabled}/>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement(ConditionsType, {ref: "catProductsType", id: "catProductsType", containerClass: "col-md-3", promoType: promoType, 
+                        onChange: this.onChange, value: values.type}, " of products in "), 
+                    React.createElement("input", {type: "hidden", id: "catProductsIds", ref: "catProductsIds", defaultValue: categories}), 
+                    React.createElement("div", {style: display}, 
+                        React.createElement(Common.Compare, {ref: "catProductsCond", id: "catProductsCond", onChange: this.onChange, 
+                            value: values.filter, disabled: disabled})
+                    ), 
+                    React.createElement("input", {ref: "catProductsValue", id: "catProductsValue", type: "text", className: "", onChange: this.onChange, 
+                        defaultValue: values.value, style: display, disabled: disabled})
+                )
             );
         },
         getDefaultProps: function () {
@@ -907,15 +907,15 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
         }
     });
 
-    var ConditionTotal = React.createClass({
+    var ConditionTotal = React.createClass({displayName: "ConditionTotal",
         mixins: [Common.removeMixin],
         render: function () {
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType} onChange={this.onChange} value={this.props.data.type}/>
-                    <Common.Compare ref="cartTotalCond" id="cartTotalCond" onChange={this.onChange} value={this.props.data.filter}/>
-                    <input ref="cartTotalValue" id="cartTotalValue" type="text" className="" onBlur={this.onChange} defaultValue={this.props.data.value}/>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement(ConditionsType, {ref: "cartTotalType", id: "cartTotalType", totalType: this.props.totalType, onChange: this.onChange, value: this.props.data.type}), 
+                    React.createElement(Common.Compare, {ref: "cartTotalCond", id: "cartTotalCond", onChange: this.onChange, value: this.props.data.filter}), 
+                    React.createElement("input", {ref: "cartTotalValue", id: "cartTotalValue", type: "text", className: "", onBlur: this.onChange, defaultValue: this.props.data.value})
+                )
             );
         },
         getDefaultProps: function () {
@@ -944,20 +944,20 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
         }
     });
 
-    var ConditionsShipping = React.createClass({
+    var ConditionsShipping = React.createClass({displayName: "ConditionsShipping",
         mixins: [Common.removeMixin],
         render: function () {
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <div className="col-md-5">
-                        <textarea ref="shippingResume" id="shippingResume"
-                            readOnly="readonly" value={this.state.valueText} className="form-control"/>
-                    </div>
-                    <div className="col-md-4">
-                        <Components.Button type="button" className="btn-primary pull-left" ref={this.props.configureId}
-                            onClick={this.handleConfigure}>Configure</Components.Button>
-                    </div>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement("div", {className: "col-md-5"}, 
+                        React.createElement("textarea", {ref: "shippingResume", id: "shippingResume", 
+                            readOnly: "readonly", value: this.state.valueText, className: "form-control"})
+                    ), 
+                    React.createElement("div", {className: "col-md-4"}, 
+                        React.createElement(Components.Button, {type: "button", className: "btn-primary pull-left", ref: this.props.configureId, 
+                            onClick: this.handleConfigure}, "Configure")
+                    )
+                )
             );
         },
         getDefaultProps: function () {
@@ -974,11 +974,11 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
         modal: null,
         modalContent: null,
         handleConfigure: function () {
-            var modal = <Components.Modal onConfirm={this.handleShippingConfirm} id={"modal-" + this.props.id} key={"modal-" + this.props.id}
-                title={this.props.modalTitle} onLoad={this.openModal} onUpdate={this.openModal}>
-                <ConditionsShippingModalContent baseUrl={this.props.options.base_url} onLoad={this.registerModalContent}
-                    key={"modal-content-" + this.props.id} data={this.state.value}/>
-            </Components.Modal>;
+            var modal = React.createElement(Components.Modal, {onConfirm: this.handleShippingConfirm, id: "modal-" + this.props.id, key: "modal-" + this.props.id, 
+                title: this.props.modalTitle, onLoad: this.openModal, onUpdate: this.openModal}, 
+                React.createElement(ConditionsShippingModalContent, {baseUrl: this.props.options.base_url, onLoad: this.registerModalContent, 
+                    key: "modal-content-" + this.props.id, data: this.state.value})
+            );
 
             React.render(modal, this.props.modalContainer.get(0));
         },
@@ -1061,37 +1061,37 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
         }
     });
 
-    var ConditionsShippingModalContent = React.createClass({
+    var ConditionsShippingModalContent = React.createClass({displayName: "ConditionsShippingModalContent",
         render: function () {
             var fieldUrl = this.props.baseUrl + this.props.url;
             var paramObj = {};
             //paramObj[this.props.idVar] = this.props.entityId;
             return (
-                <div className="shipping-combinations form-horizontal">
-                    <div className="form-group">
-                        <div className="col-md-5">
-                            <select ref="combinationType" className="form-control to-select2" defaultValue={this.state.match}>
-                                <option value="all">All Conditions Have to Match</option>
-                                <option value="any">Any Condition Has to Match</option>
-                            </select>
-                        </div>
-                        <div className="col-md-5">
-                            <select ref="combinationField" className="form-control">
-                                <option value="-1">{this.props.labelCombinationField}</option>
-                                {this.props.fields.map(function (field) {
-                                    return <option value={field.field} key={field.field}>{field.label}</option>
-                                })}
-                            </select>
-                        </div>
-                    </div>
-                    {this.state.fields.map(function (field) {
+                React.createElement("div", {className: "shipping-combinations form-horizontal"}, 
+                    React.createElement("div", {className: "form-group"}, 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("select", {ref: "combinationType", className: "form-control to-select2", defaultValue: this.state.match}, 
+                                React.createElement("option", {value: "all"}, "All Conditions Have to Match"), 
+                                React.createElement("option", {value: "any"}, "Any Condition Has to Match")
+                            )
+                        ), 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("select", {ref: "combinationField", className: "form-control"}, 
+                                React.createElement("option", {value: "-1"}, this.props.labelCombinationField), 
+                                this.props.fields.map(function (field) {
+                                    return React.createElement("option", {value: field.field, key: field.field}, field.label)
+                                })
+                            )
+                        )
+                    ), 
+                    this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         var data = field.value || [];
-                        return <ConditionsShippingModalField label={field.label} url={url} key={field.field} data={data} filter={field.filter}
-                            id={field.field} ref={field.field} removeField={this.removeField} onChange={this.elementChange} opts={ConditionsShippingModalField.opts()}/>
-                    }.bind(this))}
-                </div>
+                        return React.createElement(ConditionsShippingModalField, {label: field.label, url: url, key: field.field, data: data, filter: field.filter, 
+                            id: field.field, ref: field.field, removeField: this.removeField, onChange: this.elementChange, opts: ConditionsShippingModalField.opts()})
+                    }.bind(this))
+                )
             );
         },
         serialize: function () {
@@ -1250,7 +1250,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
         }
     });
 
-    var ConditionsShippingModalField = React.createClass({
+    var ConditionsShippingModalField = React.createClass({displayName: "ConditionsShippingModalField",
         mixins: [Common.select2QueryMixin],
         statics: {
             opts: function () {
@@ -1270,19 +1270,19 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
                     value = this.props.data;
                 }
             }
-            var input = <input className="form-control" type="hidden" id={fieldId} key={fieldId} ref={fieldId} defaultValue={value}/>;
+            var input = React.createElement("input", {className: "form-control", type: "hidden", id: fieldId, key: fieldId, ref: fieldId, defaultValue: value});
             var helperBlock = '';
             if (this.props.id == 'postcode') {
-                helperBlock = <span key={fieldId + '.help'} className="help-block">{this.props.postHelperText }</span>;
+                helperBlock = React.createElement("span", {key: fieldId + '.help', className: "help-block"}, this.props.postHelperText);
             }
             return (
-                <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                    <div className="col-md-4">
-                        <Common.Compare opts={this.props.opts} id={"fieldCompare." + this.props.id} value={this.props.filter}
-                            ref={"fieldCompare." + this.props.id} onChange={this.onCompareChange}/>
-                    </div>
-                    <div className="col-md-5">{[input, helperBlock]}</div>
-                </Common.Row>
+                React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    React.createElement("div", {className: "col-md-4"}, 
+                        React.createElement(Common.Compare, {opts: this.props.opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
+                            ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
+                    ), 
+                    React.createElement("div", {className: "col-md-5"}, [input, helperBlock])
+                )
             );
         },
         values: {},
@@ -1412,26 +1412,26 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
                             var key = type + '-' + idx;
                             switch (type) {
                                 case 'sku':
-                                    el = <ConditionsSkuCollection onUpdate={cu} data={field} options={options} key={key} id={key} removeCondition={rc}/>;
+                                    el = React.createElement(ConditionsSkuCollection, {onUpdate: cu, data: field, options: options, key: key, id: key, removeCondition: rc});
                                     break;
                                 case 'category':
-                                    el = <ConditionsCategories onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                    el = React.createElement(ConditionsCategories, {onUpdate: cu, options: options, key: key, id: key, data: field, removeCondition: rc});
                                     break;
                                 case 'total':
                                     if(promoType == 'catalog') {
                                         el = '';
                                     } else {
-                                        el = <ConditionTotal onUpdate={cu} options={options} key={key} id={key} data={field} removeCondition={rc}/>;
+                                        el = React.createElement(ConditionTotal, {onUpdate: cu, options: options, key: key, id: key, data: field, removeCondition: rc});
                                     }
                                     break;
                                 case 'combination':
-                                    el = <ConditionsAttributeCombination onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                    el = React.createElement(ConditionsAttributeCombination, {onUpdate: cu, options: options, data: field, modalContainer: mc, key: key, id: key, removeCondition: rc});
                                     break;
                                 case 'shipping':
                                     if(promoType == 'catalog') {
                                         el = '';
                                     } else {
-                                        el = <ConditionsShipping onUpdate={cu} options={options} data={field} modalContainer={mc} key={key} id={key} removeCondition={rc}/>;
+                                        el = React.createElement(ConditionsShipping, {onUpdate: cu, options: options, data: field, modalContainer: mc, key: key, id: key, removeCondition: rc});
                                     }
                                     break;
                             }
@@ -1445,9 +1445,9 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'fcom.promo.common'
                 }
             }
             return (
-                <div className="conditions col-md-offset-1" style={{display: this.props.hidden?"none": "block"}}>
-                    {children}
-                </div>
+                React.createElement("div", {className: "conditions col-md-offset-1", style: {display: this.props.hidden?"none": "block"}}, 
+                    children
+                )
             );
         },
         componentDidMount: function () {
