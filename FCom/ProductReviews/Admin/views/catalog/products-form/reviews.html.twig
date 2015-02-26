@@ -1,3 +1,7 @@
+<!--{ label: Product Reviews }-->
+<!--{ pos: 70 }-->
+<!--{ model_new_hide: true }-->
+
 {% set m = THIS.get('model') %}
 {% set ctrl = APP.instance('FCom_ProductReviews_Admin_Controller') %}
 {% set gridConfig = ctrl.gridConfig(m) %}
@@ -50,6 +54,7 @@ require(["jquery", "underscore", "jquery.validate"], function($, _) {
 });
 </script>
 
-{{ THIS.view('core/backbonegrid').set('grid', {config: gridConfig }) | raw }}
+{#{{ THIS.view('core/backbonegrid').set('grid', {config: gridConfig }) | raw }}#}
+{{ THIS.view('core/griddle').set('grid', {config: gridConfig }) | raw }}
 
 
