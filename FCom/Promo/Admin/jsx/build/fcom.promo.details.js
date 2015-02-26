@@ -193,12 +193,6 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                     contentValue = this.props.data.text_content;
                 }
 
-                //for(var c in this.props.data.conditions) {
-                //    if(this.props.data.conditions.hasOwnProperty(c)) {
-                //        conditions.push(<AddPromoDisplayCondition key={c + '-' + this.props.data.id} customerGroups={this.props.customerGroups}
-                //            data_id={this.props.data.id} type={c} value={this.props.data.conditions[c]}/>)
-                //    }
-                //}
                 if (this.props.data.conditions !== undefined) {
                     conditions = this.props.data.conditions.map(function (condition, idx) {
                         //console.log(condition);
@@ -289,6 +283,7 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                                     ref: "display-add-condition-" + this.props.data.id, className: "form-control"}, 
                                     React.createElement("option", {value: "-1"}, Locale._("Add Condition...")), 
                                     React.createElement("option", {value: "promo_conditions_match"}, Locale._("Promo Conditions Met")), 
+                                    React.createElement("option", {value: "promo_applied"}, Locale._("Has promo been applied to cart")), 
                                     React.createElement("option", {value: "customer_groups"}, Locale._("Customer Group"))
                                 )
                             )
@@ -318,14 +313,6 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                     cart_page: Locale._("Cart"),
                     success_page: Locale._("Success Page"),
                     custom_hook: Locale._("Custom Hook")
-                },
-                locationPageOptions: {
-                    home_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "home"],
-                    category_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "category"],
-                    product_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "product"],
-                    cart_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "cart"],
-                    success_page: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "success"],
-                    custom_hook: ["Below Product Name", "Below Add To Cart Block", "Above Description  Block", "Above Add To Cart Button", "hook"]
                 }
             }
         },
@@ -376,12 +363,12 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                     type: "button", style:  {paddingRight: 10, paddingLeft: 10}, key: "rm-for-" + type + "-" + id}, 
                     React.createElement("span", {className: "icon-trash"})
                 );
-            if(type === 'promo_conditions_match') {
+            if(type === 'promo_conditions_match' || type === 'promo_applied') {
                 condition = [
                     React.createElement(Components.ControlLabel, {input_id: type + "-" + id, key: labelFor, 
                         label_class: "col-md-4"}, 
                                 delBtn, 
-                                this.props.promoMetLabel
+                                this.props[type + '_label']
                     ),
                     React.createElement("div", {key: key, style: divStyle}, 
                         React.createElement(Components.YesNo, {name: inputName, value: val})
@@ -395,7 +382,7 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                     React.createElement(Components.ControlLabel, {input_id: type + "-" + id, key: labelFor, 
                         label_class: "col-md-4"}, 
                                 delBtn, 
-                                this.props.customerGroupLabel
+                                this.props.customer_group_label
                     ),
                     React.createElement("div", {key: key, style: divStyle}, 
                         React.createElement("select", {name: inputName, defaultValue: val, className: "form-control"}, 
@@ -408,8 +395,9 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
         },
         getDefaultProps: function () {
             return {
-                promoMetLabel: Locale._("Display when promo conditions have been met"),
-                customerGroupLabel: Locale._("Display when customer group is")
+                promo_conditions_match_label: Locale._("Display when promo conditions have been met"),
+                promo_applied_label: Locale._("Display when the promo has been applied to cart"),
+                customer_group_label: Locale._("Display when customer group is")
             };
         },
         onRemove: function () {
@@ -434,7 +422,7 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                     content =
                         React.createElement("div", null, 
                             React.createElement(Components.ControlLabel, {input_id: this.props.id, 
-                                label_class: this.props.labelClass}, "Block Handle", 
+                                label_class: this.props.labelClass}, Locale._("Block Handle"), 
                                 React.createElement(Components.HelpIcon, {id: "help-" + this.props.id, 
                                     content: Locale._("Select a cms block handle")})
                             ), 
