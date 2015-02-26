@@ -4,7 +4,7 @@
  * Class FCom_CustomerGroups_Admin_Controller_TierPrices
  *
  * @property FCom_CustomerGroups_Model_Group $FCom_CustomerGroups_Model_Group
- * @property FCom_CustomerGroups_Model_TierPrice $FCom_CustomerGroups_Model_TierPrice
+ * @property FCom_Catalog_Model_ProductPrice $FCom_Catalog_Model_ProductPrice
  */
 class FCom_CustomerGroups_Admin_Controller_TierPrices
     extends FCom_Admin_Controller_Abstract_GridForm
@@ -12,7 +12,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
     protected static $_origClass = __CLASS__;
 
     protected $_gridHref = 'tier-prices';
-    protected $_modelClass = 'FCom_CustomerGroups_Model_TierPrice';
+    protected $_modelClass = 'FCom_Catalog_Model_ProductPrice';
     protected $_gridTitle = "Tier Prices";
     protected $_recordName = "Tier Price";
     protected $_mainTableAlias = 'tp';
@@ -24,7 +24,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
     public function getTierPricesGrid($model)
     {
         $cgOptions = $this->FCom_CustomerGroups_Model_Group->groupsOptions();
-        $orm = $this->FCom_CustomerGroups_Model_TierPrice->orm()->where('product_id', $model->id());
+        $orm = $this->FCom_Catalog_Model_ProductPrice->orm()->where('product_id', $model->id());
         $grid = [
             'config' => [
                 'id' => 'tier-prices',

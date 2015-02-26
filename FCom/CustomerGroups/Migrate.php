@@ -132,4 +132,13 @@ class FCom_CustomerGroups_Migrate extends BClass
         VALUES (0, 'ALL', 'all')
         ");
     }
+
+    // un comment if we need to remove the table
+    //public function upgrade__0_1_2__0_1_3()
+    //{
+    //    $tPrices = $this->FCom_CustomerGroups_Model_TierPrice->table();
+    //
+    //    $this->BDb->ddlDropTable($tPrices);
+    //
+    //}
 }

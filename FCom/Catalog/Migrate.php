@@ -15,6 +15,9 @@
  * @property FCom_Catalog_Model_InventoryBin $FCom_Catalog_Model_InventoryBin
  * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  * @property FCom_Catalog_Model_InventorySkuHistory $FCom_Catalog_Model_InventorySkuHistory
+ * @property FCom_Catalog_Model_ProductPrice $FCom_Catalog_Model_ProductPrice
+ * @property FCom_CustomerGroups_Model_Group $FCom_CustomerGroups_Model_Group
+ * @property FCom_MultiSite_Model_Site $FCom_MultiSite_Model_Site
  */
 class FCom_Catalog_Migrate extends BClass
 {
@@ -692,4 +695,33 @@ class FCom_Catalog_Migrate extends BClass
             ]
         ]);
     }
+
+    public function upgrade__0_3_3__0_3_4()
+    {
+        $tablePrice = $this->FCom_Catalog_Model_ProductPrice->table();
+
+        $tableProduct    = $this->FCom_Catalog_Model_Product->table();
+        $tableDef = [
+            BDb::COLUMNS => [
+                'id'                => 'int(10) unsigned not null auto_increment',
+                'product_id'        => 'int(10) unsigned not null',
+                'customer_group_id' => 'int(10) unsigned null',
+                'site_id'           => 'int(10) unsigned null',
+                'currency_id'       => 'int(10) unsigned null',
+                'price'             => 'decimal(12,2) not null',
+                'price_type'        => 'varchar(20) not null',
+                'qty'               => 'int(10) unsigned not null default 1',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS    => [
+                'UNQ_prod_group_qty' => 'UNIQUE (product_id, customer_group_id, site_id, currency_id, qty)',
+            ],
+            BDb::CONSTRAINTS => [
+                'product' => ['product_id', $tableProduct],
+            ],
+        ];
+
+        $this->BDb->ddlTableDef($tablePrice, $tableDef);
+    }
+
 }
