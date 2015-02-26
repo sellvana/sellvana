@@ -4,7 +4,7 @@
  * Class FCom_CustomerGroups_Admin
  *
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
- * @property FCom_CustomerGroups_Model_TierPrice $FCom_CustomerGroups_Model_TierPrice
+ * @property FCom_Catalog_Model_ProductPrice $FCom_Catalog_Model_ProductPrice
  */
 class FCom_CustomerGroups_Admin extends BClass
 {
@@ -24,7 +24,7 @@ class FCom_CustomerGroups_Admin extends BClass
             $rows = $data['rows'];
             $remove_ids = $data['remove_ids'];
 
-            $model = $this->FCom_CustomerGroups_Model_TierPrice;
+            $model = $this->FCom_Catalog_Model_ProductPrice;
 
             foreach ($remove_ids as $id) {
                 $r = $model->load($id);
