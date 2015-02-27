@@ -29,6 +29,8 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
             return $this;
         }
 
+        $this->BApp->set('current_page_type', 'category');
+
         $this->layout('/catalog/category');
         $layout = $this->BLayout;
         /** @var FCom_Catalog_Frontend_View_Pager $pagerView */
@@ -95,6 +97,8 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
     public function action_search()
     {
+        $this->BApp->set('current_page_type', 'search');
+
         $q = $this->BRequest->get('q');
         if (is_array($q)) {
             $q = join(' ', $q);

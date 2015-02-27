@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'react', 'jquery', 'jsx!griddle.fcomGridBody', 'jsx!griddle.fcomGridFilter', 'jsx!fcom.components', 'jsx!griddle', 'backbone', 'bootstrap'],
+define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
 function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) {
 
     var dataUrl,
@@ -287,7 +287,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     window.location.href = exportUrl + '&export=true';
                     break;
                 default:
-                    console.log('mass-action');
+                    console.log('do-mass-action');
                     break;
             }
 
@@ -386,6 +386,11 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             React.unmountComponentAtNode(mountNode);
             React.render(<ol className="dd-list dropdown-menu columns ui-sortable" style={{minWidth: '200px'}}>{options}</ol>, mountNode);
         },
+        handleCustom: function(callback, event) {
+            if (typeof window[callback] === 'function') {
+                return window[callback](this.props.getCurrentGrid());
+            }
+        },
         render: function () {
             var that = this;
             var id = this.props.getConfig('id');
@@ -398,36 +403,43 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var buttonActions = [];
             if (configActions) {
                 _.forEach(configActions, function(action, name) {
-                    /*console.log('action', action);
-                    console.log('name', name);*/
-                    //todo: get action caption
                     var node = '';
                     switch (name) {
                         case 'refresh':
-                            node = <a href="#" className="js-change-url grid-refresh btn">Refresh</a>;
+                            node = <a href="#" className={action.class}>{action.caption}</a>;
                             break;
                         case 'export':
-                            node = <button className={"grid-export btn"} data-action='export' onClick={that.doMassAction}>Export</button>;
+                            node = <button className={action.class} data-action='export' onClick={that.doMassAction}>{action.caption}</button>;
                             break;
                         case 'link_to_page':
-                            node = <a href="#" className="grid-link_to_page btn">Link</a>;
+                            node = <a href="#" className={action.class}>{action.caption}</a>;
                             break;
                         case 'edit':
-                            node = <a href='#' className={"btn grid-mass-edit btn-success" + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button">Edit</a>;
+                            node = <a href='#' className={action.class + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button">{action.caption}</a>;
                             break;
                         case 'delete':
-                            //todo: option noconfirm
-                            node = <button className={"btn grid-mass-delete btn-danger" + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction}>Delete</button>;
+                            node = <button className={action.class + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction}>{action.caption}</button>;
                             break;
                         case 'add':
-                            node = <button className="btn grid-add btn-primary" type="button">Add</button>;
+                            node = <button className={action.class} type="button">{action.caption}</button>;
                             break;
                         case 'new':
-                            //todo: option modal
-                            node = <button className="btn grid-new btn-primary" type="button">New</button>;
+                            node = <button className={action.class} type="button">{action.caption}</button>;
                             break;
                         default:
-                            node = <span dangerouslySetInnerHTML={{__html: action.html}}></span>;
+                            if (action.type) {
+                                switch (action.type) {
+                                    case 'button':
+                                    default:
+                                        //compatibility with old backbone grid
+                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} id={action.id}
+                                            type="button" onClick={that.handleCustom.bind(this, action.callback)}>{action.caption}</button>;
+                                        break;
+                                }
+                            } else if (action.html) {
+                                node = <span dangerouslySetInnerHTML={{__html: action.html}}></span>;
+                            }
+
                             break;
                     }
 

@@ -385,72 +385,70 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
         foreach ($grid['config']['actions'] as $k => &$action) {
             //var_dump($action);
+
+            $html = $caption = $class = '';
+
             if (!empty(static::$_defaultActions[$k])) {
 
                 switch ($k) {
                     case 'refresh':
-                        $action = ['html' => $this->BUtil->tagHtml('a',
-                            ['href' => '#', 'class' => 'js-change-url grid-refresh btn'],
-                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Refresh')
-                        )];
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Refresh');
+                        $class   = 'js-change-url grid-refresh btn';
+                        $html    = $this->BUtil->tagHtml('a', ['href' => '#', 'class' => $class], $caption);
                         break;
                     case 'export':
-                        $action = ['html' => $this->BUtil->tagHtml('button',
-                            ['type' => 'button', 'class' => 'grid-export btn'],
-                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Export')
-                        )];
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Export');
+                        $class   = 'grid-export btn';
+                        $html    = $this->BUtil->tagHtml('button', ['type' => 'button', 'class' => $class], $caption);
                         break;
                     case 'link_to_page':
-                        $action = ['html' => $this->BUtil->tagHtml('a',
-                            ['href' => $this->BRequest->currentUrl(), 'class' => 'grid-link_to_page btn'],
-                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Link')
-                        )];
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Export');
+                        $class   = 'grid-export btn';
+                        $html    = $this->BUtil->tagHtml('a', ['href' => $action['href'], 'class' => $class], $caption);
                         break;
                     case 'edit':
-                        $action = ['html' => $this->BUtil->tagHtml('a',
-                            ['class' => 'btn grid-mass-edit btn-success disabled', 'data-toggle' => 'modal',
-                                'href' => '#' . $grid['config']['id'] . '-mass-edit', 'role' => 'button'],
-                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Edit')
-                        )];
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Edit');
+                        $class   = 'btn grid-mass-edit mass-action btn-success';
+                        $html    = $this->BUtil->tagHtml('a',
+                            ['class' => $class .' disabled', 'data-toggle' => 'modal', 'href' => '#' . $grid['config']['id'] . '-mass-edit', 'role' => 'button'],
+                            $caption
+                        );
                         break;
                     case 'delete':
-                        $action = ['html' => $this->BUtil->tagHtml('button',
-                            ['class' => 'btn grid-mass-delete btn-danger disabled' . ((isset($action['confirm'])
-                                && $action['confirm'] === false) ? ' noconfirm' : ''), 'type' => 'button'],
-                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Delete')
-                        )];
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Delete');
+                        $class   = 'btn grid-mass-delete mass-action btn-danger' . ((isset($action['confirm']) && $action['confirm'] === false) ? ' noconfirm' : '');
+                        $html    = $this->BUtil->tagHtml('button', ['class' => $class . ' disabled', 'type' => 'button'], $caption);
                         break;
-                    case 'add':
-                        $action = ['html' => $this->BUtil->tagHtml('button',
-                            ['class' => 'btn grid-add btn-primary', 'type' => 'button'],
-                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add')
-                        )];
+                    case 'add': //todo: confirm with Boris merge this action with 'new'
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add');
+                        $class   = 'btn grid-add btn-primary';
+                        $html    = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button'], $caption);
                         break;
                     case 'new':
-                        $action = ['html' => $this->BUtil->tagHtml('button',
-                            ['class' => "btn grid-new btn-primary " . (isset($action['modal'])
-                                && $action['modal'] ? '_modal' : ''), 'type' => 'button'],
-                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add')
-                        )];
+                        $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add');
+                        $class   = 'btn grid-new btn-primary' . (isset($action['modal']) && $action['modal'] ? ' _modal' : '');
+                        $html    = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button'], $caption);
                         break;
                     default:
                         $action = static::$_defaultActions[$k];
                 }
             } elseif (!isset($action['html']) || !$action['html']) {
-                $action = [
-                    'html' => $this->BUtil->tagHtml(
-                        'button',
-                        [
-                            'class' => isset($action['class']) ? 'btn ' . $action['class'] : 'btn',
-                            'type' => 'button',
-                            'id' => isset($action['id']) ? $action['id'] : ''
-                        ],
-                        isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add')
-                    )
+                $caption = isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add');
+                $class = isset($action['class']) ? 'btn ' . $action['class'] : 'btn';
+                $html = $this->BUtil->tagHtml('button', ['class' => $class, 'type' => 'button', 'id' => isset($action['id']) ? $action['id'] : ''], $caption);
+            }
+
+            if ($html && $class && $caption) {
+                $data = [
+                    'html'    => $html,
+                    'caption' => isset($action['caption']) ? $action['caption'] : $caption,
+                    'class'   => $class,
                 ];
+
+                $action = is_array($action) ? array_merge($action, $data) : $data;
             }
         }
-        unset($action);
+        unset($action, $data);
         $this->grid = $grid;
     }
 

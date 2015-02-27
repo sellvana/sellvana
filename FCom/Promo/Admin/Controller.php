@@ -109,19 +109,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             }
         }
     }
-/*
-
-    /**
-     * @param $view
-     * @param null $model
-     * @param string $mode
-     * @param null $allowed
-     * @return $this
-     */
-    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
-    {
-        return parent::processFormTabs($view, $model, $mode, $allowed);
-    }
 
     /**
      * @param array $args
@@ -179,311 +166,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         #$this->processMediaPost($args['model'], $_POST);
     }
 
-    /**
-     * @param $model
-     * @param $data
-     * @return $this
-     */
-    public function processGroupsPost($model, $data)
-    {
-        $groups     = $model->groups();
-        $groupData  = [];
-        /** @var FCom_Promo_Model_Product[] $groupProds */
-        $groupProds = $this->FCom_Promo_Model_Product->orm()->where('promo_id', $model->id())->find_many();
-        foreach ($groupProds as $gp) {
-            $groupData[$gp->group_id][$gp->product_id] = 1;
-        }
-        if (!empty($data['_del_group_ids'])) {
-            $deleteGroups = explode(',', trim($data['_del_group_ids'], ','));
-            $this->FCom_Promo_Model_Group->delete_many([
-                  'id'       => $deleteGroups,
-                  'promo_id' => $model->id,
-                ]
-            );
-            foreach ($deleteGroups as $gId) {
-                unset($groups[$gId], $groupData[$gId]);
-            }
-        }
-        $gIdMap = [];
-        if (!empty($data['group'])) {
-            foreach ($data['group'] as $gId => $g) {
-                if ($gId < 0) {
-                    $group  = $this->FCom_Promo_Model_Group->create([
-                        'promo_id'   => $model->id,
-                        'group_type' => $g['group_type'],
-                        'group_name' => $g['group_name'],
-                    ])->save();
-                    $gIdMap[$gId]       = $group->id;
-                    $groups[$group->id] = $group;
-                } elseif (!empty($groups[$gId])) {
-                    $groups[$gId]->set('group_name', $g['group_name'])->save();
-                }
-
-                if (!empty($g['product_ids_add'])) {
-                    foreach (explode(',', $g['product_ids_add']) as $pId) {
-                        if (!$pId) {
-                            continue;
-                        }
-                        //list($gId, $pId) = explode(':', $gp);
-                        if (!empty($groupData[$gId][$pId])) {
-                            continue;
-                        }
-                        $this->FCom_Promo_Model_Product->create([
-                            'promo_id'   => $model->id,
-                            'group_id'   => $gId,
-                            'product_id' => $pId,
-                        ])->save();
-                        $groupData[$gId][$pId] = 1;
-                    }
-                }
-
-                if (!empty($g['product_ids_remove'])) {
-                    $pIds = [];
-                    foreach (explode(',', $g['product_ids_remove']) as $pId) {
-                        if (!empty($groupData[$gId][$pId])) {
-                            $pIds[] = $pId;
-                            unset($groupData[$gId][$pId]);
-                        }
-                    }
-                    if ($pIds) {
-                        $this->FCom_Promo_Model_Product->delete_many([
-                            'promo_id'   => $model->id,
-                            'group_id'   => $gId,
-                            'product_id' => $pIds,
-                        ]);
-                    }
-                }
-
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param $model
-     * @param $data
-     * @return $this
-     */
-    public function processMediaPost($model, $data)
-    {
-        $hlp = $this->FCom_Promo_Model_PromoMedia;
-        if (!empty($data['grid']['promo_attachments']['del'])) {
-            $hlp->delete_many([
-                'promo_id' => $model->id,
-                'file_id' => explode(',', $data['grid']['promo_attachments']['del']),
-            ]);
-        }
-        if (!empty($data['grid']['promo_attachments']['add'])) {
-            $oldAtt = $hlp->orm()->where('promo_id', $model->id)->find_many_assoc('file_id');
-            foreach (explode(',', $data['grid']['promo_attachments']['add']) as $attId) {
-                if ($attId && empty($oldAtt[$attId])) {
-                    $m = $hlp->create([
-                        'promo_id' => $model->id,
-                        'file_id' => $attId,
-                    ])->save();
-                }
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * @param $model
-     * @param $type
-     * @param null $groupId
-     * @return array
-     * @throws BException
-     */
-    public function productGridConfig($model, $type, $groupId = null)
-    {
-        static $groups = [], $groupData = [];
-
-        if ($model && $model->id && empty($groups[$model->id])) {
-            $groups[$model->id] = $this->FCom_Promo_Model_Promo->load($model->id)->groups();
-            $data = $this->FCom_Promo_Model_Product->orm()->table_alias('pp')
-                ->join('FCom_Catalog_Model_Product', ['p.id', '=', 'pp.product_id'], 'p')
-                ->select('pp.group_id')
-                ->select('p.id')->select('p.product_name')->select('p.product_sku')
-                ->where('promo_id', $model->id)->find_many();
-            foreach ($data as $p) {
-                $groupData[$p->group_id][] = $p->as_array();
-            }
-
-        }
-
-        $groupName = $model ? htmlspecialchars($groups[$model->id][$groupId]->group_name)
-                            : 'Group ' . abs($groupId);
-        $gridId    = 'promo_products_' . $type . '_' . $groupId;
-        $config    = parent::gridConfig();
-        unset($config['orm']);
-        $config['id']        = $gridId;
-        $config['data']      = !empty($groupData[$groupId]) ? $groupData[$groupId] : [];
-        $config['data_mode'] = 'local';
-        $config['columns']   = [
-            ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 40, 'hidden' => true],
-            ['name' => 'product_name', 'label' => 'Name', 'index' => 'product_name',
-                'width' => 450, 'addable' => true],
-            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'product_sku', 'width' => 70],
-        ];
-        $actions = [
-            'add'    => ['caption' => 'Add products'],
-            'delete' => ['caption' => 'Remove products'],
-        ];
-        $config['actions'] = $actions;
-        $config['filters'] = [
-            ['field' => 'product_name', 'type' => 'text']
-        ];
-        $config['grid_before_create'] = $gridId . '_register';
-
-//        $config = array(
-//            'grid' => array(
-//                'id'            => $gridId,
-//                'data'          => !empty($groupData[$groupId]) ? $groupData[$groupId] : array(),
-//                'datatype'      => 'local',
-//                'caption'       =>
-//                    "<input type='text' name='group[$groupId][group_name]' value='$groupName'>"
-//                    ."<input type='hidden' name='group[$groupId][group_type]' value='$type'>"
-//                    ."<input type='hidden' name='_group_id' value='$groupId'>"
-//                    .($type==='buy' && !empty($model) && $model->buy_group!=='one'?" <button type='button' class='sz2 st2 btn' onclick=\"return removeGroup(this);\">Remove</button>":''),
-//                'colModel'      => array(
-//                    array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>40, 'hidden'=>true),
-//                    array('name'=>'product_name', 'label'=>'Name', 'index'=>'product_name', 'width'=>250),
-//                    array('name'=>'product_sku', 'label'=>'Mfr Part #', 'index'=>'product_sku', 'width'=>70),
-//                ),
-//                'rowNum'        => 10,
-//                'sortname'      => 'p.product_name',
-//                'sortorder'     => 'asc',
-//                'autowidth'     => false,
-//                'multiselect'   => true,
-//                'multiselectWidth' => 30,
-//                'shrinkToFit' => true,
-//                'forceFit' => true,
-//            ),
-//            'navGrid' => array('add'=>false, 'edit'=>false, 'search'=>false, 'del'=>false, 'refresh'=>false),
-//            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-plus', 'title' => 'Add Products'),
-//            array('navButtonAdd', 'caption' => '', 'buttonicon'=>'ui-icon-trash', 'title' => 'Remove Products'),
-//            'js' => array(
-//                "if (typeof productLibrary !== 'undefined'){ productLibrary.initTargetGrid('#$gridId'); }",
-//            ),
-//        );
-
-
-        return [
-            'config'  => $config,
-            "group_name" => $groupName,
-            'js' => [
-                "if (typeof productLibrary !== 'undefined'){ productLibrary.initTargetGrid('#$gridId'); }",
-            ]
-        ];
-    }
-
-    /**
-     *
-     */
-    public function action_form_group()
-    {
-        $this->BResponse->nocache();
-        $r = $this->BRequest;
-        $this->view('jqgrid')->set('config', $this->productGridConfig(false, $r->get('type'), $r->get('group_id')));
-        $this->BLayout->setRootView('jqgrid');
-    }
-
-    /**
-     *
-     */
-    public function action_form_products()
-    {
-        $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')->select('p.*')
-            ->join('FCom_Promo_Model_Product', ['pp.product_id', '=', 'p.id'], 'pp')
-            ->select('pp.qty')
-            ->join('FCom_Promo_Model_Promo', ['promo.id', '=', 'pp.promo_id'], 'promo')
-        ;
-        $data = $this->FCom_Admin_View_Grid->processORM($orm, 'FCom_Promo_Admin_Controller::action_form_products');
-        $this->BResponse->json($data);
-    }
-
-    /**
-     * @param array $args
-     */
-    public function onAttachmentsGridConfig($args)
-    {
-        array_splice($args['config']['grid']['colModel'], -1, 0, [
-            ['name'          => 'promo_status',
-                'label'         => 'Status',
-                'width'         => 80,
-                'options'       => ['' => 'All', 'A' => 'Active', 'I' => 'Inactive'],
-                'editable'      => true,
-                'edittype'      => 'select',
-                'searchoptions' => ['defaultValue' => 'A']
-            ],
-        ]);
-    }
-
-    /**
-     * @param $args
-     */
-    public function onAttachmentsGridGetORM($args)
-    {
-        $args['orm']->join('FCom_Promo_Model_PromoMedia', ['pa.file_id', '=', 'a.id',  ], 'pa')
-            ->where_null('pa.promo_id')
-            ->select(['pa.promo_status']);
-    }
-
-    /**
-     * @param $args
-     */
-    public function onAttachmentsGridUpload($args)
-    {
-        $hlp = $this->FCom_Promo_Model_PromoMedia;
-        $id = $args['model']->id;
-        if (!$hlp->loadWhere(['promo_id' => null, 'file_id' => $id])) {
-            $hlp->create(['file_id' => $id])->save();
-        }
-    }
-
-    /**
-     * @param $args
-     * @throws BException
-     */
-    public function onAttachmentsGridEdit($args)
-    {
-        $r = $this->BRequest;
-        $this->FCom_Promo_Model_PromoMedia
-            ->loadWhere(['promo_id' => null, 'file_id' => $args['model']->id])
-            ->set([
-                'promo_status' => $r->post('promo_status'),
-            ])
-            ->save();
-    }
-
-    /**
-     * @param $model
-     * @return array
-     */
-    public function attachmentGridConfig($model)
-    {
-        return [
-            'grid' => [
-                'id' => 'promo_attachments',
-                'caption' => 'Promotion Attachments',
-                'datatype' => 'local',
-                'data' => $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->select('a.id')->select('a.file_name')->find_many()),
-                'colModel' => [
-                    ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
-                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
-                ],
-                'multiselect' => true,
-                'multiselectWidth' => 30,
-                'shrinkToFit' => true,
-                'forceFit' => true,
-            ],
-            'navGrid' => ['add' => false, 'edit' => false, 'search' => false, 'del' => false, 'refresh' => false],
-            ['navButtonAdd', 'caption' => 'Add', 'buttonicon' => 'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor' => 'pointer'],
-            ['navButtonAdd', 'caption' => 'Remove', 'buttonicon' => 'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor' => 'pointer'],
-        ];
-    }
     public function action_coupons_grid_data__POST()
     {
         $this->_processGridDataPost('FCom_Promo_Model_PromoCoupon');
@@ -837,5 +519,117 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $this->message($e->getMessage(), 'error');
             return false;
         }
+    }
+
+    /***************** NOT USED RIGHT NOW ******************/
+
+
+    /**
+     * @param $model
+     * @param $data
+     * @return $this
+     */
+    public function processMediaPost($model, $data)
+    {
+        $hlp = $this->FCom_Promo_Model_PromoMedia;
+        if (!empty($data['grid']['promo_attachments']['del'])) {
+            $hlp->delete_many([
+                'promo_id' => $model->id,
+                'file_id' => explode(',', $data['grid']['promo_attachments']['del']),
+            ]);
+        }
+        if (!empty($data['grid']['promo_attachments']['add'])) {
+            $oldAtt = $hlp->orm()->where('promo_id', $model->id)->find_many_assoc('file_id');
+            foreach (explode(',', $data['grid']['promo_attachments']['add']) as $attId) {
+                if ($attId && empty($oldAtt[$attId])) {
+                    $m = $hlp->create([
+                        'promo_id' => $model->id,
+                        'file_id' => $attId,
+                    ])->save();
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param array $args
+     */
+    public function onAttachmentsGridConfig($args)
+    {
+        array_splice($args['config']['grid']['colModel'], -1, 0, [
+            ['name'          => 'promo_status',
+                'label'         => 'Status',
+                'width'         => 80,
+                'options'       => ['' => 'All', 'A' => 'Active', 'I' => 'Inactive'],
+                'editable'      => true,
+                'edittype'      => 'select',
+                'searchoptions' => ['defaultValue' => 'A']
+            ],
+        ]);
+    }
+
+    /**
+     * @param $args
+     */
+    public function onAttachmentsGridGetORM($args)
+    {
+        $args['orm']->join('FCom_Promo_Model_PromoMedia', ['pa.file_id', '=', 'a.id',  ], 'pa')
+            ->where_null('pa.promo_id')
+            ->select(['pa.promo_status']);
+    }
+
+    /**
+     * @param $args
+     */
+    public function onAttachmentsGridUpload($args)
+    {
+        $hlp = $this->FCom_Promo_Model_PromoMedia;
+        $id = $args['model']->id;
+        if (!$hlp->loadWhere(['promo_id' => null, 'file_id' => $id])) {
+            $hlp->create(['file_id' => $id])->save();
+        }
+    }
+
+    /**
+     * @param $args
+     * @throws BException
+     */
+    public function onAttachmentsGridEdit($args)
+    {
+        $r = $this->BRequest;
+        $this->FCom_Promo_Model_PromoMedia
+            ->loadWhere(['promo_id' => null, 'file_id' => $args['model']->id])
+            ->set([
+                'promo_status' => $r->post('promo_status'),
+            ])
+            ->save();
+    }
+
+    /**
+     * @param $model
+     * @return array
+     */
+    public function attachmentGridConfig($model)
+    {
+        return [
+            'grid' => [
+                'id' => 'promo_attachments',
+                'caption' => 'Promotion Attachments',
+                'datatype' => 'local',
+                'data' => $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->select('a.id')->select('a.file_name')->find_many()),
+                'colModel' => [
+                    ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
+                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
+                ],
+                'multiselect' => true,
+                'multiselectWidth' => 30,
+                'shrinkToFit' => true,
+                'forceFit' => true,
+            ],
+            'navGrid' => ['add' => false, 'edit' => false, 'search' => false, 'del' => false, 'refresh' => false],
+            ['navButtonAdd', 'caption' => 'Add', 'buttonicon' => 'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor' => 'pointer'],
+            ['navButtonAdd', 'caption' => 'Remove', 'buttonicon' => 'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor' => 'pointer'],
+        ];
     }
 }

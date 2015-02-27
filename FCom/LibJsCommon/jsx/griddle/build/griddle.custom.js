@@ -7,8 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['underscore', 'react', 'jsx!griddle.gridNoData', 'jsx!griddle.customFormatContainer', 'jsx!griddle.customPaginationContainer'],
-    function(_, React, GridBody, GridFilter, GridPagination, GridSettings, GridTitle, GridNoData, CustomFormatContainer, CustomPaginationContainer) {
+define(['underscore', 'react', 'griddle.gridNoData'], function(_, React, GridBody, GridNoData) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
@@ -21,7 +20,7 @@ var CustomFormatContainer = require('./customFormatContainer.jsx');
 var CustomPaginationContainer = require('./customPaginationContainer.jsx');
 var _ = require('underscore');
 */
-var Griddle = React.createClass({
+var Griddle = React.createClass({displayName: "Griddle",
     getDefaultProps: function() {
         return{
             "columns": [],
@@ -407,17 +406,17 @@ var Griddle = React.createClass({
         var filter = this.props.showFilter ?
             (
                 this.props.useCustomFilter
-                ? <this.props.customFilter changeFilter={this.setFilter} customFilter={this.props.customFilter} getConfig={this.getConfig} />
-                : <GridFilter changeFilter={this.setFilter} placeholderText={this.props.filterPlaceholderText} />
+                ? React.createElement(this.props.customFilter, {changeFilter: this.setFilter, customFilter: this.props.customFilter, getConfig: this.getConfig})
+                : React.createElement(GridFilter, {changeFilter: this.setFilter, placeholderText: this.props.filterPlaceholderText})
             ) : "";
         var settings = this.props.showSettings ?
         (
             this.props.useCustomSettings
-            ? <this.props.customSettings columnMetadata={this.props.columnMetadata} selectedColumns={this.getColumns} setColumns={this.setColumns}
-                getConfig={this.getConfig} searchWithinResults={this.searchWithinResults} getSelectedRows={this.getSelectedRows} refresh={this.refresh}
-                setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState}
-                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} getCurrentGrid={this.getCurrentGrid} />
-            : <span className="settings" onClick={this.toggleColumnChooser}>{this.props.settingsText} <i className="glyphicon glyphicon-cog"></i></span>
+            ? React.createElement(this.props.customSettings, {columnMetadata: this.props.columnMetadata, selectedColumns: this.getColumns, setColumns: this.setColumns, 
+                getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh, 
+                setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState, 
+                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, getCurrentGrid: this.getCurrentGrid})
+            : React.createElement("span", {className: "settings", onClick: this.toggleColumnChooser}, this.props.settingsText, " ", React.createElement("i", {className: "glyphicon glyphicon-cog"}))
         ) : "";
 
         var resultContent = "";
@@ -439,25 +438,25 @@ var Griddle = React.createClass({
             //clean this stuff up so it's not if else all over the place.
             //console.log('this.props.columnMetadata', this.props.columnMetadata);
             resultContent = this.props.useCustomFormat
-                ? (<CustomFormatContainer data= {data} columns={cols} metadataColumns={meta} className={this.props.customFormatClassName} customFormat={this.props.customFormat}/>)
+                ? (React.createElement(CustomFormatContainer, {data: data, columns: cols, metadataColumns: meta, className: this.props.customFormatClassName, customFormat: this.props.customFormat}))
                 : (
                     this.props.useCustomGrid
-                    ? (<this.props.customGrid columnMetadata={this.props.columnMetadata} data={data} originalData={results} columns={cols} metadataColumns={meta}
-                        className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
-                        getConfig={this.getConfig} refresh={this.refresh} setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
-                        getSelectedRows={this.getSelectedRows} addSelectedRows={this.addSelectedRows} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
-                    />)
-                    : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
+                    ? (React.createElement(this.props.customGrid, {columnMetadata: this.props.columnMetadata, data: data, originalData: results, columns: cols, metadataColumns: meta, 
+                        className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, 
+                        getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, 
+                        getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows}
+                    ))
+                    : (React.createElement(GridBody, {columnMetadata: this.props.columnMetadata, data: data, columns: cols, metadataColumns: meta, className: this.props.tableClassName}))
                 );
 
             pagingContent = this.props.useCustomPager && this.props.customPager
-                ? (<this.props.customPager next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage}
-                    setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText} totalResults={this.state.totalResults}
-                    getConfig={this.getConfig} setPageSize={this.setPageSize} resultsPerPage={this.props.resultsPerPage} getHeaderSelection={this.getHeaderSelection} />)
-                : (<GridPagination next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText}/>);
+                ? (React.createElement(this.props.customPager, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page, maxPage: this.state.maxPage, 
+                    setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText, totalResults: this.state.totalResults, 
+                    getConfig: this.getConfig, setPageSize: this.setPageSize, resultsPerPage: this.props.resultsPerPage, getHeaderSelection: this.getHeaderSelection}))
+                : (React.createElement(GridPagination, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page, maxPage: this.state.maxPage, setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText}));
         } else {
             // Otherwise, display the loading content.
-            resultContent = (<div className="loading img-responsive center-block"></div>);
+            resultContent = (React.createElement("div", {className: "loading img-responsive center-block"}));
         }
 
 
@@ -485,24 +484,24 @@ var Griddle = React.createClass({
             var rowTopClassName = "f-grid-top f-grid-toolbar clearfix " + this.getConfig('id');
             var rowBottomClassName = "row f-grid-bottom f-grid-toolbar clearfix " + this.getConfig('id');
             topSection = (
-                <div>
-                    <div className={rowTopClassName}>
-                        {filter}
-                    </div>
-                    <div className={rowBottomClassName}>
-                        {settings}
-                        {that.props.showPager ? pagingContent : ""}
-                    </div>
-                </div>
+                React.createElement("div", null, 
+                    React.createElement("div", {className: rowTopClassName}, 
+                        filter
+                    ), 
+                    React.createElement("div", {className: rowBottomClassName}, 
+                        settings, 
+                        that.props.showPager ? pagingContent : ""
+                    )
+                )
             );
         }
 
         var columnSelector = this.state.showColumnChooser && !this.props.useCustomSettings ? (
-            <div className="row">
-                <div className="col-md-12">
-                    <GridSettings columns={keys} selectedColumns={cols} setColumns={this.setColumns} settingsText={this.props.settingsText} maxRowsText={this.props.maxRowsText}  setPageSize={this.setPageSize} resultsPerPage={this.props.resultsPerPage} allowToggleCustom={this.props.allowToggleCustom} toggleCustomFormat={this.toggleCustomFormat} useCustomFormat={this.props.useCustomFormat} enableCustomFormatText={this.props.enableCustomFormatText} columnMetadata={this.props.columnMetadata} />
-                </div>
-            </div>
+            React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-md-12"}, 
+                    React.createElement(GridSettings, {columns: keys, selectedColumns: cols, setColumns: this.setColumns, settingsText: this.props.settingsText, maxRowsText: this.props.maxRowsText, setPageSize: this.setPageSize, resultsPerPage: this.props.resultsPerPage, allowToggleCustom: this.props.allowToggleCustom, toggleCustomFormat: this.toggleCustomFormat, useCustomFormat: this.props.useCustomFormat, enableCustomFormatText: this.props.enableCustomFormatText, columnMetadata: this.props.columnMetadata})
+                )
+            )
         ) : "";
 
         var gridClassName = this.props.gridClassName.length > 0 ? "griddle " + this.props.gridClassName : "griddle";
@@ -511,13 +510,13 @@ var Griddle = React.createClass({
 
 
         var gridBody = this.props.useCustomFormat || this.props.customGrid
-            ?       <div className="scrollable-area">{resultContent}</div>
-            :       (<div className="grid-body">
-                        {this.props.showTableHeading ? <table className={headerTableClassName}>
-                            <GridTitle columns={cols} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending} columnMetadata={this.props.columnMetadata}/>
-                        </table> : ""}
-                        {resultContent}
-                        </div>);
+            ?       React.createElement("div", {className: "scrollable-area"}, resultContent)
+            :       (React.createElement("div", {className: "grid-body"}, 
+                        this.props.showTableHeading ? React.createElement("table", {className: headerTableClassName}, 
+                            React.createElement(GridTitle, {columns: cols, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, columnMetadata: this.props.columnMetadata})
+                        ) : "", 
+                        resultContent
+                        ));
 
         if (typeof this.state.results === 'undefined' || this.state.results.length == 0) {
             /*if (this.props.customNoData != null) {
@@ -544,11 +543,11 @@ var Griddle = React.createClass({
             </div>
         );*/
         return (
-            <div className={gridClassName}>
-                {topSection}
-                {columnSelector}
-                {gridBody}
-            </div>
+            React.createElement("div", {className: gridClassName}, 
+                topSection, 
+                columnSelector, 
+                gridBody
+            )
         );
 
     },

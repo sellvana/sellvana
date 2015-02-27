@@ -8,4 +8,5 @@
 
 {% set m = THIS.get('model') %}
 {% set hlp = APP.instance('FCom_ProductReviews_Admin_Controller') %}
-{{ THIS.view('core/backbonegrid').set('grid', hlp.customerReviewsGridConfig(m)) | raw }}
+{#{{ THIS.view('core/backbonegrid').set('grid', hlp.customerReviewsGridConfig(m)) | raw }}#}
+{{ THIS.view('core/griddle').set('grid', hlp.customerReviewsGridConfig(m)) | raw }}

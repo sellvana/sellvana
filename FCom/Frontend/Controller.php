@@ -4,6 +4,7 @@ class FCom_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_index()
     {
+        $this->BApp->set('current_page_type', 'home');
         $this->layout('/');
     }
 
