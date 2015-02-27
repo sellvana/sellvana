@@ -7,8 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['underscore', 'react', 'griddle.gridNoData', 'jsx!griddle.customFormatContainer', 'jsx!griddle.customPaginationContainer'],
-    function(_, React, GridBody, GridFilter, GridPagination, GridSettings, GridTitle, GridNoData, CustomFormatContainer, CustomPaginationContainer) {
+define(['underscore', 'react', 'griddle.gridNoData'], function(_, React, GridBody, GridNoData) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
