@@ -3,7 +3,7 @@
 /**
  * FCom GridBody Component
  */
-define(['react', 'jsx!griddle.fcomRow', 'jsx!fcom.components', 'jquery-ui'], function (React, FComRow, Components) {
+define(['react', 'jsx!griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (React, FComRow, Components) {
 
     /*
      var React = require('react');

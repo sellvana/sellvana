@@ -8,7 +8,8 @@
 {% set labelClass = "col-md-3" %}
 {% set promoDisplayData = m.getPromoDisplayData(true) %}
 {% set data = UTIL.fromJson(validator.fieldValue("data_serialized")) %}
-{% set displayOptions = CONFIG.get("modules/FCom_Promo/display") %}
+{% set displayPages = APP.instance('FCom_Promo_Model_PromoDisplay').getDisplayPages() %}
+{% set displayPageLocations = APP.instance('FCom_Promo_Model_PromoDisplay').getDisplayPageLocations() %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 {% if MODULES.isLoaded('FCom_CustomerGroups') %}
@@ -83,7 +84,7 @@
         {% set base_url = APP.href('promo/') %}
     </div>
     <script>
-        require(['jquery', 'jsx!fcom.promo.details'], function ($, PromoDetails) {
+        require(['jquery', 'fcom.promo.details'], function ($, PromoDetails) {
             var promoDisplayOptions = {
                 container: $('#add_promo_display_details')[0],
                 addDisplayBtn: $('#add_promo_display_btn'),
@@ -91,13 +92,13 @@
                 base_url: "{{ base_url }}",
                 customerGroups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'false' }}
             };
-            var locationPages = {{ displayOptions.locationPages ? UTIL.toJson(displayOptions.locationPages)|raw: 'false' }};
-            var locationPageOptions = {{ displayOptions.locationPageOptions ? UTIL.toJson(displayOptions.locationPageOptions)|raw: 'false' }};
-            if(locationPages) {
-                promoDisplayOptions['locationPages'] = locationPages;
+            var displayPages = {{ displayPages ? UTIL.toJson(displayPages)|raw: 'false' }};
+            var displayPageLocations = {{ displayPageLocations ? UTIL.toJson(displayPageLocations)|raw: 'false' }};
+            if (displayPages) {
+                promoDisplayOptions['locationPages'] = displayPages;
             }
-            if(locationPageOptions) {
-                promoDisplayOptions['locationPageOptions'] = locationPageOptions;
+            if (displayPageLocations) {
+                promoDisplayOptions['locationPageOptions'] = displayPageLocations;
             }
 
             PromoDetails.initAddPromoDisplayApp(promoDisplayOptions);

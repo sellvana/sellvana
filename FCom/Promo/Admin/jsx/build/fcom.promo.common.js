@@ -1,40 +1,40 @@
 define(['react', 'fcom.components'], function (React, Components) {
     var Common = {
-        DelBtn: React.createClass({
+        DelBtn: React.createClass({displayName: "DelBtn",
             render: function () {
                 return (
-                    <Components.Button className="btn-link btn-delete" onClick={this.props.onClick}
-                        type="button" style={ {paddingRight: 10, paddingLeft: 10} }>
-                        <span className="icon-trash"></span>
-                    </Components.Button>
+                    React.createElement(Components.Button, {className: "btn-link btn-delete", onClick: this.props.onClick, 
+                        type: "button", style:  {paddingRight: 10, paddingLeft: 10} }, 
+                        React.createElement("span", {className: "icon-trash"})
+                    )
                 );
             }
         }),
-        Row: React.createClass({
+        Row: React.createClass({displayName: "Row",
             render: function () {
                 var cls = "form-group condition";
                 if (this.props.rowClass) {
                     cls += " " + this.props.rowClass;
                 }
-                return (<div className={cls}>
-                    <div className="col-md-3">
-                        <Components.ControlLabel label_class="pull-right">{this.props.label}
-                            <Common.DelBtn onClick={this.props.onDelete}/>
-                        </Components.ControlLabel>
-                    </div>
-                {this.props.children}
-                </div>);
+                return (React.createElement("div", {className: cls}, 
+                    React.createElement("div", {className: "col-md-3"}, 
+                        React.createElement(Components.ControlLabel, {label_class: "pull-right"}, this.props.label, 
+                            React.createElement(Common.DelBtn, {onClick: this.props.onDelete})
+                        )
+                    ), 
+                this.props.children
+                ));
             }
         }),
-        Compare: React.createClass({
+        Compare: React.createClass({displayName: "Compare",
             render: function () {
                 return (
-                    <select className="to-select2" onChange={this.props.onChange} id={this.props.id}
-                        defaultValue={this.props.value} disabled={this.props.disabled} style={this.props.style}>
-                    {this.props.opts.map(function(type){
-                        return <option value={type.id} key={type.id}>{type.label}</option>
-                    })}
-                    </select>
+                    React.createElement("select", {className: "to-select2", onChange: this.props.onChange, id: this.props.id, 
+                        defaultValue: this.props.value, disabled: this.props.disabled, style: this.props.style}, 
+                    this.props.opts.map(function(type){
+                        return React.createElement("option", {value: type.id, key: type.id}, type.label)
+                    })
+                    )
                 );
             },
             getDefaultProps: function () {
@@ -53,12 +53,12 @@ define(['react', 'fcom.components'], function (React, Components) {
                 $(this.getDOMNode()).select2().on('change', this.props.onChange);
             }
         }),
-        AddFieldButton: React.createClass({
+        AddFieldButton: React.createClass({displayName: "AddFieldButton",
             render: function () {
                 return (
-                    <Components.Button onClick={this.props.onClick} className="btn-link pull-left" type="button" style={ {paddingRight:10, paddingLeft:10} }>
-                        <span aria-hidden="true" className="glyphicon glyphicon glyphicon-plus-sign"></span>
-                    </Components.Button>
+                    React.createElement(Components.Button, {onClick: this.props.onClick, className: "btn-link pull-left", type: "button", style:  {paddingRight:10, paddingLeft:10} }, 
+                        React.createElement("span", {"aria-hidden": "true", className: "glyphicon glyphicon glyphicon-plus-sign"})
+                    )
                 );
             }
         }),

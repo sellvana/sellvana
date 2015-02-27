@@ -4,7 +4,7 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
         $.get(url).done(callback);
     }
 
-    var CentralPageApp = React.createClass({
+    var CentralPageApp = React.createClass({displayName: "CentralPageApp",
         getCmsOptions: function () {
             if (!cmsBlocks) {
                 var self = this;
@@ -12,7 +12,7 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                 getCmsBlocks(url, function (result) {
                     if (result.items) {
                         cmsBlocks = result.items.map(function (item) {
-                            return <option key={item.id} value={item.text}>{item.text}</option>
+                            return React.createElement("option", {key: item.id, value: item.text}, item.text)
                         });
                         //cmsBlocks.unshift(<option key="0" value="">{Locale._("Select block handle")}</option>);
                         self.forceUpdate();
@@ -30,18 +30,18 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                     value = this.props.values[this.props.cmsOptions.id];
                 }
                 types =
-                    <div>
-                        <Components.ControlLabel input_id={this.props.cmsOptions.id}
-                            label_class={this.props.labelClass}>
-                            {this.props.cmsOptions.label}
-                            <Components.HelpIcon id={"help-" + this.props.cmsOptions.id}
-                                content={this.props.cmsOptions.help}/>
-                        </Components.ControlLabel>
-                        <div className="col-md-5">
-                            <select ref={this.props.cmsOptions.id} id={this.props.cmsOptions.id}
-                                defaultValue={value} className="form-control">{cmsOptions}</select>
-                        </div>
-                    </div>
+                    React.createElement("div", null, 
+                        React.createElement(Components.ControlLabel, {input_id: this.props.cmsOptions.id, 
+                            label_class: this.props.labelClass}, 
+                            this.props.cmsOptions.label, 
+                            React.createElement(Components.HelpIcon, {id: "help-" + this.props.cmsOptions.id, 
+                                content: this.props.cmsOptions.help})
+                        ), 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("select", {ref: this.props.cmsOptions.id, id: this.props.cmsOptions.id, 
+                                defaultValue: value, className: "form-control"}, cmsOptions)
+                        )
+                    )
             } else {
                 var titleVal, applicationVal, conditionsVal, descriptionVal;
                 if (this.props.values) {
@@ -51,62 +51,62 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                     descriptionVal = this.props.values['text_options'][this.props.textOptions.descriptionId];
                 }
                 types = [
-                    <div className="form-group" key={this.props.textOptions.titleId}>
-                        <Components.ControlLabel input_id={this.props.textOptions.titleId}
-                            label_class={this.props.labelClass}>
-                            {this.props.textOptions.titleLabel}
-                            <Components.HelpIcon id={"help-" + this.props.textOptions.titleId}
-                                content={this.props.textOptions.titleHelp}/>
-                        </Components.ControlLabel>
-                        <div className="col-md-5">
-                            <input id={this.props.textOptions.titleId} ref={this.props.textOptions.titleId}
-                                placeholder={this.props.textOptions.titlePlaceholder} className="form-control"
-                                onChange={this.props.onTextChange} defaultValue={titleVal}/>
-                        </div>
-                    </div>,
-                    <div className="form-group" key={this.props.textOptions.applicationId}>
-                        <Components.ControlLabel input_id={this.props.textOptions.applicationId}
-                            label_class={this.props.labelClass}>
-                            {this.props.textOptions.applicationLabel}
-                            <Components.HelpIcon id={"help-" + this.props.textOptions.applicationId}
-                                content={this.props.textOptions.applicationHelp}/>
-                        </Components.ControlLabel>
-                        <div className="col-md-5">
-                            <input id={this.props.textOptions.applicationId} ref={this.props.textOptions.applicationId}
-                                placeholder={this.props.textOptions.applicationPlaceholder} className="form-control"
-                                onChange={this.props.onTextChange} defaultValue={applicationVal}/>
-                        </div>
-                    </div>,
-                    <div className="form-group" key={this.props.textOptions.conditionsId}>
-                        <Components.ControlLabel input_id={this.props.textOptions.conditionsId}
-                            label_class={this.props.labelClass}>
-                            {this.props.textOptions.conditionsLabel}
-                            <Components.HelpIcon id={"help-" + this.props.textOptions.conditionsId}
-                                content={this.props.textOptions.conditionsHelp}/>
-                        </Components.ControlLabel>
-                        <div className="col-md-5">
-                            <input id={this.props.textOptions.conditionsId} ref={this.props.textOptions.conditionsId}
-                                placeholder={this.props.textOptions.conditionsPlaceholder} className="form-control"
-                                onChange={this.props.onTextChange} defaultValue={conditionsVal}/>
-                        </div>
-                    </div>,
-                    <div className="form-group" key={this.props.textOptions.descriptionId}>
-                        <Components.ControlLabel input_id={this.props.textOptions.descriptionId}
-                            label_class={this.props.labelClass}>
-                            {this.props.textOptions.descriptionLabel}
-                            <Components.HelpIcon id={"help-" + this.props.textOptions.descriptionId}
-                                content={this.props.textOptions.descriptionHelp}/>
-                        </Components.ControlLabel>
-                        <div className="col-md-5">
-                            <input id={this.props.textOptions.descriptionId} ref={this.props.textOptions.descriptionId}
-                                placeholder={this.props.textOptions.descriptionPlaceholder} className="form-control"
-                                onChange={this.props.onTextChange} defaultValue={descriptionVal}/>
-                        </div>
-                    </div>
+                    React.createElement("div", {className: "form-group", key: this.props.textOptions.titleId}, 
+                        React.createElement(Components.ControlLabel, {input_id: this.props.textOptions.titleId, 
+                            label_class: this.props.labelClass}, 
+                            this.props.textOptions.titleLabel, 
+                            React.createElement(Components.HelpIcon, {id: "help-" + this.props.textOptions.titleId, 
+                                content: this.props.textOptions.titleHelp})
+                        ), 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("input", {id: this.props.textOptions.titleId, ref: this.props.textOptions.titleId, 
+                                placeholder: this.props.textOptions.titlePlaceholder, className: "form-control", 
+                                onChange: this.props.onTextChange, defaultValue: titleVal})
+                        )
+                    ),
+                    React.createElement("div", {className: "form-group", key: this.props.textOptions.applicationId}, 
+                        React.createElement(Components.ControlLabel, {input_id: this.props.textOptions.applicationId, 
+                            label_class: this.props.labelClass}, 
+                            this.props.textOptions.applicationLabel, 
+                            React.createElement(Components.HelpIcon, {id: "help-" + this.props.textOptions.applicationId, 
+                                content: this.props.textOptions.applicationHelp})
+                        ), 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("input", {id: this.props.textOptions.applicationId, ref: this.props.textOptions.applicationId, 
+                                placeholder: this.props.textOptions.applicationPlaceholder, className: "form-control", 
+                                onChange: this.props.onTextChange, defaultValue: applicationVal})
+                        )
+                    ),
+                    React.createElement("div", {className: "form-group", key: this.props.textOptions.conditionsId}, 
+                        React.createElement(Components.ControlLabel, {input_id: this.props.textOptions.conditionsId, 
+                            label_class: this.props.labelClass}, 
+                            this.props.textOptions.conditionsLabel, 
+                            React.createElement(Components.HelpIcon, {id: "help-" + this.props.textOptions.conditionsId, 
+                                content: this.props.textOptions.conditionsHelp})
+                        ), 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("input", {id: this.props.textOptions.conditionsId, ref: this.props.textOptions.conditionsId, 
+                                placeholder: this.props.textOptions.conditionsPlaceholder, className: "form-control", 
+                                onChange: this.props.onTextChange, defaultValue: conditionsVal})
+                        )
+                    ),
+                    React.createElement("div", {className: "form-group", key: this.props.textOptions.descriptionId}, 
+                        React.createElement(Components.ControlLabel, {input_id: this.props.textOptions.descriptionId, 
+                            label_class: this.props.labelClass}, 
+                            this.props.textOptions.descriptionLabel, 
+                            React.createElement(Components.HelpIcon, {id: "help-" + this.props.textOptions.descriptionId, 
+                                content: this.props.textOptions.descriptionHelp})
+                        ), 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("input", {id: this.props.textOptions.descriptionId, ref: this.props.textOptions.descriptionId, 
+                                placeholder: this.props.textOptions.descriptionPlaceholder, className: "form-control", 
+                                onChange: this.props.onTextChange, defaultValue: descriptionVal})
+                        )
+                    )
                 ]
             }
             return (
-                <div className="col-md-offset-1">{types}</div>
+                React.createElement("div", {className: "col-md-offset-1"}, types)
             );
         },
         getDefaultProps: function () {
@@ -158,19 +158,19 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
         }
     });
 
-    var AddPromoDisplayApp = React.createClass({
+    var AddPromoDisplayApp = React.createClass({displayName: "AddPromoDisplayApp",
         render: function () {
             var other = _.omit(this.props, ['data']);
             return (
-                <div id="add-promo-display">
-                    {this.props.data.map(function (item) {
+                React.createElement("div", {id: "add-promo-display"}, 
+                    this.props.data.map(function (item) {
                         if (item['data_serialized']) {
                             $.extend(item, JSON.parse(item['data_serialized']));
                             delete item['data_serialized'];
                         }
-                        return <AddPromoDisplayItem {...other} data={item} key={item.id} id={"add-promo-item" + item.id}/>
-                    }.bind(this))}
-                </div>
+                        return React.createElement(AddPromoDisplayItem, React.__spread({},  other, {data: item, key: item.id, id: "add-promo-item" + item.id}))
+                    }.bind(this))
+                )
             );
         },
         getDefaultProps: function () {
@@ -178,12 +178,12 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
         }
     });
 
-    var AddPromoDisplayItem = React.createClass({
+    var AddPromoDisplayItem = React.createClass({displayName: "AddPromoDisplayItem",
         render: function () {
             var contentValue, content, conditions = [];
 
             if(this.state.delete) {
-                content = <input key={'delete' + this.props.data.id} type="hidden" name={"display[" + this.props.data.id + "][delete]"} value="1"/>
+                content = React.createElement("input", {key: 'delete' + this.props.data.id, type: "hidden", name: "display[" + this.props.data.id + "][delete]", value: "1"})
             } else {
                 if (this.props.data.content_type == 'cms_block') {
                     contentValue = this.props.data.cms_block_handle;
@@ -197,100 +197,100 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                     conditions = this.props.data.conditions.map(function (condition, idx) {
                         //console.log(condition);
                         for (var c in condition) {
-                            return <AddPromoDisplayCondition key={c + '-' + idx + '-' + this.props.data.id} customerGroups={this.props.customerGroups}
-                                data_id={this.props.data.id} type={c} value={condition[c]} onRemove={this.props.removeCondition}/>;
+                            return React.createElement(AddPromoDisplayCondition, {key: c + '-' + idx + '-' + this.props.data.id, customerGroups: this.props.customerGroups, 
+                                data_id: this.props.data.id, type: c, value: condition[c], onRemove: this.props.removeCondition});
                         }
                     }.bind(this));
                 }
                 content =
-                    <div key={'add-promo-' + this.props.data.id} className="add-promo-display-item" style={{position: "relative"}}>
-                        <a href="#" className="btn-remove" id={"remove_promo_display_btn_" + this.props.data.id}>
-                            <span className="icon-remove-sign"></span>
-                        </a>
-                        <div className="form-group">
-                            <Components.ControlLabel input_id={"display-page_type-" + this.props.data.id}
-                                label_class={this.props.labelClass}>
-                                {this.props.typeLabel}
-                                <Components.HelpIcon id={"display-page_type-help-" + this.props.data.id}
-                                    content={this.props.typeHelp}/>
-                            </Components.ControlLabel>
-                            <div style={divStyle}>
-                                <select id={"display-page_type-" + this.props.data.id}
-                                    ref={"display-page_type-" + this.props.data.id} className="form-control"
-                                    name={"display[" + this.props.data.id + "][page_type]"}
-                                    defaultValue={this.props.data.page_type}>
-                                    {
+                    React.createElement("div", {key: 'add-promo-' + this.props.data.id, className: "add-promo-display-item", style: {position: "relative"}}, 
+                        React.createElement("a", {href: "#", className: "btn-remove", id: "remove_promo_display_btn_" + this.props.data.id}, 
+                            React.createElement("span", {className: "icon-remove-sign"})
+                        ), 
+                        React.createElement("div", {className: "form-group"}, 
+                            React.createElement(Components.ControlLabel, {input_id: "display-page_type-" + this.props.data.id, 
+                                label_class: this.props.labelClass}, 
+                                this.props.typeLabel, 
+                                React.createElement(Components.HelpIcon, {id: "display-page_type-help-" + this.props.data.id, 
+                                    content: this.props.typeHelp})
+                            ), 
+                            React.createElement("div", {style: divStyle}, 
+                                React.createElement("select", {id: "display-page_type-" + this.props.data.id, 
+                                    ref: "display-page_type-" + this.props.data.id, className: "form-control", 
+                                    name: "display[" + this.props.data.id + "][page_type]", 
+                                    defaultValue: this.props.data.page_type}, 
+                                    
                                         _.map(this.props.locationPages, function (label, val) {
-                                            return <option value={val} key={val}>{label}</option>
+                                            return React.createElement("option", {value: val, key: val}, label)
                                         })
-                                    }
-                                </select>
-                            </div>
-                            <div style={divStyle}>
-                                <select id={"display-page_location-" + this.props.data.id} className="form-control"
-                                    name={"display[" + this.props.data.id + "][page_location]"}
-                                    defaultValue={this.props.data.page_location}>
-                                    {
+                                    
+                                )
+                            ), 
+                            React.createElement("div", {style: divStyle}, 
+                                React.createElement("select", {id: "display-page_location-" + this.props.data.id, className: "form-control", 
+                                    name: "display[" + this.props.data.id + "][page_location]", 
+                                    defaultValue: this.props.data.page_location}, 
+                                    
                                         _.map(this.props.locationPageOptions[this.state.page_type ? this.state.page_type : this.props.data.page_type], function (label, val) {
-                                            return <option value={val} key={val}>{label}</option>
+                                            return React.createElement("option", {value: val, key: val}, label)
                                         })
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <Components.ControlLabel input_id={"display-content_type-" + this.props.data.id}
-                                label_class={this.props.labelClass}>
-                                {this.props.contentTypeLabel}
-                                <Components.HelpIcon id={"display-content_type-help-" + this.props.data.id}
-                                    content={this.props.contentTypeHelp}/>
-                            </Components.ControlLabel>
-                            <div style={divStyle}>
-                                <select id={"display-content_type-" + this.props.data.id}
-                                    ref={"display-content_type-" + this.props.data.id} className="form-control"
-                                    name={"display[" + this.props.data.id + "][content_type]"}
-                                    defaultValue={this.props.data.content_type}>
-                                    <option value="html">{Locale._("Text (Html)")}</option>
-                                    <option value="md">{Locale._("Text (Markdown)")}</option>
-                                    <option value="cms_block">{Locale._("CMS Block")}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <AddPromoDisplayItemContent id={"display-content-" + this.props.data.id} ref={"display-content-" + this.props.data.id}
-                                data_id={this.props.data.id} value={contentValue} base_url={this.props.base_url} cmsBlocksUrl={this.props.cmsBlocksUrl}
-                                type={this.state.content_type ? this.state.content_type : this.props.data.content_type}/>
-                        </div>
-                        <div className="form-group">
-                            <Components.ControlLabel input_id={"display-match-" + this.props.data.id}
-                                label_class={this.props.labelClass}>
-                                {this.props.conditionsLabel}
-                                <Components.HelpIcon id={"display-match-help-" + this.props.data.id}
-                                    content={this.props.conditionsHelp}/>
-                            </Components.ControlLabel>
-                            <div style={divStyle}>
-                                <select id={"display-match-" + this.props.data.id}
-                                    ref={"display-match-" + this.props.data.id} className="form-control"
-                                    name={"display[" + this.props.data.id + "][data][match]"}
-                                    defaultValue={this.props.data.match}>
-                                    <option value="always">{Locale._("Show Always")}</option>
-                                    <option value="all">{Locale._("When ALL Conditions Match")}</option>
-                                    <option value="any">{Locale._("When ANY Conditions Match")}</option>
-                                </select>
-                            </div>
-                            <div style={divStyle}>
-                                <select id={"display-add-condition-" + this.props.data.id}
-                                    ref={"display-add-condition-" + this.props.data.id} className="form-control">
-                                    <option value="-1">{Locale._("Add Condition...")}</option>
-                                    <option value="promo_conditions_match">{Locale._("Promo Conditions Met")}</option>
-                                    <option value="promo_applied">{Locale._("Has promo been applied to cart")}</option>
-                                    <option value="customer_groups">{Locale._("Customer Group")}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="col-md-offset-1" ref={"display-add-conditions-container" + this.props.data.id}>{conditions}</div>
-                        <hr/>
-                    </div>;
+                                    
+                                )
+                            )
+                        ), 
+                        React.createElement("div", {className: "form-group"}, 
+                            React.createElement(Components.ControlLabel, {input_id: "display-content_type-" + this.props.data.id, 
+                                label_class: this.props.labelClass}, 
+                                this.props.contentTypeLabel, 
+                                React.createElement(Components.HelpIcon, {id: "display-content_type-help-" + this.props.data.id, 
+                                    content: this.props.contentTypeHelp})
+                            ), 
+                            React.createElement("div", {style: divStyle}, 
+                                React.createElement("select", {id: "display-content_type-" + this.props.data.id, 
+                                    ref: "display-content_type-" + this.props.data.id, className: "form-control", 
+                                    name: "display[" + this.props.data.id + "][content_type]", 
+                                    defaultValue: this.props.data.content_type}, 
+                                    React.createElement("option", {value: "html"}, Locale._("Text (Html)")), 
+                                    React.createElement("option", {value: "md"}, Locale._("Text (Markdown)")), 
+                                    React.createElement("option", {value: "cms_block"}, Locale._("CMS Block"))
+                                )
+                            )
+                        ), 
+                        React.createElement("div", {className: "form-group"}, 
+                            React.createElement(AddPromoDisplayItemContent, {id: "display-content-" + this.props.data.id, ref: "display-content-" + this.props.data.id, 
+                                data_id: this.props.data.id, value: contentValue, base_url: this.props.base_url, cmsBlocksUrl: this.props.cmsBlocksUrl, 
+                                type: this.state.content_type ? this.state.content_type : this.props.data.content_type})
+                        ), 
+                        React.createElement("div", {className: "form-group"}, 
+                            React.createElement(Components.ControlLabel, {input_id: "display-match-" + this.props.data.id, 
+                                label_class: this.props.labelClass}, 
+                                this.props.conditionsLabel, 
+                                React.createElement(Components.HelpIcon, {id: "display-match-help-" + this.props.data.id, 
+                                    content: this.props.conditionsHelp})
+                            ), 
+                            React.createElement("div", {style: divStyle}, 
+                                React.createElement("select", {id: "display-match-" + this.props.data.id, 
+                                    ref: "display-match-" + this.props.data.id, className: "form-control", 
+                                    name: "display[" + this.props.data.id + "][data][match]", 
+                                    defaultValue: this.props.data.match}, 
+                                    React.createElement("option", {value: "always"}, Locale._("Show Always")), 
+                                    React.createElement("option", {value: "all"}, Locale._("When ALL Conditions Match")), 
+                                    React.createElement("option", {value: "any"}, Locale._("When ANY Conditions Match"))
+                                )
+                            ), 
+                            React.createElement("div", {style: divStyle}, 
+                                React.createElement("select", {id: "display-add-condition-" + this.props.data.id, 
+                                    ref: "display-add-condition-" + this.props.data.id, className: "form-control"}, 
+                                    React.createElement("option", {value: "-1"}, Locale._("Add Condition...")), 
+                                    React.createElement("option", {value: "promo_conditions_match"}, Locale._("Promo Conditions Met")), 
+                                    React.createElement("option", {value: "promo_applied"}, Locale._("Has promo been applied to cart")), 
+                                    React.createElement("option", {value: "customer_groups"}, Locale._("Customer Group"))
+                                )
+                            )
+                        ), 
+                        React.createElement("div", {className: "col-md-offset-1", ref: "display-add-conditions-container" + this.props.data.id}, conditions), 
+                        React.createElement("hr", null)
+                    );
             }
 
             return (
@@ -353,45 +353,45 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
             }
         }
     });
-    var AddPromoDisplayCondition = React.createClass({
+    var AddPromoDisplayCondition = React.createClass({displayName: "AddPromoDisplayCondition",
         render: function () {
             var condition = '', type= this.props.type, val = this.props.value, id = this.props.data_id;
             var inputName = "display[" + this.props.data_id + "][data][conditions][][" + type + "]";
             var labelFor = "label-for-" + type + "-" + id, key = "value-for-" + type + "-" + id;
             var delBtn =
-                <Components.Button className="btn-link btn-delete" onClick={this.onRemove}
-                    type="button" style={ {paddingRight: 10, paddingLeft: 10} } key={"rm-for-" + type + "-" + id}>
-                    <span className="icon-trash"></span>
-                </Components.Button>;
+                React.createElement(Components.Button, {className: "btn-link btn-delete", onClick: this.onRemove, 
+                    type: "button", style:  {paddingRight: 10, paddingLeft: 10}, key: "rm-for-" + type + "-" + id}, 
+                    React.createElement("span", {className: "icon-trash"})
+                );
             if(type === 'promo_conditions_match' || type === 'promo_applied') {
                 condition = [
-                    <Components.ControlLabel input_id={type + "-" + id} key={ labelFor }
-                        label_class="col-md-4">
-                                {delBtn}
-                                {this.props[type + '_label']}
-                    </Components.ControlLabel>,
-                    <div key={key} style={divStyle}>
-                        <Components.YesNo name={inputName} value={val}/>
-                    </div>
+                    React.createElement(Components.ControlLabel, {input_id: type + "-" + id, key: labelFor, 
+                        label_class: "col-md-4"}, 
+                                delBtn, 
+                                this.props[type + '_label']
+                    ),
+                    React.createElement("div", {key: key, style: divStyle}, 
+                        React.createElement(Components.YesNo, {name: inputName, value: val})
+                    )
                 ];
             } else if(type === 'customer_groups') {
                 var customerOptions = _.map(this.props.customerGroups, function (groupName, groupCode) {
-                    return <option key={groupCode + id} value={groupCode}>{groupName}</option>;
+                    return React.createElement("option", {key: groupCode + id, value: groupCode}, groupName);
                 });
                 condition = [
-                    <Components.ControlLabel input_id={type + "-" + id} key={ labelFor }
-                        label_class="col-md-4">
-                                {delBtn}
-                                {this.props.customer_group_label}
-                    </Components.ControlLabel>,
-                    <div key={key} style={divStyle}>
-                        <select name={inputName} defaultValue={val} className="form-control">
-                            {customerOptions}
-                        </select>
-                    </div>
+                    React.createElement(Components.ControlLabel, {input_id: type + "-" + id, key: labelFor, 
+                        label_class: "col-md-4"}, 
+                                delBtn, 
+                                this.props.customer_group_label
+                    ),
+                    React.createElement("div", {key: key, style: divStyle}, 
+                        React.createElement("select", {name: inputName, defaultValue: val, className: "form-control"}, 
+                            customerOptions
+                        )
+                    )
                 ];
             }
-            return (<div id={type + '-' + id} className="form-group">{condition}</div>);
+            return (React.createElement("div", {id: type + '-' + id, className: "form-group"}, condition));
         },
         getDefaultProps: function () {
             return {
@@ -404,48 +404,48 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
             return this.props.onRemove(this.props.data_id, this.props.type, this.props.value);
         }
     });
-    var AddPromoDisplayItemContent = React.createClass({
+    var AddPromoDisplayItemContent = React.createClass({displayName: "AddPromoDisplayItemContent",
         render: function () {
             var content = '';
             switch(this.props.type) {
                 case 'html':
-                    content = <div><textarea rows="5" key={'wysywig-' + this.props.id}
-                        className="form-control ckeditor js-desc-wysiwyg"
-                        id={this.props.id}
-                        name={"display[" + this.props.data_id + "][data][html_content]"} defaultValue={this.props.value}></textarea>
-                        <textarea className="form-control js-desc-wysiwyg" id={this.props.id + "-validation"} key={'wysywig-val-' + this.props.id}
-                            style={{display: "none"}} defaultValue={this.props.value}></textarea>
-                    </div>;
+                    content = React.createElement("div", null, React.createElement("textarea", {rows: "5", key: 'wysywig-' + this.props.id, 
+                        className: "form-control ckeditor js-desc-wysiwyg", 
+                        id: this.props.id, 
+                        name: "display[" + this.props.data_id + "][data][html_content]", defaultValue: this.props.value}), 
+                        React.createElement("textarea", {className: "form-control js-desc-wysiwyg", id: this.props.id + "-validation", key: 'wysywig-val-' + this.props.id, 
+                            style: {display: "none"}, defaultValue: this.props.value})
+                    );
                     break;
                 case 'cms_block':
                     var cmsOptions = this.getCmsOptions();
                     content =
-                        <div>
-                            <Components.ControlLabel input_id={this.props.id}
-                                label_class={this.props.labelClass}>{Locale._("Block Handle")}
-                                <Components.HelpIcon id={"help-" + this.props.id}
-                                    content={Locale._("Select a cms block handle")}/>
-                            </Components.ControlLabel>
-                            <div className="col-md-5">
-                                <select ref={this.props.id} id={this.props.id} key={'cms-block-' + this.props.id}
-                                    name={"display[" + this.props.data_id + "][data][cms_block_handle]"}
-                                    defaultValue={this.props.value} className="form-control">{cmsOptions}</select>
-                            </div>
-                        </div>;
+                        React.createElement("div", null, 
+                            React.createElement(Components.ControlLabel, {input_id: this.props.id, 
+                                label_class: this.props.labelClass}, Locale._("Block Handle"), 
+                                React.createElement(Components.HelpIcon, {id: "help-" + this.props.id, 
+                                    content: Locale._("Select a cms block handle")})
+                            ), 
+                            React.createElement("div", {className: "col-md-5"}, 
+                                React.createElement("select", {ref: this.props.id, id: this.props.id, key: 'cms-block-' + this.props.id, 
+                                    name: "display[" + this.props.data_id + "][data][cms_block_handle]", 
+                                    defaultValue: this.props.value, className: "form-control"}, cmsOptions)
+                            )
+                        );
                     break;
                 case 'md':
-                    content = <textarea rows="5"
-                        id={this.props.id}
-                        name={"display[" + this.props.data_id + "][data][text_content]"}
-                        className="form-control"
-                        placeholder={Locale._("Text content here ...")} defaultValue={this.props.value}></textarea>;
+                    content = React.createElement("textarea", {rows: "5", 
+                        id: this.props.id, 
+                        name: "display[" + this.props.data_id + "][data][text_content]", 
+                        className: "form-control", 
+                        placeholder: Locale._("Text content here ..."), defaultValue: this.props.value});
                     break;
             }
 
             return (
-                <div className="col-md-offset-3">
-                    {content}
-                </div>
+                React.createElement("div", {className: "col-md-offset-3"}, 
+                    content
+                )
             );
         },
         initCmsBlockSelect: function () {
@@ -493,7 +493,7 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
                 getCmsBlocks(url, function (result) {
                     if (result.items) {
                         cmsBlocks = result.items.map(function (item) {
-                            return <option key={item.id} value={item.text}>{item.text}</option>
+                            return React.createElement("option", {key: item.id, value: item.text}, item.text)
                         });
                         self.forceUpdate();
                     }
@@ -504,11 +504,11 @@ define(['jquery', 'react', 'fcom.components', 'underscore', 'fcom.locale', 'cked
     });
 
     function renderCentralPageApp(properties, container) {
-        React.render(<CentralPageApp {...properties} id="central-page-app"/>, container);
+        React.render(React.createElement(CentralPageApp, React.__spread({},  properties, {id: "central-page-app"})), container);
     }
 
     function renderAddPromoDisplayApp(properties, container) {
-        React.render(<AddPromoDisplayApp {...properties} id="add-promo-display-app"/>, container);
+        React.render(React.createElement(AddPromoDisplayApp, React.__spread({},  properties, {id: "add-promo-display-app"})), container);
     }
 
     var lastNewId = 1;

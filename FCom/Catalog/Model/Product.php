@@ -4,7 +4,8 @@
  * Model class for table "fcom_product".
  *
  * The followings are the available columns in table 'fcom_product':
- * @property string  $id
+ *
+*@property string  $id
  * @property string  $product_sku
  * @property string  $product_name
  * @property string  $short_description
@@ -41,7 +42,8 @@
  * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
- */
+ * @property FCom_Catalog_Model_ProductPrice $FCom_Catalog_Model_ProductPrice
+*/
 class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
@@ -1150,6 +1152,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $p2 = !empty($v2['pos']) ? $v2['pos'] : 999;
             return $p1 < $p2 ? -1 : ($p1 > $p2 ? 1 : 0);
         });
+        return $prices;
+    }
+
+    public function getAllPrices()
+    {
+        $priceModel= $this->FCom_Catalog_Model_ProductPrice;
+        $prices = $priceModel->getProductPrices($this);
         return $prices;
     }
 

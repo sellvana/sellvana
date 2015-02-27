@@ -9,13 +9,6 @@
  */
 class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
-    public function action_manuf()
-    {
-        $this->forward(false);
-        return;
-        $this->BLayout->layout('/catalog/manuf');
-    }
-
     public function action_product()
     {
         $layout = $this->BLayout;
@@ -64,6 +57,8 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $head->addTitle($category->get('node_name'));
             $crumbs[] = ['label' => $category->get('node_name'), 'href' => $category->url()];
         }
+
+        $this->BApp->set('current_page_type', 'product');
 
         $head->addTitle($product->get('product_name'));
         $crumbs[] = ['label' => $product->get('product_name'), 'active' => true];

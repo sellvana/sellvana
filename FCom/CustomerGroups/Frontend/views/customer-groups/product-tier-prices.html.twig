@@ -1,4 +1,4 @@
-{% set tiers = APP.instance('FCom_CustomerGroups_Model_TierPrice').getProductTiers(THIS.get('product')) %}
+{% set tiers = APP.instance('FCom_Catalog_Model_ProductPrice').getProductPrices(THIS.get('product')) %}
 
 {% if tiers %}
   <table class="f-tier-price-group table table-condensed">

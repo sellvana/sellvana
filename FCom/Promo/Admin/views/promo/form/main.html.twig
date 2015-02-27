@@ -197,7 +197,7 @@
         </div>
         {% set elView = LAYOUT.view('core/form-elements') %}
         <script type="text/javascript">
-            require(['react', 'jsx!fcom.promo'], function (React, Promo) {
+            require(['react', 'fcom.promo'], function (React, Promo) {
                 $('select.to-select2').select2();
                 var promo_type_id = '{{ elView.getInputId({'field':'promo_type'}) }}';
                 var coupon_type_id = '{{ elView.getInputId({'field':'coupon_type'}) }}';
