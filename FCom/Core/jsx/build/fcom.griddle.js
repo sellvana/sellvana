@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'react', 'jquery', 'jsx!griddle.fcomGridBody', 'jsx!griddle.fcomGridFilter', 'fcom.components', 'jsx!griddle', 'backbone', 'bootstrap'],
+define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
 function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) {
 
     var dataUrl,

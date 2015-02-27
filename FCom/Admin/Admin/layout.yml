@@ -96,17 +96,18 @@ common_js_libs:
             - [ requireJs, fcom.backbonegrid, "@FCom_Core/js/fcom/fcom.backbonegrid" ]
 
             #jsx source
-            - [ requireJs, fcom.components, @FCom_Core/jsx/build/fcom.components ]
-            - [ requireJs, fcom.griddle, @FCom_Core/jsx/src/fcom.griddle, { deps : [ react, griddle ]} ]
-            - [ requireJs, griddle.fcomGridBody, @FCom_Core/jsx/src/fcom.gridBody, { deps : [ react, griddle ]} ]
-            - [ requireJs, griddle.fcomGridFilter, @FCom_Core/jsx/src/fcom.gridFilter, { deps : [ react, griddle ]} ]
-            - [ requireJs, griddle.fcomRow, @FCom_Core/jsx/src/fcom.row, { deps : [ react, griddle ]} ]
+            #- [ requireJs, fcom.components, @FCom_Core/jsx/src/fcom.components ]
+            #- [ requireJs, fcom.griddle, @FCom_Core/jsx/src/fcom.griddle, { deps : [ react, griddle ]} ]
+            #- [ requireJs, griddle.fcomGridBody, @FCom_Core/jsx/src/fcom.gridBody, { deps : [ react, griddle ]} ]
+            #- [ requireJs, griddle.fcomGridFilter, @FCom_Core/jsx/src/fcom.gridFilter, { deps : [ react, griddle ]} ]
+            #- [ requireJs, griddle.fcomRow, @FCom_Core/jsx/src/fcom.row, { deps : [ react, griddle ]} ]
 
             #jsx build
-            #- [ requireJs, fcom.griddle, @FCom_Core/jsx/build/fcom.griddle, { deps : [ react, griddle ]} ]
-            #- [ requireJs, griddle.fcomGridBody, @FCom_Core/jsx/build/fcom.gridBody, { deps : [ react, griddle ]} ]
-            #- [ requireJs, griddle.fcomGridFilter, @FCom_Core/jsx/build/fcom.gridFilter, { deps : [ react, griddle ]} ]
-            #- [ requireJs, griddle.fcomRow, @FCom_Core/jsx/build/fcom.row, { deps : [ react, griddle ]} ]
+            - [ requireJs, fcom.components, @FCom_Core/jsx/build/fcom.components ]
+            - [ requireJs, fcom.griddle, @FCom_Core/jsx/build/fcom.griddle, { deps : [ react, griddle.custom ]} ]
+            - [ requireJs, griddle.fcomGridBody, @FCom_Core/jsx/build/fcom.gridBody, { deps : [ react, griddle.custom ]} ]
+            - [ requireJs, griddle.fcomGridFilter, @FCom_Core/jsx/build/fcom.gridFilter, { deps : [ react, griddle.custom ]} ]
+            - [ requireJs, griddle.fcomRow, @FCom_Core/jsx/build/fcom.row, { deps : [ react, griddle.custom ]} ]
 
 
 lib_admin_theme1:
