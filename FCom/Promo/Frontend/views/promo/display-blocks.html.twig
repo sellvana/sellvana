@@ -1,0 +1,23 @@
+{% set location = THIS.get('location') %}
+{% set page = THIS.get('page') %}
+{% set product = THIS.get('product') %}
+{% set blocks = APP.instance('FCom_Promo_Model_PromoDisplay').findDisplayBlocks(product, location, page) %}
+
+{% for block in blocks %}
+    {% if block.get('content_type') == 'html' %}
+        {{ block.getData('html_content') | raw }}
+    {% elseif block.get('content_type') == 'md' %}
+        {% if MODULES.isLoaded('FCom_LibMarkdown') %}
+            {{ APP.instance('FCom_LibMarkdown_Main').parser().transform(block.getData('text_content')) }}
+        {% else %}
+            <!-- ERROR: FCom_LibMarkdown module is not enabled -->
+            {{ block.getData('text_content') }}
+        {% endif %}
+    {% elseif block.get('content_type') == 'cms_block' %}
+        {% if MODULES.isLoaded('FCom_Cms') %}
+            {{ APP.instance('FCom_Cms_Frontend_View_Block').createView(block.getData('cms_block_handle')).set('block', block) | raw }}
+        {% else %}
+            <!-- ERROR: FCom_Cms module is not enabled -->
+        {% endif %}
+    {% endif %}
+{% endfor %}

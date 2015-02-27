@@ -12,7 +12,11 @@
             {% if promo.get('display_index_section') == section %}
                 <h2>{{ sectionLabel|_ }}</h2>
                 {% if promo.get('display_index_type') == 'cms_block' %}
-                    {{ APP.instance('FCom_Cms_Frontend_View_Block').createView('promo-test').set('promo', promo) | raw }}
+                    {% if MODULES.isLoaded('FCom_Cms') %}
+                        {{ APP.instance('FCom_Cms_Frontend_View_Block').createView(promo.getData('display_type_details/block_handle')).set('promo', promo) | raw }}
+                    {% else %}
+                        <!-- ERROR: FCom_Cms module is not enabled -->
+                    {% endif %}
                 {% elseif promo.get('display_index_type') == 'text' %}
                     {% set opt = promo.getData('display_type_details/text_options') %}
                     <p>
