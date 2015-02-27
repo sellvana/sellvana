@@ -7,7 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['underscore', 'react', 'griddle.gridNoData'], function(_, React, GridBody, GridNoData) {
+define(['underscore', 'react', 'griddle.gridNoData'], function(_, React, GridNoData) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
@@ -450,10 +450,10 @@ var Griddle = React.createClass({displayName: "Griddle",
                 );
 
             pagingContent = this.props.useCustomPager && this.props.customPager
-                ? (React.createElement(this.props.customPager, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page, maxPage: this.state.maxPage, 
+                ? (React.createElement(this.props.customPager, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page, maxPage: this.state.maxPage ? this.state.maxPage : 0, 
                     setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText, totalResults: this.state.totalResults, 
                     getConfig: this.getConfig, setPageSize: this.setPageSize, resultsPerPage: this.props.resultsPerPage, getHeaderSelection: this.getHeaderSelection}))
-                : (React.createElement(GridPagination, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page, maxPage: this.state.maxPage, setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText}));
+                : (React.createElement(GridPagination, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page ? this.state.page : 0, maxPage: this.state.maxPage, setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText}));
         } else {
             // Otherwise, display the loading content.
             resultContent = (React.createElement("div", {className: "loading img-responsive center-block"}));

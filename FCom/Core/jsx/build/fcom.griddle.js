@@ -105,7 +105,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "nextText": "",
                 "previousText": "",
                 "currentPage": 0,
-                "getHeaderSelection": null
+                "getHeaderSelection": null,
+                "totalResults": 0
             }
         },
         pageChange: function (event) {
@@ -144,16 +145,18 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var pageSizeOptions = this.props.getConfig('page_size_options');
             var pageSize = this.props.resultsPerPage;
 
-            var first = React.createElement("li", {className: "first"}, 
+            var disabledClass = !this.props.totalResults ? ' disabled' : '';
+
+            var first = React.createElement("li", {className: 'first' + disabledClass}, 
                 React.createElement("a", {href: "#", className: "js-change-url", onClick: this.pageFirst}, "«")
             );
-            var previous = React.createElement("li", {className: "prev"}, 
+            var previous = React.createElement("li", {className: 'prev' + disabledClass}, 
                 React.createElement("a", {href: "#", className: "js-change-url", onClick: this.pagePrevious}, "‹")
             );
-            var next = React.createElement("li", {className: "next"}, 
+            var next = React.createElement("li", {className: 'next' + disabledClass}, 
                 React.createElement("a", {className: "js-change-url", href: "#", onClick: this.pageNext}, "›")
             );
-            var last = React.createElement("li", {className: "last"}, 
+            var last = React.createElement("li", {className: 'last' + disabledClass}, 
                 React.createElement("a", {className: "js-change-url", href: "#", onClick: this.pageLast}, this.props.maxPage, " »")
             );
 
@@ -176,7 +179,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             var pageSizeHtml = [];
             for (var j = 0; j < pageSizeOptions.length; j++) {
-                selected = pageSizeOptions[j] == pageSize ? "active" : "";
+                selected = (pageSizeOptions[j] == pageSize ? "active" : "") + disabledClass;
                 pageSizeHtml.push(
                     React.createElement("li", {className: selected}, 
                         React.createElement("a", {href: "#", "data-value": pageSizeOptions[j], onClick: this.setPageSize, className: "js-change-url page-size"}, pageSizeOptions[j])
@@ -186,7 +189,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             return (
                 React.createElement("div", {className: "col-sm-6 text-right pagination", style: { margin: "0"}}, 
-                    React.createElement("span", {className: "f-grid-pagination"}, this.props.totalResults, " record(s)"), 
+                    React.createElement("span", {className: "f-grid-pagination"}, this.props.totalResults ? this.props.totalResults + ' record(s)' : 'No data found'), 
                     React.createElement("ul", {className: "pagination pagination-sm pagination-griddle pagesize"}, 
                         pageSizeHtml
                     ), 

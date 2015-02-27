@@ -105,7 +105,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "nextText": "",
                 "previousText": "",
                 "currentPage": 0,
-                "getHeaderSelection": null
+                "getHeaderSelection": null,
+                "totalResults": 0
             }
         },
         pageChange: function (event) {
@@ -144,16 +145,18 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var pageSizeOptions = this.props.getConfig('page_size_options');
             var pageSize = this.props.resultsPerPage;
 
-            var first = <li className="first">
+            var disabledClass = !this.props.totalResults ? ' disabled' : '';
+
+            var first = <li className={'first' + disabledClass}>
                 <a href="#" className="js-change-url" onClick={this.pageFirst}>«</a>
             </li>;
-            var previous = <li className="prev">
+            var previous = <li className={'prev' + disabledClass}>
                 <a href="#" className="js-change-url" onClick={this.pagePrevious}>‹</a>
             </li>;
-            var next = <li className="next">
+            var next = <li className={'next' + disabledClass}>
                 <a className="js-change-url" href="#" onClick={this.pageNext}>›</a>
             </li>;
-            var last = <li className="last">
+            var last = <li className={'last' + disabledClass}>
                 <a className="js-change-url" href="#" onClick={this.pageLast}>{this.props.maxPage} »</a>
             </li>;
 
@@ -176,7 +179,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             var pageSizeHtml = [];
             for (var j = 0; j < pageSizeOptions.length; j++) {
-                selected = pageSizeOptions[j] == pageSize ? "active" : "";
+                selected = (pageSizeOptions[j] == pageSize ? "active" : "") + disabledClass;
                 pageSizeHtml.push(
                     <li className={selected}>
                         <a href="#" data-value={pageSizeOptions[j]} onClick={this.setPageSize} className="js-change-url page-size">{pageSizeOptions[j]}</a>
@@ -186,7 +189,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             return (
                 <div className="col-sm-6 text-right pagination" style={{ margin: "0" }}>
-                    <span className="f-grid-pagination">{this.props.totalResults} record(s)</span>
+                    <span className="f-grid-pagination">{this.props.totalResults ? this.props.totalResults + ' record(s)' : 'No data found'}</span>
                     <ul className="pagination pagination-sm pagination-griddle pagesize">
                         {pageSizeHtml}
                     </ul>

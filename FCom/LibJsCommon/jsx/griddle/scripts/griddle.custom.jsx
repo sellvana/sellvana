@@ -7,8 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['underscore', 'react', 'jsx!griddle.gridNoData', 'jsx!griddle.customFormatContainer', 'jsx!griddle.customPaginationContainer'],
-    function(_, React, GridBody, GridFilter, GridPagination, GridSettings, GridTitle, GridNoData, CustomFormatContainer, CustomPaginationContainer) {
+define(['underscore', 'react', 'griddle.gridNoData'], function(_, React, GridNoData) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
@@ -451,10 +450,10 @@ var Griddle = React.createClass({
                 );
 
             pagingContent = this.props.useCustomPager && this.props.customPager
-                ? (<this.props.customPager next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage}
+                ? (<this.props.customPager next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage ? this.state.maxPage : 0}
                     setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText} totalResults={this.state.totalResults}
                     getConfig={this.getConfig} setPageSize={this.setPageSize} resultsPerPage={this.props.resultsPerPage} getHeaderSelection={this.getHeaderSelection} />)
-                : (<GridPagination next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText}/>);
+                : (<GridPagination next={this.nextPage} previous={this.previousPage} currentPage={this.state.page ? this.state.page : 0} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText}/>);
         } else {
             // Otherwise, display the loading content.
             resultContent = (<div className="loading img-responsive center-block"></div>);
