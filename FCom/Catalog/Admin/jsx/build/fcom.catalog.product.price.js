@@ -19,82 +19,112 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                             return React.createElement("input", {key: 'delete-' + price.id, type: "hidden", 
                                           name: "price[" + price.id + "][delete]", value: "1"})
                         }
-                        var show = true;
-                        if(this.props['filter_customer_group_value'] && this.props['filter_customer_group_value'] !== '*' && this.props['filter_customer_group_value'] != price['customer_group_id']) {
-                            show = false;
-                        }
-                        if(this.props['filter_site_value'] && this.props['filter_site_value'] !== '*' && this.props['filter_site_value'] != price['site_id']) {
-                            show = false;
-                        }
-                        if(this.props['filter_currency_value'] && this.props['filter_currency_value'] !== '*' && this.props['filter_currency_value'] != price['currency_id']) {
-                            show = false;
-                        }
 
-                        if(price.id === undefined) {
-                            price.id = 'new_' + this.newIdx++;
-                        }
-
-                        if(show === false) {
+                        if(this.shouldPriceShow(price) === false) {
                             return React.createElement("span", {key: 'empty'+price.id});
                         }
-                        var qty = React.createElement("input", {type: "hidden", name: this.getFieldName(price, "qty"), defaultValue: price['qty']});
-                        if(price['price_type'] === 'tier') {
-                            qty = React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "qty"), defaultValue: price['qty']});
-                        }
-                        return (
-                            React.createElement("div", {className: "form-group", key: price['id']}, 
-                                React.createElement("div", {style: divStyle}, 
-                                    React.createElement("a", {href: "#", className: "btn-remove", "data-id": price.id, 
-                                       id: "remove_price_btn_" + price.id}, 
-                                        React.createElement("span", {className: "icon-remove-sign"})
-                                    ), 
-                                    React.createElement("select", {className: "to-select2 form-control", name: this.getFieldName(price, 'price_type'), defaultValue: price['price_type']}, 
-                                    _.map(this.props.price_types, function (pt, pk) {
-                                        return React.createElement("option", {key: pk, value: pk}, pt)
-                                    })
-                                    )
-                                ), 
-                                React.createElement("div", {style: divStyle}, 
-                                    React.createElement("input", {type: "hidden", name: this.getFieldName(price, "product_id"), defaultValue: price['product_id']}), 
-                                    React.createElement("input", {type: "hidden", name: this.getFieldName(price, "customer_group_id"), defaultValue: price['customer_group_id']}), 
-                                    React.createElement("input", {type: "text", className: "form-control", readOnly: "readOnly", defaultValue: this.getCustomerGroupName(price['customer_group_id'])})
-                                ), 
-                                React.createElement("div", {style: divStyle}, 
-                                    React.createElement("input", {type: "hidden", name: this.getFieldName(price, "site_id"), defaultValue: price['site_id']}), 
-                                    React.createElement("input", {type: "text", className: "form-control", readOnly: "readOnly", defaultValue: this.getSiteName(price['site_id'])})
-                                ), 
-                                React.createElement("div", {style: divStyle}, 
-                                    React.createElement("input", {type: "hidden", name: this.getFieldName(price, "currency_id"), defaultValue: price['currency_id']}), 
-                                    React.createElement("input", {type: "text", className: "form-control", readOnly: "readOnly", defaultValue: this.getCurrencyName(price['currency_id'])})
-                                ), 
-                                React.createElement("div", {style: divStyle}, 
-                                    React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "price"), defaultValue: price['price']})
-                                ), 
-                                React.createElement("div", {style: divStyle}, 
-                                    qty
-                                )
-                            )
-                        )
+
+                        return React.createElement(PriceItem, {data: price, price_types: this.props.price_types, key: price['id'], 
+                                          customer_groups: this.props.customer_groups, sites: this.props.sites, 
+                                          currencies: this.props.currencies, deletePrice: this.props.deletePrice, 
+                                          updatePriceType: this.props.updatePriceType})
                     }.bind(this))
                 )
             );
         },
+        shouldPriceShow: function (price) {
+            var show = true;
+            if (this.props['filter_customer_group_value'] && this.props['filter_customer_group_value'] !== '*' && this.props['filter_customer_group_value'] != price['customer_group_id']) {
+                show = false;
+            }
+            if (this.props['filter_site_value'] && this.props['filter_site_value'] !== '*' && this.props['filter_site_value'] != price['site_id']) {
+                show = false;
+            }
+            if (this.props['filter_currency_value'] && this.props['filter_currency_value'] !== '*' && this.props['filter_currency_value'] != price['currency_id']) {
+                show = false;
+            }
+            return show;
+        }
+    });
+
+    var PriceItem = React.createClass({displayName: "PriceItem",
+        render: function () {
+            var price = this.props.data;
+            var qty = React.createElement("input", {type: "hidden", name: this.getFieldName(price, "qty"), defaultValue: price['qty']});
+            if (price['price_type'] === 'tier') {
+                qty = React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "qty"), 
+                             defaultValue: price['qty']});
+            }
+            return (
+                React.createElement("div", {className: "form-group"}, 
+                    React.createElement("div", {style: divStyle}, 
+                        React.createElement("a", {href: "#", className: "btn-remove", "data-id": price.id, 
+                           id: "remove_price_btn_" + price.id}, 
+                            React.createElement("span", {className: "icon-remove-sign"})
+                        )
+                    ), 
+                    React.createElement("div", {style: divStyle}, 
+                        React.createElement("select", {className: "to-select2 form-control", name: this.getFieldName(price, 'price_type'), 
+                                defaultValue: price['price_type'], ref: "price_type"}, 
+                            _.map(this.props.price_types, function (pt, pk) {
+                                return React.createElement("option", {key: pk, value: pk}, pt)
+                            })
+                        )
+                    ), 
+                    React.createElement("div", {style: divStyle}, 
+                        React.createElement("input", {type: "hidden", name: this.getFieldName(price, "product_id"), 
+                               defaultValue: price['product_id']}), 
+                        React.createElement("input", {type: "hidden", name: this.getFieldName(price, "customer_group_id"), 
+                               defaultValue: price['customer_group_id']}), 
+                        React.createElement("input", {type: "text", className: "form-control", readOnly: "readOnly", 
+                               defaultValue: this.getCustomerGroupName(price['customer_group_id'])})
+                    ), 
+                    React.createElement("div", {style: divStyle}, 
+                        React.createElement("input", {type: "hidden", name: this.getFieldName(price, "site_id"), 
+                               defaultValue: price['site_id']}), 
+                        React.createElement("input", {type: "text", className: "form-control", readOnly: "readOnly", 
+                               defaultValue: this.getSiteName(price['site_id'])})
+                    ), 
+                    React.createElement("div", {style: divStyle}, 
+                        React.createElement("input", {type: "hidden", name: this.getFieldName(price, "currency_id"), 
+                               defaultValue: price['currency_id']}), 
+                        React.createElement("input", {type: "text", className: "form-control", readOnly: "readOnly", 
+                               defaultValue: this.getCurrencyName(price['currency_id'])})
+                    ), 
+                    React.createElement("div", {style: divStyle}, 
+                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "price"), 
+                               defaultValue: price['price']})
+                    ), 
+                    React.createElement("div", {style: divStyle}, 
+                        qty
+                    )
+                )
+            );
+        },
         componentDidMount: function () {
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+            this.initPrices();
+        },
+        initPrices: function () {
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
             var self = this;
+            $(this.refs['price_type'].getDOMNode()).on('change', function (e) {
+                e.stopPropagation();
+                var priceType = $(e.target).val();
+                var id = self.props.data.id;
+                self.props.updatePriceType(id, priceType);
+            });
             $('a.btn-remove', this.getDOMNode()).on('click', function (e) {
                 e.preventDefault();
                 var id = $(this).data('id');
-                console.log(id);
+                //console.log(id);
                 self.props.deletePrice(id);
             });
         },
-        newIdx: 0,
         getFieldName: function (obj, field) {
             return "prices[productPrice][" + obj['id'] + "][" + field + "]";
         },
         _getPropOptionLabel: function (option, id) {
-            if(null === id || undefined === id || false === id) {
+            if (null === id || undefined === id || false === id) {
                 return Locale._("N/A");
             }
             if (this.props[option] && this.props[option][id]) {
@@ -112,19 +142,14 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
             return this._getPropOptionLabel('currencies', id);
         }
     });
+
     var divStyle = {float: 'left', marginLeft: 15};
     var productPrice = {
         options: {
             price_types: { regular:"Regular", map:"MAP", msrp:"MSRP", sale:"Sale", tier:"Tier" },
-            title: Locale._("Product Prices"),
-            deletePrice: function (id) {
-                if (!this.options['deleted']) {
-                    this.options['deleted'] = {};
-                }
-                this.options['deleted'][id] = true;
-                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0])
-            }.bind(this)
+            title: Locale._("Product Prices")
         },
+        newIdx: 0,
         init: function (options) {
             this.options = _.extend({}, this.options, options);
 
@@ -149,7 +174,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                 this.options.prices_add_new.on('click', function (e) {
                     e.preventDefault();
                     var newPrice = {
-                        price_type: 'regular',
+                        id: 'new_' + (this.newIdx++),
+                        price_type: 'tier',
                         customer_group_id: this.options.filter_customer_group_value || null,
                         site_id: this.options.filter_site_value || null,
                         currency_id: this.options.filter_currency_value || null,
@@ -163,6 +189,24 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                     React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0]);
                 }.bind(this));
             }
+
+            this.options.deletePrice = function (id) {
+                if (!this.options['deleted']) {
+                    this.options['deleted'] = {};
+                }
+                this.options['deleted'][id] = true;
+                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0])
+            }.bind(this);
+
+            this.options.updatePriceType = function (price_id, price_type) {
+                _.each(this.options.prices, function (price) {
+                    if (price.id == price_id) {
+                        price.price_type = price_type;
+                    }
+                });
+
+                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0])
+            }.bind(this);
 
             React.render(React.createElement(PricesApp, React.__spread({},  this.options)), container[0])
         }

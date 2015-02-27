@@ -73,7 +73,7 @@
 </fieldset>
 <script type="text/javascript">
     require(['jquery', 'fcom.catalog.product.price'], function ($, Price) {
-        $('select.to-select2').select2({minimumResultsForSearch: 15});
+        $('select.to-select2').select2({minimumResultsForSearch: 15, width: 'resolve', dropdownAutoWidth: true});
         var options = {
             container: $('#price_list'),
             prices: {{ UTIL.toJson(prices)|raw }},
