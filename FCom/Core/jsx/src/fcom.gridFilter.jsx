@@ -224,11 +224,10 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         },
         render: function() {
             //console.log('begin render filters');
-            var that = this;
             var id = this.props.getConfig('id');
+            /*var that = this;
             var filters = this.state.filters;
-
-            console.log('filters', filters);
+            console.log('filters', filters);*/
 
             var filterSettings = (
                 <div className={id + ' dropdown'} style={{"display" : "inline-block"}}>
