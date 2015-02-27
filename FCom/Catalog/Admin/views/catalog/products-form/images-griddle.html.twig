@@ -1,0 +1,73 @@
+Images grid with griddle
+
+{% set m = THIS.get('model') %}
+{% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfigForGriddle(m) %}
+
+
+{# media lib #}
+{% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
+{% set mediaConfig = {
+    id: 'all_images',
+    mode: 'images',
+    type: 'product-images',
+    title: 'Images',
+    folder: 'media/product/images',
+    config: {}
+} %}
+
+{% set mediaLibAttachConfig = mediaLib.gridConfig({'id': mediaConfig.id, 'folder': mediaConfig.folder, 'config': mediaConfig.config, 'mode': mediaConfig.mode}) %}
+
+{# show main grid#}
+{{ LAYOUT.view('core/griddle').set('grid', prodImagesConfig) | raw }}
+
+{# modal #}
+<div class='modal fade' id='{{mediaConfig.id}}_modal' tabindex='-1'>
+    <div class='modal-dialog' style='width:900px;'>
+        <div class='modal-content'>
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                <h4 class="modal-title" id="myLangLabel">Images</h4>
+            </div>
+            <div class="modal-body">
+                <div class='row'>
+                    <div class='tabbable'>
+                        <ul class='nav nav-tabs prod-type f-horiz-nav-tabs'>
+                            <li class='active'>
+                                <a data-toggle='tab' href='#{{mediaConfig.id}}-attach_library'>
+                                    {{ 'Library'|_ }}
+                                </a>
+                            </li>
+                            <li>
+                                <a data-toggle='tab' href='#{{mediaConfig.id}}-media-upload'>
+                                    Uploads
+                                </a>
+                            </li>
+                        </ul>
+                        <div class='tab-content'>
+                            <div class='tab-pane active' id='{{mediaConfig.id}}-attach_library'>
+                                {{ THIS.view('core/griddle').set('grid', mediaLibAttachConfig) | raw }}
+                            </div>
+                            <div class='tab-pane' id='{{mediaConfig.id}}-media-upload'>
+                                Pre content
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class='btn btn-primary btn-add btn_{{mediaConfig.id}}_add disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
+                <button class='btn btn-default btn-close btn_{{mediaConfig.id}}_close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var mediaId = '{{ mediaConfig.id }}';
+    require(['jquery', 'underscore', 'backbone', 'unique', 'griddle.custom'], function ($, _, Backbone) {
+        window.showModalToAddImage = function() {
+            console.log('showModalToAddImage');
+            $('#' + mediaId + '_modal').modal('show');
+        };
+    });
+</script>

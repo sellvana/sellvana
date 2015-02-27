@@ -101,7 +101,7 @@ define(['underscore', 'react'], function (_, React) {
                             var rc = {
                                 row: that.props.row
                             };
-                            node = eval('print('+col.print+');');
+                            node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
                         } else if (col.display == 'file_size') {
                             node = that.fileSizeFormat(that.props.row[col.name]);
                         } else {
