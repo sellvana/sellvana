@@ -1,0 +1,37 @@
+modules:
+    Sellvana_CustomField:
+        version: 0.2.3
+        channel: beta
+        require: { module: { Sellvana_Catalog: 0.2.1 } }
+        translations: { en: en.php }
+        after: [ Sellvana_Customer ]
+        description: "Base custom fields implementation, currently for catalog only"
+        auto_use: [ bootstrap ]
+        observe:
+            - [ "Sellvana_Catalog_Model_Product::find_one:orm", Sellvana_CustomField_Main.productFindORM ]
+            - [ "Sellvana_Catalog_Model_Product::find_many:orm", Sellvana_CustomField_Main.productFindORM ]
+            - [ "Sellvana_Catalog_Model_Product::onAfterSave", Sellvana_CustomField_Main.productAfterSave ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]
+                routing:
+                    - [ /customfields/fieldsets, Sellvana_CustomField_Admin_Controller_FieldSets.fieldsets ]
+                    - [ /customfields/fields, Sellvana_CustomField_Admin_Controller_FieldSets.fields ]
+                    - [ /customfields/fieldsets/.action, Sellvana_CustomField_Admin_Controller_FieldSets ]
+                    - [ /customfields/fields/.action, Sellvana_CustomField_Admin_Controller_FieldSets ]
+                    - [ /customfields/products/.action, Sellvana_CustomField_Admin_Controller_Products ]
+                observe:
+                    - [ "Sellvana_Catalog_Admin_Controller_Products::gridColumns", Sellvana_CustomField_Admin.onProductGridColumns ]
+                    - [ "Sellvana_Catalog_Admin_Controller_Products::formViewBefore", Sellvana_CustomField_Admin.onProductsFormViewBefore ]
+                    - [ "Sellvana_Catalog_Admin_Controller_Products::formPostAfter:afterValidate", Sellvana_CustomField_Admin.onProductFormPostAfterValidate ]
+                security:
+                    request_fields_whitelist:
+                        /catalog/products/form:
+                            POST/custom_fields: "+"
+
+            FCom_Frontend:
+                auto_use: [ views ]
+                observe:
+                    - [ "BLayout::hook:custom-fields-filters", Sellvana_CustomField_Main.hookCustomFieldFilters ]
+                    - [ "Sellvana_Sales_Workflow_Cart::customerAddsItemsToCart:calcDetails", Sellvana_CustomField_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]

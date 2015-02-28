@@ -1,0 +1,93 @@
+{% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set type = THIS.get('address_type') %}
+{% set validator = THIS.validator(type ~ '-form', cart) %}
+
+<fieldset>
+    <input type="hidden" name="{{ type }}[address_type]" value="{{ type }}">
+
+    <div class="row">
+        <div class="form-group col-sm-6">
+            {% set field = type ~ '_firstname' %}
+            <label for="{{ field }}" class="control-label required">{{ "First name" |_ }}</label>
+            <input type="text" name="{{ type }}[firstname]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            {{ validator.errorHtml(field, field) | raw }}
+        </div>
+        <div class="form-group col-sm-6">
+            {% set field = type ~ '_lastname' %}
+            <label for="{{ field }}" class="control-label required">{{ "Last name" |_ }}</label>
+            <input type="text" name="{{ type }}[lastname]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            {{ validator.errorHtml(field, field) | raw }}
+        </div>
+    </div>
+    <div class="form-group">
+        {% set field = type ~ '_street1' %}
+        <label for="{{ field }}" class="control-label required">{{ "Street 1" |_ }}</label>
+        <input type="text" name="{{ type }}[street1]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+        {{ validator.errorHtml(field, field) | raw }}
+    </div>
+    <div class="form-group">
+        {% set field = type ~ '_street2' %}
+        <label for="{{ field }}" class="control-label">{{ "Street 2" |_ }}</label>
+        <input type="text" name="{{ type }}[street2]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="{{ validator.fieldClass(field) }} form-control">
+        {{ validator.errorHtml(field, field) | raw }}
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            {% set field = type ~ '_city' %}
+            <label for="{{ field }}" class="control-label required">{{ "City" |_ }}</label>
+            <input type="text" name="{{ type }}[city]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            {{ validator.errorHtml(field, field) | raw }}
+        </div>
+
+        {{ THIS.view('core/geo-embed') | raw }}
+
+        <div class="form-group col-sm-6">
+            {% set field = type ~ '_country' %}
+            <label for="{{ field }}" class="control-label required">{{ "Country" |_ }}</label>
+            {% set countries = THIS.get('countries') %}
+            {% set defC = validator.fieldValue(field) %}
+            <select class="geo-country required {{ validator.fieldClass(field) }} form-control" name="{{ type }}[country]" id="{{ field }}">
+                <option value="">{{ "Select an option" |_ }}</option>
+                {% for iso, country in countries %}
+                    <option value="{{ iso }}" {{ defC == iso ? "selected" }}>{{ country }}</option>
+                {% endfor %}
+            </select>
+            {{ validator.errorHtml(field, field) | raw }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            {% set field = type ~ '_region' %}
+            <label for="{{ field }}" class="control-label required">{{ "Region" |_ }}</label>
+            <select class="geo-region required {{ validator.fieldClass(field) }} form-control" style="display: none" name="{{ type }}[region]" id="{{ field }}">
+                <option value="">{{ "Select an option" |_ }}</option>
+            </select>
+            <input type="text" class="geo-region required {{ validator.fieldClass(field) }} form-control" name="{{ type }}[region]" id="{{ field }}" value="{{ validator.fieldValue(field) }}"/>
+            {{ validator.errorHtml(field, field) | raw }}
+        </div>
+        <div class="form-group col-sm-6">
+            {% set field = type ~ '_postcode' %}
+            <label for="{{ field }}" class="control-label required">{{ "Zip / Postal Code" |_ }}</label>
+            <input type="text" name="{{ type }}[postcode]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            {{ validator.errorHtml(field, field) | raw }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-sm-6">
+            {% set field = type ~ '_phone' %}
+            <label for="{{ field }}" class="control-label required">{{ "Phone" |_ }}</label>
+            <input type="text" name="{{ type }}[phone]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            {{ validator.errorHtml(field, field) | raw }}
+        </div>
+    </div>
+</fieldset>
+
+<script>
+    require(['jquery', 'jquery.validate'], function($) {
+        $(function() {
+            $('.geo-country').geoCountryRegion({country:'{{ validator.fieldValue(type ~ '_country') }}', region:'{{ validator.fieldValue(type ~ '_region') }}'});
+            $('#{{ type }}-form').validate();
+        })
+    })
+</script>

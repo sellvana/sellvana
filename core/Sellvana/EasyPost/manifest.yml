@@ -1,0 +1,10 @@
+modules:
+    Sellvana_EasyPost:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0 } }
+        #autoload: lib
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]

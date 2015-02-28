@@ -7,7 +7,7 @@ if (version_compare(PHP_VERSION, '5.4.0', '<')) {
 }
 
 $rootDir = dirname(__DIR__);
-require_once $rootDir.'/FCom/Core/Main.php';
+require_once $rootDir . '/core/FCom/Core/Main.php';
 
 $storeRoot = BRequest::i()->webRoot(1);
 BConfig::i()

@@ -6,7 +6,7 @@ if (version_compare(PHP_VERSION, '5.4.0', '<')) {
     die('<h1>Unsupported PHP version: ' . PHP_VERSION . '</h1><p>PHP 5.4.0 or higher required</p>');
 }
 
-require_once __DIR__.'/FCom/Core/Main.php';
+require_once __DIR__ . '/core/FCom/Core/Main.php';
 
 if (file_exists(__DIR__.'/index.local.php')) {
     require_once __DIR__.'/index.local.php';

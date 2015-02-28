@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_PaymentAuthorizeNet, { label: Authorize.net, group: payment_methods, async: true } ]

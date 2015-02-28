@@ -1,0 +1,34 @@
+modules:
+    Sellvana_Promo:
+        version: 0.1.14
+        channel: beta
+        require: { module: { Sellvana_Catalog: 0.1.0, Sellvana_Sales: 0.2.0 }}
+        description: "Promotions module"
+
+        observe:
+            - [ Sellvana_Sales_Workflow_Cart::customerAddsCouponCode, Sellvana_Promo_Main.onWorkflowCustomerAddsCouponCode ]
+            - [ Sellvana_Sales_Model_Cart_Total_Discount::calculate, Sellvana_Promo_Main.onCartDiscountCalculate ]
+
+        auto_use: [ bootstrap, views, layout ]
+
+        areas:
+            FCom_Admin:
+                routing:
+                    - [ "/promo", Sellvana_Promo_Admin_Controller.index ]
+                    - [ "/promo/coupons/view", Sellvana_Promo_Admin_Controller.coupons_grid ]
+                    - [ "/promo/coupons/generate", Sellvana_Promo_Admin_Controller.coupons_generate ]
+                    - [ "/promo/coupons/import", Sellvana_Promo_Admin_Controller.coupons_import ]
+                    - [ "/promo/.action", Sellvana_Promo_Admin_Controller ]
+
+                    - ["/promo/conditions/.action", Sellvana_Promo_Admin_Controller_Conditions]
+                    - [ "/promo/form/:id/products", Sellvana_Promo_Admin_Controller.form_products ]
+                    - [ "/promo/form/:id/group", Sellvana_Promo_Admin_Controller.form_group ]
+
+            FCom_Frontend:
+                routing:
+                    - [ /promo/?.action, Sellvana_Promo_Frontend_Controller ]
+                    - [ /promo/cart/?.action, Sellvana_Promo_Frontend_Controller_Cart ]
+                observe:
+                    - [ "Sellvana_Sales_Model_Cart::calculateTotals", "Sellvana_Promo_Frontend::onPromoCartValidate" ]
+                    - [ "Sellvana_Sales_Model_Cart::addProduct", "Sellvana_Promo_Frontend::onPromoCartAddProduct" ]
+                    - [ "BLayout::hook:promotions", Sellvana_Promo_Frontend_Controller.hook_promotions ]

@@ -1,7 +1,0 @@
-base:
-    - { view: admin/nav, do: [[ addNav, system/translations, { label: Translations, href: /translations } ]] }
-
-/settings:
-    - view: settings
-        do:
-            - [ addTab, FCom_MultiLanguage, { label: Multi Language, group: catalog, pos: 150, async: true } ]

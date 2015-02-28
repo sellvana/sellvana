@@ -1,0 +1,25 @@
+modules:
+    Sellvana_Seo:
+        version: 0.1.1
+        channel: beta
+        description: "SEO related goodies, such as sitemaps and URL aliases"
+        require: { module: { FCom_Core: 0.1.0 } }
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]
+                routing:
+                    - [ /sitemaps, Sellvana_Seo_Admin_Controller_Sitemaps.index ]
+                    - [ /sitemaps/.action, Sellvana_Seo_Admin_Controller_Sitemaps ]
+                    - [ /urlaliases, Sellvana_Seo_Admin_Controller_UrlAliases.index ]
+                    - [ /urlaliases/.action, Sellvana_Seo_Admin_Controller_UrlAliases ]
+
+            FCom_Frontend:
+                auto_use: [ bootstrap, views, layout ]
+                routing:
+                    - [ /sitemap, Sellvana_Seo_Frontend_Controller_Sitemaps.sitemap ]
+                    # https://support.google.com/webmasters/bin/answer.py?hl=en&answer=71453
+                    - [ /sitemap-index.xml, Sellvana_Seo_Frontend_Controller_Sitemaps.index_xml ]
+                    # https://support.google.com/webmasters/bin/answer.py?hl=en&answer=183668 */
+                    - [ '^/sitemap(-([a-z0-9-]+))?\.(xml|txt)(\.gz)?$', Sellvana_Seo_Frontend_Controller_Sitemaps.sitemap_data ]
+                    - [ /*url, Sellvana_Seo_Frontend_Controller_UrlAliases.index ]
