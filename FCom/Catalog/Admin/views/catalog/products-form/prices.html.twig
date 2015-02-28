@@ -60,6 +60,9 @@
                     </select>
                 </div>
             {% endif %}
+            <div class="col-md-2">
+                <button class="btn btn-primary" id="prices_add_new" type="button">{{ "Add New Price"|_ }}</button>
+            </div>
         </div>
         <div id="price_list">
             <div style="width: 200px;margin:10px auto;" class="progress">
@@ -70,13 +73,17 @@
 </fieldset>
 <script type="text/javascript">
     require(['jquery', 'fcom.catalog.product.price'], function ($, Price) {
-        $('select.to-select2').select2({minimumResultsForSearch: 15});
+        $('select.to-select2').select2({minimumResultsForSearch: 15, width: 'resolve', dropdownAutoWidth: true});
         var options = {
             container: $('#price_list'),
             prices: {{ UTIL.toJson(prices)|raw }},
             customer_groups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'null' }},
             sites: {{ sites? UTIL.toJson(sites)|raw: 'null' }},
-            currencies: {{ currencies? UTIL.toJson(currencies)|raw: 'null' }}
+            currencies: {{ currencies? UTIL.toJson(currencies)|raw: 'null' }},
+            filter_customer_group: $('#prices-customer_groups'),
+            filter_site: $('#prices-sites'),
+            filter_currency: $('#prices-currencies'),
+            prices_add_new: $('#prices_add_new')
         };
 
         Price.init(options);
