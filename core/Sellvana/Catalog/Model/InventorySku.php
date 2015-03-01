@@ -8,6 +8,19 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         "title" => "N/A"
     ];
 
+    public function collectInventoryForProducts($products)
+    {
+        $pIds = [];
+        foreach ($products as $p) {
+            $pIds[$p->id()] = $p->id();
+        }
+        $invModels = $this->orm()->where_in('id', $pIds)->find_many_assoc('id');
+        foreach ($products as $p) {
+            $p->set('inventory_model', !empty($invModels[$p->id()]) ? $invModels[$p->id()] : false);
+        }
+        return $invModels;
+    }
+
     public function getQtyAvailable()
     {
         return $this->get('qty_in_stock') - $this->get('qty_buffer') - $this->get('qty_reserved');

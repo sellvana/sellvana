@@ -10,6 +10,9 @@
                 <tr><td colspan="6">
 
                     {{ pci.get('customer_label') }}: {{ pci.get('customer_details') }}
+                    {% if pci.get('coupon_code') %}
+                        (Coupon: {{ pci.get('coupon_code') }})
+                    {% endif %}
 
                     {% if item.sku|length > 1 %}
                         <a href="{{ UTIL.setUrlQuery(APP.href('promo/cart/add_free_item'), {

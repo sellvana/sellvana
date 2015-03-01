@@ -10,6 +10,7 @@
  * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
+ * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  */
 
 class Sellvana_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abstract
@@ -49,6 +50,9 @@ class Sellvana_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
         //$productsData['state']['sc'] = $this->BRequest->get('sc');
+
+        $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($productsData['rows']);
+
         $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
         $this->BApp->i()
@@ -136,6 +140,9 @@ class Sellvana_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
         #$productsData['state']['sc'] = $req->get('sc');
+
+        $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($productsData['rows']);
+
         $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
         $this->BApp->i()

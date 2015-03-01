@@ -267,7 +267,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //$key = $this->manuf()->manuf_name.'-'.$this->product_sku.'-'.$this->product_name;
         $key = $this->product_name;
         $urlKey = $this->BLocale->transliterate($key);
-        $t = static::$_table;
+        $t = $this->BDb->t(static::$_table);
         $existsSql = "SELECT COUNT(*) as cnt from {$t} WHERE url_key=?";
         if ($this->id()) {
             $existsSql .= ' and id!=' . (int)$this->id();
@@ -1180,7 +1180,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function getInventoryModel()
     {
         $invModel = $this->get('inventory_model');
-        if ($invModel) {
+        if ($invModel !== null) {
             return $invModel;
         }
         $invHlp = $this->Sellvana_Catalog_Model_InventorySku;

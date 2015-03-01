@@ -9,6 +9,7 @@
  * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
+ * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  */
 class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
 {
@@ -44,6 +45,7 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
             'sort_options'  => $pagerView->sort_options,
             'page_size_options' => $pagerView->page_size_options,
         ]);
+        $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($productsData['rows']);
         $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
         $this->BApp->i()
@@ -120,6 +122,7 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
             'sort_options'  => $pagerView->sort_options,
             'page_size_options' => $pagerView->page_size_options,
         ]);
+        $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($productsData['rows']);
         $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
         $category = $this->Sellvana_Catalog_Model_Category->orm()->where_null('parent_id')->find_one();
