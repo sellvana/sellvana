@@ -1,0 +1,39 @@
+{% set facets = THIS.get('products_data')['facets'] %}
+{% set s = THIS.products_data['state'] %}
+{% set hlp = APP.instance('Sellvana_CatalogIndex_Main') %}
+<section class="f-prod-listing-filter">
+  <header class="f-widget-header">
+    <strong class="f-widget-title">{{ "Narrow Results" |_ }}</strong>
+  </header>
+  <form class="f-widget-content" action="" method="get">
+    {% if facets %}
+      <dl>
+  {% for fKey, facet in facets %}
+    {% if facet['custom_view'] %}
+        {{ THIS.view( facet['custom_view'], { 'facet_key': fKey, 'facet': facet, 'products_data': THIS.get('products_data') })| raw }}
+    {% elseif facet['values'] %}
+        <dt>{{ facet['display'] }}</dt>
+        <dd>
+          <ul>
+            {%  for vKey, value in facet['values'] %}
+              {% if value['selected'] %}
+                <li><a class="active" href="{{ hlp.getUrl(null, { (fKey): vKey}) }}">
+                    <span class="glyphicon glyphicon-check"></span> {{ value['display'] }}</a></li>
+                {% if s['save_filter']%}
+                    <input type="hidden" name="{{ fKey }}" value="{{ vKey }}"/>
+                {% endif %}
+              {% else %}
+                <li><a href="{{ hlp.getUrl({ (fKey): vKey}) }}">
+                     <span class="glyphicon glyphicon-unchecked"></span> {{ value['display'] }}
+                     {% if value['cnt'] %}<span class="count">{{ "(%s)" | _(value['cnt']) }}</span>{% endif %}
+                     </a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </dd>
+    {% endif %}
+    {% endfor %}
+      </dl>
+  {% endif %}
+  </form>
+</section>

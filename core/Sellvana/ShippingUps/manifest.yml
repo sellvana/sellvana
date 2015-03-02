@@ -1,0 +1,23 @@
+modules:
+    Sellvana_ShippingUps:
+        version: 0.1.0
+        channel: beta
+        require: { module: { Sellvana_Checkout: 0.2.1 } }
+        description: "Universal Post Service shipping module"
+        auto_use: [ bootstrap ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]
+
+        default_config:
+            modules:
+                Sellvana_ShippingUps:
+                    enabled: 1
+                    label: UPS
+                    max_package_weight: 150
+                    production_mode: 0
+                    sort_order: 10
+                    default_service: '03'
+                    conditionally_free_services: ['03', '11', '65']
+                    services: ['02', '03', '07', '08', '11', '12', '13', '14', '54', '59', '65']

@@ -1,0 +1,50 @@
+<!--{ label: History }-->
+<!--{ pos: 30 }-->
+<!--{ model_new_hide: 1 }-->
+<!--{ disabled: 1 }-->
+
+{% set m = THIS.get('model') %}
+{% set mediaCtrl = APP.instance('FCom_Admin_Controller_MediaLibrary') %}
+
+<fieldset id="attachments-layout">
+    <div class="ui-layout-west form-group">
+        <div class="col-md-12">
+            <input type="hidden" name="_add_attachments" value=""/>
+            <input type="hidden" name="_del_attachments" value=""/>
+            {{ THIS.view('jqgrid').set('config', APP.instance('Sellvana_Promo_Admin_Controller').attachmentGridConfig(m))|raw }}
+        </div>
+    </div>
+
+    <div class="ui-layout-center form-group">
+        <div class="col-md-12">
+            {{ THIS.view('jqgrid').set('config', mediaCtrl.gridConfig({'id':'all_attachments', 'folder':'media/promo'}))|raw }}
+        </div>
+    </div>
+</fieldset>
+<script>
+require(['jquery', 'fcom.admin'], function($) {
+    $(function() {
+        /*
+        attachmentsLayout = $('#attachments-layout').height($('.adm-wrapper').height()).layout({
+            useStateCookie: true,
+            west__minWidth:400,
+            west__spacing_open:20,
+            west__closable:false,
+            triggerEventsOnLoad: true,
+            onresize:function(pane, $Pane, paneState) {
+                $('.ui-jqgrid-btable:visible', $Pane).each(function(index) {
+                    $(this).setGridWidth(paneState.innerWidth - 20);
+                });
+            }
+        });
+        */
+        var attachmentsGrid = new FCom.Admin.MediaLibrary({
+            grid:'#all_attachments',
+            url:'{{ APP.href('media/grid') }}',
+            folder:'media/promo'
+        });
+
+        new FCom.Admin.TargetGrid({source:'#all_attachments', target:'#promo_attachments'});
+    })
+})
+</script>

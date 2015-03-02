@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_PaymentIdeal, { label: iDEAL, group: payment_methods } ]

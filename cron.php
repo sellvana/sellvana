@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/FCom/Core/Main.php';
+require_once __DIR__ . '/core/FCom/Core/Main.php';
 
 BConfig::i()->set('cookie/session_disable', true);
 

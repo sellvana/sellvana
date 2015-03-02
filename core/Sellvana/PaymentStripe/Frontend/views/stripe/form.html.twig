@@ -1,0 +1,55 @@
+{% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set token = cart.getData('payment_details/stripe/token') %}
+{% set prefix = THIS.get('form_prefix') %}
+
+<style>
+    #stripe-wait-message { color: green; }
+    #stripe-error-message { color: red; font-weight: bold; }
+    #stripe-success-message { color: green; font-weight: bold; }
+</style>
+
+<script src="https://checkout.stripe.com/v2/checkout.js"></script>
+
+<div id="stripe-button-container" {{ token ? 'hidden' }}>
+    <button type="button" id="stripe-modal-trigger" class="btn btn-primary">{{ 'Enter Payment Information'|_ }}</button>
+</div>
+
+<div id="stripe-wait-message" hidden>{{ 'Opening secure payment popup window...'|_ }}</div>
+<div id="stripe-error-message" hidden>{{ 'There was an error with payment, please try again'|_ }}</div>
+
+<div id="stripe-success-message" {{ not token ? 'hidden' }}>
+    {{ 'Payment information entered'|_ }}
+    <button type="button" id="stripe-change-trigger" class="btn btn-primary">{{ 'Change'|_ }}</button>
+</div>
+
+<input type="hidden" id="stripe-token" name="{{ prefix }}[token]" value="" disabled>
+
+<script>
+    require(['jquery'], function($) {
+        $('#stripe-modal-trigger,#stripe-change-trigger').click(function () {
+            $('#stripe-button-container').prop('hidden', true);
+            $('#stripe-success-message').prop('hidden', true);
+            $('#stripe-wait-message').prop('hidden', false);
+
+            var token = function (res) {
+                console.log(res);
+                $('#stripe-token').prop('disabled', false).val(res.id);
+                $('#stripe-wait-message').prop('hidden', true);
+                $('#stripe-success-message').prop('hidden', false);
+                var postData = { payment_method: 'stripe', stripe: { token: res.id } };
+                $.post('{{ APP.href('checkout/xhr_payment_method') }}', postData);
+            };
+
+            StripeCheckout.open({
+                key: '{{  THIS.get('public_key')|trim }}',
+                amount: {{ cart.get('grand_total') * 100 }},
+                currency: '{{ cart.get('currency') | default('USD') }}',
+                name: '{{ cart.get('billing_firstname') ~ ' ' ~ cart.get('billing_lastname') }}',
+                description: '{{ 'Cart (%s)'|_(cart.get('grand_total')|currency) }}',
+                panelLabel: '{{ 'Authorize'|_ }}',
+                //address: true,
+                token: token
+            });
+        });
+    });
+</script>

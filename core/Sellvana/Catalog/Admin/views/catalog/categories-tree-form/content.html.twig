@@ -1,0 +1,67 @@
+{% set m = THIS.get('model') %}
+{% set views = APP.instance('Sellvana_Catalog_Admin').getAvailableViews() %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { model:m } %}
+<div class="form-group">
+    <label class="col-md-2 control-label" for="main-show_order">{{ 'Show Order'|_ }}</label>
+    <div class="col-md-2">
+        <input type="hidden" id="model-page_parts" name="model[page_parts]" value="{{ m.get('page_parts') }}">
+        <ol id="show-order" class="dd-list columns ui-sortable" style="overflow:hidden">
+{% for k, label in m.getPageParts() %}
+            <li class="dd-item dd3-item" data-id="{{ k }}"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content"><label>{{ label|_ }}</label></div></li>
+{% endfor %}
+        </ol>
+    </div>
+</div>
+    {{ forms.boolean(fieldData, {field:'show_content', label:'Show Custom Content'|_}) }}
+
+
+    <div class="form-group">
+        {{ forms.label(fieldData, {field:'show_view', label:'Show Block / Page'|_}) }}
+        <div class="col-md-3">
+            <select style="float: left; width: auto" class="form-control" name="model[show_view]" value="{{ c.get('modules/Sellvana_ShippingUps/services/s'~sId) }}">
+                <option value="0">{{ "no"|_ }}</option>
+                <option value="1" {% if m.get('show_view') == 1  %}selected{% endif %}>{{ "YES"|_ }}</option>
+            </select>
+        </div>
+        <div class="col-md-5">
+            <select name="model[view_name]" class="form-control select2" id="category-view-name-select2">
+                {{ UTIL.optionsHtml(views, m.get('view_name')) | raw }}
+            </select>
+        </div>
+    </div>
+    {{ forms.boolean(fieldData, {field:'show_sub_cat', label:'Show Subcategories'|_}) }}
+    {{ forms.boolean(fieldData, {field:'show_products', label:'Show Products'|_}) }}
+    {{ forms.boolean(fieldData, {field:'show_sidebar', label:'Show Sidebar'|_}) }}
+
+    {{ forms.textarea({label: 'Custom Content'|_, name: "model[content]", input_div_class: "col-md-10", value:  m.get('content'), id: "model-content", input_class: "ckeditor" }) }}
+<script>
+require(['jquery', 'jquery-ui', 'select2'], function($) {
+    $('#category-view-name-select2').select2({
+        sortResults: function(results, container, query) {
+            for (var i = 0 ; i < results.length; i ++ ) {
+                for (var j = i+1; j < results.length; j++) {
+                   if (results[i].text.toLowerCase() > results[j].text.toLowerCase()) {
+                       var tmp = results[i];
+                       results[i] = results[j];
+                       results[j] = tmp;
+                   }
+                }
+            }
+            return results;
+        }
+    });
+    $('#show-order').sortable({
+        scroll: false,
+        revert: true,
+        axis:'y',
+        update: function(event, ui) {
+            var pageParts = [];
+            $('#show-order li').each(function(idx, el) {
+                pageParts.push($(el).data('id'));
+            });
+            $('#model-page_parts').val(pageParts.join(','));
+        }
+    });
+})
+</script>

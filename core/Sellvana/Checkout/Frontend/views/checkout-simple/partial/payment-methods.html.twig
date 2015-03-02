@@ -1,0 +1,34 @@
+{% set methods = APP.instance('Sellvana_Sales_Main').getPaymentMethods() %}
+{% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set curMethod = cart.get('payment_method') %}
+
+<h4>{{ 'Payment methods'|_ }}</h4>
+
+<dl>
+{% for code, method in methods %}
+    <dt>
+        <label for="payment_method-{{ code }}">
+            <input type="radio" name="payment_method" id="payment_method-{{ code }}" class="payment_method" required
+                   value="{{ code }}" {{ code == curMethod ? 'checked' }}> {{ method.getName() |_ }}</label>
+    </dt>
+    <dd id="payment_form-{{ code }}" class="payment_form">
+        {{ method.getCheckoutFormView().set({ cart:cart, code:code, method:method}) | raw }}
+    </dd>
+{% endfor %}
+</dl>
+
+
+<script type="text/javascript">
+    require(['jquery'], function($){
+        $('.payment_method').click(function(){
+            $('.payment_form').addClass('hidden').find('input, select, textarea').prop('disabled', true);
+            $('#payment_form-' + this.value).removeClass('hidden').find('input, select, textarea').prop('disabled', false);
+        });
+        $('.payment_form').each(function(idx, el) {
+            var method = el.id.replace('payment_form-','');
+            if (method !== '{{ curMethod }}') {
+                $(el).addClass('hidden');
+            }
+        });
+    });
+</script>

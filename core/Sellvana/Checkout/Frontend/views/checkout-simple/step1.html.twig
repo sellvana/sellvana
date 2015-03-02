@@ -1,0 +1,43 @@
+{% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set customer = APP.instance('Sellvana_Customer_Model_Customer').sessionUser() %}
+{% set validator = THIS.validator(type ~ '-form', cart) %}
+
+<div class="row">
+    <div class="col-md-9">
+        <form action="{{ APP.href('checkout/step1') }}" method="post" id="{{ type }}-form" role="form">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <input type="hidden" name="checkout_step" value="1">
+
+            <div class="f-checkout-form">
+
+                {% if not customer %}
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            <label for="customer_email" class="control-label required">{{ "E-mail" |_ }}</label>
+                            <input type="text" name="customer_email" id="customer_email" value="{{ validator.fieldValue('customer_email') }}" required class="required {{ validator.fieldClass('customer_email') }} form-control">
+                            {{ validator.errorHtml("customer_email", "customer_email") | raw }}
+                        </div>
+                        <div class="col-sm-6">
+                            <p>{{ 'Already have an account?'|_ }} <a href="{{ APP.href('checkout/login') }}">{{ 'Login here'|_ }}</a></p>
+                        </div>
+                    </div>
+                {% else %}
+                    {{ "You are logged in as: %s"|_(customer.get('email')) }}
+                {% endif %}
+
+                <header class="f-page-header">
+                    <h1 class="f-page-title">{{ 'Shipping Address'|_ }}</h1>
+                </header>
+
+                {{ THIS.view('checkout-simple/partial/address-form').set('address_type', 'shipping') | raw}}
+
+                <div class="form-group">
+                    <button class="btn btn-primary btn-lg" type="submit">{{ "Continue" |_ }}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-3">
+        {{ THIS.view('checkout-simple/partial/summary') | raw }}
+    </div>
+</div>

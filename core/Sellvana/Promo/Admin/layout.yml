@@ -1,0 +1,30 @@
+base:
+    - { view: admin/nav, do: [[ addNav, catalog/promo, { label: Promotions, href: /promo } ]] }
+    - view: head
+        do:
+#        raw src files
+#            - [ requireJs, fcom.promo.common, @Sellvana_Promo/Admin/jsx/src/fcom.promo.common ]
+#            - [ requireJs, fcom.promo, @Sellvana_Promo/Admin/jsx/src/fcom.promo ]
+#            - [ requireJs, fcom.promo.actions, @Sellvana_Promo/Admin/jsx/src/fcom.promo.actions, [react, fcom.promo.common] ]
+#            - [ requireJs, fcom.promo.coupon, @Sellvana_Promo/Admin/jsx/src/fcom.promo.coupon, [react, fcom.promo.common] ]
+#            - [ requireJs, fcom.promo.conditions, @Sellvana_Promo/Admin/jsx/src/fcom.promo.conditions, [react, fcom.promo.common] ]
+#            - [ requireJs, fcom.promo.details, @Sellvana_Promo/Admin/jsx/src/fcom.promo.details, [react, fcom.promo.common] ]
+#            production files
+            - [ requireJs, fcom.components, @FCom_Core/jsx/build/fcom.components ]
+#            - [ requireJs, fcom.promo.common, @Sellvana_Promo/Admin/jsx/build/fcom.promo.common ]
+#            - [ requireJs, fcom.promo.actions, @Sellvana_Promo/Admin/jsx/build/fcom.promo.actions, [react, fcom.promo.common] ]
+#            - [ requireJs, fcom.promo.coupon, @Sellvana_Promo/Admin/jsx/build/fcom.promo.coupon, [react, fcom.promo.common] ]
+#            - [ requireJs, fcom.promo.conditions, @Sellvana_Promo/Admin/jsx/build/fcom.promo.conditions, [react, fcom.promo.common] ]
+            - [ requireJs, fcom.promo, @Sellvana_Promo/Admin/jsx/build/fcom.promo, [jquery, react] ]
+            - [ requireJs, fcom.promo.details, @Sellvana_Promo/Admin/jsx/build/fcom.promo.details, [react] ]
+            - [ requireJs, store, @FCom_LibJsCommon/js/store ]
+
+    - { include: lib_griddle }
+
+promo_form_tabs:
+    - view: admin/form
+        set: { tab_view_prefix: 'promo/form/' }
+
+/promo/form:
+    - { include: promo_form_tabs }
+

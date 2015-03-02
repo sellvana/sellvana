@@ -1,4 +1,0 @@
-/settings:
-    - view: settings
-        do:
-            - [ addTab, FCom_PaymentBasic, { label: Check / MO, group: payment_methods, async: true } ]

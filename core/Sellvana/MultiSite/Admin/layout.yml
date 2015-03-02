@@ -1,0 +1,9 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, system/multisite, { label: Multi Site, pos: 30, href: /multisite } ]
+
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_MultiSite, { label: Multi Site, group: catalog, async: true } ]

@@ -1,0 +1,14 @@
+{% set c = THIS.get('model') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { model: c, settings_module:'Sellvana_AdminLiveFeed' } %}
+<h2>{{ "Admin Live Feed Settings"|_ }}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_AdminLiveFeed'}) }}
+     {{ forms.accordion_panel_start({label:'Admin Live Feed Recent Activity'|_, id:'settings-Sellvana_AdminLiveFeed-group0', in:1}) }}
+        {{ forms.boolean(fieldData, {field:'enable_catalog', label:'Catalog'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'enable_newsletter', label:'Newsletter'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'enable_wishlist', label:'Wishlist'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'enable_customer', label:'Customer'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'enable_product_reviews', label:'Product Reviews'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'enable_sales', label:'Sales'|_ }) }}
+     {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

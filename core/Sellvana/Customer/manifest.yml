@@ -1,0 +1,56 @@
+modules:
+    Sellvana_Customer:
+        version: 0.1.12
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.0 } }
+        translations: { en: en.php }
+        description: Customer Accounts and Management
+
+        observe:
+            - [ "FCom_OAuth_Provider_BaseV1::getAccessToken:after", "Sellvana_Customer_Main.onOAuthAfterGetAccessToken" ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ bootstrap, layout, views ]
+                routing:
+                    - [ /customers, Sellvana_Customer_Admin_Controller_Customers.index ]
+                    - [ /customers/.action, Sellvana_Customer_Admin_Controller_Customers ]
+                    - [ /customers/import/.action, Sellvana_Customer_Admin_Controller_CustomersImport ]
+                    - [ /addresses/.action, Sellvana_Customer_Admin_Controller_Addresses ]
+                observe:
+                    - [ "BActionController::beforeDispatch", Sellvana_Customer_Admin.onControllerBeforeDispatch ]
+                    - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Customer_Admin.onGetDashboardWidgets ]
+                    - [ "FCom_Admin_Controller_HeaderSearch::action_index", Sellvana_Customer_Admin_Controller_Customers.onHeaderSearch ]
+                uploads:
+                    customer-import:
+                        permission: customer/import
+                        filetype: csv,txt
+                        folder: {random}/import/customers
+
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ /login, Sellvana_Customer_Frontend_Controller.login ]
+                    - [ /customer/register, Sellvana_Customer_Frontend_Controller.register ]
+                    - [ /customer/password/recover, Sellvana_Customer_Frontend_Controller.password_recover ]
+                    - [ /customer/password/reset, Sellvana_Customer_Frontend_Controller.password_reset ]
+                    - [ /logout, Sellvana_Customer_Frontend_Controller.logout ]
+
+                    - [ /customer/myaccount, Sellvana_Customer_Frontend_Controller_Account.index ]
+                    - [ /customer/myaccount/.action, Sellvana_Customer_Frontend_Controller_Account ]
+
+                    - [ /customer/address, Sellvana_Customer_Frontend_Controller_Address.index ]
+                    - [ /customer/address/.action, Sellvana_Customer_Frontend_Controller_Address ]
+                    #- [ /customer/address/billing, Sellvana_Customer_Frontend_Controller_Address.billing ]
+                observe:
+                    - [ "Sellvana_Sales_Model_Cart::addProduct", "Sellvana_Customer_Model_Customer::onAddProductToCart" ]
+                views:
+                    - [ customer/account/sidebar, { view_class: Sellvana_Customer_Frontend_View_Sidebar } ]
+
+            FCom_ApiServer:
+                routing:
+                    - [ /v1/customer/customer, Sellvana_Customer_ApiServer_V1_Customer.index ]
+                    - [ "/v1/customer/customer/:id", Sellvana_Customer_ApiServer_V1_Customer.index ]
+
+                    - [ /v1/customer/address, Sellvana_Customer_ApiServer_V1_Address.index ]
+                    - [ "/v1/customer/address/:id", Sellvana_Customer_ApiServer_V1_Address.index ]

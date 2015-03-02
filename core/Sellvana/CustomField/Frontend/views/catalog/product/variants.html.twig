@@ -1,0 +1,112 @@
+{% set prod = THIS.get('product') %}
+{% set modelField = APP.instance('Sellvana_CustomField_Model_Field') %}
+{% set varData = APP.instance('Sellvana_CustomField_Model_ProductVariant').fetchProductVariantsData(prod) %}
+
+{% if varData.fields and varData.variants is not empty %}
+    <div id="f-prod-tab-variant">
+        {% for field in varData.fields %}
+            <div class="form-group row" style="overflow: hidden">
+                <label class="col-xs-12 col-md-3 control-label">{{ field.frontend_label |_ }}</label>
+                <div class="col-xs-12 col-md-9">
+                    <select id="variant-select-{{ field.field_code }}" name="variant_select[{{ field.field_code }}]" class="form-control variant-dropdown">
+                        {{ UTIL.optionsHtml(field.options) | raw }}
+                    </select>
+                </div>
+            </div>
+        {% endfor %}
+        <!--
+        <div class="form-group row overflow-hidden">
+            <label class="col-xs-12 col-md-3 control-label ">{{ 'Sku: ' |_ }}</label>
+            <div class="col-xs-12 col-md-9 f-price-group" style="margin: 0px;">
+                <div class="f-reg-price">
+                    <span class="f-price" id="sku-variant">{{ prod.get('product_sku') }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row overflow-hidden">
+            <label class="col-xs-12 col-md-3 control-label ">{{ 'Price:' |_ }}</label>
+            <div class="col-xs-12 col-md-9 f-price-group" style="margin: 0px;">
+                <div class="f-reg-price">
+                    <span class="f-price" id="price-variant"></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row overflow-hidden">
+            <label class="col-xs-12 col-md-3 control-label">{{ 'Quantity:' |_ }}</label>
+            <div class="col-xs-12 col-md-9">
+                <input type="text" name="qty" class="form-control col-md-2" id="quantity-variant" value="1"/>
+            </div>
+        </div>
+        -->
+    </div>
+
+<script>
+    require(['jquery'], function ($) {
+        var $imgContainer = $('.f-prod-more-view-imgs');
+        var $price = $('.f-final-price');
+        var $sku = $('.f-sku');
+        var $addToCart = $('#prod-add-to-cart');
+        var $displayAll = $('#display-all-images');
+        var varData = {{ UTIL.toJson(varData) | raw }};
+        var firstRun = true;
+
+        function processVariants() {
+            var vrKey = [], node = varData.variants_tree;
+            
+            // handle dropdowns
+            varData.fields.forEach(function(f, i) {
+                var $select = $('#variant-select-' + f.field_code), val = $select.val();
+                if (i > 0) {
+                    $select.empty();
+                    if (!node[val]) {
+                        val = false;
+                    }
+                    for (var j in node) {
+                        if (false === val) {
+                            val = j;
+                        }
+                        $select.append($('<option>').val(j).html(j).prop('selected', val == j));
+                    }
+                }
+                node = node[val];
+            });
+
+            // handle current variant price and stock data
+            $sku.html(node.product_sku);
+            $price.html(node.variant_price);
+            console.log(node.variant_qty, node);
+            $('.f-stock-notice.f-in-stock').prop('hidden', node.variant_qty == 0);
+            $('.f-stock-notice.f-out-of-stock').prop('hidden', node.variant_qty > 0);
+            $addToCart.prop('disabled', !Number(node.variant_qty));
+
+            // handle images
+            if (!firstRun) {
+                if (node.img_ids.length) {
+                    $imgContainer.children().each(function(idx, img) {
+                        var $img = $(img);
+                        $img.prop('hidden', node.img_ids.indexOf('' + $img.data('id')) === -1);
+                    });
+                    $imgContainer.find('li:visible a').get(0).click();
+                    $displayAll.prop('hidden', 0);
+                } else {
+                    $imgContainer.children().prop('hidden', 0);
+                    $displayAll.prop('hidden', 1);                    
+                }
+            }
+            firstRun = false;
+        }
+
+        $displayAll.click(function() { 
+            $imgContainer.children().prop('hidden', 0);
+            $displayAll.prop('hidden', 1);
+        });
+        
+        // process immediately
+        processVariants();
+
+        // process on dropdown change
+        $('.variant-dropdown').change(processVariants);
+    });
+</script>
+
+{% endif %}

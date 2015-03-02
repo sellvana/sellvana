@@ -1,9 +1,0 @@
-{% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
-{% if (cart.itemQty()) %}
-<div class="f-widget f-widget-featured-prods">
-  <header class="f-widget-header">
-    <strong class="f-widget-title">Customers who bought items in your cart also bought</strong>
-  </header>
-  {{ THIS.view('catalog/product/grid-tiles').set('products', []) | raw }}
-</div><!-- /.f-widget-featured-prods -->
-{% endif %}

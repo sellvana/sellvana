@@ -1,0 +1,43 @@
+modules:
+    Sellvana_Cms:
+        version: 0.1.6
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0, FCom_LibTwig: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
+        translations: { en: en.php }
+        description: "CMS for custom pages and blocks"
+        auto_use: all
+
+        default_config:
+            modules/Sellvana_Cms/page_enable: true
+            modules/Sellvana_Cms/nav_enable: true
+
+        observe:
+            - [ "FCom_Core_LayoutEditor::fetchLibrary", "Sellvana_Cms_Main.onLayoutEditorFetchLibrary" ]
+
+        areas:
+            FCom_Admin:
+                routing:
+                    - [ /cms/nav, Sellvana_Cms_Admin_Controller_Nav.index ]
+                    - [ /cms/nav/.action, Sellvana_Cms_Admin_Controller_Nav ]
+
+                    - [ /cms/pages, Sellvana_Cms_Admin_Controller_Pages.index ]
+                    - [ /cms/pages/.action, Sellvana_Cms_Admin_Controller_Pages ]
+                    - [ "/cms/pages/history/:id/grid_data", Sellvana_Cms_Admin_Controller_Pages.history_grid_data ]
+
+                    - [ /cms/blocks, Sellvana_Cms_Admin_Controller_Blocks.index ]
+                    - [ /cms/blocks/.action, Sellvana_Cms_Admin_Controller_Blocks ]
+                    - [ "/cms/blocks/history/:id/grid_data", Sellvana_Cms_Admin_Controller_Blocks.history_grid_data ]
+
+                    - [ /cms/forms, Sellvana_Cms_Admin_Controller_Forms.index ]
+                    - [ /cms/forms/.action, Sellvana_Cms_Admin_Controller_Forms ]
+
+                security:
+                    request_fields_whitelist:
+                        /cms/blocks/form:
+                            POST/model/content: "*"
+            FCom_Frontend:
+                views:
+                    - [ cms/form-fields, { view_class: Sellvana_Cms_Frontend_View_FormFields } ]
+
+                observe:
+                    - [ "FCom_Frontend_Controller::beforeDispatch", "Sellvana_Cms_Frontend.onFrontendIndexBeforeDispatch" ]
