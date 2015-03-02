@@ -350,6 +350,29 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     }
 
     /**
+     * //todo: remove after finish griddle
+     * temporary function to build griddle, will be removed after test
+     * @param $model
+     * @return array
+     */
+    public function productImagesGridConfigForGriddle($model)
+    {
+        $config = $this->productImagesGridConfig($model);
+        unset($config['config']['actions']['add']);
+        $config['config']['actions'] += [
+            'add-images' => [
+                'caption'  => 'Add images',
+                'type'     => 'button',
+                'id'       => 'add-image-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'showModalToAddImage'
+            ]
+        ];
+
+        return $config;
+    }
+
+    /**
      * modal grid on category/product tab
      * @param $model Sellvana_Catalog_Model_Product
      * @return array
