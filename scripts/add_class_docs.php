@@ -8,12 +8,12 @@ ini_set("display_errors", 1);
 error_reporting(-1);
 
 $rootDir = dirname(__DIR__);
-require_once  $rootDir . '/FCom/Core/Main.php';
+require_once $rootDir . '/core/FCom/Core/Main.php';
 BConfig::i()->set( 'fs/root_dir', $rootDir );
 FCom_Core_Main::i()->init( 'FCom_Core' );
 BModuleRegistry::i()->bootstrap();
 
-$files = BUtil::i()->globRecursive($rootDir . '/FCom', '*.php');
+$files = BUtil::i()->globRecursive($rootDir . '/core/*', '*.php');
 
 echo "<pre>";
 //var_dump($files);

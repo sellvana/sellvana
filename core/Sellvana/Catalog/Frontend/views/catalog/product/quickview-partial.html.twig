@@ -1,0 +1,87 @@
+{% set m = THIS.get('model') %}
+{% set images = m.media('I') %}
+<div class="row">
+  <!-- Product Image Column -->
+  <div class="f-col-prod-img col-sm-6">
+    <div class="f-rslides-container">
+      <ul class="thumbnails f-rslides f-prod-imgs" id="quickview-rslides">
+{% for img in images %}
+            <li><img class="f-prod-img img-responsive" src="{{ img.imageUrl() }}" alt=""/></li>
+{% endfor %}
+      </ul>
+      <a href="#" hidden id="display-all-images"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
+    </div>
+    <ul class="f-prod-more-view-imgs row" id="quickview-rslides-pager">
+{% for img in images %}
+          <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.thumbUrl(50) }}" alt="" title=""></a></li>
+{% endfor %}
+    </ul>
+    <script>
+      require(['jquery', 'responsiveslides', 'jquery.zoom'], function($) {
+        $("#quickview-rslides").responsiveSlides({
+          speed: 500,
+          timeout: 4000,
+          nav: true,
+          manualControls: '#quickview-rslides-pager',
+          pause: true,
+          pauseControls: true,
+          namespace: "f"
+        });
+        $('#quickview-rslides li').addClass('zoom').zoom();
+      });
+    </script>
+  </div>
+  <div class="tab-content col-sm-6">
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#f-tab-summary" data-toggle="tab">{{ 'Summary'|_ }}</a></li>
+      <li><a href="#f-tab-detail" data-toggle="tab">{{ 'Details'|_ }}</a></li>
+    </ul>
+    <div class="tab-pane active" id="f-tab-summary">
+      <h4 class="f-prod-name"><a href="{{ m.url() }}">{{ m.get('product_name') }}</a></h4>
+        <p class="f-sku">{{ m.get('product_sku') }}</p>
+
+{% if MODULES.isLoaded('Sellvana_ProductReviews') %}
+      <div class="f-prod-avg-rating">
+        <div class="glyphicon f-rating-stars f-xs-stars">
+          <span class="f-filled-stars" style="width:{{ m.getAverageStars() }}%;"></span>
+          <span class="f-empty-stars"></span>
+        </div>
+        <a href="#f-prod-tab-reviews">{{ '%s Review(s)'|_(m.getNumReviews()) }}</a>
+      </div>
+{% endif %}
+
+      {{ THIS.view('catalog/product/price').set('product', prod) | raw }}
+
+      <form class="f-prod-select form-horizontal" role="form" method="post" action="{{ APP.href('cart/add') }}">
+        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+        <input type="hidden" name="id" value="{{ m.id() }}">
+
+        {{ THIS.view('catalog/product/variants').set('product', m) | raw }}
+
+        <p class="f-stock-notice f-in-stock">{{ 'In Stock.'|_ }}</p>
+        <p class="f-stock-notice f-out-of-stock" hidden>{{ 'Out Of Stock.'|_ }}</p>
+
+        <div class="f-prod-add-cart">
+
+            <div class="form-group overflow-hidden">
+                <label class="col-md-3 control-label">{{ 'Qty:' |_ }}</label>
+                <div class="col-md-2">
+                    <input type="text" name="qty" class="form-control col-md-3" value="1"/>
+                </div>
+            </div>
+          <button type="submit" class="btn btn-primary btn-lg" id="prod-add-to-cart"><span class="glyphicon glyphicon-shopping-cart"></span>{{ 'Add to Cart'|_ }}</button>
+          <ul class="f-add-to-links">
+            <li><a href="{{ APP.href('wishlist/add?id=') ~ m.id() }}" rel="nofollow" class="btn-link">{{ 'Add to Wishlist'|_ }}</a></li>
+              {{ THIS.view('catalog/compare-link').set('product_id', m.id()) | raw }}
+          </ul>
+        </div>
+      </form>
+    </div>
+    <!-- /.tab-pane -->
+    <div class="tab-pane" id="f-tab-detail">
+      <div class="f-prod-short-description">
+        <p>{{ m.get('description') | raw }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_PaymentBasic, { label: Check / MO, group: payment_methods, async: true } ]

@@ -1,0 +1,45 @@
+<!--{ label: Customer Info }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model') %}
+{% if APP.m('Sellvana_CustomerGroups').run_status == 'LOADED' %}
+    {% set customerGroups = APP.instance('Sellvana_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+{% set validator = THIS.get('validator') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<div class="col-md-12">
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Personal Information"|_ }}</h3>
+        {{ forms.input({label: 'First Name'|_,  required: 1, name: "model[firstname]", value: validator.fieldValue('firstname'), id: "model-firstname" }) }}
+        {{ forms.input({label: 'Last Name'|_,  required: 1, name: "model[lastname]", value: validator.fieldValue('lastname'), id: "model-lastname" }) }}
+        {{ forms.input({label: 'Email'|_, type: "email", required: 1, name: "model[email]", value: validator.fieldValue('email'), id: "model-email" }) }}
+        {% if customerGroups is defined %}
+            {{ forms.select({label: 'Customer Group'|_, options: customerGroups, value: validator.fieldValue('customer_group'), name: "model[customer_group]", id: "model-customer_group" }) }}
+        {% endif %}
+        {{ forms.input({label: 'Daytime Phone'|_, name: "model[phone]", value: validator.fieldValue('phone'), id: "model-phone" }) }}
+        {{ forms.input({label: 'Evening Phone'|_, name: "model[phone_evening]", value: validator.fieldValue('phone_evening'), id: "model-phone_evening" }) }}
+        {{ forms.select({label: 'Status'|_, options: m.fieldOptions('status'), value: validator.fieldValue('status'), name: "model[status]", id: "model-status" }) }}
+    </fieldset>
+
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ 'Password Reset'|_ }}</h3>
+
+        {{ forms.input({label: 'New Password'|_, type: "password", name: "model[password]", value: validator.fieldValue('password'), autocomplete:'off' }) }}
+        {{ forms.input({label: 'Confirm Password'|_, type: "password", name: "model[password_confirm]", value: validator.fieldValue('password_confirm'), autocomplete:'off' }) }}
+    </fieldset>
+</div>
+
+<script>
+    require(['jquery', 'jquery.validate'], function($) {
+        $(function() {
+            $('#model-password').parents('form').validate({
+                rules:{
+                    'model[password]': {
+                        passwordSecurity: {{ CONFIG.get('modules/Sellvana_Customer/password_strength') ? 'true' : 'false' }}
+                    }
+                }
+            });
+        })
+    })
+</script>

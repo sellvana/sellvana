@@ -1,0 +1,12 @@
+<!--{ label: Reviews }-->
+<!--{ pos: 40 }-->
+<!--{ model_new_hide: true }-->
+
+<script>
+    require(['jquery.rateit']);
+</script>
+
+{% set m = THIS.get('model') %}
+{% set hlp = APP.instance('Sellvana_ProductReviews_Admin_Controller') %}
+{#{{ THIS.view('core/backbonegrid').set('grid', hlp.customerReviewsGridConfig(m)) | raw }}#}
+{{ THIS.view('core/griddle').set('grid', hlp.customerReviewsGridConfig(m)) | raw }}

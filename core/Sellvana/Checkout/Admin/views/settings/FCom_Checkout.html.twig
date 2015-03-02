@@ -1,0 +1,8 @@
+{% set c = THIS.get('model') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { model: c, settings_module:'Sellvana_Checkout' } %}
+<h2>{{ "Checkout Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_Checkout'}) }}
+
+{{ forms.accordion_end }}
+

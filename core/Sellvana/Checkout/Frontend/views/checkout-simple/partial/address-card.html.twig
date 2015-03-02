@@ -1,0 +1,4 @@
+{% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set type = THIS.get('address_type') %}
+
+{{ cart.addressAsHtml(type) | raw }}

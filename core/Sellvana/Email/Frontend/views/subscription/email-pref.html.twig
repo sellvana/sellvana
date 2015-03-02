@@ -1,0 +1,37 @@
+{% set r = REQUEST %}
+{% set hlp = APP.instance("Sellvana_Email_Model_Pref") %}
+{% set email = r.get('email') %}
+{% set validToken = hlp.validateToken( email, r.get('token') ) %}
+{% set pref = hlp.load(email, 'email') %}
+{% set formUrl = UTIL.setUrlQuery( r.currentUrl(), { 'unsub_all': '' } ) %}
+
+<header class="main-title">
+    <h1>{{ "Subscription Preferences" | _ }}</h1>
+</header>
+<div class="main col1-layout">
+    <div class="col-main">
+        {{ THIS.view('core/messages') | raw }}
+
+{% if validToken %}
+        <form method="post" action="{{ formUrl }}">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <fieldset>
+                <p>{{ "Your email" | _ }}: <strong>{{ email }}</strong></p>
+                <input type="hidden" name="model[email]" value="{{ email }}"/>
+                <div class="checkbox">
+                  <label>
+                      <input type="checkbox" name="model[unsub_all]" value="1"
+                      {{ pref and pref.get('unsub_all') or r.get('unsub_all') ? 'checked' }} />{{"Unsubscribe from all non-transactional emails" | _ }}
+                  </label>
+                </div>
+                <p><input type="submit" class="btn btn-primary" value="{{ "Save Preferences" | _ }}"/></p>
+            </fieldset>
+        </form>
+{% else %}
+
+{{ "ERROR: " | _ }}{{ "Invalid token." | _ }}
+
+{% endif %}
+
+    </div>
+</div>

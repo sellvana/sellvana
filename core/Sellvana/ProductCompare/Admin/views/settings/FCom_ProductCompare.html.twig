@@ -1,0 +1,9 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'Sellvana_ProductCompare' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+<h2>{{ "Product Comparison Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_ProductCompare'}) }}
+     {{ forms.accordion_panel_start({label:'Product Comparison'|_, id:'settings-Sellvana_ProductCompare-group0', in:1}) }}
+        {{ forms.input(fieldData, {field:'cookie_token_ttl_days', label:'Comparison Cookie TTL (days)'|_, attr: 'data-rule-number="true"' }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

@@ -3,7 +3,7 @@
 $destDir = __DIR__.'/../storage/formatted1'; // target dir
 
 $tab = 4; // tab indent size
-$files = array_merge(glob('../FCom/*/*.yml'), glob('../FCom/*/*/*.yml')); // find all YML files
+$files = array_merge(glob('../core/*/*/*.yml'), glob('../core/*/*/*/*.yml')); // find all YML files
 
 foreach ($files as $file) {
     echo '<hr>'.$file.': ';
