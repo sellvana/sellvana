@@ -40,7 +40,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
             if (this.props['filter_site_value'] && this.props['filter_site_value'] !== '*' && this.props['filter_site_value'] != price['site_id']) {
                 show = false;
             }
-            if (this.props['filter_currency_value'] && this.props['filter_currency_value'] !== '*' && this.props['filter_currency_value'] != price['currency_id']) {
+            if (this.props['filter_currency_value'] && this.props['filter_currency_value'] !== '*' && this.props['filter_currency_value'] != price['currency_code']) {
                 show = false;
             }
             return show;
@@ -86,10 +86,10 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                                defaultValue={this.getSiteName(price['site_id'])}/>
                     </div>
                     <div style={divStyle}>
-                        <input type="hidden" name={this.getFieldName(price, "currency_id")}
-                               defaultValue={price['currency_id']} className="priceUnique"/>
+                        <input type="hidden" name={this.getFieldName(price, "currency_code")}
+                               defaultValue={price['currency_code']} className="priceUnique"/>
                         <input type="text" className="form-control" readOnly="readOnly"
-                               defaultValue={this.getCurrencyName(price['currency_id'])}/>
+                               defaultValue={this.getCurrencyName(price['currency_code'])}/>
                     </div>
                     <div style={divStyle}>
                         <input type="text" className="form-control" name={this.getFieldName(price, "price")}
@@ -193,7 +193,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                         price_type: 'tier',
                         customer_group_id: this.options.filter_customer_group_value || null,
                         site_id: this.options.filter_site_value || null,
-                        currency_id: this.options.filter_currency_value || null,
+                        currency_code: this.options.filter_currency_value || null,
                         price: 0.0,
                         qty: 1
                     };
