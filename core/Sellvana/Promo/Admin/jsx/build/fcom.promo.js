@@ -822,6 +822,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                         React.createElement(ConditionsType, {ref: "catProductsType", id: "catProductsType", containerClass: "col-md-3", promoType: promoType, 
                             onChange: this.onChange, value: values.type}, " of products in "), 
                         React.createElement("input", {type: "hidden", id: "catProductsIds", ref: "catProductsIds", defaultValue: categories}), 
+                        React.createElement("select", {id: "catProductInclude", ref: "catProductInclude", className: "to-select2", defaultValue: values.include}, 
+                            React.createElement("option", {value: "only_this"}, Locale._("Only This")), 
+                            React.createElement("option", {value: "include_subcategories"}, Locale._("This and sub categories"))
+                        ), 
                         React.createElement("div", {style: display}, 
                             React.createElement(Common.Compare, {ref: "catProductsCond", id: "catProductsCond", onChange: this.onChange, 
                                 value: values.filter, disabled: disabled})
@@ -892,7 +896,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             onChange: function () {
                 var value = {};
                 value.category_id = $(this.refs['catProductsIds'].getDOMNode()).select2('val');
-                //value.include = $(this.refs['catProductInclude'].getDOMNode()).val();
+                value.include = $(this.refs['catProductInclude'].getDOMNode()).val();
                 if (this.props.options.promo_type !== 'catalog') {
                     value.type = this.refs['catProductsType'].serialize();
                     value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();
