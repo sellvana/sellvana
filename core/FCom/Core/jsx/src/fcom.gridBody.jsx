@@ -109,8 +109,22 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
 
             var dataForRender = (headerSelection == 'show_all') ? this.props.originalData : selectedRows;
 
+            var defaultValues = [];
+            _.forEach(this.props.columnMetadata, function(col, index) {
+                if (col.default) {
+                    defaultValues.push(col);
+                }
+            });
+
             var nodes = dataForRender.map(function (row, index) {
-                return <FComRow row={row} index={index} columns={that.props.columns} columnMetadata={that.props.columnMetadata}
+                //set default value
+                if (defaultValues.length) {
+                    _.forEach(defaultValues, function(value) {
+                        row[value.name] = value.default;
+                    });
+                }
+
+                return <FComRow row={row} index={index} columns={that.props.columns} columnMetadata={that.props.columnMetadata} defaultValues={defaultValues}
                     getConfig={that.props.getConfig} doRowAction={that.doRowAction} removeSelectedRows={that.props.removeSelectedRows}
                     addSelectedRows={that.props.addSelectedRows} getSelectedRows={that.props.getSelectedRows} />;
             });
