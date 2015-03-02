@@ -48,4 +48,4 @@ modules:
                     - [ "FCom_Core_Model_Seq::getFirstSeqId", Sellvana_Sales_Model_Order.onGetFirstSeqId ]
             FCom_Cron:
                 crontab:
-                    - [ "* * * * *", Sellvana_Sales_Cron::everyMinute ]
+                    - [ "* * * * *", Sellvana_Sales_Cron::runEveryMinute ]

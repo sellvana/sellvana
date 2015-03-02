@@ -32,3 +32,7 @@ modules:
                     - [ "Sellvana_Sales_Model_Cart::calculateTotals", "Sellvana_Promo_Frontend::onPromoCartValidate" ]
                     - [ "Sellvana_Sales_Model_Cart::addProduct", "Sellvana_Promo_Frontend::onPromoCartAddProduct" ]
                     - [ "BLayout::hook:promotions", Sellvana_Promo_Frontend_Controller.hook_promotions ]
+
+            FCom_Cron:
+                crontab:
+                    - [ "* * * * *", "Sellvana_Promo_Cron.runEveryMinute" ]

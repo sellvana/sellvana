@@ -40,7 +40,7 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
             'subtotal' => $subtotal,
         ]);
 
-        $this->_cart->getTotalByType('grand_total')->addComponent($this->_value, 'subtotal');
+        $this->_cart->getTotalByType('grand_total')->resetComponents()->addComponent($this->_value, 'subtotal');
 
         return $this;
     }

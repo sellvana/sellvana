@@ -14,6 +14,9 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         foreach ($products as $p) {
             $pIds[$p->id()] = $p->id();
         }
+        if (empty($pIds)) {
+            return [];
+        }
         $invModels = $this->orm()->where_in('id', $pIds)->find_many_assoc('id');
         foreach ($products as $p) {
             $p->set('inventory_model', !empty($invModels[$p->id()]) ? $invModels[$p->id()] : false);

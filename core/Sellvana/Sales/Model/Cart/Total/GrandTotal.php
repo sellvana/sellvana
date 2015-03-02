@@ -40,6 +40,12 @@ class Sellvana_Sales_Model_Cart_Total_GrandTotal extends Sellvana_Sales_Model_Ca
         return false;
     }
 
+    public function resetComponents($components = [])
+    {
+        $this->_components = $components;
+        return $this;
+    }
+
     public function addComponent($value, $type = null)
     {
         $this->_components[] = ['value' => $value, 'type' => $type];
