@@ -733,6 +733,10 @@ class Sellvana_Catalog_Migrate extends BClass
                 'currency_id' => BDb::DROP,
                 'currency_code' => 'char(3) null',
             ],
+            BDb::KEYS => [
+                'UNQ_prod_group_qty' => 'DROP',
+                'UNQ_type_prod_group_qty' => 'UNIQUE (product_id, customer_group_id, site_id, currency_code, qty, price_type)',
+            ],
         ]);
     }
 }

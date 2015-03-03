@@ -2,7 +2,8 @@
 
 /**
  * Class Sellvana_Catalog_Admin_Controller_Products
- * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ *
+*@property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
@@ -14,7 +15,8 @@
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
- */
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+*/
 class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -535,6 +537,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $this->processMediaPost($model, $data);
                 $this->processInventoryPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
+                $this->processPricesPost($model, $data);
                 // moved to Sellvana_CustomFields
                 #$this->processVariantPost($model, $data);
                 #$this->processCustomFieldPost($model, $data);
@@ -950,5 +953,22 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             array_push($args['site_map'], ['loc' => $this->BApp->frontendHref($row->get('url_key')), 'changefreq' => 'daily']);
         };
         $this->Sellvana_Catalog_Model_Product->orm()->select('url_key')->iterate($callback);
+    }
+
+    protected function processPricesPost($model, $data)
+    {
+        if(empty($data['prices']) || empty($data['prices']['productPrice'])){
+            return;
+        }
+
+        foreach ($data['prices']['productPrice'] as $id => $priceData) {
+            if(is_numeric($id)) {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
+            } else {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
+            }
+            $price->set($priceData)->save();
+        }
+
     }
 }
