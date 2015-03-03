@@ -61,7 +61,7 @@
                 </div>
             {% endif %}
             <div class="col-md-2">
-                <button class="btn btn-primary" id="prices_add_new" type="button">{{ "Add New Price"|_ }}</button>
+                <button class="btn btn-primary" id="prices_add_new" type="button" disabled="disabled">{{ "Add New Price"|_ }}</button>
             </div>
         </div>
         <div id="price_list">
@@ -72,8 +72,18 @@
     </div>
 </fieldset>
 <script type="text/javascript">
-    require(['jquery', 'fcom.catalog.product.price'], function ($, Price) {
+    require(['jquery', 'fcom.catalog.product.price', 'jquery.validate'], function ($, Price) {
         $('select.to-select2').select2({minimumResultsForSearch: 15, width: 'resolve', dropdownAutoWidth: true});
+        function validatePrices() {
+            var valid = true;
+            $('#price_list').find('select.priceUnique').each(function (el) {
+                if (!$(this).valid()) {
+                    valid = false;
+                }
+            });
+            return valid;
+        }
+
         var options = {
             container: $('#price_list'),
             prices: {{ UTIL.toJson(prices)|raw }},
@@ -83,10 +93,55 @@
             filter_customer_group: $('#prices-customer_groups'),
             filter_site: $('#prices-sites'),
             filter_currency: $('#prices-currencies'),
-            prices_add_new: $('#prices_add_new')
+            prices_add_new: $('#prices_add_new'),
+            product_id: '{{ m.id() }}',
+            validatePrices: validatePrices
         };
 
         Price.init(options);
+        /*
+         *custom validation function for checking duplicated input
+         */
+        function priceUnique(value, elem) {
+            var valid = true;
+            if (typeof (elem) !== 'undefined') {
+                var parent = $(elem).parents('.price-item');
+                var curFields = parent.find('input.priceUnique, select.priceUnique');
+                var items = $('.price-item');
+                items.each(function () {
+                    if (!valid) {
+                        return;
+                    }
+
+                    var $item = $(this);
+                    if (this === parent[0]) {
+                        return;
+                    }
+                    var fields = $item.find('input.priceUnique, select.priceUnique');
+                    var same = true;
+                    fields.each(function (idx) {
+                        var currField = $(curFields[idx]);
+                        var checkField = $(this);
+                        if (currField.val() != checkField.val()) {
+                            same = false;
+                        }
+                    });
+                    if (same) {
+                        valid = false;
+                    }
+                });
+                return valid;
+            }
+        }
+
+        $.validator.addMethod('priceUnique', priceUnique, 'Same price already exists.');
+
+        $.validator.addClassRules("priceUnique", {
+            priceUnique: true
+        });
+        $('form').submit(function () {
+            return validatePrices();
+        });
     })
 </script>
 
