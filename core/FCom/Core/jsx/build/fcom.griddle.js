@@ -13,7 +13,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         getDefaultProps: function () {
             return {
                 "config": {},
-                "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable'
+                "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable',
+                "callbacks": {}
             }
         },
         componentWillMount: function () {
@@ -46,20 +47,43 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     break;
             }
         },
+        callCallbackFunctions: function (type) {
+            var grid = this.refs[this.props.config.id];
+            //todo: add code to support multi callbacks
+
+            if (typeof this.props.callbacks[type] !== 'undefined') {
+                if (typeof this.props.callbacks[type] === 'function') {
+                    return this.props.callbacks[type](grid);
+                } else {
+                    var funcName = this.props.callbacks[type];
+                    if (typeof window[funcName] === 'function') {
+                        return window[funcName](grid);
+                    }
+                }
+            }
+        },
+        componentDidMount: function () {
+            this.callCallbackFunctions('componentDidMount');
+        },
+        componentDidUpdate: function () {
+            this.callCallbackFunctions('componentDidUpdate');
+        },
         render: function () {
             console.log('config', this.props.config);
             var config = this.props.config;
 
             return (
-                React.createElement(Griddle, {showTableHeading: false, tableClassName: this.props.tableClassName, 
-                    config: config, initColumns: this.getColumn(), 
-                    sortColumn: config.data.state.s, sortAscending: config.data.state.sd == 'asc', 
-                    columns: this.getColumn('show'), columnMetadata: this.props.columnMetadata, 
-                    useCustomGrid: true, customGrid: FComGridBody, 
-                    getExternalResults: FComDataMethod, resultsPerPage: config.data.state.ps, 
-                    useCustomPager: "true", customPager: FComPager, initPage: config.data.state.p - 1, 
-                    showSettings: true, useCustomSettings: true, customSettings: FComSettings, 
-                    showFilter: true, useCustomFilter: "true", customFilter: FComFilter, filterPlaceholderText: "Quick Search"}
+                React.createElement("div", {className: "fcom-htmlgrid responsive-table"}, 
+                    React.createElement(Griddle, {showTableHeading: false, tableClassName: this.props.tableClassName, ref: config.id, 
+                        config: config, initColumns: this.getColumn(), 
+                        sortColumn: config.data.state.s, sortAscending: config.data.state.sd == 'asc', 
+                        columns: this.getColumn('show'), columnMetadata: this.props.columnMetadata, 
+                        useCustomGrid: true, customGrid: FComGridBody, 
+                        getExternalResults: FComDataMethod, resultsPerPage: config.data.state.ps, 
+                        useCustomPager: "true", customPager: FComPager, initPage: config.data.state.p - 1, 
+                        showSettings: true, useCustomSettings: true, customSettings: FComSettings, 
+                        showFilter: true, useCustomFilter: "true", customFilter: FComFilter, filterPlaceholderText: "Quick Search"}
+                    )
                 )
             );
         }
