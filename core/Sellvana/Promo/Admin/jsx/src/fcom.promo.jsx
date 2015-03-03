@@ -201,7 +201,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                     id={"modal-" + this.props.id} key={"modal-" + this.props.id}
                     title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
                     <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} data={this.state.value}
-                        onLoad={this.registerModalContent} key={"modal-content-" + this.props.id} />
+                        onLoad={this.registerModalContent} key={"modal-content-" + this.props.id} promo_type={this.props.options.promo_type}/>
                 </Components.Modal>;
 
                 React.render(modal, this.props.modalContainer.get(0));
@@ -418,6 +418,9 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 var fieldCombination = this.refs['combinationField'];
                 var self = this;
                 this.url = this.props.baseUrl + this.props.url;
+                if(this.props.promo_type) {
+                    this.url += "?promo_type=" + encodeURIComponent(this.props.promo_type);
+                }
                 $(fieldCombination.getDOMNode()).select2({
                     placeholder: self.props.labelCombinationField,
                     multiple: false,
