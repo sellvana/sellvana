@@ -3,6 +3,9 @@
 /**
  * Class Sellvana_Sales_Model_Cart_Total_Subtotal
  *
+ * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
@@ -26,6 +29,22 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
                 $this->_cart->removeProduct($item->product_id);
             }
             */
+            $product = $item->getProduct();
+            $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+            $customerGroup = $customer->getCustomerGroupId();
+            // todo , load site currency, load site id
+            $site = null;
+            $currency = null;
+            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
+                $site = $this->Sellvana_MultiSite_Main->getCurrentSiteData();
+            }
+            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+                $currency = $this->Sellvana_MultiCurrency_Main->getCurrentCurrency();
+            }
+            $tierPrice = $product->getTierPrice($item->getQty(), $customerGroup, $site['id'], $currency);
+            if($tierPrice){
+                $item->set('tier_price', $tierPrice);
+            }
             $itemNum++;
             $itemQty += $item->get('qty');
             $rowTotal = $item->calcRowTotal();

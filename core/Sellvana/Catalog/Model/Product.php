@@ -1204,4 +1204,22 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $this->set('inventory_model', $invModel);
         return $invModel;
     }
+
+    /**
+     * @param float  $qty quantity of product in cart
+     * @param int    $customerGroupId
+     * @param int    $siteId
+     * @param string $currencyCode
+     * @return null|float
+     */
+    public function getTierPrice($qty, $customerGroupId = null, $siteId = null, $currencyCode = null)
+    {
+        $priceModel = $this->Sellvana_Catalog_Model_ProductPrice;
+        $price      = $priceModel->getPrice($this, 'tier', $qty, $customerGroupId, $siteId, $currencyCode);
+
+        if ($price) {
+            return $price->get('price');
+        }
+        return null;
+    }
 }

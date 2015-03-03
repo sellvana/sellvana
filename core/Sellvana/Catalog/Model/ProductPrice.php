@@ -36,4 +36,27 @@ class Sellvana_Catalog_Model_ProductPrice
         }
         return $prices ? $this->BDb->many_as_array($prices) : [];
     }
+
+    /**
+     * @param Sellvana_Catalog_Model_Product $product
+     * @param string                         $price_type
+     * @param int                            $qty
+     * @param int                            $customerGroupId
+     * @param int                            $siteId
+     * @param string                         $currencyCode
+     * @return Sellvana_Catalog_Model_ProductPrice
+     */
+    public function getPrice($product, $price_type, $qty = 1, $customerGroupId = null, $siteId = null, $currencyCode = null)
+    {
+        $price = $this->load([
+            'product_id'        => $product->id(),
+            'price_type'        => $price_type,
+            'customer_group_id' => $customerGroupId,
+            'site_id'           => $siteId,
+            'qty'               => $qty,
+            'currency_code'     => $currencyCode
+        ]);
+
+        return $price;
+    }
 }
