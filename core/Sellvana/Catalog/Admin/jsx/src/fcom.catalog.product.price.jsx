@@ -50,12 +50,12 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
     var PriceItem = React.createClass({
         render: function () {
             var price = this.props.data;
+            var editable = (['regular', 'map', 'msrp', 'sale', 'tier'].indexOf(price['price_type']) != -1);
             var qty = <input type="hidden" name={this.getFieldName(price, "qty")} defaultValue={price['qty']}/>;
             if (price['price_type'] === 'tier') {
                 qty = <input type="text" className="form-control priceUnique" name={this.getFieldName(price, "qty")}
-                             defaultValue={price['qty']} onChange={this.props.validate}/>;
+                             defaultValue={price['qty']} onChange={this.props.validate} readOnly={editable ? null : 'readonly'}/>;
             }
-            var editable = (price['price_type'] in ['regular', 'map', 'msrp', 'sale', 'tier']);
             return (
                 <div className="form-group price-item">
                     <div style={divStyle}>
@@ -65,7 +65,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                         </a>
                     </div>
                     <div style={divStyle}>
-                        <select className="to-select2 form-control priceUnique" disabled={editable? 'disabled': false}
+                        <select className="to-select2 form-control priceUnique" disabled={editable? null: 'disabled'}
                             name={this.getFieldName(price, 'price_type')}
                                 defaultValue={price['price_type']} ref="price_type">
                             {_.map(this.props.price_types, function (pt, pk) {
@@ -95,7 +95,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                     </div>
                     <div style={divStyle}>
                         <input type="text" className="form-control" name={this.getFieldName(price, "price")}
-                               defaultValue={price['price']}/>
+                               defaultValue={price['price']} readOnly={editable ? null: 'readonly'}/>
                     </div>
                     <div style={divStyle}>
                         {qty}
@@ -149,7 +149,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
     var divStyle = {float: 'left', marginLeft: 15};
     var productPrice = {
         options: {
-            price_types: { regular:"Regular", map:"MAP", msrp:"MSRP", sale:"Sale", tier:"Tier" },
+            price_types: { regular:"Regular", map:"MAP", msrp:"MSRP", sale:"Sale", tier:"Tier" , cost:"Cost" , promo:"Promo" },
             title: Locale._("Product Prices")
         },
         newIdx: 0,
