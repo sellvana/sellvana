@@ -21,11 +21,19 @@ class Sellvana_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
 
     public function validateConditions(Sellvana_Promo_Model_Promo $promo, Sellvana_Sales_Model_Cart $cart)
     {
-        $matchType = $cart->getData('conditions/match') ?: Sellvana_Promo_Model_Promo::MATCH_ANY; //TODO: remove default after testing
+        $matchType = $promo->getData('conditions/match');
+
+        if (!$matchType || $matchType === 'always') {
+            $result['match'] = true;
+            $result['items'] = $cart->items();
+            return $result;
+        }
+
         $result = [
             'match' => $matchType === Sellvana_Promo_Model_Promo::MATCH_ALL ? true : false,
             'items' => [],
         ];
+
         if ($promo->get('status') !== 'active' || $promo->get('promo_type') !== 'cart') {
             return $result;
         }
@@ -56,12 +64,12 @@ class Sellvana_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
                         $match = $this->_validateCategories($cart, $condition, $result);
                         break;
 
-                    case 'total':
-                        $match = $this->_validateTotal($cart, $condition, $result);
-                        break;
-
                     case 'combination':
                         $match = $this->_validateCombination($cart, $condition, $result);
+                        break;
+
+                    case 'total':
+                        $match = $this->_validateTotal($cart, $condition, $result);
                         break;
 
                     case 'shipping':

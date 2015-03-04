@@ -616,6 +616,11 @@ class BLayout extends BClass
         return $this->hook($hookName, $view, $args, $viewName);
     }
 
+    public function hookText($hookName, $text)
+    {
+        return $this->hook($hookName, function() use ($text) { return $text; });
+    }
+
     public function hookClear($hookName, $viewNames)
     {
         $eventHlp = $this->BEvents;
@@ -921,6 +926,11 @@ class BLayout extends BClass
             }
             if (!empty($d['use_meta'])) {
                 $this->view($v)->useMetaData();
+            }
+        }
+        if (!empty($d['text'])) {
+            foreach ((array)$d['text'] as $text) {
+                $this->hook($d['name'], function() use ($text) { return $text; });
             }
         }
     }
