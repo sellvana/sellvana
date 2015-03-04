@@ -654,6 +654,14 @@ var Griddle = React.createClass({displayName: "Griddle",
     clearSelectedRows: function() {
         this.setState({selectedRows: []});
     },
+    addRows: function(rows) {
+        var results = this.state.filteredResults || this.state.results;
+        results.push.apply(results, rows);
+        this.setState({ results: results, filteredResults: results });
+    },
+    getRows: function() {
+        return this.state.filteredResults || this.state.results;
+    },
     /**
      * set value header selection
      * @param value

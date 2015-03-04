@@ -27,29 +27,31 @@ Images grid with griddle
 {# show main grid#}
 {{ LAYOUT.view('core/griddle').set('grid', prodImagesConfig) | raw }}
 
+<input type='hidden' name="grid[images][del]" class="target-attach-remove" id="{{ prodImagesConfig.config.id }}-attach-remove"/>
+<input type='hidden' name="grid[images][rows]" class="target-attach-rows" id="{{ prodImagesConfig.config.id }}-attach-rows"/>
+
 <script>
-    var mainGrid, attachGrid;
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
-        var mediaId = '{{ mediaConfig.id }}'
-            ;
+        //var mediaId = '{{ mediaConfig.id }}';
+        var mainGridId = '{{ prodImagesConfig.config.id }}';
+        var mainGrid, attachGrid;
 
         window.showModalToAddImage = function(grid) {
             mainGrid = grid;
-
-            console.log('showModalToAddImage');
-            console.log('grid', grid);
-
-            var mediaLibAttachConfigCompiled = {{ UTIL.toJson(mediaLibAttachConfigCompiled) | raw }};
-
-            var modalEleContainer = document.getElementById('{{ prodImagesConfig.config.id }}-modal');
-            React.unmountComponentAtNode(modalEleContainer);
-
-            React.render(
+            var modalContainerEle = document.getElementById('{{ prodImagesConfig.config.id }}-modal');
+            //render modal
+            React.unmountComponentAtNode(modalContainerEle);
+            React.renderComponent(
                     React.createElement(Components.Modal, {
+                                id: "attachGridModal",
                                 show: true,
                                 title: 'Add images',
                                 confirm: 'Add',
                                 cancel: 'Close',
+                                onLoad: function (modal) {
+                                    var node = $(modal.getDOMNode());
+                                    node.find('.modal-dialog').css('width', '900px');
+                                },
                                 onConfirm: window.addSelectedImages
                             },
                             React.createElement("div", { className: "row f-grid-wrapper" }, React.createElement("div", { className: "tabbable" },
@@ -62,24 +64,55 @@ Images grid with griddle
                                             )
                                     ),
                                     React.createElement("div", { className: "tab-content" },
-                                            React.createElement("div", { className: "tab-pane active", id: "{{mediaConfig.id}}-attach_library" },
-                                                    React.createElement(FComGriddleComponent, { config: mediaLibAttachConfigCompiled , "callbacks": {"componentDidMount": "setAttachGrid"}})),
+                                            React.createElement("div", { className: "tab-pane active", id: "{{mediaConfig.id}}-attach_library" }
+                                            ),
                                             React.createElement("div", { className: "tab-pane", id: "{{mediaConfig.id}}-media-upload" }, "Pre content")
                                     )
                             )))
-                    , modalEleContainer);
+                    , modalContainerEle);
+
+            var mediaLibAttachConfigCompiled = {{ UTIL.toJson(mediaLibAttachConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('{{mediaConfig.id}}-attach_library');
+            var instanceAttachGrid = React.renderComponent(
+                    React.createElement(FComGriddleComponent, { config: mediaLibAttachConfigCompiled}),
+                    attachGridContainerEle
+            );
+
+            if (typeof instanceAttachGrid.refs[mediaLibAttachConfigCompiled.id] !== 'undefined') {
+                attachGrid = instanceAttachGrid.refs[mediaLibAttachConfigCompiled.id];
+            }
 
             //$('#' + mediaId + '_modal').modal('show');
         };
 
         window.addSelectedImages = function(modal) {
-            //todo: function add selected items to main row
-            modal.close();
-        };
+            var selectedRows = attachGrid.getSelectedRows();
+            if (selectedRows.length) {
+                var addRows = [];
+                //process selected rows
+                selectedRows.forEach(function(attachRow) {
+                    if (!_.findWhere(mainGrid.getRows(), {file_id: attachRow.id})) {
+                        var row = attachRow;
+                        var current = FCom.Mixin.dateTimeNow();
+                        _.extend(row, {
+                            id: guid(),
+                            file_id: attachRow.id,
+                            update_at: current,
+                            create_at: current
+                        });
+                        addRows.push(row);
+                    }
 
-        window.setAttachGrid = function(grid) {
-            console.log('setAttachGrid');
-            attachGrid = grid;
+                    if (addRows.length) {
+                        mainGrid.addRows(addRows);
+                        $('#' + mainGridId + '-attach-rows').val(JSON.stringify(addRows));
+                    }
+                });
+
+                modal.close();
+            } else {
+                alert('please choose at least one item');
+            }
         };
     });
 </script>

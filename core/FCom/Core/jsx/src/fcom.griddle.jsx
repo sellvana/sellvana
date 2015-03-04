@@ -6,7 +6,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
     var dataUrl,
         gridId,
         buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
-            return dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+            var beginQueryChar = dataUrl.indexOf('?') ? '&' : '?';
+            return dataUrl + beginQueryChar+ 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
         };
 
     var FComGriddleComponent = React.createClass({
@@ -47,11 +48,12 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     break;
             }
         },
-        callCallbackFunctions: function (type) {
+        /*callCallbackFunctions: function (type) {
             var grid = this.refs[this.props.config.id];
             //todo: add code to support multi callbacks
 
             if (typeof this.props.callbacks[type] !== 'undefined') {
+                console.log('grid.callback: ', this.props.callbacks[type]);
                 if (typeof this.props.callbacks[type] === 'function') {
                     return this.props.callbacks[type](grid);
                 } else {
@@ -67,7 +69,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         },
         componentDidUpdate: function () {
             this.callCallbackFunctions('componentDidUpdate');
-        },
+        },*/
         render: function () {
             console.log('config', this.props.config);
             var config = this.props.config;
@@ -415,6 +417,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         },
         handleCustom: function(callback, event) {
             if (typeof window[callback] === 'function') {
+                console.log('actions.callback: ' + callback);
                 return window[callback](this.props.getCurrentGrid());
             }
         },
