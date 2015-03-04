@@ -2981,6 +2981,38 @@ class BModel extends Model
         static::$_tableNames[$class] = null;
     }
 
+    public static function create_many(array $data, array $defaults = [], array $options = [])
+    {
+        $fields = [];
+        foreach ($data as $r) {
+            foreach ($r as $f => $v) {
+                $fields[$f] = $f;
+            }
+        }
+
+        $params = [];
+        foreach ($data as $r) {
+            foreach ($fields as $f) {
+                $params[] = !empty($r[$f]) ? $r[$f] : (!empty($defaults[$f]) ? $defaults[$f] : null);
+            }
+        }
+
+        $instr = !empty($options['replace']) ? 'REPLACE INTO' : 'INSERT INTO';
+        $table = static::table();
+        $values = join(',', array_fill(0, sizeof($data), '(' . join(',', array_fill(0, sizeof($fields), '?')) . ')'));
+        $sql = "{$instr} {$table} ({$fields}) VALUES {$values}";
+
+        BDebug::debug('SQL: ' . $sql);
+
+        BEvents::i()->fire(static::origClass() . '::create_many:before', ['data' => &$data]);
+
+        $result = static::run_sql($sql, $params);
+
+        BEvents::i()->fire(static::origClass() . '::create_many:after', ['data' => $data, 'result' => &$result]);
+
+        return $result;
+    }
+
     /**
      * Update one or many records of the class
      *
