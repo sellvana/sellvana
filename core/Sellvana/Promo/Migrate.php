@@ -21,155 +21,228 @@
  */
 class Sellvana_Promo_Migrate extends BClass
 {
-    public function install__0_1_6()
+    public function install__0_2_0()
     {
+        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
+        $tOrder = $this->Sellvana_Sales_Model_Order->table();
         $tPromo = $this->Sellvana_Promo_Model_Promo->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS {$tPromo}(
-            `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
-            `description` VARCHAR(255)  NOT NULL  ,
-            `details` TEXT  NULL  ,
-            `manuf_vendor_id` INT(10) UNSIGNED NULL  ,
-            `from_date` DATE NULL  ,
-            `to_date` DATE NULL  ,
-            `status` ENUM('template','pending','active','expired')  NOT NULL  DEFAULT 'pending' ,
-            `buy_type` ENUM('qty','$')  NOT NULL  DEFAULT 'qty' ,
-            `buy_group` ENUM('one', 'any', 'all', 'cat', 'anyp')  NOT NULL  DEFAULT 'one',
-            `buy_amount` INT(11) NULL  ,
-            `get_type` ENUM('qty','$','%','text','choice','free')  NOT NULL  DEFAULT 'qty' ,
-            `get_group` ENUM('same_prod','same_group','any_group','diff_group')  NOT NULL  DEFAULT 'same_prod' ,
-            `get_amount` INT(11) NULL  ,
-            `originator` ENUM('manuf','vendor')  NOT NULL  DEFAULT 'manuf' ,
-            `fulfillment` ENUM('manuf','vendor')  NOT NULL  DEFAULT 'manuf' ,
-            `create_at` DATETIME NOT NULL  ,
-            `update_at` DATETIME NULL  ,
-            `coupon` varchar(100) NULL  ,
-            PRIMARY KEY (`id`)
-            ) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
+        $tPromoCoupon = $this->Sellvana_Promo_Model_PromoCoupon->table();
+        $tPromoOrder = $this->Sellvana_Promo_Model_PromoOrder->table();
+        $tPromoCart = $this->Sellvana_Promo_Model_PromoCart->table();
+        $tPromoMedia = $this->Sellvana_Promo_Model_PromoMedia->table();
+        $tPromoProduct = $this->Sellvana_Promo_Model_PromoProduct->table();
 
-        $tGroup = $this->Sellvana_Promo_Model_Group->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS {$tGroup}(
-    `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
-    `promo_id` INT(10) UNSIGNED NOT NULL  ,
-    `group_type` ENUM('buy','get')  NOT NULL  ,
-    `group_name` VARCHAR(255)  NOT NULL  ,
-    PRIMARY KEY (`id`) ,
-    KEY `FK_promo_group_promo`(`promo_id`)
-) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
+        $tAdminUser = $this->FCom_Admin_Model_User->table();
+        $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
+        $tCartItem = $this->Sellvana_Sales_Model_Cart_Item->table();
+        $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
+        $tPromoHistory = $this->Sellvana_Promo_Model_PromoHistory->table();
+        $tPromoDisplay = $this->Sellvana_Promo_Model_PromoDisplay->table();
+        $tPromoCartItem = $this->Sellvana_Promo_Model_PromoCartItem->table();
 
-        $tMedia = $this->Sellvana_Promo_Model_PromoMedia->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS $tMedia(
-    `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
-    `promo_id` INT(10) UNSIGNED NULL  ,
-    `file_id` INT(11) UNSIGNED NOT NULL  ,
-    `manuf_vendor_id` INT(11) UNSIGNED NULL  ,
-    `promo_status` CHAR(1)  NOT NULL  DEFAULT 'A' ,
-    PRIMARY KEY (`id`) ,
-    KEY `FK_promo_media_file`(`file_id`) ,
-    KEY `FK_promo_media_promo`(`promo_id`)
-) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
-
-        $tProduct = $this->Sellvana_Promo_Model_PromoProduct->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS $tProduct(
-    `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
-    `promo_id` INT(10) UNSIGNED NOT NULL  ,
-    `group_id` INT(10) UNSIGNED NOT NULL  ,
-    `product_id` INT(11) UNSIGNED NOT NULL  ,
-    `qty` TINYINT(3) UNSIGNED NULL  ,
-    PRIMARY KEY (`id`) ,
-    KEY `FK_promo_product_promo`(`promo_id`) ,
-    KEY `FK_promo_product_product`(`product_id`) ,
-    KEY `FK_promo_product_group`(`group_id`)
-) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
-
-        $tCart = $this->Sellvana_Promo_Model_PromoCart->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS $tCart(
-            `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
-            `cart_id` INT(10) UNSIGNED NOT NULL  ,
-            `promo_id` INT(10) UNSIGNED NOT NULL  ,
-            `update_at` datetime NULL  ,
-            PRIMARY KEY (`id`)
-        ) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
-    }
-
-    public function upgrade__0_1_0__0_1_1()
-    {
-        $tCart = $this->Sellvana_Promo_Model_PromoCart->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS $tCart(
-            `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
-            `cart_id` INT(10) UNSIGNED NOT NULL  ,
-            `promo_id` INT(10) UNSIGNED NOT NULL  ,
-            PRIMARY KEY (`id`)
-        ) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
-    }
-
-    public function upgrade__0_1_1__0_1_2()
-    {
-        $tCart = $this->Sellvana_Promo_Model_PromoCart->table();
-        $this->BDb->ddlTableDef($tCart, [BDb::COLUMNS => ['updated_dt' => "datetime"]]);
-    }
-
-    public function upgrade__0_1_2__0_1_3()
-    {
-        $table = $this->Sellvana_Promo_Model_PromoCart->table();
-        $this->BDb->ddlTableDef($table, [
+        $this->BDb->ddlTableDef($tPromo, [
             BDb::COLUMNS => [
-                'updated_dt' => 'RENAME updated_at datetime NULL',
+                'id' => 'int unsigned not null auto_increment',
+                'from_date' => 'date null',
+                'to_date' => 'date null',
+                'status' => "enum('template','pending','active','expired')  not null  default 'pending'",
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime null',
+                'summary'                  => "VARCHAR(255) NOT NULL",
+                'internal_notes'           => "TEXT NULL",
+                'customer_label'           => "VARCHAR(255) NULL",
+                'customer_details'         => "TEXT NULL",
+                'promo_type'               => "ENUM('catalog','cart') NOT NULL DEFAULT 'cart'",
+                'coupon_type'              => 'TINYINT UNSIGNED DEFAULT 0 COMMENT "0 = Do not use, 1 = Single code, 2 = multiple codes"',
+                'limit_per_promo'        => "INT(10) UNSIGNED NULL DEFAULT 0",
+                'limit_per_customer' => "INT(10) UNSIGNED NULL DEFAULT 0",
+                'limit_per_coupon'         => "INT(10) UNSIGNED NULL DEFAULT 1",
+                'data_serialized'          => "TEXT",
+                'site_ids' => 'varchar(255)',
+                'customer_group_ids' => 'varchar(255)',
+                'priority_order' => 'smallint not null default 0',
+                'stop_flag' => 'tinyint not null default 0',
+                'display_index' => 'tinyint not null default 0',
+                'display_index_order' => 'int unsigned not null default 0',
+                'display_index_section' => "varchar(10) not null default 'regular'",
+                'display_index_type' => "varchar(10) not null default 'text'",
+                'display_index_showexp' => 'tinyint unsigned not null default 1',
+                'conditions_operator' => "varchar(6) not null default 'always'",
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_promo_status'     => "(status)",
+                'IDX_promo_from_to_date' => "(from_date, to_date)",
+                'IDX_status_type_priority_date' => '(`status`, promo_type, coupon_type, priority_order, from_date, to_date)',
+                'IDX_display_index' => '(display_index, display_index_order)',
+            ]
+        ]);
+
+        $this->BDb->ddlTableDef($tPromoMedia, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'promo_id' => 'int unsigned null',
+                'file_id' => 'int unsigned not null',
+                'promo_status' => "char(1) not null default 'A'",
+            ],
+            BDb::PRIMARY => '(id)',
+        ]);
+
+        $this->BDb->ddlTableDef($tPromoProduct, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'promo_id' => 'int unsigned not null',
+                'product_id' => 'int unsigned not null',
+                'calc_status' => 'tinyint not null default 0',
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_calc_status' => '(calc_status)',
+            ],
+            BDb::CONSTRAINTS => [
+                'promo' => ['promo_id', $tPromo],
+                'product' => ['product_id', $tProduct],
             ],
         ]);
-        $table = $this->Sellvana_Promo_Model_Promo->table();
-        $this->BDb->ddlTableDef($table, [
+
+        $this->BDb->ddlTableDef($tPromoCoupon, [
             BDb::COLUMNS => [
-                'create_dt' => 'RENAME create_at datetime NOT NULL',
-                'update_dt' => 'RENAME update_at datetime NULL',
+                'id' => "INT(10) UNSIGNED NOT NULL AUTO_INCREMENT",
+                'promo_id' => "INT(10) UNSIGNED NOT NULL",
+                'code' => "VARCHAR(50) NOT NULL",
+                'uses_per_customer' => "INT(10) UNSIGNED NULL ",
+                'uses_total' => "INT(10) UNSIGNED NULL ",
+                'total_used' => "INT(10) UNSIGNED NULL",
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                "promo" => ["promo_id", $tPromo],
+            ]
+        ]);
+
+        $this->BDb->ddlTableDef($tPromoCart, [
+            BDb::COLUMNS => [
+                'id'                 => "INT(10) unsigned not null auto_increment",
+                'promo_id'           => "INT(10) UNSIGNED NOT NULL",
+                'cart_id'            => "INT(10) UNSIGNED NOT NULL",
+                'coupon_id'          => "INT(10) UNSIGNED NULL",
+                'free_cart_item_id'  => "INT(10) UNSIGNED NULL",
+                'coupon_code'        => "varchar(50) NULL",
+                'subtotal_discount'  => "DECIMAL(12,2) NULL",
+                'shipping_discount'  => "DECIMAL(12,2) NULL",
+                'create_at'         => "DATETIME NOT NULL",
+                'update_at'         => "DATETIME NULL",
+                'customer_id' => 'int unsigned',
+                'data_serialized' => 'text',
+                'shipping_free' => 'tinyint not null default 0',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                "promo" => ["promo_id", $tPromo],
+                "cart" => ["cart_id", $tCart],
+                'cart_item' => ['free_cart_item_id', $tCartItem],
+                'customer' => ['customer_id', $tCustomer, 'id', 'CASCADE', 'SET NULL'],
+            ]
+        ]);
+
+        $this->BDb->ddlTableDef($tPromoOrder, [
+            BDb::COLUMNS => [
+                'id'                 => "INT(10) unsigned not null auto_increment",
+                'promo_id'           => "INT(10) UNSIGNED NOT NULL",
+                'order_id'           => "INT(10) UNSIGNED NULL",
+                'coupon_id'          => "INT(10) UNSIGNED NULL",
+                'free_order_item_id' => "INT(10) UNSIGNED NULL",
+                'coupon_code'        => "varchar(50) NULL",
+                'subtotal_discount'  => "DECIMAL(12,2) NULL",
+                'shipping_discount'  => "DECIMAL(12,2) NULL",
+                'create_at'         => "DATETIME NOT NULL",
+                'update_at'         => "DATETIME NULL",
+                'customer_id' => 'int unsigned',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                "promo" => ["promo_id", $tPromo],
+                "order" => ["order_id", $tOrder],
+                'order_item' => ['free_order_item_id', $tOrderItem],
+                'customer' => ['customer_id', $tCustomer, 'id', 'CASCADE', 'SET NULL'],
+            ]
+        ]);
+
+        $this->BDb->ddlTableDef($tPromoHistory, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'promo_id' => 'int unsigned not null',
+                'action_type' => 'varchar(20) not null',
+                'coupon_id' => 'int unsigned',
+                'coupon_code' => 'varchar(50)',
+                'admin_user_id' => 'int unsigned',
+                'customer_id' => 'int unsigned',
+                'cart_id' => 'int unsigned',
+                'order_id' => 'int unsigned',
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime',
+                'description' => 'text',
+                'data_serialized' => 'text',
+                'amount' => 'decimal(12,2)',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'promo' => ['promo_id', $tPromo],
+                'coupon' => ['coupon_id', $tPromoCoupon],
+                'admin_user' => ['admin_user_id', $tAdminUser],
+                'customer' => ['customer_id', $tCustomer],
+                'cart' => ['cart_id', $tCart],
+                'order' => ['order_id', $tOrder],
             ],
         ]);
-    }
 
-    public function upgrade__0_1_3__0_1_4()
-    {
+        $this->BDb->ddlTableDef($tPromoDisplay, [
+            BDb::COLUMNS     => [
+                'id'              => 'int unsigned not null auto_increment',
+                'promo_id'        => 'int unsigned not null',
+                'page_type'       => 'varchar(50) not null default "home_page"',
+                'page_location'   => 'varchar(50) not null default ""',
+                'content_type'    => 'varchar(20) not null default "html"',
+                'data_serialized' => 'text',
+                'create_at'       => 'datetime not null',
+                'update_at'       => 'datetime',
+            ],
+            BDb::PRIMARY     => '(id)',
+            BDb::CONSTRAINTS => [
+                'promo' => ['promo_id', $tPromo],
+            ]
+        ]);
 
-        $table = $this->Sellvana_Promo_Model_PromoCart->table();
-        $this->BDb->ddlTableDef($table, [
+        $this->BDb->ddlTableDef($tPromoCartItem, [
             BDb::COLUMNS => [
-                  'updated_at' => 'RENAME update_at datetime NULL',
+                'id' => 'int unsigned not null auto_increment',
+                'promo_cart_id' => 'int unsigned not null',
+                'promo_id' => 'int unsigned not null',
+                'cart_id' => 'int unsigned not null',
+                'cart_item_id' => 'int unsigned not null',
+                'item_type' => 'tinyint not null default 0',
+                'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_promo_cart_item' => '(promo_id, cart_id, cart_item_id, item_type)',
+            ],
+            BDb::CONSTRAINTS => [
+                'promo_cart' => ['promo_cart_id', $tPromoCart],
+                'promo' => ['promo_id', $tPromo],
+                'cart' => ['cart_id', $tCart],
+                'cart_item' => ['cart_item_id', $tCartItem],
             ],
         ]);
-    }
 
-    public function upgrade__0_1_4__0_1_5()
-    {
 
-        $table = $this->Sellvana_Promo_Model_Promo->table();
-        $this->BDb->ddlTableDef($table, [
-            BDb::COLUMNS => [
-                "coupon"          => "varchar(100)",
-                "manuf_vendor_id" => "INT(10) UNSIGNED NULL",
-                "buy_group"       => "ENUM('one', 'any', 'all', 'cat', 'anyp')  NOT NULL  DEFAULT 'one'"
-            ],
-        ]);
-    }
-
-    public function upgrade__0_1_5__0_1_6()
-    {
-
-        $table = $this->Sellvana_Promo_Model_Promo->table();
-        $this->BDb->ddlTableDef($table, [
-            BDb::COLUMNS => [
-                "get_type" => "enum('qty','$','%','text','choice','free') NOT NULL DEFAULT 'qty'"
-            ],
-        ]);
     }
 
     public function upgrade__0_1_6__0_1_7()

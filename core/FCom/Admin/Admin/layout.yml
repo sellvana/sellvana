@@ -33,6 +33,7 @@ base:
             #- [ css, "@FCom_Admin/Admin/js/dynatree/skin-vista/ui.dynatree.css" ]
 
     - { include: common_js_libs }
+    - { include: lib_griddle }
     - { include: lib_admin_theme1 }
 
     - view: admin/nav
