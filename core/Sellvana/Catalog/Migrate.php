@@ -18,6 +18,7 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
+ * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  */
 class Sellvana_Catalog_Migrate extends BClass
 {
@@ -736,6 +737,24 @@ class Sellvana_Catalog_Migrate extends BClass
             BDb::KEYS => [
                 'UNQ_prod_group_qty' => 'DROP',
                 'UNQ_type_prod_group_qty' => 'UNIQUE (product_id, customer_group_id, site_id, currency_code, qty, price_type)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_5__0_3_6()
+    {
+        $tPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
+
+        $tableProductVariant = $this->Sellvana_CustomField_Model_ProductVariant->table();
+        $this->BDb->ddlTableDef($tPrice, [
+            BDb::COLUMNS => [
+                'valid_from' => 'DATE NULL DEFAULT NULL',
+                'valid_to'   => 'DATE NULL DEFAULT NULL',
+                'variant_id' => 'INT(10) UNSIGNED NULL DEFAULT NULL',
+                'operation'  => 'CHAR(3) NULL DEFAULT NULL',
+                'base_field' => 'varchar(20) null'],
+            BDb::CONSTRAINTS => [
+                'variant' => ['variant_id', $tableProductVariant],
             ],
         ]);
     }

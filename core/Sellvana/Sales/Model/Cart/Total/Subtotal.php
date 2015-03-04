@@ -43,7 +43,7 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
             }
             $tierPrice = $product->getTierPrice($item->getQty(), $customerGroup, $site['id'], $currency);
             if($tierPrice){
-                $item->set('tier_price', $tierPrice);
+                $item->setData('tier_price', $tierPrice);
             }
             $itemNum++;
             $itemQty += $item->get('qty');

@@ -52,8 +52,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
             var price = this.props.data;
             var qty = React.createElement("input", {type: "hidden", name: this.getFieldName(price, "qty"), defaultValue: price['qty']});
             if (price['price_type'] === 'tier') {
-                qty = React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "qty"), 
-                             defaultValue: price['qty'], className: "priceUnique", onChange: this.props.validate});
+                qty = React.createElement("input", {type: "text", className: "form-control priceUnique", name: this.getFieldName(price, "qty"), 
+                             defaultValue: price['qty'], onChange: this.props.validate});
             }
             return (
                 React.createElement("div", {className: "form-group price-item"}, 

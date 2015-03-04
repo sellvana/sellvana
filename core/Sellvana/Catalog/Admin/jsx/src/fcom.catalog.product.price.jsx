@@ -52,9 +52,10 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
             var price = this.props.data;
             var qty = <input type="hidden" name={this.getFieldName(price, "qty")} defaultValue={price['qty']}/>;
             if (price['price_type'] === 'tier') {
-                qty = <input type="text" className="form-control" name={this.getFieldName(price, "qty")}
-                             defaultValue={price['qty']} className="priceUnique" onChange={this.props.validate}/>;
+                qty = <input type="text" className="form-control priceUnique" name={this.getFieldName(price, "qty")}
+                             defaultValue={price['qty']} onChange={this.props.validate}/>;
             }
+            var editable = (price['price_type'] in ['regular', 'map', 'msrp', 'sale', 'tier']);
             return (
                 <div className="form-group price-item">
                     <div style={divStyle}>
@@ -64,7 +65,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                         </a>
                     </div>
                     <div style={divStyle}>
-                        <select className="to-select2 form-control priceUnique" name={this.getFieldName(price, 'price_type')}
+                        <select className="to-select2 form-control priceUnique" disabled={editable? 'disabled': false}
+                            name={this.getFieldName(price, 'price_type')}
                                 defaultValue={price['price_type']} ref="price_type">
                             {_.map(this.props.price_types, function (pt, pk) {
                                 return <option key={pk} value={pk}>{pt}</option>
