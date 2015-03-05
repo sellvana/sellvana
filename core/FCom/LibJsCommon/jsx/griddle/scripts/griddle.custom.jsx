@@ -325,6 +325,7 @@ var Griddle = React.createClass({
         // If we need to get external results, grab the results.
         if (!this.hasExternalResults()) {
             state.results = this.props.results;
+            state.totalResults = this.props.results.length;
         } else {
             state.isLoading = true; // Initialize to 'loading'
         }
