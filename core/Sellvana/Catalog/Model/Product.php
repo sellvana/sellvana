@@ -1222,4 +1222,9 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         return null;
     }
+
+    public function priceTypeOptions()
+    {
+        return $this->Sellvana_Catalog_Model_ProductPrice->fieldOptions('price_types');
+    }
 }

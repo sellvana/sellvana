@@ -87,6 +87,7 @@
         var options = {
             container: $('#price_list'),
             prices: {{ UTIL.toJson(prices)|raw }},
+            price_types: {{ UTIL.toJson(m.priceTypeOptions())|raw }},
             customer_groups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'null' }},
             sites: {{ sites? UTIL.toJson(sites)|raw: 'null' }},
             currencies: {{ currencies? UTIL.toJson(currencies)|raw: 'null' }},

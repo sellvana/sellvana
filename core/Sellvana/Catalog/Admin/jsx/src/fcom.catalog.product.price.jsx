@@ -48,14 +48,27 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
     });
 
     var PriceItem = React.createClass({
+        editable: true,
         render: function () {
             var price = this.props.data;
-            var editable = (['regular', 'map', 'msrp', 'sale', 'tier'].indexOf(price['price_type']) != -1);
+            this.editable = (['regular', 'map', 'msrp', 'sale', 'tier'].indexOf(price['price_type']) != -1);
+            var priceTypes = <span>{this.props.price_types[price['price_type']]}</span>;
+            if(this.editable) {
+                priceTypes =
+                    <select className="to-select2 form-control priceUnique"
+                        name={this.getFieldName(price, 'price_type')}
+                        defaultValue={price['price_type']} ref="price_type">
+                            {_.map(this.props.price_types, function (pt, pk) {
+                                return <option key={pk} value={pk} disabled={pk == 'promo' ? 'disabled' : null}>{pt}</option>
+                            })}
+                    </select>;
+            }
             var qty = <input type="hidden" name={this.getFieldName(price, "qty")} defaultValue={price['qty']}/>;
             if (price['price_type'] === 'tier') {
                 qty = <input type="text" className="form-control priceUnique" name={this.getFieldName(price, "qty")}
-                             defaultValue={price['qty']} onChange={this.props.validate} readOnly={editable ? null : 'readonly'}/>;
+                             defaultValue={price['qty']} onChange={this.props.validate} readOnly={this.editable ? null : 'readonly'}/>;
             }
+
             return (
                 <div className="form-group price-item">
                     <div style={divStyle}>
@@ -65,13 +78,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                         </a>
                     </div>
                     <div style={divStyle}>
-                        <select className="to-select2 form-control priceUnique" disabled={editable? null: 'disabled'}
-                            name={this.getFieldName(price, 'price_type')}
-                                defaultValue={price['price_type']} ref="price_type">
-                            {_.map(this.props.price_types, function (pt, pk) {
-                                return <option key={pk} value={pk}>{pt}</option>
-                            })}
-                        </select>
+                        {priceTypes}
                     </div>
                     <div style={divStyle}>
                         <input type="hidden" name={this.getFieldName(price, "product_id")}
@@ -95,7 +102,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                     </div>
                     <div style={divStyle}>
                         <input type="text" className="form-control" name={this.getFieldName(price, "price")}
-                               defaultValue={price['price']} readOnly={editable ? null: 'readonly'}/>
+                               defaultValue={price['price']} readOnly={this.editable ? null: 'readonly'}/>
                     </div>
                     <div style={divStyle}>
                         {qty}
@@ -109,19 +116,21 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
         initPrices: function () {
             $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
             var self = this;
-            $(this.refs['price_type'].getDOMNode()).on('change', function (e) {
-                e.stopPropagation();
-                var priceType = $(e.target).val();
-                var id = self.props.data.id;
-                self.props.updatePriceType(id, priceType);
-                self.props.validate();
-            });
-            $('a.btn-remove', this.getDOMNode()).on('click', function (e) {
-                e.preventDefault();
-                var id = $(this).data('id');
-                //console.log(id);
-                self.props.deletePrice(id);
-            });
+            if (this.editable) {
+                $(this.refs['price_type'].getDOMNode()).on('change', function (e) {
+                    e.stopPropagation();
+                    var priceType = $(e.target).val();
+                    var id = self.props.data.id;
+                    self.props.updatePriceType(id, priceType);
+                    self.props.validate();
+                });
+                $('a.btn-remove', this.getDOMNode()).on('click', function (e) {
+                    e.preventDefault();
+                    var id = $(this).data('id');
+                    //console.log(id);
+                    self.props.deletePrice(id);
+                });
+            }
         },
         getFieldName: function (obj, field) {
             return "prices[productPrice][" + obj['id'] + "][" + field + "]";
@@ -149,7 +158,6 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
     var divStyle = {float: 'left', marginLeft: 15};
     var productPrice = {
         options: {
-            price_types: { regular:"Regular", map:"MAP", msrp:"MSRP", sale:"Sale", tier:"Tier" , cost:"Cost" , promo:"Promo" },
             title: Locale._("Product Prices")
         },
         newIdx: 0,
@@ -184,6 +192,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                     no_filters = false;
                 }
             }.bind(this));
+
             checkAddAllowed(this.options);
 
             if(this.options.prices_add_new && this.options.prices_add_new.length) {
