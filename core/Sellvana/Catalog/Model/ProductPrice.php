@@ -33,6 +33,9 @@ class Sellvana_Catalog_Model_ProductPrice
             self::TYPE_TIER => "Tier Price",
             self::TYPE_COST => "Cost Price",
             self::TYPE_PROMO => "Promo Price"
+        ],
+        'editable_prices' => [
+            'base', 'map', 'msrp', 'sale', 'tier'
         ]
     ];
 

@@ -4,6 +4,7 @@
 define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, Locale) {
     var PricesApp = React.createClass({displayName: "PricesApp",
         render: function () {
+            var childProps = _.omit(this.props, ['prices', 'deleted','validatePrices', 'title']);
             return (
                 React.createElement("div", {id: "prices"}, React.createElement("h4", null, this.props.title), 
                     React.createElement("div", {className: "form-group", id: "price_captions"}, 
@@ -24,10 +25,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                             return React.createElement("span", {key: 'empty'+price.id});
                         }
 
-                        return React.createElement(PriceItem, {data: price, price_types: this.props.price_types, key: price['id'], 
-                                          customer_groups: this.props.customer_groups, sites: this.props.sites, 
-                                          currencies: this.props.currencies, deletePrice: this.props.deletePrice, 
-                                          updatePriceType: this.props.updatePriceType, validate: this.props.validatePrices})
+                        return React.createElement(PriceItem, React.__spread({data: price},  childProps, {key: price['id'], validate: this.props.validatePrices}))
                     }.bind(this))
                 )
             );
@@ -51,7 +49,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
         editable: true,
         render: function () {
             var price = this.props.data;
-            this.editable = (['regular', 'map', 'msrp', 'sale', 'tier'].indexOf(price['price_type']) != -1);
+            this.editable = (this.props.editable_prices.indexOf(price['price_type']) != -1);
             var priceTypes = React.createElement("span", null, this.props.price_types[price['price_type']]);
             if(this.editable) {
                 priceTypes =

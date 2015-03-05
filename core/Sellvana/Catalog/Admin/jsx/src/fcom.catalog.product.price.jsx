@@ -4,6 +4,7 @@
 define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, Locale) {
     var PricesApp = React.createClass({
         render: function () {
+            var childProps = _.omit(this.props, ['prices', 'deleted','validatePrices', 'title']);
             return (
                 <div id="prices"><h4>{this.props.title}</h4>
                     <div className="form-group" id="price_captions">
@@ -24,10 +25,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                             return <span key={'empty'+price.id}/>;
                         }
 
-                        return <PriceItem data={price} price_types={this.props.price_types} key={price['id']}
-                                          customer_groups={this.props.customer_groups} sites={this.props.sites}
-                                          currencies={this.props.currencies} deletePrice={this.props.deletePrice}
-                                          updatePriceType={this.props.updatePriceType} validate={this.props.validatePrices}/>
+                        return <PriceItem data={price} {...childProps} key={price['id']} validate={this.props.validatePrices}/>
                     }.bind(this))}
                 </div>
             );
@@ -51,7 +49,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
         editable: true,
         render: function () {
             var price = this.props.data;
-            this.editable = (['regular', 'map', 'msrp', 'sale', 'tier'].indexOf(price['price_type']) != -1);
+            this.editable = (this.props.editable_prices.indexOf(price['price_type']) != -1);
             var priceTypes = <span>{this.props.price_types[price['price_type']]}</span>;
             if(this.editable) {
                 priceTypes =

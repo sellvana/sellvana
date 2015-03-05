@@ -1,6 +1,6 @@
 modules:
     Sellvana_CustomField:
-        version: 0.2.3
+        version: 0.2.4
         channel: beta
         require: { module: { Sellvana_Catalog: 0.2.1 } }
         translations: { en: en.php }
