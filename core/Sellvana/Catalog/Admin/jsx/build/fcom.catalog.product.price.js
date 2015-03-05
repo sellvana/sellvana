@@ -1,7 +1,7 @@
 /**
  * Created by pp on 02-26-2015.
  */
-define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, Locale) {
+define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], function ($, _, React, Locale) {
     var PricesApp = React.createClass({displayName: "PricesApp",
         render: function () {
             var childProps = _.omit(this.props, ['prices', 'deleted','validatePrices', 'title']);
@@ -61,10 +61,18 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                             })
                     );
             }
-            var qty = React.createElement("input", {type: "hidden", name: this.getFieldName(price, "qty"), defaultValue: price['qty']});
+
+            var qty = React.createElement("input", {key: "qty", type: "hidden", name: this.getFieldName(price, "qty"), defaultValue: price['qty']});
             if (price['price_type'] === 'tier') {
-                qty = React.createElement("input", {type: "text", className: "form-control priceUnique", name: this.getFieldName(price, "qty"), 
+                qty = React.createElement("input", {key: "qty", type: "text", className: "form-control priceUnique", name: this.getFieldName(price, "qty"), 
                              defaultValue: price['qty'], onChange: this.props.validate, readOnly: this.editable ? null : 'readonly'});
+            }
+
+            var dateRange = React.createElement("span", {key: "sale_period"});
+            if(price['price_type'] === 'sale') {
+                dateRange = React.createElement("input", {ref: "sale_period", key: "sale_period", type: "text", className: "form-control", 
+                    name: this.getFieldName(price, "sale_period"), 
+                    defaultValue: price['sale_period'], readOnly: this.editable ? null : 'readonly'});
             }
 
             return (
@@ -103,7 +111,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                                defaultValue: price['price'], readOnly: this.editable ? null: 'readonly'})
                     ), 
                     React.createElement("div", {style: divStyle}, 
-                        qty
+                        [qty, dateRange]
                     )
                 )
             );
@@ -128,7 +136,33 @@ define(['jquery', 'underscore', 'react', 'fcom.locale'], function ($, _, React, 
                     //console.log(id);
                     self.props.deletePrice(id);
                 });
+
+                if(this.props.data['price_type'] === 'sale'){
+                    this.initDateInput();
+                }
             }
+        },
+        initDateInput: function () {
+            var data = this.props.data['sale_period'], s, e;
+            var dateField = this.refs['sale_period'];
+            if (!data) {
+                var startDate = new Date();
+                s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+            } else {
+                var dates = data.split(" - ");
+                s = dates[0];
+                e = dates[1] || dates[0];
+            }
+            var $input = $(dateField.getDOMNode());
+            var options = {
+                format: 'YYYY-MM-DD',
+                startDate: s
+            };
+            if (e) {
+                options.endDate = e;
+            }
+            $input.daterangepicker(options);
+            //todo set setStartDate and setEndDate
         },
         getFieldName: function (obj, field) {
             return "prices[productPrice][" + obj['id'] + "][" + field + "]";
