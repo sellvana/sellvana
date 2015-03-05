@@ -78,8 +78,42 @@ class Sellvana_Catalog_Model_ProductPrice
             'site_id'           => $siteId,
             'qty'               => $qty,
             'currency_code'     => $currencyCode
-        ]);
+        ], true);
 
         return $price;
+    }
+
+    /**
+     * @param int    $variant_id
+     * @param string $type
+     * @return Sellvana_Catalog_Model_ProductPrice
+     * @throws BException
+     */
+    public function getVariantPrice($variant_id, $type = self::TYPE_BASE)
+    {
+        /** @var Sellvana_Catalog_Model_ProductPrice $price */
+        $price = $this->load(['variant_id' => $variant_id, 'price_type' => $type], true);
+        return $price;
+    }
+
+    /**
+     * @param float  $price
+     * @param int    $variant_id
+     * @param int    $product_id
+     * @param string $type
+     */
+    public function saveVariantPrice($price, $variant_id, $product_id, $type = self::TYPE_BASE)
+    {
+        $priceModel = $this->getVariantPrice($variant_id);
+        if(!$priceModel){
+            $priceModel = $this->create();
+        }
+
+        $priceModel->set([
+            'product_id' => $product_id,
+            'variant_id' => $variant_id,
+            'price'      => (float) $price,
+            'price_type' => $type
+        ])->save();
     }
 }

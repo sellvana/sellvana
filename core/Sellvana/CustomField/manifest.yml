@@ -9,8 +9,10 @@ modules:
         auto_use: [ bootstrap ]
         observe:
             - [ "Sellvana_Catalog_Model_Product::find_one:orm", Sellvana_CustomField_Main.productFindORM ]
-            - [ "Sellvana_Catalog_Model_Product::find_many:orm", Sellvana_CustomField_Main.productFindORM ]
             - [ "Sellvana_Catalog_Model_Product::onAfterSave", Sellvana_CustomField_Main.productAfterSave ]
+            - [ "Sellvana_Catalog_Model_Product::find_many:orm", Sellvana_CustomField_Main.productFindORM ]
+            - [ "Sellvana_CustomField_Model_ProductVariant::find_one:after", Sellvana_CustomField_Main.productVariantFindAfter ]
+            - [ "Sellvana_CustomField_Model_ProductVariant::find_many:after", Sellvana_CustomField_Main.productVariantFindAfter ]
 
         areas:
             FCom_Admin:

@@ -349,7 +349,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'product_name' => $product->get('product_name'),
                 'product_sku' => !empty($params['product_sku']) ? $params['product_sku'] : $product->get('product_sku'),
                 'inventory_sku' => $product->get('inventory_sku'),
-                'show_separate' => !empty($params['show_separate']) ? $params['show_separate'] : false,
+                'show_separate' => !empty($params['show_separate']) ? $params['show_separate'] : 0,
                 'qty' => $params['qty'],
                 'price' => $params['price'],
                 'unique_hash' => $hash,

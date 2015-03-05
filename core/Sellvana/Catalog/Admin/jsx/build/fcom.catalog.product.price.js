@@ -31,6 +31,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             );
         },
         shouldPriceShow: function (price) {
+            if(price.variant_id) {
+                return false;
+            }
             var show = true;
             if (this.props['filter_customer_group_value'] && this.props['filter_customer_group_value'] !== '*' && this.props['filter_customer_group_value'] != price['customer_group_id']) {
                 show = false;
