@@ -109,6 +109,7 @@ var Griddle = React.createClass({
         }
     },
     getExternalResults: function(state, callback) {
+        //console.log('getExternalResults');
         // use init data in grid config
         if (this.state.isInit) {
             var fcomData = this.getConfig('data');
@@ -162,6 +163,7 @@ var Griddle = React.createClass({
             state.isLoading = false;
             state.isInit = false;
 
+            //todo: re-check this code again to reduce set state and avoid re-render
             //fix pagination when get data from external results
             that.setState({
                 results: externalResults.results,
@@ -368,6 +370,8 @@ var Griddle = React.createClass({
             // Don't sort or page data if loaded externally.
         }
 
+        //console.log('getDataForRender.data', data);
+
         var meta = [].concat(this.props.metadataColumns);
         meta.push(this.props.childrenColumnName);
 
@@ -445,6 +449,7 @@ var Griddle = React.createClass({
                         className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
                         getConfig={this.getConfig} refresh={this.refresh} setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
                         getSelectedRows={this.getSelectedRows} addSelectedRows={this.addSelectedRows} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
+                        hasExternalResults={this.hasExternalResults}
                     />)
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );

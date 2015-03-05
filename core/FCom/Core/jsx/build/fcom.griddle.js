@@ -6,7 +6,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
     var dataUrl,
         gridId,
         buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
-            var beginQueryChar = dataUrl.indexOf('?') ? '&' : '?';
+            var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
             return dataUrl + beginQueryChar+ 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
         };
 
@@ -74,17 +74,40 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             console.log('config', this.props.config);
             var config = this.props.config;
 
+            //prepare props base on data mode
+            var props, state;
+            if (config.data_mode == 'local') {
+                props = {
+                    getExternalResults: null,
+                    results: config.data.data
+                };
+                state = config.state;
+            } else {
+                props = {
+                    getExternalResults: FComDataMethod,
+                    results: []
+                };
+                state = config.data.state;
+            }
+
+            //set initial page, use for personalization
+            var initPage = state.p - 1;
+            if (isNaN(initPage) || initPage < 0) {
+                initPage = 0;
+            }
+
             return (
                 React.createElement("div", {className: "fcom-htmlgrid responsive-table"}, 
-                    React.createElement(Griddle, {showTableHeading: false, tableClassName: this.props.tableClassName, ref: config.id, 
+                    React.createElement(Griddle, React.__spread({showTableHeading: false, tableClassName: this.props.tableClassName, ref: config.id, 
                         config: config, initColumns: this.getColumn(), 
-                        sortColumn: config.data.state.s, sortAscending: config.data.state.sd == 'asc', 
+                        sortColumn: state.s, sortAscending: state.sd == 'asc', 
                         columns: this.getColumn('show'), columnMetadata: this.props.columnMetadata, 
                         useCustomGrid: true, customGrid: FComGridBody, 
-                        getExternalResults: FComDataMethod, resultsPerPage: config.data.state.ps, 
-                        useCustomPager: "true", customPager: FComPager, initPage: config.data.state.p - 1, 
+                        resultsPerPage: state.ps, 
+                        useCustomPager: "true", customPager: FComPager, initPage: initPage, 
                         showSettings: true, useCustomSettings: true, customSettings: FComSettings, 
-                        showFilter: true, useCustomFilter: "true", customFilter: FComFilter, filterPlaceholderText: "Quick Search"}
+                        showFilter: true, useCustomFilter: "true", customFilter: FComFilter, filterPlaceholderText: "Quick Search"}, 
+                        props)
                     )
                 )
             );

@@ -107,7 +107,18 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                 removeSelectedRows: this.props.removeSelectedRows}
             );
 
-            var dataForRender = (headerSelection == 'show_all') ? this.props.originalData : selectedRows;
+            //get data for render
+            var dataForRender = [];
+            if (headerSelection == 'show_selected') { //show only selected rows
+                dataForRender = selectedRows;
+            } else if (!this.props.hasExternalResults()) { //show data as local mode
+                _.forEach(this.props.data, function(row) {
+                    var origRow = _.findWhere(that.props.originalData, { id: row.id });
+                    dataForRender.push(origRow);
+                });
+            } else {
+                dataForRender = this.props.originalData;
+            }
 
             var defaultValues = [];
             _.forEach(this.props.columnMetadata, function(col, index) {
