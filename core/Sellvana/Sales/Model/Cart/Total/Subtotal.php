@@ -6,6 +6,7 @@
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
  * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
+ * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  */
 class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
@@ -31,7 +32,11 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
             */
             $product = $item->getProduct();
             $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-            $customerGroup = $customer->getCustomerGroupId();
+            if ($customer) {
+                $customerGroup = $customer->getCustomerGroupId();
+            } else {
+                $customerGroup = $this->Sellvana_CustomerGroups_Model_Group->notLoggedInId();
+            }
             // todo , load site currency, load site id
             $site = null;
             $currency = null;
