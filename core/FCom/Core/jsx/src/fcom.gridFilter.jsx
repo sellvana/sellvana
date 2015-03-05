@@ -115,7 +115,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 );
             });
 
-            var mountNode = document.getElementById('list-filters-setting');
+            var mountNode = document.getElementById(id + '-list-filters-setting');
             React.unmountComponentAtNode(mountNode);
             React.render(<ul className={id + " dd-list dropdown-menu filters ui-sortable"}>{filterSettingNodes}</ul>, mountNode);
         },
@@ -131,7 +131,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 return (<FComFilterNodeContainer filter={f} setFilter={that.doFilter} setStateFilter={that.setStateFilter} capitaliseFirstLetter={that.capitaliseFirstLetter} keepShowDropDown={that.keepShowDropDown} getConfig={that.props.getConfig} />);
             });
 
-            var mountNode = document.getElementById('list-filters');
+            var mountNode = document.getElementById(id + '-list-filters');
             React.unmountComponentAtNode(mountNode);
             React.render(<div className={id + " f-filter-btns"}>{filterNodes}</div>, mountNode);
         },
@@ -234,7 +234,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     <a data-toggle="dropdown" className="btn dropdown-toggle showhide_columns">
                         Filters <b className="caret"></b>
                     </a>
-                    <div id="list-filters-setting"></div>
+                    <div id={id + "-list-filters-setting"}></div>
                 </div>
             );
 
@@ -245,7 +245,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     <div className="f-col-filters-selection pull-left">
                         {filterSettings}
                     </div>
-                    <div id="list-filters"></div>
+                    <div id={id + "-list-filters"}></div>
                 </div>
             );
         }

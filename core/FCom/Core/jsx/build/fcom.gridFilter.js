@@ -115,7 +115,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 );
             });
 
-            var mountNode = document.getElementById('list-filters-setting');
+            var mountNode = document.getElementById(id + '-list-filters-setting');
             React.unmountComponentAtNode(mountNode);
             React.render(React.createElement("ul", {className: id + " dd-list dropdown-menu filters ui-sortable"}, filterSettingNodes), mountNode);
         },
@@ -131,7 +131,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 return (React.createElement(FComFilterNodeContainer, {filter: f, setFilter: that.doFilter, setStateFilter: that.setStateFilter, capitaliseFirstLetter: that.capitaliseFirstLetter, keepShowDropDown: that.keepShowDropDown, getConfig: that.props.getConfig}));
             });
 
-            var mountNode = document.getElementById('list-filters');
+            var mountNode = document.getElementById(id + '-list-filters');
             React.unmountComponentAtNode(mountNode);
             React.render(React.createElement("div", {className: id + " f-filter-btns"}, filterNodes), mountNode);
         },
@@ -234,7 +234,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     React.createElement("a", {"data-toggle": "dropdown", className: "btn dropdown-toggle showhide_columns"}, 
                         "Filters ", React.createElement("b", {className: "caret"})
                     ), 
-                    React.createElement("div", {id: "list-filters-setting"})
+                    React.createElement("div", {id: id + "-list-filters-setting"})
                 )
             );
 
@@ -245,7 +245,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     React.createElement("div", {className: "f-col-filters-selection pull-left"}, 
                         filterSettings
                     ), 
-                    React.createElement("div", {id: "list-filters"})
+                    React.createElement("div", {id: id + "-list-filters"})
                 )
             );
         }
