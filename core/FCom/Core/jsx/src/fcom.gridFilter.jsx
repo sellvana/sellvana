@@ -56,21 +56,22 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             ;
 
             //sort filters
-            $(this.getDOMNode()).find('.dd-list').sortable({
+            var domSortable = $(this.getDOMNode()).find('.dd-list');
+            domSortable.sortable({
                 handle: '.dd-handle',
                 revert: true,
                 axis: 'y',
-                stop: function() {
-                    that.sortFilters();
-                    that.keepShowDropDown(this);
+                stop: function(event, ui) {
+                    //that.keepShowDropDown(this);
+                    var newPosFilters = domSortable.sortable('toArray', { attribute: 'data-filter-id' });
+                    domSortable.sortable("cancel");
+                    that.sortFilters(newPosFilters);
                 }
             });
         },
-        sortFilters: function() {
+        sortFilters: function(newPosFilters) {
             var personalizeUrl = this.props.getConfig('personalize_url');
             var id = this.props.getConfig('id');
-
-            var newPosFilters = $(this.getDOMNode()).find('.dd-list').sortable('toArray', { attribute: 'data-filter-id' });
             var filters = this.state.filters;
             var newFilters = {};
             var postFilters = []; //reduce amount post data
@@ -92,8 +93,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             }
 
             //console.log('newFilters', newFilters);
-            this.setState({ filters: {} });
-            this.setState({ filters: newFilters });
+            this.replaceState({ filters: newFilters });
         },
         capitaliseFirstLetter: function(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);

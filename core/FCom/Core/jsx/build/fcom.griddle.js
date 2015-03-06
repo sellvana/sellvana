@@ -377,9 +377,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         quickSearch: function(event) {
             this.props.searchWithinResults(event.target.value);
         },
-        sortColumns: function() {
+        sortColumns: function(newPosColumns) {
             var personalizeUrl = this.props.getConfig('personalize_url');
-            var newPosColumns = $(this.getDOMNode()).find('.dd-list').sortable('toArray', {attribute: 'data-id'}); //new position columns array
 
             if (personalizeUrl) {
                 var id = this.props.getConfig('id');
@@ -402,12 +401,15 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         },
         componentDidMount: function() {
             var that = this;
-            $(this.getDOMNode()).find('.dd-list').sortable({
+            var dom = $(this.getDOMNode()).find('.dd-list');
+            dom.sortable({
                 handle: '.dd-handle',
                 revert: true,
                 axis: 'y',
                 stop: function () {
-                    that.sortColumns();
+                    var newPosColumns = dom.sortable('toArray', {attribute: 'data-id'}); //new position columns array
+                    dom.sortable("cancel");
+                    that.sortColumns(newPosColumns);
                 }
             });
         },
