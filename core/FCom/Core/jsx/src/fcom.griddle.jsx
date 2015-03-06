@@ -400,8 +400,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             newPosColumns.unshift(0); //add first column again
             this.props.updateInitColumns(newPosColumns);
         },
-        componentDidUpdate: function() {
-            this.renderDropdownColumnsSettings();
+        componentDidMount: function() {
             var that = this;
             $(this.getDOMNode()).find('.dd-list').sortable({
                 handle: '.dd-handle',
@@ -411,32 +410,6 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     that.sortColumns();
                 }
             });
-        },
-        renderDropdownColumnsSettings: function() {
-            var that = this;
-            var options = _.map(this.props.getInitColumns(), function(column) {
-                if (column == '0') {
-                    return false;
-                }
-
-                var checked = _.contains(that.props.selectedColumns(), column);
-                var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
-                return (
-                    <li data-id={column} id={column} className="dd-item dd3-item">
-                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
-                        <div className="dd3-content">
-                            <label>
-                                <input type="checkbox" defaultChecked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
-                                {colInfo ?  colInfo.label : column}
-                            </label>
-                        </div>
-                    </li>
-                )
-            });
-
-            var mountNode = document.getElementById('column-settings');
-            React.unmountComponentAtNode(mountNode);
-            React.render(<ol className="dd-list dropdown-menu columns ui-sortable" style={{minWidth: '200px'}}>{options}</ol>, mountNode);
         },
         handleCustom: function(callback, event) {
             if (typeof window[callback] === 'function') {
@@ -500,6 +473,26 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 });
             }
 
+            var options = _.map(this.props.getInitColumns(), function(column) {
+                if (column == '0') {
+                    return false;
+                }
+
+                var checked = _.contains(that.props.selectedColumns(), column);
+                var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
+                return (
+                    <li data-id={column} id={column} className="dd-item dd3-item">
+                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+                        <div className="dd3-content">
+                            <label>
+                                <input type="checkbox" defaultChecked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
+                                {colInfo ?  colInfo.label : column}
+                            </label>
+                        </div>
+                    </li>
+                )
+            });
+
             var styleColumnSettings = {position: 'absolute', top: 'auto', marginTop: '-2px', padding: '0', display: 'block', left: 0};
             return (
                 <div className="col-sm-6">
@@ -508,7 +501,11 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                         <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">
                             Columns <b className="caret"></b>
                         </a>
-                        <div id="column-settings" style={styleColumnSettings}></div>
+                        <div id="column-settings" style={styleColumnSettings}>
+                            <ol className="dd-list dropdown-menu columns ui-sortable" style={{minWidth: '200px'}}>
+                                {options}
+                            </ol>
+                        </div>
                     </div>
                     {buttonActions}
                 </div>

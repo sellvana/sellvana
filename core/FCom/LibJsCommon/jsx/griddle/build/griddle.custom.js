@@ -411,7 +411,7 @@ var Griddle = React.createClass({displayName: "Griddle",
         var filter = this.props.showFilter ?
             (
                 this.props.useCustomFilter
-                ? React.createElement(this.props.customFilter, {changeFilter: this.setFilter, customFilter: this.props.customFilter, getConfig: this.getConfig})
+                ? React.createElement(this.props.customFilter, {changeFilter: this.setFilter, getConfig: this.getConfig})
                 : React.createElement(GridFilter, {changeFilter: this.setFilter, placeholderText: this.props.filterPlaceholderText})
             ) : "";
         var settings = this.props.showSettings ?
@@ -704,10 +704,8 @@ var Griddle = React.createClass({displayName: "Griddle",
             }
         });
 
-        this.setState({
-            initColumns: columns,
-            filteredColumns: newSelectedColumns
-        });
+        this.setState({ initColumns: [], filteredColumns: [] });
+        this.setState({ initColumns: columns, filteredColumns: newSelectedColumns });
     },
     /**
      * return array init columns

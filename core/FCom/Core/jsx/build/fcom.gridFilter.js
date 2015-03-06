@@ -5,6 +5,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         getInitialState: function() {
             var that = this;
             var filters = {};
+            //todo: get filters from this place is not correct, need to be passed as props
             _.forEach(this.props.getConfig('filters'), function(f) {
                 if (!f.field) {
                     return false;
@@ -53,18 +54,15 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     }
                 })
             ;
-        },
-        componentDidUpdate: function() {
-            var that = this;
-            //todo: find another way to avoid re-render filters component after main component didUpdate
-            this.renderDropdownFilters();
-            this.renderListFilters();
+
+            //sort filters
             $(this.getDOMNode()).find('.dd-list').sortable({
                 handle: '.dd-handle',
                 revert: true,
                 axis: 'y',
                 stop: function() {
                     that.sortFilters();
+                    that.keepShowDropDown(this);
                 }
             });
         },
@@ -94,46 +92,8 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             }
 
             //console.log('newFilters', newFilters);
+            this.setState({ filters: {} });
             this.setState({ filters: newFilters });
-        },
-        renderDropdownFilters: function() {
-            var that = this;
-            var id = this.props.getConfig('id');
-            var filters = this.state.filters;
-
-            var filterSettingNodes = _.map(filters, function(f) {
-                return (
-                    React.createElement("li", {"data-filter-id": f.field, className: "dd-item dd3-item"}, 
-                        React.createElement("div", {className: "icon-ellipsis-vertical dd-handle dd3-handle"}), 
-                        React.createElement("div", {className: "dd3-content"}, 
-                            React.createElement("label", null, 
-                                React.createElement("input", {className: "showhide_column", "data-field": f.field, onChange: that.toggleFilter, type: "checkbox", defaultChecked: !f.hidden ? 'checked' : ''}), 
-                                f.label
-                            )
-                        )
-                    )
-                );
-            });
-
-            var mountNode = document.getElementById(id + '-list-filters-setting');
-            React.unmountComponentAtNode(mountNode);
-            React.render(React.createElement("ul", {className: id + " dd-list dropdown-menu filters ui-sortable"}, filterSettingNodes), mountNode);
-        },
-        renderListFilters: function() {
-            var that = this;
-            var id = this.props.getConfig('id');
-            var filters = this.state.filters;
-
-            var filterNodes = _.map(filters, function(f) {
-                if (f.hidden) {
-                    return false;
-                }
-                return (React.createElement(FComFilterNodeContainer, {filter: f, setFilter: that.doFilter, setStateFilter: that.setStateFilter, capitaliseFirstLetter: that.capitaliseFirstLetter, keepShowDropDown: that.keepShowDropDown, getConfig: that.props.getConfig}));
-            });
-
-            var mountNode = document.getElementById(id + '-list-filters');
-            React.unmountComponentAtNode(mountNode);
-            React.render(React.createElement("div", {className: id + " f-filter-btns"}, filterNodes), mountNode);
         },
         capitaliseFirstLetter: function(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -223,29 +183,56 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             this.props.changeFilter(JSON.stringify(submitFilters));
         },
         render: function() {
-            //console.log('begin render filters');
+            console.log('begin render filters');
+            var that = this;
             var id = this.props.getConfig('id');
-            /*var that = this;
             var filters = this.state.filters;
-            console.log('filters', filters);*/
+            //console.log('filters', filters);
+
+            /** filters settings */
+            var filterSettingNodes = _.map(filters, function(f, i) {
+                return (
+                    React.createElement("li", {"data-filter-id": f.field, className: "dd-item dd3-item", key: id + '-filter-setting-' + i}, 
+                        React.createElement("div", {className: "icon-ellipsis-vertical dd-handle dd3-handle"}), 
+                        React.createElement("div", {className: "dd3-content"}, 
+                            React.createElement("label", null, 
+                                React.createElement("input", {className: "showhide_column", "data-field": f.field, onChange: that.toggleFilter, type: "checkbox", defaultChecked: !f.hidden ? 'checked' : ''}), 
+                                f.label
+                            )
+                        )
+                    )
+                );
+            });
 
             var filterSettings = (
                 React.createElement("div", {className: id + ' dropdown', style: {"display" : "inline-block"}}, 
                     React.createElement("a", {"data-toggle": "dropdown", className: "btn dropdown-toggle showhide_columns"}, 
                         "Filters ", React.createElement("b", {className: "caret"})
                     ), 
-                    React.createElement("div", {id: id + "-list-filters-setting"})
+                    React.createElement("div", {id: id + "-list-filters-setting"}, 
+                        React.createElement("ul", {className: id + " dd-list dropdown-menu filters ui-sortable"}, 
+                            filterSettingNodes
+                        )
+                    )
                 )
             );
 
-            //console.log('end render filters');
+            /** filters list */
+            var filterNodes = _.map(filters, function(f, i) {
+                if (f.hidden) {
+                    return false;
+                }
+                return (React.createElement(FComFilterNodeContainer, {filter: f, setFilter: that.doFilter, key: id + '- filter-block-' + i, setStateFilter: that.setStateFilter, capitaliseFirstLetter: that.capitaliseFirstLetter, keepShowDropDown: that.keepShowDropDown, getConfig: that.props.getConfig}));
+            });
 
             return (
                 React.createElement("div", null, 
                     React.createElement("div", {className: "f-col-filters-selection pull-left"}, 
                         filterSettings
                     ), 
-                    React.createElement("div", {id: id + "-list-filters"})
+                    React.createElement("div", {id: id + "-list-filters"}, 
+                        React.createElement("div", {className: id + " f-filter-btns"}, filterNodes)
+                    )
                 )
             );
         }
@@ -370,7 +357,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             /*console.log('end render filter: ' +  filter.field);*/
 
             return (
-                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field}, 
+                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field, key: this.props.key}, 
                     React.createElement("button", {className: "btn dropdown-toggle filter-text-main", "data-toggle": "dropdown"}, 
                         React.createElement("span", {className: "f-grid-filter-field"}, filter.label), ":", 
                         React.createElement("span", {className: "f-grid-filter-value"}, " ", filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All', " "), 
@@ -468,7 +455,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             });
 
             return (
-                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field}, 
+                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field, key: this.props.key}, 
                     React.createElement("button", {className: "btn dropdown-toggle filter-text-main", "data-toggle": "dropdown"}, 
                         React.createElement("span", {className: "f-grid-filter-field"}, filter.label), ":", 
                         React.createElement("span", {className: "f-grid-filter-value"}, " ", filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All', " "), 
@@ -557,7 +544,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             });
 
             return (
-                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field}, 
+                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field, key: this.props.key}, 
                     React.createElement("button", {className: "btn dropdown-toggle filter-text-main", "data-toggle": "dropdown"}, 
                         React.createElement("span", {className: "f-grid-filter-field"}, filter.label), ":", 
                         React.createElement("span", {className: "f-grid-filter-value"}, " ", filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All', " "), 
@@ -653,7 +640,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var filter = this.state.filter;
 
             return (
-                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field}, 
+                React.createElement("div", {className: "btn-group dropdown f-grid-filter" + (filter.submit ? " f-grid-filter-val" : ""), id: "f-grid-filter-" + filter.field, key: this.props.key}, 
                     React.createElement("button", {className: "btn dropdown-toggle filter-text-main", "data-toggle": "dropdown"}, 
                         React.createElement("span", {className: "f-grid-filter-field"}, " ", filter.label, ": "), 
                         React.createElement("span", {className: "f-grid-filter-value"}, " ", filter.submit ? filter.opLabel + " " + filter.valName : 'All', " "), 
