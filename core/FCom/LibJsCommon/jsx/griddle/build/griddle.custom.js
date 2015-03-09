@@ -593,14 +593,15 @@ var Griddle = React.createClass({displayName: "Griddle",
      */
     setFilterLocalData: function (submitFilters) {
         var filteredResults = [];
-        var that = this;
+        var originalResults = this.props.results;
+
         _.each(submitFilters, function(filter, key) { //key is field name
             var type = filter.type;
+            var filterVal = filter.val.toLowerCase();
 
             switch (type) {
                 case 'text':
                     var check = {};
-                    var filterVal = filter.val.toLowerCase();
                     switch (filter.op) {
                         case 'contains':
                             check.contain = true;
@@ -623,12 +624,12 @@ var Griddle = React.createClass({displayName: "Griddle",
                             break;
                     }
 
-                    filteredResults = _.filter(that.state.results, function(row) {
+                    filteredResults = _.filter(originalResults, function(row) {
                         console.log('row', row);
                         var flag = true;
-                        var rowValue = (row[key] + '').toLowerCase();
-                        var firstIndex = rowValue.indexOf(filterVal);
-                        var lastIndex = rowValue.lastIndexOf(filterVal);
+                        var rowVal = (row[key] + '').toLowerCase();
+                        var firstIndex = rowVal.indexOf(filterVal);
+                        var lastIndex = rowVal.lastIndexOf(filterVal);
                         _.forEach(check, function(checkValue, checkKey) {
                             switch (checkKey) {
                                 case 'contain':
@@ -638,7 +639,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                                     flag = flag && firstIndex === 0;
                                     break;
                                 case 'end':
-                                    flag = flag && (lastIndex + filterVal.length) === rowValue.length;
+                                    flag = flag && (lastIndex + filterVal.length) === rowVal.length;
                                     break;
                             }
 
@@ -650,6 +651,54 @@ var Griddle = React.createClass({displayName: "Griddle",
                     });
 
                     break;
+                case 'multiselect':
+                    filterVal = filterVal.split(',');
+                    filteredResults = _.filter(originalResults, function(row) {
+                        var flag = false;
+                        _.forEach(filterVal, function(value) {
+                            flag = flag || (value === row[key].toLowerCase());
+                        });
+
+                        return flag;
+                    });
+                    break;
+                case 'number-range':
+                    filteredResults = _.filter(originalResults, function(row) {
+                        var flag = false;
+                        var rowVal = row[key].toLowerCase();
+                        var rangeVal;
+                        switch (filter.op) {
+                            case 'between':
+                                rangeVal = filterVal.split('~');
+                                if (Number(rangeVal[0]) < rowVal && rowVal < Number(rangeVal[1])) {
+                                    flag = true;
+                                }
+                                break;
+                            case 'from':
+                                if ( filterVal < Number(rowVal)) {
+                                    flag = true;
+                                }
+                                break;
+                            case 'to':
+                                if (rowVal < Number(filterVal)) {
+                                    flag = true;
+                                }
+                                break;
+                            case 'equal':
+                                if (rowVal == Number(filterVal) ) {
+                                    flag = true;
+                                }
+                                break;
+                            case 'not_in':
+                                rangeVal = filterVal.split('~');
+                                if (Number(rangeVal[0]) > rowVal || Number(rangeVal[1]) < rowVal) {
+                                    flag = true;
+                                }
+                                break;
+                        }
+                        return flag;
+                    });
+                    break;
                 default:
                     break;
             }
@@ -657,7 +706,7 @@ var Griddle = React.createClass({displayName: "Griddle",
 
         console.log('setFilterLocalData.filteredResults', filteredResults);
 
-        this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length });
+        this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
     },
     /**
      * quick search in available data collection
