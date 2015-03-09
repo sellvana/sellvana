@@ -141,6 +141,11 @@ var Griddle = React.createClass({displayName: "Griddle",
             sortAscending = this.state.sortAscending;
         }
 
+        //empty sort column in case empty sort ascending, it will reset personlization
+        if (sortAscending == '') {
+            sortColumn = '';
+        }
+
         if (state !== undefined && state.page !== undefined) {
             page = state.page;
         } else {
