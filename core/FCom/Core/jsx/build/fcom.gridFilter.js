@@ -188,7 +188,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             }
         },
         render: function() {
-            console.log('begin render filters');
+            //console.log('begin render filters');
             var that = this;
             var id = this.props.getConfig('id');
             var filters = this.state.filters;

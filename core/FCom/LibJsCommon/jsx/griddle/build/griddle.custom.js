@@ -625,7 +625,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                     }
 
                     filteredResults = _.filter(originalResults, function(row) {
-                        console.log('row', row);
+                        //console.log('row', row);
                         var flag = true;
                         var rowVal = (row[key] + '').toLowerCase();
                         var firstIndex = rowVal.indexOf(filterVal);
@@ -704,7 +704,7 @@ var Griddle = React.createClass({displayName: "Griddle",
             }
         });
 
-        console.log('setFilterLocalData.filteredResults', filteredResults);
+        //console.log('setFilterLocalData.filteredResults', filteredResults);
 
         this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
     },
