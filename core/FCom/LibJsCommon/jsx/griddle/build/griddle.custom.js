@@ -416,7 +416,7 @@ var Griddle = React.createClass({displayName: "Griddle",
         var filter = this.props.showFilter ?
             (
                 this.props.useCustomFilter
-                ? React.createElement(this.props.customFilter, {changeFilter: this.setFilter, getConfig: this.getConfig})
+                ? React.createElement(this.props.customFilter, {changeFilter: this.setFilter, changeFilterLocalData: this.setFilterLocalData, getConfig: this.getConfig})
                 : React.createElement(GridFilter, {changeFilter: this.setFilter, placeholderText: this.props.filterPlaceholderText})
             ) : "";
         var settings = this.props.showSettings ?
@@ -586,6 +586,78 @@ var Griddle = React.createClass({displayName: "Griddle",
                 that.setMaxPage();
             });
         }
+    },
+    /**
+     * set filter for local data
+     * @param submitFilters
+     */
+    setFilterLocalData: function (submitFilters) {
+        var filteredResults = [];
+        var that = this;
+        _.each(submitFilters, function(filter, key) { //key is field name
+            var type = filter.type;
+
+            switch (type) {
+                case 'text':
+                    var check = {};
+                    var filterVal = filter.val.toLowerCase();
+                    switch (filter.op) {
+                        case 'contains':
+                            check.contain = true;
+                            break;
+                        case 'start':
+                            check.contain = true;
+                            check.start = true;
+                            break;
+                        case 'end':
+                            check.contain = true;
+                            check.end = true;
+                            break;
+                        case 'equal':
+                            check.contain = true;
+                            check.end = true;
+                            check.start = true;
+                            break;
+                        case 'not':
+                            check.contain = false;
+                            break;
+                    }
+
+                    filteredResults = _.filter(that.state.results, function(row) {
+                        console.log('row', row);
+                        var flag = true;
+                        var rowValue = (row[key] + '').toLowerCase();
+                        var firstIndex = rowValue.indexOf(filterVal);
+                        var lastIndex = rowValue.lastIndexOf(filterVal);
+                        _.forEach(check, function(checkValue, checkKey) {
+                            switch (checkKey) {
+                                case 'contain':
+                                    flag = flag && ((firstIndex !== -1) === check.contain);
+                                    break;
+                                case 'start':
+                                    flag = flag && firstIndex === 0;
+                                    break;
+                                case 'end':
+                                    flag = flag && (lastIndex + filterVal.length) === rowValue.length;
+                                    break;
+                            }
+
+                            if (!flag)
+                                return flag;
+                        });
+
+                        return flag;
+                    });
+
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        console.log('setFilterLocalData.filteredResults', filteredResults);
+
+        this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length });
     },
     /**
      * quick search in available data collection

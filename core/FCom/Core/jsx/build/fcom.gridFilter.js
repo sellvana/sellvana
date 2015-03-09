@@ -93,7 +93,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             }
 
             //console.log('newFilters', newFilters);
-            this.replaceState({ filters: newFilters });
+            this.setState({ filters: newFilters });
         },
         capitaliseFirstLetter: function(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -174,13 +174,18 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             }
             //prepare data
             var field = filter.field;
+            var dataMode = this.props.getConfig('data_mode');
             this.setStateFilter(field, 'submit', !isClear);
 
             var submitFilters = this.prepareFilter();
             //console.log('submitFilters', submitFilters);
 
-            //call parent griddle function to handle filter
-            this.props.changeFilter(JSON.stringify(submitFilters));
+            if (dataMode == 'local') {
+                this.props.changeFilterLocalData(submitFilters);
+            } else {
+                //call parent griddle function to handle filter
+                this.props.changeFilter(JSON.stringify(submitFilters));
+            }
         },
         render: function() {
             console.log('begin render filters');
