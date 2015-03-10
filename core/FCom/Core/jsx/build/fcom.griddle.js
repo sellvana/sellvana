@@ -186,6 +186,18 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             this.props.setPageSize(parseInt(value));
             this.props.setPage(0);
         },
+        calcPageSizeOptionsForRender: function(pageSizeOptions) {
+            var pageSizeOptsRender = [];
+            for (var j = 0; j < pageSizeOptions.length; j++) {
+                var value = pageSizeOptions[j];
+                pageSizeOptsRender.push(value);
+                if (this.props.totalResults <= value) {
+                    break;
+                }
+            }
+
+            return pageSizeOptsRender;
+        },
         render: function () {
             var headerSelection = this.props.getHeaderSelection();
             if (headerSelection == 'show_selected') {
@@ -227,11 +239,12 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             }
 
             var pageSizeHtml = [];
-            for (var j = 0; j < pageSizeOptions.length; j++) {
-                selected = (pageSizeOptions[j] == pageSize ? "active" : "") + disabledClass;
+            var pageSizeOptionsForRender = this.calcPageSizeOptionsForRender(pageSizeOptions);
+            for (var j = 0; j < pageSizeOptionsForRender.length; j++) {
+                selected = (pageSizeOptionsForRender[j] == pageSize ? "active" : "") + disabledClass;
                 pageSizeHtml.push(
                     React.createElement("li", {className: selected}, 
-                        React.createElement("a", {href: "#", "data-value": pageSizeOptions[j], onClick: this.setPageSize, className: "js-change-url page-size"}, pageSizeOptions[j])
+                        React.createElement("a", {href: "#", "data-value": pageSizeOptionsForRender[j], onClick: this.setPageSize, className: "js-change-url page-size"}, pageSizeOptionsForRender[j])
                     )
                 );
             }
