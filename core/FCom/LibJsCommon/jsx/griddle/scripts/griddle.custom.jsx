@@ -236,9 +236,11 @@ var Griddle = React.createClass({
         var that = this;
 
         //if we don't have any data don't mess with this
-        if (this.state.results === undefined || this.state.results.length == 0){ return [];}
+        //if (this.state.results === undefined || this.state.results.length == 0){ return [];}
 
         var result = this.state.filteredColumns;
+
+        console.log('this.state', this.state);
 
         //if we didn't set default or filter
         if (this.state.filteredColumns.length == 0){
@@ -314,7 +316,7 @@ var Griddle = React.createClass({
             maxPage: 0,
             page: this.props.initPage,
             filteredResults: null,
-            filteredColumns: [],
+            filteredColumns: this.props.columns,
             filter: "",
             sortColumn: this.props.sortColumn,
             sortAscending: this.props.sortAscending,
@@ -433,6 +435,8 @@ var Griddle = React.createClass({
         var pagingContent = "";
         var keys = [];
         var cols = this.getColumns();
+
+        console.log('cols', cols);
 
         // If we're not loading results, fill the table with legitimate data.
         if (!this.state.isLoading) {
@@ -838,7 +842,7 @@ var Griddle = React.createClass({
             }
         });
 
-        this.setState({ initColumns: [], filteredColumns: [] });
+        //this.setState({ initColumns: [], filteredColumns: [] });
         this.setState({ initColumns: columns, filteredColumns: newSelectedColumns });
     },
     /**
