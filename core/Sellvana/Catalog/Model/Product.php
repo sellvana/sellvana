@@ -1165,15 +1165,22 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getAllPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
     {
-        $priceModel= $this->Sellvana_Catalog_Model_ProductPrice;
-        $productPrices = $priceModel->getProductPrices($this, $qty, $customerGroup_id, $site_id, $currency_code, $date);
+
         $prices = [];
+        $productPrices = $this->getRawPrices($qty, $customerGroup_id, $site_id, $currency_code, $date);
         foreach ($productPrices as $p) {
-            $type = $p->get('price_type');
+            $type = $p['price_type'];
             $prices[$type][] = $p;
         }
 
         return $prices;
+    }
+
+    public function getRawPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
+    {
+        $priceModel    = $this->Sellvana_Catalog_Model_ProductPrice;
+        $productPrices = $priceModel->getProductPrices($this, $qty, $customerGroup_id, $site_id, $currency_code, $date);
+        return $productPrices;
     }
 
     /**
