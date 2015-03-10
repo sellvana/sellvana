@@ -592,115 +592,123 @@ var Griddle = React.createClass({
      * @param submitFilters
      */
     setFilterLocalData: function (submitFilters) {
-        var filteredResults = [];
+        //console.log('setFilterLocalData');
         var originalResults = this.props.results;
+        var filteredResults = originalResults;
+
+        //console.log('submitFilters', submitFilters);
 
         _.each(submitFilters, function(filter, key) { //key is field name
-            var type = filter.type;
             var filterVal = filter.val.toLowerCase();
 
-            switch (type) {
-                case 'text':
-                    var check = {};
-                    switch (filter.op) {
-                        case 'contains':
-                            check.contain = true;
-                            break;
-                        case 'start':
-                            check.contain = true;
-                            check.start = true;
-                            break;
-                        case 'end':
-                            check.contain = true;
-                            check.end = true;
-                            break;
-                        case 'equal':
-                            check.contain = true;
-                            check.end = true;
-                            check.start = true;
-                            break;
-                        case 'not':
-                            check.contain = false;
-                            break;
-                    }
+            if (filter.submit && filterVal != '') {
+                switch (filter.type) {
+                    case 'text':
+                        var check = {};
+                        switch (filter.op) {
+                            case 'contains':
+                                check.contain = true;
+                                break;
+                            case 'start':
+                                check.contain = true;
+                                check.start = true;
+                                break;
+                            case 'end':
+                                check.contain = true;
+                                check.end = true;
+                                break;
+                            case 'equal':
+                                check.contain = true;
+                                check.end = true;
+                                check.start = true;
+                                break;
+                            case 'not':
+                                check.contain = false;
+                                break;
+                        }
 
-                    filteredResults = _.filter(originalResults, function(row) {
-                        //console.log('row', row);
-                        var flag = true;
-                        var rowVal = (row[key] + '').toLowerCase();
-                        var firstIndex = rowVal.indexOf(filterVal);
-                        var lastIndex = rowVal.lastIndexOf(filterVal);
-                        _.forEach(check, function(checkValue, checkKey) {
-                            switch (checkKey) {
-                                case 'contain':
-                                    flag = flag && ((firstIndex !== -1) === check.contain);
+                        filteredResults = _.filter(originalResults, function(row) {
+                            //console.log('row', row);
+                            var flag = true;
+                            var rowVal = (row[key] + '').toLowerCase();
+                            var firstIndex = rowVal.indexOf(filterVal);
+                            var lastIndex = rowVal.lastIndexOf(filterVal);
+                            _.forEach(check, function(checkValue, checkKey) {
+                                switch (checkKey) {
+                                    case 'contain':
+                                        flag = flag && ((firstIndex !== -1) === check.contain);
+                                        break;
+                                    case 'start':
+                                        flag = flag && firstIndex === 0;
+                                        break;
+                                    case 'end':
+                                        flag = flag && (lastIndex + filterVal.length) === rowVal.length;
+                                        break;
+                                }
+
+                                if (!flag)
+                                    return flag;
+                            });
+
+                            return flag;
+                        });
+
+                        break;
+                    case 'multiselect':
+                        filterVal = filterVal.split(',');
+                        filteredResults = _.filter(originalResults, function(row) {
+                            var flag = false;
+                            _.forEach(filterVal, function(value) {
+                                flag = flag || (value === row[key].toLowerCase());
+                            });
+
+                            return flag;
+                        });
+                        break;
+                    case 'number-range':
+                        filteredResults = _.filter(originalResults, function(row) {
+                            var flag = false;
+                            var rowVal = row[key].toLowerCase();
+                            var rangeVal = [];
+                            switch (filter.op) {
+                                case 'between':
+                                    rangeVal = filterVal.split('~');
+                                    if (Number(rangeVal[0]) <= rowVal && rowVal <= Number(rangeVal[1])) {
+                                        flag = true;
+                                    }
                                     break;
-                                case 'start':
-                                    flag = flag && firstIndex === 0;
+                                case 'from':
+                                    if ( filterVal <= Number(rowVal)) {
+                                        flag = true;
+                                    }
                                     break;
-                                case 'end':
-                                    flag = flag && (lastIndex + filterVal.length) === rowVal.length;
+                                case 'to':
+                                    if (rowVal <= Number(filterVal)) {
+                                        flag = true;
+                                    }
+                                    break;
+                                case 'equal':
+                                    if (rowVal == Number(filterVal) ) {
+                                        flag = true;
+                                    }
+                                    break;
+                                case 'not_in':
+                                    rangeVal = filterVal.split('~');
+                                    if (Number(rangeVal[0]) > rowVal || Number(rangeVal[1]) < rowVal) {
+                                        flag = true;
+                                    }
                                     break;
                             }
 
-                            if (!flag)
-                                return flag;
+                            console.log('row', row);
+                            console.log('flag', flag);
+                            return flag;
                         });
-
-                        return flag;
-                    });
-
-                    break;
-                case 'multiselect':
-                    filterVal = filterVal.split(',');
-                    filteredResults = _.filter(originalResults, function(row) {
-                        var flag = false;
-                        _.forEach(filterVal, function(value) {
-                            flag = flag || (value === row[key].toLowerCase());
-                        });
-
-                        return flag;
-                    });
-                    break;
-                case 'number-range':
-                    filteredResults = _.filter(originalResults, function(row) {
-                        var flag = false;
-                        var rowVal = row[key].toLowerCase();
-                        var rangeVal;
-                        switch (filter.op) {
-                            case 'between':
-                                rangeVal = filterVal.split('~');
-                                if (Number(rangeVal[0]) < rowVal && rowVal < Number(rangeVal[1])) {
-                                    flag = true;
-                                }
-                                break;
-                            case 'from':
-                                if ( filterVal < Number(rowVal)) {
-                                    flag = true;
-                                }
-                                break;
-                            case 'to':
-                                if (rowVal < Number(filterVal)) {
-                                    flag = true;
-                                }
-                                break;
-                            case 'equal':
-                                if (rowVal == Number(filterVal) ) {
-                                    flag = true;
-                                }
-                                break;
-                            case 'not_in':
-                                rangeVal = filterVal.split('~');
-                                if (Number(rangeVal[0]) > rowVal || Number(rangeVal[1]) < rowVal) {
-                                    flag = true;
-                                }
-                                break;
-                        }
-                        return flag;
-                    });
-                    break;
-                default:
-                    break;
+                        break;
+                    default:
+                        break;
+                }
+                originalResults = filteredResults;
             }
         });
 
