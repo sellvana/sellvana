@@ -1155,10 +1155,24 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $prices;
     }
 
-    public function getAllPrices()
+    /**
+     * @param int    $qty
+     * @param int    $customerGroup_id
+     * @param int    $site_id
+     * @param string $currency_code
+     * @param null   $date
+     * @return Sellvana_Catalog_Model_ProductPrice[]
+     */
+    public function getAllPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
     {
         $priceModel= $this->Sellvana_Catalog_Model_ProductPrice;
-        $prices = $priceModel->getProductPrices($this);
+        $productPrices = $priceModel->getProductPrices($this, $qty, $customerGroup_id, $site_id, $currency_code, $date);
+        $prices = [];
+        foreach ($productPrices as $p) {
+            $type = $p->get('price_type');
+            $prices[$type][] = $p;
+        }
+
         return $prices;
     }
 
@@ -1226,5 +1240,10 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function priceTypeOptions()
     {
         return $this->Sellvana_Catalog_Model_ProductPrice->fieldOptions('price_types');
+    }
+
+    public function variantPrice($itemPrice, $variant_id)
+    {
+        return $itemPrice;
     }
 }

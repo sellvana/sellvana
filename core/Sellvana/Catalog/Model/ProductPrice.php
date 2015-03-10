@@ -41,12 +41,42 @@ class Sellvana_Catalog_Model_ProductPrice
 
     /**
      * @param Sellvana_Catalog_Model_Product $product
+     * @param int                            $qty
+     * @param int                            $customer_group_id
+     * @param int                            $site_id
+     * @param string                         $currency_code
+     * @param string                         $date
      * @return Sellvana_Catalog_Model_ProductPrice[]
      * @throws BException
      */
-    public function getProductPrices($product)
+    public function getProductPrices($product, $qty = null, $customer_group_id = null, $site_id = null,
+        $currency_code = null, $date = null)
     {
-        $prices = $this->orm('tp')->where('product_id', $product->id())->find_many();
+        $orm    = $this->orm('tp')
+            ->where('product_id', $product->id());
+        if($date){
+            $orm->where_complex([
+                'OR' => [
+                    'valid_from IS NULL AND valid_to IS NULL',
+                    ['(? BETWEEN valid_from AND valid_to)', $date]
+                ]
+            ]);
+        }
+        if(!empty($qty)){
+            $orm->where(['qty <= ?', $qty]); // tier prices up to provided qty
+        }
+        if(!empty($customer_group_id)){
+            $orm->where('customer_group_id', $customer_group_id);
+        }
+        if(!empty($site_id)){
+            $orm->where('site_id', $site_id);
+        }
+        if(!empty($currency_code)){
+            $orm->where('currency_code', $currency_code);
+        }
+
+
+        $prices = $orm->find_many();
         if (!empty($prices)) {
             $salePrice = (float) $product->get('sale_price');
             $basePrice = (float) $product->get('base_price');

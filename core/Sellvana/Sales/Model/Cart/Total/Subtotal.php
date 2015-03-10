@@ -46,10 +46,54 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
             if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
                 $currency = $this->Sellvana_MultiCurrency_Main->getCurrentCurrency();
             }
-            $tierPrice = $product->getTierPrice($item->getQty(), $customerGroup, $site['id'], $currency);
-            if($tierPrice){
-                $item->setData('tier_price', $tierPrice);
+            $productPrices = $product->getAllPrices($item->getQty(), $customerGroup, $site['id'], $currency, $this->BDb->now());
+            $itemPrice = $item->get('price');
+            if($item->get('custom_price')){
+                $itemPrice = $item->get('custom_price');
+            } else {
+                $now = time();
+                foreach ($productPrices as $type => $prices) {
+                    foreach ($prices as $p) {
+                        switch ($type) {
+                            case 'sale':
+                                $dFrom = strtotime($p['active_from']);
+                                $dTo   = strtotime($p['active_to']);
+                                if ($dFrom <= $now && $dTo >= $now) {
+                                    $itemPrice = min($itemPrice, $p['price']);
+                                }
+                                break;
+                            case 'tier':
+                                if ($item->get('qty') > $p['qty']) {
+                                    $itemPrice = min($itemPrice, $p['price']);
+                                }
+                                break;
+                            case 'promo':
+                                $itemPrice = min($itemPrice, $p['price']);
+                                break;
+                        }
+
+                    }
+
+                }
+
+                if ($product->get('sale_price')) {
+                    $itemPrice = min($itemPrice, $product->get('sale_price'));
+                }
             }
+
+            if ($item->get('variant')) {
+                // the function can be add %, add $, set %, set $
+                $itemPrice = $product->variantPrice($itemPrice, $item->get('variant'));
+            }
+
+            if ($item->get('shopper_fields')) {
+                foreach ($item->get('shopper_fields') as $f => $fData) {
+                    $itemPrice = $this->shopperFieldPriceFunction($itemPrice, $fData);
+                }
+            }
+
+            $item->set('price', $itemPrice);
+
             $itemNum++;
             $itemQty += $item->get('qty');
             $rowTotal = $item->calcRowTotal();
@@ -68,4 +112,82 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
 
         return $this;
     }
+
+    /**
+     * @param float $itemPrice - item price to the moment
+     * @param array $fData - an array with shopper field config
+     * @return float
+     */
+    public function shopperFieldPriceFunction($itemPrice, $fData)
+    {
+        if(!is_array($fData) || empty($fData['operation']) || empty($fData['price'])) {
+            return $itemPrice;
+        }
+        $price = $fData['price'];
+        switch ($fData['operation']) {
+            case '+$':
+                // add fixed amount to price
+                $itemPrice += (float) $price;
+                break;
+            case '+%':
+                // add percent of the price to price
+                $itemPrice += $itemPrice * ($price / 100);
+                break;
+            case '-$':
+                // subtract fixed amount
+                $itemPrice -= (float) $price;
+                break;
+            case '-%':
+                // subtract a fraction of the price
+                $itemPrice -= $itemPrice / ($price / 100);
+                break;
+            case '$$':
+                // set the price to provided amount
+                $itemPrice = $price;
+                break;
+        }
+
+        return $itemPrice;
+    }
 }
+
+/*
+ $item; // cart item
+$prod = $item.product();
+
+$prices = $prod.prices(); // specific for current environment
+
+if ($item.custom_price) {
+
+  $itemPrice = $item.custom_price;
+
+} else {
+
+  $itemPrice = $prices['base'] ? $prices['base'] : $prod.base_price;
+
+  if ($prices['sale'] && checkSaleDates($prices['sale'])) {
+    $itemPrice = min($itemPrice, $prices['sale']);
+  } elseif ($prod.sale_price && checkSaleDates($prod)) {
+    $itemPrice = min($itemPrice, $prod.sale_price);
+  }
+
+  foreach ($prices['tier'] as $tQty => $tPrice) {
+    if ($item.qty >= $tQty) {
+      $itemPrice = min($itemPrice, $tPrice);
+    }
+  }
+
+  if ($prices['promo']) {
+    $itemPrice = min($itemPrice, $prices['promo'];
+  }
+}
+
+if ($item.variant) {
+  // the function can be add %, add $, set %, set $
+  $itemPrice = variantPriceFunction($itemPrice, $item.variant);
+}
+
+foreach ($item.shopper_fields as $f => $fData) {
+  $itemPrice = shopperFieldPriceFunction($itemPrice, $fData);
+}
+ */
