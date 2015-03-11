@@ -200,7 +200,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             var $input = $(dateField.getDOMNode());
             var options = {
                 format: 'YYYY-MM-DD',
-                startDate: s
+                startDate: s,
+                separator: this.props.sale_date_separator? this.props.sale_date_separator :'/'
             };
             if (e) {
                 options.endDate = e;

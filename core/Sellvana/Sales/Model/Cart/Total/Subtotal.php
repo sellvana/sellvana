@@ -56,8 +56,8 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
                     foreach ($prices as $p) {
                         switch ($type) {
                             case 'sale':
-                                $dFrom = strtotime($p['active_from']);
-                                $dTo   = strtotime($p['active_to']);
+                                $dFrom = strtotime($p['valid_from']);
+                                $dTo   = strtotime($p['valid_to']);
                                 if ($dFrom <= $now && $dTo >= $now) {
                                     $itemPrice = min($itemPrice, $p['price']);
                                 }
@@ -88,7 +88,7 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
 
             if ($item->get('shopper_fields')) {
                 foreach ($item->get('shopper_fields') as $f => $fData) {
-                    $itemPrice = $this->shopperFieldPriceFunction($itemPrice, $fData);
+                    $itemPrice = $this->priceFunction($itemPrice, $fData);
                 }
             }
 
@@ -118,7 +118,7 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
      * @param array $fData - an array with shopper field config
      * @return float
      */
-    public function shopperFieldPriceFunction($itemPrice, $fData)
+    public function priceFunction($itemPrice, $fData)
     {
         if(!is_array($fData) || empty($fData['operation']) || empty($fData['price'])) {
             return $itemPrice;
@@ -188,6 +188,6 @@ if ($item.variant) {
 }
 
 foreach ($item.shopper_fields as $f => $fData) {
-  $itemPrice = shopperFieldPriceFunction($itemPrice, $fData);
+  $itemPrice = priceFunction($itemPrice, $fData);
 }
  */

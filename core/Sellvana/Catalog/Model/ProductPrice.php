@@ -38,6 +38,7 @@ class Sellvana_Catalog_Model_ProductPrice
             'base', 'map', 'msrp', 'sale', 'tier'
         ]
     ];
+    const SALE_DATE_SEPARATOR = ' / ';
 
     /**
      * @param Sellvana_Catalog_Model_Product $product
@@ -63,7 +64,7 @@ class Sellvana_Catalog_Model_ProductPrice
             ]);
         }
         if(!empty($qty)){
-            $orm->where(['qty <= ?', $qty]); // tier prices up to provided qty
+            $orm->where([['qty <= ?', $qty]]); // tier prices up to provided qty
         }
         if(!empty($customer_group_id)){
             $orm->where('customer_group_id', $customer_group_id);
@@ -146,4 +147,29 @@ class Sellvana_Catalog_Model_ProductPrice
             'price_type' => $type
         ])->save();
     }
+
+    public function onBeforeSave()
+    {
+        if($this->get('sale_period')){
+            $salePeriod = explode(self::SALE_DATE_SEPARATOR, $this->get('sale_period'));
+            $count = count($salePeriod);
+            if($count){
+                $this->set('valid_from', trim($salePeriod[0]));
+            }
+            if($count > 1){
+                $this->set('valid_to', trim($salePeriod[1]));
+            }
+        }
+        return parent::onBeforeSave();
+    }
+
+    public function onAfterLoad()
+    {
+        if($this->get('valid_from')){
+            $salePeriod = [$this->get('valid_from'), $this->get('valid_to')];
+            $this->set('sale_period', join(self::SALE_DATE_SEPARATOR, $salePeriod));
+        }
+        parent::onAfterLoad();
+    }
+
 }
