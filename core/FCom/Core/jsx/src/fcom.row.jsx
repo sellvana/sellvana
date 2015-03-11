@@ -54,11 +54,11 @@ define(['underscore', 'react'], function (_, React) {
                         node = <input type="checkbox" name={id + "[checked][" + that.props.row.id + "]"} className="select-row" checked={defaultChecked} onChange={that.selectRow} />;
                         break;
                     case 'btn_group':
-                        var actions = col.buttons.map(function(btn) {
+                        var actions = col.buttons.map(function(btn, index) {
                             //var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
                             if (btn.type == 'link') {
                                 return (
-                                    <a className={"btn btn-link " + btn.cssClass} href={btn.href + that.props.row[btn.col]} title={btn.title ? btn.title : ""}>
+                                    <a className={"btn btn-link " + btn.cssClass} key={index} href={btn.href + that.props.row[btn.col]} title={btn.title ? btn.title : ""}>
                                         <i className={btn.icon}></i>
                                         {btn.caption}
                                     </a>
@@ -66,7 +66,7 @@ define(['underscore', 'react'], function (_, React) {
                             } else {
                                 //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
-                                    <button className={"btn btn-link " + btn.cssClass} title={btn.title ? btn.title : ""} type="button"
+                                    <button className={"btn btn-link " + btn.cssClass} key={index} title={btn.title ? btn.title : ""} type="button"
                                         data-action={btn.name} data-row={that.props.row.id} onClick={that.props.doRowAction}>
                                         <i className={btn.icon} data-action={btn.name} data-row={that.props.row.id}></i>
                                         {btn.caption}
@@ -113,13 +113,13 @@ define(['underscore', 'react'], function (_, React) {
                 }
 
                 if (customNodeHtml) {
-                    return <td data-col={col.name} dangerouslySetInnerHTML={{__html: node}}></td>;
+                    return <td key={col.name} data-col={col.name} dangerouslySetInnerHTML={{__html: node}}></td>;
                 }
-                return <td data-col={col.name}>{node}</td>;
+                return <td data-col={col.name} key={col.name}>{node}</td>;
             });
 
             return (
-                <tr className={"standard-row " + (this.props.index % 2 ? 'odd' : 'even')} id={this.props.row.id}>
+                <tr className={"standard-row " + (this.props.index % 2 ? 'odd' : 'even')} id={this.props.row.id} key={this.props.key}>
                     {nodes}
                 </tr>
             );

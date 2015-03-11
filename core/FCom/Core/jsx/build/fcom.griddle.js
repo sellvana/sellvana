@@ -232,7 +232,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             for (var i = startIndex; i < endIndex; i++) {
                 var selected = this.props.currentPage == i ? "page active" : "page";
                 options.push(
-                    React.createElement("li", {className: selected}, 
+                    React.createElement("li", {key: 'fcom-pager-pagenumber-' + i, className: selected}, 
                         React.createElement("a", {href: "#", "data-value": i, onClick: this.pageChange, className: "js-change-url"}, i + 1)
                     )
                 );
@@ -243,7 +243,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             for (var j = 0; j < pageSizeOptionsForRender.length; j++) {
                 selected = (pageSizeOptionsForRender[j] == pageSize ? "active" : "") + disabledClass;
                 pageSizeHtml.push(
-                    React.createElement("li", {className: selected}, 
+                    React.createElement("li", {className: selected, key: 'fcom-pager-pagesize-' + pageSizeOptionsForRender[j]}, 
                         React.createElement("a", {href: "#", "data-value": pageSizeOptionsForRender[j], onClick: this.setPageSize, className: "js-change-url page-size"}, pageSizeOptionsForRender[j])
                     )
                 );
@@ -434,10 +434,10 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         },
         render: function () {
             var that = this;
-            var id = this.props.getConfig('id');
+            var gridId = this.props.getConfig('id');
 
             //quick search
-            var quickSearch = React.createElement("input", {type: "text", className: "f-grid-quick-search form-control", placeholder: "Search within results", id: id + '-quick-search', onChange: this.quickSearch});
+            var quickSearch = React.createElement("input", {type: "text", className: "f-grid-quick-search form-control", placeholder: "Search within results", id: gridId + '-quick-search', onChange: this.quickSearch});
 
             var disabledClass = !this.props.getSelectedRows().length ? ' disabled' : '';
             var configActions = this.props.getConfig('actions');
@@ -445,27 +445,32 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             if (configActions) {
                 _.forEach(configActions, function(action, name) {
                     var node = '';
+                    var actionKey = gridId + '-fcom-settings-action-' + name;
+                    var actionProps = {
+                        key: gridId + '-fcom-settings-action-' + name,
+                        class: action.class
+                    }
                     switch (name) {
                         case 'refresh':
-                            node = React.createElement("a", {href: "#", className: action.class}, action.caption);
+                            node = React.createElement("a", {href: "#", className: action.class, key: actionKey}, action.caption);
                             break;
                         case 'export':
-                            node = React.createElement("button", {className: action.class, "data-action": "export", onClick: that.doMassAction}, action.caption);
+                            node = React.createElement("button", {className: action.class, "data-action": "export", onClick: that.doMassAction, key: actionKey}, action.caption);
                             break;
                         case 'link_to_page':
-                            node = React.createElement("a", {href: "#", className: action.class}, action.caption);
+                            node = React.createElement("a", {href: "#", className: action.class, key: actionKey}, action.caption);
                             break;
                         case 'edit':
-                            node = React.createElement("a", {href: "#", className: action.class + disabledClass, "data-action": "mass-edit", onClick: that.doMassAction, role: "button"}, action.caption);
+                            node = React.createElement("a", {href: "#", className: action.class + disabledClass, "data-action": "mass-edit", onClick: that.doMassAction, role: "button", key: actionKey}, action.caption);
                             break;
                         case 'delete':
-                            node = React.createElement("button", {className: action.class + disabledClass, type: "button", "data-action": "mass-delete", onClick: that.doMassAction}, action.caption);
+                            node = React.createElement("button", {className: action.class + disabledClass, type: "button", "data-action": "mass-delete", onClick: that.doMassAction, key: actionKey}, action.caption);
                             break;
                         case 'add':
-                            node = React.createElement("button", {className: action.class, type: "button"}, action.caption);
+                            node = React.createElement("button", {className: action.class, type: "button", key: actionKey}, action.caption);
                             break;
                         case 'new':
-                            node = React.createElement("button", {className: action.class, type: "button"}, action.caption);
+                            node = React.createElement("button", {className: action.class, type: "button", key: actionKey}, action.caption);
                             break;
                         default:
                             if (action.type) {
@@ -473,12 +478,12 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                                     case 'button':
                                     default:
                                         //compatibility with old backbone grid
-                                        node = React.createElement("button", {className: action.class + (action.isMassAction ? disabledClass : ''), id: action.id, 
+                                        node = React.createElement("button", {className: action.class + (action.isMassAction ? disabledClass : ''), key: actionKey, id: action.id, 
                                             type: "button", onClick: that.handleCustom.bind(this, action.callback)}, action.caption);
                                         break;
                                 }
                             } else if (action.html) {
-                                node = React.createElement("span", {dangerouslySetInnerHTML: {__html: action.html}});
+                                node = React.createElement("span", {key: actionKey, dangerouslySetInnerHTML: {__html: action.html}});
                             }
 
                             break;
@@ -496,7 +501,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 var checked = _.contains(that.props.selectedColumns(), column);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
                 return (
-                    React.createElement("li", {"data-id": column, id: column, className: "dd-item dd3-item"}, 
+                    React.createElement("li", {"data-id": column, id: column, key: gridId + '-fcom-settings-' + column, className: "dd-item dd3-item"}, 
                         React.createElement("div", {className: "icon-ellipsis-vertical dd-handle dd3-handle"}), 
                         React.createElement("div", {className: "dd3-content"}, 
                             React.createElement("label", null, 

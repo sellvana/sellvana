@@ -232,7 +232,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             for (var i = startIndex; i < endIndex; i++) {
                 var selected = this.props.currentPage == i ? "page active" : "page";
                 options.push(
-                    <li className={selected}>
+                    <li key={'fcom-pager-pagenumber-' + i} className={selected}>
                         <a href="#" data-value={i} onClick={this.pageChange} className="js-change-url">{i + 1}</a>
                     </li>
                 );
@@ -243,7 +243,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             for (var j = 0; j < pageSizeOptionsForRender.length; j++) {
                 selected = (pageSizeOptionsForRender[j] == pageSize ? "active" : "") + disabledClass;
                 pageSizeHtml.push(
-                    <li className={selected}>
+                    <li className={selected} key={'fcom-pager-pagesize-' + pageSizeOptionsForRender[j]}>
                         <a href="#" data-value={pageSizeOptionsForRender[j]} onClick={this.setPageSize} className="js-change-url page-size">{pageSizeOptionsForRender[j]}</a>
                     </li>
                 );
@@ -434,10 +434,10 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         },
         render: function () {
             var that = this;
-            var id = this.props.getConfig('id');
+            var gridId = this.props.getConfig('id');
 
             //quick search
-            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} onChange={this.quickSearch} />;
+            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={gridId + '-quick-search'} onChange={this.quickSearch} />;
 
             var disabledClass = !this.props.getSelectedRows().length ? ' disabled' : '';
             var configActions = this.props.getConfig('actions');
@@ -445,27 +445,32 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             if (configActions) {
                 _.forEach(configActions, function(action, name) {
                     var node = '';
+                    var actionKey = gridId + '-fcom-settings-action-' + name;
+                    var actionProps = {
+                        key: gridId + '-fcom-settings-action-' + name,
+                        class: action.class
+                    }
                     switch (name) {
                         case 'refresh':
-                            node = <a href="#" className={action.class}>{action.caption}</a>;
+                            node = <a href="#" className={action.class} key={actionKey}>{action.caption}</a>;
                             break;
                         case 'export':
-                            node = <button className={action.class} data-action='export' onClick={that.doMassAction}>{action.caption}</button>;
+                            node = <button className={action.class} data-action='export' onClick={that.doMassAction} key={actionKey}>{action.caption}</button>;
                             break;
                         case 'link_to_page':
-                            node = <a href="#" className={action.class}>{action.caption}</a>;
+                            node = <a href="#" className={action.class} key={actionKey}>{action.caption}</a>;
                             break;
                         case 'edit':
-                            node = <a href='#' className={action.class + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button">{action.caption}</a>;
+                            node = <a href='#' className={action.class + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button" key={actionKey}>{action.caption}</a>;
                             break;
                         case 'delete':
-                            node = <button className={action.class + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction}>{action.caption}</button>;
+                            node = <button className={action.class + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction} key={actionKey}>{action.caption}</button>;
                             break;
                         case 'add':
-                            node = <button className={action.class} type="button">{action.caption}</button>;
+                            node = <button className={action.class} type="button" key={actionKey}>{action.caption}</button>;
                             break;
                         case 'new':
-                            node = <button className={action.class} type="button">{action.caption}</button>;
+                            node = <button className={action.class} type="button" key={actionKey}>{action.caption}</button>;
                             break;
                         default:
                             if (action.type) {
@@ -473,12 +478,12 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                                     case 'button':
                                     default:
                                         //compatibility with old backbone grid
-                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} id={action.id}
+                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} key={actionKey} id={action.id}
                                             type="button" onClick={that.handleCustom.bind(this, action.callback)}>{action.caption}</button>;
                                         break;
                                 }
                             } else if (action.html) {
-                                node = <span dangerouslySetInnerHTML={{__html: action.html}}></span>;
+                                node = <span key={actionKey} dangerouslySetInnerHTML={{__html: action.html}}></span>;
                             }
 
                             break;
@@ -496,7 +501,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 var checked = _.contains(that.props.selectedColumns(), column);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
                 return (
-                    <li data-id={column} id={column} className="dd-item dd3-item">
+                    <li data-id={column} id={column} key={gridId + '-fcom-settings-' + column} className="dd-item dd3-item">
                         <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                         <div className="dd3-content">
                             <label>

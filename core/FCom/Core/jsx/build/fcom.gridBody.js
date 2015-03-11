@@ -135,7 +135,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                     });
                 }
 
-                return React.createElement(FComRow, {row: row, index: index, columns: that.props.columns, columnMetadata: that.props.columnMetadata, defaultValues: defaultValues, 
+                return React.createElement(FComRow, {row: row, key: 'row-' + row.id, index: index, columns: that.props.columns, columnMetadata: that.props.columnMetadata, defaultValues: defaultValues, 
                     getConfig: that.props.getConfig, doRowAction: that.doRowAction, removeSelectedRows: that.props.removeSelectedRows, 
                     addSelectedRows: that.props.addSelectedRows, getSelectedRows: that.props.getSelectedRows});
             });
@@ -227,6 +227,8 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
 
             var nodes = this.props.columns.map(function(col, index){
 
+                var columnClass = "js-draggable ui-resizable "; //todo: allow resizeable class base on config
+
                 //checkbox
                 if (col == '0') {
 
@@ -262,12 +264,12 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                     var headerSelectionNodes = that.getHeaderSelectionOptions().map(function(option) {
                         if ((option.visibleOnSelected && selectedRows.length) ||
                             (option.invisibleOnSelected && !selectedRows.length)) {
-                            return (React.createElement("li", null, " ", React.createElement("a", {href: "#", "data-select": option.select, onClick: option.action ? option.action : that.updateHeaderSelect}, option.label)))
+                            return (React.createElement("li", {key: '0' + option.label}, " ", React.createElement("a", {href: "#", "data-select": option.select, onClick: option.action ? option.action : that.updateHeaderSelect}, option.label)))
                         }
                     });
 
                     return (
-                        React.createElement("th", {className: "js-draggable ui-resizable", "data-id": "0"}, 
+                        React.createElement("th", {className: columnClass, "data-id": "0", key: col}, 
                             React.createElement("div", {className: "dropdown f-grid-display-type"}, 
                                 selectionButtonText, 
                                 React.createElement("ul", {className: "dropdown-menu js-sel"}, headerSelectionNodes)
@@ -276,12 +278,10 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                     );
                 }
 
-                var columnSort = "js-draggable ui-resizable ";
-
-                if (that.props.sortColumn == col && that.props.sortAscending == 'asc'){
-                    columnSort += "sort-ascending th-sorting-asc"
-                }  else if (that.props.sortColumn == col && that.props.sortAscending == 'desc'){
-                    columnSort += "sort-descending th-sorting-desc"
+                if (that.props.sortColumn == col && that.props.sortAscending == 'asc') {
+                    columnClass += "sort-ascending th-sorting-asc"
+                }  else if (that.props.sortColumn == col && that.props.sortAscending == 'desc') {
+                    columnClass += "sort-descending th-sorting-desc"
                 }
 
                 var displayName = col;
@@ -289,7 +289,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                 if (that.props.columnMetadata != null) {
                     meta = _.findWhere(that.props.columnMetadata, {name: col});
                     if (meta && typeof meta.cssClass != 'undefined') {
-                        columnSort += " " + meta.cssClass;
+                        columnClass += " " + meta.cssClass;
                     }
                     if (typeof meta !== "undefined" && typeof meta.label !== "undefined" && meta.label != null) {
                         displayName = meta.label;
@@ -300,13 +300,13 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
 
                 if (typeof meta !== "undefined" && meta.name == 'btn_group') {
                     return (
-                        React.createElement("th", {"data-title": col, className: columnSort}, 
+                        React.createElement("th", {"data-title": col, className: columnClass, key: col}, 
                             displayName
                         )
                     )
                 } else {
                     return (
-                        React.createElement("th", {onClick: that.sort, "data-title": col, className: columnSort, style: width}, 
+                        React.createElement("th", {onClick: that.sort, "data-title": col, className: columnClass, style: width, key: col}, 
                             React.createElement("a", {href: "#", className: "js-change-url", onClick: that.triggerSort}, displayName)
                         )
                     );
