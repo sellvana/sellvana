@@ -240,8 +240,6 @@ var Griddle = React.createClass({
 
         var result = this.state.filteredColumns;
 
-        console.log('this.state', this.state);
-
         //if we didn't set default or filter
         if (this.state.filteredColumns.length == 0){
             var meta = [].concat(this.props.metadataColumns);
@@ -323,7 +321,7 @@ var Griddle = React.createClass({
             showColumnChooser: false,
             isLoading: false,
             //fcom custom
-            initColumns: [], //init columns include all hide columns
+            initColumns: this.props.initColumns, //init columns include all hide columns
             isInit: true,
             selectedRows: [],
             headerSelect: 'show_all' //select value in header dropdown
@@ -435,8 +433,6 @@ var Griddle = React.createClass({
         var pagingContent = "";
         var keys = [];
         var cols = this.getColumns();
-
-        console.log('cols', cols);
 
         // If we're not loading results, fill the table with legitimate data.
         if (!this.state.isLoading) {
