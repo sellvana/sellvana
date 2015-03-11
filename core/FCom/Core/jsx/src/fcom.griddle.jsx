@@ -6,14 +6,16 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
     var dataUrl,
         gridId,
         buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
-            return dataUrl + '?gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+            var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
+            return dataUrl + beginQueryChar+ 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
         };
 
     var FComGriddleComponent = React.createClass({
         getDefaultProps: function () {
             return {
                 "config": {},
-                "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable'
+                "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable',
+                "callbacks": {}
             }
         },
         componentWillMount: function () {
@@ -46,21 +48,68 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     break;
             }
         },
+        /*callCallbackFunctions: function (type) {
+            var grid = this.refs[this.props.config.id];
+            //todo: add code to support multi callbacks
+
+            if (typeof this.props.callbacks[type] !== 'undefined') {
+                console.log('grid.callback: ', this.props.callbacks[type]);
+                if (typeof this.props.callbacks[type] === 'function') {
+                    return this.props.callbacks[type](grid);
+                } else {
+                    var funcName = this.props.callbacks[type];
+                    if (typeof window[funcName] === 'function') {
+                        return window[funcName](grid);
+                    }
+                }
+            }
+        },
+        componentDidMount: function () {
+            this.callCallbackFunctions('componentDidMount');
+        },
+        componentDidUpdate: function () {
+            this.callCallbackFunctions('componentDidUpdate');
+        },*/
         render: function () {
             console.log('config', this.props.config);
             var config = this.props.config;
 
+            //prepare props base on data mode
+            var props, state;
+            if (config.data_mode == 'local') {
+                props = {
+                    getExternalResults: null,
+                    results: config.data.data
+                };
+                state = config.state;
+            } else {
+                props = {
+                    getExternalResults: FComDataMethod,
+                    results: []
+                };
+                state = config.data.state;
+            }
+
+            //set initial page, use for personalization
+            var initPage = state.p - 1;
+            if (isNaN(initPage) || initPage < 0) {
+                initPage = 0;
+            }
+
             return (
-                <Griddle showTableHeading={false} tableClassName={this.props.tableClassName}
-                    config={config} initColumns={this.getColumn()}
-                    sortColumn={config.data.state.s} sortAscending={config.data.state.sd == 'asc'}
-                    columns={this.getColumn('show')} columnMetadata={this.props.columnMetadata}
-                    useCustomGrid={true} customGrid={FComGridBody}
-                    getExternalResults={FComDataMethod} resultsPerPage={config.data.state.ps}
-                    useCustomPager="true" customPager={FComPager} initPage={config.data.state.p - 1}
-                    showSettings={true} useCustomSettings={true} customSettings={FComSettings}
-                    showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
-                />
+                <div className="fcom-htmlgrid responsive-table">
+                    <Griddle showTableHeading={false} tableClassName={this.props.tableClassName} ref={config.id}
+                        config={config} initColumns={this.getColumn()}
+                        sortColumn={state.s} sortAscending={state.sd == 'asc'}
+                        columns={this.getColumn('show')} columnMetadata={this.props.columnMetadata}
+                        useCustomGrid={true} customGrid={FComGridBody}
+                        resultsPerPage={state.ps}
+                        useCustomPager="true" customPager={FComPager} initPage={initPage}
+                        showSettings={true} useCustomSettings={true} customSettings={FComSettings}
+                        showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
+                        {...props}
+                    />
+                </div>
             );
         }
     });
@@ -105,7 +154,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "nextText": "",
                 "previousText": "",
                 "currentPage": 0,
-                "getHeaderSelection": null
+                "getHeaderSelection": null,
+                "totalResults": 0
             }
         },
         pageChange: function (event) {
@@ -136,6 +186,18 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             this.props.setPageSize(parseInt(value));
             this.props.setPage(0);
         },
+        calcPageSizeOptionsForRender: function(pageSizeOptions) {
+            var pageSizeOptsRender = [];
+            for (var j = 0; j < pageSizeOptions.length; j++) {
+                var value = pageSizeOptions[j];
+                pageSizeOptsRender.push(value);
+                if (this.props.totalResults <= value) {
+                    break;
+                }
+            }
+
+            return pageSizeOptsRender;
+        },
         render: function () {
             var headerSelection = this.props.getHeaderSelection();
             if (headerSelection == 'show_selected') {
@@ -144,16 +206,18 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var pageSizeOptions = this.props.getConfig('page_size_options');
             var pageSize = this.props.resultsPerPage;
 
-            var first = <li className="first">
+            var disabledClass = !this.props.totalResults ? ' disabled' : '';
+
+            var first = <li className={'first' + disabledClass}>
                 <a href="#" className="js-change-url" onClick={this.pageFirst}>«</a>
             </li>;
-            var previous = <li className="prev">
+            var previous = <li className={'prev' + disabledClass}>
                 <a href="#" className="js-change-url" onClick={this.pagePrevious}>‹</a>
             </li>;
-            var next = <li className="next">
+            var next = <li className={'next' + disabledClass}>
                 <a className="js-change-url" href="#" onClick={this.pageNext}>›</a>
             </li>;
-            var last = <li className="last">
+            var last = <li className={'last' + disabledClass}>
                 <a className="js-change-url" href="#" onClick={this.pageLast}>{this.props.maxPage} »</a>
             </li>;
 
@@ -175,18 +239,19 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             }
 
             var pageSizeHtml = [];
-            for (var j = 0; j < pageSizeOptions.length; j++) {
-                selected = pageSizeOptions[j] == pageSize ? "active" : "";
+            var pageSizeOptionsForRender = this.calcPageSizeOptionsForRender(pageSizeOptions);
+            for (var j = 0; j < pageSizeOptionsForRender.length; j++) {
+                selected = (pageSizeOptionsForRender[j] == pageSize ? "active" : "") + disabledClass;
                 pageSizeHtml.push(
                     <li className={selected}>
-                        <a href="#" data-value={pageSizeOptions[j]} onClick={this.setPageSize} className="js-change-url page-size">{pageSizeOptions[j]}</a>
+                        <a href="#" data-value={pageSizeOptionsForRender[j]} onClick={this.setPageSize} className="js-change-url page-size">{pageSizeOptionsForRender[j]}</a>
                     </li>
                 );
             }
 
             return (
                 <div className="col-sm-6 text-right pagination" style={{ margin: "0" }}>
-                    <span className="f-grid-pagination">{this.props.totalResults} record(s)</span>
+                    <span className="f-grid-pagination">{this.props.totalResults ? this.props.totalResults + ' record(s)' : 'No data found'}</span>
                     <ul className="pagination pagination-sm pagination-griddle pagesize">
                         {pageSizeHtml}
                     </ul>
@@ -325,9 +390,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         quickSearch: function(event) {
             this.props.searchWithinResults(event.target.value);
         },
-        sortColumns: function() {
+        sortColumns: function(newPosColumns) {
             var personalizeUrl = this.props.getConfig('personalize_url');
-            var newPosColumns = $(this.getDOMNode()).find('.dd-list').sortable('toArray', {attribute: 'data-id'}); //new position columns array
 
             if (personalizeUrl) {
                 var id = this.props.getConfig('id');
@@ -348,46 +412,23 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             newPosColumns.unshift(0); //add first column again
             this.props.updateInitColumns(newPosColumns);
         },
-        componentDidUpdate: function() {
-            this.renderDropdownColumnsSettings();
+        componentDidMount: function() {
             var that = this;
-            $(this.getDOMNode()).find('.dd-list').sortable({
+            var dom = $(this.getDOMNode()).find('.dd-list');
+            dom.sortable({
                 handle: '.dd-handle',
                 revert: true,
                 axis: 'y',
                 stop: function () {
-                    that.sortColumns();
+                    var newPosColumns = dom.sortable('toArray', {attribute: 'data-id'}); //new position columns array
+                    dom.sortable("cancel");
+                    that.sortColumns(newPosColumns);
                 }
             });
-        },
-        renderDropdownColumnsSettings: function() {
-            var that = this;
-            var options = _.map(this.props.getInitColumns(), function(column) {
-                if (column == '0') {
-                    return false;
-                }
-
-                var checked = _.contains(that.props.selectedColumns(), column);
-                var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
-                return (
-                    <li data-id={column} id={column} className="dd-item dd3-item">
-                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
-                        <div className="dd3-content">
-                            <label>
-                                <input type="checkbox" defaultChecked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
-                                {colInfo ?  colInfo.label : column}
-                            </label>
-                        </div>
-                    </li>
-                )
-            });
-
-            var mountNode = document.getElementById('column-settings');
-            React.unmountComponentAtNode(mountNode);
-            React.render(<ol className="dd-list dropdown-menu columns ui-sortable" style={{minWidth: '200px'}}>{options}</ol>, mountNode);
         },
         handleCustom: function(callback, event) {
             if (typeof window[callback] === 'function') {
+                console.log('actions.callback: ' + callback);
                 return window[callback](this.props.getCurrentGrid());
             }
         },
@@ -447,6 +488,26 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 });
             }
 
+            var options = _.map(this.props.getInitColumns(), function(column) {
+                if (column == '0') {
+                    return false;
+                }
+
+                var checked = _.contains(that.props.selectedColumns(), column);
+                var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
+                return (
+                    <li data-id={column} id={column} className="dd-item dd3-item">
+                        <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+                        <div className="dd3-content">
+                            <label>
+                                <input type="checkbox" defaultChecked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
+                                {colInfo ?  colInfo.label : column}
+                            </label>
+                        </div>
+                    </li>
+                )
+            });
+
             var styleColumnSettings = {position: 'absolute', top: 'auto', marginTop: '-2px', padding: '0', display: 'block', left: 0};
             return (
                 <div className="col-sm-6">
@@ -455,7 +516,11 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                         <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">
                             Columns <b className="caret"></b>
                         </a>
-                        <div id="column-settings" style={styleColumnSettings}></div>
+                        <div id="column-settings" style={styleColumnSettings}>
+                            <ol className="dd-list dropdown-menu columns ui-sortable" style={{minWidth: '200px'}}>
+                                {options}
+                            </ol>
+                        </div>
                     </div>
                     {buttonActions}
                 </div>

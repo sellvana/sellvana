@@ -22,6 +22,7 @@ catalog_product_form_tabs:
             - [ addTab, linked-products, { label: Merchandising, pos: 40, async: true } ]
             - [ addTab, categories, { label: Categories, pos: 50, async: true } ]
             - [ addTab, images, { label: Images, pos: 60, async: true } ]
+            #- [ addTab, images-griddle, { label: Images Griddle, pos: 65, async: true } ]
             - [ addTab, attachments, { label: Attachments, pos: 70, async: true } ]
             - [ addTab, layout, { label: Layout, pos: 80, async: true } ]
 

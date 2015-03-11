@@ -101,16 +101,41 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
             console.log('FComGridBody.columns', this.props.columns);*/
 
             var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn} getConfig={that.props.getConfig}
-                sortAscending={that.props.sortAscending ? 'asc' : 'desc'} columnMetadata={that.props.columnMetadata} data={this.props.data}
+                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} data={this.props.data}
                 originalData={this.props.originalData} setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
                 addSelectedRows={this.props.addSelectedRows} getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows}
                 removeSelectedRows={this.props.removeSelectedRows}
             />;
 
-            var dataForRender = (headerSelection == 'show_all') ? this.props.originalData : selectedRows;
+            //get data for render
+            var dataForRender = [];
+            if (headerSelection == 'show_selected') { //show only selected rows
+                dataForRender = selectedRows;
+            } else if (!this.props.hasExternalResults()) { //show data as local mode
+                _.forEach(this.props.data, function(row) {
+                    var origRow = _.findWhere(that.props.originalData, { id: row.id });
+                    dataForRender.push(origRow);
+                });
+            } else {
+                dataForRender = this.props.originalData;
+            }
+
+            var defaultValues = [];
+            _.forEach(this.props.columnMetadata, function(col, index) {
+                if (col.default) {
+                    defaultValues.push(col);
+                }
+            });
 
             var nodes = dataForRender.map(function (row, index) {
-                return <FComRow row={row} index={index} columns={that.props.columns} columnMetadata={that.props.columnMetadata}
+                //set default value
+                if (defaultValues.length) {
+                    _.forEach(defaultValues, function(value) {
+                        row[value.name] = value.default;
+                    });
+                }
+
+                return <FComRow row={row} index={index} columns={that.props.columns} columnMetadata={that.props.columnMetadata} defaultValues={defaultValues}
                     getConfig={that.props.getConfig} doRowAction={that.doRowAction} removeSelectedRows={that.props.removeSelectedRows}
                     addSelectedRows={that.props.addSelectedRows} getSelectedRows={that.props.getSelectedRows} />;
             });
@@ -131,7 +156,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
             return {
                 "columns":[],
                 "sortColumn": "",
-                "sortAscending": "asc",
+                "sortAscending": "",
                 "setHeaderSelection": null
             }
         },
@@ -251,7 +276,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                     );
                 }
 
-                var columnSort = "";
+                var columnSort = "js-draggable ui-resizable ";
 
                 if (that.props.sortColumn == col && that.props.sortAscending == 'asc'){
                     columnSort += "sort-ascending th-sorting-asc"
@@ -263,8 +288,9 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                 var meta;
                 if (that.props.columnMetadata != null) {
                     meta = _.findWhere(that.props.columnMetadata, {name: col});
-                    //the weird code is just saying add the space if there's text in columnSort otherwise just set to metaclassname
-                    columnSort = meta == null ? columnSort : (columnSort && (columnSort + " ")||columnSort) + meta.cssClass;
+                    if (meta && typeof meta.cssClass != 'undefined') {
+                        columnSort += " " + meta.cssClass;
+                    }
                     if (typeof meta !== "undefined" && typeof meta.label !== "undefined" && meta.label != null) {
                         displayName = meta.label;
                     }
