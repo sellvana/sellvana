@@ -1335,7 +1335,7 @@ fieldset[disabled] .btn {
 /* Responsive */
 .responsive-table {
   position:relative;
-  overflow:hidden;
+  /*overflow:hidden;*/
   }
 .responsive-table .scrollable-area {
   width:100%;
