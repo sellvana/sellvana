@@ -479,7 +479,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                                     default:
                                         //compatibility with old backbone grid
                                         node = React.createElement("button", {className: action.class + (action.isMassAction ? disabledClass : ''), key: actionKey, id: action.id, 
-                                            type: "button", onClick: that.handleCustom.bind(this, action.callback)}, action.caption);
+                                            type: "button", onClick: that.handleCustom.bind(null, action.callback)}, action.caption);
                                         break;
                                 }
                             } else if (action.html) {
