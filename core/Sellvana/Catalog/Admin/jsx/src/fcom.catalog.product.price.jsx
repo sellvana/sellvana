@@ -53,10 +53,10 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
         render: function () {
             var price = this.props.data;
             this.editable = (this.props.editable_prices.indexOf(price['price_type']) != -1);
-            var priceTypes = <span>{this.props.price_types[price['price_type']]}</span>;
+            var priceTypes = <span key="price_type">{this.props.price_types[price['price_type']]}</span>;
             if(this.editable) {
                 priceTypes =
-                    <select className="to-select2 form-control priceUnique"
+                    <select key="price_type" className="to-select2 form-control priceUnique"
                         name={this.getFieldName(price, 'price_type')}
                         defaultValue={price['price_type']} ref="price_type">
                             {_.map(this.props.price_types, function (pt, pk) {
@@ -249,12 +249,20 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             var no_filters = true;
 
             var checkAddAllowed = function (options) {
-                var allowed = true;
+                var allowed = null;
                 _.each(['filter_customer_group_value', 'filter_site_value', 'filter_currency_value'], function (value) {
+                    if(allowed) { // if any of the options allow it, then its allowed
+                        return;
+                    }
                     allowed = (options[value] != '*');
                 });
-                if(allowed && options.prices_add_new && options.prices_add_new.length) {
-                    options.prices_add_new.attr('disabled', false);
+                if(options.prices_add_new && options.prices_add_new.length) {
+                    console.log(allowed);
+                    if (allowed) {
+                        options.prices_add_new.attr('disabled', false);
+                    } else {
+                        options.prices_add_new.attr('disabled', 'disabled');
+                    }
                 }
             };
             _.each(['filter_customer_group', 'filter_site', 'filter_currency'], function (filter) {
