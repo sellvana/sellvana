@@ -19,7 +19,7 @@
   </div>
 </fieldset>
 
-{% set prices = m.getAllPrices() %}
+{% set prices = m.getRawPrices() %}
 
 
 <fieldset name="product-prices">
@@ -84,9 +84,18 @@
             return valid;
         }
 
+//        = "base",
+//                "map",
+//                "msrp",
+//                "sale",
+//                "tier",
+//                "cost",
+//                = "promo";
         var options = {
             container: $('#price_list'),
             prices: {{ UTIL.toJson(prices)|raw }},
+            price_types: {{ UTIL.toJson(m.priceTypeOptions())|raw }},
+            editable_prices: {{ UTIL.toJson(APP.instance('Sellvana_Catalog_Model_ProductPrice').fieldOptions('editable_prices'))|raw }},
             customer_groups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'null' }},
             sites: {{ sites? UTIL.toJson(sites)|raw: 'null' }},
             currencies: {{ currencies? UTIL.toJson(currencies)|raw: 'null' }},
@@ -95,7 +104,20 @@
             filter_currency: $('#prices-currencies'),
             prices_add_new: $('#prices_add_new'),
             product_id: '{{ m.id() }}',
-            validatePrices: validatePrices
+            validatePrices: validatePrices,
+            priceRelationOptions: {
+                "base": [{value: 'cost', label: 'Cost'}, {value: 'msrp', label: 'MSRP'}],
+                "cost": [{value: 'base', label: 'Base price'}],
+                "sale": [{value: 'cost', label: 'Cost'}, {value: 'base', label: 'Base price'}]
+            },
+            operationOptions: [
+                {value: '$$', label: "{{ 'Fixed price'|_ }}"},
+                {value: '+$', label: "{{ 'Add amount to'|_ }}"},
+                {value: '-$', label: "{{ 'Subtract amount from'|_ }}"},
+                {value: '+%', label: "{{ 'Add percent of'|_ }}"},
+                {value: '-%', label: "{{ 'Subtract percent from'|_ }}"}
+            ],
+            sale_date_separator: ' / '
         };
 
         Price.init(options);

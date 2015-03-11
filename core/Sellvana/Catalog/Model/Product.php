@@ -1155,11 +1155,32 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $prices;
     }
 
-    public function getAllPrices()
+    /**
+     * @param int    $qty
+     * @param int    $customerGroup_id
+     * @param int    $site_id
+     * @param string $currency_code
+     * @param null   $date
+     * @return Sellvana_Catalog_Model_ProductPrice[]
+     */
+    public function getAllPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
     {
-        $priceModel= $this->Sellvana_Catalog_Model_ProductPrice;
-        $prices = $priceModel->getProductPrices($this);
+
+        $prices = [];
+        $productPrices = $this->getRawPrices($qty, $customerGroup_id, $site_id, $currency_code, $date);
+        foreach ($productPrices as $p) {
+            $type = $p['price_type'];
+            $prices[$type][] = $p;
+        }
+
         return $prices;
+    }
+
+    public function getRawPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
+    {
+        $priceModel    = $this->Sellvana_Catalog_Model_ProductPrice;
+        $productPrices = $priceModel->getProductPrices($this, $qty, $customerGroup_id, $site_id, $currency_code, $date);
+        return $productPrices;
     }
 
     /**
@@ -1203,5 +1224,33 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         $this->set('inventory_model', $invModel);
         return $invModel;
+    }
+
+    /**
+     * @param float  $qty quantity of product in cart
+     * @param int    $customerGroupId
+     * @param int    $siteId
+     * @param string $currencyCode
+     * @return null|float
+     */
+    public function getTierPrice($qty, $customerGroupId = null, $siteId = null, $currencyCode = null)
+    {
+        $priceModel = $this->Sellvana_Catalog_Model_ProductPrice;
+        $price      = $priceModel->getPrice($this, 'tier', $qty, $customerGroupId, $siteId, $currencyCode);
+
+        if ($price) {
+            return $price->get('price');
+        }
+        return null;
+    }
+
+    public function priceTypeOptions()
+    {
+        return $this->Sellvana_Catalog_Model_ProductPrice->fieldOptions('price_types');
+    }
+
+    public function variantPrice($itemPrice, $variant_id)
+    {
+        return $itemPrice;
     }
 }

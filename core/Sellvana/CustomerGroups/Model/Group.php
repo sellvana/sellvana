@@ -52,4 +52,13 @@ class Sellvana_CustomerGroups_Model_Group extends FCom_Core_Model_Abstract
 
         return $groups;
     }
+
+    public function notLoggedInId()
+    {
+        $group = $this->load('guest', 'code');
+        if($group){
+            return $group->id();
+        }
+        return null;
+    }
 }

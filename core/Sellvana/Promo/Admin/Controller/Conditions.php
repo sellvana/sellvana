@@ -124,6 +124,7 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
         $page   = $r->get('page')?: 1;
         $term   = $r->get('q');
         $limit  = $r->get('o')?: 30;
+        $type   = $r->get('promo_type')?: 'cart';
         $offset = ($page - 1) * $limit;
 
         $orm = $this->Sellvana_CustomField_Model_Field->orm()->where('field_type', 'product');
@@ -134,10 +135,11 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
 
         $countOrm = clone $orm;
         $count    = $countOrm->count();
-        $results  = ['total_count' => $count, 'items' => [
-            ['id' => 'cart.qty', 'text' => 'Total Qty (cart)', 'input' => 'number'],
-            ['id' => 'cart.amt', 'text' => 'Total Amount (cart)', 'input' => 'number'],
-        ]];
+        $results  = ['total_count' => $count, 'items' => []];
+        if($type == 'cart'){
+            $results['items'][] = ['id' => 'cart.qty', 'text' => 'Total Qty (cart)', 'input' => 'number'];
+            $results['items'][] = ['id' => 'cart.amt', 'text' => 'Total Amount (cart)', 'input' => 'number'];
+        }
         $orm->limit((int) $limit)->offset($offset)->order_by_desc('frontend_label');
 
         $orm->iterate(function ($model) use (&$results) {
