@@ -70,7 +70,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             ['field' => 'rating3', 'type' => 'number-range'],
             ['field' => 'helpful', 'type' => 'text'],
             ['field' => 'approved', 'type' => 'multiselect'],
-            ['field' => 'product_id', 'type' => 'multiselect'],
+            //['field' => 'product_id', 'type' => 'multiselect'],
             ['field' => 'customer_id', 'type' => 'multiselect'],
             ['field' => 'create_at', 'type' => 'date-range'],
             '_quick' => ['expr' => 'title like ? or id=?', 'args' => ['%?%', '?']]
@@ -147,6 +147,8 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
                 ->left_outer_join('Sellvana_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
                 ->left_outer_join('Sellvana_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
                 ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
+
+	        $config['filters'][] = ['field' => 'product_id', 'type' => 'multiselect'];
         }
 
         /*$config['columns'][] = ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
