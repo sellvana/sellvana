@@ -44,6 +44,7 @@ define(['underscore', 'react'], function (_, React) {
                 }
 
                 var node = "";
+                var customNodeHtml = false;
                 switch (col.type) {
                     case 'row_select':
                         var defaultChecked = false;
@@ -101,7 +102,8 @@ define(['underscore', 'react'], function (_, React) {
                             var rc = {
                                 row: that.props.row
                             };
-                            node = eval('print('+col.print+');');
+                            node = eval(col.print);
+                            customNodeHtml = true;
                         } else if (col.display == 'file_size') {
                             node = that.fileSizeFormat(that.props.row[col.name]);
                         } else {
@@ -110,6 +112,9 @@ define(['underscore', 'react'], function (_, React) {
                         break;
                 }
 
+                if (customNodeHtml) {
+                    return <td data-col={col.name} dangerouslySetInnerHTML={{__html: node}}></td>;
+                }
                 return <td data-col={col.name}>{node}</td>;
             });
 

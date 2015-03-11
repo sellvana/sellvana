@@ -27,6 +27,16 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
             }
 
             return size;
+        },
+        dateTimeNow: function () {
+            var d = new Date();
+            var dateTime = d.getFullYear() + '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate()) + ' ' + toString(d.getHours()) + ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
+
+            function toString(val) {
+                return (val < 10) ? '0' + val : val;
+            }
+
+            return dateTime;
         }
     };
 
