@@ -370,4 +370,14 @@ class Sellvana_CustomField_Migrate extends BClass
         ]);
         $this->BDb->run("UPDATE {$tProdVariant} SET product_sku=inventory_sku");
     }
+
+    public function upgrade__0_2_3__0_2_4()
+    {
+        $tProdVariant = $this->Sellvana_CustomField_Model_ProductVariant->table();
+        $this->BDb->ddlTableDef($tProdVariant, [
+            BDb::COLUMNS => [
+                'variant_price' => 'DROP',
+            ],
+        ]);
+    }
 }

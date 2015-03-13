@@ -48,6 +48,28 @@ class Sellvana_CustomField_Main extends BClass
     }
 
     /**
+     * @param array $args
+     */
+    public function productVariantFindAfter($args)
+    {
+        if ($this->_disabled) {
+            return;
+        }
+        $m = $args['result'];
+        if(!$m){
+            return;
+        }
+        if(!is_array($m)){
+            $m = [$m];
+        }
+
+        foreach ($m as $model) {
+            /** @var Sellvana_CustomField_Model_ProductVariant $model */
+            $model->onAfterLoad();
+        }
+    }
+
+    /**
      * @param $args
      * @throws BException
      */

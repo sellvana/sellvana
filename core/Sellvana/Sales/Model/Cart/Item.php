@@ -85,7 +85,6 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @param null $variantId
      * @return mixed
      */
     public function calcRowTotal()
