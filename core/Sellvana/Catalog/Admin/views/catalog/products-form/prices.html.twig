@@ -2,6 +2,7 @@
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
+{% set viewHelper = LAYOUT.view('core/form-elements') %}
 
 <fieldset name="main-product">
   <div class="f-section">
@@ -14,7 +15,17 @@
     {{ forms.input(fieldData, {field:'base_price', label:'Regular Price'|_, required:1}) }}
 
     {{ forms.input(fieldData, {field:'sale_price', label:'Special Price'|_}) }}
-
+      <div class="form-group">
+          {{ forms.label({field:'sale_price', label:'Special Price'|_}) }}
+          <div class="col-md-10">
+              <div class="pull-left"><input type="text" name="{{ viewHelper.getInputName({field: 'sale_price' }) }}"
+                                            class="form-control"></div>
+              <div class="pull-left">{{ forms.label({field:'sale_price_period', label:'Period'|_}) }}</div>
+              <div class="pull-left"><input type="text" placeholder="{{ "Select sale dates"|_ }}" id="{{ viewHelper.getInputId({field: 'sale_price_period' }) }}"
+                                           name="{{ viewHelper.getInputName({field: 'sale_price_period' }) }}"
+                                           class="form-control"></div>
+          </div>
+      </div>
     {{ forms.input(fieldData, {field:'markup', label:'Default Markup'|_}) }}
   </div>
 </fieldset>
@@ -72,7 +83,29 @@
     </div>
 </fieldset>
 <script type="text/javascript">
-    require(['jquery', 'fcom.catalog.product.price', 'jquery.validate'], function ($, Price) {
+    require(['jquery', 'fcom.catalog.product.price', 'jquery.validate', 'daterangepicker'], function ($, Price) {
+
+        var data = '{{m.get('sale_price_period')}}', s, e;
+        if (!data) {
+            var startDate = new Date();
+            s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+        } else {
+            var dates = data.split(" - ");
+            s = dates[0];
+            e = dates[1] || dates[0];
+        }
+        var $input = $('#model-sale_price_period');
+        var datePickerOptions = {
+            format: 'YYYY-MM-DD',
+            startDate: s,
+            separator: ' / '
+        };
+        if (e) {
+            datePickerOptions.endDate = e;
+        }
+        $input.daterangepicker(datePickerOptions);
+
+
         $('select.to-select2').select2({minimumResultsForSearch: 15, width: 'resolve', dropdownAutoWidth: true});
         function validatePrices() {
             var valid = true;
