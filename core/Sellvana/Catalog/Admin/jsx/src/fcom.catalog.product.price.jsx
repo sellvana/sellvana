@@ -114,22 +114,22 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         {priceTypes}
                     </div>
                     <div style={divStyle}>
-                        <input type="hidden" name={this.getFieldName(price, "product_id")}
-                               defaultValue={price['product_id']}/>
-                        <input type="hidden" name={this.getFieldName(price, "customer_group_id")}
-                               defaultValue={price['customer_group_id']} className="priceUnique"/>
+                        { price['product_id'] && price['product_id'] !== "*" ? <input type="hidden" name={this.getFieldName(price, "product_id")}
+                               defaultValue={price['product_id']}/>: null }
+                        { price['customer_group_id'] && price['customer_group_id'] !== "*" ? <input type="hidden" name={this.getFieldName(price, "customer_group_id")}
+                               defaultValue={price['customer_group_id']} className="priceUnique"/>: null}
                         <input type="text" className="form-control" readOnly="readOnly"
                                defaultValue={this.getCustomerGroupName(price['customer_group_id'])}/>
                     </div>
                     <div style={divStyle}>
-                        <input type="hidden" name={this.getFieldName(price, "site_id")}
-                               defaultValue={price['site_id']} className="priceUnique"/>
+                        { price['site_id'] && price['site_id'] !== "*" ? <input type="hidden" name={this.getFieldName(price, "site_id")}
+                               defaultValue={price['site_id']} className="priceUnique"/>: null }
                         <input type="text" className="form-control" readOnly="readOnly"
                                defaultValue={this.getSiteName(price['site_id'])}/>
                     </div>
                     <div style={divStyle}>
-                        <input type="hidden" name={this.getFieldName(price, "currency_code")}
-                               defaultValue={price['currency_code']} className="priceUnique"/>
+                        { price['currency_code'] && price['currency_code'] !== "*" ? <input type="hidden" name={this.getFieldName(price, "currency_code")}
+                               defaultValue={price['currency_code']} className="priceUnique"/>: null }
                         <input type="text" className="form-control" readOnly="readOnly"
                                defaultValue={this.getCurrencyName(price['currency_code'])}/>
                     </div>
