@@ -277,7 +277,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "className": "",
                 "getConfig": null,
                 "selectedColumns": [],
-                "refresh": null
+                "refresh": null,
+                "deleteRows": null
             }
         },
         modalSaveMassChanges: function(modal) {
@@ -312,12 +313,14 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             }
         },
         doMassAction: function(event) { //top mass action
+            if (this.props.getConfig('data_mode') == 'local') {
+                this.doMassLocalAction(event);
+            }
             var that = this;
             var action = event.target.dataset.action;
             var dataUrl = this.props.getConfig('data_url');
             var editUrl = this.props.getConfig('edit_url');
             var gridId = this.props.getConfig('id');
-            var pageSize = this.props.resultsPerPage;
 
             switch (action) {
                 case 'mass-delete':
@@ -347,6 +350,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     );
                     break;
                 case 'export':
+                    var pageSize = this.props.resultsPerPage;
                     var griddleState = this.props.getGriddleState();
                     var exportUrl = buildGridDataUrl(griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
                     window.location.href = exportUrl + '&export=true';
@@ -356,6 +360,32 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     break;
             }
 
+        },
+        doMassLocalAction: function(event) {
+            var that = this;
+            var action = event.target.dataset.action;
+            var gridId = this.props.getConfig('id');
+
+            switch (action) {
+                case 'mass-delete':
+                    var confirm = false;
+                    if ($(event.target).hasClass('noconfirm')) {
+                        confirm = true;
+                    } else {
+                        confirm = window.confirm("Do you really want to delete selected rows?");
+                    }
+
+                    if (confirm) {
+                        var selectedRows = this.props.getSelectedRows();
+                        if (selectedRows.length && this.props.deleteRows != null) {
+                            this.props.deleteRows(selectedRows);
+                        }
+                    }
+                    break;
+                default:
+                    console.log('do-mass-local-action');
+                    break;
+            }
         },
         toggleColumn: function(event) {
             var personalizeUrl = this.props.getConfig('personalize_url');

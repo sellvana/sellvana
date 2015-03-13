@@ -49,6 +49,9 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
             }
         },
         doRowAction: function(event) {
+            if (this.props.getConfig('data_mode') == 'local') {
+                return this.doRowLocalAction(event);
+            }
             var that = this;
             var action = event.target.dataset.action;
             var rowId = event.target.dataset.row;
@@ -86,7 +89,32 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                     }
                     break;
                 default:
-                    console.log('doRowAction');
+                    console.log('do-row-action');
+                    break;
+            }
+        },
+        doRowLocalAction: function(event) {
+            var that = this;
+            var action = event.target.dataset.action;
+
+            switch (action) {
+                case 'delete':
+                    var confirm = false;
+                    if ($(event.target).hasClass('noconfirm')) {
+                        confirm = true;
+                    } else {
+                        confirm = window.confirm("Do you want to really delete?");
+                    }
+
+                    if (confirm) {
+                        var row = _.findWhere(this.props.originalData, {id: event.target.dataset.row});
+                        if (row) {
+                            this.props.deleteRows([row]);
+                        }
+                    }
+                    break;
+                default:
+                    console.log('do-row-local-action');
                     break;
             }
         },

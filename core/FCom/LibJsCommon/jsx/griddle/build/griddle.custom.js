@@ -425,7 +425,7 @@ var Griddle = React.createClass({displayName: "Griddle",
             ? React.createElement(this.props.customSettings, {columnMetadata: this.props.columnMetadata, selectedColumns: this.getColumns, setColumns: this.setColumns, 
                 getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh, 
                 setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState, 
-                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, getCurrentGrid: this.getCurrentGrid})
+                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, deleteRows: this.deleteRows, getCurrentGrid: this.getCurrentGrid})
             : React.createElement("span", {className: "settings", onClick: this.toggleColumnChooser}, this.props.settingsText, " ", React.createElement("i", {className: "glyphicon glyphicon-cog"}))
         ) : "";
 
@@ -455,7 +455,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                         className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, 
                         getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, 
                         getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows, 
-                        hasExternalResults: this.hasExternalResults}
+                        hasExternalResults: this.hasExternalResults, deleteRows: this.deleteRows}
                     ))
                     : (React.createElement(GridBody, {columnMetadata: this.props.columnMetadata, data: data, columns: cols, metadataColumns: meta, className: this.props.tableClassName}))
                 );
@@ -797,7 +797,17 @@ var Griddle = React.createClass({displayName: "Griddle",
     addRows: function(rows) {
         var results = this.state.filteredResults || this.state.results;
         results.push.apply(results, rows);
-        this.setState({ results: results, filteredResults: results });
+        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) });
+    },
+    deleteRows: function(rows) {
+        var results = this.state.filteredResults || this.state.results;
+        var deleteIds = _.pluck(rows, 'id');
+        if (deleteIds) {
+            results = _.filter(results, function(row) {
+                return !_.contains(deleteIds, row.id);
+            });
+        }
+        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) });
     },
     getRows: function() {
         return this.state.filteredResults || this.state.results;
