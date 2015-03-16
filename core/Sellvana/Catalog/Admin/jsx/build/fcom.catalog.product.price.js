@@ -81,16 +81,16 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             var priceFraction = React.createElement("span", {key: "price_fraction"});
             if(this.props.priceRelationOptions && this.props.priceRelationOptions[price['price_type']]) {
                 var operation =
-                    React.createElement("select", {name: this.getFieldName(price, 'operation'), defaultValue: price['operation'], 
+                    React.createElement("select", {key: "operation", name: this.getFieldName(price, 'operation'), defaultValue: price['operation'], 
                         ref: "operation", className: "to-select2"}, 
                         this.props.operationOptions.map(function (o) {
                             return React.createElement("option", {value: o.value, key: o.value}, o.label)
                         })
                     );
-                var baseField = React.createElement("span", null);
+                var baseField = null;
                 if(price['operation'] && price['operation'] !== "$$") {
                     baseField =
-                        React.createElement("select", {key: "base_fields", name: this.getFieldName(price, 'base_field'), 
+                        React.createElement("select", {ref: "base_fields", key: "base_fields", name: this.getFieldName(price, 'base_field'), 
                             defaultValue: price['base_field'], className: "base_field to-select2"}, 
                             this.props.priceRelationOptions[price['price_type']].map(function (p) {
                                 return React.createElement("option", {key: p.value, value: p.value}, p.label)
@@ -152,6 +152,11 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
         componentDidUpdate: function () {
             if(this.props.data.operation && this.props.data.operation !== '$$') {
                 $('select.base_field', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
+            }
+        },
+        componentWillUpdate: function () {
+            if(this.refs['base_fields']) {
+                $(this.refs['base_fields'].getDOMNode()).select2('destroy');
             }
         },
         initPrices: function () {
