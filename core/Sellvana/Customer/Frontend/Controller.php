@@ -7,9 +7,9 @@
  */
 class Sellvana_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
-    public function beforeDispatch()
+    public function onBeforeDispatch()
     {
-        if (!parent::beforeDispatch()) {
+        if (!parent::onBeforeDispatch()) {
             return false;
         }
         if ($this->Sellvana_Customer_Model_Customer->isLoggedIn() && in_array($this->_action, ['login', 'register', 'password_recover'])) {

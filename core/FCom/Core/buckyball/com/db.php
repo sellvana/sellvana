@@ -321,7 +321,7 @@ class BDb
         foreach ((array)$rows as $i => $r) {
             if (!$r instanceof BModel) {
                 echo "Rows are not models: <pre>"; print_r($r);
-                debug_print_backtrace();
+                BDebug::cleanBacktrace();
                 exit;
             }
             $row = $r->$method();
@@ -2993,14 +2993,15 @@ class BModel extends Model
         $params = [];
         foreach ($data as $r) {
             foreach ($fields as $f) {
-                $params[] = !empty($r[$f]) ? $r[$f] : (!empty($defaults[$f]) ? $defaults[$f] : null);
+                $params[] = isset($r[$f]) ? $r[$f] : (isset($defaults[$f]) ? $defaults[$f] : null);
             }
         }
 
         $instr = !empty($options['replace']) ? 'REPLACE INTO' : 'INSERT INTO';
         $table = static::table();
-        $values = join(',', array_fill(0, sizeof($data), '(' . join(',', array_fill(0, sizeof($fields), '?')) . ')'));
-        $sql = "{$instr} {$table} ({$fields}) VALUES {$values}";
+        $fieldsStr = join(',', $fields);
+        $valuesStr = join(',', array_fill(0, sizeof($data), '(' . join(',', array_fill(0, sizeof($fields), '?')) . ')'));
+        $sql = "{$instr} {$table} ({$fieldsStr}) VALUES {$valuesStr}";
 
         BDebug::debug('SQL: ' . $sql);
 
@@ -3375,7 +3376,7 @@ class BModel extends Model
      * @param boolean $ignoreModelRules
      * @return bool
      */
-    public function validate($data = [], $rules = [], $formName = 'admin', $ignoreModelRules = false)
+    public function validate(array &$data = [], array $rules = [], $formName = 'admin', $ignoreModelRules = false)
     {
         if (!$data && $this->orm) {
             $data = $this->as_array();
@@ -3431,6 +3432,23 @@ class BModel extends Model
     {
         foreach ($instances as $name => $instance) {
             $this->_diLocal[$name] = $instance;
+        }
+        return $this;
+    }
+
+    /**
+     * Set date field
+     * By default dates are returned as strings, therefore we need to convert them for mysql
+     *
+     * @param $field
+     * @param $fieldDate
+     * @return static
+     */
+    public function setDate($field, $fieldDate)
+    {
+        $date = strtotime($fieldDate);
+        if (-1 != $date) {
+            $this->set($field, date("Y-m-d", $date));
         }
         return $this;
     }

@@ -40,4 +40,4 @@ modules:
                     - [ cms/form-fields, { view_class: Sellvana_Cms_Frontend_View_FormFields } ]
 
                 observe:
-                    - [ "FCom_Frontend_Controller::beforeDispatch", "Sellvana_Cms_Frontend.onFrontendIndexBeforeDispatch" ]
+                    - [ "FCom_Frontend_Controller::onBeforeDispatch", "Sellvana_Cms_Frontend.onFrontendIndexBeforeDispatch" ]

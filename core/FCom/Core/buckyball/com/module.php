@@ -613,7 +613,7 @@ class BModuleRegistry extends BClass
     {
         foreach ($this->_modules as $mod) {
             $this->pushModule($mod->name);
-            $mod->beforeBootstrap();
+            $mod->onBeforeBootstrap();
             $this->popModule();
         }
         foreach ($this->_modules as $mod) {
@@ -1258,7 +1258,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         return $this;
     }
 
-    public function beforeBootstrap()
+    public function onBeforeBootstrap()
     {
         if ($this->run_status !== BModule::PENDING) {
             return $this;
@@ -1294,7 +1294,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     {
         if ($this->run_status !== BModule::PENDING) {
             if ($force) {
-                $this->_prepareModuleEnvData(); // prepare data missed in beforeBootstrap
+                $this->_prepareModuleEnvData(); // prepare data missed in onBeforeBootstrap
             } else {
                 return $this; // skip module bootstrap
             }

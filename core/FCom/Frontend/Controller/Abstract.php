@@ -55,9 +55,9 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
     }
 
-    public function beforeDispatch()
+    public function onBeforeDispatch()
     {
-        if (!parent::beforeDispatch()) return false;
+        if (!parent::onBeforeDispatch()) return false;
 
         $this->view('head')->setTitle($this->BConfig->get('modules/FCom_Core/site_title'));
 

@@ -77,7 +77,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         /*array('is_hidden', '@integer'),*/
         ['num_reviews', '@integer'],
 
-
         ['cost', '@numeric'],
         ['msrp', '@numeric'],
         ['map', '@numeric'],
