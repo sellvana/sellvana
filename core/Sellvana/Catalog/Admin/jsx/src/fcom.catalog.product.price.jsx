@@ -88,7 +88,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         })}
                     </select>;
                 var baseField = null;
-                if(price['operation'] && price['operation'] !== "$$") {
+                if(price['operation'] && price['operation'] !== "=$") {
                     baseField =
                         <select ref="base_fields" key="base_fields" name={this.getFieldName(price, 'base_field')}
                             defaultValue={price['base_field']} className="base_field to-select2">
@@ -150,7 +150,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             this.initPrices();
         },
         componentDidUpdate: function () {
-            if(this.props.data.operation && this.props.data.operation !== '$$') {
+            if(this.props.data.operation && this.props.data.operation !== '=$') {
                 $('select.base_field', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
             }
         },

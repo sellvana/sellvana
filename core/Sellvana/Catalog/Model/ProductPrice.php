@@ -46,7 +46,7 @@ class Sellvana_Catalog_Model_ProductPrice
             "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base price']]
         ],
         'operation_options' => [
-            ['value' => '$$', 'label' => "Fixed price"],
+            ['value' => '=$', 'label' => "Fixed price"],
             ['value' => '+$', 'label' => "Add amount to"],
             ['value' => '-$', 'label' => "Subtract amount from"],
             ['value' => '+%', 'label' => "Add percent of"],
