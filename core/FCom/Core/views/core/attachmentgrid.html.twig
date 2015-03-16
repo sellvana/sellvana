@@ -22,12 +22,6 @@
         var originIds, addedIds = [], removedIds = [];
         var rowsAllImages;
 
-        function _removeSpecialChars(str) {
-            var pos = str.indexOf('.');
-            var label = str.substr(0, pos);
-            return label.replace(/[\-_]/gi, ' ');
-        }
-
         function _getAttachmentsDbFields(row) {
             return {
                 id: row.id,

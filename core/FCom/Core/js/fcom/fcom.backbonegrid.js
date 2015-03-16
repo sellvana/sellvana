@@ -74,6 +74,11 @@ function dateTimeNow() {
     return dateTime;
 }
 
+function _removeSpecialChars(str) {
+    var label = str.substr(0, str.indexOf('.'));
+    return label.replace(/[_\-]/gi, ' ');
+}
+
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
     'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
     function (Backbone, _, $, NProgress) {

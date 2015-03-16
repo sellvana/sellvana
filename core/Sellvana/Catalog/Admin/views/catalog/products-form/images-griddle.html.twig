@@ -31,7 +31,7 @@ Images grid with griddle
 <input type='hidden' name="grid[images][rows]" class="target-attach-rows" id="{{ prodImagesConfig.config.id }}-attach-rows"/>
 
 <script>
-    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique', 'fcom.backbonegrid'], function ($, _, React, FComGriddleComponent, Components) {
         //var mediaId = '{{ mediaConfig.id }}';
         var mainGridId = '{{ prodImagesConfig.config.id }}';
         var mainGrid, attachGrid;
@@ -101,7 +101,7 @@ Images grid with griddle
                             create_at: current,
                             //temporary value before implement edit inline
                             position: 0,
-                            label: ''
+                            label: _removeSpecialChars(attachRow.file_name)
                         });
                         addRows.push(row);
                     }
