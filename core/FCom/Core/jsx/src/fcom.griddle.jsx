@@ -278,7 +278,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "getConfig": null,
                 "selectedColumns": [],
                 "refresh": null,
-                "deleteRows": null
+                "removeRows": null
             }
         },
         modalSaveMassChanges: function(modal) {
@@ -314,7 +314,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         },
         doMassAction: function(event) { //top mass action
             if (this.props.getConfig('data_mode') == 'local') {
-                this.doMassLocalAction(event);
+                return this.doMassLocalAction(event);
             }
             var that = this;
             var action = event.target.dataset.action;
@@ -350,10 +350,12 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     );
                     break;
                 case 'export':
-                    var pageSize = this.props.resultsPerPage;
-                    var griddleState = this.props.getGriddleState();
-                    var exportUrl = buildGridDataUrl(griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
-                    window.location.href = exportUrl + '&export=true';
+                    if (dataUrl != '') {
+                        var pageSize = this.props.resultsPerPage;
+                        var griddleState = this.props.getGriddleState();
+                        var exportUrl = buildGridDataUrl(griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
+                        window.location.href = exportUrl + '&export=true';
+                    }
                     break;
                 default:
                     console.log('do-mass-action');
@@ -377,8 +379,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
                     if (confirm) {
                         var selectedRows = this.props.getSelectedRows();
-                        if (selectedRows.length && this.props.deleteRows != null) {
-                            this.props.deleteRows(selectedRows);
+                        if (selectedRows.length && this.props.removeRows != null) {
+                            this.props.removeRows(selectedRows);
                         }
                     }
                     break;

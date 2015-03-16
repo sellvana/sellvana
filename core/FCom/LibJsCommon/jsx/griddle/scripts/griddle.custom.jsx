@@ -425,7 +425,7 @@ var Griddle = React.createClass({
             ? <this.props.customSettings columnMetadata={this.props.columnMetadata} selectedColumns={this.getColumns} setColumns={this.setColumns}
                 getConfig={this.getConfig} searchWithinResults={this.searchWithinResults} getSelectedRows={this.getSelectedRows} refresh={this.refresh}
                 setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState}
-                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} deleteRows={this.deleteRows} getCurrentGrid={this.getCurrentGrid} />
+                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} removeRows={this.removeRows} getCurrentGrid={this.getCurrentGrid} />
             : <span className="settings" onClick={this.toggleColumnChooser}>{this.props.settingsText} <i className="glyphicon glyphicon-cog"></i></span>
         ) : "";
 
@@ -455,7 +455,7 @@ var Griddle = React.createClass({
                         className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
                         getConfig={this.getConfig} refresh={this.refresh} setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
                         getSelectedRows={this.getSelectedRows} addSelectedRows={this.addSelectedRows} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
-                        hasExternalResults={this.hasExternalResults} deleteRows={this.deleteRows}
+                        hasExternalResults={this.hasExternalResults} removeRows={this.removeRows}
                     />)
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );
@@ -799,15 +799,19 @@ var Griddle = React.createClass({
         results.push.apply(results, rows);
         this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) });
     },
-    deleteRows: function(rows) {
+    removeRows: function(rows) {
         var results = this.state.filteredResults || this.state.results;
+        var selectedRows = this.getSelectedRows();
         var deleteIds = _.pluck(rows, 'id');
         if (deleteIds) {
             results = _.filter(results, function(row) {
                 return !_.contains(deleteIds, row.id);
             });
+            selectedRows = _.filter(selectedRows, function(row) {
+                return !_.contains(deleteIds, row.id);
+            });
         }
-        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) });
+        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results), selectedRows: selectedRows });
     },
     getRows: function() {
         return this.state.filteredResults || this.state.results;

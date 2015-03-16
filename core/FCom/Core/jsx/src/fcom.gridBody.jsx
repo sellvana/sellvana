@@ -109,7 +109,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                     if (confirm) {
                         var row = _.findWhere(this.props.originalData, {id: event.target.dataset.row});
                         if (row) {
-                            this.props.deleteRows([row]);
+                            this.props.removeRows([row]);
                         }
                     }
                     break;
