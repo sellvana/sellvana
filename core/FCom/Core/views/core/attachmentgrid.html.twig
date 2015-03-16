@@ -22,6 +22,12 @@
         var originIds, addedIds = [], removedIds = [];
         var rowsAllImages;
 
+        function _removeSpecialChars(str) {
+            var pos = str.indexOf('.');
+            var label = str.substr(0, pos);
+            return label.replace(/[\-_]/gi, ' ');
+        }
+
         function _getAttachmentsDbFields(row) {
             return {
                 id: row.id,
@@ -82,6 +88,7 @@
                         addedRow.set('selected', false);
                         addedRow.set('update_at', dateTimeNow());
                         addedRow.set('create_at', dateTimeNow());
+                        addedRow.set('label', _removeSpecialChars(row.attributes.file_name));
                         gridView.collection.add(addedRow.toJSON(), {silent: true});
                     }
                 });
