@@ -1,6 +1,6 @@
 modules:
     Sellvana_Promo:
-        version: 0.2.0
+        version: 0.2.1
         channel: beta
         require: { module: { Sellvana_Catalog: 0.1.0, Sellvana_Sales: 0.2.0 }}
         description: "Promotions module"

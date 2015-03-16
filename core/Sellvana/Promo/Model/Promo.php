@@ -128,29 +128,15 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
 
         $this->setDate('from_date', $this->get("from_date"));
         $this->setDate('to_date', $this->get("to_date"));
-        if (!$this->get("create_at")) {
-            $this->set("create_at", date("Y-m-d"));
-        }
-        $this->set("update_at", date("Y-m-d"));
 
         return true;
     }
 
-    /**
-     * Set date field
-     * By default dates are returned as strings, therefore we need to convert them for mysql
-     *
-     * @param $field
-     * @param $fieldDate
-     * @return static
-     */
-    public function setDate($field, $fieldDate)
+    public function onAfterSave()
     {
-        $date = strtotime($fieldDate);
-        if (-1 != $date) {
-            $this->set($field, date("Y-m-d", $date));
+        if ($this->get('promo_type') === 'catalog') {
+            $this->Sellvana_Promo_Model_PromoProduct->processPromo($this);
         }
-        return $this;
     }
 
     public function getActive()

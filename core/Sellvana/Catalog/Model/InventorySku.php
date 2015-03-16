@@ -4,8 +4,18 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_inventory_sku';
     static protected $_origClass = __CLASS__;
+
+    static protected $_validationRules = [
+        ['unit_cost', '@numeric'],
+        ['net_weight', '@numeric'],
+        ['shipping_weight', '@numeric'],
+        ['qty_warn_customer', '@integer'],
+        ['qty_notify_admin', '@integer'],
+        ['qty_cart_min', '@integer'],
+    ];
+
     static protected $_fieldDefaults = [
-        "title" => "N/A"
+        "title" => "N/A",
     ];
 
     public function collectInventoryForProducts($products)

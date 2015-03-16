@@ -15,7 +15,7 @@
  */
 class FCom_Core_Controller_Abstract extends BActionController
 {
-    public function beforeDispatch()
+    public function onBeforeDispatch()
     {
         if ($this->BRequest->csrf() && false == $this->isApiCall()) {
             $this->BResponse->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
@@ -24,10 +24,10 @@ class FCom_Core_Controller_Abstract extends BActionController
         if (($root = $this->BLayout->view('root'))) {
             $root->body_class = $this->BRequest->path(0, 1);
         }
-        return parent::beforeDispatch();
+        return parent::onBeforeDispatch();
     }
 
-    public function afterDispatch()
+    public function onAfterDispatch()
     {
         $this->BResponse->render();
     }

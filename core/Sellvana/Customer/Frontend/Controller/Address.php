@@ -11,9 +11,9 @@
  */
 class Sellvana_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
 {
-    public function beforeDispatch()
+    public function onBeforeDispatch()
     {
-        if (!parent::beforeDispatch()) return false;
+        if (!parent::onBeforeDispatch()) return false;
 
         $this->BResponse->nocache();
 
