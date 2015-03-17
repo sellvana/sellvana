@@ -4,32 +4,6 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set viewHelper = LAYOUT.view('core/form-elements') %}
 {% set priceHelper = APP.instance('Sellvana_Catalog_Model_ProductPrice') %}
-<fieldset name="main-product">
-  <div class="f-section">
-    {{ forms.input(fieldData, {field:'cost', label:'Cost'|_}) }}
-
-    {{ forms.input(fieldData, {field:'msrp', label:'MSRP'|_}) }}
-
-    {{ forms.input(fieldData, {field:'map', label:'MAP'|_}) }}
-
-    {{ forms.input(fieldData, {field:'base_price', label:'Regular Price'|_, required:1}) }}
-
-    {{ forms.input(fieldData, {field:'sale_price', label:'Special Price'|_}) }}
-      <div class="form-group">
-          {{ forms.label({field:'sale_price', label:'Special Price'|_}) }}
-          <div class="col-md-10">
-              <div class="pull-left"><input type="text" name="{{ viewHelper.getInputName({field: 'sale_price' }) }}"
-                                            class="form-control"></div>
-              <div class="pull-left">{{ forms.label({field:'sale_price_period', label:'Period'|_}) }}</div>
-              <div class="pull-left"><input type="text" placeholder="{{ "Select sale dates"|_ }}" id="{{ viewHelper.getInputId({field: 'sale_price_period' }) }}"
-                                           name="{{ viewHelper.getInputName({field: 'sale_price_period' }) }}"
-                                           class="form-control"></div>
-          </div>
-      </div>
-    {{ forms.input(fieldData, {field:'markup', label:'Default Markup'|_}) }}
-  </div>
-</fieldset>
-
 {% set prices = m.getRawPrices() %}
 
 
@@ -38,41 +12,43 @@
         <div class="form-group">
             {% if MODULES.isLoaded('Sellvana_CustomerGroups') %}
                 {% set customerGroups = APP.instance('Sellvana_CustomerGroups_Model_Group').groupsOptions() %}
-                <label for="prices-customer_groups" class="col-md-2 control-label">{{ "Customer group"|_ }}</label>
                 <div class="" style="float: left; margin-left: 15px;">
+                    <label for="prices-customer_groups" >{{ "Customer group"|_ }}</label><br/>
                     <select id="prices-customer_groups" name="prices[customer_groups]" class="form-control to-select2">
-                        <option value="*">{{ "Any (*)"|_ }}</option>
+                        <option value="*">{{ "All (*)"|_ }}</option>
                         {{ UTIL.optionsHtml(customerGroups)|raw }}
                     </select>
                 </div>
             {% endif %}
             {% if MODULES.isLoaded('Sellvana_MultiSite') %}
                 {% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
-                <label for="prices-sites"
-                       class="control-label {{ customerGroups? 'col-md-1': 'col-md-2' }}">{{ "Site"|_ }}</label>
-
                 <div class="" style="float: left; margin-left: 15px;">
+                    <label for="prices-sites"
+                           class="">{{ "Site"|_ }}</label><br/>
                     <select id="prices-sites" name="prices[sites]" class="form-control to-select2">
-                        <option value="*">{{ "Any (*)"|_ }}</option>
+                        <option value="*">{{ "All (*)"|_ }}</option>
                         {{ UTIL.optionsHtml(sites)|raw }}
                     </select>
                 </div>
             {% endif %}
             {% if MODULES.isLoaded('Sellvana_MultiCurrency') %}
-                {# todo replace with actual currency config #}
                 {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').curencyOptions() %}
-                <label for="prices-currencies"
-                       class="control-label {{ (customerGroups or sites)? 'col-md-1': 'col-md-2' }}">{{ "Currency"|_ }}</label>
-
                 <div class="" style="float: left; margin-left: 15px;">
+                    <label for="prices-currencies"
+                           class="">{{ "Currency"|_ }}</label><br/>
                     <select id="prices-currencies" name="prices[currencies]" class="form-control to-select2">
-                        <option value="*">{{ "Any (*)"|_ }}</option>
+                        <option value="*">{{ "All (*)"|_ }}</option>
                         {{ UTIL.optionsHtml(currencies)|raw }}
                     </select>
                 </div>
             {% endif %}
-            <div class="col-md-2">
-                <button class="btn btn-primary" id="prices_add_new" type="button" disabled="disabled">{{ "Add New Price"|_ }}</button>
+            <div class="" style="float: left; margin-left: 15px;">
+                <label for="price-types"
+                       class="">{{ "Price Types"|_ }}</label><br/>
+                <select id="price-types" class="form-control to-select2">
+                    <option value="-1">{{ "Choose price" }}</option>
+                    {{ UTIL.optionsHtml(m.priceTypeOptions())|raw }}
+                </select>
             </div>
         </div>
         <div id="price_list">
@@ -117,13 +93,6 @@
             return valid;
         }
 
-//        = "base",
-//                "map",
-//                "msrp",
-//                "sale",
-//                "tier",
-//                "cost",
-//                = "promo";
         var options = {
             container: $('#price_list'),
             prices: {{ UTIL.toJson(prices)|raw }},
@@ -135,7 +104,7 @@
             filter_customer_group: $('#prices-customer_groups'),
             filter_site: $('#prices-sites'),
             filter_currency: $('#prices-currencies'),
-            prices_add_new: $('#prices_add_new'),
+            prices_add_new: $('#price-types'),
             product_id: '{{ m.id() }}',
             validatePrices: validatePrices,
             priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options'))|raw }},

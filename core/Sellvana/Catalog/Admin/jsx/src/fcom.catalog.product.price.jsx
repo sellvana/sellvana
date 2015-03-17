@@ -7,14 +7,6 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             var childProps = _.omit(this.props, ['prices', 'deleted','validatePrices', 'title']);
             return (
                 <div id="prices"><h4>{this.props.title}</h4>
-                    <div className="form-group" id="price_captions">
-                        <div style={divStyle}>{Locale._("Price Type")}</div>
-                        <div style={divStyle}>{Locale._("Customer group")}</div>
-                        <div style={divStyle}>{Locale._("Site")}</div>
-                        <div style={divStyle}>{Locale._("Currency")}</div>
-                        <div style={divStyle}>{Locale._("Price")}</div>
-                        <div style={divStyle}>{Locale._("Qty (only tier prices)")}</div>
-                    </div>
                     {_.map(this.props['prices'], function (price) {
                         if (this.props['deleted'] && this.props['deleted'][price.id]) {
                             return <input key={'delete-' + price.id} type="hidden"
@@ -111,27 +103,37 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         </a>
                     </div>
                     <div style={divStyle}>
-                        {priceTypes}
-                    </div>
-                    <div style={divStyle}>
                         { price['product_id'] && price['product_id'] !== "*" ? <input type="hidden" name={this.getFieldName(price, "product_id")}
                                defaultValue={price['product_id']}/>: null }
-                        { price['customer_group_id'] && price['customer_group_id'] !== "*" ? <input type="hidden" name={this.getFieldName(price, "customer_group_id")}
-                               defaultValue={price['customer_group_id']} className="priceUnique"/>: null}
-                        <input type="text" className="form-control" readOnly="readOnly"
-                               defaultValue={this.getCustomerGroupName(price['customer_group_id'])}/>
+                        <select name={this.getFieldName(price, "customer_group_id")} disabled={this.editable? null: true}
+                                defaultValue={price['customer_group_id']} className="to-select2 priceUnique">
+                            <option value="*">{Locale._("Default")}</option>
+                            {_.map(this.props.customer_groups, function (val, key) {
+                                return <option key={key} value={key}>{val}</option>
+                            })}
+                        </select>
                     </div>
                     <div style={divStyle}>
-                        { price['site_id'] && price['site_id'] !== "*" ? <input type="hidden" name={this.getFieldName(price, "site_id")}
-                               defaultValue={price['site_id']} className="priceUnique"/>: null }
-                        <input type="text" className="form-control" readOnly="readOnly"
-                               defaultValue={this.getSiteName(price['site_id'])}/>
+                        <select name={this.getFieldName(price, "site_id")} disabled={this.editable? null: true}
+                                defaultValue={price['site_id']} className="to-select2 priceUnique">
+                            <option value="*">{Locale._("Default")}</option>
+                            {_.map(this.props.sites, function (val, key) {
+                                return <option key={key} value={key}>{val}</option>
+                            })}
+                        </select>
                     </div>
                     <div style={divStyle}>
-                        { price['currency_code'] && price['currency_code'] !== "*" ? <input type="hidden" name={this.getFieldName(price, "currency_code")}
-                               defaultValue={price['currency_code']} className="priceUnique"/>: null }
-                        <input type="text" className="form-control" readOnly="readOnly"
-                               defaultValue={this.getCurrencyName(price['currency_code'])}/>
+                        <select name={this.getFieldName(price, "currency_code")} disabled={this.editable? null: true}
+                                defaultValue={price['currency_code']} className="to-select2 priceUnique">
+                            <option value="*">{Locale._("Default")}</option>
+                            {_.map(this.props.currencies, function (val, key) {
+                                return <option key={key} value={key}>{val}</option>
+                            })}
+                        </select>
+
+                    </div>
+                    <div style={divStyle}>
+                        {priceTypes}
                     </div>
                     <div style={divStyle}>
                         {priceFraction}
@@ -276,22 +278,25 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     this.options[filter].on('change', function (e) {
                         e.preventDefault();
                         this.options[filter + '_value'] = $(e.target).val();
-                        checkAddAllowed(this.options);
-                        React.render(<PricesApp {...this.options}/>, this.options.container[0]);
+                        //checkAddAllowed(this.options);
+                        //React.render(<PricesApp {...this.options}/>, this.options.container[0]);
                     }.bind(this));
                     no_filters = false;
                 }
             }.bind(this));
 
-            checkAddAllowed(this.options);
+            //checkAddAllowed(this.options);
 
             if(this.options.prices_add_new && this.options.prices_add_new.length) {
-                this.options.prices_add_new.on('click', function (e) {
+                this.options.prices_add_new.on('change', function (e) {
                     e.preventDefault();
+                    var type = $(e.target).val();
+                    $(e.target).select2("val", "-1", false);
+
                     var newPrice = {
                         id: 'new_' + (this.newIdx++),
                         product_id: this.options.product_id,
-                        price_type: 'tier',
+                        price_type: type,
                         customer_group_id: this.options.filter_customer_group_value || null,
                         site_id: this.options.filter_site_value || null,
                         currency_code: this.options.filter_currency_value || null,
