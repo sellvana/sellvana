@@ -1588,6 +1588,14 @@ FULLERON
   height:31px;
   margin-right:5px;
   }
+.f-grid-page-no {
+    display: inline;
+    width: 30px;
+    height: 20px;
+}
+.pagesize {
+    margin-right: 5px;
+}
 .f-filter-btns .f-grid-filter-val .dropdown-toggle .caret {
   border-top-color:#444444;
   }

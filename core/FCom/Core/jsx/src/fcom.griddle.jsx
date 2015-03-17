@@ -158,6 +158,19 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "totalResults": 0
             }
         },
+        pageGoTo: function (event) {
+            event.preventDefault();
+            if (event.keyCode == 13) {
+                var startIndex = Math.max(this.props.currentPage - 5, 0),
+                    endIndex = Math.min(startIndex + 11, this.props.maxPage),
+                    num = parseInt(event.target.value);
+                if (num > endIndex) {
+                    alert('Page number incorrect !');
+                    event.target.value = num = endIndex;
+                }
+                this.props.setPage((num == 1) ? 0 : num - 1);
+            }
+        },
         pageChange: function (event) {
             event.preventDefault();
             this.props.setPage(parseInt(event.target.getAttribute("data-value")));
@@ -208,6 +221,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             var disabledClass = !this.props.totalResults ? ' disabled' : '';
 
+            var pageGoTo = <input type="text" defaultValue="" className={'f-grid-page-no form-control'} onKeyUp={this.pageGoTo}/>
+
             var first = <li className={'first' + disabledClass}>
                 <a href="#" className="js-change-url" onClick={this.pageFirst}>«</a>
             </li>;
@@ -255,6 +270,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     <ul className="pagination pagination-sm pagination-griddle pagesize">
                         {pageSizeHtml}
                     </ul>
+                    <span className="f-grid-pagination">{'Page: '} {pageGoTo}</span>
                     <ul className="pagination pagination-sm pagination-griddle page">
                         {first}
                         {previous}
