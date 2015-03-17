@@ -11,7 +11,7 @@
  */
 class FCom_Admin_Admin extends BClass
 {
-    public function beforeBootstrap()
+    public function onBeforeBootstrap()
     {
         $defaultTheme = $this->BConfig->get('modules/FCom_Admin/theme');
         $this->BLayout

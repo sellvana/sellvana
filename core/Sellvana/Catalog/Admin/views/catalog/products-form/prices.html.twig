@@ -3,7 +3,7 @@
 {% set fieldData = { validator:validator } %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set viewHelper = LAYOUT.view('core/form-elements') %}
-
+{% set priceHelper = APP.instance('Sellvana_Catalog_Model_ProductPrice') %}
 <fieldset name="main-product">
   <div class="f-section">
     {{ forms.input(fieldData, {field:'cost', label:'Cost'|_}) }}
@@ -128,7 +128,7 @@
             container: $('#price_list'),
             prices: {{ UTIL.toJson(prices)|raw }},
             price_types: {{ UTIL.toJson(m.priceTypeOptions())|raw }},
-            editable_prices: {{ UTIL.toJson(APP.instance('Sellvana_Catalog_Model_ProductPrice').fieldOptions('editable_prices'))|raw }},
+            editable_prices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices'))|raw }},
             customer_groups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'null' }},
             sites: {{ sites? UTIL.toJson(sites)|raw: 'null' }},
             currencies: {{ currencies? UTIL.toJson(currencies)|raw: 'null' }},
@@ -138,18 +138,8 @@
             prices_add_new: $('#prices_add_new'),
             product_id: '{{ m.id() }}',
             validatePrices: validatePrices,
-            priceRelationOptions: {
-                "base": [{value: 'cost', label: 'Cost'}, {value: 'msrp', label: 'MSRP'}],
-                "cost": [{value: 'base', label: 'Base price'}],
-                "sale": [{value: 'cost', label: 'Cost'}, {value: 'base', label: 'Base price'}]
-            },
-            operationOptions: [
-                {value: '$$', label: "{{ 'Fixed price'|_ }}"},
-                {value: '+$', label: "{{ 'Add amount to'|_ }}"},
-                {value: '-$', label: "{{ 'Subtract amount from'|_ }}"},
-                {value: '+%', label: "{{ 'Add percent of'|_ }}"},
-                {value: '-%', label: "{{ 'Subtract percent from'|_ }}"}
-            ],
+            priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options'))|raw }},
+            operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options'))|raw }},
             sale_date_separator: ' / '
         };
 

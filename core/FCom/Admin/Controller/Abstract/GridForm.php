@@ -312,7 +312,13 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     $model->set($data);
                 }
 
-                if ($model->validate($model->as_array(), [], $formId)) {
+                $origModelData = $modelData = $model->as_array();
+                $validated = $model->validate($modelData, [], $formId);
+                if ($modelData !== $origModelData) {
+                    $model->set($modelData);
+                }
+
+                if ($validated) {
                     $model->save();
                     $this->message('Changes have been saved');
                     if ($r->post('do') === 'save_and_continue') {
@@ -332,6 +338,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             #$trace = $e->getTrace();
             #$traceMsg = print_r($trace[4], 1);
             $traceMsg = $e->getTraceAsString();
+            $traceMsg = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $traceMsg);
             $this->message($e->getMessage() . ': ' . $traceMsg, 'error');
             $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
         }

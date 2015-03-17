@@ -10,9 +10,9 @@
  */
 class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstract
 {
-    public function beforeDispatch()
+    public function onBeforeDispatch()
     {
-        if (!parent::beforeDispatch()) return false;
+        if (!parent::onBeforeDispatch()) return false;
 
         $this->BResponse->nocache();
 

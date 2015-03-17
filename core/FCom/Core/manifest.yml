@@ -2,7 +2,7 @@ modules:
     FCom_Core:
         version: 0.2.0
         channel: beta
-        before_bootstrap: { callback: "FCom_Core_Main::beforeBootstrap" }
+        before_bootstrap: { callback: "FCom_Core_Main::onBeforeBootstrap" }
         run_level: REQUIRED
         description: "Base Sellvana classes and JS libraries"
         load_after: [ FCom_LibTwig ]

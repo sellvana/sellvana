@@ -70,9 +70,9 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     /**
      * @return bool
      */
-    public function beforeDispatch()
+    public function onBeforeDispatch()
     {
-        if (!parent::beforeDispatch()) return false;
+        if (!parent::onBeforeDispatch()) return false;
 
         $this->view('head')->addTitle($this->BLocale->_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
 

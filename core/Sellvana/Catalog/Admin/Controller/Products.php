@@ -740,7 +740,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             unset($data['inventory']['id'], $data['inventory']['inventory_sku']);
             // save inventory form data
             $data['inventory']['manage_inventory'] = $model->get('manage_inventory');
-            $invModel->set($data['inventory'])->save();
+            if ($invModel->validate($data['inventory'], [], $this->formId())) {
+                $invModel->set($data['inventory'])->save();
+            } else {
+                throw new BException('Cannot save inventory data, please fix above errors');
+            }
         }
     }
 

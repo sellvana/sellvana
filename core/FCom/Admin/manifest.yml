@@ -22,7 +22,7 @@ modules:
                     #- [ jqgrid, { view_class: FCom_Admin_View_JqGrid } ]
                     - [ dashboard, { view_class: FCom_Admin_View_Dashboard } ]
                 auto_use: [ bootstrap, views ]
-                before_bootstrap: FCom_Admin_Admin::beforeBootstrap
+                before_bootstrap: FCom_Admin_Admin::onBeforeBootstrap
                 routing:
                     - [ route, _ /noroute, FCom_Admin_Controller.noroute, {}, null, false ]
                     - [ /, FCom_Admin_Controller.index ]

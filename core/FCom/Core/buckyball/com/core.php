@@ -1861,7 +1861,7 @@ class BEvents extends BClass
                     $r = explode($sep, $cb);
                     if (sizeof($r) == 2) {
 if (!class_exists($r[0]) && $this->BDebug->is('DEBUG')) {
-    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
+    echo "<pre>"; BDebug::cleanBacktrace(); echo "</pre>";
 }
                         $cb = [$r[0]::i(), $r[1]];
                         $observer['callback'] = $cb;

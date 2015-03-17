@@ -4,7 +4,7 @@ modules:
         channel: beta
         translations: { en: en.php }
         description: "Enable multiple website management from the same instance"
-        before_bootstrap: { callback: "Sellvana_MultiSite_Main::beforeBootstrap" }
+        before_bootstrap: { callback: "Sellvana_MultiSite_Main::onBeforeBootstrap" }
         require: { module: { FCom_Core: 0.1.0 } }
         auto_use: [ bootstrap, layout, views ]
 

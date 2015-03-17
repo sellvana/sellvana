@@ -2360,7 +2360,7 @@ class BActionController extends BClass
         $this->_action = $actionName;
         $this->_forward = null;
 
-        if (!$this->beforeDispatch($args)) {
+        if (!$this->onBeforeDispatch($args)) {
             return false;
         }
         if (null !== $this->_forward) {
@@ -2384,7 +2384,7 @@ class BActionController extends BClass
         $this->tryDispatch($actionName, $args);
 
         if (null === $this->_forward && !$this->BRouting->isStopped()) {
-            $this->afterDispatch($args);
+            $this->onAfterDispatch($args);
         }
         return $this->_forward;
     }
@@ -2490,12 +2490,12 @@ class BActionController extends BClass
     *
     * @return bool
     */
-    public function beforeDispatch()
+    public function onBeforeDispatch()
     {
-        $this->BEvents->fire(__METHOD__); // general beforeDispatch event for all controller
+        $this->BEvents->fire(__METHOD__); // general onBeforeDispatch event for all controller
         $className = static::$_origClass ? static::$_origClass : get_class($this);
         $args = ['action' => $this->_action, 'controller' => $this];
-        $this->BEvents->fire($className . '::beforeDispatch', $args); // specific controller instance
+        $this->BEvents->fire($className . '::onBeforeDispatch', $args); // specific controller instance
         return true;
     }
 
@@ -2503,12 +2503,12 @@ class BActionController extends BClass
     * Execute after dispatch
     *
     */
-    public function afterDispatch()
+    public function onAfterDispatch()
     {
-        $this->BEvents->fire(__METHOD__); // general afterDispatch event for all controller
+        $this->BEvents->fire(__METHOD__); // general onAfterDispatch event for all controller
         $className = static::$_origClass ? static::$_origClass : get_class($this);
         $args = ['action' => $this->_action, 'controller' => $this];
-        $this->BEvents->fire($className . '::afterDispatch', $args); // specific controller instance
+        $this->BEvents->fire($className . '::onAfterDispatch', $args); // specific controller instance
     }
 
     /**
