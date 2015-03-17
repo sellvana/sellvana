@@ -54,7 +54,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     protected static $_validationRules = [
         ['email', '@required'],
-        ['email', 'Sellvana_Customer_Model_Customer::validateUniqueEmail'],
+        ['email', 'Sellvana_Customer_Model_Customer::ruleEmailUnique', 'An account with this email address already exists'],
         ['firstname', '@required'],
         ['lastname', '@required'],
         //array('password', '@required'),
@@ -203,11 +203,6 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
                 break;
         }
         return $result;
-    }
-
-    public function validateUniqueEmail($data) {
-        $email = $data['email'];
-        return !$this->orm()->where_equal('email', $email)->find_one();
     }
 
     /**

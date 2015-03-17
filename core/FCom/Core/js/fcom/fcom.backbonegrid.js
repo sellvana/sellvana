@@ -3,7 +3,8 @@
 */
 function validationRules(rules) {
     var str = '';
-    for (var key in rules) {
+    for (var key in rules)
+    {
         switch (key) {
             case 'required':
                 str += 'data-rule-required="true" ';
@@ -72,11 +73,6 @@ function dateTimeNow() {
        return (val <  10) ? '0' + val: val;
     }
     return dateTime;
-}
-
-function _removeSpecialChars(str) {
-    var label = str.substr(0, str.indexOf('.'));
-    return label.replace(/[_\-]/gi, ' ');
 }
 
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
