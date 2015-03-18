@@ -4033,7 +4033,7 @@ class BValidate extends BClass
         if ('' === $value) {
             return ['value' => null];
         }
-        return is_integer($value);
+        return (string)$value == (int)$value;
     }
 
     /**
