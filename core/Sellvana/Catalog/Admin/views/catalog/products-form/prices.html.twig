@@ -121,6 +121,11 @@
             if (typeof (elem) !== 'undefined') {
                 var parent = $(elem).parents('.price-item');
                 var curFields = parent.find('input.priceUnique, select.priceUnique');
+                var currHash = '';
+                curFields.each(function () {
+                    currHash += $(this).val();
+                });
+
                 var items = $('.price-item');
                 items.each(function () {
                     if (!valid) {
@@ -133,16 +138,21 @@
                     }
                     var fields = $item.find('input.priceUnique, select.priceUnique');
                     var same = true;
+                    var checkHash = '';
                     fields.each(function (idx) {
-                        var currField = $(curFields[idx]);
-                        var checkField = $(this);
-                        if (currField.val() != checkField.val()) {
-                            same = false;
-                        }
+                        checkHash += $(this).val();
+//                        var currField = $(curFields[idx]);
+//                        var checkField = $(this);
+//                        var currVal = currField.val();
+//                        var checkedVal = checkField.val();
+//                        if (currVal != checkedVal) {
+//                            same = false;
+//                        }
                     });
-                    if (same) {
-                        valid = false;
-                    }
+//                    if (same) {
+//                        valid = false;
+//                    }
+                    valid = currHash != checkHash;
                 });
                 return valid;
             }
