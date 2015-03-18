@@ -65,7 +65,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected static $_validationRules = [
         ['product_name', '@required'],
-        ['base_price', '@required'],
+        //['base_price', '@required'],
         ['product_sku', '@required'],
         ['product_sku', '@string', null, ['max' => 100]],
         ['product_sku', 'Sellvana_Catalog_Model_Product::validateDupSku'],
@@ -77,11 +77,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         /*array('is_hidden', '@integer'),*/
         ['num_reviews', '@integer'],
 
-        ['cost', '@numeric'],
-        ['msrp', '@numeric'],
-        ['map', '@numeric'],
-        ['markup', '@numeric'],
-        ['sale_price', '@numeric'],
         ['net_weight', '@numeric'],
         ['ship_weight', '@numeric'],
         ['avg_rating', '@numeric'],
@@ -202,21 +197,21 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!$this->get('url_key')) $this->generateUrlKey();
 
         // Cleanup possible bad input
-        if ($this->get('sale_price') === '') {
-            $this->set('sale_price', null);
-        }
-        if ($this->get('cost') === '') {
-            $this->set('cost', null);
-        }
-        if ($this->get('msrp') === '') {
-            $this->set('msrp', null);
-        }
-        if ($this->get('map') === '') {
-            $this->set('map', null);
-        }
-        if ($this->get('markup') === '') {
-            $this->set('markup', null);
-        }
+        //if ($this->get('sale_price') === '') {
+        //    $this->set('sale_price', null);
+        //}
+        //if ($this->get('cost') === '') {
+        //    $this->set('cost', null);
+        //}
+        //if ($this->get('msrp') === '') {
+        //    $this->set('msrp', null);
+        //}
+        //if ($this->get('map') === '') {
+        //    $this->set('map', null);
+        //}
+        //if ($this->get('markup') === '') {
+        //    $this->set('markup', null);
+        //}
 
         return true;
     }
