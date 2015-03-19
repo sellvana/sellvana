@@ -46,7 +46,7 @@ class Sellvana_Catalog_Model_ProductPrice
             "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base price']]
         ],
         'operation_options' => [
-            ['value' => '$$', 'label' => "Fixed price"],
+            ['value' => '=$', 'label' => "Fixed price"],
             ['value' => '+$', 'label' => "Add amount to"],
             ['value' => '-$', 'label' => "Subtract amount from"],
             ['value' => '+%', 'label' => "Add percent of"],
@@ -92,16 +92,16 @@ class Sellvana_Catalog_Model_ProductPrice
         }
 
         $prices = $orm->find_many();
-        if (!empty($prices)) {
-            $salePrice = (float) $product->get('sale_price');
-            $basePrice = (float) $product->get('base_price');
-            $price     = $salePrice? $salePrice: $basePrice;
-            #$this->BDebug->dump($tiers);
-            #var_dump($salePrice, $basePrice, $price);
-            foreach ($prices as $p) {
-                $p->set('save_percent', ceil((1 - $p->get('price') / $price) * 100));
-            }
-        }
+        //if (!empty($prices)) {
+        //    $salePrice = (float) $product->get('sale_price');
+        //    $basePrice = (float) $product->get('base_price');
+        //    $price     = $salePrice? $salePrice: $basePrice;
+        //    #$this->BDebug->dump($tiers);
+        //    #var_dump($salePrice, $basePrice, $price);
+        //    foreach ($prices as $p) {
+        //        $p->set('save_percent', ceil((1 - $p->get('price') / $price) * 100));
+        //    }
+        //}
 
         return $prices? $this->BDb->many_as_array($prices): [];
     }
