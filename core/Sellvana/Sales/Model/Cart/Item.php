@@ -55,9 +55,9 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     /**
      * @return Sellvana_Catalog_Model_Product
      */
-    public function getProduct()
+    public function getProduct($loadIfMissing = true)
     {
-        if (!$this->_product) {
+        if (!$this->_product && $loadIfMissing) {
             $this->_product = $this->relatedModel('Sellvana_Catalog_Model_Product', $this->get('product_id'));
         }
         return $this->_product;
@@ -159,6 +159,7 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->_product, $this->_cart, $this->_relatedSkuProductCache);
     }
 }

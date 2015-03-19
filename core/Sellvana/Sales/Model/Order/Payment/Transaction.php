@@ -182,6 +182,7 @@ class Sellvana_Sales_Model_Order_Payment_Transaction extends FCom_Core_Model_Abs
 
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->_payment);
     }
 }

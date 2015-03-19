@@ -25,7 +25,7 @@ class Sellvana_CustomField_Frontend extends BClass
      *      product: Sellvana_Catalog_Model_Product
      *      qty: item qty (optional, default: 1)
      *      details: resulting details data structure
-     *          price: item price (optional, default: $product->getPrice() )
+     *          price: item price (optional, default: $product->getCatalogPrice() )
      *          product_sku: local catalog product unique id
      *          mfr_sku: manufacturer or wholesale sku (depends on variant)
      *          data:

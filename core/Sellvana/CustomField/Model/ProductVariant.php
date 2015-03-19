@@ -172,7 +172,7 @@ class Sellvana_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
 
     public function onAfterLoad()
     {
-        $priceModel = $this->Sellvana_Catalog_Model_ProductPrice->getVariantPrice($this->id());
+        $priceModel = $this->Sellvana_Catalog_Model_ProductPrice->getVariantPriceModel($this->id());
         if($priceModel){
             $this->set('variant_price', $priceModel->get('price'));
         }
@@ -183,7 +183,7 @@ class Sellvana_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
     {
         $price = $this->get('variant_price');
         if($price){
-            $this->Sellvana_Catalog_Model_ProductPrice->saveVariantPrice($price, $this->id(), $this->product_id);
+            $this->Sellvana_Catalog_Model_ProductPrice->saveVariantPriceModel($price, $this->id(), $this->product_id);
         }
         return parent::onAfterSave();
     }

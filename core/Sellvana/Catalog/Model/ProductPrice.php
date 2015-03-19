@@ -56,6 +56,17 @@ class Sellvana_Catalog_Model_ProductPrice
     const SALE_DATE_SEPARATOR = ' / ';
 
     /**
+     * @var Sellvana_Catalog_Model_Product
+     */
+    protected $_product;
+
+    public function setProduct($product)
+    {
+        $this->_product = $product;
+        return $this;
+    }
+
+    /**
      * @param Sellvana_Catalog_Model_Product $product
      * @param int                            $qty
      * @param int                            $customer_group_id
@@ -115,7 +126,7 @@ class Sellvana_Catalog_Model_ProductPrice
      * @param string                         $currencyCode
      * @return Sellvana_Catalog_Model_ProductPrice
      */
-    public function getPrice($product, $price_type, $qty = 1, $customerGroupId = null, $siteId = null,
+    public function getPriceModel($product, $price_type, $qty = 1, $customerGroupId = null, $siteId = null,
         $currencyCode = null)
     {
         $price = $this->load([
@@ -136,7 +147,7 @@ class Sellvana_Catalog_Model_ProductPrice
      * @return Sellvana_Catalog_Model_ProductPrice
      * @throws BException
      */
-    public function getVariantPrice($variant_id, $type = self::TYPE_BASE)
+    public function getVariantPriceModel($variant_id, $type = self::TYPE_BASE)
     {
         /** @var Sellvana_Catalog_Model_ProductPrice $price */
         $price = $this->load(['variant_id' => $variant_id, 'price_type' => $type], true);
@@ -150,9 +161,9 @@ class Sellvana_Catalog_Model_ProductPrice
      * @param int    $product_id
      * @param string $type
      */
-    public function saveVariantPrice($price, $variant_id, $product_id, $type = self::TYPE_BASE)
+    public function saveVariantPriceModel($price, $variant_id, $product_id, $type = self::TYPE_BASE)
     {
-        $priceModel = $this->getVariantPrice($variant_id);
+        $priceModel = $this->getVariantPriceModel($variant_id);
         if (!$priceModel) {
             $priceModel = $this->create();
         }
@@ -190,4 +201,149 @@ class Sellvana_Catalog_Model_ProductPrice
         parent::onAfterLoad();
     }
 
+    public function collectProductsPrices($products, $context = null)
+    {
+        if (!$products) {
+            return $this;
+        }
+        $productsById = [];
+        /** @var Sellvana_Catalog_Model_Product $p */
+        foreach ($products as $p) {
+            $productsById[$p->id()] = $p;
+        }
+        /** @var BORM $orm */
+        $orm = $this->orm()->where_in('product_id', array_keys($productsById));
+
+        if (isset($context['site_id'])) {
+            if (false === $context['site_id']) {
+                $orm->where_null('site_id');
+            } else {
+                $orm->where_complex(['OR' => [
+                    'site_id is NULL',
+                    'site_id' => $context['site_id'],
+                ]]);
+            }
+        }
+
+        if (isset($context['customer_group_id'])) {
+            if (false === $context['customer_group_id']) {
+                $orm->where_null('customer_group_id');
+            } else {
+                $orm->where_complex(['OR' => [
+                    'customer_group_id is NULL',
+                    'customer_group_id' => $context['customer_group_id'],
+                ]]);
+            }
+        }
+
+        if (isset($context['currency_code'])) {
+            if (false === $context['currency_code']) {
+                $orm->where_null('currency_code');
+            } else {
+                $orm->where_complex(['OR' => [
+                    'currency_code is NULL',
+                    'currency_code' => $context['currency_code'],
+                ]]);
+            }
+        }
+
+        if (isset($context['date'])) {
+            $orm->where_complex(['OR' => [
+                'valid_from IS NULL AND valid_to IS NULL',
+                ['(? BETWEEN valid_from AND valid_to)', $context['date']],
+            ]]);
+        }
+
+        if (empty($context['variants'])) {
+            $orm->where_null('variant_id');
+        }
+
+        $priceRows = $orm->find_many_assoc('id');
+        $prices = [];
+        /** @var static $r */
+        foreach ($priceRows as $rId => $r) {
+            $pId = $r->get('product_id');
+            $vId = $r->get('variant_id') ?: 0;
+            $type = $r->get('price_type');
+            $idx = ($r->get('site_id') ?: '*')
+                . ':' . ($r->get('customer_group_id') ?: '*')
+                . ':' . ($r->get('currency_code') ?: '*');
+            if ('tier' === $type) {
+                $prices[$pId][$vId][$type][$idx][$r->get('qty')] = $r;
+            } else {
+                $prices[$pId][$vId][$type][$idx] = $r;
+            }
+            $r->setProduct($productsById[$pId]);
+        }
+        /** @var Sellvana_Catalog_Model_Product $p */
+        foreach ($products as $p) {
+            $p->setPriceModels(!empty($prices[$p->id()]) ? $prices[$p->id()] : false);
+        }
+        return $this;
+    }
+
+    /**
+     * Calculate result price based on base amount, relative amount and operation
+     *
+     * @param float $value1
+     * @param float $value2
+     * @param string $op
+     * @return float
+     */
+    public function applyPriceOperation($value1, $value2, $op)
+    {
+        $result = $value1;
+        switch ($op) {
+            case '=$': $result = $value2; break;
+            case '+$': $result += $value2; break;
+            case '-$': $result -= $value2; break;
+            case '+%': $result += $value1 * $value2 / 100; break;
+            case '-%': $result -= $value1 * $value2 / 100; break;
+        }
+        return $result;
+    }
+
+    public function isValid($date = true)
+    {
+        if (true === $date) {
+            $date = $this->BDb->now();
+        }
+        $from = $this->get('valid_from');
+        $to = $this->get('valid_to');
+        return (null === $from || $from <= $date) && (null === $to || $to >= $date);
+    }
+
+    public function getPrice()
+    {
+        $op = $this->get('operation');
+        if (null === $op || '=$' === $op) {
+            return $this->get('price');
+        }
+
+        if (!$this->_product) {
+            return null;
+        }
+
+        $baseField = $this->get('base_field');
+        if (!$baseField) {
+            return null;
+        }
+
+        $baseModel = $this->_product->getPriceModelByType($baseField, [
+            'site_id' => $this->get('site_id'),
+            'customer_group_id' => $this->get('customer_group_id'),
+            'currency_code' => $this->get('currency_code'),
+        ]);
+        if (!$baseModel) {
+            return null;
+        }
+
+        return $this->applyPriceOperation($this->get('price'), $baseModel->getPrice(), $op);
+    }
+
+    public function __destruct()
+    {
+        parent::__destruct();
+        unset($this->_product);
+    }
 }
