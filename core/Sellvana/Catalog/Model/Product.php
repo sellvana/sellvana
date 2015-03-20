@@ -243,10 +243,12 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         if (!$this->get('position')) {
             $this->set('position', $this->calcPosition());
+            $saveAgain = true;
         }
         if ($saveAgain) {
             $this->save();
         }
+        $this->Sellvana_Catalog_Model_ProductPrice->parseAndSaveDefaultPrices($this);
 
         return true;
     }

@@ -341,6 +341,72 @@ class Sellvana_Catalog_Model_ProductPrice
         return $this->applyPriceOperation($this->get('price'), $baseModel->getPrice(), $op);
     }
 
+    public function parseAndSaveDefaultPrices(Sellvana_Catalog_Model_Product $product)
+    {
+        foreach (['base', 'sale', 'cost', 'msrp', 'map'] as $f) {
+            $v = $product->get('price.' . $f);
+            if (null !== $v) {
+                $priceModel = $this->orm()
+                    ->where('product_id', $product->id())->where('price_type', $f)->where_null('variant_id')
+                    ->where_null('site_id')->where_null('customer_group_id')->where_null('currency_code')
+                    ->find_one();
+                if ($priceModel) {
+                    if (false === $v) {
+                        $priceModel->delete();
+                        continue;
+                    }
+                } else {
+                    $priceModel = $this->create([
+                        'product_id' => $product->id(),
+                        'price_type' => $f,
+                    ]);
+                }
+                $priceModel->set($this->_parsePriceField($v))->save();
+            }
+        }
+        if ($product->get('price.tier')) {
+            /** @var static[] $priceModels */
+            $priceModels = $this->orm()
+                ->where('product_id', $product->id())->where('price_type', 'tier')->where_null('variant_id')
+                ->where_null('site_id')->where_null('customer_group_id')->where_null('currency_code')
+                ->find_many_assoc('qty');
+            foreach ($product->get('price.tier') as $tier => $v) {
+                if (!empty($priceModels[$tier])) {
+                    if (false === $v) {
+                        $priceModels[$tier]->delete();
+                        continue;
+                    }
+                } else {
+                    $priceModels[$tier] = $this->create([
+                        'product_id' => $product->id(),
+                        'price_type' => 'tier',
+                        'qty' => $tier,
+                    ]);
+                }
+                $priceModels[$tier]->set($this->_parsePriceField($v))->save();
+            }
+        }
+    }
+
+    protected function _parsePriceField($value)
+    {
+        if (is_numeric($value)) {
+            return [
+                'operation' => '=$',
+                'price' => $value,
+                'base_field' => null,
+            ];
+        } elseif (is_string($value) && preg_match('#^(base|sale|cost|msrp|map)([+-])([0-9.]+)(%?)$#', $value, $m)) {
+            return [
+                'operation' => $m[2].($m[4]?:'$'),
+                'price' => $m[3],
+                'base_field' => $m[1],
+            ];
+        } else {
+            throw new BException('Invalid price field value');
+        }
+    }
+    
     public function __destruct()
     {
         parent::__destruct();
