@@ -416,7 +416,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function getCatProdConfig($model)
     {
-        $orm = $this->Sellvana_Catalog_Model_Product->orm()->table_alias('p')
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')
             ->select(['p.id', 'p.product_name', 'p.product_sku'])
             ->join('Sellvana_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
             ->where('cp.category_id', $model ? $model->id : 0)
@@ -455,7 +455,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function linkedProductGridConfig($model, $type)
     {
-        $orm = $this->Sellvana_Catalog_Model_Product->orm()->table_alias('p')
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')
             ->select(['p.id', 'p.product_name', 'p.product_sku']);//, 'p.base_price', 'p.sale_price']);
 
         switch ($type) {
