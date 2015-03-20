@@ -1,0 +1,17 @@
+{% set product = THIS.get('product') %}
+{% set tiers = product.getAllTierPrices() %}
+
+{% if tiers %}
+    {% set catalogPrice = product.getCatalogPrice() %}
+    <table class="f-tier-price-group table table-condensed">
+        <caption>{{ 'Tier Pricing'|_ }}</caption>
+        {% for tier in tiers %}
+            {% set tierPrice = tier.getPrice() %}
+            <tr>
+                <td>Buy {{ tier.qty }}</td>
+                <td>{{ '%s each'|_(tierPrice|currency) }}</td>
+                <td>{{ 'Save %s%%'|_((catalogPrice-tierPrice)/catalogPrice*100) }}</td>
+            </tr>
+        {% endfor %}
+    </table> <!-- /.f-tier-price-group -->
+{% endif %}

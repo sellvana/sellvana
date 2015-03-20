@@ -1274,32 +1274,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $price;
     }
 
-    /**
-     * Get product tier price
-     *
-     * @param float  $qty quantity of product in cart
-     * @param array|boolean $context
-     * @return null|float
-     */
-    public function getTierPrice($qty, $context = true)
-    {
-        /** @var Sellvana_Catalog_Model_ProductPrice[] $tierPrices */
-        $tierPrices = $this->getPriceModelByType('tier', $context);
-        if (!$tierPrices) {
-            return null;
-        }
-        $maxTierQty = 0;
-        foreach ($tierPrices as $tierQty => $r) {
-            if ($tierQty <= $qty) {
-                $maxTierQty = max($maxTierQty, $tierQty);
-            }
-        }
-        if ($maxTierQty) {
-            return $tierPrices[$maxTierQty]->getPrice();
-        }
-        return null;
-    }
-
     public function getFrontendPrices()
     {
         /**
@@ -1331,6 +1305,37 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             return $p1 < $p2 ? -1 : ($p1 > $p2 ? 1 : 0);
         });
         return $prices;
+    }
+
+    /**
+     * Get product tier price
+     *
+     * @param float  $qty quantity of product in cart
+     * @param array|boolean $context
+     * @return null|float
+     */
+    public function getTierPrice($qty, $context = true)
+    {
+        /** @var Sellvana_Catalog_Model_ProductPrice[] $tierPrices */
+        $tierPrices = $this->getPriceModelByType('tier', $context);
+        if (!$tierPrices) {
+            return null;
+        }
+        $maxTierQty = 0;
+        foreach ($tierPrices as $tierQty => $r) {
+            if ($tierQty <= $qty) {
+                $maxTierQty = max($maxTierQty, $tierQty);
+            }
+        }
+        if ($maxTierQty) {
+            return $tierPrices[$maxTierQty]->getPrice();
+        }
+        return null;
+    }
+
+    public function getAllTierPrices($context = true)
+    {
+        return $this->getPriceModelByType('tier', $context);
     }
 
     /**
