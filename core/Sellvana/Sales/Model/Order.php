@@ -447,6 +447,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->_cart, $this->_addresses);
     }
 }

@@ -23,6 +23,7 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
         $itemNum = 0;
         $itemQty = 0;
         $subtotal = 0;
+
         foreach ($this->_cart->items() as $item) {
             /*
             // TODO: figure out handling cart items of products removed from catalog

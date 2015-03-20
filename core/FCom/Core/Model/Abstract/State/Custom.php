@@ -77,6 +77,7 @@ abstract class FCom_Core_Model_Abstract_State_Custom extends FCom_Core_Model_Abs
 
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->_model, $this->_options);
     }
 }

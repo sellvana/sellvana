@@ -62,6 +62,7 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->_state, $this->_order, $this->_product);
     }
 }

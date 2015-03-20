@@ -163,6 +163,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         }
 
         // retrieve product records
+        /** @var Sellvana_Catalog_Model_Product[] $products */
         $products = $this->Sellvana_Catalog_Model_Product->orm('p')
             ->where_in('p.id', $ids)
             ->left_outer_join('Sellvana_Catalog_Model_InventorySku', ['i.inventory_sku', '=', 'p.inventory_sku'], 'i')
@@ -183,7 +184,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
             $p = $item['product'] = $products[$item['id']];
             $item['details'] = [
                 'qty' => $item['qty'],
-                'price' => $p->getPrice(),
+                'price' => $p->getCatalogPrice(),
                 'product_id' => $p->id(),
                 'product_sku' => $p->get('product_sku'),
                 'inventory_id' => $p->get('inventory_id'),

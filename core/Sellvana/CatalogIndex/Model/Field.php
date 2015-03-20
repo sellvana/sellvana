@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  */
 class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
 {
@@ -111,7 +112,7 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         */
         $pIds = [];
         foreach ($products as $p) {
-            $pIds[] = $p->id;
+            $pIds[] = $p->id();
         }
         $catIds = [];
         $prodCatIds = [];
@@ -124,7 +125,7 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                 ->find_many();
             // find ascendant ids of associated categories
             foreach ($catProds as $cp) {
-                $idPath = explode('/', $cp->id_path);
+                $idPath = explode('/', $cp->get('id_path'));
                 for ($i = sizeof($idPath)-1; $i > 0; $i--) {
                     $prodCatIds[$cp->product_id][] = $idPath[$i];
                     $catIds[$idPath[$i]] = $idPath[$i];
@@ -140,12 +141,12 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                 ->find_many_assoc('id');
             // fill index data
             foreach ($products as $p) {
-                if (empty($prodCatIds[$p->id])) {
+                if (empty($prodCatIds[$p->id()])) {
                     continue;
                 }
-                foreach ($prodCatIds[$p->id] as $cId) {
+                foreach ($prodCatIds[$p->id()] as $cId) {
                     $c = $categories[$cId];
-                    $data[$p->id][$c->url_path] = $c->url_path . ' ==> ' . $c->node_name;
+                    $data[$p->id()][$c->get('url_path')] = $c->get('url_path') . ' ==> ' . $c->get('node_name');
                 }
             }
         }
@@ -154,18 +155,20 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
 
     public function indexPrice($products, $field)
     {
+        $prices = $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($products);
         $data = [];
         foreach ($products as $p) {
-            $data[$p->id] = $p->sale_price ? $p->sale_price : $p->base_price;
+            $data[$p->id()] = $p->getCatalogPrice();
         }
         return $data;
     }
 
     public function indexPriceRange($products, $field)
     {
+        $prices = $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($products);
         $data = [];
         foreach ($products as $p) {
-            $m = $p->sale_price ? $p->sale_price : $p->base_price;
+            $m = $p->getCatalogPrice();
             if     ($m ==    0) $v = '0         ==> FREE';
             elseif ($m <   100) $v = '1-99      ==> $1 to $99';
             elseif ($m <   200) $v = '100-199   ==> $100 to $199';

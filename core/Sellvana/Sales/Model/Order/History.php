@@ -9,6 +9,7 @@ class Sellvana_Sales_Model_Order_History extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->_order);
     }
 }
