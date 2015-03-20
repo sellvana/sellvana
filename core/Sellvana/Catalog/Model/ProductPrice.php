@@ -316,7 +316,7 @@ class Sellvana_Catalog_Model_ProductPrice
     public function getPrice()
     {
         $op = $this->get('operation');
-        if (null === $op || '=$' === $op) {
+        if (!$op || '=$' === $op) {
             return $this->get('price');
         }
 
@@ -338,7 +338,7 @@ class Sellvana_Catalog_Model_ProductPrice
             return null;
         }
 
-        return $this->applyPriceOperation($this->get('price'), $baseModel->getPrice(), $op);
+        return $this->applyPriceOperation($baseModel->getPrice(), $this->get('price'), $op);
     }
 
     public function parseAndSaveDefaultPrices(Sellvana_Catalog_Model_Product $product)
@@ -364,15 +364,24 @@ class Sellvana_Catalog_Model_ProductPrice
                 $priceModel->set($this->_parsePriceField($v))->save();
             }
         }
-        if ($product->get('price.tier')) {
+        $tiers = $product->get('price.tiers');
+        if ($tiers) {
+            if (is_string($tiers)) {
+                $tiersArr = explode(';', $tiers);
+                $tiers = [];
+                foreach ($tiersArr as $t1) {
+                    $t2 = explode(':', $t1);
+                    $tiers[trim($t2[0])] = trim($t2[1]);
+                }
+            }
             /** @var static[] $priceModels */
             $priceModels = $this->orm()
                 ->where('product_id', $product->id())->where('price_type', 'tier')->where_null('variant_id')
                 ->where_null('site_id')->where_null('customer_group_id')->where_null('currency_code')
                 ->find_many_assoc('qty');
-            foreach ($product->get('price.tier') as $tier => $v) {
+            foreach ($tiers as $tier => $v) {
                 if (!empty($priceModels[$tier])) {
-                    if (false === $v) {
+                    if (false === $v || '-' === $v) {
                         $priceModels[$tier]->delete();
                         continue;
                     }
@@ -398,7 +407,7 @@ class Sellvana_Catalog_Model_ProductPrice
             ];
         } elseif (is_string($value) && preg_match('#^(base|sale|cost|msrp|map)([+-])([0-9.]+)(%?)$#', $value, $m)) {
             return [
-                'operation' => $m[2].($m[4]?:'$'),
+                'operation' => $m[2] . ($m[4] ?: '$'),
                 'price' => $m[3],
                 'base_field' => $m[1],
             ];
