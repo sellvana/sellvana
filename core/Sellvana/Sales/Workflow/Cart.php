@@ -276,7 +276,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                         }
                     }
                 } else {
-                    $totalQty = $arrQty[0];
+                    $totalQty = $arrQty;
                 }
                 if ($totalQty > 0) {
                     $item->set('qty', $totalQty)->setData('variants', $variants)->save();

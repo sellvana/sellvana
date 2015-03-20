@@ -228,7 +228,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $cached = $this->Sellvana_Catalog_Model_Product->cacheFetch('id', $pId);
             if ($cached) {
                 $item->setProduct($cached);
-            } else {
+            } elseif ($pId) {
                 $productIds[$pId] = $pId;
                 $itemsToUpdate[] = $item;
             }

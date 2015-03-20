@@ -258,7 +258,7 @@ class Sellvana_Catalog_Model_ProductPrice
             $orm->where_null('variant_id');
         }
 
-        $priceRows = $orm->find_many_assoc('id');
+        $priceRows = $orm->order_by_asc('qty')->find_many_assoc('id');
         $prices = [];
         /** @var static $r */
         foreach ($priceRows as $rId => $r) {
