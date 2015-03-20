@@ -31,7 +31,7 @@ class Sellvana_Catalog_Model_ProductPrice
             self::TYPE_MSRP  => "MSRP",
             self::TYPE_SALE  => "Sale Price",
             self::TYPE_TIER  => "Tier Price",
-            self::TYPE_PROMO => "Promo Price"
+            //self::TYPE_PROMO => "Promo Price"
         ],
         'editable_prices' => [
             'base',
@@ -415,7 +415,7 @@ class Sellvana_Catalog_Model_ProductPrice
             throw new BException('Invalid price field value');
         }
     }
-    
+
     public function __destruct()
     {
         parent::__destruct();

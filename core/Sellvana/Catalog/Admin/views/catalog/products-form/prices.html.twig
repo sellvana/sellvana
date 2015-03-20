@@ -5,12 +5,14 @@
 {% set viewHelper = LAYOUT.view('core/form-elements') %}
 {% set priceHelper = APP.instance('Sellvana_Catalog_Model_ProductPrice') %}
 {% set prices = m.getRawPrices() %}
-
+{% set loadCustomerGroups = MODULES.isLoaded('Sellvana_CustomerGroups') %}
+{% set loadSites = MODULES.isLoaded('Sellvana_MultiSite') %}
+{% set loadCurrency = MODULES.isLoaded('Sellvana_MultiCurrency') %}
 
 <fieldset name="product-prices">
     <div class="f-section">
         <div class="form-group">
-            {% if MODULES.isLoaded('Sellvana_CustomerGroups') %}
+            {% if loadCustomerGroups %}
                 {% set customerGroups = APP.instance('Sellvana_CustomerGroups_Model_Group').groupsOptions() %}
                 <div class="" style="float: left; margin-left: 15px;">
                     <label for="prices-customer_groups" >{{ "Customer group"|_ }}</label><br/>
@@ -20,7 +22,7 @@
                     </select>
                 </div>
             {% endif %}
-            {% if MODULES.isLoaded('Sellvana_MultiSite') %}
+            {% if loadSites %}
                 {% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
                 <div class="" style="float: left; margin-left: 15px;">
                     <label for="prices-sites"
@@ -31,7 +33,7 @@
                     </select>
                 </div>
             {% endif %}
-            {% if MODULES.isLoaded('Sellvana_MultiCurrency') %}
+            {% if loadCurrency %}
                 {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').curencyOptions() %}
                 <div class="" style="float: left; margin-left: 15px;">
                     <label for="prices-currencies"
@@ -109,7 +111,10 @@
             validatePrices: validatePrices,
             priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options'))|raw }},
             operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options'))|raw }},
-            sale_date_separator: ' / '
+            sale_date_separator: ' / ',
+            show_customers: {{ loadCustomerGroups? 'true': 'false' }},
+            show_sites: {{ loadSites? 'true': 'false' }},
+            show_currency: {{ loadCurrency? 'true': 'false' }}
         };
 
         Price.init(options);
