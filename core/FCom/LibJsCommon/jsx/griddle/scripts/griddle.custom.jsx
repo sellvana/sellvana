@@ -358,12 +358,16 @@ var Griddle = React.createClass({
         if (!this.hasExternalResults()) {
             //get the correct page size
             if(this.state.sortColumn != "" || this.props.initialSort != ""){
-                data = _.sortBy(data, function(item){
-                    return item[that.state.sortColumn||that.props.initialSort];
-                });
-
-                if(this.state.sortAscending == false){
-                    data.reverse();
+                switch (this.state.sortAscending) {
+                    case 'asc':
+                        data = _.sortBy(data, this.state.sortColumn);
+                        break;
+                    case 'desc':
+                        data = _.sortBy(data, this.state.sortColumn).reverse();
+                        break;
+                    default:
+                        data = _.sortBy(data, this.state.sortColumn);
+                        break;
                 }
             }
 
@@ -409,7 +413,7 @@ var Griddle = React.createClass({
         //console.log('this.state.initColumns', this.state.initColumns);
         var that = this,
             results = this.state.filteredResults || this.state.results; // Attempt to assign to the filtered results, if we have any.
-
+            results = _.uniq(results);
         var headerTableClassName = this.props.tableClassName + " table-header";
 
         //figure out if we want to show the filter section

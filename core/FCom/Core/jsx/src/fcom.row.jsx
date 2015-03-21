@@ -93,7 +93,8 @@ define(['underscore', 'react'], function (_, React) {
                                     break;
                             }
                         } else { //todo: add inline row
-                            node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                            var inlineColValue = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                            node = (<input type="text" defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + col.name + "][" + that.props.row.id + "]"} />);
                         }
                         break;
                     default:

@@ -158,19 +158,6 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "totalResults": 0
             }
         },
-        pageGoTo: function (event) {
-            event.preventDefault();
-            if (event.keyCode == 13) {
-                var startIndex = Math.max(this.props.currentPage - 5, 0),
-                    endIndex = Math.min(startIndex + 11, this.props.maxPage),
-                    num = parseInt(event.target.value);
-                if (num > endIndex) {
-                    alert('Page number incorrect !');
-                    event.target.value = num = endIndex;
-                }
-                this.props.setPage((num == 1) ? 0 : num - 1);
-            }
-        },
         pageChange: function (event) {
             event.preventDefault();
             this.props.setPage(parseInt(event.target.getAttribute("data-value")));
@@ -210,6 +197,22 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             }
 
             return pageSizeOptsRender;
+        },
+        pageGoTo: function (event) {
+            event.preventDefault();
+            if (event.keyCode == 13) {
+                var startIndex = Math.max(this.props.currentPage - this.props.maxPage, 0),
+                    endIndex = Math.min(startIndex + this.props.maxPage, this.props.maxPage),
+                    num = event.target.value;
+
+                if (parseInt(num) <= startIndex || num.match(/\D/g)) {
+                    event.target.value = num = startIndex + 1;
+                } else if(parseInt(num) > endIndex) {
+                    event.target.value = num = endIndex;
+                }
+                num = parseInt(num);
+                this.props.setPage((num == 1) ? 0 : num - 1);
+            }
         },
         render: function () {
             var headerSelection = this.props.getHeaderSelection();
@@ -570,8 +573,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                             "Columns ", React.createElement("b", {className: "caret"})
                         ), 
                         React.createElement("div", {id: "column-settings", style: styleColumnSettings}, 
-                            React.createElement("ol", {className: "dd-list dropdown-menu columns ui-sortable", style: {minWidth: '200px'}}, 
-                                options
+                            React.createElement("ol", {className: "dd-list dropdown-menu columns ui-sortable", style: {minWidth: '200px'}}
+
                             )
                         )
                     ), 
