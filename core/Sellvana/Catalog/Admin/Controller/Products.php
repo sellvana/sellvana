@@ -34,15 +34,15 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['type' => 'row_select'],
+            ['type' => 'row_select', 'width' => 55],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
                 'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"'],
             ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
             ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
-            ['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
-            ['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
+            //['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
+            //['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
             ['name' => 'net_weight', 'label' => 'Net Weight',  'width' => 100, 'hidden' => true],
             ['name' => 'ship_weight', 'label' => 'Ship Weight',  'width' => 100, 'hidden' => true],
             ['name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true],
@@ -63,8 +63,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['field' => 'product_name', 'type' => 'text'],
             ['field' => 'product_sku', 'type' => 'text'],
             ['field' => 'short_description', 'type' => 'text'],
-            ['field' => 'base_price', 'type' => 'number-range'],
-            ['field' => 'sale_price', 'type' => 'number-range'],
+            //['field' => 'base_price', 'type' => 'number-range'],
+            //['field' => 'sale_price', 'type' => 'number-range'],
             ['field' => 'net_weight', 'type' => 'number-range'],
             ['field' => 'ship_weight', 'type' => 'number-range'],
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -456,7 +456,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function linkedProductGridConfig($model, $type)
     {
         $orm = $this->Sellvana_Catalog_Model_Product->orm()->table_alias('p')
-            ->select(['p.id', 'p.product_name', 'p.product_sku', 'p.base_price', 'p.sale_price']);
+            ->select(['p.id', 'p.product_name', 'p.product_sku']);//, 'p.base_price', 'p.sale_price']);
 
         switch ($type) {
         case 'related': case 'similar':case 'cross_sell':
@@ -485,8 +485,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
                     ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
                     ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
-                    ['name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price'],
-                    ['name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price'],
+                    //['name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price'],
+                    //['name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price'],
                     ['name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true], 'type' => 'input'],
                 ],

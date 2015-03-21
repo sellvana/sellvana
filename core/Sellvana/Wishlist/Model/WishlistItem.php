@@ -28,6 +28,7 @@ class Sellvana_Wishlist_Model_WishlistItem extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->_product);
     }
 }

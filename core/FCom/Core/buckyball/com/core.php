@@ -1613,15 +1613,31 @@ class BClassDecorator
 
 class BClassAutoload extends BClass
 {
+    protected $_path;
+    protected $_moduleName;
+
     protected $_pools = [];
 
-    public function __construct()
+    public function register($path, $moduleName = null)
     {
-        spl_autoload_register([$this, 'callback'], false);
+        $this->_path = $path;
+        $this->_moduleName = $moduleName;
+        spl_autoload_register([$this, 'callbackSingle']);
+        BDebug::debug('AUTOLOAD.register: ' . $path . '(' . $moduleName . ')');
+        return $this;
     }
 
-    public function addPath($path, $moduleName = null, $filenameCb = null)
+    public function addPath($path, $moduleName = null, $filenameCb = null, $single = true)
     {
+        if ($single) {
+            $inst = new BClassAutoload;
+            $inst->register($path, $moduleName);
+            return $this;
+        }
+
+        if (!$this->_pools) {
+            spl_autoload_register([$this, 'callbackMulti']);
+        }
         $item = [
             'path' => $path,
             'module_name' => $moduleName,
@@ -1632,12 +1648,20 @@ class BClassAutoload extends BClass
         return $this;
     }
 
+    public function callbackSingle($class)
+    {
+        $file = $this->_path . '/' . str_replace(['_', '\\'], ['/', '/'], $class) . '.php';
+        if (file_exists($file)) {
+            include($file);
+        }
+    }
+
     /**
     * Default autoload callback
     *
     * @param string $class
     */
-    public function callback($class)
+    public function callbackMulti($class)
     {
 #echo $this->root_dir.' : '.$class.'<br>';
         foreach ($this->_pools as $pool) {

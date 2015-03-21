@@ -23,6 +23,7 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
         $itemNum = 0;
         $itemQty = 0;
         $subtotal = 0;
+
         foreach ($this->_cart->items() as $item) {
             /*
             // TODO: figure out handling cart items of products removed from catalog
@@ -47,37 +48,14 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
                 $currency = $this->Sellvana_MultiCurrency_Main->getCurrentCurrency();
             }
             $productPrices = $product->getAllPrices($item->getQty(), $customerGroup, $site['id'], $currency, $this->BDb->now());
-            $itemPrice = $item->get('price');
+            //$itemPrice = $item->get('price');
             if($item->get('custom_price')){
                 $itemPrice = $item->get('custom_price');
             } else {
-                $now = time();
-                foreach ($productPrices as $type => $prices) {
-                    foreach ($prices as $p) {
-                        switch ($type) {
-                            case 'sale':
-                                $dFrom = strtotime($p['valid_from']);
-                                $dTo   = strtotime($p['valid_to']);
-                                if ($dFrom <= $now && $dTo >= $now) {
-                                    $itemPrice = min($itemPrice, $p['price']);
-                                }
-                                break;
-                            case 'tier':
-                                if ($item->get('qty') > $p['qty']) {
-                                    $itemPrice = min($itemPrice, $p['price']);
-                                }
-                                break;
-                            case 'promo':
-                                $itemPrice = min($itemPrice, $p['price']);
-                                break;
-                        }
-
-                    }
-
-                }
-
-                if ($product->get('sale_price')) {
-                    $itemPrice = min($itemPrice, $product->get('sale_price'));
+                $itemPrice = $product->getCatalogPrice();
+                $tierPrice = $product->getTierPrice($item->getQty());
+                if ($tierPrice) {
+                    $itemPrice = min($itemPrice, $tierPrice);
                 }
             }
 

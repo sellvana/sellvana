@@ -30,20 +30,24 @@
  * @property integer $num_reviews
  *
  * DI
- * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
- * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
- * @property Sellvana_Catalog_Model_ProductLink $Sellvana_Catalog_Model_ProductLink
+ * @property FCom_Core_Main                          $FCom_Core_Main
+ * @property FCom_Core_Model_MediaLibrary            $FCom_Core_Model_MediaLibrary
+ * @property Sellvana_Catalog_Model_Category         $Sellvana_Catalog_Model_Category
+ * @property Sellvana_Catalog_Model_CategoryProduct  $Sellvana_Catalog_Model_CategoryProduct
+ * @property Sellvana_Catalog_Model_InventorySku     $Sellvana_Catalog_Model_InventorySku
+ * @property Sellvana_Catalog_Model_Product          $Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_ProductLink      $Sellvana_Catalog_Model_ProductLink
+ * @property Sellvana_Catalog_Model_ProductMedia     $Sellvana_Catalog_Model_ProductMedia
+ * @property Sellvana_Catalog_Model_ProductPrice     $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_Customer_Model_Customer        $Sellvana_Customer_Model_Customer
+ * @property Sellvana_CustomerGroups_Model_Group     $Sellvana_CustomerGroups_Model_Group
+ * @property Sellvana_CustomField_Model_Field        $Sellvana_CustomField_Model_Field
+ * @property Sellvana_CustomField_Model_FieldOption  $Sellvana_CustomField_Model_FieldOption
  * @property Sellvana_CustomField_Model_ProductField $Sellvana_CustomField_Model_ProductField
- * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
- * @property Sellvana_CustomField_Model_FieldOption $Sellvana_CustomField_Model_FieldOption
- * @property Sellvana_CustomField_Model_Field $Sellvana_CustomField_Model_Field
- * @property Sellvana_ProductReviews_Model_Review $Sellvana_ProductReviews_Model_Review
- * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
- * @property FCom_Core_Main $FCom_Core_Main
- * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
- * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
-*/
+ * @property Sellvana_ProductReviews_Model_Review    $Sellvana_ProductReviews_Model_Review
+ * @property Sellvana_MultiSite_Main                 $Sellvana_MultiSite_Main
+ * @property Sellvana_MultiCurrency_Main             $Sellvana_MultiCurrency_Main
+ */
 class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
@@ -65,7 +69,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected static $_validationRules = [
         ['product_name', '@required'],
-        ['base_price', '@required'],
+        //['base_price', '@required'],
         ['product_sku', '@required'],
         ['product_sku', '@string', null, ['max' => 100]],
         ['product_sku', 'Sellvana_Catalog_Model_Product::validateDupSku'],
@@ -77,11 +81,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         /*array('is_hidden', '@integer'),*/
         ['num_reviews', '@integer'],
 
-        ['cost', '@numeric'],
-        ['msrp', '@numeric'],
-        ['map', '@numeric'],
-        ['markup', '@numeric'],
-        ['sale_price', '@numeric'],
         ['net_weight', '@numeric'],
         ['ship_weight', '@numeric'],
         ['avg_rating', '@numeric'],
@@ -99,6 +98,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected $_importErrors = null;
     protected $_dataImport = [];
+
+    protected $_priceModels;
 
     protected static $_urlPrefix;
 
@@ -202,21 +203,21 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!$this->get('url_key')) $this->generateUrlKey();
 
         // Cleanup possible bad input
-        if ($this->get('sale_price') === '') {
-            $this->set('sale_price', null);
-        }
-        if ($this->get('cost') === '') {
-            $this->set('cost', null);
-        }
-        if ($this->get('msrp') === '') {
-            $this->set('msrp', null);
-        }
-        if ($this->get('map') === '') {
-            $this->set('map', null);
-        }
-        if ($this->get('markup') === '') {
-            $this->set('markup', null);
-        }
+        //if ($this->get('sale_price') === '') {
+        //    $this->set('sale_price', null);
+        //}
+        //if ($this->get('cost') === '') {
+        //    $this->set('cost', null);
+        //}
+        //if ($this->get('msrp') === '') {
+        //    $this->set('msrp', null);
+        //}
+        //if ($this->get('map') === '') {
+        //    $this->set('map', null);
+        //}
+        //if ($this->get('markup') === '') {
+        //    $this->set('markup', null);
+        //}
 
         return true;
     }
@@ -242,10 +243,12 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         if (!$this->get('position')) {
             $this->set('position', $this->calcPosition());
+            $saveAgain = true;
         }
         if ($saveAgain) {
             $this->save();
         }
+        $this->Sellvana_Catalog_Model_ProductPrice->parseAndSaveDefaultPrices($this);
 
         return true;
     }
@@ -1116,73 +1119,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return mixed
-     */
-    public function getPrice()
-    {
-        if ($this->get('sale_price')) {
-            return $this->get('sale_price');
-        }
-        return $this->get('base_price');
-    }
-
-    public function getFrontendPrices()
-    {
-        /**
-         * - type: old, new, reg, msrp, extax
-         * - label: Old Price, New Price, Price, MSRP, Ex.Tax
-         * - value: 1234.56
-         * - formatted: $1,234.56
-         * - pos: 0,1,2,3
-         */
-        $prices = [];
-
-        if ($this->get('sale_price') !== null) {
-            $prices['base'] = ['type' => 'old', 'label' => 'Was', 'pos' => 10, 'value' => $this->get('base_price')];
-            $prices['sale'] = ['type' => 'new', 'label' => 'Price', 'pos' => 20, 'value' => $this->get('sale_price'), 'final' => 1];
-        } else {
-            $prices['base'] = ['type' => 'reg', 'label' => 'Price', 'pos' => 10, 'value' => $this->get('base_price'), 'final' => 1];
-        }
-
-        $this->BEvents->fire(__METHOD__, ['product' => $this, 'prices' => &$prices]);
-
-        uasort($prices, function($v1, $v2) {
-            $p1 = !empty($v1['pos']) ? $v1['pos'] : 999;
-            $p2 = !empty($v2['pos']) ? $v2['pos'] : 999;
-            return $p1 < $p2 ? -1 : ($p1 > $p2 ? 1 : 0);
-        });
-        return $prices;
-    }
-
-    /**
-     * @param int    $qty
-     * @param int    $customerGroup_id
-     * @param int    $site_id
-     * @param string $currency_code
-     * @param null   $date
-     * @return Sellvana_Catalog_Model_ProductPrice[]
-     */
-    public function getAllPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
-    {
-
-        $prices = [];
-        $productPrices = $this->getRawPrices($qty, $customerGroup_id, $site_id, $currency_code, $date);
-        foreach ($productPrices as $p) {
-            $type = $p['price_type'];
-            $prices[$type][] = $p;
-        }
-
-        return $prices;
-    }
-
-    public function getRawPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
-    {
-        $priceModel    = $this->Sellvana_Catalog_Model_ProductPrice;
-        $productPrices = $priceModel->getProductPrices($this, $qty, $customerGroup_id, $site_id, $currency_code, $date);
-        return $productPrices;
-    }
-
-    /**
      * @return array
      */
     public function backOrders()
@@ -1226,22 +1162,210 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param boolean|Sellvana_Catalog_Model_ProductPrice[] $priceModels
+     * @return $this
+     */
+    public function setPriceModels($priceModels)
+    {
+        $this->_priceModels = $priceModels;
+        return $this;
+    }
+
+    /**
+     * @param string $type
+     * @param array|boolean $context
+     * @param bool $useDefault
+     * @return Sellvana_Catalog_Model_ProductPrice
+     */
+    public function getPriceModelByType($type, $context = null, $useDefault = true)
+    {
+        if (!isset($this->_priceModels)) {
+            $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices([$this], true);
+        }
+        if (false === $this->_priceModels || empty($this->_priceModels[0][$type])) {
+            return null;
+        }
+
+        $prices = $this->_priceModels[0][$type];
+
+        if (!$context) {
+            return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
+        }
+
+        static $siteId = null, $customerGroupId = false, $currencyCode = false;
+        if (null === $siteId) {
+            $modHlp = $this->BModuleRegistry;
+            $siteId = false;
+            if ($modHlp->isLoaded('Sellvana_MultiSite')) {
+                $site = $this->Sellvana_MultiSite_Main->getCurrentSiteData();
+                $siteId = $site ? $site->id() : false;
+            }
+            if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
+                $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+                $customerGroupId = $customer ? $customer->get('customer_group_id')
+                    : $this->Sellvana_CustomerGroups_Model_Group->notLoggedInId();
+            }
+            if ($modHlp->isLoaded('Sellvana_MultiCurrency')) {
+                $currency = $this->Sellvana_MultiCurrency_Main->getCurrentCurrency();
+                $currencyCode = $currency ?: false;
+            }
+        }
+
+        if (true === $context) {
+            $context = [
+                'site_id' => true,
+                'customer_group_id' => true,
+                'currency_code' => true,
+            ];
+        }
+
+        $s = !empty($context['site_id']) ? (true !== $context['site_id'] ? $context['site_id'] : $siteId) : '*';
+        $g = !empty($context['customer_group_id']) ? (true !== $context['customer_group_id'] ? $context['customer_group_id'] : $customerGroupId) : '*';
+        $c = !empty($context['currency_code']) ? (true !== $context['currency_code'] ? $context['currency_code'] : $currencyCode) : '*';
+
+        if (isset($prices["{$s}:{$g}:{$c}"])) {
+            return $prices["{$s}:{$g}:{$c}"];
+        }
+        if (!$useDefault) {
+            return null;
+        }
+        if ($s !== '*' && isset($prices["*:{$g}:{$c}"])) {
+            return $prices["*:{$g}:{$c}"];
+        }
+        if ($g !== '*' && isset($prices["{$s}:*:{$c}"])) {
+            return $prices["{$s}:*:{$c}"];
+        }
+        if ($c !== '*' && isset($prices["{$s}:{$g}:*"])) {
+            return $prices["{$s}:{$g}:*"];
+        }
+        if ($s !== '*' && $g !== '*' && isset($prices["*:*:{$c}"])) {
+            return $prices["*:*:{$c}"];
+        }
+        if ($s !== '*' && $c !== '*' && isset($prices["*:{$g}:*"])) {
+            return $prices["*:{$g}:*"];
+        }
+        if ($g !== '*' && $c !== '*' && isset($prices["*:*:{$c}"])) {
+            return $prices["*:*:{$c}"];
+        }
+        return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
+    }
+
+    /**
+     * Get final price of product in catalog
+     *
+     * @param boolean|array $context
+     * @return mixed
+     */
+    public function getCatalogPrice($context = true)
+    {
+        $priceModel = $this->getPriceModelByType('base', $context);
+        $price = $priceModel ? $priceModel->getPrice() : 0;
+
+        $salePriceModel = $this->getPriceModelByType('sale', $context);
+        if ($salePriceModel && $salePriceModel->isValid()) {
+            $price = min($price, $salePriceModel->getPrice());
+        }
+
+        $promoPriceModel = $this->getPriceModelByType('promo', $context);
+        if ($promoPriceModel && $promoPriceModel->isValid()) {
+            $price = min($price, $promoPriceModel->getPrice());
+        }
+
+        return $price;
+    }
+
+    public function getFrontendPrices()
+    {
+        /**
+         * - type: old, new, reg, msrp, extax
+         * - label: Old Price, New Price, Price, MSRP, Ex.Tax
+         * - value: 1234.56
+         * - formatted: $1,234.56
+         * - pos: 0,1,2,3
+         */
+        $prices = [];
+
+        $basePriceModel = $this->getPriceModelByType('base', true);
+        $basePrice = $basePriceModel ? $basePriceModel->getPrice() : 0;
+
+        $finalPrice = $this->getCatalogPrice();
+
+        if ($finalPrice !== null && $finalPrice < $basePrice) {
+            $prices['base'] = ['type' => 'old', 'label' => 'Was', 'pos' => 10, 'value' => $basePrice];
+            $prices['sale'] = ['type' => 'new', 'label' => 'Now', 'pos' => 20, 'value' => $finalPrice, 'final' => 1];
+        } else {
+            $prices['base'] = ['type' => 'reg', 'label' => 'Price', 'pos' => 10, 'value' => $basePrice, 'final' => 1];
+        }
+
+        $this->BEvents->fire(__METHOD__, ['product' => $this, 'prices' => &$prices]);
+
+        uasort($prices, function($v1, $v2) {
+            $p1 = !empty($v1['pos']) ? $v1['pos'] : 999;
+            $p2 = !empty($v2['pos']) ? $v2['pos'] : 999;
+            return $p1 < $p2 ? -1 : ($p1 > $p2 ? 1 : 0);
+        });
+        return $prices;
+    }
+
+    /**
+     * Get product tier price
+     *
      * @param float  $qty quantity of product in cart
-     * @param int    $customerGroupId
-     * @param int    $siteId
-     * @param string $currencyCode
+     * @param array|boolean $context
      * @return null|float
      */
-    public function getTierPrice($qty, $customerGroupId = null, $siteId = null, $currencyCode = null)
+    public function getTierPrice($qty, $context = true)
     {
-        $priceModel = $this->Sellvana_Catalog_Model_ProductPrice;
-        $price      = $priceModel->getPrice($this, 'tier', $qty, $customerGroupId, $siteId, $currencyCode);
-
-        if ($price) {
-            return $price->get('price');
+        /** @var Sellvana_Catalog_Model_ProductPrice[] $tierPrices */
+        $tierPrices = $this->getPriceModelByType('tier', $context);
+        if (!$tierPrices) {
+            return null;
+        }
+        $maxTierQty = 0;
+        foreach ($tierPrices as $tierQty => $r) {
+            if ($tierQty <= $qty) {
+                $maxTierQty = max($maxTierQty, $tierQty);
+            }
+        }
+        if ($maxTierQty) {
+            return $tierPrices[$maxTierQty]->getPrice();
         }
         return null;
     }
+
+    public function getAllTierPrices($context = true)
+    {
+        return $this->getPriceModelByType('tier', $context);
+    }
+
+    /**
+     * @param int    $qty
+     * @param int    $customerGroup_id
+     * @param int    $site_id
+     * @param string $currency_code
+     * @param null   $date
+     * @return Sellvana_Catalog_Model_ProductPrice[]
+     */
+    public function getAllPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
+    {
+
+        $prices = [];
+        $productPrices = $this->getRawPrices($qty, $customerGroup_id, $site_id, $currency_code, $date);
+        foreach ($productPrices as $p) {
+            $type = $p['price_type'];
+            $prices[$type][] = $p;
+        }
+
+        return $prices;
+    }
+
+    public function getRawPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
+    {
+        $priceModel    = $this->Sellvana_Catalog_Model_ProductPrice;
+        $productPrices = $priceModel->getProductPrices($this, $qty, $customerGroup_id, $site_id, $currency_code, $date);
+        return $productPrices;
+    }
+
 
     public function priceTypeOptions()
     {
@@ -1251,5 +1375,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function variantPrice($itemPrice, $variant_id)
     {
         return $itemPrice;
+    }
+
+    public function __destruct()
+    {
+        parent::__destruct();
+        unset($this->_priceModels);
     }
 }
