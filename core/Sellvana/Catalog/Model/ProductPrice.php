@@ -171,7 +171,7 @@ class Sellvana_Catalog_Model_ProductPrice
         $priceModel->set([
             'product_id' => $product_id,
             'variant_id' => $variant_id,
-            'price'      => (float) $price,
+            'amount'      => (float) $price,
             'price_type' => $type
         ])->save();
     }
@@ -268,10 +268,15 @@ class Sellvana_Catalog_Model_ProductPrice
             $idx = ($r->get('site_id') ?: '*')
                 . ':' . ($r->get('customer_group_id') ?: '*')
                 . ':' . ($r->get('currency_code') ?: '*');
-            if ('tier' === $type) {
-                $prices[$pId][$vId][$type][$idx][$r->get('qty')] = $r;
-            } else {
-                $prices[$pId][$vId][$type][$idx] = $r;
+            switch ($type) {
+                case 'promo':
+                    $prices[$pId][$vId][$type][$idx][$r->get('promo_id')] = $r;
+                    break;
+                case 'tier':
+                    $prices[$pId][$vId][$type][$idx][$r->get('qty')] = $r;
+                    break;
+                default:
+                    $prices[$pId][$vId][$type][$idx] = $r;
             }
             $r->setProduct($productsById[$pId]);
         }
@@ -313,32 +318,35 @@ class Sellvana_Catalog_Model_ProductPrice
         return (null === $from || $from <= $date) && (null === $to || $to >= $date);
     }
 
-    public function getPrice()
+    public function getPrice($basePrice = null)
     {
         $op = $this->get('operation');
         if (!$op || '=$' === $op) {
-            return $this->get('price');
+            return $this->get('amount');
         }
 
         if (!$this->_product) {
             return null;
         }
 
-        $baseField = $this->get('base_field');
-        if (!$baseField) {
-            return null;
+        if (null === $basePrice) {
+            $baseField = $this->get('base_field');
+            if (!$baseField) {
+                return null;
+            }
+
+            $baseModel = $this->_product->getPriceModelByType($baseField, [
+                'site_id' => $this->get('site_id'),
+                'customer_group_id' => $this->get('customer_group_id'),
+                'currency_code' => $this->get('currency_code'),
+            ]);
+            if (!$baseModel) {
+                return null;
+            }
+            $basePrice = $baseModel->getPrice();
         }
 
-        $baseModel = $this->_product->getPriceModelByType($baseField, [
-            'site_id' => $this->get('site_id'),
-            'customer_group_id' => $this->get('customer_group_id'),
-            'currency_code' => $this->get('currency_code'),
-        ]);
-        if (!$baseModel) {
-            return null;
-        }
-
-        return $this->applyPriceOperation($baseModel->getPrice(), $this->get('price'), $op);
+        return $this->applyPriceOperation($basePrice, $this->get('amount'), $op);
     }
 
     public function parseAndSaveDefaultPrices(Sellvana_Catalog_Model_Product $product)
@@ -402,13 +410,13 @@ class Sellvana_Catalog_Model_ProductPrice
         if (is_numeric($value)) {
             return [
                 'operation' => '=$',
-                'price' => $value,
+                'amount' => $value,
                 'base_field' => null,
             ];
         } elseif (is_string($value) && preg_match('#^(base|sale|cost|msrp|map)([+-])([0-9.]+)(%?)$#', $value, $m)) {
             return [
                 'operation' => $m[2] . ($m[4] ?: '$'),
-                'price' => $m[3],
+                'amount' => $m[3],
                 'base_field' => $m[1],
             ];
         } else {
