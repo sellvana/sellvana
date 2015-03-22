@@ -293,7 +293,7 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         /** @var Sellvana_Promo_Model_PromoProduct $epp */
         $promoId = $promo->id();
         foreach ($existing as $pId => $epp) {
-            if (empty($data[$pId])) {
+            if (empty($data['products'][$pId])) {
                 $ppIdsToDelete[] = $epp->id();
             }
         }
