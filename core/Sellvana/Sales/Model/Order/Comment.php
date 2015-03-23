@@ -27,6 +27,7 @@ class Sellvana_Sales_Model_Order_Comment extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->_order, $this->_state);
     }
 }

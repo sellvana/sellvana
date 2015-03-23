@@ -4,4 +4,4 @@ base:
             - [ addNav, customer/customer-groups, { label: Customer Groups, href: /customer-groups, pos: 20 } ]
 
 /catalog/products/form:
-    - { hook: catalog/products-form/prices, views: customer-groups/product-prices }
+#    - { hook: catalog/products-form/prices, views: customer-groups/product-prices }

@@ -2,24 +2,9 @@
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
-
-<fieldset name="main-product">
-  <div class="f-section">
-    {{ forms.input(fieldData, {field:'cost', label:'Cost'|_}) }}
-
-    {{ forms.input(fieldData, {field:'msrp', label:'MSRP'|_}) }}
-
-    {{ forms.input(fieldData, {field:'map', label:'MAP'|_}) }}
-
-    {{ forms.input(fieldData, {field:'base_price', label:'Regular Price'|_, required:1}) }}
-
-    {{ forms.input(fieldData, {field:'sale_price', label:'Special Price'|_}) }}
-
-    {{ forms.input(fieldData, {field:'markup', label:'Default Markup'|_}) }}
-  </div>
-</fieldset>
-
-{% set prices = m.getAllPrices() %}
+{% set viewHelper = LAYOUT.view('core/form-elements') %}
+{% set priceHelper = APP.instance('Sellvana_Catalog_Model_ProductPrice') %}
+{% set prices = m.getRawPrices() %}
 
 
 <fieldset name="product-prices">
@@ -27,41 +12,43 @@
         <div class="form-group">
             {% if MODULES.isLoaded('Sellvana_CustomerGroups') %}
                 {% set customerGroups = APP.instance('Sellvana_CustomerGroups_Model_Group').groupsOptions() %}
-                <label for="prices-customer_groups" class="col-md-2 control-label">{{ "Customer group"|_ }}</label>
                 <div class="" style="float: left; margin-left: 15px;">
+                    <label for="prices-customer_groups" >{{ "Customer group"|_ }}</label><br/>
                     <select id="prices-customer_groups" name="prices[customer_groups]" class="form-control to-select2">
-                        <option value="*">{{ "Any (*)"|_ }}</option>
+                        <option value="*">{{ "All (*)"|_ }}</option>
                         {{ UTIL.optionsHtml(customerGroups)|raw }}
                     </select>
                 </div>
             {% endif %}
             {% if MODULES.isLoaded('Sellvana_MultiSite') %}
                 {% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
-                <label for="prices-sites"
-                       class="control-label {{ customerGroups? 'col-md-1': 'col-md-2' }}">{{ "Site"|_ }}</label>
-
                 <div class="" style="float: left; margin-left: 15px;">
+                    <label for="prices-sites"
+                           class="">{{ "Site"|_ }}</label><br/>
                     <select id="prices-sites" name="prices[sites]" class="form-control to-select2">
-                        <option value="*">{{ "Any (*)"|_ }}</option>
+                        <option value="*">{{ "All (*)"|_ }}</option>
                         {{ UTIL.optionsHtml(sites)|raw }}
                     </select>
                 </div>
             {% endif %}
             {% if MODULES.isLoaded('Sellvana_MultiCurrency') %}
-                {# todo replace with actual currency config #}
                 {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').curencyOptions() %}
-                <label for="prices-currencies"
-                       class="control-label {{ (customerGroups or sites)? 'col-md-1': 'col-md-2' }}">{{ "Currency"|_ }}</label>
-
                 <div class="" style="float: left; margin-left: 15px;">
+                    <label for="prices-currencies"
+                           class="">{{ "Currency"|_ }}</label><br/>
                     <select id="prices-currencies" name="prices[currencies]" class="form-control to-select2">
-                        <option value="*">{{ "Any (*)"|_ }}</option>
+                        <option value="*">{{ "All (*)"|_ }}</option>
                         {{ UTIL.optionsHtml(currencies)|raw }}
                     </select>
                 </div>
             {% endif %}
-            <div class="col-md-2">
-                <button class="btn btn-primary" id="prices_add_new" type="button">{{ "Add New Price"|_ }}</button>
+            <div class="" style="float: left; margin-left: 15px;">
+                <label for="price-types"
+                       class="">{{ "Price Types"|_ }}</label><br/>
+                <select id="price-types" class="form-control to-select2">
+                    <option value="-1">{{ "Choose price" }}</option>
+                    {{ UTIL.optionsHtml(m.priceTypeOptions())|raw }}
+                </select>
             </div>
         </div>
         <div id="price_list">
@@ -72,21 +59,113 @@
     </div>
 </fieldset>
 <script type="text/javascript">
-    require(['jquery', 'fcom.catalog.product.price'], function ($, Price) {
+    require(['jquery', 'fcom.catalog.product.price', 'jquery.validate', 'daterangepicker'], function ($, Price) {
+
+        var data = '{{m.get('sale_price_period')}}', s, e;
+        if (!data) {
+            var startDate = new Date();
+            s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+        } else {
+            var dates = data.split(" - ");
+            s = dates[0];
+            e = dates[1] || dates[0];
+        }
+        var $input = $('#model-sale_price_period');
+        var datePickerOptions = {
+            format: 'YYYY-MM-DD',
+            startDate: s,
+            separator: ' / '
+        };
+        if (e) {
+            datePickerOptions.endDate = e;
+        }
+        $input.daterangepicker(datePickerOptions);
+
+
         $('select.to-select2').select2({minimumResultsForSearch: 15, width: 'resolve', dropdownAutoWidth: true});
+        function validatePrices() {
+            var valid = true;
+            $('#price_list').find('select.priceUnique').each(function (el) {
+                if (!$(this).valid()) {
+                    valid = false;
+                }
+            });
+            return valid;
+        }
+
         var options = {
             container: $('#price_list'),
             prices: {{ UTIL.toJson(prices)|raw }},
+            price_types: {{ UTIL.toJson(m.priceTypeOptions())|raw }},
+            editable_prices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices'))|raw }},
             customer_groups: {{ customerGroups? UTIL.toJson(customerGroups)|raw: 'null' }},
             sites: {{ sites? UTIL.toJson(sites)|raw: 'null' }},
             currencies: {{ currencies? UTIL.toJson(currencies)|raw: 'null' }},
             filter_customer_group: $('#prices-customer_groups'),
             filter_site: $('#prices-sites'),
             filter_currency: $('#prices-currencies'),
-            prices_add_new: $('#prices_add_new')
+            prices_add_new: $('#price-types'),
+            product_id: '{{ m.id() }}',
+            validatePrices: validatePrices,
+            priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options'))|raw }},
+            operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options'))|raw }},
+            sale_date_separator: ' / '
         };
 
         Price.init(options);
+        /*
+         *custom validation function for checking duplicated input
+         */
+        function priceUnique(value, elem) {
+            var valid = true;
+            if (typeof (elem) !== 'undefined') {
+                var parent = $(elem).parents('.price-item');
+                var curFields = parent.find('input.priceUnique, select.priceUnique');
+                var currHash = '';
+                curFields.each(function () {
+                    currHash += $(this).val();
+                });
+
+                var items = $('.price-item');
+                items.each(function () {
+                    if (!valid) {
+                        return;
+                    }
+
+                    var $item = $(this);
+                    if (this === parent[0]) {
+                        return;
+                    }
+                    var fields = $item.find('input.priceUnique, select.priceUnique');
+                    var same = true;
+                    var checkHash = '';
+                    fields.each(function (idx) {
+                        checkHash += $(this).val();
+//                        var currField = $(curFields[idx]);
+//                        var checkField = $(this);
+//                        var currVal = currField.val();
+//                        var checkedVal = checkField.val();
+//                        if (currVal != checkedVal) {
+//                            same = false;
+//                        }
+                    });
+//                    if (same) {
+//                        valid = false;
+//                    }
+                    valid = currHash != checkHash;
+                });
+                return valid;
+            }
+        }
+
+        $.validator.addMethod('priceUnique', priceUnique, 'Same price already exists.');
+
+        $.validator.addClassRules("priceUnique", {
+            priceUnique: true
+        });
+        $('form').submit(function () {
+            return validatePrices();
+        });
     })
 </script>
 

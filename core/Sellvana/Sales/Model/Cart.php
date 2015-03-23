@@ -33,6 +33,7 @@
  *
  * DI
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
@@ -216,23 +217,33 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $items = $this->items();
         }
         $productIds = [];
+        /** @var Sellvana_Sales_Model_Cart_Item[] $itemsToUpdate */
+        $itemsToUpdate = [];
         foreach ($items as $item) {
-            if ($item->product) continue;
-            if (($cached = $this->Sellvana_Catalog_Model_Product->cacheFetch('id', $item->product_id))) {
+            if ($item->getProduct(false)) {
+                continue;
+            }
+            $pId = $item->get('product_id');
+            if (is_null($pId)) {
+                $this->BDebug->warning('product_id is NULL for item #' . $item->id());
+                continue;
+            }
+            /** @var Sellvana_Catalog_Model_Product $cached */
+            $cached = $this->Sellvana_Catalog_Model_Product->cacheFetch('id', $pId);
+            if ($cached) {
                 $item->setProduct($cached);
-            } else {
-                $productIds[$item->product_id] = $item->id;
+            } elseif ($pId) {
+                $productIds[$pId] = $pId;
+                $itemsToUpdate[] = $item;
             }
         }
         if ($productIds) {
-            //todo: fix bug for ambigious field ID
-            //$this->Sellvana_Catalog_Model_Product->cachePreloadFrom(array_keys($productIds));
+            $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $productIds)->find_many_assoc('id');
+            $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($products);
+            foreach ($itemsToUpdate as $item) {
+                $item->setProduct($products[$item->get('product_id')]);
+            }
         }
-        /*
-        foreach ($items as $item) {
-            $item->product = $this->Sellvana_Catalog_Model_Product->load($item->product_id);
-        }
-        */
         return $this;
     }
 
@@ -349,7 +360,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'product_name' => $product->get('product_name'),
                 'product_sku' => !empty($params['product_sku']) ? $params['product_sku'] : $product->get('product_sku'),
                 'inventory_sku' => $product->get('inventory_sku'),
-                'show_separate' => !empty($params['show_separate']) ? $params['show_separate'] : false,
+                'show_separate' => !empty($params['show_separate']) ? $params['show_separate'] : 0,
                 'qty' => $params['qty'],
                 'price' => $params['price'],
                 'unique_hash' => $hash,
@@ -791,6 +802,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
+        parent::__destruct();
         unset($this->_addresses, $this->items, $this->totals);
     }
 

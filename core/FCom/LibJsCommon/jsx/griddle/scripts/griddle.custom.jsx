@@ -7,8 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['underscore', 'react', 'jsx!griddle.gridNoData', 'jsx!griddle.customFormatContainer', 'jsx!griddle.customPaginationContainer'],
-    function(_, React, GridBody, GridFilter, GridPagination, GridSettings, GridTitle, GridNoData, CustomFormatContainer, CustomPaginationContainer) {
+define(['underscore', 'react', 'griddle.gridNoData'], function(_, React, GridNoData) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
@@ -110,6 +109,7 @@ var Griddle = React.createClass({
         }
     },
     getExternalResults: function(state, callback) {
+        //console.log('getExternalResults');
         // use init data in grid config
         if (this.state.isInit) {
             var fcomData = this.getConfig('data');
@@ -141,6 +141,11 @@ var Griddle = React.createClass({
             sortAscending = this.state.sortAscending;
         }
 
+        //empty sort column in case empty sort ascending, it will reset personlization
+        if (sortAscending == '') {
+            sortColumn = '';
+        }
+
         if (state !== undefined && state.page !== undefined) {
             page = state.page;
         } else {
@@ -163,6 +168,7 @@ var Griddle = React.createClass({
             state.isLoading = false;
             state.isInit = false;
 
+            //todo: re-check this code again to reduce set state and avoid re-render
             //fix pagination when get data from external results
             that.setState({
                 results: externalResults.results,
@@ -230,7 +236,7 @@ var Griddle = React.createClass({
         var that = this;
 
         //if we don't have any data don't mess with this
-        if (this.state.results === undefined || this.state.results.length == 0){ return [];}
+        //if (this.state.results === undefined || this.state.results.length == 0){ return [];}
 
         var result = this.state.filteredColumns;
 
@@ -308,14 +314,14 @@ var Griddle = React.createClass({
             maxPage: 0,
             page: this.props.initPage,
             filteredResults: null,
-            filteredColumns: [],
+            filteredColumns: this.props.columns,
             filter: "",
             sortColumn: this.props.sortColumn,
             sortAscending: this.props.sortAscending,
             showColumnChooser: false,
             isLoading: false,
             //fcom custom
-            initColumns: [], //init columns include all hide columns
+            initColumns: this.props.initColumns, //init columns include all hide columns
             isInit: true,
             selectedRows: [],
             headerSelect: 'show_all' //select value in header dropdown
@@ -324,6 +330,7 @@ var Griddle = React.createClass({
         // If we need to get external results, grab the results.
         if (!this.hasExternalResults()) {
             state.results = this.props.results;
+            state.totalResults = this.props.results.length;
         } else {
             state.isLoading = true; // Initialize to 'loading'
         }
@@ -369,6 +376,8 @@ var Griddle = React.createClass({
             // Don't sort or page data if loaded externally.
         }
 
+        //console.log('getDataForRender.data', data);
+
         var meta = [].concat(this.props.metadataColumns);
         meta.push(this.props.childrenColumnName);
 
@@ -407,7 +416,7 @@ var Griddle = React.createClass({
         var filter = this.props.showFilter ?
             (
                 this.props.useCustomFilter
-                ? <this.props.customFilter changeFilter={this.setFilter} customFilter={this.props.customFilter} getConfig={this.getConfig} />
+                ? <this.props.customFilter changeFilter={this.setFilter} changeFilterLocalData={this.setFilterLocalData} getConfig={this.getConfig} />
                 : <GridFilter changeFilter={this.setFilter} placeholderText={this.props.filterPlaceholderText} />
             ) : "";
         var settings = this.props.showSettings ?
@@ -446,15 +455,16 @@ var Griddle = React.createClass({
                         className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
                         getConfig={this.getConfig} refresh={this.refresh} setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
                         getSelectedRows={this.getSelectedRows} addSelectedRows={this.addSelectedRows} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
+                        hasExternalResults={this.hasExternalResults}
                     />)
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );
 
             pagingContent = this.props.useCustomPager && this.props.customPager
-                ? (<this.props.customPager next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage}
+                ? (<this.props.customPager next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage ? this.state.maxPage : 0}
                     setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText} totalResults={this.state.totalResults}
                     getConfig={this.getConfig} setPageSize={this.setPageSize} resultsPerPage={this.props.resultsPerPage} getHeaderSelection={this.getHeaderSelection} />)
-                : (<GridPagination next={this.nextPage} previous={this.previousPage} currentPage={this.state.page} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText}/>);
+                : (<GridPagination next={this.nextPage} previous={this.previousPage} currentPage={this.state.page ? this.state.page : 0} maxPage={this.state.maxPage} setPage={this.setPage} nextText={this.props.nextText} previousText={this.props.previousText}/>);
         } else {
             // Otherwise, display the loading content.
             resultContent = (<div className="loading img-responsive center-block"></div>);
@@ -578,6 +588,135 @@ var Griddle = React.createClass({
         }
     },
     /**
+     * set filter for local data
+     * @param submitFilters
+     */
+    setFilterLocalData: function (submitFilters) {
+        //console.log('setFilterLocalData');
+        var originalResults = this.props.results;
+        var filteredResults = originalResults;
+
+        //console.log('submitFilters', submitFilters);
+
+        _.each(submitFilters, function(filter, key) { //key is field name
+            var filterVal = filter.val.toLowerCase();
+
+            if (filter.submit && filterVal != '') {
+                switch (filter.type) {
+                    case 'text':
+                        var check = {};
+                        switch (filter.op) {
+                            case 'contains':
+                                check.contain = true;
+                                break;
+                            case 'start':
+                                check.contain = true;
+                                check.start = true;
+                                break;
+                            case 'end':
+                                check.contain = true;
+                                check.end = true;
+                                break;
+                            case 'equal':
+                                check.contain = true;
+                                check.end = true;
+                                check.start = true;
+                                break;
+                            case 'not':
+                                check.contain = false;
+                                break;
+                        }
+
+                        filteredResults = _.filter(originalResults, function(row) {
+                            //console.log('row', row);
+                            var flag = true;
+                            var rowVal = (row[key] + '').toLowerCase();
+                            var firstIndex = rowVal.indexOf(filterVal);
+                            var lastIndex = rowVal.lastIndexOf(filterVal);
+                            _.forEach(check, function(checkValue, checkKey) {
+                                switch (checkKey) {
+                                    case 'contain':
+                                        flag = flag && ((firstIndex !== -1) === check.contain);
+                                        break;
+                                    case 'start':
+                                        flag = flag && firstIndex === 0;
+                                        break;
+                                    case 'end':
+                                        flag = flag && (lastIndex + filterVal.length) === rowVal.length;
+                                        break;
+                                }
+
+                                if (!flag)
+                                    return flag;
+                            });
+
+                            return flag;
+                        });
+
+                        break;
+                    case 'multiselect':
+                        filterVal = filterVal.split(',');
+                        filteredResults = _.filter(originalResults, function(row) {
+                            var flag = false;
+                            _.forEach(filterVal, function(value) {
+                                flag = flag || (value === row[key].toLowerCase());
+                            });
+
+                            return flag;
+                        });
+                        break;
+                    case 'number-range':
+                        filteredResults = _.filter(originalResults, function(row) {
+                            var flag = false;
+                            var rowVal = row[key].toLowerCase();
+                            var rangeVal = [];
+                            switch (filter.op) {
+                                case 'between':
+                                    rangeVal = filterVal.split('~');
+                                    if (Number(rangeVal[0]) <= rowVal && rowVal <= Number(rangeVal[1])) {
+                                        flag = true;
+                                    }
+                                    break;
+                                case 'from':
+                                    if ( filterVal <= Number(rowVal)) {
+                                        flag = true;
+                                    }
+                                    break;
+                                case 'to':
+                                    if (rowVal <= Number(filterVal)) {
+                                        flag = true;
+                                    }
+                                    break;
+                                case 'equal':
+                                    if (rowVal == Number(filterVal) ) {
+                                        flag = true;
+                                    }
+                                    break;
+                                case 'not_in':
+                                    rangeVal = filterVal.split('~');
+                                    if (Number(rangeVal[0]) > rowVal || Number(rangeVal[1]) < rowVal) {
+                                        flag = true;
+                                    }
+                                    break;
+                            }
+
+                            console.log('row', row);
+                            console.log('flag', flag);
+                            return flag;
+                        });
+                        break;
+                    default:
+                        break;
+                }
+                originalResults = filteredResults;
+            }
+        });
+
+        //console.log('setFilterLocalData.filteredResults', filteredResults);
+
+        this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
+    },
+    /**
      * quick search in available data collection
      * @param value
      */
@@ -655,6 +794,14 @@ var Griddle = React.createClass({
     clearSelectedRows: function() {
         this.setState({selectedRows: []});
     },
+    addRows: function(rows) {
+        var results = this.state.filteredResults || this.state.results;
+        results.push.apply(results, rows);
+        this.setState({ results: results, filteredResults: results });
+    },
+    getRows: function() {
+        return this.state.filteredResults || this.state.results;
+    },
     /**
      * set value header selection
      * @param value
@@ -691,10 +838,8 @@ var Griddle = React.createClass({
             }
         });
 
-        this.setState({
-            initColumns: columns,
-            filteredColumns: newSelectedColumns
-        });
+        //this.setState({ initColumns: [], filteredColumns: [] });
+        this.setState({ initColumns: columns, filteredColumns: newSelectedColumns });
     },
     /**
      * return array init columns

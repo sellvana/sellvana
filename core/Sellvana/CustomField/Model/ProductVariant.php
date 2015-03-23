@@ -20,6 +20,7 @@
  * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  * @property Sellvana_CustomField_Model_FieldOption $Sellvana_CustomField_Model_FieldOption
  * @property Sellvana_CustomField_Model_ProductVariantImage $Sellvana_CustomField_Model_ProductVariantImage
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  */
 class Sellvana_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
 {
@@ -27,7 +28,7 @@ class Sellvana_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_importExportProfile = [
         'related' => ['product_id' => 'Sellvana_Catalog_Model_Product.id'],
-        'unique_key' => ['product_id', 'field_values'],  
+        'unique_key' => ['product_id', 'field_values'],
     ];
 
     /**
@@ -168,4 +169,23 @@ class Sellvana_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
     {
         return $this->load($product, 'product_id');
     }
+
+    public function onAfterLoad()
+    {
+        $priceModel = $this->Sellvana_Catalog_Model_ProductPrice->getVariantPriceModel($this->id());
+        if($priceModel){
+            $this->set('variant_price', $priceModel->getPrice());
+        }
+        parent::onAfterLoad();
+    }
+
+    public function onAfterSave()
+    {
+        $price = $this->get('variant_price');
+        if($price){
+            $this->Sellvana_Catalog_Model_ProductPrice->saveVariantPriceModel($price, $this->id(), $this->get('product_id'));
+        }
+        return parent::onAfterSave();
+    }
+
 }

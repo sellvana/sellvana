@@ -7,7 +7,7 @@
  */
 class Sellvana_MultiSite_Main extends BClass
 {
-    public function beforeBootstrap()
+    public function onBeforeBootstrap()
     {
         if ($this->BConfig->get('install_status') === 'installed') {
             BDb::connect();

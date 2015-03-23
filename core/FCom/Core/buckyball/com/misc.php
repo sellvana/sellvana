@@ -3019,12 +3019,7 @@ class BDebug extends BClass
         $l = static::$_level[static::OUTPUT];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
             echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
-            ob_start();
-            echo htmlspecialchars($message) . "\n";
-            debug_print_backtrace();
-            $output = ob_get_clean();
-            $output = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $output);
-            echo $output;
+            echo static::cleanBacktrace($message);
             echo '</xmp>';
         }
 /*
@@ -3056,6 +3051,18 @@ class BDebug extends BClass
     static public function alert($msg, $stackPop = 0, $backtrace = false)
     {
         return static::trigger(static::ALERT, $msg, $stackPop + 1);
+    }
+
+    static public function cleanBacktrace($textBefore = null)
+    {
+        ob_start();
+        if ($textBefore) {
+            echo htmlspecialchars($textBefore) . "\n";
+        }
+        debug_print_backtrace();
+        $output = ob_get_clean();
+        $output = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $output);
+        return $output;
     }
 
     /**
@@ -3731,11 +3738,11 @@ class BValidate extends BClass
             'message' => 'Invalid string length', // this is default, actual message supplied by callback
         ],
         'numeric'   => [
-            'rule'    => '/^([+-]?)([0-9 ]+)(\.?,?)([0-9]*)$/',
+            'rule'    => 'BValidate::ruleNumeric',
             'message' => 'Invalid number: :field',
         ],
         'integer'   => [
-            'rule'    => '/^[+-]?[0-9]+$/',
+            'rule'    => 'BValidate::ruleInteger',
             'message' => 'Invalid integer: :field',
         ],
         'alphanum'  => [
@@ -3820,10 +3827,10 @@ class BValidate extends BClass
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @throws BException
      */
-    protected function _validateRules($data)
+    protected function _validateRules(array &$data)
     {
         $this->_validateErrors = [];
         foreach ($this->_expandedRules as $r) {
@@ -3857,7 +3864,18 @@ class BValidate extends BClass
 
             }
 
-            if (is_string($result)) {
+
+            if (is_array($result)) {
+                if (array_key_exists('value', $result)) {
+                    $data[$r['field']] = $result['value'];
+                }
+                if (!empty($result['message'])) {
+                    $r['message'] = $result['message'];
+                    $result = false;
+                } else {
+                    $result = true;
+                }
+            } elseif (is_string($result)) {
                 $r['message'] = $result;
                 $result = false;
             }
@@ -3911,7 +3929,7 @@ class BValidate extends BClass
      * @param null  $formName
      * @return bool
      */
-    public function validateInput($data, $rules, $formName = null)
+    public function validateInput(array &$data, $rules, $formName = null)
     {
         $this->_expandRules($rules);
 
@@ -3982,6 +4000,40 @@ class BValidate extends BClass
             return 'The field can not exceed ' . $args['max'] . ' characters: :field';
         }
         return true;
+    }
+
+    /**
+     * @param $data
+     * @param $args
+     * @return bool|array
+     */
+    public function ruleNumeric($data, $args)
+    {
+        if (!isset($data[$args['field']])) {
+            return true;
+        }
+        $value = $data[$args['field']];
+        if ('' === $value) {
+            return ['value' => null];
+        }
+        return is_numeric($value);
+    }
+
+    /**
+     * @param $data
+     * @param $args
+     * @return bool|array
+     */
+    public function ruleInteger($data, $args)
+    {
+        if (!isset($data[$args['field']])) {
+            return true;
+        }
+        $value = $data[$args['field']];
+        if ('' === $value) {
+            return ['value' => null];
+        }
+        return (string)$value == (int)$value;
     }
 
     /**

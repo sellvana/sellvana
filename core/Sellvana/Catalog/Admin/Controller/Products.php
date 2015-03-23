@@ -2,7 +2,8 @@
 
 /**
  * Class Sellvana_Catalog_Admin_Controller_Products
- * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ *
+*@property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
@@ -14,7 +15,8 @@
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
- */
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+*/
 class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -32,15 +34,15 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['type' => 'row_select'],
+            ['type' => 'row_select', 'width' => 55],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
                 'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"'],
             ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
             ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
-            ['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
-            ['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
+            //['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
+            //['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
             ['name' => 'net_weight', 'label' => 'Net Weight',  'width' => 100, 'hidden' => true],
             ['name' => 'ship_weight', 'label' => 'Ship Weight',  'width' => 100, 'hidden' => true],
             ['name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true],
@@ -61,8 +63,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['field' => 'product_name', 'type' => 'text'],
             ['field' => 'product_sku', 'type' => 'text'],
             ['field' => 'short_description', 'type' => 'text'],
-            ['field' => 'base_price', 'type' => 'number-range'],
-            ['field' => 'sale_price', 'type' => 'number-range'],
+            //['field' => 'base_price', 'type' => 'number-range'],
+            //['field' => 'sale_price', 'type' => 'number-range'],
             ['field' => 'net_weight', 'type' => 'number-range'],
             ['field' => 'ship_weight', 'type' => 'number-range'],
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -350,6 +352,29 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     }
 
     /**
+     * //todo: remove after finish griddle
+     * temporary function to build griddle, will be removed after test
+     * @param $model
+     * @return array
+     */
+    public function productImagesGridConfigForGriddle($model)
+    {
+        $config = $this->productImagesGridConfig($model);
+        unset($config['config']['actions']['add']);
+        $config['config']['actions'] += [
+            'add-images' => [
+                'caption'  => 'Add images',
+                'type'     => 'button',
+                'id'       => 'add-image-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'showModalToAddImage'
+            ]
+        ];
+
+        return $config;
+    }
+
+    /**
      * modal grid on category/product tab
      * @param $model Sellvana_Catalog_Model_Product
      * @return array
@@ -431,7 +456,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function linkedProductGridConfig($model, $type)
     {
         $orm = $this->Sellvana_Catalog_Model_Product->orm()->table_alias('p')
-            ->select(['p.id', 'p.product_name', 'p.product_sku', 'p.base_price', 'p.sale_price']);
+            ->select(['p.id', 'p.product_name', 'p.product_sku']);//, 'p.base_price', 'p.sale_price']);
 
         switch ($type) {
         case 'related': case 'similar':case 'cross_sell':
@@ -460,8 +485,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
                     ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
                     ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
-                    ['name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price'],
-                    ['name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price'],
+                    //['name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price'],
+                    //['name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price'],
                     ['name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true], 'type' => 'input'],
                 ],
@@ -512,6 +537,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $this->processMediaPost($model, $data);
                 $this->processInventoryPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
+                $this->processPricesPost($model, $data);
                 // moved to Sellvana_CustomFields
                 #$this->processVariantPost($model, $data);
                 #$this->processCustomFieldPost($model, $data);
@@ -714,7 +740,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             unset($data['inventory']['id'], $data['inventory']['inventory_sku']);
             // save inventory form data
             $data['inventory']['manage_inventory'] = $model->get('manage_inventory');
-            $invModel->set($data['inventory'])->save();
+            if ($invModel->validate($data['inventory'], [], $this->formId())) {
+                $invModel->set($data['inventory'])->save();
+            } else {
+                throw new BException('Cannot save inventory data, please fix above errors');
+            }
         }
     }
 
@@ -927,5 +957,23 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             array_push($args['site_map'], ['loc' => $this->BApp->frontendHref($row->get('url_key')), 'changefreq' => 'daily']);
         };
         $this->Sellvana_Catalog_Model_Product->orm()->select('url_key')->iterate($callback);
+    }
+
+    protected function processPricesPost($model, $data)
+    {
+        if(empty($data['prices']) || empty($data['prices']['productPrice'])){
+            return;
+        }
+
+        foreach ($data['prices']['productPrice'] as $id => $priceData) {
+            $priceData['product_id'] = $model->id();
+            if(is_numeric($id)) {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
+            } else {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
+            }
+            $price->set($priceData)->save();
+        }
+
     }
 }

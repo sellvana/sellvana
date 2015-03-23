@@ -437,7 +437,7 @@ class FCom_Core_Main extends BClass
         return $this;
     }
 
-    public function beforeBootstrap()
+    public function onBeforeBootstrap()
     {
         $this->BLayout->setDefaultViewClass('FCom_Core_View_Base');
     }

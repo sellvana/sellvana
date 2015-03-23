@@ -201,7 +201,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                     id: "modal-" + this.props.id, key: "modal-" + this.props.id, 
                     title: "Product Combination Configuration", onLoad: this.registerModal, onUpdate: this.registerModal}, 
                     React.createElement(ConditionsAttributesModalContent, {baseUrl: this.props.options.base_url, data: this.state.value, 
-                        onLoad: this.registerModalContent, key: "modal-content-" + this.props.id})
+                        onLoad: this.registerModalContent, key: "modal-content-" + this.props.id, promo_type: this.props.options.promo_type})
                 );
 
                 React.render(modal, this.props.modalContainer.get(0));
@@ -418,6 +418,9 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 var fieldCombination = this.refs['combinationField'];
                 var self = this;
                 this.url = this.props.baseUrl + this.props.url;
+                if(this.props.promo_type) {
+                    this.url += "?promo_type=" + encodeURIComponent(this.props.promo_type);
+                }
                 $(fieldCombination.getDOMNode()).select2({
                     placeholder: self.props.labelCombinationField,
                     multiple: false,
@@ -822,6 +825,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                         React.createElement(ConditionsType, {ref: "catProductsType", id: "catProductsType", containerClass: "col-md-3", promoType: promoType, 
                             onChange: this.onChange, value: values.type}, " of products in "), 
                         React.createElement("input", {type: "hidden", id: "catProductsIds", ref: "catProductsIds", defaultValue: categories}), 
+                        React.createElement("select", {id: "catProductInclude", ref: "catProductInclude", className: "to-select2", defaultValue: values.include}, 
+                            React.createElement("option", {value: "only_this"}, Locale._("Only This")), 
+                            React.createElement("option", {value: "include_subcategories"}, Locale._("This and sub categories"))
+                        ), 
                         React.createElement("div", {style: display}, 
                             React.createElement(Common.Compare, {ref: "catProductsCond", id: "catProductsCond", onChange: this.onChange, 
                                 value: values.filter, disabled: disabled})
@@ -892,7 +899,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             onChange: function () {
                 var value = {};
                 value.category_id = $(this.refs['catProductsIds'].getDOMNode()).select2('val');
-                //value.include = $(this.refs['catProductInclude'].getDOMNode()).val();
+                value.include = $(this.refs['catProductInclude'].getDOMNode()).val();
                 if (this.props.options.promo_type !== 'catalog') {
                     value.type = this.refs['catProductsType'].serialize();
                     value.filter = $(this.refs['catProductsCond'].getDOMNode()).val();

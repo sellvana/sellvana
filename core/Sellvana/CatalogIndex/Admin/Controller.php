@@ -77,12 +77,19 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
             $products = [];
             for ($i = 0; $i < 1000; $i++) {
                 ++$maxId;
+                $cost = rand(1, 1000);
+                $basePrice = 'cost+50%';
+                $salePrice = 'base-20%';
+                $tiers = '5:sale-5%;10:sale-10%';
                 $product = $this->Sellvana_Catalog_Model_Product->create([
                     'product_sku' => 'test-' . $maxId,
                     'product_name' => 'Product ' . $maxId,
                     'short_description' => 'Short Description ' . $maxId,
                     'description' => 'Long Description ' . $maxId,
-                    'base_price' => rand(1, 1000),
+                    'price.cost' => $cost,
+                    'price.base' => $basePrice,
+                    'price.sale' => $salePrice,
+                    'price.tiers' => $tiers,
                     'color' => $colors[rand(0, sizeof($colors)-1)],
                     'size' => $sizes[rand(0, sizeof($sizes)-1)],
                 ])->save();

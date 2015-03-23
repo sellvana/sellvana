@@ -24,7 +24,7 @@ class Sellvana_CustomField_Main extends BClass
      * @param $flag
      * @return $this
      */
-    public function disable($flag)
+    public function disable($flag = true)
     {
         $this->_disabled = $flag;
         return $this;
@@ -33,7 +33,7 @@ class Sellvana_CustomField_Main extends BClass
     /**
      * @param $args
      */
-    public function productFindORM($args)
+    public function onProductOrm($args)
     {
         if ($this->_disabled) {
             return;
@@ -48,10 +48,32 @@ class Sellvana_CustomField_Main extends BClass
     }
 
     /**
+     * @param array $args
+     */
+    public function onProductVariantFindAfter($args)
+    {
+        if ($this->_disabled) {
+            return;
+        }
+        $m = $args['result'];
+        if(!$m){
+            return;
+        }
+        if(!is_array($m)){
+            $m = [$m];
+        }
+
+        foreach ($m as $model) {
+            /** @var Sellvana_CustomField_Model_ProductVariant $model */
+            $model->onAfterLoad();
+        }
+    }
+
+    /**
      * @param $args
      * @throws BException
      */
-    public function productAfterSave($args)
+    public function onProductAfterSave($args)
     {
         $p = $args['model'];
         $data = $p->as_array();

@@ -10,9 +10,9 @@
  */
 class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 {
-    public function beforeDispatch()
+    public function onBeforeDispatch()
     {
-        if (!parent::beforeDispatch()) return false;
+        if (!parent::onBeforeDispatch()) return false;
 
         $method = $this->BRequest->method();
         switch ($method) {

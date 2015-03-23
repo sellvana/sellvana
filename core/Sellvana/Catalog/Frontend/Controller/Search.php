@@ -45,6 +45,8 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
             'sort_options'  => $pagerView->sort_options,
             'page_size_options' => $pagerView->page_size_options,
         ]);
+
+        $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($productsData['rows']);
         $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($productsData['rows']);
         $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
@@ -122,6 +124,8 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
             'sort_options'  => $pagerView->sort_options,
             'page_size_options' => $pagerView->page_size_options,
         ]);
+
+        $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($productsData['rows']);
         $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($productsData['rows']);
         $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 

@@ -3,7 +3,8 @@
 /**
  * Model class for table 'fcom_customer'
  * The followings are the available columns in table 'fcom_customer':
- * @property string $id
+ *
+*@property string $id
  * @property string $email
  * @property string $firstname
  * @property string $lastname
@@ -30,7 +31,8 @@
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
  * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
- */
+ * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
+*/
 class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_customer';
@@ -678,5 +680,15 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             }
         }
         return $statistics;
+    }
+
+    public function getCustomerGroupId()
+    {
+        $group = $this->get('customer_group');
+        if(!$group && $this->BModuleRegistry->isLoaded('Sellvana_CustomerGroups')) {
+            $group = $this->Sellvana_CustomerGroups_Model_Group->notLoggedInId();
+            $this->set('customer_group', $group);
+        }
+        return $group;
     }
 }

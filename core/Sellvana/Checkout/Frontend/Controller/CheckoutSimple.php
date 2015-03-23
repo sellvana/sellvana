@@ -17,9 +17,9 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
      */
     protected $_cart;
 
-    public function beforeDispatch()
+    public function onBeforeDispatch()
     {
-        if (!parent::beforeDispatch()) {
+        if (!parent::onBeforeDispatch()) {
             return false;
         }
         if ($this->_action !== 'success') {

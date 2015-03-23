@@ -18,6 +18,7 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
+ * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  */
 class Sellvana_Catalog_Migrate extends BClass
 {
@@ -732,6 +733,86 @@ class Sellvana_Catalog_Migrate extends BClass
             BDb::COLUMNS => [
                 'currency_id' => BDb::DROP,
                 'currency_code' => 'char(3) null',
+            ],
+            BDb::KEYS => [
+                'UNQ_prod_group_qty' => 'DROP',
+                'UNQ_type_prod_group_qty' => 'UNIQUE (product_id, customer_group_id, site_id, currency_code, qty, price_type)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_5__0_3_6()
+    {
+        $tPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
+
+        $tableProductVariant = $this->Sellvana_CustomField_Model_ProductVariant->table();
+        $this->BDb->ddlTableDef($tPrice, [
+            BDb::COLUMNS => [
+                'valid_from' => 'DATE NULL DEFAULT NULL',
+                'valid_to'   => 'DATE NULL DEFAULT NULL',
+                'variant_id' => 'INT(10) UNSIGNED NULL DEFAULT NULL',
+                'operation'  => 'CHAR(3) NULL DEFAULT NULL',
+                'base_field' => 'varchar(20) null'],
+            BDb::CONSTRAINTS => [
+                'variant' => ['variant_id', $tableProductVariant],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_6__0_3_7()
+    {
+        $tPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
+        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
+
+        $selectSql = "SELECT p.id, p.cost, p.msrp, p.map, p.base_price, p.sale_price FROM `$tProduct` p";
+
+        $insertSql = "INSERT INTO $tPrice (product_id, price, price_type) VALUE(?, ?, ?)";
+
+        $conn = $this->BDb->connect();
+        $insStmt = $conn->prepare($insertSql);
+        $rows = $conn->query($selectSql);
+        $all = $rows->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($all as $price) {
+            $prId = $price['id'];
+            foreach ($price as $k => $v) {
+                if('id' === $k || empty($v)){
+                    continue;
+                }
+                switch ($k) {
+                    case 'base_price':
+                        $type = 'base';
+                        break;
+                    case 'sale_price':
+                        $type = 'sale';
+                        break;
+                    default :
+                        $type = $k;
+                        break;
+                }
+
+                $insStmt->execute([$prId, $v, $type]);
+            }
+        }
+
+        $this->BDb->ddlTableDef($tProduct, [
+            BDb::COLUMNS => [
+                'cost'       => 'DROP',
+                'msrp'       => 'DROP',
+                'map'        => 'DROP',
+                'markup'     => 'DROP',
+                'base_price' => 'DROP',
+                'sale_price' => 'DROP',
+            ]
+        ]);
+    }
+
+    public function upgrade__0_3_7__0_3_8()
+    {
+        $tPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
+        $this->BDb->ddlTableDef($tPrice, [
+            BDb::COLUMNS => [
+                'price' => 'RENAME amount decimal(12,2) not null default 0',
+                'data_serialized' => 'text default null',
             ],
         ]);
     }
