@@ -5,6 +5,13 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
     var PricesApp = React.createClass({displayName: "PricesApp",
         render: function () {
             var childProps = _.omit(this.props, ['prices', 'deleted','validatePrices', 'title']);
+            var baseFound = false;
+            var priceOptions = {};
+            _.each(this.props.price_types, function (op, k) {
+                if(k !== 'promo') {
+                    priceOptions[k] = op;
+                }
+            });
             return (
                 React.createElement("div", {id: "prices"}, 
                     React.createElement("h4", null, this.props.title), 
@@ -49,7 +56,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             React.createElement("td", null, 
                                 React.createElement("select", {id: "price-types", className: "form-control to-select2", ref: "price-types"}, 
                                     React.createElement("option", {value: "-1"}, Locale._("Add Price ...")), 
-                                    _.map(this.props.price_types, function (pt, pk) {
+                                    _.map(priceOptions, function (pt, pk) {
                                         return React.createElement("option", {key: pk, value: pk, 
                                                        disabled: pk == 'promo' ? 'disabled' : null}, pt)
                                     })
@@ -70,8 +77,15 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                 return React.createElement("span", {key: 'empty' + price.id});
                             }
 
-                            return React.createElement(PriceItem, React.__spread({data: price},  childProps, {key: price['id'], 
-                                              validate: this.props.validatePrices}))
+                            var theBase = false;
+                            if(!baseFound) {
+                                // if price type is base and site, currency and group are null, this is The base price?!
+                                theBase = baseFound = (price['price_type'] == 'base') && (price['customer_group_id'] === null)
+                                    && (price['site_id'] === null) && (price['currency_code'] === null);
+                            }
+
+                            return React.createElement(PriceItem, React.__spread({data: price},  childProps, {key: price['id'], priceOptions: priceOptions, 
+                                              validate: this.props.validatePrices, theBase: theBase}))
                         }.bind(this))
                         )
                     )
@@ -111,16 +125,26 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
 
     var PriceItem = React.createClass({displayName: "PriceItem",
         editable: true,
+        checkEditable: function (price) {
+            var editable = true;
+            if (editable) {
+                editable = (this.props.editable_prices.indexOf(price['price_type']) != -1);
+            }
+            if (editable) {
+                editable = !(this.props.theBase === true);
+            }
+            return editable;
+        },
         render: function () {
             var price = this.props.data;
-            this.editable = (this.props.editable_prices.indexOf(price['price_type']) != -1);
+            this.editable = this.checkEditable(price);
             var priceTypes = React.createElement("span", {key: "price_type"}, this.props.price_types[price['price_type']]);
             if(this.editable) {
                 priceTypes =
                     React.createElement("select", {key: "price_type", className: "to-select2 form-control priceUnique", 
                         name: this.getFieldName(price, 'price_type'), 
                         defaultValue: price['price_type'], ref: "price_type"}, 
-                            _.map(this.props.price_types, function (pt, pk) {
+                            _.map(this.props.priceOptions, function (pt, pk) {
                                 return React.createElement("option", {key: pk, value: pk, disabled: pk == 'promo' ? 'disabled' : null}, pt)
                             })
                     );
@@ -151,7 +175,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 if(price['operation'] && price['operation'] !== "=$") {
                     baseField =
                         React.createElement("select", {ref: "base_fields", key: "base_fields", name: this.getFieldName(price, 'base_field'), 
-                            defaultValue: price['base_field'], className: "base_field to-select2"}, 
+                            defaultValue: price['base_field'], className: "base_field to-select2", 
+                                disabled: this.editable || this.props.theBase ? null: true}, 
                             this.props.priceRelationOptions[price['price_type']].map(function (p) {
                                 return React.createElement("option", {key: p.value, value: p.value}, p.label)
                             })
@@ -162,10 +187,10 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             return (
                 React.createElement("tr", {className: "price-item"}, 
                     React.createElement("td", null, 
-                        React.createElement("a", {href: "#", className: "btn-remove", "data-id": price.id, 
+                        this.editable? React.createElement("a", {href: "#", className: "btn-remove", "data-id": price.id, 
                            id: "remove_price_btn_" + price.id}, 
                             React.createElement("span", {className: "icon-remove-sign"})
-                        ), 
+                        ): null, 
                          price['product_id'] && price['product_id'] !== "*" ?
                             React.createElement("input", {type: "hidden", name: this.getFieldName(price, "product_id"), 
                                    defaultValue: price['product_id']}) : null
@@ -203,7 +228,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     ), 
                     React.createElement("td", null, 
                         React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"), 
-                               defaultValue: price['amount'], readOnly: this.editable ? null: 'readonly'})
+                               defaultValue: price['amount'], readOnly: this.editable || this.props.theBase ? null: 'readonly'})
                     ), 
                     React.createElement("td", null, 
                          operation? {operation:operation} : null, 
