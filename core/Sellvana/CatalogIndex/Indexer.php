@@ -193,7 +193,7 @@ class Sellvana_CatalogIndex_Indexer extends BClass
             $row = ['id' => $pId, 'last_indexed' => $now];
 
             foreach ($sortColumn as $fName => $field) {
-                $row['sort_' . $fName] = $pData[$fName];
+                $row['sort_' . $fName] = substr((string)$pData[$fName], 0, 50);
             }
 
             $docHlp->create($row)->save();
