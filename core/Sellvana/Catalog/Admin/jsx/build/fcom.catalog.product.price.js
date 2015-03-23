@@ -16,7 +16,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             this.props.show_sites? React.createElement("th", null, Locale._("Site")): null, 
                             this.props.show_currency? React.createElement("th", null, Locale._("Currency")): null, 
                             React.createElement("th", null, Locale._("Price Type")), 
-                            React.createElement("th", null, Locale._("Price")), 
+                            React.createElement("th", null, Locale._("Amount")), 
                             React.createElement("th", null, Locale._("")), 
                             React.createElement("th", null, Locale._(""))
                         ), 
@@ -202,8 +202,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         priceTypes
                     ), 
                     React.createElement("td", null, 
-                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "price"), 
-                               defaultValue: price['price'], readOnly: this.editable ? null: 'readonly'})
+                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"), 
+                               defaultValue: price['amount'], readOnly: this.editable ? null: 'readonly'})
                     ), 
                     React.createElement("td", null, 
                          operation? {operation:operation} : null, 
@@ -369,7 +369,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     customer_group_id: this.options.filter_customer_group_value || null,
                     site_id: this.options.filter_site_value || null,
                     currency_code: this.options.filter_currency_value || null,
-                    price: 0.0,
+                    amount: 0.0,
                     qty: 1
                 };
                 if(!this.options.prices) {

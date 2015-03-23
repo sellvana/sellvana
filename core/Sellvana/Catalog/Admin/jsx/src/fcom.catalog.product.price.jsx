@@ -16,7 +16,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             {this.props.show_sites? <th>{Locale._("Site")}</th>: null}
                             {this.props.show_currency? <th>{Locale._("Currency")}</th>: null}
                             <th>{Locale._("Price Type")}</th>
-                            <th>{Locale._("Price")}</th>
+                            <th>{Locale._("Amount")}</th>
                             <th>{Locale._("")}</th>
                             <th>{Locale._("")}</th>
                         </tr>
@@ -202,8 +202,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         {priceTypes}
                     </td>
                     <td>
-                        <input type="text" className="form-control" name={this.getFieldName(price, "price")}
-                               defaultValue={price['price']} readOnly={this.editable ? null: 'readonly'}/>
+                        <input type="text" className="form-control" name={this.getFieldName(price, "amount")}
+                               defaultValue={price['amount']} readOnly={this.editable ? null: 'readonly'}/>
                     </td>
                     <td>
                         { operation? {operation} : null }
@@ -369,7 +369,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     customer_group_id: this.options.filter_customer_group_value || null,
                     site_id: this.options.filter_site_value || null,
                     currency_code: this.options.filter_currency_value || null,
-                    price: 0.0,
+                    amount: 0.0,
                     qty: 1
                 };
                 if(!this.options.prices) {

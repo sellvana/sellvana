@@ -43,7 +43,8 @@ class Sellvana_Catalog_Model_ProductPrice
         'price_relation_options' => [
             "base" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'msrp', 'label' => 'MSRP']],
             "cost" => [['value' => 'base', 'label' => 'Base price']],
-            "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base price']]
+            "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base price']],
+            "tier" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base price']]
         ],
         'operation_options' => [
             ['value' => '=$', 'label' => "Fixed price"],
