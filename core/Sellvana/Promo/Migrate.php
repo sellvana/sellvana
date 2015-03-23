@@ -22,7 +22,7 @@
  */
 class Sellvana_Promo_Migrate extends BClass
 {
-    public function install__0_2_1()
+    public function install__0_2_2()
     {
         $tAdminUser     = $this->FCom_Admin_Model_User->table();
         $tCustomer      = $this->Sellvana_Customer_Model_Customer->table();
@@ -98,26 +98,6 @@ class Sellvana_Promo_Migrate extends BClass
                 'promo_status'  => "char(1) not null default 'A'",
             ],
             BDb::PRIMARY => '(id)',
-        ]);
-
-        $this->BDb->ddlTableDef($tPromoProduct, [
-            BDb::COLUMNS => [
-                'id'              => 'int unsigned not null auto_increment',
-                'promo_id'        => 'int unsigned not null',
-                'product_id'      => 'int unsigned not null',
-                'calc_status'     => 'tinyint not null default 0',
-                'data_serialized' => 'text',
-                'create_at'       => 'datetime',
-                'update_at'       => 'datetime',
-            ],
-            BDb::PRIMARY => '(id)',
-            BDb::KEYS => [
-                'IDX_calc_status' => '(calc_status)',
-            ],
-            BDb::CONSTRAINTS => [
-                'promo'   => ['promo_id', $tPromo],
-                'product' => ['product_id', $tProduct],
-            ],
         ]);
 
         $this->BDb->ddlTableDef($tPromoCoupon, [
@@ -253,6 +233,27 @@ class Sellvana_Promo_Migrate extends BClass
             ],
         ]);
 
+        /*
+        $this->BDb->ddlTableDef($tPromoProduct, [
+            BDb::COLUMNS => [
+                'id'              => 'int unsigned not null auto_increment',
+                'promo_id'        => 'int unsigned not null',
+                'product_id'      => 'int unsigned not null',
+                'calc_status'     => 'tinyint not null default 0',
+                'data_serialized' => 'text',
+                'create_at'       => 'datetime',
+                'update_at'       => 'datetime',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_calc_status' => '(calc_status)',
+            ],
+            BDb::CONSTRAINTS => [
+                'promo'   => ['promo_id', $tPromo],
+                'product' => ['product_id', $tProduct],
+            ],
+        ]);
+
         $this->BDb->ddlTableDef($tPromoProductPrice, [
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
@@ -272,6 +273,16 @@ class Sellvana_Promo_Migrate extends BClass
                 'product_price' => ['product_price_id', $tProductPrice],
                 'promo_product' => ['promo_product_id', $tPromoProduct, 'id', 'CASCADE', 'SET NULL'],
             ],
+        ]);
+        */
+
+        $this->BDb->ddlTableDef($tProductPrice, [
+            BDb::COLUMNS => [
+                'promo_id' => 'int unsigned default null',
+            ],
+            BDb::CONSTRAINTS => [
+                'promo' => ['promo_id', $tPromo],
+            ]
         ]);
     }
 
@@ -654,6 +665,22 @@ class Sellvana_Promo_Migrate extends BClass
             ],
         ]);
         */
+    }
+
+
+    public function upgrade__0_2_1__0_2_2()
+    {
+        $tProductPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
+        $tPromo = $this->Sellvana_Promo_Model_Promo->table();
+
+        $this->BDb->ddlTableDef($tProductPrice, [
+            BDb::COLUMNS => [
+                'promo_id' => 'int unsigned default null',
+            ],
+            BDb::CONSTRAINTS => [
+                'promo' => ['promo_id', $tPromo],
+            ]
+        ]);
     }
 }
 /*
