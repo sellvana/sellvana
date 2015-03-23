@@ -351,6 +351,7 @@ var Griddle = React.createClass({
                 that.setMaxPage();
             });
         }
+        this.triggerCallback('componentDidMount');
     },
 
     getDataForRender: function(data, cols, pageList){
@@ -704,8 +705,6 @@ var Griddle = React.createClass({
                                     break;
                             }
 
-                            console.log('row', row);
-                            console.log('flag', flag);
                             return flag;
                         });
                         break;
@@ -799,9 +798,12 @@ var Griddle = React.createClass({
         this.setState({selectedRows: []});
     },
     addRows: function(rows) {
+        console.log('addRows');
         var results = this.state.filteredResults || this.state.results;
         results.push.apply(results, rows);
-        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) });
+        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) }, function() {
+            $(this.getDOMNode()).trigger('addedRows.griddle', [rows, this]);
+        });
     },
     removeRows: function(rows) {
         var results = this.state.filteredResults || this.state.results;
@@ -815,7 +817,9 @@ var Griddle = React.createClass({
                 return !_.contains(deleteIds, row.id);
             });
         }
-        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results), selectedRows: selectedRows });
+        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results), selectedRows: selectedRows }, function() {
+            $(this.getDOMNode()).trigger('removedRows.griddle', [rows, this]);
+        });
     },
     getRows: function() {
         return this.state.filteredResults || this.state.results;
@@ -868,6 +872,16 @@ var Griddle = React.createClass({
     },
     getCurrentGrid: function() {
         return this;
+    },
+    triggerCallback: function(name) {
+        var callbacks = this.getConfig('callbacks');
+        if (callbacks && typeof callbacks[name] !== 'undefined') {
+            var callbackFuncName = callbacks[name];
+            if (typeof window[callbackFuncName] === 'function') {
+                console.log('triggerCallback:'+name);
+                return window[callbackFuncName](this);
+            }
+        }
     }
 });
 
