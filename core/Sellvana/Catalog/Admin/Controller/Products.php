@@ -27,6 +27,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     protected $_mainTableAlias = 'p';
     protected $_permission = 'catalog/products';
 
+	//config to use react griddle
+	/*protected $_gridPageViewName = 'admin/griddle';
+	protected $_gridViewName = 'core/griddle';
+	protected $_useDefaultLayout = false;*/
+
     /**
      * @return array
      */
@@ -370,6 +375,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'callback' => 'showModalToAddImage'
             ]
         ];
+
+	    $config['config']['callbacks'] = [
+		    'componentDidMount' => 'setProductImagesMainGrid'
+	    ];
 
         return $config;
     }
