@@ -1266,10 +1266,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $price = min($price, $salePriceModel->getPrice());
         }
 
-        $promoPriceModel = $this->getPriceModelByType('promo', $context);
-        if ($promoPriceModel && $promoPriceModel->isValid()) {
-            $price = min($price, $promoPriceModel->getPrice());
-        }
+        $this->BEvents->fire(__METHOD__, ['product' => $this, 'context' => $context, 'price' => &$price]);
 
         return $price;
     }

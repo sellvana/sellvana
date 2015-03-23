@@ -1,6 +1,6 @@
 modules:
     Sellvana_Promo:
-        version: 0.2.1
+        version: 0.2.2
         channel: beta
         require: { module: { Sellvana_Catalog: 0.1.0, Sellvana_Sales: 0.2.0 }}
         description: "Promotions module"
@@ -8,6 +8,7 @@ modules:
         observe:
             - [ Sellvana_Sales_Workflow_Cart::customerAddsCouponCode, Sellvana_Promo_Main.onWorkflowCustomerAddsCouponCode ]
             - [ Sellvana_Sales_Model_Cart_Total_Discount::calculate, Sellvana_Promo_Main.onCartDiscountCalculate ]
+            - [ Sellvana_Catalog_Model_Product::getCatalogPrice, Sellvana_Promo_Main.onProductGetCatalogPrice ]
 
         auto_use: [ bootstrap, views, layout ]
 

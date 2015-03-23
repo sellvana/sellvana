@@ -805,4 +805,15 @@ class Sellvana_Catalog_Migrate extends BClass
             ]
         ]);
     }
+
+    public function upgrade__0_3_7__0_3_8()
+    {
+        $tPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
+        $this->BDb->ddlTableDef($tPrice, [
+            BDb::COLUMNS => [
+                'price' => 'RENAME amount decimal(12,2) not null default 0',
+                'data_serialized' => 'text default null',
+            ],
+        ]);
+    }
 }

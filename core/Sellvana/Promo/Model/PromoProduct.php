@@ -17,6 +17,9 @@
  * @property Sellvana_Promo_Main $Sellvana_Promo_Main
  * @property Sellvana_Promo_Model_Promo $Sellvana_Promo_Model_Promo
  * @property Sellvana_Promo_Model_PromoProductPrice $Sellvana_Promo_Model_PromoProductPrice
+ * @property Sellvana_CustomField_Main $Sellvana_CustomField_Main
+ *
+ * @deprecated by ProductPrice - delete after testing
  */
 class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
 {
@@ -97,7 +100,10 @@ class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
 
     public function updatePromoProducts(Sellvana_Promo_Model_Promo $promo, array $data)
     {
-        $existing = $this->orm('pp')->where('promo_id', $promo->id())->find_many_assoc('product_id');
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        /** @var Sellvana_Catalog_Model_ProductPrice[] $existing */
+        $existing = $priceHlp->orm('pp') #$this
+            ->where('promo_id', $promo->id())->find_many_assoc('product_id');
         $ppIdsToDelete = [];
         /** @var Sellvana_Promo_Model_PromoProduct $epp */
         $promoId = $promo->id();
@@ -107,7 +113,7 @@ class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
             }
         }
         if ($ppIdsToDelete) {
-            $this->delete_many(['id' => $ppIdsToDelete]);
+            $priceHlp->delete_many(['id' => $ppIdsToDelete]); #$this
         }
         $ppsToCreate = [];
         $actions = $promo->getData('actions/rules/discount');
@@ -115,10 +121,11 @@ class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
         $sortOrder = $promo->get('priority_order');
 
         foreach ($data['products'] as $pId => $r) {
-            $r['sort_order'] = $sortOrder;
-            $r['action_amount'] = $action['value'];
-            $r['action_op'] = $action['type'] === 'pcnt' ? '-%' : '-$';
+            $r['qty'] = $sortOrder;
+            $r['amount'] = $action['value'];
+            $r['operation'] = $action['type'] === 'pcnt' ? '-%' : '-$';
             if (empty($existing[$pId])) {
+                $r['price_type'] = $r['calc_status'] ? 'promo' : 'promo-pending';
                 $r['product_id'] = $pId;
                 $r['promo_id'] = $promoId;
                 $r['data_serialized'] = !empty($r['data']) ? $this->BUtil->toJson($r['data']) : '';
@@ -134,7 +141,7 @@ class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
         }
         if ($ppsToCreate) {
             //echo "<pre>"; var_dump($ppsToCreate); exit;
-            $this->create_many($ppsToCreate);
+            $priceHlp->create_many($ppsToCreate); #$this
             //TODO: run onAfterCreate?
         }
         return $this;
@@ -142,7 +149,8 @@ class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
 
     public function confirmCombinations(array $where = null, $limit = self::MAX_PRICES_PER_RUN)
     {
-        $ppsOrm = $this->orm('pp')->where('calc_status', static::STATUS_PENDING);
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        $ppsOrm = $priceHlp->orm('pp')->where('price_type', 'promo-pending');
         if ($where) {
             $ppsOrm->where($where);
         }
@@ -161,16 +169,18 @@ class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
         }
         $products = $this->Sellvana_Catalog_Model_Product->orm('p')
             ->where_in('id', array_values($pIds))->find_many_assoc('id');
+        $priceHlp->collectProductsPrices($products);
         $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($products);
         $hlp = $this->Sellvana_Promo_Main;
         $ppIdsToDelete = [];
 
-        /** @var Sellvana_Promo_Model_PromoProduct $pp */
+        /** @var Sellvana_Catalog_Model_ProductPrice $pp */
         foreach ($pps as $pp) {
             $product = $products[$pp->get('product_id')];
+            $conditions = $pp->getData('conditions');
             $matchAny = $pp->getData('match_type') === Sellvana_Promo_Model_Promo::MATCH_ANY;
             $match = $matchAny ? false : true;
-            foreach ($pp->getData('conditions') as $idx => $condition) {
+            foreach ($conditions as $idx => $condition) {
                 $validated = $hlp->validateProductConditionCombination($product, $condition);
                 if ($validated && $matchAny) {
                     $match = true;
@@ -181,7 +191,7 @@ class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
                 }
             }
             if ($match) {
-                $pp->set('calc_status', static::STATUS_CONFIRMED)->save();
+                $pp->set('price_type', 'promo')->save();
             } else {
                 $ppIdsToDelete[] = $pp->id();
             }
@@ -189,64 +199,6 @@ class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
         if ($ppIdsToDelete) {
             $this->delete_many(['id' => $ppIdsToDelete]);
         }
-    }
-
-    public function calcPromoProductPrices(array $where = null, $limit = self::MAX_PRICES_PER_RUN)
-    {
-        $ppsOrm = $this->orm('pp')->where('calc_status', static::STATUS_CONFIRMED)->select('pp.*');
-        if ($where) {
-            $ppsOrm->where($where);
-        }
-        if ($limit) {
-            $ppsOrm->limit($limit);
-        }
-        $pps = $ppsOrm->find_many_assoc('id');
-
-        $promoIds = [];
-        foreach ($pps as $pp) {
-            $promoIds[$pp->get('promo_id')] = 1;
-        }
-        $promos = $this->Sellvana_Promo_Model_Promo->orm('p')->where_in('id', $promoIds)->find_many_assoc('id');
-
-        $prices = [];
-        foreach ($pps as $pp) {
-            $prodId = $pp->get('product_id');
-            $promoId = $pp->get('promo_id');
-            $actions = $promos[$promoId]->getData('actions/rules/discount');
-            $action = $actions[0];
-            if (empty($prices[$prodId])) {
-               # $prices[$prodId] = ['price' => 0, 'op' => ];
-            }
-
-            #$prices[$prodId] = min();
-
-        }
-    }
-
-    public function updatePromoProductPrices(array $where = null, $limit = self::MAX_PRICES_PER_RUN)
-    {
-        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
-        $promoPriceHlp = $this->Sellvana_Promo_Model_PromoProductPrice;
-
-        $existingPricesOrm = $priceHlp->orm('pp')->where('price_type', 'promo')
-            ->join('Sellvana_Promo_Model_PromoProductPrice', ['ppp.product_price_id', '=', 'pp.id'], 'ppp');
-
-        $pricesToDeleteOrm = clone $existingPricesOrm;
-        $pricesToDelete = $pricesToDeleteOrm->where_not_in('promo_product_id', array_keys($pps))
-            ->find_many_assoc('id', 'id');
-        $priceHlp->delete_many(['id' => array_keys($pricesToDelete)]);
-
-        $existingPrices = $existingPricesOrm->find_many();
-
-        foreach ($pps as $pp) {
-
-        }
-
-    }
-
-    public function upgradeProductPrices()
-    {
-
     }
 
     protected function _calcPromoProductsBySku(array $condition, array $context, array &$result)

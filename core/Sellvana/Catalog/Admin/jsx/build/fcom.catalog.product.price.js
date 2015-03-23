@@ -59,7 +59,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
 
             var qty = React.createElement("input", {key: "qty", type: "hidden", name: this.getFieldName(price, "qty"), defaultValue: price['qty']});
             if (price['price_type'] === 'tier') {
-                qty = React.createElement("input", {key: "qty", type: "text", className: "form-control priceUnique", name: this.getFieldName(price, "qty"), placeholder: Locale._("Amount"), 
+                qty = React.createElement("input", {key: "qty", type: "text", className: "form-control priceUnique", name: this.getFieldName(price, "qty"), placeholder: Locale._("Qty"),
                              defaultValue: price['qty'], onChange: this.props.validate, readOnly: this.editable ? null : 'readonly'});
             }
 
@@ -139,8 +139,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     ): null, 
 
                     React.createElement("div", {style: divStyle}, 
-                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "price"), 
-                               defaultValue: price['price'], readOnly: this.editable ? null: 'readonly'})
+                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"),
+                               defaultValue: price['amount'], readOnly: this.editable ? null: 'readonly'})
                     ), 
                     React.createElement("div", {style: divStyle}, 
                         [qty, dateRange]
@@ -309,7 +309,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         customer_group_id: this.options.filter_customer_group_value || null,
                         site_id: this.options.filter_site_value || null,
                         currency_code: this.options.filter_currency_value || null,
-                        price: 0.0,
+                        amount: 0.0,
                         qty: 1
                     };
                     if(!this.options.prices) {

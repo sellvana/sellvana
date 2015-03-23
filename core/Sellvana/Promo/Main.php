@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Promo_Model_Promo $Sellvana_Promo_Model_Promo
  * @property Sellvana_Promo_Model_PromoCart $Sellvana_Promo_Model_PromoCart
+ * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  */
 class Sellvana_Promo_Main extends BClass
 {
@@ -72,6 +73,29 @@ class Sellvana_Promo_Main extends BClass
         }
 
         $hlp->applyActions($cart, $result);
+    }
+
+    public function onProductGetCatalogPrice($args)
+    {
+        /** @var Sellvana_Catalog_Model_Product $product */
+        $product = $args['product'];
+        $context = $args['context'];
+        $price = $args['price'];
+
+        /** @var Sellvana_Catalog_Model_ProductPrice[] $promoPriceModels */
+        $promoPriceModels = $product->getPriceModelByType('promo', $context);
+        if ($promoPriceModels) {
+            foreach ($promoPriceModels as $pm) {
+                if (!$pm->isValid()) {
+                    continue;
+                }
+                $price = $pm->getPrice($price);
+                if ($pm->getData('stop_flag')) {
+                    break;
+                }
+            }
+            $args['price'] = $price;
+        }
     }
 
     public function onCatalogDiscountCalculate($args)

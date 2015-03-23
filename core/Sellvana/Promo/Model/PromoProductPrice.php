@@ -4,6 +4,7 @@
  * Class Sellvana_Promo_Model_PromoProductPrice
  *
  * Required mostly to associate product price rows with promotions, to remove when not valid anymore
+ * @deprecated by ProductPrice - delete after testing
  */
 class Sellvana_Promo_Model_PromoProductPrice extends FCom_Core_Model_Abstract
 {

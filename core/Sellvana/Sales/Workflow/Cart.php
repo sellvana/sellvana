@@ -278,13 +278,14 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 } else {
                     $totalQty = $arrQty;
                 }
+                $product = $item->getProduct();
                 if ($totalQty > 0) {
                     $item->set('qty', $totalQty)->setData('variants', $variants)->save();
-                    $items[] = ['id' => $id, 'status' => 'updated', 'name' => $item->getProduct()->get('product_name')];
+                    $items[] = ['id' => $id, 'status' => 'updated', 'name' => $product ? $product->get('product_name') : ''];
                 } elseif ($totalQty <= 0 || empty($variants)) {
                     $item->delete();
                     unset($cartItems[$id]);
-                    $items[] = ['id' => $id, 'status' => 'deleted', 'name' => $item->getProduct()->get('product_name')];
+                    $items[] = ['id' => $id, 'status' => 'deleted', 'name' => $product ? $product->get('product_name') : ''];
                 }
             }
         }

@@ -32,31 +32,16 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
             }
             */
             $product = $item->getProduct();
-            $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-            if ($customer) {
-                $customerGroup = $customer->getCustomerGroupId();
-            } else {
-                $customerGroup = $this->Sellvana_CustomerGroups_Model_Group->notLoggedInId();
-            }
-            // todo , load site currency, load site id
-            $site = null;
-            $currency = null;
-            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
-                $site = $this->Sellvana_MultiSite_Main->getCurrentSiteData();
-            }
-            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
-                $currency = $this->Sellvana_MultiCurrency_Main->getCurrentCurrency();
-            }
-            $productPrices = $product->getAllPrices($item->getQty(), $customerGroup, $site['id'], $currency, $this->BDb->now());
-            //$itemPrice = $item->get('price');
-            if($item->get('custom_price')){
+            if ($item->get('custom_price')) {
                 $itemPrice = $item->get('custom_price');
-            } else {
+            } elseif ($product) {
                 $itemPrice = $product->getCatalogPrice();
                 $tierPrice = $product->getTierPrice($item->getQty());
                 if ($tierPrice) {
                     $itemPrice = min($itemPrice, $tierPrice);
                 }
+            } else {
+                $itemPrice = 0;
             }
 
             if ($item->get('variant')) {
