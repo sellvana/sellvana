@@ -138,7 +138,7 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
      */
     public function postGridConfig($model, $related = true)
     {
-        $orm = $this->Sellvana_Blog_Model_Post->orm()->table_alias('p')
+        $orm = $this->Sellvana_Blog_Model_Post->orm('p')
             ->select(['p.id', 'p.author_user_id', 'p.status', 'p.title']);
         $orm->join('FCom_Admin_Model_User', ['p.author_user_id', '=', 'u.id'], 'u')
             ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');

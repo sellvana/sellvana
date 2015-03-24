@@ -10,6 +10,7 @@
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
  * @property Sellvana_CustomField_Main $Sellvana_CustomField_Main
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  */
 class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
@@ -168,4 +169,33 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
         echo 'DONE';
     }
 
+    public function action_test2()
+    {
+        $this->BResponse->startLongResponse();
+        BORM::configure('logging', 0);
+        $this->BConfig->set('db/logging', 0);
+
+        /** @var Sellvana_Catalog_Model_Product[] $products */
+        $products = $this->Sellvana_Catalog_Model_Product->orm()->find_many();
+        $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($products);
+        $this->Sellvana_CatalogIndex_Main->autoReindex(false);
+
+        echo "<pre>START: " . memory_get_usage();
+        foreach ($products as $p) {
+            $p->set([
+                'price.cost' => rand(1, 1000),
+                'price.base' => 'cost+50%',
+                'price.sale' => 'base-20%',
+                'price.tiers' => '5:sale-5%;10:sale-10%',
+            ])->save();
+            echo '<hr>' . $p->id() . ': ' . memory_get_usage();
+        }
+
+        echo '<hr>Indexing... ' . memory_get_usage() . '<br>';
+        //$this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
+        $this->Sellvana_CatalogIndex_Indexer->indexProducts(true);
+        $this->Sellvana_CatalogIndex_Indexer->indexGC();
+        echo '<hr>ALL DONE... ' . memory_get_usage() . '</pre>';
+        exit;
+    }
 }

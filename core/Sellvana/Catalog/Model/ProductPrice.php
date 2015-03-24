@@ -359,7 +359,7 @@ class Sellvana_Catalog_Model_ProductPrice
                     ->where_null('site_id')->where_null('customer_group_id')->where_null('currency_code')
                     ->find_one();
                 if ($priceModel) {
-                    if (false === $v) {
+                    if (false === $v || '-' === $v) {
                         $priceModel->delete();
                         continue;
                     }
