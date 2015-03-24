@@ -798,7 +798,6 @@ var Griddle = React.createClass({displayName: "Griddle",
         this.setState({selectedRows: []});
     },
     addRows: function(rows) {
-        console.log('addRows');
         var results = this.state.filteredResults || this.state.results;
         results.push.apply(results, rows);
         this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) }, function() {

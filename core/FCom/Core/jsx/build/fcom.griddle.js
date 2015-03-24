@@ -400,8 +400,6 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                         var selectedRows = this.props.getSelectedRows();
                         if (selectedRows.length && this.props.removeRows != null) {
                             this.props.removeRows(selectedRows);
-                            var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
-                            $('#product_ids_remove').val(ids);
                         }
                     }
                     break;
@@ -575,8 +573,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                             "Columns ", React.createElement("b", {className: "caret"})
                         ), 
                         React.createElement("div", {id: "column-settings", style: styleColumnSettings}, 
-                            React.createElement("ol", {className: "dd-list dropdown-menu columns ui-sortable", style: {minWidth: '200px'}}
-
+                            React.createElement("ol", {className: "dd-list dropdown-menu columns ui-sortable", style: {minWidth: '200px'}}, 
+                                options
                             )
                         )
                     ), 

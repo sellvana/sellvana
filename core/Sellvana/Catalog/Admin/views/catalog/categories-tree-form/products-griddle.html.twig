@@ -8,12 +8,27 @@
 {% set allProductConfig = prodCtrl.getAllProdConfigForGriddle(m) %}
 {% set prodAttachConfigCompiled = THIS.view('core/griddle').set('grid', allProductConfig).getGridConfig() %}
 
-{{ THIS.view('core/griddle').set('grid', catProductConfig) | raw }}
-
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
         var mainGridId = '{{ catProductConfig.config.id }}';
-        var mainGrid, attachGrid, removedIds = [], addedIds = [];
+        var mainGrid, attachGrid;
+        function inArray(needle, haystack) {
+            var length = haystack.length;
+            for(var i = 0; i < length; i++) {
+                if(haystack[i] == needle)
+                    return true;
+            }
+            return false;
+        }
+        function calcAddRemoveRows(rows, ids) {
+            var temp = [];
+            rows.forEach(function(row) {
+                if (inArray(row.id, ids) !== false) {
+                    temp.push(row.id);
+                }
+            });
+            return temp;
+        }
         window.showModalToAddProduct = function(grid) {
             mainGrid = grid;
             mainGridId = '{{ prodImagesConfig.config.id }}';
@@ -46,7 +61,6 @@
             }
         };
         window.addSelectedProduct = function(modal) {
-            console.log(mainGrid);
             var selectedRows = attachGrid.getSelectedRows();
             if (selectedRows.length) {
                 var addRows = [];
@@ -58,16 +72,45 @@
 
                     if (addRows.length) {
                         mainGrid.addRows(addRows);
-                        addedIds = _.pluck(addRows, 'id');
-                        $('#product_ids_add').val(addedIds.join(','));
                     }
                 });
-
-
                 modal.close();
             } else {
                 alert('please choose at least one product');
             }
+        };
+        window.setCatProdMainGrid = function(grid) {
+            mainGrid = grid;
+            var addedIds = [], removedIds = [];
+            var countDiffAddIds = 0, countDiffRemoveIds = 0;
+            originIds = _.pluck(grid.getRows(), 'id');
+
+            $(mainGrid.getDOMNode()).
+                    on('removedRows.griddle', function (e, removedRows, grid) {
+                        removedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffRemoveIds = _.difference(originIds, removedIds);
+                        $('#product_ids_remove').val(diffRemoveIds.join(','));
+
+                        var arrCurrentAddedIds = $('#product_ids_add').val().split(',');
+                        if (!_.isEmpty(arrCurrentAddedIds)) {
+                            temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                            $('#product_ids_add').val(temp.join(','));
+                        }
+                    })
+                    .on('addedRows.griddle', function(e, addedRows, grid) {
+                        addedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffAddIds = _.difference(addedIds, originIds);
+                        $('#product_ids_add').val(diffAddIds.join(','));
+
+                        var arrCurrentRemovedIds = $('#product_ids_remove').val().split(',');
+                        if (!_.isEmpty(arrCurrentRemovedIds)) {
+                            temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                            $('#product_ids_remove').val(temp.join(','));
+                        }
+
+                    });
         }
     });
 </script>
+
+{{ THIS.view('core/griddle').set('grid', catProductConfig) | raw }}

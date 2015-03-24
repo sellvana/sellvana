@@ -478,7 +478,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         ];
 
         $config['config']['callbacks'] = [
-            'componentDidMount' => 'setProductImagesMainGrid'
+            'componentDidMount' => 'setCatProdMainGrid'
         ];
 
         return $config;
