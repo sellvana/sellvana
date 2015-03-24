@@ -198,6 +198,22 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             return pageSizeOptsRender;
         },
+        pageGoTo: function (event) {
+            event.preventDefault();
+            if (event.keyCode == 13) {
+                var startIndex = Math.max(this.props.currentPage - this.props.maxPage, 0),
+                    endIndex = Math.min(startIndex + this.props.maxPage, this.props.maxPage),
+                    num = event.target.value;
+
+                if (parseInt(num) <= startIndex || num.match(/\D/g)) {
+                    event.target.value = num = startIndex + 1;
+                } else if(parseInt(num) > endIndex) {
+                    event.target.value = num = endIndex;
+                }
+                num = parseInt(num);
+                this.props.setPage((num == 1) ? 0 : num - 1);
+            }
+        },
         render: function () {
             var headerSelection = this.props.getHeaderSelection();
             if (headerSelection == 'show_selected') {
@@ -207,6 +223,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             var pageSize = this.props.resultsPerPage;
 
             var disabledClass = !this.props.totalResults ? ' disabled' : '';
+
+            var pageGoTo = <input type="text" defaultValue="" className={'f-grid-page-no form-control'} onKeyUp={this.pageGoTo}/>
 
             var first = <li className={'first' + disabledClass}>
                 <a href="#" className="js-change-url" onClick={this.pageFirst}>«</a>
@@ -223,16 +241,16 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             var options = [];
 
-            var startIndex = Math.max(this.props.currentPage - 5, 0);
-            var endIndex = Math.min(startIndex + 11, this.props.maxPage);
-            if (this.props.maxPage >= 11 && (endIndex - startIndex) <= 10) {
-                startIndex = endIndex - 11;
+            var startIndex = Math.max(this.props.currentPage - 3, 0);
+            var endIndex = Math.min(startIndex + 7, this.props.maxPage);
+            if (this.props.maxPage >= 7 && (endIndex - startIndex) <= 6) {
+                startIndex = endIndex - 7;
             }
 
             for (var i = startIndex; i < endIndex; i++) {
                 var selected = this.props.currentPage == i ? "page active" : "page";
                 options.push(
-                    <li className={selected}>
+                    <li key={'fcom-pager-pagenumber-' + i} className={selected}>
                         <a href="#" data-value={i} onClick={this.pageChange} className="js-change-url">{i + 1}</a>
                     </li>
                 );
@@ -243,7 +261,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             for (var j = 0; j < pageSizeOptionsForRender.length; j++) {
                 selected = (pageSizeOptionsForRender[j] == pageSize ? "active" : "") + disabledClass;
                 pageSizeHtml.push(
-                    <li className={selected}>
+                    <li className={selected} key={'fcom-pager-pagesize-' + pageSizeOptionsForRender[j]}>
                         <a href="#" data-value={pageSizeOptionsForRender[j]} onClick={this.setPageSize} className="js-change-url page-size">{pageSizeOptionsForRender[j]}</a>
                     </li>
                 );
@@ -255,6 +273,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     <ul className="pagination pagination-sm pagination-griddle pagesize">
                         {pageSizeHtml}
                     </ul>
+                    <span className="f-grid-pagination">{'Page: '} {pageGoTo}</span>
                     <ul className="pagination pagination-sm pagination-griddle page">
                         {first}
                         {previous}
@@ -277,7 +296,8 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 "className": "",
                 "getConfig": null,
                 "selectedColumns": [],
-                "refresh": null
+                "refresh": null,
+                "removeRows": null
             }
         },
         modalSaveMassChanges: function(modal) {
@@ -312,12 +332,14 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             }
         },
         doMassAction: function(event) { //top mass action
+            if (this.props.getConfig('data_mode') == 'local') {
+                return this.doMassLocalAction(event);
+            }
             var that = this;
             var action = event.target.dataset.action;
             var dataUrl = this.props.getConfig('data_url');
             var editUrl = this.props.getConfig('edit_url');
             var gridId = this.props.getConfig('id');
-            var pageSize = this.props.resultsPerPage;
 
             switch (action) {
                 case 'mass-delete':
@@ -347,15 +369,44 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     );
                     break;
                 case 'export':
-                    var griddleState = this.props.getGriddleState();
-                    var exportUrl = buildGridDataUrl(griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
-                    window.location.href = exportUrl + '&export=true';
+                    if (dataUrl != '') {
+                        var pageSize = this.props.resultsPerPage;
+                        var griddleState = this.props.getGriddleState();
+                        var exportUrl = buildGridDataUrl(griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
+                        window.location.href = exportUrl + '&export=true';
+                    }
                     break;
                 default:
                     console.log('do-mass-action');
                     break;
             }
 
+        },
+        doMassLocalAction: function(event) {
+            var that = this;
+            var action = event.target.dataset.action;
+            var gridId = this.props.getConfig('id');
+
+            switch (action) {
+                case 'mass-delete':
+                    var confirm = false;
+                    if ($(event.target).hasClass('noconfirm')) {
+                        confirm = true;
+                    } else {
+                        confirm = window.confirm("Do you really want to delete selected rows?");
+                    }
+
+                    if (confirm) {
+                        var selectedRows = this.props.getSelectedRows();
+                        if (selectedRows.length && this.props.removeRows != null) {
+                            this.props.removeRows(selectedRows);
+                        }
+                    }
+                    break;
+                default:
+                    console.log('do-mass-local-action');
+                    break;
+            }
         },
         toggleColumn: function(event) {
             var personalizeUrl = this.props.getConfig('personalize_url');
@@ -434,10 +485,10 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
         },
         render: function () {
             var that = this;
-            var id = this.props.getConfig('id');
+            var gridId = this.props.getConfig('id');
 
             //quick search
-            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={id + '-quick-search'} onChange={this.quickSearch} />;
+            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={gridId + '-quick-search'} onChange={this.quickSearch} />;
 
             var disabledClass = !this.props.getSelectedRows().length ? ' disabled' : '';
             var configActions = this.props.getConfig('actions');
@@ -445,27 +496,32 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             if (configActions) {
                 _.forEach(configActions, function(action, name) {
                     var node = '';
+                    var actionKey = gridId + '-fcom-settings-action-' + name;
+                    var actionProps = {
+                        key: gridId + '-fcom-settings-action-' + name,
+                        class: action.class
+                    }
                     switch (name) {
                         case 'refresh':
-                            node = <a href="#" className={action.class}>{action.caption}</a>;
+                            node = <a href="#" className={action.class} key={actionKey}>{action.caption}</a>;
                             break;
                         case 'export':
-                            node = <button className={action.class} data-action='export' onClick={that.doMassAction}>{action.caption}</button>;
+                            node = <button className={action.class} data-action='export' onClick={that.doMassAction} key={actionKey}>{action.caption}</button>;
                             break;
                         case 'link_to_page':
-                            node = <a href="#" className={action.class}>{action.caption}</a>;
+                            node = <a href="#" className={action.class} key={actionKey}>{action.caption}</a>;
                             break;
                         case 'edit':
-                            node = <a href='#' className={action.class + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button">{action.caption}</a>;
+                            node = <a href='#' className={action.class + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button" key={actionKey}>{action.caption}</a>;
                             break;
                         case 'delete':
-                            node = <button className={action.class + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction}>{action.caption}</button>;
+                            node = <button className={action.class + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction} key={actionKey}>{action.caption}</button>;
                             break;
                         case 'add':
-                            node = <button className={action.class} type="button">{action.caption}</button>;
+                            node = <button className={action.class} type="button" key={actionKey}>{action.caption}</button>;
                             break;
                         case 'new':
-                            node = <button className={action.class} type="button">{action.caption}</button>;
+                            node = <button className={action.class} type="button" key={actionKey}>{action.caption}</button>;
                             break;
                         default:
                             if (action.type) {
@@ -473,12 +529,12 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                                     case 'button':
                                     default:
                                         //compatibility with old backbone grid
-                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} id={action.id}
-                                            type="button" onClick={that.handleCustom.bind(this, action.callback)}>{action.caption}</button>;
+                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} key={actionKey} id={action.id}
+                                            type="button" onClick={that.handleCustom.bind(null, action.callback)}>{action.caption}</button>;
                                         break;
                                 }
                             } else if (action.html) {
-                                node = <span dangerouslySetInnerHTML={{__html: action.html}}></span>;
+                                node = <span key={actionKey} dangerouslySetInnerHTML={{__html: action.html}}></span>;
                             }
 
                             break;
@@ -496,7 +552,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 var checked = _.contains(that.props.selectedColumns(), column);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
                 return (
-                    <li data-id={column} id={column} className="dd-item dd3-item">
+                    <li data-id={column} id={column} key={gridId + '-fcom-settings-' + column} className="dd-item dd3-item">
                         <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                         <div className="dd3-content">
                             <label>

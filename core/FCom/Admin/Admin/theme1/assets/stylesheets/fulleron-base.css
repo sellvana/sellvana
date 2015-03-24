@@ -1335,7 +1335,7 @@ fieldset[disabled] .btn {
 /* Responsive */
 .responsive-table {
   position:relative;
-  overflow:hidden;
+  /*overflow:hidden;*/
   }
 .responsive-table .scrollable-area {
   width:100%;
@@ -1588,6 +1588,14 @@ FULLERON
   height:31px;
   margin-right:5px;
   }
+.f-grid-page-no {
+    display: inline;
+    width: 40px;
+    text-align: center;
+}
+.pagesize {
+    margin-right: 5px;
+}
 .f-filter-btns .f-grid-filter-val .dropdown-toggle .caret {
   border-top-color:#444444;
   }
