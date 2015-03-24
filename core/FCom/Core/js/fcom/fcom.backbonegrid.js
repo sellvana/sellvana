@@ -3,7 +3,8 @@
 */
 function validationRules(rules) {
     var str = '';
-    for (var key in rules) {
+    for (var key in rules)
+    {
         switch (key) {
             case 'required':
                 str += 'data-rule-required="true" ';

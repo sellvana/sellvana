@@ -227,7 +227,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                 if (f.hidden) {
                     return false;
                 }
-                return (React.createElement(FComFilterNodeContainer, {filter: f, setFilter: that.doFilter, key: id + '- filter-block-' + i, setStateFilter: that.setStateFilter, capitaliseFirstLetter: that.capitaliseFirstLetter, keepShowDropDown: that.keepShowDropDown, getConfig: that.props.getConfig}));
+                return (React.createElement(FComFilterNodeContainer, {filter: f, setFilter: that.doFilter, key: f.field, setStateFilter: that.setStateFilter, capitaliseFirstLetter: that.capitaliseFirstLetter, keepShowDropDown: that.keepShowDropDown, getConfig: that.props.getConfig}));
             });
 
             return (
@@ -356,7 +356,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             console.log('begin render filter: ' +  filter.field);*/
 
             var operations = this.getOperations().map(function(item) {
-                return ( React.createElement("li", null, " ", React.createElement("a", {className: "filter_op", "data-id": item.op, onClick: that.setStateOperation, href: "#"}, item.name), " ") )
+                return ( React.createElement("li", {key: item.op}, " ", React.createElement("a", {className: "filter_op", "data-id": item.op, onClick: that.setStateOperation, href: "#"}, item.name), " ") )
             });
 
             /*console.log('end render filter: ' +  filter.field);*/
@@ -456,7 +456,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var that = this;
 
             var operations = this.getOperations().map(function(item) {
-                return ( React.createElement("li", null, " ", React.createElement("a", {className: "filter_op " + (item.range ? 'range' : 'not_range'), "data-id": item.op, onClick: that.setStateOperation, href: "#"}, item.name), " ") )
+                return ( React.createElement("li", {key: item.op}, " ", React.createElement("a", {className: "filter_op " + (item.range ? 'range' : 'not_range'), "data-id": item.op, onClick: that.setStateOperation, href: "#"}, item.name), " ") )
             });
 
             return (
@@ -545,7 +545,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var filter = this.state.filter;
 
             var operations = this.getOperations().map(function(item) {
-                return ( React.createElement("li", null, " ", React.createElement("a", {className: "filter_op " + (item.range ? 'range' : 'not_range'), "data-id": item.op, onClick: that.setStateOperation, href: "#"}, item.name), " ") )
+                return ( React.createElement("li", {key: item.op}, " ", React.createElement("a", {className: "filter_op " + (item.range ? 'range' : 'not_range'), "data-id": item.op, onClick: that.setStateOperation, href: "#"}, item.name), " ") )
             });
 
             return (
