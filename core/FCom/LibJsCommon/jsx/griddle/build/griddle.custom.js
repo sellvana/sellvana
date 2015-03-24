@@ -444,6 +444,8 @@ var Griddle = React.createClass({displayName: "Griddle",
             //figure out which columns are displayed and show only those
             var data = this.getDataForRender(results, cols, true);
 
+            console.log('dataForRender', data);
+
             var meta = this.props.metadataColumns;
             meta.push(this.props.childrenColumnName);
 
@@ -799,7 +801,11 @@ var Griddle = React.createClass({displayName: "Griddle",
     },
     addRows: function(rows) {
         var results = this.state.filteredResults || this.state.results;
-        results.push.apply(results, rows);
+        _.forEach(rows, function(row) {
+            if (!_.findWhere(results, {id: row.id})) {
+                results.push(row);
+            }
+        });
         this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) }, function() {
             $(this.getDOMNode()).trigger('addedRows.griddle', [rows, this]);
         });

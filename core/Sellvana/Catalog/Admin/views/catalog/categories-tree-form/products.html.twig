@@ -29,6 +29,10 @@
             return temp;
         }
 
+        /**
+         * callback function for top action to show modal to add products
+         * @param grid
+         */
         window.showModalToAddProduct = function(grid) {
             mainGrid = grid;
             mainGridId = '{{ prodImagesConfig.config.id }}';
@@ -60,6 +64,11 @@
                 attachGrid = instanceAttachGrid.refs[prodAttachConfigCompiled.id];
             }
         };
+
+        /**
+         * add selected products from full products grid to category-products grid
+         * @param modal
+         */
         window.addSelectedProduct = function(modal) {
             var selectedRows = attachGrid.getSelectedRows();
             if (selectedRows.length) {
@@ -79,6 +88,11 @@
                 alert('please choose at least one product');
             }
         };
+
+        /**
+         * callback function after main category products grid was rendered
+         * @param grid
+         */
         window.setCatProdMainGrid = function(grid) {
             mainGrid = grid;
             var addedIds = [], removedIds = [],
