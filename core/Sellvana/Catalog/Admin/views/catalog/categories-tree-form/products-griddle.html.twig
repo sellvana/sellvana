@@ -1,0 +1,73 @@
+{% set m = THIS.get('model') %}
+{% set prodCtrl = APP.instance('Sellvana_Catalog_Admin_Controller_Products') %}
+
+<input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
+<input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
+
+{% set catProductConfig = prodCtrl.getCatProdConfigForGriddle(m) %}
+{% set allProductConfig = prodCtrl.getAllProdConfigForGriddle(m) %}
+{% set prodAttachConfigCompiled = THIS.view('core/griddle').set('grid', allProductConfig).getGridConfig() %}
+
+{{ THIS.view('core/griddle').set('grid', catProductConfig) | raw }}
+
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+        var mainGridId = '{{ catProductConfig.config.id }}';
+        var mainGrid, attachGrid, removedIds = [], addedIds = [];
+        window.showModalToAddProduct = function(grid) {
+            mainGrid = grid;
+            mainGridId = '{{ prodImagesConfig.config.id }}';
+            var modalContainerEle = document.getElementById('{{ catProductConfig.config.id }}-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.renderComponent(
+                    React.createElement(Components.Modal, {
+                                id: "addProductModal",
+                                show: true,
+                                title: 'Products List',
+                                confirm: 'Add',
+                                cancel: 'Close',
+                                onLoad: function(modal) {
+                                    var node = $(modal.getDOMNode());
+                                    node.find('.modal-dialog').css('width', '900px');
+                                },
+                                onConfirm: window.addSelectedProduct
+                            },
+                            React.createElement('div', {className: 'f-grid-wrapper', id: 'allProductList'})
+                    ), modalContainerEle);
+            var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('allProductList');
+            var instanceAttachGrid = React.renderComponent(
+                    React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
+                    attachGridContainerEle
+            );
+
+            if (typeof instanceAttachGrid.refs[prodAttachConfigCompiled.id] !== 'undefined') {
+                attachGrid = instanceAttachGrid.refs[prodAttachConfigCompiled.id];
+            }
+        };
+        window.addSelectedProduct = function(modal) {
+            console.log(mainGrid);
+            var selectedRows = attachGrid.getSelectedRows();
+            if (selectedRows.length) {
+                var addRows = [];
+                //process selected rows
+                selectedRows.forEach(function(attachRow) {
+                    if (!_.findWhere(mainGrid.getRows(), {id: attachRow.id})) {
+                        addRows.push(attachRow);
+                    }
+
+                    if (addRows.length) {
+                        mainGrid.addRows(addRows);
+                        addedIds = _.pluck(addRows, 'id');
+                        $('#product_ids_add').val(addedIds.join(','));
+                    }
+                });
+
+
+                modal.close();
+            } else {
+                alert('please choose at least one product');
+            }
+        }
+    });
+</script>
