@@ -17,10 +17,9 @@ modules:
         areas:
             FCom_Admin:
                 routing:
+                    - [ /catalogindex/?.action, Sellvana_CatalogIndex_Admin_Controller ]
                     - [ /catalogindex/fields, Sellvana_CatalogIndex_Admin_Controller_Fields.index ]
                     - [ /catalogindex/fields/.action, Sellvana_CatalogIndex_Admin_Controller_Fields ]
-                    - [ /catalogindex/reindex, Sellvana_CatalogIndex_Admin_Controller.reindex ]
-                    - [ /catalogindex/test, Sellvana_CatalogIndex_Admin_Controller.test ]
 
             FCom_Frontend:
                 routing:

@@ -34,6 +34,12 @@
             };
         }
 
+        function removeSpecialChars(str)
+        {
+            var label = str.substr(0, str.lastIndexOf('.'));
+            return label.replace(/[_\-\.]/gi, ' ');
+        }
+
         /*
          *function to set attachment grid data into form fields to send them server
          *This function is callend when 'save' button of product form is clicked.
@@ -82,6 +88,7 @@
                         addedRow.set('selected', false);
                         addedRow.set('update_at', dateTimeNow());
                         addedRow.set('create_at', dateTimeNow());
+                        addedRow.set('label', removeSpecialChars(row.attributes.file_name));
                         gridView.collection.add(addedRow.toJSON(), {silent: true});
                     }
                 });

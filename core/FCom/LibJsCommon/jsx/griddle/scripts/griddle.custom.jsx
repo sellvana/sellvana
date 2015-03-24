@@ -351,6 +351,7 @@ var Griddle = React.createClass({
                 that.setMaxPage();
             });
         }
+        this.triggerCallback('componentDidMount');
     },
 
     getDataForRender: function(data, cols, pageList){
@@ -358,12 +359,16 @@ var Griddle = React.createClass({
         if (!this.hasExternalResults()) {
             //get the correct page size
             if(this.state.sortColumn != "" || this.props.initialSort != ""){
-                data = _.sortBy(data, function(item){
-                    return item[that.state.sortColumn||that.props.initialSort];
-                });
-
-                if(this.state.sortAscending == false){
-                    data.reverse();
+                switch (this.state.sortAscending) {
+                    case 'asc':
+                        data = _.sortBy(data, this.state.sortColumn);
+                        break;
+                    case 'desc':
+                        data = _.sortBy(data, this.state.sortColumn).reverse();
+                        break;
+                    default:
+                        data = _.sortBy(data, this.state.sortColumn);
+                        break;
                 }
             }
 
@@ -409,7 +414,7 @@ var Griddle = React.createClass({
         //console.log('this.state.initColumns', this.state.initColumns);
         var that = this,
             results = this.state.filteredResults || this.state.results; // Attempt to assign to the filtered results, if we have any.
-
+            results = _.uniq(results);
         var headerTableClassName = this.props.tableClassName + " table-header";
 
         //figure out if we want to show the filter section
@@ -425,7 +430,7 @@ var Griddle = React.createClass({
             ? <this.props.customSettings columnMetadata={this.props.columnMetadata} selectedColumns={this.getColumns} setColumns={this.setColumns}
                 getConfig={this.getConfig} searchWithinResults={this.searchWithinResults} getSelectedRows={this.getSelectedRows} refresh={this.refresh}
                 setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState}
-                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} getCurrentGrid={this.getCurrentGrid} />
+                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} removeRows={this.removeRows} getCurrentGrid={this.getCurrentGrid} />
             : <span className="settings" onClick={this.toggleColumnChooser}>{this.props.settingsText} <i className="glyphicon glyphicon-cog"></i></span>
         ) : "";
 
@@ -438,6 +443,8 @@ var Griddle = React.createClass({
         if (!this.state.isLoading) {
             //figure out which columns are displayed and show only those
             var data = this.getDataForRender(results, cols, true);
+
+            console.log('dataForRender', data);
 
             var meta = this.props.metadataColumns;
             meta.push(this.props.childrenColumnName);
@@ -455,7 +462,7 @@ var Griddle = React.createClass({
                         className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
                         getConfig={this.getConfig} refresh={this.refresh} setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
                         getSelectedRows={this.getSelectedRows} addSelectedRows={this.addSelectedRows} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
-                        hasExternalResults={this.hasExternalResults}
+                        hasExternalResults={this.hasExternalResults} removeRows={this.removeRows}
                     />)
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );
@@ -700,8 +707,6 @@ var Griddle = React.createClass({
                                     break;
                             }
 
-                            console.log('row', row);
-                            console.log('flag', flag);
                             return flag;
                         });
                         break;
@@ -796,8 +801,30 @@ var Griddle = React.createClass({
     },
     addRows: function(rows) {
         var results = this.state.filteredResults || this.state.results;
-        results.push.apply(results, rows);
-        this.setState({ results: results, filteredResults: results });
+        _.forEach(rows, function(row) {
+            if (!_.findWhere(results, {id: row.id})) {
+                results.push(row);
+            }
+        });
+        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) }, function() {
+            $(this.getDOMNode()).trigger('addedRows.griddle', [rows, this]);
+        });
+    },
+    removeRows: function(rows) {
+        var results = this.state.filteredResults || this.state.results;
+        var selectedRows = this.getSelectedRows();
+        var deleteIds = _.pluck(rows, 'id');
+        if (deleteIds) {
+            results = _.filter(results, function(row) {
+                return !_.contains(deleteIds, row.id);
+            });
+            selectedRows = _.filter(selectedRows, function(row) {
+                return !_.contains(deleteIds, row.id);
+            });
+        }
+        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results), selectedRows: selectedRows }, function() {
+            $(this.getDOMNode()).trigger('removedRows.griddle', [rows, this]);
+        });
     },
     getRows: function() {
         return this.state.filteredResults || this.state.results;
@@ -850,6 +877,16 @@ var Griddle = React.createClass({
     },
     getCurrentGrid: function() {
         return this;
+    },
+    triggerCallback: function(name) {
+        var callbacks = this.getConfig('callbacks');
+        if (callbacks && typeof callbacks[name] !== 'undefined') {
+            var callbackFuncName = callbacks[name];
+            if (typeof window[callbackFuncName] === 'function') {
+                console.log('triggerCallback:'+name);
+                return window[callbackFuncName](this);
+            }
+        }
     }
 });
 
