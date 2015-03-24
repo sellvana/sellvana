@@ -1590,8 +1590,8 @@ FULLERON
   }
 .f-grid-page-no {
     display: inline;
-    width: 50px;
-    height: 20px;
+    width: 40px;
+    text-align: center;
 }
 .pagesize {
     margin-right: 5px;

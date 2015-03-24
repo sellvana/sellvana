@@ -241,10 +241,10 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
 
             var options = [];
 
-            var startIndex = Math.max(this.props.currentPage - 5, 0);
-            var endIndex = Math.min(startIndex + 11, this.props.maxPage);
-            if (this.props.maxPage >= 11 && (endIndex - startIndex) <= 10) {
-                startIndex = endIndex - 11;
+            var startIndex = Math.max(this.props.currentPage - 3, 0);
+            var endIndex = Math.min(startIndex + 7, this.props.maxPage);
+            if (this.props.maxPage >= 7 && (endIndex - startIndex) <= 6) {
+                startIndex = endIndex - 7;
             }
 
             for (var i = startIndex; i < endIndex; i++) {
