@@ -5,20 +5,90 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
     var PricesApp = React.createClass({displayName: "PricesApp",
         render: function () {
             var childProps = _.omit(this.props, ['prices', 'deleted','validatePrices', 'title']);
+            var baseFound = false;
+            var priceOptions = {};
+            _.each(this.props.price_types, function (op, k) {
+                if(k !== 'promo') {
+                    priceOptions[k] = op;
+                }
+            });
             return (
-                React.createElement("div", {id: "prices"}, React.createElement("h4", null, this.props.title), 
-                    _.map(this.props['prices'], function (price) {
-                        if (this.props['deleted'] && this.props['deleted'][price.id]) {
-                            return React.createElement("input", {key: 'delete-' + price.id, type: "hidden", 
-                                name: "price[" + price.id + "][delete]", value: "1"})
-                        }
+                React.createElement("div", {id: "prices"}, 
+                    React.createElement("h4", null, this.props.title), 
+                    React.createElement("table", {className: "table table-striped"}, 
+                        React.createElement("thead", null, 
+                        React.createElement("tr", {className: "table-title"}, 
+                            React.createElement("th", null), 
+                            this.props.show_customers? React.createElement("th", null, Locale._("Customer Group")): null, 
+                            this.props.show_sites? React.createElement("th", null, Locale._("Site")): null, 
+                            this.props.show_currency? React.createElement("th", null, Locale._("Currency")): null, 
+                            React.createElement("th", null, Locale._("Price Type")), 
+                            React.createElement("th", null, Locale._("Amount")), 
+                            React.createElement("th", null, Locale._("")), 
+                            React.createElement("th", null, Locale._(""))
+                        ), 
+                        React.createElement("tr", {className: "table-actions"}, 
+                            React.createElement("td", null), 
+                            this.props.show_customers? React.createElement("td", null, 
+                                React.createElement("select", {id: "filter_customer_group", ref: "filter_customer_group", className: "form-control to-select2"}, 
+                                    React.createElement("option", {value: "*"}, Locale._("All (*)")), 
+                                    _.map(this.props.customer_groups, function (val, key) {
+                                        return React.createElement("option", {key: key, value: key}, val)
+                                    })
+                                )
+                            ): null, 
+                            this.props.show_sites? React.createElement("td", null, 
+                                React.createElement("select", {id: "filter_site", ref: "filter_site", className: "form-control to-select2"}, 
+                                    React.createElement("option", {value: "*"}, Locale._("All (*)")), 
+                                    _.map(this.props.sites, function (val, key) {
+                                        return React.createElement("option", {key: key, value: key}, val)
+                                    })
+                                )
+                            ): null, 
+                            this.props.show_currency? React.createElement("td", null, 
+                                React.createElement("select", {id: "filter_currency", ref: "filter_currency", className: "form-control to-select2"}, 
+                                    React.createElement("option", {value: "*"}, Locale._("All (*)")), 
+                                    _.map(this.props.currencies, function (val, key) {
+                                        return React.createElement("option", {key: key, value: key}, val)
+                                    })
+                                )
+                            ): null, 
+                            React.createElement("td", null, 
+                                React.createElement("select", {id: "price-types", className: "form-control to-select2", ref: "price-types"}, 
+                                    React.createElement("option", {value: "-1"}, Locale._("Add Price ...")), 
+                                    _.map(priceOptions, function (pt, pk) {
+                                        return React.createElement("option", {key: pk, value: pk, 
+                                                       disabled: pk == 'promo' ? 'disabled' : null}, pt)
+                                    })
+                                )
+                            ), 
+                            React.createElement("td", null), 
+                            React.createElement("td", null)
+                        )
+                        ), 
+                        React.createElement("tbody", null, 
+                        _.map(this.props['prices'], function (price) {
+                            if (this.props['deleted'] && this.props['deleted'][price.id]) {
+                                return React.createElement("input", {key: 'delete-' + price.id, type: "hidden", 
+                                              name: "price[" + price.id + "][delete]", value: "1"})
+                            }
 
-                        if (this.shouldPriceShow(price) === false) {
-                            return React.createElement("span", {key: 'empty' + price.id});
-                        }
+                            if (this.shouldPriceShow(price) === false) {
+                                return React.createElement("span", {key: 'empty' + price.id});
+                            }
 
-                        return React.createElement(PriceItem, React.__spread({data: price},  childProps, {key: price['id'], validate: this.props.validatePrices}))
-                    }.bind(this))
+                            var theBase = false;
+                            if(!baseFound) {
+                                // if price type is base and site, currency and group are null, this is The base price?!
+                                theBase = baseFound = (price['price_type'] == 'base') && (price['customer_group_id'] === null)
+                                    && (price['site_id'] === null) && (price['currency_code'] === null);
+                            }
+
+                            return React.createElement(PriceItem, React.__spread({data: price},  childProps, {key: price['id'], priceOptions: priceOptions, 
+                                              validate: this.props.validatePrices, theBase: theBase}))
+                        }.bind(this))
+                        )
+                    )
                 )
             );
         },
@@ -37,21 +107,44 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 show = false;
             }
             return show;
+        },
+        componentDidUpdate: function () {
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
+        },
+        componentDidMount: function () {
+            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
+            $(this.refs['price-types'].getDOMNode()).on("change", this.props.prices_add_new);
+            _.each(['filter_customer_group', 'filter_site', 'filter_currency'], function (filter) {
+                if (this.refs[filter]) {
+                    var $filter = $(this.refs[filter].getDOMNode());
+                    $filter.on('change', this.props.applyFilter)
+                }
+            }.bind(this));
         }
     });
 
     var PriceItem = React.createClass({displayName: "PriceItem",
         editable: true,
+        checkEditable: function (price) {
+            var editable = true;
+            if (editable) {
+                editable = (this.props.editable_prices.indexOf(price['price_type']) != -1);
+            }
+            if (editable) {
+                editable = !(this.props.theBase === true);
+            }
+            return editable;
+        },
         render: function () {
             var price = this.props.data;
-            this.editable = (this.props.editable_prices.indexOf(price['price_type']) != -1);
+            this.editable = this.checkEditable(price);
             var priceTypes = React.createElement("span", {key: "price_type"}, this.props.price_types[price['price_type']]);
             if(this.editable) {
                 priceTypes =
                     React.createElement("select", {key: "price_type", className: "to-select2 form-control priceUnique", 
                         name: this.getFieldName(price, 'price_type'), 
                         defaultValue: price['price_type'], ref: "price_type"}, 
-                            _.map(this.props.price_types, function (pt, pk) {
+                            _.map(this.props.priceOptions, function (pt, pk) {
                                 return React.createElement("option", {key: pk, value: pk, disabled: pk == 'promo' ? 'disabled' : null}, pt)
                             })
                     );
@@ -59,7 +152,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
 
             var qty = React.createElement("input", {key: "qty", type: "hidden", name: this.getFieldName(price, "qty"), defaultValue: price['qty']});
             if (price['price_type'] === 'tier') {
-                qty = React.createElement("input", {key: "qty", type: "text", className: "form-control priceUnique", name: this.getFieldName(price, "qty"), placeholder: Locale._("Qty"),
+                qty = React.createElement("input", {key: "qty", type: "text", className: "form-control priceUnique", name: this.getFieldName(price, "qty"), placeholder: Locale._("Amount"), 
                              defaultValue: price['qty'], onChange: this.props.validate, readOnly: this.editable ? null : 'readonly'});
             }
 
@@ -82,7 +175,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 if(price['operation'] && price['operation'] !== "=$") {
                     baseField =
                         React.createElement("select", {ref: "base_fields", key: "base_fields", name: this.getFieldName(price, 'base_field'), 
-                            defaultValue: price['base_field'], className: "base_field to-select2"}, 
+                            defaultValue: price['base_field'], className: "base_field to-select2", 
+                                disabled: this.editable || this.props.theBase ? null: true}, 
                             this.props.priceRelationOptions[price['price_type']].map(function (p) {
                                 return React.createElement("option", {key: p.value, value: p.value}, p.label)
                             })
@@ -91,16 +185,17 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }
 
             return (
-                React.createElement("div", {className: "form-group price-item"}, 
-                    React.createElement("div", {style: divStyle}, 
-                        React.createElement("a", {href: "#", className: "btn-remove", "data-id": price.id, 
+                React.createElement("tr", {className: "price-item"}, 
+                    React.createElement("td", null, 
+                        this.editable? React.createElement("a", {href: "#", className: "btn-remove", "data-id": price.id, 
                            id: "remove_price_btn_" + price.id}, 
                             React.createElement("span", {className: "icon-remove-sign"})
-                        )
+                        ): null, 
+                         price['product_id'] && price['product_id'] !== "*" ?
+                            React.createElement("input", {type: "hidden", name: this.getFieldName(price, "product_id"), 
+                                   defaultValue: price['product_id']}) : null
                     ), 
-                    React.createElement("div", {style: divStyle}, 
-                         price['product_id'] && price['product_id'] !== "*" ? React.createElement("input", {type: "hidden", name: this.getFieldName(price, "product_id"), 
-                               defaultValue: price['product_id']}): null, 
+                     this.props.show_customers ? React.createElement("td", null, 
                         React.createElement("select", {name: this.getFieldName(price, "customer_group_id"), disabled: this.editable? null: true, 
                                 defaultValue: price['customer_group_id'], className: "to-select2" + (this.editable? " priceUnique": '')}, 
                             React.createElement("option", {value: "*"}, Locale._("Default")), 
@@ -108,8 +203,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                 return React.createElement("option", {key: key, value: key}, val)
                             })
                         )
-                    ), 
-                    React.createElement("div", {style: divStyle}, 
+                    ): null, 
+                     this.props.show_sites ? React.createElement("td", null, 
                         React.createElement("select", {name: this.getFieldName(price, "site_id"), disabled: this.editable? null: true, 
                                 defaultValue: price['site_id'], className: "to-select2" + (this.editable? " priceUnique": '')}, 
                             React.createElement("option", {value: "*"}, Locale._("Default")), 
@@ -117,8 +212,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                 return React.createElement("option", {key: key, value: key}, val)
                             })
                         )
-                    ), 
-                    React.createElement("div", {style: divStyle}, 
+                    ): null, 
+                    this.props.show_currency ? React.createElement("td", null, 
                         React.createElement("select", {name: this.getFieldName(price, "currency_code"), disabled: this.editable? null: true, 
                                 defaultValue: price['currency_code'], className: "to-select2" + (this.editable? " priceUnique": '')}, 
                             React.createElement("option", {value: "*"}, Locale._("Default")), 
@@ -127,22 +222,19 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             })
                         )
 
-                    ), 
-                    React.createElement("div", {style: divStyle}, 
+                    ): null, 
+                    React.createElement("td", null, 
                         priceTypes
                     ), 
-                     operation? React.createElement("div", {style: divStyle}, 
-                        operation
-                    ): null, 
-                     baseField? React.createElement("div", {style: divStyle}, 
-                        baseField
-                    ): null, 
-
-                    React.createElement("div", {style: divStyle}, 
-                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"),
-                               defaultValue: price['amount'], readOnly: this.editable ? null: 'readonly'})
+                    React.createElement("td", null, 
+                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"), 
+                               defaultValue: price['amount'], readOnly: this.editable || this.props.theBase ? null: 'readonly'})
                     ), 
-                    React.createElement("div", {style: divStyle}, 
+                    React.createElement("td", null, 
+                         operation? {operation:operation} : null, 
+                         baseField ? {baseField:baseField} : null
+                    ), 
+                    React.createElement("td", null, 
                         [qty, dateRange]
                     )
                 )
@@ -155,15 +247,16 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             if(this.props.data.operation && this.props.data.operation !== '=$') {
                 $('select.base_field', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
             }
-            var operation = this.refs['operation'];
-            if (operation) {
-                var self = this;
-                $(operation.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'}).on('change', function (e) {
-                    var operation = $(e.target).val();
-                    var id = self.props.data.id;
-                    self.props.updateOperation(id, operation);
-                })
-            }
+            //var operation = this.refs['operation'];
+            //if (operation) {
+            //    var self = this;
+            //    $(operation.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'}).on('change', function (e) {
+            //        var operation = $(e.target).val();
+            //        var id = self.props.data.id;
+            //        self.props.updateOperation(id, operation);
+            //    })
+            //}
+            this.initPrices();
         },
         componentWillUpdate: function () {
             if(this.refs['base_fields']) {
@@ -171,7 +264,6 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }
         },
         initPrices: function () {
-            $('select.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
             var self = this;
             if (this.editable) {
                 $(this.refs['price_type'].getDOMNode()).on('change', function (e) {
@@ -281,45 +373,38 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     }
                 }
             };
-            _.each(['filter_customer_group', 'filter_site', 'filter_currency'], function (filter) {
-                if (this.options[filter].length) {
-                    this.options[filter + '_value'] = this.options[filter].val();
-                    this.options[filter].on('change', function (e) {
-                        e.preventDefault();
-                        this.options[filter + '_value'] = $(e.target).val();
-                        //checkAddAllowed(this.options);
-                        //React.render(<PricesApp {...this.options}/>, this.options.container[0]);
-                    }.bind(this));
-                    no_filters = false;
-                }
-            }.bind(this));
+            this.options.applyFilter = function (e) {
+                var $el = $(e.target);
+                var filter = $el.attr('id');
+                this.options[filter + '_value'] = $el.val();
+                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0]);
+            }.bind(this);
 
             //checkAddAllowed(this.options);
 
-            if(this.options.prices_add_new && this.options.prices_add_new.length) {
-                this.options.prices_add_new.on('change', function (e) {
-                    e.preventDefault();
-                    var type = $(e.target).val();
-                    $(e.target).select2("val", "-1", false);
+            this.options.prices_add_new = function (e) {
+                e.preventDefault();
+                var type = $(e.target).val();
+                $(e.target).select2("val", "-1", false);
 
-                    var newPrice = {
-                        id: 'new_' + (this.newIdx++),
-                        product_id: this.options.product_id,
-                        price_type: type,
-                        customer_group_id: this.options.filter_customer_group_value || null,
-                        site_id: this.options.filter_site_value || null,
-                        currency_code: this.options.filter_currency_value || null,
-                        amount: 0.0,
-                        qty: 1
-                    };
-                    if(!this.options.prices) {
-                        this.options.prices = [];
-                    }
-                    this.options.prices.push(newPrice);
-                    React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0]);
-                }.bind(this));
+                var newPrice = {
+                    id: 'new_' + (this.newIdx++),
+                    product_id: this.options.product_id,
+                    price_type: type,
+                    customer_group_id: this.options.filter_customer_group_value || null,
+                    site_id: this.options.filter_site_value || null,
+                    currency_code: this.options.filter_currency_value || null,
+                    amount: 0.0,
+                    qty: 1
+                };
+                if(!this.options.prices) {
+                    this.options.prices = [];
+                }
+                this.options.prices.push(newPrice);
 
-            }
+                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0]);
+            }.bind(this);
+
 
             this.options.deletePrice = function (id) {
                 if (!this.options['deleted']) {
@@ -345,7 +430,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         price.operation = operation;
                     }
                 });
-
+                $("#price").find(".to-select2").select2('destroy');
                 React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0])
             }.bind(this);
 
