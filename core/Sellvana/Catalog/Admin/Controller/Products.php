@@ -966,6 +966,12 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
 
         foreach ($data['prices']['productPrice'] as $id => $priceData) {
+            foreach ($priceData as $field => $pf) {
+                if(in_array($field, ['customer_group_id', 'site_id', 'currency_code']) && !is_numeric($pf)){
+                    $priceData[$field] = null;
+                }
+            }
+
             $priceData['product_id'] = $model->id();
             if(is_numeric($id)) {
                 $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
