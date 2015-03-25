@@ -63,7 +63,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $id = !empty($options['id']) ? $options['id'] : 'media_library';
         $folder = $this->_parseFolder($options['folder']);
         $url = $this->BApp->href('/media/grid');
-        $orm = $this->FCom_Core_Model_MediaLibrary->orm()->table_alias('a')
+        $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
             ->where('folder', $folder)
             ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
@@ -172,7 +172,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             case 'data':
                 $folder = $this->getFolder();
     //            $r = $this->BRequest->get();
-                $orm = $this->FCom_Core_Model_MediaLibrary->orm()->table_alias('a')
+                $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
                     ->where('folder', $folder)
                     ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
                     ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')

@@ -31,7 +31,8 @@ class Sellvana_Catalog_Model_ProductPrice
             self::TYPE_MSRP  => "MSRP",
             self::TYPE_SALE  => "Sale Price",
             self::TYPE_TIER  => "Tier Price",
-            self::TYPE_PROMO => "Promo Price"
+            self::TYPE_COST => "Cost",
+            self::TYPE_PROMO => "Promo Price",
         ],
         'editable_prices' => [
             'base',
@@ -42,15 +43,16 @@ class Sellvana_Catalog_Model_ProductPrice
         ],
         'price_relation_options' => [
             "base" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'msrp', 'label' => 'MSRP']],
-            "cost" => [['value' => 'base', 'label' => 'Base price']],
-            "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base price']]
+            "cost" => [['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']],
+            "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base']],
+            "tier" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']]
         ],
         'operation_options' => [
-            ['value' => '=$', 'label' => "Fixed price"],
-            ['value' => '+$', 'label' => "Add amount to"],
-            ['value' => '-$', 'label' => "Subtract amount from"],
-            ['value' => '+%', 'label' => "Add percent of"],
-            ['value' => '-%', 'label' => "Subtract percent from"]
+            ['value' => '=$', 'label' => "Fixed"],
+            ['value' => '+$', 'label' => "Add amount"],
+            ['value' => '-$', 'label' => "Sub amount"],
+            ['value' => '+%', 'label' => "Add %"],
+            ['value' => '-%', 'label' => "Sub %"]
         ],
     ];
     const SALE_DATE_SEPARATOR = ' / ';
@@ -359,7 +361,7 @@ class Sellvana_Catalog_Model_ProductPrice
                     ->where_null('site_id')->where_null('customer_group_id')->where_null('currency_code')
                     ->find_one();
                 if ($priceModel) {
-                    if (false === $v) {
+                    if (false === $v || '-' === $v) {
                         $priceModel->delete();
                         continue;
                     }
@@ -423,7 +425,7 @@ class Sellvana_Catalog_Model_ProductPrice
             throw new BException('Invalid price field value');
         }
     }
-    
+
     public function __destruct()
     {
         parent::__destruct();
