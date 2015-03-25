@@ -1198,7 +1198,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $siteId = false;
             if ($modHlp->isLoaded('Sellvana_MultiSite')) {
                 $site = $this->Sellvana_MultiSite_Main->getCurrentSiteData();
-                $siteId = $site ? $site->id() : false;
+                $siteId = $site ? $site['id'] : false;
             }
             if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
                 $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
