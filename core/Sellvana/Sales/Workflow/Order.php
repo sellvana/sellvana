@@ -4,23 +4,7 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_localHooks = [
-        'customerPlacesOrder',
-
-        'adminPlacesOrder',
-
-        'adminUpdatesOrderShippingAddress',
-        'adminUpdatesOrderBillingAddress',
-        'adminCreatesChangeOrder',
-
-        'adminMarksOrderForReview',
-        'adminMarksOrderAsLegit',
-        'adminMarksOrderAsFraud',
-
-        'adminChangesCustomState',
-    ];
-
-    public function customerPlacesOrder($args)
+    public function action_customerPlacesOrder($args)
     {
         $order = $args['result']['order'];
         $order->state()->overall()->setPlaced();
@@ -34,7 +18,7 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         $order->save();
     }
 
-    public function adminPlacesOrder($args)
+    public function action_adminPlacesOrder($args)
     {
         $args['order']->state()->overall()->setPlaced();
         $args['order']->addHistoryEvent('placed', 'Order was placed by an admin user');
@@ -42,30 +26,30 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         $args['order']->save();
     }
 
-    public function adminUpdatesOrderShippingAddress($args)
+    public function action_adminUpdatesOrderShippingAddress($args)
     {
         $args['order']->importAddressFromArray($args['address'], 'shipping')->save();
         $args['order']->addHistoryEvent('cancel_req', 'Admin has updated shipping address');
     }
 
-    public function adminUpdatesOrderBillingAddress($args)
+    public function action_adminUpdatesOrderBillingAddress($args)
     {
         $args['order']->importAddressFromArray($args['address'], 'billing')->save();
         $args['order']->addHistoryEvent('cancel_req', 'Admin has updated billing address');
     }
 
-    public function adminCreatesChangeOrder($args)
+    public function action_adminCreatesChangeOrder($args)
     {
         throw new BException('Not implemented yet');
     }
 
-    public function adminMarksOrderForReview($args)
+    public function action_adminMarksOrderForReview($args)
     {
         $args['order']->state()->overall()->setReview();
         $args['order']->addHistoryEvent('review', 'Admin user has marked the order for review');
     }
 
-    public function adminMarksOrderAsLegit($args)
+    public function action_adminMarksOrderAsLegit($args)
     {
         $args['order']->state()->overall()->setLegit();
         $args['order']->addHistoryEvent('legit', 'Admin user has marked the order as legitimate');
@@ -73,14 +57,14 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         $args['order']->save();
     }
 
-    public function adminMarksOrderAsFraud($args)
+    public function action_adminMarksOrderAsFraud($args)
     {
         $args['order']->state()->overall()->setFraud();
         $args['order']->addHistoryEvent('fraud', 'Admin user has marked the order as fraud');
         $args['order']->save();
     }
 
-    public function adminChangesOrderCustomState($args)
+    public function action_adminChangesOrderCustomState($args)
     {
         $newState = $args['order']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();

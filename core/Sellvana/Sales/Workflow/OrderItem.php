@@ -4,13 +4,7 @@ class Sellvana_Sales_Workflow_OrderItem extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_localHooks = [
-        'customerCancelsOrderItems',
-        'adminCancelsOrderItems',
-        'adminChangesOrderItemCustomState',
-    ];
-
-    public function customerCancelsOrderItems($args)
+    public function action_customerCancelsOrderItems($args)
     {
         foreach ($args['items'] as $item) {
             $item->state()->overall()->setCancelRequested();
@@ -19,7 +13,7 @@ class Sellvana_Sales_Workflow_OrderItem extends Sellvana_Sales_Workflow_Abstract
         }
     }
 
-    public function adminCancelsOrderItems($args)
+    public function action_adminCancelsOrderItems($args)
     {
         foreach ($args['items'] as $item) {
             $item->state()->overall()->setCanceled();
@@ -28,7 +22,7 @@ class Sellvana_Sales_Workflow_OrderItem extends Sellvana_Sales_Workflow_Abstract
         }
     }
 
-    public function adminChangesOrderItemCustomState($args)
+    public function action_adminChangesOrderItemCustomState($args)
     {
         $newState = $args['item']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();

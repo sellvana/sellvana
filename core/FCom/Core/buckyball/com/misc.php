@@ -3198,8 +3198,8 @@ class BDebug extends BClass
         //$this->BEvents->debug();
         echo "</pre>";
         //print_r(static::$_events);
-?><table cellspacing="0"><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th>
-    <th>Relevant Location</th><th>Module</th></tr><?php
+?><table cellspacing="0" id="buckyball-debug-table"><thead><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th>
+    <th>Relevant Location</th><th>Module</th></tr></thead><tbody><?php
         foreach (static::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6) . ($e['c'] > 1 ? ' (' . $e['c'] . ')' : '') : '';
@@ -3208,7 +3208,13 @@ class BDebug extends BClass
                 . "</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>"
                 . (!empty($e['module']) ? $e['module'] : '') . "</td></tr>";
         }
-?></table></div><?php
+?></tbody></table></div><script>
+        if (require) {
+            require(['jquery.tablesorter'], function() {
+                $('#buckyball-debug-table').tablesorter();
+            })
+        }
+</script><?php
         $html = ob_get_clean();
         if ($return) {
             return $html;

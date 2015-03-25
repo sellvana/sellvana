@@ -36,6 +36,7 @@ common_js_libs:
             #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]
 
             - [ requireJs, sortable, @FCom_LibJsCommon/js/sortable.min ]
+            - [ requireJs, ajaxify, @FCom_LibJsCommon/js/ajaxify.min, { deps: [ jquery ] } ]
 
 lib_visualsearch:
     - view: head

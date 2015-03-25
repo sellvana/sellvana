@@ -9,7 +9,6 @@ modules:
         auto_use: [ bootstrap ]
         observe:
             - [ "Sellvana_Catalog_Model_Product::orm", Sellvana_CustomField_Main.onProductOrm ]
-            - [ "Sellvana_Catalog_Model_Product::orm", Sellvana_CustomField_Main.onProductOrm ]
             - [ "Sellvana_Catalog_Model_Product::onAfterSave", Sellvana_CustomField_Main.onProductAfterSave ]
             - [ "Sellvana_CustomField_Model_ProductVariant::find_one:after", Sellvana_CustomField_Main.onProductVariantFindAfter ]
             - [ "Sellvana_CustomField_Model_ProductVariant::find_many:after", Sellvana_CustomField_Main.onProductVariantFindAfter ]

@@ -10,19 +10,7 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_localHooks = [
-        'customerStartsCheckout',
-        'customerChoosesGuestCheckout',
-        'customerUpdatesShippingAddress',
-        'customerUpdatesShippingMethod',
-        'customerUpdatesBillingAddress',
-        'customerUpdatesPaymentMethod',
-        'customerPlacesOrder',
-        'customerCreatesAccountFromOrder',
-        'customerMergesOrderToAccount',
-    ];
-
-    public function customerStartsCheckout($args)
+    public function action_customerStartsCheckout($args)
     {
         // TODO: figure out for virtual orders ($c->isShippable())
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
@@ -42,12 +30,12 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         }
     }
 
-    public function customerChoosesGuestCheckout($args)
+    public function action_customerChoosesGuestCheckout($args)
     {
 
     }
 
-    public function customerUpdatesShippingAddress($args)
+    public function action_customerUpdatesShippingAddress($args)
     {
         if (!empty($args['post']['shipping'])) {
             $same = $args['cart']->get('same_address');
@@ -61,7 +49,7 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         }
     }
 
-    public function customerUpdatesBillingAddress($args)
+    public function action_customerUpdatesBillingAddress($args)
     {
         if (!empty($args['post']['billing'])) {
             $same = $args['cart']->get('same_address');
@@ -77,7 +65,7 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         }
     }
 
-    public function customerUpdatesShippingMethod($args)
+    public function action_customerUpdatesShippingMethod($args)
     {
         $cart = $this->_getCart($args);
         if (empty($args['post']['shipping_method'])) {
@@ -90,7 +78,7 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         $cart->setShippingMethod($method[0], $method[1])->calculateTotals()->save();
     }
 
-    public function customerUpdatesPaymentMethod($args)
+    public function action_customerUpdatesPaymentMethod($args)
     {
 
         $cart = $this->_getCart($args);
@@ -104,7 +92,7 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         $cart->save();
     }
 
-    public function customerPlacesOrder($args)
+    public function action_customerPlacesOrder($args)
     {
         /** @var Sellvana_Sales_Model_Cart $cart */
         $cart = $this->_getCart($args);
@@ -143,12 +131,12 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         $args['result']['success'] = true;
     }
 
-    public function customerCreatesAccountFromOrder($args)
+    public function action_customerCreatesAccountFromOrder($args)
     {
 
     }
 
-    public function customerMergesOrderToAccount($args)
+    public function action_customerMergesOrderToAccount($args)
     {
 
     }

@@ -50,7 +50,7 @@
       </div>
 {% endif %}
 
-      {{ THIS.view('catalog/product/price').set('product', prod) | raw }}
+      {{ THIS.view('catalog/product/price').set('product', m) | raw }}
 
       <form class="f-prod-select form-horizontal" role="form" method="post" action="{{ APP.href('cart/add') }}">
         <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>

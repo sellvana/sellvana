@@ -10,18 +10,7 @@ class Sellvana_Sales_Workflow_Comment extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_localHooks = [
-        'customerPostsOrderComment',
-
-        'adminAcknowledgesOrderComment',
-        'adminDelegatesOrderComment',
-        'adminPostsOrderComment',
-        'adminClosesOrderComment',
-
-        'timedAutoCloseOrderComment',
-    ];
-
-    public function customerPostsOrderComment($args)
+    public function action_customerPostsOrderComment($args)
     {
         $this->Sellvana_Sales_Model_Order_Comment->create([
             'order_id' => $args['order']->id(),
@@ -33,7 +22,7 @@ class Sellvana_Sales_Workflow_Comment extends Sellvana_Sales_Workflow_Abstract
         $args['order']->save();
     }
 
-    public function adminAcknowledgesOrderComment($args)
+    public function action_adminAcknowledgesOrderComment($args)
     {
         $args['order']->state()->comment()->setProcessing();
         $args['order']->save();
@@ -46,7 +35,7 @@ class Sellvana_Sales_Workflow_Comment extends Sellvana_Sales_Workflow_Abstract
         $comment->set('user_id', $args['user']->id())->save();
     }
 
-    public function adminDelegatesOrderComment($args)
+    public function action_adminDelegatesOrderComment($args)
     {
         $this->Sellvana_Sales_Model_Order_Comment->create([
             'order_id' => $args['order']->id(),
@@ -59,7 +48,7 @@ class Sellvana_Sales_Workflow_Comment extends Sellvana_Sales_Workflow_Abstract
         $args['order']->save();
     }
 
-    public function adminPostsOrderComment($args)
+    public function action_adminPostsOrderComment($args)
     {
         $this->Sellvana_Sales_Model_Order_Comment->create([
             'order_id' => $args['order']->id(),
@@ -72,13 +61,13 @@ class Sellvana_Sales_Workflow_Comment extends Sellvana_Sales_Workflow_Abstract
         $args['order']->save();
     }
 
-    public function adminClosesOrderComment($args)
+    public function action_adminClosesOrderComment($args)
     {
         $args['order']->state()->commment()->setClosed();
         $args['order']->save();
     }
 
-    public function timedAutoCloseOrderComment($args)
+    public function action_timedAutoCloseOrderComment($args)
     {
         $args['order']->state()->comment()->setAutoClosed();
         $args['order']->save();
