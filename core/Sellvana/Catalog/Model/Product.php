@@ -459,7 +459,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function mediaORM($type)
     {
-        return $this->Sellvana_Catalog_Model_ProductMedia->orm()->table_alias('pa')
+        return $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
             ->where('pa.product_id', $this->id)->where('pa.media_type', $type)
             //->select(array('pa.manuf_vendor_id'))
             ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
@@ -1198,7 +1198,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $siteId = false;
             if ($modHlp->isLoaded('Sellvana_MultiSite')) {
                 $site = $this->Sellvana_MultiSite_Main->getCurrentSiteData();
-                $siteId = $site ? $site->id() : false;
+                $siteId = $site ? $site['id'] : false;
             }
             if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
                 $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();

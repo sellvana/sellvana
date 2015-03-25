@@ -4,11 +4,7 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_localHooks = [
-        'adminChangesRefundCustomState',
-    ];
-
-    public function adminChangesRefundCustomState($args)
+    public function action_adminChangesRefundCustomState($args)
     {
         $newState = $args['refund']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();

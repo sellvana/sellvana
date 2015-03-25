@@ -76,6 +76,11 @@ class Sellvana_CatalogIndex_Main extends BClass
     {
         if (static::$_autoReindex) {
             $this->Sellvana_CatalogIndex_Indexer->indexProducts([$args['model']]);
+        } else {
+            $doc = $this->Sellvana_CatalogIndex_Model_Doc->load($args['model']->id());
+            if ($doc) {
+                $doc->set('flag_reindex', 1)->save();
+            }
         }
     }
 

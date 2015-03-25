@@ -6,6 +6,7 @@
  * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Admin_Main $FCom_Admin_Main
  */
 class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -186,7 +187,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
     public function getGroupCustomersConfig($group)
     {
         $class = $this->_modelClass;
-        $orm = $class::i()->orm()->table_alias('c')
+        $orm = $class::i()->orm('c')
             ->select(['c.id', 'c.firstname', 'c.lastname', 'c.email'])
             ->join('Sellvana_CustomerGroups_Model_Group', ['c.customer_group', '=', 'cg.id'], 'cg')
             ->where('c.customer_group', $group ? $group->id : 0);
@@ -302,5 +303,12 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
 
         }
 
+    }
+
+    public function action_start_session()
+    {
+        $cId = $this->BRequest->get('id');
+        $this->BSession->set('admin_customer_id', $cId);
+        $this->BResponse->redirect($this->FCom_Admin_Main->frontendHref());
     }
 }

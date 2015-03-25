@@ -4,26 +4,19 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_localHooks = [
-        'adminCreatesShipment',
-        'adminUpdatesShipment',
-        'adminPrintsShippingLabels',
-        'adminChangesShipmentCustomState',
-    ];
-
-    public function adminCreatesShipment($args)
+    public function action_adminCreatesShipment($args)
     {
     }
 
-    public function adminUpdatesShipment($args)
+    public function action_adminUpdatesShipment($args)
     {
     }
 
-    public function adminPrintsShippingLabels($args)
+    public function action_adminPrintsShippingLabels($args)
     {
     }
 
-    public function adminChangesShipmentCustomState($args)
+    public function action_adminChangesShipmentCustomState($args)
     {
         $newState = $args['shipment']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();
