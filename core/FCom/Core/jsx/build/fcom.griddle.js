@@ -273,7 +273,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     React.createElement("ul", {className: "pagination pagination-sm pagination-griddle pagesize"}, 
                         pageSizeHtml
                     ), 
-                    React.createElement("span", {className: "f-grid-pagination"}, 'Page: ', " ", pageGoTo), 
+                    this.props.maxPage >= 7 ? React.createElement("span", {className: "f-grid-pagination"}, 'Page: ', " ", pageGoTo) : '', 
                     React.createElement("ul", {className: "pagination pagination-sm pagination-griddle page"}, 
                         first, 
                         previous, 
