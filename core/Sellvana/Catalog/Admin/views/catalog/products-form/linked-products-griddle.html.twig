@@ -1,0 +1,272 @@
+{% set m = THIS.get('model') %}
+{% set prodCtrl =  APP.instance('Sellvana_Catalog_Admin_Controller_Products') %}
+
+{% set allProductConfig = prodCtrl.getAllProdConfigForGriddle(m) %}
+{% set prodAttachConfigCompiled = THIS.view('core/griddle').set('grid', allProductConfig).getGridConfig() %}
+
+{% set relatedLinkedProdConfig = prodCtrl.linkedProductGridConfigForGriddle(m, 'related') %}
+{% set similarLinkedProdConfig = prodCtrl.linkedProductGridConfigForGriddle(m, 'similar') %}
+{% set crossLinkedProdConfig = prodCtrl.linkedProductGridConfigForGriddle(m, 'cross_sell') %}
+
+<input type='hidden' name='grid[linked_products_similar][add]' id='similar_ids_add' />
+<input type='hidden' name='grid[linked_products_similar][del]' id='similar_ids_remove'/>
+<input type='hidden' name='grid[linked_products_related][add]' id='related_ids_add'/>
+<input type='hidden' name='grid[linked_products_related][del]' id='related_ids_remove'/>
+<input type='hidden' name='grid[linked_products_cross_sell][add]' id='cross_sell_ids_add'/>
+<input type='hidden' name='grid[linked_products_cross_sell][del]' id='cross_sell_ids_remove'/>
+
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+        var mainGrid, attachGrid;
+
+        /**
+         * calc rows when save
+         * @param rows
+         * @param ids
+         * @returns {Array}
+         */
+        function calcAddRemoveRows(rows, ids) {
+            var temp = [];
+            rows.forEach(function(row) {
+                if (_.contains(ids, row.id) !== false) {
+                    temp.push(row.id);
+                }
+            });
+            return temp;
+        }
+
+        /**
+         * callback function for top action to show modal to add products
+         * @param grid
+         */
+        window.showModalToAddRelatedProduct = function(grid) {
+            mainGrid = grid;
+            var modalContainerEle = document.getElementById('{{ relatedLinkedProdConfig.config.id }}-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.renderComponent(
+                    React.createElement(Components.Modal, {
+                                className: "relatedProductModal",
+                                show: true,
+                                title: 'Products List',
+                                confirm: 'Add',
+                                cancel: 'Close',
+                                onLoad: function(modal) {
+                                    var relatedNode = $(modal.getDOMNode());
+                                    relatedNode.find('.modal-dialog').css('width', '900px');
+                                },
+                                onConfirm: window.addSelectedProduct
+                            },
+                            React.createElement('div', {className: 'f-grid-wrapper', id: 'relatedProductList'})
+                    ), modalContainerEle);
+            var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('relatedProductList');
+            var instanceAttachGrid = React.renderComponent(
+                    React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
+                    attachGridContainerEle
+            );
+
+            if (typeof instanceAttachGrid.refs[prodAttachConfigCompiled.id] !== 'undefined') {
+                attachGrid = instanceAttachGrid.refs[prodAttachConfigCompiled.id];
+            }
+        };
+
+        window.showModalToAddSimilarProduct = function(grid) {
+            mainGrid = grid;
+            var modalContainerEle = document.getElementById('{{ similarLinkedProdConfig.config.id }}-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.renderComponent(
+                    React.createElement(Components.Modal, {
+                                className: "similarProductModal",
+                                show: true,
+                                title: 'Products List',
+                                confirm: 'Add',
+                                cancel: 'Close',
+                                onLoad: function(modal) {
+                                    var similarNode = $(modal.getDOMNode());
+                                    similarNode.find('.modal-dialog').css('width', '900px');
+                                },
+                                onConfirm: window.addSelectedProduct
+                            },
+                            React.createElement('div', {className: 'f-grid-wrapper', id: 'similarProductList'})
+                    ), modalContainerEle);
+            var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('similarProductList');
+            var instanceAttachGrid = React.renderComponent(
+                    React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
+                    attachGridContainerEle
+            );
+
+            if (typeof instanceAttachGrid.refs[prodAttachConfigCompiled.id] !== 'undefined') {
+                attachGrid = instanceAttachGrid.refs[prodAttachConfigCompiled.id];
+            }
+        };
+
+        /**
+         * callback function for top action to show modal to add products
+         * @param grid
+         */
+        window.showModalToAddCrossProduct = function(grid) {
+            mainGrid = grid;
+            var modalContainerEle = document.getElementById('{{ crossLinkedProdConfig.config.id }}-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.renderComponent(
+                    React.createElement(Components.Modal, {
+                                className: "crossProductModal",
+                                show: true,
+                                title: 'Products List',
+                                confirm: 'Add',
+                                cancel: 'Close',
+                                onLoad: function(modal) {
+                                    var crossNode = $(modal.getDOMNode());
+                                    crossNode.find('.modal-dialog').css('width', '900px');
+                                },
+                                onConfirm: window.addSelectedProduct
+                            },
+                            React.createElement('div', {className: 'f-grid-wrapper', id: 'crossProductList'})
+                    ), modalContainerEle);
+            var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('crossProductList');
+            var instanceAttachGrid = React.renderComponent(
+                    React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
+                    attachGridContainerEle
+            );
+
+            if (typeof instanceAttachGrid.refs[prodAttachConfigCompiled.id] !== 'undefined') {
+                attachGrid = instanceAttachGrid.refs[prodAttachConfigCompiled.id];
+            }
+        };
+
+        /**
+         * add selected products from full products grid to category-products grid
+         * @param modal
+         */
+        window.addSelectedProduct = function(modal) {
+            var selectedRows = attachGrid.getSelectedRows();
+            if (selectedRows.length) {
+                var addRows = [];
+                //process selected rows
+                selectedRows.forEach(function(attachRow) {
+                    if (!_.findWhere(mainGrid.getRows(), {id: attachRow.id})) {
+                        addRows.push(attachRow);
+                    }
+
+                    if (addRows.length) {
+                        mainGrid.addRows(addRows);
+                    }
+                });
+                modal.close();
+            } else {
+                alert('please choose at least one product');
+            }
+        };
+        window.setLinkedProdMainGrid = function(grid) {
+            mainGrid = grid;
+            var addedIds = [], removedIds = [],
+                    arrCurrentRemovedIds, temp,
+                    originIds = _.pluck(grid.getRows(), 'id'),
+                    relatedIdsAddEle = $('#related_ids_add'),
+                    similarIdsAddEle = $('#similar_ids_add'),
+                    crossIdsAddEle = $('#cross_sell_ids_add'),
+                    similarIdsRemovedEle = $('#similar_ids_remove'),
+                    crossIdsRemovedEle = $('#cross_sell_ids_remove'),
+                    relatedIdsRemovedEle = $('#related_ids_remove');
+
+            $(mainGrid.getDOMNode())
+                    .on('removedRows.griddle', function (e, removedRows, grid) {
+                        removedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffRemoveIds = _.difference(originIds, removedIds);
+                        switch (grid.props.config.id) {
+                            case 'linked_products_related':
+                                relatedIdsRemovedEle.val(diffRemoveIds.join(','));
+                                arrCurrentAddedIds = relatedIdsAddEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentAddedIds)) {
+                                    temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                                    relatedIdsAddEle.val(temp.join(','));
+                                }
+                                break;
+                            case 'linked_products_similar':
+                                similarIdsRemovedEle.val(diffRemoveIds.join(','));
+                                arrCurrentAddedIds = similarIdsAddEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentAddedIds)) {
+                                    temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                                    similarIdsAddEle.val(temp.join(','));
+                                }
+                                break;
+                            case 'linked_products_cross_sell':
+                                crossIdsRemovedEle.val(diffRemoveIds.join(','));
+                                arrCurrentAddedIds = crossIdsAddEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentAddedIds)) {
+                                    temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                                    crossIdsAddEle.val(temp.join(','));
+                                }
+                                break;
+                        }
+                    })
+                    .on('addedRows.griddle', function(e, addedRows, grid) {
+                        addedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffAddIds = _.difference(addedIds, originIds);
+                        switch (grid.props.config.id) {
+                            case 'linked_products_related':
+                                relatedIdsAddEle.val(diffAddIds.join(','));
+                                arrCurrentRemovedIds = relatedIdsRemovedEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentRemovedIds)) {
+                                    temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                                    relatedIdsRemovedEle.val(temp.join(','));
+                                }
+                                break;
+                            case 'linked_products_similar':
+                                similarIdsAddEle.val(diffAddIds.join(','));
+                                arrCurrentRemovedIds = similarIdsRemovedEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentRemovedIds)) {
+                                    temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                                    similarIdsRemovedEle.val(temp.join(','));
+                                }
+                                break;
+                            case 'linked_products_cross_sell':
+                                crossIdsAddEle.val(diffAddIds.join(','));
+                                arrCurrentRemovedIds = crossIdsRemovedEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentRemovedIds)) {
+                                    temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                                    crossIdsRemovedEle.val(temp.join(','));
+                                }
+                                break;
+                        }
+                    });
+        };
+    });
+</script>
+
+<div class='row'>
+    <div class='col-sm-12'>
+        <div class='tabbable'>
+            <ul class='nav nav-tabs f-horiz-nav-tabs prod-type'>
+                <li class='active'>
+                    <a data-toggle='tab' href='#related'>
+                        {{ "Related"|_ }}
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle='tab' href='#similar'>
+                        {{ "Upsells"|_ }}
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle='tab' href='#cross_sell'>
+                        {{ " Cross-Sell"|_ }}
+                    </a>
+                </li>
+            </ul>
+            <div class='tab-content'>
+                <div class='tab-pane active' id='related'>
+                    {{ THIS.view('core/griddle').set('grid', relatedLinkedProdConfig) | raw }}
+                </div>
+                <div class='tab-pane' id='similar'>
+                    {{ THIS.view('core/griddle').set('grid', similarLinkedProdConfig) | raw }}
+                </div>
+                <div class='tab-pane' id='cross_sell'>
+                    {{ THIS.view('core/griddle').set('grid', crossLinkedProdConfig) | raw }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
