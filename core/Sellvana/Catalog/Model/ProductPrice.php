@@ -39,7 +39,8 @@ class Sellvana_Catalog_Model_ProductPrice
             'map',
             'msrp',
             'sale',
-            'tier'
+            'tier',
+            'cost'
         ],
         'price_relation_options' => [
             "base" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'msrp', 'label' => 'MSRP']],
