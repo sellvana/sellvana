@@ -5,9 +5,24 @@
 {% set viewHelper = LAYOUT.view('core/form-elements') %}
 {% set priceHelper = APP.instance('Sellvana_Catalog_Model_ProductPrice') %}
 {% set prices = m.getRawPrices() %}
+
 {% set loadCustomerGroups = MODULES.isLoaded('Sellvana_CustomerGroups') %}
+
+{% if loadCustomerGroups %}
+    {% set customerGroups = APP.instance('Sellvana_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+
 {% set loadSites = MODULES.isLoaded('Sellvana_MultiSite') %}
+
+{% if loadSites %}
+    {% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
+{% endif %}
+
 {% set loadCurrency = MODULES.isLoaded('Sellvana_MultiCurrency') %}
+
+{% if loadCurrency %}
+    {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').curencyOptions() %}
+{% endif %}
 
 <fieldset name="product-prices">
     <div class="f-section">
@@ -42,7 +57,7 @@
         $input.daterangepicker(datePickerOptions);
 
 
-        $('select.to-select2').select2({minimumResultsForSearch: 15, width: 'resolve', dropdownAutoWidth: true});
+//        $('select.to-select2').select2({minimumResultsForSearch: 15, width: 'resolve', dropdownAutoWidth: true});
         function validatePrices() {
             var valid = true;
             $('#price_list').find('select.priceUnique').each(function (el) {

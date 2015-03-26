@@ -12,6 +12,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     priceOptions[k] = op;
                 }
             });
+            var showFilters = this.props.show_customers || this.props.show_sites || this.props.show_currency;
+            var colspan = 3 + (this.props.show_customers ? 1 : 0) + (this.props.show_sites ? 1 : 0) + (this.props.show_currency ? 1 : 0);
+
             return (
                 <div id="prices">
                     <h4>{this.props.title}</h4>
@@ -27,7 +30,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             <th style={{width: 250}}>{Locale._("")}</th>
                             <th style={{width: 75}}>{Locale._("")}</th>
                         </tr>
-                        <tr className="table-actions" style={{backgroundColor: "#ccc"}}>
+                        {showFilters? <tr className="table-actions" style={{backgroundColor: "#ccc"}}>
                             <td></td>
                             {this.props.show_customers ? <td>
                                 <select id="filter_customer_group" ref="filter_customer_group"
@@ -54,11 +57,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                     })}
                                 </select>
                             </td> : null}
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                            <td colSpan="4"></td>
+                        </tr>: null}
 
                         </thead>
                         <tbody>
@@ -95,12 +95,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                 })}
                                 </select>
                             </td>
-                            {this.props.show_sites?<td></td>:null}
-                            {this.props.show_currency?<td></td>:null}
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td colSpan={colspan}></td>
                         </tr>
                         </tfoot>
                     </table>
@@ -153,9 +148,12 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
         render: function () {
             var price = this.props.data;
             this.editable = this.checkEditable(price);
-            //var priceTypes = <span key="price_type">{this.props.price_types[price['price_type']]}</span>;
-            //if(this.editable) {
-                var priceTypes =
+            var priceTypes = <span key="price_type_disabled">
+                <input type="hidden" value={price['price_type']} name={this.getFieldName(price, 'price_type')} />
+                <input type="text" className="form-control" readOnly={true} value={this.props.price_types[price['price_type']]} />
+            </span>;
+            if(this.editable) {
+                 priceTypes =
                     <select key="price_type" className="form-control priceUnique"
                         name={this.getFieldName(price, 'price_type')} readOnly={this.editable? null: "readonly"}
                         defaultValue={price['price_type']} ref="price_type">
@@ -163,7 +161,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                 return <option key={pk} value={pk} disabled={pk == 'promo' ? 'disabled' : null}>{pt}</option>
                             })}
                     </select>;
-            //}
+            }
 
             var qty = <input key="qty_hidden" type="hidden" name={this.getFieldName(price, "qty")} defaultValue={price['qty']}/>;
             if (price['price_type'] === 'tier') {
@@ -216,6 +214,69 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 }
             }
 
+            var groups = null, sites = null, currencies = null;
+            if(this.props.show_customers) {
+                if (this.editable) {
+                    groups =
+                        <select name={this.getFieldName(price, "customer_group_id")}
+                                disabled={this.editable? null: true}
+                                defaultValue={price['customer_group_id']}
+                                className={"form-control" + (this.editable? " priceUnique": '')}>
+                            <option value="*">{Locale._("Default")}</option>
+                            {_.map(this.props.customer_groups, function (val, key) {
+                                return <option key={key} value={key}>{val}</option>
+                            })}
+                        </select>
+                } else {
+                    groups = <span>
+                    <input type="hidden" name={this.getFieldName(price, "customer_group_id")} value={price['customer_group_id']}/>
+                    <input type="text" readOnly={true} value={this.props.customer_groups[price['customer_group_id']]? this.props.customer_groups[price['customer_group_id']]: Locale._("Default")} className="form-control"/>
+                    </span>
+                }
+            }
+            if(this.props.show_sites) {
+                if (this.editable) {
+                    sites =
+                        <select name={this.getFieldName(price, "site_id")} disabled={this.editable? null: true}
+                                defaultValue={price['site_id']}
+                                className={"form-control" + (this.editable? " priceUnique": '')}>
+                            <option value="*">{Locale._("Default")}</option>
+                            {_.map(this.props.sites, function (val, key) {
+                                return <option key={key} value={key}>{val}</option>
+                            })}
+                        </select>
+                } else {
+                    sites = <span>
+                    <input type="hidden" name={this.getFieldName(price, "site_id")}
+                           value={price['site_id']}/>
+                    <input type="text" readOnly={true}
+                           value={this.props.sites[price['site_id']]? this.props.sites[price['site_id']]: Locale._("Default")}
+                           className="form-control"/>
+                    </span>
+                }
+            }
+            if(this.props.show_currency) {
+                if (this.editable) {
+                    currencies =
+                        <select name={this.getFieldName(price, "currency_code")} disabled={this.editable? null: true}
+                                defaultValue={price['currency_code']}
+                                className={"form-control" + (this.editable? " priceUnique": '')}>
+                            <option value="*">{Locale._("Default")}</option>
+                            {_.map(this.props.currencies, function (val, key) {
+                                return <option key={key} value={key}>{val}</option>
+                            })}
+                        </select>
+                } else {
+                    currencies = <span>
+                    <input type="hidden" name={this.getFieldName(price, "currency_code")}
+                           value={price['currency_code']}/>
+                    <input type="text" readOnly={true}
+                           value={this.props.currencies[price['currency_code']]? this.props.currencies[price['currency_code']]: Locale._("Default")}
+                           className="form-control"/>
+                    </span>
+                }
+            }
+
             return (
                 <tr className="price-item">
                     <td>
@@ -227,34 +288,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             <input type="hidden" name={this.getFieldName(price, "product_id")}
                                    defaultValue={price['product_id']}/> : null }
                     </td>
-                    { this.props.show_customers ? <td>
-                        <select name={this.getFieldName(price, "customer_group_id")} disabled={this.editable? null: true}
-                                defaultValue={price['customer_group_id']} className={"form-control" + (this.editable? " priceUnique": '')}>
-                            <option value="*">{Locale._("Default")}</option>
-                            {_.map(this.props.customer_groups, function (val, key) {
-                                return <option key={key} value={key}>{val}</option>
-                            })}
-                        </select>
-                    </td>: null }
-                    { this.props.show_sites ? <td>
-                        <select name={this.getFieldName(price, "site_id")} disabled={this.editable? null: true}
-                                defaultValue={price['site_id']} className={"form-control" + (this.editable? " priceUnique": '')}>
-                            <option value="*">{Locale._("Default")}</option>
-                            {_.map(this.props.sites, function (val, key) {
-                                return <option key={key} value={key}>{val}</option>
-                            })}
-                        </select>
-                    </td>: null}
-                    {this.props.show_currency ? <td>
-                        <select name={this.getFieldName(price, "currency_code")} disabled={this.editable? null: true}
-                                defaultValue={price['currency_code']} className={"form-control" + (this.editable? " priceUnique": '')}>
-                            <option value="*">{Locale._("Default")}</option>
-                            {_.map(this.props.currencies, function (val, key) {
-                                return <option key={key} value={key}>{val}</option>
-                            })}
-                        </select>
-
-                    </td>: null}
+                    { this.props.show_customers ? <td>{groups}</td>: null }
+                    { this.props.show_sites ? <td>{sites}</td>: null }
+                    { this.props.show_currency ? <td>{currencies}</td>: null }
                     <td>
                         {priceTypes}
                     </td>
@@ -397,14 +433,6 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     }
                     allowed = (options[value] != '*');
                 });
-                if(options.prices_add_new && options.prices_add_new.length) {
-                    console.log(allowed);
-                    if (allowed) {
-                        options.prices_add_new.attr('disabled', false);
-                    } else {
-                        options.prices_add_new.attr('disabled', 'disabled');
-                    }
-                }
             };
             this.options.applyFilter = function (e) {
                 var $el = $(e.target);
@@ -418,7 +446,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             this.options.prices_add_new = function (e) {
                 e.preventDefault();
                 var type = $(e.target).val();
-                $(e.target).select2("val", "-1", false);
+                $(e.target).val("-1");
 
                 var newPrice = {
                     id: 'new_' + (this.newIdx++),
