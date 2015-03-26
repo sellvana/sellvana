@@ -303,7 +303,7 @@ VALUES
 
         $priceField = $this->Sellvana_CatalogIndex_Model_Field->load('price', 'field_name');
         if ($priceField) {
-            $priceField->set('filter_type', 'range');
+            $priceField->set('filter_type', 'range')->save();
         }
     }
 }
