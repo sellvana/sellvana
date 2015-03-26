@@ -23,6 +23,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_mainTableAlias = 'main';
 
     protected $_useDefaultLayout = true;
+    protected $_defaultGridLayoutName = 'default_grid';
 
     public function __construct()
     {
@@ -124,7 +125,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $this->gridViewBefore(['view' => $view, 'page_view' => $pageView]);
 
         if ($this->_useDefaultLayout) {
-            $this->BLayout->applyLayout('default_grid');
+            $this->BLayout->applyLayout($this->_defaultGridLayoutName);
         }
         $this->BLayout->applyLayout($this->_gridLayoutName);
     }
