@@ -21,16 +21,16 @@ class Sellvana_Sales_Main extends BClass
             'sales/order_status' => 'Order Status',
             'sales/order_custom_state' => 'Order Custom State',
             'sales/carts' => 'Carts',
-            'sales/reports' => 'Reports'
-
+            'sales/reports' => 'Reports',
         ]);
 
         foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal'] as $total) {
             $this->Sellvana_Sales_Model_Cart->registerTotalRowHandler('Sellvana_Sales_Model_Cart_Total_' . $total);
         }
 
-        foreach (['Cart', 'Checkout', 'Order', 'OrderItem', 'Payment', 'Shipment', 'Cancel', 'Return', 'Refund', 'Comment'] as $workflow) {
-            $this->{'Sellvana_Sales_Workflow_' . $workflow}->registerWorkflow();
+        foreach (['Cart', 'Checkout', 'Order', 'OrderItem', 'Payment', 'Shipment', 'Cancel', 'Return', 'Refund',
+                     'Comment'] as $workflow) {
+            $this->addWorkflow('Sellvana_Sales_Workflow_' . $workflow);
         }
     }
 
@@ -87,6 +87,15 @@ class Sellvana_Sales_Main extends BClass
             $class = $name;
         }
         $this->_registry['discount_method'][$name] = $class;
+        return $this;
+    }
+
+    public function addWorkflow($name, $class = null)
+    {
+        if (is_null($class)) {
+            $class = $name;
+        }
+        $this->_registry['workflow'][$name] = $class;
         return $this;
     }
 
@@ -230,7 +239,20 @@ class Sellvana_Sales_Main extends BClass
 
     public function workflowAction($actionName, $args = [])
     {
-        return $this->BEvents->fire('Sellvana_Sales_Workflow::' . $actionName, $args);
+        #return $this->BEvents->fire('Sellvana_Sales_Workflow::' . $actionName, $args);
+
+        $method = 'action_' . $actionName;
+        $result = [];
+        foreach ($this->_registry['workflow'] as $workflow => $class) {
+            if (is_string($class)) {
+                $class = $this->BClassRegistry->instance($class);
+                $this->_registry['workflow'][$workflow] = $class;
+            }
+            if (method_exists($class, $method)) {
+                $result[] = $class->$method($args);
+            }
+        }
+        return $result;
     }
 
     public function onCustomerLogIn($args)

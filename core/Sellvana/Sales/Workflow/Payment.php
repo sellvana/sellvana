@@ -11,24 +11,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_localHooks = [
-        'customerPaysOnCheckout',
-        'customerStartsExternalPayment',
-        'customerReturnsFromExternalPayment',
-        'customerCompletesCheckoutPayment',
-        'customerFailsCheckoutPayment',
-        'customerGetsPaymentError',
-
-        'adminPlacesOrder',
-        'adminAuthorizesPayment',
-        'adminVoidsAuthorization',
-        'adminReAuthorizesPayment',
-        'adminCapturesPayment',
-        'adminRefundsPayment',
-        'adminChangesPaymentCustomState',
-    ];
-
-    public function customerPaysOnCheckout($args)
+    public function action_customerPaysOnCheckout($args)
     {
         try {
             $order = $args['order'];
@@ -44,7 +27,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         }
     }
 
-    public function customerStartsExternalPayment($args)
+    public function action_customerStartsExternalPayment($args)
     {
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $args['payment'];
@@ -58,7 +41,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $cart->save();
     }
 
-    public function customerReturnsFromExternalPayment($args)
+    public function action_customerReturnsFromExternalPayment($args)
     {
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $args['payment'];
@@ -67,7 +50,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $payment->save();
     }
 
-    public function customerCompletesCheckoutPayment($args)
+    public function action_customerCompletesCheckoutPayment($args)
     {
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $args['payment'];
@@ -107,7 +90,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         );
     }
 
-    public function customerFailsCheckoutPayment($args)
+    public function action_customerFailsCheckoutPayment($args)
     {
         /** @var Sellvana_Sales_Model_Order_Payment $payment */
         $payment = $args['payment'];
@@ -155,36 +138,36 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         }
     }
 
-    public function adminPlacesOrder($args)
+    public function action_adminPlacesOrder($args)
     {
     }
 
-    public function adminAuthorizesPayment($args)
-    {
-
-    }
-
-    public function adminVoidsAuthorization($args)
+    public function action_adminAuthorizesPayment($args)
     {
 
     }
 
-    public function adminReAuthorizesPayment($args)
+    public function action_adminVoidsAuthorization($args)
     {
 
     }
 
-    public function adminCapturesPayment($args)
+    public function action_adminReAuthorizesPayment($args)
     {
 
     }
 
-    public function adminRefundsPayment($args)
+    public function action_adminCapturesPayment($args)
     {
 
     }
 
-    public function adminChangesPaymentCustomState($args)
+    public function action_adminRefundsPayment($args)
+    {
+
+    }
+
+    public function action_adminChangesPaymentCustomState($args)
     {
         $newState = $args['payment']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();

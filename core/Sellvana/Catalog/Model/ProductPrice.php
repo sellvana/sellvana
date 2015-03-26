@@ -43,16 +43,16 @@ class Sellvana_Catalog_Model_ProductPrice
         ],
         'price_relation_options' => [
             "base" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'msrp', 'label' => 'MSRP']],
-            "cost" => [['value' => 'base', 'label' => 'Base price']],
-            "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base price']],
-            "tier" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base price']]
+            "cost" => [['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']],
+            "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base']],
+            "tier" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']]
         ],
         'operation_options' => [
-            ['value' => '=$', 'label' => "Fixed price"],
-            ['value' => '+$', 'label' => "Add amount to"],
-            ['value' => '-$', 'label' => "Subtract amount from"],
-            ['value' => '+%', 'label' => "Add percent of"],
-            ['value' => '-%', 'label' => "Subtract percent from"]
+            ['value' => '=$', 'label' => "Fixed"],
+            ['value' => '+$', 'label' => "Add amount"],
+            ['value' => '-$', 'label' => "Sub amount"],
+            ['value' => '+%', 'label' => "Add %"],
+            ['value' => '-%', 'label' => "Sub %"]
         ],
     ];
     const SALE_DATE_SEPARATOR = ' / ';

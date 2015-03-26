@@ -743,20 +743,6 @@ class Sellvana_Catalog_Migrate extends BClass
 
     public function upgrade__0_3_5__0_3_6()
     {
-        $tPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
-
-        $tableProductVariant = $this->Sellvana_CustomField_Model_ProductVariant->table();
-        $this->BDb->ddlTableDef($tPrice, [
-            BDb::COLUMNS => [
-                'valid_from' => 'DATE NULL DEFAULT NULL',
-                'valid_to'   => 'DATE NULL DEFAULT NULL',
-                'variant_id' => 'INT(10) UNSIGNED NULL DEFAULT NULL',
-                'operation'  => 'CHAR(3) NULL DEFAULT NULL',
-                'base_field' => 'varchar(20) null'],
-            BDb::CONSTRAINTS => [
-                'variant' => ['variant_id', $tableProductVariant],
-            ],
-        ]);
     }
 
     public function upgrade__0_3_6__0_3_7()

@@ -862,12 +862,14 @@ class BPDO extends PDO
         restore_exception_handler();
     }
 */
-    protected function _nestable() {
+    protected function _nestable()
+    {
         return in_array($this->getAttribute(PDO::ATTR_DRIVER_NAME),
                         static::$_savepointTransactions);
     }
 
-    public function beginTransaction() {
+    public function beginTransaction()
+    {
         if (!$this->_nestable() || $this->_transLevel == 0) {
             parent::beginTransaction();
         } else {
@@ -877,7 +879,8 @@ class BPDO extends PDO
         $this->_transLevel++;
     }
 
-    public function commit() {
+    public function commit()
+    {
         $this->_transLevel--;
 
         if (!$this->_nestable() || $this->_transLevel == 0) {

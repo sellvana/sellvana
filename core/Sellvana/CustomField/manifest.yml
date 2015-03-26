@@ -1,6 +1,6 @@
 modules:
     Sellvana_CustomField:
-        version: 0.2.4
+        version: 0.2.5
         channel: beta
         require: { module: { Sellvana_Catalog: 0.2.1 } }
         translations: { en: en.php }
@@ -8,7 +8,6 @@ modules:
         description: "Base custom fields implementation, currently for catalog only"
         auto_use: [ bootstrap ]
         observe:
-            - [ "Sellvana_Catalog_Model_Product::orm", Sellvana_CustomField_Main.onProductOrm ]
             - [ "Sellvana_Catalog_Model_Product::orm", Sellvana_CustomField_Main.onProductOrm ]
             - [ "Sellvana_Catalog_Model_Product::onAfterSave", Sellvana_CustomField_Main.onProductAfterSave ]
             - [ "Sellvana_CustomField_Model_ProductVariant::find_one:after", Sellvana_CustomField_Main.onProductVariantFindAfter ]
