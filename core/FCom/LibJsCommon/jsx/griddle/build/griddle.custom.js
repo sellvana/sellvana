@@ -327,6 +327,17 @@ var Griddle = React.createClass({displayName: "Griddle",
             headerSelect: 'show_all' //select value in header dropdown
         };
 
+        //set current filter state
+        if (this.getConfig('filters').length) {
+            var filters = {};
+            _.forEach(this.getConfig('filters'), function(f) {
+                if (f.submit) {
+                    filters[f.field] = f;
+                }
+            });
+            state.filter = JSON.stringify(filters);
+        }
+
         // If we need to get external results, grab the results.
         if (!this.hasExternalResults()) {
             state.results = this.props.results;
