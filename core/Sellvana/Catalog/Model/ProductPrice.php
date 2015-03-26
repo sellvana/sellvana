@@ -43,10 +43,11 @@ class Sellvana_Catalog_Model_ProductPrice
             'cost'
         ],
         'price_relation_options' => [
-            "base" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'msrp', 'label' => 'MSRP']],
-            "cost" => [['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']],
-            "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base']],
-            "tier" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']]
+            "base"  => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'msrp', 'label' => 'MSRP']],
+            "cost"  => [['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']],
+            "sale"  => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base']],
+            "tier"  => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']],
+            "promo" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale'], ['value' => 'msrp', 'label' => 'MSRP']]
         ],
         'operation_options' => [
             ['value' => '=$', 'label' => "Fixed"],
