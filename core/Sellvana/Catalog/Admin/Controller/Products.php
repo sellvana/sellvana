@@ -822,6 +822,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $newModel->create_at = $newModel->update_at = date('Y-m-d H:i:s');
                 $newModel->is_hidden = 1;
                 if ($newModel->save()
+                    && $this->duplicateProductPrices($oldModel, $newModel)
                     && $this->duplicateProductCategories($oldModel, $newModel)
                     && $this->duplicateProductLink($oldModel, $newModel)
                     && $this->duplicateProductMedia($oldModel, $newModel)
@@ -870,6 +871,30 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             $numberSuffix = $max + 1;
         }
         return $numberSuffix;
+    }
+
+    /**
+     * @param $old Sellvana_Catalog_Model_Product
+     * @param $new Sellvana_Catalog_Model_Product
+     * @return bool
+     */
+    public function duplicateProductPrices($old, $new)
+    {
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        $prices = $priceHlp->orm()->where('product_id', $old->id())->find_many();
+        if ($prices) {
+            $newId = $new->id();
+            foreach ($prices as $price) {
+                $data = $price->as_array();
+                unset($data['id']);
+                try {
+                    $priceHlp->create($data)->set('product_id', $newId)->save();
+                } catch (Exception $e) {
+                    var_dump($e); exit;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -948,17 +973,19 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function duplicateProductReviews($old, $new)
     {
-        //todo: confirm need duplicate product review or not
-        $hlp = $this->Sellvana_ProductReviews_Model_Review;
-        $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
-        if ($reviews) {
-            foreach ($reviews as $r) {
-                $data = $r->as_array();
-                unset($data['id']);
-                $data['product_id'] = $new->id();
-                if (!$hlp->create($data)->save()) {
-                    $this->message('An error occurred while duplicate product reviews.', 'error');
-                    return false;
+        if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
+            //todo: confirm need duplicate product review or not
+            $hlp = $this->Sellvana_ProductReviews_Model_Review;
+            $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
+            if ($reviews) {
+                foreach ($reviews as $r) {
+                    $data = $r->as_array();
+                    unset($data['id']);
+                    $data['product_id'] = $new->id();
+                    if (!$hlp->create($data)->save()) {
+                        $this->message('An error occurred while duplicate product reviews.', 'error');
+                        return false;
+                    }
                 }
             }
         }

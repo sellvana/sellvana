@@ -884,12 +884,16 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function reviews($incAvgRating = true)
     {
-        $reviews = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
-            ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
-            ->where(['pr.product_id' => $this->id(), 'approved' => 1])->order_by_expr('pr.create_at DESC')->find_many();
+        if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
+            $reviews = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
+                ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1])->order_by_expr('pr.create_at DESC')->find_many();
 
-        if ($incAvgRating) {
-            $avgRating = $this->calcAverageRating($reviews);
+            if ($incAvgRating) {
+                $avgRating = $this->calcAverageRating($reviews);
+            }
+        } else {
+            $reviews = [];
         }
         return [
             'items' => $reviews,
@@ -974,6 +978,9 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function isAlreadyReviewed($customerId)
     {
+        if (!$this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
+            return false;
+        }
         return $this->Sellvana_ProductReviews_Model_Review->loadWhere(['product_id' => $this->id, 'customer_id' => (int)$customerId]);
     }
 
@@ -1334,35 +1341,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         return $this->getPriceModelByType('tier', $context);
     }
-
-    /**
-     * @param int    $qty
-     * @param int    $customerGroup_id
-     * @param int    $site_id
-     * @param string $currency_code
-     * @param null   $date
-     * @return Sellvana_Catalog_Model_ProductPrice[]
-     */
-    public function getAllPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
-    {
-
-        $prices = [];
-        $productPrices = $this->getRawPrices($qty, $customerGroup_id, $site_id, $currency_code, $date);
-        foreach ($productPrices as $p) {
-            $type = $p['price_type'];
-            $prices[$type][] = $p;
-        }
-
-        return $prices;
-    }
-
-    public function getRawPrices($qty = null, $customerGroup_id = null, $site_id = null, $currency_code = null, $date = null)
-    {
-        $priceModel    = $this->Sellvana_Catalog_Model_ProductPrice;
-        $productPrices = $priceModel->getProductPrices($this, $qty, $customerGroup_id, $site_id, $currency_code, $date);
-        return $productPrices;
-    }
-
 
     public function priceTypeOptions()
     {

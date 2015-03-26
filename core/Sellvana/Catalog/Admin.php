@@ -71,23 +71,20 @@ class Sellvana_Catalog_Admin extends BClass
 
     public function getAvailableViews()
     {
-        $template = [];
+        $result = ['' => ''];
         $allViews = $this->FCom_Frontend_Main->getLayout()->getAllViews();
         foreach ($allViews as $view) {
             $tmp = $view->param('view_name');
             if ($tmp != '') {
-                $template['view:' . $tmp] = $tmp;
+                $result['@Templates']['view:' . $tmp] = $tmp;
             }
         }
-        $cmsBlocks = [];
-        $blocks = $this->BDb->many_as_array($this->Sellvana_Cms_Model_Block->orm()->select('id')->select('description')->find_many());
-        foreach ($blocks as $block) {
-            $cmsBlocks['block:' . $block['id']] = $block['description'];
+        if ($this->BModuleRegistry->isLoaded('Sellvana_Cms')) {
+            $blocks = $this->BDb->many_as_array($this->Sellvana_Cms_Model_Block->orm()->select('id')->select('description')->find_many());
+            foreach ($blocks as $block) {
+                $result['@CMS Pages']['block:' . $block['id']] = $block['description'];
+            }
         }
-        return [
-            '' => '',
-            '@CMS Pages' => $cmsBlocks,
-            '@Templates' => $template,
-        ];
+        return $result;
     }
 }

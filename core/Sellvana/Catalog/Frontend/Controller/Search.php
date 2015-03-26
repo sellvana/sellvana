@@ -117,7 +117,7 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
         $q = $this->Sellvana_Catalog_Model_SearchAlias->processSearchQuery($q);
 
         $productsORM = $this->Sellvana_Catalog_Model_Product->searchProductOrm($q, $filter);
-        $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_search:products_orm', ['data' => $productsORM]);
+        $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_search:products_orm', ['orm' => $productsORM]);
         $productsData = $productsORM->paginate(null, [
             'ps' => $pagerView->default_page_size,
             'sc' => $pagerView->default_sort,

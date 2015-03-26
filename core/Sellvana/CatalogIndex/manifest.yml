@@ -1,6 +1,6 @@
 modules:
     Sellvana_CatalogIndex:
-        version: 0.2.0
+        version: 0.2.1
         channel: beta
         require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_CustomField: 0.1.4 } }
         description: "Catalog search and facets indexing engine"
