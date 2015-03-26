@@ -79,7 +79,3 @@ catalog_product_form_tabs:
     - { include: base }
     - { hook: main, views: catalog/inventory }
     - { view: admin/nav, do: [[ setNav, catalog/inventory ]] }
-
-/catalog/products:
-    - { include: base }
-    - { hook: main, views: ['catalog/products', 'admin/griddle'] }

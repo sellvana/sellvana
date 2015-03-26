@@ -273,7 +273,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     <ul className="pagination pagination-sm pagination-griddle pagesize">
                         {pageSizeHtml}
                     </ul>
-                    <span className="f-grid-pagination">{'Page: '} {pageGoTo}</span>
+                    {this.props.maxPage >= 7 ? <span className="f-grid-pagination">{'Page: '} {pageGoTo}</span> : '' }
                     <ul className="pagination pagination-sm pagination-griddle page">
                         {first}
                         {previous}
