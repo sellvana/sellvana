@@ -997,24 +997,36 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     protected function processPricesPost($model, $data)
     {
-        if(empty($data['prices']) || empty($data['prices']['productPrice'])){
+        if(empty($data['prices'])){
             return;
         }
 
-        foreach ($data['prices']['productPrice'] as $id => $priceData) {
-            foreach ($priceData as $field => $pf) {
-                if(in_array($field, ['customer_group_id', 'site_id', 'currency_code']) && !is_numeric($pf)){
-                    $priceData[$field] = null;
+        if (!empty($data['prices']['productPrice'])) {
+            foreach ($data['prices']['productPrice'] as $id => $priceData) {
+                foreach ($priceData as $field => $pf) {
+                    if (in_array($field, ['customer_group_id', 'site_id', 'currency_code']) && !is_numeric($pf)) {
+                        $priceData[$field] = null;
+                    }
+                }
+
+                $priceData['product_id'] = $model->id();
+                if (is_numeric($id)) {
+                    $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
+                } else {
+                    $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
+                }
+                $price->set($priceData)->save();
+            }
+        }
+
+        if(!empty($data['prices']['delete'])){
+            foreach ($data['prices']['delete'] as $delPrice) {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($delPrice);
+                if($price){
+                    $price->delete();
                 }
             }
 
-            $priceData['product_id'] = $model->id();
-            if(is_numeric($id)) {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
-            } else {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
-            }
-            $price->set($priceData)->save();
         }
 
     }

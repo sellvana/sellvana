@@ -66,7 +66,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         {_.map(this.props['prices'], function (price) {
                             if (this.props['deleted'] && this.props['deleted'][price.id]) {
                                 return <input key={'delete-' + price.id} type="hidden"
-                                              name={"price[" + price.id + "][delete]"} value="1"/>
+                                              name={"prices[delete][]"} value={price.id}/>
                             }
 
                             if (this.shouldPriceShow(price) === false) {
