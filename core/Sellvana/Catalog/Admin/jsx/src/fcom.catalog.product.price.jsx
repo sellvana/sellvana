@@ -202,7 +202,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             {this.props.operationOptions.map(function (o) {
                                 return <option value={o.value} key={o.value}>{o.label}</option>
                             })}
-                        </select>
+                        </select>;
                 if(price['operation'] && price['operation'] !== "=$") {
                     baseField =
                             <select ref="base_fields" key="base_fields" name={this.getFieldName(price, 'base_field')}
