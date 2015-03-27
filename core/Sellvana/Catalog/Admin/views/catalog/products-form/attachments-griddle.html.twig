@@ -1,38 +1,30 @@
-Images grid with griddle
-
 {% set m = THIS.get('model') %}
-{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfigForGriddle(m) %}
-
+{% set prodAttachConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productAttachmentsGridConfigForGriddle(m) %}
 
 {# media lib #}
 {% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
-{% set mediaActions = {
-    "add-selected" : {
-        caption: "Add selected images"
-    }
-} %}
+
 {% set mediaConfig = {
-    id: 'all_images',
-    mode: 'images',
-    type: 'product-images',
-    title: 'Images',
-    folder: 'media/product/images',
-    config: {}
+id: 'all_attachment',
+mode: 'attachments',
+type: 'product-attachments',
+title: 'Attachments',
+folder: 'media/product/attachment',
+config: {}
 } %}
 
 {% set mediaLibAttachConfig = mediaLib.gridConfig({'id': mediaConfig.id, 'folder': mediaConfig.folder, 'config': mediaConfig.config, 'mode': mediaConfig.mode}) %}
 {% set mediaLibAttachConfigCompiled = THIS.view('core/griddle').set('grid', mediaLibAttachConfig).getGridConfig() %}
 
-<input type='hidden' name="grid[images][del]" class="target-attach-remove" id="{{ prodImagesConfig.config.id }}-attach-remove"/>
-<input type='hidden' name="grid[images][rows]" class="target-attach-rows" id="{{ prodImagesConfig.config.id }}-attach-rows"/>
+<input type='hidden' name="grid[attachments][del]" class="target-attach-remove" id="{{ prodAttachConfig.config.id }}-attach-remove"/>
+<input type='hidden' name="grid[attachments][rows]" class="target-attach-rows" id="{{ prodAttachConfig.config.id }}-attach-rows"/>
 
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
-        var mainGridId = '{{ prodImagesConfig.config.id }}';
+        var mainGridId = '{{ prodAttachConfig.config.id }}';
         var inputAddRowsEle = $('#' + mainGridId + '-attach-rows'),
             inputRemoveRowsEle = $('#' + mainGridId + '-attach-remove');
-        var mainGrid, attachGrid,
-            originIds;
+        var mainGrid, attachGrid, originIds;
 
         /**
          * remove special chars
@@ -44,6 +36,10 @@ Images grid with griddle
             return label.replace(/[^A-Z0-9]/ig, ' ');
         }
 
+        /**
+         * Get fields for save
+         * @param row
+         */
         function getFieldToSave(row) {
             return {
                 id: row.id,
@@ -57,26 +53,52 @@ Images grid with griddle
         }
 
         /**
+         * Update rows before save
+         * @param grid
+         */
+        function updateRowsRecord(grid) {
+            var rows = [];
+            var removedIds = _.difference(originIds, _.pluck(grid.getRows(), 'id'));
+
+            grid.getRows().forEach(function(row) {
+                rows.push(getFieldToSave(row));
+            });
+
+            inputAddRowsEle.val(JSON.stringify(rows));
+            inputRemoveRowsEle.val(removedIds.join(','));
+        }
+
+        /**
+         * remove special chars
+         * @param {string} str
+         */
+        function removeSpecialChars(str)
+        {
+            var label = str.substr(0, str.lastIndexOf('.'));
+            return label.replace(/[^A-Z0-9]/ig, ' ');
+        }
+
+        /**
          * callback function to show modal to add image from full images grid to product images grid
          * @param grid
          */
-        window.showModalToAddImage = function(grid) {
+        window.showModalToAddAttachment = function(grid) {
             mainGrid = grid;
-            var modalContainerEle = document.getElementById('{{ prodImagesConfig.config.id }}-modal');
+            var modalContainerEle = document.getElementById('{{ prodAttachConfig.config.id }}-modal');
             //render modal
             React.unmountComponentAtNode(modalContainerEle);
             React.renderComponent(
                     React.createElement(Components.Modal, {
                                 id: "attachGridModal",
                                 show: true,
-                                title: 'Add images',
+                                title: 'Add Attachment',
                                 confirm: 'Add',
                                 cancel: 'Close',
                                 onLoad: function (modal) {
                                     var node = $(modal.getDOMNode());
                                     node.find('.modal-dialog').css('width', '900px');
                                 },
-                                onConfirm: window.addSelectedImages
+                                onConfirm: window.addSelectedAttachment
                             },
                             React.createElement("div", { className: "row f-grid-wrapper" }, React.createElement("div", { className: "tabbable" },
                                     React.createElement("ul", { className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
@@ -90,11 +112,10 @@ Images grid with griddle
                                     React.createElement("div", { className: "tab-content" },
                                             React.createElement("div", { className: "tab-pane active", id: "{{mediaConfig.id}}-attach_library" }
                                             ),
-                                            React.createElement("div", { className: "tab-pane", id: "{{mediaConfig.id}}-media-upload" }, "Pre content")
+                                            React.createElement("div", { className: "tab-pane", id: "{{mediaConfig.id}}-media-upload" })
                                     )
                             )))
                     , modalContainerEle);
-
             var mediaLibAttachConfigCompiled = {{ UTIL.toJson(mediaLibAttachConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById('{{mediaConfig.id}}-attach_library');
             var instanceAttachGrid = React.renderComponent(
@@ -102,18 +123,18 @@ Images grid with griddle
                     attachGridContainerEle
             );
 
+            //var uploadLibAttachConfigCompiled = {{ UTIL.toJson(uploadLibAttachConfigCompiled) | raw }};
+
             if (typeof instanceAttachGrid.refs[mediaLibAttachConfigCompiled.id] !== 'undefined') {
                 attachGrid = instanceAttachGrid.refs[mediaLibAttachConfigCompiled.id];
             }
-
-            //$('#' + mediaId + '_modal').modal('show');
         };
 
         /**
          * callback function to add selected image from full images grid to product images grid
          * @param modal
          */
-        window.addSelectedImages = function(modal) {
+        window.addSelectedAttachment = function(modal) {
             var selectedRows = attachGrid.getSelectedRows();
             if (selectedRows.length) {
                 var addRows = [];
@@ -150,31 +171,21 @@ Images grid with griddle
          * callback function after main grid product_images was rendered
          * @param grid
          */
-        window.setProductImagesMainGrid = function(grid) {
+        window.setProductAttachmentMainGrid = function(grid) {
             mainGrid = grid;
             originIds = _.pluck(grid.getRows(), 'id');
+        };
 
-            //handle event
-            $(mainGrid.getDOMNode()).
-                    on('removedRows.griddle', function (e, removedRows, grid) {
-                        var removedIds = _.difference(originIds, _.pluck(grid.getRows(), 'id'));
-                        inputRemoveRowsEle.val(removedIds.join(','));
-                    }).
-                    on('addedRows.griddle', function(e, addedRows, grid) {
-                        var rows = [];
-                        grid.getRows().forEach(function(row) {
-                            if (isNaN(row.id)) {
-                                rows.push(getFieldToSave(row));
-                            }
-                        });
-                        inputAddRowsEle.val(JSON.stringify(rows));
+        /*
+         *function to set attachment grid data into form fields to send them server
+         *This function is callend when 'save' button of product form is clicked.
+         */
+        window.submitCallback.push(function () {
+            updateRowsRecord(mainGrid);
+        });
 
-                        //todo: add code to handle list images in tab Variant
-                    })
-            ;
-        }
     });
 </script>
 
 {# show main grid#}
-{{ LAYOUT.view('core/griddle').set('grid', prodImagesConfig) | raw }}
+{{ LAYOUT.view('core/griddle').set('grid', prodAttachConfig) | raw }}

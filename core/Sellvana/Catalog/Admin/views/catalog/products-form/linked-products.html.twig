@@ -1,12 +1,12 @@
 {% set m = THIS.get('model') %}
 {% set prodCtrl =  APP.instance('Sellvana_Catalog_Admin_Controller_Products') %}
 
-{% set allProductConfig = prodCtrl.getAllProdConfigForGriddle(m) %}
+{% set allProductConfig = prodCtrl.getAllProdConfig(m) %}
 {% set prodAttachConfigCompiled = THIS.view('core/griddle').set('grid', allProductConfig).getGridConfig() %}
 
-{% set relatedLinkedProdConfig = prodCtrl.linkedProductGridConfigForGriddle(m, 'related') %}
-{% set similarLinkedProdConfig = prodCtrl.linkedProductGridConfigForGriddle(m, 'similar') %}
-{% set crossLinkedProdConfig = prodCtrl.linkedProductGridConfigForGriddle(m, 'cross_sell') %}
+{% set relatedLinkedProdConfig = prodCtrl.linkedProductGridConfig(m, 'related') %}
+{% set similarLinkedProdConfig = prodCtrl.linkedProductGridConfig(m, 'similar') %}
+{% set crossLinkedProdConfig = prodCtrl.linkedProductGridConfig(m, 'cross_sell') %}
 
 <input type='hidden' name='grid[linked_products_similar][add]' id='similar_ids_add' />
 <input type='hidden' name='grid[linked_products_similar][del]' id='similar_ids_remove'/>
@@ -162,7 +162,7 @@
         window.setLinkedProdMainGrid = function(grid) {
             mainGrid = grid;
             var addedIds = [], removedIds = [],
-                    arrCurrentRemovedIds, temp,
+                    arrCurrentAddedIds, arrCurrentRemovedIds, temp,
                     originIds = _.pluck(grid.getRows(), 'id'),
                     relatedIdsAddEle = $('#related_ids_add'),
                     similarIdsAddEle = $('#similar_ids_add'),
