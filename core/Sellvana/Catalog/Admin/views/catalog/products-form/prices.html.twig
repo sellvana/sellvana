@@ -4,7 +4,7 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set viewHelper = LAYOUT.view('core/form-elements') %}
 {% set priceHelper = APP.instance('Sellvana_Catalog_Model_ProductPrice') %}
-{% set prices = m.getRawPrices() %}
+{% set prices = priceHelper.getProductPrices(m) %}
 
 {% set loadCustomerGroups = MODULES.isLoaded('Sellvana_CustomerGroups') %}
 

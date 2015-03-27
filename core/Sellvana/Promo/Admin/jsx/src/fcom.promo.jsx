@@ -1587,10 +1587,11 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             },
             getDefaultProps: function () {
                 return {
-                    totalType: [{id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}, {
-                        id: "fixed",
-                        label: "$ Only"
-                    }],
+                    totalType: [
+                        {id: "-%", label: "% Off"},
+                        {id: "-$", label: "$ Amount Off"},
+                        {id: "=$", label: "$ Only"}
+                    ],
                     select2: true,
                     containerClass: "col-md-2",
                     className: "form-control"
@@ -2607,10 +2608,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             getDefaultProps: function () {
                 return {
                     fields: [
-                        {id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}, {
-                            id: "fixed",
-                            label: "$ Only"
-                        }, {id: "free", label: "Free"}
+                        {id: "-%", label: "% Off"},
+                        {id: "-$", label: "$ Amount Off"},
+                        {id: "=$", label: "$ Only"},
+                        {id: "=0", label: "Free"}
                     ],
                     labelMethodsField: Locale._("Select shipping methods"),
                     url: "conditions/shipping"
