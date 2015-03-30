@@ -1,9 +1,11 @@
 base:
     - view: head
         do:
+            - [ requireJs, underscore, "@FCom_LibJsCommon/js/underscore"  , { exports: _ } ]
+            - [ requireJs, backbone, "@FCom_LibJsCommon/js/backbone", { deps: [ jquery, underscore ], exports: Backbone } ]
             - [ requireJs, fcom.pushclient, "@FCom_PushServer/js/fcom.pushclient" ]
-
     - { callback: FCom_PushServer_Main.layoutInit }
+
 /settings:
     - view: settings
         do:

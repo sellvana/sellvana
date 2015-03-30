@@ -288,9 +288,7 @@ VALUES
 
     public function upgrade__0_2_0__0_2_1()
     {
-        $tField = $this->Sellvana_CatalogIndex_Model_Field->table();
         $tDocValue = $this->Sellvana_CatalogIndex_Model_DocValue->table();
-
         $this->BDb->ddlTableDef($tDocValue, [
             BDb::COLUMNS => [
                 'value_id' => 'int unsigned default null',
@@ -300,10 +298,13 @@ VALUES
                 'IDX_value_decimal' => '(value_decimal)',
             ],
         ]);
+    }
 
+    public function upgrade__0_2_1__0_2_2()
+    {
         $priceField = $this->Sellvana_CatalogIndex_Model_Field->load('price', 'field_name');
         if ($priceField) {
-            $priceField->set('filter_type', 'range')->save();
+            $priceField->set(['filter_type' => 'range', 'filter_custom_view' => 'catalog/category/_filter_price'])->save();
         }
     }
 }

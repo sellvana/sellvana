@@ -440,7 +440,7 @@ class Sellvana_Catalog_Model_ProductPrice
                 'amount' => $value,
                 'base_field' => null,
             ];
-        } elseif (is_string($value) && preg_match('#^(base|sale|cost|msrp|map)([+-*])([0-9.]+)(%?)$#', $value, $m)) {
+        } elseif (is_string($value) && preg_match('#^(base|sale|cost|msrp|map)([+\*-])([0-9.]+)(%?)$#', $value, $m)) {
             return [
                 'operation' => $m[2] . ($m[4] ?: '$'),
                 'amount' => $m[3],
