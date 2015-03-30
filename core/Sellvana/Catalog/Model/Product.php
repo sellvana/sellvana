@@ -1290,15 +1290,30 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $prices = [];
 
         $basePriceModel = $this->getPriceModelByType('base', true);
+        $mapPriceModel = $this->getPriceModelByType('map', true);
+        $msrpPriceModel = $this->getPriceModelByType('msrp', true);
+
         $basePrice = $basePriceModel ? $basePriceModel->getPrice() : 0;
 
         $finalPrice = $this->getCatalogPrice();
+        $finalText = null;
+
+        if ($mapPriceModel) {
+            $mapPrice = $mapPriceModel->getPrice();
+            if ($mapPrice > $finalPrice) {
+                $finalText = $this->BLocale->_('Add to cart');
+            }
+        }
+
+        if ($msrpPriceModel) {
+            $prices['msrp'] = ['type' => 'old', 'label' => 'List Price', 'pos' => 10, 'value' => $msrpPriceModel->getPrice()];
+        }
 
         if ($finalPrice !== null && $finalPrice < $basePrice) {
-            $prices['base'] = ['type' => 'old', 'label' => 'Was', 'pos' => 10, 'value' => $basePrice];
-            $prices['sale'] = ['type' => 'new', 'label' => 'Now', 'pos' => 20, 'value' => $finalPrice, 'final' => 1];
+            $prices['base'] = ['type' => 'old', 'label' => 'Price', 'pos' => 20, 'value' => $basePrice];
+            $prices['sale'] = ['type' => 'new', 'label' => 'Sale', 'pos' => 30, 'value' => $finalPrice, 'formatted' => $finalText, 'final' => 1];
         } else {
-            $prices['base'] = ['type' => 'reg', 'label' => 'Price', 'pos' => 10, 'value' => $basePrice, 'final' => 1];
+            $prices['base'] = ['type' => 'reg', 'label' => 'Price', 'pos' => 20, 'value' => $basePrice, 'final' => 1];
         }
 
         $this->BEvents->fire(__METHOD__, ['product' => $this, 'prices' => &$prices]);
@@ -1309,6 +1324,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             return $p1 < $p2 ? -1 : ($p1 > $p2 ? 1 : 0);
         });
         return $prices;
+    }
+
+    public function getAllTierPrices($context = true)
+    {
+        return $this->getPriceModelByType('tier', $context);
     }
 
     /**
@@ -1335,11 +1355,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             return $tierPrices[$maxTierQty]->getPrice();
         }
         return null;
-    }
-
-    public function getAllTierPrices($context = true)
-    {
-        return $this->getPriceModelByType('tier', $context);
     }
 
     public function priceTypeOptions()
