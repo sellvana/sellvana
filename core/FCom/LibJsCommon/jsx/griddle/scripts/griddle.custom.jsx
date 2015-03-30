@@ -328,10 +328,11 @@ var Griddle = React.createClass({
         };
 
         //set current filter state
+        var filters = {};
         if (this.getConfig('filters').length) {
-            var filters = {};
             _.forEach(this.getConfig('filters'), function(f) {
-                if (f.submit) {
+                if (f.val != '') {
+                    f.submit = true;
                     filters[f.field] = f;
                 }
             });
@@ -342,6 +343,14 @@ var Griddle = React.createClass({
         if (!this.hasExternalResults()) {
             state.results = this.props.results;
             state.totalResults = this.props.results.length;
+
+            //filter local data if we have local_personalise config
+            if (this.getConfig('data_mode') == 'local' && this.getConfig('local_personalize') == true && this.getConfig('filters').length) {
+                var results = this.filterLocalData(this.props.results, filters);
+                state.filteredResults = results;
+                state.totalResults = results.length;
+                state.maxPage = this.getMaxPage(results);
+            }
         } else {
             state.isLoading = true; // Initialize to 'loading'
         }
@@ -454,8 +463,6 @@ var Griddle = React.createClass({
         if (!this.state.isLoading) {
             //figure out which columns are displayed and show only those
             var data = this.getDataForRender(results, cols, true);
-
-            console.log('dataForRender', data);
 
             var meta = this.props.metadataColumns;
             meta.push(this.props.childrenColumnName);
@@ -606,20 +613,19 @@ var Griddle = React.createClass({
         }
     },
     /**
-     * set filter for local data
-     * @param submitFilters
+     * filter local data
+     * @param data
+     * @param filters
+     * @returns {Griddle.props.results|*}
      */
-    setFilterLocalData: function (submitFilters) {
-        //console.log('setFilterLocalData');
+    filterLocalData: function(data, filters) {
         var originalResults = this.props.results;
         var filteredResults = originalResults;
 
-        //console.log('submitFilters', submitFilters);
+        _.each(filters, function(filter, key) { //key is field name
+            if (filter.submit == true && typeof filter.val != 'undefined') {
+                var filterVal = filter.val.toLowerCase();
 
-        _.each(submitFilters, function(filter, key) { //key is field name
-            var filterVal = filter.val.toLowerCase();
-
-            if (filter.submit && filterVal != '') {
                 switch (filter.type) {
                     case 'text':
                         var check = {};
@@ -728,9 +734,55 @@ var Griddle = React.createClass({
             }
         });
 
-        //console.log('setFilterLocalData.filteredResults', filteredResults);
+        return filteredResults;
+    },
+    /**
+     * set filter for local data
+     * @param submitFilters
+     */
+    setFilterLocalData: function (submitFilters) {
+        var filteredResults = this.filterLocalData(this.props.results, submitFilters);
+
+        //personalize
+        var personalizeUrl = this.getLocalPersonalizeUrl();
+        if (personalizeUrl) {
+            $.post(personalizeUrl, {
+                'do': 'grid.local.filters',
+                'grid': this.getConfig('id'),
+                'filters': JSON.stringify(submitFilters)
+            });
+        }
 
         this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
+    },
+    /**
+     * get url to save personalize url
+     */
+    getLocalPersonalizeUrl: function () {
+        var personalizeUrl = this.getConfig('personalize_url');
+        var localPersonalize = this.getConfig('local_personalize');
+
+        if (personalizeUrl && localPersonalize == true) {
+            return personalizeUrl;
+        }
+        return '';
+    },
+    /**
+     * post ajax to save local state
+     */
+    saveLocalState: function() {
+        //personalize
+        var personalizeUrl = this.getLocalPersonalizeUrl();
+        if (personalizeUrl) {
+            $.post(personalizeUrl, {
+                'do': 'grid.state',
+                'grid': this.getConfig('id'),
+                's': this.state.sortColumn,
+                'sd': this.state.sortAscending ? 'asc' : 'desc',
+                'p': this.state.page + 1,
+                'ps': this.props.resultsPerPage
+            });
+        }
     },
     /**
      * quick search in available data collection
