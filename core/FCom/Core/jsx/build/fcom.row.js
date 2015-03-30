@@ -36,11 +36,6 @@ define(['underscore', 'react'], function (_, React) {
             var that = this;
             var id = this.props.getConfig('id');
 
-            //don't render if don't have id
-            if (!this.props.row.id) {
-                return null;
-            }
-
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
                 if (!col) {
