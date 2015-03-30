@@ -154,7 +154,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     var priceTypes =
                     React.createElement("span", {key: "price_type_wrapper"}, 
                         React.createElement("select", {key: "price_type", className: "form-control priceUnique", 
-                            name: this.getFieldName(price, 'price_type'), readOnly: this.editable? null: "readonly", 
+                            name: this.getFieldName(price, 'price_type'), disabled: !this.editable, 
                             defaultValue: price['price_type'], ref: "price_type"}, 
                                 _.map(this.props.price_types, function (pt, pk) {
                                     return React.createElement("option", {key: pk, value: pk, disabled: pk == 'promo' ? 'disabled' : null}, pt)
@@ -202,7 +202,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             this.props.operationOptions.map(function (o) {
                                 return React.createElement("option", {value: o.value, key: o.value}, o.label)
                             })
-                        )
+                        );
                 if(price['operation'] && price['operation'] !== "=$") {
                     baseField =
                             React.createElement("select", {ref: "base_fields", key: "base_fields", name: this.getFieldName(price, 'base_field'), 

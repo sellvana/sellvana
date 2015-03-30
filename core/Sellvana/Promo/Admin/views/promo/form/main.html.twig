@@ -259,7 +259,8 @@
                     labelClass: '{{ labelClass }}',
                     debug: true,
                     base_url: "{{ APP.href('promo/') }}",
-                    buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "No coupon codes" }}'
+                    buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "No coupon codes" }}',
+                    base_fields: {{ UTIL.toJson(APP.instance('Sellvana_Catalog_Model_ProductPrice').fieldOptions('price_relation_options'))|raw }}
                 };
                 Promo.init(options);
             });
