@@ -89,6 +89,13 @@ class Sellvana_Promo_Main extends BClass
                 if (!$pm->isValid()) {
                     continue;
                 }
+                $baseField = $pm->get('base_field');
+                if ($baseField && $baseField !== 'catalog') {
+                    $priceModel = $product->getPriceModelByType($baseField, $context);
+                    if ($priceModel) {
+                        $price = $priceModel->getPrice();
+                    }
+                }
                 $price = $pm->getPrice($price);
                 if ($pm->getData('stop_flag')) {
                     break;

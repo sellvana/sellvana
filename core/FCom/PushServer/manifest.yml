@@ -13,6 +13,9 @@ modules:
                     - [ "FCom_Admin_Model_User::logout", "FCom_PushServer_Main::onAdminUserLogout" ]
                     - [ "BSession::regenerateId", "FCom_PushServer_Main::onRegenerateSessionId" ]
 
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+
             FCom_PushServer:
                 auto_use: [ bootstrap ]
                 routing:
