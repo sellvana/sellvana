@@ -1590,6 +1590,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                     totalType: [
                         {id: "-%", label: "% Off"},
                         {id: "-$", label: "$ Amount Off"},
+                        {id: "+%", label: "Add % to"},
+                        {id: "+$", label: "Add to"},
                         {id: "=$", label: "$ Only"}
                     ],
                     select2: true,
@@ -2350,7 +2352,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                                    defaultValue: this.state.value, onBlur: this.onChange})
                         ), 
                         React.createElement(Type, {ref: "discountType" + this.props.id, id: "discountType" + this.props.id, promoType: promoType, 
-                            key: "discountType" + this.props.id, value: this.state.type, onChange: this.onChange}), 
+                            key: "discountType" + this.props.id, value: this.state.type, onChange: this.onTypeChange}), 
                         React.createElement("div", {style: $.extend({},divStyle, display)}, 
                             React.createElement("select", {className: "to-select2 form-control", disabled: isCatalog, 
                                 ref: "discountScope" + this.props.id, defaultValue: this.state.scope, 
@@ -2369,14 +2371,23 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                                     combination: this.state.combination
                                 }, promoType: promoType})
                         ), 
-                         isCatalog?
+                         isCatalog && this.state.type != '=$'?
                             React.createElement("div", {style: divStyle}, 
                                 React.createElement("select", {className: "form-control to-select2", ref: "base-field-" + this.props.id, 
                                         defaultValue: this.state.base_field, 
                                         id: "base-field-" + this.props.id, key: "base-field-" + this.props.id}, 
                                     this.props.options['base_fields']['promo'].map(function (p) {
-                                        return React.createElement("option", {key: p.value, value: p.value}, p.label)
-                                    })
+
+                                        var opt = null;
+                                        var t = this.state.type;
+                                        if((t == '+%' || t == '+$') && p.value === 'cost') {
+                                            opt = React.createElement("option", {key: p.value, value: p.value}, p.label);
+                                        } else if((t == '-%' || t == '-$') && p.value !== 'cost'){
+                                            opt = React.createElement("option", {key: p.value, value: p.value}, p.label);
+                                        }
+
+                                        return opt;
+                                    }.bind(this))
                                 )
                             ):
                             null
@@ -2456,8 +2467,11 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                         delete value['product_ids'];
                     }
                 } else {
-                    var baseField = $(this.refs["base-field-" + this.props.id].getDOMNode()).select2('val');
-                    value.base_field = baseField;
+                    var ref = this.refs["base-field-" + this.props.id];
+                    if (ref) {
+                        var baseField = $(ref.getDOMNode()).select2().val();
+                        value.base_field = baseField;
+                    }
                 }
 
                 //this.setState(value);
