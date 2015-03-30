@@ -2374,7 +2374,6 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                                 React.createElement("select", {className: "form-control to-select2", ref: "base-field-" + this.props.id, 
                                         defaultValue: this.state.base_field, 
                                         id: "base-field-" + this.props.id, key: "base-field-" + this.props.id}, 
-                                    React.createElement("option", {value: ""}, Locale._("Select Price")), 
                                     this.props.options['base_fields']['promo'].map(function (p) {
                                         return React.createElement("option", {key: p.value, value: p.value}, p.label)
                                     })

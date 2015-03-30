@@ -61,7 +61,7 @@ class Sellvana_Catalog_Model_ProductPrice
                 ['value' => 'sale', 'label' => 'Sale'],
             ],
             "promo" => [
-                ['value' => 'catalog', 'label' => 'Catalog'],
+                ['value' => 'catalog', 'label' => 'Catalog Price'],
                 ['value' => 'cost', 'label' => 'Cost'],
                 ['value' => 'base', 'label' => 'Base'],
                 ['value' => 'sale', 'label' => 'Sale'],
