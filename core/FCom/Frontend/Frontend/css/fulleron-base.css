@@ -445,10 +445,11 @@ label.success {
   font-size:.9em;
   }
 .f-price-group th {
-  width:45px;
+  width:60px;
   padding-right:5px;
   color:#777;
   font-weight:normal;
+  text-align:right;
   }
 .f-price-group .f-free-price .f-price { 
   color: #6a6; 
@@ -462,9 +463,13 @@ label.success {
   text-decoration:line-through;
   }
 .f-price-group .f-map-price {
-  color:#b21919;
-  font-weight:bold;
-  }
+    color:#b21919;
+    font-weight:bold;
+}
+.f-price-group .f-save-price {
+    color:#b21919;
+    font-size:.9em;
+}
 
 /*------------------------------------*\
    CONTAINER-SPECIFIC

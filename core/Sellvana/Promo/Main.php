@@ -80,7 +80,7 @@ class Sellvana_Promo_Main extends BClass
         /** @var Sellvana_Catalog_Model_Product $product */
         $product = $args['product'];
         $context = $args['context'];
-        $price = $args['price'];
+        $finalPrice =& $args['final_price'];
 
         /** @var Sellvana_Catalog_Model_ProductPrice[] $promoPriceModels */
         $promoPriceModels = $product->getPriceModelByType('promo', $context);
@@ -93,15 +93,14 @@ class Sellvana_Promo_Main extends BClass
                 if ($baseField && $baseField !== 'catalog') {
                     $priceModel = $product->getPriceModelByType($baseField, $context);
                     if ($priceModel) {
-                        $price = $priceModel->getPrice();
+                        $finalPrice = $priceModel->getPrice();
                     }
                 }
-                $price = $pm->getPrice($price);
+                $finalPrice = $pm->getPrice($finalPrice);
                 if ($pm->getData('stop_flag')) {
                     break;
                 }
             }
-            $args['price'] = $price;
         }
     }
 

@@ -1288,10 +1288,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
          * - pos: 0,1,2,3
          */
         $prices = [];
+        $context = true;
 
-        $basePriceModel = $this->getPriceModelByType('base', true);
-        $mapPriceModel = $this->getPriceModelByType('map', true);
-        $msrpPriceModel = $this->getPriceModelByType('msrp', true);
+        $basePriceModel = $this->getPriceModelByType('base', $context);
+        $mapPriceModel = $this->getPriceModelByType('map', $context);
+        $msrpPriceModel = $this->getPriceModelByType('msrp', $context);
 
         $basePrice = $basePriceModel ? $basePriceModel->getPrice() : 0;
 
@@ -1306,17 +1307,33 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         if ($msrpPriceModel) {
-            $prices['msrp'] = ['type' => 'old', 'label' => 'List Price', 'pos' => 10, 'value' => $msrpPriceModel->getPrice()];
+            $msrpPrice = $msrpPriceModel->getPrice();
+            $prices['msrp'] = ['type' => 'old', 'label' => 'List Price', 'pos' => 10, 'value' => $msrpPrice];
         }
 
         if ($finalPrice !== null && $finalPrice < $basePrice) {
             $prices['base'] = ['type' => 'old', 'label' => 'Price', 'pos' => 20, 'value' => $basePrice];
-            $prices['sale'] = ['type' => 'new', 'label' => 'Sale', 'pos' => 30, 'value' => $finalPrice, 'formatted' => $finalText, 'final' => 1];
+            $prices['sale'] = ['type' => 'new', 'label' => 'Sale', 'pos' => 30, 'value' => $finalPrice,
+                'formatted' => $finalText, 'final' => 1];
         } else {
             $prices['base'] = ['type' => 'reg', 'label' => 'Price', 'pos' => 20, 'value' => $basePrice, 'final' => 1];
         }
 
-        $this->BEvents->fire(__METHOD__, ['product' => $this, 'prices' => &$prices]);
+        $this->BEvents->fire(__METHOD__, [
+            'product' => $this,
+            'context' => $context,
+            'prices' => &$prices,
+            'final_price' => &$finalPrice,
+        ]);
+
+        if ($finalPrice !== null && $finalPrice < $basePrice) {
+            if (!empty($msrpPrice)) {
+                $basePrice = max($basePrice, $msrpPrice);
+            }
+            $diff = $basePrice - $finalPrice;
+            $saveText = $this->BLocale->currency($diff) . ' (' . number_format($diff / $basePrice * 100) . '%)';
+            $prices['save'] = ['type' => 'save', 'label' => 'You Save', 'pos' => 90, 'formatted' => $saveText];
+        }
 
         uasort($prices, function($v1, $v2) {
             $p1 = !empty($v1['pos']) ? $v1['pos'] : 999;

@@ -5,12 +5,13 @@
   'reg': 'f-reg-price',
   'new': 'f-special-price',
   'old': 'f-old-price',
+  'save': 'f-save-price',
 } %}
 
 <div class="f-price-group" itemprop="offerDetails" itemscope itemtype="http://data-vocabulary.org/Offer">
     <table>
 {% for price in prices %}
-      <tr class="{{ classByType[price.type] }}">
+      <tr class="{{ price.tr_class ~ ' ' ~ classByType[price.type] }}">
           <th class="f-price-label">{{ price.label|_ }}</th>
           <td class="f-price {{ price.final ? 'f-final-price' }}">
               {{ price.formatted ?: (price.value ? price.value|currency : 'FREE'|_) }}
