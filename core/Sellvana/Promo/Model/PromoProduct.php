@@ -123,7 +123,7 @@ class Sellvana_Promo_Model_PromoProduct extends FCom_Core_Model_Abstract
         foreach ($data['products'] as $pId => $r) {
             $r['qty'] = $sortOrder;
             $r['amount'] = $action['value'];
-            $r['operation'] = $action['type'] === 'pcnt' ? '-%' : '-$';
+            $r['operation'] = $action['type'];
             if (empty($existing[$pId])) {
                 $r['price_type'] = $r['calc_status'] ? 'promo' : 'promo-pending';
                 $r['product_id'] = $pId;

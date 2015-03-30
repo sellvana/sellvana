@@ -293,7 +293,7 @@ class Sellvana_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
         $combineStrategy = $this->BConfig->get('modules/Sellvana_Promo/combine_strategy', 'max'); //,compound
         //TODO: remove defaults
         $scope = !empty($action['scope']) ? $action['scope'] : 'whole_order';
-        $amountType = !empty($action['type']) ? $action['type'] : 'pcnt'; //,amt,fixed
+        $amountType = !empty($action['type']) ? $action['type'] : '-%';
         $amount = !empty($action['value']) ? $action['value'] : 10;
         $localeHlp = $this->BLocale;
         $items = [];
@@ -348,13 +348,13 @@ class Sellvana_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
             $totalAmount += $rowTotals[$i];
         }
         if ($totalAmount) {
-            if ($amountType === 'pcnt') {
+            if ($amountType === '-%') {
                 $percent       = $amount / 100;
                 $totalDiscount = (float)$localeHlp->roundCurrency($totalAmount * $percent);
-            } elseif ($amountType === 'amt') {
+            } elseif ($amountType === '-$') {
                 $percent       = $amount / $totalAmount;
                 $totalDiscount = $amount;
-            } elseif ($amountType === 'fixed') {
+            } elseif ($amountType === '=$') {
                 $percent       = 1 - $amount / $totalAmount;
                 $totalDiscount = $totalAmount - $amount;
             }
@@ -398,18 +398,18 @@ class Sellvana_Promo_Model_PromoCart extends FCom_Core_Model_Abstract
             }
         }
         switch ($action['type']) {
-            case 'free':
+            case '=0':
                 $actionsResult['shipping_discount'] = $cart->get('shipping_price');
                 $actionsResult['shipping_free'] = 1;
                 break;
 
-            case 'pcnt': //TODO: account for previous shipping discounts?
+            case '-%': //TODO: account for previous shipping discounts?
                 $discount = $cart->get('shipping_price') * $action['value'] / 100;
                 $actionsResult['shipping_discount'] = $this->BLocale->roundCurrency($discount);
                 $actionsResult['shipping_free'] = $actionsResult['shipping_discount'] == $cart->get('shipping_price');
                 break;
 
-            case 'amt':
+            case '-$':
                 $actionsResult['shipping_discount'] = min($action['value'], $cart->get('shipping_price'));
                 $actionsResult['shipping_free'] = $actionsResult['shipping_discount'] == $cart->get('shipping_price');
                 break;

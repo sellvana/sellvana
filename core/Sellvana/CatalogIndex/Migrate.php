@@ -285,4 +285,25 @@ VALUES
         $tField = $this->Sellvana_CatalogIndex_Model_Field->table();
         $this->BDb->run("UPDATE {$tField} SET source_callback=replace(source_callback, 'FCom_', 'Sellvana_') WHERE source_callback REGEXP '{$origRegex}'");
     }
+
+    public function upgrade__0_2_0__0_2_1()
+    {
+        $tField = $this->Sellvana_CatalogIndex_Model_Field->table();
+        $tDocValue = $this->Sellvana_CatalogIndex_Model_DocValue->table();
+
+        $this->BDb->ddlTableDef($tDocValue, [
+            BDb::COLUMNS => [
+                'value_id' => 'int unsigned default null',
+                'value_decimal' => 'decimal(12,2) default null',
+            ],
+            BDb::KEYS => [
+                'IDX_value_decimal' => '(value_decimal)',
+            ],
+        ]);
+
+        $priceField = $this->Sellvana_CatalogIndex_Model_Field->load('price', 'field_name');
+        if ($priceField) {
+            $priceField->set('filter_type', 'range')->save();
+        }
+    }
 }

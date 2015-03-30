@@ -11,6 +11,7 @@
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  */
 
 class Sellvana_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abstract
@@ -129,7 +130,7 @@ class Sellvana_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller
         $pagerView->set('sort_options', $this->Sellvana_CatalogIndex_Model_Field->getSortingArray());
 
         $productsData = $this->Sellvana_CatalogIndex_Indexer->searchProducts($q, null, false);
-        $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_search:products_orm', ['data' => $productsData['orm']]);
+        $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_search:products_orm', ['orm' => $productsData['orm']]);
         $r = $req->get();
         #$r['sc'] = '';
         $paginated = $productsData['orm']->paginate($r, [

@@ -864,6 +864,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $newModel->create_at = $newModel->update_at = date('Y-m-d H:i:s');
                 $newModel->is_hidden = 1;
                 if ($newModel->save()
+                    && $this->duplicateProductPrices($oldModel, $newModel)
                     && $this->duplicateProductCategories($oldModel, $newModel)
                     && $this->duplicateProductLink($oldModel, $newModel)
                     && $this->duplicateProductMedia($oldModel, $newModel)
@@ -912,6 +913,30 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             $numberSuffix = $max + 1;
         }
         return $numberSuffix;
+    }
+
+    /**
+     * @param $old Sellvana_Catalog_Model_Product
+     * @param $new Sellvana_Catalog_Model_Product
+     * @return bool
+     */
+    public function duplicateProductPrices($old, $new)
+    {
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        $prices = $priceHlp->orm()->where('product_id', $old->id())->find_many();
+        if ($prices) {
+            $newId = $new->id();
+            foreach ($prices as $price) {
+                $data = $price->as_array();
+                unset($data['id']);
+                try {
+                    $priceHlp->create($data)->set('product_id', $newId)->save();
+                } catch (Exception $e) {
+                    var_dump($e); exit;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -990,17 +1015,19 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function duplicateProductReviews($old, $new)
     {
-        //todo: confirm need duplicate product review or not
-        $hlp = $this->Sellvana_ProductReviews_Model_Review;
-        $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
-        if ($reviews) {
-            foreach ($reviews as $r) {
-                $data = $r->as_array();
-                unset($data['id']);
-                $data['product_id'] = $new->id();
-                if (!$hlp->create($data)->save()) {
-                    $this->message('An error occurred while duplicate product reviews.', 'error');
-                    return false;
+        if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
+            //todo: confirm need duplicate product review or not
+            $hlp = $this->Sellvana_ProductReviews_Model_Review;
+            $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
+            if ($reviews) {
+                foreach ($reviews as $r) {
+                    $data = $r->as_array();
+                    unset($data['id']);
+                    $data['product_id'] = $new->id();
+                    if (!$hlp->create($data)->save()) {
+                        $this->message('An error occurred while duplicate product reviews.', 'error');
+                        return false;
+                    }
                 }
             }
         }
@@ -1039,24 +1066,36 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     protected function processPricesPost($model, $data)
     {
-        if(empty($data['prices']) || empty($data['prices']['productPrice'])){
+        if(empty($data['prices'])){
             return;
         }
 
-        foreach ($data['prices']['productPrice'] as $id => $priceData) {
-            foreach ($priceData as $field => $pf) {
-                if(in_array($field, ['customer_group_id', 'site_id', 'currency_code']) && !is_numeric($pf)){
-                    $priceData[$field] = null;
+        if (!empty($data['prices']['productPrice'])) {
+            foreach ($data['prices']['productPrice'] as $id => $priceData) {
+                foreach ($priceData as $field => $pf) {
+                    if (in_array($field, ['customer_group_id', 'site_id', 'currency_code']) && !is_numeric($pf)) {
+                        $priceData[$field] = null;
+                    }
+                }
+
+                $priceData['product_id'] = $model->id();
+                if (is_numeric($id)) {
+                    $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
+                } else {
+                    $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
+                }
+                $price->set($priceData)->save();
+            }
+        }
+
+        if(!empty($data['prices']['delete'])){
+            foreach ($data['prices']['delete'] as $delPrice) {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($delPrice);
+                if($price){
+                    $price->delete();
                 }
             }
 
-            $priceData['product_id'] = $model->id();
-            if(is_numeric($id)) {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
-            } else {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
-            }
-            $price->set($priceData)->save();
         }
 
     }

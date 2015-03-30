@@ -31,7 +31,7 @@ class Sellvana_Catalog_Model_ProductPrice
             self::TYPE_MSRP  => "MSRP",
             self::TYPE_SALE  => "Sale Price",
             self::TYPE_TIER  => "Tier Price",
-            self::TYPE_COST => "Cost",
+            self::TYPE_COST  => "Cost",
             self::TYPE_PROMO => "Promo Price",
         ],
         'editable_prices' => [
@@ -39,20 +39,43 @@ class Sellvana_Catalog_Model_ProductPrice
             'map',
             'msrp',
             'sale',
-            'tier'
+            'tier',
+            'cost'
         ],
         'price_relation_options' => [
-            "base" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'msrp', 'label' => 'MSRP']],
-            "cost" => [['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']],
-            "sale" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base']],
-            "tier" => [['value' => 'cost', 'label' => 'Cost'], ['value' => 'base', 'label' => 'Base'], ['value' => 'sale', 'label' => 'Sale']]
+            "base" => [
+                ['value' => 'cost', 'label' => 'Cost'],
+                ['value' => 'msrp', 'label' => 'MSRP'],
+            ],
+            "cost" => [
+                ['value' => 'base', 'label' => 'Base'],
+                ['value' => 'sale', 'label' => 'Sale'],
+            ],
+            "sale" => [
+                ['value' => 'cost', 'label' => 'Cost'],
+                ['value' => 'base', 'label' => 'Base'],
+            ],
+            "tier" => [
+                ['value' => 'cost', 'label' => 'Cost'],
+                ['value' => 'base', 'label' => 'Base'],
+                ['value' => 'sale', 'label' => 'Sale'],
+            ],
+            "promo" => [
+                ['value' => 'catalog', 'label' => 'Catalog'],
+                ['value' => 'cost', 'label' => 'Cost'],
+                ['value' => 'base', 'label' => 'Base'],
+                ['value' => 'sale', 'label' => 'Sale'],
+                ['value' => 'msrp', 'label' => 'MSRP'],
+            ],
         ],
         'operation_options' => [
             ['value' => '=$', 'label' => "Fixed"],
-            ['value' => '+$', 'label' => "Add amount"],
-            ['value' => '-$', 'label' => "Sub amount"],
-            ['value' => '+%', 'label' => "Add %"],
-            ['value' => '-%', 'label' => "Sub %"]
+            ['value' => '*$', 'label' => "Times"],
+            ['value' => '+$', 'label' => "Add to"],
+            ['value' => '-$', 'label' => "Subtract from"],
+            ['value' => '*%', 'label' => "Set % of"],
+            ['value' => '+%', 'label' => "Add % to"],
+            ['value' => '-%', 'label' => "Subtract % from"],
         ],
     ];
     const SALE_DATE_SEPARATOR = ' / ';
@@ -299,13 +322,15 @@ class Sellvana_Catalog_Model_ProductPrice
      */
     public function applyPriceOperation($value1, $value2, $op)
     {
-        $result = $value1;
         switch ($op) {
             case '=$': $result = $value2; break;
-            case '+$': $result += $value2; break;
-            case '-$': $result -= $value2; break;
-            case '+%': $result += $value1 * $value2 / 100; break;
-            case '-%': $result -= $value1 * $value2 / 100; break;
+            case '*$': $result = $value1 * $value2; break;
+            case '+$': $result = $value1 + $value2; break;
+            case '-$': $result = $value1 - $value2; break;
+            case '*%': $result = $value1 * $value2 / 100; break;
+            case '+%': $result = $value1 + $value1 * $value2 / 100; break;
+            case '-%': $result = $value1 - $value1 * $value2 / 100; break;
+            default: $result = $value1;
         }
         return $result;
     }
@@ -415,7 +440,7 @@ class Sellvana_Catalog_Model_ProductPrice
                 'amount' => $value,
                 'base_field' => null,
             ];
-        } elseif (is_string($value) && preg_match('#^(base|sale|cost|msrp|map)([+-])([0-9.]+)(%?)$#', $value, $m)) {
+        } elseif (is_string($value) && preg_match('#^(base|sale|cost|msrp|map)([+-*])([0-9.]+)(%?)$#', $value, $m)) {
             return [
                 'operation' => $m[2] . ($m[4] ?: '$'),
                 'amount' => $m[3],

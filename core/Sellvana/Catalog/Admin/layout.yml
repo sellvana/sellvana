@@ -32,6 +32,7 @@ catalog_product_form_tabs:
     - { include: catalog_product_form_tabs }
     - view: head
         do:
+            - [ css, "@Sellvana_Catalog/Admin/css/prices.css" ]
             - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.product.price, [jquery, react]]
 #            - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/src/fcom.catalog.product.price, [jquery, react]]
 

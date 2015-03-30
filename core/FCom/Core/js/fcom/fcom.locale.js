@@ -31,7 +31,7 @@ define(['jquery'], function ($) {
             if (this.translations[phrase] != undefined) {
                 return this.translations[phrase];
             }
-            console.log("Could not find translation for: [%s]", phrase);
+            //console.log("Could not find translation for: [%s]", phrase);
             return phrase;
         },
         processPhrase: function (phrase) {
