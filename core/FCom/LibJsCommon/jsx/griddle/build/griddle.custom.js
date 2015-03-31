@@ -373,7 +373,10 @@ var Griddle = React.createClass({displayName: "Griddle",
         }
         this.triggerCallback('componentDidMount');
     },
-
+    componentDidUpdate: function() {
+        console.log('didUpdate');
+        this.triggerCallback('componentDidUpdate');
+    },
     getDataForRender: function(data, cols, pageList){
         var that = this;
         if (!this.hasExternalResults()) {
@@ -480,7 +483,8 @@ var Griddle = React.createClass({displayName: "Griddle",
                         className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, 
                         getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, 
                         getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows, 
-                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows}
+                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, 
+                        ref: 'gridBody'}
                     ))
                     : (React.createElement(GridBody, {columnMetadata: this.props.columnMetadata, data: data, columns: cols, metadataColumns: meta, className: this.props.tableClassName}))
                 );
@@ -947,7 +951,7 @@ var Griddle = React.createClass({displayName: "Griddle",
             var callbackFuncName = callbacks[name];
             if (typeof window[callbackFuncName] === 'function') {
                 console.log('triggerCallback:'+name);
-                return window[callbackFuncName](this);
+                return window[callbackFuncName](this, name);
             }
         }
     }

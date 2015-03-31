@@ -16,7 +16,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     protected $_gridTitle = 'Modules';
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'm';
-    protected $_gridViewName = 'core/backbonegrid';
+    protected $_gridViewName = 'core/griddle';
     protected $_navPath = 'modules/installed';
     protected $_useDefaultLayout = false;
 
@@ -166,6 +166,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         ];
         $config['events'] = ['edit', 'mass-edit'];
         $config['grid_before_create'] = 'moduleGridRegister';
+        $config['callbacks'] = [
+            'componentDidMount' => 'moduleGridMounted',
+            'componentDidUpdate' => 'moduleGridMounted'
+        ];
         $config['local_personalize'] = true;
 
         //$config['state'] =array(5,6,7,8);

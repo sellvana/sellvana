@@ -20,6 +20,50 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         });
     }
 
+    window.moduleGridMounted = function(grid) {
+        moduleGrid = grid;
+
+        var rows = grid.refs['gridBody'].refs;
+
+        _.each(rows, function(row) {
+            wrapBadgeHTML(row);
+        });
+    };
+
+    var wrapBadgeHTML = function(rowComponent) {
+        var row = rowComponent.props.row;
+        var el = $(rowComponent.getDOMNode());
+        if (!row) {
+            return false;
+        }
+
+        if (row['migration_available']) {
+            el.find('td[data-col="schema_version"]').wrapInner('<span class="badge badge-important"></span>');
+        }
+
+        if (row['run_status'] === 'LOADED') {
+            el.find('td[data-col="run_status"]').wrapInner('<span class="badge badge-success"></span>');
+        } else if (row['run_status'] === 'ERROR') {
+            el.find('td[data-col="run_status"]').wrapInner('<span class="badge badge-important"></span>');
+        }
+
+        var badge = '';
+        switch(row['run_level']) {
+            case 'REQUESTED':
+                badge = 'success';
+                break;
+            case 'REQUIRED':
+                badge = 'warning';
+                break;
+        }
+
+        if (badge != '') {
+            el.find('td[data-col="run_level"]').wrapInner('<span class="badge badge-'+badge+'"></span>');
+        }
+
+    };
+
+    //todo: will remove this function after completely moved to react griddle
     window.moduleGridRegister = function(grid) {
         moduleGrid = grid;
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
@@ -67,6 +111,6 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
 });
 </script>
 
-{{ THIS.view('admin/grid') | raw }}
+{{ THIS.view('admin/griddle') | raw }}
 
 

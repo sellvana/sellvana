@@ -132,7 +132,8 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                 sortAscending: that.props.sortAscending, columnMetadata: that.props.columnMetadata, data: this.props.data, 
                 originalData: this.props.originalData, setHeaderSelection: that.props.setHeaderSelection, getHeaderSelection: this.props.getHeaderSelection, 
                 addSelectedRows: this.props.addSelectedRows, getSelectedRows: that.props.getSelectedRows, clearSelectedRows: this.props.clearSelectedRows, 
-                removeSelectedRows: this.props.removeSelectedRows}
+                removeSelectedRows: this.props.removeSelectedRows, 
+                ref: 'gridTitle'}
             );
 
             //get data for render
@@ -163,7 +164,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui'], function (R
                     });
                 }
 
-                return React.createElement(FComRow, {row: row, key: 'row-' + row.id, index: index, columns: that.props.columns, columnMetadata: that.props.columnMetadata, defaultValues: defaultValues, 
+                return React.createElement(FComRow, {ref: 'row'+row.id, row: row, key: 'row-' + row.id, index: index, columns: that.props.columns, columnMetadata: that.props.columnMetadata, defaultValues: defaultValues, 
                     getConfig: that.props.getConfig, doRowAction: that.doRowAction, removeSelectedRows: that.props.removeSelectedRows, 
                     addSelectedRows: that.props.addSelectedRows, getSelectedRows: that.props.getSelectedRows});
             });
