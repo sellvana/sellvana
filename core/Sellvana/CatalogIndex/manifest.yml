@@ -1,6 +1,6 @@
 modules:
     Sellvana_CatalogIndex:
-        version: 0.2.0
+        version: 0.2.2
         channel: beta
         require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_CustomField: 0.1.4 } }
         description: "Catalog search and facets indexing engine"
@@ -17,10 +17,9 @@ modules:
         areas:
             FCom_Admin:
                 routing:
+                    - [ /catalogindex/?.action, Sellvana_CatalogIndex_Admin_Controller ]
                     - [ /catalogindex/fields, Sellvana_CatalogIndex_Admin_Controller_Fields.index ]
                     - [ /catalogindex/fields/.action, Sellvana_CatalogIndex_Admin_Controller_Fields ]
-                    - [ /catalogindex/reindex, Sellvana_CatalogIndex_Admin_Controller.reindex ]
-                    - [ /catalogindex/test, Sellvana_CatalogIndex_Admin_Controller.test ]
 
             FCom_Frontend:
                 routing:

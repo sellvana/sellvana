@@ -14,24 +14,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_localHooks = [
-        'customerCreatesNewCart',
-
-        'customerLogsIn',
-        'customerLogsOut',
-
-        'customerAddsItemsToCart',
-        'customerUpdatesCart',
-
-        'customerRequestsShippingEstimate',
-
-        'customerAddsCouponCode',
-        'customerRemovesCouponCode',
-
-        'customerAbandonsCart',
-    ];
-
-    public function customerCreatesNewCart($args)
+    public function action_customerCreatesNewCart($args)
     {
         // get cookie token ttl from config
         $ttl = $this->BConfig->get('modules/Sellvana_Sales/cart_cookie_token_ttl_days') * 86400;
@@ -65,7 +48,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
     /**
      * @throws BException
      */
-    public function customerLogsIn($args)
+    public function action_customerLogsIn($args)
     {
         // load just logged in customer
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
@@ -110,7 +93,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
     /**
      *
      */
-    public function customerLogsOut($args)
+    public function action_customerLogsOut($args)
     {
         $this->Sellvana_Sales_Model_Cart->resetSessionCart();
     }
@@ -131,7 +114,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
      *          items:
      *              - { status: added|error }
      */
-    public function customerAddsItemsToCart($args)
+    public function action_customerAddsItemsToCart($args)
     {
         $cart = $this->_getCart($args, true);
         $post = !empty($args['post']) ? $args['post'] : null;
@@ -229,7 +212,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
      * @todo normalize API
      * @todo move "variants" code to Sellvana_CustomFields module
      */
-    public function customerUpdatesCart($args)
+    public function action_customerUpdatesCart($args)
     {
         $cart = $this->_getCart($args, true);
         $post = !empty($args['post']) ? $args['post'] : null;
@@ -295,7 +278,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         $args['result']['items'] = $items;
     }
 
-    public function customerRequestsShippingEstimate($args)
+    public function action_customerRequestsShippingEstimate($args)
     {
         $postcode = $args['post']['shipping']['postcode'];
         $cart = $this->_getCart($args);
@@ -304,7 +287,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
     }
 
 
-    public function customerAddsCouponCode($args)
+    public function action_customerAddsCouponCode($args)
     {
         if (empty($args['post']['coupon_code'])) {
             $args['result']['error']['message'] = 'No coupon code provided';
@@ -342,7 +325,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         $cart->set('coupon_code', $cartCouponCodes)->calculateTotals()->saveAllDetails();
     }
 
-    public function customerRemovesCouponCode($args)
+    public function action_customerRemovesCouponCode($args)
     {
         if (empty($args['post']['coupon_code'])) {
             $args['result']['error']['message'] = 'No coupon code provided';
@@ -369,7 +352,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         $cart->set('coupon_code', $cartCouponCodes)->calculateTotals()->saveAllDetails();
     }
 
-    public function customerAbandonsCart($args)
+    public function action_customerAbandonsCart($args)
     {
         $cart = $this->_getCart($args);
         $cart->state()->overall()->setAbandoned();

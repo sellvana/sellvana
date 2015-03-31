@@ -2384,7 +2384,7 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     }
 }
 
-class BSession_APC extends BClass
+class BSession_APC extends BClass implements SessionHandlerInterface
 {
     protected $_prefix;
     protected $_ttl;
@@ -2410,11 +2410,7 @@ class BSession_APC extends BClass
         if (null !== $ttl) {
             $this->_ttl = $ttl;
         }
-        session_set_save_handler(
-            [$this, 'open'], [$this, 'close'],
-            [$this, 'read'], [$this, 'write'],
-            [$this, 'destroy'], [$this, 'gc']
-        );
+        session_set_save_handler($this);
     }
 
     public function open($savePath, $sessionName)

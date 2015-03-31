@@ -143,33 +143,35 @@ class Sellvana_CatalogIndex_Indexer extends BClass
 
     protected function _indexFetchVariantsData($products)
     {
-        if (!$this->BModuleRegistry->isLoaded('Sellvana_CatalogIndex')
-            || !$this->BModuleRegistry->isLoaded('Sellvana_CustomField')
-        ) {
+        if (!$this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
             return;
         }
         $pIds = [];
         foreach ($products as $p) {
             $pIds[] = $p->id();
         }
+        if (!$pIds) {
+            return;
+        }
         $variants = $this->Sellvana_CustomField_Model_ProductVariant->orm()
             ->where_in('product_id', $pIds)->find_many();
-        if ($variants) {
-            foreach ($variants as $v) {
-                $pId = $v->get('product_id');
-                $vFieldValues = $this->BUtil->fromJson($v->get('field_values'));
-                $fValues = [];
-                foreach ($vFieldValues as $field => $value) {
-                    if (empty(static::$_indexData[$pId][$field])) {
-                        $fValues[$field] = [];
-                    } else {
-                        $fValues[$field] = (array)static::$_indexData[$pId][$field];
-                    }
-                    $fValues[$field][] = $value;
+        if (!$variants) {
+            return;
+        }
+        foreach ($variants as $v) {
+            $pId = $v->get('product_id');
+            $vFieldValues = $this->BUtil->fromJson($v->get('field_values'));
+            $fValues = [];
+            foreach ($vFieldValues as $field => $value) {
+                if (empty(static::$_indexData[$pId][$field])) {
+                    $fValues[$field] = [];
+                } else {
+                    $fValues[$field] = (array)static::$_indexData[$pId][$field];
                 }
-                foreach ($fValues as $field => $values) {
-                    static::$_indexData[$pId][$field] = array_unique($values);
-                }
+                $fValues[$field][] = $value;
+            }
+            foreach ($fValues as $field => $values) {
+                static::$_indexData[$pId][$field] = array_unique($values);
             }
         }
     }
@@ -221,22 +223,27 @@ class Sellvana_CatalogIndex_Indexer extends BClass
                     continue;
                 }
                 foreach ((array)$value as $vKey => $v) {
-                    $v1 = explode('==>', $v, 2);
-                    $vVal = $this->BUtil->simplifyString(trim($v1[0]), '#[^a-z0-9/-]+#');
-                    $vDisplay = !empty($v1[1]) ? trim($v1[1]) : $v1[0];
-                    if (empty(static::$_filterValues[$fId][$vVal])) {
-                        $fieldValue = $fieldValueHlp->loadWhere(['field_id' => (int)$fId, 'val' => (string)$vVal]);
-                        if (!$fieldValue) {
-                            $fieldValue = $fieldValueHlp->create([
-                                'field_id' => $fId,
-                                'val' => $vVal,
-                                'display' => $vDisplay !== '' ? $vDisplay : null,
-                            ])->save();
+                    if ($field->get('filter_type') === 'range') {
+                        $row = ['doc_id' => $pId, 'field_id' => $fId, 'value_decimal' => $value];
+                        $docValueHlp->create($row)->save();
+                    } else {
+                        $v1 = explode('==>', $v, 2);
+                        $vVal = $this->BUtil->simplifyString(trim($v1[0]), '#[^a-z0-9/-]+#');
+                        $vDisplay = !empty($v1[1]) ? trim($v1[1]) : $v1[0];
+                        if (empty(static::$_filterValues[$fId][$vVal])) {
+                            $fieldValue = $fieldValueHlp->loadWhere(['field_id' => (int)$fId, 'val' => (string)$vVal]);
+                            if (!$fieldValue) {
+                                $fieldValue = $fieldValueHlp->create([
+                                    'field_id' => $fId,
+                                    'val' => $vVal,
+                                    'display' => $vDisplay !== '' ? $vDisplay : null,
+                                ])->save();
+                            }
+                            static::$_filterValues[$fId][$vVal] = $fieldValue->id();
                         }
-                        static::$_filterValues[$fId][$vVal] = $fieldValue->id();
+                        $row = ['doc_id' => $pId, 'field_id' => $fId, 'value_id' => static::$_filterValues[$fId][$vVal]];
+                        $docValueHlp->create($row)->save();
                     }
-                    $row = ['doc_id' => $pId, 'field_id' => $fId, 'value_id' => static::$_filterValues[$fId][$vVal]];
-                    $docValueHlp->create($row)->save();
                 }
             }
         }
@@ -404,9 +411,26 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
 
         // apply facet filters
         $facetFilters = [];
-        $tFieldValue = $this->Sellvana_CatalogIndex_Model_FieldValue->table();
+        //$tFieldValue = $this->Sellvana_CatalogIndex_Model_FieldValue->table();
         $tDocValue = $this->Sellvana_CatalogIndex_Model_DocValue->table();
         foreach ($filterFields as $fName => $field) {
+            if ($field['filter_type'] === 'range') {
+                $rangeWhere = [];
+                $from = (int)$req->request($fName . '_from');
+                $to = (int)$req->request($fName . '_to');
+                if ($from) {
+                    $rangeWhere[] = 'dv.value_decimal >= ' . $from;
+                }
+                if ($to) {
+                    $rangeWhere[] = 'dv.value_decimal <= ' . $to;
+                }
+                if ($rangeWhere) {
+                    $productsOrm->where_raw("(p.id in (SELECT dv.doc_id from {$tDocValue} dv WHERE field_id={$field['id']} AND "
+                         . join(' AND ', $rangeWhere) . '))');
+                }
+                continue;
+            }
+
             $fReqValues = !empty($filters[$fName]) ? (array)$filters[$fName] : null;
             if (!empty($fReqValues)) { // request has filter by this field
                 $fReqValueIds = [];
@@ -418,7 +442,9 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     $fReqValueIds[] = $filterValueIdsByVal[$field['id']][$v];
                 }
                 if (empty($fReqValueIds)) {
-                    $whereArr = [['(0)']];
+                    $whereArr = [
+                        ['(0)'],
+                    ];
                 } else {
                     $whereArr = [
                         ["(p.id in (SELECT dv.doc_id from {$tDocValue} dv WHERE dv.value_id IN (?)))", $fReqValueIds],
@@ -461,7 +487,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                         $curLevel = sizeof($valueArr);
                         $valueParent = join('/', array_slice($valueArr, 0, $curLevel - 1));
                         $facets[$fName]['values'][$v]['level'] = $value['category_level'];
-                        $countValueIds = [];
+                        //$countValueIds = [];
                         foreach ($filterValues as $vId1 => $value1) {
                             $vVal = $value1['val'];
                             if (empty($value1['category_level']) || $vId === $vId1) {
@@ -603,8 +629,8 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     }
                 }
             } else { // TODO: benchmark whether vertical count is faster than horizontal
-                $fName = $filterFieldNamesById[$ff['field_ids'][0]]; // single value fields always separate (1 field per facet query)
-                $field = $filterFields[$fName];
+                //$fName = $filterFieldNamesById[$ff['field_ids'][0]]; // single value fields always separate (1 field per facet query)
+                //$field = $filterFields[$fName];
                 $counts = $orm->select('dv.value_id')->select_expr('COUNT(*)', 'cnt')
                     ->where_in('dv.field_id', $ff['field_ids']) //TODO: maybe filter by value_id? preferred index conflict?
                     ->group_by('dv.value_id')->find_many();

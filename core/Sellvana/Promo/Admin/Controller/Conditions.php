@@ -247,13 +247,15 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
                     $methodCodes = explode(",", $methodCodes);
                 }
                 $methods = $this->Sellvana_Sales_Main->getShippingMethods();
-                foreach ($methods as $code => $method) {
-                    /** @var Sellvana_Sales_Method_Shipping_Abstract $method */
-                    $name              = $method->getName();
-                    if (!$methodCodes) { // if looking for method codes, return just them
-                        $result['items'][] = ['id' => $code, 'text' => $name];
-                    } else if (in_array($code, $methodCodes)) {
-                        $result['items'][] = ['id' => $code, 'text' => $name];
+                if ($methods) {
+                    foreach ($methods as $code => $method) {
+                        /** @var Sellvana_Sales_Method_Shipping_Abstract $method */
+                        $name = $method->getName();
+                        if (!$methodCodes) { // if looking for method codes, return just them
+                            $result['items'][] = ['id' => $code, 'text' => $name];
+                        } else if (in_array($code, $methodCodes)) {
+                            $result['items'][] = ['id' => $code, 'text' => $name];
+                        }
                     }
                 }
                 break;
@@ -263,11 +265,13 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
                     $countryCodes = explode(",", $countryCodes);
                 }
                 $countries = $this->FCom_Core_Main->getAllowedCountries();
-                foreach ($countries as $code => $country) {
-                    if (!$countryCodes) { // if looking for method codes, return just them
-                        $result['items'][] = ['id' => $code, 'text' => $country];
-                    } else if (in_array($code, $countryCodes)) {
-                        $result['items'][] = ['id' => $code, 'text' => $country];
+                if ($countries) {
+                    foreach ($countries as $code => $country) {
+                        if (!$countryCodes) { // if looking for method codes, return just them
+                            $result['items'][] = ['id' => $code, 'text' => $country];
+                        } else if (in_array($code, $countryCodes)) {
+                            $result['items'][] = ['id' => $code, 'text' => $country];
+                        }
                     }
                 }
                 break;
@@ -278,17 +282,19 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
                 $regionCodes = explode(",", $regionCodes);
                 }
                 $regions = $this->FCom_Core_Main->getAllowedRegions();
-                foreach ($regions as $country => $region) {
-                    //$countryRegions = ['text' => trim($country, '@'), 'children' => []];
-                    foreach ($region as $code => $r) {
-                        if (!$regionCodes) {
-                            $result['items'][] = ['id' => $code, 'text' => $r];
-                        } elseif(in_array($code, $regionCodes)){
-                            $result['items'][] = ['id' => $code, 'text' => $r];
+                if ($regions) {
+                    foreach ($regions as $country => $region) {
+                        //$countryRegions = ['text' => trim($country, '@'), 'children' => []];
+                        foreach ($region as $code => $r) {
+                            if (!$regionCodes) {
+                                $result['items'][] = ['id' => $code, 'text' => $r];
+                            } elseif (in_array($code, $regionCodes)) {
+                                $result['items'][] = ['id' => $code, 'text' => $r];
+                            }
+                            //$countryRegions['children'][] = ['id' => $code, 'text' => $r];
                         }
-                        //$countryRegions['children'][] = ['id' => $code, 'text' => $r];
+                        //$result['items'][] = $countryRegions;
                     }
-                    //$result['items'][] = $countryRegions;
                 }
                 break;
             default :

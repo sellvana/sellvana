@@ -36,7 +36,7 @@ class Sellvana_Catalog_Model_ProductLink extends FCom_Core_Model_Abstract
      */
     public function productsByType($id, $type)
     {
-        $orm = $this->Sellvana_Catalog_Model_Product->orm()->table_alias('p')
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')
             ->select('*');
         $orm->join('Sellvana_Catalog_Model_ProductLink', ['pl.linked_product_id', '=', 'p.id'], 'pl')
                 ->where('link_type', $type)

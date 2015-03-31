@@ -220,7 +220,8 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
             //always return false -> update rules in FCom_Core_Model_Abstract
             /** @see FCom_Core_Model_Abstract */
             $formId = $this->formId;
-            if ($model->validate($model->as_array(), [], $formId)) {
+	        $modelAttributes = $model->as_array();
+            if ($model->validate($modelAttributes, [], $formId)) {
 
                 $model->save();
                 $model->refreshDescendants(true, true);

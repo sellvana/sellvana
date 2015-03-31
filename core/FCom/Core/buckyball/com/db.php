@@ -862,12 +862,14 @@ class BPDO extends PDO
         restore_exception_handler();
     }
 */
-    protected function _nestable() {
+    protected function _nestable()
+    {
         return in_array($this->getAttribute(PDO::ATTR_DRIVER_NAME),
                         static::$_savepointTransactions);
     }
 
-    public function beginTransaction() {
+    public function beginTransaction()
+    {
         if (!$this->_nestable() || $this->_transLevel == 0) {
             parent::beginTransaction();
         } else {
@@ -877,7 +879,8 @@ class BPDO extends PDO
         $this->_transLevel++;
     }
 
-    public function commit() {
+    public function commit()
+    {
         $this->_transLevel--;
 
         if (!$this->_nestable() || $this->_transLevel == 0) {
@@ -2983,6 +2986,7 @@ class BModel extends Model
 
     public static function create_many(array $data, array $defaults = [], array $options = [])
     {
+        static::writeDb();
         $fields = [];
         foreach ($data as $r) {
             foreach ($r as $f => $v) {
@@ -3024,6 +3028,7 @@ class BModel extends Model
      */
     public static function update_many(array $data, $where = null, $p = [])
     {
+        static::writeDb();
         $update = [];
         $params = [];
         foreach ($data as $k => $v) {
@@ -3064,6 +3069,7 @@ class BModel extends Model
      */
     public static function update_many_by_id(array $data, $idField = null, $updateField = null)
     {
+        static::writeDb();
         if (null === $idField) {
             $idField = static::_get_id_column_name(get_called_class());
         }
@@ -3118,6 +3124,7 @@ class BModel extends Model
     */
     public static function delete_many($where, $params = [])
     {
+        static::writeDb();
         BEvents::i()->fire(static::origClass() . '::delete_many:before', [
             'where' => &$where,
             'params' => &$params,

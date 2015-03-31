@@ -1587,16 +1587,20 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             },
             getDefaultProps: function () {
                 return {
-                    totalType: [{id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}, {
-                        id: "fixed",
-                        label: "$ Only"
-                    }],
+                    totalType: [
+                        {id: "-%", label: "% Off"},
+                        {id: "-$", label: "$ Amount Off"},
+                        {id: "+%", label: "Add % to"},
+                        {id: "+$", label: "Add to"},
+                        {id: "=$", label: "$ Only"}
+                    ],
                     select2: true,
                     containerClass: "col-md-2",
                     className: "form-control"
                 };
-            }, componentDidMount: function () {
-                $('select.to-select2', this.getDOMNode()).select2().on('change', this.onChange);
+            },
+            componentDidMount: function () {
+                $('select.to-select2', this.getDOMNode()).select2({width:'resolve'}).on('change', this.onChange);
             }
         });
 
@@ -2337,37 +2341,57 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 var display = {
                     display: (promoType === 'catalog') ? 'none' : 'inherit'
                 };
-                var disabled = (promoType === 'catalog');
+                var isCatalog = (promoType === 'catalog');
 
                 return (
                     React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement("div", {style: divStyle}, 
+                            React.createElement("input", {className: "form-control pull-left", ref: "discountValue" + this.props.id, 
+                                   id: "discountValue" + this.props.id, key: "discountValue" + this.props.id, 
+                                   type: "text", size: "6", 
+                                   defaultValue: this.state.value, onBlur: this.onChange})
+                        ), 
                         React.createElement(Type, {ref: "discountType" + this.props.id, id: "discountType" + this.props.id, promoType: promoType, 
-                            key: "discountType" + this.props.id, value: this.state.type, onChange: this.onChange}), 
-                        React.createElement("div", {className: "col-md-7"}, 
-                            React.createElement("div", {className: "col-md-2"}, 
-                                React.createElement("input", {className: "form-control pull-left", ref: "discountValue" + this.props.id, 
-                                    id: "discountValue" + this.props.id, key: "discountValue" + this.props.id, type: "text", 
-                                    defaultValue: this.state.value, onBlur: this.onChange})
-                            ), 
-                            React.createElement("div", {className: "col-md-5", style: display}, 
-                                React.createElement("select", {className: "to-select2 form-control", disabled: disabled, 
-                                    ref: "discountScope" + this.props.id, defaultValue: this.state.scope, 
-                                    id: "discountScope" + this.props.id, key: "discountScope" + this.props.id, onChange: this.onChange}, 
-                                    this.props.scopeOptions.map(function (type) {
-                                        return React.createElement("option", {value: type.id, key: type.id}, type.label)
-                                    })
-                                )
-                            ), 
-                            React.createElement("div", {className: "col-md-5", style: display}, 
-                                React.createElement(DiscountDetails, {type: this.state.scope, options: this.props.options, ref: "discountDetails" + this.props.id, 
-                                    id: "discountDetails" + this.props.id, key: "discountDetails" + this.props.id, 
-                                    modalContainer: this.props.modalContainer, onChange: this.onChange, 
-                                    data: {
-                                        sku: this.state.sku,
-                                        combination: this.state.combination
-                                    }, promoType: promoType})
+                            key: "discountType" + this.props.id, value: this.state.type, onChange: this.onTypeChange}), 
+                        React.createElement("div", {style: $.extend({},divStyle, display)}, 
+                            React.createElement("select", {className: "to-select2 form-control", disabled: isCatalog, 
+                                ref: "discountScope" + this.props.id, defaultValue: this.state.scope, 
+                                id: "discountScope" + this.props.id, key: "discountScope" + this.props.id, onChange: this.onChange}, 
+                                this.props.scopeOptions.map(function (type) {
+                                    return React.createElement("option", {value: type.id, key: type.id}, type.label)
+                                })
                             )
-                        )
+                        ), 
+                        React.createElement("div", {style: $.extend({},divStyle, display)}, 
+                            React.createElement(DiscountDetails, {type: this.state.scope, options: this.props.options, ref: "discountDetails" + this.props.id, 
+                                id: "discountDetails" + this.props.id, key: "discountDetails" + this.props.id, 
+                                modalContainer: this.props.modalContainer, onChange: this.onChange, 
+                                data: {
+                                    sku: this.state.sku,
+                                    combination: this.state.combination
+                                }, promoType: promoType})
+                        ), 
+                         isCatalog && this.state.type != '=$'?
+                            React.createElement("div", {style: divStyle}, 
+                                React.createElement("select", {className: "form-control to-select2", ref: "base-field-" + this.props.id, 
+                                        defaultValue: this.state.base_field, 
+                                        id: "base-field-" + this.props.id, key: "base-field-" + this.props.id}, 
+                                    this.props.options['base_fields']['promo'].map(function (p) {
+
+                                        var opt = null;
+                                        var t = this.state.type;
+                                        if((t == '+%' || t == '+$') && p.value === 'cost') {
+                                            opt = React.createElement("option", {key: p.value, value: p.value}, p.label);
+                                        } else if((t == '-%' || t == '-$') && p.value !== 'cost'){
+                                            opt = React.createElement("option", {key: p.value, value: p.value}, p.label);
+                                        }
+
+                                        return opt;
+                                    }.bind(this))
+                                )
+                            ):
+                            null
+                        
                     )
                 );
             },
@@ -2378,6 +2402,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             componentDidMount: function () {
                 if (this.props.options.promo_type != 'catalog') {
                     $(this.refs['discountScope' + this.props.id].getDOMNode()).select2().on('change', this.onScopeChange);
+                } else {
+                    $(this.refs["base-field-" + this.props.id].getDOMNode()).select2().on('change', this.onScopeChange);
                 }
                 this.onChange();
             },
@@ -2439,6 +2465,12 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
 
                     if (value.scope != "other_prod") {
                         delete value['product_ids'];
+                    }
+                } else {
+                    var ref = this.refs["base-field-" + this.props.id];
+                    if (ref) {
+                        var baseField = $(ref.getDOMNode()).select2().val();
+                        value.base_field = baseField;
                     }
                 }
 
@@ -2607,10 +2639,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             getDefaultProps: function () {
                 return {
                     fields: [
-                        {id: "pcnt", label: "% Off"}, {id: "amt", label: "$ Amount Off"}, {
-                            id: "fixed",
-                            label: "$ Only"
-                        }, {id: "free", label: "Free"}
+                        {id: "-%", label: "% Off"},
+                        {id: "-$", label: "$ Amount Off"},
+                        {id: "=$", label: "$ Only"},
+                        {id: "=0", label: "Free"}
                     ],
                     labelMethodsField: Locale._("Select shipping methods"),
                     url: "conditions/shipping"

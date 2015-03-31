@@ -54,6 +54,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     protected static $_validationRules = [
         ['email', '@required'],
+        ['email', 'Sellvana_Customer_Model_Customer::ruleEmailUnique', 'An account with this email address already exists'],
         ['firstname', '@required'],
         ['lastname', '@required'],
         //array('password', '@required'),
@@ -340,7 +341,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function sessionUserId()
     {
-        return $this->BSession->get('customer_id');
+        $sess = $this->BSession;
+        return $sess->get('admin_customer_id') ?: $sess->get('customer_id');
     }
 
     /**
@@ -350,11 +352,11 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function sessionUser($reset = false)
     {
         if ($reset || !static::$_sessionUser) {
-            $sessData =& $this->BSession->dataToUpdate();
-            if (empty($sessData['customer_id'])) {
+            $userId = $this->sessionUserId();
+            if (!$userId) {
                 return false;
             }
-            $userId = $sessData['customer_id'];
+            $sessData =& $this->BSession->dataToUpdate();
             $user = static::$_sessionUser = $this->load($userId);
             if (!$user) {
                 $sessData['customer_id'] = null;

@@ -3,7 +3,7 @@
 /**
  * Class Sellvana_Catalog_Admin_Controller_Products
  *
-*@property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ *@property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
@@ -16,7 +16,7 @@
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
-*/
+ */
 class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -26,6 +26,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
     protected $_permission = 'catalog/products';
+
+    //config to use react griddle
+    /*protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';
+    protected $_useDefaultLayout = false;*/
 
     /**
      * @return array
@@ -49,8 +54,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100],
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100],
             ['type' => 'btn_group', 'buttons' => [
-                  ['name' => 'edit', 'href' => $this->BApp->href('catalog/products/form?id=')],
-                  ['name' => 'delete']
+                ['name' => 'edit', 'href' => $this->BApp->href('catalog/products/form?id=')],
+                ['name' => 'delete']
             ]],
         ];
         $config['actions'] = [
@@ -209,7 +214,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['name' => 'product_name', 'label'   => 'Name', 'index'   => 'p.product_name',
-                   'width' => 450, 'addable' => true],
+                'width' => 450, 'addable' => true],
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 70],
         ];
 
@@ -284,14 +289,14 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
         $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
-                ->order_by_expr('pa.position asc')
-                ->left_outer_join('Sellvana_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
-                ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
-                    'a.file_size', 'pa.create_at', 'pa.update_at', 'pa.main_thumb'])
-                ->select('a.id', 'file_id')
-                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
-                ->group_by('pa.id')
-                ->find_many());
+            ->order_by_expr('pa.position asc')
+            ->left_outer_join('Sellvana_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
+            ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
+                'a.file_size', 'pa.create_at', 'pa.update_at', 'pa.main_thumb'])
+            ->select('a.id', 'file_id')
+            ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
+            ->group_by('pa.id')
+            ->find_many());
         $config =  [
             'config' => [
                 'id' => 'product_images',
@@ -371,6 +376,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ]
         ];
 
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'setProductImagesMainGrid'
+        ];
+
         return $config;
     }
 
@@ -409,6 +418,12 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         return ['config' => $config];
     }
 
+    public function getAllProdConfigForGriddle($model) {
+        $config = $this->getAllProdConfig($model);
+        unset($config['config']['actions']['add']);
+        return $config;
+    }
+
     /**
      * main grid on category/product tab
      * @param $model Sellvana_Catalog_Model_Category
@@ -416,7 +431,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function getCatProdConfig($model)
     {
-        $orm = $this->Sellvana_Catalog_Model_Product->orm()->table_alias('p')
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')
             ->select(['p.id', 'p.product_name', 'p.product_sku'])
             ->join('Sellvana_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
             ->where('cp.category_id', $model ? $model->id : 0)
@@ -428,6 +443,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         unset($config['orm']);
         $config['data'] = $orm->find_many();
         $config['id'] = 'category_prods_grid_' . $model->id;
+        $config['data_mode'] = 'local';
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
@@ -448,6 +464,26 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         return ['config' => $config];
     }
 
+    public function getCatProdConfigForGriddle($model) {
+        $config = $this->getCatProdConfig($model);
+        unset($config['config']['actions']['add']);
+        $config['config']['actions'] += [
+            'add-product' => [
+                'caption'  => 'Add Products',
+                'type'     => 'button',
+                'id'       => 'add-product-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'showModalToAddProduct'
+            ]
+        ];
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'setCatProdMainGrid'
+        ];
+
+        return $config;
+    }
+
     /**
      * @param $model
      * @param $type
@@ -455,11 +491,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function linkedProductGridConfig($model, $type)
     {
-        $orm = $this->Sellvana_Catalog_Model_Product->orm()->table_alias('p')
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')
             ->select(['p.id', 'p.product_name', 'p.product_sku']);//, 'p.base_price', 'p.sale_price']);
 
         switch ($type) {
-        case 'related': case 'similar':case 'cross_sell':
+            case 'related': case 'similar':case 'cross_sell':
             $orm->join('Sellvana_Catalog_Model_ProductLink', ['pl.linked_product_id', '=', 'p.id'], 'pl')
                 ->select_expr('pl.position', 'product_link_position')
                 ->where('link_type', $type)
@@ -469,38 +505,38 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             $caption = $type == 'related' ? 'Related Products' : 'Similar Products';
             break;
 
-        default:
-            $caption = '';
+            default:
+                $caption = '';
         }
 
         $gridId = 'linked_products_' . $type;
 
         $config = [
-                'id'           => $gridId,
-                'data'         => null,
-                'data_mode'     => 'local',
-                //'caption'      =>$caption,
-                'columns'      => [
-                    ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
-                    ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-                    ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
-                    //['name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price'],
-                    //['name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price'],
-                    ['name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position', 'width' => 50,
-                        'editable' => 'inline', 'validation' => ['number' => true], 'type' => 'input'],
-                ],
-                'actions' => [
-                    'add' => ['caption' => 'Add products'],
-                    'delete' => ['caption' => 'Remove']
-                ],
-                'filters' => [
-                    ['field' => 'product_name', 'type' => 'text'],
-                    ['field' => 'product_sku', 'type' => 'text']
-                ],
-                'events' => ['init', 'add', 'mass-delete'],
-                'grid_before_create' => $gridId . '_register'
-            ];
+            'id'           => $gridId,
+            'data'         => null,
+            'data_mode'     => 'local',
+            //'caption'      =>$caption,
+            'columns'      => [
+                ['type' => 'row_select'],
+                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
+                ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
+                //['name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price'],
+                //['name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price'],
+                ['name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position', 'width' => 50,
+                    'editable' => 'inline', 'validation' => ['number' => true], 'type' => 'input'],
+            ],
+            'actions' => [
+                'add' => ['caption' => 'Add products'],
+                'delete' => ['caption' => 'Remove']
+            ],
+            'filters' => [
+                ['field' => 'product_name', 'type' => 'text'],
+                ['field' => 'product_sku', 'type' => 'text']
+            ],
+            'events' => ['init', 'add', 'mass-delete'],
+            'grid_before_create' => $gridId . '_register'
+        ];
 
 
         //$this->BEvents->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
@@ -786,10 +822,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $newModel->create_at = $newModel->update_at = date('Y-m-d H:i:s');
                 $newModel->is_hidden = 1;
                 if ($newModel->save()
-                        && $this->duplicateProductCategories($oldModel, $newModel)
-                        && $this->duplicateProductLink($oldModel, $newModel)
-                        && $this->duplicateProductMedia($oldModel, $newModel)
-                        && $this->duplicateProductReviews($oldModel, $newModel)
+                    && $this->duplicateProductPrices($oldModel, $newModel)
+                    && $this->duplicateProductCategories($oldModel, $newModel)
+                    && $this->duplicateProductLink($oldModel, $newModel)
+                    && $this->duplicateProductMedia($oldModel, $newModel)
+                    && $this->duplicateProductReviews($oldModel, $newModel)
                 ) {
                     $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $newModel->id;
                     $this->message('Duplicate successful');
@@ -834,6 +871,30 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             $numberSuffix = $max + 1;
         }
         return $numberSuffix;
+    }
+
+    /**
+     * @param $old Sellvana_Catalog_Model_Product
+     * @param $new Sellvana_Catalog_Model_Product
+     * @return bool
+     */
+    public function duplicateProductPrices($old, $new)
+    {
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        $prices = $priceHlp->orm()->where('product_id', $old->id())->find_many();
+        if ($prices) {
+            $newId = $new->id();
+            foreach ($prices as $price) {
+                $data = $price->as_array();
+                unset($data['id']);
+                try {
+                    $priceHlp->create($data)->set('product_id', $newId)->save();
+                } catch (Exception $e) {
+                    var_dump($e); exit;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -912,17 +973,19 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function duplicateProductReviews($old, $new)
     {
-        //todo: confirm need duplicate product review or not
-        $hlp = $this->Sellvana_ProductReviews_Model_Review;
-        $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
-        if ($reviews) {
-            foreach ($reviews as $r) {
-                $data = $r->as_array();
-                unset($data['id']);
-                $data['product_id'] = $new->id();
-                if (!$hlp->create($data)->save()) {
-                    $this->message('An error occurred while duplicate product reviews.', 'error');
-                    return false;
+        if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
+            //todo: confirm need duplicate product review or not
+            $hlp = $this->Sellvana_ProductReviews_Model_Review;
+            $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
+            if ($reviews) {
+                foreach ($reviews as $r) {
+                    $data = $r->as_array();
+                    unset($data['id']);
+                    $data['product_id'] = $new->id();
+                    if (!$hlp->create($data)->save()) {
+                        $this->message('An error occurred while duplicate product reviews.', 'error');
+                        return false;
+                    }
                 }
             }
         }
@@ -961,18 +1024,36 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     protected function processPricesPost($model, $data)
     {
-        if(empty($data['prices']) || empty($data['prices']['productPrice'])){
+        if(empty($data['prices'])){
             return;
         }
 
-        foreach ($data['prices']['productPrice'] as $id => $priceData) {
-            $priceData['product_id'] = $model->id();
-            if(is_numeric($id)) {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
-            } else {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
+        if (!empty($data['prices']['productPrice'])) {
+            foreach ($data['prices']['productPrice'] as $id => $priceData) {
+                foreach ($priceData as $field => $pf) {
+                    if (in_array($field, ['customer_group_id', 'site_id', 'currency_code']) && !is_numeric($pf)) {
+                        $priceData[$field] = null;
+                    }
+                }
+
+                $priceData['product_id'] = $model->id();
+                if (is_numeric($id)) {
+                    $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
+                } else {
+                    $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
+                }
+                $price->set($priceData)->save();
             }
-            $price->set($priceData)->save();
+        }
+
+        if(!empty($data['prices']['delete'])){
+            foreach ($data['prices']['delete'] as $delPrice) {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($delPrice);
+                if($price){
+                    $price->delete();
+                }
+            }
+
         }
 
     }

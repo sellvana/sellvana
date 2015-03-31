@@ -4,27 +4,19 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    protected $_localHooks = [
-        'customerRequestsRMA',
-        'adminCreatesRMA',
-        'adminApprovesRMA',
-        'adminRefundsPayment',
-        'adminChangesReturnCustomState',
-    ];
-
-    public function customerRequestsRMA($args)
+    public function action_customerRequestsRMA($args)
     {
     }
 
-    public function adminCreatesRMA($args)
+    public function action_adminCreatesRMA($args)
     {
     }
 
-    public function adminApprovesRMA($args)
+    public function action_adminApprovesRMA($args)
     {
     }
 
-    public function adminChangesReturnCustomState($args)
+    public function action_adminChangesReturnCustomState($args)
     {
         $newState = $args['return']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();

@@ -1,0 +1,12 @@
+{% set fKey = THIS.get('facet_key') %}
+{% set facet = THIS.get('facet') %}
+
+<dt>{{ facet['display'] | _ }}</dt>
+<dd>
+    <div class="input-group input-group-sm">
+        <input class="form-control" type="number" name="{{ fKey }}_from" value="{{ REQUEST.get(fKey ~ '_from') }}" placeholder="{{ 'From'|_ }}">
+        <span class="input-group-addon">-</span>
+        <input class="form-control" type="number" name="{{ fKey }}_to" value="{{ REQUEST.get(fKey ~ '_to') }}" placeholder="{{ 'To'|_ }}">
+        <span class="input-group-btn"><button class="btn btn-default" type="submit">{{ 'Go'|_ }}</button></span>
+    </div>
+</dd>

@@ -310,7 +310,7 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         foreach ($data['products'] as $pId => $r) {
             $r['qty'] = $sortOrder;
             $r['amount'] = $action['value'];
-            $r['operation'] = $action['type'] === 'pcnt' ? '-%' : '-$';
+            $r['operation'] = $action['type'];
             $r['valid_from'] = $fromDate;
             $r['valid_to'] = $toDate;
             if (empty($existing[$pId])) {

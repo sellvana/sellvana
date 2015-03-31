@@ -54,3 +54,6 @@ modules:
 
                     - [ /v1/customer/address, Sellvana_Customer_ApiServer_V1_Address.index ]
                     - [ "/v1/customer/address/:id", Sellvana_Customer_ApiServer_V1_Address.index ]
+
+            FCom_PushServer:
+                auto_use: [ bootstrap ]

@@ -14,6 +14,7 @@
  * @property Sellvana_CustomField_Model_ProductVarfield     $Sellvana_CustomField_Model_ProductVarfield
  * @property Sellvana_CustomField_Model_ProductVariantField $Sellvana_CustomField_Model_ProductVariantField
  * @property Sellvana_CustomField_Model_ProductVariantImage $Sellvana_CustomField_Model_ProductVariantImage
+ * @property Sellvana_Catalog_Model_ProductPrice            $Sellvana_Catalog_Model_ProductPrice
  */
 class Sellvana_CustomField_Migrate extends BClass
 {
@@ -377,6 +378,24 @@ class Sellvana_CustomField_Migrate extends BClass
         $this->BDb->ddlTableDef($tProdVariant, [
             BDb::COLUMNS => [
                 'variant_price' => 'DROP',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_2_4__0_2_5()
+    {
+        $tPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
+
+        $tableProductVariant = $this->Sellvana_CustomField_Model_ProductVariant->table();
+        $this->BDb->ddlTableDef($tPrice, [
+            BDb::COLUMNS => [
+                'valid_from' => 'DATE NULL DEFAULT NULL',
+                'valid_to'   => 'DATE NULL DEFAULT NULL',
+                'variant_id' => 'INT UNSIGNED NULL DEFAULT NULL',
+                'operation'  => 'CHAR(3) NULL DEFAULT NULL',
+                'base_field' => 'varchar(20) null'],
+            BDb::CONSTRAINTS => [
+                'variant' => ['variant_id', $tableProductVariant],
             ],
         ]);
     }
