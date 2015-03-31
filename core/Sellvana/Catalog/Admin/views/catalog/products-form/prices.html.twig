@@ -87,6 +87,49 @@
         };
 
         Price.init(options);
+
+        /**
+         *
+         *
+         */
+        function validateBaseField(value, element) {
+            var valid = false;
+            if(typeof element !== 'undefined') {
+                var $parent = $(element).parents('.price-item');
+                var $curFields = $parent.find('.customer-group, .site, .currency');
+                var currHash = value;
+                $curFields.each(function () {
+                    currHash += $(this).val();
+                });
+                var $items = $('.price-item');
+                $items.each(function () {
+                    if(valid) {
+                        // valid price already found, return
+                        return;
+                    }
+
+                    var $item = $(this);
+                    if($item[0] === $parent[0]) {
+                        // same as validated element, return
+                        return;
+                    }
+                    var $priceType = $item.find('.price-type');
+                    if($priceType.length == 0) {
+                        // no price type return
+                        return;
+                    }
+                    var itemHash = $priceType.val();
+
+                    var $itemFields = $item.find('.customer-group, .site, .currency');
+                    $itemFields.each(function () {
+                        itemHash += $(this).val();
+                    });
+                    valid = (currHash == itemHash);
+                });
+            }
+            return valid;
+        }
+
         /*
          *custom validation function for checking duplicated input
          */
@@ -111,32 +154,26 @@
                         return;
                     }
                     var fields = $item.find('input.priceUnique, select.priceUnique');
-                    var same = true;
                     var checkHash = '';
                     fields.each(function (idx) {
                         checkHash += $(this).val();
-//                        var currField = $(curFields[idx]);
-//                        var checkField = $(this);
-//                        var currVal = currField.val();
-//                        var checkedVal = checkField.val();
-//                        if (currVal != checkedVal) {
-//                            same = false;
-//                        }
                     });
-//                    if (same) {
-//                        valid = false;
-//                    }
                     valid = currHash != checkHash;
                 });
                 return valid;
             }
         }
 
-        $.validator.addMethod('priceUnique', priceUnique, 'Same price already exists.');
+        $.validator.addMethod('priceUnique', priceUnique, '{{"Same price already exists."|_}}');
+        $.validator.addMethod('base_field', validateBaseField, '{{"No matching base price"|_}}');
 
         $.validator.addClassRules("priceUnique", {
             priceUnique: true
         });
+        $.validator.addClassRules("base_field", {
+            base_field: true
+        });
+
         $('form').submit(function () {
             return validatePrices();
         });

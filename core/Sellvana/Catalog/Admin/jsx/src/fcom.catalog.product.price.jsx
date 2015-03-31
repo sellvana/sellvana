@@ -131,6 +131,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     $filter.on('change', this.props.applyFilter)
                 }
             }.bind(this));
+            if(this.props.validatePrices) {
+                this.props.validatePrices();
+            }
         }
     });
 
@@ -153,7 +156,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             //if(this.editable) {
                     var priceTypes =
                     <span key="price_type_wrapper">
-                        <select key="price_type" className={"form-control" + (this.editable || this.props.theBase ? " priceUnique": '')}
+                        <select key="price_type" className={"form-control price-type" + (this.editable || this.props.theBase ? " priceUnique": '')}
                             name={this.getFieldName(price, 'price_type')} disabled={!this.editable}
                             defaultValue={price['price_type']} ref="price_type">
                                 {_.map(this.props.price_types, function (pt, pk) {
@@ -186,7 +189,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         dates += price['valid_to']
                     }
                 }
-                dateRange = <input ref="sale_period" key="sale_period" type="text" className="form-control"
+                dateRange = <input ref="sale_period" key="sale_period" type="text" className="form-control priceUnique"
                     name={this.getFieldName(price, "sale_period")} placeholder={Locale._("Select sale dates")}
                     defaultValue={dates} readOnly={this.editable ? null : 'readonly'}/>;
             }
@@ -207,6 +210,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     baseField =
                             <select ref="base_fields" key="base_fields" name={this.getFieldName(price, 'base_field')}
                                     defaultValue={price['base_field']} className="base_field form-control"
+                                    onChange={this.props.validate}
                                     disabled={this.editable || this.props.theBase ? null: true}>
                                 {this.props.priceRelationOptions[price['price_type']].map(function (p) {
                                     return <option key={p.value} value={p.value}>{p.label}</option>
@@ -222,7 +226,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             <select name={this.getFieldName(price, "customer_group_id")}
                                     disabled={this.editable? null: true}
                                     defaultValue={price['customer_group_id']}
-                                    className={"form-control" + (this.editable? " priceUnique": '')}>
+                                    className={"form-control customer-group" + (this.editable? " priceUnique": '')}>
                                 <option value="*">{Locale._("Default")}</option>
                                 {_.map(this.props.customer_groups, function (val, key) {
                                     return <option key={key} value={key}>{val}</option>
@@ -237,7 +241,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     <span key="sites">
                         <select name={this.getFieldName(price, "site_id")} disabled={this.editable? null: true}
                                 defaultValue={price['site_id']}
-                                className={"form-control" + (this.editable? " priceUnique": '')}>
+                                className={"form-control site" + (this.editable? " priceUnique": '')}>
                             <option value="*">{Locale._("Default")}</option>
                             {_.map(this.props.sites, function (val, key) {
                                 return <option key={key} value={key}>{val}</option>
@@ -252,7 +256,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     <span>
                         <select name={this.getFieldName(price, "currency_code")} disabled={this.editable? null: true}
                                 defaultValue={price['currency_code']}
-                                className={"form-control" + (this.editable? " priceUnique": '')}>
+                                className={"form-control currency" + (this.editable? " priceUnique": '')}>
                             <option value="*">{Locale._("Default")}</option>
                             {_.map(this.props.currencies, function (val, key) {
                                 return <option key={key} value={key}>{val}</option>
