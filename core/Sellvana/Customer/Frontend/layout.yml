@@ -1,3 +1,9 @@
+base:
+    - view: head
+        do:
+            - [ css, @Sellvana_Customer/Frontend/css/fcom.customer.css ]
+    - { hook: body_start, views: customer/admin-toolbar }
+
 /customer/login:
     - { include: base }
     - view: head

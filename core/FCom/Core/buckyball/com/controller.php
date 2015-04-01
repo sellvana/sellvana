@@ -541,6 +541,33 @@ class BRequest extends BClass
         return null === $key ? $_REQUEST : (isset($_REQUEST[$key]) ? $_REQUEST[$key] : null);
     }
 
+    public function getCookieDomain()
+    {
+        $confDomain = $this->BConfig->get('cookie/domain');
+        $httpHost = $this->httpHost(false);
+        if (!empty($confDomain)) {
+            $allowedDomains = explode('|', $confDomain);
+            if (in_array($httpHost, $allowedDomains)) {
+                $domain = $httpHost;
+            } else {
+                $domain = $allowedDomains[0];
+            }
+        } else {
+            $domain = $httpHost;
+        }
+        return $domain;
+    }
+
+    public function getCookiePath()
+    {
+        $confPath = $this->BConfig->get('cookie/path');
+        $path = $confPath ? $confPath : $this->BConfig->get('web/base_store');
+        if (empty($path)) {
+            $path = $this->webRoot();
+        }
+        return $path;
+    }
+
     /**
      * Set or retrieve cookie value
      *
@@ -563,8 +590,8 @@ class BRequest extends BClass
 
         $config = $this->BConfig->get('cookie');
         $lifespan = null !== $lifespan ? $lifespan : (!empty($config['timeout']) ? $config['timeout'] : null);
-        $path = null !== $path ? $path : (!empty($config['path']) ? $config['path'] : $this->webRoot());
-        $domain = null !== $domain ? $domain : (!empty($config['domain']) ? $config['domain'] : $this->httpHost(false));
+        $path = null !== $path ? $path : (!empty($config['path']) ? $config['path'] : $this->getCookiePath());
+        $domain = null !== $domain ? $domain : (!empty($config['domain']) ? $config['domain'] : $this->getCookieDomain());
         $secure = null !== $secure ? $secure : $this->https();
         $httpOnly = null !== $httpOnly ? $httpOnly : true;
         return setcookie($name, $value, time() + $lifespan, $path, $domain, $secure, $httpOnly);

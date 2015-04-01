@@ -1988,42 +1988,16 @@ class BSession extends BClass
         return $handlers ? array_combine($handlers, $handlers) : [];
     }
 
-    public function getCookieDomain()
-    {
-        $confDomain = $this->BConfig->get('cookie/domain');
-        $httpHost = $this->BRequest->httpHost(false);
-        if (!empty($confDomain)) {
-            $allowedDomains = explode('|', $confDomain);
-            if (in_array($httpHost, $allowedDomains)) {
-                $domain = $httpHost;
-            } else {
-                $domain = $allowedDomains[0];
-            }
-        } else {
-            $domain = $httpHost;
-        }
-        return $domain;
-    }
-
-    public function getCookiePath()
-    {
-        $confPath = $this->BConfig->get('cookie/path');
-        $path = $confPath ? $confPath : $this->BConfig->get('web/base_store');
-        if (empty($path)) {
-            $path = $this->BRequest->webRoot();
-        }
-        return $path;
-    }
-
     /**
      * Open session
      *
      * @todo work around multiple cookies in header bug: https://bugs.php.net/bug.php?id=38104
      * @param string|null $id Optional session ID
      * @param bool        $autoClose
+     * @param bool        $validate
      * @return $this
      */
-    public function open($id = null, $autoClose = false)
+    public function open($id = null, $autoClose = false, $validate = true)
     {
         if (null !== $this->data) {
             return $this;
@@ -2040,8 +2014,8 @@ class BSession extends BClass
             $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
         }
 
-        $domain = $this->getCookieDomain();
-        $path = $this->getCookiePath();
+        $domain = $this->BRequest->getCookieDomain();
+        $path = $this->BRequest->getCookiePath();
 
         if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
             $class = $this->_availableHandlers[$config['session_handler']];
@@ -2079,7 +2053,7 @@ class BSession extends BClass
         }
         $this->_sessionId = session_id();
 
-        if (!empty($config['session_check_ip'])) {
+        if (!empty($config['session_check_ip']) && $validate) {
             $ip = $this->BRequest->ip();
             if (empty($_SESSION['_ip'])) {
                 $_SESSION['_ip'] = $ip;
@@ -2262,8 +2236,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
 
     public function destroy()
     {
-        $path = $this->getCookiePath();
-        $domain = $this->getCookieDomain();
+        $path = $this->BRequest->getCookiePath();
+        $domain = $this->BRequest->getCookieDomain();
         $https = $this->BRequest->https();
         if (!isset($_SESSION) && !headers_sent()) {
             session_set_cookie_params(0, $path, $domain, $https, true);
@@ -2271,8 +2245,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         }
         session_destroy();
 
-        setcookie(session_name(), '', time() - 3600, $this->getCookiePath(), $this->getCookieDomain(), $https, true);
-#echo "<pre>"; var_dump($_SESSION, $_COOKIE, session_name(), $this->getCookiePath(), $this->getCookieDomain()); exit;
+        setcookie(session_name(), '', time() - 3600, $path, $domain, $https, true);
+#echo "<pre>"; var_dump($_SESSION, $_COOKIE, session_name(), $path, $domain); exit;
         return $this;
     }
 
