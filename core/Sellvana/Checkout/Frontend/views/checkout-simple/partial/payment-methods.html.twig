@@ -6,14 +6,16 @@
 
 <dl>
 {% for code, method in methods %}
-    <dt>
-        <label for="payment_method-{{ code }}">
-            <input type="radio" name="payment_method" id="payment_method-{{ code }}" class="payment_method" required
-                   value="{{ code }}" {{ code == curMethod ? 'checked' }}> {{ method.getName() |_ }}</label>
-    </dt>
-    <dd id="payment_form-{{ code }}" class="payment_form">
-        {{ method.getCheckoutFormView().set({ cart:cart, code:code, method:method}) | raw }}
-    </dd>
+    {% if method.can('pay_online') %}
+        <dt>
+            <label for="payment_method-{{ code }}">
+                <input type="radio" name="payment_method" id="payment_method-{{ code }}" class="payment_method" required
+                       value="{{ code }}" {{ code == curMethod ? 'checked' }}> {{ method.getName() |_ }}</label>
+        </dt>
+        <dd id="payment_form-{{ code }}" class="payment_form">
+            {{ method.getCheckoutFormView().set({ cart:cart, code:code, method:method}) | raw }}
+        </dd>
+    {% endif %}
 {% endfor %}
 </dl>
 

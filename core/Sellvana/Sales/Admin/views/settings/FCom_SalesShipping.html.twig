@@ -1,8 +1,0 @@
-{% set c = THIS.get('model') %}
-{% set fieldData = { model: c, settings_module:'Sellvana_Sales' } %}
-{% import THIS.view('core/form-elements').twigName() as forms %}
-<h2>{{ "Sales Settings"|_}}</h2>
-{{ forms.accordion_start({id:'settings-Sellvana_Sales_Shipping'}) }}
-    {{ forms.accordion_panel_start({label:'Global Settings'|_, id:'settings-Sellvana_Sales_Shipping-group0', in:1}) }}
-    {{ forms.accordion_panel_end }}
-{{ forms.accordion_end }}

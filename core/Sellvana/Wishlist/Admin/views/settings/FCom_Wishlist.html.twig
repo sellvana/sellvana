@@ -1,9 +1,0 @@
-{% set c = THIS.get('model') %}
-{% set fieldData = { model: c, settings_module:'Sellvana_Wishlist' } %}
-{% import THIS.view('core/form-elements').twigName() as forms %}
-<h2>{{ "Wishlist Settings"|_}}</h2>
-{{ forms.accordion_start({id:'settings-Sellvana_Wishlist'}) }}
-     {{ forms.accordion_panel_start({label:'Wishlist'|_, id:'settings-Sellvana_Wishlist-group0', in:1}) }}
-        {{ forms.input(fieldData, {field:'cookie_token_ttl_days', label:'Wishlist Cookie TTL (days)'|_, attr: 'data-rule-number="true"' }) }}
-    {{ forms.accordion_panel_end }}
-{{ forms.accordion_end }}
