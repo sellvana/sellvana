@@ -50,6 +50,10 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
      */
     public function action_customerLogsIn($args)
     {
+        if ($this->BSession->get('admin_customer_id')) {
+            return;
+        }
+
         // load just logged in customer
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
         // something wrong, abort abort!

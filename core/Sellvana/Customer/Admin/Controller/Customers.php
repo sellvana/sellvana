@@ -49,6 +49,8 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login', 'hidden' => true],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
+                ['name' => 'login', 'icon' => 'icon-user', 'href' => $this->BApp->href('customers/start_session?id='),
+                    'title' => $this->BLocale->_('Log in as customer'), 'target' => 'AdminCustomer'],
                 ['name' => 'delete'],
             ]],
         ];
@@ -300,15 +302,33 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
                     'url' => $this->BApp->href($this->_formHref) . '?id=' . $result->id()
                 ];
             }
-
         }
-
     }
 
     public function action_start_session()
     {
+        $sess = $this->BSession;
+        $resp = $this->BResponse;
+
         $cId = $this->BRequest->get('id');
-        $this->BSession->set('admin_customer_id', $cId);
-        $this->BResponse->redirect($this->FCom_Admin_Main->frontendHref());
+        $customer = $this->Sellvana_Customer_Model_Customer->load($cId);
+
+        if (!$customer) {
+            $sess->addMessage('Invalid customer ID: ' . $cId, 'error');
+            $resp->redirect('customers');
+            return;
+        }
+
+        $customer->login(false);
+        $sess->set('admin_customer_id', $cId);
+        $resp->cookie('cart', false);
+        /*
+        $sessId = $sess->sessionId();
+        $sess->open($customer->get('last_session_id'), false, false);
+        //...
+        $sess->close();
+        $sess->open($sessId);
+        */
+        $resp->redirect($this->FCom_Admin_Main->frontendHref());
     }
 }

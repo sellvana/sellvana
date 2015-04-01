@@ -1,6 +1,6 @@
 modules:
     Sellvana_Customer:
-        version: 0.1.12
+        version: 0.1.13
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.0 } }
         translations: { en: en.php }
@@ -54,6 +54,3 @@ modules:
 
                     - [ /v1/customer/address, Sellvana_Customer_ApiServer_V1_Address.index ]
                     - [ "/v1/customer/address/:id", Sellvana_Customer_ApiServer_V1_Address.index ]
-
-            FCom_PushServer:
-                auto_use: [ bootstrap ]

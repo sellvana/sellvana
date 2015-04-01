@@ -1,0 +1,29 @@
+<li>
+    <a href="#" id="customer-help-me">{{ 'Help me!'|_ }}</a>
+
+    <!--<script src="https://togetherjs.com/togetherjs-min.js"></script>-->
+    <script>
+        require(['jquery', 'fcom.pushclient', 'bootstrap-notify'], function($, PushClient) {
+            var sessionId = '{{ SESSION.sessionId() }}',
+                    cartId = '{{ REQUEST.cookie('cart') }}',
+                    channelName = 'customer:' + sessionId;
+
+            PushClient.listen({channel:channelName, callback:customer_channel});
+
+            function customer_channel(msg) {
+                switch (msg.signal) {
+                    case 'say':
+                        $.notify(msg.text);
+                        break;
+                }
+            }
+
+            $('#customer-help-me').click(function(ev) {
+                PushClient.send({channel:channelName, signal:'request', session_id:sessionId, cart_id:cartId});
+                //TogetherJS(ev.target);
+                $.notify('Please wait, contacting sales representative...');
+                return false;
+            });
+        });
+    </script>
+</li>
