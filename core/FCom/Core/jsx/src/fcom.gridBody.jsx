@@ -35,7 +35,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
             if (form.valid()) {
                 if (this.props.isLocalMode()) {
                     //console.log('localModeSave');
-                    this.props.updateRow(hash);
+                    this.props.updateRows([hash]);
                     modal.close();
                 } else if (url) {
                     $.post(url, hash, function(data) {

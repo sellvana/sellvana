@@ -452,7 +452,9 @@ var Griddle = React.createClass({displayName: "Griddle",
             ? React.createElement(this.props.customSettings, {columnMetadata: this.props.columnMetadata, selectedColumns: this.getColumns, setColumns: this.setColumns, 
                 getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh, 
                 setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState, 
-                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, removeRows: this.removeRows, getCurrentGrid: this.getCurrentGrid})
+                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, removeRows: this.removeRows, getCurrentGrid: this.getCurrentGrid, 
+                ref: 'gridSettings', isLocalMode: this.isLocalMode, updateRows: this.updateRows}
+            )
             : React.createElement("span", {className: "settings", onClick: this.toggleColumnChooser}, this.props.settingsText, " ", React.createElement("i", {className: "glyphicon glyphicon-cog"}))
         ) : "";
 
@@ -482,7 +484,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                         className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, 
                         getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, 
                         getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows, 
-                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, isLocalMode: this.isLocalMode, updateRow: this.updateRow, 
+                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, isLocalMode: this.isLocalMode, updateRows: this.updateRows, 
                         ref: 'gridBody'}
                     ))
                     : (React.createElement(GridBody, {columnMetadata: this.props.columnMetadata, data: data, columns: cols, metadataColumns: meta, className: this.props.tableClassName}))
@@ -896,15 +898,13 @@ var Griddle = React.createClass({displayName: "Griddle",
         });
     },
     /**
-     * update row data, almost use in data mode local
-     * @param data
-     * @returns {boolean}
+     * update multi rows data, almost use in data mode local
+     * @param {array} data
      * @param {object} options
+     * @returns {boolean}
      */
-    updateRow: function(data, options) {
-        if (!data.id) {
-            return false;
-        }
+    updateRows: function(data, options) {
+        console.log('updateRows.data', data);
 
         options = _.extend({
             silent: false
@@ -912,25 +912,28 @@ var Griddle = React.createClass({displayName: "Griddle",
         }, options);
 
         var rows = this.getRows();
-        var updatedRow;
+        var mapIds = rows.map(function (e) {
+            return e.id.toString();
+        });
+        var updatedRows = [];
 
-        for (var i in rows) {
-            if (rows[i].id == data.id) {
-                _.each(data, function(value, key) {
-                    if (rows[i].hasOwnProperty(key)) {
-                        rows[i][key] = value;
+        _.each(data, function(item) {
+            var index = mapIds.indexOf(item.id);
+            console.log('item', item);
+            console.log('index', index);
+            if (index != -1) {
+                _.each(item, function(value, key) {
+                    if (rows[index].hasOwnProperty(key)) {
+                        rows[index][key] = value;
                     }
-                    updatedRow = rows[i];
                 });
-                break;
+                updatedRows.push(rows[index]);
             }
-        }
+        });
 
         this.setState({ results: rows, filteredResults: rows }, function() {
             if (!options.silent) {
-                //console.log('trigger.updatedRow.griddle');
-                //todo: event updatedRow.server.griddle?
-                $(this.getDOMNode()).trigger('updatedRow.griddle', [updatedRow, data, this]);
+                $(this.getDOMNode()).trigger('updatedRows.griddle', [updatedRows, data, this]); //todo: event updatedRow.server.griddle???
             }
         });
     },

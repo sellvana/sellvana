@@ -1,10 +1,9 @@
 <script>
-var testModuleGrid;
 require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
     var moduleGrid = null;
 
     window.moduleGridMounted = function(grid, trigger) {
-        moduleGrid = grid; testModuleGrid = grid;
+        moduleGrid = grid;
 
         //add badge
         var rows = moduleGrid.refs['gridBody'].refs;
@@ -13,8 +12,8 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         });
 
         if (trigger == 'componentDidMount') {
-            $(moduleGrid.getDOMNode()).on('updatedRow.griddle', function(e, row, data) {
-                updateModuleLevel(row);
+            $(moduleGrid.getDOMNode()).on('updatedRows.griddle', function(e, rows, data) {
+                updateModuleLevel(rows);
             });
         }
     };
@@ -52,28 +51,38 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
 
     };
 
-    var updateModuleLevel = function(module) {
+    var updateModuleLevel = function(modules) {
         var data = [];
-        data.push({
-            module_name: module.name,
-            run_level_core: module.run_level_core
+        _.each(modules, function(m) {
+            data.push({
+                module_name: m.name,
+                run_level_core: m.run_level_core
+            });
         });
 
         $.post("{{ THIS.get('form_url') }}", {data: data}, function(response, status, xhr) {
 
             $.post("{{ THIS.get('form_url') }}", {async: true, data: data}, function(response, status, xhr) {
+                var data = []; //new data to update rows again
                 response.data.forEach(function (obj) {
                     console.log('obj', obj);
                     var row = _.findWhere(moduleGrid.getRows(), { name: obj.module_name });
                     if (row) {
-                        obj.id = row.id;
-                        moduleGrid.updateRow(obj, { silent: true });
+                        obj.id = row.id.toString();
+                        data.push(obj);
                     }
                 });
+
+                if (data.length) {
+                    moduleGrid.updateRows(data, { silent: true });
+                }
             });
         });
     };
 
+
+    /**** begin function for backbonegrid ******/
+    //todo: will remove these functions after completely moved to react griddle
     function changeLevel(rows) {
         var data = [];
         for (var i in rows) {
@@ -91,7 +100,6 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         });
     }
 
-    //todo: will remove this function after completely moved to react griddle
     window.moduleGridRegister = function(grid) {
         moduleGrid = grid;
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
