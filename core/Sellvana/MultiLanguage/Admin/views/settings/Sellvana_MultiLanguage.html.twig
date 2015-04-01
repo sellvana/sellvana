@@ -1,0 +1,13 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'Sellvana_MultiLanguage', } %}
+{% set backOrders = prod.backOrders() %}
+{% set locales = LOCALE.getAvailableLocaleCodes() %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<h2>{{ "Locale Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_Catalog'}) }}
+    {{ forms.accordion_panel_start({label:'Internationalization'|_, id:'settings-Sellvana_MultiLanguage-group1'}) }}
+        {{ forms.select(fieldData, {field:'allowed_locales', label:'Allowed Product Data Locales', select2: {},
+            multiple: true, options:locales }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

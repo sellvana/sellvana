@@ -1,0 +1,14 @@
+{% set c = THIS.get('model') %}
+{% set customerClasses = APP.instance('Sellvana_SalesTax_Model_CustomerClass').getAllTaxClasses() %}
+{% set productClasses = APP.instance('Sellvana_SalesTax_Model_ProductClass').getAllTaxClasses() %}
+{% set fieldData = { model: c, settings_module:'Sellvana_SalesTax' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<h2>{{ "Sales Tax Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_SalesTax'}) }}
+    {{ forms.accordion_panel_start({label:'Defaults'|_, id:'settings-Sellvana_SalesTax-group0', in:1}) }}
+        {{ forms.select(fieldData, {field:'default_guest_class_id', label:'Default Guest Visitor Class'|_, options: customerClasses }) }}
+        {{ forms.select(fieldData, {field:'default_customer_class_id', label:'Default New Customer Class'|_, options: customerClasses }) }}
+        {{ forms.select(fieldData, {field:'default_product_class_id', label:'Default Product Class'|_, options: productClasses }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

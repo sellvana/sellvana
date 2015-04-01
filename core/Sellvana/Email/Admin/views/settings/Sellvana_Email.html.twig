@@ -1,0 +1,13 @@
+{% set c = THIS.get('model') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { model: c, settings_module:'Sellvana_Email' } %}
+<h2>{{ "Email Settings"|_}}</h2>
+
+{{ forms.accordion_start({id:'settings-Sellvana_Email'}) }}
+     {{ forms.accordion_panel_start({label:'Email Sending'|_, id:'settings-Sellvana_Email-group0', in:1}) }}
+        {{ forms.input(fieldData, {field:'smtp_host', label:'SMTP Host'|_ }) }}
+        {{ forms.input(fieldData, {field:'sendmail_from', label:'Sendmail From'|_ }) }}
+        {{ forms.select(fieldData, {field:'default_handler', label:'Default Handler'|_, options: UTIL.arrayToOptions(APP.instance('BEmail').getHandlers(), 'description') }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+
