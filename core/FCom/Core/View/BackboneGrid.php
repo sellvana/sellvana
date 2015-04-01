@@ -280,7 +280,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         switch ($btn['name']) {
                             case 'edit':
                                 if (empty($btn['icon'])) {
-                                    $btn['icon'] = ' icon-pencil';
+                                    $btn['icon'] = ' icon-pencil ';
                                 }
                                 if (!empty($grid['config']['form_url']) && empty($btn['href'])) {
                                     $btn['href'] = $grid['config']['form_url'] . '?' . $btn['col'] . '=';
@@ -291,9 +291,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
                             case 'delete':
                                 $btn['icon'] = 'icon-trash';
-                                $btn['cssClass'] = 'btn-delete ';
+                                $btn['cssClass'] = ' btn-delete ';
                                 if (!empty($btn['noconfirm']) && $btn['noconfirm']) {
-                                    $btn['cssClass'] .= 'noconfirm';
+                                    $btn['cssClass'] .= ' noconfirm ';
                                 }
                                 break;
                         }

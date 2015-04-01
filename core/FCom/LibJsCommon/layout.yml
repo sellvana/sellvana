@@ -19,6 +19,7 @@ common_js_libs:
             - [ requireJs, fcom.locale, @FCom_Core/js/fcom/fcom.locale ]
 
             - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
+            - [ requireJs, bootstrap-notify, @FCom_LibJsCommon/js/bootstrap-notify.min, { deps: [ jquery, bootstrap ] } ]
 
             #ReactJs
             - [ requireConfig, { jsx: { fileExtension: '.jsx', harmony: true } } ]

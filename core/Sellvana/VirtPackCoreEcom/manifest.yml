@@ -18,6 +18,7 @@ modules:
                 Sellvana_Checkout: 0.1.0
                 Sellvana_Cms: 0.1.0
                 Sellvana_Customer: 0.1.0
+                #Sellvana_CustomerAssist: 0.1.0
                 Sellvana_CustomerGroups: 0.1.0
                 Sellvana_CustomField: 0.1.0
                 Sellvana_Disqus: 0.1.0

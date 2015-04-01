@@ -89,16 +89,30 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (static::$_sessionCart) {
             return static::$_sessionCart;
         }
+        /*
+        if ($this->BSession->get('admin_cart_id')) {
 
-        // get unique cart token from cookie
-        $cookieToken = $this->BRequest->cookie('cart');
-
+        }
+        */
         // get session user
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
 
         $cart = null;
+        /*
+        // if session cart id is set, try to load it
+        $sessCartId = $this->BSession->get('cart_id');
+        if ($sessCartId) {
+            $cart = $this->loadWhere([
+                'id' => $sessCartId,
+                'state_overall' => Sellvana_Sales_Model_Cart_State_Overall::ACTIVE
+            ]);
+            $this->resetSessionCart($cart);
+        }
+        */
         // if cookie cart token is set, try to load it
-        if ($cookieToken) {
+        // get unique cart token from cookie
+        $cookieToken = $this->BRequest->cookie('cart');
+        if (!$cart && $cookieToken) {
             $cart = $this->loadWhere([
                 'cookie_token' => (string)$cookieToken,
                 'state_overall' => Sellvana_Sales_Model_Cart_State_Overall::ACTIVE
@@ -122,7 +136,8 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @param Sellvana_Sales_Model_Cart
+     * @param Sellvana_Sales_Model_Cart $cart
+     *
      * @return Sellvana_Sales_Model_Cart
      */
     public function resetSessionCart($cart = null)
@@ -133,8 +148,10 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             // get cookie token ttl from config
             $ttl = $this->BConfig->get('modules/Sellvana_Sales/cart_cookie_token_ttl_days') * 86400;
             // set cookie cart token for found cart
+            //$this->BSession->set('cart_id', $cart->id());
             $this->BResponse->cookie('cart', $cart->get('cookie_token'), $ttl);
         } else {
+            //$this->BSession->set('cart_id', false);
             $this->BResponse->cookie('cart', false);
         }
 

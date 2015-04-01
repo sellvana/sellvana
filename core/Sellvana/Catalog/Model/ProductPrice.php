@@ -61,7 +61,7 @@ class Sellvana_Catalog_Model_ProductPrice
                 ['value' => 'sale', 'label' => 'Sale'],
             ],
             "promo" => [
-                ['value' => 'catalog', 'label' => 'Catalog Price'],
+                ['value' => 'catalog', 'label' => 'Catalog'],
                 ['value' => 'cost', 'label' => 'Cost'],
                 ['value' => 'base', 'label' => 'Base'],
                 ['value' => 'sale', 'label' => 'Sale'],
@@ -127,7 +127,15 @@ class Sellvana_Catalog_Model_ProductPrice
             $orm->where('currency_code', $currency_code);
         }
 
-        $prices = $orm->find_many();
+        $prices = $orm->order_by_asc("(case tp.price_type
+            when 'base'  then 1
+            when 'cost'  then 2
+            when 'map'   then 3
+            when 'msrp'  then 4
+            when 'sale'  then 5
+            when 'tier'  then 6
+            when 'promo' then 7
+            else 99 end)")->order_by_asc("tp.qty")->find_many();
         //if (!empty($prices)) {
         //    $salePrice = (float) $product->get('sale_price');
         //    $basePrice = (float) $product->get('base_price');
