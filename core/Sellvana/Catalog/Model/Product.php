@@ -1288,20 +1288,52 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
          * - pos: 0,1,2,3
          */
         $prices = [];
+        $context = true;
 
-        $basePriceModel = $this->getPriceModelByType('base', true);
+        $basePriceModel = $this->getPriceModelByType('base', $context);
+        $mapPriceModel = $this->getPriceModelByType('map', $context);
+        $msrpPriceModel = $this->getPriceModelByType('msrp', $context);
+
         $basePrice = $basePriceModel ? $basePriceModel->getPrice() : 0;
 
         $finalPrice = $this->getCatalogPrice();
+        $finalText = null;
 
-        if ($finalPrice !== null && $finalPrice < $basePrice) {
-            $prices['base'] = ['type' => 'old', 'label' => 'Was', 'pos' => 10, 'value' => $basePrice];
-            $prices['sale'] = ['type' => 'new', 'label' => 'Now', 'pos' => 20, 'value' => $finalPrice, 'final' => 1];
-        } else {
-            $prices['base'] = ['type' => 'reg', 'label' => 'Price', 'pos' => 10, 'value' => $basePrice, 'final' => 1];
+        if ($mapPriceModel) {
+            $mapPrice = $mapPriceModel->getPrice();
+            if ($mapPrice > $finalPrice) {
+                $finalText = $this->BLocale->_('Add to cart');
+            }
         }
 
-        $this->BEvents->fire(__METHOD__, ['product' => $this, 'prices' => &$prices]);
+        if ($msrpPriceModel) {
+            $msrpPrice = $msrpPriceModel->getPrice();
+            $prices['msrp'] = ['type' => 'old', 'label' => 'List Price', 'pos' => 10, 'value' => $msrpPrice];
+        }
+
+        if ($finalPrice !== null && $finalPrice < $basePrice) {
+            $prices['base'] = ['type' => 'old', 'label' => 'Price', 'pos' => 20, 'value' => $basePrice];
+            $prices['sale'] = ['type' => 'new', 'label' => 'Sale', 'pos' => 30, 'value' => $finalPrice,
+                'formatted' => $finalText, 'final' => 1];
+        } else {
+            $prices['base'] = ['type' => 'reg', 'label' => 'Price', 'pos' => 20, 'value' => $basePrice, 'final' => 1];
+        }
+
+        $this->BEvents->fire(__METHOD__, [
+            'product' => $this,
+            'context' => $context,
+            'prices' => &$prices,
+            'final_price' => &$finalPrice,
+        ]);
+
+        if ($finalPrice !== null && $finalPrice < $basePrice) {
+            if (!empty($msrpPrice)) {
+                $basePrice = max($basePrice, $msrpPrice);
+            }
+            $diff = $basePrice - $finalPrice;
+            $saveText = $this->BLocale->currency($diff) . ' (' . number_format($diff / $basePrice * 100) . '%)';
+            $prices['save'] = ['type' => 'save', 'label' => 'You Save', 'pos' => 90, 'formatted' => $saveText];
+        }
 
         uasort($prices, function($v1, $v2) {
             $p1 = !empty($v1['pos']) ? $v1['pos'] : 999;
@@ -1309,6 +1341,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             return $p1 < $p2 ? -1 : ($p1 > $p2 ? 1 : 0);
         });
         return $prices;
+    }
+
+    public function getAllTierPrices($context = true)
+    {
+        return $this->getPriceModelByType('tier', $context);
     }
 
     /**
@@ -1335,11 +1372,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             return $tierPrices[$maxTierQty]->getPrice();
         }
         return null;
-    }
-
-    public function getAllTierPrices($context = true)
-    {
-        return $this->getPriceModelByType('tier', $context);
     }
 
     public function priceTypeOptions()

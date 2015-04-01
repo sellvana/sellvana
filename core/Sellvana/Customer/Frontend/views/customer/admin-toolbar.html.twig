@@ -1,0 +1,29 @@
+{% set adminCustomerId = SESSION.get('admin_customer_id') %}
+{% if adminCustomerId %}
+    {% set userHlp = APP.instance('FCom_Admin_Model_User') %}
+    {% set user = userHlp.sessionUser() %}
+    {% set customerHlp = APP.instance('Sellvana_Customer_Model_Customer') %}
+    {% set customer = customerHlp.sessionUser() %}
+
+    {% if user and user.getPermission('frontendcp') %}
+        <div style="height:40px"></div>
+        <div class="admin-toolbar-wrapper">
+            <div class="admin-toolbar">
+                <div class="pull-right">
+                    <img class="avatar" src="{{ UTIL.gravatar(user.get('email')) }}" width="25" height="25"/>
+                    {{ user.fullName() }}
+                </div>
+
+                <div class="pull-left">
+                    {{ 'Logged in as customer: '|_ }}
+                    <a href="{{ APP.adminHref('customers/form?id=' ~ customer.id()) }}" target="_black">
+                        {{ customer.firstname ~ ' ' ~ customer.lastname }}
+                    </a>
+                </div>
+
+                {{ THIS.hook('customer/admin-toolbar') | raw }}
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}

@@ -153,8 +153,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             //if(this.editable) {
                     var priceTypes =
                     <span key="price_type_wrapper">
-                        <select key="price_type" className="form-control priceUnique"
-                            name={this.getFieldName(price, 'price_type')} readOnly={this.editable? null: "readonly"}
+                        <select key="price_type" className={"form-control" + (this.editable || this.props.theBase ? " priceUnique": '')}
+                            name={this.getFieldName(price, 'price_type')} disabled={!this.editable}
                             defaultValue={price['price_type']} ref="price_type">
                                 {_.map(this.props.price_types, function (pt, pk) {
                                     return <option key={pk} value={pk} disabled={pk == 'promo' ? 'disabled' : null}>{pt}</option>
@@ -202,7 +202,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                             {this.props.operationOptions.map(function (o) {
                                 return <option value={o.value} key={o.value}>{o.label}</option>
                             })}
-                        </select>
+                        </select>;
                 if(price['operation'] && price['operation'] !== "=$") {
                     baseField =
                             <select ref="base_fields" key="base_fields" name={this.getFieldName(price, 'base_field')}
@@ -285,7 +285,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                defaultValue={price['amount']} readOnly={this.editable || this.props.theBase ? null: 'readonly'}/>
                     </td>
                     <td>
-                        { operation? {operation} : null }
+                        { operation ? {operation} : null }
                         { baseField ? {baseField} : null }
                     </td>
                     <td>
@@ -301,16 +301,16 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             //if(this.props.data.operation && this.props.data.operation !== '=$') {
             //    $('select.base_field', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
             //}
-            //var operation = this.refs['operation'];
-            //if (operation) {
-            //    var self = this;
-            //    $(operation.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'}).on('change', function (e) {
-            //        var operation = $(e.target).val();
-            //        var id = self.props.data.id;
-            //        self.props.updateOperation(id, operation);
-            //    })
-            //}
-            this.initPrices();
+            var operation = this.refs['operation'];
+            if (operation) {
+                var self = this;
+                $(operation.getDOMNode()).off("change").on('change', function (e) {
+                    var operation = $(e.target).val();
+                    var id = self.props.data.id;
+                    self.props.updateOperation(id, operation);
+                })
+            }
+            //this.initPrices();
         },
         componentWillUpdate: function () {
             //if(this.refs['base_fields']) {
@@ -320,14 +320,14 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
         initPrices: function () {
             var self = this;
             if (this.editable) {
-                $(this.refs['price_type'].getDOMNode()).on('change', function (e) {
+                $(this.refs['price_type'].getDOMNode()).off("change").on('change', function (e) {
                     e.stopPropagation();
                     var priceType = $(e.target).val();
                     var id = self.props.data.id;
                     self.props.updatePriceType(id, priceType);
                     self.props.validate();
                 });
-                $('a.btn-remove', this.getDOMNode()).on('click', function (e) {
+                $('a.btn-remove', this.getDOMNode()).off("click").on('click', function (e) {
                     e.preventDefault();
                     var id = $(this).data('id');
                     //console.log(id);
@@ -342,7 +342,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             if(this.editable || this.props.theBase) {
                 var operation = this.refs['operation'];
                 if (operation) {
-                    $(operation.getDOMNode()).on('change', function (e) {
+                    $(operation.getDOMNode()).off("change").on('change', function (e) {
                         var operation = $(e.target).val();
                         var id = self.props.data.id;
                         self.props.updateOperation(id, operation);
@@ -402,6 +402,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
         },
         newIdx: 0,
         init: function (options) {
+            //var Perf = React.addons.Perf;
             this.options = _.extend({}, this.options, options);
 
             var container = this.options.container;
@@ -481,8 +482,10 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         price.price_type = price_type;
                     }
                 });
-
+                //Perf.start();
                 React.render(<PricesApp {...this.options} />, this.options.container[0])
+                //Perf.stop();
+                //Perf.printInclusive();
             }.bind(this);
 
             this.options.updateOperation = function (price_id, operation) {

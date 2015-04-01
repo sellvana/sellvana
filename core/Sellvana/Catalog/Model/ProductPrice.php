@@ -127,7 +127,15 @@ class Sellvana_Catalog_Model_ProductPrice
             $orm->where('currency_code', $currency_code);
         }
 
-        $prices = $orm->find_many();
+        $prices = $orm->order_by_asc("(case tp.price_type
+            when 'base'  then 1
+            when 'cost'  then 2
+            when 'map'   then 3
+            when 'msrp'  then 4
+            when 'sale'  then 5
+            when 'tier'  then 6
+            when 'promo' then 7
+            else 99 end)")->order_by_asc("tp.qty")->find_many();
         //if (!empty($prices)) {
         //    $salePrice = (float) $product->get('sale_price');
         //    $basePrice = (float) $product->get('base_price');
@@ -440,7 +448,7 @@ class Sellvana_Catalog_Model_ProductPrice
                 'amount' => $value,
                 'base_field' => null,
             ];
-        } elseif (is_string($value) && preg_match('#^(base|sale|cost|msrp|map)([+-*])([0-9.]+)(%?)$#', $value, $m)) {
+        } elseif (is_string($value) && preg_match('#^(base|sale|cost|msrp|map)([+\*-])([0-9.]+)(%?)$#', $value, $m)) {
             return [
                 'operation' => $m[2] . ($m[4] ?: '$'),
                 'amount' => $m[3],

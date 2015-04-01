@@ -56,8 +56,14 @@ define(['underscore', 'react'], function (_, React) {
                         var actions = col.buttons.map(function(btn, index) {
                             //var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
                             if (btn.type == 'link') {
+                                console.log(btn);
                                 return (
-                                    <a className={"btn btn-link " + btn.cssClass} key={index} href={btn.href + that.props.row[btn.col]} title={btn.title ? btn.title : ""}>
+                                    <a key={index}
+                                        className={"btn btn-link " + (btn.cssClass ? btn.cssClass : "")}
+                                        title={btn.title ? btn.title : ""}
+                                        href={btn.href + that.props.row[btn.col]}
+                                        target={btn.target ? btn.target : ""}
+                                    >
                                         <i className={btn.icon}></i>
                                         {btn.caption}
                                     </a>

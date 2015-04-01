@@ -1590,14 +1590,17 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                     totalType: [
                         {id: "-%", label: "% Off"},
                         {id: "-$", label: "$ Amount Off"},
+                        {id: "+%", label: "Add % to"},
+                        {id: "+$", label: "Add to"},
                         {id: "=$", label: "$ Only"}
                     ],
                     select2: true,
                     containerClass: "col-md-2",
                     className: "form-control"
                 };
-            }, componentDidMount: function () {
-                $('select.to-select2', this.getDOMNode()).select2().on('change', this.onChange);
+            },
+            componentDidMount: function () {
+                $('select.to-select2', this.getDOMNode()).select2({width:'resolve'}).on('change', this.onChange);
             }
         });
 
@@ -2338,37 +2341,57 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 var display = {
                     display: (promoType === 'catalog') ? 'none' : 'inherit'
                 };
-                var disabled = (promoType === 'catalog');
+                var isCatalog = (promoType === 'catalog');
 
                 return (
                     <Common.Row rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
-                        <Type ref={"discountType" + this.props.id} id={"discountType" + this.props.id} promoType={promoType}
-                            key={"discountType" + this.props.id} value={this.state.type} onChange={this.onChange}/>
-                        <div className="col-md-7">
-                            <div className="col-md-2">
-                                <input className="form-control pull-left" ref={"discountValue" + this.props.id}
-                                    id={"discountValue" + this.props.id} key={"discountValue" + this.props.id} type="text"
-                                    defaultValue={this.state.value} onBlur={this.onChange}/>
-                            </div>
-                            <div className="col-md-5" style={display}>
-                                <select className="to-select2 form-control" disabled={disabled}
-                                    ref={"discountScope" + this.props.id} defaultValue={this.state.scope}
-                                    id={"discountScope" + this.props.id} key={"discountScope" + this.props.id} onChange={this.onChange}>
-                                    {this.props.scopeOptions.map(function (type) {
-                                        return <option value={type.id} key={type.id}>{type.label}</option>
-                                    })}
-                                </select>
-                            </div>
-                            <div className="col-md-5" style={display}>
-                                <DiscountDetails type={this.state.scope} options={this.props.options} ref={"discountDetails" + this.props.id}
-                                    id={"discountDetails" + this.props.id} key={"discountDetails" + this.props.id}
-                                    modalContainer={this.props.modalContainer} onChange={this.onChange}
-                                    data={{
-                                        sku: this.state.sku,
-                                        combination: this.state.combination
-                                    }} promoType={promoType}/>
-                            </div>
+                        <div style={divStyle}>
+                            <input className="form-control pull-left" ref={"discountValue" + this.props.id}
+                                   id={"discountValue" + this.props.id} key={"discountValue" + this.props.id}
+                                   type="text" size="6"
+                                   defaultValue={this.state.value} onBlur={this.onChange}/>
                         </div>
+                        <Type ref={"discountType" + this.props.id} id={"discountType" + this.props.id} promoType={promoType}
+                            key={"discountType" + this.props.id} value={this.state.type} onChange={this.onTypeChange}/>
+                        <div style={$.extend({},divStyle, display)}>
+                            <select className="to-select2 form-control" disabled={isCatalog}
+                                ref={"discountScope" + this.props.id} defaultValue={this.state.scope}
+                                id={"discountScope" + this.props.id} key={"discountScope" + this.props.id} onChange={this.onChange}>
+                                {this.props.scopeOptions.map(function (type) {
+                                    return <option value={type.id} key={type.id}>{type.label}</option>
+                                })}
+                            </select>
+                        </div>
+                        <div style={$.extend({},divStyle, display)}>
+                            <DiscountDetails type={this.state.scope} options={this.props.options} ref={"discountDetails" + this.props.id}
+                                id={"discountDetails" + this.props.id} key={"discountDetails" + this.props.id}
+                                modalContainer={this.props.modalContainer} onChange={this.onChange}
+                                data={{
+                                    sku: this.state.sku,
+                                    combination: this.state.combination
+                                }} promoType={promoType}/>
+                        </div>
+                        { isCatalog && this.state.type != '=$'?
+                            <div style={divStyle}>
+                                <select className="form-control to-select2" ref={"base-field-" + this.props.id}
+                                        defaultValue={this.state.base_field}
+                                        id={"base-field-" + this.props.id} key={"base-field-" + this.props.id}>
+                                    {this.props.options['base_fields']['promo'].map(function (p) {
+
+                                        var opt = null;
+                                        var t = this.state.type;
+                                        if((t == '+%' || t == '+$') && p.value === 'cost') {
+                                            opt = <option key={p.value} value={p.value}>{p.label}</option>;
+                                        } else if((t == '-%' || t == '-$') && p.value !== 'cost'){
+                                            opt = <option key={p.value} value={p.value}>{p.label}</option>;
+                                        }
+
+                                        return opt;
+                                    }.bind(this))}
+                                </select>
+                            </div>:
+                            null
+                        }
                     </Common.Row>
                 );
             },
@@ -2379,6 +2402,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             componentDidMount: function () {
                 if (this.props.options.promo_type != 'catalog') {
                     $(this.refs['discountScope' + this.props.id].getDOMNode()).select2().on('change', this.onScopeChange);
+                } else {
+                    $(this.refs["base-field-" + this.props.id].getDOMNode()).select2().on('change', this.onScopeChange);
                 }
                 this.onChange();
             },
@@ -2440,6 +2465,12 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
 
                     if (value.scope != "other_prod") {
                         delete value['product_ids'];
+                    }
+                } else {
+                    var ref = this.refs["base-field-" + this.props.id];
+                    if (ref) {
+                        var baseField = $(ref.getDOMNode()).select2().val();
+                        value.base_field = baseField;
                     }
                 }
 

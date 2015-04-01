@@ -9,7 +9,7 @@
 
 class Sellvana_Customer_Migrate extends BClass
 {
-    public function install__0_1_11()
+    public function install__0_1_13()
     {
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
         $tAddress = $this->Sellvana_Customer_Model_Address->table();
@@ -32,8 +32,12 @@ class Sellvana_Customer_Migrate extends BClass
                 'payment_details' => 'text',
                 'status' => "varchar(10) not null default 'review'",
                 'password_session_token' => 'varchar(16)',
+                'last_session_id' => 'varchar(40) null',
             ],
             BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_session_id' => '(last_session_id)',
+            ],
         ]);
 
         $this->BDb->ddlTableDef($tAddress, [
@@ -61,6 +65,8 @@ class Sellvana_Customer_Migrate extends BClass
                 'update_at' => 'datetime not null',
                 'lat' => 'decimal(15,10) default null',
                 'lng' => 'decimal(15,10) default null',
+                'is_default_billing' => 'tinyint not null default 0',
+                'is_default_shipping' => 'tinyint not null default 0',
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
@@ -228,5 +234,18 @@ class Sellvana_Customer_Migrate extends BClass
                 a.is_default_shipping=IF(c.default_shipping_id=a.id,1,0)
             WHERE a.customer_id=c.id
         ");
+    }
+
+    public function upgrade__0_1_12__0_1_13()
+    {
+        $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($tCustomer, [
+            BDb::COLUMNS => [
+                'last_session_id' => 'varchar(40) null',
+            ],
+            BDb::KEYS => [
+                'IDX_session_id' => '(last_session_id)',
+            ],
+        ]);
     }
 }

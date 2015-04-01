@@ -57,7 +57,8 @@ define(['underscore', 'react'], function (_, React) {
                             //var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
                             if (btn.type == 'link') {
                                 return (
-                                    React.createElement("a", {className: "btn btn-link " + btn.cssClass, key: index, href: btn.href + that.props.row[btn.col], title: btn.title ? btn.title : ""}, 
+                                    React.createElement("a", {className: "btn btn-link " + (btn.cssClass || ''), key: index,
+                                            href: btn.href + that.props.row[btn.col], title: btn.title || '', target: btn.target || ''},
                                         React.createElement("i", {className: btn.icon}), 
                                         btn.caption
                                     )
@@ -65,8 +66,8 @@ define(['underscore', 'react'], function (_, React) {
                             } else {
                                 //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
-                                    React.createElement("button", {className: "btn btn-link " + btn.cssClass, key: index, title: btn.title ? btn.title : "", type: "button", 
-                                        "data-action": btn.name, "data-row": that.props.row.id, onClick: that.props.doRowAction}, 
+                                    React.createElement("button", {className: "btn btn-link " + (btn.cssClass || ''), key: index, title: btn.title || '', type: "button",
+                                        "data-action": btn.name, "data-row": that.props.row.id, onClick: that.props.doRowAction},
                                         React.createElement("i", {className: btn.icon, "data-action": btn.name, "data-row": that.props.row.id}), 
                                         btn.caption
                                     )

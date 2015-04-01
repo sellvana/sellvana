@@ -1,0 +1,2 @@
+base:
+    - { hook: header-top-util, views: customer-assist/header }

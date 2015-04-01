@@ -12,6 +12,8 @@ class FCom_Frontend_Frontend extends BClass
             $this->BLayout->setRootView('under_construction');
             $this->BResponse->render();
         }
+
+        $this->BSession->set('current_url', $this->BRequest->currentUrl());
     }
 
     public function layout()

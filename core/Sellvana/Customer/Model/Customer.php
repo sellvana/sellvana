@@ -342,7 +342,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function sessionUserId()
     {
         $sess = $this->BSession;
-        return $sess->get('admin_customer_id') ?: $sess->get('customer_id');
+        //return $sess->get('admin_customer_id') ?: $sess->get('customer_id');
+        return $sess->get('customer_id');
     }
 
     /**
@@ -362,18 +363,30 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
                 $sessData['customer_id'] = null;
                 return false;
             }
-            $token = $user->get('password_session_token');
-            if (!$token) {
-                $token = $this->BUtil->randomString(16);
-                $user->set('password_session_token', $token)->save();
-            }
-            if (empty($sessData['customer_password_token'])) {
-                $sessData['customer_password_token'] = $token;
-            } elseif ($sessData['customer_password_token'] !== $token) {
-                $user->logout();
-                $this->BResponse->cookie('remember_me', 0);
-                $this->BResponse->redirect('');
-                return;
+            if (!$this->BSession->get('admin_user_id')) {
+                $save = false;
+                $sessId = $this->BSession->sessionId();
+                if ($user->get('last_session_id') !== $sessId) {
+                    $user->set('last_session_id', $sessId);
+                    $save = true;
+                }
+                $token = $user->get('password_session_token');
+                if (!$token) {
+                    $token = $this->BUtil->randomString(16);
+                    $user->set('password_session_token', $token);
+                    $save = true;
+                }
+                if ($save) {
+                    $user->save();
+                }
+                if (empty($sessData['customer_password_token'])) {
+                    $sessData['customer_password_token'] = $token;
+                } elseif ($sessData['customer_password_token'] !== $token) {
+                    $user->logout();
+                    $this->BResponse->cookie('remember_me', 0);
+                    $this->BResponse->redirect('');
+                    return;
+                }
             }
         }
         return static::$_sessionUser;
@@ -412,13 +425,17 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param boolean $resetSessionId
+     *
      * @return $this
      */
-    public function login()
+    public function login($resetSessionId = true)
     {
         $this->set('last_login', $this->BDb->now())->save();
 
-        $this->BSession->regenerateId();
+        if ($resetSessionId) {
+            $this->BSession->regenerateId();
+        }
         $this->BSession->set('customer_id', $this->id());
         static::$_sessionUser = $this;
         if ($this->locale) {
