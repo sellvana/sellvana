@@ -285,8 +285,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         priceTypes
                     ), 
                     React.createElement("td", null, 
-                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"), size: "6", 
-                               defaultValue: price['amount'], readOnly: this.editable || this.props.theBase ? null: 'readonly'})
+                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"), size: "6", title: price['calc_amount']? price['calc_amount']: price['amount'], 
+                               defaultValue: price['amount'], readOnly: this.editable || this.props.theBase ? null: 'readonly'}), 
+                        price['calc_amount'] ? React.createElement("span", {className: "help-block"}, price['calc_amount']) : null
                     ), 
                     React.createElement("td", null, 
                          operation ? {operation:operation} : null, 
@@ -311,8 +312,13 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 $(operation.getDOMNode()).off("change").on('change', function (e) {
                     var operation = $(e.target).val();
                     var id = self.props.data.id;
-                    self.props.updateOperation(id, operation);
-                })
+
+                    var baseField = null;
+                    if (self.refs['base_fields']) {
+                        baseField = $(self.refs['base_fields'].getDOMNode()).val();
+                    }
+                    self.props.updateOperation(id, operation, baseField);
+                });
             }
             //this.initPrices();
         },
@@ -349,8 +355,12 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     $(operation.getDOMNode()).off("change").on('change', function (e) {
                         var operation = $(e.target).val();
                         var id = self.props.data.id;
-                        self.props.updateOperation(id, operation);
-                    })
+                        var baseField = null;
+                        if(self.refs['base_fields']) {
+                            baseField = $(self.refs['base_fields'].getDOMNode()).val();
+                        }
+                        self.props.updateOperation(id, operation, baseField);
+                    });
                 }
             }
         },
@@ -400,6 +410,59 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
     });
 
     var divStyle = {float: 'left', marginLeft: 15};
+    function renderPrices(options, container) {
+        var prices = options.prices;
+        _.each(prices, function (price) {
+            //console.log(price);
+            if(price.operation && price.operation != '=$') {
+                var operation = price.operation;
+                var base_field = price.base_field;
+                var customer_group_id = price.customer_group_id;
+                var currency_code = price.currency_code;
+                var site_id = price.site_id;
+                var basePrice = _.find(prices, function (p) {
+                    if(p === price) {
+                        return false;
+                    }
+
+                    return (p.price_type == base_field && p.customer_group_id == customer_group_id &&
+                    p.currency_code == currency_code && p.site_id == site_id)
+                });
+                //console.log(basePrice);
+                if(basePrice) {
+                    var result;
+                    var value = parseFloat(basePrice.amount);
+                    var value2 = parseFloat(price.amount);
+                    switch (operation) {
+                        case '*$':
+                            result = value * value2;
+                            break;
+                        case '+$':
+                            result = value + value2;
+                            break;
+                        case '-$':
+                            result = value - value2;
+                            break;
+                        case '*%':
+                            result = value * value2 / 100;
+                            break;
+                        case '+%':
+                            result = value + value * value2 / 100;
+                            break;
+                        case '-%':
+                            result = value - value * value2 / 100;
+                            break;
+                        default:
+                            result = value;
+                    }
+                    price.calc_amount = result;
+                    console.log(value, value2, operation, price.calc_amount);
+                }
+            }
+        });
+        React.render(React.createElement(PricesApp, React.__spread({},  options)), container);
+    }
+
     var productPrice = {
         options: {
             title: Locale._("Product Prices")
@@ -429,7 +492,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 var $el = $(e.target);
                 var filter = $el.attr('id');
                 this.options[filter + '_value'] = $el.val();
-                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0]);
+                renderPrices(this.options, this.options.container[0]);
             }.bind(this);
 
             //checkAddAllowed(this.options);
@@ -454,7 +517,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 }
                 this.options.prices.push(newPrice);
 
-                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0]);
+                renderPrices(this.options, this.options.container[0]);
             }.bind(this);
 
             if(this.options.prices.length == 0) {
@@ -477,7 +540,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     this.options['deleted'] = {};
                 }
                 this.options['deleted'][id] = true;
-                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0])
+                renderPrices(this.options, this.options.container[0]);
             }.bind(this);
 
             this.options.updatePriceType = function (price_id, price_type) {
@@ -487,22 +550,23 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     }
                 });
                 //Perf.start();
-                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0])
+                renderPrices(this.options, this.options.container[0]);
                 //Perf.stop();
                 //Perf.printInclusive();
             }.bind(this);
 
-            this.options.updateOperation = function (price_id, operation) {
+            this.options.updateOperation = function (price_id, operation, base_field) {
                 _.each(this.options.prices, function (price) {
                     if (price.id == price_id) {
                         price.operation = operation;
+                        price.base_field = base_field || 'base';
                     }
                 });
                 $("#price").find(".to-select2").select2('destroy');
-                React.render(React.createElement(PricesApp, React.__spread({},  this.options)), this.options.container[0])
+                renderPrices(this.options, this.options.container[0]);
             }.bind(this);
 
-            React.render(React.createElement(PricesApp, React.__spread({},  this.options)), container[0])
+            renderPrices(this.options, this.options.container[0]);
         }
     };
     return productPrice;
