@@ -374,7 +374,6 @@ var Griddle = React.createClass({displayName: "Griddle",
         this.triggerCallback('componentDidMount');
     },
     componentDidUpdate: function() {
-        console.log('didUpdate');
         this.triggerCallback('componentDidUpdate');
     },
     getDataForRender: function(data, cols, pageList){
@@ -483,7 +482,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                         className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, 
                         getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, 
                         getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows, 
-                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, 
+                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, isLocalMode: this.isLocalMode, updateRow: this.updateRow, 
                         ref: 'gridBody'}
                     ))
                     : (React.createElement(GridBody, {columnMetadata: this.props.columnMetadata, data: data, columns: cols, metadataColumns: meta, className: this.props.tableClassName}))
@@ -601,6 +600,9 @@ var Griddle = React.createClass({displayName: "Griddle",
             return this.props.config[name];
         }
         return null;
+    },
+    isLocalMode: function() {
+        return this.getConfig('data_mode') == 'local';
     },
     /**
      * re-render grid with same state
@@ -891,6 +893,45 @@ var Griddle = React.createClass({displayName: "Griddle",
         }
         this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results), selectedRows: selectedRows }, function() {
             $(this.getDOMNode()).trigger('removedRows.griddle', [rows, this]);
+        });
+    },
+    /**
+     * update row data, almost use in data mode local
+     * @param data
+     * @returns {boolean}
+     * @param {object} options
+     */
+    updateRow: function(data, options) {
+        if (!data.id) {
+            return false;
+        }
+
+        options = _.extend({
+            silent: false
+            //other options
+        }, options);
+
+        var rows = this.getRows();
+        var updatedRow;
+
+        for (var i in rows) {
+            if (rows[i].id == data.id) {
+                _.each(data, function(value, key) {
+                    if (rows[i].hasOwnProperty(key)) {
+                        rows[i][key] = value;
+                    }
+                    updatedRow = rows[i];
+                });
+                break;
+            }
+        }
+
+        this.setState({ results: rows, filteredResults: rows }, function() {
+            if (!options.silent) {
+                //console.log('trigger.updatedRow.griddle');
+                //todo: event updatedRow.server.griddle?
+                $(this.getDOMNode()).trigger('updatedRow.griddle', [updatedRow, data, this]);
+            }
         });
     },
     getRows: function() {

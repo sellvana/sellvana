@@ -1,7 +1,78 @@
 <script>
-
+var testModuleGrid;
 require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
     var moduleGrid = null;
+
+    window.moduleGridMounted = function(grid, trigger) {
+        moduleGrid = grid; testModuleGrid = grid;
+
+        //add badge
+        var rows = moduleGrid.refs['gridBody'].refs;
+        _.each(rows, function(row) {
+            wrapBadgeHTML(row);
+        });
+
+        if (trigger == 'componentDidMount') {
+            $(moduleGrid.getDOMNode()).on('updatedRow.griddle', function(e, row, data) {
+                updateModuleLevel(row);
+            });
+        }
+    };
+
+    var wrapBadgeHTML = function (rowComponent) {
+        var row = rowComponent.props.row;
+        var el = $(rowComponent.getDOMNode());
+        if (!row) {
+            return false;
+        }
+
+        if (row['migration_available']) {
+            el.find('td[data-col="schema_version"]').html('<span class="badge badge-important">' + row['schema_version'] + '</span>');
+        }
+
+        if (row['run_status'] === 'LOADED') {
+            el.find('td[data-col="run_status"]').html('<span class="badge badge-success">' + row['run_status'] + '</span>');
+        } else if (row['run_status'] === 'ERROR') {
+            el.find('td[data-col="run_status"]').html('<span class="badge badge-important">' + row['run_status'] + '</span>');
+        }
+
+        var badge = '';
+        switch (row['run_level']) {
+            case 'REQUESTED':
+                badge = 'success';
+                break;
+            case 'REQUIRED':
+                badge = 'warning';
+                break;
+        }
+
+        if (badge != '') {
+            el.find('td[data-col="run_level"]').html('<span class="badge badge-' + badge + '">' + row['run_level'] + '</span>');
+        }
+
+    };
+
+    var updateModuleLevel = function(module) {
+        var data = [];
+        data.push({
+            module_name: module.name,
+            run_level_core: module.run_level_core
+        });
+
+        $.post("{{ THIS.get('form_url') }}", {data: data}, function(response, status, xhr) {
+
+            $.post("{{ THIS.get('form_url') }}", {async: true, data: data}, function(response, status, xhr) {
+                response.data.forEach(function (obj) {
+                    console.log('obj', obj);
+                    var row = _.findWhere(moduleGrid.getRows(), { name: obj.module_name });
+                    if (row) {
+                        obj.id = row.id;
+                        moduleGrid.updateRow(obj, { silent: true });
+                    }
+                });
+            });
+        });
+    };
 
     function changeLevel(rows) {
         var data = [];
@@ -19,49 +90,6 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
             });
         });
     }
-
-    window.moduleGridMounted = function(grid) {
-        moduleGrid = grid;
-
-        var rows = grid.refs['gridBody'].refs;
-
-        _.each(rows, function(row) {
-            wrapBadgeHTML(row);
-        });
-    };
-
-    var wrapBadgeHTML = function(rowComponent) {
-        var row = rowComponent.props.row;
-        var el = $(rowComponent.getDOMNode());
-        if (!row) {
-            return false;
-        }
-
-        if (row['migration_available']) {
-            el.find('td[data-col="schema_version"]').wrapInner('<span class="badge badge-important"></span>');
-        }
-
-        if (row['run_status'] === 'LOADED') {
-            el.find('td[data-col="run_status"]').wrapInner('<span class="badge badge-success"></span>');
-        } else if (row['run_status'] === 'ERROR') {
-            el.find('td[data-col="run_status"]').wrapInner('<span class="badge badge-important"></span>');
-        }
-
-        var badge = '';
-        switch(row['run_level']) {
-            case 'REQUESTED':
-                badge = 'success';
-                break;
-            case 'REQUIRED':
-                badge = 'warning';
-                break;
-        }
-
-        if (badge != '') {
-            el.find('td[data-col="run_level"]').wrapInner('<span class="badge badge-'+badge+'"></span>');
-        }
-
-    };
 
     //todo: will remove this function after completely moved to react griddle
     window.moduleGridRegister = function(grid) {
