@@ -1868,6 +1868,19 @@ class Sellvana_Sales_Migrate extends BClass
         $this->upgrade__0_3_11__0_3_12();
         $this->upgrade__0_3_12__0_3_13();
     }
+
+    public function upgrade__0_3_14__0_3_15()
+    {
+        $tOrder = $this->Sellvana_Sales_Model_Order->table();
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDb::KEYS => [
+                'FK_cart_id' => '(cart_id)',
+                'UNQ_cart_id' => BDb::DROP,
+            ],
+        ]);
+
+    }
 }
 
 class Sellvana_Sales_Migrate_Model_Cart_Address extends BModel
