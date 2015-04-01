@@ -1,0 +1,6 @@
+lib_js_codemirror:
+    - view: head
+        do:
+            - [ css, "@FCom_LibJsCodemirror/js/codemirror/lib/codemirror.css" ]
+            - [ requireJs, codemirror, "@FCom_LibJsCodemirror/js/codemirror/lib/codemirror" ]
+            - [ requireJs, codemirror-loadmode, "@FCom_LibJsCodemirror/js/codemirror/addon/mode/loadmode", { deps: [ coremirror ] } ]

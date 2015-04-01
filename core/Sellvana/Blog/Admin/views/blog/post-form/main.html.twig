@@ -1,0 +1,52 @@
+<!--{ label: Blog Post }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator', m) %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator } %}
+<div class="f-section">
+<fieldset class="form-horizontal">
+    {{ forms.select(fieldData, {field:'status', label:'Status'|_, options: m.fieldOptions('status') }) }}
+    {{ forms.input(fieldData, {field:'title', label:'Title'|_, required: 1}) }}
+    {{ forms.textarea(fieldData, {field:'tags', label:'Tags'|_,rows: 2, value:  validator.fieldValue('tags') ? validator.fieldValue('tags') : m.getTagsString()}) }}
+    {{ forms.input(fieldData, {field:'url_key', label:'URL Key optional'|_, required: 1}) }}
+    {{ forms.textarea(fieldData, {field:'meta_keywords', label:'Meta Keywords'|_,rows: 2}) }}
+    {{ forms.wysiwyg(fieldData, {field:'preview', label:'Preview'|_, input_div_class: "col-md-10" }) }}
+    {{ forms.wysiwyg(fieldData, {field:'content', label:'Content'|_, input_div_class: "col-md-10" }) }}
+</fieldset>
+</div>
+<script>
+    require(['jquery', 'jquery.validate', 'jstree'], function($) {
+        $(function() {
+            var form = $('#model-status').parents('form');
+            $.validator.addMethod('category', validateCategory, 'You must choose one or more category.');
+            function validateCategory (value, element, param) {
+                $('#categories-layout').find('label.error').hide();
+                $('a[href="#tab-categories"]').find('i.error').hide();
+                if (value == 'published') {
+                    var checked_ids = [];
+                    $("#categories").jstree("get_checked",null,true).each(function () {
+                        checked_ids.push(this.id);
+                    });
+                    if (checked_ids.length == 0) {
+                        $('#categories-layout').find('label.error').show();
+                        $('a[href="#tab-categories"]').find('i.error').show();
+                        return false;
+                    }
+                }
+                return true;
+
+            }
+            form.validate({
+                ignore: '',
+                rules:{
+                    'model[status]': {
+                        category: true
+                    }
+                }
+            });
+
+        })
+    })
+</script>

@@ -1,6 +1,0 @@
-{% set rootId = THIS.get('root_id') ? THIS.get('root_id') : 1 %}
-{% set navList = APP.instance('FCom_Cms_Model_Nav')->orm()->where('parent_id', rootId)->find_many() %}
-
-{% for nav in navList %}
-    <li><a href="{% nav.getUrl() %}">{% nav.get('node_name') %}</a></li>
-{% endfor %}

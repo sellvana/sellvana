@@ -1,0 +1,15 @@
+{% set item = THIS.get('item') %}
+{% set display = item.getData('display') %}
+{% set product = THIS.get('product') ?: item.product() %}
+<span class="product-name"><a href="{{ product.url() }}">{{ item.get('product_name') }}</a></span>
+{% if display %}
+    <ul>
+        {% for row in display %}
+            {% if row.value is null %}
+                <li>{{ row.label }}</li>
+            {% else %}
+                <li>{{ row.label }}: {{ row.value }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}

@@ -1,0 +1,32 @@
+<div class="f-site-footer">
+    <div class="container">
+        <div class="row">
+            <dl class="col-md-3 col-sm-3">
+                <dt class="col-title">Customer Service</dt>
+                <dd><a href="#">Contact Us</a></dd>
+                <dd><a href="#">Return Policy</a></dd>
+                <dd><a href="#">Shipping Policy</a></dd>
+                <dd><a href="#">Help</a></dd>
+            </dl>
+            <dl class="col-md-3 col-sm-3">
+                <dt class="col-title">Customer Service</dt>
+                <dd><a href="#">Contact Us</a></dd>
+                <dd><a href="#">Return Policy</a></dd>
+                <dd><a href="#">Shipping Policy</a></dd>
+                <dd><a href="#">Help</a></dd>
+            </dl>
+            <dl class="col-md-3 col-sm-3">
+                <dt class="col-title">Customer Service</dt>
+                <dd><a href="#">Contact Us</a></dd>
+                <dd><a href="#">Return Policy</a></dd>
+                <dd><a href="#">Shipping Policy</a></dd>
+                <dd><a href="#">Help</a></dd>
+            </dl>
+            {{ THIS.hook('footer-widget') | raw }}
+        </div>
+        <p class="f-copyright">&copy; {{ 'now'|date('Y') }} {{ CONFIG.get('modules/FCom_Core/copyright_message') }} {{ "All rights reserved."|_ }}
+            <a href="{{ APP.href('privacy') }}">{{ "Privacy Notice"|_ }}</a>
+            <a href="{{ APP.href('tnc') }}">{{ "Terms and Conditions"|_ }}</a>
+        </p>
+    </div>
+</div>

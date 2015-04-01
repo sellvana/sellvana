@@ -1,0 +1,225 @@
+/:
+    type: map
+    key_enum: modules
+
+/modules:
+    type: map
+    key_pattern: "^[A-Z][a-z0-9]+(_[A-Za-z0-9])*$"
+
+/modules/*:
+    type: map
+    key_enum: [ version, channel, title, author, description, migrate, themes, areas ]
+    include: $area
+
+/modules/*/version:
+    type: str
+    prefer_pattern: "^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$"
+
+/modules/*/channel:
+    type: str
+    prefer_enum: [ stable, beta, alpha ]
+
+/modules/*/themes:
+    type: map
+
+/modules/*/themes/*:
+    type: map
+    key_enum: [ name, area, parent, layout_before, layout_after, views_before, views_after ]
+
+/modules/*/themes/*/(name|area):
+    type: str
+
+/modules/*/themes/*/(parent|layout_before|layout_after|views_before|views_after):
+    type: seq_cast
+
+/modules/*/themes/*/(parent|layout_before|layout_after|views_before|views_after)/*:
+    type: str
+
+/modules/*/(title|author|description):
+    type: str
+
+/modules/*/category:
+    type: seq_cast
+
+/modules/*/migrate:
+    include: $callback
+
+/modules/*/areas:
+    type: map
+    prefer_key_enum: [ FCom_Frontend, FCom_Admin, FCom_ApiServer, FCom_PushServer, FCom_Cron, FCom_Test ]
+
+/modules/*/areas/*:
+    include: $area
+
+$callback:
+    type: [ str, seq ]
+    children_min: 1
+    children_max: 2
+
+$callback/*:
+    type: str
+
+$area:
+    type: map
+    key_enum: [ bootstrap, before_bootstrap, db_connection_name, root_dir, view_root_dir, url_prefix, base_src, base_href, require, load_after, auto_use, views, routing, observe, override, default_config, autoload, crontab, translations, custom ]
+
+$area/bootstrap:
+    type: map
+    key_enum: [ file, callback ]
+
+$area/bootstrap/file:
+    type: str
+
+$area/bootstrap/callback:
+    include: $callback
+
+$area/before_bootstrap:
+    include: $callback
+
+$area/(db_connection_name|root_dir|view_root_dir|url_prefix|base_src|base_href):
+    type: str
+
+$area/load_after:
+    type: seq
+
+$area/require:
+    type: map
+    key_enum: [ module ]
+
+$area/require/module:
+    type: [ seq, map ]
+
+$area/auto_use:
+    type: seq
+
+$area/auto_use/*:
+    type: str
+    enum: [ views, layout, bootstrap ]
+
+$area/views:
+    type: seq
+
+$area/views/*:
+    type: seq
+    children_min: 2
+    children_max: 2
+
+$area/views/*/0:
+    type: str
+
+$area/views/*/1:
+    type: map
+
+$area/routing:
+    type: seq
+
+$area/routing/*:
+    type: seq
+    children_min: 2
+    children_max: 5
+
+$area/routing/*/0:
+    type: str
+
+$area/routing/*/1:
+    include: $callback
+
+$area/routing/*/2:
+    type: map
+
+$area/routing/*/3:
+    type: str
+
+$area/routing/*/4:
+    type: bool
+
+$area/observe:
+    type: seq
+
+$area/observe/*:
+    type: seq
+    children_min: 2
+    children_max: 3
+
+$area/observe/*/0:
+    type: str
+
+$area/observe/*/1:
+    include: $callback
+
+$area/observe/*/2:
+    type: map
+
+$area/override:
+    type: map
+    key_enum: [ class ]
+
+$area/override/class:
+    type: seq
+
+$area/override/class/*:
+    type: seq
+    children_min: 2
+    children_max: 2
+
+$area/override/class/*/0:
+    type: str
+
+$area/override/class/*/1:
+    include: $callback
+
+$area/default_config:
+    type: map
+
+$area/autoload:
+    type: seq_cast
+
+$area/autoload/*:
+    type: [ str, map ]
+
+$area/autoload/*/root_dir:
+    type: str
+
+$area/autoload/*/callback:
+    include: $callback
+
+$area/crontab:
+    type: seq
+
+$area/crontab/*:
+    type: seq
+    children_min: 2
+    children_max: 3
+
+$area/crontab/*/0:
+    type: str
+
+$area/crontab/*/1:
+    include: $callback
+
+$area/crontab/*/2:
+    type: map
+
+$area/translations:
+    type: map
+
+$area/translations/*:
+    type: seq_cast
+
+$area/custom:
+    type: map
+
+$area/security:
+    type: map
+    key_enum: [ request_fields_whitelist ]
+
+$area/security/request_fields_whitelist:
+    type: map
+
+$area/security/request_fields_whitelist/*:
+    type: map
+    key_pattern: "^/.*$"
+
+$area/security/request_fields_whitelist/*/*:
+    type: str
+    key_pattern: "^(GET|POST|REQUEST|COOKIE)/.*$"

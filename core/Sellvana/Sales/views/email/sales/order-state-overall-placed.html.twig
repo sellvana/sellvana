@@ -1,0 +1,18 @@
+{% set order = THIS.get('order') %}
+
+<!--{ Content-Type: text/html; charset=UTF-8 }-->
+<!--{ From: "{{ CONFIG.get('modules/FCom_Core/email/support_name') }}" <[{{ CONFIG.get('modules/FCom_Core/email/support_email') }}]> }-->
+<!--{ To: "{{ order.get('billing_firstname') ~ ' ' ~ order.get('billing_lastname') }}" <{{ order.get('customer_email') }}> }-->
+<!--{ Subject: {{ 'Your order %s' | _(order.get('unique_id')) }} }-->
+
+Hello, {{ order.get('billing_firstname') }}.
+
+<p>Thank you for your order!</p>
+
+{% if not order.get('customer_id') %}
+    {% if order.accountExistsForGuestEmail() %}
+        <p><a href="{{ APP.href('order/add_to_account?order=' ~ order.get('unique_id')) }}">Click here to add this order to your account</a></p>
+    {% else %}
+        <p><a href="{{ APP.href('order/create_account?order=' ~ order.get('unique_id')) }}">Click here to create account from your order</a></p>
+    {% endif %}
+{% endif %}

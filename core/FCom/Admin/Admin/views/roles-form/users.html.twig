@@ -1,0 +1,91 @@
+<!--{ label: Users }-->
+<!--{ pos: 20 }-->
+
+{% set m = THIS.get('model') %}
+{% set userCtrl = APP.instance('FCom_Admin_Controller_Users') %}
+<input type='hidden' name='model[user_ids_add]' id='user_ids_add'/>
+<input type='hidden' name='model[user_ids_remove]' id='user_ids_remove'/>
+
+<script>
+require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
+    var userGrid, rolesGrid, orignIds, addedIds = [], removedIds = [];
+    function updateFormData() {
+        console.log(rolesGrid.getRows().pluck('id'));
+        removedIds = _.difference(removedIds, rolesGrid.getRows().pluck('id'));
+        console.log(rolesGrid.getRows().toJSON());
+        var addedRows = _.filter(rolesGrid.getRows().toJSON(), function(row) {
+                            return row['added_row'];
+                        });
+
+        addedIds = _.pluck(addedRows, 'id');
+        $('#user_ids_add').val(addedIds.join(','));
+        $('#user_ids_remove').val(removedIds.join(','));
+    }
+    window.userGridRegister = function(grid) {
+        userGrid = grid;
+        grid.build();
+
+        $(userGrid.getGridSkeleton().AddButton).click(function() {
+            if(userGrid.getSelectedRows().length >0) {
+                userGrid.getSelectedRows().forEach(function (row) {
+                    if (!rolesGrid.getRows().findWhere({username: row.get('username')})) {
+                        var addedRow = row.toJSON();
+                        addedRow.added_row = true;
+                        rolesGrid.getRows().add(addedRow);
+                    }
+                });
+            }
+            rolesGrid.getGridView().render();
+            userGrid.getSelectedRows().reset({});
+            $('.role-user-modal-close').trigger('click');
+
+            updateFormData();
+        });
+    }
+
+    window.rolesGridRegister = function(grid) {
+        rolesGrid = grid;
+        rolesGrid.build();
+        originIds = rolesGrid.getRows().pluck('id');
+
+        $(rolesGrid.getGridSkeleton().AddButton).click(function() {
+            $('#btn_add_user').trigger('click');
+        });
+
+        $(rolesGrid.getGridSkeleton().MassDeleteButton).off('click');
+        $(rolesGrid.getGridSkeleton().MassDeleteButton).click(function() {
+
+            var rows = rolesGrid.getRows();
+            var sRows = rolesGrid.getSelectedRows();
+
+            removedIds = sRows.pluck('id');
+
+            rows.remove(sRows.models);
+            sRows.reset();
+            rolesGrid.getGridView().render();
+
+            updateFormData();
+        });
+    }
+});
+</script>
+
+{{ THIS.view('core/backbonegrid').set('grid', userCtrl.getRoleUsersConfig(m)) | raw }}
+
+<a role="button" href="#user-grid-add" data-toggle="modal" style='display:none;' id='btn_add_user'>{{ "Add"|_ }}</a>
+<div class='modal fade' id='user-grid-add' tabindex='-1'>
+    <div class='modal-dialog' style='width:900px;'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                <h4 class='modal-title' id='myModalLabel'>{{ "Add user"|_ }}</h4>
+            </div>
+            <div class='modal-body'>
+                {{ THIS.view('core/backbonegrid').set('grid', userCtrl.getAllUsersConfig(m)) | raw }}
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-default btn-close role-user-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,24 @@
+{% set m = THIS.get('model') %}
+<h2>{{ "API Server Settings"|_}}</h2>
+
+<div class="accordion accordion-blue panel-group" id="settings-FCom_ApiServer">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "Area Settings"|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body in" id="settings-FCom_ApiServer-group0">
+            <div class="panel-body">
+                <div class="form-group " >
+                    <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
+                    <div class="col-md-8 group-ip-mode"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script  type="text/javascript">
+    require(['backbone', 'jquery', 'fcom.ipmode','select2'], function(Backbone, $, ipMode) {
+        var mode = {{ UTIL.toJson(c.get("mode_by_ip/FCom_Admin")|split("\n")) | raw }};
+        ipMode.initMode({el: $('#settings-FCom_ApiServer-group0').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_ApiServer]', mode: mode});
+    })
+</script>

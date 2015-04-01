@@ -1,0 +1,19 @@
+{% set hlp = APP.instance('FCom_Admin_Model_User') %}
+{% set user = hlp.isLoggedIn() ? hlp.sessionUser() : null %}
+
+{% if user and user.getPermission('frontendcp') %}
+    <div style="height:40px"></div>
+    <div class="admin-toolbar-wrapper">
+        <div class="admin-toolbar">
+            <div class="pull-right">
+                <img class="avatar" src="{{ UTIL.gravatar(user.get('email')) }}" width="25" height="25"/>
+                {{ user.fullName() }}
+            </div>
+            {% if user.getPermission('frontendcp/edit') %}
+                <button type="button" class="btn btn-default btn-xs" id="admin-toolbar--edit">{{ 'Edit Page Contents' |_ }}</button>
+            {% endif %}
+
+            {{ THIS.hook('frontendcp/toolbar') | raw }}
+        </div>
+    </div>
+{% endif %}

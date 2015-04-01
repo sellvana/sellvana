@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_search_alias id="1" alias_term="search alias 1" target_term="blank" num_hits="11" />
+    <fcom_search_alias id="2" alias_term="search alias 2" target_term="blank" num_hits="22" />
+</dataset>

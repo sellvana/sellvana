@@ -1,0 +1,9 @@
+{% set model = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator } %}
+<fieldset>
+    {{ forms.input(fieldData, {field:'email', label:'Email'|_}) }}
+    {{ forms.boolean(fieldData, {field:'unsub_all', label:'Un Subscribe All'|_}) }}
+    {{ forms.boolean(fieldData, {field:'sub_newsletter', label:'Subscribe Newsletter'|_}) }}
+</fieldset>

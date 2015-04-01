@@ -1,0 +1,4 @@
+
+/customer_assist/help_me:
+    - { include: base }
+    - { hook: main, views: 'customer-assist/help-me' }

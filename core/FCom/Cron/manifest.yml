@@ -1,0 +1,25 @@
+modules:
+    FCom_Cron:
+        version: 0.1.1
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0, FCom_LibTwig: 0.1.0 } }
+        description: Cron scheduled tasks manager
+
+        default_config:
+            modules/FCom_Cron/mode_by_ip: |
+                127.0.0.1:DEBUG
+                DISABLED
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+
+            FCom_Cron:
+                routing:
+                    - [ /, FCom_Cron_Controller.run ]
+                    - [ /*task, FCom_Cron_Controller.run ]
+                observe:
+                    - [ "BModuleRegistry::bootstrap:after", "FCom_Cron_Main::onBootstrapAfter" ]
+
+        #crontab:
+            #- [ * * * * *, FCom_Cron_Main::callback ]

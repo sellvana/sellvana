@@ -1,0 +1,30 @@
+<!--{ title: {{ 'Find your order' }} }-->
+
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set validator = APP.instance('BValidateViewHelper').initialize({form:'find_order'}) %}
+{% set fieldData = { id_prefix:'find', name_prefix:'find', label_class:'col-md-3', input_div_class:'col-md-5', validator:validator } %}
+{% set customer = APP.instance('Sellvana_Customer_Model_Customer').sessionUser() %}
+{% if customer %}
+    {% set address = customer.getDefaultShippingAddress() %}
+{% endif %}
+
+<h1>{{ 'Find your guest order'|_ }}</h1>
+
+{{ THIS.view('core/messages') | raw }}
+
+<form method="post" action="{{ APP.href('guest/find_order') }}" role="form" class="form-horizontal">
+    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+    <fieldset>
+        {{ forms.input(fieldData, { field: 'id', label: 'Order ID'|_, attr: { required: true } }) }}
+        {{ validator.errorHtml('id') | raw }}
+
+        {{ forms.input(fieldData, { field: 'email', label: 'Email'|_, type: 'email', attr: { required: true }, value: customer ? customer.get('email') }) }}
+        {{ validator.errorHtml('email') | raw}}
+
+        {{ forms.input(fieldData, { field: 'postcode', label: 'Shipping Zip Code'|_, attr: { required: true }, value: address ? address.get('postcode') }) }}
+        {{ validator.errorHtml('postcode') | raw }}
+
+        {{ forms.button(fieldData, { label: ' ', text: 'Find Order'|_ }) }}
+    </fieldset>
+</form>
+

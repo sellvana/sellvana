@@ -1,0 +1,16 @@
+modules:
+    FCom_OAuth:
+        version: 0.1.1
+
+        areas:
+            FCom_Admin:
+                observe:
+                    - [ "FCom_Admin_Model_User::login:after", "FCom_OAuth_Main.onAdminUserLogin" ]
+            FCom_Frontend:
+                observe:
+                    - [ "Sellvana_Customer_Model_Customer::login:after", "FCom_OAuth_Main.onCustomerLogin" ]
+
+        routing:
+            - [ /oauth/login/!provider, FCom_OAuth_Controller.login ]
+            - [ /oauth/.action, FCom_OAuth_Controller ]
+

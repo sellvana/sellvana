@@ -1,0 +1,222 @@
+{% set m = THIS.get('model') %}
+{% set countries = LOCALE.getAvailableCountries() %}
+
+{#<script>
+    //var custModule = angular.module('custModule', []);
+
+    function CustomerAddressesCtrl($scope)
+    {
+        $scope.addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.getAddresses()))|raw }};
+        $scope.countries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options())|raw }};
+        $scope.regions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions())|raw }};
+
+        $scope.del_ids = [];
+        $scope.newId = 0;
+
+        $scope.addAddress = function () {
+            $scope.addresses.push({edit_mode: true, id: --$scope.newId});
+        }
+
+        $scope.delAddress = function (addr) {
+            for (var i = 0, ii = $scope.addresses.length; i < ii; i++) {
+                if (addr === $scope.addresses[i]) {
+                    $scope.addresses.splice(i, 1);
+                }
+            }
+            if (addr.id > 0) {
+                $scope.del_ids.push(addr.id);
+            }
+        }
+    }
+
+    function CustomerAddressCtrl($scope)
+    {
+
+    }
+</script>#}
+
+<div ng-app ng-controller="CustomerAddressesCtrl" class="col-md-10">
+    <div class="col-customer-info">
+        <fieldset class="f-fieldset-group">
+            <h3 class="form-group-title">{{ "Order Information"|_ }}</h3>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Order"|_ }}</label>
+                <div class="col-md-5">
+                    <span class="form-control">{{ m.get('id') }}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Order Date"|_ }}</label>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="model[create_at]" value="{{ m.get('create_at') }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Order Status"|_ }}</label>
+                <div class="col-md-5">
+                    <select class="form-control" name="model[status_id]">
+                        {% set status = m.state().custom().getValue() %}
+                        {% for stobj in APP.instance('Sellvana_Sales_Model_Order_CustomStatus').statusList() %}
+                            <option value="{{ stobj.get('id') }}" {% if stobj.get('code') == status %}checked="checked"{% endif %}>
+                                {{ stobj.get('name')|raw }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="f-fieldset-group">
+            <h3 class="form-group-title">{{ "Account information"|_ }}</h3>
+
+            {% set customer = m.get('customer') %}
+            {% if customer.guest %}
+                <div class="form-group">
+                    {{ "Purchased by guest"|_ }}
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Customer name"|_ }}</label>
+                    <div class="col-md-5">
+                        {{ customer.get('firstname') }} {{ customer.get('lastname') }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Email"|_ }}</label>
+                    <div class="col-md-5">
+                        {{ customer.get('email') }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a href="{{ APP.href('customers/form?id=' ~ customer.get('id')) }}">{{ "Edit customer account"|_ }}</a>
+                </div>
+            {% endif %}
+        </fieldset>
+
+        <fieldset class="f-fieldset-group">
+            <h3 class="form-group-title">{{ "Payment info"|_ }}</h3>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Payment method"|_ }}</label>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="model[payment_method]" value="{{ m.get('payment_method') }}" />
+                </div>
+            </div>
+            {% if UTIL.fromJson(m.get('payment_details')) %}
+                <div class="form-group">
+                    <ul>
+                        {% for paymentKey, paymentValue in UTIL.fromJson(m.get('payment_details')) %}
+                            <li>{{ paymentKey }}: {{ paymentValue }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </fieldset>
+
+        <fieldset class="f-fieldset-group">
+            <h3 class="form-group-title">{{ "Shipping & Handling information"|_ }}</h3>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Shipping method"|_ }}</label>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="model[shipping_method]" value="{{ m.get('shipping_method') }}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Shipping service"|_ }}</label>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="model[shipping_service_title]" value="{{ m.get('shipping_service_title') }}" />
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="f-fieldset-group">
+            <h3 class="form-group-title">{{ "Items ordered"|_ }}</h3>
+
+            {% if m.get('items') %}
+                {% for item in m.get('items') %}
+                    {% set product = UTIL.fromJson(item.get('product_info')) %}
+                    {% set itemId = item.get('id') %}
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">{{ "Product"|_ }}</label>
+                        <div class="col-md-5"> {{ product.product_name }} </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">{{ "SKU"|_ }}</label>
+                        <div class="col-md-5"> {{ product.product_sku }} </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">{{ "Price"|_ }}</label>
+                        <div class="col-md-5"> {{ product.base_price }} </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">{{ "Qty"|_ }}</label>
+                        <div class="col-md-5">
+                            <input type="text" name="model[items][{{ itemId }}][qty]" value="{{ item.get('qty') }}" onkeyup="$('#total_{{ itemId }}').val({{ product.base_price }}*this.value)">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">{{ "Total"|_ }}</label>
+                        <div class="col-md-5">
+                            <input type="text" name="model[items][{{ itemId }}][total]" value="{{ item.get('total') }}" id="total_{{ itemId }}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">{{ "Delete"|_ }}</label>
+                        <div class="col-md-5">
+                            <input type="checkbox" name="model[items][{{ itemId }}][delete]" value="1" />
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </fieldset>
+    </div>
+
+    <div class="col-customer-address" ng-controller="CustomerAddressesCtrl" ng-show="true" style="display:none">
+        <h3 class="form-group-title">{{ "Addresses"|_ }}</h3>
+        <div ng-repeat="a in addresses">
+            <h4>{% verbatim %}{{ a.atype }}{% endverbatim %} address</h4>
+            <label><input type="checkbox" ng-model="a.edit_mode"/> {{ "Edit"|_ }}</label>
+
+            <div class="adr">
+                <div class="street-address">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.street1"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.street1" placeholder="Street 1"></span>
+                </div>
+                <div class="extended-address" ng-show="a.street2 || a.edit_mode">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.street2" placeholder="Street 2"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.street2"></span>
+                </div>
+                <div class="extended-address" ng-show="a.street3 || a.edit_mode">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.street3" placeholder="Street 3"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.street3"></span>
+                </div>
+            <span class="locality">
+                <input type="text" ng-show="a.edit_mode" ng-model="a.city" placeholder="City"/>
+                <span ng-hide="a.edit_mode" ng-bind="a.city"></span>
+            </span>,
+            <span class="region">
+                <select ng-show="a.edit_mode && regions[a.country]" ng-options="name for (key,name) in regions[a.country]" ng-model="a.region"><option></option></select>
+                <input ng-show="a.edit_mode && !regions[a.country]" type="text" ng-model="a.region" placeholder="Region/State"/>
+                <span ng-hide="a.edit_mode" ng-bind="a.region"></span>
+            </span>
+            <span class="postal-code">
+                <input type="text" ng-show="a.edit_mode" ng-model="a.postcode" size="6" placeholder="Zip"/>
+                <span ng-hide="a.edit_mode" ng-bind="a.postcode"></span>
+            </span>
+                <div class="country-name">
+                    <select ng-show="a.edit_mode" ng-options="key as name for (key,name) in countries" ng-model="a.country"><option></option></select>
+                    <span ng-hide="a.edit_mode" ng-bind="countries[a.country]"></span>
+                </div>
+                <div class="phone">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.phone" placeholder="Phone"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.phone"></span>
+                </div>
+                <div class="fax">
+                    <input type="text" ng-show="a.edit_mode" ng-model="a.fax" placeholder="Fax"/>
+                    <span ng-hide="a.edit_mode" ng-bind="a.fax"></span>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="address[data_json]" value="{% verbatim %}{{addresses}}{% endverbatim %}"/>
+        <input type="hidden" name="address[del_json]" value="{% verbatim %}{{del_ids}}{% endverbatim %}"/>
+    </div>
+</div>

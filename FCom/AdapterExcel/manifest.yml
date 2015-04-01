@@ -1,5 +1,0 @@
-modules:
-    FCom_AdapterExcel:
-        version: 1.7.9
-        channel: beta
-        autoload: lib

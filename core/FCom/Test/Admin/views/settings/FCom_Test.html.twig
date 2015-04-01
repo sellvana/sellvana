@@ -1,0 +1,18 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, id_prefix:'FCom_Test', name_prefix:'config[modules][FCom_Test]' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+<h2>{{ "Unit Tests Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-FCom_Test'}) }}
+    {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Test-group0', in:1}) }}
+        <div class="form-group" >
+            <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
+            <div class="col-md-8  group-ip-mode"></div>
+        </div>
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+<script  type="text/javascript">
+    require(['backbone', 'jquery', 'fcom.ipmode','select2'], function(Backbone, $, ipMode) {
+        var mode = {{ UTIL.toJson(c.get("mode_by_ip/FCom_Test")|split("\n")) | raw }};
+        ipMode.initMode({el: $('#settings-FCom_Test-group0').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_Test]', mode: mode});
+    })
+</script>

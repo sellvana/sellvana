@@ -1,0 +1,14 @@
+modules:
+    Sellvana_PaymentCC:
+        version: 0.1.0
+        channel: beta
+        translations: { en: en.php }
+        description: "Payment Credit Card test module"
+        require: { module: { Sellvana_Sales: 0.1.10 } }
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]
+
+            FCom_Frontend:
+                auto_use: [ views ]

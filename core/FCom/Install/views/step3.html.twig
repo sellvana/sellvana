@@ -1,0 +1,40 @@
+{% set w = SESSION.get('w') %}
+
+<form class="form-horizontal" method="post" action="{{APP.href('install/step3')}}">
+    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+    <div class="panel-heading">
+        <h1 class="panel-title">{{ 'Step 3 of 3: Initial Configuration' |_ }}</h1>
+    </div>
+
+    <div class="form-group">
+        <label for="config-run_mode_admin" class="control-label col-lg-4">{{ 'Run Mode for Admin' |_ }}</label>
+        <div class="col-lg-7">
+            <select class="form-control" id="config-run_mode_admin" name="w[config][run_mode_admin]">
+                {{ UTIL.optionsHtml(THIS.debug_modes, w.config.run_mode_admin) | raw }}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="config-run_mode_frontend" class="control-label col-lg-4">{{ 'Run Mode for Frontend' |_ }}</label>
+        <div class="col-lg-7">
+            <select class="form-control" id="config-run_mode_frontend" name="w[config][run_mode_frontend]">
+                {{ UTIL.optionsHtml(THIS.debug_modes, w.config.run_mode_frontend) | raw }}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="config-run_levels_bundle" class="control-label col-lg-4">{{ 'Run Levels Bundle' |_ }}</label>
+        <div class="col-lg-7">
+            <select class="form-control" id="config-run_levels_bundle" name="w[config][run_levels_bundle]">
+                {{ UTIL.optionsHtml(THIS.run_level_bundles, w.config.run_levels_bundle) | raw }}
+            </select>
+        </div>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item clearfix">
+            <!--<a class="btn btn-link pull-left" name="do" value="back" href="{{APP.href('install/step2')}}">&laquo; {{ 'Back' |_ }}</a>-->
+            <button type="submit" class="btn btn-primary pull-right" name="do" value="next">{{ 'Continue' |_ }}</button>
+        </li>
+    </ul>
+</form>

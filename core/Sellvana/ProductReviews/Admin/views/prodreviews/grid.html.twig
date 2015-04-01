@@ -1,0 +1,98 @@
+{% set grid = THIS.get('grid') %}
+<div class="f-admin-main-view">
+  <div class="page-header f-admin-page-header">
+      <h1 class="f-page-title">
+          <i class="icon-table"></i>
+          {{ THIS.get('title') }}
+      </h1>
+      <div class="btn-group">
+          {{ THIS.get('actions') | join(' ') | raw }}
+      </div>
+  </div>
+
+  <div class="f-admin-main">
+      {#{{ THIS.view('core/backbonegrid').set('grid', {config: grid['config']}) | raw }}#}
+      {{ THIS.view('core/griddle').set('grid', {config: grid['config']}) | raw }}
+  </div>
+</div>
+<script>
+
+require(["jquery", "underscore", "jquery.validate"], function($, _) {
+
+    /** BEGIN callback functions for custom action in fcom.backbonegrid */
+    //TODO: will remove these functions when complete griddle
+    var reviewGrid;
+    window.{{ grid['config']['id']}}_register = function(grid) {
+        reviewGrid = grid;
+        grid.getGridSkeleton().Views.GridView.prototype.afterSelectionChanged = function() {
+            if (reviewGrid.getSelectedRows().length > 0) {
+                btnApprove.removeClass('disabled');
+                btnDeny.removeClass('disabled');
+            } else {
+                btnApprove.addClass('disabled');
+                btnDeny.addClass('disabled');
+            }
+        };
+        grid.build();
+
+    };
+
+    var btnApprove = $('#prod-reviews-approve');
+    var btnDeny = $('#prod-reviews-deny');
+
+    btnApprove.on('click', function() {
+        updateStatus(1);
+    });
+
+    btnDeny.on('click', function() {
+        updateStatus(0);
+    });
+
+    function updateStatus(approve)
+    {
+        var selectedRows = reviewGrid.getRows().toJSON();
+        for (var index = 0; index < selectedRows.length; index++) {
+            var row = reviewGrid.getRows().findWhere({id:selectedRows[index].id});
+            row.set('approved', approve);
+            row.save();
+            row.trigger('render');
+            //TODO implement collection update method
+
+        }
+        $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+    }
+    /** END callback functions for custom action in fcom.backbonegrid **/
+
+    /** BEGIN callback functions for custom action in react.js griddle grid */
+    window.approveReviews = function(grid) {
+        updateMassStatus(grid, 1);
+    };
+    window.denyReviews = function(grid) {
+        updateMassStatus(grid, 0);
+    };
+
+    function updateMassStatus(grid, approve)
+    {
+        var selectedRows = grid.getSelectedRows();
+        var editUrl = grid.getConfig('edit_url');
+        if (editUrl) {
+            var post = {
+                oper: 'mass-edit',
+                id: (_.pluck(selectedRows, 'id')).join(','),
+                approved: approve
+            };
+
+            $.post(editUrl, post, function(resp) {
+                if (resp.success) {
+                    $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+                    grid.refresh(); //re-render grid
+                } else {
+                    $.bootstrapGrowl("Fail saved.", { type: 'danger', align: 'center', width: 'auto' });
+                }
+            })
+        }
+    }
+    /** END callback functions for custom action in react.js griddle grid */
+});
+
+</script>

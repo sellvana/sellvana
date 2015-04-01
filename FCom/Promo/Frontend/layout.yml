@@ -1,2 +1,0 @@
-/promo/media:
-    - { hook: main, views: promo/media }

@@ -1,0 +1,17 @@
+modules:
+    Sellvana_ShippingPlain:
+        version: 0.1.0
+        channel: beta
+        require: { module: { Sellvana_Sales: 0.1.10 } }
+        category: [ Shipping ]
+        title: Shipping Plain module
+        description: Plain shipping module for checkout
+        author: Fulleron Inc
+        license: [ GPL3 ]
+
+        auto_use: [ bootstrap ]
+
+        default_config:
+            modules:
+                Sellvana_ShippingPlain:
+                    conditionally_free_services: ['01', '02']

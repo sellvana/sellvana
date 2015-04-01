@@ -1,0 +1,55 @@
+
+    <div class="row f-mb-slideout-menu">
+      <div class="col-sm-9 f-col-main">
+        <header class="f-page-header">
+          <h1 class="f-page-title">{{"Dashboard" | _ }}</h1>
+          <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
+        </header>
+          {{ THIS.view('core/messages') | raw }}
+        <h4>My Accounts</h4>
+        <ul>
+          <li>
+            <a href="{{ APP.href('customer/myaccount/edit') }}">Edit Account Information</a>
+          </li>
+          <li>
+            <a href="{{ APP.href('customer/myaccount/editpassword') }}">Change Password</a>
+          </li>
+          <li>
+            <a href="{{ APP.href('customer/address') }}">Address Book</a>
+          </li>
+          <li>
+            <a href="{{ APP.href('wishlist') }}">Wishlist</a>
+          </li>
+        </ul>
+        <h4>My Orders</h4>
+        <ul>
+          <li>
+            <a href="{{ APP.href('orders') }}">Order history</a>
+          </li>
+          <li>
+            <a href="{{ APP.href('') }}">Downloads</a>
+          </li>
+          <li>
+            <a href="{{ APP.href('') }}">Reward Points</a>
+          </li>
+          <li>
+            <a href="{{ APP.href('') }}">Return Request</a>
+          </li>
+        </ul>
+        <h4>Newsletter</h4>
+        <ul>
+          <li>
+            <a href="{{ APP.href('') }}">Newsletter Subscriptions</a>
+          </li>
+        </ul>
+      </div>
+      {{ THIS.view('customer/account/sidebar').set('current', 'dashboard') | raw }}
+    </div>
+<script>
+  require(['jquery'], function($) {
+    $( "#button" ).click(function() {
+      $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
+    });
+  });
+</script>
+

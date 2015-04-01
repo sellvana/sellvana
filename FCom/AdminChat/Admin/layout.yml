@@ -1,6 +1,0 @@
-base:
-    - view: head
-        do:
-            - [ requireJs, fcom.adminchat, @FCom_AdminChat/Admin/js/fcom.adminchat ]
-    - { hook: header_toolbar, views: adminchat/header-item }
-    - { hook: main, views: adminchat/chat }

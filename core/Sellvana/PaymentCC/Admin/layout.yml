@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_PaymentCC, { label: Saved CC, group: payment_methods, pos: 50, async: true } ]

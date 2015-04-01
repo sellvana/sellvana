@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_SampleData, { label: SampleData, group: other, async: true } ]

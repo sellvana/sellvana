@@ -1,0 +1,22 @@
+{% if not THIS.get('products_data').state.c %}
+    <div class="alert alert-info">{{ "There are no products matching the selection." |_ }}</div>
+{% else %}
+    <section class="f-category-prod-listing">
+
+      {{ THIS.view('catalog/compare-toolbar') | raw }}
+
+      {{ THIS.view('catalog/product/pager') | raw }}
+
+      <div class="f-prod-listing f-prod-listing-grid">
+          <div class="row">
+              {{ THIS.view('catalog/product/grid-tiles').set({
+                add_wishlist: 1,
+                add_compare: 1,
+                products: THIS.get('products_data').rows,
+                category: THIS.get('category'),
+              }) | raw }}
+          </div>
+      </div>
+
+    </section>
+{% endif %}

@@ -1,0 +1,18 @@
+modules:
+    Sellvana_FrontendThemeBootSimple:
+        version: 0.1.0
+        channel: beta
+        description: Bootstrap 3.x simple theme
+        require: { module: { FCom_Frontend: 0.1.0 } }
+
+        default_config:
+            modules:
+                FCom_Frontend:
+                    theme: Sellvana_FrontendThemeBootSimple
+                    
+        themes:
+            Sellvana_FrontendThemeBootSimple:
+                name: Simple Bootstrap Theme
+                area: FCom_Frontend
+                parent: FCom_Frontend_DefaultTheme
+                layout_before: Frontend/layout.yml

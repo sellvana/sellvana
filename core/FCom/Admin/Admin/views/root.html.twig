@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html {{ THIS.getHtmlAttributes() | raw }}>
+<head>
+    {{ THIS.hook('head') | raw }}
+</head>
+<body class="{{ THIS.getBodyClass() }}">
+    <form id="util-form" method="post"></form>
+    {% if APP.instance('FCom_Admin_Model_User').isLoggedIn() %}
+        {{ THIS.view('admin/header') | raw }}
+        <div class="f-admin-container" id="root-layout">
+            {{ THIS.view('admin/nav') | raw }}
+            {{ THIS.hook('main')|raw }}
+        </div>
+    {% else %}
+        {{ THIS.hook('main') | raw }}
+    {% endif %}
+
+    {{ THIS.hook('before_body_end') | raw }}
+</body>
+</html>

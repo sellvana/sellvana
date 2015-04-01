@@ -1,0 +1,130 @@
+{% set m = THIS.get('model') %}
+{% set prodCtrl = APP.instance('Sellvana_Catalog_Admin_Controller_Products') %}
+
+<input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
+<input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
+
+{% set catProductConfig = prodCtrl.getCatProdConfigForGriddle(m) %}
+{% set allProductConfig = prodCtrl.getAllProdConfigForGriddle(m) %}
+{% set prodAttachConfigCompiled = THIS.view('core/griddle').set('grid', allProductConfig).getGridConfig() %}
+
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+        var mainGridId = '{{ catProductConfig.config.id }}';
+        var mainGrid, attachGrid;
+
+        /**
+         * calc rows when save
+         * @param rows
+         * @param ids
+         * @returns {Array}
+         */
+        function calcAddRemoveRows(rows, ids) {
+            var temp = [];
+            rows.forEach(function(row) {
+                if (_.contains(ids, row.id) !== false) {
+                    temp.push(row.id);
+                }
+            });
+            return temp;
+        }
+
+        /**
+         * callback function for top action to show modal to add products
+         * @param grid
+         */
+        window.showModalToAddProduct = function(grid) {
+            mainGrid = grid;
+            mainGridId = '{{ prodImagesConfig.config.id }}';
+            var modalContainerEle = document.getElementById('{{ catProductConfig.config.id }}-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.renderComponent(
+                    React.createElement(Components.Modal, {
+                                id: "addProductModal",
+                                show: true,
+                                title: 'Products List',
+                                confirm: 'Add',
+                                cancel: 'Close',
+                                onLoad: function(modal) {
+                                    var node = $(modal.getDOMNode());
+                                    node.find('.modal-dialog').css('width', '900px');
+                                },
+                                onConfirm: window.addSelectedProduct
+                            },
+                            React.createElement('div', {className: 'f-grid-wrapper', id: 'allProductList'})
+                    ), modalContainerEle);
+            var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('allProductList');
+            var instanceAttachGrid = React.renderComponent(
+                    React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
+                    attachGridContainerEle
+            );
+
+            if (typeof instanceAttachGrid.refs[prodAttachConfigCompiled.id] !== 'undefined') {
+                attachGrid = instanceAttachGrid.refs[prodAttachConfigCompiled.id];
+            }
+        };
+
+        /**
+         * add selected products from full products grid to category-products grid
+         * @param modal
+         */
+        window.addSelectedProduct = function(modal) {
+            var selectedRows = attachGrid.getSelectedRows();
+            if (selectedRows.length) {
+                var addRows = [];
+                //process selected rows
+                selectedRows.forEach(function(attachRow) {
+                    if (!_.findWhere(mainGrid.getRows(), {id: attachRow.id})) {
+                        addRows.push(attachRow);
+                    }
+
+                    if (addRows.length) {
+                        mainGrid.addRows(addRows);
+                    }
+                });
+                modal.close();
+            } else {
+                alert('please choose at least one product');
+            }
+        };
+
+        /**
+         * callback function after main category products grid was rendered
+         * @param grid
+         */
+        window.setCatProdMainGrid = function(grid) {
+            mainGrid = grid;
+            var addedIds = [], removedIds = [],
+                    originIds = _.pluck(grid.getRows(), 'id'),
+                    productIdsAddEle = $('#product_ids_add'),
+                    productIdsRemoveEle = $('#product_ids_remove');
+
+            $(mainGrid.getDOMNode())
+                    .on('removedRows.griddle', function (e, removedRows, grid) {
+                        removedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffRemoveIds = _.difference(originIds, removedIds);
+                        productIdsRemoveEle.val(diffRemoveIds.join(','));
+
+                        var arrCurrentAddedIds = productIdsAddEle.val().split(',');
+                        if (!_.isEmpty(arrCurrentAddedIds)) {
+                            var temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                            productIdsAddEle.val(temp.join(','));
+                        }
+                    })
+                    .on('addedRows.griddle', function(e, addedRows, grid) {
+                        addedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffAddIds = _.difference(addedIds, originIds);
+                        productIdsAddEle.val(diffAddIds.join(','));
+
+                        var arrCurrentRemovedIds = productIdsRemoveEle.val().split(',');
+                        if (!_.isEmpty(arrCurrentRemovedIds)) {
+                            var temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                            productIdsRemoveEle.val(temp.join(','));
+                        }
+                    });
+        }
+    });
+</script>
+
+{{ THIS.view('core/griddle').set('grid', catProductConfig) | raw }}

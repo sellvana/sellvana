@@ -1,0 +1,33 @@
+modules:
+    Sellvana_PaymentAuthorizeNet:
+        version: 0.1.0
+        channel: beta
+        require: { module: { Sellvana_Sales: 0.1.10 } }
+        translations: { en: en.php }
+        description: "Authorize.net payment methods"
+        #autoload: lib
+
+        auto_use: [ bootstrap ]
+        encrypt_config:
+            - modules/Sellvana_PaymentAuthorizeNet/aim/login
+            - modules/Sellvana_PaymentAuthorizeNet/aim/trans_key
+            - modules/Sellvana_PaymentAuthorizeNet/dpm/login
+            - modules/Sellvana_PaymentAuthorizeNet/dpm/trans_key
+        default_config:
+            modules:
+                Sellvana_PaymentAuthorizeNet:
+                    aim:
+                        title: "Credit Card (Authorize.net)"
+                    dpm:
+                        title: "Credit Card Direct Post (Authorize.net)"
+                    url: "https://secure.authorize.net/gateway/transact.dll"
+                    test_url: "https://test.authorize.net/gateway/transact.dll"
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]
+
+            FCom_Frontend:
+                auto_use: [ views ]
+                routing:
+                    - [ /authorizenet/.action, Sellvana_PaymentAuthorizeNet_Frontend_Controller ]

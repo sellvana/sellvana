@@ -1,0 +1,33 @@
+{% set item = THIS.get('item') %}
+{% set display = item.getData('display') %}
+{% set product = item.product() %}
+
+<div class="row">
+    <div class="col-md-2">
+        <img src="{{ product.thumbUrl(40, 40) }}" width="40" height="40" alt="{{ item.get('product_name') }}"/>
+    </div>
+
+    <div class="col-md-8">
+        <span class="product-name">{{ item.get('product_name') }} x{{ item.qty*1 }}</span>
+        {% if display %}
+            <ul>
+                {% for row in display %}
+                    {% if row.value is null %}
+                        <li>{{ row.label }}</li>
+                    {% else %}
+                        <li>{{ row.label }}: {{ row.value }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <div class="col-md-2">
+        <div class="f-price-group">
+            <span class="f-reg-price">
+                <span class="f-price">{{ item.row_total | currency }}</span>
+            </span>
+        </div>
+
+    </div>
+</div>

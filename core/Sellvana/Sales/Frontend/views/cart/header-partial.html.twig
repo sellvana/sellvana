@@ -1,0 +1,47 @@
+{% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set cartQty = cart.itemQty() %}
+{% set items = cart.recentItems() %}
+{% set checkoutButton = APP.instance('Sellvana_Checkout_Frontend_CheckoutMethod').getCartCheckoutButton() %}
+
+{% set imgBaseUrl = APP.src('@Sellvana_FrontendThemeBootSimple/Frontend/img') %}
+{% if cartQty %}
+    <div class="f-widget f-mini-cart">
+      <header class="f-widget-header">
+        <strong class="f-widget-title">{{ 'Recently added to cart'|_ }}</strong>
+      </header>
+      <ul class="f-widget-content">
+      {% for item in items %}{% set p = item.product() %}{% set pUrl = p.url() %}{% set pName = p.get('product_name')  %}
+          <li>
+              <a href="{{ pUrl }}" class="media">
+                  <img class="media-object pull-left" src="{{ p.thumbUrl(50) }}" width="50" alt="{{ pName }}">
+                  <div class="media-body">
+                      <h4 class="media-heading">{{ pName }}</h4>
+                      <div class="f-price-group">
+                        <span class="f-price">{{ item.get('row_total') | currency }}</span>
+                      </div>
+                      <span class="f-qty">{{ 'Quantity:'|_ }} <span>{{ item.get('qty') | number_format(0) }}</span></span>
+                  </div>
+              </a>
+          </li>
+      {% endfor %}
+          <li class="f-subtotal f-price-group">
+              <span class="f-price">{{ 'Subtotal:'|_ }} <span>{{ cart.get('subtotal') | currency }}</span></span>
+          </li>
+          <li class="btn-group">
+              <a class="btn btn-primary" href="{{ APP.href('cart') }}">{{ 'Go to Cart'|_ }} ({{ '%s items'|_(cartQty) }})</a>
+              {# checkoutButton.href #}
+          </li>
+      </ul>
+    </div>
+{% else %}
+
+    <div class="f-widget f-mini-cart">
+      <header class="f-widget-header">
+        <strong class="f-widget-title">{{ 'Cart is empty'|_ }}</strong>
+      </header>
+      <div class="f-widget-content">
+        <p class="f-mini-cart-empty-text">{{ 'Please, add some items to cart.'|_ }}</p>
+      </div>
+    </div>
+
+{% endif %}

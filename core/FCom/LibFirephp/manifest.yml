@@ -1,0 +1,4 @@
+modules:
+    FCom_LibFirephp:
+        version: 0.1.0
+        auto_use: [ bootstrap ]

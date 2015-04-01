@@ -1,0 +1,63 @@
+<!--{ label: IE/Export }-->
+<!--{ pos: 10 }-->
+{% set m = THIS.get('model') %}
+{% set grid = m['export_config'] %}
+
+<script type="text/javascript">
+    require(['jquery'], function ($) {
+        window.modelsGridRegister = function (grid) {
+            grid.build();
+            $('#' + grid.id).find('input[type=checkbox]').on('click', function(){
+                var val = this.checked;
+                var id = this.name.replace(grid.id + '[checked][','').replace(']','');
+
+                var rowsCol = grid.getRows();
+
+                var row = rowsCol.get(id);
+
+                var children = row.get('children');
+
+                if(children) {
+                    _.each(children, function (o) {
+                        var chName = grid.id + '[checked][' + o + ']';
+                        var $chBox = $('input[name="' + chName + '"]');
+                        if (val && !$chBox.is(':checked')) {
+                            $chBox.click();
+                        } else if (!val && $chBox.is(':checked')) {
+                            $chBox.click();
+                        }
+                    });
+                }
+                if (!val) {
+                    var parent = row.get('parent');
+
+                    if (parent) {
+                        var pName = grid.id + '[checked][' + parent + ']';
+                        $('input[name="' + pName + '"]').prop('checked', false);
+                        if (parent != 'FCom') {
+                            $('input[name="' + grid.id + '[checked][FCom]' + '"]').prop('checked', false);
+                        }
+                    }
+                }
+            });
+            $('#btn_export_start').click(function(e){
+                e.preventDefault();
+                var url = '{{ APP.href('importexport/export') }}';
+                var data = $('input[name^=ie_export_grid]').serializeArray();
+                $.post(url, data).done(function(d){
+                    console.log(d);
+                });
+            });
+        }
+    });
+</script>
+<div class="panel-body">
+    {{ THIS.view('core/backbonegrid').set('grid', grid) | raw }}
+    <div class="form-group">
+        <label for="export_file_name" class="col-md-2 control-label">{{ "Export file name"|_ }}</label>
+        <div class="col-md-5"><input type="text" class="form-control" id="export_file_name" name="ie_export_grid[export_file_name]" placeholder="{{"Leave empty for default"|_}}">
+        <span class="help-block">{{ "Leave empty for default file name, \"export.json\""|_ }}</span>
+        </div>
+    </div>
+    <button type="button" class="btn btn-lg btn-primary" id="btn_export_start">{{ "Export selected models"|_ }}</button>
+</div>

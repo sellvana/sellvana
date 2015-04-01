@@ -1,0 +1,14 @@
+modules:
+    FCom_Test:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0 }, class: [ PHPUnit ] }
+        description: PHPUnit tests integration
+        noexport: 1
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ /tests/index, FCom_Test_Admin_Controller_Tests.index ]
+                    - [ /tests/run, FCom_Test_Admin_Controller_Tests.run ]
+                    - [ /tests/run2, FCom_Test_Admin_Controller_Tests.run2 ]

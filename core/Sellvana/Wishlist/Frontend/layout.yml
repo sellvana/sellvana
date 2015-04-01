@@ -1,0 +1,16 @@
+base:
+    - view: head
+        do:
+            - [ css, "@Sellvana_Wishlist/Frontend/css/fcom.wishlist.css" ]
+            - [ requireJs, fcom.wishlist, "@Sellvana_Wishlist/Frontend/js/fcom.wishlist" ]
+            - [ requireRun, fcom.wishlist ]
+
+customer_account_sidebar:
+    - view: customer/account/sidebar
+        do:
+            - [ addNavItem, wishlist, { label: Wishlist, position: 30, href: wishlist } ]
+
+/wishlist:
+    - { include: base }
+    - { hook: main, views: wishlist }
+    - { include: customer_account_sidebar }

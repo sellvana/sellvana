@@ -1,0 +1,29 @@
+{% set m = THIS.get('model') %}
+{% set fieldData = { model:m } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl() %}
+
+<div class="form-group">
+    <div class="col-md-2 control-label">{{ "ID: %s"|_(m.id()) }}</div>
+</div>
+
+{{ forms.input(fieldData, {field:'node_name', label:'Label'|_, required:1}) }}
+
+{{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_, required:1}) }}
+
+{{ forms.boolean(fieldData, {field:'is_top_menu', label:'Display In Navigation'|_}) }}
+
+{{ forms.boolean(fieldData, {field:'is_enabled', label:'Enable'|_}) }}
+
+{{ forms.boolean(fieldData, {field:'is_featured', label:'Featured'|_}) }}
+
+{{ forms.textarea(fieldData, {field:'description', label:'Internal Notes'|_ }) }}
+
+{{ forms.input(fieldData, {field:'page_title', label:'Page Title'|_ }) }}
+
+{{ forms.input(fieldData, {field:'meta_title', label:'Meta Title'|_ }) }}
+
+{{ forms.textarea(fieldData, {field:'meta_description', label:'Meta Description'|_, input_div_class:'col-md-10' }) }}
+
+{{ forms.textarea(fieldData, {field:'meta_keywords', label:'Meta Keywords'|_, input_div_class:'col-md-10' }) }}
+

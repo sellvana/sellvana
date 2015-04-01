@@ -1,0 +1,14 @@
+<!--{ label: Translations }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model') %}
+
+<fieldset>
+    <div class="form-group">
+        <label class="col-md-2 label-control">{{ 'Source'|_ }}</label>
+        <div class="col-md-5">
+            <input type="hidden" name="file" value="{{ m.get('id') }}" />
+            <textarea class="js-code-editor" name="source" rows="5">{{ m.get('source') }}</textarea>
+        </div>
+    </div>
+</fieldset>

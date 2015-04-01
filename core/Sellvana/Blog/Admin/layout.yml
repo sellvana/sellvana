@@ -1,0 +1,11 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, cms/blog, { label: Blog Posts, href: /blog/post, pos: 100 } ]
+            - [ addNav, cms/category, { label: Blog Categories, href: /blog/category, pos: 110 } ]
+
+/blog/post/form:
+    - { include: lib_tokeninput }
+    - { include: lib_wysihtml5 }
+    - { include: jstree }
+
