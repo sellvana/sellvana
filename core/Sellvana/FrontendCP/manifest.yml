@@ -1,0 +1,15 @@
+modules:
+    Sellvana_FrontendCP:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Frontend: 0.1.0 } }
+
+        areas:
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+                views:
+                    - [ frontendcp/editable, { view_class: Sellvana_FrontendCP_Frontend_View_EditableAttributes } ]
+                routing:
+                    - [ /frontendcp/upload, Sellvana_FrontendCP_Frontend_Controller.upload ]
+                    - [ /frontendcp/update, Sellvana_FrontendCP_Frontend_Controller.update ]
+

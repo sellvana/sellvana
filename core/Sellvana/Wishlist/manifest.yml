@@ -1,0 +1,19 @@
+modules:
+    Sellvana_Wishlist:
+        version: 0.1.2
+        channel: beta
+        translations: { en: en.php }
+        require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_Customer: 0.1.3, Sellvana_Sales: 0.3.7 } }
+        description: Wishlist functionality
+        auto_use: [ layout, views ]
+
+        areas:
+            FCom_Frontend:
+                routing:
+                    - [ "/wishlist/?.action", Sellvana_Wishlist_Frontend_Controller ]
+                observe:
+                    - [ "Sellvana_Catalog_Frontend_Controller::action_product:addToWishlist", "Sellvana_Wishlist_Frontend_Controller::onAddToWishlist" ]
+                    - [ "Sellvana_Customer_Model_Customer::login:after", "Sellvana_Wishlist_Model_Wishlist::onUserLogin" ]
+
+        default_config:
+            modules/Sellvana_Wishlist/cookie_token_ttl_days: 365

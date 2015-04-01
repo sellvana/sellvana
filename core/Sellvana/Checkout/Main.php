@@ -1,0 +1,15 @@
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
+/**
+ * Class Sellvana_Checkout_Main
+ *
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
+ */
+
+class Sellvana_Checkout_Main extends BClass
+{
+    public function bootstrap()
+    {
+        $this->Sellvana_Sales_Main->addCheckoutMethod('default', 'Sellvana_Checkout_Frontend_CheckoutMethod');
+    }
+}

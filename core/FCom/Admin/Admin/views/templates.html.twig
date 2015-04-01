@@ -1,0 +1,20 @@
+<script>
+    require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
+        window.template_grid = function(grid) {
+            grid.getGridSkeleton().Models.Row.prototype.destroy = function () {
+                var BackboneGrid = grid.getGridSkeleton();
+                if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
+                    var hash = {};
+                    hash.do = 'DELETE';
+                    hash.model = {view_name: this.get('view_name')}
+                    $.post(BackboneGrid.edit_url, hash, function() {
+                        location.reload(true);
+                    });
+                }
+
+                return false;
+            };
+            grid.build();
+        }
+    })
+</script>

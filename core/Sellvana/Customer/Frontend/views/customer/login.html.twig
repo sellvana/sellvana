@@ -1,0 +1,50 @@
+{% set formUrl = THIS.get('form_url') ?: 'login' %}
+{% set noAccountUrl = THIS.get('no_account_url') ?: 'customer/register' %}
+{% set noAccountLabel = THIS.get('no_account_label') ?: 'Sign up now' %}
+
+<form action="{{ APP.href(formUrl) }}" method="post" id="login-form" role="form">
+  <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+  <input type="hidden" name="redirect_to" value="{{ THIS.get('redirect_to') }}"/>
+
+  <fieldset class="f-authentification-form">
+    <header class="f-page-header">
+      <h1 class="f-page-title">{{ 'Login' |_ }}</h1>
+    </header>
+    {{ THIS.view('core/messages') | raw }}
+    <div id="login-cookie-message"></div>
+    <div class="form-group">
+        <label for="email" class="control-label">{{ "Email" | _ }}</label>
+        <div class="controls">
+          <input type="email" name="login[email]" class="required form-control" id="email"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="password" class="control-label">{{ "Password" | _ }}</label>
+        <div class="controls">
+          <input type="password" name="login[password]" class="required form-control" id="password"/>
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="checkbox">
+        <label for="remember-me"><input type="checkbox" id="remember-me" name="login[remember_me]"/>{{"Remember Me" | _}}</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary btn-lg" type="submit"><span>{{"Login"|_}}</span></button>
+      <a href="{{ APP.href('customer/password/recover')}}" class="btn btn-link">{{ "Forgot your password?" | _ }}</a>
+    </div>
+    <div class="alert alert-info">{{ "No Account? " | _ }}<a href="{{ APP.href(noAccountUrl) }}"><strong>{{ noAccountLabel|_ }} &raquo;</strong></a></div>
+  </fieldset>
+</form>
+<script>
+require(['jquery', 'jquery.validate', 'jquery.cookie'], function($) {
+    $(function() {
+        $('#login-form').validate();
+    })
+
+    $.cookie('check-cookies', true);
+    if (!$.cookie('check-cookies')) {
+        $("#login-cookie-message").html('<div class="alert alert-danger">{{ "This login form requires cookies enabled"|_ }}</div>');
+    }
+})
+</script>

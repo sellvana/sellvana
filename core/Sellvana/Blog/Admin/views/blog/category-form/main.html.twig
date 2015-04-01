@@ -1,0 +1,14 @@
+<!--{ label: Category }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator', m) %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator } %}
+<div class="f-section">
+<fieldset class="form-horizontal">
+    {{ forms.input(fieldData, {field:'name', label:'Name'|_, required: 1 }) }}
+    {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_, required: 1 }) }}
+    {{ forms.textarea(fieldData, {field:'description', label:'Description'|_, input_class: "ckeditor", input_div_class: "col-md-10" }) }}
+</fieldset>
+</div>

@@ -1,0 +1,24 @@
+<form class="col-md-3 col-sm-3 f-mini-newsletter" role="form" action="{{ APP.href('email/subscribe') }}" method="post">
+    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+    <div class="form-group">
+        <label for="newsletter-email" class="f-col-title">{{ "Subscribe to our newsletter"|_ }}</label>
+        <input type="email" name="email" class="form-control required" id="newsletter-email" placeholder="Enter your email">
+    </div>
+    <button type="submit" class="btn btn-default btn-sm">{{ "Subscribe"|_ }}</button>
+</form>
+
+<script>
+    require(['jquery', 'jquery.validate'], function($) {
+        var newsletterForm = $('form.f-mini-newsletter');
+        newsletterForm.validate({
+            submitHandler: function (form) {
+                newsletterForm.find('label.error, label.success').remove();
+                var inputEmail = newsletterForm.find('#newsletter-email');
+                $.post(newsletterForm.attr('action'), newsletterForm.serialize(), function(data, status, xhr) {
+                    var label = $('<label/>').attr('for', inputEmail.attr('id')).addClass(data.status).text(data.message);
+                    inputEmail.after(label);
+                });
+            }
+        });
+    })
+</script>

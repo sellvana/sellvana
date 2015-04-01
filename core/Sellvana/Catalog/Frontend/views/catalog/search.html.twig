@@ -1,0 +1,30 @@
+<div class="f-site-main" role="main">
+  <div class="container">
+    {{ THIS.view('breadcrumbs') | raw }}
+    <header class="f-page-header visible-xs">
+      <span class="f-page-title">{{ 'Search: %s' | _(THIS.get('query')) }}</span>
+      <a href="javascript:void(null);" id="button" class="f-btn-prod-listing-filter-toggle btn btn-default">Filters</a>
+    </header>
+    <div class="row">
+      <!-- Sidebar Start -->
+      <aside class="f-col-sidebar col-sm-3">
+          {{ THIS.hook('sidebar-left') | raw }}
+      </aside>
+      <!-- Sidebar End -->
+      <!-- Category -->
+      <div class="f-col-main col-sm-9">
+        <header class="f-page-header hidden-xs">
+          <h1 class="f-page-title">{{ 'Search: %s' | _(THIS.get('query')) }}</h1>
+        </header>
+        {{ THIS.hook('main_products') | raw }}
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  require(['jquery'], function($) {
+    $( "#button" ).click(function() {
+      $('.f-col-sidebar').toggleClass( "open" );
+    });
+  });
+</script>

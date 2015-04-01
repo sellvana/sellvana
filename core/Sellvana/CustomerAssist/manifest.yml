@@ -1,0 +1,20 @@
+modules:
+    Sellvana_CustomerAssist:
+        version: 0.1.0
+        require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.0, Sellvana_Customer: 0.1.0 } }
+
+        #todo:
+            # push link to user
+            # shadow browsing (share session and cart)
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ /customer_assist/.action, Sellvana_CustomerAssist_Admin_Controller ]
+
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+
+            FCom_PushServer:
+                auto_use: [ bootstrap ]

@@ -1,0 +1,12 @@
+base:
+    - view: head
+        do:
+            - [ requireJs, fcom.productcompare, "@Sellvana_ProductCompare/Frontend/js/fcom.productcompare" ]
+            - [ requireRun, fcom.productcompare ]
+
+/catalog/compare:
+    - { include: base }
+    - { hook: main, views: catalog/compare }
+
+/catalog/compare/xhr:
+    - { root: catalog/compare }

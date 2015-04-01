@@ -1,5 +1,0 @@
-/catalog/category:
-    - { hook: catalog/product/pager.fields, views: catalog/category/_pager_fields }
-
-/catalog/search:
-    - { hook: catalog/product/pager.fields, views: catalog/category/_pager_fields }

@@ -1,0 +1,18 @@
+<!--{ label: Page Options }-->
+<!--{ pos: 20 }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator', m) %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator } %}
+<fieldset class="form-horizontal">
+    <div class="f-section">
+    {{ forms.boolean(fieldData, {field:'page_enabled', label:'Page Enabled'|_}) }}
+    {{ forms.input(fieldData, {field:'page_url', label:'Page URL Path'|_}) }}
+    {{ forms.input(fieldData, {field:'page_title', label:'Window Title'|_}) }}
+    {{ forms.textarea(fieldData, {field:'layout_update', label:'Page Layout Update'|_}) }}
+    {{ forms.input(fieldData, {field:'meta_title', label:'Meta Title'|_}) }}
+    {{ forms.input(fieldData, {field:'meta_description', label:'Meta Description'|_}) }}
+    {{ forms.input(fieldData, {field:'meta_keywords', label:'Meta Keywords'|_}) }}
+    </div>
+</fieldset>

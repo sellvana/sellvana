@@ -20,12 +20,12 @@ foreach ($modules as $modName => $mod) {
 //        mkdir($targetFile);
         BUtil::ensureDir($targetFile);
     }
-    $targetFile .= '/de.php';
+    $targetFile .= '/en.php';
     if (!file_exists($targetFile)) {
         touch($targetFile);
     }
     echo $targetFile . "\n";
     chmod($targetFile, 0777);
-    BLocale::collectTranslations($viewDir, $targetFile);
+    FCom_Dev_Translations::i()->collectTranslations($viewDir, $targetFile);
 }
 echo "Done" . PHP_EOL;

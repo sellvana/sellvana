@@ -1,0 +1,178 @@
+{% set m = THIS.get('model') %}
+{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfigForGriddle(m) %}
+
+
+{# media lib #}
+{% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
+{% set mediaActions = {
+    "add-selected" : {
+        caption: "Add selected images"
+    }
+} %}
+{% set mediaConfig = {
+    id: 'all_images',
+    mode: 'images',
+    type: 'product-images',
+    title: 'Images',
+    folder: 'media/product/images',
+    config: {}
+} %}
+
+{% set mediaLibAttachConfig = mediaLib.gridConfig({'id': mediaConfig.id, 'folder': mediaConfig.folder, 'config': mediaConfig.config, 'mode': mediaConfig.mode}) %}
+{% set mediaLibAttachConfigCompiled = THIS.view('core/griddle').set('grid', mediaLibAttachConfig).getGridConfig() %}
+
+<input type='hidden' name="grid[images][del]" class="target-attach-remove" id="{{ prodImagesConfig.config.id }}-attach-remove"/>
+<input type='hidden' name="grid[images][rows]" class="target-attach-rows" id="{{ prodImagesConfig.config.id }}-attach-rows"/>
+
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+        var mainGridId = '{{ prodImagesConfig.config.id }}';
+        var inputAddRowsEle = $('#' + mainGridId + '-attach-rows'),
+            inputRemoveRowsEle = $('#' + mainGridId + '-attach-remove');
+        var mainGrid, attachGrid,
+            originIds;
+
+        /**
+         * remove special chars
+         * @param {string} str
+         */
+        function removeSpecialChars(str)
+        {
+            var label = str.substr(0, str.lastIndexOf('.'));
+            return label.replace(/[^A-Z0-9]/ig, ' ');
+        }
+
+        function getFieldToSave(row) {
+            return {
+                id: row.id,
+                file_id: row.file_id,
+                label: row.label,
+                position: row.position,
+                create_at: row.create_at,
+                update_at: row.update_at,
+                _new: row._new
+            };
+        }
+
+        /**
+         * callback function to show modal to add image from full images grid to product images grid
+         * @param grid
+         */
+        window.showModalToAddImage = function(grid) {
+            mainGrid = grid;
+            var modalContainerEle = document.getElementById('{{ prodImagesConfig.config.id }}-modal');
+            //render modal
+            React.unmountComponentAtNode(modalContainerEle);
+            React.renderComponent(
+                    React.createElement(Components.Modal, {
+                                id: "attachGridModal",
+                                show: true,
+                                title: 'Add images',
+                                confirm: 'Add',
+                                cancel: 'Close',
+                                onLoad: function (modal) {
+                                    var node = $(modal.getDOMNode());
+                                    node.find('.modal-dialog').css('width', '900px');
+                                },
+                                onConfirm: window.addSelectedImages
+                            },
+                            React.createElement("div", { className: "row f-grid-wrapper" }, React.createElement("div", { className: "tabbable" },
+                                    React.createElement("ul", { className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
+                                            React.createElement("li", { className: "active" },
+                                                    React.createElement("a", { "data-toggle": "tab", href: "#{{mediaConfig.id}}-attach_library" }, "Library")
+                                            ),
+                                            React.createElement("li", null,
+                                                    React.createElement("a", { "data-toggle": "tab", href: "#{{mediaConfig.id}}-media-upload" }, "Uploads")
+                                            )
+                                    ),
+                                    React.createElement("div", { className: "tab-content" },
+                                            React.createElement("div", { className: "tab-pane active", id: "{{mediaConfig.id}}-attach_library" }
+                                            ),
+                                            React.createElement("div", { className: "tab-pane", id: "{{mediaConfig.id}}-media-upload" }, "Pre content")
+                                    )
+                            )))
+                    , modalContainerEle);
+
+            var mediaLibAttachConfigCompiled = {{ UTIL.toJson(mediaLibAttachConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('{{mediaConfig.id}}-attach_library');
+            var instanceAttachGrid = React.renderComponent(
+                    React.createElement(FComGriddleComponent, { config: mediaLibAttachConfigCompiled}),
+                    attachGridContainerEle
+            );
+
+            if (typeof instanceAttachGrid.refs[mediaLibAttachConfigCompiled.id] !== 'undefined') {
+                attachGrid = instanceAttachGrid.refs[mediaLibAttachConfigCompiled.id];
+            }
+
+            //$('#' + mediaId + '_modal').modal('show');
+        };
+
+        /**
+         * callback function to add selected image from full images grid to product images grid
+         * @param modal
+         */
+        window.addSelectedImages = function(modal) {
+            var selectedRows = attachGrid.getSelectedRows();
+            if (selectedRows.length) {
+                var addRows = [];
+                //process selected rows
+                selectedRows.forEach(function(attachRow) {
+                    if (!_.findWhere(mainGrid.getRows(), {file_id: attachRow.id})) {
+                        var row = attachRow;
+                        var current = FCom.Mixin.dateTimeNow();
+                        _.extend(row, {
+                            _new: true,
+                            id: guid(),
+                            file_id: attachRow.id,
+                            update_at: current,
+                            create_at: current,
+                            //temporary value before implement edit inline
+                            position: 0,
+                            label: removeSpecialChars(attachRow.file_name)
+                        });
+                        addRows.push(row);
+                    }
+                });
+
+                if (addRows.length) {
+                    mainGrid.addRows(addRows);
+                }
+
+                modal.close();
+            } else {
+                alert('please choose at least one item');
+            }
+        };
+
+        /**
+         * callback function after main grid product_images was rendered
+         * @param grid
+         */
+        window.setProductImagesMainGrid = function(grid) {
+            mainGrid = grid;
+            originIds = _.pluck(grid.getRows(), 'id');
+
+            //handle event
+            $(mainGrid.getDOMNode()).
+                    on('removedRows.griddle', function (e, removedRows, grid) {
+                        var removedIds = _.difference(originIds, _.pluck(grid.getRows(), 'id'));
+                        inputRemoveRowsEle.val(removedIds.join(','));
+                    }).
+                    on('addedRows.griddle', function(e, addedRows, grid) {
+                        var rows = [];
+                        grid.getRows().forEach(function(row) {
+                            if (isNaN(row.id)) {
+                                rows.push(getFieldToSave(row));
+                            }
+                        });
+                        inputAddRowsEle.val(JSON.stringify(rows));
+
+                        //todo: add code to handle list images in tab Variant
+                    })
+            ;
+        }
+    });
+</script>
+
+{# show main grid#}
+{{ LAYOUT.view('core/griddle').set('grid', prodImagesConfig) | raw }}

@@ -1,0 +1,64 @@
+{% set lgColumns = THIS.get('lg_columns') ?: 3 %}
+{% set mdColumns = THIS.get('md_columns') ?: 3 %}
+{% set smColumns = THIS.get('sm_columns') ?: 3 %}
+{% set xsColumns = THIS.get('xs_columns') ?: 2 %}
+
+{% set colLg = (12 / lgColumns) | floor %}
+{% set colMd = (12 / mdColumns) | floor %}
+{% set colSm = (12 / smColumns) | floor %}
+{% set colXs = (12 / xsColumns) | floor %}
+
+{% set addToCartUrl = THIS.url('cart/add') %}
+
+
+{% set count = 0 %}
+{% for p in THIS.get('products') %}
+  {% set productName = p.get('product_name') %}
+  {% set productUrl = p.url(THIS.get('category')) %}
+    <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }}">
+      <div class="thumbnail">
+        {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
+            <span class="sale tooltip-test">Sale</span>
+        {% endif %}
+        <div class="f-col-listing-prod-img">
+          <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>
+          <a href="{{ productUrl }}" class="f-prod-img" title="{{ productName }}">
+            <img alt="{{ productName }}" src="{{ p.thumbUrl(350, 350) }}"/>
+          </a>
+        </div>
+        <div class="caption">
+          {% if THIS.get('add_wishlist') %}
+            {{ THIS.view('wishlist/add-icon').set({p:p}) | raw }}
+          {% endif %}
+          <a href="{{ productUrl }}" class="f-prod-name">{{ productName }}</a>
+          {{ THIS.view('catalog/product/price').set('product', p) | raw }}
+          <!--{{ p.get('short_description') }}-->
+          <form method="post" action="{{ addToCartUrl }}" class="hidden-xs">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="qty" value="1">
+            <p>
+              <button type="submit" name="id" value="{{ p.id() }}" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false" class="btn btn-primary btn-sm">{{ 'Add to Cart'|_ }}</button>
+              <a href="{{ productUrl }}" class="btn btn-link btn-sm">{{ 'View Details'|_ }}</a>
+              {% if THIS.get('add_compare') %}
+                  {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
+              {% endif %}
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% set count = count + 1 %}
+    {% if count % lgColumns == 0 %}
+        <div class="visible-lg clearfix"></div>
+    {% endif %}
+    {% if count % mdColumns == 0 %}
+        <div class="visible-md clearfix"></div>
+    {% endif %}
+    {% if count % smColumns == 0 %}
+        <div class="visible-sm clearfix"></div>
+    {% endif %}
+    {% if count % xsColumns == 0 %}
+        <div class="visible-xs clearfix"></div>
+    {% endif %}
+{% endfor %}

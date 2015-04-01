@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_promo id="1" description="promo 1" coupon="aids" status="active"/>
+
+    <fcom_product id="1" product_name="Product 1" product_sku="product1" url_key="product-1" base_price="2" />
+    <fcom_product id="2" product_name="Product 2" product_sku="product2" url_key="product-2" base_price="2" />
+    <fcom_product id="3" product_name="Product 3" product_sku="product3" url_key="product-3" base_price="3" />
+    <fcom_product id="4" product_name="Product 4" product_sku="product4" url_key="product-4" base_price="5" />
+
+    <fcom_sales_cart id="1" customer_id="1" item_qty="5" item_num="2" subtotal="10" shipping_method="ShippingPlain" />
+    <fcom_sales_cart id="2" customer_id="0" item_qty="1" item_num="1" subtotal="3" shipping_method="" />
+
+    <fcom_sales_cart_item id="1" cart_id="1" product_id="1" qty="4" price="8" />
+    <fcom_sales_cart_item id="2" cart_id="1" product_id="2" qty="1" price="2" />
+    <fcom_sales_cart_item id="3" cart_id="2" product_id="3" qty="1" price="3" />
+</dataset>

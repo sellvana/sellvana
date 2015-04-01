@@ -1,0 +1,34 @@
+{% set item = THIS.get('item') %}
+{% set p = item.product() %}
+<tr id="tr-product-{{ item.id() }}">
+    <td class="f-cart-col-img">
+        <a href="{{ p.url() }}" class="f-prod-img">
+            <img src="{{ p.thumbUrl(80, 80) }}" width="80" height="80" alt="{{ item.get('product_name') }}"/>
+        </a>
+    </td>
+    <td class="f-cart-col-name">
+        {{ THIS.view('cart/product-info').set({'item': item, 'product': p}) | raw }}
+    </td>
+    <td class="f-cart-col-qty text-center">
+        <input min="0" type="text" size="3" name="qty[{{ item.id() }}]" value="{{ item.qty*1 }}" class="f-input-qty input-sm form-control"/>
+    </td>
+    <td class="f-cart-col-total text-left">
+        <div class="checkbox">
+            <label><input type="checkbox" name="remove[{{ item.id() }}]" class="remove-checkbox" value="{{ item.id() }}"> {{ 'Remove'|_ }}</label>
+        </div>
+    </td>
+    <td class="f-cart-col-price text-right">
+        <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
+            <span class="f-reg-price">
+                <span class="f-price">{{ item.price | currency }}</span>
+            </span>
+        </div>
+    </td>
+    <td class="f-cart-col-total text-right">
+        <div class="f-price-group">
+            <span class="f-reg-price">
+                <span class="f-price">{{ item.row_total | currency }}</span>
+            </span>
+        </div>
+    </td>
+</tr>

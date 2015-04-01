@@ -1,0 +1,52 @@
+{% set w = SESSION.get('w') %}
+
+<form method="post" action="{{APP.href('install/step1')}}" class="form-horizontal">
+    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+    <div class="panel-heading">
+        <h1 class="panel-title">{{ 'Step 1 of 3: Database Connection' |_ }}</h1>
+    </div>
+
+    <div class="form-group">
+        <label for="db-host" class="control-label col-lg-4 required">{{ 'Host' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="db-host" name="w[db][host]" value="{{w.db.host}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="db-port" class="control-label col-lg-4 required">{{ 'Port' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="db-port" name="w[db][port]" value="{{w.db.port}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="db-dbname" class="control-label col-lg-4 required">{{ 'Database' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="db-dbname" name="w[db][dbname]" value="{{w.db.dbname}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="db-username" class="control-label col-lg-4 required">{{ 'Username' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="db-username" name="w[db][username]" value="{{w.db.username}}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="db-password" class="control-label col-lg-4">{{ 'Password' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="password" class="form-control" id="db-password" name="w[db][password]" value="{{w.db.password}}" placeholder="*****">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="dbname" class="control-label col-lg-4">{{ 'Table prefix' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="dbname" name="w[db][table_prefix]" value="{{w.db.table_prefix}}">
+        </div>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item clearfix">
+            <!--<a class="btn btn-link pull-left" name="do" value="back" href="{{APP.href('install/index')}}">&laquo; {{ 'Back' |_ }}</a>-->
+            <button type="submit" class="btn btn-primary pull-right" name="do" value="next">{{ 'Continue' |_ }}</button>
+        </li>
+    </ul>
+</form>

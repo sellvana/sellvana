@@ -1,0 +1,2 @@
+{% set gridConfig = THIS.get( 'grid' ) %}
+{{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }}

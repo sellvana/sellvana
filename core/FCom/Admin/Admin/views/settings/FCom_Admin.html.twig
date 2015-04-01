@@ -1,0 +1,50 @@
+{% set c = THIS.get('model') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set locales = LOCALE.getAvailableLocaleCodes() %}
+
+<h2>{{ "Admin Settings"|_}}</h2>
+{% set fieldData = { model: c, settings_module:'FCom_Admin' } %}
+{{ forms.accordion_start({id:'settings-FCom_Admin'}) }}
+    {{ forms.accordion_panel_start({label:'HTML'|_, id:'settings-FCom_Admin-group0', in:1}) }}
+        {{ forms.select(fieldData, {field:'theme', label:'Theme'|_, options:LAYOUT.getThemes("FCom_Admin", true) }) }}
+        {{ forms.textarea(fieldData, {field:'add_js_files', label:'Additional JS Files'|_, raw:1 }) }}
+        {{ forms.textarea(fieldData, {field:'add_css_files', label:'Additional CSS Files'|_, raw:1 }) }}
+        {{ forms.textarea(fieldData, {field:'add_js_code', label:'Additional JS Code'|_, raw:1 }) }}
+        {{ forms.textarea(fieldData, {field:'add_css_style', label:'Additional CSS Style'|_, raw:1 }) }}
+    {{ forms.accordion_panel_end }}
+
+    {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Admin-group1'}) }}
+        <div class="form-group">
+            {{ forms.label({label:'IP: mode'|_}) }}
+            <div class="col-md-8 group-ip-mode"></div>
+        </div>
+        {{ forms.textarea(fieldData, {name:'config[recovery_modules][FCom_Admin]', id:'recovery_modules-FCom_Admin',
+            label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery_modules/FCom_Admin'), raw:1 }) }}
+
+        {{ forms.boolean(fieldData, {field:'enable_locales', label:'Enable UI Multi Locale'|_ }) }}
+        {{ forms.select(fieldData, {field:'default_locale', label:'Default Product Locale', select2: {}, options:locales }) }}
+        {{ forms.select(fieldData, {field:'allowed_locales', label:'Allowed Admin UI Locales', select2: {},
+            multiple: true, options:locales }) }}
+    {{ forms.accordion_panel_end }}
+
+
+    {{ forms.accordion_panel_start({label:'Users'|_, id:'settings-FCom_Admin-group2'}) }}
+        {{ forms.boolean(fieldData, {field:'password_strength', label:'Strong Password Security'|_ }) }}
+        {{ forms.input(fieldData, {field:'password_reset_token_ttl_hr', label:'Password Reset Token TTL (hours, default 24)'|_ }) }}
+    {{ forms.accordion_panel_end }}
+
+    {{ forms.accordion_panel_start({label:'Site Map'|_, id:'settings-FCom_Admin-group3'}) }}
+        <div class="form-group">
+            <div class="col-md-5">
+                <a class="btn btn-primary" href="{{ APP.href('generate_sitemap') }}">{{ 'Generate Site Map'|_ }}</a>
+            </div>
+        </div>
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+
+<script  type="text/javascript">
+    require(['backbone', 'jquery', 'fcom.ipmode', 'select2'], function(Backbone, $, ipMode) {
+        var mode = {{ UTIL.toJson(c.get("mode_by_ip/FCom_Admin")|split("\n")) | raw }};
+        ipMode.initMode({el: $('#settings-FCom_Admin-group1').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_Admin]', mode: mode});
+    })
+</script>

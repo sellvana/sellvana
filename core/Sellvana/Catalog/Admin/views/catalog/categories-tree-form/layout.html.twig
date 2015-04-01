@@ -1,0 +1,11 @@
+<!--{ label: {{ 'Layout'|_ }} }-->
+<!--{ pos: 80 }-->
+
+{% set m = THIS.get('model') %}
+{% set layout = m.getData('layout') %}
+
+<fieldset>
+    <div class="f-section">
+        {{ THIS.view('core/layout-editor').set({layout: layout, type: 'category'}) | raw }}
+    </div>
+</fieldset>

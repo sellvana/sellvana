@@ -1,0 +1,269 @@
+<!--{ label: Promo Details }-->
+<!--{ pos: 10 }-->
+{% set m = THIS.get('model') %}
+{% set promo_type = validator.fieldValue('promo_type') %}
+{#{% set promo = APP.instance('Sellvana_Promo_Model_Promo') %}#}
+{% set validator = THIS.get('validator') %}
+{% set labelClass = "col-md-3" %}
+{% set numCodes = m.get('numCodes') %}
+{% set fromDate = validator.fieldValue('from_date') %}
+{% set toDate = validator.fieldValue('to_date') %}
+{% set priority = validator.fieldValue('priority_order')? :0 %}
+
+
+{% if fromDate and toDate %}
+    {% set daterange = fromDate ~ " - " ~ toDate %}
+{% else %}
+    {% set daterange = fromDate? fromDate: '' %}
+{% endif %}
+
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+{% if MODULES.isLoaded('Sellvana_CustomerGroups') %}
+    {% set customerGroups = APP.instance('Sellvana_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+
+{% if MODULES.isLoaded('Sellvana_MultiSite') %}
+    {% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
+{% endif %}
+
+<fieldset class="adm-section-group">
+    <div class="f-section">
+        {{ forms.select({
+            label: 'Type'|_,label_class: labelClass,
+            value: promo_type,
+            field: "promo_type", help_icon: 1,
+            help_text: "Promotion tyoe, catalog or cart. Once selected cannot be changed"|_,
+            select2: {minimumResultsForSearch: 15},
+            options: m.fieldOptions('promo_type'),
+            required: 1, disabled: m.id()? 1: 0
+        }) }}
+        {{ forms.input({label: 'Admin Summary'|_, required: 1, field: "summary",
+            value: validator.fieldValue('summary'), label_class: labelClass,
+            help_icon: 1, help_text: 'Admin Summary'|_ }) }}
+        {{ forms.textarea({label: 'Internal Notes'|_, field: "internal_notes",
+            value: validator.fieldValue('internal_notes'),label_class: labelClass,
+            help_icon: 1, help_text: 'Internal Notes'|_ }) }}
+        {{ forms.input({label: 'Customer Label'|_, required: 1, field: "customer_label",
+            value: validator.fieldValue('customer_label'),label_class: labelClass,
+            help_icon: 1, help_text: 'Customer Label'|_ }) }}
+        {{ forms.textarea({label: 'Details for Customers'|_, field: "customer_details",
+            value: validator.fieldValue('customer_details'),label_class: labelClass,
+            help_icon: 1, help_text: 'Details for Customers'|_ }) }}
+
+        {{ forms.input({label: 'Priority'|_, field: "priority_order",
+            value: priority,label_class: labelClass,
+            placeholder:"Enter priority number", type: "number",
+            help_icon: 1, help_text: 'Execution priority for order, lower order is calculated first.'|_ }) }}
+
+        {{ forms.select({
+            label: 'Status'|_,label_class: labelClass,
+            value: validator.fieldValue('status'),
+            field: "status", help_icon: 1,
+            help_text: "Promotion status"|_,
+            select2: {minimumResultsForSearch: 15},
+            options: m.fieldOptions('status'),
+            input_div_class: "col-md-2"
+        }) }}
+
+        {{ forms.boolean({
+            label: "Stop flag"|_, label_class: labelClass,
+            value: validator.fieldValue('stop_flag'),
+            field: 'stop_flag', help_icon: 1,
+            help_text: "Stop other promotions from processing."|_,
+            select2: {minimumResultsForSearch: 15}
+        }) }}
+        {% if customerGroups %}
+            {{ forms.select({
+                label: 'Customer Groups'|_,label_class: labelClass,
+                field: "customer_group_ids",
+                value: validator.fieldValue('customer_group_ids'), help_icon: 1,
+                help_text: "Promotion Customer Groups"|_,
+                multiple: 'multiple',
+                select2: {minimumResultsForSearch: 15}, options: customerGroups,
+            }) }}
+        {% endif %}
+
+        {% if sites %}
+            {{ forms.select({
+                label: 'Websites'|_,label_class: labelClass,
+                field: "websites",
+                value: validator.fieldValue('websites'), help_icon: 1,
+                multiple: 'multiple',
+                help_text: "Promotion websites"|_,
+                select2: {minimumResultsForSearch: 15}, options: sites,
+            }) }}
+        {% endif %}
+
+        {{ forms.input({label: 'Date Range'|_, field: "date_range"
+            ,label_class: labelClass, value: daterange,
+            placeholder: "From - To",
+            help_icon: 1, help_text: 'Date Range'|_ }) }}
+        <div id="testbed"></div>
+        <script type="text/javascript">
+            require(['jquery', 'moment', 'daterangepicker', 'bootstrap'], function ($) {
+                {% if fromDate %}
+                    var s = '{{ fromDate }}';
+                {% else %}
+                    var startDate = new Date();
+                    var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+                {% endif %}
+
+                {% if toDate %}
+                    var e = '{{ toDate }}';
+                {% else %}
+                    var e = s;
+                {% endif %}
+
+                $('#model-date_range').daterangepicker(
+                    {
+                        format: 'YYYY-MM-DD',
+                        startDate: s,
+                        endDate: e
+                    }
+                );
+                var $help = $('.help-icon');
+                $help.popover({placement: 'auto', trigger: 'hover focus'});
+                $help.on('click', function (e) {
+                    e.preventDefault();
+                });
+            });
+
+        </script>
+        {{ forms.select({
+            label: "Coupon Code Enter For Validity"|_,label_class: labelClass,
+            field: "coupon_type",
+            value: validator.fieldValue("coupon_type"),
+            help_icon: 1,
+            help_text: "Require coupon code"|_,
+            select2: {minimumResultsForSearch: 15}, disabled: (promo_type == 'catalog')? 1: 0,
+            style: (promo_type == 'catalog')? "display: none": '',
+            options: m.fieldOptions('coupon_type')
+        }) }}
+        <div id="coupon-options"></div>
+        {{ forms.hidden({field:"data_serialized", value: validator.fieldValue("data_serialized")}) }}
+        <div class="form-group">
+            <label class="control-label col-md-3" for="model-conditions">{{"Conditions"|_}}&nbsp;
+                    <a id="help-model-conditions" class="pull-right help-icon" href="#"
+                       data-toggle="popover" data-trigger="focus" data-content="{{"Configure conditions"|_}}"
+                       data-container="body">
+                        <span class="glyphicon glyphicon-question-sign"></span></a>
+            </label>
+            <div class="col-md-5">
+                <select id="model-conditions_operator" name="model[conditions_operator]" class="form-control to-select2">
+                    {{ UTIL.optionsHtml(m.fieldOptions('conditions_operator'), validator.fieldValue("conditions_operator"))|raw }}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="model-conditions_type" class="sr-only">{{ "Condition type"|_ }}</label>
+                <select id="model-conditions_type" class="form-control to-select2">
+                    <option value="-1">{{ "Add Condition Type..."|_ }}</option>
+                    <option value="sku">{{ "Products"|_ }}</option>
+                    <option value="category">{{ "Categories"|_ }}</option>
+                    <option value="combination">{{ "Attribute Combination"|_ }}</option>
+                    <option value="total" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">{{ "Cart Total"|_ }}</option>
+                    <option value="shipping" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">
+                        {{ "Shipping Destination"|_ }}</option>
+                </select>
+            </div>
+        </div>
+        <div id="conditions-options">
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-3" for="model-actions">{{"Promo Actions"|_}}&nbsp;
+                    <a id="help-model-actions" class="pull-right help-icon" href="#"
+                       data-toggle="popover" data-trigger="focus" data-content="{{"Configure promo actions"|_}}"
+                       data-container="body">
+                        <span class="glyphicon glyphicon-question-sign"></span></a>
+            </label>
+            <div class="col-md-5">
+                <select id="model-actions" class="form-control to-select2">
+                    <option value="-1">{{"Add Promo Action..."|_}}</option>
+                    <option value="discount">{{"Discount"|_}}</option>
+                    <option value="shipping" {{ promo_type == 'catalog'? 'disabled':'' }}
+                            class="cart-only">{{"Shipping"|_}}</option>
+                    <option value="free_product" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">
+                        {{"Free Products"|_}}</option>
+                </select>
+            </div>
+        </div>
+        <div id="actions-options">
+            <div style="width: 200px;margin:10px auto;" class="progress">
+                <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+            </div>
+        </div>
+        {% set elView = LAYOUT.view('core/form-elements') %}
+        <script type="text/javascript">
+            require(['react', 'fcom.promo'], function (React, Promo) {
+                $('select.to-select2').select2();
+                var promo_type_id = '{{ elView.getInputId({'field':'promo_type'}) }}';
+                var coupon_type_id = '{{ elView.getInputId({'field':'coupon_type'}) }}';
+                var $promoType = $('#' + promo_type_id);
+                if ($promoType.length) {
+                    var promo_type = $promoType.val();
+                    var $cartOptions = $('option.cart-only');
+                    var $couponType = $('#' + coupon_type_id);
+                    var $action = $('#model-actions');
+                    var $condition = $('#model-conditions_type');
+                    $promoType.select2().on('change', function (e) {
+                        // on promo type element change, set resulting promo type to options and render form
+                        promo_type = $(e.target).val();
+                        if(promo_type == 'catalog') {
+                            // hide coupons type dropdown
+                            // disable total and shipping condition
+                            // disable all but discount action
+                            $couponType.select2('enable', false);
+
+                            $action.select2('destroy');
+                            $condition.select2('destroy');
+
+                            $cartOptions.attr('disabled', true);
+
+                            $action.select2();
+                            $condition.select2();
+                        } else {
+                            $couponType.select2('enable', true);
+
+                            $action.select2('destroy');
+                            $condition.select2('destroy');
+
+                            $cartOptions.attr('disabled', false);
+
+                            $action.select2();
+                            $condition.select2();
+                        }
+                    });
+                }
+                var options = {
+                    promo_type_id: promo_type_id,
+                    coupon_select_id: coupon_type_id,
+                    condition_match_id: 'model-conditions_operator',
+                    condition_select_id: 'model-conditions_type',
+                    actions_select_id: "model-actions",
+                    coupon_container_id: 'coupon-options',
+                    condition_container_id: 'conditions-options',
+                    actions_container_id: "actions-options",
+                    single_coupon_name: "{{ elView.getInputName({'field':'single_coupon_code'}) }}",
+                    single_coupon_code: "{{ validator.fieldValue("single_coupon_code") }}",
+                    promo_serialized: "{{ elView.getInputId({'field':'data_serialized'}) }}",
+                    showCouponsUrl: "{{ APP.href('promo/coupons/view')}}", // "/admin/promo/coupons/view?id=1",
+                    generateCouponsUrl: "{{ APP.href('promo/coupons/generate')}}", // "/admin/promo/coupons/generate?id=1",
+                    importCouponsUrl: "{{ APP.href('promo/coupons/import')}}", // "/admin/promo/coupons/import?id=1",
+                    valueUpc: '{{validator.fieldValue("limit_per_customer")}}',
+                    valueUt: '{{validator.fieldValue("limit_per_promo")}}',
+                    limit_per_coupon: '{{validator.fieldValue("limit_per_coupon")}}',
+                    singleCouponValue: '',
+                    labelClass: '{{ labelClass }}',
+                    debug: true,
+                    base_url: "{{ APP.href('promo/') }}",
+                    buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "No coupon codes" }}',
+                    base_fields: {{ UTIL.toJson(APP.instance('Sellvana_Catalog_Model_ProductPrice').fieldOptions('price_relation_options'))|raw }}
+                };
+                Promo.init(options);
+            });
+        </script>
+    </div>
+</fieldset>

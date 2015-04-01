@@ -1,0 +1,26 @@
+modules:
+    Sellvana_Email:
+        version: 0.1.2
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.3 } }
+        translations: { en: en.php }
+        description: "Base email subscription, message queue and mailing list management"
+        auto_use: [ views, bootstrap, layout ]
+
+        default_config:
+            modules/Sellvana_Email/default_handler: Sellvana_Email
+
+        observe:
+            - [ "BEmail::send:before", "Sellvana_Email_Main::onEmailSendBefore" ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout, bootstrap ]
+                routing:
+                    - [ /subscriptions, Sellvana_Email_Admin_Controller_Subscriptions.index ]
+                    - [ /subscriptions/.action, Sellvana_Email_Admin_Controller_Subscriptions ]
+
+            FCom_Frontend:
+                routing:
+                    - [ /email/pref, Sellvana_Email_Frontend_Controller.pref ]
+                    - [ /email/subscribe, Sellvana_Email_Frontend_Controller.subscribe ]

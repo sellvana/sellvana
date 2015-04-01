@@ -1,0 +1,135 @@
+{# Logic provided by FCom_Core_View_BackboneGrid #}
+
+{% set config = THIS.getGridConfig() %}
+{% set s = config.data.result.state %}
+
+{# main grid structure #}
+{# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
+<!-- Grid Start -->
+<div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
+    <!-- Grid Header Start -->
+    {% if config.filters %}
+    <div class="f-grid-top f-grid-toolbar {{ config.id | raw }} clearfix">
+        <div class="f-col-filters-selection pull-left">
+        <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}"
+        id="{{ config.id | raw }}-quick-search">
+        <span class="{{ config.id }} dropdown">
+            <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns" href="javascript:void(0)">
+                {{ 'Filters'|_ }}
+                <b class="caret"></b>
+            </a>
+            <ul class="{{ config.id }} dd-list dropdown-menu filters"></ul>
+        </span>
+        </div>
+        {% if config.filters[0] %}
+        <span class="{{ config.id }} f-filter-btns">
+            <!-- filter buttons here -->
+        </span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="row f-grid-bottom f-grid-toolbar {{ config.id | raw }} clearfix">
+        <div class="col-sm-6">
+            <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
+                <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns" href="javascript:void(0)">
+                    {{ 'Columns' |_ }}
+                    <b class="caret"></b>
+                </a>
+                <ol class="{{ config.id }} dd-list dropdown-menu columns" style="min-width:200px;">
+                </ol>
+            </span>
+            {% for action in THIS.gridActions() %}
+                {% if action.renderer %}
+                    {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
+                {% elseif action.html %}
+                    {{ action.html | raw }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="col-sm-6 text-right pagination" style='margin:0px;'>
+            <span class="{{ config.id }}-pagination f-grid-pagination"> </span>
+            {# why this line has been commented? In local mode grid, we don't need pagination...#}
+            {#{% if config['data_mode']!= 'local' %}#}
+                <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
+                    {% for ps in THIS.pageSizeOptions() %}
+                        <li {{ ps == s.ps ? 'class="active"' }}>
+                            <a class="js-change-url page-size" href="#">{{ ps }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <ul class="{{ config.id }} pagination pagination-sm page" style='margin:0px;'>
+                </ul>
+            {#{% endif %}#}
+        </div>
+    </div>
+    {% if s.description %}
+        <div class="fcom-htmlgrid__status-description">
+            {{ s.description|raw }}
+        </div>
+    {% endif %}
+    <!-- Grid Header End -->
+
+    <!-- Grid Body Start -->
+    <div class="scrollable-area">
+        <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable"
+                id = {{ config.id | raw }}>
+            <thead>
+                <tr id="tr-sort-{{ config.id }}" role="row">
+                    <!-- header template -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- row template -->
+            </tbody>
+        </table>
+    </div>
+    <!-- Grid Body End -->
+</div>
+<!-- Grid End -->
+
+{# modal body template #}
+<div id="{{ config.id }}-modal">
+    <a class="btn" id="{{ config.id }}-modal-form-show" role="button"
+            href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;">
+    </a>
+    <div class='modal fade' id='{{ config.id }}-modal-form' tabindex='-1'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                    <h4 class='modal-title' id='myModalLabel'>{{ 'Edit form'|_ }}</h4>
+                </div>
+                <form class="form form-horizontal validate-form" id='{{ config.id }}-modal-form'>
+                    <div class='modal-body'>
+                        <!-- Modal body template -->
+                        {# BackboneGrid.Views.ModalForm #}
+                    </div>
+                </form>
+                <div class='modal-footer'>
+                    <button class='btn btn-default f-grid-modal-close' data-dismiss='modal' type='button'>{{ 'Close'|_ }}</button>
+                    <button class='btn btn-primary save' type='button'>{{ 'Save changes' |_ }}</button>
+                </div>
+            </div>
+        </div>
+      </div>
+</div>
+
+{% include 'core/backbonegrid-templates.html.twig' %}
+
+<script>
+require(['jquery', 'fcom.backbonegrid', 'backbone', 'underscore'], function($, Backbone, _) {
+
+    if ($('#fcom_append_form').length > 0) {
+      $('#fcom_append_form').append('<form id="{{ config.id }}-new-form" class="form form-horizontal validate-form"/>');
+      var html = $("#{{ config.id }}-modal").html();
+
+      $("#{{ config.id }}-modal").remove();
+      $('form#{{ config.id }}-new-form').append(html);
+
+    }
+
+    var grid = new FCom.BackboneGrid({{ UTIL.toJson(config) | raw }});
+});
+</script>

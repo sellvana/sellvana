@@ -1,0 +1,51 @@
+modules:
+    Sellvana_VirtPackCoreEcom:
+        version: 0.2.0
+        channel: alpha
+
+        require:
+            module:
+                FCom_Admin: 0.1.0
+                FCom_AdminChat: 0.1.0
+                FCom_Cron: 0.1.0
+                FCom_Frontend: 0.1.0
+                FCom_PushServer: 0.1.0
+                Sellvana_MarketClient: 0.1.0
+                Sellvana_AdapterExcel: 0.1.0
+                Sellvana_Blog: 0.1.0
+                Sellvana_Catalog: 0.1.0
+                Sellvana_CatalogIndex: 0.1.0
+                Sellvana_Checkout: 0.1.0
+                Sellvana_Cms: 0.1.0
+                Sellvana_Customer: 0.1.0
+                #Sellvana_CustomerAssist: 0.1.0
+                Sellvana_CustomerGroups: 0.1.0
+                Sellvana_CustomField: 0.1.0
+                Sellvana_Disqus: 0.1.0
+                Sellvana_Email: 0.1.0
+                Sellvana_Feedback: 0.1.0
+                Sellvana_FrontendThemeBootSimple: 0.1.0
+                Sellvana_MarketClient: 0.1.0
+                Sellvana_MultiCurrency: 0.1.0
+                Sellvana_MultiLanguage: 0.1.0
+                Sellvana_MultiSite: 0.1.0
+                Sellvana_MultiVendor: 0.1.0
+                Sellvana_MultiWarehouse: 0.1.0
+                Sellvana_PaymentAuthorizeNet: 0.1.0
+                Sellvana_PaymentOgone: 0.1.0
+                Sellvana_PaymentBasic: 0.1.0
+                Sellvana_PaymentCC: 0.1.0
+                Sellvana_PaymentIdeal: 0.1.0
+                Sellvana_PaymentPaypal: 0.1.0
+                Sellvana_ProductReviews: 0.1.0
+                Sellvana_Promo: 0.1.0
+                Sellvana_Referrals: 0.1.0
+                Sellvana_Sales: 0.1.0
+                Sellvana_SalesTax: 0.1.0
+                Sellvana_SampleData: 0.1.0
+                Sellvana_Seo: 0.1.0
+                Sellvana_ShippingPlain: 0.1.0
+                Sellvana_ShippingUps: 0.1.0
+                Sellvana_ShippingEasyPost: 0.1.0
+                Sellvana_ShopperFields: 0.1.0
+                Sellvana_Wishlist: 0.1.0

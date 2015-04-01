@@ -1,0 +1,16 @@
+{% set config = THIS.getGridConfig() %}
+
+{#{{ dump(config) }}#}
+<div class="f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;"></div>
+
+{# modal body template #}
+<div id="{{ config.id }}-modal"></div>
+
+<script type="text/javascript">
+    require(['react', 'fcom.griddle'], function(React, FComGriddleComponent) {
+        var config = {{ UTIL.toJson(config) | raw }};
+        React.render(
+            React.createElement(FComGriddleComponent, {config: config}), document.getElementById(config.id)
+        );
+    });
+</script>

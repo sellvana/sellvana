@@ -1,0 +1,76 @@
+base:
+    - view: head
+        do:
+            - [ css, @Sellvana_Customer/Frontend/css/fcom.customer.css ]
+    - { hook: body_start, views: customer/admin-toolbar }
+
+/customer/login:
+    - { include: base }
+    - view: head
+        do:
+            - [ title, Customer Login ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: main, views: customer/login }
+
+/customer/register:
+    - { include: base }
+    - view: head
+        do:
+            - [ title, Customer Registration ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: main, views: customer/register }
+
+/customer/password/recover:
+    - { include: base }
+    - view: head
+        do:
+            - [ title, Password Recovery ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: main, views: customer/password/recover }
+
+/customer/password/reset:
+    - { include: base }
+    - view: head
+        do:
+            - [ title, Password Reset ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: main, views: customer/password/reset }
+
+customer_account_sidebar:
+    - { view: root, do: [[ addBodyClass, page-customer ]] }
+    - view: customer/account/sidebar
+        do:
+            - [ addNavItem, dashboard, { label: Dashboard, position: 1, href: customer/myaccount } ]
+            - [ addNavItem, edit, { label: Edit Account, position: 10, href: customer/myaccount/edit } ]
+            - [ addNavItem, addresses, { label: Address Book, position: 10, href: customer/address } ]
+            #- [ addNavItem, newsletters, { label: Newsletters, position: 60, href: email/subscriptions } ]
+
+/customer/account:
+    - { include: base }
+    - { hook: main, views: customer/account/dashboard }
+    - { include: customer_account_sidebar }
+
+/customer/account/edit:
+    - { include: base }
+    - { hook: main, views: customer/account/edit }
+    - { include: customer_account_sidebar }
+
+/customer/account/editpassword:
+    - { include: base }
+    - { hook: main, views: customer/account/editpassword }
+    - { include: customer_account_sidebar }
+
+/customer/address/edit:
+    - { include: base }
+    - { hook: main, views: customer/address/edit }
+    - { include: customer_account_sidebar }
+
+/customer/address/list:
+    - { include: base }
+    - { hook: main, views: customer/address/list }
+    - { include: customer_account_sidebar }
+
+/customer/address/choose:
+    - { include: base }
+    - { hook: main, views: customer/address/choose }
+    - { include: customer_account_sidebar }

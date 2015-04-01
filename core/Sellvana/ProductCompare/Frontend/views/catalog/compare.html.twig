@@ -1,0 +1,51 @@
+{% set xhr = REQUEST.xhr() %}
+<div class="main">
+    {% if not xhr %}
+        {{ THIS.view('breadcrumbs') | raw }}
+    {% endif %}
+    <div class="col-main">
+        {% if not xhr %}
+            <a href="{{ APP.instance('FCom_Core_Main').lastNav() }}">&lt;&lt; {{ "Back to results" |_ }}</a>
+        {% endif %}
+
+        <div class="main-title category-title">
+            <h1>{{ 'Compare' |_ }} <span class="compare-num-products">{{ THIS.get('products') | length }}</span> {{ 'products' |_ }}</h1>
+        </div>
+
+        <ul class="compare">
+        {% for i in 0..3 %}
+            <li>
+            {% if THIS.get('products')[i] %}{% set p = THIS.get('products')[i] %}
+                <p><a href="#" class="remove-trigger" onclick="$('.block-compare').data('compare').remove({{ p.id() }}, this)">{{ "Remove" |_ }}</a></p>
+                <p><img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img"/></p>
+                <h3 class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></h3>
+                <span class="manuf-name">{{ p.get('mfr_name') }}</span>
+                <span class="sku">{{ "Part #: %s" | _(p.get('mfr_sku'))  }}</span>
+                <div class="rateit" data-rateit-value="{{p.get('avg_rating')}}"></div>
+                {{ '%s of 5' | _(p.get('avg_rating')) }}
+                {% if p.get('num_reviews') %}
+                    (<a href="{{p.url(cat)}}#reviews">{{ '%s reviews' | _(p.get('num_reviews')) }}</a>)
+                {% endif %}
+                {{ THIS.view('catalog/product/price', {'prod': p}) | raw }}
+                <button class="button btn-add-to-cart" onclick="dentevaCart.add({{ p.id() }})">+ {{ "Add to Cart" |_ }}</button>
+            {% else %}
+                &nbsp;
+            {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% if not xhr %}
+    <script>
+        require(['fcom.frontend'], function() {
+            {#var compare = new FulleronCompare({emptyUrl:'{{ APP.instance('FCom_Core_Main').lastNav() }}'});#}
+        })
+    </script>
+{% else %}
+    <script>
+        require(['jquery', 'jquery.rateit'], function($) {
+            $('.rateit').rateit();
+        })
+    </script>
+{% endif %}

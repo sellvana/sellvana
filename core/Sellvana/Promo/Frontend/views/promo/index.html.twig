@@ -1,0 +1,46 @@
+{% set promos = THIS.get('promos') %}
+
+{% if promos %}
+    {% for section, sectionLabel in {
+        'featured': 'FEATURED',
+        'today': 'TODAY',
+        'this_week': 'THIS WEEK',
+        'this_month': 'THIS MONTHS',
+        'regular': 'OTHER'
+    } %}
+        {% for promo in promos %}
+            {% if promo.get('display_index_section') == section %}
+                <h2>{{ sectionLabel|_ }}</h2>
+                {% if promo.get('display_index_type') == 'cms_block' %}
+                    {% if MODULES.isLoaded('Sellvana_Cms') %}
+                        {{ APP.instance('Sellvana_Cms_Frontend_View_Block').createView(promo.getData('display_type_details/block_handle')).set('promo', promo) | raw }}
+                    {% else %}
+                        <!-- ERROR: Sellvana_Cms module is not enabled -->
+                    {% endif %}
+                {% elseif promo.get('display_index_type') == 'text' %}
+                    {% set opt = promo.getData('display_type_details/text_options') %}
+                    <p>
+                        {{ opt.title ?: promo.customer_label }}
+                        {{ opt.description ?: promo.customer_details }}
+                    </p>
+                    {% if opt.application %}
+                        <p>{{ opt.application }}</p>
+                    {% else %}
+                        {% if promo.get('coupon_type') == 0 %}
+                            <p>{{ 'AUTOMATICALLY APPLIED'|_ }}</p>
+                        {% elseif promo.get('coupon_type') == 1 %}
+                            <p>{{ 'USE COUPON: %s'|_(promo.get('coupon_code')) }}</p>
+                        {% elseif promo.get('coupon_type') == 2 %}
+                            <p>{{ 'USE YOUR COUPON CODE'|_ }}</p>
+                        {% endif %}
+                    {% endif %}
+                    {% if promo.get('display_index_showexp') %}
+                        <p>{{ 'EXPIRES: %s'|_(LOCALE.datetimeDbToLocal(promo.get('to_date'))) }}</p>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% else %}
+    {{ 'No current promotions found'|_ }}
+{% endif %}
