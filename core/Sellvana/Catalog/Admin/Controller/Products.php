@@ -358,14 +358,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 ],
                 'actions' => [
                     'refresh' => true,
-                    #'add' => ['caption' => 'Add images'],
-                    'add-images' => [
-                        'caption'  => 'Add images',
-                        'type'     => 'button',
-                        'id'       => 'add-image-from-grid',
-                        'class'    => 'btn-primary',
-                        'callback' => 'showModalToAddImage'
-                    ],
+                    'add' => ['caption' => 'Add images'],
                     'quick_add' => [
                         'html' => '<span class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
                                      <i class="icon-plus icon-white"></i>
@@ -384,6 +377,33 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     '_quick' => ['expr' => 'file_name like ? ', 'args' => ['%?%']]
                 ],
 
+            ]
+        ];
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'setProductImagesMainGrid'
+        ];
+
+        return $config;
+    }
+
+    /**
+     * //todo: remove after finish griddle
+     * temporary function to build griddle, will be removed after test
+     * @param $model
+     * @return array
+     */
+    public function productImagesGridConfigForGriddle($model)
+    {
+        $config = $this->productImagesGridConfig($model);
+        unset($config['config']['actions']['add']);
+        $config['config']['actions'] += [
+            'add-images' => [
+                'caption'  => 'Add images',
+                'type'     => 'button',
+                'id'       => 'add-image-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'showModalToAddImage'
             ]
         ];
 

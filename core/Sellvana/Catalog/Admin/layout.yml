@@ -19,7 +19,7 @@ catalog_product_form_tabs:
             - [ addTab, main, { label: General Info, pos: 10 } ]
             - [ addTab, prices, { label: "Prices", pos: 20 } ]
             - [ addTab, inventory, { label: "Inventory & Shipping", pos: 30 } ]
-            - [ addTab, linked-products-griddle, { label: Merchandising, pos: 45, async: true } ]
+            - [ addTab, linked-products, { label: Merchandising, pos: 45, async: true } ]
             - [ addTab, categories, { label: Categories, pos: 50, async: true } ]
             - [ addTab, images, { label: Images, pos: 60, async: true } ]
             #- [ addTab, images-griddle, { label: Images (Griddle), pos: 65, async: true } ]
