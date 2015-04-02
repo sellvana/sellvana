@@ -24,6 +24,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
     protected $_permission = 'sales/orders';
     protected $_navPath = 'sales/orders';
 
+    protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';
+    protected $_defaultGridLayoutName = 'default_griddle';
+
     public function gridConfig()
     {
         $overallStates = $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels();
@@ -99,7 +103,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set([
+        $this->view('admin/griddle')->set([
             'actions' => [
                 'new' => '',
             ],
