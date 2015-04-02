@@ -327,10 +327,30 @@ var Griddle = React.createClass({
             headerSelect: 'show_all' //select value in header dropdown
         };
 
+        //set current filter state
+        var filters = {};
+        if (this.getConfig('filters').length) {
+            _.forEach(this.getConfig('filters'), function(f) {
+                if (f.val != '') {
+                    f.submit = true;
+                    filters[f.field] = f;
+                }
+            });
+            state.filter = JSON.stringify(filters);
+        }
+
         // If we need to get external results, grab the results.
         if (!this.hasExternalResults()) {
             state.results = this.props.results;
             state.totalResults = this.props.results.length;
+
+            //filter local data if we have local_personalise config
+            if (this.getConfig('data_mode') == 'local' && this.getConfig('local_personalize') == true && this.getConfig('filters').length) {
+                var results = this.filterLocalData(this.props.results, filters);
+                state.filteredResults = results;
+                state.totalResults = results.length;
+                state.maxPage = this.getMaxPage(results);
+            }
         } else {
             state.isLoading = true; // Initialize to 'loading'
         }
@@ -353,7 +373,9 @@ var Griddle = React.createClass({
         }
         this.triggerCallback('componentDidMount');
     },
-
+    componentDidUpdate: function() {
+        this.triggerCallback('componentDidUpdate');
+    },
     getDataForRender: function(data, cols, pageList){
         var that = this;
         if (!this.hasExternalResults()) {
@@ -430,7 +452,9 @@ var Griddle = React.createClass({
             ? <this.props.customSettings columnMetadata={this.props.columnMetadata} selectedColumns={this.getColumns} setColumns={this.setColumns}
                 getConfig={this.getConfig} searchWithinResults={this.searchWithinResults} getSelectedRows={this.getSelectedRows} refresh={this.refresh}
                 setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState}
-                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} removeRows={this.removeRows} getCurrentGrid={this.getCurrentGrid} />
+                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} removeRows={this.removeRows} getCurrentGrid={this.getCurrentGrid}
+                ref={'gridSettings'} isLocalMode={this.isLocalMode} updateRows={this.updateRows}
+            />
             : <span className="settings" onClick={this.toggleColumnChooser}>{this.props.settingsText} <i className="glyphicon glyphicon-cog"></i></span>
         ) : "";
 
@@ -443,8 +467,6 @@ var Griddle = React.createClass({
         if (!this.state.isLoading) {
             //figure out which columns are displayed and show only those
             var data = this.getDataForRender(results, cols, true);
-
-            console.log('dataForRender', data);
 
             var meta = this.props.metadataColumns;
             meta.push(this.props.childrenColumnName);
@@ -462,7 +484,8 @@ var Griddle = React.createClass({
                         className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
                         getConfig={this.getConfig} refresh={this.refresh} setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
                         getSelectedRows={this.getSelectedRows} addSelectedRows={this.addSelectedRows} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
-                        hasExternalResults={this.hasExternalResults} removeRows={this.removeRows}
+                        hasExternalResults={this.hasExternalResults} removeRows={this.removeRows} isLocalMode={this.isLocalMode} updateRows={this.updateRows}
+                        ref={'gridBody'}
                     />)
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );
@@ -580,6 +603,9 @@ var Griddle = React.createClass({
         }
         return null;
     },
+    isLocalMode: function() {
+        return this.getConfig('data_mode') == 'local';
+    },
     /**
      * re-render grid with same state
      */
@@ -595,20 +621,19 @@ var Griddle = React.createClass({
         }
     },
     /**
-     * set filter for local data
-     * @param submitFilters
+     * filter local data
+     * @param data
+     * @param filters
+     * @returns {Griddle.props.results|*}
      */
-    setFilterLocalData: function (submitFilters) {
-        //console.log('setFilterLocalData');
+    filterLocalData: function(data, filters) {
         var originalResults = this.props.results;
         var filteredResults = originalResults;
 
-        //console.log('submitFilters', submitFilters);
+        _.each(filters, function(filter, key) { //key is field name
+            if (filter.submit == true && typeof filter.val != 'undefined') {
+                var filterVal = filter.val.toLowerCase();
 
-        _.each(submitFilters, function(filter, key) { //key is field name
-            var filterVal = filter.val.toLowerCase();
-
-            if (filter.submit && filterVal != '') {
                 switch (filter.type) {
                     case 'text':
                         var check = {};
@@ -717,9 +742,55 @@ var Griddle = React.createClass({
             }
         });
 
-        //console.log('setFilterLocalData.filteredResults', filteredResults);
+        return filteredResults;
+    },
+    /**
+     * set filter for local data
+     * @param submitFilters
+     */
+    setFilterLocalData: function (submitFilters) {
+        var filteredResults = this.filterLocalData(this.props.results, submitFilters);
+
+        //personalize
+        var personalizeUrl = this.getLocalPersonalizeUrl();
+        if (personalizeUrl) {
+            $.post(personalizeUrl, {
+                'do': 'grid.local.filters',
+                'grid': this.getConfig('id'),
+                'filters': JSON.stringify(submitFilters)
+            });
+        }
 
         this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
+    },
+    /**
+     * get url to save personalize url
+     */
+    getLocalPersonalizeUrl: function () {
+        var personalizeUrl = this.getConfig('personalize_url');
+        var localPersonalize = this.getConfig('local_personalize');
+
+        if (personalizeUrl && localPersonalize == true) {
+            return personalizeUrl;
+        }
+        return '';
+    },
+    /**
+     * post ajax to save local state
+     */
+    saveLocalState: function() {
+        //personalize
+        var personalizeUrl = this.getLocalPersonalizeUrl();
+        if (personalizeUrl) {
+            $.post(personalizeUrl, {
+                'do': 'grid.state',
+                'grid': this.getConfig('id'),
+                's': this.state.sortColumn,
+                'sd': this.state.sortAscending ? 'asc' : 'desc',
+                'p': this.state.page + 1,
+                'ps': this.props.resultsPerPage
+            });
+        }
     },
     /**
      * quick search in available data collection
@@ -826,6 +897,46 @@ var Griddle = React.createClass({
             $(this.getDOMNode()).trigger('removedRows.griddle', [rows, this]);
         });
     },
+    /**
+     * update multi rows data, almost use in data mode local
+     * @param {array} data
+     * @param {object} options
+     * @returns {boolean}
+     */
+    updateRows: function(data, options) {
+        console.log('updateRows.data', data);
+
+        options = _.extend({
+            silent: false
+            //other options
+        }, options);
+
+        var rows = this.getRows();
+        var mapIds = rows.map(function (e) {
+            return e.id.toString();
+        });
+        var updatedRows = [];
+
+        _.each(data, function(item) {
+            var index = mapIds.indexOf(item.id);
+            console.log('item', item);
+            console.log('index', index);
+            if (index != -1) {
+                _.each(item, function(value, key) {
+                    if (rows[index].hasOwnProperty(key)) {
+                        rows[index][key] = value;
+                    }
+                });
+                updatedRows.push(rows[index]);
+            }
+        });
+
+        this.setState({ results: rows, filteredResults: rows }, function() {
+            if (!options.silent) {
+                $(this.getDOMNode()).trigger('updatedRows.griddle', [updatedRows, data, this]); //todo: event updatedRow.server.griddle???
+            }
+        });
+    },
     getRows: function() {
         return this.state.filteredResults || this.state.results;
     },
@@ -884,7 +995,7 @@ var Griddle = React.createClass({
             var callbackFuncName = callbacks[name];
             if (typeof window[callbackFuncName] === 'function') {
                 console.log('triggerCallback:'+name);
-                return window[callbackFuncName](this);
+                return window[callbackFuncName](this, name);
             }
         }
     }

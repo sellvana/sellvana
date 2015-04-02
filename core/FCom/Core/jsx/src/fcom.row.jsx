@@ -28,14 +28,13 @@ define(['underscore', 'react'], function (_, React) {
                 this.props.removeSelectedRows([this.props.row]);
             }
         },
+        handleChange: function(event) {
+            var col = event.target.getAttribute('data-col');
+            this.props.row[col] = event.target.value;
+        },
         render: function () {
             var that = this;
             var id = this.props.getConfig('id');
-
-            //don't render if don't have id
-            if (!this.props.row.id) {
-                return null;
-            }
 
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
@@ -100,7 +99,7 @@ define(['underscore', 'react'], function (_, React) {
                             }
                         } else {
                             var inlineColValue = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
-                            node = (<input type="text" defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + col.name + "][" + that.props.row.id + "]"} />);
+                            node = (<input type="text" data-col={col.name} onChange={that.handleChange} defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + that.props.row.id + "][" + col.name + "]"} />);
                         }
                         break;
                     default:

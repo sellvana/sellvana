@@ -1,21 +1,22 @@
 {% set m = THIS.get('model') %}
-{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfigForGriddle(m) %}
+{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 
 
 {# media lib #}
 {% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
 {% set mediaActions = {
-    "add-selected" : {
-        caption: "Add selected images"
-    }
+"add-selected" : {
+caption: "Add selected images"
+}
 } %}
+
 {% set mediaConfig = {
-    id: 'all_images',
-    mode: 'images',
-    type: 'product-images',
-    title: 'Images',
-    folder: 'media/product/images',
-    config: {}
+id: 'all_images',
+mode: 'images',
+type: 'product-images',
+title: 'Images',
+folder: 'media/product/images',
+config: {}
 } %}
 
 {% set mediaLibAttachConfig = mediaLib.gridConfig({'id': mediaConfig.id, 'folder': mediaConfig.folder, 'config': mediaConfig.config, 'mode': mediaConfig.mode}) %}
@@ -28,9 +29,9 @@
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
         var mainGridId = '{{ prodImagesConfig.config.id }}';
         var inputAddRowsEle = $('#' + mainGridId + '-attach-rows'),
-            inputRemoveRowsEle = $('#' + mainGridId + '-attach-remove');
+                inputRemoveRowsEle = $('#' + mainGridId + '-attach-remove');
         var mainGrid, attachGrid,
-            originIds;
+                originIds;
 
         /**
          * remove special chars
@@ -55,6 +56,22 @@
         }
 
         /**
+         * Update rows before save
+         * @param grid
+         */
+        function updateRowsRecord(grid) {
+            var rows = [];
+            var removedIds = _.difference(originIds, _.pluck(grid.getRows(), 'id'));
+
+            grid.getRows().forEach(function(row) {
+                rows.push(getFieldToSave(row));
+            });
+
+            inputAddRowsEle.val(JSON.stringify(rows));
+            inputRemoveRowsEle.val(removedIds.join(','));
+        }
+
+        /**
          * callback function to show modal to add image from full images grid to product images grid
          * @param grid
          */
@@ -65,7 +82,7 @@
             React.unmountComponentAtNode(modalContainerEle);
             React.renderComponent(
                     React.createElement(Components.Modal, {
-                                id: "attachGridModal",
+                                id: "imageGridModal",
                                 show: true,
                                 title: 'Add images',
                                 confirm: 'Add',
@@ -151,26 +168,15 @@
         window.setProductImagesMainGrid = function(grid) {
             mainGrid = grid;
             originIds = _.pluck(grid.getRows(), 'id');
+        };
 
-            //handle event
-            $(mainGrid.getDOMNode()).
-                    on('removedRows.griddle', function (e, removedRows, grid) {
-                        var removedIds = _.difference(originIds, _.pluck(grid.getRows(), 'id'));
-                        inputRemoveRowsEle.val(removedIds.join(','));
-                    }).
-                    on('addedRows.griddle', function(e, addedRows, grid) {
-                        var rows = [];
-                        grid.getRows().forEach(function(row) {
-                            if (isNaN(row.id)) {
-                                rows.push(getFieldToSave(row));
-                            }
-                        });
-                        inputAddRowsEle.val(JSON.stringify(rows));
-
-                        //todo: add code to handle list images in tab Variant
-                    })
-            ;
-        }
+        /*
+         *function to set attachment grid data into form fields to send them server
+         *This function is callend when 'save' button of product form is clicked.
+         */
+        window.submitCallback.push(function () {
+            updateRowsRecord(mainGrid);
+        });
     });
 </script>
 

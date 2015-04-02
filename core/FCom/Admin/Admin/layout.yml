@@ -234,6 +234,10 @@ default_grid:
     - { include: base }
     - { hook: main, views: admin/grid }
 
+default_griddle:
+    - { include: base }
+    - { hook: main, views: admin/griddle }
+
 default_form:
     - { include: base }
     - { include: form }
