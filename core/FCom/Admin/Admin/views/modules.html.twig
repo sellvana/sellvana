@@ -2,6 +2,11 @@
 require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
     var moduleGrid = null;
 
+    /**
+     * callback function after module grid mounted
+     * @param grid
+     * @param trigger
+     */
     window.moduleGridMounted = function(grid, trigger) {
         moduleGrid = grid;
 
@@ -18,9 +23,14 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         }
     };
 
-    var wrapBadgeHTML = function (rowComponent) {
-        var row = rowComponent.props.row;
-        var el = $(rowComponent.getDOMNode());
+    /**
+     * wrap badge html base on module run level
+     * @param module row component
+     * @returns {boolean}
+     */
+    var wrapBadgeHTML = function (module) {
+        var row = module.props.row;
+        var el = $(module.getDOMNode());
         if (!row) {
             return false;
         }
@@ -51,6 +61,10 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
 
     };
 
+    /**
+     * update module level by ajax POST and update module status, run level
+     * @param modules
+     */
     var updateModuleLevel = function(modules) {
         var data = [];
         _.each(modules, function(m) {
@@ -83,7 +97,7 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
 
     /**** begin function for backbonegrid ******/
     //todo: will remove these functions after completely moved to react griddle
-    function changeLevel(rows) {
+    /*function changeLevel(rows) {
         var data = [];
         for (var i in rows) {
             data.push({module_name: rows[i].name, run_level_core: rows[i].run_level_core});
@@ -143,7 +157,7 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         grid.getRows().on('row_changed', function(ev) {
             changeLevel([ev.toJSON()]);
         });
-    }
+    }*/
 });
 </script>
 
