@@ -48,7 +48,7 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
 			['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
 		];
 		$config['actions'] = [
-			#'new' => array('caption' => 'Add New Product Group', 'modal' => true),
+			'new' => array('caption' => 'Add New Tax Zone', 'modal' => true),
 			'edit' => true,
 			'delete' => true,
 		];

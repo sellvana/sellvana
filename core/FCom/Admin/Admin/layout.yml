@@ -109,6 +109,7 @@ common_js_libs:
             - [ requireJs, griddle.fcomGridBody, @FCom_Core/jsx/build/fcom.gridBody, { deps : [ react, griddle.custom ]} ]
             - [ requireJs, griddle.fcomGridFilter, @FCom_Core/jsx/build/fcom.gridFilter, { deps : [ react, griddle.custom ]} ]
             - [ requireJs, griddle.fcomRow, @FCom_Core/jsx/build/fcom.row, { deps : [ react, griddle.custom ]} ]
+            - [ requireJs, griddle.fcomModalForm, @FCom_Core/jsx/build/fcom.modalForm, { deps : [ react, griddle.custom ]} ]
 
 
 lib_admin_theme1:

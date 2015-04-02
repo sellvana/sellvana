@@ -34,7 +34,7 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
 			['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
 		];
 		$config['actions'] = [
-			#'new' => array('caption' => 'Add New Customer Tax Class', 'modal' => true),
+			'new' => array('caption' => 'Add New Customer Tax Class', 'modal' => true),
 			'edit' => true,
 			'delete' => true,
 		];

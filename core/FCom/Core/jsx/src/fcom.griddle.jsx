@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
-function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) {
+define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
+function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle, Backbone) {
 
     var dataUrl,
         gridId,
@@ -434,7 +434,6 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 $.post(personalizeUrl, { 'do': 'grid.col.hidden', 'grid': id, 'col': event.target.dataset.name, hidden: !(event.target.checked == true) });
             }
 
-            //don't close dropdown after toggle column
             $(event.target).parents('div.dropdown').addClass('open');
         },
         quickSearch: function(event) {
@@ -476,10 +475,22 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                 }
             });
         },
+        handleClick: function() {
+            var that = this;
+            var gridId = that.props.getConfig('id');
+            var modalEleContainer = document.getElementById(gridId + '-modal');
+            React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
+            React.render(
+                <Components.Modal show={true} title="Create Form" confirm="Save changes" cancel="Close" onConfirm={that.props.saveModalForm}>
+                    <FComModalForm columnMetadata={that.props.columnMetadata} id={gridId} />
+                </Components.Modal>,
+                modalEleContainer
+            );
+        },
         handleCustom: function(callback, event) {
             if (typeof window[callback] === 'function') {
                 console.log('actions.callback: ' + callback);
-                return window[callback](this.props.getCurrentGrid());
+                return window[callback](this);
             }
         },
         render: function () {
@@ -520,7 +531,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                             node = <button className={action.class} type="button" key={actionKey}>{action.caption}</button>;
                             break;
                         case 'new':
-                            node = <button className={action.class} type="button" key={actionKey}>{action.caption}</button>;
+                            node = <button className={action.class} onClick={that.handleClick} type="button" key={actionKey}>{action.caption}</button>;
                             break;
                         default:
                             if (action.type) {

@@ -7,7 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['underscore', 'react', 'griddle.gridNoData'], function(_, React, GridNoData) {
+define(['underscore', 'react', 'griddle.gridNoData', 'fcom.components',], function(_, React, GridNoData, Components) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
@@ -21,6 +21,7 @@ var CustomPaginationContainer = require('./customPaginationContainer.jsx');
 var _ = require('underscore');
 */
 var Griddle = React.createClass({displayName: "Griddle",
+    mixins: [FCom.Mixin],
     getDefaultProps: function() {
         return{
             "columns": [],
@@ -453,7 +454,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                 getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh, 
                 setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState, 
                 updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, removeRows: this.removeRows, getCurrentGrid: this.getCurrentGrid, 
-                ref: 'gridSettings', isLocalMode: this.isLocalMode, updateRows: this.updateRows}
+                ref: 'gridSettings', isLocalMode: this.isLocalMode, updateRows: this.updateRows, saveModalForm: this.saveModalForm}
             )
             : React.createElement("span", {className: "settings", onClick: this.toggleColumnChooser}, this.props.settingsText, " ", React.createElement("i", {className: "glyphicon glyphicon-cog"}))
         ) : "";
@@ -484,8 +485,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                         className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, 
                         getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, 
                         getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows, 
-                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, isLocalMode: this.isLocalMode, updateRows: this.updateRows, 
-                        ref: 'gridBody'}
+                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, isLocalMode: this.isLocalMode, updateRows: this.updateRows, saveModalForm: this.saveModalForm, ref: 'gridBody'}
                     ))
                     : (React.createElement(GridBody, {columnMetadata: this.props.columnMetadata, data: data, columns: cols, metadataColumns: meta, className: this.props.tableClassName}))
                 );
@@ -897,6 +897,46 @@ var Griddle = React.createClass({displayName: "Griddle",
             $(this.getDOMNode()).trigger('removedRows.griddle', [rows, this]);
         });
     },
+
+    /**
+     * Save modal form
+     * @param modal
+     */
+    saveModalForm: function(modal) {
+        var that = this,
+            form = $(modal.getDOMNode()).find('form'),
+            id = form.find('#id').val();
+            url = that.getConfig('edit_url'),
+            hash = { oper: id ? 'edit' : 'add' };
+        form.find('textarea, input, select').each(function() {
+            var key = $(this).attr('id');
+            var val = $(this).val();
+            hash[key] = that.html2text(val);
+        });
+        form.validate();
+        if (form.valid()) {
+            if (this.isLocalMode()) {
+                //console.log('localModeSave');
+                this.updateRows([hash]);
+                modal.close();
+            } else if (url) {
+                $.post(url, hash, function(data) {
+                    if (data) {console.log('data', data);
+                        that.refresh();
+                        modal.close();
+                    } else {
+                        alert('error when save');
+                        return false;
+                    }
+                });
+            }
+        } else {
+            //error
+            console.log('form validated fail');
+            return false;
+        }
+    },
+
     /**
      * update multi rows data, almost use in data mode local
      * @param {array} data

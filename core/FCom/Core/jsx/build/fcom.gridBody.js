@@ -3,7 +3,7 @@
 /**
  * FCom GridBody Component
  */
-define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.validate'], function (React, FComRow, Components) {
+define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.validate'], function (React, FComModalForm, FComRow, Components) {
 
     /*
      var React = require('react');
@@ -17,41 +17,6 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
                 "originalData": [],
                 "columnMetadata": [],
                 "className": ""
-            }
-        },
-        modalSaveChange: function(modal) {
-            //console.log('modalSaveChange');
-            var that = this;
-            var url = this.props.getConfig('edit_url');
-
-            var hash = { oper: 'edit' };
-            var form = $(modal.getDOMNode()).find('form');
-            form.find('textarea, input, select').each(function() {
-                var key = $(this).attr('id');
-                var val = $(this).val();
-                hash[key] = that.html2text(val);
-            });
-            form.validate();
-            if (form.valid()) {
-                if (this.props.isLocalMode()) {
-                    //console.log('localModeSave');
-                    this.props.updateRows([hash]);
-                    modal.close();
-                } else if (url) {
-                    $.post(url, hash, function(data) {
-                        if (data) {
-                            that.props.refresh();
-                            modal.close();
-                        } else {
-                            alert('error when save');
-                            return false;
-                        }
-                    });
-                }
-            } else {
-                //error
-                console.log('form validated fail');
-                return false;
             }
         },
         doRowAction: function(event) {
@@ -84,7 +49,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        React.createElement(Components.Modal, {show: true, title: "Edit Form", confirm: "Save changes", cancel: "Close", onConfirm: this.modalSaveChange}, 
+                        React.createElement(Components.Modal, {show: true, title: "Edit Form", confirm: "Save changes", cancel: "Close", onConfirm: that.props.saveModalForm}, 
                             React.createElement(FComModalForm, {columnMetadata: that.props.columnMetadata, row: row, id: gridId})
                         ),
                         modalEleContainer
@@ -347,55 +312,6 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
                     )
                 )
             );
-        }
-    });
-
-    /**
-     * form content for modal
-     */
-    var FComModalForm = React.createClass({displayName: "FComModalForm",
-        mixins: [FCom.Mixin, FCom.FormMixin],
-        getDefaultProps: function () {
-            return {
-                'row': {},
-                'id': 'modal-form',
-                'columnMetadata': []
-            }
-        },
-        getInitialState: function () {
-            return {
-                isNew: (this.props.row.id > 0)
-            }
-        },
-        componentDidMount: function () {
-            //console.log('row', this.props.row);
-            var that = this;
-
-            //update value for element is rendered as element_print
-            $(this.getDOMNode()).find('.element_print').find('input, select, textarea').each(function() {
-                var name = $(this).attr('name');
-                var value = (typeof that.props.row[name] !== 'undefined') ? that.props.row[name] : '';
-                $(this).val(that.text2html(value));
-            });
-        },
-        render: function () {
-            var that = this;
-            var gridId = this.props.id;
-            //console.log('row', this.props.row);
-
-            var nodes = this.props.columnMetadata.map(function(column) {
-                if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
-                return React.createElement(Components.ModalElement, {column: column, value: that.props.row[column.name]})
-            });
-
-            //add id
-            nodes.push(React.createElement("input", {type: "hidden", name: "id", id: "id", value: this.props.row.id}));
-
-            return (
-                React.createElement("form", {className: "form form-horizontal validate-form", id: gridId + '-modal-form'}, 
-                    nodes
-                )
-            )
         }
     });
 

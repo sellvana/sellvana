@@ -5,14 +5,14 @@
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, FComGridBody, FComModalForm, Components) {
 
         var mainGridId = '{{ orderCustomStateConfig.config.id }}';
-        var mainGrid, mainConfig, here;
+        var mainGrid, mainConfig;
 
         /**
          * callback function for top action to show modal to add products
          * @param that
          * @param form
          */
-        window.showModalToAddStateCustom = function(that, form) {
+        window.showModalToAddStateCustom = function(that) {
             mainGrid = that.props.getCurrentGrid();
             mainConfig = {{ UTIL.toJson(orderCustomStateConfig.config) | raw }};
             var modalContainerEle = document.getElementById('{{ orderCustomStateConfig.config.id }}-modal');
