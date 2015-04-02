@@ -15,7 +15,7 @@
     <div class="form-group">
         <label class="col-md-2 control-label">{{ "Order Status"|_ }}</label>
         <div class="col-md-5">
-            <label class="form-control">{{ m.status() ? m.status().name : m.get('status') }}</label>
+            <label class="form-control">{{ m.state().overall().getValueLabel() }}</label>
         </div>
     </div>
 </fieldset>

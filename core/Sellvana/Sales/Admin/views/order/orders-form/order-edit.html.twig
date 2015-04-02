@@ -55,7 +55,7 @@
                 <label class="col-md-2 control-label">{{ "Order Status"|_ }}</label>
                 <div class="col-md-5">
                     <select class="form-control" name="model[status_id]">
-                        {% set status = m.status() ? m.status().get('code') : m.get('status')  %}
+                        {% set status = m.state().custom().getValue() %}
                         {% for stobj in APP.instance('Sellvana_Sales_Model_Order_CustomStatus').statusList() %}
                             <option value="{{ stobj.get('id') }}" {% if stobj.get('code') == status %}checked="checked"{% endif %}>
                                 {{ stobj.get('name')|raw }}

@@ -7,6 +7,11 @@ class Sellvana_PaymentBasic_PaymentMethod extends Sellvana_Sales_Method_Payment_
 {
     protected $_name = 'Check / Money Order';
 
+    protected $_capabilities = [
+        'pay'             => 1,
+        'pay_online'      => 1,
+    ];
+
     /**
      * @return BLayout|BView
      */
