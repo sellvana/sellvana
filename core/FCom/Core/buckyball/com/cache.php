@@ -192,6 +192,9 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
         if (empty($config['default_ttl'])) {
             $config['default_ttl'] = 3600;
         }
+        if (empty($config['file_type'])) {
+            $config['file_type'] = 'json'; // dat, php
+        }
         $this->_config = $config;
         return true;
     }
@@ -199,7 +202,8 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     protected function _filename($key)
     {
         $md5 = md5($key);
-        return $this->_config['dir'] . '/' . substr($md5, 0, 2) . '/' . $this->BUtil->simplifyString($key) . '.' . substr($md5, 0, 10) . '.dat';
+        return $this->_config['dir'] . '/' . substr($md5, 0, 2) . '/'
+            . $this->BUtil->simplifyString($key) . '.' . substr($md5, 0, 10) . '.' . $this->_config['file_type'];
     }
 
     public function load($key)
@@ -208,16 +212,33 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
         if (!file_exists($filename)) {
             return null;
         }
-        $fp = fopen($filename, 'r');
-        $meta = @unserialize(fgets($fp, 1024));
-        if (!$meta || $meta['ttl'] !== false && $meta['ts'] + $meta['ttl'] < time()) {
-            fclose($fp);
-            @unlink($filename);
-            return null;
+        $fileType = $this->_config['file_type'];
+        switch ($fileType) {
+            case 'dat':
+            case 'json':
+                $fp = fopen($filename, 'r');
+                $metaRaw = fgets($fp, 1024);
+                $meta = $fileType === 'dat' ? @unserialize($metaRaw) : json_decode($metaRaw, true);
+                if (!$meta || $meta['ttl'] !== false && $meta['ts'] + $meta['ttl'] < time()) {
+                    fclose($fp);
+                    @unlink($filename);
+                    return null;
+                }
+                for ($contents = ''; $chunk = fread($fp, 4096); $contents .= $chunk) ;
+                fclose($fp);
+                $data = $fileType === 'dat' ? @unserialize($contents) : json_decode($contents, true);
+                break;
+
+            case 'php':
+                $array = include($filename);
+                $meta = !empty($array['meta']) ? $array['meta'] : null;
+                if (!$meta || $meta['ttl'] !== false && $meta['ts'] + $meta['ttl'] < time()) {
+                    @unlink($filename);
+                    return null;
+                }
+                $data = $array['data'];
+                break;
         }
-        for ($data = ''; $chunk = fread($fp, 4096); $data .= $chunk);
-        fclose($fp);
-        $data = unserialize($data);
         return $data;
 
     }
@@ -232,7 +253,20 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
             'ttl' => !is_null($ttl) ? $ttl : $this->_config['default_ttl'],
             'key' => $key,
         ];
-        file_put_contents($filename, serialize($meta) . "\n" . serialize($data));
+        switch ($this->_config['file_type']) {
+            case 'dat':
+                $contents = serialize($meta) . "\n" . serialize($data);
+                break;
+
+            case 'json':
+                $contents = json_encode($meta) . "\n" . json_encode($data);
+                break;
+
+            case 'php':
+                $contents = '<' . '?php return ' . var_export(['meta' => $meta, 'data' => $data], 1) . ';';
+                break;
+        }
+        file_put_contents($filename, $contents);
         return true;
     }
 
@@ -252,6 +286,7 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     * @todo implement regexp pattern
     *
     * @param mixed $pattern
+    * @return array
     */
     public function loadMany($pattern)
     {
@@ -260,19 +295,38 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
             return [];
         }
         $result = [];
-        foreach ($files as $filename) {
-            $fp = fopen($filename, 'r');
-            $meta = unserialize(fgets($fp, 1024));
-            if (!$meta || $meta['ttl'] !== false && $meta['ts'] + $meta['ttl'] < time()) {
-                fclose($fp);
-                @unlink($filename);
-                continue;
-            }
-            if (strpos($meta['key'], $pattern) !== false) { // TODO: regexp search without iterating all files
-                for ($data = ''; $chunk = fread($fp, 4096); $data .= $chunk);
-                $result[$meta['key']] = $data;
-            }
-            fclose($fp);
+        $fileType = $this->_config['file_type'];
+        switch ($fileType) {
+            case 'dat':
+            case 'json':
+                foreach ($files as $filename) {
+                    $fp = fopen($filename, 'r');
+                    $metaRaw = fgets($fp, 1024);
+                    $meta = $fileType === 'dat' ? @unserialize($metaRaw) : json_decode($metaRaw, true);
+                    if (!$meta || $meta['ttl'] !== false && $meta['ts'] + $meta['ttl'] < time()) {
+                        fclose($fp);
+                        @unlink($filename);
+                        continue;
+                    }
+                    if (strpos($meta['key'], $pattern) !== false) { // TODO: regexp search without iterating all files
+                        for ($contents = ''; $chunk = fread($fp, 4096); $contents .= $chunk);
+                        $result[$meta['key']] = $fileType === 'dat' ? @unserialize($contents) : json_decode($contents, true);
+                    }
+                    fclose($fp);
+                }
+                break;
+
+            case 'php':
+                foreach ($files as $filename) {
+                    $array = include($filename);
+                    $meta = !empty($array['meta']) ? $array['meta'] : null;
+                    if (!$meta || $meta['ttl'] !== false && $meta['ts'] + $meta['ttl'] < time()) {
+                        @unlink($filename);
+                        continue;
+                    }
+                    $result[$meta['key']] = $array['data'];
+                }
+                break;
         }
         return $result;
     }
@@ -288,19 +342,42 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
             return false;
         }
         $result = [];
-        foreach ($files as $filename) {
-            if ($pattern === true) {
-                @unlink($filename);
-                continue;
-            }
-            $fp = fopen($filename, 'r');
-            $meta = unserialize(fgets($fp, 1024));
-            fclose($fp);
-            if (!$meta || $meta['ttl'] !== false && $meta['ts'] + $meta['ttl'] < time()
-                || $pattern === false || strpos($meta['key'], $pattern) !== false // TODO: regexp search without iterating all files
-            ) {
-                @unlink($filename);
-            }
+        $fileType = $this->_config['file_type'];
+        switch ($fileType) {
+            case 'dat':
+            case 'json':
+                foreach ($files as $filename) {
+                    if ($pattern === true) {
+                        @unlink($filename);
+                        continue;
+                    }
+                    $fp = fopen($filename, 'r');
+                    $metaRaw = fgets($fp, 1024);
+                    $meta = $fileType === 'dat' ? @unserialize($metaRaw) : json_decode($metaRaw, true);
+                    fclose($fp);
+                    if (!$meta || $meta['ttl'] !== false && $meta['ts'] + $meta['ttl'] < time()
+                        || $pattern === false || strpos($meta['key'], $pattern) !== false // TODO: regexp search without iterating all files
+                    ) {
+                        @unlink($filename);
+                    }
+                }
+                break;
+
+            case 'php':
+                foreach ($files as $filename) {
+                    if ($pattern === true) {
+                        @unlink($filename);
+                        continue;
+                    }
+                    $array = include($filename);
+                    $meta = !empty($array['meta']) ? $array['meta'] : null;
+                    if (!$meta || $meta['ttl'] !== false && $meta['ts'] + $meta['ttl'] < time()
+                        || $pattern === false || strpos($meta['key'], $pattern) !== false // TODO: regexp search without iterating all files
+                    ) {
+                        @unlink($filename);
+                    }
+                }
+                break;
         }
         return true;
     }

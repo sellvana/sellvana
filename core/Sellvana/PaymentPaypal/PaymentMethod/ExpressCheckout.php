@@ -29,6 +29,15 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
         'recurring'       => 1,
     ];
 
+    public function can($capability)
+    {
+        $conf = $this->getConfig();
+        if (empty($conf['username']) || empty($conf['password']) || empty($conf['signature'])) {
+            return false;
+        }
+        return parent::can($capability);
+    }
+
     /**
      * @return BLayout|BView
      */
