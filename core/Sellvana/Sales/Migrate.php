@@ -1879,7 +1879,18 @@ class Sellvana_Sales_Migrate extends BClass
                 'UNQ_cart_id' => BDb::DROP,
             ],
         ]);
+    }
 
+    public function upgrade__0_3_15__0_3_16()
+    {
+        $tOrder = $this->Sellvana_Sales_Model_Order->table();
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDb::KEYS => [
+                'FK_cart_id' => '(cart_id)',
+                'UNQ_cart_id' => BDb::DROP,
+            ],
+        ]);
     }
 }
 
