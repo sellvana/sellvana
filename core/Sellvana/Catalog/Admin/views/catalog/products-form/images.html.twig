@@ -4,20 +4,20 @@
 {% set type = 'images' %}
 {% set targetType = 'product' %}
 {% set medialibConfig = {
-    id: 'all_' ~ type,
-    mode: 'images',
-    type: 'product-images',
-    title: 'Images',
-    folder: 'media/product/images',
-    config: {actions: {delete: {caption : 'Remove'}}}
+id: 'all_' ~ type,
+mode: 'images',
+type: 'product-images',
+title: 'Images',
+folder: 'media/product/images',
+config: {actions: {delete: {caption : 'Remove'}}}
 } %}
 
 {% set attachmentsConfig = {
-    type: type,
-    targetType: targetType,
-    elementContainer: '#tab-images',
-    medialibConfig: medialibConfig,
-    gridConfig: prodImagesConfig
+type: type,
+targetType: targetType,
+elementContainer: '#tab-images',
+medialibConfig: medialibConfig,
+gridConfig: prodImagesConfig
 } %}
 {% set combineType = targetType ~ type %}
 {#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
@@ -117,11 +117,11 @@
                 });
             }
         })
-        .bind('fileuploadstop', function(e, data) {
-            if (file_error.join(',') != '') {
-                alert('Illegal file extension: ' + file_error.join(','));
-                file_error = [];
-            }
-        });
+                .bind('fileuploadstop', function(e, data) {
+                    if (file_error.join(',') != '') {
+                        alert('Illegal file extension: ' + file_error.join(','));
+                        file_error = [];
+                    }
+                });
     });
 </script>

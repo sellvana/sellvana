@@ -20,12 +20,12 @@
         {% else %}
             {% for  order in orders %}
                 <tr>
-                    <td>{{ order.id|_ }}</td>
-                    <td>{{ order.firstname|_ }} {{ order.lastname|_ }}</td>
-                    <td>{{ order.grand_total|_ }}</td>
-                    <td>{{ order.balance|_ }}</td>
-                    <td>{{ order.status|_ }}</td>
-                    <td>{{ order.create_at|_ }}</td>
+                    <td>{{ order.id() }}</td>
+                    <td>{{ order.get('firstname') }} {{ order.get('lastname') }}</td>
+                    <td>{{ order.get('grand_total') }}</td>
+                    <td>{{ order.get('amount_due') }}</td>
+                    <td>{{ order.state().overall().getValueLabel() }}</td>
+                    <td>{{ order.get('create_at')|date }}</td>
                 </tr>
             {% endfor %}
         {% endif %}

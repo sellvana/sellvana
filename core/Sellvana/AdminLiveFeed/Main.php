@@ -92,16 +92,13 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         $model = $args['model'];
         if ($model->isNewRecord()) {
             if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_sales')) {
-                $customer = $this->Sellvana_Customer_Model_Customer->load($model->get('customer_id'));
-                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
-                    [
-                        'href' => 'orders/form/?id=' . $model->id(),
-                        'text' => $this->BLocale->_(
-                                'Order %s has been placed by %s',
-                                ['#' . $model->id(), $customer->firstname . ' ' . $customer->lastname]
-                            ),
-                    ]
-                );
+                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+                    'href' => 'orders/form/?id=' . $model->id(),
+                    'text' => $this->BLocale->_(
+                        'Order %s has been placed by %s',
+                        ['#' . $model->get('unique_id'), $model->fullName('billing')]
+                    ),
+                ]);
             }
         }
     }

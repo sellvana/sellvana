@@ -304,17 +304,34 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             //todo: combine this with FComGridBody::modalSaveChange()
             var that = this;
             var url = this.props.getConfig('edit_url');
-            if (url) {
-                var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
-                var hash = { oper: 'mass-edit', id: ids };
-                var form = $(modal.getDOMNode()).find('form');
-                form.find('textarea, input, select').each(function() {
-                    var key = $(this).attr('id');
-                    var val = $(this).val();
-                    hash[key] = that.html2text(val);
-                });
-                form.validate();
-                if (form.valid()) {
+            var ids = _.pluck(this.props.getSelectedRows(), 'id');
+            var hash = { oper: 'mass-edit', id: ids.join(',') };
+            var isLocalMode = this.props.isLocalMode();
+            var form = $(modal.getDOMNode()).find('form');
+
+            form.find('textarea, input, select').each(function() {
+                var key = $(this).attr('id');
+                var val = $(this).val();
+                hash[key] = that.html2text(val);
+            });
+
+            form.validate();
+            if (form.valid()) {
+
+                if (isLocalMode) {
+                    var dataToSave = [];
+                    _.each(ids, function(id) {
+                        var item = _.clone(hash);
+                        item.id = id.toString();
+                        dataToSave.push(item);
+                    });
+
+                    if (dataToSave.length) {
+                        this.props.updateRows(dataToSave);
+                    }
+
+                    modal.close();
+                } else if (url) {
                     $.post(url, hash, function(data) {
                         if (data) {
                             that.props.refresh();
@@ -324,22 +341,23 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                             return false;
                         }
                     });
-                } else {
-                    //error
-                    console.log('error');
-                    return false;
                 }
+            } else {
+                //error
+                console.log('error');
+                return false;
             }
         },
         doMassAction: function(event) { //top mass action
-            if (this.props.getConfig('data_mode') == 'local') {
+            /*if (this.props.getConfig('data_mode') == 'local') {
                 return this.doMassLocalAction(event);
-            }
+            }*/
             var that = this;
             var action = event.target.dataset.action;
             var dataUrl = this.props.getConfig('data_url');
             var editUrl = this.props.getConfig('edit_url');
             var gridId = this.props.getConfig('id');
+            var isLocalMode = this.props.isLocalMode();
 
             switch (action) {
                 case 'mass-delete':
@@ -351,10 +369,17 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     }
 
                     if (confirm) {
-                        var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
-                        $.post(dataUrl, { oper: action, id: ids }, function() {
-                            that.props.refresh();
-                        });
+                        if (isLocalMode) {
+                            var selectedRows = this.props.getSelectedRows();
+                            if (selectedRows.length && this.props.removeRows != null) {
+                                this.props.removeRows(selectedRows);
+                            }
+                        } else {
+                            var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
+                            $.post(dataUrl, { oper: action, id: ids }, function() {
+                                that.props.refresh();
+                            });
+                        }
                     }
 
                     break;
@@ -381,32 +406,6 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
                     break;
             }
 
-        },
-        doMassLocalAction: function(event) {
-            var that = this;
-            var action = event.target.dataset.action;
-            var gridId = this.props.getConfig('id');
-
-            switch (action) {
-                case 'mass-delete':
-                    var confirm = false;
-                    if ($(event.target).hasClass('noconfirm')) {
-                        confirm = true;
-                    } else {
-                        confirm = window.confirm("Do you really want to delete selected rows?");
-                    }
-
-                    if (confirm) {
-                        var selectedRows = this.props.getSelectedRows();
-                        if (selectedRows.length && this.props.removeRows != null) {
-                            this.props.removeRows(selectedRows);
-                        }
-                    }
-                    break;
-                default:
-                    console.log('do-mass-local-action');
-                    break;
-            }
         },
         toggleColumn: function(event) {
             var personalizeUrl = this.props.getConfig('personalize_url');
@@ -644,7 +643,7 @@ function (_, React, $, FComGridBody, FComFilter, Components, Griddle, Backbone) 
             console.log('state.shownFields', this.state.shownFields);
             //todo: we have 2 types of render mass-edit, refer https://fulleron.atlassian.net/browse/SC-306
 
-            if (!this.props.editUrl) return null;
+            //if (!this.props.editUrl) return null;
             var that = this;
             var gridId = this.props.id;
 

@@ -22,7 +22,6 @@ modules:
                 Sellvana_CustomerGroups: 0.1.0
                 Sellvana_CustomField: 0.1.0
                 Sellvana_Disqus: 0.1.0
-                Sellvana_EasyPost: 0.1.0
                 Sellvana_Email: 0.1.0
                 Sellvana_Feedback: 0.1.0
                 Sellvana_FrontendThemeBootSimple: 0.1.0
@@ -47,5 +46,6 @@ modules:
                 Sellvana_Seo: 0.1.0
                 Sellvana_ShippingPlain: 0.1.0
                 Sellvana_ShippingUps: 0.1.0
+                Sellvana_ShippingEasyPost: 0.1.0
                 Sellvana_ShopperFields: 0.1.0
                 Sellvana_Wishlist: 0.1.0

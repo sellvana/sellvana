@@ -1,9 +1,103 @@
 <script>
-
 require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
     var moduleGrid = null;
 
-    function changeLevel(rows) {
+    /**
+     * callback function after module grid mounted
+     * @param grid
+     * @param trigger
+     */
+    window.moduleGridMounted = function(grid, trigger) {
+        moduleGrid = grid;
+
+        //add badge
+        var rows = moduleGrid.refs['gridBody'].refs;
+        _.each(rows, function(row) {
+            wrapBadgeHTML(row);
+        });
+
+        if (trigger == 'componentDidMount') {
+            $(moduleGrid.getDOMNode()).on('updatedRows.griddle', function(e, rows, data) {
+                updateModuleLevel(rows);
+            });
+        }
+    };
+
+    /**
+     * wrap badge html base on module run level
+     * @param module row component
+     * @returns {boolean}
+     */
+    var wrapBadgeHTML = function (module) {
+        var row = module.props.row;
+        var el = $(module.getDOMNode());
+        if (!row) {
+            return false;
+        }
+
+        if (row['migration_available']) {
+            el.find('td[data-col="schema_version"]').html('<span class="badge badge-important">' + row['schema_version'] + '</span>');
+        }
+
+        if (row['run_status'] === 'LOADED') {
+            el.find('td[data-col="run_status"]').html('<span class="badge badge-success">' + row['run_status'] + '</span>');
+        } else if (row['run_status'] === 'ERROR') {
+            el.find('td[data-col="run_status"]').html('<span class="badge badge-important">' + row['run_status'] + '</span>');
+        }
+
+        var badge = '';
+        switch (row['run_level']) {
+            case 'REQUESTED':
+                badge = 'success';
+                break;
+            case 'REQUIRED':
+                badge = 'warning';
+                break;
+        }
+
+        if (badge != '') {
+            el.find('td[data-col="run_level"]').html('<span class="badge badge-' + badge + '">' + row['run_level'] + '</span>');
+        }
+
+    };
+
+    /**
+     * update module level by ajax POST and update module status, run level
+     * @param modules
+     */
+    var updateModuleLevel = function(modules) {
+        var data = [];
+        _.each(modules, function(m) {
+            data.push({
+                module_name: m.name,
+                run_level_core: m.run_level_core
+            });
+        });
+
+        $.post("{{ THIS.get('form_url') }}", {data: data}, function(response, status, xhr) {
+
+            $.post("{{ THIS.get('form_url') }}", {async: true, data: data}, function(response, status, xhr) {
+                var data = []; //new data to update rows again
+                response.data.forEach(function (obj) {
+                    console.log('obj', obj);
+                    var row = _.findWhere(moduleGrid.getRows(), { name: obj.module_name });
+                    if (row) {
+                        obj.id = row.id.toString();
+                        data.push(obj);
+                    }
+                });
+
+                if (data.length) {
+                    moduleGrid.updateRows(data, { silent: true });
+                }
+            });
+        });
+    };
+
+
+    /**** begin function for backbonegrid ******/
+    //todo: will remove these functions after completely moved to react griddle
+    /*function changeLevel(rows) {
         var data = [];
         for (var i in rows) {
             data.push({module_name: rows[i].name, run_level_core: rows[i].run_level_core});
@@ -63,10 +157,10 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         grid.getRows().on('row_changed', function(ev) {
             changeLevel([ev.toJSON()]);
         });
-    }
+    }*/
 });
 </script>
 
-{{ THIS.view('admin/grid') | raw }}
+{{ THIS.view('admin/griddle') | raw }}
 
 

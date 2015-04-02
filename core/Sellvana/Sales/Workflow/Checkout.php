@@ -32,7 +32,7 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
 
     public function action_customerChoosesGuestCheckout($args)
     {
-
+        $args['cart']->set('customer_email', $args['post']['customer_email']);
     }
 
     public function action_customerUpdatesShippingAddress($args)
@@ -97,6 +97,8 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Cart $cart */
         $cart = $this->_getCart($args);
 
+        $cart->calculateTotals()->saveAllDetails();
+
         /** @var Sellvana_Sales_Model_Order[] $oldOrdersFromCart */
         $oldOrdersFromCart = $this->Sellvana_Sales_Model_Order->orm()->where('cart_id', $cart->id())->find_many();
         if ($oldOrdersFromCart) {
@@ -125,6 +127,8 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
                 $args['result']['redirect_to'] = $result['payment']['redirect_to'];
             }
         }
+
+        $this->Sellvana_Sales_Model_Cart->resetSessionCart();
 
         $this->BSession->set('last_order_id', $order->id());
         $args['result']['order'] = $order;
