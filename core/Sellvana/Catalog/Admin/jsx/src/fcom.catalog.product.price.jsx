@@ -210,7 +210,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     baseField =
                             <select ref="base_fields" key="base_fields" name={this.getFieldName(price, 'base_field')}
                                     defaultValue={price['base_field']} className="base_field form-control"
-                                    onChange={this.props.validate}
+                                    onChange={this.updateOperation}
                                     disabled={this.editable || this.props.theBase ? null: true}>
                                 {this.props.priceRelationOptions[price['price_type']].map(function (p) {
                                     return <option key={p.value} value={p.value}>{p.label}</option>
@@ -335,6 +335,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 baseField = $(this.refs['base_fields'].getDOMNode()).val();
             }
             this.props.updateOperation(id, operation, baseField);
+            this.props.validate();
         },
         initPrices: function () {
             var self = this;
@@ -423,67 +424,68 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 var customer_group_id = price.customer_group_id;
                 var currency_code = price.currency_code;
                 var site_id = price.site_id;
-                var basePrice = _.findWhere(prices, {
-                    'price_type': base_field,
-                    'customer_group_id': customer_group_id,
-                    'currency_code': currency_code,
-                    'site_id': site_id
+
+                var possiblePrices = _.filter(prices, function (p) {
+                    return p.price_type == base_field;
+                });
+
+                if (!possiblePrices) {
+                    return;
+                }
+
+                var basePrice = _.find(possiblePrices, function (p) {
+                    return p['customer_group_id'] == customer_group_id &&
+                        p['currency_code'] == currency_code &&
+                        p['site_id'] == site_id;
                 });
                 if (!basePrice) {
-                    basePrice = _.findWhere(prices, {
-                        'price_type': base_field,
-                        'customer_group_id': null,
-                        'currency_code': currency_code,
-                        'site_id': site_id
+                    basePrice = _.find(possiblePrices, function (p) {
+                        return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
+                            p['currency_code'] == currency_code &&
+                            p['site_id'] == site_id;
                     });
                 }
                 if (!basePrice) {
-                    basePrice = _.findWhere(prices, {
-                        'price_type': base_field,
-                        'customer_group_id': customer_group_id,
-                        'currency_code': null,
-                        'site_id': site_id
+                    basePrice = _.find(possiblePrices, function (p) {
+                        return p['customer_group_id'] == customer_group_id &&
+                            (p['currency_code'] == null || p['currency_code'] == '') &&
+                            p['site_id'] == site_id;
                     });
                 }
                 if (!basePrice) {
-                    basePrice = _.findWhere(prices, {
-                        'price_type': base_field,
-                        'customer_group_id': customer_group_id,
-                        'currency_code': currency_code,
-                        'site_id': null
+                    basePrice = _.find(possiblePrices, function (p) {
+                        return p['customer_group_id'] == customer_group_id &&
+                            p['currency_code'] == currency_code &&
+                            (p['site_id'] == null || p['site_id'] == '');
                     });
                 }
                 if (!basePrice) {
-                    basePrice = _.findWhere(prices, {
-                        'price_type': base_field,
-                        'customer_group_id': null,
-                        'currency_code': null,
-                        'site_id': site_id
+                    basePrice = _.find(possiblePrices, function (p) {
+                        return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
+                            (p['currency_code'] == null || p['currency_code'] == '') &&
+                            p['site_id'] == site_id;
                     });
                 }
                 if (!basePrice) {
-                    basePrice = _.findWhere(prices, {
-                        'price_type': base_field,
-                        'customer_group_id': customer_group_id,
-                        'currency_code': null,
-                        'site_id': null
+                    basePrice = _.find(possiblePrices, function (p) {
+                        return p['customer_group_id'] == customer_group_id &&
+                            (p['currency_code'] == null || p['currency_code'] == '') &&
+                            (p['site_id'] == null || p['site_id'] == '');
                     });
                 }
                 if (!basePrice) {
-                    basePrice = _.findWhere(prices, {
-                        'price_type': base_field,
-                        'customer_group_id': null,
-                        'currency_code': currency_code,
-                        'site_id': null
+                    basePrice = _.find(possiblePrices, function (p) {
+                        return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
+                            p['currency_code'] == currency_code &&
+                            (p['site_id'] == null || p['site_id'] == '');
                     });
                 }
 
                 if (!basePrice) {
-                    basePrice = _.findWhere(prices, {
-                        'price_type': base_field,
-                        'customer_group_id': null,
-                        'currency_code': null,
-                        'site_id': null
+                    basePrice = _.find(possiblePrices, function (p) {
+                        return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
+                            (p['currency_code'] == null || p['currency_code'] == '') &&
+                            (p['site_id'] == null || p['site_id'] == '');
                     });
                 }
 
