@@ -1093,7 +1093,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         if (!empty($data['prices']['productPrice'])) {
             foreach ($data['prices']['productPrice'] as $id => $priceData) {
                 foreach ($priceData as $field => $pf) {
-                    if (in_array($field, ['customer_group_id', 'site_id', 'currency_code']) && !is_numeric($pf)) {
+                    if (in_array($field, ['customer_group_id', 'site_id']) && !is_numeric($pf)) {
+                        $priceData[$field] = null;
+                    }
+
+                    if($field == 'currency_code' && $pf == '*'){
                         $priceData[$field] = null;
                     }
                 }
