@@ -285,7 +285,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         {priceTypes}
                     </td>
                     <td>
-                        <input type="text" className="form-control" name={this.getFieldName(price, "amount")} size="6" title={price['calc_amount']? price['calc_amount']: price['amount']}
+                        <input type="text" className="form-control" name={this.getFieldName(price, "amount")} size="6" onBlur={this.updatePrice} data-type="amount"
                                defaultValue={price['amount']} readOnly={this.editable || this.props.theBase ? null: 'readonly'}/>
                     </td>
                     <td>
