@@ -37,6 +37,8 @@
  * @property Sellvana_Sales_Model_Order_Comment $Sellvana_Sales_Model_Order_Comment
  * @property Sellvana_Sales_Model_Order_History $Sellvana_Sales_Model_Order_History
  * @property Sellvana_Sales_Model_Order_State $Sellvana_Sales_Model_Order_State
+ * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
+ * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
  */
 class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
@@ -48,6 +50,8 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     /** @var Sellvana_Sales_Model_Cart */
     protected $_cart;
+
+    protected $_customer;
 
     protected $_state;
 
@@ -90,6 +94,49 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this->_cart;
     }
 
+    public function customer()
+    {
+        if (!$this->_customer) {
+            if (!$this->get('customer_id')) {
+                return null;
+            }
+            $this->_customer = $this->Sellvana_Customer_Model_Customer->load($this->get('customer_id'));
+        }
+        return $this->_customer;
+    }
+
+    /**
+     * Return the order items
+     * @param boolean $assoc
+     * @return array
+     */
+    public function items($assoc = true)
+    {
+        if (!$this->items) {
+            $this->items = $this->Sellvana_Sales_Model_Order_Item->orm()
+                ->where('order_id', $this->id())->find_many_assoc();
+        }
+        return $assoc ? $this->items : array_values($this->items);
+    }
+
+    public function shipments($assoc = true)
+    {
+        if (!$this->shipments) {
+            $this->shipments = $this->Sellvana_Sales_Model_Order_Shipment->orm()
+                ->where('order_id', $this->id())->find_many_assoc();
+        }
+        return $assoc ? $this->shipments : array_values($this->shipments);
+    }
+
+    public function payments($assoc = true)
+    {
+        if (!$this->payments) {
+            $this->payments = $this->Sellvana_Sales_Model_Order_Payment->orm()
+                ->where('order_id', $this->id())->find_many_assoc();
+        }
+        return $assoc ? $this->payments : array_values($this->payments);
+    }
+
     public function addHistoryEvent($type, $description, $params = null)
     {
         $history = $this->Sellvana_Sales_Model_Order_History->create([
@@ -118,16 +165,6 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this->addressAsObject('shipping');
     }
 
-    /**
-     * Return the order items
-     * @param boolean $assoc
-     * @return array
-     */
-    public function items($assoc = true)
-    {
-        $this->items = $this->Sellvana_Sales_Model_Order_Item->orm()->where('order_id', $this->id)->find_many_assoc();
-        return $assoc ? $this->items : array_values($this->items);
-    }
 
     public function findCustomerOrders($customerId)
     {
@@ -336,6 +373,8 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
         $this->set([
             'payment_method' => $cart->get('payment_method'),
+        ])->setData([
+            'payment_details' => $cart->getData('payment_details'),
         ]);
 
         return $this;

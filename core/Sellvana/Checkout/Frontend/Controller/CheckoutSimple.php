@@ -148,9 +148,6 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
         }
         $this->Sellvana_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
         $this->Sellvana_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
-
-        $this->_cart->calculateTotals()->saveAllDetails();
-
         $this->Sellvana_Sales_Main->workflowAction('customerPlacesOrder', $args);
 
         if (!empty($result['redirect_to'])) {

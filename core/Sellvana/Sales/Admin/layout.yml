@@ -23,6 +23,12 @@ base:
     set: { tab_view_prefix: order/orders-form/ }
     do:
       - [ addTab, main, { label: General Info, pos: 10 } ]
+      - [ addTab, payments, { label: Payments, pos: 20, async: true } ]
+      - [ addTab, shipments, { label: Shipments, pos: 30, async: true } ]
+      - [ addTab, returns, { label: Returns, pos: 40, async: true } ]
+      - [ addTab, refunds, { label: Refunds, pos: 50, async: true } ]
+      - [ addTab, comments, { label: Comments, pos: 80, async: true } ]
+      - [ addTab, history, { label: History, pos: 90, async: true } ]
 
 /header_search:
     - { hook: main, views: 'header-search/Sellvana_Sales_Orders' }
