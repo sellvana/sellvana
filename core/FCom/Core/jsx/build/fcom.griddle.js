@@ -48,28 +48,6 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     break;
             }
         },
-        /*callCallbackFunctions: function (type) {
-            var grid = this.refs[this.props.config.id];
-            //todo: add code to support multi callbacks
-
-            if (typeof this.props.callbacks[type] !== 'undefined') {
-                console.log('grid.callback: ', this.props.callbacks[type]);
-                if (typeof this.props.callbacks[type] === 'function') {
-                    return this.props.callbacks[type](grid);
-                } else {
-                    var funcName = this.props.callbacks[type];
-                    if (typeof window[funcName] === 'function') {
-                        return window[funcName](grid);
-                    }
-                }
-            }
-        },
-        componentDidMount: function () {
-            this.callCallbackFunctions('componentDidMount');
-        },
-        componentDidUpdate: function () {
-            this.callCallbackFunctions('componentDidUpdate');
-        },*/
         render: function () {
             console.log('config', this.props.config);
             var config = this.props.config;
@@ -597,21 +575,27 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
     /**
      * FCom Modal Mass Edit Form
      */
-    var FComModalMassEditForm = React.createClass({displayName: "FComModalMassEditForm",
+    var FComModalMassEditForm = React.createClass({
+        displayName: "FComModalMassEditForm",
         getInitialState: function() {
             var fields = [];
             var shownFields = [];
+            var oneField = false
             _.forEach(this.props.columnMetadata, function(column) {
-                if (column.multirow_edit) {
+                if (column['multirow_edit']) {
                     fields.push(column);
                 }
             });
-            /*if (fields.length == 1) {
-                shownFields.push(fields[0].name);
-            }*/
+
+            if (fields.length == 1) {
+                shownFields = [fields[0].name];
+                oneField = true;
+            }
+
             return {
                 'shownFields': shownFields,
-                'fields': fields
+                'fields': fields,
+                'oneField': oneField
             }
         },
         getDefaultProps: function() {
@@ -624,11 +608,12 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         componentDidMount: function() {
             var that = this;
             var domNode = this.getDOMNode();
-            $(domNode).find('.well select').select2({
+            var select = $(domNode).find('.well select');
+            select.select2({
                 placeholder: "Select a Field",
                 allowClear: true
             });
-            $(domNode).find('.well select').on('change', function(e) {
+            select.on('change', function(e) {
                 that.addField(e);
                 $(this).select2('data', null);
             });
@@ -657,32 +642,41 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             //if (!this.props.editUrl) return null;
             var that = this;
             var gridId = this.props.id;
+            var oneField = this.state.oneField;
 
-            var fieldDropDownNodes = this.state.fields.map(function(column) {
-                if (!_.contains(that.state.shownFields, column.name)) {
-                    return React.createElement("option", {value: column.name}, column.label);
-                }
-                return null;
-            });
-            fieldDropDownNodes.unshift(React.createElement("option", {value: ""}));
+            var fieldDropdownDiv = null;
 
-            var formElements = this.state.shownFields.map(function(fieldName) {
-                var column = _.findWhere(that.state.fields, {name: fieldName});
-                return React.createElement(Components.ModalElement, {column: column, removeFieldDisplay: true, removeFieldHandle: that.removeField})
-            });
+            if (!oneField) {
+                var fieldDropDownNodes = this.state.fields.map(function(column) {
+                    if (!_.contains(that.state.shownFields, column.name)) {
+                        return React.createElement("option", {value: column.name}, column.label);
+                    }
+                    return null;
+                });
+                fieldDropDownNodes.unshift(React.createElement("option", {value: ""}));
 
-            return (
-                React.createElement("div", null, 
-                    React.createElement("div", {className: "well"}, 
-                        React.createElement("div", {className: "row"}, 
-                            React.createElement("div", {className: "col-sm-12"}, 
-                                React.createElement("select", {className: "select2 form-control", id: gridId + '-form-select', style: {width: '150px'}}, 
+                fieldDropdownDiv = (
+                    React.createElement("div", { className: "well" },
+                        React.createElement("div", { className: "row" },
+                            React.createElement("div", { className: "col-sm-12" },
+                                React.createElement("select", { className: "select2 form-control", id: gridId + '-form-select', style: { width: '150px' } },
                                     fieldDropDownNodes
                                 )
                             )
                         )
-                    ), 
-                    React.createElement("form", {className: "form form-horizontal validate-form", id: gridId + '-modal-mass-form'}, 
+                    )
+                );
+            }
+
+            var formElements = this.state.shownFields.map(function(fieldName) {
+                var column = _.findWhere(that.state.fields, {name: fieldName});
+                return React.createElement(Components.ModalElement, {column: column, removeFieldDisplay: !oneField, removeFieldHandle: that.removeField})
+            });
+
+            return (
+                React.createElement("div", null,
+                    fieldDropdownDiv,
+                    React.createElement("form", {className: "form form-horizontal validate-form", id: gridId + '-modal-mass-form'},
                         formElements
                     )
                 )
