@@ -13,7 +13,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 }
             });
             var showFilters = this.props.show_customers || this.props.show_sites || this.props.show_currency;
-            var colspan = 3 + (this.props.show_customers ? 1 : 0) + (this.props.show_sites ? 1 : 0) + (this.props.show_currency ? 1 : 0);
+            var colspan = 4 + (this.props.show_customers ? 1 : 0) + (this.props.show_sites ? 1 : 0) + (this.props.show_currency ? 1 : 0);
 
             return (
                 React.createElement("div", {id: "prices"}, 
@@ -58,7 +58,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                 )
                             ) : null, 
                             React.createElement("td", null), 
-                            React.createElement("td", {colSpan: "3"})
+                            React.createElement("td", {colSpan: "4"})
                         ): null
 
                         ), 
@@ -286,8 +286,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     ), 
                     React.createElement("td", null, 
                         React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"), size: "6", title: price['calc_amount']? price['calc_amount']: price['amount'], 
-                               defaultValue: price['amount'], readOnly: this.editable || this.props.theBase ? null: 'readonly'}), 
-                        price['calc_amount'] ? React.createElement("span", {className: "help-block"}, price['calc_amount']) : null
+                               defaultValue: price['amount'], readOnly: this.editable || this.props.theBase ? null: 'readonly'})
                     ), 
                     React.createElement("td", null, 
                          operation ? {operation:operation} : null, 
@@ -295,6 +294,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     ), 
                     React.createElement("td", null, 
                         [qty, dateRange]
+                    ), 
+                    React.createElement("td", null, 
+                        price['calc_amount'] ? React.createElement("span", {className: "help-block"}, price['calc_amount']) : null
                     )
                 )
             );

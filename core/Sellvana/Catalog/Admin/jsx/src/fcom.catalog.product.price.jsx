@@ -13,7 +13,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 }
             });
             var showFilters = this.props.show_customers || this.props.show_sites || this.props.show_currency;
-            var colspan = 3 + (this.props.show_customers ? 1 : 0) + (this.props.show_sites ? 1 : 0) + (this.props.show_currency ? 1 : 0);
+            var colspan = 4 + (this.props.show_customers ? 1 : 0) + (this.props.show_sites ? 1 : 0) + (this.props.show_currency ? 1 : 0);
 
             return (
                 <div id="prices">
@@ -58,7 +58,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                 </select>
                             </td> : null}
                             <td></td>
-                            <td colSpan="3"></td>
+                            <td colSpan="4"></td>
                         </tr>: null}
 
                         </thead>
@@ -287,7 +287,6 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     <td>
                         <input type="text" className="form-control" name={this.getFieldName(price, "amount")} size="6" title={price['calc_amount']? price['calc_amount']: price['amount']}
                                defaultValue={price['amount']} readOnly={this.editable || this.props.theBase ? null: 'readonly'}/>
-                        {price['calc_amount'] ? <span className="help-block">{price['calc_amount']}</span> : null}
                     </td>
                     <td>
                         { operation ? {operation} : null }
@@ -295,6 +294,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     </td>
                     <td>
                         {[qty, dateRange]}
+                    </td>
+                    <td>
+                        {price['calc_amount'] ? <span className="help-block">{price['calc_amount']}</span> : null}
                     </td>
                 </tr>
             );
