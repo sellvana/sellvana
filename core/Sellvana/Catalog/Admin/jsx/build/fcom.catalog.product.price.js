@@ -201,7 +201,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 });
                 operation =
                         React.createElement("select", {key: "operation", name: this.getFieldName(price, 'operation'), defaultValue: price['operation'], 
-                            ref: "operation", className: "form-control", disabled: price['price_type'] == 'promo'}, 
+                            ref: "operation", className: "form-control", disabled: price['price_type'] == 'promo', onChange: this.updateOperation}, 
                             this.props.operationOptions.map(function (o) {
                                 return React.createElement("option", {value: o.value, key: o.value}, o.label)
                             })
@@ -224,8 +224,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     groups =
                         React.createElement("span", {key: "cuatomer_groups"}, 
                             React.createElement("select", {name: this.getFieldName(price, "customer_group_id"), 
-                                    disabled: this.editable? null: true, 
-                                    defaultValue: price['customer_group_id'], 
+                                    disabled: this.editable? null: true, onChange: this.updatePrice, 
+                                    defaultValue: price['customer_group_id'], "data-type": "customer_group_id", 
                                     className: "form-control customer-group" + (this.editable? " priceUnique": '')}, 
                                 React.createElement("option", {value: "*"}, Locale._("Default")), 
                                 _.map(this.props.customer_groups, function (val, key) {
@@ -240,7 +240,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     sites =
                     React.createElement("span", {key: "sites"}, 
                         React.createElement("select", {name: this.getFieldName(price, "site_id"), disabled: this.editable? null: true, 
-                                defaultValue: price['site_id'], 
+                                defaultValue: price['site_id'], onChange: this.updatePrice, "data-type": "site_id", 
                                 className: "form-control site" + (this.editable? " priceUnique": '')}, 
                             React.createElement("option", {value: "*"}, Locale._("Default")), 
                             _.map(this.props.sites, function (val, key) {
@@ -255,7 +255,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     currencies =
                     React.createElement("span", null, 
                         React.createElement("select", {name: this.getFieldName(price, "currency_code"), disabled: this.editable? null: true, 
-                                defaultValue: price['currency_code'], 
+                                defaultValue: price['currency_code'], onChange: this.updatePrice, "data-type": "currency_code", 
                                 className: "form-control currency" + (this.editable? " priceUnique": '')}, 
                             React.createElement("option", {value: "*"}, Locale._("Default")), 
                             _.map(this.props.currencies, function (val, key) {
@@ -306,26 +306,35 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             //if(this.props.data.operation && this.props.data.operation !== '=$') {
             //    $('select.base_field', this.getDOMNode()).select2({minimumResultsForSearch: 15, width: 'resolve'});
             //}
-            var operation = this.refs['operation'];
-            if (operation) {
-                var self = this;
-                $(operation.getDOMNode()).off("change").on('change', function (e) {
-                    var operation = $(e.target).val();
-                    var id = self.props.data.id;
-
-                    var baseField = null;
-                    if (self.refs['base_fields']) {
-                        baseField = $(self.refs['base_fields'].getDOMNode()).val();
-                    }
-                    self.props.updateOperation(id, operation, baseField);
-                });
-            }
+            //var operation = this.refs['operation'];
+            //if (operation) {
+            //    var self = this;
+            //    $(operation.getDOMNode()).off("change").on('change', function (e) {
+            //        var operation = $(e.target).val();
+            //        var id = self.props.data.id;
+            //
+            //        var baseField = null;
+            //        if (self.refs['base_fields']) {
+            //            baseField = $(self.refs['base_fields'].getDOMNode()).val();
+            //        }
+            //        self.props.updateOperation(id, operation, baseField);
+            //    });
+            //}
             //this.initPrices();
         },
-        componentWillUpdate: function () {
-            //if(this.refs['base_fields']) {
-            //    $(this.refs['base_fields'].getDOMNode()).select2('destroy');
-            //}
+        updatePrice: function (e) {
+            var $el = $(e.target);
+            //console.log($el.data('type'), $el.val());
+            this.props.updatePriceField(this.props.data.id, $el.data('type'), $el.val());
+        },
+        updateOperation: function () {
+            var operation = $(this.refs['operation'].getDOMNode()).val();
+            var id = this.props.data.id;
+            var baseField = null;
+            if (this.refs['base_fields']) {
+                baseField = $(this.refs['base_fields'].getDOMNode()).val();
+            }
+            this.props.updateOperation(id, operation, baseField);
         },
         initPrices: function () {
             var self = this;
@@ -349,20 +358,12 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 }
             }
 
-            if(this.editable || this.props.theBase) {
-                var operation = this.refs['operation'];
-                if (operation) {
-                    $(operation.getDOMNode()).off("change").on('change', function (e) {
-                        var operation = $(e.target).val();
-                        var id = self.props.data.id;
-                        var baseField = null;
-                        if(self.refs['base_fields']) {
-                            baseField = $(self.refs['base_fields'].getDOMNode()).val();
-                        }
-                        self.props.updateOperation(id, operation, baseField);
-                    });
-                }
-            }
+            //if(this.editable || this.props.theBase) {
+            //    var operation = this.refs['operation'];
+            //    if (operation) {
+            //        $(operation.getDOMNode()).off("change").on('change', this.updateOperation);
+            //    }
+            //}
         },
         initDateInput: function () {
             var s = this.props.data['valid_from'], e = this.props.data['valid_to'];
@@ -410,26 +411,92 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
     });
 
     var divStyle = {float: 'left', marginLeft: 15};
-    function renderPrices(options, container) {
+
+    function calculateDynamicPrice(options) {
         var prices = options.prices;
         _.each(prices, function (price) {
+            price.calc_amount = null;
             //console.log(price);
-            if(price.operation && price.operation != '=$') {
+            if (price.operation && price.operation != '=$') {
                 var operation = price.operation;
                 var base_field = price.base_field;
                 var customer_group_id = price.customer_group_id;
                 var currency_code = price.currency_code;
                 var site_id = price.site_id;
-                var basePrice = _.find(prices, function (p) {
-                    if(p === price) {
-                        return false;
-                    }
-
-                    return (p.price_type == base_field && p.customer_group_id == customer_group_id &&
-                    p.currency_code == currency_code && p.site_id == site_id)
+                var basePrice = _.findWhere(prices, {
+                    'price_type': base_field,
+                    'customer_group_id': customer_group_id,
+                    'currency_code': currency_code,
+                    'site_id': site_id
                 });
-                //console.log(basePrice);
-                if(basePrice) {
+                if (!basePrice) {
+                    basePrice = _.findWhere(prices, {
+                        'price_type': base_field,
+                        'customer_group_id': null,
+                        'currency_code': currency_code,
+                        'site_id': site_id
+                    });
+                }
+                if (!basePrice) {
+                    basePrice = _.findWhere(prices, {
+                        'price_type': base_field,
+                        'customer_group_id': customer_group_id,
+                        'currency_code': null,
+                        'site_id': site_id
+                    });
+                }
+                if (!basePrice) {
+                    basePrice = _.findWhere(prices, {
+                        'price_type': base_field,
+                        'customer_group_id': customer_group_id,
+                        'currency_code': currency_code,
+                        'site_id': null
+                    });
+                }
+                if (!basePrice) {
+                    basePrice = _.findWhere(prices, {
+                        'price_type': base_field,
+                        'customer_group_id': null,
+                        'currency_code': null,
+                        'site_id': site_id
+                    });
+                }
+                if (!basePrice) {
+                    basePrice = _.findWhere(prices, {
+                        'price_type': base_field,
+                        'customer_group_id': customer_group_id,
+                        'currency_code': null,
+                        'site_id': null
+                    });
+                }
+                if (!basePrice) {
+                    basePrice = _.findWhere(prices, {
+                        'price_type': base_field,
+                        'customer_group_id': null,
+                        'currency_code': currency_code,
+                        'site_id': null
+                    });
+                }
+
+                if (!basePrice) {
+                    basePrice = _.findWhere(prices, {
+                        'price_type': base_field,
+                        'customer_group_id': null,
+                        'currency_code': null,
+                        'site_id': null
+                    });
+                }
+
+                //var basePrice = _.find(prices, function (p) {
+                //    if(p === price) {
+                //        return false;
+                //    }
+                //
+                //    return (p.price_type == base_field && p.customer_group_id == customer_group_id &&
+                //    p.currency_code == currency_code && p.site_id == site_id)
+                //});
+                console.log(basePrice);
+                if (basePrice) {
                     var result;
                     var value = parseFloat(basePrice.amount);
                     var value2 = parseFloat(price.amount);
@@ -460,6 +527,10 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 }
             }
         });
+    }
+
+    function renderPrices(options, container) {
+        calculateDynamicPrice(options);
         React.render(React.createElement(PricesApp, React.__spread({},  options)), container);
     }
 
@@ -562,7 +633,18 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         price.base_field = base_field || 'base';
                     }
                 });
-                $("#price").find(".to-select2").select2('destroy');
+                renderPrices(this.options, this.options.container[0]);
+            }.bind(this);
+
+            this.options.updatePriceField = function (price_id, field, value) {
+                if(value === '*') {
+                    value = null;
+                }
+                _.each(this.options.prices, function (price) {
+                    if (price.id == price_id) {
+                        price[field] = value;
+                    }
+                });
                 renderPrices(this.options, this.options.container[0]);
             }.bind(this);
 
