@@ -1,0 +1,38 @@
+modules:
+    Sellvana_IndexTank:
+        version: 0.2.1
+        channel: beta
+        translations: { en: en.php }
+        description: "IndexTank API integration"
+        require: { module: { FCom_Core: 0.1.0 } }
+        auto_use: [ bootstrap ]
+        areas:
+            FCom_Admin:
+                auto_use: [ bootstrap, views, layout ]
+                require: { module: { FCom_LibGanon: 0.1.0 } }
+                routing:
+                    - [ /indextank/product_fields, Sellvana_IndexTank_Admin_Controller_ProductFields.index ]
+                    - [ /indextank/product_fields/.action, Sellvana_IndexTank_Admin_Controller_ProductFields ]
+
+                    - [ /indextank/product_functions, Sellvana_IndexTank_Admin_Controller_ProductFunctions.index ]
+                    - [ /indextank/product_functions/.action, Sellvana_IndexTank_Admin_Controller_ProductFunctions ]
+
+                    - [ /indextank/products/index, "Sellvana_IndexTank_Admin::productsIndexStart" ]
+                    - [ /indextank/products/index-pause, "Sellvana_IndexTank_Admin::productsIndexPause" ]
+                    - [ /indextank/products/index-resume, "Sellvana_IndexTank_Admin::productsIndexResume" ]
+                    - [ /indextank/products/indexing-status, "Sellvana_IndexTank_Admin::productsIndexingStatus" ]
+                    #- [ route, GET /indextank/products/index-stop, Sellvana_IndexTank_Admin::productsStopIndexAll ]
+                    - [ route, DELETE /indextank/products/index, "Sellvana_IndexTank_Admin::productsDeleteAll" ]
+                observe:
+                    # on update settings create new index if index was changed
+                    - [ "FCom_Admin_Controller_Settings::action_index__POST", "Sellvana_IndexTank_Admin::onSaveAdminSettings" ]
+
+            FCom_Frontend:
+                auto_use: [ views, layout ]
+                routing:
+                    - [ /indextank/search, Sellvana_IndexTank_Frontend_Controller.search ]
+                observe:
+                    - [ "Sellvana_IndexTank_Index_Product::add", "Sellvana_IndexTank_Index_Product::onProductIndexAdd" ]
+                override:
+                    class:
+                        - [ Sellvana_Catalog_Frontend_Controller_Search, Sellvana_IndexTank_Frontend_Controller ]

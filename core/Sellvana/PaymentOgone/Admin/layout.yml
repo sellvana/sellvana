@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_PaymentOgone, { label: Ogone, group: payment_methods, async: true } ]

@@ -1,0 +1,135 @@
+{% set order = THIS.get('model') %}
+{% set shippingMethod = order.getShippingMethod() %}
+{% set paymentMethod = order.getPaymentMethod() %}
+{% set paymentDetails = order.getData('payment_details/' ~ order.get('payment_method')) %}
+{% set totals = order.getData('totals') %}
+{% set itemsGridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').itemsOrderGridConfig(order) %}
+{% set orderCustomStates = order.state().custom().getAllValueLabels() %}
+{% set orderCustomStates = order.state().custom().getAllValueLabels() %}
+{% set orderCustomStates = order.state().custom().getAllValueLabels() %}
+
+{{ THIS.view('core/geo-embed') | raw }}
+
+<style>
+    .no-gutter { margin-right: 0; margin-left: 0; }
+    .no-gutter [class*="col-"] { padding-right: 0; padding-left: 0; }
+    h4 > i { color:#AAA; }
+</style>
+
+<div class="f-section" id="order-container">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-md-4">
+                    {% if order.get('customer_id') %}
+                        {% set customer = order.customer() %}
+                        <h4><i class="icon-user"></i> {{ 'Customer'|_ }}</h4>
+                        <p><a href="{{ APP.href('customers/form?id=' ~ customer.id()) }}">
+                                <strong>{{ customer.get('firstname') ~ ' ' ~ customer.get('lastname') }}</strong></a></p>
+                        <p><label>{{ 'Email'|_ }}:</label> <strong>{{ order.get('customer_email') }}</strong></p>
+                    {% else %}
+                        <h4><i class="icon-user"></i> {{ 'Guest Checkout'|_ }} <a href="#" id="customer-section-edit-link" class="section-edit-trigger"></a></h4>
+                        <div id="customer-section-view">
+                            <p><label>{{ 'Email'|_ }}:</label> <strong>{{ order.get('customer_email') }}</strong></p>
+                        </div>
+                        <div id="customer-section-edit" hidden>
+                            <input type="text" class="form-control input-sm" name="order[customer_email]" value="{{ order.get('customer_email') }}" placeholder="{{ 'Customer Email' }}">
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <h4><i class="icon-map-marker"></i> {{ 'Shipping'|_ }} <a href="#" id="shipping-section-edit-link" class="section-edit-trigger"></a></h4>
+                    {{ THIS.view('order/orders-form/main/address').set({order:order, type:'shipping'}) | raw}}
+                </div>
+                <div class="col-md-4">
+                    <h4><i class="icon-credit-card"></i> {{ 'Billing'|_ }} <a href="#" id="billing-section-edit-link" class="section-edit-trigger"></a></h4>
+                    {{ THIS.view('order/orders-form/main/address').set({order:order, type:'billing'}) | raw }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <h4><i class="icon-file-text"></i> {{ 'Order'|_ }} <a href="#" id="order-section-edit-link" class="section-edit-trigger"></a></h4>
+                    <div id="order-section-view">
+                        <p><label>{{ 'Overall Status' }}:</label> <strong>{{ order.state().overall().getValueLabel() }}</strong></p>
+                        {% if order.state().custom().getValue() %}
+                            <p><label>{{ 'Custom Status' }}:</label> <strong>{{ order.state().custom().getValueLabel() }}</strong></p>
+                        {% endif %}
+                        <p><label>{{ 'Placed' }}:</label> <strong>{{ order.get('create_at')|date }}</strong></p>
+                        {% if order.get('create_at')|date != order.get('update_at')|date %}
+                            <p><label>{{ 'Updated' }}:</label> <strong>{{ order.get('update_at')|date }}</strong></p>
+                        {% endif %}
+                    </div>
+                    <div id="order-section-edit" hidden>
+                        <select class="form-control input-sm" name="order_state[custom]">
+                            {% if orderCustomStates %}
+                                <option value="">{{ 'Select Custom State...'|_ }}</option>
+                                {{ UTIL.optionsHtml(orderCustomStates, order.state().custom().getValue()) | raw }}
+                            {% else %}
+                                <option value="">{{ 'No Custom Order States Defined'|_ }}</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h4><i class="icon-truck"></i> {{ 'Delivery'|_ }} <a href="#" id="delivery-section-edit-link" class="section-edit-trigger"></a></h4>
+                    <div id="delivery-section-view">
+                        <p><label>{{ 'Status' }}:</label> <strong>{{ order.state().delivery().getValueLabel() }}</strong></p>
+                        <p><strong>{{ shippingMethod.getDescription() }}</strong></p>
+                        <p><label>{{ 'Service Level' }}:</label> <strong>{{ shippingMethod.getService(order.get('shipping_service')) }}</strong></p>
+                    </div>
+                    <div id="delivery-section-edit" hidden>
+
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h4><i class="fa fa-university"></i> {{ 'Payment'|_ }} <a href="#" id="payment-section-edit-link" class="section-edit-trigger"></a></h4>
+                    <div id="payment-section-view">
+                        <p><label>{{ 'Status' }}:</label> <strong>{{ order.state().payment().getValueLabel() }}</strong></p>
+                        <p><strong>{{ paymentMethod.getName() }}</strong></p>
+                        {% if paymentDetails %}
+                            {% for k, v in paymentDetails %}
+                                <p><label>{{ k }}:</label> {{ v }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div id="payment-section-edit" hidden>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <h4><i class="fa fa-info-circle"></i> {{ 'Totals'|_ }}</h4>
+            <table class="table table-bordered table-striped">
+                {% for total in totals %}
+                    <tr><th>{{ total.label }}</th><td style="text-align:right">{{ total.value|currency(total.currency) }}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <h4><i class="icon-list"></i> {{ 'Items'|_ }}</h4>
+    {{ THIS.view('core/backbonegrid').set('grid', itemsGridConfig) | raw }}
+</div>
+
+<script>
+    require(['jquery'], function($) {
+        $('#order-container').find('hidden').find('input,select,textarea').prop('disabled', true);
+        var $triggers = $('.section-edit-trigger'),
+                editTitle = '{{ 'Edit this section'|_ }}', cancelTitle = '{{ 'Cancel changes'|_ }}';
+
+        $triggers.append('<i class="icon-pencil"></i>').prop('title', editTitle);
+        $triggers.click(function(ev) {
+            var $a = $(ev.target).parent(), id = $a.prop('id').replace(/-edit-link$/, ''),
+                $view = $('#' + id + '-view'), $edit = $('#' + id + '-edit'),
+                $icon = $a.find('i'),
+                viewMode = $edit.prop('hidden');
+            $a.prop('title', viewMode ? cancelTitle : editTitle);
+            $icon.toggleClass('icon-pencil icon-eraser');
+            $view.prop('hidden', viewMode);
+            $edit.prop('hidden', !viewMode);
+            $edit.find('input,select,textarea').prop('disabled', !viewMode);
+            return false;
+        });
+    })
+</script>

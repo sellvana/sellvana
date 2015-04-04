@@ -1,0 +1,12 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, seo, { label: Seo, pos: 600, icon_class: icon-user } ]
+            - [ addNav, seo/urlaliases, { label: URL Alias, href: /urlaliases } ]
+/urlaliases:
+    - { include: base }
+    - { view: admin/nav, do: [[ setNav, seo/urlaliases ]] }
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_Seo, { label: SEO, group: catalog, async: true } ]

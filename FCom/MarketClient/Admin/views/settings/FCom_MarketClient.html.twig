@@ -1,9 +1,0 @@
-{% set c = THIS.get('model') %}
-{% set fieldData = { model: c, settings_module:'FCom_MarketClient' } %}
-{% import THIS.view('core/form-elements').twigName() as forms %}
-<h2>{{ "MarketClient Settings"|_}}</h2>
-{{ forms.accordion_start({id:'settings-FCom_Disqus'}) }}
-     {{ forms.accordion_panel_start({label:'API information'|_, id:'settings-FCom_MarketClient-group0', in:1}) }}
-     {{ forms.accordion_panel_end }}
-{{ forms.accordion_end }}
-

@@ -1,0 +1,13 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, sales/tax, { label: Tax } ]
+            - [ addNav, sales/tax/customer-classes, { label: Customer Classes, href: /salestax/customer-classes, pos: 10 } ]
+            - [ addNav, sales/tax/product-classes, { label: Product Classes, href: /salestax/product-classes, pos: 20 } ]
+            - [ addNav, sales/tax/zones, { label: Zones, href: /salestax/zones, pos: 30 } ]
+            - [ addNav, sales/tax/rules, { label: Rules, href: /salestax/rules, pos: 40 } ]
+
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_SalesTax, { label: Sales Tax, group: sales, pos: 20, async: true } ]

@@ -1,0 +1,60 @@
+# Base layout, used in most pages
+base:
+    - { root: root }
+    - { hook: head, views: head }
+    - { hook: before_body_end, views: bottom_scripts }
+    - { view: core/messages, set: { namespace: frontend } }
+
+    - view: head
+        do:
+            - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
+            - [ meta, viewport, "width=device-width, initial-scale=1.0" ]
+            #- [ meta, X-UA-Compatible, IE=100, true ]
+            - [ icon, @FCom_Core/favicon.ico ]
+            - [ css, "//fonts.googleapis.com/css?family=Lato:400,700,900,400italic,700italic,900italic" ]
+            - [ css, "//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" ]
+            - [ css, "@FCom_Frontend/Frontend/css/bootstrap.css" ]
+            - [ css, "@FCom_Core/css/flags.css" ]
+            - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
+            - [ css, "@FCom_Frontend/Frontend/css/fulleron-base.css" ]
+            - [ js, //html5shim.googlecode.com/svn/trunk/html5.js, { if: lt IE 9 } ]
+
+            - [ requireJs, bootstrap, "@FCom_Frontend/Frontend/js/bootstrap", { deps: [ jquery ] } ]
+            - [ requireJs, responsiveslides, "@FCom_Frontend/Frontend/js/vendor/responsiveslides.min", { deps: [ jquery ] } ]
+            - [ requireJs, typeahead, "@FCom_Frontend/Frontend/js/vendor/typeahead.min", { deps: [ jquery ] } ]
+
+            - [ requireJs, fcom.core, "@FCom_Core/js/fcom.core" ]
+            - [ requireJs, fcom.frontend, "@FCom_Frontend/Frontend/js/fcom.frontend" ]
+            - [ requireRun, fcom.frontend ]
+
+    - { view: root, set: { use_container: true } }
+
+    - { include: common_js_libs }
+    - { include: lib_select2 }
+
+    - { callback: FCom_Core_Main.defaultThemeCustomLayout }
+    - { callback: FCom_Frontend_Frontend.layout }
+
+    #- { hook: breadcrumbs, views: breadcrumbs }
+    - { hook: header, views: header }
+    - { hook: header-components, views: [ header-top, header-nav, header-callouts ] }
+    - { hook: header-top-util, views: [ multilanguage/header, multicurrency/header, customer/header, cart/header ] }
+
+    - { hook: footer, views: footer }
+
+404:
+    - { include: base }
+    - { hook: main, views: 404, use_meta: true }
+
+/denied:
+    - { include: base }
+    - { hook: main, views: denied, use_meta: true }
+
+# Homepage
+/:
+    - { include: base }
+    - { view: root, do: [[ addBodyClass, "f-page-home" ]] }
+    - { view: head, do: [[ title, "Home Page" ]] }
+    - { hook: main, views: index, use_meta: true }
+    - { hook: before_body_end, views: custom-tags }
+    - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_homepage } }

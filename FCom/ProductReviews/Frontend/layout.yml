@@ -1,8 +1,0 @@
-base:
-    - view: head
-        do:
-            - [ requireJs, fcom.productreviews, "@FCom_ProductReviews/Frontend/js/fcom.productreviews" ]
-
-/prodreview/form:
-    - { include: base }
-    - { hook: main, views: prodreviews/form }

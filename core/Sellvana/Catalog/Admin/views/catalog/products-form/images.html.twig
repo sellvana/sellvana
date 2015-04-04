@@ -1,0 +1,127 @@
+{% set m = THIS.get('model') %}
+{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
+
+{% set type = 'images' %}
+{% set targetType = 'product' %}
+{% set medialibConfig = {
+id: 'all_' ~ type,
+mode: 'images',
+type: 'product-images',
+title: 'Images',
+folder: 'media/product/images',
+config: {actions: {delete: {caption : 'Remove'}}}
+} %}
+
+{% set attachmentsConfig = {
+type: type,
+targetType: targetType,
+elementContainer: '#tab-images',
+medialibConfig: medialibConfig,
+gridConfig: prodImagesConfig
+} %}
+{% set combineType = targetType ~ type %}
+{#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
+
+{{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}
+
+<script>
+    $(document).ready(function() {
+        var id = "{{ m.id }}";
+        var url = "{{ formUrl }}?id="+id+"&tabs=variants";
+        {# load variants tab before update image list when add image for product #}
+        if (typeof(updateListVariantImage) != "function") {
+            $.getJSON(url, function (data, status, req) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-variants').html(tabHtml).data('loaded', true);
+                    $('#tab-variants' + ' .collapse').collapse();
+                });
+            });
+        }
+    });
+    window.afterBuiltImagesGrid = function(grid) {
+        console.log('after build image grid');
+        //bind remove event
+        grid.getRows().bind('remove', function(row) {
+            console.log('remove row', row);
+            var image = [];
+            image.push({
+                file_id: row.get('file_id'),
+                subfolder: row.get('subfolder'),
+                file_name: row.get('file_name')
+            });
+            if (typeof(updateListVariantImage) == "function") {
+                updateListVariantImage({
+                    add: false,
+                    image: image
+                });
+            }
+        })
+    };
+    window.afterAddImages = function (grid) {
+        var image = [];
+        grid.getSelectedRows().forEach(function (row) {
+            image.push({
+                file_id: row.get('file_id'),
+                subfolder: row.get('subfolder'),
+                file_name: row.get('file_name')
+            });
+        });
+        if (typeof(updateListVariantImage) == "function") {
+            updateListVariantImage({
+                add: true,
+                image: image
+            });
+        }
+    };
+    window.afterMassDelete = function() {
+        var image = [];
+        {{ combineType }}Grid.getSelectedRows().forEach(function (row) {
+            image.push({
+                file_id: row.get('file_id'),
+                subfolder: row.get('subfolder'),
+                file_name: row.get('file_name')
+            });
+        });
+        if (typeof(updateListVariantImage) == "function") {
+            updateListVariantImage({
+                add: false,
+                image: image
+            });
+        }
+    };
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
+        var file_error = [];
+        $('#quick-add-images').fileupload({
+            url: uploadUrl,
+            multiple:true,
+            autoUpload: true
+        }).bind('fileuploadalways', function(e, data) {
+            if ($.isArray(data.result.files)) {
+                data.result.files.forEach(function (obj) {
+                    if (!obj.error) {
+                        var newRow = obj;
+                        newRow.selected = true;
+                        {{ medialibConfig.id }}_grid.getSelectedRows().add(obj);
+                        {{ medialibConfig.id }}_grid.getRows().add(newRow,{merge: true}).trigger('render');
+                        $('#{{ medialibConfig.id }}').find('td.name span').each(function(i) {
+                            if($(this).html() === obj.file_name)
+                                $(this).parents('tr:first').remove();
+                        });
+                        //trigger add
+                        $('.btn_' + '{{ medialibConfig.id }}' + '_add').trigger('click');
+                    }
+                    else {
+                        file_error.push(obj.file_name);
+                    }
+                });
+            }
+        })
+                .bind('fileuploadstop', function(e, data) {
+                    if (file_error.join(',') != '') {
+                        alert('Illegal file extension: ' + file_error.join(','));
+                        file_error = [];
+                    }
+                });
+    });
+</script>

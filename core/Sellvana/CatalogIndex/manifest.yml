@@ -1,0 +1,29 @@
+modules:
+    Sellvana_CatalogIndex:
+        version: 0.2.2
+        channel: beta
+        require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_CustomField: 0.1.4 } }
+        description: "Catalog search and facets indexing engine"
+        auto_use: [ bootstrap, views, layout ]
+        observe:
+            - [ "Sellvana_Catalog_Model_Product::onAfterSave", "Sellvana_CatalogIndex_Main::onProductAfterSave" ]
+            - [ "Sellvana_Catalog_Model_Product::import:before", "Sellvana_CatalogIndex_Main::onProductBeforeImport" ]
+            - [ "Sellvana_Catalog_Model_Product::import:after", "Sellvana_CatalogIndex_Main::onProductAfterImport" ]
+            - [ "Sellvana_Catalog_Model_Category::onAfterSave:products", "Sellvana_CatalogIndex_Main::onCategoryAfterSave" ]
+            - [ "Sellvana_CustomField_Model_Field::onAfterSave", "Sellvana_CatalogIndex_Main::onCustomFieldAfterSave" ]
+        default_config:
+            modules/Sellvana_CatalogIndex/show_root_categories: 1
+            modules/Sellvana_CatalogIndex/show_sibling_categories: 1
+        areas:
+            FCom_Admin:
+                routing:
+                    - [ /catalogindex/?.action, Sellvana_CatalogIndex_Admin_Controller ]
+                    - [ /catalogindex/fields, Sellvana_CatalogIndex_Admin_Controller_Fields.index ]
+                    - [ /catalogindex/fields/.action, Sellvana_CatalogIndex_Admin_Controller_Fields ]
+
+            FCom_Frontend:
+                routing:
+                    - [ /catalogindex/search, Sellvana_CatalogIndex_Frontend_Controller.search ]
+                override:
+                    class:
+                        - [ Sellvana_Catalog_Frontend_Controller_Search, Sellvana_CatalogIndex_Frontend_Controller ]

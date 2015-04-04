@@ -1,0 +1,14 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, catalog/index-fields, { label: Products Indexing, href: /catalogindex/fields } ]
+
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_CatalogIndex, { label: Catalog Index, group: catalog, async: true } ]
+
+/catalogindex/fields:
+     - { include: base }
+     - { hook: main, views: fields }
+     - { view: admin/nav, do: [[ setNav, catalog/index-fields ]] }

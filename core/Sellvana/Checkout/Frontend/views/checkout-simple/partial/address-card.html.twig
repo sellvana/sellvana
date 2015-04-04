@@ -1,0 +1,8 @@
+{% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set type = THIS.get('address_type') %}
+{% set addr = cart.addressAsArray(type) %}
+
+{{ cart.fullName(type) }}<br>
+{{ cart.addressAsHtml(type) | raw }}
+{% if addr.phone %}{{ 'Phone: %s'|_(addr.phone) }}<br>{% endif %}
+{% if addr.fax %}{{ 'Fax: %s'|_(addr.fax) }}<br>{% endif %}

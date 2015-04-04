@@ -1,0 +1,4 @@
+{% set m = THIS.get('model') %}
+{% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').returnsGridConfig(m) %}
+
+{{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }}

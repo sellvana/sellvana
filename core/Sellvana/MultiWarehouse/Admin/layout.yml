@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_MultiWarehouse, { label: Multi Warehouse, group: catalog, pos: 100, async: true } ]

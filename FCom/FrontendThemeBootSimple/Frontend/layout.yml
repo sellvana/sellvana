@@ -1,5 +1,0 @@
-base:
-    - view: head
-        do:
-            - [ css, "@FCom_FrontendThemeBootSimple/Frontend/css/fulleron-theme.css" ]
-

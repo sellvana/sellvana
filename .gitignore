@@ -19,3 +19,6 @@ index.local.php
 composer.*
 notes.txt
 FCom/Test/Test/Unit/buckyball/com/db_test_config.php
+
+#nodejs: cache folder when build jsx -> js
+.module-cache

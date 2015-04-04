@@ -1,0 +1,24 @@
+{% set m = THIS.get('model') %}
+{% set prodAttachConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
+
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+{% set type = 'attachments' %}
+{% set targetType = 'product' %}
+{% set medialibConfig = {
+    id: 'all_' ~ type,
+    type: 'product-attachments',
+    config: {actions: {delete: {caption : 'Remove'}}}
+} %}
+
+{% set attachmentsConfig = {
+    type: type,
+    targetType: targetType,
+    elementContainer: '#tab-attachments',
+    medialibConfig: medialibConfig,
+    gridConfig: prodAttachConfig
+} %}
+
+{#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
+
+{{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}

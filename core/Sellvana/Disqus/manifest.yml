@@ -1,0 +1,23 @@
+modules:
+    Sellvana_Disqus:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0 } }
+        translations: { en: en.php }
+        description: Embed Disqus comments on any page
+        auto_use: [ views ]
+        load_after: [ Sellvana_Catalog ]
+
+        areas:
+            FCom_Frontend:
+                auto_use: [ layout ]
+                #observe:
+                    #- [ BLayout::loadTheme:after, Sellvana_Disqus_Frontend::layout ]
+
+            FCom_Admin:
+                security:
+                    request_fields_whitelist:
+                        /settings:
+                            POST/config/modules/Sellvana_Disqus/comments_code: "*"
+                            POST/config/modules/Sellvana_Disqus/counts_code: "*"
+

@@ -1,0 +1,14 @@
+{# TODO: split functionality to relevant modules #}
+{% set c = THIS.get('model') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldDataCustomer = { model: c, settings_module:'Sellvana_Customer' } %}
+{% set fieldDataSales = { model: c, settings_module:'Sellvana_Sales' } %}
+{% set fieldDataProductReviews = { model: c, settings_module:'Sellvana_ProductReviews' } %}
+<h2>{{ "Push Server Settings"|_ }}</h2>
+{{ forms.accordion_start({id:'settings-FCom_PushServer'}) }}
+     {{ forms.accordion_panel_start({label:'Sales Notification'|_, id:'settings-FCom_PushServer-group0', in:1}) }}
+        {#{{ forms.boolean(fieldDataSales, {field:'neworder_realtime_notification', label:'Order'|_ }) }}#}
+        {#{{ forms.boolean(fieldDataProductReviews, {field:'newreview_realtime_notification', label:'Product Review'|_ }) }}#}
+        {#{{ forms.boolean(fieldDataCustomer, {field:'newcustomer_realtime_notification', label:'Customer'|_ }) }}#}
+     {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

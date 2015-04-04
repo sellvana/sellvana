@@ -1,0 +1,16 @@
+modules:
+    Sellvana_PaymentStripe:
+        version: 0.1.0
+        require: { module: { Sellvana_Sales: 0.3.0 } }
+        auto_use: [ bootstrap ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+
+        default_config:
+            api_url: "https://api.stripe.com"
+            test: true
