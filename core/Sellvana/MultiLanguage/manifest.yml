@@ -9,6 +9,8 @@ modules:
         areas:
             FCom_Frontend:
                 auto_use: [ views, bootstrap ]
+                routing:
+                    - [ /language/switch/:locale, Sellvana_MultiLanguage_Frontend_Controller.switch ]
                 observe:
                     - [ "Sellvana_Catalog_Model_Product::find_many:after", Sellvana_MultiLanguage_Main.productCollectionLoadLocale ]
                     - [ "Sellvana_Catalog_Model_Product::find_one:after", Sellvana_MultiLanguage_Main.productLoadLocale ]

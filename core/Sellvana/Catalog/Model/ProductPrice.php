@@ -127,7 +127,18 @@ class Sellvana_Catalog_Model_ProductPrice
             $orm->where('currency_code', $currency_code);
         }
 
-        $prices = $orm->order_by_asc("(case tp.price_type
+        $modHlp = $this->BModuleRegistry;
+        if ($modHlp->isLoaded('Sellvana_MultiSite')) {
+            $orm->order_by_asc('(ifnull(customer_group_id,0))');
+        }
+        if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
+            $orm->order_by_asc('(ifnull(site_id,0))');
+        }
+        if ($modHlp->isLoaded('Sellvana_MultiCurrency')) {
+            $orm->order_by_asc("(ifnull(currency_code,''))");
+        }
+
+        $priceModels = $orm->order_by_asc("(case tp.price_type
             when 'base'  then 1
             when 'cost'  then 2
             when 'map'   then 3
@@ -147,7 +158,8 @@ class Sellvana_Catalog_Model_ProductPrice
         //    }
         //}
 
-        return $prices? $this->BDb->many_as_array($prices): [];
+        $prices = $priceModels ? $this->BDb->many_as_array($priceModels) : [];
+        return $prices;
     }
 
     /**

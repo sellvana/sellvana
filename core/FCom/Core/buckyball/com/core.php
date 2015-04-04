@@ -435,8 +435,10 @@ class BApp extends BClass
 
     public function href($url = '', $full = true, $method = self::USE_CONFIG)
     {
-        return $this->BApp->baseUrl($full, $method)
-               . $this->BRouting->processHref($url);
+        $baseUrl = $this->BApp->baseUrl($full, $method);
+        $url = $this->BRouting->processHref($url);
+        $this->BEvents->fire(__METHOD__, ['url' => &$url]);
+        return $baseUrl . $url;
     }
 
     public function adminHref($url = '')
@@ -455,7 +457,9 @@ class BApp extends BClass
             }
             $baseAdminHref = rtrim($adminHref, '/') . '/';
         }
-        return $baseAdminHref . ltrim($url, '/');
+        $url = $this->BRouting->processHref($url);
+        $this->BEvents->fire(__METHOD__, ['url' => &$url]);
+        return $baseAdminHref . $url;
     }
 
     public function frontendHref($url = '')
@@ -477,7 +481,9 @@ class BApp extends BClass
             }
             $baseStoreHref = rtrim($storeHref, '/') . '/';
         }
-        return $baseStoreHref . ltrim($url, '/');
+        $url = $this->BRouting->processHref($url);
+        $this->BEvents->fire(__METHOD__, ['url' => &$url]);
+        return $baseStoreHref . $url;
     }
 
     /**
@@ -2075,10 +2081,10 @@ class BSession extends BClass
             $this->data =& $_SESSION[$namespace];
         }
 
-        if (empty($this->data['_language'])) {
-            $lang = $this->BRequest->language();
+        if (empty($this->data['current_language'])) {
+            $lang = $this->BRequest->language(true);
             if (!empty($lang)) {
-                $this->data['_language'] = $lang;
+                $this->data['current_language'] = $lang;
             }
         }
 

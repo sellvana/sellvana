@@ -1,9 +1,16 @@
+{% set hlp = APP.instance('Sellvana_MultiCurrency_Main') %}
+{% set currencies = hlp.getAvailableCurrencies() %}
+{% set current = hlp.getCurrentCurrency() %}
 
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-    <span class="glyphicon glyphicon-usd"></span><span class="f-header-util-links-label">$ USD <b class="caret"></b></span></a>
-  <ul class="dropdown-menu">
-    <li><a href="#" rel="nofollow">$ - USD</a></li>
-    <li><a href="#" rel="nofollow">&euro; - EUR</a></li>
-  </ul>
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <span class="f-header-util-links-label">{{ current }} - {{ LOCALE.getSymbol(current) }} <b class="caret"></b></span>
+    </a>
+    <ul class="dropdown-menu">
+        {% for c in currencies %}
+            {% if c != current %}
+                <li><a href="{{ APP.href('currency/switch/' ~ c) }}" rel="nofollow">{{ c }} - {{ LOCALE.getSymbol(c) }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
 </li>

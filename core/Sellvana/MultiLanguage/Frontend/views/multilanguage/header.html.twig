@@ -1,11 +1,18 @@
-<!--
+{% set allLanguages = LOCALE.getAvailableLanguages() %}
+{% set allowedLocales = APP.instance('Sellvana_MultiLanguage_Main').getAllowedLocales() %}
+{% set current = LOCALE.getCurrentLocale() %}
+{% set localeArr = current|split('_') %}
+
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-    <span class="glyphicon glyphicon-globe"></span><span class="f-header-util-links-label"><b class="flag
-    flag-gb"></b> {{"English"|_}} <b class="caret"></b></span></a>
-  <ul class="dropdown-menu">
-    <li><a href="#" rel="nofollow"><b class="flag flag-gb"></b> {{"English"|_}}</a></li>
-    <li><a href="#" rel="nofollow"><b class="flag flag-es"></b> {{"German"|_}}</a></li>
-  </ul>
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <span class="f-header-util-links-label"><b class="flag flag-{{ localeArr[1]|lower }}"></b> {{ allLanguages[localeArr[0]] }} <b class="caret"></b></span>
+    </a>
+    <ul class="dropdown-menu">
+        {% for l in allowedLocales %}
+            {% if l != current %}
+                {% set lArr = l|split('_') %}
+                <li><a href="{{ APP.href('language/switch/' ~ l) }}" rel="nofollow"><b class="flag flag-{{ lArr[1]|lower }}"></b> {{ allLanguages[lArr[0]] }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
 </li>
--->

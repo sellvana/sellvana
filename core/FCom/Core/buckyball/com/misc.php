@@ -1444,6 +1444,9 @@ class BUtil extends BClass
             $default = (string)$default;
         }
         $htmlArr = [];
+        if (!$options) {
+            return '';
+        }
         foreach ($options as $k => $v) {
             $k = (string)$k;
             if (is_array($v) && $k !== '' && $k[0] === '@') { // group
