@@ -437,7 +437,7 @@ class BApp extends BClass
     {
         $baseUrl = $this->BApp->baseUrl($full, $method);
         $url = $this->BRouting->processHref($url);
-        $this->BEvents->fire(__METHOD__, ['url' => &$url]);
+        #$this->BEvents->fire(__METHOD__, ['url' => &$url]);
         return $baseUrl . $url;
     }
 
@@ -458,7 +458,7 @@ class BApp extends BClass
             $baseAdminHref = rtrim($adminHref, '/') . '/';
         }
         $url = $this->BRouting->processHref($url);
-        $this->BEvents->fire(__METHOD__, ['url' => &$url]);
+        #$this->BEvents->fire(__METHOD__, ['url' => &$url]);
         return $baseAdminHref . $url;
     }
 
@@ -482,7 +482,7 @@ class BApp extends BClass
             $baseStoreHref = rtrim($storeHref, '/') . '/';
         }
         $url = $this->BRouting->processHref($url);
-        $this->BEvents->fire(__METHOD__, ['url' => &$url]);
+        #$this->BEvents->fire(__METHOD__, ['url' => &$url]);
         return $baseStoreHref . $url;
     }
 

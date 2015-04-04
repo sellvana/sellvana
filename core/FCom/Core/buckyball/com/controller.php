@@ -2238,7 +2238,7 @@ class BRouteNode extends BClass
 
     public function __destruct()
     {
-        unset($this->_observers, $this->_children, $this->_match);
+        unset($this->_observers);
     }
 }
 
