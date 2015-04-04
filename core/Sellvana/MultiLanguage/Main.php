@@ -22,7 +22,7 @@ class Sellvana_MultiLanguage_Main extends BClass
 
     public function getAllowedLocales()
     {
-        $localesConf = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales');
+        $localesConf = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales', []);
         return array_combine($localesConf, $localesConf);
     }
 

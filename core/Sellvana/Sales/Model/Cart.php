@@ -388,7 +388,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 $itemData = array_merge($itemData, [
                     'inventory_id' => $skuModel->id(),
                     'pack_separate' => $skuModel->get('pack_separate'),
-                    'shipping_weight' => $skuModel->get('shipping_weight'),
+                    'shipping_weight' => $skuModel->get('shipping_weight') ?: $product->get('ship_weight'),
                     'shipping_size' => $skuModel->get('shipping_size'),
                     'cost' => $skuModel->get('unit_cost'),
                 ]);
