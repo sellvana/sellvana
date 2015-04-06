@@ -1216,6 +1216,7 @@ class BLocale extends BClass
     public function roundCurrency($value, $decimals = 2)
     {
         //TODO: currency specific number of digits
-        return number_format($value, $decimals);
+        $precision = pow(10, $decimals);
+        return round($value * $precision) / $precision;
     }
 }

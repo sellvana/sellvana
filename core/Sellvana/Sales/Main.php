@@ -267,7 +267,7 @@ class Sellvana_Sales_Main extends BClass
 
     public function onSwitchCurrency($args)
     {
-        $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
+        $cart = $this->Sellvana_Sales_Model_Cart->sessionCart(true);
         $cart->setStoreCurrency($args['new_currency'])->calculateTotals()->saveAllDetails();
     }
 }
