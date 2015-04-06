@@ -6,6 +6,18 @@
  */
 class Sellvana_MultiCurrency_Main extends BClass
 {
+    static protected $_rates;
+
+    public function switchCurrency($newCurrency)
+    {
+        $currencies = $this->getAvailableCurrencies();
+        if (in_array($newCurrency, $currencies)) {
+            $oldCurrency = $this->BSession->get('current_currency');
+            $this->BSession->set('current_currency', $newCurrency);
+            $this->BEvents->fire(__METHOD__, ['old_currency' => $oldCurrency, 'new_currency' => $newCurrency]);
+        }
+        return $this;
+    }
 
     public function getAvailableCurrencies()
     {
@@ -30,7 +42,8 @@ class Sellvana_MultiCurrency_Main extends BClass
             throw new BException('Could not retrieve rates because App ID is not configured');
         }
         $baseCur = $this->BConfig->get('modules/FCom_Core/base_currency', 'USD');
-        $url = 'https://openexchangerates.org/api/latest.json?app_id=' . $appId . '&base=' . $baseCur;
+        $url = $this->BUtil->setUrlQuery('https://openexchangerates.org/api/latest.json',
+            ['app_id' => $appId, 'base' => $baseCur]);
         $response = $this->BUtil->remoteHttp('GET', $url);
         if (!$response) {
             throw new BException('Invalid OpenExchangeRates response: ' . $response);
@@ -49,5 +62,54 @@ class Sellvana_MultiCurrency_Main extends BClass
         $this->BConfig->set('modules/Sellvana_MultiCurrency/exchange_rates', join("\n", $rates), false, true);
         $this->BConfig->writeConfigFiles('local');
         return $this;
+    }
+
+    public function getAvailableRates()
+    {
+        if (null === static::$_rates) {
+            $ratesConfig = $this->BConfig->get('modules/Sellvana_MultiCurrency/exchange_rates');
+            if (!$ratesConfig) {
+                static::$_rates = [];
+                return null;
+            }
+            $baseCurrency = $this->BConfig->get('modules/FCom_Core/base_currency');
+            $ratesArr = explode("\n", $ratesConfig);
+            foreach ($ratesArr as $r) {
+                list($cur, $rate) = explode(':', $r, 2) + [null];
+                if ($cur && is_numeric($rate)) {
+                    static::$_rates[$baseCurrency][$cur] = $rate;
+                }
+            }
+        }
+        return static::$_rates;
+    }
+
+    public function getRate($toCurrency = null, $fromCurrency = null)
+    {
+        static $rateCache = [];
+
+        $baseCurrency = $this->BConfig->get('modules/FCom_Core/base_currency');
+        if (null === $fromCurrency || true === $fromCurrency) {
+            $fromCurrency = $baseCurrency;
+        }
+        if (null === $toCurrency || true === $toCurrency) {
+            $toCurrency = $this->getCurrentCurrency();
+        }
+        $rates = $this->getAvailableRates();
+        if (!empty($rates[$fromCurrency][$toCurrency])) {
+            return $rates[$fromCurrency][$toCurrency];
+        }
+        if (empty($rates[$baseCurrency][$toCurrency])) {
+            return null;
+        }
+        $rate = $rates[$baseCurrency][$toCurrency];
+        if ($fromCurrency === $baseCurrency) {
+            return $rate;
+        }
+        $baseRate = $this->getRate($fromCurrency);
+        if (!$baseRate) {
+            return null;
+        }
+        return $rate / $baseRate;
     }
 }

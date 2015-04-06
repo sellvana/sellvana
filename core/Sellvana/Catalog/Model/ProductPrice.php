@@ -9,6 +9,8 @@
  * @property float $base_price
  * @property float $sale_price
  * @property int   $qty
+ *
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Catalog_Model_ProductPrice
     extends FCom_Core_Model_Abstract
@@ -365,11 +367,20 @@ class Sellvana_Catalog_Model_ProductPrice
         return (null === $from || $from <= $date) && (null === $to || $to >= $date);
     }
 
-    public function getPrice($basePrice = null)
+    public function getPrice($basePrice = null, $currency = null)
     {
         $op = $this->get('operation');
+
         if (!$op || '=$' === $op) {
-            return $this->get('amount');
+            $amount = $this->get('amount');
+            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+                $rate = $this->Sellvana_MultiCurrency_Main->getRate($currency, $this->get('currency_code'));
+                if ($rate && $rate != 1) {
+                    $amount *= $rate;
+                }
+            }
+            $amount = $this->BLocale->roundCurrency($amount);
+            return $amount;
         }
 
         if (!$this->_product) {
@@ -390,10 +401,14 @@ class Sellvana_Catalog_Model_ProductPrice
             if (!$baseModel) {
                 return null;
             }
-            $basePrice = $baseModel->getPrice();
+            $basePrice = $baseModel->getPrice(null, $currency);
         }
 
-        return $this->applyPriceOperation($basePrice, $this->get('amount'), $op);
+        $amount = $this->applyPriceOperation($basePrice, $this->get('amount'), $op);
+
+        $amount = $this->BLocale->roundCurrency($amount);
+
+        return $amount;
     }
 
     public function parseAndSaveDefaultPrices(Sellvana_Catalog_Model_Product $product)

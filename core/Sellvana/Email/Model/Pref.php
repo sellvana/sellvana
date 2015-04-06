@@ -72,12 +72,4 @@ class Sellvana_Email_Model_Pref extends FCom_Core_Model_Abstract
         }
         return false;
     }
-
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = $this->BDb->now();
-        $this->update_at = $this->BDb->now();
-        return true;
-    }
 }

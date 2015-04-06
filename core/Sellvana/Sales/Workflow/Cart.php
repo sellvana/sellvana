@@ -29,6 +29,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
             'cookie_token' => (string)$cookieToken,
         ]);
         $cart->state()->overall()->setActive();
+        $cart->setStoreCurrency();
 
         if ($customer) {
             $cart->set([
@@ -171,7 +172,6 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
             $p = $item['product'] = $products[$item['id']];
             $item['details'] = [
                 'qty' => $item['qty'],
-                'price' => $p->getCatalogPrice(),
                 'product_id' => $p->id(),
                 'product_sku' => $p->get('product_sku'),
                 'inventory_id' => $p->get('inventory_id'),

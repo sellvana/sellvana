@@ -1271,18 +1271,30 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      *
      * @param boolean|array $context
      * @return mixed
+     *
+     * @todo assume $context true when null, or when components null - same for ProductPrice::getPrice()
      */
     public function getCatalogPrice($context = true)
     {
+        if (is_array($context) && !empty($context['currency_code']) && $context['currency_code'] !== true) {
+            $currency = $context['currency_code'];
+        } else {
+            $currency = null;
+        }
         $priceModel = $this->getPriceModelByType('base', $context);
-        $price = $priceModel ? $priceModel->getPrice() : 0;
+        $price = $priceModel ? $priceModel->getPrice(null, $currency) : 0;
 
         $salePriceModel = $this->getPriceModelByType('sale', $context);
         if ($salePriceModel && $salePriceModel->isValid()) {
-            $price = min($price, $salePriceModel->getPrice());
+            $price = min($price, $salePriceModel->getPrice(null, $currency));
         }
 
-        $this->BEvents->fire(__METHOD__, ['product' => $this, 'context' => $context, 'price' => &$price]);
+        $this->BEvents->fire(__METHOD__, [
+            'product' => $this,
+            'context' => $context,
+            'currency' => $currency,
+            'price' => &$price,
+        ]);
 
         return $price;
     }
@@ -1390,6 +1402,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function variantPrice($itemPrice, $variant_id)
     {
+        //TODO: implement
         return $itemPrice;
     }
 
