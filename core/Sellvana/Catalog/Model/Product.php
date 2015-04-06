@@ -45,7 +45,7 @@
  * @property Sellvana_CustomField_Model_FieldOption  $Sellvana_CustomField_Model_FieldOption
  * @property Sellvana_CustomField_Model_ProductField $Sellvana_CustomField_Model_ProductField
  * @property Sellvana_ProductReviews_Model_Review    $Sellvana_ProductReviews_Model_Review
- * @property Sellvana_MultiSite_Main                 $Sellvana_MultiSite_Main
+ * @property Sellvana_MultiSite_Frontend             $Sellvana_MultiSite_Frontend
  * @property Sellvana_MultiCurrency_Main             $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
@@ -1213,8 +1213,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $modHlp = $this->BModuleRegistry;
             $siteId = false;
             if ($modHlp->isLoaded('Sellvana_MultiSite')) {
-                $site = $this->Sellvana_MultiSite_Main->getCurrentSiteData();
-                $siteId = $site ? $site['id'] : false;
+                $site = $this->Sellvana_MultiSite_Frontend->getCurrentSite();
+                $siteId = $site ? $site->id() : false;
             }
             if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
                 $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
