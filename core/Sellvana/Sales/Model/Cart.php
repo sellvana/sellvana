@@ -40,6 +40,7 @@
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Sales_Model_Cart_Item $Sellvana_Sales_Model_Cart_Item
  * @property Sellvana_Sales_Model_Cart_State $Sellvana_Sales_Model_Cart_State
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
@@ -342,7 +343,11 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $params['qty'] = intval($params['qty']);
 
         if (empty($params['price']) || !is_numeric($params['price'])) {
-            $params['price'] = 0;
+            $params['price'] = $product->getCatalogPrice([
+                'currency_code' => $this->BConfig->get('modules/FCom_Core/base_currency'),
+                'site_id' => true,
+                'customer_group_id' => true,
+            ]);
         }
 
         $hash = !empty($params['signature']) ? $this->calcItemSignatureHash($params['signature']) : null;
@@ -388,7 +393,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 $itemData = array_merge($itemData, [
                     'inventory_id' => $skuModel->id(),
                     'pack_separate' => $skuModel->get('pack_separate'),
-                    'shipping_weight' => $skuModel->get('shipping_weight'),
+                    'shipping_weight' => $skuModel->get('shipping_weight') ?: $product->get('ship_weight'),
                     'shipping_size' => $skuModel->get('shipping_size'),
                     'cost' => $skuModel->get('unit_cost'),
                 ]);
@@ -783,7 +788,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 $services[$serviceCode] = [
                     'value' => $methodCode . ':' . $serviceCode,
                     'title' => $serviceTitle,
-                    'price' => $serviceRate['price'],
+                    'price' => $this->convertToStoreCurrency($serviceRate['price']),
                     'max_days' => $serviceRate['max_days'],
                     'selected' => $selMethod == $methodCode && $selService == $serviceCode,
                 ];
@@ -816,6 +821,32 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
+    public function setStoreCurrency($currency = null)
+    {
+        if (null === $currency) {
+            $currency = $this->BSession->get('current_currency');
+            if (!$currency) {
+                $currency = $this->BConfig->get('modules/FCom_Core/default_currency');
+            }
+        }
+        $this->set('store_currency_code', $currency);
+        return $this;
+    }
+
+    public function convertToStoreCurrency($amount)
+    {
+        $baseCurrency = $this->BConfig->get('modules/FCom_Core/base_currency');
+        $storeCurrency = $this->get('store_currency_code');
+        if ($storeCurrency === $baseCurrency || !$this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+            return $amount;
+        }
+        $rate = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
+        if ($rate) {
+            $amount *= $rate;
+        }
+        $amount = $this->BLocale->roundCurrency($amount);
+        return $amount;
+    }
 
     public function __destruct()
     {

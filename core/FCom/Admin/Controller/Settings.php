@@ -33,7 +33,11 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
                 ]);
             }
         }
-        $this->processFormTabs($view, $this->BConfig);
+        $model = $this->BConfig;
+
+        $this->BEvents->fire(__METHOD__, ['model' => &$model]);
+
+        $this->processFormTabs($view, $model);
 #echo "<pre>"; var_dump($view);echo "</pre>"; exit;
     }
 
@@ -43,18 +47,23 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         try {
             $post = $this->BRequest->post();
 
-            $this->BEvents->fire(__METHOD__, ['post' => &$post]);
-            $this->BConfig->add($post['config'], true);
+            $skipDefaultHandler = false;
 
-            if (!empty($post['config']['db'])) {
-                try {
-                    $this->BDb->connect();
-                    //$this->BConfig->writeConfigFiles('db');
-                } catch (Exception $e) {
-                    $this->message('Invalid DB configuration, not saved: ' . $e->getMessage(), 'error');
+            $this->BEvents->fire(__METHOD__, ['post' => &$post, 'skip_default_handler' => &$skipDefaultHandler]);
+
+            if (!$skipDefaultHandler) {
+                $this->BConfig->add($post['config'], true);
+
+                if (!empty($post['config']['db'])) {
+                    try {
+                        $this->BDb->connect();
+                        //$this->BConfig->writeConfigFiles('db');
+                    } catch (Exception $e) {
+                        $this->message('Invalid DB configuration, not saved: ' . $e->getMessage(), 'error');
+                    }
                 }
+                $this->BConfig->writeConfigFiles();
             }
-            $this->BConfig->writeConfigFiles();
 
             if (!$xhr) {
                 $this->message('Settings updated');
@@ -103,7 +112,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         $this->BResponse->json("success");
     }
 
-    public function getAllMode()
+    public function getAllModes()
     {
         return [
           BDebug::MODE_DEBUG => BDebug::MODE_DEBUG,

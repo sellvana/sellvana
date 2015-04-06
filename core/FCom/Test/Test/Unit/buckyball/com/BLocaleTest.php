@@ -5,8 +5,8 @@ class BLocale_Test extends PHPUnit_Framework_TestCase
     public function testSetLanguage()
     {
         $lang = 'de_DE';
-        BLocale::i()->setCurrentLanguage($lang);
-        $this->assertEquals($lang, BLocale::i()->getCurrentLanguage());
+        BLocale::i()->setCurrentLocale($lang);
+        $this->assertEquals($lang, BLocale::i()->getCurrentLocale());
     }
 
     public function testTransliterateAlgorithm()

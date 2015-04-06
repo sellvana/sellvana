@@ -1,19 +1,20 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Class Sellvana_Catalog_Frontend_Controller
+ * Class Sellvana_Catalog_Frontend_Controller_Product
+ *
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  */
-class Sellvana_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
+class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Controller_Abstract
 {
-    public function action_product()
+    public function action_index()
     {
         $layout = $this->BLayout;
         $crumbs = ['home'];
-        $p = $this->BRequest->params('product');
+        $p = $this->BRequest->param('product');
         if ($p === '' || is_null($p)) {
             $this->forward(false);
             return $this;
@@ -28,14 +29,14 @@ class Sellvana_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abst
             return $this;
         }
         $this->layout('/catalog/product');
-        $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller::action_product:product', ['product' => &$product]);
+        $this->BEvents->fire(__METHOD__ . ':product', ['product' => &$product]);
         $this->BApp->set('current_product', $product);
 
         $viewName = 'catalog/product/details';
         $layout->view($viewName)->set('product', $product);
         $head = $layout->view('head');
 
-        $categoryPath = $this->BRequest->params('category');
+        $categoryPath = $this->BRequest->param('category');
         if ($categoryPath) {
             $category = $this->Sellvana_Catalog_Model_Category->load($categoryPath, 'url_path');
             /** @var Sellvana_Catalog_Model_Category $category */
@@ -81,7 +82,7 @@ class Sellvana_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abst
         }
     }
 
-    public function action_product__POST()
+    public function action_index__POST()
     {
         $r = explode('/', $this->BRequest->param('product'));
         $href = $r[0];
@@ -98,11 +99,11 @@ class Sellvana_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abst
         $eventArgs = ['product' => &$product, 'qty' => $post['qty']];
 
         if (!empty($post['add2cart'])) {
-            $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller::action_product:addToCart', $eventArgs);
+            $this->BEvents->fire(__METHOD__ . ':addToCart', $eventArgs);
         }
 
         if (!empty($post['add2wishlist'])) {
-            $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller::action_product:addToWishlist', $eventArgs);
+            $this->BEvents->fire(__METHOD__ . ':addToWishlist', $eventArgs);
         }
 
 

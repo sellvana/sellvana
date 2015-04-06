@@ -252,11 +252,11 @@ class BRequest extends BClass
         return substr($toplang, 0, 2);
     }
 
-    public function language()
+    public function language($fallbackToBrowser = false)
     {
         if (null === static::$_language) {
             $this->rawPath();
-            if (null === static::$_language) {
+            if (null === static::$_language && $fallbackToBrowser) {
                 static::$_language = $this->acceptLanguage();
             }
         }
@@ -441,9 +441,11 @@ class BRequest extends BClass
             $basename = basename($this->scriptName());
             $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
 
-            if ($this->BConfig->get('web/language_in_url') && preg_match('#^/([a-z]{2})(/.*|$)#', $path, $match)) {
-                static::$_language = $match[1];
-                $path = $match[2];
+            $re = '#^/(([a-z]{2})(_[A-Z]{2})?)(/.*|$)#';
+            if ($this->BConfig->get('web/language_in_url') && preg_match($re, $path, $match)) {
+                static::$_language = $match[2];
+                $this->BLocale->setCurrentLocale($match[1]);
+                $path = $match[4];
             }
 
             if (!$path) {
@@ -2236,7 +2238,7 @@ class BRouteNode extends BClass
 
     public function __destruct()
     {
-        unset($this->_observers, $this->_children, $this->_match);
+        unset($this->_observers);
     }
 }
 

@@ -12,7 +12,7 @@ modules:
                 routing:
                     - [ "/wishlist/?.action", Sellvana_Wishlist_Frontend_Controller ]
                 observe:
-                    - [ "Sellvana_Catalog_Frontend_Controller::action_product:addToWishlist", "Sellvana_Wishlist_Frontend_Controller::onAddToWishlist" ]
+                    - [ "Sellvana_Catalog_Frontend_Controller_Product::action_index__POST:addToWishlist", "Sellvana_Wishlist_Frontend_Controller::onAddToWishlist" ]
                     - [ "Sellvana_Customer_Model_Customer::login:after", "Sellvana_Wishlist_Model_Wishlist::onUserLogin" ]
 
         default_config:

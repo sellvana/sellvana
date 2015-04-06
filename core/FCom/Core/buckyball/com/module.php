@@ -1098,7 +1098,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     protected function _processTranslations()
     {
         //load translations
-        $language = $this->BSession->get('_language');
+        $language = $this->BSession->get('current_language');
         if (!empty($language) && !empty($this->translations[$language])) {
             /*
             if (!is_array($this->translations[$language])) {

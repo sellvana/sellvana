@@ -9,6 +9,8 @@
  * @property float $base_price
  * @property float $sale_price
  * @property int   $qty
+ *
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Catalog_Model_ProductPrice
     extends FCom_Core_Model_Abstract
@@ -127,7 +129,18 @@ class Sellvana_Catalog_Model_ProductPrice
             $orm->where('currency_code', $currency_code);
         }
 
-        $prices = $orm->order_by_asc("(case tp.price_type
+        $modHlp = $this->BModuleRegistry;
+        if ($modHlp->isLoaded('Sellvana_MultiSite')) {
+            $orm->order_by_asc('(ifnull(customer_group_id,0))');
+        }
+        if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
+            $orm->order_by_asc('(ifnull(site_id,0))');
+        }
+        if ($modHlp->isLoaded('Sellvana_MultiCurrency')) {
+            $orm->order_by_asc("(ifnull(currency_code,''))");
+        }
+
+        $priceModels = $orm->order_by_asc("(case tp.price_type
             when 'base'  then 1
             when 'cost'  then 2
             when 'map'   then 3
@@ -147,7 +160,8 @@ class Sellvana_Catalog_Model_ProductPrice
         //    }
         //}
 
-        return $prices? $this->BDb->many_as_array($prices): [];
+        $prices = $priceModels ? $this->BDb->many_as_array($priceModels) : [];
+        return $prices;
     }
 
     /**
@@ -353,11 +367,20 @@ class Sellvana_Catalog_Model_ProductPrice
         return (null === $from || $from <= $date) && (null === $to || $to >= $date);
     }
 
-    public function getPrice($basePrice = null)
+    public function getPrice($basePrice = null, $currency = null)
     {
         $op = $this->get('operation');
+
         if (!$op || '=$' === $op) {
-            return $this->get('amount');
+            $amount = $this->get('amount');
+            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+                $rate = $this->Sellvana_MultiCurrency_Main->getRate($currency, $this->get('currency_code'));
+                if ($rate && $rate != 1) {
+                    $amount *= $rate;
+                }
+            }
+            $amount = $this->BLocale->roundCurrency($amount);
+            return $amount;
         }
 
         if (!$this->_product) {
@@ -378,10 +401,14 @@ class Sellvana_Catalog_Model_ProductPrice
             if (!$baseModel) {
                 return null;
             }
-            $basePrice = $baseModel->getPrice();
+            $basePrice = $baseModel->getPrice(null, $currency);
         }
 
-        return $this->applyPriceOperation($basePrice, $this->get('amount'), $op);
+        $amount = $this->applyPriceOperation($basePrice, $this->get('amount'), $op);
+
+        $amount = $this->BLocale->roundCurrency($amount);
+
+        return $amount;
     }
 
     public function parseAndSaveDefaultPrices(Sellvana_Catalog_Model_Product $product)

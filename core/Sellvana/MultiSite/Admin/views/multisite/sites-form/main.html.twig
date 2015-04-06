@@ -5,12 +5,10 @@
 {% set validator = THIS.get('validator') %}
 {% set fieldData = {validator: validator} %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
-<fieldset>
-    {{ forms.input(fieldData, {field: 'name'|_, required: 1, label: "Name"}) }}
-    {{ forms.textarea(fieldData, {field: 'match_domains'|_, rows: 2, label: "Domains"}) }}
-    {{ forms.input(fieldData, {field: 'default_theme'|_, label: "Default Theme"}) }}
-    {{ forms.textarea(fieldData, {field: 'layout_update'|_, rows: 5, label: "Layout Update"}) }}
-    {{ forms.textarea(fieldData, {field: 'meta_title'|_, rows: 5, label: "Meta Title"}) }}
-    {{ forms.textarea(fieldData, {field: 'meta_description'|_, rows: 5, label: "Meta Description"}) }}
-    {{ forms.textarea(fieldData, {field: 'meta_keywords'|_, rows: 5, label: "Meta Keywords"}) }}
+
+<fieldset name="main-product">
+    <div class="f-section">
+        {{ forms.input(fieldData, {field: 'name'|_, required: 1, label: "Name"}) }}
+        {{ forms.textarea(fieldData, {field: 'match_domains'|_, rows: 2, label: "Domains"}) }}
+    </div>
 </fieldset>

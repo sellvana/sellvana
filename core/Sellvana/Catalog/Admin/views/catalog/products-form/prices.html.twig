@@ -21,7 +21,7 @@
 {% set loadCurrency = MODULES.isLoaded('Sellvana_MultiCurrency') %}
 
 {% if loadCurrency %}
-    {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').curencyOptions() %}
+    {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').getAvailableCurrencies() %}
 {% endif %}
 
 <fieldset name="product-prices">

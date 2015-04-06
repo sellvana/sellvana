@@ -1,0 +1,2 @@
+base:
+    - { callback: Sellvana_MultiSite_Frontend.onBaseLayout }

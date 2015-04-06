@@ -103,7 +103,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         }
 
         list($language) = explode('_', $locale);
-        $this->BSession->set('_locale', $locale)->set('_language', $language);
+        $this->BSession->set('current_locale', $locale)->set('current_language', $language);
 
         $redirectUrl = $req->request('redirect_to');
         if (!$redirectUrl) {

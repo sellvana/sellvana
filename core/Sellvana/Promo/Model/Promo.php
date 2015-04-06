@@ -22,21 +22,20 @@
  * @property string $update_at
  * @property string $coupon
  *
- * @property Sellvana_Promo_Model_PromoCart     $Sellvana_Promo_Model_PromoCart
- * @property Sellvana_Promo_Model_PromoMedia    $Sellvana_Promo_Model_PromoMedia
- * @property FCom_Core_Model_MediaLibrary   $FCom_Core_Model_MediaLibrary
- * @property Sellvana_Promo_Model_PromoProduct  $Sellvana_Promo_Model_PromoProduct
- * @property Sellvana_Customer_Model_Customer   $Sellvana_Customer_Model_Customer
- * @property Sellvana_MultiSite_Main            $Sellvana_MultiSite_Main
- * @property Sellvana_Promo_Model_PromoCoupon   $Sellvana_Promo_Model_PromoCoupon
+ * @property Sellvana_Promo_Model_PromoCart         $Sellvana_Promo_Model_PromoCart
+ * @property Sellvana_Promo_Model_PromoMedia        $Sellvana_Promo_Model_PromoMedia
+ * @property FCom_Core_Model_MediaLibrary           $FCom_Core_Model_MediaLibrary
+ * @property Sellvana_Customer_Model_Customer       $Sellvana_Customer_Model_Customer
+ * @property Sellvana_MultiSite_Frontend            $Sellvana_MultiSite_Frontend
+ * @property Sellvana_Promo_Model_PromoCoupon       $Sellvana_Promo_Model_PromoCoupon
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
- * @property Sellvana_Promo_Model_PromoDisplay $Sellvana_Promo_Model_PromoDisplay
- * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
- * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
- * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
- * @property Sellvana_Promo_Main $Sellvana_Promo_Main
- * @property Sellvana_CustomField_Main $Sellvana_CustomField_Main
+ * @property Sellvana_Promo_Model_PromoDisplay      $Sellvana_Promo_Model_PromoDisplay
+ * @property Sellvana_Catalog_Model_Product         $Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_ProductPrice    $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_Catalog_Model_InventorySku    $Sellvana_Catalog_Model_InventorySku
+ * @property Sellvana_Catalog_Model_Category        $Sellvana_Catalog_Model_Category
+ * @property Sellvana_Promo_Main                    $Sellvana_Promo_Main
+ * @property Sellvana_CustomField_Main              $Sellvana_CustomField_Main
  */
 class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
 {
@@ -176,9 +175,9 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         }
 
         if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
-            $siteData = $this->Sellvana_MultiSite_Main->getCurrentSiteData();
-            if ($siteData) {
-                $orm->where_raw('FIND_IN_SET(?, site_ids)', [$siteData['id']]);
+            $site = $this->Sellvana_MultiSite_Frontend->getCurrentSite();
+            if ($site) {
+                $orm->where_raw('FIND_IN_SET(?, site_ids)', [$site->id()]);
             }
         }
 
