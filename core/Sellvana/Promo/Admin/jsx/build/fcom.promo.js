@@ -1551,7 +1551,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
     }
 
     function action(React, $, Components, Common, Locale) {
-        var divStyle = {float: left, marginLeft: 5};
+        var divStyle = {float: 'left', marginLeft: 5};
         var Type = React.createClass({displayName: "Type",
             render: function () {
                 var cls = this.props.select2 ? "to-select2 " : "";
@@ -2426,7 +2426,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             getInitialState: function () {
                 return {
                     value: 0,
-                    type: '',
+                    type: '-%',
                     scope: 'cond_prod',
                     sku: [],
                     combination: {}
