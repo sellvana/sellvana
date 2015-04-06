@@ -296,7 +296,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         [qty, dateRange]
                     ), 
                     React.createElement("td", null, 
-                        price['calc_amount'] ? React.createElement("span", {className: "help-block"}, price['calc_amount']) : null
+                        price['calc_amount'] ? React.createElement("span", {className: "help-block"}, price['calc_amount'].toFixed(2)) : null
                     )
                 )
             );
