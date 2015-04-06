@@ -45,7 +45,7 @@
  * @property Sellvana_CustomField_Model_FieldOption  $Sellvana_CustomField_Model_FieldOption
  * @property Sellvana_CustomField_Model_ProductField $Sellvana_CustomField_Model_ProductField
  * @property Sellvana_ProductReviews_Model_Review    $Sellvana_ProductReviews_Model_Review
- * @property Sellvana_MultiSite_Main                 $Sellvana_MultiSite_Main
+ * @property Sellvana_MultiSite_Frontend             $Sellvana_MultiSite_Frontend
  * @property Sellvana_MultiCurrency_Main             $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
@@ -151,7 +151,16 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function urlPrefix()
     {
         if (empty(static::$_urlPrefix)) {
-            static::$_urlPrefix = $this->BConfig->get('modules/Sellvana_Catalog/url_prefix');
+            $prefix = $this->BConfig->get('modules/Sellvana_Catalog/url_prefix');
+            switch ($this->BConfig->get('web/language_in_url')) {
+                case 'lang':
+                    $prefix .= $this->BLocale->getCurrentLanguage() . '/';
+                    break;
+                case 'locale':
+                    $prefix .= $this->BLocale->getCurrentLocale() . '/';
+                    break;
+            }
+            static::$_urlPrefix = $prefix;
         }
         return static::$_urlPrefix;
     }
@@ -1204,8 +1213,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $modHlp = $this->BModuleRegistry;
             $siteId = false;
             if ($modHlp->isLoaded('Sellvana_MultiSite')) {
-                $site = $this->Sellvana_MultiSite_Main->getCurrentSiteData();
-                $siteId = $site ? $site['id'] : false;
+                $site = $this->Sellvana_MultiSite_Frontend->getCurrentSite();
+                $siteId = $site ? $site->id() : false;
             }
             if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
                 $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
@@ -1262,18 +1271,30 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      *
      * @param boolean|array $context
      * @return mixed
+     *
+     * @todo assume $context true when null, or when components null - same for ProductPrice::getPrice()
      */
     public function getCatalogPrice($context = true)
     {
+        if (is_array($context) && !empty($context['currency_code']) && $context['currency_code'] !== true) {
+            $currency = $context['currency_code'];
+        } else {
+            $currency = null;
+        }
         $priceModel = $this->getPriceModelByType('base', $context);
-        $price = $priceModel ? $priceModel->getPrice() : 0;
+        $price = $priceModel ? $priceModel->getPrice(null, $currency) : 0;
 
         $salePriceModel = $this->getPriceModelByType('sale', $context);
         if ($salePriceModel && $salePriceModel->isValid()) {
-            $price = min($price, $salePriceModel->getPrice());
+            $price = min($price, $salePriceModel->getPrice(null, $currency));
         }
 
-        $this->BEvents->fire(__METHOD__, ['product' => $this, 'context' => $context, 'price' => &$price]);
+        $this->BEvents->fire(__METHOD__, [
+            'product' => $this,
+            'context' => $context,
+            'currency' => $currency,
+            'price' => &$price,
+        ]);
 
         return $price;
     }
@@ -1381,6 +1402,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function variantPrice($itemPrice, $variant_id)
     {
+        //TODO: implement
         return $itemPrice;
     }
 

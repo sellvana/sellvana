@@ -20,14 +20,14 @@
     <td class="f-cart-col-price text-right">
         <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
             <span class="f-reg-price">
-                <span class="f-price">{{ item.price | currency }}</span>
+                <span class="f-price">{{ item.getPriceFormatted() }}</span>
             </span>
         </div>
     </td>
     <td class="f-cart-col-total text-right">
         <div class="f-price-group">
             <span class="f-reg-price">
-                <span class="f-price">{{ item.row_total | currency }}</span>
+                <span class="f-price">{{ item.getRowTotalFormatted() }}</span>
             </span>
         </div>
     </td>

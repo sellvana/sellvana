@@ -264,5 +264,11 @@ class Sellvana_Sales_Main extends BClass
     {
         $this->workflowAction('customerLogsOut', $args);
     }
+
+    public function onSwitchCurrency($args)
+    {
+        $cart = $this->Sellvana_Sales_Model_Cart->sessionCart(true);
+        $cart->setStoreCurrency($args['new_currency'])->calculateTotals()->saveAllDetails();
+    }
 }
 

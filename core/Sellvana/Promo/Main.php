@@ -93,7 +93,8 @@ class Sellvana_Promo_Main extends BClass
                 if ($baseField && $baseField !== 'catalog') {
                     $priceModel = $product->getPriceModelByType($baseField, $context);
                     if ($priceModel) {
-                        $finalPrice = $priceModel->getPrice();
+                        $currency = !empty($context['currency_code']) ? $context['currency_code'] : null;
+                        $finalPrice = $priceModel->getPrice(null, $currency);
                     }
                 }
                 $finalPrice = $pm->getPrice($finalPrice);

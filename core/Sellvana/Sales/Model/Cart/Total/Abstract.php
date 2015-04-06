@@ -16,6 +16,7 @@ abstract class Sellvana_Sales_Model_Cart_Total_Abstract extends BClass implement
     protected $_cartField;
     protected $_value = 0;
     protected $_currency;
+    protected $_storeCurrencyValue = 0;
 
     /**
      * @param Sellvana_Sales_Model_Cart $cart
@@ -24,7 +25,7 @@ abstract class Sellvana_Sales_Model_Cart_Total_Abstract extends BClass implement
     public function init($cart)
     {
         $this->_cart = $cart;
-        $this->_currency = $this->_cart->get('cart_currency');
+        $this->_currency = $this->_cart->get('store_currency_code');
         if (!$this->_configPath) {
             $this->_configPath = 'modules/Sellvana_Sales/cart_totals/' . $this->_code;
         }
@@ -93,12 +94,20 @@ abstract class Sellvana_Sales_Model_Cart_Total_Abstract extends BClass implement
         return $this->_cartField ? $this->_cart->get($this->_cartField) : $this->_value;
     }
 
+    public function getStoreCurrencyValue($calculated = false)
+    {
+        if ($calculated) {
+            return $this->_storeCurrencyValue;
+        }
+        return $this->_cartField ? $this->_cart->getData('store_currency/' . $this->_cartField) : $this->_storeCurrencyValue;
+    }
+
     /**
      * @return string
      */
     public function getValueFormatted()
     {
-        return $this->BLocale->currency($this->getValue());
+        return $this->BLocale->currency($this->getStoreCurrencyValue());
     }
 
     /**

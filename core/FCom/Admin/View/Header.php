@@ -108,7 +108,7 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
      */
     public function getCurrentLocale()
     {
-        $locale = $this->BSession->get('_locale');
+        $locale = $this->BSession->get('current_locale');
 #echo "<pre>"; var_dump($locale); exit;
         if (!$locale) {
             $locale = $this->BConfig->get('modules/FCom_Admin/default_locale');

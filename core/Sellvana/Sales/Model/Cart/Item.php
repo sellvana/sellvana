@@ -25,6 +25,7 @@
  *
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 {
@@ -87,9 +88,10 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     /**
      * @return mixed
      */
-    public function calcRowTotal()
+    public function calcRowTotal($forStoreCurrency = false)
     {
-        return $this->get('price') * $this->get('qty');
+        $price = $forStoreCurrency ? $this->getData('store_currency/price') : $this->get('price');
+        return $price * $this->get('qty');
     }
 
     /**
@@ -142,6 +144,24 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     public function getQty()
     {
         return $this->get('qty');
+    }
+
+    public function getPriceFormatted()
+    {
+        $amount = $this->getData('store_currency/price');
+        if (!$amount) {
+            $amount = $this->get('price');
+        }
+        return $this->BLocale->currency($amount);
+    }
+
+    public function getRowTotalFormatted()
+    {
+        $amount = $this->getData('store_currency/row_total');
+        if (!$amount) {
+            $amount = $this->get('row_total');
+        }
+        return $this->BLocale->currency($amount);
     }
 
     public function calcUniqueHash($signature)

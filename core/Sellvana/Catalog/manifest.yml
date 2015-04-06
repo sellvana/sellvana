@@ -59,11 +59,11 @@ modules:
 
             FCom_Frontend:
                 routing:
-                    - [ /*category, Sellvana_Catalog_Frontend_Controller_Search.category ]
-                    - [ /catalog/search, Sellvana_Catalog_Frontend_Controller_Search.search ]
-                    - [ /catalog/quickview, Sellvana_Catalog_Frontend_Controller.quickview ]
-                    - [ "/:product", Sellvana_Catalog_Frontend_Controller.product ]
-                    - [ "/*category/:product", Sellvana_Catalog_Frontend_Controller.product ]
+                    - [ /*category, Sellvana_Catalog_Frontend_Controller_Category.index ]
+                    - [ /catalog/search, Sellvana_Catalog_Frontend_Controller_Search.index ]
+                    - [ "/:product", Sellvana_Catalog_Frontend_Controller_Product.index ]
+                    - [ "/*category/:product", Sellvana_Catalog_Frontend_Controller_Product.index ]
+                    - [ /catalog/quickview, Sellvana_Catalog_Frontend_Controller_Product.quickview ]
 
                 observe:
                     - [ "Sellvana_FrontendCP_Frontend_Controller::action_update:after", "Sellvana_Catalog_Frontend_ControlPanel::onAfterUpdate" ]

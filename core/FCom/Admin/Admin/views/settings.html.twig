@@ -1,4 +1,5 @@
-{% set formUrl = APP.href("settings") %}
+{% set site = REQUEST.get('site') %}
+{% set formUrl = APP.href("settings" ~ (site ? '?site=' ~ site)) %}
 
 <script type="text/javascript">
 
@@ -185,7 +186,7 @@
         </div>
         <div class="col-md-3">
             <select class="form-control select-mode">
-                {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Controller_Settings').getAllMode())|raw }}
+                {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Controller_Settings').getAllModes())|raw }}
             </select>
         </div>
 	<div class="col-md-6">
@@ -208,8 +209,9 @@
     <form id="settings-form" class="form form-horizontal" action="{{ formUrl }}" method="post">
         <div class="page-header f-admin-page-header">
             <h1 class="f-page-title">
-                <i class="icon-cog"></i>
+                <i class="fa fa-cog"></i>
                 <span>{{ "Settings" |_ }}</span>
+                {{ THIS.hook('settings_header_title') | raw }}
             </h1>
             <div class="btn-group">
                 <button class="btn btn-primary" type="submit">{{ "Save All" |_ }}</button>

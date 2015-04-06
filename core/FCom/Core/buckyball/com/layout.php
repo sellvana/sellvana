@@ -832,7 +832,7 @@ class BLayout extends BClass
             }
             $d['type'] = trim($d['type']);
             if (empty($d['type']) || empty(static::$_metaDirectives[$d['type']])) {
-                BDebug::error('Unknown directive: ' . $d['type']);
+                BDebug::error('Unknown directive: ' . print_r($d, 1));
                 continue;
             }
             if (empty($d['name']) && !empty($d[1])) {

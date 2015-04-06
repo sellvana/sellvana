@@ -14,22 +14,24 @@ class Sellvana_MultiLanguage_Main extends BClass
 
     public function bootstrap()
     {
-        $lang = $this->getLanguage();
-        if (!empty($lang)) {
-            $this->BSession->set('_language', $lang);
-        }
         $this->FCom_Admin_Model_Role->createPermission([
             'translations' => 'Translations',
         ]);
 
     }
 
+    public function getAllowedLocales()
+    {
+        $localesConf = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales', []);
+        return array_combine($localesConf, $localesConf);
+    }
+
     /**
      * @return null|string
      */
-    protected function getLanguage()
+    protected function _getLanguage()
     {
-        return $this->BRequest->request("lang");
+        return $this->BRequest->request("lang", $this->BLocale->getCurrentLanguage());
     }
 
     /**
@@ -75,7 +77,7 @@ class Sellvana_MultiLanguage_Main extends BClass
      */
     public function modelLoadLocale($args, $entityType)
     {
-        $lang = $this->getLanguage();
+        $lang = $this->_getLanguage();
         if (!$lang || !($args['result'] instanceof BModel)) { // should instance check be more strict?
             return false;
         }
@@ -100,7 +102,7 @@ class Sellvana_MultiLanguage_Main extends BClass
      * @throws BException
      */
     public function modelCollectionLoadLocale($args, $entityType) {
-        $lang = $this->getLanguage();
+        $lang = $this->_getLanguage();
         if (!$lang || count($args['result']) == 0) {
             return false;
         }

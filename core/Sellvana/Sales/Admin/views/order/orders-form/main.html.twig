@@ -13,6 +13,7 @@
 <style>
     .no-gutter { margin-right: 0; margin-left: 0; }
     .no-gutter [class*="col-"] { padding-right: 0; padding-left: 0; }
+    h4 > i { color:#AAA; }
 </style>
 
 <div class="f-section" id="order-container">
@@ -22,12 +23,12 @@
                 <div class="col-md-4">
                     {% if order.get('customer_id') %}
                         {% set customer = order.customer() %}
-                        <h4>{{ 'Customer'|_ }}</h4>
+                        <h4><i class="icon-user"></i> {{ 'Customer'|_ }}</h4>
                         <p><a href="{{ APP.href('customers/form?id=' ~ customer.id()) }}">
                                 <strong>{{ customer.get('firstname') ~ ' ' ~ customer.get('lastname') }}</strong></a></p>
                         <p><label>{{ 'Email'|_ }}:</label> <strong>{{ order.get('customer_email') }}</strong></p>
                     {% else %}
-                        <h4>{{ 'Guest Checkout'|_ }} <a href="#" id="customer-section-edit-link" class="section-edit-trigger"></a></h4>
+                        <h4><i class="icon-user"></i> {{ 'Guest Checkout'|_ }} <a href="#" id="customer-section-edit-link" class="section-edit-trigger"></a></h4>
                         <div id="customer-section-view">
                             <p><label>{{ 'Email'|_ }}:</label> <strong>{{ order.get('customer_email') }}</strong></p>
                         </div>
@@ -37,17 +38,17 @@
                     {% endif %}
                 </div>
                 <div class="col-md-4">
-                    <h4>{{ 'Shipping'|_ }} <a href="#" id="shipping-section-edit-link" class="section-edit-trigger"></a></h4>
+                    <h4><i class="icon-map-marker"></i> {{ 'Shipping'|_ }} <a href="#" id="shipping-section-edit-link" class="section-edit-trigger"></a></h4>
                     {{ THIS.view('order/orders-form/main/address').set({order:order, type:'shipping'}) | raw}}
                 </div>
                 <div class="col-md-4">
-                    <h4>{{ 'Billing'|_ }} <a href="#" id="billing-section-edit-link" class="section-edit-trigger"></a></h4>
+                    <h4><i class="icon-credit-card"></i> {{ 'Billing'|_ }} <a href="#" id="billing-section-edit-link" class="section-edit-trigger"></a></h4>
                     {{ THIS.view('order/orders-form/main/address').set({order:order, type:'billing'}) | raw }}
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <h4>{{ 'Order'|_ }} <a href="#" id="order-section-edit-link" class="section-edit-trigger"></a></h4>
+                    <h4><i class="icon-file-text"></i> {{ 'Order'|_ }} <a href="#" id="order-section-edit-link" class="section-edit-trigger"></a></h4>
                     <div id="order-section-view">
                         <p><label>{{ 'Overall Status' }}:</label> <strong>{{ order.state().overall().getValueLabel() }}</strong></p>
                         {% if order.state().custom().getValue() %}
@@ -70,7 +71,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <h4>{{ 'Delivery'|_ }} <a href="#" id="delivery-section-edit-link" class="section-edit-trigger"></a></h4>
+                    <h4><i class="icon-truck"></i> {{ 'Delivery'|_ }} <a href="#" id="delivery-section-edit-link" class="section-edit-trigger"></a></h4>
                     <div id="delivery-section-view">
                         <p><label>{{ 'Status' }}:</label> <strong>{{ order.state().delivery().getValueLabel() }}</strong></p>
                         <p><strong>{{ shippingMethod.getDescription() }}</strong></p>
@@ -81,7 +82,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <h4>{{ 'Payment'|_ }} <a href="#" id="payment-section-edit-link" class="section-edit-trigger"></a></h4>
+                    <h4><i class="fa fa-university"></i> {{ 'Payment'|_ }} <a href="#" id="payment-section-edit-link" class="section-edit-trigger"></a></h4>
                     <div id="payment-section-view">
                         <p><label>{{ 'Status' }}:</label> <strong>{{ order.state().payment().getValueLabel() }}</strong></p>
                         <p><strong>{{ paymentMethod.getName() }}</strong></p>
@@ -98,7 +99,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <h4>{{ 'Totals'|_ }}</h4>
+            <h4><i class="fa fa-info-circle"></i> {{ 'Totals'|_ }}</h4>
             <table class="table table-bordered table-striped">
                 {% for total in totals %}
                     <tr><th>{{ total.label }}</th><td style="text-align:right">{{ total.value|currency(total.currency) }}</td></tr>
@@ -107,7 +108,7 @@
         </div>
     </div>
 
-    <h4>{{ 'Items'|_ }}</h4>
+    <h4><i class="icon-list"></i> {{ 'Items'|_ }}</h4>
     {{ THIS.view('core/backbonegrid').set('grid', itemsGridConfig) | raw }}
 </div>
 
