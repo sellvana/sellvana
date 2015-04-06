@@ -38,14 +38,17 @@ class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart
         list($selMethod, $selService) = $this->_findSelectedMethodService($rates);
 
         $this->_value = $selMethod && $selService ? $rates[$selMethod][$selService]['price'] : 0;
+        $this->_storeCurrencyValue = $this->_cart->convertToStoreCurrency($this->_value);
 
         $cart->set([
             'shipping_method' => $selMethod,
             'shipping_service' => $selService,
             'shipping_price' => $this->_value,
-        ]);
+        ])->setData('store_currency/shipping_price', $this->_storeCurrencyValue);
 
-        $this->_cart->getTotalByType('grand_total')->addComponent($this->_value, 'shipping');
+        /** @var Sellvana_Sales_Model_Cart_Total_GrandTotal $grandTotalModel */
+        $grandTotalModel = $this->_cart->getTotalByType('grand_total');
+        $grandTotalModel->addComponent('shipping', $this->_value, $this->_storeCurrencyValue);
 
         return $this;
     }

@@ -61,6 +61,8 @@ modules:
                     sales_email: support@example.com
                     default_tz: "America/New_York"
                     default_country: US
+                    base_currency: USD
+                    default_currency: USD
                     import_export:
                         batch_size: 10
                         delete_after_import: 1

@@ -125,6 +125,8 @@ class Sellvana_Sales_Migrate extends BClass
                 'shipping_country' => 'char(2)',
                 'shipping_phone' => 'varchar(50)',
                 'shipping_fax' => 'varchar(50)',
+
+                'store_currency_code' => 'char(3) null',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
@@ -245,6 +247,8 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_payment' => "varchar(15) not null default 'new'",
                 'state_custom' => "varchar(15) not null default ''",
 
+
+                'store_currency_code' => 'char(3) null',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
@@ -1883,12 +1887,17 @@ class Sellvana_Sales_Migrate extends BClass
 
     public function upgrade__0_3_15__0_3_16()
     {
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
         $tOrder = $this->Sellvana_Sales_Model_Order->table();
 
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'store_currency_code' => 'char(3) null',
+            ],
+        ]);
         $this->BDb->ddlTableDef($tOrder, [
-            BDb::KEYS => [
-                'FK_cart_id' => '(cart_id)',
-                'UNQ_cart_id' => BDb::DROP,
+            BDb::COLUMNS => [
+                'store_currency_code' => 'char(3) null',
             ],
         ]);
     }

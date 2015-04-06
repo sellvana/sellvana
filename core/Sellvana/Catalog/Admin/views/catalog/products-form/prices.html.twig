@@ -21,7 +21,7 @@
 {% set loadCurrency = MODULES.isLoaded('Sellvana_MultiCurrency') %}
 
 {% if loadCurrency %}
-    {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').curencyOptions() %}
+    {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').getAvailableCurrencies() %}
 {% endif %}
 
 <fieldset name="product-prices">
@@ -87,6 +87,82 @@
         };
 
         Price.init(options);
+
+        /**
+         *
+         *
+         */
+        function validateBaseField(value, element) {
+            var valid = false;
+            if(typeof element !== 'undefined') {
+                var $parent = $(element).parents('.price-item');
+                var $curFields = $parent.find('.customer-group, .site, .currency');
+                var currHash = value;
+                var matchingHashes = {};
+                var siteId = '*', currCode = '*', groupId = '*';
+                $curFields.each(function () {
+                    var $el = $(this);
+                    var val = $el.val();
+
+                    if($el.hasClass('site')) {
+                        siteId = val;
+                    } else if($el.hasClass('currency')) {
+                        currCode = val;
+                    } else if($el.hasClass('customer-group')) {
+                        groupId = val;
+                    }
+                });
+
+                matchingHashes[value + '***'] = 1;
+
+                matchingHashes[value + groupId +'**'] = 1;
+                matchingHashes[value + '*' + siteId + '*'] = 1;
+                matchingHashes[value + '**' + currCode] = 1;
+                matchingHashes[value + groupId + '*' + currCode] = 1;
+                matchingHashes[value + '*' + siteId + currCode] = 1;
+                matchingHashes[value + groupId + siteId + '*'] = 1;
+
+                matchingHashes[currHash] = 1;
+
+
+                var $items = $('.price-item');
+                $items.each(function () {
+                    if(valid) {
+                        // valid price already found, return
+                        return;
+                    }
+
+                    var $item = $(this);
+                    if($item[0] === $parent[0]) {
+                        // same as validated element, return
+                        return;
+                    }
+                    var $priceType = $item.find('.price-type');
+                    if($priceType.length == 0) {
+                        // no price type return
+                        return;
+                    }
+                    var itemHash = $priceType.val();
+
+                    var $itemFields = $item.find('.customer-group, .site, .currency');
+                    var siteId = '*', currCode = '*', groupId = '*', defaultHash = '';
+                    $itemFields.each(function () {
+                        var $el = $(this);
+                        if ($el.hasClass('site')) {
+                            siteId = $el.val();
+                        } else if ($el.hasClass('currency')) {
+                            currCode = $el.val();
+                        } else if ($el.hasClass('customer-group')) {
+                            groupId = $el.val();
+                        }
+                    });
+                    itemHash += groupId + siteId + currCode;
+                    valid = (matchingHashes[itemHash] == 1);
+                });
+            }
+            return valid;
+        }
+
         /*
          *custom validation function for checking duplicated input
          */
@@ -111,32 +187,26 @@
                         return;
                     }
                     var fields = $item.find('input.priceUnique, select.priceUnique');
-                    var same = true;
                     var checkHash = '';
                     fields.each(function (idx) {
                         checkHash += $(this).val();
-//                        var currField = $(curFields[idx]);
-//                        var checkField = $(this);
-//                        var currVal = currField.val();
-//                        var checkedVal = checkField.val();
-//                        if (currVal != checkedVal) {
-//                            same = false;
-//                        }
                     });
-//                    if (same) {
-//                        valid = false;
-//                    }
                     valid = currHash != checkHash;
                 });
                 return valid;
             }
         }
 
-        $.validator.addMethod('priceUnique', priceUnique, 'Same price already exists.');
+        $.validator.addMethod('priceUnique', priceUnique, '{{"Same price already exists."|_}}');
+        $.validator.addMethod('base_field', validateBaseField, '{{"No matching base price"|_}}');
 
         $.validator.addClassRules("priceUnique", {
             priceUnique: true
         });
+        $.validator.addClassRules("base_field", {
+            base_field: true
+        });
+
         $('form').submit(function () {
             return validatePrices();
         });

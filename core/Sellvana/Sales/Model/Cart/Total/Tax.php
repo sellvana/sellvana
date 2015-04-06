@@ -29,19 +29,22 @@ class Sellvana_Sales_Model_Cart_Total_Tax extends Sellvana_Sales_Model_Cart_Tota
          */
 
         $this->_value = !empty($result['tax_amount']) ? $result['tax_amount'] : 0;
+        $this->_storeCurrencyValue = $this->_cart->convertToStoreCurrency($this->_value);
 
-        $this->_cart->set($this->_cartField, $this->_value);
-        $this->_cart->add('grand_total', $this->_value);
+        $this->_cart->set($this->_cartField, $this->_value)
+            ->setData('store_currency/' . $this->_cartField, $this->_storeCurrencyValue);
         $this->_cart->setData('tax_details', !empty($result['details']) ? $result['details'] : []);
 
         if (!empty($result['items'])) {
             foreach ($this->_cart->items() as $item) {
                 $itemId = $item->id();
                 if (!empty($result['items'][$itemId]['row_tax'])) {
-                    $item->set('row_tax', $result['items'][$itemId]['row_tax']);
+                    $rowTax = $result['items'][$itemId]['row_tax'];
                 } else {
-                    $item->set('row_tax', 0);
+                    $rowTax = 0;
                 }
+                $item->set('row_tax', $rowTax)
+                    ->setData('store_currency/row_tax', $this->_cart->convertToStoreCurrency($rowTax));
                 if (!empty($result['items'][$itemId]['details'])) {
                     $item->setData('tax_details', $result['items'][$itemId]['details']);
                 } else {
@@ -50,7 +53,9 @@ class Sellvana_Sales_Model_Cart_Total_Tax extends Sellvana_Sales_Model_Cart_Tota
             }
         }
 
-        $this->_cart->getTotalByType('grand_total')->addComponent($this->_value, 'tax');
+        /** @var Sellvana_Sales_Model_Cart_Total_GrandTotal $grandTotalModel */
+        $grandTotalModel = $this->_cart->getTotalByType('grand_total');
+        $grandTotalModel->addComponent('tax', $this->_value, $this->_storeCurrencyValue);
 
         return $this;
     }

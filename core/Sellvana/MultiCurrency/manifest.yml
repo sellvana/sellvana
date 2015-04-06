@@ -4,6 +4,23 @@ modules:
         channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
 
+        observe:
+            - [ Sellvana_Catalog_Model_Product::getCatalogPrice, Sellvana_Promo_Main.onProductGetCatalogPrice ]
+
         areas:
-            FCom_Frontend:
+            FCom_Admin:
                 auto_use: [ views ]
+                routing:
+                    - [ /multicurrency/.action, Sellvana_MultiCurrency_Admin_Controller ]
+
+            FCom_Frontend:
+                auto_use: [ bootstrap, views ]
+                routing:
+                    - [ /currency/switch/:currency, Sellvana_MultiCurrency_Frontend_Controller.switch ]
+
+            FCom_Cron:
+                crontab:
+                    - [ "0 0 * * *", Sellvana_MultiCurrency_Cron.runDaily ]
+
+        default_config:
+            modules/Sellvana_MultiCurrency/available_currencies: USD,EUR,GBP,CAD

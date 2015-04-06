@@ -28,14 +28,13 @@
         {{ forms.input(fieldData, { field:'copyright_message', label:'Copyright Message'|_ }) }}
     {{ forms.accordion_panel_end }}
 
-    {{ forms.accordion_panel_start({label:'Geography'|_, id:'settings-FCom_Core-group2'}) }}
+    {{ forms.accordion_panel_start({label:'Localization'|_, id:'settings-FCom_Core-group2'}) }}
         {{ forms.boolean(fieldData, { field:'limit_countries', label:'Limit Countries' }) }}
         {{ forms.select(fieldData, { field:'allowed_countries', label:'Allowed Countries'|_, options:LOCALE.getAvailableCountries(), select2: {}, multiple:1 }) }}
         {{ forms.select(fieldData, { field:'default_country', label:'Default Country'|_, options:LOCALE.getAvailableCountries(), select2: {} }) }}
-    {{ forms.accordion_panel_end }}
-
-    {{ forms.accordion_panel_start({label:'Timezones'|_, id:'settings-FCom_Core-group3'}) }}
         {{ forms.select(fieldData,  { field:'default_tz', label:'Default Timezone'|_, options:LOCALE.tzOptions(true), select2: {} }) }}
+        {{ forms.input(fieldData,  { field:'base_currency', label:'Base Currency'|_ }) }}
+        {{ forms.input(fieldData,  { field:'default_currency', label:'Default Currency'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, id_prefix:'config-cookie', name_prefix:'config[cookie]', get_prefix:'cookie' } %}

@@ -30,6 +30,7 @@ base:
     - { view: root, set: { use_container: true } }
 
     - { include: common_js_libs }
+    - { include: lib_select2 }
 
     - { callback: FCom_Core_Main.defaultThemeCustomLayout }
     - { callback: FCom_Frontend_Frontend.layout }

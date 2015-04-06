@@ -1,6 +1,6 @@
 modules:
     Sellvana_Sales:
-        version: 0.3.15
+        version: 0.3.16
         channel: beta
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"
@@ -46,6 +46,7 @@ modules:
                     - [ "Sellvana_Customer_Model_Customer::login:after", "Sellvana_Sales_Main::onCustomerLogIn" ]
                     - [ "Sellvana_Customer_Model_Customer::logout:before", "Sellvana_Sales_Main::onCustomerLogOut" ]
                     - [ "FCom_Core_Model_Seq::getFirstSeqId", Sellvana_Sales_Model_Order.onGetFirstSeqId ]
+                    - [ "Sellvana_MultiCurrency_Main::switchCurrency", "Sellvana_Sales_Main.onSwitchCurrency" ]
             FCom_Cron:
                 crontab:
                     - [ "* * * * *", Sellvana_Sales_Cron::runEveryMinute ]

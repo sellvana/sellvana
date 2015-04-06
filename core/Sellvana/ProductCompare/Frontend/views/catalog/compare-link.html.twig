@@ -1,5 +1,5 @@
 {% set pId = THIS.get('product_id') %}
-{% set inSet = APP.instance('Sellvana_ProductCompare_Model_Set').sessionSet().isInSet(pId) %}
+{% set inSet = APP.instance('Sellvana_ProductCompare_Model_Set').sessionSet(true).findSetItem(pId) %}
 {% set base = 'catalog/compare/' %}
 {% set action = inSet ? 'remove': 'add' %}
 {% set href = base ~ action ~ '?id=' ~ pId %}
