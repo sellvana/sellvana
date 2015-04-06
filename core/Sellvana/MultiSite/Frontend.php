@@ -18,10 +18,14 @@ class Sellvana_MultiSite_Frontend extends BClass
             $siteId = $hlp->findIdByDomain();
             if ($siteId) {
                 $site = $hlp->load($siteId);
-                static::$_currentSite = $site;
-                $config = $site->getData('config');
-                if ($config) {
-                    $this->BConfig->add($config);
+                if ($site) {
+                    static::$_currentSite = $site;
+                    $config = $site->getData('config');
+                    if ($config) {
+                        $this->BConfig->add($config);
+                    }
+                } else {
+                    $hlp->createDomainMap();
                 }
             }
         }

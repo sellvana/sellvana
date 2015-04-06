@@ -70,7 +70,7 @@ class Sellvana_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     public function getDomainMap()
     {
         $map = $this->BCache->load(static::$_mapCacheKey);
-        if (!$map) {
+        if (null === $map) {
             $map = $this->createDomainMap();
         }
         return $map;
