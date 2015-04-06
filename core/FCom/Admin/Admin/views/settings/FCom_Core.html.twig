@@ -5,19 +5,9 @@
 <h2>{{ "Core Settings"|_}}</h2>
 
 {{ forms.accordion_start({id:'settings-FCom_Core'}) }}
-    {% set fieldData = { model: c, id_prefix:'db', name_prefix:'config[db]', get_prefix:'db' } %}
-    {{ forms.accordion_panel_start({label:'DB Settings'|_, id:'settings-FCom_Core-group0', in:1}) }}
-        {{ forms.input(fieldData,   { field:'host', label:'Host'|_ }) }}
-        {{ forms.input(fieldData,   { field:'port', label:'Port'|_ }) }}
-        {{ forms.input(fieldData,   { field:'dbname', label:'Database'|_ }) }}
-        {{ forms.input(fieldData,   { field:'username', label:'Username'|_ }) }}
-        {{ forms.input(fieldData,   { field:'password', label:'Password'|_, value:c.get('db/password')?'*****':'', type:'password', placeholder:'*****' }) }}
-        {{ forms.boolean(fieldData, { field:'logging', label:'Enable Logging'|_ }) }}
-        {{ forms.boolean(fieldData, { field:'implicit_migration', label:'Implicit Migration'|_ }) }}
-    {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model:c, settings_module: 'FCom_Core' } %}
-    {{ forms.accordion_panel_start({label:'Website'|_, id:'settings-FCom_Core-group1'}) }}
+    {{ forms.accordion_panel_start({label:'Website'|_, id:'settings-FCom_Core-group1', in:1}) }}
         {{ forms.input(fieldData, { field:'company_name', label:'Company Name'|_ }) }}
         {{ forms.input(fieldData, { field:'site_title', label:'Site Title'|_ }) }}
         {{ forms.input(fieldData, { field:'admin_email', label:'Admin Email'|_, type:'email' }) }}
@@ -47,6 +37,18 @@
         {{ forms.boolean(fieldData, { field:'session_check_ip', label:'Verify Session IP'|_ }) }}
     {{ forms.accordion_panel_end }}
 
+{% if not REQUEST.get('site') %}
+    {% set fieldData = { model: c, id_prefix:'db', name_prefix:'config[db]', get_prefix:'db' } %}
+    {{ forms.accordion_panel_start({label:'DB Settings'|_, id:'settings-FCom_Core-group0' }) }}
+        {{ forms.input(fieldData,   { field:'host', label:'Host'|_ }) }}
+        {{ forms.input(fieldData,   { field:'port', label:'Port'|_ }) }}
+        {{ forms.input(fieldData,   { field:'dbname', label:'Database'|_ }) }}
+        {{ forms.input(fieldData,   { field:'username', label:'Username'|_ }) }}
+        {{ forms.input(fieldData,   { field:'password', label:'Password'|_, value:c.get('db/password')?'*****':'', type:'password', placeholder:'*****' }) }}
+        {{ forms.boolean(fieldData, { field:'logging', label:'Enable Logging'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'implicit_migration', label:'Implicit Migration'|_ }) }}
+    {{ forms.accordion_panel_end }}
+
     {% set fieldData = { model:c, name_prefix: 'config[core][cache]', id_prefix: 'config-core-cache', get_prefix:'core/cache',
         options:{'':'Enable in staging or production modes'|_, 'enable':'Enable always'|_, 'disable':'Disable always'|_} } %}
     {{ forms.accordion_panel_start({ label:'Optimizations'|_, id:'settings-FCom_Core-group5'}) }}
@@ -55,6 +57,7 @@
         {{ forms.select(fieldData, { field:'view_files', label:'View Template Files Cache'|_ }) }}
         {{ forms.select(fieldData, { field:'twig', label:'Twig Cache'|_ }) }}
     {{ forms.accordion_panel_end }}
+{% endif %}
 
     {% set fieldData = { model: c, id_prefix:'web', name_prefix:'config[web]', get_prefix:'web' } %}
     {{ forms.accordion_panel_start({label:'Web Settings'|_, id:'settings-FCom_Core-group6'}) }}
