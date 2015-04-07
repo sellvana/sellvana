@@ -45,6 +45,11 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
 
     const MAX_PRICES_PER_RUN = 10000;
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['promo_type', 'from_date', 'to_date', 'status', 'create_at', 'summary'],
+    ];
+
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo';
     protected static $_fieldOptions = [

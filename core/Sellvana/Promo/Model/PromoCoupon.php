@@ -13,6 +13,11 @@ class Sellvana_Promo_Model_PromoCoupon extends FCom_Core_Model_Abstract
      * @var resource file handle
      */
     protected $_importFileHandle;
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['promo_id', 'code'],
+        'related'    => ['promo_id' => 'Sellvana_Promo_Model_Promo.id'],
+    ];
 
     /**
      * Generate number fo coupon codes for a promotion
