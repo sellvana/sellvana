@@ -7,7 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['underscore', 'react', 'griddle.gridNoData', 'fcom.components',], function(_, React, GridNoData, Components) {
+define(['jquery', 'underscore', 'react', 'griddle.gridNoData', 'fcom.components',], function($, _, React, GridNoData, Components) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
@@ -921,7 +921,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                 modal.close();
             } else if (url) {
                 $.post(url, hash, function(data) {
-                    if (data) {console.log('data', data);
+                    if (data) {
                         that.refresh();
                         modal.close();
                     } else {

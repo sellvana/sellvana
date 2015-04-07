@@ -19,7 +19,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 "className": ""
             }
         },
-        doRowAction: function(event) {
+        doRowAction: function(callback, event) {
             /*if (this.props.getConfig('data_mode') == 'local') {
                 return this.doRowLocalAction(event);
             }*/
@@ -29,7 +29,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
             var gridId = this.props.getConfig('id');
             var data = this.props.originalData ? this.props.originalData : this.props.data;
             var isLocalMode = this.props.isLocalMode();
-
+            var editUrl = this.props.getConfig('edit_url');
             var row = _.find(data, function(item) {
                 if (item.id == rowId || item.id == parseInt(rowId)) {
                     return true;
@@ -41,8 +41,6 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 return false;
             }
 
-
-            console.log('action', action);
             switch (action) {
                 case 'edit':
                     //console.log('render modal');
@@ -67,7 +65,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                         if (isLocalMode) {
                             this.props.removeRows([row]);
                         } else {
-                            var editUrl = this.props.getConfig('edit_url');
+                            
                             if (editUrl.length > 0 && rowId) {
                                 $.post(editUrl, {id: rowId, oper: 'del'}, function() {
                                     that.props.refresh();
@@ -77,7 +75,17 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     }
                     break;
                 default:
-                    console.log('do-row-action');
+                    if (typeof callback === 'object') {
+
+                        var action = callback.action,
+                            subCallback = callback.callback;
+                        if (typeof window[action] !== 'undefined' && typeof window[action] === 'function') {
+                            return window[action](that, row, subCallback);
+                        }
+
+                    } else {
+                        console.log('do row custom action');
+                    }
                     break;
             }
         },
