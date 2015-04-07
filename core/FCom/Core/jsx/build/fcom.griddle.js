@@ -465,16 +465,8 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             );
         },
         handleCustom: function(callback, event) {
-            if (typeof callback === 'object') {
-                var action = callback.action,
-                    subCallback = callback.callback;
-                if (typeof window[action] === 'function') {
-                    return window[action](this, subCallback);
-                }
-            } else {
-                if (typeof window[callback] === 'function') {
-                    return window[callback](this);
-                }
+            if (typeof window[callback] === 'function') {
+                return window[callback](this);
             }
         },
         render: function () {

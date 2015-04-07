@@ -38,10 +38,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                             'name' => 'custom', 
                             'icon' => 'icon-edit-sign', 
                             'cssClass' => 'btn-custom', 
-                            'callback' => [
-                                'action' => 'showModalToEditFieldset',
-                                'callback' => 'modalRender'
-                            ]
+                            'callback' => 'showModalToEditFieldset'
                         ],
                         ['name' => 'delete']
                     ]]
@@ -52,10 +49,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                         'type' => 'button',
                         'id' => 'add-fieldset-grid',
                         'class' => 'btn-primary',
-                        'callback' => [
-                            'action' => 'showModalToAddFieldset',
-                            'callback' => 'modalRender'
-                        ]
+                        'callback' => 'showModalToAddFieldset'
                     ],
 //                    'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
                     'delete' => true

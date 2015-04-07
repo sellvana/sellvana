@@ -75,16 +75,10 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     }
                     break;
                 default:
-                    if (typeof callback === 'object') {
-
-                        var action = callback.action,
-                            subCallback = callback.callback;
-                        if (typeof window[action] !== 'undefined' && typeof window[action] === 'function') {
-                            return window[action](that, row, subCallback);
-                        }
-
+                    if (typeof window[callback] === 'function') {
+                        return window[callback](that, row);
                     } else {
-                        console.log('do row custom action');
+                        console.log('Do row custom action');
                     }
                     break;
             }

@@ -84,34 +84,29 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             linkedRows = selectedAttachGrid.getSelectedRows();
         }
             
-        if (linkedRows.length) {
-            form.find('textarea, input, select').each(function() {
-                var key = $(this).attr('id'),
-                    val = $(this).val();
-                hash[key] = selectedAttachGrid.html2text(val);
-                hash['field_ids'] = _.pluck(linkedRows, 'id').join(',');
-            });
+        form.find('textarea, input, select').each(function() {
+            var key = $(this).attr('id'),
+                val = $(this).val();
+            hash[key] = selectedAttachGrid.html2text(val);
+            hash['field_ids'] = _.pluck(linkedRows, 'id').join(',');
+        });
 
-            $.post(url, hash, function(data) {
-                if (data) {
-                    switch(hash.oper) {
-                        case 'add':
-                            mainGrid.addRows([data]);
-                            break;
-                        case 'edit':
-                            mainGrid.updateRows([data]);
-                            break;
-                    }
-                    modal.close();
-                } else {
-                    console.log('error when save');
-                    return false;
+        $.post(url, hash, function(data) {
+            if (data) {
+                switch(hash.oper) {
+                    case 'add':
+                        mainGrid.addRows([data]);
+                        break;
+                    case 'edit':
+                        mainGrid.updateRows([data]);
+                        break;
                 }
-            }, 'json');
-        } else {
-            alert('Please select before save changes !');
-            return false;
-        }
+                modal.close();
+            } else {
+                console.log('error when save');
+                return false;
+            }
+        }, 'json');
     }
 
     /**
@@ -120,11 +115,9 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
      * @param row
      * @param callback
      */
-    window.showModalToEditFieldset = function(that, rows, callback) {
+    window.showModalToEditFieldset = function(that, rows) {
         mainGrid = that.props;
-        if (typeof window[callback] === 'function') {
-            return window[callback](that, rows);
-        }
+        modalRender(that, rows);
     }
 
     /**
@@ -132,11 +125,9 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
      * @param grid
      * @param callback
      */
-    window.showModalToAddFieldset = function(that, callback) {
+    window.showModalToAddFieldset = function(that) {
         mainGrid = that.props.getCurrentGrid();
-        if (typeof window[callback] === 'function') {
-            return window[callback](that);
-        }
+        modalRender(that);
         
     };
 
@@ -145,7 +136,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
      * @param grid
      * @param row
      */
-    window.modalRender = function(that, row) {
+    function modalRender(that, row) {
         url = that.props.getConfig('edit_url');
         var modalContainerEle = document.getElementById('{{ fieldSetsConfig.config.id }}-modal');
         React.unmountComponentAtNode(modalContainerEle);
@@ -164,22 +155,22 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                     },
                     React.createElement("div", { className: "row f-grid-wrapper" }, React.createElement("div", { className: "tabbable" },
                             React.createElement("ul", { className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
-                                    React.createElement("li", { className: "active" },
+                                    React.createElement("li", null,
                                             React.createElement("a", { "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_form_tab', href: "#{{ fieldSetsConfig.config.id }}_form_content" }, "Field Sets")
                                     ),
                                     React.createElement("li", null,
                                             React.createElement("a", { "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_selected_tab', href: "#{{ fieldSetsConfig.config.id }}_selected_content" }, "Linked Field")
                                     ),
-                                    React.createElement("li", null,
+                                    React.createElement("li", { className: "active" },
                                             React.createElement("a", { "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_fields_tab', href: "#{{ fieldSetsConfig.config.id }}_fields_content" }, "Add Fields")
                                     )
                             ),
                             React.createElement("div", { className: "tab-content" },
-                                    React.createElement("div", { className: "tab-pane active", id: '{{ fieldSetsConfig.config.id }}_form_content' }, 
+                                    React.createElement("div", { className: "tab-pane", id: '{{ fieldSetsConfig.config.id }}_form_content' }, 
                                             React.createElement(FComModalForm, {columnMetadata: that.props.columnMetadata, row: row, id: that.props.getConfig('id')})
                                         ),
                                     React.createElement("div", { className: "tab-pane", id: '{{ fieldSetsConfig.config.id }}_selected_content' }),
-                                    React.createElement("div", { className: "tab-pane", id: '{{ fieldSetsConfig.config.id }}_fields_content' })
+                                    React.createElement("div", { className: "tab-pane active", id: '{{ fieldSetsConfig.config.id }}_fields_content' })
                             )
                     ))),
             modalContainerEle);
