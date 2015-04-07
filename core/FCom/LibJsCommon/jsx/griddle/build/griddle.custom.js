@@ -809,7 +809,8 @@ var Griddle = React.createClass({displayName: "Griddle",
                     that.setState(updatedState);
                 };
 
-            state.filteredResults = _.filter(this.state.results,
+            var results = this.getRows();
+            state.filteredResults = _.filter(results,
                 function (item) {
                     var arr = _.values(item);
                     for (var i = 0; i < arr.length; i++) {
@@ -822,11 +823,20 @@ var Griddle = React.createClass({displayName: "Griddle",
                 });
 
             updateAfterResultsObtained(state);
-        } else {
-            this.setState({
-                filteredResults: null,
-                maxPage: this.getMaxPage(null)
-            });
+        } else { //empty value
+            if (this.isLocalMode() && this.state.filter != '') { //already have filtered data
+                var filters = JSON.parse(this.state.filter);
+                var filteredResults = this.filterLocalData(null, filters);
+                this.setState({
+                    filteredResults: filteredResults,
+                    maxPage: this.getMaxPage(filteredResults)
+                });
+            } else {
+                this.setState({
+                    filteredResults: null,
+                    maxPage: this.getMaxPage(null)
+                });
+            }
         }
     },
     /**
@@ -882,18 +892,26 @@ var Griddle = React.createClass({displayName: "Griddle",
         });
     },
     removeRows: function(rows) {
-        var results = this.state.filteredResults || this.state.results;
+        var results = this.state.results;
+        var filteredResults = this.state.filteredResults;
         var selectedRows = this.getSelectedRows();
         var deleteIds = _.pluck(rows, 'id');
         if (deleteIds) {
-            results = _.filter(results, function(row) {
+
+            function filterRow(row) {
                 return !_.contains(deleteIds, row.id);
-            });
-            selectedRows = _.filter(selectedRows, function(row) {
-                return !_.contains(deleteIds, row.id);
-            });
+            }
+
+            results = _.filter(results, filterRow);
+
+            if (selectedRows.length) {
+                selectedRows = _.filter(selectedRows, filterRow);
+            }
+            if (filteredResults.length) {
+                filteredResults = _.filter(filteredResults, filterRow);
+            }
         }
-        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results), selectedRows: selectedRows }, function() {
+        this.setState({ results: results, filteredResults: filteredResults, totalResults: results.length, maxPage: this.getMaxPage(results), selectedRows: selectedRows }, function() {
             $(this.getDOMNode()).trigger('removedRows.griddle', [rows, this]);
         });
     },
@@ -971,7 +989,7 @@ var Griddle = React.createClass({displayName: "Griddle",
             }
         });
 
-        this.setState({ results: rows, filteredResults: rows }, function() {
+        this.setState({ results: rows }, function() {
             if (!options.silent) {
                 $(this.getDOMNode()).trigger('updatedRows.griddle', [updatedRows, data, this]); //todo: event updatedRow.server.griddle???
             }
