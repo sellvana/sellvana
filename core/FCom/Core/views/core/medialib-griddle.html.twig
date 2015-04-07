@@ -1,0 +1,27 @@
+{% set config = THIS.get('config') %}
+{% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
+{% set uploadConfig = mediaLib.uploadConfig(config.type) %}
+{% set mediaLibAttachConfig = mediaLib.gridConfig({'id': config.id, 'folder': uploadConfig.folder, 'config': config.config, 'mode': config.mode}) %}
+{% set mediaLibAttachConfigCompiled = THIS.view('core/griddle').set('grid', mediaLibAttachConfig).getGridConfig() %}\
+
+<div id="{{ config.id }}-modal"></div>
+
+<script type="text/javascript">
+    require(['underscore', 'react', 'griddle.fcomMediaLib'], function(_, React, FComMediaLib) {
+        var mediaGridId = '{{ config.id }}';
+
+        var mediaConfig = {{ UTIL.toJSON(mediaLibAttachConfigCompiled) | raw }};
+        var uploadConfig = {{ UTIL.toJSON(uploadConfig) | raw }};
+        var modalConfig = {
+            show: true,
+            title: '{{ config.title }}'
+
+        };
+
+        console.log('begin');
+
+        var modalEle = document.getElementById(mediaGridId + '-modal');
+        console.log('mediaGridId', mediaGridId);
+        React.render(React.createElement(FComMediaLib, { mediaConfig: mediaConfig, uploadConfig: uploadConfig, modalConfig: modalConfig}), modalEle);
+    });
+</script>

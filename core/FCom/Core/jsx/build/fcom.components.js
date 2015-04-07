@@ -37,6 +37,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
             }
 
             return dateTime;
+        },
+        updateModalWidth: function(modal) {
+            $(modal.getDOMNode()).find('.modal-dialog').css('width', '900px');
         }
     };
 
