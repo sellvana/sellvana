@@ -7,11 +7,16 @@ class Sellvana_SalesTax_Model_Zone extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = [
         'zone_type' => [
-            'country' => 'Country',
-            'region' => 'Region',
+            'country'   => 'Country',
+            'region'    => 'Region',
             'postrange' => 'Postcode Range',
-            'postcode' => 'Postcode',
+            'postcode'  => 'Postcode',
         ],
+    ];
+
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['zone_type', 'title', 'postcode_from', 'postcode_to'],
     ];
 
     public function getAllZones()
