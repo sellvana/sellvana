@@ -804,6 +804,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                 updateAfterResultsObtained = function (updatedState) {
                     // Update the max page.
                     updatedState.maxPage = that.getMaxPage(updatedState.filteredResults);
+                    updatedState.totalResults = updatedState.filteredResults.length;
 
                     // Set the state.
                     that.setState(updatedState);
@@ -823,20 +824,19 @@ var Griddle = React.createClass({displayName: "Griddle",
                 });
 
             updateAfterResultsObtained(state);
-        } else { //empty value
-            if (this.isLocalMode() && this.state.filter != '') { //already have filtered data
-                var filters = JSON.parse(this.state.filter);
-                var filteredResults = this.filterLocalData(null, filters);
-                this.setState({
-                    filteredResults: filteredResults,
-                    maxPage: this.getMaxPage(filteredResults)
-                });
-            } else {
-                this.setState({
-                    filteredResults: null,
-                    maxPage: this.getMaxPage(null)
-                });
-            }
+        } else if (this.isLocalMode() && this.state.filter != '') { //empty value + already have filtered data, return to filtered data
+            var filters = JSON.parse(this.state.filter);
+            var filteredResults = this.filterLocalData(null, filters);
+            this.setState({
+                filteredResults: filteredResults,
+                maxPage: this.getMaxPage(filteredResults),
+                totalResults: filteredResults.length
+            });
+        } else { //empty value + empty filtered data
+            this.setState({
+                filteredResults: null,
+                maxPage: this.getMaxPage(null)
+            });
         }
     },
     /**
