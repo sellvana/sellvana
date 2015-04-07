@@ -24,6 +24,6 @@ modules:
             FCom_Frontend:
                 routing:
                     - [ /catalogindex/search, Sellvana_CatalogIndex_Frontend_Controller.search ]
-                override:
-                    class:
-                        - [ Sellvana_Catalog_Frontend_Controller_Search, Sellvana_CatalogIndex_Frontend_Controller ]
+                observe:
+                    - [ "Sellvana_Catalog_Frontend_Controller_Category::action_index:products_data", Sellvana_CatalogIndex_Frontend.onCategoryProductsData ]
+                    - [ "Sellvana_Catalog_Frontend_Controller_Search::action_index:products_data", Sellvana_CatalogIndex_Frontend.onSearchProductsData ]

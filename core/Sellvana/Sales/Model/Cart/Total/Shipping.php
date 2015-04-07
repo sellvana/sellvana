@@ -35,7 +35,12 @@ class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart
             $rates = $cart->getData('shipping_rates');
         }
 
-        list($selMethod, $selService) = $this->_findSelectedMethodService($rates);
+        if ($rates) {
+            list($selMethod, $selService) = $this->_findSelectedMethodService($rates);
+        } else {
+            $selMethod = null;
+            $selService = null;
+        }
 
         $this->_value = $selMethod && $selService ? $rates[$selMethod][$selService]['price'] : 0;
         $this->_storeCurrencyValue = $this->_cart->convertToStoreCurrency($this->_value);
