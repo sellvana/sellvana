@@ -18,6 +18,12 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         "title" => "N/A",
     ];
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['inventory_sku'],
+        'related'    => ['bin_id' => 'Sellvana_Catalog_Model_InventoryBin.id'],
+    ];
+
     public function collectInventoryForProducts($products)
     {
         $pIds = [];
