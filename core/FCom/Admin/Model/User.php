@@ -68,6 +68,15 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         //array('superior_id', '@integer'),
     ];
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id', 'create_at', 'update_at'],
+        'unique_key' => ['username'],
+        'related'    => [
+            'superior_id' => 'FCom_Admin_Model_User.id',
+            'role_id'     => 'FCom_Admin_Model_Role.id'
+        ],
+    ];
+
     protected $_persModel;
     protected $_persData;
 
