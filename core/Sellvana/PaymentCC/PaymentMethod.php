@@ -23,6 +23,11 @@ class Sellvana_PaymentCC_PaymentMethod extends Sellvana_Sales_Method_Payment_Abs
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)
     {
         $result = [];
+
+        $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [
+            'payment' => $payment,
+        ]);
+
         return $result;
     }
 

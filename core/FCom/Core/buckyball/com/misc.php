@@ -999,7 +999,7 @@ class BUtil extends BClass
     public function remoteHttp($method, $url, $data = [], $headers = [], $options = [])
     {
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
-        $timeout = 5;
+        $timeout = !empty($options['timeout']) ? $options['timeout'] : 5;
         $userAgent = !empty($options['useragent']) ? $options['useragent'] : 'Mozilla/5.0';
         if (preg_match('#^//#', $url)) {
             $url = 'http:' . $url;

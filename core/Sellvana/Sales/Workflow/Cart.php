@@ -222,6 +222,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         $post = !empty($args['post']) ? $args['post'] : null;
         $cartItems = $cart->items(true);
         $items = [];
+        $recalc = false;
 
         // remove items
         if (!empty($post['remove'])) {
@@ -233,6 +234,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 $item = $cartItems[$id];
                 $variants = $item->getData('variants');
                 if (null === $variants || count($variants) == 1) { //TODO: explain and improve logic
+                    $recalc = true;
                     $cart->removeItem($id);
                     $items[$id] = ['id' => $id, 'status' => 'removed', 'name' => $item->getProduct()->get('product_name')];
                 }
@@ -267,9 +269,13 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 }
                 $product = $item->getProduct();
                 if ($totalQty > 0) {
+                    if ($item->get('qty') !== $totalQty) {
+                        $recalc = true;
+                    }
                     $item->set('qty', $totalQty)->setData('variants', $variants)->save();
                     $items[] = ['id' => $id, 'status' => 'updated', 'name' => $product ? $product->get('product_name') : ''];
                 } elseif ($totalQty <= 0 || empty($variants)) {
+                    $recalc = true;
                     $item->delete();
                     unset($cartItems[$id]);
                     $items[] = ['id' => $id, 'status' => 'deleted', 'name' => $product ? $product->get('product_name') : ''];
@@ -277,7 +283,10 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
             }
         }
 
-        $cart->set('recalc_shipping_rates', 1)->calculateTotals()->saveAllDetails();
+        if ($recalc) {
+            $cart->set('recalc_shipping_rates', 1);
+        }
+        $cart->calculateTotals()->saveAllDetails();
 
         $args['result']['items'] = $items;
     }

@@ -86,6 +86,11 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
         $paymentModel->setData('response', $this->getDataToSave());
         $paymentModel->save();
 
+        //TODO: change the above to Transaction model
+        $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [
+            'payment' => $payment,
+        ]);
+
         return $this;
     }
 

@@ -62,6 +62,12 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         $result['response'] = $response;
         $this->clear();
         $transaction->setData('result', $result)->save();
+
+        $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [
+            'payment' => $payment,
+            'transaction' => $transaction,
+        ]);
+
         return $result;
     }
 
