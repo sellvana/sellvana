@@ -49,7 +49,6 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             }
         },
         render: function () {
-            console.log('config', this.props.config);
             var config = this.props.config;
 
             //prepare props base on data mode
@@ -466,9 +465,16 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             );
         },
         handleCustom: function(callback, event) {
-            if (typeof window[callback] === 'function') {
-                console.log('actions.callback: ' + callback);
-                return window[callback](this);
+            if (typeof callback === 'object') {
+                var action = callback.action,
+                    subCallback = callback.callback;
+                if (typeof window[action] === 'function') {
+                    return window[action](this, subCallback);
+                }
+            } else {
+                if (typeof window[callback] === 'function') {
+                    return window[callback](this);
+                }
             }
         },
         render: function () {
