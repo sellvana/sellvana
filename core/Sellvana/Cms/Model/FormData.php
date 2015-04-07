@@ -18,4 +18,12 @@ class Sellvana_Cms_Model_FormData extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_cms_form_data';
     static protected $_origClass = __CLASS__;
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['form_id', 'customer_id', 'create_at'],
+        'related'    => [
+            'form_id'     => 'Sellvana_Cms_Model_Form.id',
+            'customer_id' => 'Sellvana_Customer_Model_Customer.id'
+        ],
+    ];
 }
