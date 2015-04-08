@@ -78,6 +78,40 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
         $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
     }
 
+    public function formPostAfter($args)
+    {
+        parent::formPostAfter($args);
+        /** @var Sellvana_SalesTax_Model_ProductClass $model */
+        $model = $args['model'];
+        $data  = $this->BRequest->post();
+        if(!empty($data['grid']['products'])){
+            if(!empty($data['grid']['products']['add'])){
+                // add ProductTax models
+                $addIds = explode(',', $data['grid']['products']['add']);
+                foreach ($addIds as $id) {
+                    $this->Sellvana_SalesTax_Model_ProductTax
+                        ->create(['product_id'=>(int)trim($id), 'product_class_id' => $model->id()])
+                        ->save();
+                }
+
+            }
+
+            if(!empty($data['grid']['products']['del'])){
+                // del ProductTax models
+                $rmIds = explode(',', $data['grid']['products']['del']);
+                $toDel = $this->Sellvana_SalesTax_Model_ProductTax
+                    ->orm()->where('product_class_id', $model->id())
+                    ->where(['product_id' => $rmIds])->find_many();
+                if($toDel){
+                    foreach ($toDel as $d) {
+                        $d->delete();
+                    }
+
+                }
+            }
+        }
+    }
+
     /**
      * @param $model Sellvana_SalesTax_Model_ProductClass
      * @return mixed
