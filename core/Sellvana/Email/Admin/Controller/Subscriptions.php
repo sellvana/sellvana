@@ -16,6 +16,10 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
     protected $_navPath = 'customer/subscriptions';
     protected $_permission = 'subscriptions';
 
+    protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';
+    protected $_defaultGridLayoutName = 'default_griddle';
+
     public function gridConfig()
     {
         $config            = parent::gridConfig();
@@ -33,7 +37,7 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
-//            'new' => array('caption' => 'New Email Subscription', 'modal' => true),
+            'new' => array('caption' => 'New Email Subscription', 'modal' => true),
             'export' => true,
             'edit'   => true,
             'delete' => true
