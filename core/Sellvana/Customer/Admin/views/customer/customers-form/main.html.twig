@@ -31,6 +31,7 @@
 
     {{ THIS.hook('customer_form_main') | raw }}
 </div>
+{{ THIS.hook('customer_main_form_after', {'model' : m}) | raw }}
 
 <script>
     require(['jquery', 'jquery.validate'], function($) {

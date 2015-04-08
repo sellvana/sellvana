@@ -11,3 +11,9 @@ base:
     - view: settings
         do:
             - [ addTab, Sellvana_SalesTax, { label: Sales Tax, group: sales, pos: 20, async: true } ]
+
+
+/catalog/products/form:
+    - { hook: product_prices_form_after, views: catalog/products-form/salestax }
+/customers/form:
+    - { hook: customer_main_form_after, views: catalog/customers-form/salestax }

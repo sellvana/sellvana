@@ -12,4 +12,9 @@ class Sellvana_SalesTax_Model_CustomerTax extends FCom_Core_Model_Abstract
             'customer_class_id' => 'Sellvana_SalesTax_Model_CustomerClass.id'
         ],
     ];
+
+    public function getCustomerTaxClassIds($customer)
+    {
+        return $this->orm()->where('customer_id', $customer->id())->find_many_assoc('id', 'customer_class_id');
+    }
 }

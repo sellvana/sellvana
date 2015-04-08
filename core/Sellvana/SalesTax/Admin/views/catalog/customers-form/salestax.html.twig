@@ -5,8 +5,8 @@
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
-{% set allTaxClasses = APP.instance('Sellvana_SalesTax_Model_ProductClass').getAllTaxClasses() %}
-{% set taxClassIds = APP.instance('Sellvana_SalesTax_Model_ProductTax').getProductTaxClassIds(m) %}
+{% set allTaxClasses = APP.instance('Sellvana_SalesTax_Model_CustomerClass').getAllTaxClasses() %}
+{% set taxClassIds = APP.instance('Sellvana_SalesTax_Model_CustomerTax').getCustomerTaxClassIds(m) %}
 
 <fieldset name="main-product">
     <div class="f-section">
