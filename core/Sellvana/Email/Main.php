@@ -39,13 +39,17 @@ class Sellvana_Email_Main extends BClass
 
     public function handler($data)
     {
+        /** @var Sellvana_Email_Model_Message $msg */
         $msg = $this->Sellvana_Email_Model_Message->create([
+            'view_name' => $data['view_name'],
             'recipient' => $data['to'],
             'subject' => $data['subject'],
             'body' => $data['body'],
-            'data' => $this->BUtil->arrayMask($data, 'headers,params,files,orig_data'),
             'status' => 'sending',
-        ])->save();
+            'view_name' => !empty($data['orig_data']['view_name']) ? $data['orig_data']['view_name'] : null,
+        ]);
+        $msg->setData($this->BUtil->arrayMask($data, 'headers,params,files,orig_data'));
+        $msg->save();
 
         $this->BDebug->startErrorLogger();
         $result = $this->BEmail->defaultHandler($data);

@@ -437,7 +437,8 @@ class BLayout extends BClass
      */
     public function getView($viewName)
     {
-        return isset($this->_views[$viewName]) ? $this->_views[$viewName] : BViewEmpty::i();
+        return isset($this->_views[$viewName]) ? $this->_views[$viewName]
+            : BViewEmpty::i(true)->setParam('view_name', $viewName);
     }
 
     /**
@@ -1984,6 +1985,8 @@ class BView extends BClass
         $metaData = $this->param('meta_data') ? array_change_key_case($this->param('meta_data'), CASE_LOWER) : [];
         $data = array_merge($metaData, array_change_key_case($p, CASE_LOWER));
         $data['body'] = $body;
+        $data['view_name'] = $this->param('view_name');
+        $data['template'] = $this->param('template');
 
         return $this->BEmail->send($data);
     }
