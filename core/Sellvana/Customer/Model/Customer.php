@@ -40,10 +40,15 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     protected static $_fieldOptions = [
         'status' => [
+            'new'      => 'New',
             'review'   => 'Review',
             'active'   => 'Active',
             'disabled' => 'Disabled',
         ],
+    ];
+
+    protected static $_fieldDefaults = [
+        'status' => 'new',
     ];
 
     protected static $_sessionUser;
@@ -481,7 +486,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
         $customer = $this->create($r)->save();
         $this->BLayout->view('email/new-customer')->set('customer', $customer)->email();
-        $this->BLayout->view('email/new-admin')->set('customer', $customer)->email();
+        $this->BLayout->view('email/new-customer-admin')->set('customer', $customer)->email();
         return $customer;
     }
 

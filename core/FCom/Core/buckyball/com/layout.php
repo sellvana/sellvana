@@ -438,7 +438,7 @@ class BLayout extends BClass
     public function getView($viewName)
     {
         return isset($this->_views[$viewName]) ? $this->_views[$viewName]
-            : BViewEmpty::i(true)->setParam('view_name', $viewName);
+            : $this->BViewEmpty->i(true)->setParam('view_name', $viewName);
     }
 
     /**

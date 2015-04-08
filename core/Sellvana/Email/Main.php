@@ -67,6 +67,7 @@ class Sellvana_Email_Main extends BClass
                 'error_message' => $errors[0]['message'],
                 'num_attempts' => $msg->num_attempts + 1,
             ])->save();
+            //TODO: create retry logic
         }
         return false;
     }
