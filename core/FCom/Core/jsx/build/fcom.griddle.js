@@ -4,21 +4,8 @@ define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomMo
 function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle, Backbone) {
 
     /**
-     * build grid url
-     * @param dataUrl
-     * @param gridId
-     * @param filterString
-     * @param sortColumn
-     * @param sortAscending
-     * @param page
-     * @param pageSize
-     * @returns {string}
+     * FCom Griddle Componnent
      */
-    var buildGridDataUrl = function (dataUrl, gridId, filterString, sortColumn, sortAscending, page, pageSize) {
-        var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
-        return dataUrl + beginQueryChar + 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
-    };
-
     var FComGriddleComponent = React.createClass({displayName: "FComGriddleComponent",
         getDefaultProps: function () {
             return {
@@ -69,7 +56,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 state = config.state;
             } else {
                 props = {
-                    getExternalResults: FComDataMethod,
+                    getExternalResults: serverMethods.getResults,
+                    addRowsExternal: serverMethods.addRows,
+                    removeRowsExternal: serverMethods.removeRows,
+                    updateRowsExternal: serverMethods.updateRows,
                     results: []
                 };
                 state = config.data.state;
@@ -99,35 +89,78 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         }
     });
 
-    /**
-     * callback to get data from external results
-     * @param filterString
-     * @param sortColumn
-     * @param sortAscending
-     * @param page
-     * @param pageSize
-     * @param callback
-     * @param options
-     * @constructor
-     */
-    var FComDataMethod = function (filterString, sortColumn, sortAscending, page, pageSize, callback, options) {
-        $.ajax({
-            url: buildGridDataUrl(options.dataUrl, options.gridId, filterString, sortColumn, sortAscending, page, pageSize),
-            dataType: 'json',
-            type: 'GET',
-            data: {},
-            success: function (response) {
-                var data = {
-                    results: response[1],
-                    totalResults: response[0].c
-                };
+    var serverMethods = {
+        /**
+         * build url to submit/get data
+         * @param dataUrl
+         * @param gridId
+         * @param filterString
+         * @param sortColumn
+         * @param sortAscending
+         * @param page
+         * @param pageSize
+         * @returns {string}
+         */
+        postUrl: function(dataUrl, gridId, filterString, sortColumn, sortAscending, page, pageSize) {
+            var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
+            return dataUrl + beginQueryChar + 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+        },
+        /**
+         * get data from external results
+         * @param filterString
+         * @param sortColumn
+         * @param sortAscending
+         * @param page
+         * @param pageSize
+         * @param callback
+         * @param options
+         */
+        getResults: function(filterString, sortColumn, sortAscending, page, pageSize, callback, options) {
+            $.ajax({
+                url: serverMethods.postUrl(options.dataUrl, options.gridId, filterString, sortColumn, sortAscending, page, pageSize),
+                dataType: 'json',
+                type: 'GET',
+                data: {},
+                success: function (response) {
+                    var data = {
+                        results: response[1],
+                        totalResults: response[0].c
+                    };
 
-                callback(data);
-            },
-            error: function (xhr, status, err) {
-                //console.error(this.props.url, status, err.toString());
-            }
-        });
+                    callback(data);
+                },
+                error: function (xhr, status, err) {
+                    //console.error(this.props.url, status, err.toString());
+                }
+            });
+        },
+        /**
+         * add rows to external results
+         * @param rows
+         * @param {function} triggerEvent
+         */
+        addRows: function(rows, triggerEvent) {
+            console.log('addRowsExternal');
+            triggerEvent();
+        },
+        /**
+         * remove rows in external results
+         * @param rows
+         * @param triggerEvent
+         */
+        removeRows: function(rows, triggerEvent) {
+            console.log('removeRowsExternal');
+            triggerEvent();
+        },
+        /**
+         * update rows in external results
+         * @param rows
+         * @param triggerEvent
+         */
+        updateRows: function(rows, triggerEvent) {
+            console.log('updateRowsExternal');
+            triggerEvent();
+        }
     };
 
     /**
@@ -292,7 +325,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var url = this.props.getConfig('edit_url');
             var ids = _.pluck(this.props.getSelectedRows(), 'id');
             var hash = { oper: 'mass-edit', id: ids.join(',') };
-            var isLocalMode = this.props.isLocalMode();
+            var isLocalMode = !this.props.hasExternalResults();
             var form = $(modal.getDOMNode()).find('form');
 
             form.find('textarea, input, select').each(function() {
@@ -343,7 +376,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var dataUrl = this.props.getConfig('data_url');
             var editUrl = this.props.getConfig('edit_url');
             var gridId = this.props.getConfig('id');
-            var isLocalMode = this.props.isLocalMode();
+            var isLocalMode = !this.props.hasExternalResults();
 
             switch (action) {
                 case 'mass-delete':

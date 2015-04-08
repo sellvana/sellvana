@@ -92,7 +92,10 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         });
 
         $.post(url, hash, function(data) {
-            if (data) {
+            //todo: add alert or notify success
+            mainGrid.refresh();
+            modal.close();
+            /*if (data) {
                 switch(hash.oper) {
                     case 'add':
                         mainGrid.addRows([data]);
@@ -105,7 +108,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             } else {
                 console.log('error when save');
                 return false;
-            }
+            }*/
         }, 'json');
     }
 
