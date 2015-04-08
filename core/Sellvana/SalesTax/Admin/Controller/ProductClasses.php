@@ -4,6 +4,8 @@
  * Class Sellvana_SalesTax_Admin_Controller_ProductClasses
  *
  * @property Sellvana_SalesTax_Model_ProductClass $Sellvana_SalesTax_Model_ProductClass
+ * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_SalesTax_Model_ProductTax $Sellvana_SalesTax_Model_ProductTax
  */
 class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -20,7 +22,7 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        unset($config['form_url']);
+        //unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 50],
@@ -75,4 +77,62 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
             ->where($data['key'], $data['value'])->find_many());
         $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
     }
+
+    /**
+     * @param $model Sellvana_SalesTax_Model_ProductClass
+     * @return mixed
+     */
+    public function productTaxGridConfig($model)
+    {
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')
+                                                    ->select([
+                                                        'p.id',
+                                                        'p.product_name',
+                                                        'p.product_sku'
+                                                    ])->join($this->Sellvana_SalesTax_Model_ProductTax->table(), 'pt.product_id=p.id', 'pt')
+                                                    ->where('pt.product_class_id', $model->id());
+
+        $gridId = 'product_tax_grid';
+
+        $config['config'] = [
+            'id'                 => $gridId,
+            'data'               => null,
+            'data_mode'          => 'local',
+            'columns'            => [
+                ['type' => 'row_select'],
+                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
+                ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
+            ],
+            'actions'            => [
+                #'add' => ['caption' => 'Add products'],
+                'delete'              => ['caption' => 'Remove'],
+                'add-tax-product' => [
+                    'caption'  => 'Add Tax Products',
+                    'type'     => 'button',
+                    'id'       => 'add-tax-product-from-grid',
+                    'class'    => 'btn-primary',
+                    'callback' => 'showModalToAddTaxProduct'
+                ]
+            ],
+            'filters'            => [
+                ['field' => 'product_name', 'type' => 'text'],
+                ['field' => 'product_sku', 'type' => 'text']
+            ],
+            'events'             => ['init', 'add', 'mass-delete'],
+            'grid_before_create' => $gridId . '_register'
+        ];
+
+        $data = $this->BDb->many_as_array($orm->find_many());
+
+        $config['config']['data'] = $data;
+
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'setTaxProdMainGrid'
+        ];
+
+        return $config;
+    }
+
 }
