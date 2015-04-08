@@ -153,8 +153,13 @@ var Griddle = React.createClass({displayName: "Griddle",
             page = this.state.page;
         }
 
+        var options = {
+            dataUrl: this.getConfig('data_url'),
+            gridId: this.getConfig('id')
+        };
+
         // Obtain the results
-        this.props.getExternalResults(filter, sortColumn, sortAscending, page, this.props.resultsPerPage, callback);
+        this.props.getExternalResults(filter, sortColumn, sortAscending, page, this.props.resultsPerPage, callback, options);
     },
     updateStateWithExternalResults: function(state, callback) {
         // Update the table to indicate that it's loading.

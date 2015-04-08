@@ -3,12 +3,21 @@
 define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
 function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle, Backbone) {
 
-    var dataUrl,
-        gridId,
-        buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
-            var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
-            return dataUrl + beginQueryChar+ 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
-        };
+    /**
+     * build grid url
+     * @param dataUrl
+     * @param gridId
+     * @param filterString
+     * @param sortColumn
+     * @param sortAscending
+     * @param page
+     * @param pageSize
+     * @returns {string}
+     */
+    var buildGridDataUrl = function (dataUrl, gridId, filterString, sortColumn, sortAscending, page, pageSize) {
+        var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
+        return dataUrl + beginQueryChar + 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+    };
 
     var FComGriddleComponent = React.createClass({displayName: "FComGriddleComponent",
         getDefaultProps: function () {
@@ -20,9 +29,6 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         },
         componentWillMount: function () {
             this.initColumn();
-            //todo: need change way to get right info
-            dataUrl = this.props.config.data_url;
-            gridId = this.props.config.id;
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
@@ -50,6 +56,8 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         },
         render: function () {
             var config = this.props.config;
+
+            console.log(config);
 
             //prepare props base on data mode
             var props, state;
@@ -99,11 +107,12 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
      * @param page
      * @param pageSize
      * @param callback
+     * @param options
      * @constructor
      */
-    var FComDataMethod = function (filterString, sortColumn, sortAscending, page, pageSize, callback) {
+    var FComDataMethod = function (filterString, sortColumn, sortAscending, page, pageSize, callback, options) {
         $.ajax({
-            url: buildGridDataUrl(filterString, sortColumn, sortAscending, page, pageSize),
+            url: buildGridDataUrl(options.dataUrl, options.gridId, filterString, sortColumn, sortAscending, page, pageSize),
             dataType: 'json',
             type: 'GET',
             data: {},
