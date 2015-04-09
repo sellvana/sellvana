@@ -901,9 +901,9 @@ var Griddle = React.createClass({displayName: "Griddle",
 
         var that = this;
 
-        if (this.hasExternalResults()) {
+        /*if (this.hasExternalResults()) {
             this.props.addRowsExternal(rows, triggerAddedRowsEvent);
-        } else {
+        } else {*/
             var results = this.state.filteredResults || this.state.results;
             _.forEach(rows, function(row) {
                 if (!_.findWhere(results, {id: row.id})) {
@@ -919,7 +919,7 @@ var Griddle = React.createClass({displayName: "Griddle",
             };
 
             this.setState(state, triggerAddedRowsEvent);
-        }
+        //}
 
         function triggerAddedRowsEvent() {
             if (!options.silent) {
@@ -935,9 +935,9 @@ var Griddle = React.createClass({displayName: "Griddle",
 
         var that = this;
 
-        if (this.hasExternalResults()) {
+        /*if (this.hasExternalResults()) {
             this.props.removeRowsExternal(rows, triggerRemovedRowsEvent);
-        } else {
+        } else {*/
             var results = this.state.results;
             var filteredResults = this.state.filteredResults;
             var selectedRows = this.getSelectedRows();
@@ -967,7 +967,7 @@ var Griddle = React.createClass({displayName: "Griddle",
             };
 
             this.setState(state, triggerRemovedRowsEvent);
-        }
+        //}
 
         function triggerRemovedRowsEvent() {
             if (!options.silent) {
@@ -1032,9 +1032,9 @@ var Griddle = React.createClass({displayName: "Griddle",
 
         var that = this;
 
-        if (this.hasExternalResults()) {
+        /*if (this.hasExternalResults()) {
             this.props.updateRowsExternal(rows);
-        } else {
+        } else {*/
             var rows = this.getRows();
             var mapIds = rows.map(function (e) {
                 return e.id.toString();
@@ -1054,7 +1054,7 @@ var Griddle = React.createClass({displayName: "Griddle",
             });
 
             this.setState({ results: rows }, triggerUpdatedRowsEvent);
-        }
+        //}
 
         function triggerUpdatedRowsEvent() {
             if (!options.silent) {
@@ -1063,6 +1063,7 @@ var Griddle = React.createClass({displayName: "Griddle",
         }
     },
     getRows: function() {
+        console.log('state', this.state);
         return this.state.filteredResults || this.state.results;
     },
     /**

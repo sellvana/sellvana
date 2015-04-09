@@ -508,7 +508,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         },
         handleCustom: function(callback, event) {
             if (typeof window[callback] === 'function') {
-                return window[callback](this);
+                return window[callback](this.props.getCurrentGrid());
             }
         },
         render: function () {
