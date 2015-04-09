@@ -112,6 +112,26 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $config['columns'] = [
             ['type' => 'row_select'],
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
+            ['type' => 'btn_group', 'width' => 115,
+                'buttons' => [
+                    /*
+                        array(
+                            'type'=>'link','name'=>'required',
+                            'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
+                            'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_('Required')
+                        ),
+                        array(
+                            'type'=>'link','name'=>'ondemand',
+                            'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
+                            'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
+                        ),
+                    */
+                    [
+                        'type' => 'button', 'name' => 'edit',
+                        'icon' => 'fa fa-toggle-on',
+                    ],
+                ]
+            ],
             ['name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 100, 'overflow' => true],
             ['name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true],
             ['name' => 'version', 'label' => 'Version', 'width' => 80, 'overflow' => true],
@@ -129,26 +149,6 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             ['name' => 'required_by', 'label' => 'Required By', 'width' => 300, 'overflow' => true],
             ['name' => 'dep_errors', 'label' => 'Dependency Errors', 'width' => 300, 'overflow' => true,
                 'hidden' => true],
-            ['type' => 'btn_group', 'width' => 115,
-                'buttons' => [
-                /*
-                    array(
-                        'type'=>'link','name'=>'required',
-                        'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
-                        'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_('Required')
-                    ),
-                    array(
-                        'type'=>'link','name'=>'ondemand',
-                        'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
-                        'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
-                    ),
-                */
-                    [
-                        'type' => 'button', 'name' => 'edit',
-                        'icon' => 'glyphicon glyphicon-repeat',
-                    ],
-                ]
-            ],
         ];
 
         $config['state']['ps'] = 100;

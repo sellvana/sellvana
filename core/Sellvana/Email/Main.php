@@ -41,7 +41,6 @@ class Sellvana_Email_Main extends BClass
     {
         /** @var Sellvana_Email_Model_Message $msg */
         $msg = $this->Sellvana_Email_Model_Message->create([
-            'view_name' => $data['view_name'],
             'recipient' => $data['to'],
             'subject' => $data['subject'],
             'body' => $data['body'],
