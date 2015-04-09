@@ -15,5 +15,6 @@ base:
 
 /catalog/products/form:
     - { hook: product_prices_form_after, views: catalog/products-form/salestax }
+
 /customers/form:
     - { hook: customer_main_form_after, views: catalog/customers-form/salestax }
