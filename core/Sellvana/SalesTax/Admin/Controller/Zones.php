@@ -23,7 +23,7 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        unset($config['form_url']);
+        //unset($config['form_url']);
 
         $zoneTypeOptions = $this->Sellvana_SalesTax_Model_Zone->fieldOptions('zone_type');
         $countries = $this->FCom_Core_Main->getAllowedCountries();
