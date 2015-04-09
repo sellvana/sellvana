@@ -698,6 +698,7 @@ class BModule extends BClass
     public $custom;
     public $license;
     public $uploads;
+    public $package;
 
     public $is_cached;
     /**

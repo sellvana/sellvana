@@ -1845,12 +1845,13 @@ class BUtil extends BClass
     }
 
     /**
-     * @param $filename
-     * @param $sourceDir
+     * @param string $filename
+     * @param string $sourceDir
+     * @param string $ignorePattern
      * @return bool
      * @throws BException
      */
-    public function zipCreateFromDir($filename, $sourceDir)
+    public function zipCreateFromDir($filename, $sourceDir, $ignorePattern = null)
     {
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
@@ -1866,6 +1867,9 @@ class BUtil extends BClass
         }
         foreach ($files as $file) {
             $packedFile = str_replace($sourceDir . '/', '', $file);
+            if (!empty($ignorePattern) && preg_match($ignorePattern, $packedFile)) {
+                continue;
+            }
             if (is_dir($file)) {
                 $zip->addEmptyDir($packedFile);
             } else {
