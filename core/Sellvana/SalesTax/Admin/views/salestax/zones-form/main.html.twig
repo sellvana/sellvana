@@ -16,7 +16,7 @@
             options: countries, form_group_class: 'zone-field'}) }}
         {{ forms.select(fieldData, {id: 'region_select',field: 'region', label:'Region'|_, select2: 1, options: regions, form_group_class: 'zone-field'}) }}
         {{ forms.input(fieldData, {id: 'region_field', field: 'region', label:'Region'|_, form_group_class: 'zone-field', disabled: 1}) }}
-        {{ forms.input(fieldData, {field: 'postcode', label:'Postcode'|_, form_group_class: 'zone-field'}) }}
+        {{ forms.input(fieldData, {field: 'postcode_from', name: 'postcode', id: 'postcode', label:'Postcode'|_, form_group_class: 'zone-field'}) }}
         {{ forms.input(fieldData, {field: 'postcode_from', label:'Postcode from'|_, form_group_class: 'zone-field'}) }}
         {{ forms.input(fieldData, {field: 'postcode_to', label:'Postcode To'|_, form_group_class: 'zone-field'}) }}
         {{ forms.input(fieldData, {field: 'zone_rate_percent', label:'Zone Rate'|_}) }}

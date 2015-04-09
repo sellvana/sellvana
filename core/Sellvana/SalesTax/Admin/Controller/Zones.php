@@ -79,6 +79,15 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
                 . $this->BLocale->_('Add New Tax Zone') . '</button>']]);
     }
 
+    public function formPostBefore($args)
+    {
+        parent::formPostBefore($args);
+        $data = $args['data'];
+        if(!empty($data['zone_type']) && $data['zone_type'] == 'postcode') {
+            $args['data']['postcode_to'] =$args['data']['postcode_from'] = $data['postcode'];
+        }
+    }
+
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
