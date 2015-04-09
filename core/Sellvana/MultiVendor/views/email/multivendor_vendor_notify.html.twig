@@ -1,0 +1,21 @@
+{% set vendor = THIS.get('vendor') %}
+{% set order = THIS.get('order') %}
+{% set items = THIS.get('items') %}
+{% set shipping = THIS.get('shipping') %}
+{% set config = CONFIG.get('modules/Sellvana_MultiVendor') %}
+
+<!--{ subject: "{{ 'Order # %s'|_(order.unique_id) }}" }-->
+<!--{ from: "{{ config.store_contact_name }}" <{{ config.store_contact_email }}> }-->
+<!--{ to: "{{ vendor.vendor_name }}" <{{ vendor.email_notify }}> }-->
+
+Hello,
+
+The following items were ordered:
+
+{% for item in items %}
+
+  * {{item.qty}} x {{ item.sku }}: {{ item.name }}
+
+{% endfor %}
+
+Shipping method: {{ shipping.method }} - {{ shipping.service }}

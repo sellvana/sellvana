@@ -33,7 +33,8 @@ class Sellvana_PaymentBasic_PaymentMethod extends Sellvana_Sales_Method_Payment_
         // $this->Sellvana_Sales_Main->workflowAction('customerReturnsFromExternalPayment', ['payment' => $payment]);
 
         $payment->state()->overall()->setPending();
-        $payment->save();
+
+        $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', ['payment' => $payment]);
 
         $result = [];
 

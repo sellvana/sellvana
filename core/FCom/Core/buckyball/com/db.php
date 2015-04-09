@@ -1130,7 +1130,7 @@ class BORM extends ORMWrapper
 
     public function use_index($index, $type = 'USE', $table = '_')
     {
-        $this->_use_index[$table] = compact('index', 'type');
+        $this->_use_index[$table] = ['index' => $index, 'type' => $type];
         return $this;
     }
 
