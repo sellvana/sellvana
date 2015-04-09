@@ -34,7 +34,8 @@ class BDb
         CONSTRAINTS = 'CONSTRAINTS',
         KEYS = 'KEYS',
         OPTIONS = 'OPTIONS',
-        DROP = 'DROP';
+        DROP = 'DROP',
+        RENAME = 'RENAME';
     /**
     * Collection of cached named DB connections
     *
@@ -701,19 +702,22 @@ EOT
         if ($fields) {
             foreach ($fields as $f => $def) {
                 $fLower = strtolower($f);
-                if ($def === 'DROP') {
+                if ($def === static::DROP) {
                     if (!empty($tableFields[$fLower])) {
                         $alterArr[] = "DROP `{$f}`";
                     }
-                } elseif (strpos($def, 'RENAME') === 0) {
+                } elseif (strpos($def, static::RENAME) === 0) {
                     $a = explode(' ', $def, 3); //TODO: smarter parser, allow spaces in column name??
                     // Why not use a sprintf($def, $f) to fill in column name from $f?
                     $colName = $a[1];
                     $def = $a[2];
-                    if (empty($tableFields[$fLower])) {
-                        $f = $colName;
+                    if (!empty($tableFields[$fLower])) {
+                        $alterArr[] = "CHANGE `{$f}` `{$colName}` {$def}";
+                    } elseif (!empty($tableFields[strtolower($colName)])) {
+                        $alterArr[] = "CHANGE `{$colName}` `{$colName}` {$def}";
+                    } else {
+                        $alterArr[] = "ADD `{$colName}` {$def}";
                     }
-                    $alterArr[] = "CHANGE `{$f}` `{$colName}` {$def}";
                 } elseif (empty($tableFields[$fLower])) {
                     $alterArr[] = "ADD `{$f}` {$def}";
                 } else {

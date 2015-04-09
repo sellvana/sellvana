@@ -1098,6 +1098,7 @@ class BUtil extends BClass
             curl_close($ch);
         } else {
             $streamOptions = ['http' => [
+                'protocol_version' => '1.1',
                 'method' => $method,
                 'timeout' => $timeout,
                 'header' => "User-Agent: {$userAgent}\r\n",

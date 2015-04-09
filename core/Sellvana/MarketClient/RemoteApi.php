@@ -13,7 +13,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     /**
      * @var string
      */
-    protected $_apiUrl = 'http://market.sellvana.com/';
+    protected $_apiUrl = 'https://market.sellvana.com/';
     #protected $_apiUrl = 'http://127.0.0.1/sellvana/';
 
     /**
@@ -44,8 +44,8 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         }
 
         $url = $this->getUrl('api/v1/market/site/connect', [
-            'admin_url' => $this->BApp->href(),
-            'retry_url' => $this->BApp->href('marketclient/site/connect'),
+            'admin_url' => $this->BApp->adminHref(),
+            'retry_url' => $this->BApp->adminHref('marketclient/site/connect'),
             'redirect_to' => $redirect,
             'site_key' => $siteKey,
 

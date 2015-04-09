@@ -255,7 +255,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     public function action_migrate__POST()
     {
         try {
-            $this->BMigrate->migrateModules(true, true);
+            $this->BMigrate->migrateModules(true, true, 'modules');
             $this->message('Migration complete');
         } catch (Exception $e) {
             $this->BDebug->logException($e);
