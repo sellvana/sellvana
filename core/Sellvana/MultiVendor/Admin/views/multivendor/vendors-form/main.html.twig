@@ -1,0 +1,16 @@
+<!--{ label: Site Info }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% set fieldData = {validator: validator} %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<fieldset name="main-product">
+    <div class="f-section">
+        {{ forms.input(fieldData,  {field: 'vendor_name'|_, required: 1, label: "Name"}) }}
+        {{ forms.select(fieldData, {field: 'notify_type', label: "Notification Type", options:m.fieldOptions('notify_type') }) }}
+        {{ forms.input(fieldData,  {field: 'email_notify'|_, label: "Email for Notifications"}) }}
+        {{ forms.input(fieldData,  {field: 'email_support'|_, label: "Email for Support"}) }}
+    </div>
+</fieldset>

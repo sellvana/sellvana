@@ -484,6 +484,22 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $methods[$this->get('payment_method')];
     }
 
+    public function loadItemsProducts()
+    {
+        $pIds = [];
+        foreach ($this->items() as $item) {
+            $pIds[] = $item->get('product_id');
+        }
+        $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $pIds)->find_many_assoc();
+        foreach ($this->items() as $item) {
+            $pId = $item->get('product_id');
+            if (!empty($products[$pId])) {
+                $item->setProduct($products[$pId]);
+            }
+        }
+        return $this;
+    }
+
     public function __destruct()
     {
         parent::__destruct();

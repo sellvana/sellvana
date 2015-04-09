@@ -1,0 +1,8 @@
+/step3:
+    - view: head
+        do:
+            - [ css, @FCom_Core/css/font-awesome/css/font-awesome.min.css ]
+            - [ css, @Sellvana_MarketClient/Install/js/jquery.qtip.min.css ]
+            - [ requireJs, jquery.qtip, @Sellvana_MarketClient/Install/js/jquery.qtip.min ]
+
+    - { hook: after_form_fields, views: marketclient/register }

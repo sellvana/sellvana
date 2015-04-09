@@ -83,7 +83,21 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
             } else {
                 $prefix = '';
             }
-            return $p['model']->get($prefix . $p['field']);
+            $model = $p['model'];
+            $path = $prefix . $p['field'];
+
+            if ($model instanceof BClass) {
+                return $p['model']->get($path);
+            } elseif (is_array($model)) {
+                $node = $model;
+                foreach (explode('/', $path) as $key) {
+                    if (!isset($node[$key])) {
+                        return null;
+                    }
+                    $node = $node[$key];
+                }
+                return $node;
+            }
         }
         return '';
     }

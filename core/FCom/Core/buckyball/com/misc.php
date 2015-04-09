@@ -270,7 +270,7 @@ class BUtil extends BClass
     public function arrayToObject($d)
     {
         if (is_array($d)) {
-            return (object) array_map([$this->BUtil, 'objectToArray'], $d);
+            return (object) array_map([$this->BUtil, 'arrayToObject'], $d);
         }
         return $d;
     }
@@ -999,7 +999,7 @@ class BUtil extends BClass
     public function remoteHttp($method, $url, $data = [], $headers = [], $options = [])
     {
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
-        $timeout = 5;
+        $timeout = !empty($options['timeout']) ? $options['timeout'] : 5;
         $userAgent = !empty($options['useragent']) ? $options['useragent'] : 'Mozilla/5.0';
         if (preg_match('#^//#', $url)) {
             $url = 'http:' . $url;
@@ -1098,6 +1098,7 @@ class BUtil extends BClass
             curl_close($ch);
         } else {
             $streamOptions = ['http' => [
+                'protocol_version' => '1.1',
                 'method' => $method,
                 'timeout' => $timeout,
                 'header' => "User-Agent: {$userAgent}\r\n",
@@ -1845,12 +1846,13 @@ class BUtil extends BClass
     }
 
     /**
-     * @param $filename
-     * @param $sourceDir
+     * @param string $filename
+     * @param string $sourceDir
+     * @param string $ignorePattern
      * @return bool
      * @throws BException
      */
-    public function zipCreateFromDir($filename, $sourceDir)
+    public function zipCreateFromDir($filename, $sourceDir, $ignorePattern = null)
     {
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
@@ -1866,6 +1868,9 @@ class BUtil extends BClass
         }
         foreach ($files as $file) {
             $packedFile = str_replace($sourceDir . '/', '', $file);
+            if (!empty($ignorePattern) && preg_match($ignorePattern, $packedFile)) {
+                continue;
+            }
             if (is_dir($file)) {
                 $zip->addEmptyDir($packedFile);
             } else {
@@ -2790,7 +2795,13 @@ class BDebug extends BClass
      */
     public function errorHandlerLogger($code, $message, $file, $line, $context = null)
     {
-        return static::$_errorHandlerLog[] = compact('code', 'message', 'file', 'line', 'context');
+        return static::$_errorHandlerLog[] = [
+            'code' => $code,
+            'message' => $message,
+            'file' => $file,
+            'line' => $line,
+            'context' => $context,
+        ];
     }
 
     /**
@@ -3212,11 +3223,13 @@ class BDebug extends BClass
                 . (!empty($e['module']) ? $e['module'] : '') . "</td></tr>";
         }
 ?></tbody></table></div><script>
+        /*
         if (require) {
             require(['jquery.tablesorter'], function() {
                 $('#buckyball-debug-table').tablesorter();
             })
         }
+        */
 </script><?php
         $html = ob_get_clean();
         if ($return) {
@@ -3948,7 +3961,7 @@ class BValidate extends BClass
             $this->BSession->set('validator-data:' . $formName, $data);
             foreach ($this->_validateErrors as $field => $errors) {
                 foreach ($errors as $error) {
-                    $msg = compact('error', 'field');
+                    $msg = ['error' => $error, 'field' => $field];
                     $this->BSession->addMessage($msg, 'error', 'validator-errors:' . $formName);
                 }
             }
@@ -3962,6 +3975,15 @@ class BValidate extends BClass
     public function validateErrors()
     {
         return $this->_validateErrors;
+    }
+
+    public function validateErrorsString()
+    {
+        $result = [];
+        foreach ($this->_validateErrors as $field => $errors) {
+            $result[] = $field . ': ' . join('; ', $errors);
+        }
+        return join("\n", $result);
     }
 
     /**

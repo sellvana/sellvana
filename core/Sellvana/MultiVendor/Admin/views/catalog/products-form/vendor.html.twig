@@ -1,0 +1,13 @@
+{% set m = THIS.get('model') %}
+{% set vendors = APP.instance('Sellvana_MultiVendor_Model_Vendor').vendorOptions() %}
+{% set vendorProduct = APP.instance('Sellvana_MultiVendor_Model_VendorProduct').load(m.id(), 'product_id') %}
+{% set fieldData = {id_prefix: 'vendor_product', name_prefix: 'vendor_product', model:vendorProduct } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<fieldset name="main-product">
+    <div class="f-section">
+        {{ forms.select(fieldData, {field:'vendor_id', label:'Vendor', options:vendors }) }}
+        {{ forms.input(fieldData, {field:'vendor_sku', label:'Vendor SKU'|_ }) }}
+        {{ forms.input(fieldData, {field:'vendor_product_name', label:'Vendor Product Name'|_ }) }}
+    </div>
+</fieldset>

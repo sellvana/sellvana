@@ -276,7 +276,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function generateUrlKey()
     {
         //$key = $this->manuf()->manuf_name.'-'.$this->product_sku.'-'.$this->product_name;
-        $key = $this->product_name;
+        $key = $this->get('product_name');
         $urlKey = $this->BLocale->transliterate($key);
         $t = $this->BDb->t(static::$_table);
         $existsSql = "SELECT COUNT(*) as cnt from {$t} WHERE url_key=?";
@@ -285,11 +285,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         $exists = $this->orm()->raw_query($existsSql, [$urlKey])->find_one();
         if ($exists && $exists->cnt > 0) {
-            $matchSql        = "SELECT url_key FROM {$t} WHERE url_key LIKE ?";
+            $matchSql = "SELECT url_key FROM {$t} WHERE url_key LIKE ?";
             if ($this->id()) {
                 $matchSql .= ' and id!=' . (int)$this->id();
             }
-            $result           = $this->orm()->raw_query($matchSql, [$urlKey . '%'])->find_many();
+            $result = $this->orm()->raw_query($matchSql, [$urlKey . '%'])->find_many();
             $similarUrlKeys = [];
             foreach ($result as $row) {
                 $similarUrlKeys[$row->get('url_key')] = 1;
