@@ -239,10 +239,12 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                     ['name' => 'qty_ordered', 'label' => 'Qty', 'width' => 100],
                     ['name' => 'row_total', 'label' => 'Total', 'width' => 150],
                 ],
+                /*
                 'actions'   => [
                     'add'    => ['caption' => 'Add products'],
                     'delete' => ['caption' => 'Remove'] //todo: fix remove is not delete in some grid
                 ],
+                */
             ]
         );
         return ['config' => $config];

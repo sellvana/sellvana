@@ -44,6 +44,7 @@ class Sellvana_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract
         ];
         return $config;
     }
+
     /**
      * @param array $args
      */
@@ -56,5 +57,4 @@ class Sellvana_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract
             $args['model']->setData('layout', $layout);
         }
     }
-
 }

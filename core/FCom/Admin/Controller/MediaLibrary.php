@@ -492,7 +492,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
      */
     public function uploadConfig($configId = null)
     {
-        $uploadConfig         = [];
+        $uploadConfig = [];
         if(empty($this->_uploadConfigs)){
             $this->collectUploadConfig();
         }

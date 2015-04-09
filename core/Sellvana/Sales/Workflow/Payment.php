@@ -75,8 +75,6 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
                 break;
         }
 
-        $order->state()->overall()->setPlaced();
-
         $cart->state()->overall()->setOrdered();
         $cart->state()->payment()->setAccepted();
 
