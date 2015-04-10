@@ -68,6 +68,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                             
                             if (editUrl.length > 0 && rowId) {
                                 $.post(editUrl, {id: rowId, oper: 'del'}, function() {
+                                    that.removeSelectedRows([row]);
                                     that.props.refresh();
                                 });
                             }

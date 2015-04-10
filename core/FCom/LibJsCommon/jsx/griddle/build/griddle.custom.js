@@ -464,7 +464,8 @@ var Griddle = React.createClass({displayName: "Griddle",
                 getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh,
                 setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState,
                 updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, removeRows: this.removeRows, getCurrentGrid: this.getCurrentGrid,
-                ref: 'gridSettings', hasExternalResults: this.hasExternalResults, updateRows: this.updateRows, saveModalForm: this.saveModalForm}
+                ref: 'gridSettings', hasExternalResults: this.hasExternalResults, updateRows: this.updateRows, saveModalForm: this.saveModalForm,
+                clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows }
             )
             : React.createElement("span", {className: "settings", onClick: this.toggleColumnChooser}, this.props.settingsText, " ", React.createElement("i", {className: "glyphicon glyphicon-cog"}))
         ) : "";
@@ -891,7 +892,8 @@ var Griddle = React.createClass({displayName: "Griddle",
      * empty selectedRows
      */
     clearSelectedRows: function() {
-        this.setState({selectedRows: []});
+        console.log('clear selected rows');
+        this.setState({ selectedRows: [] });
     },
     addRows: function(rows, options) {
         options = _.extend({
@@ -904,21 +906,21 @@ var Griddle = React.createClass({displayName: "Griddle",
         /*if (this.hasExternalResults()) {
             this.props.addRowsExternal(rows, triggerAddedRowsEvent);
         } else {*/
-            var results = this.state.filteredResults || this.state.results;
-            _.forEach(rows, function(row) {
-                if (!_.findWhere(results, {id: row.id})) {
-                    results.push(row);
-                }
-            });
+        var results = this.state.filteredResults || this.state.results;
+        _.forEach(rows, function(row) {
+            if (!_.findWhere(results, {id: row.id})) {
+                results.push(row);
+            }
+        });
 
-            var state = {
-                results: results,
-                filteredResults: results, //todo: check this
-                totalResults: results.length,
-                maxPage: this.getMaxPage(results)
-            };
+        var state = { results: results };
 
-            this.setState(state, triggerAddedRowsEvent);
+        if (!this.state.filteredResults)  {
+            state.totalResults = results.length;
+            state.maxPage = this.getMaxPage(results);
+        }
+
+        this.setState(state, triggerAddedRowsEvent);
         //}
 
         function triggerAddedRowsEvent() {

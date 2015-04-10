@@ -40,7 +40,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
         },
         updateModalWidth: function(modal) {
             //todo: add css class to modal to pre-define width, eg: large, medium, small
-            $(modal.getDOMNode()).find('.modal-dialog').css('min-width', '900px');
+            $(modal.getDOMNode()).find('.modal-dialog').css('width', '900px');
         }
     };
 

@@ -70,13 +70,11 @@
         }
 
         window.gridRegister{{ gridConfig.config.id }} = function(grid) {
-            console.log('1');
             {{ combineType }}Grid = grid;
             originIds = _.pluck(grid.getRows(), 'id');
         };
 
         window.gridShowMedia{{ gridConfig.config.id }} = function() {
-            console.log('2');
             var mediaModal = $('#{{ medialibConfig.id }}-media-modal');
             if (mediaModal) {
                 mediaModal.modal('show');

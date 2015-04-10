@@ -396,6 +396,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                         } else {
                             var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
                             $.post(dataUrl, { oper: action, id: ids }, function() {
+                                that.props.clearSelectedRows();
                                 that.props.refresh();
                             });
                         }
