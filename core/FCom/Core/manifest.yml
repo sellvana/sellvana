@@ -24,6 +24,7 @@ modules:
             - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid } ]
             - [ core/griddle, { view_class: FCom_Core_View_BackboneGrid } ]
             - [ core/medialib, { view_class: FCom_Core_View_Base } ]
+            - [ core/medialib-griddle, { view_class: FCom_Core_View_Base } ]
             - [ core/attachmentgrid, { view_class: FCom_Core_View_Base } ]
             - [ text, { view_class: FCom_Core_View_Text } ]
 

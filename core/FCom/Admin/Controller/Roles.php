@@ -15,6 +15,9 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridTitle = 'Roles and Permissions';
     protected $_recordName = 'Role';
 
+    protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';
+    protected $_defaultGridLayoutName = 'default_griddle';
 
     public function gridConfig()
     {

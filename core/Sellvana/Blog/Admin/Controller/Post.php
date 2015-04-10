@@ -19,6 +19,10 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
     protected $_mainTableAlias = 'p';
     protected $_navPath = 'cms/blog';
 
+    protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';
+    protected $_defaultGridLayoutName = 'default_griddle';
+
     public function gridConfig()
     {
         $config = parent::gridConfig();

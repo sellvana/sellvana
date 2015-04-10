@@ -19,7 +19,7 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
     public function gridConfig()
     {
         $orm = $this->Sellvana_Sales_Model_StateCustom->orm('oscs')->select('oscs.*');
-        
+
         $config = [
             'config' => [
                 'id'     => 'state-custom',
@@ -30,37 +30,41 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'index' => 'oscs.id', 'label' => 'ID', 'width' => 40],
-                    ['name' => 'entity_type', 'index' => 'sc.entity_type', 'label' => 'Entity Type','width' => 85, 'addable'=>true,'editable' => true,
-                               'editor' => 'select', 'options' => $this->Sellvana_Sales_Model_StateCustom->fieldOptions('entity_type'),
-                               'validation' => ['required' => true]],
-                    ['name' => 'state_code', 'index' => 'oscs.state_code', 'label' => 'Code', 'width' =>  150, 'addable'=>true, 'editable' => true,
-                        'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
-                    ['name' => 'state_label', 'index' => 'oscs.state_label', 'label' => 'Label' ,'width' => 150, 'addable'=>true, 'editable' => true,    
-                        'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
+                    ['name' => 'entity_type', 'index' => 'sc.entity_type', 'label' => 'Entity Type','width' => 85, 'addable'=>true,'editable' => true, 'editor' => 'select', 'options' => $this->Sellvana_Sales_Model_StateCustom->fieldOptions('entity_type'), 'validation' => ['required' => true]],
+                    ['name' => 'state_code', 'index' => 'oscs.state_code', 'label' => 'Code', 'width' =>  150, 'addable'=>true, 'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
+                    ['name' => 'state_label', 'index' => 'oscs.state_label', 'label' => 'Label' ,'width' => 150, 'addable'=>true, 'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
                     ['type' => 'btn_group', 'buttons' => [
-                        ['name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
-                        ['name' => 'delete']]
+                            ['name' => 'edit'],
+                            ['name' => 'delete']
+                        ]
                     ]
                 ],
                 'actions' => [
+                    'add-state-custome' => [
+                        'caption'  => 'Add State Custom',
+                        'type'     => 'button',
+                        'id'       => 'add-state-custom',
+                        'class'    => 'btn-primary',
+                        'callback' => 'showModalToAddStateCustom'
+                    ],
                     'edit' => true,
                     'delete' => true
                 ],
                 'filters' => [
                     ['field' => 'entity_type', 'type' => 'text'],
                     ['field' => 'state_code', 'type' => 'text'],
-                    ['field' => 'state_label', 'type' => 'text'],            
+                    ['field' => 'state_label', 'type' => 'text'],
                 ],
                 'grid_before_create' => 'orderCustomStateGridRegister'
             ]
         ];
-        
+
         return $config;
     }
 
     public function action_order_state_custom()
     {
-        $this->layout('/orderstatecustom');        
+        $this->layout('/orderstatecustom');
     }
 
     /**
@@ -99,7 +103,7 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
             }
             $key = $this->BDb->sanitizeFieldName($data['key']);
             $value = $data['value'];
-            
+
             $exists = $this->Sellvana_Sales_Model_StateCustom->load($value, $key);
             $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
         } catch (Exception $e) {

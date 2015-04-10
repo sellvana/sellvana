@@ -22,6 +22,11 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
             $this->forward(false);
             return $this;
         }
+        $urlPrefix = $this->BConfig->get('modules/Sellvana_Catalog/url_prefix');
+        if ($urlPrefix) {
+            $urlPrefix = trim($urlPrefix, '/');
+            $catName = preg_replace('#^/?' . preg_quote($urlPrefix, '#') . '/?#', '', $catName);
+        }
         /** @var Sellvana_Catalog_Model_Category $category */
         $category = $this->Sellvana_Catalog_Model_Category->load($catName, 'url_path');
         if (!$category) {
