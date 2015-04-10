@@ -24,7 +24,7 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
 
     public function gridConfig() {
         $config = parent::gridConfig();
-        unset($config['form_url']);
+        //unset($config['form_url']);
         $config['id'] = 'customer-class';
         $config['caption'] = 'Customer Class';
         $config['columns'] = [

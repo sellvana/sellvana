@@ -24,7 +24,7 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
 
     public function gridConfig() {
         $config = parent::gridConfig();
-        unset($config['form_url']);
+        //unset($config['form_url']);
         $config['id'] = 'product-class';
         $config['caption'] = 'Product Class';
         $config['columns'] = [
