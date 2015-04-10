@@ -1,0 +1,124 @@
+{% set config = THIS.get('config') %}
+
+{% set type = config.type %}
+{% set targetType = config.targetType %}
+{% set elementContainer = config.elementContainer %}
+
+{% set gridConfig = config.gridConfig %}
+{% set medialibConfig = config.medialibConfig %}
+
+{% set combineType = targetType ~ type %}
+{% set combineTypeId = targetType ~ '_' ~ type %}
+
+{% set mediaConfig = UTIL.arrayMerge({mode: 'link', title: 'Attachments', multiSelAllowed: true, folder: 'media/product/attachment'}, medialibConfig) %}
+
+<script>
+    var {{ combineType }}Grid; //grid contains all attachment (or images) related with products (or targetType)
+
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+
+        var elementContainer = $('{{ elementContainer }}');
+        var originIds;
+
+        if (typeof setMediaModalConfig == 'function') {
+            //set modal config
+            setMediaModalConfig('{{ medialibConfig.id }}', {
+                confirm: 'Add',
+                title: '{{ mediaConfig.title }}',
+                onConfirm: addSelectedItemsToCombineGrid
+            });
+        }
+
+        function removeSpecialChars(str)
+        {
+            var label = str.substr(0, str.lastIndexOf('.'));
+            return label.replace(/[^A-Z0-9]/ig, ' ');
+        }
+
+        function addSelectedItemsToCombineGrid(modal)
+        {
+            if (typeof mediaLibGrid{{ medialibConfig.id }} != 'undefined') {
+                var selectedRows = mediaLibGrid{{ medialibConfig.id }}.getSelectedRows();
+                if (selectedRows.length) {
+                    var addRows = [];
+                    //process selected rows
+                    selectedRows.forEach(function (attachRow) {
+                        if (!_.findWhere({{ combineType }}Grid.getRows(), { file_id: attachRow.id })) {
+                            var row = attachRow;
+                            var current = FCom.Mixin.dateTimeNow();
+                            _.extend(row, {
+                                _new: true,
+                                id: guid(),
+                                file_id: attachRow.id,
+                                update_at: current,
+                                create_at: current,
+                                //temporary value before implement edit inline
+                                position: 0,
+                                label: removeSpecialChars(attachRow.file_name)
+                            });
+                            addRows.push(row);
+                        }
+                    });
+
+                    if (addRows.length) {
+                        {{ combineType }}Grid.addRows(addRows);
+                    }
+
+                    modal.close();
+                }
+            }
+        }
+
+        window.gridRegister{{ gridConfig.config.id }} = function(grid) {
+            {{ combineType }}Grid = grid;
+            originIds = _.pluck(grid.getRows(), 'id');
+        };
+
+        window.gridShowMedia{{ gridConfig.config.id }} = function() {
+            var mediaModal = $('#{{ medialibConfig.id }}-media-modal');
+            if (mediaModal) {
+                mediaModal.modal('show');
+            }
+        }
+
+        window.submitCallback.push(function () {
+            updateRowsRecord({{ combineType }}Grid);
+        });
+
+        function getFieldToSave(row) {
+            return {
+                id: row.id,
+                file_id: row.file_id,
+                label: row.label,
+                position: row.position,
+                create_at: row.create_at,
+                update_at: row.update_at,
+                _new: row._new
+            };
+        }
+
+        /**
+         * Update rows before save
+         * @param grid
+         */
+        function updateRowsRecord(grid) {
+            var rows = [];
+            var removedIds = _.difference(originIds, _.pluck(grid.getRows(), 'id'));
+
+            grid.getRows().forEach(function(row) {
+                rows.push(getFieldToSave(row));
+            });
+
+            $('#{{ gridConfig.config.id }}-attach-rows').val(JSON.stringify(rows));
+            $('#{{ gridConfig.config.id }}-attach-remove').val(removedIds.join(','));
+        }
+
+    });
+</script>
+
+
+{{ LAYOUT.view('core/griddle').set('grid', gridConfig) | raw }}
+{{ LAYOUT.view('core/medialib-griddle').set('config', mediaConfig) | raw }}
+
+<input type='hidden' name="grid[{{ type }}][del]" class="target-attach-remove" id="{{ gridConfig.config.id }}-attach-remove" />
+<input type='hidden' name="grid[{{ type }}][rows]" class="target-attach-rows" id="{{ gridConfig.config.id }}-attach-rows" />

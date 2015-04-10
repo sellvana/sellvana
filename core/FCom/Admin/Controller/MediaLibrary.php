@@ -103,8 +103,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'filters' => [
                     ['field' => 'file_name', 'type' => 'text']
                 ],
+                //callbacks for backbonegrid
                 'grid_before_create' => $id . '_register',
                 'afterMassDelete' => $id .'_afterMassDelete',
+                //callbacks for react griddle
+                'callbacks' => [
+                    'componentDidMount' => 'registerGrid' . $id,
+                ],
                 'actions' => [
                     'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
                     'refresh' => true,

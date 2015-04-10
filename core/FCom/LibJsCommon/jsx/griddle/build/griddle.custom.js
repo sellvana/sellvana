@@ -7,7 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['underscore', 'react', 'griddle.gridNoData'], function(_, React, GridNoData) {
+define(['jquery', 'underscore', 'react', 'griddle.gridNoData', 'fcom.components',], function($, _, React, GridNoData, Components) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
@@ -21,6 +21,7 @@ var CustomPaginationContainer = require('./customPaginationContainer.jsx');
 var _ = require('underscore');
 */
 var Griddle = React.createClass({displayName: "Griddle",
+    mixins: [FCom.Mixin],
     getDefaultProps: function() {
         return{
             "columns": [],
@@ -61,7 +62,10 @@ var Griddle = React.createClass({displayName: "Griddle",
             "customFilter": {},
             "customSettings": {},
             "customGrid": {},
-            "initPage": 0 //begin with 0 page
+            "initPage": 0, //begin with 0 page
+            "addRowsExternal": null,
+            "updateRowsExternal": null,
+            "removeRowsExternal": null
         };
     },
     /* if we have a filter display the max page and results accordingly */
@@ -152,8 +156,13 @@ var Griddle = React.createClass({displayName: "Griddle",
             page = this.state.page;
         }
 
+        var options = {
+            dataUrl: this.getConfig('data_url'),
+            gridId: this.getConfig('id')
+        };
+
         // Obtain the results
-        this.props.getExternalResults(filter, sortColumn, sortAscending, page, this.props.resultsPerPage, callback);
+        this.props.getExternalResults(filter, sortColumn, sortAscending, page, this.props.resultsPerPage, callback, options);
     },
     updateStateWithExternalResults: function(state, callback) {
         // Update the table to indicate that it's loading.
@@ -174,7 +183,9 @@ var Griddle = React.createClass({displayName: "Griddle",
                 results: externalResults.results,
                 totalResults: externalResults.totalResults,
                 isLoading: false,
-                isInit: false
+                isInit: false,
+                filteredResults: null,
+                maxPage: that.getMaxPage(externalResults.results)
             });
 
             callback(state);
@@ -374,6 +385,7 @@ var Griddle = React.createClass({displayName: "Griddle",
         this.triggerCallback('componentDidMount');
     },
     componentDidUpdate: function() {
+        //console.log('state', this.state);
         this.triggerCallback('componentDidUpdate');
     },
     getDataForRender: function(data, cols, pageList){
@@ -449,11 +461,12 @@ var Griddle = React.createClass({displayName: "Griddle",
         var settings = this.props.showSettings ?
         (
             this.props.useCustomSettings
-            ? React.createElement(this.props.customSettings, {columnMetadata: this.props.columnMetadata, selectedColumns: this.getColumns, setColumns: this.setColumns, 
-                getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh, 
-                setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState, 
-                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, removeRows: this.removeRows, getCurrentGrid: this.getCurrentGrid, 
-                ref: 'gridSettings', isLocalMode: this.isLocalMode, updateRows: this.updateRows}
+            ? React.createElement(this.props.customSettings, {columnMetadata: this.props.columnMetadata, selectedColumns: this.getColumns, setColumns: this.setColumns,
+                getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh,
+                setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState,
+                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, removeRows: this.removeRows, getCurrentGrid: this.getCurrentGrid,
+                ref: 'gridSettings', hasExternalResults: this.hasExternalResults, updateRows: this.updateRows, saveModalForm: this.saveModalForm,
+                clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows }
             )
             : React.createElement("span", {className: "settings", onClick: this.toggleColumnChooser}, this.props.settingsText, " ", React.createElement("i", {className: "glyphicon glyphicon-cog"}))
         ) : "";
@@ -468,6 +481,10 @@ var Griddle = React.createClass({displayName: "Griddle",
             //figure out which columns are displayed and show only those
             var data = this.getDataForRender(results, cols, true);
 
+            /*console.log('dataForRender', data);
+            console.log('filteredResults', this.state.filteredResults);
+            console.log('results', this.state.results);*/
+
             var meta = this.props.metadataColumns;
             meta.push(this.props.childrenColumnName);
 
@@ -480,19 +497,18 @@ var Griddle = React.createClass({displayName: "Griddle",
                 ? (React.createElement(CustomFormatContainer, {data: data, columns: cols, metadataColumns: meta, className: this.props.customFormatClassName, customFormat: this.props.customFormat}))
                 : (
                     this.props.useCustomGrid
-                    ? (React.createElement(this.props.customGrid, {columnMetadata: this.props.columnMetadata, data: data, originalData: results, columns: cols, metadataColumns: meta, 
-                        className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, 
-                        getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, 
-                        getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows, 
-                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, isLocalMode: this.isLocalMode, updateRows: this.updateRows, 
-                        ref: 'gridBody'}
+                    ? (React.createElement(this.props.customGrid, {columnMetadata: this.props.columnMetadata, data: data, originalData: results, columns: cols, metadataColumns: meta,
+                        className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending,
+                        getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection,
+                        getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows,
+                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, updateRows: this.updateRows, saveModalForm: this.saveModalForm, ref: 'gridBody'}
                     ))
                     : (React.createElement(GridBody, {columnMetadata: this.props.columnMetadata, data: data, columns: cols, metadataColumns: meta, className: this.props.tableClassName}))
                 );
 
             pagingContent = this.props.useCustomPager && this.props.customPager
-                ? (React.createElement(this.props.customPager, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page, maxPage: this.state.maxPage ? this.state.maxPage : 0, 
-                    setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText, totalResults: this.state.totalResults, 
+                ? (React.createElement(this.props.customPager, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page, maxPage: this.state.maxPage ? this.state.maxPage : 0,
+                    setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText, totalResults: this.state.totalResults,
                     getConfig: this.getConfig, setPageSize: this.setPageSize, resultsPerPage: this.props.resultsPerPage, getHeaderSelection: this.getHeaderSelection}))
                 : (React.createElement(GridPagination, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page ? this.state.page : 0, maxPage: this.state.maxPage, setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText}));
         } else {
@@ -525,12 +541,12 @@ var Griddle = React.createClass({displayName: "Griddle",
             var rowTopClassName = "f-grid-top f-grid-toolbar clearfix " + this.getConfig('id');
             var rowBottomClassName = "row f-grid-bottom f-grid-toolbar clearfix " + this.getConfig('id');
             topSection = (
-                React.createElement("div", null, 
-                    React.createElement("div", {className: rowTopClassName}, 
+                React.createElement("div", null,
+                    React.createElement("div", {className: rowTopClassName},
                         filter
-                    ), 
-                    React.createElement("div", {className: rowBottomClassName}, 
-                        settings, 
+                    ),
+                    React.createElement("div", {className: rowBottomClassName},
+                        settings,
                         that.props.showPager ? pagingContent : ""
                     )
                 )
@@ -538,8 +554,8 @@ var Griddle = React.createClass({displayName: "Griddle",
         }
 
         var columnSelector = this.state.showColumnChooser && !this.props.useCustomSettings ? (
-            React.createElement("div", {className: "row"}, 
-                React.createElement("div", {className: "col-md-12"}, 
+            React.createElement("div", {className: "row"},
+                React.createElement("div", {className: "col-md-12"},
                     React.createElement(GridSettings, {columns: keys, selectedColumns: cols, setColumns: this.setColumns, settingsText: this.props.settingsText, maxRowsText: this.props.maxRowsText, setPageSize: this.setPageSize, resultsPerPage: this.props.resultsPerPage, allowToggleCustom: this.props.allowToggleCustom, toggleCustomFormat: this.toggleCustomFormat, useCustomFormat: this.props.useCustomFormat, enableCustomFormatText: this.props.enableCustomFormatText, columnMetadata: this.props.columnMetadata})
                 )
             )
@@ -552,10 +568,10 @@ var Griddle = React.createClass({displayName: "Griddle",
 
         var gridBody = this.props.useCustomFormat || this.props.customGrid
             ?       React.createElement("div", {className: "scrollable-area"}, resultContent)
-            :       (React.createElement("div", {className: "grid-body"}, 
-                        this.props.showTableHeading ? React.createElement("table", {className: headerTableClassName}, 
+            :       (React.createElement("div", {className: "grid-body"},
+                        this.props.showTableHeading ? React.createElement("table", {className: headerTableClassName},
                             React.createElement(GridTitle, {columns: cols, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, columnMetadata: this.props.columnMetadata})
-                        ) : "", 
+                        ) : "",
                         resultContent
                         ));
 
@@ -584,9 +600,9 @@ var Griddle = React.createClass({displayName: "Griddle",
             </div>
         );*/
         return (
-            React.createElement("div", {className: gridClassName}, 
-                topSection, 
-                columnSelector, 
+            React.createElement("div", {className: gridClassName},
+                topSection,
+                columnSelector,
                 gridBody
             )
         );
@@ -603,9 +619,6 @@ var Griddle = React.createClass({displayName: "Griddle",
         }
         return null;
     },
-    isLocalMode: function() {
-        return this.getConfig('data_mode') == 'local';
-    },
     /**
      * re-render grid with same state
      */
@@ -618,11 +631,13 @@ var Griddle = React.createClass({displayName: "Griddle",
                 that.setState(updatedState);
                 that.setMaxPage();
             });
+        } else {
+            //todo: refresh for local data_mode
         }
     },
     /**
      * filter local data
-     * @param data
+     * @param data //todo: remove this params
      * @param filters
      * @returns {Griddle.props.results|*}
      */
@@ -749,6 +764,7 @@ var Griddle = React.createClass({displayName: "Griddle",
      * @param submitFilters
      */
     setFilterLocalData: function (submitFilters) {
+        var filter = JSON.stringify(submitFilters);
         var filteredResults = this.filterLocalData(this.props.results, submitFilters);
 
         //personalize
@@ -761,7 +777,7 @@ var Griddle = React.createClass({displayName: "Griddle",
             });
         }
 
-        this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
+        this.setState({ filter: filter, filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
     },
     /**
      * get url to save personalize url
@@ -797,6 +813,7 @@ var Griddle = React.createClass({displayName: "Griddle",
      * @param value
      */
     searchWithinResults: function (value) {
+        //console.log('searchWithinResults.value', value);
         //todo: confirm with Boris about search within available columns or all columns
         if (value) {
             var that = this,
@@ -804,12 +821,20 @@ var Griddle = React.createClass({displayName: "Griddle",
                 updateAfterResultsObtained = function (updatedState) {
                     // Update the max page.
                     updatedState.maxPage = that.getMaxPage(updatedState.filteredResults);
+                    updatedState.totalResults = updatedState.filteredResults.length;
 
                     // Set the state.
                     that.setState(updatedState);
                 };
 
-            state.filteredResults = _.filter(this.state.results,
+            var results = this.state.results;
+            //console.log('state.filter', this.state.filter);
+            if (this.state.filter != '') { //if have filter, need to filter data then search in results
+                results = this.filterLocalData(null, JSON.parse(this.state.filter));
+                //console.log('results before search', results);
+            }
+
+            state.filteredResults = _.filter(results,
                 function (item) {
                     var arr = _.values(item);
                     for (var i = 0; i < arr.length; i++) {
@@ -822,7 +847,16 @@ var Griddle = React.createClass({displayName: "Griddle",
                 });
 
             updateAfterResultsObtained(state);
-        } else {
+        } else if (!this.hasExternalResults() && this.state.filter != '') { //empty value + already have filtered data, return to filtered data
+            //console.log('state.filter', this.state.filter);
+            var filters = JSON.parse(this.state.filter);
+            var filteredResults = this.filterLocalData(null, filters);
+            this.setState({
+                filteredResults: filteredResults,
+                maxPage: this.getMaxPage(filteredResults),
+                totalResults: filteredResults.length
+            });
+        } else { //empty value + empty filtered data
             this.setState({
                 filteredResults: null,
                 maxPage: this.getMaxPage(null)
@@ -868,35 +902,132 @@ var Griddle = React.createClass({displayName: "Griddle",
      * empty selectedRows
      */
     clearSelectedRows: function() {
-        this.setState({selectedRows: []});
+        console.log('clear selected rows');
+        this.setState({ selectedRows: [] });
     },
-    addRows: function(rows) {
+    addRows: function(rows, options) {
+        options = _.extend({
+            silent: false
+            //other options
+        }, options);
+
+        var that = this;
+
+        /*if (this.hasExternalResults()) {
+            this.props.addRowsExternal(rows, triggerAddedRowsEvent);
+        } else {*/
         var results = this.state.filteredResults || this.state.results;
         _.forEach(rows, function(row) {
             if (!_.findWhere(results, {id: row.id})) {
                 results.push(row);
             }
         });
-        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) }, function() {
-            $(this.getDOMNode()).trigger('addedRows.griddle', [rows, this]);
-        });
-    },
-    removeRows: function(rows) {
-        var results = this.state.filteredResults || this.state.results;
-        var selectedRows = this.getSelectedRows();
-        var deleteIds = _.pluck(rows, 'id');
-        if (deleteIds) {
-            results = _.filter(results, function(row) {
-                return !_.contains(deleteIds, row.id);
-            });
-            selectedRows = _.filter(selectedRows, function(row) {
-                return !_.contains(deleteIds, row.id);
-            });
+
+        var state = { results: results };
+
+        if (!this.state.filteredResults)  {
+            state.totalResults = results.length;
+            state.maxPage = this.getMaxPage(results);
         }
-        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results), selectedRows: selectedRows }, function() {
-            $(this.getDOMNode()).trigger('removedRows.griddle', [rows, this]);
-        });
+
+        this.setState(state, triggerAddedRowsEvent);
+        //}
+
+        function triggerAddedRowsEvent() {
+            if (!options.silent) {
+                $(that.getDOMNode()).trigger('addedRows.griddle', [rows, that]);
+            }
+        }
     },
+    removeRows: function(rows, options) {
+        options = _.extend({
+            silent: false
+            //other options
+        }, options);
+
+        var that = this;
+
+        /*if (this.hasExternalResults()) {
+            this.props.removeRowsExternal(rows, triggerRemovedRowsEvent);
+        } else {*/
+            var results = this.state.results;
+            var filteredResults = this.state.filteredResults;
+            var selectedRows = this.getSelectedRows();
+            var deleteIds = _.pluck(rows, 'id');
+            if (deleteIds) {
+
+                function filterRow(row) {
+                    return !_.contains(deleteIds, row.id);
+                }
+
+                results = _.filter(results, filterRow);
+
+                if (selectedRows) {
+                    selectedRows = _.filter(selectedRows, filterRow);
+                }
+                if (filteredResults) {
+                    filteredResults = _.filter(filteredResults, filterRow);
+                }
+            }
+
+            var state = {
+                results: results,
+                filteredResults: filteredResults,
+                totalResults: filteredResults ? filteredResults.length : results.length,
+                maxPage: this.getMaxPage(filteredResults ? filteredResults : results),
+                selectedRows: selectedRows
+            };
+
+            this.setState(state, triggerRemovedRowsEvent);
+        //}
+
+        function triggerRemovedRowsEvent() {
+            if (!options.silent) {
+                $(that.getDOMNode()).trigger('removedRows.griddle', [rows, that]);
+            }
+        }
+    },
+
+    /**
+     * todo: need to find solution to attach this function FComModalForm
+     * Save modal form
+     * @param modal
+     */
+    saveModalForm: function(modal) {
+        var that = this,
+            form = $(modal.getDOMNode()).find('form'),
+            id = form.find('#id').val(),
+            url = that.getConfig('edit_url'),
+            hash = { oper: id ? 'edit' : 'add' };
+        form.find('textarea, input, select').each(function() {
+            var key = $(this).attr('id');
+            var val = $(this).val();
+            hash[key] = that.html2text(val);
+        });
+        form.validate();
+        if (form.valid()) {
+            if (!this.hasExternalResults()) {
+                //console.log('localModeSave');
+                this.updateRows([hash]);
+                modal.close();
+            } else if (url) {
+                $.post(url, hash, function(data) {
+                    if (data) {
+                        that.refresh();
+                        modal.close();
+                    } else {
+                        alert('error when save');
+                        return false;
+                    }
+                });
+            }
+        } else {
+            //error
+            console.log('form validated fail');
+            return false;
+        }
+    },
+
     /**
      * update multi rows data, almost use in data mode local
      * @param {array} data
@@ -904,40 +1035,47 @@ var Griddle = React.createClass({displayName: "Griddle",
      * @returns {boolean}
      */
     updateRows: function(data, options) {
-        console.log('updateRows.data', data);
+        //console.log('updateRows.data', data);
 
         options = _.extend({
             silent: false
             //other options
         }, options);
 
-        var rows = this.getRows();
-        var mapIds = rows.map(function (e) {
-            return e.id.toString();
-        });
-        var updatedRows = [];
+        var that = this;
 
-        _.each(data, function(item) {
-            var index = mapIds.indexOf(item.id);
-            console.log('item', item);
-            console.log('index', index);
-            if (index != -1) {
-                _.each(item, function(value, key) {
-                    if (rows[index].hasOwnProperty(key)) {
-                        rows[index][key] = value;
-                    }
-                });
-                updatedRows.push(rows[index]);
-            }
-        });
+        /*if (this.hasExternalResults()) {
+            this.props.updateRowsExternal(rows);
+        } else {*/
+            var rows = this.getRows();
+            var mapIds = rows.map(function (e) {
+                return e.id.toString();
+            });
+            var updatedRows = [];
 
-        this.setState({ results: rows, filteredResults: rows }, function() {
+            _.each(data, function (item) {
+                var index = mapIds.indexOf(item.id);
+                if (index != -1) {
+                    _.each(item, function (value, key) {
+                        if (rows[index].hasOwnProperty(key)) {
+                            rows[index][key] = value;
+                        }
+                    });
+                    updatedRows.push(rows[index]);
+                }
+            });
+
+            this.setState({ results: rows }, triggerUpdatedRowsEvent);
+        //}
+
+        function triggerUpdatedRowsEvent() {
             if (!options.silent) {
-                $(this.getDOMNode()).trigger('updatedRows.griddle', [updatedRows, data, this]); //todo: event updatedRow.server.griddle???
+                $(that.getDOMNode()).trigger('updatedRows.griddle', [updatedRows, data, that]); //todo: event updatedRow.server.griddle???
             }
-        });
+        }
     },
     getRows: function() {
+        console.log('state', this.state);
         return this.state.filteredResults || this.state.results;
     },
     /**
@@ -996,6 +1134,8 @@ var Griddle = React.createClass({displayName: "Griddle",
             if (typeof window[callbackFuncName] === 'function') {
                 console.log('triggerCallback:'+name);
                 return window[callbackFuncName](this, name);
+            } else {
+                console.log('DEBUG: cannot find call back ' + callbackFuncName + ' for name ' + name);
             }
         }
     }

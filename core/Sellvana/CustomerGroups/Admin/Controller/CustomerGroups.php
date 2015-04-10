@@ -18,6 +18,10 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
     protected $_navPath = 'customer/customer-groups';
     protected $_permission = 'customer_groups';
 
+    protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';
+    protected $_defaultGridLayoutName = 'default_griddle';
+
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -33,7 +37,7 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
-//            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),
+            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),
             'edit' => true,
             'delete' => true
         ];

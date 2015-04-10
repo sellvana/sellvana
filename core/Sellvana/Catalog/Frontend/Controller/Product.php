@@ -37,6 +37,13 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
         $head = $layout->view('head');
 
         $categoryPath = $this->BRequest->param('category');
+        
+        $urlPrefix = $this->BConfig->get('modules/Sellvana_Catalog/url_prefix');
+        if ($urlPrefix) {
+            $urlPrefix = trim($urlPrefix, '/');
+            $categoryPath = preg_replace('#^/?' . preg_quote($urlPrefix, '#') . '/?#', '', $categoryPath);
+        }
+
         if ($categoryPath) {
             $category = $this->Sellvana_Catalog_Model_Category->load($categoryPath, 'url_path');
             /** @var Sellvana_Catalog_Model_Category $category */

@@ -32,13 +32,25 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                             'unique' => $this->BApp->href('customfields/fieldsets/unique_set')]],
                     ['type' => 'input', 'name' => 'set_name', 'label' => 'Set Name', 'width' => 200,  'addable' => true,
                             'editable' => true , 'validation' => ['required' => true]],
-                    ['name' => 'num_fields', 'label' => 'Fields', 'width' => 30, 'default' => '0'],
+                    ['name' => 'num_fields', 'label' => 'Fields', 'width' => 30],
                     ['type' => 'btn_group', 'buttons' => [
-                        ['name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
+                        [
+                            'name' => 'custom', 
+                            'icon' => 'icon-edit-sign', 
+                            'cssClass' => 'btn-custom', 
+                            'callback' => 'showModalToEditFieldset'
+                        ],
                         ['name' => 'delete']
                     ]]
                 ],
                 'actions' => [
+                    'add-fieldset' => [
+                        'caption' => 'Add a Fieldset',
+                        'type' => 'button',
+                        'id' => 'add-fieldset-grid',
+                        'class' => 'btn-primary',
+                        'callback' => 'showModalToAddFieldset'
+                    ],
 //                    'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
                     'delete' => true
                 ],
@@ -60,6 +72,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
         $config = [
             'config' => [
                 'id' => 'fieldset-modal-selected-grid',
+                'dataUrl' => $this->BApp->href('customfields/fieldsets/fieldset_modal_selected_grid_data?set_id='),
                 'caption' => 'Fields',
                 'data_mode' => 'local',
                 'data' => [],
@@ -83,6 +96,10 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 'grid_before_create' => 'selectedFieldGridRegister',
                 'afterMassDelete' => 'afterMassDeleteSelectedGrid',
             ]
+        ];
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'selectedGridRegister'
         ];
 
         return $config;
@@ -110,10 +127,20 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                     '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
                 ],
                 'actions' => [
-                    'add' => ['caption' => 'Add Selected Fields']
+                    'add-linked-field' => [
+                        'caption' => 'Add Selected Fields',
+                        'callback' => 'addSelectedRowsToLinked',
+                        'type' => 'button',
+                        'id' => 'add-linked-fieldset-grid',
+                        'class' => 'btn-primary',
+                    ]
                 ],
                 'grid_before_create' => 'addFieldGridRegister',
             ]
+        ];
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'fieldsGridRegister'
         ];
 
         return $config;
@@ -167,7 +194,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                         'editor' => 'select', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true],
                         'options' => ['1' => 'Yes', '0' => 'No']],
                     ['type' => 'btn_group', 'buttons' => [
-                        ['name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
+                        ['name' => 'edit', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
                         //['name' => 'edit'],
                         ['name' => 'delete']
                     ]]
@@ -186,6 +213,13 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                     '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
                 ],
                 'actions' => [
+                    'add-field' => [
+                        'caption' => 'Add Field',
+                        'type' => 'button',
+                        'id' => 'add-field-from-grid',
+                        'class' => 'btn-primary',
+                        'callback' => 'showModalToAddField',
+                    ],
                     'edit' => true,
                     'delete' => true
                 ],
@@ -202,7 +236,8 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
             'config' => [
                 'id' => 'options-grid',
                 'caption' => 'Fields',
-                'data_mode' => 'local',
+                'data_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
+                'edit_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
                 'data' => [],
                 'columns' => [
                     ['type' => 'row_select'],
@@ -323,21 +358,23 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 unset($data['id'], $data['oper'], $data['field_ids']);
                 $set = $this->Sellvana_CustomField_Model_Set->create($data)->save();
                 $result = $set->as_array();
-                $mum_fields = 0;
+                $num_fields = 0;
                 if ($field_ids !== '') {
                     $arr = explode(',', $field_ids);
-                    $mum_fields = count($arr);
+                    $num_fields = count($arr);
                     foreach ($arr as $i => $fId) {
                         $model->create(['set_id' => $result['id'], 'field_id' => $fId, 'position' => $i])->save();
                     }
                 }
-                $result['num_fields'] = $mum_fields;
+                $result['num_fields'] = $num_fields;
                 $this->BResponse->json($result);
                 break;
             case 'edit':
                 $model->delete_many(['set_id' => $data['id']]);
+                $num_fields = 0;
                 if ($field_ids !== '') {
                     $arr = explode(',', $field_ids);
+                    $num_fields = count($arr);
                     foreach ($arr as $i => $fId) {
                         if (!$model->loadWhere(['set_id' => (int)$data['id'], 'field_id' => (int)$fId])) {
                             $model->create(['set_id' => $data['id'], 'field_id' => $fId, 'position' => $i])->save();
@@ -348,6 +385,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 unset($data['id'], $data['oper'], $data['field_ids']);
                 $set->set($data)->save();
                 $result = $set->as_array();
+                $result['num_fields'] = $num_fields;
                 $this->BResponse->json($result);
                 break;
             default:
