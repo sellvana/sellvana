@@ -33,7 +33,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                 id: mediaGridId + '-media-modal',
                 onLoad: this.updateModalWidth,
                 onConfirm: null,
-                onCancel: null
+                onCancel: null,
+                ref: 'modal'
             });
 
             return modalConfig;
@@ -82,7 +83,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
             console.log('uploadConfig', this.props.uploadConfig);
             console.log('mediaConfig', this.props.mediaConfig);*/
 
-            var mainGridElement = React.createElement(FComGriddleComponent, { config: this.props.mediaConfig });
+            var mainGridElement = React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
 
             return (
                 React.createElement(Components.Modal, modalConfig,

@@ -39,7 +39,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
             return dateTime;
         },
         updateModalWidth: function(modal) {
-            $(modal.getDOMNode()).find('.modal-dialog').css('width', '900px');
+            //todo: add css class to modal to pre-define width, eg: large, medium, small
+            $(modal.getDOMNode()).find('.modal-dialog').css('min-width', '900px');
         }
     };
 
