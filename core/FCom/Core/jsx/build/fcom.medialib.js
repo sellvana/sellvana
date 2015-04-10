@@ -73,6 +73,18 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                 )
             );
         },
+        getMainGridComponent: function() {
+            if (this.isMounted() && typeof this.refs['fcomGriddleComponent'].refs[this.props.mediaConfig.id] != 'undefined') {
+                return this.refs['fcomGriddleComponent'].refs[this.props.mediaConfig.id];
+            }
+            return null;
+        },
+        getModalComponent: function() {
+            if (this.isMounted() && typeof this.refs['modal'] != 'undefined') {
+                return this.refs['modal'];
+            }
+            return null
+        },
         render: function() {
             console.log('render fcom mediablib');
             var modalConfig = this.getModalConfig();

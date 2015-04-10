@@ -15,6 +15,7 @@
      * variable contains React component media library
      */
     var mediaLibComponent{{ config.id }};
+    var mediaLibGrid{{ config.id }};
 
     require(['underscore', 'react', 'griddle.fcomMediaLib'], function(_, React, FComMediaLib) {
         var mediaGridId = '{{ config.id }}';
@@ -24,6 +25,7 @@
 
         var modalEle = document.getElementById(mediaGridId + '-media-modal-container');
         mediaLibComponent{{ config.id }} = React.render(React.createElement(FComMediaLib, { mediaConfig: mediaConfig, uploadConfig: uploadConfig, modalConfig: modalConfig}), modalEle);
+        mediaLibGrid{{ config.id }} = mediaLibComponent{{ config.id }}.getMainGridComponent();
     });
 
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
@@ -39,7 +41,7 @@
         }).bind('fileuploadalways', function(e, data) {
             console.log('DEBUG: fileuploadalways.data', data);
 
-            var mediaGrid = getMediaGridComponent();
+            var mediaGrid = mediaLibGrid{{ config.id }};
 
             if (mediaGrid) {
                 //push data to media grid after upload
@@ -66,17 +68,6 @@
                 }
             }
         });
-
-        /**
-         * get media grid component
-         * @returns {*}
-         */
-        function getMediaGridComponent() {
-            if (mediaLibComponent{{ config.id }} && typeof mediaLibComponent{{ config.id }}.refs.fcomGriddleComponent.refs['{{ config.id }}'] !== 'undefined') {
-                return mediaLibComponent{{ config.id }}.refs.fcomGriddleComponent.refs['{{ config.id }}'];
-            }
-            return null;
-        }
     });
 </script>
 
