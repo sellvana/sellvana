@@ -17,6 +17,27 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                 }
             }
         },
+        getModalConfig: function() {
+            var mediaGridId = this.props.mediaConfig.id;
+            var modalConfig = this.props.modalConfig;
+
+            if (modalConfig == null || modalConfig == '') {
+                modalConfig = {};
+            }
+
+            _.extend(modalConfig, {
+                title: 'Media',
+                confirm: null,
+                cancel: 'Close',
+                show: false,
+                id: mediaGridId + '-media-modal',
+                onLoad: this.updateModalWidth,
+                onConfirm: null,
+                onCancel: null
+            });
+
+            return modalConfig;
+        },
         mediaUploadElement: function() {
             return (
                 React.createElement('div', { className: 'box-content' },
@@ -25,7 +46,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                             React.createElement('span', { className: 'btn btn-success fileinput-button' },
                                 React.createElement('i', { className: 'icon-plus icon-white' }),
                                 React.createElement('span', null, 'Add files...'),
-                                React.createElement('input', { 'data-bfi-disabled': '', 'multiple': '', name: 'upload[]', type: 'file' })
+                                React.createElement('input', { 'data-bfi-disabled': '', 'multiple': 'multiple', name: 'upload[]', type: 'file' })
                             ),
                             React.createElement('button', { className: 'btn btn-primary start', type: 'submit' },
                                 React.createElement('i', { className: 'icon-upload icon-white' }),
@@ -52,12 +73,10 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
             );
         },
         render: function() {
-            var modalConfig = this.props.modalConfig;
+            console.log('render fcom mediablib');
+            var modalConfig = this.getModalConfig();
             var uploadConfig = this.props.uploadConfig;
             var mediaGridId = this.props.mediaConfig.id;
-
-            modalConfig.id = mediaGridId + '-media-modal';
-            modalConfig.onLoad = this.updateModalWidth;
 
             /*console.log('modalConfig', this.props.modalConfig);
             console.log('uploadConfig', this.props.uploadConfig);
