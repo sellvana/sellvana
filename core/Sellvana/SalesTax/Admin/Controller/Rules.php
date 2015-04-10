@@ -85,6 +85,32 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
         $args['view']->set(['title' => $title]);
     }
 
+    public function formPostAfter($args)
+    {
+        parent::formPostAfter($args);
+        $model = $args['model'];
+        $data = $args['data'];
+
+        if($data['match_all_customer_classes'] == 1) {
+            $this->resetRuleCustomerClasses($model);
+        } else if(!empty($data['customer_classes'])) {
+            $this->setRuleCustomerClasses($model, $data['customer_classes']);
+        }
+
+        if($data['match_all_product_classes'] == 1) {
+            $this->resetRuleProductClasses($model);
+        } else if(!empty($data['product_classes'])) {
+            $this->setRuleProductClasses($model, $data['product_classes']);
+        }
+
+        if($data['match_all_zones'] == 1) {
+            $this->resetRuleZones($model);
+        } else if(!empty($data['zones'])) {
+            $this->setRuleZones($model, $data['zones']);
+        }
+
+    }
+
     public function addTitle($title = '')
     {
         /* @var $v BViewHead */
@@ -101,5 +127,127 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
         $rows = $this->BDb->many_as_array($this->Sellvana_SalesTax_Model_Rule->orm()
             ->where($data['key'], $data['value'])->find_many());
         $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+    }
+
+    /**
+     * @param $rule Sellvana_SalesTax_Model_Rule
+     */
+    protected function resetRuleCustomerClasses($rule)
+    {
+        $currentCustomerRules = $this->Sellvana_SalesTax_Model_RuleCustomerClass
+            ->orm()->where('rule_id', $rule->id())->find_many();
+        if($currentCustomerRules){
+            /** @var  $cr Sellvana_SalesTax_Model_RuleCustomerClass */
+            foreach ($currentCustomerRules as $cr) {
+                $cr->delete();
+            }
+        }
+    }
+
+    /**
+     * @param $rule Sellvana_SalesTax_Model_Rule
+     */
+    protected function resetRuleProductClasses($rule)
+    {
+        $currentProductRules = $this->Sellvana_SalesTax_Model_RuleProductClass
+            ->orm()->where('rule_id', $rule->id())->find_many();
+        if ($currentProductRules) {
+            /** @var  $pr Sellvana_SalesTax_Model_RuleCustomerClass */
+            foreach ($currentProductRules as $pr) {
+                $pr->delete();
+            }
+        }
+    }
+
+    /**
+     * @param $rule Sellvana_SalesTax_Model_Rule
+     */
+    protected function resetRuleZones($rule)
+    {
+        $currentZoneRules = $this->Sellvana_SalesTax_Model_RuleZone->orm()->where('rule_id', $rule->id())->find_many();
+        if ($currentZoneRules) {
+            /** @var  $rz Sellvana_SalesTax_Model_RuleCustomerClass */
+            foreach ($currentZoneRules as $rz) {
+                $rz->delete();
+            }
+        }
+    }
+
+    /**
+     * @param $rule Sellvana_SalesTax_Model_Rule
+     * @param $customer_classes array
+     */
+    protected function setRuleCustomerClasses($rule, $customer_classes)
+    {
+        $currentCustomerRules = $this->Sellvana_SalesTax_Model_RuleCustomerClass
+            ->orm()->where('rule_id', $rule->id())->find_many_assoc('customer_class_id');
+        foreach ($customer_classes as $cc) {
+            if (!$currentCustomerRules || !isset($currentCustomerRules[$cc])) {
+                $this->Sellvana_SalesTax_Model_RuleCustomerClass
+                    ->create(['rule_id' => $rule->id(), 'customer_class_id' => (int) $cc])->save();
+            }
+        }
+
+        if ($currentCustomerRules) {
+            /** @var Sellvana_SalesTax_Model_RuleCustomerClass $ccr */
+            foreach ($currentCustomerRules as $ccr) {
+                if (!in_array($ccr->get('customer_class_id'), $customer_classes)) {
+                    $ccr->delete();
+                }
+            }
+
+        }
+    }
+
+    /**
+     * @param $rule Sellvana_SalesTax_Model_Rule
+     * @param $product_classes array
+     */
+    protected function setRuleProductClasses($rule, $product_classes)
+    {
+        $currentProductRules = $this->Sellvana_SalesTax_Model_RuleProductClass
+            ->orm()->where('rule_id', $rule->id())->find_many_assoc('product_class_id');
+        foreach ($product_classes as $pc) {
+            if (!$currentProductRules || !isset($currentProductRules[$pc])) {
+                $this->Sellvana_SalesTax_Model_RuleProductClass
+                    ->create(['rule_id' => $rule->id(), 'product_class_id' => (int) $pc])->save();
+            }
+        }
+
+        if ($currentProductRules) {
+            /** @var Sellvana_SalesTax_Model_RuleProductClass $cpr */
+            foreach ($currentProductRules as $cpr) {
+                if (!in_array($cpr->get('product_class_id'), $product_classes)) {
+                    $cpr->delete();
+                }
+            }
+
+        }
+    }
+
+    /**
+     * @param $rule Sellvana_SalesTax_Model_Rule
+     * @param $zones array
+     */
+    protected function setRuleZones($rule, $zones)
+    {
+        $currentZoneRules = $this->Sellvana_SalesTax_Model_RuleZone
+            ->orm()->where('rule_id', $rule->id())->find_many_assoc('zone_id');
+        foreach ($zones as $rz) {
+            if (!$currentZoneRules || !isset($currentZoneRules[$rz])) {
+                $this->Sellvana_SalesTax_Model_RuleZone
+                    ->create(['rule_id' => $rule->id(), 'zone_id' => (int) $rz])->save();
+            }
+        }
+
+        if ($currentZoneRules) {
+            /** @var Sellvana_SalesTax_Model_RuleZone $czr */
+            foreach ($currentZoneRules as $czr) {
+                if (!in_array($czr->get('zone_id'), $zones)) {
+                    $czr->delete();
+                }
+            }
+
+        }
     }
 }
