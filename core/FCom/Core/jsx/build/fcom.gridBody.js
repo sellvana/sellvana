@@ -28,7 +28,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
             var rowId = event.target.dataset.row;
             var gridId = this.props.getConfig('id');
             var data = this.props.originalData ? this.props.originalData : this.props.data;
-            var isLocalMode = this.props.isLocalMode();
+            var isLocalMode = !this.props.hasExternalResults();
             var editUrl = this.props.getConfig('edit_url');
             var row = _.find(data, function(item) {
                 if (item.id == rowId || item.id == parseInt(rowId)) {

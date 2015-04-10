@@ -385,6 +385,7 @@ var Griddle = React.createClass({displayName: "Griddle",
         this.triggerCallback('componentDidMount');
     },
     componentDidUpdate: function() {
+        //console.log('state', this.state);
         this.triggerCallback('componentDidUpdate');
     },
     getDataForRender: function(data, cols, pageList){
@@ -636,7 +637,7 @@ var Griddle = React.createClass({displayName: "Griddle",
     },
     /**
      * filter local data
-     * @param data
+     * @param data //todo: remove this params
      * @param filters
      * @returns {Griddle.props.results|*}
      */
@@ -763,6 +764,7 @@ var Griddle = React.createClass({displayName: "Griddle",
      * @param submitFilters
      */
     setFilterLocalData: function (submitFilters) {
+        var filter = JSON.stringify(submitFilters);
         var filteredResults = this.filterLocalData(this.props.results, submitFilters);
 
         //personalize
@@ -775,7 +777,7 @@ var Griddle = React.createClass({displayName: "Griddle",
             });
         }
 
-        this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
+        this.setState({ filter: filter, filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
     },
     /**
      * get url to save personalize url
@@ -811,6 +813,7 @@ var Griddle = React.createClass({displayName: "Griddle",
      * @param value
      */
     searchWithinResults: function (value) {
+        //console.log('searchWithinResults.value', value);
         //todo: confirm with Boris about search within available columns or all columns
         if (value) {
             var that = this,
@@ -824,7 +827,13 @@ var Griddle = React.createClass({displayName: "Griddle",
                     that.setState(updatedState);
                 };
 
-            var results = this.getRows();
+            var results = this.state.results;
+            //console.log('state.filter', this.state.filter);
+            if (this.state.filter != '') { //if have filter, need to filter data then search in results
+                results = this.filterLocalData(null, JSON.parse(this.state.filter));
+                //console.log('results before search', results);
+            }
+
             state.filteredResults = _.filter(results,
                 function (item) {
                     var arr = _.values(item);
@@ -839,6 +848,7 @@ var Griddle = React.createClass({displayName: "Griddle",
 
             updateAfterResultsObtained(state);
         } else if (!this.hasExternalResults() && this.state.filter != '') { //empty value + already have filtered data, return to filtered data
+            //console.log('state.filter', this.state.filter);
             var filters = JSON.parse(this.state.filter);
             var filteredResults = this.filterLocalData(null, filters);
             this.setState({
