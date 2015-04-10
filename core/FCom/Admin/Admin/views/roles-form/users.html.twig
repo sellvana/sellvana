@@ -3,11 +3,163 @@
 
 {% set m = THIS.get('model') %}
 {% set userCtrl = APP.instance('FCom_Admin_Controller_Users') %}
+{% set roleUserConfig = userCtrl.getRoleUsersConfig(m) %}
+{% set allUserConfigCompiled = THIS.view('core/griddle').set('grid', userCtrl.getAllUsersConfig(m)).getGridConfig() %}
+
 <input type='hidden' name='model[user_ids_add]' id='user_ids_add'/>
 <input type='hidden' name='model[user_ids_remove]' id='user_ids_remove'/>
 
 <script>
-require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+        var mainGridId = '{{ roleUserConfig.config.id }}';
+        var inputAddRowsEle = $('#user_ids_add'),
+                inputRemoveRowsEle = $('#user_ids_remove');
+        var mainGrid, attachGrid, originIds;
+
+        function getFieldToSave(row) {
+            return {
+                id: row.id,
+                file_id: row.file_id,
+                label: row.label,
+                position: row.position,
+                create_at: row.create_at,
+                update_at: row.update_at,
+                _new: row._new
+            };
+        }
+
+        /**
+         * Update rows before save
+         * @param grid
+         */
+        function updateRowsRecord(grid) {
+            var rows = [];
+            var removedIds = _.difference(originIds, _.pluck(grid.getRows(), 'id'));
+
+            grid.getRows().forEach(function(row) {
+                rows.push(getFieldToSave(row));
+            });
+
+            inputAddRowsEle.val(JSON.stringify(rows));
+            inputRemoveRowsEle.val(removedIds.join(','));
+        }
+
+        /**
+         * calc rows when save
+         * @param rows
+         * @param ids
+         * @returns {Array}
+         */
+        function calcAddRemoveRows(rows, ids) {
+            var temp = [];
+            rows.forEach(function(row) {
+                if (_.contains(ids, row.id) !== false) {
+                    temp.push(row.id);
+                }
+            });
+            return temp;
+        }
+
+
+        /**
+         * callback function for top action to show modal to add users
+         * @param grid
+         */
+        window.showModalToAddUser = function(that) {
+            mainGrid = that.props.getCurrentGrid();
+            var modalContainerEle = document.getElementById('{{ roleUserConfig.config.id }}-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.renderComponent(
+                    React.createElement(Components.Modal, {
+                                id: "addUserModal",
+                                show: true,
+                                title: 'Add User',
+                                confirm: 'Add',
+                                cancel: 'Close',
+                                onLoad: function(modal) {
+                                    var node = $(modal.getDOMNode());
+                                    node.find('.modal-dialog').css('width', '900px');
+                                },
+                                onConfirm: window.addSelectedUser
+                            },
+                            React.createElement('div', {className: 'f-grid-wrapper', id: 'allUserList'})
+                    ), modalContainerEle);
+            var allUserConfigCompiled = {{ UTIL.toJson(allUserConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('allUserList');
+            var instanceAttachGrid = React.renderComponent(
+                    React.createElement(FComGriddleComponent, { config: allUserConfigCompiled}),
+                    attachGridContainerEle
+            );
+
+            if (typeof instanceAttachGrid.refs[allUserConfigCompiled.id] !== 'undefined') {
+                attachGrid = instanceAttachGrid.refs[allUserConfigCompiled.id];
+            }
+        };
+
+        /**
+         * add selected users from full users grid to user-role grid
+         * @param modal
+         */
+        window.addSelectedUser = function(modal) {
+            var selectedRows = attachGrid.getSelectedRows();
+            if (selectedRows.length) {
+                var addRows = [];
+                //process selected rows
+                selectedRows.forEach(function(attachRow) {
+                    if (!_.findWhere(mainGrid.getRows(), {id: attachRow.id})) {
+                        addRows.push(attachRow);
+                    }
+
+                    if (addRows.length) {
+                        mainGrid.addRows(addRows);
+                    }
+                });
+                modal.close();
+            } else {
+                alert('please choose at least one product');
+            }
+        };
+
+        /**
+         * callback function after main user role grid was rendered
+         * @param grid
+         */
+        window.setUserRoleMainGrid = function(grid) {
+            mainGrid = grid;
+            var addedIds = [], removedIds = [],
+                originIds = _.pluck(grid.getRows(), 'id');
+
+            $(mainGrid.getDOMNode())
+                    .on('removedRows.griddle', function (e, removedRows, grid) {
+                        removedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffRemoveIds = _.difference(originIds, removedIds);
+                        inputRemoveRowsEle.val(diffRemoveIds.join(','));
+
+                        var arrCurrentAddedIds = inputAddRowsEle.val().split(',');
+                        if (!_.isEmpty(arrCurrentAddedIds)) {
+                            var temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                            inputAddRowsEle.val(temp.join(','));
+                        }
+                    })
+                    .on('addedRows.griddle', function(e, addedRows, grid) {
+                        addedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffAddIds = _.difference(addedIds, originIds);
+                        inputAddRowsEle.val(diffAddIds.join(','));
+
+                        var arrCurrentRemovedIds = inputRemoveRowsEle.val().split(',');
+                        if (!_.isEmpty(arrCurrentRemovedIds)) {
+                            var temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                            inputRemoveRowsEle.val(temp.join(','));
+                        }
+                    });
+        };
+    });
+</script>
+
+
+<script>
+/* Backbone Grid Section */
+/*require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
     var userGrid, rolesGrid, orignIds, addedIds = [], removedIds = [];
     function updateFormData() {
         console.log(rolesGrid.getRows().pluck('id'));
@@ -67,12 +219,12 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
             updateFormData();
         });
     }
-});
+});*/
 </script>
 
-{{ THIS.view('core/backbonegrid').set('grid', userCtrl.getRoleUsersConfig(m)) | raw }}
+{{ THIS.view('core/griddle').set('grid', userCtrl.getRoleUsersConfig(m)) | raw }}
 
-<a role="button" href="#user-grid-add" data-toggle="modal" style='display:none;' id='btn_add_user'>{{ "Add"|_ }}</a>
+{# <a role="button" href="#user-grid-add" data-toggle="modal" style='display:none;' id='btn_add_user'>{{ "Add"|_ }}</a>
 <div class='modal fade' id='user-grid-add' tabindex='-1'>
     <div class='modal-dialog' style='width:900px;'>
         <div class='modal-content'>
@@ -88,4 +240,4 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
             </div>
         </div>
     </div>
-</div>
+</div> #}

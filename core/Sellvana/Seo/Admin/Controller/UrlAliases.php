@@ -15,6 +15,10 @@ class Sellvana_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abs
     protected $_recordName = 'URL Alias';
     protected $_mainTableAlias = 'a';
 
+    protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';
+    protected $_defaultGridLayoutName = 'default_griddle';
+
     public function gridConfig()
     {
         $fieldHlp = $this->Sellvana_Seo_Model_UrlAlias;
@@ -41,6 +45,7 @@ class Sellvana_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abs
                 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
+            'new' => ['caption' => 'Add New Url Alias'],
             'delete' => true
         ];
         $config['filters'] = [

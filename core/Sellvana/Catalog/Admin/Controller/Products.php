@@ -295,12 +295,12 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'type'     => 'button',
                 'id'       => 'add-attachment-from-grid',
                 'class'    => 'btn-primary',
-                'callback' => 'showModalToAddAttachment'
+                'callback' => 'gridShowMedia' . $config['config']['id']
             ]
         ];
 
         $config['config']['callbacks'] = [
-            'componentDidMount' => 'setProductAttachmentMainGrid'
+            'componentDidMount' => 'gridRegister' . $config['config']['id']
         ];
 
         return $config;
