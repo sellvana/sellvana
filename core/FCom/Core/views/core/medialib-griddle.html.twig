@@ -5,8 +5,6 @@
 
 {# need to processe config by class FCom_Core_View_BackboneGrid #}
 {% set mediaLibAttachConfigProcessed = THIS.view('core/griddle').set('grid', mediaLibAttachConfig).getGridConfig() %}
-{# config for modal contains Media Grid #}
-{% set modalConfig = THIS.get('modalConfig') %}
 
 <div id="{{ config.id }}-media-modal-container"></div>
 
@@ -17,11 +15,36 @@
     var mediaLibComponent{{ config.id }};
     var mediaLibGrid{{ config.id }};
 
+    /**
+     * global media modal config, need to use as javascript instead php twig, because we need to pass onConfirm function
+     * todo: need to find the better way
+     */
+    var mediaModalConfig = {};
+    /**
+     *
+     * @param id
+     * @param config
+     */
+    function setMediaModalConfig(id, config) {
+        mediaModalConfig[id] = config;
+    }
+    /**
+     *
+     * @param id
+     * @returns {*}
+     */
+    function getMediaModalConfig(id) {
+        if (typeof mediaModalConfig[id] != 'undefined') {
+            return mediaModalConfig[id];
+        }
+        return null;
+    }
+
     require(['underscore', 'react', 'griddle.fcomMediaLib'], function(_, React, FComMediaLib) {
         var mediaGridId = '{{ config.id }}';
         var mediaConfig = {{ UTIL.toJSON(mediaLibAttachConfigProcessed) | raw }};
         var uploadConfig = {{ UTIL.toJSON(uploadConfig) | raw }};
-        var modalConfig = {{ UTIL.toJSON(modalConfig) | raw }};
+        var modalConfig = getMediaModalConfig(mediaGridId);
 
         var modalEle = document.getElementById(mediaGridId + '-media-modal-container');
         mediaLibComponent{{ config.id }} = React.render(React.createElement(FComMediaLib, { mediaConfig: mediaConfig, uploadConfig: uploadConfig, modalConfig: modalConfig}), modalEle);

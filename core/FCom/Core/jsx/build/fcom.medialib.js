@@ -25,7 +25,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                 modalConfig = {};
             }
 
-            _.extend(modalConfig, {
+            var config = $.extend({}, {
                 title: 'Media',
                 confirm: null,
                 cancel: 'Close',
@@ -35,9 +35,9 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                 onConfirm: null,
                 onCancel: null,
                 ref: 'modal'
-            });
+            }, modalConfig);
 
-            return modalConfig;
+            return config;
         },
         mediaUploadElement: function() {
             return (
@@ -91,7 +91,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
             var uploadConfig = this.props.uploadConfig;
             var mediaGridId = this.props.mediaConfig.id;
 
-            /*console.log('modalConfig', this.props.modalConfig);
+            /*console.log('modalConfig', modalConfig);
+            console.log('propsmodalConfig', this.props.modalConfig);
             console.log('uploadConfig', this.props.uploadConfig);
             console.log('mediaConfig', this.props.mediaConfig);*/
 

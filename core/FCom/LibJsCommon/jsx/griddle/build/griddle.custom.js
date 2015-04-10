@@ -1122,6 +1122,8 @@ var Griddle = React.createClass({displayName: "Griddle",
             if (typeof window[callbackFuncName] === 'function') {
                 console.log('triggerCallback:'+name);
                 return window[callbackFuncName](this, name);
+            } else {
+                console.log('DEBUG: cannot find call back ' + callbackFuncName + ' for name ' + name);
             }
         }
     }
