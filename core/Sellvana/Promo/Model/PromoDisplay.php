@@ -9,7 +9,11 @@ class Sellvana_Promo_Model_PromoDisplay extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
 
     protected static $_displayPagesLocations = null;
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['promo_id', 'page_type', 'page_location', 'content_type'],
+        'related'    => ['promo_id' => 'Sellvana_Promo_Model_Promo.id'],
+    ];
     public function collectDisplayPageLocations($reset = false)
     {
         if (static::$_displayPagesLocations && !$reset) {
@@ -112,7 +116,7 @@ class Sellvana_Promo_Model_PromoDisplay extends FCom_Core_Model_Abstract
         }
         return $options;
     }
-    
+
     public function getDisplayPageLocations()
     {
         $this->collectDisplayPageLocations();

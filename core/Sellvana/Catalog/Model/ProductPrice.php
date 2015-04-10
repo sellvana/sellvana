@@ -17,7 +17,17 @@ class Sellvana_Catalog_Model_ProductPrice
 {
     protected static $_table     = "fcom_product_price";
     protected static $_origClass = __CLASS__;
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['product_id', 'price_type', 'customer_group_id', 'site_id', 'currency_code','qty','variant_id','promo_id'],
+        'related'    => [
+            'product_id' => 'Sellvana_Catalog_Model_Product.id',
+            'customer_group_id' => 'Sellvana_CustomerGroups_Model_Group.id',
+            'site_id' => 'Sellvana_MultiSite_Model_Site.id',
+            'variant_id' => 'Sellvana_CustomField_Model_ProductVariant.id',
+            'promo_id' => 'Sellvana_Promo_Model_Promo.id'
+        ],
+    ];
     const TYPE_BASE = "base",
         TYPE_MAP = "map",
         TYPE_MSRP = "msrp",

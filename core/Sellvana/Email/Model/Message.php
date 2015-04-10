@@ -20,5 +20,8 @@ class Sellvana_Email_Model_Message extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_email_message';
     static protected $_origClass = __CLASS__;
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['recipient', 'subject', 'status', 'create_at'],
+    ];
 }

@@ -42,6 +42,15 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         ],
     ];
 
+    static protected $_importExportProfile = [
+        'skip'    => ['id'],
+        'related' => [
+            'action_user_id' => 'FCom_Admin_Model_User.id',
+            'customer_id'    => 'Sellvana_Customer_Model_Customer.id',
+            'order_id'       => 'Sellvana_Sales_Model_Order.id',
+        ]
+    ];
+
     static protected $_availableFilters = [];
 
     static protected $_permissionsCache = [];

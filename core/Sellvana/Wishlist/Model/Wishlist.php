@@ -23,6 +23,12 @@ class Sellvana_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     protected $items = null;
     protected static $_sessionWishlist = null;
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['cookie_token'],
+        'related'    => ['customer_id' => 'Sellvana_Customer_Model_Customer.id'],
+    ];
+
     /**
      * @param bool $createAnonymousIfNeeded
      * @return bool|Sellvana_Wishlist_Model_Wishlist

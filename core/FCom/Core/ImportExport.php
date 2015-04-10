@@ -275,7 +275,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             /** @var FCom_Core_Model_Abstract $model */
             $model     = null;
             if (!empty($data[static::DEFAULT_MODEL_KEY])) {
-                // new model declaration found, import reminder of previous batch
+                // new model declaration found, import remainder of previous batch
                 if (!empty($batchData)) {
                     $this->importBatch($batchData);
                     $batchData = [];
