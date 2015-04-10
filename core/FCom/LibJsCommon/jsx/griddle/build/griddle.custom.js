@@ -950,10 +950,10 @@ var Griddle = React.createClass({displayName: "Griddle",
 
                 results = _.filter(results, filterRow);
 
-                if (selectedRows.length) {
+                if (selectedRows) {
                     selectedRows = _.filter(selectedRows, filterRow);
                 }
-                if (filteredResults.length) {
+                if (filteredResults) {
                     filteredResults = _.filter(filteredResults, filterRow);
                 }
             }
@@ -961,8 +961,8 @@ var Griddle = React.createClass({displayName: "Griddle",
             var state = {
                 results: results,
                 filteredResults: filteredResults,
-                totalResults: filteredResults.length,
-                maxPage: this.getMaxPage(filteredResults),
+                totalResults: filteredResults ? filteredResults.length : results.length,
+                maxPage: this.getMaxPage(filteredResults ? filteredResults : results),
                 selectedRows: selectedRows
             };
 
