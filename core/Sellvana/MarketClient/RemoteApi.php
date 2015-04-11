@@ -32,7 +32,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     }
 
     /**
-     * @param string $email
+     * @param string $data
      * @return array|mixed
      */
     public function setupConnection($data = null)
