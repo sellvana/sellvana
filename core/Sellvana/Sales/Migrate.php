@@ -33,7 +33,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_14()
+    public function install__0_3_17()
     {
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
@@ -500,6 +500,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'payment_id' => 'int unsigned default null',
+                'amount' => 'decimal(12,2) not null default 0',
                 'state_overall' => "varchar(10) not null default 'new'",
                 'state_custom' => "varchar(10) not null default ''",
                 'data_serialized' => 'text',
@@ -1898,6 +1899,16 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tOrder, [
             BDb::COLUMNS => [
                 'store_currency_code' => 'char(3) null',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_16__0_3_17()
+    {
+        $tRefund = $this->Sellvana_Sales_Model_Order_Refund->table();
+        $this->BDb->ddlTableDef($tRefund, [
+            BDb::COLUMNS => [
+                'amount' => 'decimal(12,2) not null default 0',
             ],
         ]);
     }

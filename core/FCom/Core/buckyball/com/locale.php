@@ -1208,9 +1208,14 @@ class BLocale extends BClass
         return !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
     }
 
-    public function currency($value, $decimals = 2)
+    public function currency($value, $currency = null, $decimals = 2)
     {
-        return sprintf('%s%s', static::$_currencySymbol, number_format($value, $decimals));
+        if ($currency) {
+            $symbol = $this->getSymbol($currency);
+        } else {
+            $symbol = static::$_currencySymbol;
+        }
+        return sprintf('%s%s', $symbol, number_format($value, $decimals));
     }
 
     public function roundCurrency($value, $decimals = 2)

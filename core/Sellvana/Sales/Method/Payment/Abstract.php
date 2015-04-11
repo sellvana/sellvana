@@ -70,6 +70,11 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return false;
     }
 
+    public function getKey()
+    {
+        return static::$_methodKey;
+    }
+
     public function getName()
     {
         return $this->_name;
