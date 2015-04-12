@@ -16,8 +16,6 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     protected $_gridTitle = 'Modules';
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'm';
-    protected $_gridViewName = 'core/griddle';
-    protected $_gridPageViewName = 'admin/griddle';
     protected $_navPath = 'modules/installed';
     protected $_useDefaultLayout = false;
 
@@ -181,12 +179,19 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     {
         parent::gridViewBefore($args);
 
+        /** @var FCom_Admin_View_Grid $view */
         $view = $args['page_view'];
         $actions = (array)$view->get('actions');
-        $actions += [
-            'run_migration' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \''
-                               . $this->BApp->href('modules/migrate') . '\').submit()"><span>' . $this->BLocale->_('Run Migration Scripts')
-                               . '</span></button>',
+        $actions['run_migration'] = [
+            'button',
+            [
+                'type' => 'button',
+                'class'=> ['btn', 'btn-primary'],
+                'onclick' => "$('#util-form').attr('action', '{$this->BApp->href('modules/migrate')}').submit()",
+            ],
+            [
+                ['span', null, $this->BLocale->_('Run Migration Scripts')]
+            ]
         ];
         unset($actions['new']);
         $view->set('actions', $actions);

@@ -17,10 +17,6 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
     protected $_recordName = 'CMS Block';
     protected $_formTitleField = 'handle';
 
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
-
     public function gridConfig()
     {
         $config = parent::gridConfig();

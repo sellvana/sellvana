@@ -16,10 +16,6 @@ class Sellvana_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstra
     protected $_recordName = 'Cart';
     protected $_permission = 'sales/carts';
 
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
-
     public function gridConfig()
     {
         $shippingMethods = $this->Sellvana_Sales_Main->getShippingMethods();

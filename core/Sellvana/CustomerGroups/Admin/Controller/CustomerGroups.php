@@ -19,10 +19,6 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
     protected $_permission = 'customer_groups';
     protected $_formTitleField = 'title';
 
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
-
     public function gridConfig()
     {
         $config = parent::gridConfig();

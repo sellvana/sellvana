@@ -28,11 +28,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     protected $_permission = 'catalog/products';
     protected $_formTitleField = 'product_name';
 
-    //config to use react griddle
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
-
     /**
      * @return array
      */

@@ -18,10 +18,6 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     protected $_navPath = 'system/users';
     protected $_formTitleField = 'username';
 
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
-
     public function gridConfig()
     {
         $config = parent::gridConfig();

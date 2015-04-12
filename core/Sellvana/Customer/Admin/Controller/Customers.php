@@ -21,9 +21,6 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
     protected $_formViewPrefix = 'customer/customers-form/';
     protected $_formTitleField = 'Sellvana_Customer_Admin_Controller_Customers.formTitleField';
 
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -84,12 +81,6 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
         }
         $config['grid_before_create'] = 'customerGridRegister';
         return $config;
-    }
-
-    public function gridViewBefore($args)
-    {
-        parent::gridViewBefore($args);
-        $this->_useDefaultLayout = false;
     }
 
     public function gridOrmConfig($orm)
@@ -266,8 +257,6 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             ['field' => 'email', 'type' => 'text'],
             '_quick' => ['expr' => 'firstname like ? or lastname like ? or email like ? or c.id=?', 'args' => ['?%', '%?%', '?']]
         ];
-
-
 
         return ['config' => $config];
     }

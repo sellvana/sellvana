@@ -17,10 +17,6 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
     protected $_navPath = 'sales/tax/zones';
     protected $_permission = 'sales/tax/zones';
 
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
-
     public function gridConfig() {
         $config = parent::gridConfig();
         //unset($config['form_url']);

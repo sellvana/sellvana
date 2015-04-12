@@ -19,10 +19,6 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
     protected $_navPath = 'sales/tax/customer-classes';
     protected $_permission = 'sales/tax/customer_classes';
 
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
-
     public function gridConfig() {
         $config = parent::gridConfig();
         //unset($config['form_url']);

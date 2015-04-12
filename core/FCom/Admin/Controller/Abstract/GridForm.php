@@ -10,40 +10,46 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_permission;# = 'feature/permission';
     protected $_navPath;# = 'nav/subnav';
     protected $_recordName = 'Record';
+    protected $_mainTableAlias = 'main';
+
     protected $_gridTitle = 'List of Records';
-    protected $_gridPageViewName = 'admin/grid';
-    protected $_gridViewName = 'core/backbonegrid';
+    protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';
+    protected $_useDefaultLayout = true;
+    protected $_defaultGridLayoutName = 'default_griddle';
     protected $_gridLayoutName;# = '/feature';
     protected $_gridConfig = [];
+
     protected $_formHref;# = 'feature/form';
     protected $_formLayoutName;# = '/feature/form';
     protected $_formViewPrefix;# = 'module/feature-form/';
     protected $_formViewName = 'admin/form';
     protected $_formTitle;# = 'Record';
     protected $_formTitleField = 'id';
-    protected $_mainTableAlias = 'main';
 
-    protected $_useDefaultLayout = true;
-    protected $_defaultGridLayoutName = 'default_grid';
 
     public function __construct()
     {
         parent::__construct();
+
         $this->_gridHref = trim($this->_gridHref, '/');
 
-        if (is_null($this->_permission))     $this->_permission = $this->_gridHref;
-        if (is_null($this->_navPath))        $this->_navPath = $this->_permission;
+        if (null === $this->_permission) {
+            $this->_permission = $this->_gridHref;
+        }
+        if (null === $this->_navPath)  {
+            $this->_navPath = $this->_permission;
+        }
 
-        if (is_null($this->_gridLayoutName)) $this->_gridLayoutName = '/' . $this->_gridHref;
-        if (is_null($this->_gridViewName))   $this->_gridViewName = 'core/backbonegrid';
-
-        if (is_null($this->_formHref))       $this->_formHref = $this->_gridHref . '/form';
-        if (is_null($this->_formLayoutName)) $this->_formLayoutName = $this->_gridLayoutName . '/form';
-        if (is_null($this->_formViewName))   $this->_formViewName = 'admin/form';
-        if (is_null($this->_formViewPrefix)) $this->_formViewPrefix = $this->_gridHref . '-form/';
-
-        if (is_null($this->_mainTableAlias)) $this->_mainTableAlias = 'main';
-
+        if (null === $this->_formHref) {
+            $this->_formHref = $this->_gridHref . '/form';
+        }
+        if (null === $this->_formLayoutName) {
+            $this->_formLayoutName = $this->_gridLayoutName . '/form';
+        }
+        if (null === $this->_formViewPrefix) {
+            $this->_formViewPrefix = $this->_gridHref . '-form/';
+        }
     }
 
     /**

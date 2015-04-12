@@ -3,6 +3,10 @@
 /**
  * Class Sellvana_Sales_Admin_Controller_Orders
  *
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
+ * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
+ * @property Sellvana_Sales_Model_Order_Payment_State_Overall $Sellvana_Sales_Model_Order_Payment_State_Overall
+ * @property Sellvana_Sales_Model_Order_Payment_State_Custom $Sellvana_Sales_Model_Order_Payment_State_Custom
  */
 
 class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abstract_GridForm
@@ -15,10 +19,6 @@ class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abs
     protected $_mainTableAlias = 'p';
     protected $_permission = 'sales/payments';
     protected $_navPath = 'sales/payments';
-
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
 
     public function gridConfig()
     {

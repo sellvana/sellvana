@@ -47,10 +47,6 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
     protected $_formViewPrefix = 'order/orders-form/';
     protected $_formTitleField = 'unique_id';
 
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
-
     public function gridConfig()
     {
         $overallStates = $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels();
@@ -136,7 +132,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
-        
+
         /** @var Sellvana_Sales_Model_Order $m */
         $m = $args['model'];
         if ($m->id()) {
