@@ -14,6 +14,7 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
     protected $_modelClass = 'Sellvana_SalesTax_Model_ProductClass';
     protected $_gridTitle = 'Product Tax Classes';
     protected $_recordName = 'Product Tax Class';
+    protected $_formTitleField = 'title';
     protected $_mainTableAlias = 'tp';
     protected $_navPath = 'sales/tax/product-classes';
     protected $_permission = 'sales/tax/product_classes';
@@ -52,22 +53,6 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_product_class" class="btn grid-new btn-primary _modal">'
             . $this->BLocale->_('Add New Product Tax Class') . '</button>']]);
-    }
-
-    public function formViewBefore($args) {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $title = $m->id ? 'Edit Product Tax Class: ' . $m->title : 'Create New Product Tax Class';
-        $this->addTitle($title);
-        $args['view']->set(['title' => $title]);
-    }
-
-    public function addTitle($title = '') {
-        /* @var $v BViewHead */
-        $v = $this->view('head');
-        if ($v) {
-            $v->addTitle($title);
-        }
     }
 
     public function action_unique__POST() {

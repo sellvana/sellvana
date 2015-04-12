@@ -5,6 +5,8 @@
  *
  * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
+ * @property Sellvana_Sales_Model_StateCustom $Sellvana_Sales_Model_StateCustom
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
  * @property Sellvana_Sales_Model_Order_State_Overall $Sellvana_Sales_Model_Order_State_Overall
@@ -15,8 +17,21 @@
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Sales_Model_Order_Return $Sellvana_Sales_Model_Order_Return
  * @property Sellvana_Sales_Model_Order_Refund $Sellvana_Sales_Model_Order_Refund
+ * @property Sellvana_Sales_Model_Order_Cancel $Sellvana_Sales_Model_Order_Cancel
  * @property Sellvana_Sales_Model_Order_Comment $Sellvana_Sales_Model_Order_Comment
  * @property Sellvana_Sales_Model_Order_History $Sellvana_Sales_Model_Order_History
+ *
+ * @property Sellvana_Sales_Model_Order_Payment_State_Overall $Sellvana_Sales_Model_Order_Payment_State_Overall
+ * @property Sellvana_Sales_Model_Order_Payment_State_Custom $Sellvana_Sales_Model_Order_Payment_State_Custom
+ * @property Sellvana_Sales_Model_Order_Shipment_State_Overall $Sellvana_Sales_Model_Order_Shipment_State_Overall
+ * @property Sellvana_Sales_Model_Order_Shipment_State_Carrier $Sellvana_Sales_Model_Order_Shipment_State_Carrier
+ * @property Sellvana_Sales_Model_Order_Shipment_State_Custom $Sellvana_Sales_Model_Order_Shipment_State_Custom
+ * @property Sellvana_Sales_Model_Order_Return_State_Overall $Sellvana_Sales_Model_Order_Return_State_Overall
+ * @property Sellvana_Sales_Model_Order_Return_State_Custom $Sellvana_Sales_Model_Order_Return_State_Custom
+ * @property Sellvana_Sales_Model_Order_Cancel_State_Overall $Sellvana_Sales_Model_Order_Cancel_State_Overall
+ * @property Sellvana_Sales_Model_Order_Cancel_State_Custom $Sellvana_Sales_Model_Order_Cancel_State_Custom
+ * @property Sellvana_Sales_Model_Order_Refund_State_Overall $Sellvana_Sales_Model_Order_Refund_State_Overall
+ * @property Sellvana_Sales_Model_Order_Refund_State_Custom $Sellvana_Sales_Model_Order_Refund_State_Custom
  */
 
 class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_GridForm
@@ -29,6 +44,8 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
     protected $_mainTableAlias = 'o';
     protected $_permission = 'sales/orders';
     protected $_navPath = 'sales/orders';
+    protected $_formViewPrefix = 'order/orders-form/';
+    protected $_formTitleField = 'unique_id';
 
     protected $_gridPageViewName = 'admin/griddle';
     protected $_gridViewName = 'core/griddle';
@@ -116,81 +133,32 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         ]);
     }
 
-    public function action_form()
-    {
-        $orderId = $this->BRequest->param('id', true);
-        $act = $this->BRequest->param('act', true);
-
-        $order = $this->Sellvana_Sales_Model_Order->load($orderId);
-        if (empty($order)) {
-            $order = $this->Sellvana_Sales_Model_Order->create();
-        }
-
-        if ($order->customer_id) {
-            $customer = $this->Sellvana_Customer_Model_Customer->load($order->customer_id);
-            $customer->guest = false;
-        } else {
-            $customer = new stdClass();
-            $customer->guest = true;
-        }
-        $order->items = $order->items();
-        $order->customer = $customer;
-
-        $model = $order;
-        $model->act = $act;
-
-        $this->layout($this->_formLayoutName);
-        $view = $this->view($this->_formViewName)->set('model', $model);
-
-        $this->formViewBefore(['view' => $view, 'model' => $model]);
-
-        $this->processFormTabs($view, $model, 'edit');
-    }
-
     public function formViewBefore($args)
     {
+        parent::formViewBefore($args);
+        
+        /** @var Sellvana_Sales_Model_Order $m */
         $m = $args['model'];
-        $act = $m->act;
-        $actions = [
-            'back' => '<a class="btn btn-link" href=\'' . $this->BApp->href($this->_gridHref) . '\'><span>'
-                . $this->BLocale->_('Back to list') . '</span></a>',
-            'delete' => '<button type="submit" class="st2 sz2 btn btn-danger" name="do" value="DELETE" '
-                . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
-                . $this->BLocale->_('Delete') . '</span></button>',
-            'save' => '<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
-                . $this->BLocale->_('Save') . '</span></button>',
-        ];
-        if ($m->id) {
-            if ($m->act == 'edit') {
-                $title = 'Edit Order #' . $m->get('unique_id');
-            } else {
-                $title = 'View Order #' . $m->get('unique_id');
+        if ($m->id()) {
+            $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($m->get('grand_total'))
+                . ' | ' . $this->_('Overall Status') . ': ' . $m->state()->overall()->getValueLabel()
+                . ' | ' . $this->_('Payment') . ': ' . $m->state()->payment()->getValueLabel()
+                . ' | ' . $this->_('Delivery') . ': ' . $m->state()->delivery()->getValueLabel();
+            $customState = $m->state()->custom()->getValueLabel();
+            if ($customState) {
+                $info .= ' | ' . $this->_('Custom Status') . ' ' . $customState;
             }
-        } else {
-            $title = 'Create New Order';
+            /** @var BView $view */
+            $view = $args['view'];
+            $view->set('other_info', $info);
         }
-        $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($m->get('grand_total'))
-            . ' | ' . $this->_('Overall Status') . ': ' . $m->state()->overall()->getValueLabel()
-            . ' | ' . $this->_('Payment') . ': ' . $m->state()->payment()->getValueLabel()
-            . ' | ' . $this->_('Delivery') . ': ' . $m->state()->delivery()->getValueLabel();
-        $customState = $m->state()->custom()->getValueLabel();
-        if ($customState) {
-            $info .= ' | ' . $this->_('Custom Status') . ' ' . $customState;
-        }
-        $args['view']->set([
-            'form_id' => $this->BLocale->transliterate($this->_formLayoutName),
-            'form_url' => $this->BApp->href($this->_formHref) . '?id=' . $m->id,
-            'actions' => $actions,
-            'otherInfo' => $m->id ? $info : '',
-            'title' => $title,
-        ]);
-        $this->BEvents->fire(static::$_origClass . '::formViewBefore', $args);
     }
 
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
         if ($args['do'] !== 'DELETE') {
+            /** @var Sellvana_Sales_Model_Order $order */
             $order = $args['model'];
 
             $orderPost = $this->BRequest->post('order');
@@ -205,6 +173,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
             $itemsPost = $this->BRequest->post('items');
             if ($itemsPost) {
+                /** @var Sellvana_Sales_Model_Order_Item[] $oldItems */
                 $oldItems = $this->Sellvana_Sales_Model_Order_Item->orm('i')->where('order_id', $order->id())
                     ->find_many_assoc();
                 foreach ($itemsPost as $id => $itemData) {
@@ -224,7 +193,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         }
     }
 
-    public function itemsOrderGridConfig($order)
+    public function itemsOrderGridConfig(Sellvana_Sales_Model_Order $order)
     {
         $config = array_merge(
             parent::gridConfig(),
@@ -287,8 +256,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['field' => 'grand_total', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
-        $config['orm'] = $config['orm']->where('customer_id', $customer->id());
-        $this->gridOrmConfig($config['orm']);
+        /** @var BORM $orm */
+        $orm = $config['orm'];
+        $orm->where('customer_id', $customer->id());
+        $this->gridOrmConfig($orm);
 
         return ['config' => $config];
     }
@@ -361,9 +332,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 if ($configOrderNumber != null) {
                     $configOrderNumber = '1' . $configOrderNumber;
                 }
-                if ($configOrderNumber && $orderNumber != $configOrderNumber  && $orderNumber < $seq->current_seq_id) {
+                $curSeqId = $seq->get('current_seq_id');
+                if ($configOrderNumber && $orderNumber != $configOrderNumber  && $orderNumber < $curSeqId) {
                     $result['status'] = false;
-                    $result['messages'] = $this->BLocale->_('Order number must larger than order current: ' . $seq->current_seq_id);
+                    $result['messages'] = $this->BLocale->_('Order number must larger than order current: ' . $curSeqId);
                 }
             }
         }
@@ -373,6 +345,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
     public function onSaveAdminSettings($args)
     {
         if (isset($args['post']['config']['modules']['Sellvana_Sales']['order_number'])) {
+            /** @var FCom_Core_Model_Seq $seq */
             $seq = $this->FCom_Core_Model_Seq->orm()->where('entity_type', 'order')->find_one();
             $configOrderNumber = $this->BConfig->get('modules/Sellvana_Sales/order_number');
             $orderNumber = $args['post']['config']['modules']['Sellvana_Sales']['order_number'];
@@ -404,7 +377,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         }
     }
 
-    public function paymentsGridConfig($model)
+    public function paymentsGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $methods = $this->Sellvana_Sales_Main->getPaymentMethods();
         $methodOptions = [];
@@ -456,7 +429,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         return ['config' => $config];
     }
 
-    public function shipmentsGridConfig($model)
+    public function shipmentsGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $methods = $this->Sellvana_Sales_Main->getShippingMethods();
         $carrierOptions = [];
@@ -514,7 +487,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         return ['config' => $config];
     }
 
-    public function returnsGridConfig($model)
+    public function returnsGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $stateOverallOptions = $this->Sellvana_Sales_Model_Order_Return_State_Overall->getAllValueLabels();
         $stateCustomOptions = $this->Sellvana_Sales_Model_Order_Return_State_Custom->getAllValueLabels();
@@ -552,7 +525,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         return ['config' => $config];
     }
 
-    public function cancellationsGridConfig($model)
+    public function cancellationsGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $stateOverallOptions = $this->Sellvana_Sales_Model_Order_Cancel_State_Overall->getAllValueLabels();
         $stateCustomOptions = $this->Sellvana_Sales_Model_Order_Cancel_State_Custom->getAllValueLabels();
@@ -590,7 +563,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         return ['config' => $config];
     }
 
-    public function refundsGridConfig($model)
+    public function refundsGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $stateOverallOptions = $this->Sellvana_Sales_Model_Order_Refund_State_Overall->getAllValueLabels();
         $stateCustomOptions = $this->Sellvana_Sales_Model_Order_Refund_State_Custom->getAllValueLabels();
@@ -630,7 +603,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         return ['config' => $config];
     }
 
-    public function commentsGridConfig($model)
+    public function commentsGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $orm = $this->Sellvana_Sales_Model_Order_Comment->orm('s')
             ->select('s.*')->where('order_id', $model->id());
@@ -666,7 +639,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         return ['config' => $config];
     }
 
-    public function historyGridConfig($model)
+    public function historyGridConfig(Sellvana_Sales_Model_Order $model)
     {
         $orm = $this->Sellvana_Sales_Model_Order_History->orm('s')
             ->select('s.*')->where('order_id', $model->id());

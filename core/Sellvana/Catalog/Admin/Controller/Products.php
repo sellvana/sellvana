@@ -26,6 +26,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
     protected $_permission = 'catalog/products';
+    protected $_formTitleField = 'product_name';
 
     //config to use react griddle
     protected $_gridPageViewName = 'admin/griddle';
@@ -129,18 +130,37 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $m = $args['model'];
         $newAction = [];
         if ($m->id) {
-            $newAction['duplicate'] = '<button type="submit" class="btn btn-primary ignore-validate" name="do" value="DUPLICATE" '
-                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->_('Duplicate') . '</span></button>';
+            $newAction['duplicate'] = [
+                'button',
+                [
+                    'type' => 'submit',
+                    'class' => ['btn', 'btn-primary', 'ignore-validate'],
+                    'name' => 'do',
+                    'value' => 'DUPLICATE',
+                    'onclick' => 'return confirm(\'Are you sure?\')',
+                ],
+                [
+                    ['span', null, $this->_('Duplicate')],
+                ]
+            ];
         }
-        $newAction['save_and_continue'] = '<button type="submit" class="btn btn-primary" name="do" value="save_and_continue"><span>'
-            . $this->BLocale->_('Save And Continue') . '</span></button>';
+        $newAction['save_and_continue'] = [
+            'button',
+            [
+                'type' => 'submit',
+                'class' => ['btn', 'btn-primary'],
+                'name' => 'do',
+                'value' => 'save_and_continue',
+            ],
+            [
+                ['span', null, $this->BLocale->_('Save And Continue')],
+            ]
+        ];
         $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set([
             'sidebar_img' => $m->thumbUrl(98),
-            'title' => $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product',
-            'actions' => $actions
+            'actions' => $actions,
         ]);
-        $this->_formTitle = $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product';
     }
 
     /**

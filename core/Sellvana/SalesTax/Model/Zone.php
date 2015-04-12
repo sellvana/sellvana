@@ -19,6 +19,22 @@ class Sellvana_SalesTax_Model_Zone extends FCom_Core_Model_Abstract
         'unique_key' => ['zone_type', 'title', 'postcode_from', 'postcode_to'],
     ];
 
+    public function onBeforeSave()
+    {
+        if (!parent::onBeforeSave()) {
+            return false;
+        }
+
+        if ($this->get('zone_type') === 'postcode') {
+            if ($this->get('postcode')) {
+                $this->set('postcode_from', $this->get('postcode'));
+            }
+            $this->set('postcode_to', $this->get('postcode_from'));
+        }
+
+        return true;
+    }
+
     public function getAllZones()
     {
         return $this->orm()->find_many_assoc('id', 'title');

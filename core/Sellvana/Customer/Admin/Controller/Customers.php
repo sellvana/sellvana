@@ -19,6 +19,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
     protected $_permission = 'customers/manage';
     protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
+    protected $_formTitleField = 'Sellvana_Customer_Admin_Controller_Customers.formTitleField';
 
     protected $_gridPageViewName = 'admin/griddle';
     protected $_gridViewName = 'core/griddle';
@@ -102,27 +103,46 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
         ;
     }
 
+    public function formTitleField($m)
+    {
+        return $m->get('firstname') . ' ' . $m->get('lastname');
+    }
+
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
-        $m = $args['model'];
         /** @var $m Sellvana_Customer_Model_Customer */
-        $media = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
-        $silhouetteImg = $this->FCom_Core_Main->resizeUrl($media . '/silhouette.jpg', ['s' => 98]);
+        $m = $args['model'];
         $actions = $args['view']->get('actions');
-        if ($m->id) {
-            $actions = array_merge($actions, [
-                    'create-order' => '<a class="btn btn-primary" title="' . $this->BLocale->_('Redirect to frontend and create order')
-                        . '" href="' . $this->BApp->href('customers/create_order?id=' . $m->id) . '"><span>' . $this->BLocale->_('Create Order') . '</span></a>'
-                ]);
+        if ($m->id()) {
+            $actions['create-order'] = [
+                'a',
+                [
+                    'class' => ['btn', 'btn-default'],
+                    'title' => $this->BLocale->_('Redirect to frontend and create order'),
+                    'href' => $this->BApp->href('customers/start_session?id=' . $m->id()),
+                ],
+                [
+                    ['span', null, $this->BLocale->_('Log in as Customer')],
+                ]
+            ];
         }
-        $saleStatistics = $m->saleStatistics();
-        $info = $this->_('Lifetime Sales') . ' ' . $this->BLocale->currency($saleStatistics['lifetime'])
-            . ' | ' . $this->_('Avg. Sales') . ' ' . $this->BLocale->currency($saleStatistics['avg']);
+        if ($m->id()) {
+            $saleStatistics = $m->saleStatistics();
+            $info = $this->_('Lifetime Sales') . ' ' . $this->BLocale->currency($saleStatistics['lifetime'])
+                . ' | ' . $this->_('Avg. Sales') . ' ' . $this->BLocale->currency($saleStatistics['avg']);
+        } else {
+            $info = '';
+        }
+        if ($this->BConfig->get('modules/Sellvana_Customer/use_gravatar')) {
+            $img = $this->BUtil->gravatar($m->email);
+        } else {
+            $media = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+            $img = $this->FCom_Core_Main->resizeUrl($media . '/silhouette.jpg', ['s' => 98]);
+        }
         $args['view']->set([
-            'sidebar_img' => ($this->BConfig->get('modules/Sellvana_Customer/use_gravatar') ? $this->BUtil->gravatar($m->email) : $silhouetteImg),
-            'title' => $m->id ? $this->_('Edit Customer: ') . $m->firstname . ' ' . $m->lastname : $this->_('Create New Customer'),
-            'otherInfo' => $m->id ? $info : '',
+            'sidebar_img' => $img,
+            'other_info' => $info,
             'actions' => $actions,
         ]);
     }

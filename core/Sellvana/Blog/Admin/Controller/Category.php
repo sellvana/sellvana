@@ -16,6 +16,7 @@ class Sellvana_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abst
     protected $_permission = 'blog';
     protected $_mainTableAlias = 'c';
     protected $_navPath = 'cms/category';
+    protected $_formTitleField = 'name';
 
     protected $_gridPageViewName = 'admin/griddle';
     protected $_gridViewName = 'core/griddle';
@@ -60,15 +61,6 @@ class Sellvana_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abst
             ->group_by($this->_mainTableAlias . '.id')
             ->select_expr('COUNT(u.category_id)', 'post')
         ;
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $args['view']->set([
-                'title' => $m->id ? 'Edit Blog Category: ' . $m->title : 'Create New Blog Category',
-            ]);
     }
 
     public function formPostAfter($args)

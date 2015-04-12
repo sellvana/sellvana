@@ -1,6 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
+/**
+ * Class FCom_Admin_View_Form
+ */
+class FCom_Admin_View_Form extends FCom_Admin_View_Abstract
 {
     public function getActionsHtml()
     {

@@ -20,6 +20,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_formViewPrefix;# = 'module/feature-form/';
     protected $_formViewName = 'admin/form';
     protected $_formTitle;# = 'Record';
+    protected $_formTitleField = 'id';
     protected $_mainTableAlias = 'main';
 
     protected $_useDefaultLayout = true;
@@ -263,25 +264,62 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function formViewBefore($args)
     {
+        /** @var FCom_Core_Model_Abstract $m */
         $m = $args['model'];
         $actions = [];
 
-        $actions['back'] = '<button type="button" class="btn btn-link" onclick="location.href=\''
-            . $this->BApp->href($this->_gridHref) . '\'"><span>' .  $this->BLocale->_('Back to list') . '</span></button>';
-        if ($m->id) {
-            $actions['delete'] = '<button type="submit" class="btn btn-warning ignore-validate" name="do" value="DELETE" '
-                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->BLocale->_('Delete') . '</span></button>';
-        }
-        $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
-            . $this->BLocale->_('Save') . '</span></button>';
+        $actions['back'] = [
+            'button',
+            [
+                'type' => "button",
+                'class' => ['btn', 'btn-link'],
+                'onclick' => "location.href='{$this->BApp->href($this->_gridHref)}'",
+            ],
+            [
+                ['span', null, $this->BLocale->_('Back to list')],
+            ]
+        ];
 
-        $id = method_exists($m, 'id') ? $m->id() : $m->id;
-        $title = $id ? $this->BLocale->_('Edit %s: %s', [$this->_recordName, $m->title]) : $this->BLocale->_('Create New %s', [$this->_recordName]);
+        if ($m->id()) {
+            $actions['delete'] = [
+                'button',
+                [
+                    'type' => 'submit',
+                    'class' => ['btn', 'btn-warning', 'ignore-validate'],
+                    'name' => 'do',
+                    'value' => 'DELETE',
+                    'onclick' => 'return confirm(\'Are you sure?\')',
+                ],
+                [
+                    ['span', null, $this->BLocale->_('Delete')],
+                ]
+            ];
+        }
+        $actions['save'] = [
+            'button',
+            [
+                'class' => ['btn', 'btn-primary'],
+                'onclick' => 'return adminForm.saveAll(this)',
+            ],
+            [
+                ['span', null, $this->BLocale->_('Save')],
+            ]
+        ];
+
+        $id = $m ? (method_exists($m, 'id') ? $m->id() : $m->get('id')) : null;
+        if ($id) {
+            $titleFieldValue = is_string($this->_formTitleField) && preg_match('#^[a-z0-9_]+$#i', $this->_formTitleField)
+                ? $m->get($this->_formTitleField)
+                : $this->BUtil->call($this->_formTitleField, $m);
+            $this->_formTitle = $this->BLocale->_('Edit %s: %s', [$this->_recordName, $titleFieldValue]);
+        } else {
+            $this->_formTitle = $this->BLocale->_('Create New %s', [$this->_recordName]);
+        }
 
         $args['view']->set([
             'form_id' => $this->formId(),
-            'form_url' => $this->BApp->href($this->_formHref) . '?id=' . $m->id,
-            'title' => $title,
+            'form_url' => $this->BApp->href($this->_formHref) . '?id=' . $id,
+            'title' => $this->_formTitle,
             'actions' => $actions,
         ]);
         $this->BEvents->fire(static::$_origClass . '::formViewBefore', $args);

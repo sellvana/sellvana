@@ -16,6 +16,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     protected $_recordName = 'User';
     protected $_mainTableAlias = 'au';
     protected $_navPath = 'system/users';
+    protected $_formTitleField = 'username';
 
     protected $_gridPageViewName = 'admin/griddle';
     protected $_gridViewName = 'core/griddle';
@@ -63,10 +64,9 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
-        $m = $args['model'];
+
         $args['view']->set([
-            'sidebar_img' => $this->BUtil->gravatar($m->email),
-            'title' => $m->id ? 'Edit User: ' . $m->username : 'Create New User',
+            'sidebar_img' => $this->BUtil->gravatar($args['model']->get('email')),
         ]);
     }
 

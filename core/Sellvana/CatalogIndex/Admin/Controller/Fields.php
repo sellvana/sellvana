@@ -16,6 +16,7 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
     protected $_permission = 'catalog_index';
     protected $_navPath = 'catalog/index-fields';
     protected $_formViewPrefix = 'catalogindex/fields/form/';
+    protected $_formTitleField = 'field_label';
 
     public function gridConfig()
     {
@@ -108,15 +109,6 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
         $actions['new'] = '<button type="button" id="add_new_index_field" class="btn grid-new btn-primary _modal">'
             . $this->BLocale->_('Add New Index Field') . '</button>';
         $gridView->set('actions', $actions);
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $title = $m->id ? 'Edit Index Field: ' . $m->field_label : 'Create New Index Field';
-        if (($head = $this->view('head'))) $head->addTitle($title);
-        $args['view']->set(['title' => $title]);
     }
 
     public function action_unique__POST()

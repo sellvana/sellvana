@@ -14,6 +14,7 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
     protected $_modelClass = 'Sellvana_SalesTax_Model_CustomerClass';
     protected $_gridTitle = 'Customer Tax Classes';
     protected $_recordName = 'Customer Tax Class';
+    protected $_formTitleField = 'title';
     protected $_mainTableAlias = 'tc';
     protected $_navPath = 'sales/tax/customer-classes';
     protected $_permission = 'sales/tax/customer_classes';
@@ -52,22 +53,6 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
         $this->view('admin/griddle')->set(['actions' => [
             'new' => '<button type="button" id="add_new_customer_class" class="btn grid-new btn-primary _modal">'
             . $this->BLocale->_('Add New Customer Tax Class') . '</button>']]);
-    }
-
-    public function formViewBefore($args) {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $title = $m->id ? 'Edit Customer Tax Class: ' . $m->title : 'Create New Customer Tax Class';
-        $this->addTitle($title);
-        $args['view']->set(['title' => $title]);
-    }
-
-    public function addTitle($title = '') {
-        /* @var $v BViewHead */
-        $v = $this->view('head');
-        if ($v) {
-            $v->addTitle($title);
-        }
     }
 
     public function action_unique__POST() {

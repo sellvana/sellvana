@@ -17,6 +17,7 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
     protected $_mainTableAlias = 'cg';
     protected $_navPath = 'customer/customer-groups';
     protected $_permission = 'customer_groups';
+    protected $_formTitleField = 'title';
 
     protected $_gridPageViewName = 'admin/griddle';
     protected $_gridViewName = 'core/griddle';
@@ -55,24 +56,6 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_customer_group" class="btn grid-new btn-primary _modal">'
                 . $this->BLocale->_('Add New Customer Group') . '</button>']]);
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $title = $m->id ? 'Edit Customer Group: ' . $m->title : 'Create New Customer Group';
-        $this->addTitle($title);
-        $args['view']->set(['title' => $title]);
-    }
-
-    public function addTitle($title = '')
-    {
-        /* @var $v BViewHead */
-        $v = $this->view('head');
-        if ($v) {
-            $v->addTitle($title);
-        }
     }
 
     public function formPostAfter($args)

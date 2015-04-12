@@ -19,6 +19,7 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
     protected $_gridHref = 'salestax/rules';
     protected $_gridTitle = 'Tax Rules';
     protected $_recordName = 'Tax Rule';
+    protected $_formTitleField = 'title';
     protected $_mainTableAlias = 'r';
     protected $_navPath = 'sales/tax/rules';
     protected $_permission = 'sales/tax/rules';
@@ -78,15 +79,6 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
         $orm->select("(select count(*) from {$tZone} where rule_id=r.id)", 'zones_cnt')
             ->select("(select count(*) from {$tCustClass} where rule_id=r.id)", 'cust_class_cnt')
             ->select("(select count(*) from {$tProdClass} where rule_id=r.id)", 'prod_class_cnt');
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $title = $m->id ? 'Edit Tax Rule: ' . $m->title : 'Create New Tax Rule';
-        $this->addTitle($title);
-        $args['view']->set(['title' => $title]);
     }
 
     public function formPostAfter($args)
