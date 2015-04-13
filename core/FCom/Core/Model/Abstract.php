@@ -163,8 +163,9 @@ class FCom_Core_Model_Abstract extends BModel
     public function registerImportExport(&$config)
     {
         if (!empty(static::$_importExportProfile)) {
-            $config[static::$_origClass] = static::$_importExportProfile;
-            $config[static::$_origClass]['model'] = static::$_origClass;
+            $key = static::$_origClass? :__CLASS__;
+            $config[$key] = static::$_importExportProfile;
+            $config[$key]['model'] = $key;
         }
     }
 

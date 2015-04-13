@@ -30,7 +30,7 @@
 class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_cart_item';
-
+    protected static $_origClass = 'Sellvana_Sales_Model_Cart_Item';
     /**
      * @var Sellvana_Catalog_Model_Product
      */

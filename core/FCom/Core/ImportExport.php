@@ -157,7 +157,14 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 // disable custom fields to avoid them adding bunch of fields to export
                 $this->Sellvana_CustomField_Main->disable(true);
             }
-            $sample = $this->BDb->ddlFieldInfo($model::table());
+
+            try {
+                $sample = $this->BDb->ddlFieldInfo($model::table());
+            } catch(Exception $e) {
+                $this->BDebug->logException($e);
+                continue;
+            }
+
             $idField = $this->{$model}->getIdField();
             $heading = [static::DEFAULT_MODEL_KEY => $model, static::DEFAULT_FIELDS_KEY => []];
             foreach ($sample as $key => $value) {
@@ -489,7 +496,10 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $this->changedModels[$model->id()] = $model;
                 }
             } else {
-                $this->BDebug->warning($this->BLocale->_("%s Invalid model: %s", [$this->BDb->now(), $id]));
+                $this->channel->send([
+                    'signal'  => 'problem',
+                    'problem' => $this->BLocale->_("%s Invalid model: %s", [$this->BDb->now(), $id])
+                ]);
             }
         }
         $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->changedModels]);
@@ -508,15 +518,19 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if(!empty($module->noexport)) {
             return $modelConfigs;
         }
-        $path         = $module->root_dir . '/Model/';
+        $path         = $module->root_dir . '/Model';
         $files        = $this->BUtil->globRecursive($path, '*.php');
         if (empty($files)) {
             return $modelConfigs;
         }
         foreach ($files as $file) {
-            $cls = $module->name . '_Model_' . basename($file, '.php');
-            if (method_exists($cls, 'registerImportExport')) { // instanceof does not work with class name
-                $this->{$cls}->registerImportExport($modelConfigs);
+            $className = str_replace('/', '_', str_replace($module->root_dir, '', $file));
+            $cls = $module->name . basename($className, '.php');
+            if (class_exists($cls)) {
+                $refl = new ReflectionClass($cls);
+                if (!$refl->isAbstract() && $refl->hasMethod('registerImportExport')) { // instanceof does not work with class name
+                    $this->{$cls}->registerImportExport($modelConfigs);
+                }
             }
         }
 
@@ -568,7 +582,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                         } else {
                             if (method_exists($node, 'registerImportExport')) {
                                 $this->{$node}->registerImportExport($models);
-                                $tmpModel = $models[$node];
+                                if (isset($models[$node])) {
+                                    $tmpModel = $models[$node];
+                                }
                             }
                         }
 
@@ -876,6 +892,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $valid = false;
         } else {
             $header = fgets($rh);
+            if($header == "[\n"){
+                $header = fgets($rh);
+            }
             $decodedHeader = json_decode($header, true);
             if(!$decodedHeader || !is_array($decodedHeader)){
                 $valid = false;
