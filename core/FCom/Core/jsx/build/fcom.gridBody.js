@@ -68,7 +68,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                             
                             if (editUrl.length > 0 && rowId) {
                                 $.post(editUrl, {id: rowId, oper: 'del'}, function() {
-                                    that.removeSelectedRows([row]);
+                                    that.props.removeSelectedRows([row]);
                                     that.props.refresh();
                                 });
                             }
@@ -77,7 +77,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     break;
                 default:
                     if (typeof window[callback] === 'function') {
-                        return window[callback](that, row);
+                        return window[callback](row);
                     } else {
                         console.log('Do row custom action');
                     }

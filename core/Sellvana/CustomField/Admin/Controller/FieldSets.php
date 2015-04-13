@@ -64,6 +64,11 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
             ]
         ];
 
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'fieldsetGridRegister'
+        ];
+
         return $config;
     }
 
@@ -180,7 +185,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                             /*'facet_select'=>array('label'=>'Facet', 'width'=>200, 'editable'=>true,
                                 'options'=>array('No'=>'No', 'Exclusive'=>'Exclusive', 'Inclusive'=>'Inclusive')),*/
                     ['type' => 'input', 'name' => 'table_field_type', 'label' => 'DB Type', 'width' => 180, 'editor' => 'select',
-                            'addable' => true, 'validation' => ['required' => true], 'options' => $fld->fieldOptions('table_field_type')],
+                            'addable' => true, 'editable' => true, 'validation' => ['required' => true], 'options' => $fld->fieldOptions('table_field_type')],
                     ['type' => 'input', 'name' => 'admin_input_type', 'label' => 'Input Type', 'width' => 180,
                         'editable' => true, 'editor' => 'select', 'addable' => true, 'multirow_edit' => true,
                         'validation' => ['required' => true], 'options' => $fld->fieldOptions('admin_input_type')],
@@ -214,7 +219,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 ],
                 'actions' => [
                     'add-field' => [
-                        'caption' => 'Add Field',
+                        'caption' => 'Add a field',
                         'type' => 'button',
                         'id' => 'add-field-from-grid',
                         'class' => 'btn-primary',
@@ -351,7 +356,11 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
     {
         $r = $this->BRequest;
         $data = $r->post();
-        $field_ids = $data['field_ids'];
+        $field_ids = '';
+        if (isset($data['field_ids'])) {
+            $field_ids = $data['field_ids'];
+        }
+        
         $model = $this->Sellvana_CustomField_Model_SetField;
         switch ($r->post('oper')) {
             case 'add':

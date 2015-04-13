@@ -17,10 +17,6 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     protected $_mainTableAlias = 's';
     protected $_navPath = 'catalog/inventory';
 
-    #protected $_defaultGridLayoutName = 'default_grid';
-    #protected $_gridPageViewName = 'admin/grid';
-    #protected $_gridViewName = 'core/backbonegrid';
-
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -72,6 +68,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         $config['filters'] = [
             ['field' => 'inventory_sku', 'type' => 'text'],
             ['field' => 'product_name', 'type' => 'text'],
+            //['field' => 'is_salable', 'type' => 'multiselect'],
             ['field' => 'qty_in_stock', 'type' => 'number-range'],
         ];
         $config['grid_before_create'] = 'stockGridRegister';

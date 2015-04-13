@@ -43,13 +43,6 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
         ];
 
         $config['actions'] = [
-            'add' => [
-                'label'  => 'Add Custom State',
-                'type'     => 'button',
-                'id'       => 'add-state-custom',
-                'class'    => 'btn-primary',
-                'callback' => 'showModalToAddStateCustom'
-            ],
             'edit' => true,
             'delete' => true
         ];

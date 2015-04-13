@@ -15,10 +15,6 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     protected $_recordName = 'Template';
     protected $_navPath = 'system/templates';
 
-    #protected $_defaultGridLayoutName = 'default_grid';
-    #protected $_gridPageViewName = 'admin/grid';
-    #protected $_gridViewName = 'core/backbonegrid';
-
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -45,6 +41,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $data = [];
         foreach ($layout->getAllViews() as $view) {
             $row = [
+                'id' => md5(uniqid('templates_')),
                 'view_name' => $view->param('view_name'),
                 'file_ext' => $view->param('file_ext'),
                 'module_name' => $view->param('module_name'),
