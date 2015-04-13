@@ -33,7 +33,7 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
-            'new' => array('caption' => 'Add New Customer Tax Class', 'modal' => true),
+            #'new' => array('caption' => 'Add New Customer Tax Class', 'modal' => true),
             'edit' => true,
             'delete' => true,
         ];
@@ -42,13 +42,6 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
         ];
         $config['new_button'] = '#add_new_customer_class';
         return $config;
-    }
-
-    public function gridViewBefore($args) {
-        parent::gridViewBefore($args);
-        $this->view('admin/griddle')->set(['actions' => [
-            'new' => '<button type="button" id="add_new_customer_class" class="btn grid-new btn-primary _modal">'
-            . $this->BLocale->_('Add New Customer Tax Class') . '</button>']]);
     }
 
     public function action_unique__POST() {

@@ -15,13 +15,13 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_gridTitle = 'List of Records';
     protected $_gridPageViewName = 'admin/griddle';
     protected $_gridViewName = 'core/griddle';
-    protected $_useDefaultLayout = true;
+    protected $_useDefaultLayout = false;
     protected $_defaultGridLayoutName = 'default_griddle';
-    protected $_gridLayoutName;# = '/feature';
+    protected $_gridLayoutName = 'default_griddle';# = '/feature';
     protected $_gridConfig = [];
 
     protected $_formHref;# = 'feature/form';
-    protected $_formLayoutName;# = '/feature/form';
+    protected $_formLayoutName = 'default_form';# = '/feature/form';
     protected $_formViewPrefix;# = 'module/feature-form/';
     protected $_formViewName = 'admin/form';
     protected $_formTitle;# = 'Record';
@@ -144,10 +144,18 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $view->set([
             'title' => $this->_gridTitle,
             'actions' => [
-                'new' => ' <button type="button" class="btn btn-primary btn-sm" onclick="location.href=\''
-                    . $this->BApp->href($this->_formHref) . '\'"><span>'
-                    . $hlp->q($hlp->_('New %s', $this->_recordName))
-                    . '</span></button>',
+                'new' => [
+                    'button',
+                    [
+                        'id' => 'grid_new_form_button',
+                        'type' => 'button',
+                        'class' => ['btn', 'btn-primary', 'btn-sm'],
+                        'onclick' => "location.href='{$this->BApp->href($this->_formHref)}'",
+                    ],
+                    [
+                        ['span', null, $hlp->_('New %s', $this->_recordName)]
+                    ],
+                ],
             ],
         ]);
         $this->BEvents->fire(static::$_origClass . '::gridViewBefore', $args);

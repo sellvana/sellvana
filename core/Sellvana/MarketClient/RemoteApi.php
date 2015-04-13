@@ -13,7 +13,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     /**
      * @var string
      */
-    protected $_apiUrl = 'https://market.sellvana.com/';
+    protected $_apiUrl = 'https://market.sellvana.com/api/';
     #protected $_apiUrl = 'http://127.0.0.1/sellvana/';
 
     /**
@@ -43,7 +43,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
             $redirect = '';
         }
 
-        $url = $this->getUrl('api/v1/market/site/connect', [
+        $url = $this->getUrl('v1/market/site/connect', [
             'admin_url' => $this->BApp->adminHref(),
             'retry_url' => $this->BApp->adminHref('marketclient/site/connect'),
             'redirect_to' => $redirect,
@@ -72,7 +72,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     public function getModulesVersions($modules, $resetCache = false)
     {
         $cached = $this->BCache->load(static::$_modulesVersionsCacheKey);
-        if ($cached && true === $modules && !$resetCache) {
+        if (null !== $cached && true === $modules && !$resetCache) {
             return $cached;
         }
 
@@ -83,11 +83,14 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         }
 
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
-        $url = $this->getUrl('api/v1/market/module/version', [
+        $url = $this->getUrl('v1/market/module/version', [
             'mod_name' => join(',', $modules),
             'site_key' => $siteKey,
+            'admin_url' => $this->BApp->adminHref(''),
         ]);
+#$t = microtime(1);
         $response = $this->BUtil->remoteHttp("GET", $url);
+#var_dump($url, $response, $this->BUtil->lastRemoteHttpInfo(), microtime(1)-$t); exit;
         $remoteModResult = $this->BUtil->fromJson($response);
         if (!empty($remoteModResult['error'])) {
             $this->BCache->delete(static::$_modulesVersionsCacheKey);
@@ -113,7 +116,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
             $cached[$remoteModName] = $remoteMod;
         }
         if (!empty($cached)) {
-            $this->BCache->save(static::$_modulesVersionsCacheKey, $cached, 86400);
+            $this->BCache->save(static::$_modulesVersionsCacheKey, $cached, $cached ? 86400 : 60);
         }
         $result = [];
         foreach ($modules as $remoteModName) {
@@ -129,7 +132,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
      */
     public function getModuleInstallInfo($modules)
     {
-        $url = $this->getUrl('api/v1/market/module/install_info', [
+        $url = $this->getUrl('v1/market/module/install_info', [
             'mod_name' => $modules,
         ]);
         $response = $this->BUtil->remoteHttp("GET", $url);
@@ -167,7 +170,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     public function createModule($modName)
     {
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
-        $url = $this->getUrl('api/v1/market/module/create');
+        $url = $this->getUrl('v1/market/module/create');
         $data = [
             'site_key' => $siteKey,
             'mod_name' => $modName,
@@ -194,7 +197,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         $ignorePattern = !empty($mod->package['ignore_files']) ? $mod->package['ignore_files'] : null;
         $this->BUtil->zipCreateFromDir($packageFilename, $mod->root_dir, $ignorePattern);
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
-        $url = $this->getUrl('api/v1/market/module/upload');
+        $url = $this->getUrl('v1/market/module/upload');
         $data = [
             'site_key' => $siteKey,
             'mod_name' => $moduleName,
@@ -221,7 +224,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         if ($channel === '*') {
             $channel = null;
         }
-        $url = $this->getUrl('api/v1/market/module/download', [
+        $url = $this->getUrl('v1/market/module/download', [
             'mod_name' => $moduleName,
             'version' => $version,
             'channel' => $channel,

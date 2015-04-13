@@ -11,6 +11,7 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
     protected $_modelClass = 'Sellvana_CatalogIndex_Model_Field';
     protected $_gridHref = 'catalogindex/fields';
     protected $_gridTitle = 'Catalog Index Fields';
+    protected $_gridLayoutName = '/catalogindex/fields';
     protected $_recordName = 'Index Field';
     protected $_mainTableAlias = 'idxf';
     protected $_permission = 'catalog_index';
@@ -102,12 +103,28 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
 
         $gridView = $args['page_view'];
         $actions = $gridView->get('actions');
-        $actions += [
-            'reindex_force' => ' <button class="btn btn-primary btn-progress _modal" data-toggle="modal" data-target="#progress" type="button"><span>' . $this->BLocale->_('Force Reindex')
-                . '</span></button>',
+        $actions['reindex_force'] = [
+            'button',
+            [
+                'class' => ['btn', 'btn-primary', 'btn-progress', '_modal'],
+                'data-toggle' => 'modal',
+                'data-target' => '#progress',
+                'type' => 'button',
+            ],
+            [
+                ['span', null, $this->BLocale->_('Force Reindex')]
+            ]
         ];
-        $actions['new'] = '<button type="button" id="add_new_index_field" class="btn grid-new btn-primary _modal">'
-            . $this->BLocale->_('Add New Index Field') . '</button>';
+        $actions['new'] = [
+            'button',
+            [
+                'id' => 'add_new_index_field',
+                'class' => ['btn', 'grid-new', 'btn-primary', '_modal'],
+            ],
+            [
+                ['span', null, $this->BLocale->_('Add New Index Field')],
+            ]
+        ];
         $gridView->set('actions', $actions);
     }
 

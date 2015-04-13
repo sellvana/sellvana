@@ -9,15 +9,16 @@
 
 class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected $_permission = 'system/modules';
     protected static $_origClass = __CLASS__;
+
+    protected $_permission = 'system/modules';
+    protected $_navPath = 'modules/installed';
     protected $_modelClass = 'FCom_Core_Model_Module';
     protected $_gridHref = 'modules';
+    protected $_gridLayoutName = '/modules';
     protected $_gridTitle = 'Modules';
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'm';
-    protected $_navPath = 'modules/installed';
-    protected $_useDefaultLayout = false;
 
     /**
      * @return array
