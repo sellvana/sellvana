@@ -80,15 +80,9 @@ class Sellvana_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Co
 
     public function formViewBefore($args)
     {
-        $m = $args['model'];
+        parent::formViewBefore($args);
         $args['view']->set([
             'form_id' => $this->BLocale->transliterate($this->_formLayoutName),
-            'form_url' => $this->BApp->href($this->_formHref) . '?id=' . $m->id,
-            'actions' => [
-                'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\'' . $this->BApp->href($this->_gridHref) . '\'"><span>' .  $this->BLocale->_('Back to list') . '</span></button>',
-                'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>' .  $this->BLocale->_('Save') . '</span></button>',
-            ],
         ]);
-        $this->BEvents->fire(static::$_origClass . '::formViewBefore', $args);
     }
 }

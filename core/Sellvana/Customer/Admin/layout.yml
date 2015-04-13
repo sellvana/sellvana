@@ -4,7 +4,7 @@ base:
             - [ addNav, customer, { label: Customers, pos: 300, icon_class: icon-user } ]
             - [ addNav, customer/customers, { label: Customers, href: /customers, pos: 10 } ]
             - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index, pos: 40 } ]
-    #- { include: lib_griddle }
+
 /customers/import:
     - { include: base }
     - { include: form }
@@ -16,12 +16,6 @@ base:
         do:
             - [ addTabGroup, customers, { label: Customers, pos: 50 } ]
             - [ addTab, Sellvana_Customer, { label: Customers, group: customers, async: true } ]
-
-/customers:
-    - { include: base }
-    #- { hook: main, views: ['customer/customers', 'admin/grid'] }
-    # please also comment above hook if you want to test griddle
-    - { hook: main, views: ['customer/customers', 'admin/griddle'] }
 
 /header_search:
     - { hook: main, views: 'header-search/Sellvana_Customer' }

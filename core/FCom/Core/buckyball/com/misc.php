@@ -1001,6 +1001,7 @@ class BUtil extends BClass
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
         $timeout = !empty($options['timeout']) ? $options['timeout'] : 5;
         $userAgent = !empty($options['useragent']) ? $options['useragent'] : 'Mozilla/5.0';
+        $useCurl = isset($options['curl']) ? $options['curl'] : true;
         if (preg_match('#^//#', $url)) {
             $url = 'http:' . $url;
         }
@@ -1015,9 +1016,7 @@ class BUtil extends BClass
         }
 
         // curl disabled by default because file upload doesn't work for some reason. TODO: figure out why
-        if (!empty($options['curl']) && function_exists('curl_init')
-            || ini_get('safe_mode') || !ini_get('allow_url_fopen')
-        ) {
+        if ($useCurl && function_exists('curl_init') || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
@@ -1046,6 +1045,13 @@ class BUtil extends BClass
                 ];
             }
 
+            if (is_array($data)) {
+                foreach ($data as $k => $v) {
+                    if (is_string($v) && $v[0] === '@') {
+                        $data[$k] = new CURLFile(substr($v, 1));
+                    }
+                }
+            }
             if ($method === 'POST') {
                 $curlOpt += [
                     CURLOPT_POSTFIELDS => $data,
@@ -1084,6 +1090,14 @@ class BUtil extends BClass
                     CURLOPT_USERPWD => $options['auth'],
                 ];
             }
+            /*
+            $this->BDebug->log(print_r([
+                'ts' => $this->BDb->now(),
+                'data' => $data,
+                'curlopts' => $curlOpt,
+                'consts' => ['POSTFIELDS' => CURLOPT_POSTFIELDS, 'POST' => CURLOPT_POST],
+            ], 1), 'remotehttp.log');
+            */
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
@@ -1185,7 +1199,18 @@ class BUtil extends BClass
                 ];
             }
         }
-        #BDebug::log(print_r(compact('method', 'url', 'data', 'response'), 1), 'remotehttp.log');
+/*
+        if ($this->BDebug->is(['DEBUG'])) {
+            $this->BDebug->log(print_r([
+                'ts' => $this->BDb->now(),
+                'method' => $method,
+                'url' => $url,
+                'data' => $data,
+                'response' => $response,
+                'http_info' => static::$_lastRemoteHttpInfo,
+            ], 1), 'remotehttp.log');
+        }
+*/
 
         BDebug::profile($debugProfile);
         return $response;
@@ -1424,13 +1449,28 @@ class BUtil extends BClass
 
 
     /**
-     * @param string $tag
+     * @param string|array $tag
      * @param array  $attrs
-     * @param null   $content
+     * @param string|array $content
      * @return string
+     * @throws BException
      */
-    public function tagHtml($tag, $attrs = [], $content = null)
+    public function tagHtml($tag, $attrs = null, $content = null)
     {
+        if (is_array($tag)) {
+            if (!empty($tag[0])) {
+                list($tag, $attrs, $content) = $tag;
+            } elseif (!empty($tag['tag'])) {
+                $attrs = $tag['attrs'];
+                $content = $tag['content'];
+                $tag = $tag['tag'];
+            } else {
+                throw new BException('Invalid tag argument: ' . print_r($tag));
+            }
+        }
+        if (is_array($content)) {
+            $content = join('', array_map([$this, 'tagHtml'], $content));
+        }
         return '<' . $tag . ' ' . $this->tagAttributes($attrs) . '>' . $content . '</' . $tag . '>';
     }
 

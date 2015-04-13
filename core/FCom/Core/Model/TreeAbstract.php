@@ -59,7 +59,9 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function load($id, $field = null, $cache = false)
     {
         $cat = parent::load($id, $field, $cache);
-        if ($cat) return $cat;
+        if ($cat) {
+            return $cat;
+        }
         if ($id === 1) {
             return $this->create([
                     'id' => 1,
@@ -273,9 +275,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
                     'id_path' => $this->get('id_path') . '/' . $c->id(),
                     'full_name' => $this->get('full_name') . static::$_separator . $c->get('node_name'),
                 ]);
-            if ($resetUrl) $c->set('url_path', null);
+            if ($resetUrl) {
+                $c->set('url_path', null);
+            }
             $c->refreshDescendants($save);
-            if ($save) $c->save();
+            if ($save) {
+                $c->save();
+            }
         }
         return $this;
     }
@@ -311,10 +317,14 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         $numDesc = 1 + $this->get('num_descendants');
         foreach ($this->ascendants() as $c) {
             $c->add('num_descendants', - $numDesc);
-            if ($save) $c->save();
+            if ($save) {
+                $c->save();
+            }
         }
         $this->saveInstanceCache('parent', null);
-        if ($save) $this->save();
+        if ($save) {
+            $this->save();
+        }
         return $this;
     }
 
@@ -329,7 +339,9 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         foreach ($this->ascendants() as $c) {
             // TODO: fix updating when re-registering existing node
             $c->add('num_descendants', $numDesc);
-            if ($save) $c->save();
+            if ($save) {
+                $c->save();
+            }
         }
         return $this;
     }
@@ -383,8 +395,12 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         if (null === $numChildren || sizeof($children) != $numChildren) {
             $class = get_class($this);
             $orm = $this->orm('t')->where('t.parent_id', $id);
-            if ($children) $orm->where_not_in('t.id', array_keys($children));
-            if ($sort) $orm->order_by_asc($sort);
+            if ($children) {
+                $orm->where_not_in('t.id', array_keys($children));
+            }
+            if ($sort) {
+                $orm->order_by_asc($sort);
+            }
             $rows = $orm->find_many();
             foreach ($rows as $c) {
                 $c->cacheStore();
@@ -416,8 +432,12 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         $numDescendants = $this->get('num_descendants');
         if (null === $numDescendants || sizeof($desc) != $numDescendants) {
             $orm = $this->orm('t')->where_like('t.id_path', $path . '%');
-            if ($desc) $orm->where_not_in('t.id', array_keys($desc));
-            if ($sort) $orm->order_by_asc($sort);
+            if ($desc) {
+                $orm->where_not_in('t.id', array_keys($desc));
+            }
+            if ($sort) {
+                $orm->order_by_asc($sort);
+            }
             $rows = $orm->find_many();
             foreach ($rows as $c) {
                 $c->cacheStore();
@@ -435,7 +455,9 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     {
         $asc = [];
         foreach (explode('/', $this->get('id_path')) as $id) {
-            if ($id && $this->id() != $id) $asc[$id] = $this->load($id);
+            if ($id && $this->id() != $id) {
+                $asc[$id] = $this->load($id);
+            }
         }
         return $asc;
     }
@@ -448,7 +470,9 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     {
         $siblings = [];
         foreach ($this->parent()->children() as $c) {
-            if ($c->id() != $this->id()) $siblings[$c->id()] = $c;
+            if ($c->id() != $this->id()) {
+                $siblings[$c->id()] = $c;
+            }
         }
         return $siblings;
     }

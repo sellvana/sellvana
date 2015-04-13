@@ -19,7 +19,7 @@ class Sellvana_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Ab
         self::RMA_SENT => 'RMA Sent',
         self::EXPIRED => 'Expired',
         self::CANCELED => 'Canceled',
-        self::received => 'Received',
+        self::RECEIVED => 'Received',
         self::APPROVED => 'Approved',
         self::RESTOCKED => 'Re-stocked',
         self::DECLINED => 'Declined',

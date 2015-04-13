@@ -78,4 +78,4 @@ lib_select2:
     - view: head
         do:
             - [ requireJs, select2, @FCom_LibJsCommon/js/select2-4.0.0/js/select2.full.min ]
-            - [ css, @FCom_LibJsCommon/js/select2/css/select2-4.0.0.min.css ]
+            - [ css, @FCom_LibJsCommon/js/select2-4.0.0/css/select2.min.css ]
