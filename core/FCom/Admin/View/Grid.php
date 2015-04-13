@@ -4,6 +4,9 @@ class FCom_Admin_View_Grid extends FCom_Core_View_Abstract
 {
     public function getActionsHtml()
     {
+        if (!$this->get('actions')) {
+            return '';
+        }
         $htmlArr = [];
         foreach ($this->get('actions') as $action) {
             if (is_string($action)) {

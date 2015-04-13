@@ -15,9 +15,9 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     protected $_recordName = 'Template';
     protected $_navPath = 'system/templates';
 
-    protected $_defaultGridLayoutName = 'default_grid';
-    protected $_gridPageViewName = 'admin/grid';
-    protected $_gridViewName = 'core/backbonegrid';
+    #protected $_defaultGridLayoutName = 'default_grid';
+    #protected $_gridPageViewName = 'admin/grid';
+    #protected $_gridViewName = 'core/backbonegrid';
 
     public function gridConfig()
     {
@@ -55,7 +55,6 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $config['data_mode'] = 'local';
         $config['filters'] = [
             ['field' => 'name', 'type' => 'text'],
-            ['field' => 'run_level_core', 'type' => 'multiselect']
         ];
         $config['actions'] = [
             'delete' => ['caption' => 'Remove/Revert'],

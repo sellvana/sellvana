@@ -57,8 +57,8 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70,
-                'href' => $this->BApp->href('orders/form/?id=:id')],
+            ['name' => 'id', 'index' => 'o.id', 'label' => 'Internal ID', 'width' => 70, 'hidden' => true],
+            ['name' => 'unique_id', 'index' => 'o.unique_id', 'label' => 'ID', 'width' => 70],
             ['name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by'],
             ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
 

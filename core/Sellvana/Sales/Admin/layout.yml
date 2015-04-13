@@ -37,6 +37,5 @@ base:
     - { hook: main, views: "header-search/Sellvana_Sales_Orders" }
 
 /orderstatecustom:
-    - { include: base }
-    - { hook: main, views: order/orderstatecustom-form/state_custom }
-    - { view: admin/nav, do: [[ setNav, sales/orderstatecustom]] }
+    - { include: default_griddle }
+    - { hook: main, views: order/customstates }

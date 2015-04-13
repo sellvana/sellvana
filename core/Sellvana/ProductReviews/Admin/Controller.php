@@ -16,10 +16,11 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
     protected $_gridTitle = 'Product Reviews';
     protected $_recordName = 'Product Review';
     protected $_formTitleField = 'title';
+    protected $_formViewPrefix = 'prodreviews/form/';
     //custom grid view
-    protected $_gridViewName = 'prodreviews/grid';
-    protected $_useDefaultLayout = false;
+    protected $_gridLayoutName = '/prodreviews';
     protected $_permission = 'product_review';
+    protected $_navPath = 'catalog/prodreviews';
 
     public function gridConfig($productModel = false)
     {

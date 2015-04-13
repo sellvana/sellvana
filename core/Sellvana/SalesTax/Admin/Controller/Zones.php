@@ -45,7 +45,7 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
-            'new' => array('caption' => 'Add New Tax Zone', 'modal' => true),
+            #'new' => array('caption' => 'Add New Tax Zone', 'modal' => true),
             'edit' => true,
             'delete' => true,
         ];
@@ -68,13 +68,6 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
         }
 
         return $config;
-    }
-
-    public function gridViewBefore($args) {
-        parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(['actions' => [
-            'new' => '<button type="button" id="add_new_zone" class="btn grid-new btn-primary _modal">'
-            . $this->BLocale->_('Add New Tax Zone') . '</button>']]);
     }
 
     public function action_unique__POST() {

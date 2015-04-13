@@ -319,9 +319,8 @@ form:
             - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10 } ]
 
 /modules:
-    - { include: base }
+    - { include: default_griddle }
     - { hook: main, views: modules }
-    - { view: admin/nav, do: [[ setNav, modules/installed ]] }
 
 /templates/form:
     - { include: lib_js_codemirror }

@@ -3,7 +3,7 @@
 /**
  * Class Sellvana_Catalog_Admin_Controller_Products
  *
- *@property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
@@ -26,6 +26,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
     protected $_permission = 'catalog/products';
+    protected $_formLayoutName = '/catalog/products/form';
     protected $_formTitleField = 'product_name';
 
     /**

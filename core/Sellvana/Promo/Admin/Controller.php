@@ -19,13 +19,13 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     protected static $_origClass = __CLASS__;
     protected $_permission = 'promo';
     protected $_modelClass = 'Sellvana_Promo_Model_Promo';
-    protected $_gridLayoutName = '/promo';
     protected $_gridHref = 'promo';
     protected $_gridTitle = 'Promotions';
     protected $_recordName = 'Promotion';
     protected $_formTitleField = 'description';
     protected $_mainTableAlias = 'p';
     protected $_navPath = 'catalog/promo';
+    protected $_formLayoutName = '/promo/form';
 
     /**
      * @return array
