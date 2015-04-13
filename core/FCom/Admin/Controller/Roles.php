@@ -14,10 +14,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridHref = 'roles';
     protected $_gridTitle = 'Roles and Permissions';
     protected $_recordName = 'Role';
-
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
+    protected $_formTitleField = 'role_name';
 
     public function gridConfig()
     {
@@ -36,15 +33,6 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
             ['field' => 'role_name', 'type' => 'text'],
         ];
         return $config;
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $args['view']->set([
-            'title' => $m->id ? 'Edit Role: ' . $m->role_name : 'Create New Role',
-        ]);
     }
 
     public function formPostBefore($args)

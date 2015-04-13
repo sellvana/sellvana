@@ -15,10 +15,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
     protected $_modelClass = 'Sellvana_Cms_Model_Block';
     protected $_gridTitle = 'CMS Block';
     protected $_recordName = 'CMS Block';
-
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
+    protected $_formTitleField = 'handle';
 
     public function gridConfig()
     {
@@ -53,16 +50,6 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         ];
         return $config;
     }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $args['view']->set([
-            'title' => $m->id ? 'Edit CMS Block: ' . $m->handle : 'Create New CMS Block',
-        ]);
-    }
-
 
     /**
      * @param $model Sellvana_Catalog_Model_Product

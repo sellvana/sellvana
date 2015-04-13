@@ -45,6 +45,7 @@ class FCom_Admin_Controller_Backups extends FCom_Admin_Controller_Abstract_GridF
 
     public function action_form()
     {
+        return;
         $this->layout($this->_formLayoutName);
         $tplViewName = $this->BRequest->get('id');
         $areaLayout = $this->getAreaLayout();

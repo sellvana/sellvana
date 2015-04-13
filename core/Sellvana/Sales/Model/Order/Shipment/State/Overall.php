@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_Shipment_State_Overall extends FCom_Core_Model_Abstract_State_Custom
+class Sellvana_Sales_Model_Order_Shipment_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
     const PENDING = 'pending',
         PACKING = 'packing',

@@ -28,12 +28,13 @@ catalog_product_form_tabs:
 
 
 /catalog/products/form:
+    - { include: default_form }
     - { include: jstree }
     - { include: catalog_product_form_tabs }
     - view: head
         do:
             - [ css, "@Sellvana_Catalog/Admin/css/prices.css" ]
-            - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.product.price, [jquery, react]]
+            - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.product.price, { deps: [ jquery, react ] } ]
 #            - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/src/fcom.catalog.product.price, [jquery, react]]
 
 /catalog/products/import:
@@ -77,6 +78,4 @@ catalog_product_form_tabs:
 
 
 /catalog/inventory:
-    - { include: base }
     - { hook: main, views: catalog/inventory }
-    - { view: admin/nav, do: [[ setNav, catalog/inventory ]] }

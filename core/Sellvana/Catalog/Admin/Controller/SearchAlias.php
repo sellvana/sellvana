@@ -9,6 +9,10 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
     protected $_recordName = 'Search Term';
     protected $_mainTableAlias = 's';
 
+    #protected $_defaultGridLayoutName = 'default_grid';
+    #protected $_gridPageViewName = 'admin/grid';
+    #protected $_gridViewName = 'core/backbonegrid';
+
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -51,17 +55,7 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'update_at', 'type' => 'date-range'],
         ];
-        $config['new_button'] = '#add_new_index_search_term';
+        $config['new_button'] = '#grid_new_form_button';
         return $config;
-    }
-
-    public function gridViewBefore($args)
-    {
-        parent::gridViewBefore($args);
-        $gridView = $args['page_view'];
-        $actions = $gridView->get('actions');
-        $actions['new'] = '<button type="button" id="add_new_index_search_term" class="btn grid-new btn-primary _modal">'
-            . $this->BLocale->_('Add New Search Term') . '</button>';
-        $gridView->set('actions', $actions);
     }
 }

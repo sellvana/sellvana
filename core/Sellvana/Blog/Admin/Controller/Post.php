@@ -18,10 +18,7 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
     protected $_permission = 'blog';
     protected $_mainTableAlias = 'p';
     protected $_navPath = 'cms/blog';
-
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
+    protected $_formTitleField = 'title';
 
     public function gridConfig()
     {
@@ -86,19 +83,6 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
                 ->where('c.category_id', $this->BSession->get('categoryBlogPost'))
             ;
         }
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $args['view']->set([
-            'title' => $m->id ? 'Edit Blog Post: ' . $m->title : 'Create New Blog Post',
-        ]);
-        $tagOptions = $this->Sellvana_Blog_Model_Tag->orm()->order_by_asc('tag_name')
-            ->select('tag_key', 'id')->select('tag_name', 'name')->find_many();
-        $tagOptionsJson = $this->BUtil->toJson($this->BDb->many_as_array($tagOptions));
-        $this->view('blog/post-form/main')->set('tag_options_json', $tagOptionsJson);
     }
 
     /**
