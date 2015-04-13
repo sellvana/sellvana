@@ -17,6 +17,10 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     protected $_mainTableAlias = 's';
     protected $_navPath = 'catalog/inventory';
 
+    protected $_defaultGridLayoutName = 'default_grid';
+    protected $_gridPageViewName = 'admin/grid';
+    protected $_gridViewName = 'core/backbonegrid';
+
     public function gridConfig()
     {
         $config = parent::gridConfig();

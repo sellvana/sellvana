@@ -6,7 +6,7 @@
           {{ THIS.get('title') }}
       </h1>
       <div class="btn-group">
-          {{ THIS.get('actions') | join(' ') | raw }}
+          {{ THIS.getActionsHtml() | raw }}
       </div>
   </div>
 

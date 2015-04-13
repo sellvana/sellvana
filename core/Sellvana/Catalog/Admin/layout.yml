@@ -77,6 +77,4 @@ catalog_product_form_tabs:
 
 
 /catalog/inventory:
-    - { include: base }
     - { hook: main, views: catalog/inventory }
-    - { view: admin/nav, do: [[ setNav, catalog/inventory ]] }

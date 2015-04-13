@@ -1098,6 +1098,7 @@ class BUtil extends BClass
             curl_close($ch);
         } else {
             $streamOptions = ['http' => [
+                'protocol_version' => '1.1',
                 'method' => $method,
                 'timeout' => $timeout,
                 'header' => "User-Agent: {$userAgent}\r\n",
@@ -1423,13 +1424,28 @@ class BUtil extends BClass
 
 
     /**
-     * @param string $tag
+     * @param string|array $tag
      * @param array  $attrs
-     * @param null   $content
+     * @param string|array $content
      * @return string
+     * @throws BException
      */
-    public function tagHtml($tag, $attrs = [], $content = null)
+    public function tagHtml($tag, $attrs = null, $content = null)
     {
+        if (is_array($tag)) {
+            if (!empty($tag[0])) {
+                list($tag, $attrs, $content) = $tag;
+            } elseif (!empty($tag['tag'])) {
+                $attrs = $tag['attrs'];
+                $content = $tag['content'];
+                $tag = $tag['tag'];
+            } else {
+                throw new BException('Invalid tag argument: ' . print_r($tag));
+            }
+        }
+        if (is_array($content)) {
+            $content = join('', array_map([$this, 'tagHtml'], $content));
+        }
         return '<' . $tag . ' ' . $this->tagAttributes($attrs) . '>' . $content . '</' . $tag . '>';
     }
 
@@ -1845,12 +1861,13 @@ class BUtil extends BClass
     }
 
     /**
-     * @param $filename
-     * @param $sourceDir
+     * @param string $filename
+     * @param string $sourceDir
+     * @param string $ignorePattern
      * @return bool
      * @throws BException
      */
-    public function zipCreateFromDir($filename, $sourceDir)
+    public function zipCreateFromDir($filename, $sourceDir, $ignorePattern = null)
     {
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
@@ -1866,6 +1883,9 @@ class BUtil extends BClass
         }
         foreach ($files as $file) {
             $packedFile = str_replace($sourceDir . '/', '', $file);
+            if (!empty($ignorePattern) && preg_match($ignorePattern, $packedFile)) {
+                continue;
+            }
             if (is_dir($file)) {
                 $zip->addEmptyDir($packedFile);
             } else {

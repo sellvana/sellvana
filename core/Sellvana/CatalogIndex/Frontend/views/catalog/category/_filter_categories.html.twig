@@ -22,7 +22,7 @@
             {% endfor %}
         </ul>
         <small>
-            <a href="{{ APP.href('catalogindex/search') ~ '?q=' ~ REQUEST.get('q')|e('url') }}">{{ "Clear filters" | _ }}</a>
+            <a href="{{ APP.href('catalog/search') ~ '?q=' ~ REQUEST.get('q')|e('url') }}">{{ "Clear filters" | _ }}</a>
         </small>
     </dd>
 {% endif %}

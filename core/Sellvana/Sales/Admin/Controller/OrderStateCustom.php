@@ -23,7 +23,7 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
         $config = [
             'config' => [
                 'id'     => 'state-custom',
-                'caption' => 'State Custom',
+                'caption' => 'Custom States',
                 'data_url' => $this->BApp->href('/orderstatecustom/grid_data'),
                 'edit_url' => $this->BApp->href('/orderstatecustom/grid_data'),
                 'orm' => $orm,
@@ -41,7 +41,7 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
                 ],
                 'actions' => [
                     'add-state-custome' => [
-                        'caption'  => 'Add State Custom',
+                        'caption'  => 'Add Custom State',
                         'type'     => 'button',
                         'id'       => 'add-state-custom',
                         'class'    => 'btn-primary',

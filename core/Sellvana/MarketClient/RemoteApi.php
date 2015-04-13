@@ -13,7 +13,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     /**
      * @var string
      */
-    protected $_apiUrl = 'http://market.sellvana.com/';
+    protected $_apiUrl = 'https://market.sellvana.com/';
     #protected $_apiUrl = 'http://127.0.0.1/sellvana/';
 
     /**
@@ -32,9 +32,10 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     }
 
     /**
+     * @param string $data
      * @return array|mixed
      */
-    public function setupConnection()
+    public function setupConnection($data = null)
     {
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
         $redirect = $this->BRequest->get('redirect_to');
@@ -43,10 +44,15 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         }
 
         $url = $this->getUrl('api/v1/market/site/connect', [
-            'admin_url' => $this->BApp->href(),
-            'retry_url' => $this->BApp->href('marketclient/site/connect'),
+            'admin_url' => $this->BApp->adminHref(),
+            'retry_url' => $this->BApp->adminHref('marketclient/site/connect'),
             'redirect_to' => $redirect,
             'site_key' => $siteKey,
+
+            'email' => !empty($data['email']) ? $data['email'] : null,
+            'firstname' => !empty($data['firstname']) ? $data['firstname'] : null,
+            'lastname' => !empty($data['lastname']) ? $data['lastname'] : null,
+            'role' => !empty($data['role']) ? $data['role'] : null,
         ]);
         $response = $this->BUtil->remoteHttp('GET', $url);
         $result = $this->BUtil->fromJson($response);
@@ -185,7 +191,8 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         $this->BUtil->ensureDir($packageDir);
         $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}-{$mod->getChannel()}.zip";
         @unlink($packageFilename);
-        $this->BUtil->zipCreateFromDir($packageFilename, $mod->root_dir);
+        $ignorePattern = !empty($mod->package['ignore_files']) ? $mod->package['ignore_files'] : null;
+        $this->BUtil->zipCreateFromDir($packageFilename, $mod->root_dir, $ignorePattern);
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
         $url = $this->getUrl('api/v1/market/module/upload');
         $data = [
@@ -203,6 +210,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
      * @param $moduleName
      * @param null $version
      * @param null $channel
+     * @return string
      * @throws BException
      */
     public function downloadPackage($moduleName, $version = null, $channel = null)

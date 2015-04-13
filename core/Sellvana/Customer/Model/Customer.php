@@ -46,6 +46,15 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             'disabled' => 'Disabled',
         ],
     ];
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['email'],
+        'related'    => [
+            'customer_group'      => 'Sellvana_CustomerGroups_Model_Group.id',
+            'default_shipping_id' => 'Sellvana_Customer_Model_Address.id',
+            'default_billing_id'  => 'Sellvana_Customer_Model_Address.id'
+        ],
+    ];
 
     protected static $_fieldDefaults = [
         'status' => 'new',

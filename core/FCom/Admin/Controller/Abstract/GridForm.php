@@ -10,39 +10,46 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_permission;# = 'feature/permission';
     protected $_navPath;# = 'nav/subnav';
     protected $_recordName = 'Record';
+    protected $_mainTableAlias = 'main';
+
     protected $_gridTitle = 'List of Records';
-    protected $_gridPageViewName = 'admin/grid';
-    protected $_gridViewName = 'core/backbonegrid';
+    protected $_gridPageViewName = 'admin/griddle';
+    protected $_gridViewName = 'core/griddle';
+    protected $_useDefaultLayout = true;
+    protected $_defaultGridLayoutName = 'default_griddle';
     protected $_gridLayoutName;# = '/feature';
     protected $_gridConfig = [];
+
     protected $_formHref;# = 'feature/form';
     protected $_formLayoutName;# = '/feature/form';
     protected $_formViewPrefix;# = 'module/feature-form/';
     protected $_formViewName = 'admin/form';
     protected $_formTitle;# = 'Record';
-    protected $_mainTableAlias = 'main';
+    protected $_formTitleField = 'id';
 
-    protected $_useDefaultLayout = true;
-    protected $_defaultGridLayoutName = 'default_grid';
 
     public function __construct()
     {
         parent::__construct();
+
         $this->_gridHref = trim($this->_gridHref, '/');
 
-        if (is_null($this->_permission))     $this->_permission = $this->_gridHref;
-        if (is_null($this->_navPath))        $this->_navPath = $this->_permission;
+        if (null === $this->_permission) {
+            $this->_permission = $this->_gridHref;
+        }
+        if (null === $this->_navPath)  {
+            $this->_navPath = $this->_permission;
+        }
 
-        if (is_null($this->_gridLayoutName)) $this->_gridLayoutName = '/' . $this->_gridHref;
-        if (is_null($this->_gridViewName))   $this->_gridViewName = 'core/backbonegrid';
-
-        if (is_null($this->_formHref))       $this->_formHref = $this->_gridHref . '/form';
-        if (is_null($this->_formLayoutName)) $this->_formLayoutName = $this->_gridLayoutName . '/form';
-        if (is_null($this->_formViewName))   $this->_formViewName = 'admin/form';
-        if (is_null($this->_formViewPrefix)) $this->_formViewPrefix = $this->_gridHref . '-form/';
-
-        if (is_null($this->_mainTableAlias)) $this->_mainTableAlias = 'main';
-
+        if (null === $this->_formHref) {
+            $this->_formHref = $this->_gridHref . '/form';
+        }
+        if (null === $this->_formLayoutName) {
+            $this->_formLayoutName = $this->_gridLayoutName . '/form';
+        }
+        if (null === $this->_formViewPrefix) {
+            $this->_formViewPrefix = $this->_gridHref . '-form/';
+        }
     }
 
     /**
@@ -263,25 +270,62 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function formViewBefore($args)
     {
+        /** @var FCom_Core_Model_Abstract $m */
         $m = $args['model'];
         $actions = [];
 
-        $actions['back'] = '<button type="button" class="btn btn-link" onclick="location.href=\''
-            . $this->BApp->href($this->_gridHref) . '\'"><span>' .  $this->BLocale->_('Back to list') . '</span></button>';
-        if ($m->id) {
-            $actions['delete'] = '<button type="submit" class="btn btn-warning ignore-validate" name="do" value="DELETE" '
-                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->BLocale->_('Delete') . '</span></button>';
-        }
-        $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
-            . $this->BLocale->_('Save') . '</span></button>';
+        $actions['back'] = [
+            'button',
+            [
+                'type' => "button",
+                'class' => ['btn', 'btn-link'],
+                'onclick' => "location.href='{$this->BApp->href($this->_gridHref)}'",
+            ],
+            [
+                ['span', null, $this->BLocale->_('Back to list')],
+            ]
+        ];
 
-        $id = method_exists($m, 'id') ? $m->id() : $m->id;
-        $title = $id ? $this->BLocale->_('Edit %s: %s', [$this->_recordName, $m->title]) : $this->BLocale->_('Create New %s', [$this->_recordName]);
+        if ($m->id()) {
+            $actions['delete'] = [
+                'button',
+                [
+                    'type' => 'submit',
+                    'class' => ['btn', 'btn-warning', 'ignore-validate'],
+                    'name' => 'do',
+                    'value' => 'DELETE',
+                    'onclick' => 'return confirm(\'Are you sure?\')',
+                ],
+                [
+                    ['span', null, $this->BLocale->_('Delete')],
+                ]
+            ];
+        }
+        $actions['save'] = [
+            'button',
+            [
+                'class' => ['btn', 'btn-primary'],
+                'onclick' => 'return adminForm.saveAll(this)',
+            ],
+            [
+                ['span', null, $this->BLocale->_('Save')],
+            ]
+        ];
+
+        $id = $m ? (method_exists($m, 'id') ? $m->id() : $m->get('id')) : null;
+        if ($id) {
+            $titleFieldValue = is_string($this->_formTitleField) && preg_match('#^[a-z0-9_]+$#i', $this->_formTitleField)
+                ? $m->get($this->_formTitleField)
+                : $this->BUtil->call($this->_formTitleField, $m);
+            $this->_formTitle = $this->BLocale->_('Edit %s: %s', [$this->_recordName, $titleFieldValue]);
+        } else {
+            $this->_formTitle = $this->BLocale->_('Create New %s', [$this->_recordName]);
+        }
 
         $args['view']->set([
             'form_id' => $this->formId(),
-            'form_url' => $this->BApp->href($this->_formHref) . '?id=' . $m->id,
-            'title' => $title,
+            'form_url' => $this->BApp->href($this->_formHref) . '?id=' . $id,
+            'title' => $this->_formTitle,
             'actions' => $actions,
         ]);
         $this->BEvents->fire(static::$_origClass . '::formViewBefore', $args);

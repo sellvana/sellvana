@@ -17,6 +17,11 @@ class Sellvana_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_seo_urlalias';
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['request_url', 'is_regexp', 'is_active'],
+    ];
+
     /**
      * @var array
      */

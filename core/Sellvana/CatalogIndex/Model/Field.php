@@ -41,7 +41,11 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             'both' => 'Both Directions'
         ],
     ];
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['field_name', 'field_label','field_type'],
+        'related'    => ['fcom_field_id' => 'Sellvana_CustomField_Model_Field.id'],
+    ];
     public function getFields($context = 'all', $where = null)
     {
         if (!static::$_indexedFields) {

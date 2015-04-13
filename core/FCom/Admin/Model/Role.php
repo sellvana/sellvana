@@ -22,6 +22,11 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         'admin' => ['title' => 'Admin Tasks', 'level' => 1],
     ];
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['role_name'],
+    ];
+
     /**
      * @return array
      */

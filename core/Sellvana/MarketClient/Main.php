@@ -139,4 +139,12 @@ class Sellvana_MarketClient_Main extends BClass
         $this->progress(['status' => 'STOP']);
         return $this;
     }
+
+    public function onInstallStep3Post($args)
+    {
+        if (empty($args['data']['account'])) {
+            return;
+        }
+        $this->Sellvana_MarketClient_RemoteApi->setupConnection($args['data']['account']);
+    }
 }

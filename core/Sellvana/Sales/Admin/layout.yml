@@ -3,7 +3,9 @@ base:
         do:
             - [ addNav, sales, { label: Sales, pos: 100, icon_class: icon-shopping-cart } ]
             - [ addNav, sales/orders, { label: Orders, href: /orders } ]
+            - [ addNav, sales/payments, { label: Payments, href: /payments } ]
             - [ addNav, sales/orderstatecustom, { label: Order State Custom, href: /orderstatecustom } ]
+            - [ addNav, sales/carts, { label: Shopping Carts, href: /carts } ]
             - [ addNav, sales/reports, { label: Reports, href: /sales/reports } ]
 
 /settings:
@@ -18,20 +20,21 @@ base:
             - [ addTab, Sellvana_SalesPayment, { label: General, group: payment_methods, pos: 10, async: true } ]
 
 /orders/form:
-  - { include: default_form }
-  - view: admin/form
-    set: { tab_view_prefix: order/orders-form/ }
-    do:
-      - [ addTab, main, { label: General Info, pos: 10 } ]
-      - [ addTab, payments, { label: Payments, pos: 20, async: true } ]
-      - [ addTab, shipments, { label: Shipments, pos: 30, async: true } ]
-      - [ addTab, returns, { label: Returns, pos: 40, async: true } ]
-      - [ addTab, refunds, { label: Refunds, pos: 50, async: true } ]
-      - [ addTab, comments, { label: Comments, pos: 80, async: true } ]
-      - [ addTab, history, { label: History, pos: 90, async: true } ]
+    #- { include: default_form }
+    - view: admin/form
+        #set: { tab_view_prefix: order/orders-form/ }
+        do:
+            - [ addTab, main, { label: General Info, pos: 10 } ]
+            - [ addTab, payments, { label: Payments, pos: 20, async: true } ]
+            - [ addTab, shipments, { label: Shipments, pos: 30, async: true } ]
+            - [ addTab, cancellations, { label: Cancellations, pos: 40, async: true } ]
+            - [ addTab, returns, { label: Returns, pos: 50, async: true } ]
+            - [ addTab, refunds, { label: Refunds, pos: 60, async: true } ]
+            - [ addTab, comments, { label: Comments, pos: 80, async: true } ]
+            - [ addTab, history, { label: History, pos: 90, async: true } ]
 
 /header_search:
-    - { hook: main, views: 'header-search/Sellvana_Sales_Orders' }
+    - { hook: main, views: "header-search/Sellvana_Sales_Orders" }
 
 /orderstatecustom:
     - { include: base }

@@ -43,6 +43,17 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 
     protected $_relatedItemsCache = [];
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['cart_id', 'product_id', 'inventory_id', 'unique_hash'],
+        'related'    => [
+            'cart_id'        => 'Sellvana_Sales_Model_Cart.id',
+            'product_id'     => 'Sellvana_Catalog_Model_Product.id',
+            'inventory_id'   => 'Sellvana_Catalog_Model_InventorySku.id',
+            'parent_item_id' => 'Sellvana_Sales_Model_Cart_Item.id'
+        ],
+    ];
+
     /**
      * @param Sellvana_Catalog_Model_Product $product
      * @return $this
