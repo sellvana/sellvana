@@ -892,7 +892,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $valid = false;
         } else {
             $header = fgets($rh);
-            if($header == "[\n"){
+            if(trim($header) == "["){
                 $header = fgets($rh);
             }
             $decodedHeader = json_decode($header, true);

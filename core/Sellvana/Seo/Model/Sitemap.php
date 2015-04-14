@@ -13,7 +13,7 @@
 class Sellvana_Seo_Model_Sitemap extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_seo_sitemap';
-    static protected $_origClass = 'Sellvana_Seo_Model_Sitemap';
+    static protected $_origClass = __CLASS__;
     protected static $_importExportProfile = [
         'skip'       => ['id'],
         'unique_key' => ['url_key'],
