@@ -575,9 +575,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'add-related-product' => [
                         'caption'  => 'Add Related Products',
                         'type'     => 'button',
-                        'id'       => 'add-related-product-from-grid',
+                        'id'       => $gridId,
                         'class'    => 'btn-primary',
-                        'callback' => 'showModalToAddRelatedProduct'
+                        'callback' => 'showModalToAddProduct'
                     ]
                 ];
                 break;
@@ -586,9 +586,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'add-similar-product' => [
                         'caption'  => 'Add Similar Products',
                         'type'     => 'button',
-                        'id'       => 'add-similar-product-from-grid',
+                        'id'       => $gridId,
                         'class'    => 'btn-primary',
-                        'callback' => 'showModalToAddSimilarProduct'
+                        'callback' => 'showModalToAddProduct'
                     ]
                 ];
                 break;
@@ -597,9 +597,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'add-cross-product' => [
                         'caption'  => 'Add Cross Sell Products',
                         'type'     => 'button',
-                        'id'       => 'add-cross-product-from-grid',
+                        'id'       => $gridId,
                         'class'    => 'btn-primary',
-                        'callback' => 'showModalToAddCrossProduct'
+                        'callback' => 'showModalToAddProduct'
                     ]
                 ];
                 break;
