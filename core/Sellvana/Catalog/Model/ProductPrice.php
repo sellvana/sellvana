@@ -435,6 +435,9 @@ class Sellvana_Catalog_Model_ProductPrice
                         $priceModel->delete();
                         continue;
                     }
+                    if ($f === 'sale') {
+                        $saleModel = $priceModel;
+                    }
                 } else {
                     $priceModel = $this->create([
                         'product_id' => $product->id(),
@@ -444,6 +447,7 @@ class Sellvana_Catalog_Model_ProductPrice
                 $priceModel->set($this->_parsePriceField($v))->save();
             }
         }
+
         $tiers = $product->get('price.tiers');
         if ($tiers) {
             if (is_string($tiers)) {
@@ -473,6 +477,26 @@ class Sellvana_Catalog_Model_ProductPrice
                     ]);
                 }
                 $priceModels[$tier]->set($this->_parsePriceField($v))->save();
+            }
+        }
+
+        $saleFrom = $product->get('price.sale.from_date');
+        $saleTo = $product->get('price.sale.to_date');
+        if ($saleFrom || $saleTo) {
+            if (empty($saleModel)) {
+                $saleModel = $this->orm()
+                    ->where('product_id', $product->id())->where('price_type', 'sale')->where_null('variant_id')
+                    ->where_null('site_id')->where_null('customer_group_id')->where_null('currency_code')
+                    ->find_one();
+            }
+            if ($saleModel) {
+                if ($saleFrom) {
+                    $saleModel->set('valid_from', $saleFrom);
+                }
+                if ($saleTo) {
+                    $saleModel->set('valid_to', $saleTo);
+                }
+                $saleModel->save();
             }
         }
     }

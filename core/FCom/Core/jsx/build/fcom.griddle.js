@@ -3,6 +3,13 @@
 define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
 function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle, Backbone) {
 
+    var dataUrl,
+        gridId,
+        buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
+            var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
+            return dataUrl + beginQueryChar+ 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+        };
+
     /**
      * FCom Griddle Componnent
      */
@@ -16,6 +23,9 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         },
         componentWillMount: function () {
             this.initColumn();
+            //todo: need change way to get right info
+            dataUrl = this.props.config.data_url;
+            gridId = this.props.config.id;
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;

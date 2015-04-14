@@ -25,13 +25,13 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'width' => 50, 'index' => 'cg.id'],
             ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title',
                 'editable' => true, 'addable' => true, 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code',
                 'editable' => true, 'addable' => true,
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('customer-groups/unique')]],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
             'new' => array('caption' => 'Add New Customer Group', 'modal' => true),

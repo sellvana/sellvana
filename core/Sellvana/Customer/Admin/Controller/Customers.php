@@ -26,6 +26,12 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'login', 'icon' => 'icon-user', 'href' => $this->BApp->href('customers/start_session?id='),
+                    'title' => $this->BLocale->_('Log in as customer'), 'target' => 'AdminCustomer'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'c.id'],
             ['name' => 'firstname', 'label' => 'First Name', 'index' => 'c.firstname'],
             ['name' => 'lastname', 'label' => 'Last Name', 'index' => 'c.lastname'],
@@ -45,12 +51,6 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at'],
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
             ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login', 'hidden' => true],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'login', 'icon' => 'icon-user', 'href' => $this->BApp->href('customers/start_session?id='),
-                    'title' => $this->BLocale->_('Log in as customer'), 'target' => 'AdminCustomer'],
-                ['name' => 'delete'],
-            ]],
         ];
         $config['actions'] = [
             'export' => true,

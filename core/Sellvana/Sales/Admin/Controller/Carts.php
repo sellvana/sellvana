@@ -41,26 +41,13 @@ class Sellvana_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstra
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+            ]],
+
             ['name' => 'id', 'index' => 'c.id', 'label' => 'ID', 'width' => 70],
             ['name' => 'admin_name', 'index' => 'c.admin_id', 'label' => 'Assisted by'],
             ['name' => 'create_at', 'index' => 'c.create_at', 'label' => 'Order Date'],
-
-            ['name' => 'billing_firstname', 'label' => 'Bill First Name', 'index' => 'billing_firstname'],
-            ['name' => 'billing_lastname', 'label' => 'Bill Last Name', 'index' => 'billing_lastname'],
-            ['name' => 'billing_city', 'label' => 'Bill City', 'index' => 'billing_city'],
-            ['name' => 'billing_postcode', 'label' => 'Bill Zip', 'index' => 'billing_postcode'],
-            ['name' => 'billing_region', 'label' => 'Bill State/Province', 'index' => 'billing_region'],
-            ['name' => 'billing_country', 'label' => 'Bill Country', 'index' => 'billing_country'],
-
-            ['name' => 'shipping_firstname', 'label' => 'Ship First Name', 'index' => 'shipping_firstname'],
-            ['name' => 'shipping_lastname', 'label' => 'Ship Last Name', 'index' => 'shipping_lastname'],
-            ['name' => 'shipping_city', 'label' => 'Ship City', 'index' => 'shipping_city'],
-            ['name' => 'shipping_postcode', 'label' => 'Ship Zip', 'index' => 'shipping_postcode'],
-            ['name' => 'shipping_region', 'label' => 'Ship State/Province', 'index' => 'shipping_region'],
-            ['name' => 'shipping_country', 'label' => 'Ship Country', 'index' => 'shipping_country'],
-
-            #['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
-            #['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
 
             ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'c.grand_total'],
             ['name' => 'amount_due', 'label' => 'Due', 'index' => 'c.amount_due'],
@@ -76,9 +63,22 @@ class Sellvana_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstra
             ['name' => 'state_overall', 'label' => 'Overall State', 'index' => 'c.state_overall', 'options' => $overallStates],
             ['name' => 'state_payment', 'label' => 'Payment State', 'index' => 'c.state_payment', 'options' => $paymentStates],
 
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-            ]],
+            #['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
+            #['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
+
+            ['name' => 'billing_firstname', 'label' => 'Bill First Name', 'index' => 'billing_firstname'],
+            ['name' => 'billing_lastname', 'label' => 'Bill Last Name', 'index' => 'billing_lastname'],
+            ['name' => 'billing_city', 'label' => 'Bill City', 'index' => 'billing_city'],
+            ['name' => 'billing_postcode', 'label' => 'Bill Zip', 'index' => 'billing_postcode'],
+            ['name' => 'billing_region', 'label' => 'Bill State/Province', 'index' => 'billing_region'],
+            ['name' => 'billing_country', 'label' => 'Bill Country', 'index' => 'billing_country'],
+
+            ['name' => 'shipping_firstname', 'label' => 'Ship First Name', 'index' => 'shipping_firstname'],
+            ['name' => 'shipping_lastname', 'label' => 'Ship Last Name', 'index' => 'shipping_lastname'],
+            ['name' => 'shipping_city', 'label' => 'Ship City', 'index' => 'shipping_city'],
+            ['name' => 'shipping_postcode', 'label' => 'Ship Zip', 'index' => 'shipping_postcode'],
+            ['name' => 'shipping_region', 'label' => 'Ship State/Province', 'index' => 'shipping_region'],
+            ['name' => 'shipping_country', 'label' => 'Ship Country', 'index' => 'shipping_country'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],

@@ -33,7 +33,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_17()
+    public function install__0_3_18()
     {
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
@@ -190,7 +190,6 @@ class Sellvana_Sales_Migrate extends BClass
                 'customer_id' => "int(10) unsigned DEFAULT NULL",
                 'customer_email' => "varchar(100) DEFAULT NULL",
                 'cart_id' => "int(10) unsigned DEFAULT NULL",
-                'status' => "varchar(50) NOT NULL",
                 'item_qty' => "int(10) unsigned NOT NULL",
                 'subtotal' => "decimal(12,2) NOT NULL DEFAULT '0.00'",
                 'shipping_method' => "varchar(50) DEFAULT NULL",
@@ -245,8 +244,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(15) not null default 'new'",
                 'state_delivery' => "varchar(15) not null default 'pending'",
                 'state_payment' => "varchar(15) not null default 'new'",
-                'state_custom' => "varchar(15) not null default ''",
-
+                'state_custom' => "varchar(15) default null",
 
                 'store_currency_code' => 'char(3) null',
             ],

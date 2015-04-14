@@ -35,4 +35,4 @@ modules:
                 auto_use: [ views ]
                 observe:
                     - [ "BLayout::hook:custom-fields-filters", Sellvana_CustomField_Main.hookCustomFieldFilters ]
-                    - [ "Sellvana_Sales_Workflow_Cart::customerAddsItemsToCart:calcDetails", Sellvana_CustomField_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
+                    - [ "Sellvana_Sales_Workflow_Cart::action_customerAddsItemsToCart:calcDetails", Sellvana_CustomField_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
