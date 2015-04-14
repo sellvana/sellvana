@@ -26,6 +26,15 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 'orm' => $orm,
                 'columns' => [
                     ['type' => 'row_select'],
+                    ['type' => 'btn_group', 'buttons' => [
+                        [
+                            'name' => 'custom',
+                            'icon' => 'icon-edit-sign',
+                            'cssClass' => 'btn-custom',
+                            'callback' => 'showModalToEditFieldset'
+                        ],
+                        ['name' => 'delete']
+                    ]],
                     ['name' => 'id', 'label' => 'ID', 'width' => 55, 'sorttype' => 'number', 'key' => true, 'hidden' => true],
                     ['type' => 'input', 'name' => 'set_code', 'label' => 'Set Code', 'width' => 100,  'addable' => true,
                             'editable' => true, 'validation' => ['required' => true,
@@ -33,15 +42,6 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                     ['type' => 'input', 'name' => 'set_name', 'label' => 'Set Name', 'width' => 200,  'addable' => true,
                             'editable' => true , 'validation' => ['required' => true]],
                     ['name' => 'num_fields', 'label' => 'Fields', 'width' => 30],
-                    ['type' => 'btn_group', 'buttons' => [
-                        [
-                            'name' => 'custom', 
-                            'icon' => 'icon-edit-sign', 
-                            'cssClass' => 'btn-custom', 
-                            'callback' => 'showModalToEditFieldset'
-                        ],
-                        ['name' => 'delete']
-                    ]]
                 ],
                 'actions' => [
                     'add-fieldset' => [
@@ -162,6 +162,11 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 'edit_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
                 'columns' => [
                     ['type' => 'row_select'],
+                    ['type' => 'btn_group', 'buttons' => [
+                        ['name' => 'edit', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
+                        //['name' => 'edit'],
+                        ['name' => 'delete']
+                    ]],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['type' => 'input', 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true,
@@ -193,11 +198,6 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                     ['type' => 'input', 'name' => 'required', 'label' => 'Required', 'width' => 90, 'editable' => true,
                         'editor' => 'select', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true],
                         'options' => ['1' => 'Yes', '0' => 'No']],
-                    ['type' => 'btn_group', 'buttons' => [
-                        ['name' => 'edit', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
-                        //['name' => 'edit'],
-                        ['name' => 'delete']
-                    ]]
                 ],
                 'filters' => [
                     ['field' => 'field_code', 'type' => 'text'],

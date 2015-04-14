@@ -26,6 +26,10 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
 
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete', 'edit_inline' => false]
+            ]],
             ['name' => 'id', 'label' => 'ID'],
             ['name' => 'author', 'label' => 'Author'],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true,
@@ -43,10 +47,6 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
             ['name' => 'create_ym', 'label' => 'Create ym' , 'hidden' => true],
             ['name' => 'create_at', 'label' => 'Created', 'cell' => 'date'],
             ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'date'],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete', 'edit_inline' => false]
-            ]]
         ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {

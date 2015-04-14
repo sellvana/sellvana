@@ -26,11 +26,11 @@ class Sellvana_SalesTax_Admin_Controller_ProductClasses extends FCom_Admin_Contr
         $config['caption'] = 'Product Class';
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'width' => 50],
             ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 300,
                 'editable' => true, 'addable' => true,
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('salestax/product-classes/unique')]],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
             #'new' => array('caption' => 'Add New Product Tax Class', 'modal' => true),

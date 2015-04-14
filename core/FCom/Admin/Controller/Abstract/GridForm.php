@@ -26,6 +26,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_formViewName = 'admin/form';
     protected $_formTitle;# = 'Record';
     protected $_formTitleField = 'id';
+    protected $_formNoNewRecord = false;
 
 
     public function __construct()
@@ -250,6 +251,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $this->message('This item does not exist', 'error');
         }
         if (empty($model)) {
+            if ($this->_formNoNewRecord) {
+                $this->forward(false);
+                return;
+            }
             $model = $this->{$class}->create();
         }
         $this->layout();

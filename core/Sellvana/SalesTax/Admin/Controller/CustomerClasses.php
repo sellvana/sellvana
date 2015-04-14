@@ -26,11 +26,11 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
         $config['caption'] = 'Customer Class';
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'width' => 50],
             ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 300,
                 'editable' => true, 'addable' => true,
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('salestax/customer-classes/unique')]],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
             #'new' => array('caption' => 'Add New Customer Tax Class', 'modal' => true),

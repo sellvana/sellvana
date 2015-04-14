@@ -37,15 +37,19 @@
 class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
-    protected $_gridHref = 'orders';
     protected $_modelClass = 'Sellvana_Sales_Model_Order';
-    protected $_gridTitle = 'Orders';
     protected $_recordName = 'Order';
     protected $_mainTableAlias = 'o';
     protected $_permission = 'sales/orders';
     protected $_navPath = 'sales/orders';
+
+    protected $_gridHref = 'orders';
+    protected $_gridTitle = 'Orders';
+
     protected $_formViewPrefix = 'order/orders-form/';
     protected $_formTitleField = 'unique_id';
+    protected $_formLayoutName = '/orders/form';
+    protected $_formNoNewRecord = true;
 
     public function gridConfig()
     {
@@ -57,10 +61,25 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+            ]],
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Internal ID', 'width' => 70, 'hidden' => true],
             ['name' => 'unique_id', 'index' => 'o.unique_id', 'label' => 'ID', 'width' => 70],
             ['name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by'],
             ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
+
+            #['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
+            #['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
+            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
+            ['name' => 'amount_due', 'label' => 'Due', 'index' => 'o.amount_due'],
+            ['name' => 'amount_paid', 'label' => 'Paid', 'index' => 'o.amount_paid'],
+            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
+
+            ['name' => 'state_overall', 'label' => 'Overall State', 'index' => 'o.state_overall', 'options' => $overallStates],
+            ['name' => 'state_payment', 'label' => 'Payment State', 'index' => 'o.state_payment', 'options' => $paymentStates],
+            ['name' => 'state_delivery', 'label' => 'Delivery State', 'index' => 'o.state_delivery', 'options' => $deliveryStates],
+            ['name' => 'state_custom', 'label' => 'Custom State', 'index' => 'o.state_custom', 'options' => $customStates],
 
             ['name' => 'billing_firstname', 'label' => 'Bill First Name', 'index' => 'billing_firstname'],
             ['name' => 'billing_lastname', 'label' => 'Bill Last Name', 'index' => 'billing_lastname'],
@@ -75,22 +94,6 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['name' => 'shipping_postcode', 'label' => 'Ship Zip', 'index' => 'shipping_postcode'],
             ['name' => 'shipping_region', 'label' => 'Ship State/Province', 'index' => 'shipping_region'],
             ['name' => 'shipping_country', 'label' => 'Ship Country', 'index' => 'shipping_country'],
-
-            #['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
-            #['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
-            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
-            ['name' => 'amount_due', 'label' => 'Due', 'index' => 'o.amount_due'],
-            ['name' => 'amount_paid', 'label' => 'Paid', 'index' => 'o.amount_paid'],
-            ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
-
-            ['name' => 'state_overall', 'label' => 'Overall State', 'index' => 'o.state_overall', 'options' => $overallStates],
-            ['name' => 'state_payment', 'label' => 'Payment State', 'index' => 'o.state_payment', 'options' => $paymentStates],
-            ['name' => 'state_delivery', 'label' => 'Delivery State', 'index' => 'o.state_delivery', 'options' => $deliveryStates],
-            ['name' => 'state_custom', 'label' => 'Custom State', 'index' => 'o.state_custom', 'options' => $customStates],
-
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-            ]],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -191,6 +194,11 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
     public function itemsOrderGridConfig(Sellvana_Sales_Model_Order $order)
     {
+        $overallStates = $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels();
+        $paymentStates = $this->Sellvana_Sales_Model_Order_Item_State_Payment->getAllValueLabels();
+        $deliveryStates = $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels();
+        $customStates = $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels();
+
         $config = array_merge(
             parent::gridConfig(),
             [
@@ -201,12 +209,28 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 'columns'   => [
                     //todo: add row for image
                     ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 80, 'hidden' => true],
-                    ['name' => 'product_name', 'label' => 'Name', 'width' => 400],
-                    ['name' => 'product_sku', 'label' => 'SKU', 'width' => 200],
-                    ['name' => 'price', 'label' => 'Price', 'width' => 100],
-                    ['name' => 'qty_ordered', 'label' => 'Qty', 'width' => 100],
-                    ['name' => 'row_total', 'label' => 'Total', 'width' => 150],
+                    ['type' => 'btn_group', 'width' => 50, 'buttons' => [['name' => 'edit']]],
+                    ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
+                    ['name' => 'product_name', 'label' => 'Name'],
+                    ['name' => 'product_sku', 'label' => 'Product SKU', 'width' => 100],
+                    ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 100],
+                    ['name' => 'price', 'label' => 'Price', 'width' => 50],
+                    ['name' => 'qty_ordered', 'label' => 'Qty', 'width' => 50],
+                    ['name' => 'qty_backordered', 'label' => 'Backordered', 'width' => 50],
+                    ['name' => 'qty_canceled', 'label' => 'Canceled', 'width' => 50],
+                    ['name' => 'qty_shipped', 'label' => 'Shipped', 'width' => 50],
+                    ['name' => 'qty_returned', 'label' => 'Returned', 'width' => 50],
+                    ['name' => 'row_total', 'label' => 'Total', 'width' => 50],
+                    ['name' => 'row_tax', 'label' => 'Tax', 'width' => 50],
+                    ['name' => 'row_discount', 'label' => 'Discount', 'width' => 50],
+                    ['name' => 'row_discount_percent', 'label' => 'Discount Percent', 'width' => 50, 'hidden' => true],
+                    ['name' => 'shipping_weight', 'label' => 'Ship Weight', 'width' => 50],
+                    ['name' => 'shipping_size', 'label' => 'Ship Size', 'width' => 50, 'hidden' => true],
+                    ['name' => 'state_overall', 'label' => 'Overall', 'width' => 50, 'options' => $overallStates],
+                    ['name' => 'state_delivery', 'label' => 'Delivery', 'width' => 50, 'options' => $deliveryStates],
+                    ['name' => 'state_payment', 'label' => 'Payment', 'width' => 50, 'options' => $paymentStates, 'hidden' => true],
+                    ['name' => 'state_custom', 'label' => 'Custom', 'width' => 50, 'options' => $customStates],
+                    ['name' => 'auto_added', 'label' => 'Auto Added', 'width' => 50, 'options' => [1 => 'YES', 0 => 'no']],
                 ],
                 /*
                 'actions'   => [

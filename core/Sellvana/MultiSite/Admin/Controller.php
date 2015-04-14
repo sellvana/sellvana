@@ -22,15 +22,15 @@ class Sellvana_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete', 'edit_inline' => false]
+            ]],
             ['name' => 'id', 'label' => 'ID', 'index' => 's.id'],
             ['name' => 'name', 'label' => 'Site Name', 'index' => 's.name'],
             ['name' => 'match_domains', 'label' => 'Match Domains', 'index' => 's.match_domains'],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 's.create_at', 'formatter' => 'date'],
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 's.update_at', 'formatter' => 'date'],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete', 'edit_inline' => false]
-            ]]
         ];
         $config['actions'] = [
             'delete' => true,

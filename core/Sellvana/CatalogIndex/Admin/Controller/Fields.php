@@ -26,6 +26,8 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
+                'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'idxf.id'],
             ['type' => 'input', 'name' => 'field_name', 'label' => 'Name', 'index' => 'idxf.field_name',
                 'editable' => true, 'addable' => true, 'validation' =>
@@ -64,8 +66,6 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
                 'editor' => 'select', 'width' => 80, 'addable' => true, 'editable' => true],
             ['name' => 'source_callback', 'label' => 'Source Callback', 'index' => 'idxf.source_callback',
                 'width' => 80, 'hidden' => true],
-            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
-                'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
 //            'new'    => array('caption' => 'Add New Index Field', 'modal' => true),
