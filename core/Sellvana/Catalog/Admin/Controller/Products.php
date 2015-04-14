@@ -396,10 +396,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ]
         ];
 
-        $config['config']['callbacks'] = [
-            'componentDidMount' => 'setProductImagesMainGrid'
-        ];
-
         return $config;
     }
 
@@ -419,12 +415,12 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'type'     => 'button',
                 'id'       => 'add-image-from-grid',
                 'class'    => 'btn-primary',
-                'callback' => 'showModalToAddImage'
+                'callback' => 'gridShowMedia' . $config['config']['id']
             ]
         ];
 
         $config['config']['callbacks'] = [
-            'componentDidMount' => 'setProductImagesMainGrid'
+            'componentDidMount' => 'gridRegister' . $config['config']['id']
         ];
 
         return $config;
