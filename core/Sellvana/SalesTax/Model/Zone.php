@@ -37,6 +37,15 @@ class Sellvana_SalesTax_Model_Zone extends FCom_Core_Model_Abstract
 
     public function getAllZones()
     {
-        return $this->orm()->find_many_assoc('id', 'title');
+        //select id, (case when title then title when zone_type='region' THEN CONCAT_WS('/', region, country) WHEN zone_type='country' THEN country WHEN zone_type='postcode' THEN postcode_from WHEN zone_type='postrange' THEN CONCAT_WS('..', postcode_from, postcode_to) END) as title from fcom_salestax_zone;
+        return $this->orm()
+            ->select('id')
+            ->select_expr("(CASE
+                    WHEN title IS NOT NULL THEN title
+                    WHEN zone_type='region' THEN CONCAT_WS('/', region, country)
+                    WHEN zone_type='country' THEN country
+                    WHEN zone_type='postcode' THEN postcode_from
+                    WHEN zone_type='postrange' THEN CONCAT_WS('..', postcode_from, postcode_to)
+                    END)", 'title')->find_many_assoc('id', 'title');
     }
 }

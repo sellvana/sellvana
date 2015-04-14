@@ -1913,12 +1913,20 @@ class Sellvana_Sales_Migrate extends BClass
 
     public function upgrade__0_3_17__0_3_18()
     {
-        $tOrder = $this->Sellvana_Sales_Model_Order->table();
-        $this->BDb->ddlTableDef($tOrder, [
+        $tOrders = $this->Sellvana_Sales_Model_Order->table();
+        $tCart   = $this->Sellvana_Sales_Model_Cart->table();
+        $this->BDb->ddlTableDef($tOrders, [
             BDb::COLUMNS => [
-                'status' => BDb::DROP,
-                'state_custom' => 'varchar(15) default null',
-            ],
+                'status'   => 'DROP',
+                'item_qty' => 'int(10) unsigned NOT NULL DEFAULT 0',
+                'state_custom'=> 'varchar(15) NULL DEFAULT \'\''
+            ]
+        ]);
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'item_qty' => 'int(10) unsigned NOT NULL DEFAULT 0'
+            ]
         ]);
     }
 }

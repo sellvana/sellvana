@@ -252,7 +252,8 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             }
             $pId = $item->get('product_id');
             if (is_null($pId)) {
-                $this->BDebug->warning('product_id is NULL for item #' . $item->id());
+                $this->BDebug->log('product_id is NULL for item #' . $item->id());
+                $item->delete();
                 continue;
             }
             /** @var Sellvana_Catalog_Model_Product $cached */
