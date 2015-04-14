@@ -447,7 +447,7 @@ class Sellvana_Catalog_Model_ProductPrice
                 $priceModel->set($this->_parsePriceField($v))->save();
             }
         }
-        
+
         $tiers = $product->get('price.tiers');
         if ($tiers) {
             if (is_string($tiers)) {
@@ -481,7 +481,7 @@ class Sellvana_Catalog_Model_ProductPrice
         }
 
         $saleFrom = $product->get('price.sale.from_date');
-        $saleTo = $product->get('price.sale.from_date');
+        $saleTo = $product->get('price.sale.to_date');
         if ($saleFrom || $saleTo) {
             if (empty($saleModel)) {
                 $saleModel = $this->orm()
