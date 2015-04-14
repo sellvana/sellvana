@@ -281,6 +281,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             'admin_id' => $cart->get('admin_id'),
             'customer_id' => $cart->get('customer_id'),
             'customer_email' => $cart->get('customer_email'),
+            'item_qty' => $cart->get('item_qty'),
         ]);
         return $this;
     }

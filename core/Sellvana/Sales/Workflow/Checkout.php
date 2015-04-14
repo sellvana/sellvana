@@ -82,7 +82,7 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         if (sizeof($method) !== 2) {
             throw new BException('Shipping method is invalid');
         }
-        $cart->setShippingMethod($method[0], $method[1])->calculateTotals()->save();
+        $cart->setShippingMethod($method[0], $method[1])->calculateTotals()->saveAllDetails();
     }
 
     public function action_customerUpdatesPaymentMethod($args)

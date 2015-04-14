@@ -7,7 +7,7 @@ modules:
             FCom_Frontend:
                 auto_use: [ views ]
                 observe:
-                    - [ "Sellvana_Sales_Workflow_Cart::customerAddsItemsToCart:calcDetails", Sellvana_ShopperFields_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
+                    - [ "Sellvana_Sales_Workflow_Cart::action_customerAddsItemsToCart:calcDetails", Sellvana_ShopperFields_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
 
             FCom_Admin:
                 auto_use: [ views, layout ]

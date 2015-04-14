@@ -114,10 +114,12 @@ define(['underscore', 'react'], function (_, React) {
                             node = that.fileSizeFormat(that.props.row[col.name]);
                         } else {
                             node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                            if (col.options && node !== '') {
+                                node = col.options[node] || "";
+                            }
                         }
                         break;
                 }
-
                 if (customNodeHtml) {
                     return React.createElement("td", {key: col.name, "data-col": col.name, dangerouslySetInnerHTML: {__html: node}});
                 }
