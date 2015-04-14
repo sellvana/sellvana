@@ -10,7 +10,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             return dataUrl + beginQueryChar+ 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
         };
 
-    var FComGriddleComponent = React.createClass({
+    /**
+     * FCom Griddle Componnent
+     */
+    var FComGriddleComponent = React.createClass({displayName: "FComGriddleComponent",
         getDefaultProps: function () {
             return {
                 "config": {},
@@ -74,6 +77,8 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             console.log('config', this.props.config);
             var config = this.props.config;
 
+            console.log(config);
+
             //prepare props base on data mode
             var props, state;
             if (config.data_mode == 'local') {
@@ -84,7 +89,11 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 state = config.state;
             } else {
                 props = {
-                    getExternalResults: FComDataMethod,
+                    //getExternalResults: FComDataMethod,
+                    getExternalResults: serverMethods.getResults,
+                    addRowsExternal: serverMethods.addRows,
+                    removeRowsExternal: serverMethods.removeRows,
+                    updateRowsExternal: serverMethods.updateRows,
                     results: []
                 };
                 state = config.data.state;
@@ -114,40 +123,84 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         }
     });
 
-    /**
-     * callback to get data from external results
-     * @param filterString
-     * @param sortColumn
-     * @param sortAscending
-     * @param page
-     * @param pageSize
-     * @param callback
-     * @constructor
-     */
-    var FComDataMethod = function (filterString, sortColumn, sortAscending, page, pageSize, callback) {
-        $.ajax({
-            url: buildGridDataUrl(filterString, sortColumn, sortAscending, page, pageSize),
-            dataType: 'json',
-            type: 'GET',
-            data: {},
-            success: function (response) {
-                var data = {
-                    results: response[1],
-                    totalResults: response[0].c
-                };
+    var serverMethods = {
+        /**
+         * build url to submit/get data
+         * @param dataUrl
+         * @param gridId
+         * @param filterString
+         * @param sortColumn
+         * @param sortAscending
+         * @param page
+         * @param pageSize
+         * @returns {string}
+         */
+        postUrl: function(dataUrl, gridId, filterString, sortColumn, sortAscending, page, pageSize) {
+            var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
+            return dataUrl + beginQueryChar + 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+        },
+        /**
+         * get data from external results
+         * @param filterString
+         * @param sortColumn
+         * @param sortAscending
+         * @param page
+         * @param pageSize
+         * @param callback
+         * @param options
+         */
+        getResults: function(filterString, sortColumn, sortAscending, page, pageSize, callback, options) {
+            $.ajax({
+                url: serverMethods.postUrl(options.dataUrl, options.gridId, filterString, sortColumn, sortAscending, page, pageSize),
+                dataType: 'json',
+                type: 'GET',
+                data: {},
+                success: function (response) {
+                    var data = {
+                        results: response[1],
+                        totalResults: response[0].c
+                    };
 
-                callback(data);
-            },
-            error: function (xhr, status, err) {
-                //console.error(this.props.url, status, err.toString());
-            }
-        });
+                    callback(data);
+                },
+                error: function (xhr, status, err) {
+                    //console.error(this.props.url, status, err.toString());
+                }
+            });
+        },
+        /**
+         * add rows to external results
+         * @param rows
+         * @param {function} triggerEvent
+         */
+        addRows: function(rows, triggerEvent) {
+            console.log('addRowsExternal');
+            triggerEvent();
+        },
+        /**
+         * remove rows in external results
+         * @param rows
+         * @param triggerEvent
+         */
+        removeRows: function(rows, triggerEvent) {
+            console.log('removeRowsExternal');
+            triggerEvent();
+        },
+        /**
+         * update rows in external results
+         * @param rows
+         * @param triggerEvent
+         */
+        updateRows: function(rows, triggerEvent) {
+            console.log('updateRowsExternal');
+            triggerEvent();
+        }
     };
 
     /**
      * FCom Pager component
      */
-    var FComPager = React.createClass({
+    var FComPager = React.createClass({displayName: "FComPager",
         getDefaultProps: function () {
             return {
                 "maxPage": 0,
@@ -289,7 +342,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
     /**
      * FCom Settings component
      */
-    var FComSettings = React.createClass({
+    var FComSettings = React.createClass({displayName: "FComSettings",
         mixins: [FCom.Mixin],
         getDefaultProps: function() {
             return {
@@ -306,7 +359,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var url = this.props.getConfig('edit_url');
             var ids = _.pluck(this.props.getSelectedRows(), 'id');
             var hash = { oper: 'mass-edit', id: ids.join(',') };
-            var isLocalMode = this.props.isLocalMode();
+            var isLocalMode = !this.props.hasExternalResults();
             var form = $(modal.getDOMNode()).find('form');
 
             form.find('textarea, input, select').each(function() {
@@ -357,7 +410,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var dataUrl = this.props.getConfig('data_url');
             var editUrl = this.props.getConfig('edit_url');
             var gridId = this.props.getConfig('id');
-            var isLocalMode = this.props.isLocalMode();
+            var isLocalMode = !this.props.hasExternalResults();
 
             switch (action) {
                 case 'mass-delete':
@@ -377,6 +430,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                         } else {
                             var ids = _.pluck(this.props.getSelectedRows(), 'id').join(',');
                             $.post(dataUrl, { oper: action, id: ids }, function() {
+                                that.props.clearSelectedRows();
                                 that.props.refresh();
                             });
                         }
@@ -489,8 +543,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         },
         handleCustom: function(callback, event) {
             if (typeof window[callback] === 'function') {
-                console.log('actions.callback: ' + callback);
-                return window[callback](this);
+                return window[callback](this.props.getCurrentGrid());
+
+                //console.log('actions.callback: ' + callback);
+                //return window[callback](this);
             }
         },
         render: function () {
@@ -598,20 +654,26 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
      * FCom Modal Mass Edit Form
      */
     var FComModalMassEditForm = React.createClass({
+        displayName: "FComModalMassEditForm",
         getInitialState: function() {
             var fields = [];
             var shownFields = [];
+            var oneField = false
             _.forEach(this.props.columnMetadata, function(column) {
-                if (column.multirow_edit) {
+                if (column['multirow_edit']) {
                     fields.push(column);
                 }
             });
-            /*if (fields.length == 1) {
-                shownFields.push(fields[0].name);
-            }*/
+
+            if (fields.length == 1) {
+                shownFields = [fields[0].name];
+                oneField = true;
+            }
+
             return {
                 'shownFields': shownFields,
-                'fields': fields
+                'fields': fields,
+                'oneField': oneField
             }
         },
         getDefaultProps: function() {
@@ -624,11 +686,12 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         componentDidMount: function() {
             var that = this;
             var domNode = this.getDOMNode();
-            $(domNode).find('.well select').select2({
+            var select = $(domNode).find('.well select');
+            select.select2({
                 placeholder: "Select a Field",
                 allowClear: true
             });
-            $(domNode).find('.well select').on('change', function(e) {
+            select.on('change', function(e) {
                 that.addField(e);
                 $(this).select2('data', null);
             });
@@ -658,6 +721,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var that = this;
             var gridId = this.props.id;
 
+            var oneField = this.state.oneField;
+            var fieldDropdownDiv = null;
+
+/*
             var fieldDropDownNodes = this.state.fields.map(function(column) {
                 if (!_.contains(that.state.shownFields, column.name)) {
                     return <option value={column.name}>{column.label}</option>;
@@ -665,12 +732,44 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 return null;
             });
             fieldDropDownNodes.unshift(<option value=""></option>);
+*/
+
+
+            if (!oneField) {
+                var fieldDropDownNodes = this.state.fields.map(function(column) {
+                    if (!_.contains(that.state.shownFields, column.name)) {
+                        return React.createElement("option", {value: column.name}, column.label);
+                    }
+                    return null;
+                });
+                fieldDropDownNodes.unshift(React.createElement("option", {value: ""}));
+
+                fieldDropdownDiv = (
+                    React.createElement("div", { className: "well" },
+                        React.createElement("div", { className: "row" },
+                            React.createElement("div", { className: "col-sm-12" },
+                                React.createElement("select", { className: "select2 form-control", id: gridId + '-form-select', style: { width: '150px' } },
+                                    fieldDropDownNodes
+                                )
+                            )
+                        )
+                    )
+                );
+            }
 
             var formElements = this.state.shownFields.map(function(fieldName) {
                 var column = _.findWhere(that.state.fields, {name: fieldName});
                 return <Components.ModalElement column={column} removeFieldDisplay={true} removeFieldHandle={that.removeField} />
             });
 
+            return (
+                React.createElement("div", null,
+                    fieldDropdownDiv,
+                    React.createElement("form", {className: "form form-horizontal validate-form", id: gridId + '-modal-mass-form'},
+                        formElements
+                    )
+                )
+/*
             return (
                 <div>
                     <div className="well">
@@ -687,6 +786,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     </form>
                 </div>
             );
+*/
         }
     });
 

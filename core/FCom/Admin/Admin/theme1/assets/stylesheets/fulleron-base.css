@@ -1466,7 +1466,7 @@ FULLERON
   }
 .f-grid-toolbar .btn {
   height:31px;
-  padding:5px 10px;
+  /*padding:5px 10px;*/
   font-weight:500;
   }
 .f-grid-toolbar .dropdown .btn.update {
