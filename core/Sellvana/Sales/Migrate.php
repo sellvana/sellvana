@@ -1912,6 +1912,25 @@ class Sellvana_Sales_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_3_17__0_3_18()
+    {
+        $tOrders = $this->Sellvana_Sales_Model_Order->table();
+        $tCart   = $this->Sellvana_Sales_Model_Cart->table();
+        $this->BDb->ddlTableDef($tOrders, [
+            BDb::COLUMNS => [
+                'status'   => 'DROP',
+                'item_qty' => 'int(10) unsigned NOT NULL DEFAULT 0',
+                'state_custom'=> 'varchar(15) NULL DEFAULT \'\''
+            ]
+        ]);
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'item_qty' => 'int(10) unsigned NOT NULL DEFAULT 0'
+            ]
+        ]);
+    }
 }
 
 class Sellvana_Sales_Migrate_Model_Cart_Address extends BModel
