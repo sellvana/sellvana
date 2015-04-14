@@ -240,7 +240,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
      */
     public function loadProducts($items = null)
     {
-        if (is_null($items)) {
+        if (null === $items) {
             $items = $this->items();
         }
         $productIds = [];
@@ -252,7 +252,8 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             }
             $pId = $item->get('product_id');
             if (is_null($pId)) {
-                $this->BDebug->warning('product_id is NULL for item #' . $item->id());
+                $this->BDebug->log('product_id is NULL for item #' . $item->id());
+                $item->delete();
                 continue;
             }
             /** @var Sellvana_Catalog_Model_Product $cached */
@@ -265,11 +266,58 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             }
         }
         if ($productIds) {
-            $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $productIds)->find_many_assoc('id');
+            $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $productIds)
+                ->find_many_assoc('id');
             $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($products);
             foreach ($itemsToUpdate as $item) {
                 $item->setProduct($products[$item->get('product_id')]);
             }
+        }
+        return $this;
+    }
+
+    public function processItemsInventory($items = null)
+    {
+        if (null === $items) {
+            $items = $this->items();
+        }
+        $invSkus = [];
+        foreach ($items as $item) {
+            if ($item->get('inventory_sku') && !$item->getInventory()) {
+                $invSkus[] = $item->get('inventory_sku');
+            }
+        }
+        $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
+        /** @var Sellvana_Catalog_Model_InventorySku[] $invModels */
+        $invModels = [];
+        if ($invSkus) {
+            $invModels = $invHlp->orm()->where_in('inventory_sku', $invSkus)->find_many_assoc('inventory_sku');
+        }
+        foreach ($items as $item) {
+            $invSku = $item->get('inventory_sku');
+            $inv = $item->getInventory();
+            if (!$inv) {
+                if (empty($invModels[$invSku])) {
+                    continue;
+                }
+                $inv = $invModels[$invSku];
+                $item->setInventory($inv)->set([
+                    'inventory_id' => $inv->id(),
+                    'shipping_size' => $inv->get('shipping_size'),
+                    'shipping_weight' => $inv->get('shipping_weight'),
+                    'pack_separately' => $inv->get('pack_separately'),
+                ]);
+            }
+            $qty = $inv->calcCartItemQty($item->get('qty'));
+
+            $sku = $item->get('product_sku');
+            if (!$qty) {
+                $this->BSession->addMessage($this->BLocale->_('The product is not in stock: %s', $sku), 'warning');
+            } elseif ($qty < $item->get('qty')) {
+                $this->BSession->addMessage($this->BLocale->_('Maximum quantity reached for item %s', $sku), 'warning');
+            }
+
+            $item->set('qty', $qty)->save();
         }
         return $this;
     }
@@ -435,7 +483,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if ($item) {
             unset($this->items[$item->id]);
             $item->delete();
-            $this->calculateTotals()->save();
+            $this->calculateTotals()->saveAllDetails();
         }
         return $this;
     }
@@ -466,7 +514,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 $items[$data->id]->set('qty', $data->qty)->save();
             }
         }
-        $this->calculateTotals()->save();
+        $this->calculateTotals()->saveAllDetails();
         return $this;
     }
 
@@ -519,6 +567,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function calculateTotals()
     {
         $this->loadProducts();
+        $this->processItemsInventory();
         $totals = [];
         foreach ($this->getTotalRowInstances() as $total) {
             $total->init($this)->calculate();
@@ -535,7 +584,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         //TODO: price invalidate
         if (!$this->getData('totals') || !$this->get('last_calc_at') || $this->get('last_calc_at') < time() - 86400) {
-            $this->calculateTotals()->save();
+            $this->calculateTotals()->saveAllDetails();
         }
 
         return $this->getTotalRowInstances();

@@ -68,7 +68,7 @@ modules:
                 observe:
                     - [ "Sellvana_FrontendCP_Frontend_Controller::action_update:after", "Sellvana_Catalog_Frontend_ControlPanel::onAfterUpdate" ]
                     - [ "FCom_Core_View_BackboneGrid::getPageRowsData", "Sellvana_Catalog_Admin_Controller_Products::processInitalData" ]
-                    - [ "Sellvana_Sales_Workflow::customerAddsItems:calcDetails", Sellvana_Catalog_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
+
                 views:
                     - [ catalog/product/pager, { view_class: Sellvana_Catalog_Frontend_View_Pager } ]
                     - [ catalog/product/price, { view_class: Sellvana_Catalog_Frontend_View_Price } ]

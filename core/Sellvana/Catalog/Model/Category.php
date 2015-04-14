@@ -361,8 +361,10 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         foreach ($relations as $k => $v) {
             $model = $toUpdate[$k];
             foreach ($v as $field => $r) {
-                $rel = $relatedData[$r];
-                $model->set($field, $rel->get('local_id'));
+                if (!empty($relatedData[$r])) {
+                    $rel = $relatedData[$r];
+                    $model->set($field, $rel->get('local_id'));
+                }
             }
         }
 

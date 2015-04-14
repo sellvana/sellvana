@@ -5,6 +5,7 @@
  *
  * Uses:
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
@@ -91,7 +92,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         }
 
         if (!$sessCart->hasCompleteAddress('shipping')) {
-            $sessCart->importAddressesFromCustomer($customer)->calculateTotals()->save();
+            $sessCart->importAddressesFromCustomer($customer)->calculateTotals()->saveAllDetails();
         }
     }
 
@@ -152,14 +153,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
 
         // retrieve product records
         /** @var Sellvana_Catalog_Model_Product[] $products */
-        $products = $this->Sellvana_Catalog_Model_Product->orm('p')
-            ->where_in('p.id', $ids)
-            ->left_outer_join('Sellvana_Catalog_Model_InventorySku', ['i.inventory_sku', '=', 'p.inventory_sku'], 'i')
-            ->select('p.*')
-            ->select(['inventory_id' => 'i.id', 'i.unit_cost', 'i.net_weight', 'i.shipping_weight', 'i.shipping_size',
-                    'i.pack_separate', 'i.qty_in_stock', 'i.qty_cart_min', 'i.qty_cart_inc', 'i.qty_buffer', 'i.qty_reserved',
-                    'i.allow_backorder'])
-            ->find_many_assoc();
+        $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $ids)->find_many_assoc();
         foreach ($itemsData as $i => &$item) {
             if (!empty($item['error'])) {
                 continue;
@@ -174,8 +168,8 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 'qty' => $item['qty'],
                 'product_id' => $p->id(),
                 'product_sku' => $p->get('product_sku'),
-                'inventory_id' => $p->get('inventory_id'),
                 'inventory_sku' => $p->get('inventory_sku'),
+                #'manage_inventory' => $p->get('manage_inventory'),
             ];
 
             $item['details']['signature'] = [
@@ -190,6 +184,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
             'post' => $post,
             'items' => &$itemsData,
         ]);
+
         //echo "<pre>"; var_dump($itemsData); exit;
         // add items to cart
         foreach ($itemsData as &$item) {

@@ -78,4 +78,5 @@ catalog_product_form_tabs:
 
 
 /catalog/inventory:
+    - { include: default_griddle }
     - { hook: main, views: catalog/inventory }

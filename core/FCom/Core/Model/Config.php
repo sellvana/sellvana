@@ -4,8 +4,10 @@ class FCom_Core_Model_Config extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_core_config';
     protected $_instance_id_column = 'path';
+    protected static $_origClass = __CLASS__;
+
     protected static $_importExportProfile = [
-        'unique_key' => ['path'],
+        'unique_key' => ['path']
     ];
 
     public function fetch($path)

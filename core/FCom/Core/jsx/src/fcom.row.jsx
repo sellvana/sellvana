@@ -35,7 +35,6 @@ define(['underscore', 'react'], function (_, React) {
         render: function () {
             var that = this;
             var id = this.props.getConfig('id');
-
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
                 if (!col) {
@@ -114,6 +113,9 @@ define(['underscore', 'react'], function (_, React) {
                             node = that.fileSizeFormat(that.props.row[col.name]);
                         } else {
                             node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                            if (col.options && node !== '') {
+                                node = col.options[node] || "";
+                            }
                         }
                         break;
                 }
