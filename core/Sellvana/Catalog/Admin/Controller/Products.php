@@ -37,6 +37,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select', 'width' => 55],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete']
+            ]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
                 'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"'],
@@ -50,10 +54,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100],
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit', 'href' => $this->BApp->href('catalog/products/form?id=')],
-                ['name' => 'delete']
-            ]],
         ];
         $config['actions'] = [
             'refresh' => true,

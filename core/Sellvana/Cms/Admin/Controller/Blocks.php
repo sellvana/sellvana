@@ -22,6 +22,10 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'handle', 'label' => 'Handle'],
             ['name' => 'description', 'label' => 'Description', 'editable' => true],
             ['type' => 'input', 'name' => 'renderer', 'label' => 'Renderer', 'editor' => 'select',
@@ -35,10 +39,6 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
             ['name' => 'meta_description', 'label' => 'Meta Description', 'hidden' => true],
             ['name' => 'meta_keywords', 'label' => 'Meta Keywords', 'hidden' => true],
             ['name' => 'modified_time', 'label' => 'Modified Time', 'hidden' => true],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete'],
-            ]],
         ];
         $config['actions'] = [
             'edit' => true,

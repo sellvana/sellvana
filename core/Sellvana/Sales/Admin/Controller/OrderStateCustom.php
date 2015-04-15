@@ -28,6 +28,10 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
         $config['id'] = __CLASS__;
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'id', 'index' => 'oscs.id', 'label' => 'ID', 'width' => 40],
             ['name' => 'entity_type', 'index' => 'sc.entity_type', 'label' => 'Entity Type','width' => 85,
                 'addable'=>true,'editable' => true, 'editor' => 'select', 'options' => $entityTypes,
@@ -36,10 +40,6 @@ class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Contro
                 'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
             ['name' => 'state_label', 'index' => 'oscs.state_label', 'label' => 'Label' ,'width' => 150, 'addable'=>true,
                 'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete'],
-            ]],
         ];
 
         $config['actions'] = [

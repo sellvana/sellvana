@@ -38,9 +38,11 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
         ];
 
         $data = [];
+        /** @var Sellvana_Wishlist_Model_Wishlist[] $wishlistArr */
         $wishlistArr = $this->Sellvana_Wishlist_Model_Wishlist->orm()->where('customer_id', $customer->id)->find_many();
         if ($wishlistArr) {
             foreach ($wishlistArr as $wishlist) {
+                /** @var Sellvana_Wishlist_Model_WishlistItem[] $items */
                 $items = $wishlist->items();
                 if ($items) {
                     foreach ($items as $item) {

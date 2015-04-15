@@ -27,6 +27,7 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
         $config['caption'] = 'Tax Zone';
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'width' => 50],
             ['name' => 'title', 'label' => 'Title',
                 'editable' => true, 'addable' => true],
@@ -42,7 +43,6 @@ class Sellvana_SalesTax_Admin_Controller_Zones extends FCom_Admin_Controller_Abs
                 'editable' => true, 'addable' => true],
             ['name' => 'zone_rate_percent', 'label' => 'Zone Rate',
                 'editable' => true, 'addable' => true],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
             #'new' => array('caption' => 'Add New Tax Zone', 'modal' => true),

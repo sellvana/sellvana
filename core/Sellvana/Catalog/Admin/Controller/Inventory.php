@@ -29,6 +29,10 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'id', 'label' => 'ID', 'width' => 50],
             ['name' => 'title', 'label' => 'Title'],
             ['name' => 'inventory_sku', 'label' => 'SKU'],
@@ -46,10 +50,6 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
             ['name' => 'qty_notify_admin', 'label' => 'Qty to Notify Admin'],
             ['name' => 'qty_cart_min', 'label' => 'Min Qty in Cart'],
             ['name' => 'qty_cart_inc', 'label' => 'Cart Increment'],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete'],
-            ]],
         ];
         $config['actions'] = [
             'edit' => true,

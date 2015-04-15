@@ -34,6 +34,7 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
         $countries = $this->FCom_Core_Main->getAllowedCountries();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'width' => 50],
             ['type' => 'input', 'name' => 'title', 'label' => 'Title',
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('salestax/zones/unique')],
@@ -51,7 +52,6 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
                 'options' => $custClasses, 'editable' => true, 'addable' => true],
             ['type' => 'multiselect', 'name' => 'prod_classes', 'label' => 'Product Classes',
                 'options' => $prodClasses, 'editable' => true, 'addable' => true],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
             'edit' => true,

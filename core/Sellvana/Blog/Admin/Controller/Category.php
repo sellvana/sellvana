@@ -23,15 +23,15 @@ class Sellvana_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abst
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'id', 'label' => 'ID'],
             ['name' => 'name', 'label' => 'Name'],
             ['name' => 'description', 'label' => 'Description'],
             ['name' => 'url_key', 'label' => 'URL Key'],
             ['name' => 'post', 'label' => 'Posts', 'href' => $this->BApp->href('blog/post/?category=')],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete'],
-            ]],
         ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {

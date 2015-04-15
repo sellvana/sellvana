@@ -21,10 +21,8 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'width' => 85, 'buttons' => [['name' => 'edit']]],
             ['name' => 'role_name', 'label' => 'Role Name', 'width' => 100],
-            ['type' => 'btn_group', 'width' => 85,
-                'buttons' => [['name' => 'edit']],
-             ],
         ];
         $config['actions'] = [
             'delete' => true,

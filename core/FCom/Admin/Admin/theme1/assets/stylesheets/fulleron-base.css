@@ -1466,7 +1466,7 @@ FULLERON
   }
 .f-grid-toolbar .btn {
   height:31px;
-  padding:5px 10px;
+  /*padding:5px 10px;*/
   font-weight:500;
   }
 .f-grid-toolbar .dropdown .btn.update {
@@ -1605,10 +1605,19 @@ FULLERON
   }
 .f-grid-display-type { float:left; }
 .f-grid-wrapper .table-actions-btns-group { white-space:nowrap; }
+
 .f-grid-wrapper .table-actions-btns-group .btn { margin-right:5px; }
 .f-grid-wrapper .table-actions-btns-group .btn-link:hover { text-decoration:none; }
-.f-grid-wrapper .table-actions-btns-group .btn-link [class*='icon'] { color:#aaa; font-size:20px; }
-.f-grid-wrapper .table-actions-btns-group .btn-link [class*='icon']:hover { text-decoration:none; }
+.f-grid-wrapper .table-actions-btns-group .btn-link i { color:#ddd; font-size:20px; }
+
+.f-grid-wrapper tr:hover .table-actions-btns-group .btn-link i { color:#aaa; font-size:20px; }
+.f-grid-wrapper tr:hover .table-actions-btns-group .btn-link:hover i { color: #888; }
+
+.f-grid-wrapper tr:hover .table-actions-btns-group .btn-link i.icon-pencil { color: #88F; }
+.f-grid-wrapper tr:hover .table-actions-btns-group .btn-link:hover i.icon-pencil { color: #00F; }
+.f-grid-wrapper tr:hover .table-actions-btns-group .btn-delete i.icon-trash { color: #F88; }
+.f-grid-wrapper tr:hover .table-actions-btns-group .btn-delete:hover i.icon-trash { color: #F00; }
+
 .dataTable thead tr th:first-of-type select { width:70px; }
 
 

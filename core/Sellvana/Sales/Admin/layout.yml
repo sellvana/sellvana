@@ -20,7 +20,7 @@ base:
             - [ addTab, Sellvana_SalesPayment, { label: General, group: payment_methods, pos: 10, async: true } ]
 
 /orders/form:
-    #- { include: default_form }
+    - { include: default_form }
     - view: admin/form
         #set: { tab_view_prefix: order/orders-form/ }
         do:
