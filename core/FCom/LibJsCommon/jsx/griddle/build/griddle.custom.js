@@ -902,7 +902,7 @@ var Griddle = React.createClass({displayName: "Griddle",
      * empty selectedRows
      */
     clearSelectedRows: function() {
-        console.log('clear selected rows');
+        //console.log('clear selected rows');
         this.setState({ selectedRows: [] });
     },
     addRows: function(rows, options) {
@@ -1128,14 +1128,25 @@ var Griddle = React.createClass({displayName: "Griddle",
         return this;
     },
     triggerCallback: function(name) {
+        var that = this;
         var callbacks = this.getConfig('callbacks');
         if (callbacks && typeof callbacks[name] !== 'undefined') {
-            var callbackFuncName = callbacks[name];
-            if (typeof window[callbackFuncName] === 'function') {
-                console.log('triggerCallback:'+name);
-                return window[callbackFuncName](this, name);
+            if (callbacks[name] instanceof Array) {
+                _.forEach(callbacks[name], function(funcName) {
+                    callGlobalFunction(funcName);
+                });
             } else {
-                console.log('DEBUG: cannot find call back ' + callbackFuncName + ' for name ' + name);
+                var callbackFuncName = callbacks[name];
+                callGlobalFunction(callbackFuncName);
+            }
+        }
+
+        function callGlobalFunction(funcName) {
+            if (typeof window[funcName] === 'function') {
+                console.log('triggerCallback:' + name);
+                return window[funcName](that, name);
+            } else {
+                console.log('DEBUG: cannot find call back ' + funcName + ' for name ' + name);
             }
         }
     }

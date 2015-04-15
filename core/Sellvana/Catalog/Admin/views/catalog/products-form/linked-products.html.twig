@@ -39,9 +39,9 @@
          * callback function for top action to show modal to add products
          * @param that
          */
-        window.showModalToAddProduct = function(that) {console.log('ok');
-            mainGrid = that.props.getCurrentGrid();
-            switch(that.props.getConfig('id')) {
+        window.showModalToAddProduct = function(grid) {
+            mainGrid = grid;
+            switch(mainGrid.getConfig('id')) {
                 case 'linked_products_related':
                     var modalContainerEle = document.getElementById('{{ relatedLinkedProdConfig.config.id }}-modal');
                     break;
@@ -67,10 +67,10 @@
                                 },
                                 onConfirm: window.addSelectedProduct
                             },
-                            React.createElement('div', {className: 'f-grid-wrapper', id: that.props.getConfig('id')+'_tab'})
+                            React.createElement('div', {className: 'f-grid-wrapper', id: mainGrid.getConfig('id')+'_tab'})
                     ), modalContainerEle);
             var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
-            var attachGridContainerEle = document.getElementById(that.props.getConfig('id')+'_tab');
+            var attachGridContainerEle = document.getElementById(mainGrid.getConfig('id')+'_tab');
             var instanceAttachGrid = React.renderComponent(
                     React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
                     attachGridContainerEle

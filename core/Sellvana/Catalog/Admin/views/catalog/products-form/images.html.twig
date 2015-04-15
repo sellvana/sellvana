@@ -1,28 +1,29 @@
 {% set m = THIS.get('model') %}
-{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
+{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfigForGriddle(m) %}
 
 {% set type = 'images' %}
 {% set targetType = 'product' %}
 {% set medialibConfig = {
-id: 'all_' ~ type,
-mode: 'images',
-type: 'product-images',
-title: 'Images',
-folder: 'media/product/images',
-config: {actions: {delete: {caption : 'Remove'}}}
+    id: 'all_' ~ type,
+    mode: 'images',
+    type: 'product-images',
+    title: 'Images',
+    folder: 'media/product/images',
+    config: {actions: {delete: {caption : 'Remove'}}}
 } %}
 
 {% set attachmentsConfig = {
-type: type,
-targetType: targetType,
-elementContainer: '#tab-images',
-medialibConfig: medialibConfig,
-gridConfig: prodImagesConfig
+    type: type,
+    targetType: targetType,
+    elementContainer: '#tab-images',
+    medialibConfig: medialibConfig,
+    gridConfig: prodImagesConfig
 } %}
 {% set combineType = targetType ~ type %}
 {#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
 
-{{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}
+{#{{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}#}
+{{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}
 
 <script>
     $(document).ready(function() {
@@ -38,7 +39,52 @@ gridConfig: prodImagesConfig
             });
         }
     });
-    window.afterBuiltImagesGrid = function(grid) {
+
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+        var productImagesGrid = {{ combineType }}Grid;
+        console.log('productImagesGrid', productImagesGrid);
+        if (productImagesGrid) {
+            $(productImagesGrid.getDOMNode())
+                    .on('removedRows.griddle', function (e, rows) {
+                        pushImageToVariantsList(rows, false);
+                    }).on('addedRows.griddle', function (e, rows) {
+                        pushImageToVariantsList(rows, true);
+                    });
+        }
+    });
+
+    /**
+     * push image to variant lists image in Variants tab
+     * @param {array} rows
+     * @param {boolean} isAdd
+     */
+    function pushImageToVariantsList(rows, isAdd)
+    {
+        console.log('pushImageToVariantsList.rows', rows);
+        if (typeof isAdd === 'undefined') {
+            isAdd = false;
+        }
+
+        if (typeof(updateListVariantImage) == "function") {
+            var images = [];
+
+            _.forEach(rows, function(row) {
+                images.push({
+                    file_id: row.file_id,
+                    subfolder: row.subfolder,
+                    file_name: row.file_name
+                });
+            });
+
+            updateListVariantImage({
+                add: isAdd,
+                image: images
+            });
+        }
+    }
+
+
+    /*window.afterBuiltImagesGrid = function(grid) {
         console.log('after build image grid');
         //bind remove event
         grid.getRows().bind('remove', function(row) {
@@ -88,7 +134,7 @@ gridConfig: prodImagesConfig
                 image: image
             });
         }
-    };
+    };*/
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
         var file_error = [];

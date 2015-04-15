@@ -49,6 +49,18 @@
         var modalEle = document.getElementById(mediaGridId + '-media-modal-container');
         mediaLibComponent{{ config.id }} = React.render(React.createElement(FComMediaLib, { mediaConfig: mediaConfig, uploadConfig: uploadConfig, modalConfig: modalConfig}), modalEle);
         mediaLibGrid{{ config.id }} = mediaLibComponent{{ config.id }}.getMainGridComponent();
+
+        //re-scan image button
+        $(mediaLibComponent{{ config.id }}.getDOMNode()).find('.btn-rescan-images').on('click', function() {
+            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}', { do: 'rescan'}, function (response) {
+                if (response.status == 'success') {
+                    $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
+                    mediaLibGrid{{ config.id }}.refresh();
+                } else {
+                    $.bootstrapGrowl("Error:<br>" + response.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                }
+            });
+        });
     });
 
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
