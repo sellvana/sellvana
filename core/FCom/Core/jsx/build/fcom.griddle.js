@@ -427,7 +427,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     if (dataUrl != '') {
                         var pageSize = this.props.resultsPerPage;
                         var griddleState = this.props.getGriddleState();
-                        var exportUrl = buildGridDataUrl(griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
+                        var exportUrl = serverMethods.postUrl(dataUrl, gridId, griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
                         window.location.href = exportUrl + '&export=true';
                     }
                     break;
