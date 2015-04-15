@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_Payment_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const PENDING = 'pending',
         EXT_SENT = 'ext_sent',

@@ -5,7 +5,7 @@
  *
  * @deprecated not needed with new payment/transaction structure, keeping as backup
  */
-class Sellvana_Sales_Model_Order_Payment_State_Processor extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_Payment_State_Processor extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const NA = 'na',
         PENDING = 'pending',

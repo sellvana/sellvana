@@ -33,7 +33,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_18()
+    public function install__0_3_19()
     {
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
@@ -148,6 +148,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'inventory_sku' => 'varchar(100) default null',
                 'product_name' => "varchar(255) DEFAULT NULL",
                 'qty' => 'decimal(12,2) DEFAULT NULL',
+                'qty_backordered' => 'int unsigned not null default 0',
                 'price' => 'decimal(12,2) NOT NULL DEFAULT 0',
                 'cost' => 'decimal(12,2) default null',
                 'row_total' => "decimal(12,2) NULL",
@@ -293,7 +294,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(10) not null default 'new'",
                 'state_delivery' => "varchar(10) not null default 'pending'",
                 'state_payment' => "varchar(10) not null default 'new'",
-                'state_custom' => "varchar(10) not null default ''",
+                'state_custom' => "varchar(10) default null",
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
@@ -1927,6 +1928,23 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'item_qty' => 'int(10) unsigned NOT NULL DEFAULT 0'
             ]
+        ]);
+    }
+
+    public function upgrade__0_3_18__0_3_19()
+    {
+        $tCartItem = $this->Sellvana_Sales_Model_Cart_Item->table();
+        $this->BDb->ddlTableDef($tCartItem, [
+            BDb::COLUMNS => [
+                'qty_backordered' => 'int unsigned not null default 0',
+            ],
+        ]);
+
+        $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'state_custom' => "varchar(10) default null",
+            ],
         ]);
     }
 }

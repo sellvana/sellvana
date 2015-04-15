@@ -317,6 +317,12 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 $this->BSession->addMessage($this->BLocale->_('Maximum quantity reached for item %s', $sku), 'warning');
             }
 
+            if ($inv->getAllowBackorder()) {
+                $qtyAvailable = $inv->getQtyAvailable();
+                if ($qtyAvailable < $qty) {
+                    $item->set('qty_backordered', $qty - $qtyAvailable);
+                }
+            }
             $item->set('qty', $qty)->save();
         }
         return $this;
