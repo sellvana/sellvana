@@ -42,7 +42,6 @@
 
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
         var productImagesGrid = {{ combineType }}Grid;
-        console.log('productImagesGrid', productImagesGrid);
         if (productImagesGrid) {
             $(productImagesGrid.getDOMNode())
                     .on('removedRows.griddle', function (e, rows) {
@@ -60,7 +59,7 @@
      */
     function pushImageToVariantsList(rows, isAdd)
     {
-        console.log('pushImageToVariantsList.rows', rows);
+        //console.log('pushImageToVariantsList.rows', rows);
         if (typeof isAdd === 'undefined') {
             isAdd = false;
         }
@@ -138,32 +137,51 @@
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
         var file_error = [];
-        $('#quick-add-images').fileupload({
-            url: uploadUrl,
-            multiple:true,
-            autoUpload: true
-        }).bind('fileuploadalways', function(e, data) {
-            if ($.isArray(data.result.files)) {
-                data.result.files.forEach(function (obj) {
-                    if (!obj.error) {
-                        var newRow = obj;
-                        newRow.selected = true;
-                        {{ medialibConfig.id }}_grid.getSelectedRows().add(obj);
-                        {{ medialibConfig.id }}_grid.getRows().add(newRow,{merge: true}).trigger('render');
-                        $('#{{ medialibConfig.id }}').find('td.name span').each(function(i) {
-                            if($(this).html() === obj.file_name)
-                                $(this).parents('tr:first').remove();
+        $('#quick-add-images')
+                .fileupload({
+                    url: uploadUrl,
+                    multiple: true,
+                    autoUpload: true
+                })
+                .bind('fileuploadalways', function (e, data) {
+                    var mediaGrid = mediaLibGrid{{ medialibConfig.id }};
+                    if ($.isArray(data.result.files) && mediaGrid) {
+                        var addRows = [];
+                        var combineAddRows = [];
+                        var current = FCom.Mixin.dateTimeNow();
+                        data.result.files.forEach(function (obj) {
+                            if (!obj.error) {
+                                addRows.push(obj);
+                                combineAddRows.push(
+                                        _.extend(obj, {
+                                            _new: true,
+                                            id: guid(),
+                                            file_id: obj.id,
+                                            update_at: current,
+                                            create_at: current,
+                                            //temporary value before implement edit inline
+                                            position: 0,
+                                            label: FCom.Mixin.removeSpecialChars(obj.file_name)
+                                        })
+                                );
+                            }
+                            else {
+                                file_error.push(obj.file_name);
+                            }
                         });
-                        //trigger add
-                        $('.btn_' + '{{ medialibConfig.id }}' + '_add').trigger('click');
+
+                        //add to media grid
+                        if (addRows.length) {
+                            mediaGrid.addRows(addRows);
+                        }
+
+                        //add to combine grid
+                        if ({{ combineType }}Grid && combineAddRows.length) {
+                            {{ combineType }}Grid.addRows(combineAddRows);
+                        }
                     }
-                    else {
-                        file_error.push(obj.file_name);
-                    }
-                });
-            }
-        })
-                .bind('fileuploadstop', function(e, data) {
+                })
+                .bind('fileuploadstop', function (e, data) {
                     if (file_error.join(',') != '') {
                         alert('Illegal file extension: ' + file_error.join(','));
                         file_error = [];

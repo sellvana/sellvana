@@ -145,11 +145,6 @@ var Griddle = React.createClass({displayName: "Griddle",
             sortAscending = this.state.sortAscending;
         }
 
-        //empty sort column in case empty sort ascending, it will reset personlization
-        if (sortAscending == '') {
-            sortColumn = '';
-        }
-
         if (state !== undefined && state.page !== undefined) {
             page = state.page;
         } else {
@@ -223,7 +218,9 @@ var Griddle = React.createClass({displayName: "Griddle",
         var maxPage = this.getMaxPage();
         //re-render if we have new max page value
         if (this.state.maxPage != maxPage){
-            this.setState({ maxPage: maxPage, filteredColumns: this.props.columns, initColumns: this.props.initColumns });
+            this.setState({ maxPage: maxPage, filteredColumns: this.props.columns, initColumns: this.props.initColumns }, function() {
+                this.saveLocalState();
+            });
         }
     },
     setPage: function(number) {
@@ -239,7 +236,9 @@ var Griddle = React.createClass({displayName: "Griddle",
                     that.setState(updatedState);
                 });
             } else {
-                that.setState(state);
+                that.setState(state, function() {
+                    this.saveLocalState();
+                });
             }
         }
     },
@@ -288,14 +287,16 @@ var Griddle = React.createClass({displayName: "Griddle",
             state = {
                 page:0,
                 sortColumn: sort,
-                sortAscending: 'asc'
+                sortAscending: true
             };
 
         // If this is the same column, reverse the sort.
         if (this.state.sortColumn == sort) {
-            state.sortAscending = (this.state.sortAscending == 'asc') ? 'desc' : ((this.state.sortAscending == 'desc') ? '' : 'asc');
-        } else {
-            state.sortAscending = "asc";
+            state.sortAscending = this.state.sortAscending == false;
+            //sortAscending: true -> false -> clear -> true ...
+            if (this.state.sortAscending === false) {
+                state.sortColumn = '';
+            }
         }
 
         if (this.hasExternalResults()) {
@@ -303,7 +304,9 @@ var Griddle = React.createClass({displayName: "Griddle",
                 that.setState(updatedState);
             });
         } else {
-            this.setState(state);
+            this.setState(state, function() {
+                this.saveLocalState();
+            });
         }
     },
     componentWillReceiveProps: function(nextProps) {
@@ -393,16 +396,9 @@ var Griddle = React.createClass({displayName: "Griddle",
         if (!this.hasExternalResults()) {
             //get the correct page size
             if(this.state.sortColumn != "" || this.props.initialSort != ""){
-                switch (this.state.sortAscending) {
-                    case 'asc':
-                        data = _.sortBy(data, this.state.sortColumn);
-                        break;
-                    case 'desc':
-                        data = _.sortBy(data, this.state.sortColumn).reverse();
-                        break;
-                    default:
-                        data = _.sortBy(data, this.state.sortColumn);
-                        break;
+                data = _.sortBy(data, this.state.sortColumn);
+                if(this.state.sortAscending == false){
+                    data.reverse();
                 }
             }
 
@@ -501,7 +497,7 @@ var Griddle = React.createClass({displayName: "Griddle",
                         className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending,
                         getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection,
                         getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows,
-                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, updateRows: this.updateRows, saveModalForm: this.saveModalForm, ref: 'gridBody'}
+                        hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, updateRows: this.updateRows, saveModalForm: this.saveModalForm, saveLocalState: this.saveLocalState, ref: 'gridBody'}
                     ))
                     : (React.createElement(GridBody, {columnMetadata: this.props.columnMetadata, data: data, columns: cols, metadataColumns: meta, className: this.props.tableClassName}))
                 );

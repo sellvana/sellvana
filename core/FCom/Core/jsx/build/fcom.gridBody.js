@@ -98,7 +98,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 sortAscending: that.props.sortAscending, columnMetadata: that.props.columnMetadata, data: this.props.data, 
                 originalData: this.props.originalData, setHeaderSelection: that.props.setHeaderSelection, getHeaderSelection: this.props.getHeaderSelection, 
                 addSelectedRows: this.props.addSelectedRows, getSelectedRows: that.props.getSelectedRows, clearSelectedRows: this.props.clearSelectedRows, 
-                removeSelectedRows: this.props.removeSelectedRows, 
+                removeSelectedRows: this.props.removeSelectedRows, saveLocalState: this.props.saveLocalState,
                 ref: 'gridTitle'}
             );
 
@@ -273,10 +273,8 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     );
                 }
 
-                if (that.props.sortColumn == col && that.props.sortAscending == 'asc') {
-                    columnClass += "sort-ascending th-sorting-asc"
-                }  else if (that.props.sortColumn == col && that.props.sortAscending == 'desc') {
-                    columnClass += "sort-descending th-sorting-desc"
+                if (that.props.sortColumn == col) {
+                    columnClass += that.props.sortAscending ? 'sort-ascending th-sorting-asc' : 'sort-descending th-sorting-desc';
                 }
 
                 var displayName = col;
@@ -293,9 +291,9 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
 
                 var width = meta && meta.width ? {width: meta.width} : {};
 
-                if (typeof meta !== "undefined" && meta.name == 'btn_group') {
+                if (typeof meta !== "undefined" && (meta.name == 'btn_group' || meta.sortable == false)) {
                     return (
-                        React.createElement("th", {"data-title": col, className: columnClass, key: col}, 
+                        React.createElement("th", {"data-title": col, className: columnClass, style: width, key: col},
                             displayName
                         )
                     )
