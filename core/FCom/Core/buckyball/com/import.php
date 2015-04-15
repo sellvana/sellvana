@@ -226,7 +226,7 @@ class BImport extends BClass
 
             $data = [];
             foreach ($row as $k => $v) {
-                $f = explode('.', $k);
+                $f = explode('.', $k, 2);
                 if (empty($f[0]) || empty($f[1])) {
                     continue;
                 }
