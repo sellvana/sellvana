@@ -51,7 +51,8 @@ class BImport extends BClass
 
     public function getImportDir()
     {
-        return $this->FCom_Core_Main->dir('storage/import/' . $this->dir);
+        return $this->FCom_Core_Main->dir('storage/' . $this->BConfig->get('core/storage_random_dir') . '/import/' . $this->dir);
+        //return $this->FCom_Core_Main->dir('storage/import/' . $this->dir);
     }
 
     public function updateFieldsDueToInfo($info)

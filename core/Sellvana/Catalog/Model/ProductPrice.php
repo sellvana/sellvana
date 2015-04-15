@@ -503,6 +503,7 @@ class Sellvana_Catalog_Model_ProductPrice
 
     protected function _parsePriceField($value)
     {
+        $value = strtolower($value);
         if (is_numeric($value)) {
             return [
                 'operation' => '=$',
