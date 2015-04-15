@@ -291,9 +291,9 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
 
                 var width = meta && meta.width ? {width: meta.width} : {};
 
-                if (typeof meta !== "undefined" && meta.name == 'btn_group') {
+                if (typeof meta !== "undefined" && (meta.name == 'btn_group' || meta.sortable == false)) {
                     return (
-                        React.createElement("th", {"data-title": col, className: columnClass, key: col}, 
+                        React.createElement("th", {"data-title": col, className: columnClass, style: width, key: col},
                             displayName
                         )
                     )
