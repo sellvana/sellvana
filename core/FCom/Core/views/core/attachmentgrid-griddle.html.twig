@@ -30,16 +30,6 @@
         }
 
         /**
-         * remove special chars
-         * @param {string} str
-         */
-        function removeSpecialChars(str)
-        {
-            var label = str.substr(0, str.lastIndexOf('.'));
-            return label.replace(/[^A-Z0-9]/ig, ' ');
-        }
-
-        /**
          * add selected items from modal (media library) grid to combine grid
          * @param modal
          */
@@ -62,7 +52,7 @@
                                 create_at: current,
                                 //temporary value before implement edit inline
                                 position: 0,
-                                label: removeSpecialChars(attachRow.file_name)
+                                label: FCom.Mixin.removeSpecialChars(attachRow.file_name)
                             });
                             addRows.push(row);
                         }
@@ -72,7 +62,9 @@
                         {{ combineType }}Grid.addRows(addRows);
                     }
 
-                    modal.close();
+                    if (modal) {
+                        modal.close();
+                    }
                 }
             }
         }
