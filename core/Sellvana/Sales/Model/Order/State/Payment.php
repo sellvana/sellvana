@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_State_Payment extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const FREE = 'free',
         UNPAID = 'unpaid',

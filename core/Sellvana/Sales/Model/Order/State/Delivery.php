@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_State_Delivery extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const VIRTUAL = 'virtual',
         PENDING = 'pending',

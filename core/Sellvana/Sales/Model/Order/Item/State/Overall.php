@@ -1,9 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_Item_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const PENDING = 'pending',
-        BACKORDERED = 'backordered',
+        BACKORDERED = 'backorder',
         PROCESSING = 'processing',
         COMPLETE = 'complete',
         CANCELED = 'canceled';
@@ -17,7 +17,7 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends FCom_Core_Model_Abst
     ];
 
     protected $_setValueNotificationTemplates = [
-        self::BACKORDERED => 'email/sales/order-item-state-overall-backordered',
+        self::BACKORDERED => 'email/sales/order-item-state-overall-backorder',
         self::CANCELED => 'email/sales/order-item-state-overall-canceled',
     ];
 

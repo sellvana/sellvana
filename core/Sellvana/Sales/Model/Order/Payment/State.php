@@ -3,8 +3,13 @@
 class Sellvana_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_State_Context
 {
     const OVERALL = 'overall',
-        //PROCESSOR = 'processor',
         CUSTOM = 'custom';
+
+    protected $_stateLabels = [
+        self::OVERALL => 'Overall',
+        self::CUSTOM => 'Custom',
+    ];
+
     /**
      * Order linked
      *
