@@ -23,6 +23,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     public function allowFolder($folder)
     {
         $this->_allowedFolders[$folder] = 1;
+        $this->_allowedFolders[$this->_parseFolder($folder)] = 1;
         return $this;
     }
 
