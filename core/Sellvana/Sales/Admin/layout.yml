@@ -4,7 +4,7 @@ base:
             - [ addNav, sales, { label: Sales, pos: 100, icon_class: icon-shopping-cart } ]
             - [ addNav, sales/orders, { label: Orders, href: /orders } ]
             - [ addNav, sales/payments, { label: Payments, href: /payments } ]
-            - [ addNav, sales/orderstatecustom, { label: Order State Custom, href: /orderstatecustom } ]
+            - [ addNav, sales/orderstatecustom, { label: Custom Order States, href: /orderstatecustom } ]
             - [ addNav, sales/carts, { label: Shopping Carts, href: /carts } ]
             - [ addNav, sales/reports, { label: Reports, href: /sales/reports } ]
 

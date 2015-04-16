@@ -39,11 +39,11 @@
                 </div>
                 <div class="col-md-4">
                     <h4><i class="icon-map-marker"></i> {{ 'Shipping'|_ }} <a href="#" id="shipping-section-edit-link" class="section-edit-trigger"></a></h4>
-                    {{ THIS.view('order/orders-form/main/address').set({order:order, type:'shipping'}) | raw}}
+                    {{ THIS.view('order/orders-form-partial/address').set({order:order, type:'shipping'}) | raw}}
                 </div>
                 <div class="col-md-4">
                     <h4><i class="icon-credit-card"></i> {{ 'Billing'|_ }} <a href="#" id="billing-section-edit-link" class="section-edit-trigger"></a></h4>
-                    {{ THIS.view('order/orders-form/main/address').set({order:order, type:'billing'}) | raw }}
+                    {{ THIS.view('order/orders-form-partial/address').set({order:order, type:'billing'}) | raw }}
                 </div>
             </div>
             <div class="row">
