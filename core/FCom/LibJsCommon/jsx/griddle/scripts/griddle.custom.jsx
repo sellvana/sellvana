@@ -7,7 +7,7 @@
 
    See License / Disclaimer https://raw.githubusercontent.com/DynamicTyped/Griddle/master/LICENSE
 */
-define(['underscore', 'react', 'griddle.gridNoData', 'fcom.components',], function(_, React, GridNoData, Components) {
+define(['jquery', 'underscore', 'react', 'griddle.gridNoData', 'fcom.components',], function($, _, React, GridNoData, Components) {
 /*
 var React = require('react');
 var GridBody = require('./gridBody.jsx');
@@ -62,7 +62,10 @@ var Griddle = React.createClass({
             "customFilter": {},
             "customSettings": {},
             "customGrid": {},
-            "initPage": 0 //begin with 0 page
+            "initPage": 0, //begin with 0 page
+            "addRowsExternal": null,
+            "updateRowsExternal": null,
+            "removeRowsExternal": null
         };
     },
     /* if we have a filter display the max page and results accordingly */
@@ -142,19 +145,19 @@ var Griddle = React.createClass({
             sortAscending = this.state.sortAscending;
         }
 
-        //empty sort column in case empty sort ascending, it will reset personlization
-        if (sortAscending == '') {
-            sortColumn = '';
-        }
-
         if (state !== undefined && state.page !== undefined) {
             page = state.page;
         } else {
             page = this.state.page;
         }
 
+        var options = {
+            dataUrl: this.getConfig('data_url'),
+            gridId: this.getConfig('id')
+        };
+
         // Obtain the results
-        this.props.getExternalResults(filter, sortColumn, sortAscending, page, this.props.resultsPerPage, callback);
+        this.props.getExternalResults(filter, sortColumn, sortAscending, page, this.props.resultsPerPage, callback, options);
     },
     updateStateWithExternalResults: function(state, callback) {
         // Update the table to indicate that it's loading.
@@ -175,7 +178,9 @@ var Griddle = React.createClass({
                 results: externalResults.results,
                 totalResults: externalResults.totalResults,
                 isLoading: false,
-                isInit: false
+                isInit: false,
+                filteredResults: null,
+                maxPage: that.getMaxPage(externalResults.results)
             });
 
             callback(state);
@@ -213,7 +218,9 @@ var Griddle = React.createClass({
         var maxPage = this.getMaxPage();
         //re-render if we have new max page value
         if (this.state.maxPage != maxPage){
-            this.setState({ maxPage: maxPage, filteredColumns: this.props.columns, initColumns: this.props.initColumns });
+            this.setState({ maxPage: maxPage, filteredColumns: this.props.columns, initColumns: this.props.initColumns }, function() {
+                this.saveLocalState();
+            });
         }
     },
     setPage: function(number) {
@@ -229,7 +236,9 @@ var Griddle = React.createClass({
                     that.setState(updatedState);
                 });
             } else {
-                that.setState(state);
+                that.setState(state, function() {
+                    this.saveLocalState();
+                });
             }
         }
     },
@@ -278,14 +287,16 @@ var Griddle = React.createClass({
             state = {
                 page:0,
                 sortColumn: sort,
-                sortAscending: 'asc'
+                sortAscending: true
             };
 
         // If this is the same column, reverse the sort.
         if (this.state.sortColumn == sort) {
-            state.sortAscending = (this.state.sortAscending == 'asc') ? 'desc' : ((this.state.sortAscending == 'desc') ? '' : 'asc');
-        } else {
-            state.sortAscending = "asc";
+            state.sortAscending = this.state.sortAscending == false;
+            //sortAscending: true -> false -> clear -> true ...
+            if (this.state.sortAscending === false) {
+                state.sortColumn = '';
+            }
         }
 
         if (this.hasExternalResults()) {
@@ -293,7 +304,9 @@ var Griddle = React.createClass({
                 that.setState(updatedState);
             });
         } else {
-            this.setState(state);
+            this.setState(state, function() {
+                this.saveLocalState();
+            });
         }
     },
     componentWillReceiveProps: function(nextProps) {
@@ -375,6 +388,7 @@ var Griddle = React.createClass({
         this.triggerCallback('componentDidMount');
     },
     componentDidUpdate: function() {
+        //console.log('state', this.state);
         this.triggerCallback('componentDidUpdate');
     },
     getDataForRender: function(data, cols, pageList){
@@ -382,16 +396,9 @@ var Griddle = React.createClass({
         if (!this.hasExternalResults()) {
             //get the correct page size
             if(this.state.sortColumn != "" || this.props.initialSort != ""){
-                switch (this.state.sortAscending) {
-                    case 'asc':
-                        data = _.sortBy(data, this.state.sortColumn);
-                        break;
-                    case 'desc':
-                        data = _.sortBy(data, this.state.sortColumn).reverse();
-                        break;
-                    default:
-                        data = _.sortBy(data, this.state.sortColumn);
-                        break;
+                data = _.sortBy(data, this.state.sortColumn);
+                if(this.state.sortAscending == false){
+                    data.reverse();
                 }
             }
 
@@ -454,7 +461,8 @@ var Griddle = React.createClass({
                 getConfig={this.getConfig} searchWithinResults={this.searchWithinResults} getSelectedRows={this.getSelectedRows} refresh={this.refresh}
                 setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState}
                 updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} removeRows={this.removeRows} getCurrentGrid={this.getCurrentGrid}
-                ref={'gridSettings'} isLocalMode={this.isLocalMode} updateRows={this.updateRows} saveModalForm={this.saveModalForm}
+                ref={'gridSettings'} hasExternalResults={this.hasExternalResults} updateRows={this.updateRows} saveModalForm={this.saveModalForm}
+                clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
             />
             : <span className="settings" onClick={this.toggleColumnChooser}>{this.props.settingsText} <i className="glyphicon glyphicon-cog"></i></span>
         ) : "";
@@ -485,7 +493,7 @@ var Griddle = React.createClass({
                         className={this.props.tableClassName} changeSort={this.changeSort} sortColumn={this.state.sortColumn} sortAscending={this.state.sortAscending}
                         getConfig={this.getConfig} refresh={this.refresh} setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection}
                         getSelectedRows={this.getSelectedRows} addSelectedRows={this.addSelectedRows} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
-                        hasExternalResults={this.hasExternalResults} removeRows={this.removeRows} isLocalMode={this.isLocalMode} updateRows={this.updateRows} saveModalForm={this.saveModalForm} ref={'gridBody'}
+                        hasExternalResults={this.hasExternalResults} removeRows={this.removeRows} updateRows={this.updateRows} saveModalForm={this.saveModalForm} saveLocalState={this.saveLocalState} ref={'gridBody'}
                     />)
                     : (<GridBody columnMetadata={this.props.columnMetadata} data={data} columns={cols} metadataColumns={meta} className={this.props.tableClassName}/>)
                 );
@@ -603,9 +611,6 @@ var Griddle = React.createClass({
         }
         return null;
     },
-    isLocalMode: function() {
-        return this.getConfig('data_mode') == 'local';
-    },
     /**
      * re-render grid with same state
      */
@@ -618,11 +623,13 @@ var Griddle = React.createClass({
                 that.setState(updatedState);
                 that.setMaxPage();
             });
+        } else {
+            //todo: refresh for local data_mode
         }
     },
     /**
      * filter local data
-     * @param data
+     * @param data //todo: remove this params
      * @param filters
      * @returns {Griddle.props.results|*}
      */
@@ -749,6 +756,7 @@ var Griddle = React.createClass({
      * @param submitFilters
      */
     setFilterLocalData: function (submitFilters) {
+        var filter = JSON.stringify(submitFilters);
         var filteredResults = this.filterLocalData(this.props.results, submitFilters);
 
         //personalize
@@ -761,7 +769,7 @@ var Griddle = React.createClass({
             });
         }
 
-        this.setState({ filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
+        this.setState({ filter: filter, filteredResults: filteredResults, totalResults: filteredResults.length, maxPage: this.getMaxPage(filteredResults) });
     },
     /**
      * get url to save personalize url
@@ -797,6 +805,7 @@ var Griddle = React.createClass({
      * @param value
      */
     searchWithinResults: function (value) {
+        //console.log('searchWithinResults.value', value);
         //todo: confirm with Boris about search within available columns or all columns
         if (value) {
             var that = this,
@@ -804,12 +813,20 @@ var Griddle = React.createClass({
                 updateAfterResultsObtained = function (updatedState) {
                     // Update the max page.
                     updatedState.maxPage = that.getMaxPage(updatedState.filteredResults);
+                    updatedState.totalResults = updatedState.filteredResults.length;
 
                     // Set the state.
                     that.setState(updatedState);
                 };
 
-            state.filteredResults = _.filter(this.state.results,
+            var results = this.state.results;
+            //console.log('state.filter', this.state.filter);
+            if (this.state.filter != '') { //if have filter, need to filter data then search in results
+                results = this.filterLocalData(null, JSON.parse(this.state.filter));
+                //console.log('results before search', results);
+            }
+
+            state.filteredResults = _.filter(results,
                 function (item) {
                     var arr = _.values(item);
                     for (var i = 0; i < arr.length; i++) {
@@ -822,7 +839,16 @@ var Griddle = React.createClass({
                 });
 
             updateAfterResultsObtained(state);
-        } else {
+        } else if (!this.hasExternalResults() && this.state.filter != '') { //empty value + already have filtered data, return to filtered data
+            //console.log('state.filter', this.state.filter);
+            var filters = JSON.parse(this.state.filter);
+            var filteredResults = this.filterLocalData(null, filters);
+            this.setState({
+                filteredResults: filteredResults,
+                maxPage: this.getMaxPage(filteredResults),
+                totalResults: filteredResults.length
+            });
+        } else { //empty value + empty filtered data
             this.setState({
                 filteredResults: null,
                 maxPage: this.getMaxPage(null)
@@ -868,44 +894,101 @@ var Griddle = React.createClass({
      * empty selectedRows
      */
     clearSelectedRows: function() {
-        this.setState({selectedRows: []});
+        //console.log('clear selected rows');
+        this.setState({ selectedRows: [] });
     },
-    addRows: function(rows) {
+    addRows: function(rows, options) {
+        options = _.extend({
+            silent: false
+            //other options
+        }, options);
+
+        var that = this;
+
+        /*if (this.hasExternalResults()) {
+            this.props.addRowsExternal(rows, triggerAddedRowsEvent);
+        } else {*/
         var results = this.state.filteredResults || this.state.results;
         _.forEach(rows, function(row) {
             if (!_.findWhere(results, {id: row.id})) {
                 results.push(row);
             }
         });
-        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results) }, function() {
-            $(this.getDOMNode()).trigger('addedRows.griddle', [rows, this]);
-        });
-    },
-    removeRows: function(rows) {
-        var results = this.state.filteredResults || this.state.results;
-        var selectedRows = this.getSelectedRows();
-        var deleteIds = _.pluck(rows, 'id');
-        if (deleteIds) {
-            results = _.filter(results, function(row) {
-                return !_.contains(deleteIds, row.id);
-            });
-            selectedRows = _.filter(selectedRows, function(row) {
-                return !_.contains(deleteIds, row.id);
-            });
+
+        var state = { results: results };
+
+        if (!this.state.filteredResults)  {
+            state.totalResults = results.length;
+            state.maxPage = this.getMaxPage(results);
         }
-        this.setState({ results: results, filteredResults: results, totalResults: results.length, maxPage: this.getMaxPage(results), selectedRows: selectedRows }, function() {
-            $(this.getDOMNode()).trigger('removedRows.griddle', [rows, this]);
-        });
+
+        this.setState(state, triggerAddedRowsEvent);
+        //}
+
+        function triggerAddedRowsEvent() {
+            if (!options.silent) {
+                $(that.getDOMNode()).trigger('addedRows.griddle', [rows, that]);
+            }
+        }
+    },
+    removeRows: function(rows, options) {
+        options = _.extend({
+            silent: false
+            //other options
+        }, options);
+
+        var that = this;
+
+        /*if (this.hasExternalResults()) {
+            this.props.removeRowsExternal(rows, triggerRemovedRowsEvent);
+        } else {*/
+            var results = this.state.results;
+            var filteredResults = this.state.filteredResults;
+            var selectedRows = this.getSelectedRows();
+            var deleteIds = _.pluck(rows, 'id');
+            if (deleteIds) {
+
+                function filterRow(row) {
+                    return !_.contains(deleteIds, row.id);
+                }
+
+                results = _.filter(results, filterRow);
+
+                if (selectedRows) {
+                    selectedRows = _.filter(selectedRows, filterRow);
+                }
+                if (filteredResults) {
+                    filteredResults = _.filter(filteredResults, filterRow);
+                }
+            }
+
+            var state = {
+                results: results,
+                filteredResults: filteredResults,
+                totalResults: filteredResults ? filteredResults.length : results.length,
+                maxPage: this.getMaxPage(filteredResults ? filteredResults : results),
+                selectedRows: selectedRows
+            };
+
+            this.setState(state, triggerRemovedRowsEvent);
+        //}
+
+        function triggerRemovedRowsEvent() {
+            if (!options.silent) {
+                $(that.getDOMNode()).trigger('removedRows.griddle', [rows, that]);
+            }
+        }
     },
 
     /**
+     * todo: need to find solution to attach this function FComModalForm
      * Save modal form
      * @param modal
      */
     saveModalForm: function(modal) {
         var that = this,
             form = $(modal.getDOMNode()).find('form'),
-            id = form.find('#id').val();
+            id = form.find('#id').val(),
             url = that.getConfig('edit_url'),
             hash = { oper: id ? 'edit' : 'add' };
         form.find('textarea, input, select').each(function() {
@@ -915,13 +998,13 @@ var Griddle = React.createClass({
         });
         form.validate();
         if (form.valid()) {
-            if (this.isLocalMode()) {
+            if (!this.hasExternalResults()) {
                 //console.log('localModeSave');
                 this.updateRows([hash]);
                 modal.close();
             } else if (url) {
                 $.post(url, hash, function(data) {
-                    if (data) {console.log('data', data);
+                    if (data) {
                         that.refresh();
                         modal.close();
                     } else {
@@ -944,40 +1027,47 @@ var Griddle = React.createClass({
      * @returns {boolean}
      */
     updateRows: function(data, options) {
-        console.log('updateRows.data', data);
+        //console.log('updateRows.data', data);
 
         options = _.extend({
             silent: false
             //other options
         }, options);
 
-        var rows = this.getRows();
-        var mapIds = rows.map(function (e) {
-            return e.id.toString();
-        });
-        var updatedRows = [];
+        var that = this;
 
-        _.each(data, function(item) {
-            var index = mapIds.indexOf(item.id);
-            console.log('item', item);
-            console.log('index', index);
-            if (index != -1) {
-                _.each(item, function(value, key) {
-                    if (rows[index].hasOwnProperty(key)) {
-                        rows[index][key] = value;
-                    }
-                });
-                updatedRows.push(rows[index]);
-            }
-        });
+        /*if (this.hasExternalResults()) {
+            this.props.updateRowsExternal(rows);
+        } else {*/
+            var rows = this.getRows();
+            var mapIds = rows.map(function (e) {
+                return e.id.toString();
+            });
+            var updatedRows = [];
 
-        this.setState({ results: rows, filteredResults: rows }, function() {
+            _.each(data, function (item) {
+                var index = mapIds.indexOf(item.id);
+                if (index != -1) {
+                    _.each(item, function (value, key) {
+                        if (rows[index].hasOwnProperty(key)) {
+                            rows[index][key] = value;
+                        }
+                    });
+                    updatedRows.push(rows[index]);
+                }
+            });
+
+            this.setState({ results: rows }, triggerUpdatedRowsEvent);
+        //}
+
+        function triggerUpdatedRowsEvent() {
             if (!options.silent) {
-                $(this.getDOMNode()).trigger('updatedRows.griddle', [updatedRows, data, this]); //todo: event updatedRow.server.griddle???
+                $(that.getDOMNode()).trigger('updatedRows.griddle', [updatedRows, data, that]); //todo: event updatedRow.server.griddle???
             }
-        });
+        }
     },
     getRows: function() {
+        //console.log('state', this.state);
         return this.state.filteredResults || this.state.results;
     },
     /**
@@ -1030,12 +1120,25 @@ var Griddle = React.createClass({
         return this;
     },
     triggerCallback: function(name) {
+        var that = this;
         var callbacks = this.getConfig('callbacks');
         if (callbacks && typeof callbacks[name] !== 'undefined') {
-            var callbackFuncName = callbacks[name];
-            if (typeof window[callbackFuncName] === 'function') {
-                console.log('triggerCallback:'+name);
-                return window[callbackFuncName](this, name);
+            if (callbacks[name] instanceof Array) {
+                _.forEach(callbacks[name], function(funcName) {
+                    callGlobalFunction(funcName);
+                });
+            } else {
+                var callbackFuncName = callbacks[name];
+                callGlobalFunction(callbackFuncName);
+            }
+        }
+
+        function callGlobalFunction(funcName) {
+            if (typeof window[funcName] === 'function') {
+                console.log('triggerCallback:' + name);
+                return window[funcName](that, name);
+            } else {
+                console.log('DEBUG: cannot find call back ' + funcName + ' for name ' + name);
             }
         }
     }

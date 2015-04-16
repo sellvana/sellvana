@@ -35,6 +35,7 @@ define(['underscore', 'react'], function (_, React) {
         render: function () {
             var that = this;
             var id = this.props.getConfig('id');
+
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
                 if (!col) {
@@ -55,7 +56,6 @@ define(['underscore', 'react'], function (_, React) {
                         var actions = col.buttons.map(function(btn, index) {
                             //var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
                             if (btn.type == 'link') {
-                                console.log(btn);
                                 return (
                                     <a key={index}
                                         className={"btn btn-link " + (btn.cssClass ? btn.cssClass : "")}
@@ -71,7 +71,7 @@ define(['underscore', 'react'], function (_, React) {
                                 //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
                                     <button className={"btn btn-link " + btn.cssClass} key={index} title={btn.title ? btn.title : ""} type="button"
-                                        data-action={btn.name} data-row={that.props.row.id} onClick={that.props.doRowAction}>
+                                        data-action={btn.name} data-row={that.props.row.id} onClick={that.props.doRowAction.bind(null, btn.callback)}>
                                         <i className={btn.icon} data-action={btn.name} data-row={that.props.row.id}></i>
                                         {btn.caption}
                                     </button>

@@ -57,8 +57,7 @@ define(['underscore', 'react'], function (_, React) {
                             //var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
                             if (btn.type == 'link') {
                                 return (
-                                    React.createElement("a", {
-                                        key: index, 
+                                    React.createElement("a", {key: index, 
                                         className: "btn btn-link " + (btn.cssClass ? btn.cssClass : ""), 
                                         title: btn.title ? btn.title : "", 
                                         href: btn.href + that.props.row[btn.col], 
@@ -120,6 +119,7 @@ define(['underscore', 'react'], function (_, React) {
                         }
                         break;
                 }
+
                 if (customNodeHtml) {
                     return React.createElement("td", {key: col.name, "data-col": col.name, dangerouslySetInnerHTML: {__html: node}});
                 }
