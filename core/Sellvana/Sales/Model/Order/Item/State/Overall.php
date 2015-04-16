@@ -3,7 +3,7 @@
 class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const PENDING = 'pending',
-        BACKORDERED = 'backorder',
+        BACKORDERED = 'backordered',
         PROCESSING = 'processing',
         COMPLETE = 'complete',
         CANCELED = 'canceled';
@@ -17,7 +17,7 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model
     ];
 
     protected $_setValueNotificationTemplates = [
-        self::BACKORDERED => 'email/sales/order-item-state-overall-backorder',
+        self::BACKORDERED => 'email/sales/order-item-state-overall-backordered',
         self::CANCELED => 'email/sales/order-item-state-overall-canceled',
     ];
 

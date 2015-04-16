@@ -33,7 +33,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_19()
+    public function install__0_3_20()
     {
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
@@ -97,8 +97,8 @@ class Sellvana_Sales_Migrate extends BClass
                 'admin_id' => "int(10) unsigned  NULL",
                 'same_address' => "tinyint(1) not null default 0",
 
-                'state_overall' => "varchar(10) not null default ''",
-                'state_payment' => 'varchar(20)',
+                'state_overall' => "varchar(20) not null default ''",
+                'state_payment' => 'varchar(20) default null',
 
                 'billing_company' => 'varchar(50)',
                 'billing_attn' => 'varchar(50)',
@@ -242,10 +242,10 @@ class Sellvana_Sales_Migrate extends BClass
                 'amount_due' => 'decimal(12,2)',
                 'amount_refunded' => 'decimal(12,2)',
 
-                'state_overall' => "varchar(15) not null default 'new'",
-                'state_delivery' => "varchar(15) not null default 'pending'",
-                'state_payment' => "varchar(15) not null default 'new'",
-                'state_custom' => "varchar(15) default null",
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_delivery' => "varchar(20) not null default 'pending'",
+                'state_payment' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
 
                 'store_currency_code' => 'char(3) null',
             ],
@@ -291,10 +291,10 @@ class Sellvana_Sales_Migrate extends BClass
                 'qty_shipped' => 'int not null default 0',
                 'qty_returned' => 'int not null default 0',
 
-                'state_overall' => "varchar(10) not null default 'new'",
-                'state_delivery' => "varchar(10) not null default 'pending'",
-                'state_payment' => "varchar(10) not null default 'new'",
-                'state_custom' => "varchar(10) default null",
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_delivery' => "varchar(20) not null default 'pending'",
+                'state_payment' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
@@ -309,8 +309,8 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
-                'state_overall' => "varchar(10) not null default 'new'",
-                'state_custom' => "varchar(10) not null default ''",
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
                 'carrier_code' => 'varchar(20)',
                 'service_code' => 'varchar(20)',
                 'carrier_desc' => 'varchar(50)',
@@ -396,7 +396,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'transaction_fee'  => 'decimal(12,2)',
                 'online'           => 'BOOL',
                 'state_overall'    => "varchar(20) not null default 'new'",
-                'state_custom'     => "varchar(20) not null default ''",
+                'state_custom'     => "varchar(20) default null",
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS  => [
@@ -463,8 +463,8 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
-                'state_overall' => "varchar(10) not null default 'new'",
-                'state_custom' => "varchar(10) not null default ''",
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
@@ -500,8 +500,8 @@ class Sellvana_Sales_Migrate extends BClass
                 'order_id' => 'int unsigned default null',
                 'payment_id' => 'int unsigned default null',
                 'amount' => 'decimal(12,2) not null default 0',
-                'state_overall' => "varchar(10) not null default 'new'",
-                'state_custom' => "varchar(10) not null default ''",
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
@@ -536,8 +536,8 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
-                'state_overall' => "varchar(10) not null default 'new'",
-                'state_custom' => "varchar(10) not null default ''",
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
@@ -1944,6 +1944,72 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tOrderItem, [
             BDb::COLUMNS => [
                 'state_custom' => "varchar(10) default null",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_19__0_3_20()
+    {
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
+        $tOrder = $this->Sellvana_Sales_Model_Order->table();
+        $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
+        $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
+        $tOrderReturn = $this->Sellvana_Sales_Model_Order_Return->table();
+        $tOrderRefund = $this->Sellvana_Sales_Model_Order_Refund->table();
+        $tOrderCancel = $this->Sellvana_Sales_Model_Order_Cancel->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDB::COLUMNS => [
+                'state_overall' => "varchar(20) not null default ''",
+                'state_payment' => 'varchar(20) default null',
+            ],
+        ]);
+
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDB::COLUMNS => [
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_delivery' => "varchar(20) not null default 'pending'",
+                'state_payment' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_delivery' => "varchar(20) not null default 'pending'",
+                'state_payment' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturn, [
+            BDb::COLUMNS => [
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tOrderRefund, [
+            BDb::COLUMNS => [
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderCancel, [
+            BDb::COLUMNS => [
+                'state_overall' => "varchar(20) not null default 'new'",
+                'state_custom' => "varchar(20) default null",
             ],
         ]);
     }
