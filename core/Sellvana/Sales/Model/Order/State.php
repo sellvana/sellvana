@@ -8,6 +8,14 @@ class Sellvana_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Co
         COMMENT = 'comment',
         CUSTOM = 'custom';
 
+    protected $_stateLabels = [
+        self::OVERALL => 'Overall',
+        self::DELIVERY => 'Delivery',
+        self::PAYMENT => 'Payment',
+        self::COMMENT => 'Comment',
+        self::CUSTOM => 'Custom',
+    ];
+
     /**
      * Order linked
      *

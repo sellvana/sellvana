@@ -27,8 +27,8 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
      * callback function for top action to show modal to add fields
      * @param grid
      */
-    window.showModalToAddField = function(that) {
-        mainGrid = that.props.getCurrentGrid();
+    window.showModalToAddField = function(grid) {
+        mainGrid = grid;
         var modalContainerEle = document.getElementById('{{ fieldsConfig.config.id }}-modal');
         React.unmountComponentAtNode(modalContainerEle);
         React.render(
@@ -42,7 +42,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                                 var node = $(modal.getDOMNode());
                                 node.find('.modal-dialog').css('width', '900px');
                             },
-                            onConfirm: that.props.saveModalForm
+                            onConfirm: mainGrid.saveModalForm
                         },
                         React.createElement("div", { className: "row f-grid-wrapper" }, React.createElement("div", { className: "tabbable" },
                                 React.createElement("ul", { className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
@@ -54,7 +54,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                                         )
                                 ),
                                 React.createElement("div", { className: "tab-content" },
-                                        React.createElement("div", { className: "tab-pane active", id: '{{ fieldsConfig.config.id }}_form_tab' }, React.createElement(FComModalForm, {columnMetadata: that.props.columnMetadata, id: that.props.getConfig('id')})
+                                        React.createElement("div", { className: "tab-pane active", id: '{{ fieldsConfig.config.id }}_form_tab' }, React.createElement(FComModalForm, {columnMetadata: mainGrid.props.columnMetadata, id: mainGrid.getConfig('id')})
                                             ),
                                         React.createElement("div", { className: "tab-pane", id: '{{ fieldsConfig.config.id }}_options_tab' })
                                 )
@@ -62,7 +62,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                 modalContainerEle);
         var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
         var attachGridContainerEle = document.getElementById('{{ fieldsConfig.config.id }}_options_tab');
-        var instanceAttachGrid = React.renderComponent(
+        var instanceAttachGrid = React.render(
                 React.createElement(FComGriddleComponent, { config: optionsConfigCompiled}),
                 attachGridContainerEle
         );

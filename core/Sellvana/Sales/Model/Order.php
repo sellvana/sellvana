@@ -302,12 +302,12 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     protected function _importItemsDataFromCart()
     {
         $cart = $this->_cart;
-
         foreach ($cart->items() as $item) {
             $product = $item->getProduct();
             if (!$product) {
                 throw new BException('Can not order product that does not exist');
             }
+            /** @var Sellvana_Sales_Model_Order_Item $orderItem */
             $orderItem = $this->Sellvana_Sales_Model_Order_Item->create([
                 'order_id' => $this->id(),
                 'cart_item_id' => $item->id(),
@@ -318,6 +318,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
                 'product_name' => $item->get('product_name'),
                 'price' => $item->get('price'),
                 'qty_ordered' => $item->get('qty'),
+                'qty_backordered' => $item->get('qty_backordered'),
                 'row_total' => $item->get('row_total'),
                 'row_tax' => $item->get('row_tax'),
                 'row_discount' => $item->get('row_discount'),
@@ -327,6 +328,25 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
                 'shipping_weight' => $item->get('shipping_weight'),
                 'data_serialized' => $item->get('data_serialized'),
             ])->save();
+
+            if ($orderItem->get('qty_backordered') == $orderItem->get('qty_ordered')) {
+                $orderItem->state()->overall()->setBackordered();
+            } else {
+                $orderItem->state()->overall()->setPending();
+            }
+            if ($orderItem->get('shipping_weight') == 0) {
+                $orderItem->state()->delivery()->setVirtual();
+            } else {
+                $orderItem->state()->delivery()->setPending();
+            }
+            if ($orderItem->get('row_total') == 0) {
+                $orderItem->state()->payment()->setFree();
+            } else {
+                $orderItem->state()->payment()->setUnpaid();
+            }
+            $orderItem->state()->custom()->setDefault();
+
+            $orderItem->save();
         }
         return $this;
     }
@@ -497,6 +517,47 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             if (!empty($products[$pId])) {
                 $item->setProduct($products[$pId]);
             }
+        }
+        return $this;
+    }
+
+    public function calcOrderAndItemsStates()
+    {
+        $totalQty = [
+            'ordered' => 0,
+            'backordered' => 0,
+            'canceled' => 0,
+            'shipped' => 0,
+            'returned' => 0,
+        ];
+        $itemStates = [
+            'overall' => [],
+            'payment' => [],
+            'delivery' => [],
+        ];
+        foreach ($this->items() as $item) {
+            foreach ($totalQty as $k => $_) {
+                $totalQty[$k] += $item->get('qty_' . $k);
+            }
+            $overallState = $item->get('state_overall');
+            $paymentState = $item->get('state_payment');
+            $deliveryState = $item->get('state_delivery');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Save order with items and other details
+     *
+     * @param array $options
+     * @return static
+     */
+    public function saveAllDetails($options = [])
+    {
+        $this->save();
+        foreach ($this->items() as $item) {
+            $item->save();
         }
         return $this;
     }

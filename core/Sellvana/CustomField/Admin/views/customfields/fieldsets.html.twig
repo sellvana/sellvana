@@ -18,13 +18,21 @@
         </div>
     </div>
     <div class="f-admin-main">
-        {{ THIS.view('core/griddle').set('grid', fieldSetsCtrl.fieldSetsGridConfig()) | raw }}
+        {{ THIS.view('core/griddle').set('grid', fieldSetsConfig) | raw }}
     </div>
 </div>
 
 <script>
+var mainGrid, selectedAttachGrid, fieldsAttachGrid, url;
+/**
+ * Register main grid
+ * @param grid
+ */
+window.fieldsetGridRegister = function(grid) {
+    mainGrid = grid;
+}
+
 require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, FComModalForm, Components) {
-    var mainGrid, selectedAttachGrid, fieldsAttachGrid, url;
 
     /**
      * callback function for register selected modal grid
@@ -114,24 +122,18 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 
     /**
      * callback function for top action to show modal to edit fieldset
-     * @param grid
-     * @param row
-     * @param callback
+     * @param rows
      */
-    window.showModalToEditFieldset = function(that, rows) {
-        mainGrid = that.props;
-        modalRender(that, rows);
+    window.showModalToEditFieldset = function(rows) {
+        modalRender(rows);
     }
 
     /**
      * callback function for top action to show modal to add fieldset
      * @param grid
-     * @param callback
      */
-    window.showModalToAddFieldset = function(that) {
-        mainGrid = that.props.getCurrentGrid();
-        modalRender(that);
-        
+    window.showModalToAddFieldset = function() {
+        modalRender();
     };
 
     /**
@@ -139,8 +141,8 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
      * @param grid
      * @param row
      */
-    function modalRender(that, row) {
-        url = that.props.getConfig('edit_url');
+    function modalRender(row) {
+        url = mainGrid.getConfig('edit_url');
         var modalContainerEle = document.getElementById('{{ fieldSetsConfig.config.id }}-modal');
         React.unmountComponentAtNode(modalContainerEle);
         React.render(
@@ -170,7 +172,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                             ),
                             React.createElement("div", { className: "tab-content" },
                                     React.createElement("div", { className: "tab-pane", id: '{{ fieldSetsConfig.config.id }}_form_content' }, 
-                                            React.createElement(FComModalForm, {columnMetadata: that.props.columnMetadata, row: row, id: that.props.getConfig('id')})
+                                            React.createElement(FComModalForm, {columnMetadata: mainGrid.props.columnMetadata, row: row, id: mainGrid.getConfig('id')})
                                         ),
                                     React.createElement("div", { className: "tab-pane", id: '{{ fieldSetsConfig.config.id }}_selected_content' }),
                                     React.createElement("div", { className: "tab-pane active", id: '{{ fieldSetsConfig.config.id }}_fields_content' })
@@ -179,7 +181,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             modalContainerEle);
         
         var selectedGridContainerEle = document.getElementById('{{ fieldSetsConfig.config.id }}_selected_content');
-        var fieldsAttachGridContainerEle = document.getElementById('{{ fieldSetsConfig.config.id }}_fields_content');
+        var fieldsGridContainerEle = document.getElementById('{{ fieldSetsConfig.config.id }}_fields_content');
 
         var selectedGridCompiled = {{ UTIL.toJson(selectedGridCompiled) | raw }};
         if (typeof row !== 'undefined' && typeof row === 'object') {
@@ -191,14 +193,14 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         }
 
         var fieldsGridCompiled = {{ UTIL.toJson(fieldsGridCompiled) | raw }};
-        var linkedInstanceAttachGrid = React.render(
+        React.render(
                 React.createElement(FComGriddleComponent, { config: selectedGridCompiled}),
                 selectedGridContainerEle
         );
 
-        var addFieldInstanceAttachGrid = React.render(
+        React.render(
                 React.createElement(FComGriddleComponent, { config: fieldsGridCompiled}),
-                fieldsAttachGridContainerEle
+                fieldsGridContainerEle
         );
     }
 

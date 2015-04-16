@@ -4,7 +4,12 @@ class Sellvana_Sales_Model_Order_Cancel_State extends FCom_Core_Model_Abstract_S
 {
     const OVERALL = 'overall',
         CUSTOM = 'custom';
-    
+
+    protected $_stateLabels = [
+        self::OVERALL => 'Overall',
+        self::CUSTOM => 'Custom',
+    ];
+
     /**
      * Order linked
      *

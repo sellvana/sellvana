@@ -9,10 +9,6 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
     protected $_recordName = 'Search Term';
     protected $_mainTableAlias = 's';
 
-    #protected $_defaultGridLayoutName = 'default_grid';
-    #protected $_gridPageViewName = 'admin/grid';
-    #protected $_gridViewName = 'core/backbonegrid';
-
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -45,6 +41,7 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 's.update_at', 'width' => 100],
         ];
         $config['actions'] = [
+            'new' => ['caption' => 'Add New Search Term'],
             'delete' => true,
         ];
         $config['filters'] = [
