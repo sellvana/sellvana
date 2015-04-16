@@ -16,8 +16,9 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         try {
             $order = $args['order'];
 
-            $payment = $this->Sellvana_Sales_Model_Order_Payment->create()->importFromOrder($order);
-            $result = $payment->payOnCheckout();
+            /** @var Sellvana_Sales_Model_Order_Payment $payment */
+            $payment = $this->Sellvana_Sales_Model_Order_Payment->create();
+            $result = $payment->importFromOrder($order)->payOnCheckout();
 
             $args['result']['payment'] = $result;
             $args['result']['payment']['model'] = $payment;
@@ -83,7 +84,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $cart->save();
 
         $payment->addHistoryEvent('complete',
-            $this->BLocale->_('Customer completed payment by %s', $order->get('payment_method')),
+            $this->BLocale->_('Customer completed payment by %s', $order->getPaymentMethod()->getName()),
             ['entity_id' => $payment->id()]
         );
     }

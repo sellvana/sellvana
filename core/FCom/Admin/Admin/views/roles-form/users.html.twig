@@ -65,8 +65,8 @@
          * callback function for top action to show modal to add users
          * @param grid
          */
-        window.showModalToAddUser = function(that) {
-            mainGrid = that.props.getCurrentGrid();
+        window.showModalToAddUser = function(grid) {
+            mainGrid = grid;
             var modalContainerEle = document.getElementById('{{ roleUserConfig.config.id }}-modal');
             React.unmountComponentAtNode(modalContainerEle);
             React.renderComponent(

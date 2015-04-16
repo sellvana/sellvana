@@ -29,12 +29,10 @@
             });
         }
 
-        function removeSpecialChars(str)
-        {
-            var label = str.substr(0, str.lastIndexOf('.'));
-            return label.replace(/[^A-Z0-9]/ig, ' ');
-        }
-
+        /**
+         * add selected items from modal (media library) grid to combine grid
+         * @param modal
+         */
         function addSelectedItemsToCombineGrid(modal)
         {
             if (typeof mediaLibGrid{{ medialibConfig.id }} != 'undefined') {
@@ -54,7 +52,7 @@
                                 create_at: current,
                                 //temporary value before implement edit inline
                                 position: 0,
-                                label: removeSpecialChars(attachRow.file_name)
+                                label: FCom.Mixin.removeSpecialChars(attachRow.file_name)
                             });
                             addRows.push(row);
                         }
@@ -64,27 +62,43 @@
                         {{ combineType }}Grid.addRows(addRows);
                     }
 
-                    modal.close();
+                    if (modal) {
+                        modal.close();
+                    }
                 }
             }
         }
 
+        /**
+         * main callback for main grid (combine grid)
+         * @param {object} grid
+         */
         window.gridRegister{{ gridConfig.config.id }} = function(grid) {
             {{ combineType }}Grid = grid;
             originIds = _.pluck(grid.getRows(), 'id');
         };
 
+        /**
+         * show modal contains media library grid
+         */
         window.gridShowMedia{{ gridConfig.config.id }} = function() {
             var mediaModal = $('#{{ medialibConfig.id }}-media-modal');
             if (mediaModal) {
                 mediaModal.modal('show');
             }
-        }
+        };
 
+        /**
+         * callback to add more handle function when submit
+         */
         window.submitCallback.push(function () {
             updateRowsRecord({{ combineType }}Grid);
         });
 
+        /**
+         * get properties will be saved
+         * @param {object} row
+         */
         function getFieldToSave(row) {
             return {
                 id: row.id,

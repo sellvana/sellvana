@@ -41,6 +41,14 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
         updateModalWidth: function(modal) {
             //todo: add css class to modal to pre-define width, eg: large, medium, small
             $(modal.getDOMNode()).find('.modal-dialog').css('width', '900px');
+        },
+        /**
+         * remove special chars
+         * @param {string} str
+         */
+        removeSpecialChars: function(str) { //todo: put this function to global utilities object
+            var label = str.substr(0, str.lastIndexOf('.'));
+            return label.replace(/[^A-Z0-9]/ig, ' ');
         }
     };
 

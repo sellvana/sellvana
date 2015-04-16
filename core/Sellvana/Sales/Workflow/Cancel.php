@@ -17,6 +17,26 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         $args['order']->save();
     }
 
+    public function action_adminCancelsOrderItems($args)
+    {
+        /** @var Sellvana_Sales_Model_Order_Item $item */
+        foreach ($args['items'] as $item) {
+            $qtyOrdered = $item->get('qty_ordered');
+            $qtyCanceled = $item->get('qty_canceled');
+            $qtyShipped = $item->get('qty_shipped');
+            $qtyBackordered = $item->get('qty_backordered');
+            $qtyCanCancel = $qtyOrdered - $qtyCanceled - $qtyShipped;
+            $qtyToCancel = min($qtyCanCancel, $item->get('qty_to_cancel'));
+            if ($qtyBackordered) {
+                $item->set('qty_backordered', max(0, $qtyBackordered - $qtyToCancel));
+            }
+            $item->set('qty_canceled', $qtyCanceled + $qtyToCancel);
+        }
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = $args['order'];
+        $order->calcOrderAndItemsStates()->saveAllDetails();
+    }
+
     public function action_adminChangesCancelCustomState($args)
     {
         $newState = $args['cancel']->state()->custom()->setState($args['state']);
