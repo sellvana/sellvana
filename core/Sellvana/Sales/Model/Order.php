@@ -535,6 +535,12 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             'payment' => [],
             'delivery' => [],
         ];
+        $allPaid = true;
+        $allFree = true;
+
+        $itemFree = Sellvana_Sales_Model_Order_Item_State_Payment::FREE;
+        $itemPaid = Sellvana_Sales_Model_Order_Item_State_Payment::PAID;
+
         foreach ($this->items() as $item) {
             foreach ($totalQty as $k => $_) {
                 $totalQty[$k] += $item->get('qty_' . $k);
@@ -542,6 +548,13 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             $overallState = $item->get('state_overall');
             $paymentState = $item->get('state_payment');
             $deliveryState = $item->get('state_delivery');
+
+            if ($paymentState !== $itemFree && $item->get('row_total') == 0) {
+                $item->state()->payment()->setFree();
+            }
+            if (!in_array($paymentState, [$itemFree, $itemPaid])) {
+                $allPaid = false;
+            }
         }
 
         return $this;
