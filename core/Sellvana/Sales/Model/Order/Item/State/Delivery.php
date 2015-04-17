@@ -4,6 +4,7 @@ class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Mode
 {
     const VIRTUAL = 'virtual',
         PENDING = 'pending',
+        BACKORDERED = 'backordered',
         PACKED = 'packed',
         SHIPPED = 'shipped',
         DELIVERED = 'delivered',
