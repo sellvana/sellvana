@@ -10,7 +10,7 @@ define(['underscore', 'react'], function (_, React) {
      */
 
     var FComRow = React.createClass({displayName: "FComRow",
-        mixins: [FCom.Mixin],
+        mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function () {
             return {
                 "row": {},
@@ -97,8 +97,23 @@ define(['underscore', 'react'], function (_, React) {
                                     break;
                             }
                         } else {
+                            var validationRules = that.validationRules(col.validation);
                             var inlineColValue = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
-                            node = (React.createElement("input", {type: "text", "data-col": col.name, onChange: that.handleChange, defaultValue: inlineColValue, className: "form-control js-draggable", name: id + "[" + that.props.row.id + "][" + col.name + "]"}));
+                            switch (col.editor) {
+                                case 'checkbox':
+                                case 'radio':
+                                    break;
+                                case 'select':
+                                    var options = [];
+                                    _.forEach(col.options, function(text, value) {
+                                        options.push(React.createElement("option", {value: value}, text));
+                                    });
+                                    node = React.createElement("select", React.__spread({key: index, name: col.name, id: col.name, className: "form-control", defaultValue: inlineColValue},  validationRules), options);
+                                    break;
+                                default:
+                                    node = (React.createElement("input", React.__spread({key: index, type: "text", "data-col": col.name, onChange: that.handleChange, defaultValue: inlineColValue, className: "form-control js-draggable", name: id + "[" + guid() + "][" + col.name + "]"},  validationRules)));
+                                    break;
+                            }
                         }
                         break;
                     default:

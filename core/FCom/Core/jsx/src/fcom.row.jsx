@@ -10,7 +10,7 @@ define(['underscore', 'react'], function (_, React) {
      */
 
     var FComRow = React.createClass({
-        mixins: [FCom.Mixin],
+        mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function () {
             return {
                 "row": {},
@@ -97,8 +97,23 @@ define(['underscore', 'react'], function (_, React) {
                                     break;
                             }
                         } else {
+                            var validationRules = that.validationRules(col.validation);
                             var inlineColValue = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
-                            node = (<input type="text" data-col={col.name} onChange={that.handleChange} defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + that.props.row.id + "][" + col.name + "]"} />);
+                            switch (col.editor) {
+                                case 'checkbox':
+                                case 'radio':
+                                    break;
+                                case 'select':
+                                    var options = [];
+                                    _.forEach(col.options, function(text, value) {
+                                        options.push(<option value={value}>{text}</option>);
+                                    });
+                                    node = <select key={index} name={col.name} id={col.name} className="form-control" defaultValue={inlineColValue} {...validationRules}>{options}</select>;
+                                    break;
+                                default:
+                                    node = (<input key={index} type="text" data-col={col.name} onChange={that.handleChange} defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + guid() + "][" + col.name + "]"} {...validationRules}/>);
+                                    break;
+                            }
                         }
                         break;
                     default:
