@@ -521,7 +521,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function calcOrderStates()
+    public function calcOrderAndItemsStates()
     {
         $totalQty = [
             'ordered' => 0,
@@ -530,10 +530,34 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             'shipped' => 0,
             'returned' => 0,
         ];
+        $itemStates = [
+            'overall' => [],
+            'payment' => [],
+            'delivery' => [],
+        ];
         foreach ($this->items() as $item) {
-            foreach ($totalQty as $k => $v) {
+            foreach ($totalQty as $k => $_) {
                 $totalQty[$k] += $item->get('qty_' . $k);
             }
+            $overallState = $item->get('state_overall');
+            $paymentState = $item->get('state_payment');
+            $deliveryState = $item->get('state_delivery');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Save order with items and other details
+     *
+     * @param array $options
+     * @return static
+     */
+    public function saveAllDetails($options = [])
+    {
+        $this->save();
+        foreach ($this->items() as $item) {
+            $item->save();
         }
         return $this;
     }

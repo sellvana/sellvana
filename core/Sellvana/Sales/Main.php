@@ -274,4 +274,3 @@ class Sellvana_Sales_Main extends BClass
         $cart->setStoreCurrency($args['new_currency'])->calculateTotals()->saveAllDetails();
     }
 }
-

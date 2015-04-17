@@ -75,6 +75,10 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
      */
     public function changeState($value, $updateModelField = true)
     {
+        if ($value === $this->getValue()) {
+            return $this;
+        }
+        
         $valueLabels = $this->getAllValueLabels();
         if ($value && empty($valueLabels[$value])) {
             throw new BException("Invalid state value '" . $value . "' for type '" . $this->_type . "'");
