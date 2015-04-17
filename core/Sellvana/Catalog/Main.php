@@ -53,9 +53,12 @@ class Sellvana_Catalog_Main extends BClass
             ->addWidgetType('product_carousel', [
                 'title' => 'Products Carousel',
                 'source_view' => 'catalog/products/carousel',
+                'view' => 'catalog/products/carousel',
                 'pos' => 100,
                 'compile' => function ($args) {
                     $w = $args['widget'];
+                    $args['layout'][] = ['hook' => $w['area'], 'views' => $w['view']];
+                    $args['layout'][] = ['view' => $w['view'], 'set' => ['skus' => $w['value'], 'widget_id' => $w['id']]];
                 }
             ])
         ;

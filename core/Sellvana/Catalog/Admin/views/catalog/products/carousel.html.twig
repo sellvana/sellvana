@@ -13,7 +13,6 @@
                     var flags = $el.data('flags') || {};
                     var term = options.term || '*';
                     var page = options.page;
-                    //console.log(page);
                     var data;
                     if (flags[term] != undefined && flags[term].loaded == 2) {
                         data = {results: self.searchLocal(term, values, page, 100), more: (flags[term].page > page)};
