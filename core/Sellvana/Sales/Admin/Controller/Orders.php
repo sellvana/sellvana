@@ -139,6 +139,23 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         /** @var Sellvana_Sales_Model_Order $m */
         $m = $args['model'];
         if ($m->id()) {
+            $view = $args['view'];
+
+            $actions = $view->get('actions');
+
+            $actions['ship_all'] = [
+                'button',
+                [
+                    'name' => 'do',
+                    'type' => 'submit',
+                    'value' => 'SHIP_ALL',
+                    'class' => ['btn', 'btn-default'],
+                ],
+                [
+                    ['span', null, $this->BLocale->_('Ship All Items')],
+                ]
+            ];
+
             $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($m->get('grand_total'))
                 . ' | ' . $this->_('Overall Status') . ': ' . $m->state()->overall()->getValueLabel()
                 . ' | ' . $this->_('Payment') . ': ' . $m->state()->payment()->getValueLabel()
@@ -148,8 +165,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 $info .= ' | ' . $this->_('Custom Status') . ' ' . $customState;
             }
             /** @var BView $view */
-            $view = $args['view'];
-            $view->set('other_info', $info);
+            $view->set([
+                'actions' => $actions,
+                'other_info' => $info,
+            ]);
         }
     }
 
@@ -175,6 +194,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $pay = $this->BRequest->post('pay');
         if (!empty($pay['items'])) {
             $this->Sellvana_Sales_Model_Order_Payment->payOrderItems($order, $pay['items']);
+        }
+
+        if ($args['do'] === 'SHIP_ALL') {
+            $this->Sellvana_Sales_Model_Order_Shipment->shipOrderItems($order);
         }
 
         $ship = $this->BRequest->post('ship');

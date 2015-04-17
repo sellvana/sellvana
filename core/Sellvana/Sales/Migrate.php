@@ -33,7 +33,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_20()
+    public function install__0_3_21()
     {
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
@@ -290,6 +290,8 @@ class Sellvana_Sales_Migrate extends BClass
                 'qty_canceled' => 'int not null default 0',
                 'qty_shipped' => 'int not null default 0',
                 'qty_returned' => 'int not null default 0',
+                'qty_paid' => 'int not null default 0',
+                'qty_refunded' => 'int not null default 0',
 
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_delivery' => "varchar(20) not null default 'pending'",
@@ -2010,6 +2012,25 @@ class Sellvana_Sales_Migrate extends BClass
             BDb::COLUMNS => [
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_custom' => "varchar(20) default null",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_20__0_3_21()
+    {
+        $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
+        $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'qty_paid' => 'int not null default 0',
+                'qty_refunded' => 'int not null default 0',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'state_carrier' => "varchar(15) not null default 'pending'",
             ],
         ]);
     }
