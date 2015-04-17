@@ -1,5 +1,44 @@
-<div id="carousel-{{ THIS.get('widget_id') }}">
-    {{ THIS.skus }}
+{% set products = THIS.get('products') %}
+{#{{ dump(THIS) }}#}
+<div id="carousel-{{ THIS.get('widget_id') }}" class="carousel slide">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+        {% for i in 0..products|length %}
+            <li data-target="#carousel-{{ THIS.get('widget_id') }}" data-slide-to="{{ i }}" class="{{ i == 0 ? 'active' }}"></li>
+        {% endfor %}
+    </ol>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+        {% set active = true %}
+        {% for p in products %}
+            <div class="item {{ active ? 'active' }}">
+                <img src="{{ p.imageUrl(true) }}" alt="{{ p.get("product_name") }}" style="height: {{ THIS.get('height')|default(400)}}px;">
+                <div class="carousel-caption">
+                <h3>{{ p.get("product_name") }}</h3>
+                </div>
+            </div>
+            {% set active = false %}
+        {% endfor %}
+    </div>
+
+    <!-- Controls -->
+    <a class="left carousel-control" href="#carousel-{{ THIS.get('widget_id') }}" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">{{ "Previous"|_ }}</span>
+    </a>
+    <a class="right carousel-control" href="#carousel-{{ THIS.get('widget_id') }}" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">{{ "Next"|_ }}</span>
+    </a>
 </div>
+
 <script type="text/javascript">
+    require(['jquery', 'bootstrap'], function ($) {
+        $("#carousel-{{ THIS.get('widget_id') }}").carousel({
+            interval: {{ THIS.get('interval')|default(5000) }},
+            pause: {{ THIS.get('pause') == 1 ? '\'hover\'': 'false' }},
+            keyboard: {{ THIS.get('keyboard') == 1 ? 'true': 'false' }}
+        });
+    });
 </script>
