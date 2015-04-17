@@ -17,8 +17,10 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
             $order = $args['order'];
 
             /** @var Sellvana_Sales_Model_Order_Payment $payment */
-            $payment = $this->Sellvana_Sales_Model_Order_Payment->create();
-            $result = $payment->importFromOrder($order)->payOnCheckout();
+            $payment = $this->Sellvana_Sales_Model_Order_Payment->create()->importFromOrder($order);
+
+            $method = $payment->getMethodObject();
+            $result = $method->payOnCheckout($payment);
 
             $args['result']['payment'] = $result;
             $args['result']['payment']['model'] = $payment;
@@ -139,6 +141,12 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 
     public function action_adminPlacesOrder($args)
     {
+
+    }
+
+    public function action_adminReceivesOfflinePayment($args)
+    {
+
     }
 
     public function action_adminAuthorizesPayment($args)

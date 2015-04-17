@@ -8,7 +8,7 @@ class Sellvana_Sales_Model_Order_Shipment_State extends FCom_Core_Model_Abstract
 
     protected $_stateLabels = [
         self::OVERALL => 'Overall',
-        self::Carrier => 'Carrier',
+        self::CARRIER => 'Carrier',
         self::CUSTOM => 'Custom',
     ];
 
