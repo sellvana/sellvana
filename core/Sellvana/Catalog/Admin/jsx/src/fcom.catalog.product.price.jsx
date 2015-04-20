@@ -503,7 +503,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 case '*$':
                     result = value * value2;
                     break;
-                case '+$':1
+                case '+$':
                     result = value + value2;
                     break;
                 case '-$':
