@@ -17,7 +17,17 @@ class Sellvana_Catalog_Model_ProductPrice
 {
     protected static $_table     = "fcom_product_price";
     protected static $_origClass = __CLASS__;
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['product_id', 'price_type', 'customer_group_id', 'site_id', 'currency_code','qty','variant_id','promo_id'],
+        'related'    => [
+            'product_id' => 'Sellvana_Catalog_Model_Product.id',
+            'customer_group_id' => 'Sellvana_CustomerGroups_Model_Group.id',
+            'site_id' => 'Sellvana_MultiSite_Model_Site.id',
+            'variant_id' => 'Sellvana_CustomField_Model_ProductVariant.id',
+            'promo_id' => 'Sellvana_Promo_Model_Promo.id'
+        ],
+    ];
     const TYPE_BASE = "base",
         TYPE_MAP = "map",
         TYPE_MSRP = "msrp",
@@ -425,16 +435,24 @@ class Sellvana_Catalog_Model_ProductPrice
                         $priceModel->delete();
                         continue;
                     }
+                    if ($f === 'sale') {
+                        $saleModel = $priceModel;
+                    }
                 } else {
                     $priceModel = $this->create([
                         'product_id' => $product->id(),
                         'price_type' => $f,
                     ]);
                 }
-                $priceModel->set($this->_parsePriceField($v))->save();
+                try {
+                    $priceModel->set($this->_parsePriceField($v))->save();
+                } catch(Exception $e) {
+                    $this->BDebug->logException($e); // probably should not stop import?
+                }
             }
         }
-        $tiers = $product->get('price.tiers');
+
+        $tiers = $product->get('price.tier');
         if ($tiers) {
             if (is_string($tiers)) {
                 $tiersArr = explode(';', $tiers);
@@ -462,13 +480,38 @@ class Sellvana_Catalog_Model_ProductPrice
                         'qty' => $tier,
                     ]);
                 }
-                $priceModels[$tier]->set($this->_parsePriceField($v))->save();
+                try {
+                    $priceModels[$tier]->set($this->_parsePriceField($v))->save();
+                } catch(Exception $e) {
+                    $this->BDebug->logException($e); // probably should not stop import?
+                }
+            }
+        }
+
+        $saleFrom = new DateTime($product->get('price.sale.from_date'));
+        $saleTo = new DateTime($product->get('price.sale.to_date'));
+        if ($saleFrom || $saleTo) {
+            if (empty($saleModel)) {
+                $saleModel = $this->orm()
+                    ->where('product_id', $product->id())->where('price_type', 'sale')->where_null('variant_id')
+                    ->where_null('site_id')->where_null('customer_group_id')->where_null('currency_code')
+                    ->find_one();
+            }
+            if ($saleModel) {
+                if ($saleFrom) {
+                    $saleModel->set('valid_from', $saleFrom->format("Y-m-d"));
+                }
+                if ($saleTo) {
+                    $saleModel->set('valid_to', $saleTo->format("Y-m-d"));
+                }
+                $saleModel->save();
             }
         }
     }
 
     protected function _parsePriceField($value)
     {
+        $value = strtolower($value);
         if (is_numeric($value)) {
             return [
                 'operation' => '=$',

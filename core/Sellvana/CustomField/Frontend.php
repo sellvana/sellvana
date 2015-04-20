@@ -59,8 +59,11 @@ class Sellvana_CustomField_Frontend extends BClass
                 BDebug::notice('Empty product id, no variants calculation');
                 continue;
             }
+            /** @var Sellvana_Catalog_Model_Product $p */
             $p = $item['product'];
-            $variants = $variantHlp->orm()->where('product_id', $p->id())->find_many();
+            $pId = $p->id();
+            /** @var Sellvana_CustomField_Model_ProductVariant[] $variants */
+            $variants = $variantHlp->orm()->where('product_id', $pId)->find_many();
             if ($variants) {
                 if (empty($item['variant_select'])) {
                     $item['error'] = $this->BLocale->_('Please specify the product variant');
@@ -68,14 +71,17 @@ class Sellvana_CustomField_Frontend extends BClass
                     continue;
                 }
                 $varValues = $item['variant_select'];
-                $varfields = $varfieldHlp->orm('vf')
-                    ->join('Sellvana_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
-                    ->select('vf.*')
-                    ->select(['f.field_code', 'f.field_name', 'f.frontend_label'])
-                    ->where('vf.product_id', $p->id())
-                    ->find_many_assoc('field_id');
+                /** @var Sellvana_CustomField_Model_ProductVarfield[][] $varfields */
+                if (empty($varfields[$pId])) {
+                    $varfields[$pId] = $varfieldHlp->orm('vf')
+                        ->join('Sellvana_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
+                        ->select('vf.*')
+                        ->select(['f.field_code', 'f.field_name', 'f.frontend_label'])
+                        ->where('vf.product_id', $pId)
+                        ->find_many_assoc('field_id');
+                }
                 $valArr = [];
-                foreach ($varfields as $vf) {
+                foreach ($varfields[$pId] as $vf) {
                     $code = $vf->get('field_code');
                     $valArr[$code] = $varValues[$code];
                 }
@@ -92,38 +98,22 @@ class Sellvana_CustomField_Frontend extends BClass
                     $item['error'] = $this->BLocale->_('Invalid variant');
                     continue;
                 }
-                $varArr = $variant->as_array();
-                $invSku = $varArr['inventory_sku'] !== null ? $varArr['inventory_sku'] : $p->get('inventory_sku');
-                $invModel = $this->Sellvana_Catalog_Model_InventorySku->load($invSku, 'inventory_sku');
 
-                if ($varArr['inventory_sku'] !== null && !$invModel) { // TODO: only for debugging during development
-                    $invModel = $this->Sellvana_Catalog_Model_InventorySku->load($p->get('inventory_sku'), 'inventory_sku');
-                }
-
-                if ($p->get('manage_inventory') && $invModel->get('manage_inventory')) {
-                    $availQty = $invModel->getQtyAvailable();
-                    if (!$availQty) {
-                        $item['error'] = $this->BLocale->_('The variant is out of stock');
-                        continue;
-                    }
-                    if ($availQty < $item['qty']) {
-                        $item['error'] = $this->BLocale->_('The variant currently has only %s items in stock', $availQty);
-                        continue;
-                    }
-                }
-
-                $item['details']['inventory_id'] = $invModel->id();
-                $item['details']['inventory_sku'] = $invModel->get('inventory_sku');
-
-                $item['details']['signature']['inventory_sku'] = $item['details']['inventory_sku'];
-                $item['details']['signature']['variant_fields'] = $valArr;
-
-                if ($varArr['variant_price'] !== null) {
-                    $item['details']['price'] = $varArr['variant_price'];
+                $invSku = $variant->get('inventory_sku');
+                if ($invSku) {
+                    $item['details']['inventory_sku'] = $invSku;
+                    $item['details']['signature']['inventory_sku'] = $invSku;
                 }
 
                 $item['details']['data']['variant_fields'] = $valArr;
-                foreach ($varfields as $vf) {
+                $item['details']['signature']['variant_fields'] = $valArr;
+
+                if ($variant->get('variant_price') !== null) {
+                    //TODO: implement dynamic variant prices
+                    $item['details']['price'] = $variant->get('variant_price');
+                }
+
+                foreach ($varfields[$pId] as $vf) {
                     $item['details']['data']['display'][] = [
                         'label' => $vf->get('field_label') ?: ($vf->get('frontend_label' ?: $vf->get('field_name'))),
                         'value' => $varValues[$vf->get('field_code')],

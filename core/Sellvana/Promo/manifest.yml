@@ -6,7 +6,7 @@ modules:
         description: "Promotions module"
 
         observe:
-            - [ Sellvana_Sales_Workflow_Cart::customerAddsCouponCode, Sellvana_Promo_Main.onWorkflowCustomerAddsCouponCode ]
+            - [ Sellvana_Sales_Workflow_Cart::action_customerAddsCouponCode, Sellvana_Promo_Main.onWorkflowCustomerAddsCouponCode ]
             - [ Sellvana_Sales_Model_Cart_Total_Discount::calculate, Sellvana_Promo_Main.onCartDiscountCalculate ]
             - [ Sellvana_Catalog_Model_Product::getCatalogPrice, Sellvana_Promo_Main.onProductGetCatalogPrice ]
 

@@ -6,88 +6,55 @@
  * @property Sellvana_Sales_Model_StateCustom $Sellvana_Sales_Model_StateCustom
  */
 
-class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller_Abstract
+class Sellvana_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller_Abstract_GridForm
 {
-
     protected $_permission = 'sales/order_custom_state';
 
-    public function action_index()
-    {
-        $this->layout('/orderstatecustom');
-    }
+    protected $_navPath = 'sales/orderstatecustom';
+
+    protected $_gridHref = 'orderstatecustom';
+    protected $_modelClass = 'Sellvana_Sales_Model_StateCustom';
+    protected $_gridTitle = 'Order Custom States';
+    protected $_gridLayoutName = '/orderstatecustom';
+    protected $_recordName = 'Custom State';
+    protected $_mainTableAlias = 'oscs';
+    protected $_formViewPrefix = 'order/customstates-form/';
 
     public function gridConfig()
     {
-        $orm = $this->Sellvana_Sales_Model_StateCustom->orm('oscs')->select('oscs.*');
+        $entityTypes = $this->Sellvana_Sales_Model_StateCustom->fieldOptions('entity_type');
 
-        $config = [
-            'config' => [
-                'id'     => 'state-custom',
-                'caption' => 'State Custom',
-                'data_url' => $this->BApp->href('/orderstatecustom/grid_data'),
-                'edit_url' => $this->BApp->href('/orderstatecustom/grid_data'),
-                'orm' => $orm,
-                'columns' => [
-                    ['type' => 'row_select'],
-                    ['name' => 'id', 'index' => 'oscs.id', 'label' => 'ID', 'width' => 40],
-                    ['name' => 'entity_type', 'index' => 'sc.entity_type', 'label' => 'Entity Type','width' => 85, 'addable'=>true,'editable' => true, 'editor' => 'select', 'options' => $this->Sellvana_Sales_Model_StateCustom->fieldOptions('entity_type'), 'validation' => ['required' => true]],
-                    ['name' => 'state_code', 'index' => 'oscs.state_code', 'label' => 'Code', 'width' =>  150, 'addable'=>true, 'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
-                    ['name' => 'state_label', 'index' => 'oscs.state_label', 'label' => 'Label' ,'width' => 150, 'addable'=>true, 'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
-                    ['type' => 'btn_group', 'buttons' => [
-                            ['name' => 'edit'],
-                            ['name' => 'delete']
-                        ]
-                    ]
-                ],
-                'actions' => [
-                    'add-state-custome' => [
-                        'caption'  => 'Add State Custom',
-                        'type'     => 'button',
-                        'id'       => 'add-state-custom',
-                        'class'    => 'btn-primary',
-                        'callback' => 'showModalToAddStateCustom'
-                    ],
-                    'edit' => true,
-                    'delete' => true
-                ],
-                'filters' => [
-                    ['field' => 'entity_type', 'type' => 'text'],
-                    ['field' => 'state_code', 'type' => 'text'],
-                    ['field' => 'state_label', 'type' => 'text'],
-                ],
-                'grid_before_create' => 'orderCustomStateGridRegister'
-            ]
+        $config = parent::gridConfig();
+        $config['id'] = __CLASS__;
+        $config['columns'] = [
+            ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
+            ['name' => 'id', 'index' => 'oscs.id', 'label' => 'ID', 'width' => 40],
+            ['name' => 'entity_type', 'index' => 'sc.entity_type', 'label' => 'Entity Type','width' => 85,
+                'addable'=>true,'editable' => true, 'editor' => 'select', 'options' => $entityTypes,
+                'validation' => ['required' => true]],
+            ['name' => 'state_code', 'index' => 'oscs.state_code', 'label' => 'Code', 'width' =>  150, 'addable'=>true,
+                'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
+            ['name' => 'state_label', 'index' => 'oscs.state_label', 'label' => 'Label' ,'width' => 150, 'addable'=>true,
+                'editable' => true, 'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
         ];
 
+        $config['actions'] = [
+            'edit' => true,
+            'delete' => true
+        ];
+        $config['filters'] = [
+            ['field' => 'entity_type', 'type' => 'multiselect'],
+            ['field' => 'state_code', 'type' => 'text'],
+            ['field' => 'state_label', 'type' => 'text'],
+        ];
+
+        $config['grid_before_create'] = 'orderCustomStateGridRegister';
+
         return $config;
-    }
-
-    public function action_order_state_custom()
-    {
-        $this->layout('/orderstatecustom');
-    }
-
-    /**
-     * get data
-     */
-    public function action_grid_data()
-    {
-        $view = $this->view('core/backbonegrid');
-        $view->set('grid', $this->gridConfig());
-        $data = $view->generateOutputData();
-        $this->BResponse->json([
-            ['c' => $data['state']['c']],
-            $this->BDb->many_as_array($data['rows']),
-        ]);
-    }
-
-    /**
-     * process POST submitted data
-     */
-
-    public function action_grid_data__POST()
-    {
-        $this->_processGridDataPost('Sellvana_Sales_Model_StateCustom');
     }
 
     /**

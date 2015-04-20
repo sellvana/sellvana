@@ -1,6 +1,6 @@
 modules:
     Sellvana_Sales:
-        version: 0.3.16
+        version: 0.3.21
         channel: beta
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"
@@ -18,12 +18,11 @@ modules:
             FCom_Admin:
                 auto_use: [ views, layout ]
                 routing:
-                    - [ /orders, Sellvana_Sales_Admin_Controller_Orders.index ]
-                    - [ /orders/.action, Sellvana_Sales_Admin_Controller_Orders ]
-                    - [ /orderstatus, Sellvana_Sales_Admin_Controller_OrderStatus.index ]
-                    - [ /orderstatus/.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
-                    - [ /orderstatecustom, Sellvana_Sales_Admin_Controller_OrderStateCustom.index ]
-                    - [ /orderstatecustom/.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
+                    - [ /carts/?.action, Sellvana_Sales_Admin_Controller_Carts ]
+                    - [ /orders/?.action, Sellvana_Sales_Admin_Controller_Orders ]
+                    - [ /payments/?.action, Sellvana_Sales_Admin_Controller_Payments ]
+                    - [ /orderstatus/?.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
+                    - [ /orderstatecustom/?.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
                 observe:
                     - [ "FCom_Admin_View_Header::getNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]

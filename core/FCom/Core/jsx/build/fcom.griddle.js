@@ -3,6 +3,13 @@
 define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
 function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle, Backbone) {
 
+    var dataUrl,
+        gridId,
+        buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
+            var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
+            return dataUrl + beginQueryChar+ 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+        };
+
     /**
      * FCom Griddle Componnent
      */
@@ -16,6 +23,9 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         },
         componentWillMount: function () {
             this.initColumn();
+            //todo: need change way to get right info
+            dataUrl = this.props.config.data_url;
+            gridId = this.props.config.id;
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
@@ -53,7 +63,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     getExternalResults: null,
                     results: config.data.data
                 };
-                state = config.state;
+                //state = config.state;
             } else {
                 props = {
                     getExternalResults: serverMethods.getResults,
@@ -62,8 +72,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     updateRowsExternal: serverMethods.updateRows,
                     results: []
                 };
-                state = config.data.state;
+                //state = config.data.state;
             }
+
+            state = config.data.state;
 
             //set initial page, use for personalization
             var initPage = state.p - 1;
@@ -103,7 +115,11 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
          */
         postUrl: function(dataUrl, gridId, filterString, sortColumn, sortAscending, page, pageSize) {
             var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
-            return dataUrl + beginQueryChar + 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+            var sortType = '';
+            if (sortColumn != '') {
+                sortType = (sortAscending ? 'asc' : 'desc');
+            }
+            return dataUrl + beginQueryChar + 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortType + '&filters=' + (filterString ? filterString : '{}');
         },
         /**
          * get data from external results
@@ -417,7 +433,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     if (dataUrl != '') {
                         var pageSize = this.props.resultsPerPage;
                         var griddleState = this.props.getGriddleState();
-                        var exportUrl = buildGridDataUrl(griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
+                        var exportUrl = serverMethods.postUrl(dataUrl, gridId, griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
                         window.location.href = exportUrl + '&export=true';
                     }
                     break;

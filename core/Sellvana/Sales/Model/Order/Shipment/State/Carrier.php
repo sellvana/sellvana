@@ -1,8 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends FCom_Core_Model_Abstract_State_Custom
+class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends Sellvana_Sales_Model_Order_State_Abstract
 {
-    const LABEL = 'label',
+    const NA = 'na',
+        PENDING = 'pending',
+        LABEL = 'label',
         RECEIVED = 'received',
         SHIPPED = 'shipped',
         IN_TRANSIT = 'in_transit',
@@ -12,6 +14,8 @@ class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends FCom_Core_Model_
         RETURNED = 'returned';
 
     protected $_valueLabels = [
+        self::NA => 'N/A',
+        self::PENDING => 'Pending',
         self::LABEL => 'Label Printed',
         self::RECEIVED => 'Received',
         self::SHIPPED => 'Shipped',
@@ -21,6 +25,16 @@ class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends FCom_Core_Model_
         self::REFUSED => 'Refused',
         self::RETURNED => 'Returned',
     ];
+
+    public function setNotApplicable()
+    {
+        return $this->changeState(self::NA);
+    }
+
+    public function setPending()
+    {
+        return $this->changeState(self::PENDING);
+    }
 
     public function setLabel()
     {

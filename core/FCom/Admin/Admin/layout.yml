@@ -44,7 +44,7 @@ base:
             - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog } ]
             - [ addNav, system/users, { label: Users, href: /users  } ]
             - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
-            - [ addNav, system/emails, { label: System Emails, href: /systememails  } ]
+            #- [ addNav, system/emails, { label: System Emails, href: /systememails  } ]
             - [ addNav, system/templates, { label: Templates, href: /templates  } ]
             - [ addNav, system/backups, { label: Backups, href: /backups  } ]
             - [ addNav, system/importexport, { label: Import/Export, href: /importexport  } ]
@@ -319,9 +319,8 @@ form:
             - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10 } ]
 
 /modules:
-    - { include: base }
+    - { include: default_griddle }
     - { hook: main, views: modules }
-    - { view: admin/nav, do: [[ setNav, modules/installed ]] }
 
 /templates/form:
     - { include: lib_js_codemirror }

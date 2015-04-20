@@ -10,6 +10,13 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
     protected $_model;
 
     /**
+     * Description for state contexts
+     *
+     * @var string[]
+     */
+    protected $_stateLabels = [];
+
+    /**
      * Concrete state objects for this model
      *
      * @var FCom_Core_Model_Abstract_State_Concrete[]
@@ -38,6 +45,11 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
     public function factory($model)
     {
         return $this->BClassRegistry->instance(get_class($this), [$model]);
+    }
+
+    public function getStateLabel($stateValue)
+    {
+        return !empty($this->_stateLabels[$stateValue]) ? $this->_stateLabels[$stateValue] : null;
     }
 
     public function getModel()

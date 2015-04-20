@@ -16,10 +16,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     protected $_recordName = 'User';
     protected $_mainTableAlias = 'au';
     protected $_navPath = 'system/users';
-
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
+    protected $_formTitleField = 'username';
 
     public function gridConfig()
     {
@@ -27,6 +24,10 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
 
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'width' => 85, 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'cell' => 'integer'],
             ['name' => 'username', 'label' => 'User Name', 'width' => 100],
             ['name' => 'email', 'label' => 'Email', 'width' => 150],
@@ -39,10 +40,6 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
                 'options' => $this->FCom_Admin_Model_User->fieldOptions('status')],
             ['name' => 'create_at', 'label' => 'Created', 'width' => 100],
             ['name' => 'update_at', 'label' => 'Updated', 'width' => 100],
-            ['type' => 'btn_group', 'width' => 85, 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete'],
-            ]],
         ];
         $config['actions'] = [
             'edit' => ['caption' => 'status'],
@@ -63,10 +60,9 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
-        $m = $args['model'];
+
         $args['view']->set([
-            'sidebar_img' => $this->BUtil->gravatar($m->email),
-            'title' => $m->id ? 'Edit User: ' . $m->username : 'Create New User',
+            'sidebar_img' => $this->BUtil->gravatar($args['model']->get('email')),
         ]);
     }
 

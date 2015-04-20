@@ -17,6 +17,11 @@ class Sellvana_CustomerGroups_Model_Group extends FCom_Core_Model_Abstract
         ['code', '@required'],
     ];
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['code'],
+    ];
+
     /**
      * Get groups in format suitable for select drop down list
      * @return array

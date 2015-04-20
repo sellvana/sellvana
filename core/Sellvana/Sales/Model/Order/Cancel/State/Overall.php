@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_Cancel_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_Cancel_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const REQUESTED = 'requested',
         PENDING = 'pending',
@@ -13,7 +13,7 @@ class Sellvana_Sales_Model_Order_Cancel_State_Overall extends FCom_Core_Model_Ab
         self::PENDING => 'Pending',
         self::APPROVED => 'Approved',
         self::DECLINED => 'Declined',
-        self::CANCELED => 'Canceled',
+        self::COMPLETE => 'Canceled',
     ];
 
     protected $_setValueNotificationTemplates =[
@@ -42,9 +42,9 @@ class Sellvana_Sales_Model_Order_Cancel_State_Overall extends FCom_Core_Model_Ab
         return $this->changeState(self::DECLINED);
     }
 
-    public function setCanceled()
+    public function setComplete()
     {
-        return $this->changeState(self::CANCELED);
+        return $this->changeState(self::COMPLETE);
     }
 
 }

@@ -6,6 +6,12 @@ class Sellvana_Sales_Model_Order_Shipment_State extends FCom_Core_Model_Abstract
         CARRIER = 'carrier',
         CUSTOM = 'custom';
 
+    protected $_stateLabels = [
+        self::OVERALL => 'Overall',
+        self::CARRIER => 'Carrier',
+        self::CUSTOM => 'Custom',
+    ];
+
     /**
      * Order linked
      *

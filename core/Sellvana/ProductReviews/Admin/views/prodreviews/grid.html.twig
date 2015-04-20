@@ -1,20 +1,3 @@
-{% set grid = THIS.get('grid') %}
-<div class="f-admin-main-view">
-  <div class="page-header f-admin-page-header">
-      <h1 class="f-page-title">
-          <i class="icon-table"></i>
-          {{ THIS.get('title') }}
-      </h1>
-      <div class="btn-group">
-          {{ THIS.get('actions') | join(' ') | raw }}
-      </div>
-  </div>
-
-  <div class="f-admin-main">
-      {#{{ THIS.view('core/backbonegrid').set('grid', {config: grid['config']}) | raw }}#}
-      {{ THIS.view('core/griddle').set('grid', {config: grid['config']}) | raw }}
-  </div>
-</div>
 <script>
 
 require(["jquery", "underscore", "jquery.validate"], function($, _) {

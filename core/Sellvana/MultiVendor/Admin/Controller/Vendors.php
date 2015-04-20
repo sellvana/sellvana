@@ -23,6 +23,10 @@ class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controlle
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete', 'edit_inline' => false],
+            ]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'v.id'],
             ['name' => 'vendor_name', 'label' => 'Vendor Name', 'index' => 'v.vendor_name'],
             ['name' => 'notify_type', 'label' => 'Notification', 'options' => $notifyTypeOptions],
@@ -30,10 +34,6 @@ class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controlle
             ['name' => 'email_support', 'label' => 'Email for Support', 'index' => 'v.email_support'],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'v.create_at', 'formatter' => 'date'],
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 'v.update_at', 'formatter' => 'date'],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete', 'edit_inline' => false],
-            ]]
         ];
         $config['actions'] = [
             'delete' => true,

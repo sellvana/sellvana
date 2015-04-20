@@ -11,11 +11,13 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
     protected $_modelClass = 'Sellvana_CatalogIndex_Model_Field';
     protected $_gridHref = 'catalogindex/fields';
     protected $_gridTitle = 'Catalog Index Fields';
+    protected $_gridLayoutName = '/catalogindex/fields';
     protected $_recordName = 'Index Field';
     protected $_mainTableAlias = 'idxf';
     protected $_permission = 'catalog_index';
     protected $_navPath = 'catalog/index-fields';
     protected $_formViewPrefix = 'catalogindex/fields/form/';
+    protected $_formTitleField = 'field_label';
 
     public function gridConfig()
     {
@@ -24,6 +26,8 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
+                'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'idxf.id'],
             ['type' => 'input', 'name' => 'field_name', 'label' => 'Name', 'index' => 'idxf.field_name',
                 'editable' => true, 'addable' => true, 'validation' =>
@@ -62,8 +66,6 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
                 'editor' => 'select', 'width' => 80, 'addable' => true, 'editable' => true],
             ['name' => 'source_callback', 'label' => 'Source Callback', 'index' => 'idxf.source_callback',
                 'width' => 80, 'hidden' => true],
-            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
-                'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
 //            'new'    => array('caption' => 'Add New Index Field', 'modal' => true),
@@ -101,22 +103,29 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
 
         $gridView = $args['page_view'];
         $actions = $gridView->get('actions');
-        $actions += [
-            'reindex_force' => ' <button class="btn btn-primary btn-progress _modal" data-toggle="modal" data-target="#progress" type="button"><span>' . $this->BLocale->_('Force Reindex')
-                . '</span></button>',
+        $actions['reindex_force'] = [
+            'button',
+            [
+                'class' => ['btn', 'btn-primary', 'btn-progress', '_modal'],
+                'data-toggle' => 'modal',
+                'data-target' => '#progress',
+                'type' => 'button',
+            ],
+            [
+                ['span', null, $this->BLocale->_('Force Reindex')]
+            ]
         ];
-        $actions['new'] = '<button type="button" id="add_new_index_field" class="btn grid-new btn-primary _modal">'
-            . $this->BLocale->_('Add New Index Field') . '</button>';
+        $actions['new'] = [
+            'button',
+            [
+                'id' => 'add_new_index_field',
+                'class' => ['btn', 'grid-new', 'btn-primary', '_modal'],
+            ],
+            [
+                ['span', null, $this->BLocale->_('Add New Index Field')],
+            ]
+        ];
         $gridView->set('actions', $actions);
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $title = $m->id ? 'Edit Index Field: ' . $m->field_label : 'Create New Index Field';
-        if (($head = $this->view('head'))) $head->addTitle($title);
-        $args['view']->set(['title' => $title]);
     }
 
     public function action_unique__POST()

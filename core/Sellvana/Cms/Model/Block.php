@@ -47,7 +47,10 @@ class Sellvana_Cms_Model_Block extends FCom_Core_Model_Abstract
         ['page_enabled', '@integer'],
         ['page_url', 'Sellvana_Cms_Model_Block::rulePageUrlUnique', 'Duplicate URL Key'],
     ];
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['handle'],
+    ];
     /**
      * @return bool
      */

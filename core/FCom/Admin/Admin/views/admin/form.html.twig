@@ -6,10 +6,7 @@
 {% set validator = THIS.validator(formId, model) %}
 
 <script>
-
-
     require(["jquery", "underscore", "fcom.admin", "bootstrap", "jquery.validate", 'fcom.password'], function($, _) {
-
         $(function() {
             window.adminForm = FCom.Admin.form({
                 form:     '{{ formId }}',
@@ -54,7 +51,7 @@
                     $('ul#tabs').find('li a').each(function(index) {
                         var val = info[$(this).attr('href')];
                         if (typeof(val) !== 'undefined')
-                         {
+                        {
 //                            if ($(this).find('span.badge').length === 0) {
 //                                $(this).append('<span class="badge badge-important"></span>');
 //                            }
@@ -126,52 +123,52 @@
     });
 </script>
 <div class="f-admin-main-view f-sidebar-view">
-  <form id="{{ formId }}" class="form form-horizontal validate-form" action="{{ formUrl }}" method="post">
-      <div class="page-header f-admin-page-header">
-        <h1 class="f-page-title">
-            <i class="icon-table"></i>
-            {{ THIS.get('title') }}
-        </h1>
-        <div class="btn-group">
-            {{ THIS.get('actions') | join(' ') | raw }}
+    <form id="{{ formId }}" class="form form-horizontal validate-form" action="{{ formUrl }}" method="post">
+        <div class="page-header f-admin-page-header">
+            <h1 class="f-page-title">
+                <i class="icon-table"></i>
+                {{ THIS.get('title') }}
+            </h1>
+            <div class="btn-group">
+                {{ THIS.getActionsHtml() | raw }}
+            </div>
+            {% if THIS.get('other_info') %}
+                <div class="entity-glimpse">{{ THIS.get('other_info') }}</div>
+            {% endif %}
         </div>
-          {% if THIS.get('otherInfo') %}
-              <div class="entity-glimpse">{{ THIS.get('otherInfo') }}</div>
-          {% endif %}
-      </div>
-  
-      {{ THIS.view('core/messages') | raw }}
-  
-      <div class="row f-admin-main">
-        <div class="tabbable tabs-left">
-          <ul class="nav nav-tabs nav-stacked f-admin-nav-sidebar" id="tabs">
-              {% if THIS.get('sidebar_img') %}
-                  <li><img src="{{ THIS.get('sidebar_img') | raw }}" width="98" height="98" /></li>
-              {%  endif %}
-              {% for k, tab in tabs %}
-                  {% if tab.disabled is empty %}
-                      <li>
-                          <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
-                              <span class="icon"></span>
-                              {{ tab.label }}
-                          </a>
-                      </li>
-                  {% endif %}
-              {% endfor %}
-          </ul>
-          <div class="tab-content">
-              {% for k, tab in tabs %}
-                  <div class="tab-pane js-main-form-tab" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
-                      {% if not tab.async %}
-                          {{ THIS.view(tab.view).set({validator: validator}) | raw }}
-                      {% endif %}
-                  </div>
-              {% endfor %}
-          </div>
-        </div>
-      </div>
-  </form>
 
-  <div id="fcom_append_form">
-  </div>
+        {{ THIS.view('core/messages') | raw }}
+
+        <div class="row f-admin-main">
+            <div class="tabbable tabs-left">
+                <ul class="nav nav-tabs nav-stacked f-admin-nav-sidebar" id="tabs">
+                    {% if THIS.get('sidebar_img') %}
+                        <li><img src="{{ THIS.get('sidebar_img') | raw }}" width="98" height="98" /></li>
+                    {%  endif %}
+                    {% for k, tab in tabs %}
+                        {% if tab.disabled is empty %}
+                            <li>
+                                <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
+                                    <span class="icon"></span>
+                                    {{ tab.label }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <div class="tab-content">
+                    {% for k, tab in tabs %}
+                        <div class="tab-pane js-main-form-tab" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
+                            {% if not tab.async %}
+                                {{ THIS.view(tab.view).set({validator: validator}) | raw }}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div id="fcom_append_form">
+    </div>
 </div>

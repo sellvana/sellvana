@@ -1,0 +1,25 @@
+<!--{ label: Custom Order State }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator} %}
+
+
+<div class="f-section" id="customorderstate-container">
+    <fieldset class="adm-section-group">
+        {{ forms.select(fieldData, {field:'entity_type', label:'Entity Type'|_, options:m.fieldOptions('entity_type'), select2:true}) }}
+        {{ forms.input(fieldData, {field:'state_code', label:'Code'|_}) }}
+        {{ forms.input(fieldData, {field:'state_label', label:'Label'|_}) }}
+        {{ forms.input(fieldData, {field:'concrete_class', label:'Class'|_}) }}
+    </fieldset>
+</div>
+
+<script>
+    require(['jquery', 'fcom.admin.form'], function($) {
+        $(function() {
+            //adminForm.wysiwygCreate('main-content');
+        });
+    });
+</script>

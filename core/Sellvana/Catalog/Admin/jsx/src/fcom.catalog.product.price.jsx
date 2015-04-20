@@ -296,7 +296,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         {[qty, dateRange]}
                     </td>
                     <td>
-                        {price['calc_amount'] ? <span className="help-block">{price['calc_amount']}</span> : null}
+                        {price['calc_amount'] ? <span className="help-block">{price['calc_amount'].toFixed(2)}</span> : null}
                     </td>
                 </tr>
             );

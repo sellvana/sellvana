@@ -9,6 +9,5 @@ base:
             - [ addTab, Sellvana_CatalogIndex, { label: Catalog Index, group: catalog, async: true } ]
 
 /catalogindex/fields:
-     - { include: base }
+     - { include: default_griddle }
      - { hook: main, views: fields }
-     - { view: admin/nav, do: [[ setNav, catalog/index-fields ]] }

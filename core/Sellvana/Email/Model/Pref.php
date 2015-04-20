@@ -20,6 +20,11 @@ class Sellvana_Email_Model_Pref extends FCom_Core_Model_Abstract
         ['email', '@email'],
     ];
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['email'],
+    ];
+
     /**
      * @param string $email
      * @return $this

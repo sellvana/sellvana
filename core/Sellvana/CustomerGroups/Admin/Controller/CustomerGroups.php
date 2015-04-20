@@ -17,10 +17,7 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
     protected $_mainTableAlias = 'cg';
     protected $_navPath = 'customer/customer-groups';
     protected $_permission = 'customer_groups';
-
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
+    protected $_formTitleField = 'title';
 
     public function gridConfig()
     {
@@ -28,13 +25,13 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'width' => 50, 'index' => 'cg.id'],
             ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title',
                 'editable' => true, 'addable' => true, 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code',
                 'editable' => true, 'addable' => true,
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('customer-groups/unique')]],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
             'new' => array('caption' => 'Add New Customer Group', 'modal' => true),
@@ -55,24 +52,6 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_customer_group" class="btn grid-new btn-primary _modal">'
                 . $this->BLocale->_('Add New Customer Group') . '</button>']]);
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $title = $m->id ? 'Edit Customer Group: ' . $m->title : 'Create New Customer Group';
-        $this->addTitle($title);
-        $args['view']->set(['title' => $title]);
-    }
-
-    public function addTitle($title = '')
-    {
-        /* @var $v BViewHead */
-        $v = $this->view('head');
-        if ($v) {
-            $v->addTitle($title);
-        }
     }
 
     public function formPostAfter($args)

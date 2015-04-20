@@ -26,6 +26,15 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 'orm' => $orm,
                 'columns' => [
                     ['type' => 'row_select'],
+                    ['type' => 'btn_group', 'buttons' => [
+                        [
+                            'name' => 'custom',
+                            'icon' => 'icon-edit-sign',
+                            'cssClass' => 'btn-custom',
+                            'callback' => 'showModalToEditFieldset'
+                        ],
+                        ['name' => 'delete']
+                    ]],
                     ['name' => 'id', 'label' => 'ID', 'width' => 55, 'sorttype' => 'number', 'key' => true, 'hidden' => true],
                     ['type' => 'input', 'name' => 'set_code', 'label' => 'Set Code', 'width' => 100,  'addable' => true,
                             'editable' => true, 'validation' => ['required' => true,
@@ -33,15 +42,6 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                     ['type' => 'input', 'name' => 'set_name', 'label' => 'Set Name', 'width' => 200,  'addable' => true,
                             'editable' => true , 'validation' => ['required' => true]],
                     ['name' => 'num_fields', 'label' => 'Fields', 'width' => 30],
-                    ['type' => 'btn_group', 'buttons' => [
-                        [
-                            'name' => 'custom', 
-                            'icon' => 'icon-edit-sign', 
-                            'cssClass' => 'btn-custom', 
-                            'callback' => 'showModalToEditFieldset'
-                        ],
-                        ['name' => 'delete']
-                    ]]
                 ],
                 'actions' => [
                     'add-fieldset' => [
@@ -62,6 +62,11 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 'grid_before_create' => 'customFieldsGridRegister'
 //                'new_button' => '#add_new_field_set'
             ]
+        ];
+
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'fieldsetGridRegister'
         ];
 
         return $config;
@@ -162,6 +167,11 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 'edit_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
                 'columns' => [
                     ['type' => 'row_select'],
+                    ['type' => 'btn_group', 'buttons' => [
+                        ['name' => 'edit', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
+                        //['name' => 'edit'],
+                        ['name' => 'delete']
+                    ]],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['type' => 'input', 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true,
@@ -180,7 +190,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                             /*'facet_select'=>array('label'=>'Facet', 'width'=>200, 'editable'=>true,
                                 'options'=>array('No'=>'No', 'Exclusive'=>'Exclusive', 'Inclusive'=>'Inclusive')),*/
                     ['type' => 'input', 'name' => 'table_field_type', 'label' => 'DB Type', 'width' => 180, 'editor' => 'select',
-                            'addable' => true, 'validation' => ['required' => true], 'options' => $fld->fieldOptions('table_field_type')],
+                            'addable' => true, 'editable' => true, 'validation' => ['required' => true], 'options' => $fld->fieldOptions('table_field_type')],
                     ['type' => 'input', 'name' => 'admin_input_type', 'label' => 'Input Type', 'width' => 180,
                         'editable' => true, 'editor' => 'select', 'addable' => true, 'multirow_edit' => true,
                         'validation' => ['required' => true], 'options' => $fld->fieldOptions('admin_input_type')],
@@ -193,11 +203,6 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                     ['type' => 'input', 'name' => 'required', 'label' => 'Required', 'width' => 90, 'editable' => true,
                         'editor' => 'select', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true],
                         'options' => ['1' => 'Yes', '0' => 'No']],
-                    ['type' => 'btn_group', 'buttons' => [
-                        ['name' => 'edit', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
-                        //['name' => 'edit'],
-                        ['name' => 'delete']
-                    ]]
                 ],
                 'filters' => [
                     ['field' => 'field_code', 'type' => 'text'],
@@ -214,7 +219,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 ],
                 'actions' => [
                     'add-field' => [
-                        'caption' => 'Add Field',
+                        'caption' => 'Add a field',
                         'type' => 'button',
                         'id' => 'add-field-from-grid',
                         'class' => 'btn-primary',
@@ -351,7 +356,11 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
     {
         $r = $this->BRequest;
         $data = $r->post();
-        $field_ids = $data['field_ids'];
+        $field_ids = '';
+        if (isset($data['field_ids'])) {
+            $field_ids = $data['field_ids'];
+        }
+        
         $model = $this->Sellvana_CustomField_Model_SetField;
         switch ($r->post('oper')) {
             case 'add':

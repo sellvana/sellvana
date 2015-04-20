@@ -15,16 +15,17 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
     protected $_modelClass = 'Sellvana_Cms_Model_Block';
     protected $_gridTitle = 'CMS Block';
     protected $_recordName = 'CMS Block';
-
-    protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_defaultGridLayoutName = 'default_griddle';
+    protected $_formTitleField = 'handle';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'handle', 'label' => 'Handle'],
             ['name' => 'description', 'label' => 'Description', 'editable' => true],
             ['type' => 'input', 'name' => 'renderer', 'label' => 'Renderer', 'editor' => 'select',
@@ -38,10 +39,6 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
             ['name' => 'meta_description', 'label' => 'Meta Description', 'hidden' => true],
             ['name' => 'meta_keywords', 'label' => 'Meta Keywords', 'hidden' => true],
             ['name' => 'modified_time', 'label' => 'Modified Time', 'hidden' => true],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete'],
-            ]],
         ];
         $config['actions'] = [
             'edit' => true,
@@ -53,16 +50,6 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         ];
         return $config;
     }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $args['view']->set([
-            'title' => $m->id ? 'Edit CMS Block: ' . $m->handle : 'Create New CMS Block',
-        ]);
-    }
-
 
     /**
      * @param $model Sellvana_Catalog_Model_Product

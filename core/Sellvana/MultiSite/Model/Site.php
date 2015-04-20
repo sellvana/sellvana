@@ -27,6 +27,12 @@ class Sellvana_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         ['root_category_id', '@integer'],
     ];
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['name', 'root_category_id'],
+        'related'    => ['root_category_id' => 'Sellvana_Catalog_Model_Category.id'],
+    ];
+
     public function onAfterSave()
     {
         parent::onAfterSave();

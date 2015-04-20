@@ -30,11 +30,16 @@
 class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_cart_item';
-
+    protected static $_origClass = __CLASS__;
     /**
      * @var Sellvana_Catalog_Model_Product
      */
     protected $_product;
+
+    /**
+     * @var Sellvana_Catalog_Model_InventorySku
+     */
+    protected $_inventory;
 
     /**
      * @var Sellvana_Sales_Model_Cart
@@ -42,6 +47,17 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     protected $_cart;
 
     protected $_relatedItemsCache = [];
+
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['cart_id', 'product_id', 'inventory_id', 'unique_hash'],
+        'related'    => [
+            'cart_id'        => 'Sellvana_Sales_Model_Cart.id',
+            'product_id'     => 'Sellvana_Catalog_Model_Product.id',
+            'inventory_id'   => 'Sellvana_Catalog_Model_InventorySku.id',
+            'parent_item_id' => 'Sellvana_Sales_Model_Cart_Item.id'
+        ],
+    ];
 
     /**
      * @param Sellvana_Catalog_Model_Product $product
@@ -54,6 +70,7 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param boolean $loadIfMissing
      * @return Sellvana_Catalog_Model_Product
      */
     public function getProduct($loadIfMissing = true)
@@ -62,6 +79,28 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
             $this->_product = $this->relatedModel('Sellvana_Catalog_Model_Product', $this->get('product_id'));
         }
         return $this->_product;
+    }
+
+    /**
+     * @param Sellvana_Catalog_Model_InventorySku $inv
+     * @return $this
+     */
+    public function setInventory(Sellvana_Catalog_Model_InventorySku $inv)
+    {
+        $this->_inventory = $inv;
+        return $this;
+    }
+
+    /**
+     * @param boolean $loadIfMissing
+     * @return Sellvana_Catalog_Model_InventorySku
+     */
+    public function getInventory($loadIfMissing = true)
+    {
+        if (!$this->_inventory && $loadIfMissing) {
+            $this->_inventory = $this->relatedModel('Sellvana_Catalog_Model_InventorySku', $this->get('inventory_id'));
+        }
+        return $this->_inventory;
     }
 
     /**
@@ -180,7 +219,7 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     public function __destruct()
     {
         parent::__destruct();
-        unset($this->_product, $this->_cart, $this->_relatedSkuProductCache);
+        unset($this->_product, $this->_inventory, $this->_cart, $this->_relatedSkuProductCache);
     }
 }
 
