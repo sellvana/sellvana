@@ -45,8 +45,6 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             console.log('config', this.props.config);
             var config = this.props.config;
 
-            console.log(config);
-
             //prepare props base on data mode
             var props, state;
             if (config.data_mode == 'local') {

@@ -343,8 +343,9 @@ var Griddle = React.createClass({
 
         //set current filter state
         var filters = {};
-        if (this.getConfig('filters').length) {
-            _.forEach(this.getConfig('filters'), function(f) {
+        var configFilters = this.getConfig('filters');
+        if (configFilters && configFilters.length) {
+            _.forEach(configFilters, function(f) {
                 if (f.val != '') {
                     f.submit = true;
                     filters[f.field] = f;

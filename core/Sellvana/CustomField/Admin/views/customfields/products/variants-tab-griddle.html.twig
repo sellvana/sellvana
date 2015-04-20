@@ -1,0 +1,26 @@
+{% set ctrl = APP.instance('Sellvana_CustomField_Admin_Controller_Products') %}
+{% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
+{% set variantConfig = ctrl.variantGridConfig(model) %}
+
+<div class="well clearfix">
+    <div class="pull-left" style="width: 245px">
+        <select id="sel_var_field" class="form-control" style="width:150px;">
+            {{ UTIL.optionsHtml(APP.instance('Sellvana_CustomField_Model_Field').getDropdowns()) | raw }}
+        </select>
+        <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
+    </div>
+    <div class="col-sm-8" style="position: relative">
+        <ol id="variants-tab-field" class="dd-list columns dd-list-axis-x"></ol>
+    </div>
+</div>
+<div class="hidden" id="grid-field-hidden">
+    {{ THIS.view('core/griddle').set('grid', fieldConfig) | raw }}
+</div>
+<div class="f-variants-col row">
+  <div class="col-sm-12">
+    {{ THIS.view('core/griddle').set('grid', variantConfig) | raw }}
+  </div>
+</div>
+
+<input type='hidden' id='vfield_ids' name='vfields' />
+<input type='hidden' id='variants' name='variants' />
