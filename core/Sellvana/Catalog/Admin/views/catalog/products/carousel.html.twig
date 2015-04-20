@@ -1,7 +1,16 @@
 {% macro widget__product_carousel(widget, library, context) %}
-    {#{{ dump(widget) }}#}
-    <input type="hidden" name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" value="{{ widget.value }}"
-           id="product-carousel-{{ widget.id }}" class="form-control">
+    {% import LAYOUT.view('core/form-elements').twigName() as forms %}
+    <div class="form-group">
+        <label for="product-carousel-{{ widget.id }}" class="control-label col-md-2">{{ "Product SKUs"|_ }}</label>
+        <div class="col-md-5">
+            <input type="hidden" name="{{ context.prefix }}[widgets][{{ widget.id }}][value]" value="{{ widget.value }}"
+                   id="product-carousel-{{ widget.id }}" class="form-control">
+        </div>
+    </div>
+    {{ forms.input({label: "Carousel Height"|_, type: 'number', name: "#{context.prefix}[widgets][#{widget.id}][height]", value: widget.height|default(400), field: "height-#{widget.id}"}) }}
+    {{ forms.input({label: "Carousel Speed"|_, type: 'number', name: "#{context.prefix}[widgets][#{widget.id}][interval]", value:widget.interval|default(5000), field: "interval-#{widget.id}"}) }}
+    {{ forms.boolean({label: "Pause Carousel on Hover"|_, name: "#{context.prefix}[widgets][#{widget.id}][pause]", value:widget.pause|default(true), field: "pause-#{widget.id}"}) }}
+    {{ forms.boolean({label: "Allow Carousel to React to Keyboard"|_, name: "#{context.prefix}[widgets][#{widget.id}][keyboard]", value:widget.keyboard|default(false), field: "keyboard-#{widget.id}"}) }}
     <script type="text/javascript">
         require(['jquery', 'select2'], function ($) {
             var url = '{{ APP.href('/catalog/products/skus') }}';
