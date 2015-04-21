@@ -411,6 +411,33 @@ class FCom_Core_LayoutEditor extends BClass
             },
         ]);
 
+        $this->addWidgetType('youtube', [
+            'title' => 'Video Embed (YouTube)',
+            'pos' => 120,
+            'options' => $templates,
+            'source_view' => 'core/widgets/video',
+            'view_name'   => 'widgets/video',
+            'compile' => function ($args) {
+                $w = $args['widget'];
+                $view_name        = $w['view_name'];
+                $args['layout'][] = ['hook' => $w['area'], 'views' => $view_name];
+                $update = [
+                    'widget_id'  => $w['id'],
+                    'url'        => !empty($w['url'])? $w['url']: null,
+                    'height'     => !empty($w['height'])? $w['height']: null,
+                    'width'      => !empty($w['width'])? $w['width']: null,
+                    'use_iframe' => !empty($w['use_iframe'])? $w['use_iframe']: null,
+                ];
+
+                if (!empty($w['custom_params'])) {
+                    foreach ($w['custom_params'] as $p) {
+                        $update[$p['k']] = $p['v'];
+                    }
+                }
+                $args['layout'][] = ['view' => $view_name, 'set' => $update];
+            },
+        ]);
+
         $this->addWidgetType('remove', [
             'title' => 'Remove View',
             'pos' => 100,

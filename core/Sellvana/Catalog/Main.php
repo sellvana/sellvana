@@ -68,10 +68,10 @@ class Sellvana_Catalog_Main extends BClass
                             'widget_id' => $w['id'],
                             'skus' => $skus,
                             'products' => $products,
-                            'height' => $w['height'],
-                            'interval' => $w['interval'],
-                            'pause' => $w['pause'],
-                            'keyboard' => $w['keyboard']
+                            'height' => !empty($w['height'])? $w['height']:null,
+                            'interval' => !empty($w['interval'])? $w['interval']: null,
+                            'pause' => !empty( $w['pause'])? $w['pause']: null,
+                            'keyboard' => !empty($w['keyboard'])? $w['keyboard']: null,
                         ]
                     ];
                 }
