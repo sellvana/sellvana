@@ -2,9 +2,210 @@
 {% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
 {% set variantConfig = ctrl.variantGridConfig(model) %}
 
+<script type="text/javascript">
+
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+        var variantGrid;
+
+        /**
+         * object contains property and method to hand variant images
+         * @type { {selectClass: string, listClass: string, inputClass: string, thumbUrl: string, images: Array, init: Function, getImages: Function, addImages: Function, removeImages: Function, updateInputImageValue: Function, renderImageItemForList: Function, populateImages: Function, handleEventImages: Function} }
+         */
+        var variantImages = {
+            selectClass: '.variant-image',
+            listClass: '.list-variant-image',
+            inputClass: '.store-variant-image-id',
+            thumbUrl: '/resize.php?s=30&f=media/product/images/',
+            images: [],
+            /**
+             * init and set images list from grid config
+             */
+            init: function() {
+                if (variantGrid) {
+                    var listImages = _.findWhere(variantGrid.getConfig('columns'), { name: 'list_image' });
+                    if (listImages && typeof listImages.default !== 'undefined' && listImages.default && listImages.default.length) {
+                        this.images = listImages.default;
+                    }
+                } else {
+                    console.log('DEBUG: no variantGrid');
+                }
+            },
+            /*getImages: function() {
+                return this.images;
+            },
+            addImages: function(images) {
+                var _this = this;
+                if (images instanceof Array && images.length) {
+                    _.forEach(images, function(img) {
+                        if (img.file_id && !_.findWhere(_this.images, { file_id: img.file_id })) {
+                            _this.images.push(img);
+                        }
+                    });
+                }
+            },
+            removeImages: function(imageFileIds) {
+                var ids = imageFileIds.split(',');
+                if (this.images.length) {
+                    var images = _.filter(this.images, function(img) {
+                        return _.contains(ids, img.file_id);
+                    });
+
+                    this.images = images;
+                }
+            },*/
+            /**
+             * update image id to input hidden of each row, use this when submit
+             * @param rowId
+             */
+            updateInputImageValue: function(rowId) {
+                var el = $(variantGrid.getDOMNode()).find('#' + rowId);
+                if (el) {
+                    var id = [];
+                    //var idTr = $(el).parents('tr').attr('id');
+                    el.find(this.listClass).find('i').each(function() {
+                        id.push($(this).attr('data-id'));
+                    });
+                    var stringId = id.join(',');
+                    el.find(this.inputClass).val(stringId);
+                }
+            },
+            /**
+             * return new jquery element item for list selected images
+             * @param obj
+             * @returns {*|jQuery}
+             */
+            renderImageItemForList: function(obj) {
+                return $('<li>', { 'class': 'dd-item dd3-item' }).append(
+                        $('<div>', { 'class': 'dd3-content' }).append(
+                                $('<img>', { src: variantImages.thumbUrl + obj.file_name }),
+                                $('<label>', { text: obj.file_name }),
+                                $('<i>', {
+                                    'class': 'icon-remove pull-right btn-link btn-delete-variant-image',
+                                    'data-id': obj.file_id
+                                })
+                        )
+                );
+            },
+            /**
+             * populate image items to dropdown images and list selected images
+             */
+            populateImages: function() {
+                if (variantGrid && this.images.length) {
+                    var selectClass = this.selectClass;
+                    var listClass = this.listClass;
+                    var inputClass = this.inputClass;
+                    var images = this.images;
+
+                    _.forEach(variantGrid.getRows(), function(row) {
+                        var component = variantGrid.getRowComponent(row.id);
+                        if (component) {
+                            var dom = $(component.getDOMNode());
+                            var imageIds = dom.find(inputClass).val().split(',');
+                            var selectEle = dom.find(selectClass);
+                            var listEle = dom.find(listClass);
+
+                            //empty html first
+                            selectEle.html('').append('<option>', {value: ''});
+                            listEle.html('');
+
+                            //populate items
+                            _.forEach(images, function(img) {
+                                var hide = '';
+                                if (imageIds.indexOf(img.file_id) != '-1') {
+                                    listEle.append(variantImages.renderImageItemForList(img));
+                                    listEle.removeClass('hide');
+                                    hide = 'hide';
+                                }
+
+                                selectEle.append($('<option>', {
+                                    value: img.file_id,
+                                    text: img.file_name,
+                                    "data-subfolder": img.folder,
+                                    'class': hide
+                                }));
+                            });
+                        } else {
+                            console.log('DEBUG: cannot find the component of row' + row.id, row);
+                        }
+                    });
+
+
+                } else {
+                    //empty dropdown images and list images
+                    $(variantGrid.getDOMNode()).find(this.selectClass).html('').append($('<option>', {value: ''}));
+                    $(variantGrid.getDOMNode()).find(this.listClass).html('');
+                }
+            },
+            /**
+             * handle event for variant images
+             * - init select 2 for dropdown images
+             * - onChange select
+             * - onClick delete image
+             */
+            handleEventImages: function() {
+                var dom = $(variantGrid.getDOMNode());
+                var format = function (state) {
+                    if (!state.id) return state.text;
+                    return "<img src='" + variantImages.thumbUrl + state.text + "'/>  " + state.text;
+                };
+
+                //init select2 with format
+                dom.find(this.selectClass).select2({
+                    formatResult: format,
+                    formatSelection: format
+                });
+
+                //event when select image item
+                dom.on('change', this.selectClass, function() {
+                    var option = $(this).find(':selected');
+                    var image = {
+                        file_id: $(this).val(),
+                        file_name: option.text()
+                    };
+                    $(this).parent().find(variantImages.listClass).removeClass('hide').append(variantImages.renderImageItemForList(image));
+                    option.addClass('hide');
+                    var rowId = $(this).parents('tr').attr('id');
+                    //console.log('DEBUG: add image to row id: ' +  rowId);
+                    variantImages.updateInputImageValue(rowId);
+                    $(this).select2('data', null);
+                });
+
+                dom.on('click', '.btn-delete-variant-image', function() {
+                    var td = $(this).parents('td');
+                    td.find(variantImages.selectClass).find('option[value="'+ $(this).attr('data-id') +'"]').removeClass('hide');
+                    td.find(variantImages.selectClass).removeClass('hide');
+                    if (td.find(variantImages.listClass).find('li').length == 1) {
+                        td.find(variantImages.listClass).addClass('hide');
+                    }
+                    $(this).parents('li').remove();
+                    var rowId = td.parents('tr').attr('id');
+                    //console.log('DEBUG: delete image from row id: ' +  rowId);
+                    variantImages.updateInputImageValue(rowId)
+                });
+            }
+        };
+
+        /**
+         * variant grid callback trigger when componentDidMount | componentDidUpdate
+         * @param grid
+         * @param triggerName
+         */
+        window.variantGriddleRegister = function(grid, triggerName) {
+            variantGrid = grid;
+            if (triggerName == 'componentDidMount') {
+                variantImages.init();
+            }
+            variantImages.populateImages();
+            variantImages.handleEventImages();
+        };
+
+
+    });
+</script>
+
 <div class="well clearfix">
     <div class="pull-left" style="width: 245px">
-        <select id="sel_var_field" class="form-control" style="width:150px;">
+        <select id="sel_var_field" class="form-control" style="width:150px; display: inline-block;">
             {{ UTIL.optionsHtml(APP.instance('Sellvana_CustomField_Model_Field').getDropdowns()) | raw }}
         </select>
         <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>

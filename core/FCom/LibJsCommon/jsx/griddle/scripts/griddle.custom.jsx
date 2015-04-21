@@ -1120,6 +1120,10 @@ var Griddle = React.createClass({
     getCurrentGrid: function() {
         return this;
     },
+    /**
+     * trigger global callback function base on name
+     * @param name
+     */
     triggerCallback: function(name) {
         var that = this;
         var callbacks = this.getConfig('callbacks');
@@ -1142,6 +1146,44 @@ var Griddle = React.createClass({
                 console.log('DEBUG: cannot find call back ' + funcName + ' for name ' + name);
             }
         }
+    },
+    /**
+     * get child component by React refs
+     * @param {string} childName (body | settings | rows)
+     * @returns {*}
+     */
+    getChildComponent: function(childName) {
+        var child = null;
+        var refs = this.refs;
+        if (refs) {
+            switch (childName) {
+                case 'gridBody':
+                case 'body':
+                    child = refs.gridBody;
+                    break;
+                case 'gridSettings':
+                case 'settings':
+                    child = refs.gridSettings;
+                    break;
+                case 'rows':
+                    child = refs.gridBody.refs;
+                    break;
+            }
+        }
+
+        return child;
+    },
+    /**
+     * get row component
+     * @param id
+     * @returns {*}
+     */
+    getRowComponent: function(id) { //todo: do we need to merge this with this.getRows()
+        var rows = this.getChildComponent('rows');
+        if (rows && typeof rows['row' + id] !== 'undefined') {
+            return rows['row' + id];
+        }
+        return null;
     }
 });
 

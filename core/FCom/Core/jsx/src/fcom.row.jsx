@@ -1,4 +1,4 @@
-﻿﻿/** @jsx React.DOM */
+﻿/** @jsx React.DOM */
 
 /**
  * FCom Row Component
@@ -37,15 +37,11 @@ define(['underscore', 'react'], function (_, React) {
             var id = this.props.getConfig('id');
             var row = that.props.row;
 
-            console.log('fcomrow');
-
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
                 if (!col) {
                     return null;
                 }
-
-                console.log('fcomRows.col', col);
 
                 var node = "";
                 var customNodeHtml = false;
@@ -102,8 +98,6 @@ define(['underscore', 'react'], function (_, React) {
                                     break;
                             }
                         } else { //inline mode
-
-                            console.log('inline mode');
 
                             var validationRules = that.validationRules(col.validation);
                             var inlineProps = {

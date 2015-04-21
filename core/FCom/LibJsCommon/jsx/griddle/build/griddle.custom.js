@@ -1142,6 +1142,34 @@ var Griddle = React.createClass({displayName: "Griddle",
                 console.log('DEBUG: cannot find call back ' + funcName + ' for name ' + name);
             }
         }
+    },
+    getChildComponent: function(childName, option) {
+        var child = null;
+        var refs = this.refs;
+        if (refs) {
+            switch (childName) {
+                case 'gridBody':
+                case 'body':
+                    child = refs.gridBody;
+                    break;
+                case 'gridSettings':
+                case 'settings':
+                    child = refs.gridSettings;
+                    break;
+                case 'rows':
+                    child = refs.gridBody.refs;
+                    break;
+            }
+        }
+
+        return child;
+    },
+    getRowComponent: function(id) { //todo: do we need to merge this with this.getRows()
+        var rows = this.getChildComponent('rows');
+        if (rows && typeof rows['row' + id] !== 'undefined') {
+            return rows['row' + id];
+        }
+        return null;
     }
 });
 

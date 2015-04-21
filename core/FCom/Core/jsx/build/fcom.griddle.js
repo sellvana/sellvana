@@ -368,7 +368,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 }
             } else {
                 //error
-                console.log('error');
+                console.log('form validate fail');
                 return false;
             }
         },
