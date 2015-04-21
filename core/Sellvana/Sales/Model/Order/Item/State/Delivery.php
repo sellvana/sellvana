@@ -4,11 +4,9 @@ class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Mode
 {
     const VIRTUAL = 'virtual',
         PENDING = 'pending',
-        BACKORDERED = 'backordered',
         PACKED = 'packed',
         SHIPPED = 'shipped',
         DELIVERED = 'delivered',
-        RETURNED = 'returned',
         PARTIAL = 'partial';
 
     protected $_valueLabels = [
@@ -17,14 +15,12 @@ class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Mode
         self::PACKED => 'Packed',
         self::SHIPPED => 'Shipped',
         self::DELIVERED => 'Delivered',
-        self::RETURNED => 'Returned',
         self::PARTIAL => 'Partial',
     ];
 
     protected $_setValueNotificationTemplates =[
         self::SHIPPED => 'email/sales/order-item-state-delivery-shipped',
         self::DELIVERED => 'email/sales/order-item-state-delivery-delivered',
-        self::RETURNED => 'email/sales/order-item-state-delivery-returned',
     ];
 
     public function setVirtual()
@@ -50,11 +46,6 @@ class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Mode
     public function setDelivered()
     {
         return $this->changeState(self::DELIVERED);
-    }
-
-    public function setReturned()
-    {
-        return $this->changeState(self::RETURNED);
     }
 
     public function setPartial()

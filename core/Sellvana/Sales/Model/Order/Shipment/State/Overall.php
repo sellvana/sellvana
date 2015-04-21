@@ -22,10 +22,10 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_M
         self::CANCELED => 'Canceled',
     ];
 
-    protected $_setValueNotificationTemplates =[
-        self::SHIPPED => 'email/sales/order-shipmend-state-overall-shipped',
-        self::EXCEPTION => 'email/sales/order-shipmend-state-overall-exception',
-        self::DELIVERED => 'email/sales/order-shipmend-state-overall-delivered',
+    protected $_setValueNotificationTemplates = [
+        self::SHIPPED => 'email/sales/order-shipment-state-overall-shipped',
+        self::EXCEPTION => 'email/sales/order-shipment-state-overall-exception',
+        self::DELIVERED => 'email/sales/order-shipment-state-overall-delivered',
     ];
 
     public function setPending()

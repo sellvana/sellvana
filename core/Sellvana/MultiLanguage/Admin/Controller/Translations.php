@@ -53,7 +53,11 @@ class Sellvana_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Co
 
     public function action_form()
     {
-        $id = $this->BRequest->params('id', true);
+        $id = $this->BRequest->param('id', true);
+        if(!$id){
+            $this->forward('noroute');
+            return;
+        }
         list($module, $file) = explode("/", $id, 2);
 
         $moduleClass = $this->BApp->m($module);

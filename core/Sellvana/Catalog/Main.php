@@ -4,6 +4,7 @@
  * Class Sellvana_Catalog_Main
  *
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
+ * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  */
 class Sellvana_Catalog_Main extends BClass
 {
@@ -49,6 +50,31 @@ class Sellvana_Catalog_Main extends BClass
                         ],
                     ],
                 ],
+            ])
+            ->addWidgetType('product_carousel', [
+                'title'       => 'Products Carousel',
+                'source_view' => 'catalog/products/carousel',
+                'view_name'   => 'catalog/product/carousel',
+                'pos'         => 100,
+                'compile'     => function ($args) {
+                    $w                = $args['widget'];
+                    $view_name        = $w['view_name'];
+                    $args['layout'][] = ['hook' => $w['area'], 'views' => $view_name];
+                    $skus = explode(',', $w['value']);
+                    $products = $this->Sellvana_Catalog_Model_Product->orm()->where(['product_sku' => $skus])->find_many_assoc('product_sku');
+                    $args['layout'][] = [
+                        'view' => $view_name,
+                        'set'  => [
+                            'widget_id' => $w['id'],
+                            'skus' => $skus,
+                            'products' => $products,
+                            'height' => $w['height'],
+                            'interval' => $w['interval'],
+                            'pause' => $w['pause'],
+                            'keyboard' => $w['keyboard']
+                        ]
+                    ];
+                }
             ])
         ;
     }

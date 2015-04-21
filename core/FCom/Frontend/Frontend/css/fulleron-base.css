@@ -105,6 +105,9 @@ label.success {
 .table tfoot > tr > td {
   vertical-align:top;
   }
+.table tbody > tr > th {
+  background:#f4f4f4;
+  }
   
 /*------------------------------------*\
    PERSISTENT

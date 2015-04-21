@@ -7,7 +7,6 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
         PACKED = 'packed',
         SHIPPED = 'shipped',
         DELIVERED = 'delivered',
-        RETURNED = 'returned',
         PARTIAL = 'partial';
 
     protected $_valueLabels = [
@@ -16,14 +15,12 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
         self::PACKED => 'Packed',
         self::SHIPPED => 'Shipped',
         self::DELIVERED => 'Delivered',
-        self::RETURNED => 'Returned',
         self::PARTIAL => 'Partial',
     ];
 
     protected $_setValueNotificationTemplates = [
         self::SHIPPED => 'email/sales/order-state-delivery-shipped',
         self::DELIVERED => 'email/sales/order-state-delivery-delivered',
-        self::RETURNED => 'email/sales/order-state-delivery-returned',
     ];
 
     public function setVirtual()
@@ -49,11 +46,6 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
     public function setDelivered()
     {
         return $this->changeState(self::DELIVERED);
-    }
-
-    public function setReturned()
-    {
-        return $this->changeState(self::RETURNED);
     }
 
     public function setPartial()
