@@ -116,7 +116,8 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         }
 
         /** @var Sellvana_Sales_Model_Order $order */
-        $order = $this->Sellvana_Sales_Model_Order->create()->importDataFromCart($cart);
+        $order = $this->Sellvana_Sales_Model_Order->create();
+        $order->importDataFromCart($cart);
 
         $result = [];
         if ($order->isPayable()) {

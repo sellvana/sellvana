@@ -5,6 +5,9 @@ class Sellvana_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Co
     const OVERALL = 'overall',
         DELIVERY = 'delivery',
         PAYMENT = 'payment',
+        RETURNS = 'return',
+        REFUND = 'refund',
+        CANCEL = 'cancel',
         COMMENT = 'comment',
         CUSTOM = 'custom';
 
@@ -12,6 +15,9 @@ class Sellvana_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Co
         self::OVERALL => 'Overall',
         self::DELIVERY => 'Delivery',
         self::PAYMENT => 'Payment',
+        self::RETURNS => 'Return',
+        self::REFUND => 'Refund',
+        self::CANCEL => 'Cancel',
         self::COMMENT => 'Comment',
         self::CUSTOM => 'Custom',
     ];
@@ -33,6 +39,9 @@ class Sellvana_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Co
         self::DELIVERY => 'Sellvana_Sales_Model_Order_State_Delivery',
         self::PAYMENT => 'Sellvana_Sales_Model_Order_State_Payment',
         self::COMMENT => 'Sellvana_Sales_Model_Order_State_Comment',
+        self::RETURNS => 'Sellvana_Sales_Model_Order_State_Return',
+        self::REFUND => 'Sellvana_Sales_Model_Order_State_Refund',
+        self::CANCEL => 'Sellvana_Sales_Model_Order_State_Cancel',
         self::CUSTOM => 'Sellvana_Sales_Model_Order_State_Custom',
     ];
 
@@ -61,6 +70,34 @@ class Sellvana_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Co
     public function payment()
     {
         return $this->_getStateObject(self::PAYMENT);
+    }
+
+    /**
+     * @return Sellvana_Sales_Model_Order_Item_State_Return
+     * @throws BException
+     */
+    public function returns()
+    {
+        return $this->_getStateObject(self::RETURNS);
+    }
+
+    /**
+     * @return Sellvana_Sales_Model_Order_Item_State_Refund
+     * @throws BException
+     */
+    public function refund()
+    {
+        return $this->_getStateObject(self::REFUND);
+    }
+
+
+    /**
+     * @return Sellvana_Sales_Model_Order_Item_State_Cancel
+     * @throws BException
+     */
+    public function cancel()
+    {
+        return $this->_getStateObject(self::CANCEL);
     }
 
     /**
