@@ -21,8 +21,8 @@ class Sellvana_MarketClient_Admin_Controller_Site extends FCom_Admin_Controller_
 
     public function action_check_updates__POST()
     {
+        $redirectUrl = $this->BRequest->referrer();
         try {
-            $redirectUrl = $this->BRequest->referrer();
             $result = $this->Sellvana_MarketClient_RemoteApi->getModulesVersions(true, true);
             foreach ($result as $modName => $modUpgrade) {
                 if (!empty($modUpgrade['can_update'])) {

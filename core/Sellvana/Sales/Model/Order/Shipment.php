@@ -57,31 +57,38 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
             'shipment_id' => $shipment->id(),
         ])->save();
 
+        $shipData =
         $numItems = 0;
         /** @var Sellvana_Sales_Model_Order_Item $item */
         foreach ($order->items() as $item) {
             if ($item->get('state_delivery') == Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL) {
                 continue;
             }
-            $qtyToShip = $item->get('qty_ordered') - $item->get('qty_backordered');
+            $qtyToShip = $item->getQtyCanShip();
             if ($qtyToShip <= 0) {
                 continue;
             }
-            if ($item->get('pack_separate')) {
-                $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->create([
-                    'order_id' => $order->id(),
-                    'shipment_id' => $shipment->id(),
-                ])->save();
-            } else {
-                $package = $firstPackage;
-            }
-            $shipItem = $this->Sellvana_Sales_Model_Order_Shipment_Item->create([
+            $shipData = [
                 'order_id' => $order->id(),
                 'shipment_id' => $shipment->id(),
-                'package_id' => $package->id(),
                 'order_item_id' => $item->id(),
-                'qty' => $qtyToShip,
-            ])->save();
+            ];
+            if ($item->get('pack_separate')) {
+                $shipData['qty'] = 1;
+                for ($i = 0; $i < $qtyToShip; $i++) {
+                    $package = $this->Sellvana_Sales_Model_Order_Shipment_Package->create([
+                        'order_id' => $order->id(),
+                        'shipment_id' => $shipment->id(),
+                    ])->save();
+                    $shipData['package_id'] = $package->id();
+                    $this->Sellvana_Sales_Model_Order_Shipment_Item->create($shipData)->save();
+                }
+            } else {
+                $shipData['package_id'] = $firstPackage->id();
+                $shipData['qty'] = $qtyToShip;
+                $this->Sellvana_Sales_Model_Order_Shipment_Item->create($shipData)->save();
+            }
+            $item->add('qty_shipped', $qtyToShip)->save();
             $numItems += $qtyToShip;
         }
 

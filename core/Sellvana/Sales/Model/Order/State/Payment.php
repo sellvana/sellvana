@@ -8,9 +8,7 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
         PARTIAL_PAID = 'partial_paid',
         PAID = 'paid',
         OUTSTANDING = 'outstanding',
-        CANCELED = 'canceled',
-        PARTIAL_REFUNDED = 'partial_refunded',
-        REFUNDED = 'refunded';
+        VOID = 'void';
 
     protected $_valueLabels = [
         self::FREE => 'Free',
@@ -19,9 +17,7 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
         self::PARTIAL_PAID => 'Partial Paid',
         self::PAID => 'Paid',
         self::OUTSTANDING => 'Outstanding',
-        self::CANCELED => 'Canceled',
-        self::PARTIAL_REFUNDED => 'Partial Refunded',
-        self::REFUNDED => 'Refunded',
+        self::VOID => 'Void',
     ];
 
     public function setFree()
@@ -54,18 +50,8 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
         return $this->changeState(self::OUTSTANDING);
     }
 
-    public function setCanceled()
+    public function setVoid()
     {
-        return $this->changeState(self::CANCELED);
-    }
-
-    public function setPartialRefunded()
-    {
-        return $this->changeState(self::PARTIAL_REFUNDED);
-    }
-
-    public function setRefunded()
-    {
-        return $this->changeState(self::REFUNDED);
+        return $this->changeState(self::VOID);
     }
 }

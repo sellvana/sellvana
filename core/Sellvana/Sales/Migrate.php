@@ -33,7 +33,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_21()
+    public function install__0_3_22()
     {
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
@@ -245,6 +245,10 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_delivery' => "varchar(20) not null default 'pending'",
                 'state_payment' => "varchar(20) not null default 'new'",
+                'state_return' => "varchar(20) not null default 'none'",
+                'state_refund' => "varchar(20) not null default 'none'",
+                'state_cancel' => "varchar(20) not null default 'none'",
+                'state_comment' => "varchar(20) not null default 'none'",
                 'state_custom' => "varchar(20) default null",
 
                 'store_currency_code' => 'char(3) null',
@@ -296,6 +300,9 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_delivery' => "varchar(20) not null default 'pending'",
                 'state_payment' => "varchar(20) not null default 'new'",
+                'state_return' => "varchar(20) not null default 'none'",
+                'state_refund' => "varchar(20) not null default 'none'",
+                'state_cancel' => "varchar(20) not null default 'none'",
                 'state_custom' => "varchar(20) default null",
             ],
             BDb::PRIMARY => '(id)',
@@ -1967,7 +1974,6 @@ class Sellvana_Sales_Migrate extends BClass
             ],
         ]);
 
-
         $this->BDb->ddlTableDef($tOrder, [
             BDB::COLUMNS => [
                 'state_overall' => "varchar(20) not null default 'new'",
@@ -2031,6 +2037,30 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tOrderShipment, [
             BDb::COLUMNS => [
                 'state_carrier' => "varchar(15) not null default 'pending'",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_21__0_3_22()
+    {
+        $tOrder = $this->Sellvana_Sales_Model_Order->table();
+        $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
+
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDB::COLUMNS => [
+                'state_return' => "varchar(20) not null default 'none'",
+                'state_refund' => "varchar(20) not null default 'none'",
+                'state_cancel' => "varchar(20) not null default 'none'",
+                'state_comment' => "varchar(20) not null default 'none'",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'state_return' => "varchar(20) not null default 'none'",
+                'state_refund' => "varchar(20) not null default 'none'",
+                'state_cancel' => "varchar(20) not null default 'none'",
             ],
         ]);
     }

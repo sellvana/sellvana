@@ -282,6 +282,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             'customer_id' => $cart->get('customer_id'),
             'customer_email' => $cart->get('customer_email'),
             'item_qty' => $cart->get('item_qty'),
+            'store_currency_code' => $cart->get('store_currency_code'),
         ]);
         return $this;
     }
@@ -424,6 +425,12 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             $state->payment()->setFree();
         }
 
+        $state->returns()->setNone();
+        $state->refund()->setNone();
+        $state->cancel()->setNone();
+
+        $state->comment()->setNone();
+
         $state->custom()->setDefault();
         return $this;
     }
@@ -535,12 +542,31 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             'payment' => [],
             'delivery' => [],
         ];
+
+        $allPaymentComplete = true;
+        $allDeliveryComplete = true;
+
         $allPaid = true;
         $allFree = true;
+        $allRefunded = true;
+
+        $allVirtual = true;
+        $allShipped = true;
+        $allDelivered = true;
+        $allReturned = true;
+
+        $allCanceled = true;
 
         $itemFree = Sellvana_Sales_Model_Order_Item_State_Payment::FREE;
         $itemPaid = Sellvana_Sales_Model_Order_Item_State_Payment::PAID;
 
+        $itemVirtual = Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL;
+        $itemShipped = Sellvana_Sales_Model_Order_Item_State_Delivery::SHIPPED;
+        $itemDelivered = Sellvana_Sales_Model_Order_Item_State_Delivery::DELIVERED;
+        $itemReturned = Sellvana_Sales_Model_Order_Item_State_Delivery::RETURNED;
+        $itemShipPartial = Sellvana_Sales_Model_Order_Item_State_Delivery::PARTIAL;
+
+        /** @var Sellvana_Sales_Model_Order_Item $item */
         foreach ($this->items() as $item) {
             foreach ($totalQty as $k => $_) {
                 $totalQty[$k] += $item->get('qty_' . $k);
@@ -555,6 +581,37 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             if (!in_array($paymentState, [$itemFree, $itemPaid])) {
                 $allPaid = false;
             }
+            if ($deliveryState !== $itemVirtual && $item->get('shipping_weight') == 0) {
+                $item->state()->delivery()->setVirtual();
+            }
+            if ($deliveryState !== $itemVirtual) {
+                $allVirtual = false;
+            }
+
+        }
+
+        $orderComplete = Sellvana_Sales_Model_Order_State_Overall::COMPLETE;
+        $orderPaid = Sellvana_Sales_Model_Order_State_Payment::PAID;
+        $orderShipped = Sellvana_Sales_Model_Order_State_Delivery::SHIPPED;
+        $orderDelivered = Sellvana_Sales_Model_Order_State_Delivery::DELIVERED;
+        $orderReturned = Sellvana_Sales_Model_Order_State_Delivery::RETURNED;
+
+        if ($allPaid && $this->get('state_payment') !== $orderPaid) {
+            $this->state()->payment()->setPaid();
+        }
+
+        if ($allShipped && $this->get('state_delivery') !== $orderShipped) {
+            $this->state()->delivery()->setShipped();
+        } elseif ($allDelivered && $this->get('state_delivery') !== $orderDelivered) {
+            $this->state()->delivery()->setDelivered();
+        } elseif ($allReturned && $this->get('state_delivery') !== $orderReturned) {
+            $this->state()->delivery()->setReturned();
+        } else {
+
+        }
+
+        if ($allPaymentComplete && $allDeliveryComplete && $this->get('state_overall') !== $orderComplete) {
+            $this->state()->overall()->setComplete();
         }
 
         return $this;
