@@ -100,7 +100,10 @@ class Sellvana_CustomField_Admin_Controller_Products extends FCom_Admin_Controll
                 'actions' => [
                    'delete' => ['caption' => 'Remove']
                 ],
-                'grid_before_create' => 'variantFieldGridRegister'
+                'grid_before_create' => 'variantFieldGridRegister',
+                'callbacks' => [
+                    'componentDidMount' => 'variantFieldGriddleRegister'
+                ]
             ]
         ];
 

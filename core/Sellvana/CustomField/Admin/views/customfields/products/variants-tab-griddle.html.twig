@@ -3,9 +3,9 @@
 {% set variantConfig = ctrl.variantGridConfig(model) %}
 
 <script type="text/javascript">
+    var variantGrid, variantFieldGrid;
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'jquery-ui', 'jquery.validate', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
 
-    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
-        var variantGrid;
 
         /**
          * object contains property and method to hand variant images
@@ -145,7 +145,9 @@
             handleEventImages: function() {
                 var dom = $(variantGrid.getDOMNode());
                 var format = function (state) {
-                    if (!state.id) return state.text;
+                    if (!state.id) {
+                        return state.text;
+                    }
                     return "<img src='" + variantImages.thumbUrl + state.text + "'/>  " + state.text;
                 };
 
@@ -185,6 +187,95 @@
             }
         };
 
+        var variantFields = {
+            selectId: '#sel_var_field',
+            listId: '#variants-tab-field',
+            inputClass: '.select-value-field',
+            customFields: [],
+            init: function() {
+                if (variantFieldGrid) {
+                    this.customFields = variantFieldGrid.getRows();
+                    console.log('customFields', this.customFields);
+                }
+            },
+            populateFields: function() {
+                var select = $(this.selectId);
+                var list = $(this.listId);
+                if (variantFieldGrid && variantGrid && this.customFields.length) {
+
+                    //populate data to top fields
+                    _.forEach(variantGrid.props.columnMetadata, function (col) {
+                        _.forEach(variantFields.customFields, function (field) {
+                            if (field.id == col.field_id) {
+                                select.find("option[value='" + field.id + "']").addClass('hide');
+                                list.append(
+                                        $('<li>', { 'class': 'dd-item dd3-item' }).append(
+                                                $('<div>', { 'class': 'icon-ellipsis-vertical dd-handle dd3-handle' }),
+                                                $('<div>', { 'class': 'dd3-content' }).append(
+                                                        $('<label>', { text: field.name }),
+                                                        $('<i>', {
+                                                            'class': 'icon-remove pull-right btn-link btn-delete-field',
+                                                            'data-name': field.name,
+                                                            'data-code': field.field_code,
+                                                            'data-id': field.id
+                                                        })
+                                                )
+                                        )
+                                )
+                            }
+                        })
+                    });
+
+                    //populate data to dropdown fields in each row
+                    _.forEach(variantGrid.getRows(), function(row) {
+                        var component = variantGrid.getRowComponent(row.id);
+                        var fieldValue = row.field_values;
+                        if (component) {
+                            var dom = $(component.getDOMNode());
+                            dom.find(variantFields.inputClass).each(function() {
+                                var name = $(this).attr('name');
+                                var field = _.findWhere(variantFields.customFields, {field_code: name});
+                                if (field) {
+                                    var options = [];
+                                    _.forEach(field.options, function(value, key) {
+                                        options.push({ id: value, text: value });
+                                    });
+                                    $(this).select2({
+                                        placeholder: 'Select field value',
+                                        allowClear: true,
+                                        data: function () {
+                                            return { results: options };
+                                        }
+                                    });
+
+                                    console.log(fieldValue[name]);
+                                    if (typeof fieldValue[name] != 'undefined') {
+                                        $(this).select2('val', fieldValue[name]);
+                                    }
+                                }
+                            })
+                        }
+                    });
+
+                } else {
+                    console.log('DEBUG: cannot populate fields');
+                    console.log('variantGrid', variantGrid);
+                    console.log('variantFieldGrid', variantFieldGrid);
+                    console.log('this.customFields', this.customFields);
+                }
+            },
+            handleEventFields: function() {
+                $(this.selectId).val('').select2();
+                $(this.listId).sortable({
+                    scroll: false,
+                    axis:'x',
+                    update: function(event, ui) {
+                        console.log('sortable.update');
+                    }
+                });
+            }
+        };
+
         /**
          * variant grid callback trigger when componentDidMount | componentDidUpdate
          * @param grid
@@ -200,6 +291,15 @@
         };
 
 
+        window.variantFieldGriddleRegister = function(grid, triggerName) {
+            variantFieldGrid = grid;
+            if (triggerName == 'componentDidMount') {
+                variantFields.init();
+            }
+            variantFields.populateFields();
+            variantFields.handleEventFields();
+        }
+
     });
 </script>
 
@@ -214,13 +314,14 @@
         <ol id="variants-tab-field" class="dd-list columns dd-list-axis-x"></ol>
     </div>
 </div>
+<div class="f-variants-col row">
+    <div class="col-sm-12">
+        {{ THIS.view('core/griddle').set('grid', variantConfig) | raw }}
+    </div>
+</div>
+{#todo: check to load data without render this grid#}
 <div class="hidden" id="grid-field-hidden">
     {{ THIS.view('core/griddle').set('grid', fieldConfig) | raw }}
-</div>
-<div class="f-variants-col row">
-  <div class="col-sm-12">
-    {{ THIS.view('core/griddle').set('grid', variantConfig) | raw }}
-  </div>
 </div>
 
 <input type='hidden' id='vfield_ids' name='vfields' />
