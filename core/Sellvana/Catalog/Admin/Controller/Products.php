@@ -1135,4 +1135,42 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
 
     }
+
+    /**
+     * Fetch list of products to use in conditions
+     */
+    public function action_skus()
+    {
+
+        $r       = $this->BRequest;
+        $page    = $r->get('page')?: 1;
+        $skuTerm = $r->get('q');
+        $limit   = $r->get('o')?: 30;
+        $offset  = ($page - 1) * $limit;
+
+        /** @var BORM $orm */
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->select(['id', 'product_sku', 'product_name'], 'p');
+        if ($skuTerm && $skuTerm != '*') {
+            $orm->where(['OR' => [['product_sku LIKE ?', "%{$skuTerm}%"], ['product_name LIKE ?', "%{$skuTerm}%"]]]);
+        }
+
+        $countOrm = clone $orm;
+        $countOrm->select_expr('COUNT(*)', 'count');
+        $stmt     = $countOrm->execute();
+        $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $count    = $countRes[0]['count'];
+
+        $orm->limit((int) $limit)->offset($offset)->order_by_asc('product_name');
+        $stmt   = $orm->execute();
+        $result = ['total_count' => $count, 'items' => []];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $result['items'][] = [
+                'id'   => $row['product_sku'],
+                'text' => $row['product_name'],
+                'sku'  => $row['product_sku'],
+            ];
+        }
+
+        $this->BResponse->json($result);
+    }
 }

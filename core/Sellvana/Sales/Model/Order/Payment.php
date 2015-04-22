@@ -71,6 +71,15 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this->_parent;
     }
 
+    public function items()
+    {
+        if (!$this->_items) {
+            $this->_items = $this->Sellvana_Sales_Model_Order_Payment_Item->orm('opi')
+                ->where('payment_id', $this->id())->find_many_assoc('order_item_id');
+        }
+        return $this->_items;
+    }
+
     public function transactions()
     {
 
@@ -254,23 +263,50 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $methods[$code];
     }
 
-    public function payOnCheckout()
+    public function updateItemsAsPaid()
+    {
+        $orderItems = $this->order()->items();
+        foreach ($this->items() as $oItemId => $pItem) {
+            $oItem = $orderItems[$oItemId];
+            $oItem->set('qty_paid', $oItem->get('qty_ordered'));
+        }
+        return $this;
+    }
+
+    public function payOffline($amount = null)
     {
         $method = $this->getMethodObject();
-        $result = $method->payOnCheckout($this);
 
-        return $result;
+        if (!$method->can('pay_offline')) {
+            throw new BException('This payment method can not pay offline');
+        }
+
+        $this->Sellvana_Sales_Main->workflowAction('adminReceivesOfflinePayment', [
+            'payment' => $this,
+            'amount' => $amount,
+        ]);
+
+        $this->updateItemsAsPaid();
+
+        return $this;
     }
 
     public function authorize($amount = null)
     {
         $method = $this->getMethodObject();
 
+        if (!$method->can('auth')) {
+            throw new BException('This payment method can not authorize transactions');
+        }
+
         $parent = $this->findTransaction('order', true);
 
         $transaction = $this->createTransaction('auth', $amount, $parent)->start();
 
-        $method->authorize($transaction);
+        $result = $method->authorize($transaction);
+        if (empty($result['error'])) {
+            //TODO: handle error during authorized
+        }
 
         $transaction->complete();
 
@@ -278,12 +314,18 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             'transaction' => $transaction,
         ]);
 
+        $this->updateItemsAsPaid();
+
         return $this;
     }
 
     public function reauthorize($amount = null)
     {
         $method = $this->getMethodObject();
+
+        if (!$method->can('reauth')) {
+            throw new BException('This payment method can not authorize transactions');
+        }
 
         $parent = $this->findTransaction('auth', true);
 
@@ -297,12 +339,18 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             'transaction' => $transaction,
         ]);
 
+        $this->updateItemsAsPaid();
+
         return $this;
     }
 
     public function void()
     {
         $method = $this->getMethodObject();
+
+        if (!$method->can('void')) {
+            throw new BException('This payment method can not authorize transactions');
+        }
 
         $parent = $this->findTransaction(['auth', 'reauth'], true);
 
@@ -323,6 +371,10 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     {
         $method = $this->getMethodObject();
 
+        if (!$method->can('capture')) {
+            throw new BException('This payment method can not authorize transactions');
+        }
+
         $parent = $this->findTransaction(['auth', 'reauth'], true);
 
         $transaction = $this->createTransaction('capture', $amount, $parent)->start();
@@ -341,6 +393,10 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function refund($amount = null)
     {
         $method = $this->getMethodObject();
+
+        if (!$method->can('refund')) {
+            throw new BException('This payment method can not authorize transactions');
+        }
 
         $parent = $this->findTransaction('capture', true);
 

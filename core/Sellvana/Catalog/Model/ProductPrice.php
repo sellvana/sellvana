@@ -444,11 +444,15 @@ class Sellvana_Catalog_Model_ProductPrice
                         'price_type' => $f,
                     ]);
                 }
-                $priceModel->set($this->_parsePriceField($v))->save();
+                try {
+                    $priceModel->set($this->_parsePriceField($v))->save();
+                } catch(Exception $e) {
+                    $this->BDebug->logException($e); // probably should not stop import?
+                }
             }
         }
 
-        $tiers = $product->get('price.tiers');
+        $tiers = $product->get('price.tier');
         if ($tiers) {
             if (is_string($tiers)) {
                 $tiersArr = explode(';', $tiers);
@@ -476,12 +480,16 @@ class Sellvana_Catalog_Model_ProductPrice
                         'qty' => $tier,
                     ]);
                 }
-                $priceModels[$tier]->set($this->_parsePriceField($v))->save();
+                try {
+                    $priceModels[$tier]->set($this->_parsePriceField($v))->save();
+                } catch(Exception $e) {
+                    $this->BDebug->logException($e); // probably should not stop import?
+                }
             }
         }
 
-        $saleFrom = $product->get('price.sale.from_date');
-        $saleTo = $product->get('price.sale.to_date');
+        $saleFrom = new DateTime($product->get('price.sale.from_date'));
+        $saleTo = new DateTime($product->get('price.sale.to_date'));
         if ($saleFrom || $saleTo) {
             if (empty($saleModel)) {
                 $saleModel = $this->orm()
@@ -491,10 +499,10 @@ class Sellvana_Catalog_Model_ProductPrice
             }
             if ($saleModel) {
                 if ($saleFrom) {
-                    $saleModel->set('valid_from', $saleFrom);
+                    $saleModel->set('valid_from', $saleFrom->format("Y-m-d"));
                 }
                 if ($saleTo) {
-                    $saleModel->set('valid_to', $saleTo);
+                    $saleModel->set('valid_to', $saleTo->format("Y-m-d"));
                 }
                 $saleModel->save();
             }
@@ -503,6 +511,7 @@ class Sellvana_Catalog_Model_ProductPrice
 
     protected function _parsePriceField($value)
     {
+        $value = strtolower($value);
         if (is_numeric($value)) {
             return [
                 'operation' => '=$',

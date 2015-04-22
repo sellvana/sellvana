@@ -6,9 +6,11 @@
 class Sellvana_PaymentBasic_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {
     protected $_name = 'Check / Money Order';
+    static protected $_methodKey = 'check_mo';
 
     protected $_capabilities = [
         'pay'             => 1,
+        'pay_offline'     => 1,
         'pay_online'      => 1,
     ];
 
@@ -32,7 +34,7 @@ class Sellvana_PaymentBasic_PaymentMethod extends Sellvana_Sales_Method_Payment_
         // call this when returning from external checkout
         // $this->Sellvana_Sales_Main->workflowAction('customerReturnsFromExternalPayment', ['payment' => $payment]);
 
-        $payment->state()->overall()->setPending();
+        $payment->state()->overall()->setOffline();
 
         $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', ['payment' => $payment]);
 

@@ -48,6 +48,7 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
      */
     protected $_capabilities = [
         'pay'             => 1,
+        'pay_offline'     => 0,
         'pay_online'      => 0,
         'auth'            => 0,
         'auth_partial'    => 0,
@@ -148,29 +149,34 @@ abstract class Sellvana_Sales_Method_Payment_Abstract extends BClass implements
         return [];
     }
 
+    public function payOffline(Sellvana_Sales_Model_Order_Payment_Transaction $payment)
+    {
+        return [];
+    }
+
     public function authorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
-
+        return [];
     }
 
     public function reauthorize(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
-
+        return [];
     }
 
     public function void(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
-
+        return [];
     }
 
     public function capture(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
-
+        return [];
     }
 
     public function refund(Sellvana_Sales_Model_Order_Payment_Transaction $transaction)
     {
-
+        return [];
     }
 
     /**

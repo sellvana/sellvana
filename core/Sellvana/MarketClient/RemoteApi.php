@@ -108,7 +108,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
                 $localMod = $this->BApp->m($remoteModName);
                 if (!empty($remoteMod['channels'][$localMod->channel])) {
                     $remoteChannelVer = $remoteMod['channels'][$localMod->channel]['version_uploaded'];
-                    $remoteMod['can_update'] = version_compare($remoteChannelVer, $localMod->version, '<');
+                    $remoteMod['can_update'] = version_compare($remoteChannelVer, $localMod->version, '>');
                 } else {
                     $remoteMod['can_update'] = false;
                 }

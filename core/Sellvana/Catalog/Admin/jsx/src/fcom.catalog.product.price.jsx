@@ -425,7 +425,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             return p.price_type == base_field;
         });
 
-        if (!possiblePrices) {
+        if (possiblePrices.length == 0) {
             return;
         }
 
@@ -492,8 +492,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
         var operation = price.operation;
         var basePrice = findBasePrice(price, prices);
         console.log(basePrice);
-        if (basePrice) {
-            if (basePrice.operation && basePrice.operation != '=$') {
+        if (basePrice && basePrice != price) {
+            if (basePrice.operation && basePrice.operation != '=$' && isNaN(basePrice.calc_amount)) {
                 collectPrice(basePrice, prices)
             }
             var result;
@@ -530,7 +530,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
         var prices = options.prices;
         _.each(prices, function (price) {
             price.calc_amount = null;
-            //console.log(price);
+        });
+        _.each(prices, function (price) {
             if (price.operation && price.operation != '=$') {
                 collectPrice(price, prices);
             }
@@ -635,10 +636,15 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }.bind(this);
 
             this.options.updateOperation = function (price_id, operation, base_field) {
+                var options = this.options;
                 _.each(this.options.prices, function (price) {
                     if (price.id == price_id) {
                         price.operation = operation;
-                        price.base_field = base_field || 'base';
+                        var defBaseField = options.priceRelationOptions[price['price_type']];
+                        if(defBaseField) {
+                            defBaseField = defBaseField[0]['value'];
+                        }
+                        price.base_field = base_field || defBaseField;
                     }
                 });
                 renderPrices(this.options, this.options.container[0]);
