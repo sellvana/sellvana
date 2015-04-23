@@ -64,7 +64,7 @@ modules:
 
                     - [ /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
 
-                    - [ /media, FCom_Admin_Controller_MediaLibrary.index ]
+                    - [ /media-library, FCom_Admin_Controller_MediaLibrary.index ]
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
                     - [ /generate_sitemap, FCom_Admin_Controller.generate_sitemap ]
 

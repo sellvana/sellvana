@@ -47,6 +47,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 }
             }
         }
+        if(!$folder){
+            return null;
+        }
         if (empty($this->_allowedFolders[$folder])) {
             throw new BException('Folder ' . $folder . ' is not allowed');
         }
@@ -163,9 +166,77 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         return $config;
     }
 
+    public function gridConfigLibrary($options = [])
+    {
+        $id = !empty($options['id']) ? $options['id'] : 'media_library';
+        $folder = 'media';
+        $url = $this->BApp->href('/media/grid');
+        $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
+            ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
+            ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder');
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_Catalog')) {
+            $orm->select_expr('(SELECT COUNT(*) FROM ' . $this->Sellvana_Catalog_Model_ProductMedia->table()
+                . ' pm WHERE pm.file_id = a.id)', 'associated_products');
+        }
+        $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
+        $config = [
+            'config' => [
+                'id' => $id,
+                'caption' => 'Media Library',
+                'orm' => $orm,
+                'data_url' => $url . '/data',
+                'edit_url' => $url . '/edit',
+                'columns' => [
+                    ['type' => 'row_select'],
+                    ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
+                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                        'print' => '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
+                            . '<img src=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
+                        'sortable' => false],
+                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
+                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                        'display' => 'file_size'],
+                    ['name' => 'associated_products', 'label' => 'Associated Products', 'width' => 50],
+                    ['type' => 'btn_group',
+                        'buttons' => [
+                            ['name' => 'delete']
+                        ]
+                    ],
+                ],
+                'filters' => [
+                    ['field' => 'file_name', 'type' => 'text']
+                ],
+                //callbacks for backbonegrid
+                'grid_before_create' => $id . '_register',
+                'afterMassDelete' => $id .'_afterMassDelete',
+                //callbacks for react griddle
+                'callbacks' => [
+                    'componentDidMount' => 'registerGrid' . $id,
+                ],
+                'actions' => [
+                    'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
+                    'refresh' => true,
+                ]
+            ]
+        ];
+
+        if (!empty($options['config'])) {
+            $config['config'] = $this->BUtil->arrayMerge($config['config'], $options['config']);
+        }
+
+        return $config;
+    }
+
     public function action_index()
     {
-         $this->layout('/media');
+        $config = [
+            'id' => 'media_library',
+            'title' => $this->_("Media Library"),
+            'gridConfig' => $this->gridConfigLibrary(),
+        ];
+        $this->layout('/media');
+        $view = $this->layout()->view('media')->set('config', $config);
     }
 
     public function action_grid_data()
@@ -179,10 +250,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 $folder = $this->getFolder();
     //            $r = $this->BRequest->get();
                 $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
-                    ->where('folder', $folder)
                     ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
                     ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ;
+                if($folder){
+                    $orm->where('folder', $folder);
+                }
+
                 if ($this->BModuleRegistry->isLoaded('Sellvana_Catalog')) {
                     $orm->select_expr('(SELECT COUNT(*) FROM ' . $this->Sellvana_Catalog_Model_ProductMedia->table()
                         . ' pm WHERE pm.file_id = a.id)', 'associated_products');
@@ -503,16 +577,32 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $this->collectUploadConfig();
         }
         if (isset($this->_uploadConfigs[$configId])) {
-            $uploadConfig = $this->_uploadConfigs[$configId];
-            $uploadConfig['type'] = $configId;
-            if (isset($uploadConfig['filetype'])) {
-                $uploadConfig['filetype_regex'] = '/(\\.|\\/)(' . str_replace([','], '|', $uploadConfig['filetype']) . ')$/i';
+            $uploadConfig = $this->_processUploadConfig($this->_uploadConfigs[$configId], $configId);
+        } else if(null === $configId){
+            foreach ($this->_uploadConfigs as $id => $config) {
+                $uploadConfig[$id] = $this->_processUploadConfig($config, $id);
             }
+        }
+        return $uploadConfig;
+    }
 
-            if (isset($uploadConfig['permission'])) {
-                $canUpload = $this->FCom_Admin_Model_User->sessionUser()->getPermission($uploadConfig['permission']);
-                $uploadConfig['can_upload'] = $canUpload;
-            }
+    /**
+     * @param array $uploadConfig
+     * @param string $configId
+     * @return mixed
+     */
+    protected function _processUploadConfig($uploadConfig, $configId)
+    {
+        $uploadConfig['type'] = $configId;
+        if (isset($uploadConfig['filetype'])) {
+            $uploadConfig['filetype_regex'] = '/(\\.|\\/)(' . str_replace([','], '|',
+                    $uploadConfig['filetype']) . ')$/i';
+        }
+
+        if (isset($uploadConfig['permission'])) {
+            $canUpload                  = $this->FCom_Admin_Model_User->sessionUser()
+                                                                      ->getPermission($uploadConfig['permission']);
+            $uploadConfig['can_upload'] = $canUpload;
         }
         return $uploadConfig;
     }
