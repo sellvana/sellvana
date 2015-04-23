@@ -23,6 +23,9 @@ modules:
                     #- [ * * * * *, Sellvana_MarketClient_Cron.collectModules ]
 
             FCom_Install:
+                #auto_use: [ layout, views ]
                 auto_use: [ views ]
                 routing:
                     - [ "/marketclient/download/?.action", Sellvana_MarketClient_Controller_Download ]
+                #observe:
+                #    - [ "FCom_Install_Controller::action_step3__POST:after", Sellvana_MarketClient_Main.onInstallStep3Post ]
