@@ -1,7 +1,7 @@
 modules:
     Sellvana_CustomerGroups:
         version: 0.1.2
-        channel: beta
+        channel: alpha
         require: { module: { Sellvana_Customer: 0.1.3, Sellvana_Catalog: 0.1.0 } }
         translations: { en: en.php }
         description: "Customer Groups Management"

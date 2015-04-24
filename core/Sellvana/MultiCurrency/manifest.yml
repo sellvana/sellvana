@@ -1,7 +1,7 @@
 modules:
     Sellvana_MultiCurrency:
         version: 0.1.0
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0 } }
 
         observe:

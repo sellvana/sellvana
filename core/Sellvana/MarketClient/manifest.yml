@@ -1,7 +1,7 @@
 modules:
     Sellvana_MarketClient:
         version: 0.2.3
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Fulleron Extension Market Client"
 

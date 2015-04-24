@@ -1,7 +1,7 @@
 modules:
     Sellvana_PaymentPaypal:
         version: 0.1.0
-        channel: beta
+        channel: alpha
         require: { module: { Sellvana_Sales: 0.1.10 } }
         translations: { en: en.php }
         description: "PayPal&reg; standard payment method"
