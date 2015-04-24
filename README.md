@@ -145,3 +145,24 @@ Contributing
 5. Once received, the Sellvana development team will review your contribution and if approved, will pull your request to the appropriate branch.
 
 Note: You must agree to [Sellvana's Contributor License Agreement](http://sellvana.com/cla) before pulling any requests. You only need to sign the agreement once.
+
+Versioning
+----------
+
+Since all the functionality is contained in modules, the global Sellvana version is only an initial download package version.
+All the issue reports will require full list of currently installed module versions. If using built-in reporting, this will be done automatically.
+ 
+The global Sellvana package versions are: `[X].[Y].[Z]` (example: `1.0.5`), where:
+ 
+  * `[X]` - Sellvana generation version, before stable is `0`, the first version is `1`, etc.
+  * `[Y]` - Main release iteration version within the generation
+  * `[Z]` - Bug and Security fixes releases version
+  * All parts start from `0`.
+ 
+The module versions are: `[X].[Y].[Z].[P]` (example: `1.0.12.1`), where:
+
+  * `[X]` - Sellvana generation version, before stable is `0`, the first version is `1`, etc.
+  * `[Y]` - Feature set version. All subversions of this version should have the same feature set.
+  * `[Z]` - DB level version. Each time there's data structure change, this part will be bumped up.
+  * `[P]` - Patch version. If fixes are required without data structure change, this part will be bumped up.
+  * All parts start from `0`.

@@ -96,6 +96,10 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
             $this->BCache->delete(static::$_modulesVersionsCacheKey);
             throw new BException($remoteModResult['message']);
         }
+        if (!$siteKey && !empty($remoteModResult['site_key'])) {
+            $this->BConfig->set('modules/Sellvana_MarketClient/site_key', $remoteModResult['site_key'], false, true);
+            $this->BConfig->writeConfigFiles('local');
+        }
         if (empty($remoteModResult['modules'])) {
             //throw new BException('Unable to retrieve marketplace modules information');
             return []; //TODO: proper notifications and errors handling

@@ -1,7 +1,7 @@
 modules:
     FCom_ApiTest:
         version: 0.1.0
-        channel: beta
+        channel: alpha
         require: { module: { FCom_ApiServer: 0.1.0 } }
         description: API Tests area
         areas:

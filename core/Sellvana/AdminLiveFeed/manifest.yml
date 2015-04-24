@@ -1,7 +1,7 @@
 modules:
     Sellvana_AdminLiveFeed:
         version: 0.1
-        channel: beta
+        channel: alpha
         description: Admin Live Feed
         require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.4 } }
         auto_use: [ layout, views ]

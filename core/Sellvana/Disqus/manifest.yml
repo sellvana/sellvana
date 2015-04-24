@@ -1,7 +1,7 @@
 modules:
     Sellvana_Disqus:
         version: 0.1.0
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0 } }
         translations: { en: en.php }
         description: Embed Disqus comments on any page

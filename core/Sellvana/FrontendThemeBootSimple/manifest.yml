@@ -1,7 +1,7 @@
 modules:
     Sellvana_FrontendThemeBootSimple:
         version: 0.1.0
-        channel: beta
+        channel: alpha
         description: Bootstrap 3.x simple theme
         require: { module: { FCom_Frontend: 0.1.0 } }
 
