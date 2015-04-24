@@ -20,7 +20,7 @@ require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
 
     window.addBlankRows = function() {
         var rows = mainGrid.getRows();
-        mainGrid.addRows([{id:rows.length++}]);
+        mainGrid.addRows([{id:rows.length}]);
     }
 
     /*

@@ -101,7 +101,9 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         ];
         $config['events']             = ['add'];
         $config['grid_before_create'] = 'iePermGridRegister';
-
+        $config['callbacks'] = [
+            'componentDidMount' => 'iePermGridRegister'
+        ];
         $data                      = $this->FCom_Core_ImportExport->collectExportableModels();
         $permissions               = array_flip(explode("\n", $model->get('permissions_data')));
         $default                   = [

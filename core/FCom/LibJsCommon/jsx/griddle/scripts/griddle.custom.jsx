@@ -427,12 +427,12 @@ var Griddle = React.createClass({
         for(var i = 0; i<data.length; i++){
             var mappedData = _.pick(data[i], cols.concat(meta));
 
-            if(typeof mappedData[that.props.childrenColumnName] !== "undefined" && mappedData[that.props.childrenColumnName].length > 0){
+            /*if(typeof mappedData[that.props.childrenColumnName] !== "undefined" && mappedData[that.props.childrenColumnName].length > 0){
                 //internally we're going to use children instead of whatever it is so we don't have to pass the custom name around
                 mappedData["children"] = that.getDataForRender(mappedData[that.props.childrenColumnName], cols, false);
 
                 if(that.props.childrenColumnName !== "children") { delete mappedData[that.props.childrenColumnName]; }
-            }
+            }*/
 
             transformedData.push(mappedData);
         }
