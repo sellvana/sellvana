@@ -189,6 +189,7 @@
 
         var variantFields = {
             selectId: '#sel_var_field',
+            btnAddFieldId: '#btn_add_var_field',
             listId: '#variants-tab-field',
             inputClass: '.select-value-field',
             customFields: [],
@@ -196,6 +197,28 @@
                 if (variantFieldGrid) {
                     this.customFields = variantFieldGrid.getRows();
                     console.log('customFields', this.customFields);
+                }
+            },
+            renderFieldItemForList: function(field) {
+                return $('<li>', { 'class': 'dd-item dd3-item' }).append(
+                        $('<div>', { 'class': 'icon-ellipsis-vertical dd-handle dd3-handle' }),
+                        $('<div>', { 'class': 'dd3-content' }).append(
+                                $('<label>', { text: field.name }),
+                                $('<i>', {
+                                    'class': 'icon-remove pull-right btn-link btn-delete-field',
+                                    'data-name': field.name,
+                                    'data-code': field.field_code,
+                                    'data-id': field.id
+                                })
+                        )
+                )
+            },
+            addField: function(field) {
+                if (typeof field.id != 'undefined') {
+                    return;
+                }
+                if (!_.findWhere(this.customFields, { id: field.id })) {
+                    this.customFields.push(field);
                 }
             },
             populateFields: function() {
@@ -208,20 +231,7 @@
                         _.forEach(variantFields.customFields, function (field) {
                             if (field.id == col.field_id) {
                                 select.find("option[value='" + field.id + "']").addClass('hide');
-                                list.append(
-                                        $('<li>', { 'class': 'dd-item dd3-item' }).append(
-                                                $('<div>', { 'class': 'icon-ellipsis-vertical dd-handle dd3-handle' }),
-                                                $('<div>', { 'class': 'dd3-content' }).append(
-                                                        $('<label>', { text: field.name }),
-                                                        $('<i>', {
-                                                            'class': 'icon-remove pull-right btn-link btn-delete-field',
-                                                            'data-name': field.name,
-                                                            'data-code': field.field_code,
-                                                            'data-id': field.id
-                                                        })
-                                                )
-                                        )
-                                )
+                                list.append(variantFields.renderFieldItemForList(field));
                             }
                         })
                     });
@@ -265,7 +275,7 @@
                 }
             },
             handleEventFields: function() {
-                $(this.selectId).val('').select2();
+                this.resetSelect();
                 $(this.listId).sortable({
                     scroll: false,
                     axis:'x',
@@ -273,6 +283,72 @@
                         console.log('sortable.update');
                     }
                 });
+
+                //add field to list and variantGrid
+                $(this.btnAddFieldId).on('click', function() {
+                    var select = $(variantFields.selectId);
+                    var list = $(variantFields.listId);
+                    var val = select.val();
+                    var optSelected = select.find("option:selected");
+                    if(!val) {
+                        return;
+                    }
+
+                    $.get('{{ APP.href('/customfields/fields/options?id=') | raw }}'+val,
+                            function(response) {
+                                if (response.success) {
+                                    var field = { id: val, name: optSelected.text(), field_code: optSelected.attr('data-code'), options: response.options };
+                                    variantFields.addField(field);
+
+                                    optSelected.addClass('hide');
+                                    select.val('');
+
+                                    list.append(variantFields.renderFieldItemForList(field));
+                                    variantFields.addGridColumn(field);
+                                }
+                            }
+                    );
+
+                });
+            },
+            addGridColumn: function(field) {
+                if (variantGrid) {
+                    var columns = variantGrid.getInitColumns();
+                    if (!_.findWhere(columns, {name: field.field_code})) {
+                        columns.push(field.field_code);
+                        var filteredColumns = variantGrid.getColumns();
+                        filteredColumns.push(field.field_code);
+                        variantGrid.props.columnMetadata.push({
+                            name: field.field_code,
+                            label: field.name,
+                            field_id: field.id,
+                            width: 200,
+                            addable: true,
+                            position: 1,
+                            display: 'eval',
+                            print: '"<p style=\'overflow: hidden\'><input type=\'hidden\' name=\''+ field.field_code +'\' class=\'select-value-field required\' style=\'width: 170px;\' /></p>"',
+                            options: field.options,
+                            'default': ''
+                        });
+
+                        variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns }, function() {
+                            $(variantGrid.getDOMNode()).find('td[data-col='+field.field_code+']').find(variantFields.inputClass).select2({
+                                placeholder: 'Select field value',
+                                allowClear: true,
+                                data: function () {
+                                    return { results: field.options };
+                                }
+                            });
+                        })
+                    }
+
+                }
+            },
+            resetSelect: function() {
+                $(this.selectId).val('').select2();
+            },
+            validateUniqueVariant: function() {
+
             }
         };
 
@@ -288,6 +364,9 @@
             }
             variantImages.populateImages();
             variantImages.handleEventImages();
+            if (triggerName == 'componentDidUpdate') {
+                variantFields.populateFields();
+            }
         };
 
 
@@ -297,7 +376,9 @@
                 variantFields.init();
             }
             variantFields.populateFields();
-            variantFields.handleEventFields();
+            if (triggerName == 'componentDidMount') {
+                variantFields.handleEventFields();
+            }
         }
 
     });

@@ -40,7 +40,7 @@ define(['underscore', 'react'], function (_, React) {
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
                 if (!col) {
-                    return null;
+                    return <td></td>;
                 }
 
                 var node = "";
