@@ -7,7 +7,7 @@
 <input type='hidden' name='model[ie_perm_ids_add][export]' id='ie_perm_ids_add_export'/>
 
 <script>
-require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
+/*require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
     var iePermGrid, addedImportModels = [], addedExportModels = [];
 
     function updateFormData() {
@@ -94,8 +94,80 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
         updateFormData();
     };
 
-});
+});*/
 </script>
 
-{{ THIS.view('core/backbonegrid').set('grid', ieConfig.getIeConfig(m)) | raw }}
+{{ THIS.view('core/griddle').set('grid', ieConfig.getIeConfig(m)) | raw }}
 
+<script>
+    require(['jquery', 'underscore', 'react'], function($, _, React) {
+        var iePermGrid, iePermNode;
+        window.iePermGridRegister = function(grid) {
+            iePermGrid = grid;
+            iePermNode = $(iePermGrid.getDOMNode());
+            iePermNode.find('input[type=checkbox]').on('click', function(){
+                var val = this.checked;
+                var id = this.id.split('-');
+                var rowId = id.pop();
+                var op = id.pop();
+
+                var rowsCol = iePermGrid.getRows();
+                var tRow;
+                _.each(rowsCol, function(row) {
+                    if (row.id === rowId) {
+                        tRow = row;
+                        return;
+                    }
+                });
+
+                var children = tRow['children'];
+                if (children) {
+                    _.each(children, function (o) {
+                        var chId = [id[0]];
+                        chId.push(op);
+                        chId.push(o);
+                        chId = chId.join('-');
+                        var $chBox = iePermNode.find('#' + chId);
+                        if (val && !$chBox.is(':checked')) {
+                            $chBox.click();
+                        } else if (!val && $chBox.is(':checked')) {
+                            $chBox.click();
+                        }
+                    });
+                }
+                if (!val) {
+                    var parent = tRow['parent'];
+                    if (parent) {
+                        var pId = [id[0]];
+                        pId.push(op);
+                        pId.push(parent);
+                        pId = pId.join('-');
+                        $('#' + pId)[0].checked = false;
+                    }
+                }
+                updateFormData();
+            });
+        }
+        function updateFormData() {
+            var addedImportRows = _.filter(iePermGrid.getRows(), function (row) {
+                var id = '#' + iePermGrid.getConfig('id') + '-' + 'import' + '-' + row['id'];
+                var $cb = $(id);
+                var $cb2 = $cb[0];
+                return $cb2 && $cb2.checked;
+            });
+
+            addedImportModels = _.pluck(addedImportRows, 'id');
+            $('#ie_perm_ids_add_import').val(addedImportModels.join(','));
+
+            var addedExportRows = _.filter(iePermGrid.getRows(), function (row) {
+                var id = '#' + iePermGrid.getConfig('id') + '-' + 'export' + '-' + row['id'];
+                var $cb = $(id);
+                var $cb2 = $cb[0];
+                return $cb2 && $cb2.checked;
+            });
+
+            addedExportModels = _.pluck(addedExportRows, 'id');
+            $('#ie_perm_ids_add_export').val(addedExportModels.join(','));
+        }
+    });
+</script>

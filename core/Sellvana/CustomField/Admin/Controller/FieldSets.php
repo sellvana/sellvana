@@ -168,7 +168,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 'columns' => [
                     ['type' => 'row_select'],
                     ['type' => 'btn_group', 'buttons' => [
-                        ['name' => 'edit', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
+                        ['name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
                         //['name' => 'edit'],
                         ['name' => 'delete']
                     ]],
@@ -218,13 +218,13 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                     '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
                 ],
                 'actions' => [
-                    'add-field' => [
+                    /*'add-field' => [
                         'caption' => 'Add a field',
                         'type' => 'button',
                         'id' => 'add-field-from-grid',
                         'class' => 'btn-primary',
                         'callback' => 'showModalToAddField',
-                    ],
+                    ],*/
                     'edit' => true,
                     'delete' => true
                 ],

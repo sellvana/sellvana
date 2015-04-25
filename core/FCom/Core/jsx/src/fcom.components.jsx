@@ -37,6 +37,18 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
             }
 
             return dateTime;
+        },
+        updateModalWidth: function(modal) {
+            //todo: add css class to modal to pre-define width, eg: large, medium, small
+            $(modal.getDOMNode()).find('.modal-dialog').css('width', '900px');
+        },
+        /**
+         * remove special chars
+         * @param {string} str
+         */
+        removeSpecialChars: function(str) { //todo: put this function to global utilities object
+            var label = str.substr(0, str.lastIndexOf('.'));
+            return label.replace(/[^A-Z0-9]/ig, ' ');
         }
     };
 
@@ -390,7 +402,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
 
             var label = '';
             var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
-            if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
+            if (typeof(column['form_hidden_label']) === 'undefined' || !column['form_hidden_label']) {
                 label = (
                     <div className="control-label col-sm-3">
                         <label htmlFor={column.name}>
@@ -402,11 +414,11 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
 
             var validationRules = that.validationRules(column.validation);
             var input = '';
-            if (typeof column.element_print != 'undefined') { //custom html for element_print
-                if (typeof(column.form_hidden_label) === 'undefined' || !column.form_hidden_label) {
-                    input = '<div class="control-label col-sm-3"><label htmlFor='+column.name+'>'+column.label+'</label></div>';
+            if (typeof column['element_print'] != 'undefined') { //custom html for element_print
+                if (typeof(column['form_hidden_label']) === 'undefined' || !column['form_hidden_label']) {
+                    input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
                 }
-                input += '<div class="controls col-sm-8">' + column.element_print + '</div>';
+                input += '<div class="controls col-sm-8">' + column['element_print'] + '</div>';
                 return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
             } else {
                 switch (column.editor) {
