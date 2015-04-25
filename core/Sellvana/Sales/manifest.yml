@@ -24,7 +24,7 @@ modules:
                     - [ /orderstatus/?.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
                     - [ /orderstatecustom/?.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
                 observe:
-                    - [ "FCom_Admin_View_Header::getNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
+                    - [ "FCom_Admin_View_Header::getNotifications:local", Sellvana_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", Sellvana_Sales_Admin_Controller_Orders.onSaveAdminSettings ]
                     - [ "FCom_Admin_Controller_HeaderSearch::action_index", Sellvana_Sales_Admin_Controller_Orders.onHeaderSearch  ]

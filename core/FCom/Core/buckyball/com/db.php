@@ -536,6 +536,7 @@ EOT
 
     /**
      * @param string $fullTableName
+     * @param string $connectionName
      * @throws BException
      */
     protected static function checkTable($fullTableName, $connectionName = null)

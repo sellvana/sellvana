@@ -111,7 +111,7 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
      * @return array
      * @throws BException
      */
-    public function getProductDetails($id)
+    public function getProductDetails($id, $thumbSize = 35)
     {
         $details = [];
         /** @var Sellvana_Catalog_Model_Product $product */
@@ -123,7 +123,7 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
         if ($product) {
             $details = [
                 'id' => $product->id(),
-                'src' => $product->imageUrl(),
+                'src' => $product->thumbUrl($thumbSize),
                 'alt' => $product->get('product_name'),
             ];
         }

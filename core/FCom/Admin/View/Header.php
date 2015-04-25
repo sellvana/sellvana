@@ -37,12 +37,15 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
     }
 
     /**
+     * @param string $type (local, remote, realtime)
      * @return array
      */
-    public function getNotifications()
+    public function getNotifications($type)
     {
+        $iconClasses = ['local' => 'icon-bell', 'remote' => 'icon-rss', 'realtime' => 'icon-bolt'];
+        $titles = ['local' => 'Local Alerts', 'remote' => 'Remote Notifications', 'realtime' => 'Real-Time Activity'];
         $notifications = [];
-        $this->BEvents->fire(__METHOD__, ['notifications' => &$notifications]);
+        $this->BEvents->fire(__METHOD__ . ':' . $type, ['notifications' => &$notifications]);
         $conf      = $this->BConfig;
         $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');
         $result = [];
@@ -68,15 +71,12 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
             $result[$item['group']][] = $item;
         }
         unset($item);
-        return ['count' => sizeof($notifications), 'groups' => $result];
-    }
-
-    /**
-     * @return array
-     */
-    public function getRecentActivity()
-    {
-        return [];
+        return [
+            'title' => !empty($titles[$type]) ? $titles[$type] : null,
+            'icon_class' => !empty($iconClasses[$type]) ? $iconClasses[$type] : null,
+            'count' => sizeof($notifications),
+            'groups' => $result
+        ];
     }
 
     /**

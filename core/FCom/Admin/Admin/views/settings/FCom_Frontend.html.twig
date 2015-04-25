@@ -20,8 +20,10 @@
             <div class="col-md-8 group-ip-mode"></div>
         </div>
 
-        {{ forms.textarea(fieldData, {name:'config[recovery_modules][FCom_Frontend]', id:'recovery_modules-FCom_Frontend',
-            label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery_modules/FCom_Frontend'), raw:1 }) }}
+        {{ forms.textarea(fieldData, {name:'config[recovery][FCom_Frontend][modules]', id:'recovery-FCom_Frontend-modules',
+            label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery/FCom_Frontend/modules'), raw:1 }) }}
+        {{ forms.input(fieldData, {name:'config[recovery][FCom_Frontend][redirect]', id:'recovery-FCom_Frontend-redirect',
+            label:'URL to redirect in RECOVERY mode'|_, value:c.get('recovery/FCom_Frontend/redirect') }) }} }}
 
         {{ forms.boolean(fieldData, {field:'enable_locales', label:'Enable UI Multi Locale'|_ }) }}
         {{ forms.select(fieldData, {field:'default_locale', label:'Default Product Locale', options:locales }) }}

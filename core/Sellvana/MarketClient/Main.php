@@ -140,6 +140,11 @@ class Sellvana_MarketClient_Main extends BClass
         return $this;
     }
 
+    public function onGetHeaderNotifications($args)
+    {
+        //$args['notifications'][] =
+    }
+
     public function onInstallStep3Post($args)
     {
         if (empty($args['data']['account'])) {

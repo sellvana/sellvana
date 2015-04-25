@@ -16,7 +16,8 @@ modules:
                 observe:
                     - [ "FCom_Admin_Controller_Modules::gridViewBefore", Sellvana_MarketClient_Admin.onModulesGridViewBefore ]
                     - [ "FCom_Admin_Controller_Modules::gridView", Sellvana_MarketClient_Admin.onModulesGridView ]
-                    #- [ BLayout::hook:notification, Sellvana_MarketClient_Admin.hookFindModulesForUpdates ]
+                    - [ "FCom_Admin_View_Header::getNotifications:remote", Sellvana_MarketClient_Main.onGetHeaderNotifications ]
+
 
             FCom_Cron:
                 crontab:

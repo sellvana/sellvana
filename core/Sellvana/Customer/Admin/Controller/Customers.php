@@ -128,7 +128,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
         if ($this->BConfig->get('modules/Sellvana_Customer/use_gravatar')) {
             $img = $this->BUtil->gravatar($m->email);
         } else {
-            $media = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+            $media = $this->BConfig->get('web/media_dir') ?: 'media';
             $img = $this->FCom_Core_Main->resizeUrl($media . '/silhouette.jpg', ['s' => 98]);
         }
         $args['view']->set([
