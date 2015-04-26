@@ -37,6 +37,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     /**
      * Get or create client record for current browser session
+     *
+     * @param boolean $refresh
      * @return FCom_PushServer_Model_Client
      */
     public function sessionClient($refresh = false)

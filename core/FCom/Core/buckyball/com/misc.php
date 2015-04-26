@@ -3263,13 +3263,13 @@ class BDebug extends BClass
                 . (!empty($e['module']) ? $e['module'] : '') . "</td></tr>";
         }
 ?></tbody></table></div><script>
-        /*
+
         if (require) {
             require(['jquery.tablesorter'], function() {
                 $('#buckyball-debug-table').tablesorter();
             })
         }
-        */
+
 </script><?php
         $html = ob_get_clean();
         if ($return) {

@@ -1,6 +1,6 @@
 modules:
     Sellvana_Wishlist:
-        version: 0.1.2
+        version: 0.1.3
         channel: alpha
         translations: { en: en.php }
         require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_Customer: 0.1.3, Sellvana_Sales: 0.3.7 } }

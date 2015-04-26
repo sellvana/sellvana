@@ -142,7 +142,15 @@ class Sellvana_MarketClient_Main extends BClass
 
     public function onGetHeaderNotifications($args)
     {
-        //$args['notifications'][] =
+        $updates = $this->Sellvana_MarketClient_RemoteApi->fetchUpdatesFeed();
+
+        if (!empty($updates['items'])) {
+            foreach ($updates['items'] as $item) {
+                //TODO: make sure correct structure
+                $item['feed'] = 'remote';
+                $args['items'][] = $item;
+            }
+        }
     }
 
     public function onInstallStep3Post($args)

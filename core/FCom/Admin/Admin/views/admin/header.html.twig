@@ -1,9 +1,5 @@
 {% set user = APP.instance("FCom_Admin_Model_User").sessionUser() %}
-{% set allNotifications = {
-    'local': THIS.getNotifications('local'),
-    'remote': THIS.getNotifications('remote'),
-    'realtime': THIS.getNotifications('realtime'),
-} %}
+{% set allNotifications = THIS.getAllNotifications() %}
 {% set locales = THIS.getLocales() %}
 {% set curLocale = THIS.getCurrentLocale() %}
 {% set storeName = CONFIG.get("modules/FCom_Core/store_name") %}
@@ -45,7 +41,8 @@
       {% endif %}
 
       {% for notifType, notifications in allNotifications %}
-        <li class="dropdown widget" id="header-notifications-{{ notifType }}" {{ notifications.count == 0 ? 'style="display:none"' }}>
+        <li class="dropdown widget header-notifications" id="header-notifications-{{ notifType }}"
+                {{ notifications.count == 0 ? 'style="display:none"' }}>
           <a class="dropdown-toggle" data-toggle="dropdown" href="#" title="{{ notifications.title|_ }}">
             <i class="{{ notifications.icon_class|default('icon-bell') }}"></i>
             <div class="label" id="header-notifications-{{ notifType }}-count">{{ notifications.count }}</div>
@@ -57,21 +54,23 @@
                   <a href="{{ item.href }}" title="{{ item.title }}">
                     <div class="widget-body">
                       <div class="pull-left icon">
-                        <i class="{{ item.class }}"></i>
+                        <i class="{{ item.icon_class }}"></i>
                       </div>
                       <div class="pull-left text">
                         {{ item.content | safehtml }}
-                        <small class="text-muted timeago" title="{{ item.ts }}">{{ item.ts }}</small>
                       </div>
+                        <small class="pull-right text-muted timeago" title="{{ item.ts }}">{{ item.ts }}</small>
                     </div>
                   </a>
                 </li>
                 <li class="divider"></li>
               {% endfor %}
             {% endfor %}
+              {#
             <li class="widget-footer">
               <a href="#">{{ "All notifications" }}</a>
             </li>
+              #}
           </ul>
         </li>
       {% endfor %}

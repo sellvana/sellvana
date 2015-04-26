@@ -6,12 +6,14 @@ modules:
 
         require: { module: { FCom_Core: 0.1.0 } }
 
+        observe:
+            - [ "BSession::regenerateId", "FCom_PushServer_Main::onRegenerateSessionId" ]
+
         areas:
             FCom_Admin:
                 auto_use: [ layout, views ]
                 observe:
                     - [ "FCom_Admin_Model_User::logout", "FCom_PushServer_Main::onAdminUserLogout" ]
-                    - [ "BSession::regenerateId", "FCom_PushServer_Main::onRegenerateSessionId" ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]

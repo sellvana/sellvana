@@ -2,6 +2,8 @@
 
 /**
  * Class Sellvana_MarketClient_RemoteApi
+ *
+ * @property FCom_Admin_Model_Activity $FCom_Admin_Model_Activity
  */
 final class Sellvana_MarketClient_RemoteApi extends BClass
 {
@@ -259,5 +261,22 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         } else {
             throw new BException("Problem with write permissions ({$filepath})");
         }
+    }
+
+    public function fetchUpdatesFeed()
+    {
+        $cacheKey = 'marketclient_updates_last_fetch_at';
+        if ($this->BCache->load($cacheKey)) {
+            return;
+        }
+        $this->BCache->save($cacheKey, $this->BDb->now(), 3600);
+
+        $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
+        $url = $this->getUrl('v1/market/site/updates', [
+            'site_key' => $siteKey,
+        ]);
+        $response = $this->BUtil->remoteHttp('GET', $url);
+        $result = $response ? $this->BUtil->fromJson($response) : [];
+        return $result;
     }
 }

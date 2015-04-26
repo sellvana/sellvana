@@ -1,6 +1,6 @@
 modules:
     FCom_Admin:
-        version: 0.2.0
+        version: 0.2.1
         channel: alpha
         description: Base Admin functionality
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0 } }
