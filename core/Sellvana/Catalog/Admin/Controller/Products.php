@@ -83,10 +83,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function afterInitialData($rows)
     {
-        $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+        $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
         foreach ($rows as & $row) {
-            $thumbUrl = $row['thumb_url'] ? $row['thumb_url'] : 'image-not-found.png';
+            $thumbUrl = $row['thumb_url'] ?: 'image-not-found.png';
             $row['thumb_path'] = $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]);
         }
         return $rows;
@@ -98,7 +98,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function gridDataAfter($data)
     {
-        $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+        $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
 
         $data = parent::gridDataAfter($data);

@@ -1,7 +1,7 @@
 modules:
     Sellvana_Cms:
         version: 0.1.6
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_LibTwig: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         translations: { en: en.php }
         description: "CMS for custom pages and blocks"

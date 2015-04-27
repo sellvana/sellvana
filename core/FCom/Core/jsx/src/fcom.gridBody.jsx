@@ -19,7 +19,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 "className": ""
             }
         },
-        doRowAction: function(event) {
+        doRowAction: function(callback, event) {
             /*if (this.props.getConfig('data_mode') == 'local') {
                 return this.doRowLocalAction(event);
             }*/
@@ -28,8 +28,8 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
             var rowId = event.target.dataset.row;
             var gridId = this.props.getConfig('id');
             var data = this.props.originalData ? this.props.originalData : this.props.data;
-            var isLocalMode = this.props.isLocalMode();
-
+            var isLocalMode = !this.props.hasExternalResults();
+            var editUrl = this.props.getConfig('edit_url');
             var row = _.find(data, function(item) {
                 if (item.id == rowId || item.id == parseInt(rowId)) {
                     return true;
@@ -41,8 +41,6 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 return false;
             }
 
-
-            console.log('action', action);
             switch (action) {
                 case 'edit':
                     //console.log('render modal');
@@ -67,9 +65,10 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                         if (isLocalMode) {
                             this.props.removeRows([row]);
                         } else {
-                            var editUrl = this.props.getConfig('edit_url');
+
                             if (editUrl.length > 0 && rowId) {
                                 $.post(editUrl, {id: rowId, oper: 'del'}, function() {
+                                    that.props.removeSelectedRows([row]);
                                     that.props.refresh();
                                 });
                             }
@@ -77,7 +76,11 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     }
                     break;
                 default:
-                    console.log('do-row-action');
+                    if (typeof window[callback] === 'function') {
+                        return window[callback](row);
+                    } else {
+                        console.log('Do row custom action');
+                    }
                     break;
             }
         },
@@ -91,11 +94,11 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
             /*console.log('FComGridBody.columnMetadata', this.props.columnMetadata);
             console.log('FComGridBody.columns', this.props.columns);*/
 
-            var title = <FComGridTitle columns={that.props.columns} changeSort={that.props.changeSort} sortColumn={that.props.sortColumn} getConfig={that.props.getConfig}
-                sortAscending={that.props.sortAscending} columnMetadata={that.props.columnMetadata} data={this.props.data}
-                originalData={this.props.originalData} setHeaderSelection={that.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
-                addSelectedRows={this.props.addSelectedRows} getSelectedRows={that.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows}
-                removeSelectedRows={this.props.removeSelectedRows}
+            var title = <FComGridTitle columns={this.props.columns} changeSort={this.props.changeSort} sortColumn={this.props.sortColumn} getConfig={this.props.getConfig}
+                sortAscending={this.props.sortAscending} columnMetadata={this.props.columnMetadata} data={this.props.data}
+                originalData={this.props.originalData} setHeaderSelection={this.props.setHeaderSelection} getHeaderSelection={this.props.getHeaderSelection}
+                addSelectedRows={this.props.addSelectedRows} getSelectedRows={this.props.getSelectedRows}  clearSelectedRows={this.props.clearSelectedRows}
+                removeSelectedRows={this.props.removeSelectedRows} saveLocalState={this.saveLocalState}
                 ref={'gridTitle'}
             />;
 
@@ -270,10 +273,8 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     );
                 }
 
-                if (that.props.sortColumn == col && that.props.sortAscending == 'asc') {
-                    columnClass += "sort-ascending th-sorting-asc"
-                }  else if (that.props.sortColumn == col && that.props.sortAscending == 'desc') {
-                    columnClass += "sort-descending th-sorting-desc"
+                if (that.props.sortColumn == col) {
+                    columnClass += that.props.sortAscending ? 'sort-ascending th-sorting-asc' : 'sort-descending th-sorting-desc';
                 }
 
                 var displayName = col;
@@ -290,9 +291,9 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
 
                 var width = meta && meta.width ? {width: meta.width} : {};
 
-                if (typeof meta !== "undefined" && meta.name == 'btn_group') {
+                if (typeof meta !== "undefined" && (meta.name == 'btn_group' || meta.sortable == false)) {
                     return (
-                        <th data-title={col} className={columnClass} key={col}>
+                        <th data-title={col} className={columnClass} style={width} key={col}>
                             {displayName}
                         </th>
                     )

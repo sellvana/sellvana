@@ -6,6 +6,7 @@
 <h1>{{ 'Thank you for your order!'|_ }}</h1>
 
 <h4>{{ 'Your order number is #%s'|_(order.unique_id) }}</h4>
+<p><a href="{{ APP.href('orders/view?id=' ~ order.unique_id) }}">{{ 'View Your Order'|_ }} </a></p>
 
 {% if not sessCustomer %}
     {% if emailCustomer %}

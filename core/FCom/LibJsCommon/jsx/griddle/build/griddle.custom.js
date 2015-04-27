@@ -343,8 +343,9 @@ var Griddle = React.createClass({displayName: "Griddle",
 
         //set current filter state
         var filters = {};
-        if (this.getConfig('filters').length) {
-            _.forEach(this.getConfig('filters'), function(f) {
+        var configFilters = this.getConfig('filters');
+        if (configFilters && configFilters.length) {
+            _.forEach(configFilters, function(f) {
                 if (f.val != '') {
                     f.submit = true;
                     filters[f.field] = f;
@@ -426,12 +427,12 @@ var Griddle = React.createClass({displayName: "Griddle",
         for(var i = 0; i<data.length; i++){
             var mappedData = _.pick(data[i], cols.concat(meta));
 
-            if(typeof mappedData[that.props.childrenColumnName] !== "undefined" && mappedData[that.props.childrenColumnName].length > 0){
+            /*if(typeof mappedData[that.props.childrenColumnName] !== "undefined" && mappedData[that.props.childrenColumnName].length > 0){
                 //internally we're going to use children instead of whatever it is so we don't have to pass the custom name around
                 mappedData["children"] = that.getDataForRender(mappedData[that.props.childrenColumnName], cols, false);
 
                 if(that.props.childrenColumnName !== "children") { delete mappedData[that.props.childrenColumnName]; }
-            }
+            }*/
 
             transformedData.push(mappedData);
         }
@@ -457,12 +458,12 @@ var Griddle = React.createClass({displayName: "Griddle",
         var settings = this.props.showSettings ?
         (
             this.props.useCustomSettings
-            ? React.createElement(this.props.customSettings, {columnMetadata: this.props.columnMetadata, selectedColumns: this.getColumns, setColumns: this.setColumns,
-                getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh,
-                setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState,
-                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, removeRows: this.removeRows, getCurrentGrid: this.getCurrentGrid,
-                ref: 'gridSettings', hasExternalResults: this.hasExternalResults, updateRows: this.updateRows, saveModalForm: this.saveModalForm,
-                clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows }
+            ? React.createElement(this.props.customSettings, {columnMetadata: this.props.columnMetadata, selectedColumns: this.getColumns, setColumns: this.setColumns, 
+                getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh, 
+                setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState, 
+                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, removeRows: this.removeRows, getCurrentGrid: this.getCurrentGrid, 
+                ref: 'gridSettings', hasExternalResults: this.hasExternalResults, updateRows: this.updateRows, saveModalForm: this.saveModalForm, 
+                clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows}
             )
             : React.createElement("span", {className: "settings", onClick: this.toggleColumnChooser}, this.props.settingsText, " ", React.createElement("i", {className: "glyphicon glyphicon-cog"}))
         ) : "";
@@ -477,10 +478,6 @@ var Griddle = React.createClass({displayName: "Griddle",
             //figure out which columns are displayed and show only those
             var data = this.getDataForRender(results, cols, true);
 
-            /*console.log('dataForRender', data);
-            console.log('filteredResults', this.state.filteredResults);
-            console.log('results', this.state.results);*/
-
             var meta = this.props.metadataColumns;
             meta.push(this.props.childrenColumnName);
 
@@ -493,18 +490,18 @@ var Griddle = React.createClass({displayName: "Griddle",
                 ? (React.createElement(CustomFormatContainer, {data: data, columns: cols, metadataColumns: meta, className: this.props.customFormatClassName, customFormat: this.props.customFormat}))
                 : (
                     this.props.useCustomGrid
-                    ? (React.createElement(this.props.customGrid, {columnMetadata: this.props.columnMetadata, data: data, originalData: results, columns: cols, metadataColumns: meta,
-                        className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending,
-                        getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection,
-                        getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows,
+                    ? (React.createElement(this.props.customGrid, {columnMetadata: this.props.columnMetadata, data: data, originalData: results, columns: cols, metadataColumns: meta, 
+                        className: this.props.tableClassName, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, 
+                        getConfig: this.getConfig, refresh: this.refresh, setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, 
+                        getSelectedRows: this.getSelectedRows, addSelectedRows: this.addSelectedRows, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows, 
                         hasExternalResults: this.hasExternalResults, removeRows: this.removeRows, updateRows: this.updateRows, saveModalForm: this.saveModalForm, saveLocalState: this.saveLocalState, ref: 'gridBody'}
                     ))
                     : (React.createElement(GridBody, {columnMetadata: this.props.columnMetadata, data: data, columns: cols, metadataColumns: meta, className: this.props.tableClassName}))
                 );
 
             pagingContent = this.props.useCustomPager && this.props.customPager
-                ? (React.createElement(this.props.customPager, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page, maxPage: this.state.maxPage ? this.state.maxPage : 0,
-                    setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText, totalResults: this.state.totalResults,
+                ? (React.createElement(this.props.customPager, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page, maxPage: this.state.maxPage ? this.state.maxPage : 0, 
+                    setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText, totalResults: this.state.totalResults, 
                     getConfig: this.getConfig, setPageSize: this.setPageSize, resultsPerPage: this.props.resultsPerPage, getHeaderSelection: this.getHeaderSelection}))
                 : (React.createElement(GridPagination, {next: this.nextPage, previous: this.previousPage, currentPage: this.state.page ? this.state.page : 0, maxPage: this.state.maxPage, setPage: this.setPage, nextText: this.props.nextText, previousText: this.props.previousText}));
         } else {
@@ -537,12 +534,12 @@ var Griddle = React.createClass({displayName: "Griddle",
             var rowTopClassName = "f-grid-top f-grid-toolbar clearfix " + this.getConfig('id');
             var rowBottomClassName = "row f-grid-bottom f-grid-toolbar clearfix " + this.getConfig('id');
             topSection = (
-                React.createElement("div", null,
-                    React.createElement("div", {className: rowTopClassName},
+                React.createElement("div", null, 
+                    React.createElement("div", {className: rowTopClassName}, 
                         filter
-                    ),
-                    React.createElement("div", {className: rowBottomClassName},
-                        settings,
+                    ), 
+                    React.createElement("div", {className: rowBottomClassName}, 
+                        settings, 
                         that.props.showPager ? pagingContent : ""
                     )
                 )
@@ -550,8 +547,8 @@ var Griddle = React.createClass({displayName: "Griddle",
         }
 
         var columnSelector = this.state.showColumnChooser && !this.props.useCustomSettings ? (
-            React.createElement("div", {className: "row"},
-                React.createElement("div", {className: "col-md-12"},
+            React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "col-md-12"}, 
                     React.createElement(GridSettings, {columns: keys, selectedColumns: cols, setColumns: this.setColumns, settingsText: this.props.settingsText, maxRowsText: this.props.maxRowsText, setPageSize: this.setPageSize, resultsPerPage: this.props.resultsPerPage, allowToggleCustom: this.props.allowToggleCustom, toggleCustomFormat: this.toggleCustomFormat, useCustomFormat: this.props.useCustomFormat, enableCustomFormatText: this.props.enableCustomFormatText, columnMetadata: this.props.columnMetadata})
                 )
             )
@@ -564,10 +561,10 @@ var Griddle = React.createClass({displayName: "Griddle",
 
         var gridBody = this.props.useCustomFormat || this.props.customGrid
             ?       React.createElement("div", {className: "scrollable-area"}, resultContent)
-            :       (React.createElement("div", {className: "grid-body"},
-                        this.props.showTableHeading ? React.createElement("table", {className: headerTableClassName},
+            :       (React.createElement("div", {className: "grid-body"}, 
+                        this.props.showTableHeading ? React.createElement("table", {className: headerTableClassName}, 
                             React.createElement(GridTitle, {columns: cols, changeSort: this.changeSort, sortColumn: this.state.sortColumn, sortAscending: this.state.sortAscending, columnMetadata: this.props.columnMetadata})
-                        ) : "",
+                        ) : "", 
                         resultContent
                         ));
 
@@ -596,9 +593,9 @@ var Griddle = React.createClass({displayName: "Griddle",
             </div>
         );*/
         return (
-            React.createElement("div", {className: gridClassName},
-                topSection,
-                columnSelector,
+            React.createElement("div", {className: gridClassName}, 
+                topSection, 
+                columnSelector, 
                 gridBody
             )
         );
@@ -1071,7 +1068,7 @@ var Griddle = React.createClass({displayName: "Griddle",
         }
     },
     getRows: function() {
-        console.log('state', this.state);
+        //console.log('state', this.state);
         return this.state.filteredResults || this.state.results;
     },
     /**
@@ -1123,6 +1120,10 @@ var Griddle = React.createClass({displayName: "Griddle",
     getCurrentGrid: function() {
         return this;
     },
+    /**
+     * trigger global callback function base on name
+     * @param name
+     */
     triggerCallback: function(name) {
         var that = this;
         var callbacks = this.getConfig('callbacks');
@@ -1145,6 +1146,44 @@ var Griddle = React.createClass({displayName: "Griddle",
                 console.log('DEBUG: cannot find call back ' + funcName + ' for name ' + name);
             }
         }
+    },
+    /**
+     * get child component by React refs
+     * @param {string} childName (body | settings | rows)
+     * @returns {*}
+     */
+    getChildComponent: function(childName) {
+        var child = null;
+        var refs = this.refs;
+        if (refs) {
+            switch (childName) {
+                case 'gridBody':
+                case 'body':
+                    child = refs.gridBody;
+                    break;
+                case 'gridSettings':
+                case 'settings':
+                    child = refs.gridSettings;
+                    break;
+                case 'rows':
+                    child = refs.gridBody.refs;
+                    break;
+            }
+        }
+
+        return child;
+    },
+    /**
+     * get row component
+     * @param id
+     * @returns {*}
+     */
+    getRowComponent: function(id) { //todo: do we need to merge this with this.getRows()
+        var rows = this.getChildComponent('rows');
+        if (rows && typeof rows['row' + id] !== 'undefined') {
+            return rows['row' + id];
+        }
+        return null;
     }
 });
 

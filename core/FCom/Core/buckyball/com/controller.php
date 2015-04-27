@@ -1053,7 +1053,7 @@ class BRequest extends BClass
 
         mb_internal_encoding('UTF-8');
         if (version_compare(PHP_VERSION, '5.6.0', '<')) {
-            // bellow emits deprecated errors on php 5.6
+            // below emits deprecated errors on php 5.6
             iconv_set_encoding('input_encoding', 'UTF-8');
             iconv_set_encoding('internal_encoding', 'UTF-8');
             iconv_set_encoding('output_encoding', 'UTF-8');
@@ -1068,6 +1068,7 @@ class BRequest extends BClass
 
     public function stripTagsRecursive(&$data, $forUrlPath, $curPath = null)
     {
+        $allowedTags = $this->getAllowedTags();
         foreach ($data as $k => &$v) {
             $childPath = null === $curPath ? $k : ($curPath . '/' . $k);
             if (is_array($v)) {
@@ -1080,7 +1081,7 @@ class BRequest extends BClass
                 } else {
                     $tags = $this->_postTagsWhitelist[$forUrlPath][$childPath];
                     if ('+' === $tags) {
-                        $tags = $this->getAllowedTags();
+                        $tags = $allowedTags;
                     }
                     if ('*' !== $tags) {
                         $v = strip_tags($v, $tags);
@@ -1594,6 +1595,24 @@ class BResponse extends BClass
         // continue in background if the browser request was interrupted
         //ignore_user_abort(true);
         return $this;
+    }
+
+    public function safeHtml($html, $tags = null)
+    {
+        if (!$tags) {
+            $tags = $this->BRequest->getAllowedTags();
+        }
+        $html = strip_tags($html, $tags);
+
+        $html = preg_replace('/
+            < [a-z:-]+ \s .*? (
+                [a-z]+ \s* = \s* [\'"] \s* javascript \s* :   # src="javascript:..."
+                |
+                on[a-z]+ \s* = \s*   # onerror="..." onclick="..." onhover="..."
+            ) .*? >
+        /ix', '', $html);
+
+        return $html;
     }
 
     public function shutdown($lastMethod = null)

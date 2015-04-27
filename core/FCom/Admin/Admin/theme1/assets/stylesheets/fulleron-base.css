@@ -870,6 +870,9 @@ td {
   box-shadow:0 3px 5px rgba(0,0,0,0.125);
   -webkit-box-shadow:0 3px 5px rgba(0,0,0,0.125);
   }
+.header-notifications .dropdown-menu {
+    min-width:400px;
+}
 .dropdown-menu > li > a {
   padding:4px 13px;
   color:#444;

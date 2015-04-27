@@ -1,7 +1,7 @@
 modules:
     Sellvana_Sales:
         version: 0.3.22
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"
         auto_use: [ bootstrap ]
@@ -24,7 +24,7 @@ modules:
                     - [ /orderstatus/?.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
                     - [ /orderstatecustom/?.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
                 observe:
-                    - [ "FCom_Admin_View_Header::getNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
+                    - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", Sellvana_Sales_Admin_Controller_Orders.onSaveAdminSettings ]
                     - [ "FCom_Admin_Controller_HeaderSearch::action_index", Sellvana_Sales_Admin_Controller_Orders.onHeaderSearch  ]

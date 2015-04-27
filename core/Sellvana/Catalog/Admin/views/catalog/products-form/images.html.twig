@@ -141,29 +141,37 @@
                 .fileupload({
                     url: uploadUrl,
                     multiple: true,
-                    autoUpload: true
+                    autoUpload: true,
+                    dropZone: $('.fileinput-button')
                 })
                 .bind('fileuploadalways', function (e, data) {
                     var mediaGrid = mediaLibGrid{{ medialibConfig.id }};
+                    var combineGrid = {{ combineType }}Grid;
+                    var success = false;
                     if ($.isArray(data.result.files) && mediaGrid) {
                         var addRows = [];
                         var combineAddRows = [];
                         var current = FCom.Mixin.dateTimeNow();
+
+                        //collect data to push to grid
                         data.result.files.forEach(function (obj) {
                             if (!obj.error) {
                                 addRows.push(obj);
-                                combineAddRows.push(
-                                        _.extend(obj, {
-                                            _new: true,
-                                            id: guid(),
-                                            file_id: obj.id,
-                                            update_at: current,
-                                            create_at: current,
-                                            //temporary value before implement edit inline
-                                            position: 0,
-                                            label: FCom.Mixin.removeSpecialChars(obj.file_name)
-                                        })
-                                );
+
+                                //check combine grid already had this image
+                                if (combineGrid && !_.findWhere(combineGrid.getRows(), { file_id: obj.id })) {
+                                    var combineRow = $.extend({}, obj, {
+                                        _new: true,
+                                        id: guid(),
+                                        file_id: obj.id,
+                                        update_at: current,
+                                        create_at: current,
+                                        //temporary value before implement edit inline
+                                        position: 0,
+                                        label: FCom.Mixin.removeSpecialChars(obj.file_name)
+                                    });
+                                    combineAddRows.push(combineRow);
+                                }
                             }
                             else {
                                 file_error.push(obj.file_name);
@@ -172,12 +180,17 @@
 
                         //add to media grid
                         if (addRows.length) {
+                            success = true;
                             mediaGrid.addRows(addRows);
                         }
 
                         //add to combine grid
-                        if ({{ combineType }}Grid && combineAddRows.length) {
-                            {{ combineType }}Grid.addRows(combineAddRows);
+                        if (combineAddRows.length) {
+                            combineGrid.addRows(combineAddRows);
+                        }
+
+                        if (success) {
+                            $.bootstrapGrowl("Successfully uploaded.", { type: 'success', align: 'center', width: 'auto' });
                         }
                     }
                 })
@@ -186,6 +199,21 @@
                         alert('Illegal file extension: ' + file_error.join(','));
                         file_error = [];
                     }
+                });
+
+        $(document)
+                .bind('dragover', function (e) {
+                    console.log('drag');
+                    var span = $('.fileinput-button').find('span');
+                    if (!span.attr('data-text')) {
+                        span.attr('data-text', span.html());
+                    }
+                    span.html('Drop images to here');
+                })
+                .bind('drop dragleave', function (e) {
+                    console.log('drop');
+                    var span = $('.fileinput-button').find('span');
+                    span.html(span.attr('data-text'));
                 });
     });
 </script>

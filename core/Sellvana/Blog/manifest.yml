@@ -1,7 +1,7 @@
 modules:
     Sellvana_Blog:
         version: 0.1.4
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0, Sellvana_Cms: 0.1.0 } }
         auto_use: [ bootstrap, layout, views ]
 

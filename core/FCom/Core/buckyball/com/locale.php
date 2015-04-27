@@ -73,7 +73,7 @@ class BLocale extends BClass
     {
         date_default_timezone_set($this->_defaultTz);
         setlocale(LC_ALL, $this->_defaultLocale);
-        $this->_tzCache['GMT'] = new DateTimeZone('GMT');
+        $this->_tzCache['UTC'] = new DateTimeZone('UTC');
     }
 
     public function transliterate($str, $filler = '-')
@@ -1117,7 +1117,7 @@ class BLocale extends BClass
         if (empty($this->_tzCache[$tz])) {
             $this->_tzCache[$tz] = new DateTimeZone($tz);
         }
-        return $this->_tzCache[$tz]->getOffset($this->_tzCache['GMT']);
+        return $this->_tzCache[$tz]->getOffset($this->_tzCache['UTC']);
     }
 
     /**
@@ -1167,7 +1167,7 @@ class BLocale extends BClass
     */
     public function datetimeDbToLocal($value, $full = false)
     {
-        return strftime($full ? '%c' : '%x', strtotime($value));
+        return strftime($full ? '%c' : '%x', strtotime($value) + $this->tzOffset());
     }
 
     public function getTranslations()
