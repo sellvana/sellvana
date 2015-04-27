@@ -160,7 +160,8 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             '_quick' => ['expr' => 'username like ? or email like ? or au.id=?', 'args' => ['?%', '%?%', '?']]
         ];
         if ($filterAdmin) {
-            $config['orm'] = $this->FCom_Admin_Model_User->orm()->where('is_superadmin', 0);
+            //$config['orm'] = $this->FCom_Admin_Model_User->orm()->where('is_superadmin', 0);
+            $config['orm'] = $this->FCom_Admin_Model_User->orm();
         }
         $config['grid_before_create'] = 'userGridRegister';
         $config['events'] = ['add'];
