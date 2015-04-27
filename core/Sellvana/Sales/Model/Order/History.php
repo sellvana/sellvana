@@ -17,7 +17,7 @@ class Sellvana_Sales_Model_Order_History extends FCom_Core_Model_Abstract
             'refund' => 'Refund',
         ],
     ];
-    
+
     public function __destruct()
     {
         parent::__destruct();

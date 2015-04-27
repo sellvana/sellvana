@@ -20,6 +20,13 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
         self::VOID => 'Void',
     ];
 
+    public function getDefaultValue()
+    {
+        /** @var Sellvana_Sales_Model_Order $model */
+        $model = $this->getContext()->getModel();
+        return $model->isPayable() ? self::UNPAID : self::FREE;
+    }
+
     public function setFree()
     {
         return $this->changeState(self::FREE);
@@ -53,5 +60,43 @@ class Sellvana_Sales_Model_Order_State_Payment extends Sellvana_Sales_Model_Orde
     public function setVoid()
     {
         return $this->changeState(self::VOID);
+    }
+
+    public function isComplete()
+    {
+        return in_array($this->getValue(), [self::FREE, self::PAID]);
+    }
+
+    public function calcState()
+    {
+        $itemStates = $this->getItemStateStatistics('payment');
+
+        $free        = Sellvana_Sales_Model_Order_Item_State_Payment::FREE;
+        $unpaid      = Sellvana_Sales_Model_Order_Item_State_Payment::UNPAID;
+        $processing  = Sellvana_Sales_Model_Order_Item_State_Payment::PROCESSING;
+        $paid        = Sellvana_Sales_Model_Order_Item_State_Payment::PAID;
+        $outstanding = Sellvana_Sales_Model_Order_Item_State_Payment::OUTSTANDING;
+        $canceled    = Sellvana_Sales_Model_Order_Item_State_Payment::CANCELED;
+        $partial     = Sellvana_Sales_Model_Order_Item_State_Payment::PARTIAL;
+
+        if (!empty($itemStates[$free]) && sizeof($itemStates) === 1) {
+            return $this->setFree();
+        }
+        if (!empty($itemStates[$paid]) && empty($itemStates[$processing])
+            && empty($itemStates[$outstanding]) && empty($itemStates[$partial])
+        ) {
+            return $this->setPaid();
+        }
+        if (!empty($itemStates[$processing])) {
+            return $this->setProcessing();
+        }
+        if (!empty($itemStates[$outstanding])) {
+            return $this->setOutstanding();
+        }
+        if (!empty($itemStates[$paid]) || !empty($itemStates[$partial])) {
+            return $this->setPartialPaid();
+        }
+
+        return $this;
     }
 }

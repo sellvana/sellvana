@@ -21,6 +21,8 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model
         self::CANCELED => 'email/sales/order-item-state-overall-canceled',
     ];
 
+    protected $_defaultValue = self::PENDING;
+
     public function setPending()
     {
         return $this->changestate(self::PENDING);
@@ -44,5 +46,32 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model
     public function setCanceled()
     {
         return $this->changestate(self::CANCELED);
+    }
+
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Item_State $context */
+        $context = $this->getContext();
+
+        /** @var Sellvana_Sales_Model_Order_Item $model */
+        $model = $context->getModel();
+
+        if ($model->get('qty_backordered') > 0) {
+            return $this->setBackordered();
+        }
+
+        if ($context->cancel()->getValue() === Sellvana_Sales_Model_Order_Item_State_Cancel::CANCELED) {
+            return $this->setCanceled();
+        }
+
+        if ($context->payment()->isComplete() && $context->delivery()->isComplete()) {
+            return $this->setComplete();
+        }
+
+        if ($model->get('qty_shipped') || $model->get('qty_paid')) {
+            return $this->setProcessing();
+        }
+
+        return $this;
     }
 }

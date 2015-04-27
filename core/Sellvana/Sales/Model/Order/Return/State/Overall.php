@@ -32,6 +32,8 @@ class Sellvana_Sales_Model_Order_Return_State_Overall extends Sellvana_Sales_Mod
         self::DECLINED => 'email/sales/order-return-state-overall-declined',
     ];
 
+    protected $_defaultValue = self::PENDING;
+
     public function setRequested()
     {
         return $this->changeState(self::REQUESTED);

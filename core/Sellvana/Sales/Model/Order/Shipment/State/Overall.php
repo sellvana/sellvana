@@ -28,6 +28,8 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_M
         self::DELIVERED => 'email/sales/order-shipment-state-overall-delivered',
     ];
 
+    protected $_defaultValue = self::PENDING;
+
     public function setPending()
     {
         return $this->changeState(self::PENDING);

@@ -47,9 +47,9 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
             'shipping_size' => $order->get('shipping_size'),
             'shipping_weight' => $order->get('shipping_weight'),
         ]);
-        $shipment->state()->overall()->setPending();
-        $shipment->state()->carrier()->setPending();
-        $shipment->state()->custom()->setDefault();
+        $shipment->state()->overall()->setDefaultState();
+        $shipment->state()->carrier()->setDefaultState();
+        $shipment->state()->custom()->setDefaultState();
         $shipment->save();
 
         $firstPackage = $this->Sellvana_Sales_Model_Order_Shipment_Package->create([
@@ -88,7 +88,6 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
                 $shipData['qty'] = $qtyToShip;
                 $this->Sellvana_Sales_Model_Order_Shipment_Item->create($shipData)->save();
             }
-            $item->add('qty_shipped', $qtyToShip)->save();
             $numItems += $qtyToShip;
         }
 

@@ -14,6 +14,8 @@ class Sellvana_Sales_Model_Order_State_Cancel extends Sellvana_Sales_Model_Order
         self::CANCELED => 'Canceled',
     ];
 
+    protected $_defaultValue = self::NONE;
+
     public function setNone()
     {
         return $this->changeState(self::NONE);
@@ -32,5 +34,22 @@ class Sellvana_Sales_Model_Order_State_Cancel extends Sellvana_Sales_Model_Order
     public function setCanceled()
     {
         return $this->changeState(self::CANCELED);
+    }
+
+    public function calcState()
+    {
+        $itemStates = $this->getItemStateStatistics('cancel');
+
+        if (!empty($itemStates[Sellvana_Sales_Model_Order_Item_State_Cancel::PROCESSING])) {
+            return $this->setProcessing();
+        }
+        if (!empty($itemStates[Sellvana_Sales_Model_Order_Item_State_Cancel::PARTIAL])) {
+            return $this->setPartial();
+        }
+        if (!empty($itemStates[Sellvana_Sales_Model_Order_Item_State_Cancel::CANCELED])) {
+            return $this->setCanceled();
+        }
+
+        return $this;
     }
 }

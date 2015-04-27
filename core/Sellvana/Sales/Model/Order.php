@@ -48,6 +48,8 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     protected static $_origClass = __CLASS__;
 
+    protected static $_cacheAuto = true;
+
     /** @var Sellvana_Sales_Model_Cart */
     protected $_cart;
 
@@ -108,7 +110,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     /**
      * Return the order items
      * @param boolean $assoc
-     * @return array
+     * @return Sellvana_Sales_Model_Order_Item[]
      */
     public function items($assoc = true)
     {
@@ -345,7 +347,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             } else {
                 $orderItem->state()->payment()->setUnpaid();
             }
-            $orderItem->state()->custom()->setDefault();
+            $orderItem->state()->custom()->setDefaultState();
 
             $orderItem->save();
         }
@@ -415,23 +417,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     protected function _setDefaultStates()
     {
-        $state = $this->state();
-        $state->overall()->setPending();
-        $state->delivery()->setPending();
-
-        if ($this->isPayable()) {
-            $state->payment()->setUnpaid();
-        } else {
-            $state->payment()->setFree();
-        }
-
-        $state->returns()->setNone();
-        $state->refund()->setNone();
-        $state->cancel()->setNone();
-
-        $state->comment()->setNone();
-
-        $state->custom()->setDefault();
+        $this->state()->setDefaultStates()->calcAllStates();
         return $this;
     }
 
@@ -525,95 +511,6 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
                 $item->setProduct($products[$pId]);
             }
         }
-        return $this;
-    }
-
-    public function calcOrderAndItemsStates()
-    {
-        $totalQty = [
-            'ordered' => 0,
-            'backordered' => 0,
-            'canceled' => 0,
-            'shipped' => 0,
-            'returned' => 0,
-        ];
-        $itemStates = [
-            'overall' => [],
-            'payment' => [],
-            'delivery' => [],
-        ];
-
-        $allPaymentComplete = true;
-        $allDeliveryComplete = true;
-
-        $allPaid = true;
-        $allFree = true;
-        $allRefunded = true;
-
-        $allVirtual = true;
-        $allShipped = true;
-        $allDelivered = true;
-        $allReturned = true;
-
-        $allCanceled = true;
-
-        $itemFree = Sellvana_Sales_Model_Order_Item_State_Payment::FREE;
-        $itemPaid = Sellvana_Sales_Model_Order_Item_State_Payment::PAID;
-
-        $itemVirtual = Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL;
-        $itemShipped = Sellvana_Sales_Model_Order_Item_State_Delivery::SHIPPED;
-        $itemDelivered = Sellvana_Sales_Model_Order_Item_State_Delivery::DELIVERED;
-        $itemReturned = Sellvana_Sales_Model_Order_Item_State_Delivery::RETURNED;
-        $itemShipPartial = Sellvana_Sales_Model_Order_Item_State_Delivery::PARTIAL;
-
-        /** @var Sellvana_Sales_Model_Order_Item $item */
-        foreach ($this->items() as $item) {
-            foreach ($totalQty as $k => $_) {
-                $totalQty[$k] += $item->get('qty_' . $k);
-            }
-            $overallState = $item->get('state_overall');
-            $paymentState = $item->get('state_payment');
-            $deliveryState = $item->get('state_delivery');
-
-            if ($paymentState !== $itemFree && $item->get('row_total') == 0) {
-                $item->state()->payment()->setFree();
-            }
-            if (!in_array($paymentState, [$itemFree, $itemPaid])) {
-                $allPaid = false;
-            }
-            if ($deliveryState !== $itemVirtual && $item->get('shipping_weight') == 0) {
-                $item->state()->delivery()->setVirtual();
-            }
-            if ($deliveryState !== $itemVirtual) {
-                $allVirtual = false;
-            }
-
-        }
-
-        $orderComplete = Sellvana_Sales_Model_Order_State_Overall::COMPLETE;
-        $orderPaid = Sellvana_Sales_Model_Order_State_Payment::PAID;
-        $orderShipped = Sellvana_Sales_Model_Order_State_Delivery::SHIPPED;
-        $orderDelivered = Sellvana_Sales_Model_Order_State_Delivery::DELIVERED;
-        $orderReturned = Sellvana_Sales_Model_Order_State_Delivery::RETURNED;
-
-        if ($allPaid && $this->get('state_payment') !== $orderPaid) {
-            $this->state()->payment()->setPaid();
-        }
-
-        if ($allShipped && $this->get('state_delivery') !== $orderShipped) {
-            $this->state()->delivery()->setShipped();
-        } elseif ($allDelivered && $this->get('state_delivery') !== $orderDelivered) {
-            $this->state()->delivery()->setDelivered();
-        } elseif ($allReturned && $this->get('state_delivery') !== $orderReturned) {
-            $this->state()->delivery()->setReturned();
-        } else {
-
-        }
-
-        if ($allPaymentComplete && $allDeliveryComplete && $this->get('state_overall') !== $orderComplete) {
-            $this->state()->overall()->setComplete();
-        }
-
         return $this;
     }
 

@@ -18,6 +18,8 @@ class Sellvana_Sales_Model_Order_Item_State_Return extends Sellvana_Sales_Model_
         self::RETURNED => 'email/sales/order-item-state-return-returned',
     ];
 
+    protected $_defaultValue = self::NONE;
+
     public function setNone()
     {
         return $this->changeState(self::NONE);
@@ -36,5 +38,20 @@ class Sellvana_Sales_Model_Order_Item_State_Return extends Sellvana_Sales_Model_
     public function setReturned()
     {
         return $this->changeState(self::RETURNED);
+    }
+
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Item $model */
+        $model = $this->getContext()->getModel();
+
+        if ($model->get('qty_returned') == $model->get('qty_ordered')) {
+            return $this->setReturned();
+        }
+        if ($model->get('qty_returned') > 0) {
+            return $this->setPartial();
+        }
+
+        return $this;
     }
 }

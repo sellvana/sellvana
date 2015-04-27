@@ -23,6 +23,8 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
         self::DELIVERED => 'email/sales/order-state-delivery-delivered',
     ];
 
+    protected $_defaultValue = self::PENDING;
+
     public function setVirtual()
     {
         return $this->changeState(self::VIRTUAL);
@@ -51,5 +53,47 @@ class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Ord
     public function setPartial()
     {
         return $this->changeState(self::PARTIAL);
+    }
+
+    public function isComplete()
+    {
+        return in_array($this->getValue(), [self::VIRTUAL, self::SHIPPED, self::DELIVERED]);
+    }
+
+    public function calcState()
+    {
+        $itemStates = $this->getItemStateStatistics('delivery');
+
+        $virtual   = Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL;
+        $pending   = Sellvana_Sales_Model_Order_Item_State_Delivery::PENDING;
+        $packed    = Sellvana_Sales_Model_Order_Item_State_Delivery::PACKED;
+        $shipped   = Sellvana_Sales_Model_Order_Item_State_Delivery::SHIPPED;
+        $delivered = Sellvana_Sales_Model_Order_Item_State_Delivery::DELIVERED;
+        $partial   = Sellvana_Sales_Model_Order_Item_State_Delivery::PARTIAL;
+
+        if (sizeof($itemStates) === 1) {
+            if (!empty($itemStates[$virtual])) {
+                return $this->setVirtual();
+            } elseif (!empty($itemStates[$pending])) {
+                return $this->setPending();
+            } elseif (!empty($itemStates[$packed])) {
+                return $this->setPacked();
+            }
+        }
+        if (!empty($itemStates[$pending]) || !empty($itemStates[$packed]) || !empty($itemStates[$partial])) {
+            return $this->setPartial();
+        }
+        if (!empty($itemStates[$shipped]) && empty($itemStates[$pending])
+            && empty($itemStates[$packed]) && empty($itemStates[$partial])
+        ) {
+            return $this->setShipped();
+        }
+        if (!empty($itemStates[$delivered]) && empty($itemStates[$pending])
+            && empty($itemStates[$packed]) && empty($itemStates[$partial])
+        ) {
+            return $this->setDelivered();
+        }
+
+        return $this;
     }
 }
