@@ -195,6 +195,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                             . '<img src=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
                         'sortable' => false],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
+                    ['name' => 'folder', 'label' => 'Folder', 'width' => 200],
                     ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
                         'display' => 'file_size'],
                     ['name' => 'associated_products', 'label' => 'Associated Products', 'width' => 50],
@@ -208,13 +209,20 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     ['field' => 'file_name', 'type' => 'text']
                 ],
                 //callbacks for backbonegrid
-                'grid_before_create' => $id . '_register',
-                'afterMassDelete' => $id .'_afterMassDelete',
+                //'grid_before_create' => $id . '_register',
+                //'afterMassDelete' => $id .'_afterMassDelete',
                 //callbacks for react griddle
                 'callbacks' => [
-                    'componentDidMount' => 'registerGrid' . $id,
+                    //'componentDidMount' => 'registerGrid' . $id,
                 ],
                 'actions' => [
+                    'add-image' => [
+                        'caption'  => 'Add Images',
+                        'type'     => 'button',
+                        'id'       => 'add-attachment-from-grid',
+                        'class'    => 'btn-primary',
+                        'callback' => 'gridShowMedia' . $id
+                    ],
                     'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
                     'refresh' => true,
                 ]
@@ -594,6 +602,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     protected function _processUploadConfig($uploadConfig, $configId)
     {
         $uploadConfig['type'] = $configId;
+        $uploadConfig['label'] = ucwords(str_replace(['-', '_'], ' ', $configId));
         if (isset($uploadConfig['filetype'])) {
             $uploadConfig['filetype_regex'] = '/(\\.|\\/)(' . str_replace([','], '|',
                     $uploadConfig['filetype']) . ')$/i';

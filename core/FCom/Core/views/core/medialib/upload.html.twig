@@ -1,4 +1,5 @@
-<div class='tab-pane' id='{{ config.id }}-media-upload'>
+{#{{ dump(uploadConfig) }}#}
+<div class='' id='{{ config.id }}-media-upload'>
     <div class='box-content'>
         <div class='row fileupload-buttonbar'>
             <div class='col-sm-12'>
@@ -115,8 +116,7 @@
 
 <script type="text/javascript">
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
-        var mediaGrid = window['{{ config.id }}_grid'];
-        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
+        var uploadUrl = "{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}";
         $("#{{config.id}}-media-upload").fileupload({
             url: uploadUrl,
             multiple:true
@@ -134,6 +134,9 @@
 
                     //insert uploaded file in media grid and get selected
                     var newRow = obj;
+                    if(newRow.error) {
+                        return;
+                    }
 
                     //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
                     {% if config.multiSelAllowed %}
@@ -150,21 +153,5 @@
                 })
             }
         });
-        $('#{{ config.id }}').on('click', '.btn-rescan-images', function () {
-            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}', {do: 'rescan'}, function (response) {
-                if (response.status == 'success') {
-                    $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});
-                    mediaGrid.getRows().fetch();
-                } else {
-                    $.bootstrapGrowl("Error:<br>" + response.message, {
-                        type: 'danger',
-                        align: 'center',
-                        width: 'auto',
-                        delay: 5000
-                    });
-                }
-            });
-        });
-
     });
 </script>
