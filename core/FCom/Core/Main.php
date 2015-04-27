@@ -123,12 +123,16 @@ class FCom_Core_Main extends BClass
         }
 
         if (!$config->get('web/media_dir')) {
-            if (strpos($mediaDir, $docRoot) === 0) {
-                $mediaUrl = str_replace($docRoot, '', $mediaDir);
-            } elseif (strpos($mediaDir, $rootDir) === 0) {
-                $mediaUrl = $baseStore . str_replace($rootDir, '', $mediaDir);
+            if (strpos($mediaDir, $baseSrc) === 0) {
+                $mediaUrl = str_replace($baseSrc, '', $mediaDir);
+            } elseif (strpos($mediaDir, FULLERON_ROOT_DIR) === 0) {
+                $mediaUrl = str_replace(FULLERON_ROOT_DIR, '', $mediaDir);
+            #} elseif (strpos($mediaDir, $docRoot) === 0) {
+            #    $mediaUrl = str_replace($docRoot, '', $mediaDir);
+            #} elseif (strpos($mediaDir, $rootDir) === 0) {
+            #    $mediaUrl = $baseStore . str_replace($rootDir, '', $mediaDir);
             } else {
-                $mediaUrl = $baseStore . '/media';
+                $mediaUrl = 'media';
             }
             $config->set('web/media_dir', $mediaUrl);
         }
@@ -346,7 +350,11 @@ class FCom_Core_Main extends BClass
         }
         $this->BDebug->debug('AREA: ' . $area . ', MODE: ' . $mode);
         if ('RECOVERY' === $mode) { // load manifests for RECOVERY mode
-            $recoveryModules = $this->BConfig->get('recovery_modules/' . $area);
+            $recoveryRedirect = $this->BConfig->get("recovery/{$area}/redirect");
+            if ($recoveryRedirect) {
+                $this->BResponse->redirect($recoveryRedirect);
+            }
+            $recoveryModules = $this->BConfig->get("recovery/{$area}/modules");
             if ($recoveryModules) {
                 $moduleNames = preg_split('#\s*(,|\n)\s*#', $recoveryModules);
                 foreach ($moduleNames as $modName) {

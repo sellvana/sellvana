@@ -180,7 +180,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         static $default;
 
         $media = $this->BConfig->get('web/media_dir');# ? $this->BConfig->get('web/media_dir') : 'media/';
-        $url = $full ? $this->BRequest->baseUrl() : '';
+        $url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();
         $thumbUrl = $this->get('thumb_url');
         if ($thumbUrl) {
             return $url . $media . '/' . $thumbUrl;

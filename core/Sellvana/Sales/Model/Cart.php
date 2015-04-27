@@ -912,6 +912,22 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $amount;
     }
 
+    public function importDataFromOrder(Sellvana_Sales_Model_Order $order)
+    {
+        $orderData = $order->as_array();
+        unset($orderData['id']);
+        $this->setData($orderData)->save();
+        foreach ($order->items() as $item) {
+            $itemData = $item->as_array();
+            unset($itemData['id']);
+            $itemData['cart_id'] = $this->id();
+            $itemData['qty'] = $item->get('qty_ordered');
+            $cartItem = $this->Sellvana_Sales_Model_Cart_Item->create($itemData)->save();
+        }
+        $this->set('recalc_shipping_rates', 1)->calculateTotals()->saveAllDetails();
+        return $this;
+    }
+
     public function __destruct()
     {
         parent::__destruct();

@@ -3,13 +3,6 @@
 define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
 function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle, Backbone) {
 
-    var dataUrl,
-        gridId,
-        buildGridDataUrl = function (filterString, sortColumn, sortAscending, page, pageSize) {
-            var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
-            return dataUrl + beginQueryChar+ 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
-        };
-
     /**
      * FCom Griddle Componnent
      */
@@ -23,9 +16,6 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         },
         componentWillMount: function () {
             this.initColumn();
-            //todo: need change way to get right info
-            dataUrl = this.props.config.data_url;
-            gridId = this.props.config.id;
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
@@ -51,33 +41,9 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     break;
             }
         },
-        /*callCallbackFunctions: function (type) {
-            var grid = this.refs[this.props.config.id];
-            //todo: add code to support multi callbacks
-
-            if (typeof this.props.callbacks[type] !== 'undefined') {
-                console.log('grid.callback: ', this.props.callbacks[type]);
-                if (typeof this.props.callbacks[type] === 'function') {
-                    return this.props.callbacks[type](grid);
-                } else {
-                    var funcName = this.props.callbacks[type];
-                    if (typeof window[funcName] === 'function') {
-                        return window[funcName](grid);
-                    }
-                }
-            }
-        },
-        componentDidMount: function () {
-            this.callCallbackFunctions('componentDidMount');
-        },
-        componentDidUpdate: function () {
-            this.callCallbackFunctions('componentDidUpdate');
-        },*/
         render: function () {
             console.log('config', this.props.config);
             var config = this.props.config;
-
-            console.log(config);
 
             //prepare props base on data mode
             var props, state;
@@ -86,18 +52,19 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     getExternalResults: null,
                     results: config.data.data
                 };
-                state = config.state;
+                //state = config.state;
             } else {
                 props = {
-                    //getExternalResults: FComDataMethod,
                     getExternalResults: serverMethods.getResults,
                     addRowsExternal: serverMethods.addRows,
                     removeRowsExternal: serverMethods.removeRows,
                     updateRowsExternal: serverMethods.updateRows,
                     results: []
                 };
-                state = config.data.state;
+                //state = config.data.state;
             }
+
+            state = config.data.state;
 
             //set initial page, use for personalization
             var initPage = state.p - 1;
@@ -137,7 +104,11 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
          */
         postUrl: function(dataUrl, gridId, filterString, sortColumn, sortAscending, page, pageSize) {
             var beginQueryChar = (dataUrl.indexOf('?') != -1) ? '&' : '?';
-            return dataUrl + beginQueryChar + 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortAscending + '&filters=' + (filterString ? filterString : '{}');
+            var sortType = '';
+            if (sortColumn != '') {
+                sortType = (sortAscending ? 'asc' : 'desc');
+            }
+            return dataUrl + beginQueryChar + 'gridId=' + gridId + '&p=' + (page + 1) + '&ps=' + pageSize + '&s=' + sortColumn + '&sd=' + sortType + '&filters=' + (filterString ? filterString : '{}');
         },
         /**
          * get data from external results
@@ -397,7 +368,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 }
             } else {
                 //error
-                console.log('error');
+                console.log('form validate fail');
                 return false;
             }
         },
@@ -451,7 +422,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     if (dataUrl != '') {
                         var pageSize = this.props.resultsPerPage;
                         var griddleState = this.props.getGriddleState();
-                        var exportUrl = buildGridDataUrl(griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
+                        var exportUrl = serverMethods.postUrl(dataUrl, gridId, griddleState.filter, griddleState.sortColumn, griddleState.sortAscending, griddleState.page, pageSize);
                         window.location.href = exportUrl + '&export=true';
                     }
                     break;
@@ -544,9 +515,6 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         handleCustom: function(callback, event) {
             if (typeof window[callback] === 'function') {
                 return window[callback](this.props.getCurrentGrid());
-
-                //console.log('actions.callback: ' + callback);
-                //return window[callback](this);
             }
         },
         render: function () {
@@ -720,20 +688,9 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             //if (!this.props.editUrl) return null;
             var that = this;
             var gridId = this.props.id;
-
             var oneField = this.state.oneField;
+
             var fieldDropdownDiv = null;
-
-/*
-            var fieldDropDownNodes = this.state.fields.map(function(column) {
-                if (!_.contains(that.state.shownFields, column.name)) {
-                    return <option value={column.name}>{column.label}</option>;
-                }
-                return null;
-            });
-            fieldDropDownNodes.unshift(<option value=""></option>);
-*/
-
 
             if (!oneField) {
                 var fieldDropDownNodes = this.state.fields.map(function(column) {
@@ -759,7 +716,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
 
             var formElements = this.state.shownFields.map(function(fieldName) {
                 var column = _.findWhere(that.state.fields, {name: fieldName});
-                return <Components.ModalElement column={column} removeFieldDisplay={true} removeFieldHandle={that.removeField} />
+                return <Components.ModalElement column={column} removeFieldDisplay={!oneField} removeFieldHandle={that.removeField} />
             });
 
             return (
@@ -769,24 +726,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                         formElements
                     )
                 )
-/*
-            return (
-                <div>
-                    <div className="well">
-                        <div className="row">
-                            <div className="col-sm-12">
-                                <select className="select2 form-control" id={gridId + '-form-select'} style={{width: '150px'}}>
-                                    {fieldDropDownNodes}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <form className="form form-horizontal validate-form" id={gridId + '-modal-mass-form'}>
-                        {formElements}
-                    </form>
-                </div>
             );
-*/
         }
     });
 

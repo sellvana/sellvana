@@ -1,7 +1,7 @@
 modules:
     FCom_Cron:
         version: 0.1.1
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_LibTwig: 0.1.0 } }
         description: Cron scheduled tasks manager
 

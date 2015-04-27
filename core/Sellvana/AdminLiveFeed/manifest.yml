@@ -1,20 +1,21 @@
 modules:
     Sellvana_AdminLiveFeed:
         version: 0.1
-        channel: beta
+        channel: alpha
         description: Admin Live Feed
         require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.4 } }
         auto_use: [ layout, views ]
 
         observe:
-            - [ "FCom_Admin_View_Header::getNotifications", Sellvana_AdminLiveFeed_Main.onGetHeaderNotifications ]
-            - [ "Sellvana_Catalog_Model_Product::onAfterSave", "Sellvana_AdminLiveFeed_Main::onProductAfterSave" ]
-            - [ "Sellvana_Email_Model_Pref::onAfterSave", "Sellvana_AdminLiveFeed_Main::onPrefAfterSave" ]
-            - [ "Sellvana_Customer_Model_Customer::onAfterSave", "Sellvana_AdminLiveFeed_Main::onCustomerAfterSave" ]
-            - [ "Sellvana_ProductReviews_Model_Review::onAfterSave", "Sellvana_AdminLiveFeed_Main::onReviewsAfterSave" ]
-            - [ "Sellvana_Sales_Model_Order::onAfterSave", "Sellvana_AdminLiveFeed_Main::onOrderAfterSave" ]
-            - [ "Sellvana_CatalogIndex_Frontend_Controller::action_search:search_query", "Sellvana_AdminLiveFeed_Main::onSearch" ]
-            - [ "Sellvana_Wishlist_Frontend_Controller::action_index:after_add", "Sellvana_AdminLiveFeed_Main::onWishlistAfterAdd" ]
+            - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_AdminLiveFeed_Main.onGetHeaderNotifications ]
+
+            - [ "Sellvana_Catalog_Model_Product::onAfterSave", "Sellvana_AdminLiveFeed_Main.onProductAfterSave" ]
+            - [ "Sellvana_Email_Model_Pref::onAfterSave", "Sellvana_AdminLiveFeed_Main.onPrefAfterSave" ]
+            - [ "Sellvana_Customer_Model_Customer::onAfterSave", "Sellvana_AdminLiveFeed_Main.onCustomerAfterSave" ]
+            - [ "Sellvana_ProductReviews_Model_Review::onAfterSave", "Sellvana_AdminLiveFeed_Main.onReviewsAfterSave" ]
+            - [ "Sellvana_CatalogIndex_Frontend_Controller::action_search:search_query", "Sellvana_AdminLiveFeed_Main.onSearch" ]
+            - [ "Sellvana_Wishlist_Frontend_Controller::action_index:after_add", "Sellvana_AdminLiveFeed_Main.onWishlistAfterAdd" ]
+            - [ "Sellvana_Sales_Model_Order_State_Overall::changeState", "Sellvana_AdminLiveFeed_Main.onOrderPlaced" ]
 
         default_config:
             modules:

@@ -1,7 +1,7 @@
 modules:
     Sellvana_SampleData:
         version: 0.1.1
-        channel: beta
+        channel: alpha
         description: "Sample data for catalog"
         require: { module: { Sellvana_Catalog: 0.2.18, Sellvana_CatalogIndex: 0.1.9 } }
 

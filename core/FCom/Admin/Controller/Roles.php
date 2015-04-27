@@ -15,6 +15,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridTitle = 'Roles and Permissions';
     protected $_recordName = 'Role';
     protected $_formTitleField = 'role_name';
+    protected $_formLayoutName = '/roles/form';
 
     public function gridConfig()
     {

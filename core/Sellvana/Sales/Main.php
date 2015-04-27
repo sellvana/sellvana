@@ -201,18 +201,20 @@ class Sellvana_Sales_Main extends BClass
     public function checkDefaultShippingPayment($args)
     {
         if (!$this->getShippingMethods()) {
-            $args['notifications'][] = [
+            $args['items'][] = [
+                'feed' => 'local',
                 'type' => 'warning',
                 'group' => 'FCom Sales',
-                'message' => 'You have to enable at least one shipping module',
+                'content' => 'You have to enable at least one SHIPPING module',
                 'code' => "sales_missing_shipping",
             ];
         }
         if (!$this->getPaymentMethods()) {
-            $args['notifications'][] = [
+            $args['items'][] = [
+                'feed' => 'local',
                 'type' => 'warning',
                 'group' => 'FCom Sales',
-                'message' => 'You have to enable at least one payment module',
+                'content' => 'You have to enable at least one PAYMENT module',
                 'code' => "sales_missing_payment",
             ];
         }

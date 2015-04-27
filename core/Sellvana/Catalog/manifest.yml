@@ -1,7 +1,7 @@
 modules:
     Sellvana_Catalog:
         version: 0.3.8
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
         translations: { en: en.php }
