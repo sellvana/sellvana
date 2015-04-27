@@ -35,17 +35,15 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
 
         /** @var Sellvana_Sales_Model_Order_Item $item */
         foreach ($args['items'] as $item) {
-            $qtyOrdered = $item->get('qty_ordered');
-            $qtyCanceled = $item->get('qty_canceled');
-            $qtyShipped = $item->get('qty_shipped');
+            $qtyToCancel = min($item->getQtyCanCancel(), $item->get('qty_to_cancel'));
+
             $qtyBackordered = $item->get('qty_backordered');
-            $qtyCanCancel = $qtyOrdered - $qtyCanceled - $qtyShipped;
-            $qtyToCancel = min($qtyCanCancel, $item->get('qty_to_cancel'));
-#var_dump(compact('qtyOrdered', 'qtyCanceled', 'qtyShipped', 'qtyBackordered', 'qtyCanCancel', 'qtyToCancel')); exit;
             if ($qtyBackordered) {
                 $item->set('qty_backordered', max(0, $qtyBackordered - $qtyToCancel));
             }
-            $item->set('qty_canceled', $qtyCanceled + $qtyToCancel);
+
+            $item->add('qty_canceled', $qtyToCancel);
+
             $this->Sellvana_Sales_Model_Order_Cancel_Item->create([
                 'order_id' => $args['order']->id(),
                 'cancel_id' => $cancelModel->id(),

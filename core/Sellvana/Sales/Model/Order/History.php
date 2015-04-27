@@ -15,6 +15,8 @@ class Sellvana_Sales_Model_Order_History extends FCom_Core_Model_Abstract
             'shipment' => 'Shipment',
             'return' => 'Return',
             'refund' => 'Refund',
+            'cancel' => 'Cancel',
+            'comment' => 'Comment',
         ],
     ];
 

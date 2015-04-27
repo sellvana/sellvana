@@ -69,4 +69,22 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_M
     {
         return $this->changeState(self::CANCELED);
     }
+
+    /*
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Shipment $shipment * /
+        $shipment = $this->getContext()->getModel();
+        $order = $shipment->order();
+
+        $sItems = $shipment->items();
+        $oItems = $order->items();
+
+        foreach ($sItems as $sItem) {
+            $oItem = $oItems[$sItem->get('order_item_id')];
+        }
+
+        return $this;
+    }
+    */
 }

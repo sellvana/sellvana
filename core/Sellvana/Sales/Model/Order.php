@@ -121,6 +121,10 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $assoc ? $this->items : array_values($this->items);
     }
 
+    /**
+     * @param bool $assoc
+     * @return Sellvana_Sales_Model_Order_Shipment[]
+     */
     public function shipments($assoc = true)
     {
         if (!$this->shipments) {
@@ -527,6 +531,16 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             $item->save();
         }
         return $this;
+    }
+
+    public function shipAllShipments()
+    {
+        $shipments = $this->shipments();
+        foreach ($shipments as $shipment) {
+            $shipment->shipItems();
+        }
+        $this->state()->calcAllStates();
+        $this->saveAllDetails();
     }
 
     public function __destruct()

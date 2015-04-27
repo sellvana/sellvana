@@ -203,13 +203,13 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             $order->state()->custom()->changeState($orderStatePost['custom']);
         }
 
+        if ($args['do'] === 'SHIP_ALL') {
+            $order->shipAllShipments();
+        }
+
         $pay = $this->BRequest->post('pay');
         if (!empty($pay['items'])) {
             $this->Sellvana_Sales_Model_Order_Payment->payOrderItems($order, $pay['items']);
-        }
-
-        if ($args['do'] === 'SHIP_ALL') {
-            $this->Sellvana_Sales_Model_Order_Shipment->shipOrderItems($order);
         }
 
         $ship = $this->BRequest->post('ship');

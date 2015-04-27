@@ -53,10 +53,10 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model
         /** @var Sellvana_Sales_Model_Order_Item_State $context */
         $context = $this->getContext();
 
-        /** @var Sellvana_Sales_Model_Order_Item $model */
-        $model = $context->getModel();
+        /** @var Sellvana_Sales_Model_Order_Item $item */
+        $item = $context->getModel();
 
-        if ($model->get('qty_backordered') > 0) {
+        if ($item->get('qty_backordered') > 0) {
             return $this->setBackordered();
         }
 
@@ -68,7 +68,7 @@ class Sellvana_Sales_Model_Order_Item_State_Overall extends Sellvana_Sales_Model
             return $this->setComplete();
         }
 
-        if ($model->get('qty_shipped') || $model->get('qty_paid')) {
+        if ($item->get('qty_shipped') > 0 || $item->get('qty_paid') > 0) {
             return $this->setProcessing();
         }
 

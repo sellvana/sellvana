@@ -273,6 +273,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function payOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
+    {
+        return $this;
+    }
+
     public function payOffline($amount = null)
     {
         $method = $this->getMethodObject();
