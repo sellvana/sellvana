@@ -34,6 +34,8 @@ class Sellvana_Sales_Model_Order_Payment_State_Overall extends Sellvana_Sales_Mo
         self::REFUNDED => 'email/sales/order-payment-state-overall-refunded',
     ];
 
+    protected $_defaultValue = self::PENDING;
+
     public function setPending()
     {
         return $this->changeState(self::PENDING);

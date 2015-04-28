@@ -107,6 +107,9 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
             return []; //TODO: proper notifications and errors handling
         }
         foreach ($remoteModResult['modules'] as $remoteModName => $remoteMod) {
+            if (!is_array($remoteMod)) {
+                continue;
+            }
             if ($remoteMod && empty($remoteMod['name'])) {
                 $remoteMod['name'] = $remoteModName;
             }

@@ -259,6 +259,41 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
             ->select('au.alert_user_status')
             ->order_by_desc('ts')
             ->find_many_assoc();
+
+        foreach ($items as $i => $item) {
+            if (is_array($item->getData('module'))) {
+                $remove = false;
+                foreach ($item->getData('module') as $modName => $cond) {
+                    $mod = $this->BModuleRegistry->module($modName);
+                    if (!$mod) {
+                        $remove = true;
+                        break;
+                    }
+                    if (!empty($conf['version']['include']) && !in_array($mod->version, $conf['version']['include'])) {
+                        $remove = true;
+                        break;
+                    }
+                    if (!empty($conf['version']['exclude']) && in_array($mod->version, $conf['version']['exclude'])) {
+                        $remove = true;
+                        break;
+                    }
+                    if (!empty($conf['version']['range'][0]) && version_compare($mod->version, $conf['version']['range'][0], '<')) {
+                        $remove = true;
+                        break;
+                    }
+                    if (!empty($conf['version']['range'][1]) && version_compare($mod->version, $conf['version']['range'][1], '>')) {
+                        $remove = true;
+                        break;
+                    }
+                }
+                if ($remove) {
+                    // Module version condition can change to positive after being negative
+                    #$item[$i]->set('status', 'dismissed')->save();
+                    unset($item[$i]);
+                }
+            }
+        }
+
         return $items;
     }
 }

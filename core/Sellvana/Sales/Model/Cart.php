@@ -52,6 +52,8 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
     protected static $_sessionCart;
     protected static $_totalRowHandlers = [];
 
+    protected static $_cacheAuto = true;
+
     protected static $_fieldOptions = [
         'state_overall' => [
             'active'  => 'Active',
@@ -918,11 +920,14 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         unset($orderData['id']);
         $this->setData($orderData)->save();
         foreach ($order->items() as $item) {
-            $itemData = $item->as_array();
-            unset($itemData['id']);
-            $itemData['cart_id'] = $this->id();
+            $itemData['product_sku'] = $item->get('product_sku');
+            $itemData['inventory_sku'] = $item->get('inventory_sku');
             $itemData['qty'] = $item->get('qty_ordered');
-            $cartItem = $this->Sellvana_Sales_Model_Cart_Item->create($itemData)->save();
+            if ($item->get('auto_added')) {
+                $itemData['auto_added'] = 1;
+                $itemData['price'] = 0;
+            }
+            $this->addProduct($item->get('product_id'), $itemData);
         }
         $this->set('recalc_shipping_rates', 1)->calculateTotals()->saveAllDetails();
         return $this;

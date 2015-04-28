@@ -22,6 +22,8 @@ class Sellvana_Sales_Model_Order_Cancel_State_Overall extends Sellvana_Sales_Mod
         self::DECLINED => 'email/sales/order-cancel-state-overall-declined',
     ];
 
+    protected $_defaultValue = self::PENDING;
+
     public function setRequested()
     {
         return $this->changeState(self::REQUESTED);
@@ -46,5 +48,4 @@ class Sellvana_Sales_Model_Order_Cancel_State_Overall extends Sellvana_Sales_Mod
     {
         return $this->changeState(self::COMPLETE);
     }
-
 }

@@ -4,7 +4,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
     FCom.CompareBlock = function (opt) {
         var cookieName = opt.cookieName || 'sellvana_compare', cookie = $.cookie(cookieName);
         var selected, ul = $('ul', opt.thumbContainer);
-        var limit = opt.limitCompare || 5;
+        var limit = opt.limitCompare || 4;
         var urlAdd = opt.url_add || '/catalog/compare/add';
         var urlRm = opt.url_remove || '/catalog/compare/rm';
         var thumbWidth = opt.thumbWidth || 35;
@@ -50,18 +50,18 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
 
         function add(id) {
             if (selected.length == limit) {
-                alert(locale._("Max number of products to compare is  ") + limit);
+                alert(locale._("Max number of products to compare is: ") + limit);
                 return false;
             }
 
 //            var s = {id: id, src: img.attr('src'), alt: img.attr('alt')};
             var add = true;
+            check(id, true);
             $.get(urlAdd, {id: id}, function(result){
                 if(result.hasOwnProperty('product')) {
                     var s = result.product;
                     selected.push(s);
                     thumb(s, selected.length - 1);
-                    check(id, true);
                     $.cookie(cookieName, JSON.stringify(selected), {expires: 1});
                     $('.compare-num-products').html(selected.length);
                     $(opt.thumbContainer).addClass('set');
@@ -73,6 +73,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                     //humanMsg.displayMsg('<img src="'+s.src+'" width="35" height="35"/> Added to compare: '+s.alt);
                     notify(s);
                 } else {
+                    check(id, false);
                     var add = false;
                     alert(result.error);
                 }
@@ -92,11 +93,11 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                 return false;
             }
             var rm = true;
+            check(id, false);
             $.get(urlRm, {id: id}, function(result){
                 if(result.hasOwnProperty('success')) {
                     ul.children().get(i).remove();
                     ul.append('<li class="item"/>');
-                    check(id, false);
                     selected.splice(i, 1);
                     $.cookie(cookieName, JSON.stringify(selected), {expires: 1});
 
@@ -117,6 +118,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                         $(opt.thumbContainer).removeClass('set');
                     }
                 } else {
+                    check(id, false);
                     rm = false;
                     alert(result.error);
                 }

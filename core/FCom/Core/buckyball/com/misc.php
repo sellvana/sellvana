@@ -1001,7 +1001,7 @@ class BUtil extends BClass
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
         $timeout = !empty($options['timeout']) ? $options['timeout'] : 5;
         $userAgent = !empty($options['useragent']) ? $options['useragent'] : 'Mozilla/5.0';
-        $useCurl = isset($options['curl']) ? $options['curl'] : true;
+        $useCurl = isset($options['curl']) ? $options['curl'] : false;
         if (preg_match('#^//#', $url)) {
             $url = 'http:' . $url;
         }
@@ -1015,7 +1015,6 @@ class BUtil extends BClass
             $url .= (strpos($url, '?') === false ? '?' : '&') . $request;
         }
 
-        // curl disabled by default because file upload doesn't work for some reason. TODO: figure out why
         if ($useCurl && function_exists('curl_init') || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
@@ -1115,10 +1114,13 @@ class BUtil extends BClass
                 'protocol_version' => '1.1',
                 'method' => $method,
                 'timeout' => $timeout,
-                'header' => "User-Agent: {$userAgent}\r\n",
+                'header' => [
+                    'User-Agent: ' . $userAgent,
+                    'Connection: close',
+                ],
             ]];
             if ($headers) {
-                $streamOptions['http']['header'] .= join("\r\n", array_values($headers)) . "\r\n";
+                $streamOptions['http']['header'] += array_values($headers);
             }
             if (!empty($options['proxy'])) {
                 $streamOptions['http']['proxy'] = $options['proxy'];
@@ -1159,11 +1161,11 @@ class BUtil extends BClass
                     }
                     $streamOptions['http']['content'] .= "--{$boundary}--\r\n";
                 }
-                $streamOptions['http']['header'] .= "Content-Type: {$contentType}\r\n";
+                $streamOptions['http']['header'][] = "Content-Type: {$contentType}";
                     //."Content-Length: ".strlen($request)."\r\n";
 
                 if (!empty($options['auth'])) {
-                    $streamOptions['http']['header'] .= sprintf("Authorization: Basic %s", base64_encode($options['auth']));
+                    $streamOptions['http']['header'][] = sprintf("Authorization: Basic %s", base64_encode($options['auth']));
                 }
 
                 if (preg_match('#^(ssl|ftps|https):#', $url)) {

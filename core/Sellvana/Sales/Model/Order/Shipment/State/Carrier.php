@@ -26,6 +26,8 @@ class Sellvana_Sales_Model_Order_Shipment_State_Carrier extends Sellvana_Sales_M
         self::RETURNED => 'Returned',
     ];
 
+    protected $_defaultValue = self::PENDING;
+
     public function setNotApplicable()
     {
         return $this->changeState(self::NA);
