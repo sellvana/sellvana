@@ -12,7 +12,7 @@
          * @type { {selectClass: string, listClass: string, inputClass: string, thumbUrl: string, images: Array, init: Function, getImages: Function, addImages: Function, removeImages: Function, updateInputImageValue: Function, renderImageItemForList: Function, populateImages: Function, handleEventImages: Function} }
          */
         var variantImages = {
-            selectClass: '.variant-image',
+            selectClass: 'select.variant-image',
             listClass: '.list-variant-image',
             inputClass: '.store-variant-image-id',
             thumbUrl: '/resize.php?s=30&f=media/product/images/',
@@ -89,101 +89,84 @@
             /**
              * populate image items to dropdown images and list selected images
              */
-            populateImages: function() {
+            populateImagesAndHandleEvents: function(id) {
                 if (variantGrid && this.images.length) {
                     var selectClass = this.selectClass;
                     var listClass = this.listClass;
                     var inputClass = this.inputClass;
                     var images = this.images;
 
-                    _.forEach(variantGrid.getRows(), function(row) {
-                        var component = variantGrid.getRowComponent(row.id);
-                        if (component) {
-                            var dom = $(component.getDOMNode());
-                            var imageIds = dom.find(inputClass).val().split(',');
-                            var selectEle = dom.find(selectClass);
-                            var listEle = dom.find(listClass);
+                    var component = variantGrid.getRowComponent(id);
+                    console.log('component', component);
+                    if (component) {
+                        var dom = $(component.getDOMNode());
+                        var imageIds = dom.find(inputClass).val().split(',');
+                        var selectEle = dom.find(selectClass);
+                        var listEle = dom.find(listClass);
 
-                            //empty html first
-                            selectEle.html('').append('<option>', {value: ''});
-                            listEle.html('');
+                        //empty html first
+                        selectEle.html('').append('<option>', {value: ''});
+                        listEle.html('');
 
-                            //populate items
-                            _.forEach(images, function(img) {
-                                var hide = '';
-                                if (imageIds.indexOf(img.file_id) != '-1') {
-                                    listEle.append(variantImages.renderImageItemForList(img));
-                                    listEle.removeClass('hide');
-                                    hide = 'hide';
-                                }
+                        //populate items
+                        _.forEach(images, function(img) {
+                            var hide = '';
+                            if (imageIds.indexOf(img.file_id) != '-1') {
+                                listEle.append(variantImages.renderImageItemForList(img));
+                                listEle.removeClass('hide');
+                                hide = 'hide';
+                            }
 
-                                selectEle.append($('<option>', {
-                                    value: img.file_id,
-                                    text: img.file_name,
-                                    "data-subfolder": img.folder,
-                                    'class': hide
-                                }));
+                            selectEle.append($('<option>', {
+                                value: img.file_id,
+                                text: img.file_name,
+                                "data-subfolder": img.folder,
+                                'class': hide
+                            }));
+                        });
+
+                        var format = function (state) {
+                            if (!state.id) {
+                                return state.text;
+                            }
+                            return "<img src='" + variantImages.thumbUrl + state.text + "'/>  " + state.text;
+                        };
+
+                        //init select2 with format
+                        dom.find(this.selectClass).select2({
+                            formatResult: format,
+                            formatSelection: format
+                        });
+
+                        //only handle event when not init select2
+                        if (!dom.find(this.selectClass).hasClass('select2-offscreen')) {
+                            //event when select image item
+                            dom.on('change', this.selectClass, function() {
+                                var option = $(this).find(':selected');
+                                var image = {
+                                    file_id: $(this).val(),
+                                    file_name: option.text()
+                                };
+                                dom.find(variantImages.listClass).removeClass('hide').append(variantImages.renderImageItemForList(image));
+                                option.addClass('hide');
+                                variantImages.updateInputImageValue(id);
+                                $(this).select2('data', null);
                             });
-                        } else {
-                            console.log('DEBUG: cannot find the component of row' + row.id, row);
+
+                            dom.on('click', '.btn-delete-variant-image', function() {
+                                dom.find(variantImages.selectClass).find('option[value="'+ $(this).attr('data-id') +'"]').removeClass('hide');
+                                dom.find(variantImages.selectClass).removeClass('hide');
+                                if (dom.find(variantImages.listClass).find('li').length == 1) {
+                                    dom.find(variantImages.listClass).addClass('hide');
+                                }
+                                variantImages.updateInputImageValue(id);
+                            });
                         }
-                    });
 
-
-                } else {
-                    //empty dropdown images and list images
-                    $(variantGrid.getDOMNode()).find(this.selectClass).html('').append($('<option>', {value: ''}));
-                    $(variantGrid.getDOMNode()).find(this.listClass).html('');
+                    } else {
+                        console.log('DEBUG: cannot find the component of row' + id);
+                    }
                 }
-            },
-            /**
-             * handle event for variant images
-             * - init select 2 for dropdown images
-             * - onChange select
-             * - onClick delete image
-             */
-            handleEventImages: function() {
-                var dom = $(variantGrid.getDOMNode());
-                var format = function (state) {
-                    if (!state.id) {
-                        return state.text;
-                    }
-                    return "<img src='" + variantImages.thumbUrl + state.text + "'/>  " + state.text;
-                };
-
-                //init select2 with format
-                dom.find(this.selectClass).select2({
-                    formatResult: format,
-                    formatSelection: format
-                });
-
-                //event when select image item
-                dom.on('change', this.selectClass, function() {
-                    var option = $(this).find(':selected');
-                    var image = {
-                        file_id: $(this).val(),
-                        file_name: option.text()
-                    };
-                    $(this).parent().find(variantImages.listClass).removeClass('hide').append(variantImages.renderImageItemForList(image));
-                    option.addClass('hide');
-                    var rowId = $(this).parents('tr').attr('id');
-                    //console.log('DEBUG: add image to row id: ' +  rowId);
-                    variantImages.updateInputImageValue(rowId);
-                    $(this).select2('data', null);
-                });
-
-                dom.on('click', '.btn-delete-variant-image', function() {
-                    var td = $(this).parents('td');
-                    td.find(variantImages.selectClass).find('option[value="'+ $(this).attr('data-id') +'"]').removeClass('hide');
-                    td.find(variantImages.selectClass).removeClass('hide');
-                    if (td.find(variantImages.listClass).find('li').length == 1) {
-                        td.find(variantImages.listClass).addClass('hide');
-                    }
-                    $(this).parents('li').remove();
-                    var rowId = td.parents('tr').attr('id');
-                    //console.log('DEBUG: delete image from row id: ' +  rowId);
-                    variantImages.updateInputImageValue(rowId)
-                });
             }
         };
 
@@ -317,7 +300,7 @@
                     if (!_.findWhere(columns, {name: field.field_code})) {
                         columns.push(field.field_code);
                         var filteredColumns = variantGrid.getColumns();
-                        filteredColumns.push(field.field_code);
+                        filteredColumns.unshift(field.field_code);
                         variantGrid.props.columnMetadata.push({
                             name: field.field_code,
                             label: field.name,
@@ -362,23 +345,28 @@
             if (triggerName == 'componentDidMount') {
                 variantImages.init();
             }
-            variantImages.populateImages();
-            variantImages.handleEventImages();
-            if (triggerName == 'componentDidUpdate') {
-                variantFields.populateFields();
+
+            var rowComponents = grid.getChildComponent('rows');
+            if (!_.isEmpty(rowComponents)) {
+                _.forEach(rowComponents, function(row) {
+                    var id = row.props.row.id;
+                    variantImages.populateImagesAndHandleEvents(id);
+                });
+            }
+
+
+            //add new variant line
+            if (triggerName == 'componentDidMount') {
+                $(variantGrid.getDOMNode()).find('.grid-new').on('click', function () {
+                    //todo: implement this in fcom.row
+                    variantGrid.addRows([{ id: guid() }]);
+                });
             }
         };
 
 
         window.variantFieldGriddleRegister = function(grid, triggerName) {
             variantFieldGrid = grid;
-            if (triggerName == 'componentDidMount') {
-                variantFields.init();
-            }
-            variantFields.populateFields();
-            if (triggerName == 'componentDidMount') {
-                variantFields.handleEventFields();
-            }
         }
 
     });

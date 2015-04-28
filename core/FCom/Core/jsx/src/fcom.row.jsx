@@ -133,8 +133,8 @@ define(['underscore', 'react'], function (_, React) {
                                         }
                                     }
 
+                                    var selected = col.default ? col.default : '';
                                     node = (
-                                        var selected = col.default ? col.default : '';
                                         <select defaultValue={selected} {...inlineProps} {...validationRules}>{selectOptions}</select>
                                     );
                                     break;

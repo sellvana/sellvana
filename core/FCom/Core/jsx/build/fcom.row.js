@@ -133,8 +133,9 @@ define(['underscore', 'react'], function (_, React) {
                                         }
                                     }
 
+                                    var selected = col.default ? col.default : '';
                                     node = (
-                                        React.createElement("select", React.__spread({defaultValue: col.default},  inlineProps,  validationRules), selectOptions)
+                                        React.createElement("select", React.__spread({defaultValue: selected},  inlineProps,  validationRules), selectOptions)
                                     );
                                     break;
                                 default:

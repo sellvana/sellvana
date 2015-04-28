@@ -1167,6 +1167,11 @@ var Griddle = React.createClass({
                     break;
                 case 'rows':
                     child = refs.gridBody.refs;
+                    delete child.gridTitle;
+                    break;
+                case 'title':
+                case 'gridTitle':
+                    child = refs.gridBody.refs.gridTitle;
                     break;
             }
         }
