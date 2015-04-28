@@ -22,6 +22,7 @@ modules:
                     - [ route, _ /noroute, FCom_Frontend_Controller.noroute, {}, null, false ]
                     - [ /, FCom_Frontend_Controller.index ]
                     - [ /*view, FCom_Frontend_Controller.static ]
+                    - [ /media/upload/:do, FCom_Frontend_Controller_Media.upload ]
 
         themes:
             FCom_Frontend_DefaultTheme:

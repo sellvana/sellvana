@@ -1,0 +1,7 @@
+{% macro widget__file_upload(widget, library, context) %}
+    {% import LAYOUT.view('core/form-elements').twigName() as forms %}
+    {{ forms.input({label: "Folder"|_, name: "#{context.prefix}[widgets][#{widget.id}][folder]", value: widget.folder|default('upload'), field: "folder-#{widget.id}"}) }}
+    {{ forms.input({label: "Subfolder"|_, name: "#{context.prefix}[widgets][#{widget.id}][subfolder]", value: widget.subfolder, field: "subfolder-#{widget.id}"}) }}
+    {{ forms.input({label: "Allowed File Types"|_, name: "#{context.prefix}[widgets][#{widget.id}][filetype_regex]", value: widget.filetype_regex, field: "filetype_regex-#{widget.id}"}) }}
+    {{ forms.boolean({label: "Allow Multiple Files Upload"|_, name:"#{context.prefix}[widgets][#{widget.id}][multiple]", value: widget.multiple, field: "multiple-#{widget.id}"}) }}
+{% endmacro %}

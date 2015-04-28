@@ -49,6 +49,7 @@ base:
             - [ addNav, system/backups, { label: Backups, href: /backups  } ]
             - [ addNav, system/importexport, { label: Import/Export, href: /importexport  } ]
             - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
+            - [ addNav, system/media_library, { label: "Media Library", href: /media_library, class: media-library } ]
 
     - view: admin/header
         do:
@@ -324,10 +325,9 @@ form:
 
 /templates/form:
     - { include: lib_js_codemirror }
+
 /media:
     - { include: base }
-    - { hook: header, clear: true }
-    - { hook: top-nav, clear: true }
     - { hook: main, views: media }
 
 /roles/form:
