@@ -78,7 +78,7 @@
                         if (files > 0) {
                             $mediaTypes.attr('disabled', true); // disable changing upload type after initiating upload
                         }
-                    }).bind('fileuploadfail', function (e, data) {
+                    }).bind('fileuploadfail', function () {
                         files--;
                         if (files == 0) {
                             $mediaTypes.attr('disabled', false);

@@ -192,7 +192,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
                     ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
                         'print' => '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
-                            . '<img src=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
+                            . '<img src=\'' . $baseSrc . '"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
                         'sortable' => false],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
                     ['name' => 'folder', 'label' => 'Folder', 'width' => 200],
@@ -225,8 +225,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     ],
                     'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
                     'refresh' => true,
-                ]
-            ]
+                ],
+                'page_rows_data_callback' => [$this, 'afterInitialLibraryData']
+            ],
         ];
 
         if (!empty($options['config'])) {
@@ -234,6 +235,22 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         }
 
         return $config;
+    }
+
+    /**
+     * @param $rows
+     * @return mixed
+     */
+    public function afterInitialLibraryData($rows)
+    {
+        $mediaUrl = $this->BConfig->get('web/media_dir')?: 'media';
+        $hlp      = $this->FCom_Core_Main;
+        foreach ($rows as & $row) {
+            $thumbUrl          = 'image-not-found.png';
+            $row['thumb_path'] = $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]);
+        }
+
+        return $rows;
     }
 
     public function action_index()
