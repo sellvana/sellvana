@@ -123,10 +123,10 @@ class FCom_Core_Main extends BClass
         }
 
         if (!$config->get('web/media_dir')) {
-            if (strpos($mediaDir, $baseSrc) === 0) {
-                $mediaUrl = str_replace($baseSrc, '', $mediaDir);
-            } elseif (strpos($mediaDir, FULLERON_ROOT_DIR) === 0) {
-                $mediaUrl = str_replace(FULLERON_ROOT_DIR, '', $mediaDir);
+            if (strpos($mediaDir, FULLERON_ROOT_DIR) === 0) {
+                $mediaUrl = preg_replace('#^' . preg_quote(FULLERON_ROOT_DIR, '#') . '#', '', $mediaDir);
+            } elseif (strpos($mediaDir, $baseSrc) === 0) {
+                $mediaUrl = preg_replace('#^' . preg_quote($baseSrc, '#') . '#', '', $mediaDir);
             #} elseif (strpos($mediaDir, $docRoot) === 0) {
             #    $mediaUrl = str_replace($docRoot, '', $mediaDir);
             #} elseif (strpos($mediaDir, $rootDir) === 0) {

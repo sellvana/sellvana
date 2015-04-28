@@ -317,6 +317,9 @@ label.success {
   background:#eee;
   border:1px solid #bbb;
   }
+.f-widget-prods-compare ul > li.item a {
+  cursor: alias;
+  }
   
 /* Ratings & Reviews */
 .f-rating-stars {
