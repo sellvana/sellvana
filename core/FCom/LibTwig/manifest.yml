@@ -1,6 +1,7 @@
 modules:
     FCom_LibTwig:
-        version: 0.1.0
+        version: 0.5.0.0
+        channel: alpha
         auto_use: [ bootstrap ]
         observe:
             - [ "BLayout::addAllViews", FCom_LibTwig_Main.onLayoutAddAllViews ]
