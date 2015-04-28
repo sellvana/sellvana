@@ -96,7 +96,6 @@
                     var images = this.images;
 
                     var component = variantGrid.getRowComponent(id);
-                    console.log('component', component);
                     if (component) {
                         var dom = $(component.getDOMNode());
                         var imageIds = dom.find(inputClass).val().split(',');
@@ -212,54 +211,69 @@
             },
             processTopFieldSection: function () {
                 if (variantGrid && this.customFields.length) {
+                    var select = variantFields.select;
+                    var list = variantFields.list;
+
                     //populate data to top fields
+                    list.html('');
                     _.forEach(variantGrid.props.columnMetadata, function (col) {
                         _.forEach(variantFields.customFields, function (field) {
                             if (field.id == col.field_id) {
-                                variantFields.select.find("option[value='" + field.id + "']").addClass('hide');
-                                variantFields.list.append(variantFields.renderFieldItemForList(field));
+                                select.find("option[value='" + field.id + "']").addClass('hide');
+                                list.append(variantFields.renderFieldItemForList(field));
                             }
                         })
                     });
 
                     //add field to list and variantGrid
                     this.btnAddField.on('click', function () {
-                        var select = variantFields.select;
-                        var list = variantFields.list;
                         var val = select.val();
                         var optSelected = select.find("option:selected");
                         if (!val) {
                             return;
                         }
 
-                        $.get('{{ APP.href(' / customfields / fields / options ? id = ') | raw }}' + val,
+                        $.get('{{ APP.href('/customfields/fields/options?id=') | raw }}' + val,
                                 function (response) {
                                     if (response.success) {
-                                        var field = { id: val, name: optSelected.text(), field_code: optSelected.attr('data-code'), options: response.options };
+                                        var field = {
+                                            id: val,
+                                            name: optSelected.text(),
+                                            field_code: optSelected.attr('data-code'),
+                                            options: response.options
+                                        };
                                         variantFields.addField(field);
 
                                         optSelected.addClass('hide');
                                         select.val('');
 
-                                        list.append(variantFields.renderFieldItemForList(field));
+                                        variantFields.customFields.push(field);
                                         variantFields.addGridColumn(field);
+                                        variantFields.list.append(variantFields.renderFieldItemForList(field));
                                     }
                                 }
                         );
 
                     });
+
+                    this.resetSelect();
+                    this.list.sortable({
+                        scroll: false,
+                        axis: 'x',
+                        update: function (event, ui) {
+                            console.log('sortable.update');
+                        }
+                    });
                 }
             },
             processFieldForRow: function (id) {
-                if (variantFieldGrid && variantGrid && this.customFields.length) {
+                if (variantGrid && this.customFields.length) {
 
                     //populate data to dropdown fields in each row
                     var component = (id instanceof Object) ? id : variantGrid.getRowComponent(id);
 
                     if (component) {
                         var fieldValue = component.props.row.field_values;
-                        /*console.log('fieldValue', fieldValue);
-                        console.log('row', component.props.row);*/
                         var dom = $(component.getDOMNode());
                         dom.find(variantFields.inputClass).each(function () {
                             var name = $(this).attr('name');
@@ -281,7 +295,7 @@
                                     $(this).select2('val', fieldValue[name]);
                                 }
                             }
-                        })
+                        });
                     } else {
                         console.log('DEBUG: cannot find the component of row' + id);
                     }
@@ -289,19 +303,11 @@
                 } else {
                     console.log('DEBUG: cannot populate fields');
                     console.log('variantGrid', variantGrid);
-                    console.log('variantFieldGrid', variantFieldGrid);
                     console.log('this.customFields', this.customFields);
                 }
             },
             handleEventFields: function () {
-                this.resetSelect();
-                $(this.listId).sortable({
-                    scroll: false,
-                    axis: 'x',
-                    update: function (event, ui) {
-                        console.log('sortable.update');
-                    }
-                });
+
             },
             addGridColumn: function (field) {
                 if (variantGrid) {
@@ -310,6 +316,7 @@
                         columns.push(field.field_code);
                         var filteredColumns = variantGrid.getColumns();
                         filteredColumns.unshift(field.field_code);
+
                         variantGrid.props.columnMetadata.push({
                             name: field.field_code,
                             label: field.name,
@@ -324,30 +331,26 @@
                         });
 
                         variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns }, function () {
-                            $(variantGrid.getDOMNode()).find('td[data-col=' + field.field_code + ']').find(variantFields.inputClass).select2({
+                            /*$(variantGrid.getDOMNode()).find(variantFields.inputClass).select2({
                                 placeholder: 'Select field value',
                                 allowClear: true,
                                 data: function () {
                                     return { results: field.options };
                                 }
-                            });
+                            });*/
                         })
                     }
 
                 }
             },
             resetSelect: function () {
-                $(this.selectId).val('').select2();
-            },
-            validateUniqueVariant: function () {
-
+                this.select.val('').select2();
             }
         };
 
         window.variantFieldGriddleRegister = function(grid, triggerName) {
             variantFieldGrid = grid;
             variantFields.init();
-            variantFields.processTopFieldSection();
         };
 
         /**
@@ -373,6 +376,9 @@
 
             //add new variant line
             if (triggerName == 'componentDidMount') {
+
+                variantFields.processTopFieldSection();
+
                 $(variantGrid.getDOMNode()).find('.grid-new').on('click', function () {
                     //todo: implement this in fcom.row
                     variantGrid.addRows([{ id: guid() }]);
