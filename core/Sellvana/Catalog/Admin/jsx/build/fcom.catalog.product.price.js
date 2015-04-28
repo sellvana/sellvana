@@ -323,6 +323,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             //    });
             //}
             //this.initPrices();
+            if (this.props.data['price_type'] === 'sale') {
+                this.initDateInput();
+            }
         },
         updatePrice: function (e) {
             var $el = $(e.target);
