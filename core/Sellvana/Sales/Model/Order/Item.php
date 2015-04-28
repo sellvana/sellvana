@@ -36,6 +36,12 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
+    public function setProduct($product)
+    {
+        $this->_product = $product;
+        return $this;
+    }
+
     public function product()
     {
         if (!$this->_product) {
@@ -58,6 +64,38 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     public function isShippable()
     {
         return $this->get('shipping_weight') > 0;
+    }
+
+    public function getQtyCanPay()
+    {
+        return $this->get('qty_ordered') - $this->get('qty_paid') - $this->get('qty_canceled');
+    }
+
+    public function getQtyCanBackorder()
+    {
+        return $this->get('qty_ordered') - $this->get('qty_shipped') - $this->get('qty_canceled')
+                - $this->get('qty_backordered');
+    }
+
+    public function getQtyCanShip()
+    {
+        return $this->get('qty_ordered') - $this->get('qty_shipped') - $this->get('qty_canceled')
+                - $this->get('qty_backordered');
+    }
+
+    public function getQtyCanCancel()
+    {
+        return $this->get('qty_ordered') - $this->get('qty_shipped') -  $this->get('qty_canceled');
+    }
+
+    public function getQtyCanReturn()
+    {
+        return $this->get('qty_shipped') - $this->get('qty_returned');
+    }
+
+    public function getQtyCanRefund()
+    {
+        return $this->get('qty_paid') - $this->get('qty_refunded');
     }
 
     public function __destruct()

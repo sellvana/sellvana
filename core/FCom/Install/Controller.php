@@ -148,7 +148,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         $this->BDb->connect();
         $userHlp = $this->FCom_Admin_Model_User;
-        if ($this->BDb->ddlTableExists($userHlp->table()) && $userHlp->orm('u')->find_one()) {
+        if ($this->BDb->ddlTableExists($userHlp->table()) && ($user = $userHlp->orm('u')->find_one())) {
             $this->BResponse->redirect('install/step3');
             return;
         } else {
@@ -182,7 +182,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 ['password_confirm', '@required'],
                 ['password_confirm', '@password_confirm'],
             ])) {
-                throw new BException('Invalid form data');
+                throw new BException("Invalid form data: \n" . $this->BValidate->validateErrorsString());
             }
             $this->BMigrate->migrateModules('FCom_Admin', true);
             $this->FCom_Admin_Model_User
@@ -200,7 +200,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     public function action_step3()
     {
         $this->view('step3')->set([
-            'debug_modes' => ['DEBUG' => 'DEBUG', /*'PRODUCTION' => 'PRODUCTION', */],
+            'debug_modes' => ['DEBUG' => 'DEBUG (default for alpha)', /*'PRODUCTION' => 'PRODUCTION', */],
             'run_level_bundles' => ['all' => 'All Bundled', 'min' => 'Minimal'],
         ]);
         $this->BLayout->applyLayout('/step3');
@@ -251,6 +251,8 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         ], true);
 
         $this->BConfig->writeConfigFiles();
+
+        $this->BEvents->fire(__METHOD__ . ':after', ['data' => $w]);
 
         $this->BResponse->redirect($this->BApp->adminHref(''));
     }

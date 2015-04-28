@@ -41,7 +41,11 @@ class Sellvana_Blog_Model_Post extends FCom_Core_Model_Abstract
         ['url_key', 'Sellvana_Blog_Model_Post::validateDupUrlKey']
         /*array('url_key', '@required'),*/
     ];
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['url_key'],
+        'related'    => ['author_user_id'=>'FCom_Admin_Model_User.id'],
+    ];
 
     public function getPostsOrm()
     {

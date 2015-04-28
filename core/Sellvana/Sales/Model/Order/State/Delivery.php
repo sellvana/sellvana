@@ -1,13 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_State_Delivery extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_State_Delivery extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const VIRTUAL = 'virtual',
         PENDING = 'pending',
         PACKED = 'packed',
         SHIPPED = 'shipped',
         DELIVERED = 'delivered',
-        RETURNED = 'returned',
         PARTIAL = 'partial';
 
     protected $_valueLabels = [
@@ -16,15 +15,15 @@ class Sellvana_Sales_Model_Order_State_Delivery extends FCom_Core_Model_Abstract
         self::PACKED => 'Packed',
         self::SHIPPED => 'Shipped',
         self::DELIVERED => 'Delivered',
-        self::RETURNED => 'Returned',
         self::PARTIAL => 'Partial',
     ];
 
     protected $_setValueNotificationTemplates = [
         self::SHIPPED => 'email/sales/order-state-delivery-shipped',
         self::DELIVERED => 'email/sales/order-state-delivery-delivered',
-        self::RETURNED => 'email/sales/order-state-delivery-returned',
     ];
+
+    protected $_defaultValue = self::PENDING;
 
     public function setVirtual()
     {
@@ -51,13 +50,50 @@ class Sellvana_Sales_Model_Order_State_Delivery extends FCom_Core_Model_Abstract
         return $this->changeState(self::DELIVERED);
     }
 
-    public function setReturned()
-    {
-        return $this->changeState(self::RETURNED);
-    }
-
     public function setPartial()
     {
         return $this->changeState(self::PARTIAL);
+    }
+
+    public function isComplete()
+    {
+        return in_array($this->getValue(), [self::VIRTUAL, self::SHIPPED, self::DELIVERED]);
+    }
+
+    public function calcState()
+    {
+        $itemStates = $this->getItemStateStatistics('delivery');
+
+        $virtual   = Sellvana_Sales_Model_Order_Item_State_Delivery::VIRTUAL;
+        $pending   = Sellvana_Sales_Model_Order_Item_State_Delivery::PENDING;
+        $packed    = Sellvana_Sales_Model_Order_Item_State_Delivery::PACKED;
+        $shipped   = Sellvana_Sales_Model_Order_Item_State_Delivery::SHIPPED;
+        $delivered = Sellvana_Sales_Model_Order_Item_State_Delivery::DELIVERED;
+        $partial   = Sellvana_Sales_Model_Order_Item_State_Delivery::PARTIAL;
+
+        if (sizeof($itemStates) === 1) {
+            if (!empty($itemStates[$virtual])) {
+                return $this->setVirtual();
+            } elseif (!empty($itemStates[$pending])) {
+                return $this->setPending();
+            } elseif (!empty($itemStates[$packed])) {
+                return $this->setPacked();
+            }
+        }
+        if (!empty($itemStates[$pending]) || !empty($itemStates[$packed]) || !empty($itemStates[$partial])) {
+            return $this->setPartial();
+        }
+        if (!empty($itemStates[$shipped]) && empty($itemStates[$pending])
+            && empty($itemStates[$packed]) && empty($itemStates[$partial])
+        ) {
+            return $this->setShipped();
+        }
+        if (!empty($itemStates[$delivered]) && empty($itemStates[$pending])
+            && empty($itemStates[$packed]) && empty($itemStates[$partial])
+        ) {
+            return $this->setDelivered();
+        }
+
+        return $this;
     }
 }

@@ -285,7 +285,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         priceTypes
                     ), 
                     React.createElement("td", null, 
-                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"), size: "6", title: price['calc_amount']? price['calc_amount']: price['amount'], 
+                        React.createElement("input", {type: "text", className: "form-control", name: this.getFieldName(price, "amount"), size: "6", onBlur: this.updatePrice, "data-type": "amount", 
                                defaultValue: price['amount'], readOnly: this.editable || this.props.theBase ? null: 'readonly'})
                     ), 
                     React.createElement("td", null, 
@@ -296,7 +296,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         [qty, dateRange]
                     ), 
                     React.createElement("td", null, 
-                        price['calc_amount'] ? React.createElement("span", {className: "help-block"}, price['calc_amount']) : null
+                        price['calc_amount'] ? React.createElement("span", {className: "help-block"}, price['calc_amount'].toFixed(2)) : null
                     )
                 )
             );
@@ -415,120 +415,125 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
 
     var divStyle = {float: 'left', marginLeft: 15};
 
+    function findBasePrice(price, prices) {
+        var base_field = price.base_field;
+        var customer_group_id = price.customer_group_id;
+        var currency_code = price.currency_code;
+        var site_id = price.site_id;
+
+        var possiblePrices = _.filter(prices, function (p) {
+            return p.price_type == base_field;
+        });
+
+        if (possiblePrices.length == 0) {
+            return;
+        }
+
+        var basePrice = _.find(possiblePrices, function (p) {
+            return p['customer_group_id'] == customer_group_id &&
+                p['currency_code'] == currency_code &&
+                p['site_id'] == site_id;
+        });
+        if (!basePrice) {
+            basePrice = _.find(possiblePrices, function (p) {
+                return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
+                    p['currency_code'] == currency_code &&
+                    p['site_id'] == site_id;
+            });
+        }
+        if (!basePrice) {
+            basePrice = _.find(possiblePrices, function (p) {
+                return p['customer_group_id'] == customer_group_id &&
+                    (p['currency_code'] == null || p['currency_code'] == '') &&
+                    p['site_id'] == site_id;
+            });
+        }
+        if (!basePrice) {
+            basePrice = _.find(possiblePrices, function (p) {
+                return p['customer_group_id'] == customer_group_id &&
+                    p['currency_code'] == currency_code &&
+                    (p['site_id'] == null || p['site_id'] == '');
+            });
+        }
+        if (!basePrice) {
+            basePrice = _.find(possiblePrices, function (p) {
+                return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
+                    (p['currency_code'] == null || p['currency_code'] == '') &&
+                    p['site_id'] == site_id;
+            });
+        }
+        if (!basePrice) {
+            basePrice = _.find(possiblePrices, function (p) {
+                return p['customer_group_id'] == customer_group_id &&
+                    (p['currency_code'] == null || p['currency_code'] == '') &&
+                    (p['site_id'] == null || p['site_id'] == '');
+            });
+        }
+        if (!basePrice) {
+            basePrice = _.find(possiblePrices, function (p) {
+                return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
+                    p['currency_code'] == currency_code &&
+                    (p['site_id'] == null || p['site_id'] == '');
+            });
+        }
+
+        if (!basePrice) {
+            basePrice = _.find(possiblePrices, function (p) {
+                return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
+                    (p['currency_code'] == null || p['currency_code'] == '') &&
+                    (p['site_id'] == null || p['site_id'] == '');
+            });
+        }
+
+        return basePrice;
+    }
+
+    function collectPrice(price, prices) {
+        var operation = price.operation;
+        var basePrice = findBasePrice(price, prices);
+        console.log(basePrice);
+        if (basePrice && basePrice != price) {
+            if (basePrice.operation && basePrice.operation != '=$' && isNaN(basePrice.calc_amount)) {
+                collectPrice(basePrice, prices)
+            }
+            var result;
+            var value = parseFloat(basePrice.calc_amount || basePrice.amount);
+            var value2 = parseFloat(price.amount);
+            switch (operation) {
+                case '*$':
+                    result = value * value2;
+                    break;
+                case '+$':
+                    result = value + value2;
+                    break;
+                case '-$':
+                    result = value - value2;
+                    break;
+                case '*%':
+                    result = value * value2 / 100;
+                    break;
+                case '+%':
+                    result = value + value * value2 / 100;
+                    break;
+                case '-%':
+                    result = value - value * value2 / 100;
+                    break;
+                default:
+                    result = value;
+            }
+            price.calc_amount = result;
+            console.log(value, value2, operation, price.calc_amount);
+        }
+    }
+
     function calculateDynamicPrice(options) {
         var prices = options.prices;
         _.each(prices, function (price) {
             price.calc_amount = null;
-            //console.log(price);
+        });
+        _.each(prices, function (price) {
             if (price.operation && price.operation != '=$') {
-                var operation = price.operation;
-                var base_field = price.base_field;
-                var customer_group_id = price.customer_group_id;
-                var currency_code = price.currency_code;
-                var site_id = price.site_id;
-
-                var possiblePrices = _.filter(prices, function (p) {
-                    return p.price_type == base_field;
-                });
-
-                if (!possiblePrices) {
-                    return;
-                }
-
-                var basePrice = _.find(possiblePrices, function (p) {
-                    return p['customer_group_id'] == customer_group_id &&
-                        p['currency_code'] == currency_code &&
-                        p['site_id'] == site_id;
-                });
-                if (!basePrice) {
-                    basePrice = _.find(possiblePrices, function (p) {
-                        return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
-                            p['currency_code'] == currency_code &&
-                            p['site_id'] == site_id;
-                    });
-                }
-                if (!basePrice) {
-                    basePrice = _.find(possiblePrices, function (p) {
-                        return p['customer_group_id'] == customer_group_id &&
-                            (p['currency_code'] == null || p['currency_code'] == '') &&
-                            p['site_id'] == site_id;
-                    });
-                }
-                if (!basePrice) {
-                    basePrice = _.find(possiblePrices, function (p) {
-                        return p['customer_group_id'] == customer_group_id &&
-                            p['currency_code'] == currency_code &&
-                            (p['site_id'] == null || p['site_id'] == '');
-                    });
-                }
-                if (!basePrice) {
-                    basePrice = _.find(possiblePrices, function (p) {
-                        return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
-                            (p['currency_code'] == null || p['currency_code'] == '') &&
-                            p['site_id'] == site_id;
-                    });
-                }
-                if (!basePrice) {
-                    basePrice = _.find(possiblePrices, function (p) {
-                        return p['customer_group_id'] == customer_group_id &&
-                            (p['currency_code'] == null || p['currency_code'] == '') &&
-                            (p['site_id'] == null || p['site_id'] == '');
-                    });
-                }
-                if (!basePrice) {
-                    basePrice = _.find(possiblePrices, function (p) {
-                        return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
-                            p['currency_code'] == currency_code &&
-                            (p['site_id'] == null || p['site_id'] == '');
-                    });
-                }
-
-                if (!basePrice) {
-                    basePrice = _.find(possiblePrices, function (p) {
-                        return (p['customer_group_id'] == null || p['customer_group_id'] == '') &&
-                            (p['currency_code'] == null || p['currency_code'] == '') &&
-                            (p['site_id'] == null || p['site_id'] == '');
-                    });
-                }
-
-                //var basePrice = _.find(prices, function (p) {
-                //    if(p === price) {
-                //        return false;
-                //    }
-                //
-                //    return (p.price_type == base_field && p.customer_group_id == customer_group_id &&
-                //    p.currency_code == currency_code && p.site_id == site_id)
-                //});
-                console.log(basePrice);
-                if (basePrice) {
-                    var result;
-                    var value = parseFloat(basePrice.amount);
-                    var value2 = parseFloat(price.amount);
-                    switch (operation) {
-                        case '*$':
-                            result = value * value2;
-                            break;
-                        case '+$':
-                            result = value + value2;
-                            break;
-                        case '-$':
-                            result = value - value2;
-                            break;
-                        case '*%':
-                            result = value * value2 / 100;
-                            break;
-                        case '+%':
-                            result = value + value * value2 / 100;
-                            break;
-                        case '-%':
-                            result = value - value * value2 / 100;
-                            break;
-                        default:
-                            result = value;
-                    }
-                    price.calc_amount = result;
-                    console.log(value, value2, operation, price.calc_amount);
-                }
+                collectPrice(price, prices);
             }
         });
     }
@@ -631,10 +636,15 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }.bind(this);
 
             this.options.updateOperation = function (price_id, operation, base_field) {
+                var options = this.options;
                 _.each(this.options.prices, function (price) {
                     if (price.id == price_id) {
                         price.operation = operation;
-                        price.base_field = base_field || 'base';
+                        var defBaseField = options.priceRelationOptions[price['price_type']];
+                        if(defBaseField) {
+                            defBaseField = defBaseField[0]['value'];
+                        }
+                        price.base_field = base_field || defBaseField;
                     }
                 });
                 renderPrices(this.options, this.options.container[0]);

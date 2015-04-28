@@ -1,7 +1,7 @@
 modules:
     Sellvana_CustomField:
         version: 0.2.5
-        channel: beta
+        channel: alpha
         require: { module: { Sellvana_Catalog: 0.2.1 } }
         translations: { en: en.php }
         after: [ Sellvana_Customer ]
@@ -35,4 +35,4 @@ modules:
                 auto_use: [ views ]
                 observe:
                     - [ "BLayout::hook:custom-fields-filters", Sellvana_CustomField_Main.hookCustomFieldFilters ]
-                    - [ "Sellvana_Sales_Workflow_Cart::customerAddsItemsToCart:calcDetails", Sellvana_CustomField_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
+                    - [ "Sellvana_Sales_Workflow_Cart::action_customerAddsItemsToCart:calcDetails", Sellvana_CustomField_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]

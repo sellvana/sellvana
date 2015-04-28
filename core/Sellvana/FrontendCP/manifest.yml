@@ -1,7 +1,7 @@
 modules:
     Sellvana_FrontendCP:
         version: 0.1.0
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Frontend: 0.1.0 } }
 
         areas:

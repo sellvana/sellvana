@@ -73,7 +73,7 @@ class BLocale extends BClass
     {
         date_default_timezone_set($this->_defaultTz);
         setlocale(LC_ALL, $this->_defaultLocale);
-        $this->_tzCache['GMT'] = new DateTimeZone('GMT');
+        $this->_tzCache['UTC'] = new DateTimeZone('UTC');
     }
 
     public function transliterate($str, $filler = '-')
@@ -1117,7 +1117,7 @@ class BLocale extends BClass
         if (empty($this->_tzCache[$tz])) {
             $this->_tzCache[$tz] = new DateTimeZone($tz);
         }
-        return $this->_tzCache[$tz]->getOffset($this->_tzCache['GMT']);
+        return $this->_tzCache[$tz]->getOffset($this->_tzCache['UTC']);
     }
 
     /**
@@ -1167,7 +1167,7 @@ class BLocale extends BClass
     */
     public function datetimeDbToLocal($value, $full = false)
     {
-        return strftime($full ? '%c' : '%x', strtotime($value));
+        return strftime($full ? '%c' : '%x', strtotime($value) + $this->tzOffset());
     }
 
     public function getTranslations()
@@ -1208,14 +1208,20 @@ class BLocale extends BClass
         return !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
     }
 
-    public function currency($value, $decimals = 2)
+    public function currency($value, $currency = null, $decimals = 2)
     {
-        return sprintf('%s%s', static::$_currencySymbol, $this->roundCurrency($value, $decimals));
+        if ($currency) {
+            $symbol = $this->getSymbol($currency);
+        } else {
+            $symbol = static::$_currencySymbol;
+        }
+        return sprintf('%s%s', $symbol, number_format($value, $decimals));
     }
 
     public function roundCurrency($value, $decimals = 2)
     {
         //TODO: currency specific number of digits
-        return number_format($value, $decimals);
+        $precision = pow(10, $decimals);
+        return round($value * $precision) / $precision;
     }
 }

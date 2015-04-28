@@ -44,7 +44,7 @@ base:
             - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog } ]
             - [ addNav, system/users, { label: Users, href: /users  } ]
             - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
-            - [ addNav, system/emails, { label: System Emails, href: /systememails  } ]
+            #- [ addNav, system/emails, { label: System Emails, href: /systememails  } ]
             - [ addNav, system/templates, { label: Templates, href: /templates  } ]
             - [ addNav, system/backups, { label: Backups, href: /backups  } ]
             - [ addNav, system/importexport, { label: Import/Export, href: /importexport  } ]
@@ -109,6 +109,8 @@ common_js_libs:
             - [ requireJs, griddle.fcomGridBody, @FCom_Core/jsx/build/fcom.gridBody, { deps : [ react, griddle.custom ]} ]
             - [ requireJs, griddle.fcomGridFilter, @FCom_Core/jsx/build/fcom.gridFilter, { deps : [ react, griddle.custom ]} ]
             - [ requireJs, griddle.fcomRow, @FCom_Core/jsx/build/fcom.row, { deps : [ react, griddle.custom ]} ]
+            - [ requireJs, griddle.fcomModalForm, @FCom_Core/jsx/build/fcom.modalForm, { deps : [ react, griddle.custom ]} ]
+            - [ requireJs, griddle.fcomMediaLib, @FCom_Core/jsx/build/fcom.medialib, { deps : [ react, fcom.griddle ]} ]
 
 
 lib_admin_theme1:
@@ -317,9 +319,8 @@ form:
             - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10 } ]
 
 /modules:
-    - { include: base }
+    - { include: default_griddle }
     - { hook: main, views: modules }
-    - { view: admin/nav, do: [[ setNav, modules/installed ]] }
 
 /templates/form:
     - { include: lib_js_codemirror }
@@ -330,6 +331,7 @@ form:
     - { hook: main, views: media }
 
 /roles/form:
+    - { include: default_form }
     - { include: jstree }
 
 /header_search:

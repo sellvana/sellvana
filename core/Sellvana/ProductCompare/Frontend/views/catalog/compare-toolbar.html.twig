@@ -1,5 +1,5 @@
-{% set compareJson = APP.instance('Sellvana_ProductCompare_Model_Set').sessionSet().getCompareProductsDetailsJson(1) %}
 {% set compare = APP.instance('Sellvana_ProductCompare_Model_Set').sessionSet().getCompareProductsDetails(1) %}
+{% set compareJson = UTIL.toJson(compare) %}
 
 <div class="f-widget f-widget-prods-compare">
     <form method="post" action="{{ APP.href('catalog/compare') }}">

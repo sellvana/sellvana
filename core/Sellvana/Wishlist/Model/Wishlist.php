@@ -23,6 +23,12 @@ class Sellvana_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     protected $items = null;
     protected static $_sessionWishlist = null;
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['cookie_token'],
+        'related'    => ['customer_id' => 'Sellvana_Customer_Model_Customer.id'],
+    ];
+
     /**
      * @param bool $createAnonymousIfNeeded
      * @return bool|Sellvana_Wishlist_Model_Wishlist
@@ -75,16 +81,24 @@ class Sellvana_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     /**
      * @param bool $refresh
+     * @param bool $clean
      * @return null
      */
-    public function items($refresh = false)
+    public function items($refresh = false, $clean = false)
     {
-        if (!$this->items || $refresh) {
-            $items = $this->Sellvana_Wishlist_Model_WishlistItem->orm()->where('wishlist_id', $this->id())->find_many_assoc();
-            foreach ($items as $ik => $item) {
-                if (!$item->getProduct()) {
-                    $this->removeItem($item);
-                    unset($items[$ik]);
+        if (null === $this->items || $refresh) {
+            $orm = $this->Sellvana_Wishlist_Model_WishlistItem->orm('wi')->where('wishlist_id', $this->id());
+            if ($clean) {
+                $orm->join('Sellvana_Catalog_Model_Product', ['p.id', '=', 'wi.product_id'], 'p')
+                    ->select('wi.*')->select('p.id', 'product_id');
+            }
+            $items = $orm->find_many_assoc();
+            if ($clean) {
+                foreach ($items as $ik => $item) {
+                    if (!$item->get('product_id')) {
+                        $this->removeItem($item);
+                        unset($items[$ik]);
+                    }
                 }
             }
             $this->items = $items;

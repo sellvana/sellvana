@@ -16,6 +16,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     protected $_recordName = 'User';
     protected $_mainTableAlias = 'au';
     protected $_navPath = 'system/users';
+    protected $_formTitleField = 'username';
 
     public function gridConfig()
     {
@@ -23,6 +24,10 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
 
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'width' => 85, 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'cell' => 'integer'],
             ['name' => 'username', 'label' => 'User Name', 'width' => 100],
             ['name' => 'email', 'label' => 'Email', 'width' => 150],
@@ -35,10 +40,6 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
                 'options' => $this->FCom_Admin_Model_User->fieldOptions('status')],
             ['name' => 'create_at', 'label' => 'Created', 'width' => 100],
             ['name' => 'update_at', 'label' => 'Updated', 'width' => 100],
-            ['type' => 'btn_group', 'width' => 85, 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete'],
-            ]],
         ];
         $config['actions'] = [
             'edit' => ['caption' => 'status'],
@@ -59,10 +60,9 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
-        $m = $args['model'];
+
         $args['view']->set([
-            'sidebar_img' => $this->BUtil->gravatar($m->email),
-            'title' => $m->id ? 'Edit User: ' . $m->username : 'Create New User',
+            'sidebar_img' => $this->BUtil->gravatar($args['model']->get('email')),
         ]);
     }
 
@@ -93,9 +93,9 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
 
         // TODO for empty local grid, it throws exception
         unset($config['orm']);
-        $config['data'] = $orm->find_many();
-        $config['id'] = 'role_users_grid_' . $model->id;
-        $config['columns'] = [
+        $config['config']['data'] = $orm->find_many();
+        $config['config']['id'] = 'role_users_grid_' . $model->id;
+        $config['config']['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 80, 'hidden' => true],
             ['name' => 'username', 'label' => 'Username', 'index' => 'au.username', 'width' => 200],
@@ -104,20 +104,31 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
                 'multirow_edit' => true, 'editor' => 'select',
                 'options' => $this->FCom_Admin_Model_User->fieldOptions('status')]
         ];
-        $config['actions'] = [
-            'add' => ['caption' => 'Add user'],
+        $config['config']['actions'] = [
+            #'add' => ['caption' => 'Add user'],
+            'add-user' => [
+                'caption'  => 'Add User',
+                'type'     => 'button',
+                'id'       => 'add-user-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'showModalToAddUser'
+            ],
             'delete' => ['caption' => 'Remove']
         ];
-        $config['filters'] = [
+        $config['config']['filters'] = [
             ['field' => 'username', 'type' => 'text'],
             ['field' => 'email', 'type' => 'text'],
             ['field' => 'status', 'type' => 'multiselect']
         ];
-        $config['data_mode'] = 'local';
-        $config['grid_before_create'] = 'rolesGridRegister';
-        $config['events'] = ['init', 'add', 'mass-delete'];
+        $config['config']['data_mode'] = 'local';
+        $config['config']['grid_before_create'] = 'rolesGridRegister';
+        $config['config']['events'] = ['init', 'add', 'mass-delete'];
 
-        return ['config' => $config];
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'setUserRoleMainGrid'
+        ];
+
+        return $config;
     }
 
     /**

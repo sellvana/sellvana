@@ -3,16 +3,18 @@
 {% set current = LOCALE.getCurrentLocale() %}
 {% set localeArr = current|split('_') %}
 
-<li class="dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <span class="f-header-util-links-label"><b class="flag flag-{{ localeArr[1]|lower }}"></b> {{ allLanguages[localeArr[0]] }} <b class="caret"></b></span>
-    </a>
-    <ul class="dropdown-menu">
-        {% for l in allowedLocales %}
-            {% if l != current %}
-                {% set lArr = l|split('_') %}
-                <li><a href="{{ APP.href('language/switch/' ~ l) }}" rel="nofollow"><b class="flag flag-{{ lArr[1]|lower }}"></b> {{ allLanguages[lArr[0]] }}</a></li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-</li>
+{% if allowedLocales|length > 1 %}
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="f-header-util-links-label"><b class="flag flag-{{ localeArr[1]|lower }}"></b> {{ allLanguages[localeArr[0]] }} <b class="caret"></b></span>
+        </a>
+        <ul class="dropdown-menu">
+            {% for l in allowedLocales %}
+                {% if l != current %}
+                    {% set lArr = l|split('_') %}
+                    <li><a href="{{ APP.href('language/switch/' ~ l) }}" rel="nofollow"><b class="flag flag-{{ lArr[1]|lower }}"></b> {{ allLanguages[lArr[0]] }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </li>
+{% endif %}

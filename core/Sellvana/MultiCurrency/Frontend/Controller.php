@@ -11,10 +11,7 @@ class Sellvana_MultiCurrency_Frontend_Controller extends FCom_Frontend_Controlle
     {
         $ref = $this->BRequest->referrer();
         $cur = $this->BRequest->param('currency', true);
-        $currencies = $this->Sellvana_MultiCurrency_Main->getAvailableCurrencies();
-        if (in_array($cur, $currencies)) {
-            $this->BSession->set('current_currency', $cur);
-        }
+        $this->Sellvana_MultiCurrency_Main->switchCurrency($cur);
         $this->BResponse->redirect($ref);
     }
 }

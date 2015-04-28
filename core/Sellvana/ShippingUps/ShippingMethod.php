@@ -27,7 +27,8 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
         }
 
         if (empty($data['rate_api_url'])) {
-            $data['rate_api_url'] = 'https://onlinetools.ups.com/ups.app/xml/Rate';
+            $data['rate_api_url'] = 'https://wwwcie.ups.com/ups.app/xml/Rate';
+            #$data['rate_api_url'] = 'https://onlinetools.ups.com/ups.app/xml/Rate';
         }
         if (empty($data['pickup_type'])) {
             $data['pickup_type'] = '01';
@@ -104,8 +105,12 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
     </Shipment>
 </RatingServiceSelectionRequest>";
 
-        $response = $this->BUtil->remoteHttp('POST', $data['rate_api_url'], $request);
+        $response = $this->BUtil->remoteHttp('POST', $data['rate_api_url'], $request, [], ['timeout' => 2]);
+#echo "<xmp>"; print_r($response); echo "</xmp>";
         //echo '<!-- '. $response. ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
+if (strpos($response, '<') !== 0) {
+    echo "<xmp>"; echo $response; echo "</xmp>"; exit;
+}
         $parsed = new SimpleXMLElement($response);
 
         $result = [];

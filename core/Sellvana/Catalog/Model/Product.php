@@ -45,7 +45,7 @@
  * @property Sellvana_CustomField_Model_FieldOption  $Sellvana_CustomField_Model_FieldOption
  * @property Sellvana_CustomField_Model_ProductField $Sellvana_CustomField_Model_ProductField
  * @property Sellvana_ProductReviews_Model_Review    $Sellvana_ProductReviews_Model_Review
- * @property Sellvana_MultiSite_Main                 $Sellvana_MultiSite_Main
+ * @property Sellvana_MultiSite_Frontend             $Sellvana_MultiSite_Frontend
  * @property Sellvana_MultiCurrency_Main             $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
@@ -180,7 +180,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         static $default;
 
         $media = $this->BConfig->get('web/media_dir');# ? $this->BConfig->get('web/media_dir') : 'media/';
-        $url = $full ? $this->BRequest->baseUrl() : '';
+        $url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();
         $thumbUrl = $this->get('thumb_url');
         if ($thumbUrl) {
             return $url . $media . '/' . $thumbUrl;
@@ -276,7 +276,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function generateUrlKey()
     {
         //$key = $this->manuf()->manuf_name.'-'.$this->product_sku.'-'.$this->product_name;
-        $key = $this->product_name;
+        $key = $this->get('product_name');
         $urlKey = $this->BLocale->transliterate($key);
         $t = $this->BDb->t(static::$_table);
         $existsSql = "SELECT COUNT(*) as cnt from {$t} WHERE url_key=?";
@@ -285,11 +285,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         $exists = $this->orm()->raw_query($existsSql, [$urlKey])->find_one();
         if ($exists && $exists->cnt > 0) {
-            $matchSql        = "SELECT url_key FROM {$t} WHERE url_key LIKE ?";
+            $matchSql = "SELECT url_key FROM {$t} WHERE url_key LIKE ?";
             if ($this->id()) {
                 $matchSql .= ' and id!=' . (int)$this->id();
             }
-            $result           = $this->orm()->raw_query($matchSql, [$urlKey . '%'])->find_many();
+            $result = $this->orm()->raw_query($matchSql, [$urlKey . '%'])->find_many();
             $similarUrlKeys = [];
             foreach ($result as $row) {
                 $similarUrlKeys[$row->get('url_key')] = 1;
@@ -1213,8 +1213,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $modHlp = $this->BModuleRegistry;
             $siteId = false;
             if ($modHlp->isLoaded('Sellvana_MultiSite')) {
-                $site = $this->Sellvana_MultiSite_Main->getCurrentSiteData();
-                $siteId = $site ? $site['id'] : false;
+                $site = $this->Sellvana_MultiSite_Frontend->getCurrentSite();
+                $siteId = $site ? $site->id() : false;
             }
             if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
                 $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
@@ -1271,18 +1271,30 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      *
      * @param boolean|array $context
      * @return mixed
+     *
+     * @todo assume $context true when null, or when components null - same for ProductPrice::getPrice()
      */
     public function getCatalogPrice($context = true)
     {
+        if (is_array($context) && !empty($context['currency_code']) && $context['currency_code'] !== true) {
+            $currency = $context['currency_code'];
+        } else {
+            $currency = null;
+        }
         $priceModel = $this->getPriceModelByType('base', $context);
-        $price = $priceModel ? $priceModel->getPrice() : 0;
+        $price = $priceModel ? $priceModel->getPrice(null, $currency) : 0;
 
         $salePriceModel = $this->getPriceModelByType('sale', $context);
         if ($salePriceModel && $salePriceModel->isValid()) {
-            $price = min($price, $salePriceModel->getPrice());
+            $price = min($price, $salePriceModel->getPrice(null, $currency));
         }
 
-        $this->BEvents->fire(__METHOD__, ['product' => $this, 'context' => $context, 'price' => &$price]);
+        $this->BEvents->fire(__METHOD__, [
+            'product' => $this,
+            'context' => $context,
+            'currency' => $currency,
+            'price' => &$price,
+        ]);
 
         return $price;
     }
@@ -1390,6 +1402,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function variantPrice($itemPrice, $variant_id)
     {
+        //TODO: implement
         return $itemPrice;
     }
 

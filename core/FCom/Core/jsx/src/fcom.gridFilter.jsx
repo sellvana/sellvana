@@ -305,6 +305,9 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var filter = this.state.filter;
             var isClear = (event.target.dataset.clear == "1" || filter.val == '');
             filter.submit = !isClear;
+            if (isClear) {
+                filter.val = '';
+            }
             this.setState({filter: filter});
             this.props.setFilter(filter, isClear);
         },

@@ -14,17 +14,12 @@ base:
 #            - [ addTab, product_reviews, { label: Product Reviews, pos: 70, view: prodreviews/product, async: true } ]
 
 /prodreviews:
-    - { include: base }
+    - { include: default_griddle }
     - { hook: main, views: prodreviews/grid }
-    - { view: admin/nav, do: [[ setNav, catalog/prodreviews ]] }
 
 /prodreviews/form:
-    - { include: base }
-    - { include: form }
-    - { hook: main, views: admin/form }
-    - { view: admin/nav, do: [[ setNav, catalog/prodreviews ]] }
+    - { include: default_form }
     - view: admin/form
-        set: { tab_view_prefix: prodreviews/ }
         do:
             - [ addTab, main, { label: Product Review, pos: 10 } ]
 

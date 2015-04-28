@@ -437,7 +437,7 @@ class BApp extends BClass
     {
         $baseUrl = $this->BApp->baseUrl($full, $method);
         $url = $this->BRouting->processHref($url);
-        $this->BEvents->fire(__METHOD__, ['url' => &$url]);
+        #$this->BEvents->fire(__METHOD__, ['url' => &$url]);
         return $baseUrl . $url;
     }
 
@@ -458,7 +458,7 @@ class BApp extends BClass
             $baseAdminHref = rtrim($adminHref, '/') . '/';
         }
         $url = $this->BRouting->processHref($url);
-        $this->BEvents->fire(__METHOD__, ['url' => &$url]);
+        #$this->BEvents->fire(__METHOD__, ['url' => &$url]);
         return $baseAdminHref . $url;
     }
 
@@ -482,7 +482,7 @@ class BApp extends BClass
             $baseStoreHref = rtrim($storeHref, '/') . '/';
         }
         $url = $this->BRouting->processHref($url);
-        $this->BEvents->fire(__METHOD__, ['url' => &$url]);
+        #$this->BEvents->fire(__METHOD__, ['url' => &$url]);
         return $baseStoreHref . $url;
     }
 
@@ -830,7 +830,7 @@ class BConfig extends BClass
                 'install_status' => !empty($c['install_status'])? $c['install_status']: null,
                 'core' => !empty($c['core'])? $c['core']: null,
                 'module_run_levels' => !empty($c['module_run_levels'])? $c['module_run_levels']: [],
-                'recovery_modules' => !empty($c['recovery_modules'])? $c['recovery_modules']: null,
+                'recovery' => !empty($c['recovery'])? $c['recovery']: null,
                 'mode_by_ip' => !empty($c['mode_by_ip'])? $c['mode_by_ip']: [],
                 'cache' => !empty($c['cache'])? $c['cache']: [],
             ];
@@ -844,7 +844,7 @@ class BConfig extends BClass
         if (in_array('local', $files)) {
             // the rest of configuration
             $local = $this->BUtil->arrayMask($c,
-                'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache,core',
+                'db,install_status,module_run_levels,recovery,mode_by_ip,cache,core',
                 true);
             $this->writeFile('local.php', $local);
         }

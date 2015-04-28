@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_Item_State_Payment extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_Item_State_Payment extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const FREE = 'free',
         UNPAID = 'unpaid',
@@ -19,6 +19,8 @@ class Sellvana_Sales_Model_Order_Item_State_Payment extends FCom_Core_Model_Abst
         self::CANCELED => 'Canceled',
         self::PARTIAL => 'Partial',
     ];
+
+    protected $_defaultValue = self::UNPAID;
 
     public function setFree()
     {
@@ -53,5 +55,28 @@ class Sellvana_Sales_Model_Order_Item_State_Payment extends FCom_Core_Model_Abst
     public function setPartial()
     {
         return $this->changeState(self::PARTIAL);
+    }
+
+    public function isComplete()
+    {
+        return in_array($this->getValue(), [self::FREE, self::PAID]);
+    }
+
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Item $model */
+        $model = $this->getContext()->getModel();
+
+        if ($model->get('row_total') == 0) {
+            return $this->setFree();
+        }
+        if ($model->get('qty_paid') == $model->get('qty_ordered')) {
+            return $this->setPaid();
+        }
+        if ($model->get('qty_paid') > 0) {
+            return $this->setPartial();
+        }
+
+        return $this;
     }
 }

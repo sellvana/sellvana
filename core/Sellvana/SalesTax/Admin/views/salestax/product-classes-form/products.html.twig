@@ -1,0 +1,133 @@
+<!--{ label: {{ 'Products'|_ }} }-->
+<!--{ pos: 20 }-->
+
+{% set m = THIS.get('model') %}
+
+{% set allProductConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').getAllProdConfig(m) %}
+{% set prodAttachConfigCompiled = THIS.view('core/griddle').set('grid', allProductConfig).getGridConfig() %}
+{% set productTaxConfig = APP.instance('Sellvana_SalesTax_Admin_Controller_ProductClasses').productTaxGridConfig(m) %}
+
+<input type='hidden' name='grid[products][add]' id='products_add'/>
+<input type='hidden' name='grid[products][del]' id='products_del'/>
+
+
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+        var mainGrid, attachGrid;
+
+        /**
+         * calc rows when save
+         * @param rows
+         * @param ids
+         * @returns {Array}
+         */
+        function calcAddRemoveRows(rows, ids) {
+            var temp = [];
+            rows.forEach(function (row) {
+                if (_.contains(ids, row.id) !== false) {
+                    temp.push(row.id);
+                }
+            });
+            return temp;
+        }
+
+        /**
+         * callback function for top action to show modal to add products
+         * @param grid
+         */
+        window.showModalToAddTaxProduct = function (grid) {
+            mainGrid = grid;
+            var modalContainerEle = document.getElementById('{{ productTaxConfig.config.id }}-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.renderComponent(
+                    React.createElement(Components.Modal, {
+                                className: "taxProductModal",
+                                show: true,
+                                title: 'Products List',
+                                confirm: 'Add',
+                                cancel: 'Close',
+                                onLoad: function (modal) {
+                                    var relatedNode = $(modal.getDOMNode());
+                                    relatedNode.find('.modal-dialog').css('width', '900px');
+                                },
+                                onConfirm: window.addSelectedProduct
+                            },
+                            React.createElement('div', {className: 'f-grid-wrapper', id: 'taxProductList'})
+                    ), modalContainerEle);
+            var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('taxProductList');
+            var instanceAttachGrid = React.renderComponent(
+                    React.createElement(FComGriddleComponent, {config: prodAttachConfigCompiled}),
+                    attachGridContainerEle
+            );
+
+            if (typeof instanceAttachGrid.refs[prodAttachConfigCompiled.id] !== 'undefined') {
+                attachGrid = instanceAttachGrid.refs[prodAttachConfigCompiled.id];
+            }
+        };
+
+
+        /**
+         * add selected products from full products grid to tax-products grid
+         * @param modal
+         */
+        window.addSelectedProduct = function (modal) {
+            var selectedRows = attachGrid.getSelectedRows();
+            if (selectedRows.length) {
+                var addRows = [];
+                //process selected rows
+                selectedRows.forEach(function (attachRow) {
+                    if (!_.findWhere(mainGrid.getRows(), {id: attachRow.id})) {
+                        addRows.push(attachRow);
+                    }
+
+                    if (addRows.length) {
+                        mainGrid.addRows(addRows);
+                    }
+                });
+                modal.close();
+            } else {
+                alert('please choose at least one product');
+            }
+        };
+
+        window.setTaxProdMainGrid = function (grid) {
+            mainGrid = grid;
+            var addedIds = [], removedIds = [],
+                    arrCurrentAddedIds, arrCurrentRemovedIds, temp,
+                    originIds = _.pluck(grid.getRows(), 'id'),
+                    taxProdIdsAddEle = $('#products_add'),
+                    taxProdIdsRemovedEle = $('#products_del');
+
+            $(mainGrid.getDOMNode())
+                    .on('removedRows.griddle', function (e, removedRows, grid) {
+                        removedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffRemoveIds = _.difference(originIds, removedIds);
+                        taxProdIdsRemovedEle.val(diffRemoveIds.join(','));
+                        arrCurrentAddedIds = taxProdIdsAddEle.val().split(',');
+                        if (!_.isEmpty(arrCurrentAddedIds)) {
+                            temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                            taxProdIdsAddEle.val(temp.join(','));
+                        }
+                    })
+                    .on('addedRows.griddle', function (e, addedRows, grid) {
+                        addedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                        var diffAddIds = _.difference(addedIds, originIds);
+                        taxProdIdsAddEle.val(diffAddIds.join(','));
+                        arrCurrentRemovedIds = taxProdIdsRemovedEle.val().split(',');
+                        if (!_.isEmpty(arrCurrentRemovedIds)) {
+                            temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                            taxProdIdsRemovedEle.val(temp.join(','));
+                        }
+                    });
+        };
+
+    });
+</script>
+
+
+<div class='row'>
+    <div class='col-sm-12'>
+        {{ THIS.view('core/griddle').set('grid', productTaxConfig) | raw }}
+    </div>
+</div>

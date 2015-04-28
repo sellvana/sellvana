@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_Return_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
 
     const REQUESTED = 'requested',
@@ -19,7 +19,7 @@ class Sellvana_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Ab
         self::RMA_SENT => 'RMA Sent',
         self::EXPIRED => 'Expired',
         self::CANCELED => 'Canceled',
-        self::received => 'Received',
+        self::RECEIVED => 'Received',
         self::APPROVED => 'Approved',
         self::RESTOCKED => 'Re-stocked',
         self::DECLINED => 'Declined',
@@ -31,6 +31,8 @@ class Sellvana_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Ab
         self::APPROVED => 'email/sales/order-return-state-overall-approved',
         self::DECLINED => 'email/sales/order-return-state-overall-declined',
     ];
+
+    protected $_defaultValue = self::PENDING;
 
     public function setRequested()
     {

@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_Refund_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const PENDING = 'pending',
         SUPERVISOR_PENDING = 'super_pending',
@@ -27,6 +27,8 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends FCom_Core_Model_Ab
         self::FAILED => 'email/sales/order-refund-state-overall-failed',
         self::CANCELED => 'email/sales/order-refund-state-overall-canceled',
     ];
+
+    protected $_defaultValue = self::PENDING;
 
     public function setPending()
     {

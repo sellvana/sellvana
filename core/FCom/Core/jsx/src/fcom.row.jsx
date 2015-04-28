@@ -10,7 +10,7 @@ define(['underscore', 'react'], function (_, React) {
      */
 
     var FComRow = React.createClass({
-        mixins: [FCom.Mixin],
+        mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function () {
             return {
                 "row": {},
@@ -35,11 +35,12 @@ define(['underscore', 'react'], function (_, React) {
         render: function () {
             var that = this;
             var id = this.props.getConfig('id');
+            var row = that.props.row;
 
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
                 if (!col) {
-                    return null;
+                    return <td></td>;
                 }
 
                 var node = "";
@@ -47,21 +48,20 @@ define(['underscore', 'react'], function (_, React) {
                 switch (col.type) {
                     case 'row_select':
                         var defaultChecked = false;
-                        if (_.findWhere(that.props.getSelectedRows(), {id: that.props.row.id})) {
+                        if (_.findWhere(that.props.getSelectedRows(), {id: row.id})) {
                             defaultChecked = true;
                         }
-                        node = <input type="checkbox" name={id + "[checked][" + that.props.row.id + "]"} className="select-row" checked={defaultChecked} onChange={that.selectRow} />;
+                        node = <input type="checkbox" name={id + "[checked][" + row.id + "]"} className="select-row" checked={defaultChecked} onChange={that.selectRow} />;
                         break;
                     case 'btn_group':
                         var actions = col.buttons.map(function(btn, index) {
                             //var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
                             if (btn.type == 'link') {
-                                console.log(btn);
                                 return (
                                     <a key={index}
                                         className={"btn btn-link " + (btn.cssClass ? btn.cssClass : "")}
                                         title={btn.title ? btn.title : ""}
-                                        href={btn.href + that.props.row[btn.col]}
+                                        href={btn.href + row[btn.col]}
                                         target={btn.target ? btn.target : ""}
                                     >
                                         <i className={btn.icon}></i>
@@ -72,8 +72,8 @@ define(['underscore', 'react'], function (_, React) {
                                 //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
                                     <button className={"btn btn-link " + btn.cssClass} key={index} title={btn.title ? btn.title : ""} type="button"
-                                        data-action={btn.name} data-row={that.props.row.id} onClick={that.props.doRowAction}>
-                                        <i className={btn.icon} data-action={btn.name} data-row={that.props.row.id}></i>
+                                        data-action={btn.name} data-row={row.id} onClick={that.props.doRowAction.bind(null, btn.callback)}>
+                                        <i className={btn.icon} data-action={btn.name} data-row={row.id}></i>
                                         {btn.caption}
                                     </button>
                                 );
@@ -88,32 +88,78 @@ define(['underscore', 'react'], function (_, React) {
                             switch (col.editor) {
                                 case 'checkbox':
                                 case 'radio':
-                                    node = that.props.row[col.name] ? 'Yes' : 'No';
+                                    node = row[col.name] ? 'Yes' : 'No';
                                     break;
                                 case 'select':
-                                    node = col.options && col.options[that.props.row[col.name]] ? col.options[that.props.row[col.name]] : that.props.row[col.name];
+                                    node = col.options && col.options[row[col.name]] ? col.options[row[col.name]] : row[col.name];
                                     break;
                                 default:
-                                    node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                                    node = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
                                     break;
                             }
-                        } else {
-                            var inlineColValue = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
-                            node = (<input type="text" data-col={col.name} onChange={that.handleChange} defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + that.props.row.id + "][" + col.name + "]"} />);
+                        } else { //inline mode
+
+                            var validationRules = that.validationRules(col.validation);
+                            var inlineProps = {
+                                id: id + '-' + col.name + '-' + row.id,
+                                name: id + '[' + row.id + '][' + col.name + ']',
+                                className: (col.cssClass ? col.cssClass : '') + ' form-control',
+                                "data-col": col.name
+                            };
+
+                            var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+
+                            if (typeof row[col.name + '_disabled'] !== 'undefined' && row[col.name + '_disabled'] == true) {
+                                inlineProps.disabled = 'disabled';
+                            }
+
+                            switch (col.editor) {
+                                case 'checkbox': //todo: need test again
+                                case 'radio':
+                                    node = <input type="checkbox" {...inlineProps} {...validationRules} />;
+                                    break;
+                                case 'textarea':  //todo: need test again
+                                    node = <textarea {...inlineProps} {...validationRules} rows="4">{row[col.name]}</textarea>;
+                                    break;
+                                case 'select':
+                                    var selectOptions = [];
+                                    if (_.isArray(col.options)) {
+                                        selectOptions = col.options.map(function(opt) {
+                                            return <option value={opt.value}></option>;
+                                        });
+                                    } else {
+                                        for(var key in col.options) {
+                                            selectOptions.push(<option value={key}>{col.options[key]}</option>);
+                                        }
+                                    }
+
+                                    node = (
+                                        <select {...inlineProps} {...validationRules}>{selectOptions}</select>
+                                    );
+                                    break;
+                                default:
+                                    node = <input type="text" {...inlineProps} {...validationRules} defaultValue={defaultValue} onChange={that.handleChange} />;
+                                    break;
+                            }
+                            /*var inlineColValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+                            node = (<input type="text" data-col={col.name} onChange={that.handleChange} defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + row.id + "][" + col.name + "]"} />);*/
                         }
                         break;
                     default:
                         if (col.display == 'eval') {
                             //use rc for compatibility old backbone grid
                             var rc = {
-                                row: that.props.row
+                                row: row
                             };
                             node = eval(col.print);
                             customNodeHtml = true;
                         } else if (col.display == 'file_size') {
-                            node = that.fileSizeFormat(that.props.row[col.name]);
+                            node = that.fileSizeFormat(row[col.name]);
                         } else {
-                            node = (typeof that.props.row[col.name] != 'undefined') ? that.props.row[col.name] : "";
+                            node = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+                            if (col.options && node !== '') {
+                                node = col.options[node] || "";
+                            }
                         }
                         break;
                 }

@@ -1,7 +1,7 @@
 modules:
     Sellvana_PaymentOgone:
         version: 0.1.0
-        channel: beta
+        channel: alpha
         translations: { en: en.php }
         description: "Ogone Payment Method"
         require: { module: { Sellvana_Sales: 0.1.10, Sellvana_Checkout: 0.2.1 } }

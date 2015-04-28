@@ -26,5 +26,6 @@ promo_form_tabs:
         set: { tab_view_prefix: 'promo/form/' }
 
 /promo/form:
+    - { include: default_form }
     - { include: promo_form_tabs }
 

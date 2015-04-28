@@ -6,10 +6,6 @@
 
 <fieldset>
     <div class="f-section">
-        {{ THIS.view('core/layout-editor').set({
-            layout: layout,
-            type: 'product',
-            frontend_layout_name: '/catalog/product',
-        }) | raw }}
+        {{ THIS.view('core/layout-editor').set({layout: layout, type: 'product'}) | raw }}
     </div>
 </fieldset>

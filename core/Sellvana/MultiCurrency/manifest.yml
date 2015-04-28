@@ -1,8 +1,11 @@
 modules:
     Sellvana_MultiCurrency:
         version: 0.1.0
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0 } }
+
+        observe:
+            - [ Sellvana_Catalog_Model_Product::getCatalogPrice, Sellvana_Promo_Main.onProductGetCatalogPrice ]
 
         areas:
             FCom_Admin:
@@ -11,7 +14,7 @@ modules:
                     - [ /multicurrency/.action, Sellvana_MultiCurrency_Admin_Controller ]
 
             FCom_Frontend:
-                auto_use: [ views ]
+                auto_use: [ bootstrap, views ]
                 routing:
                     - [ /currency/switch/:currency, Sellvana_MultiCurrency_Frontend_Controller.switch ]
 

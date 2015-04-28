@@ -22,9 +22,6 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
         if ($customer) {
             $cart->importAddressesFromCustomer($customer)
-                ->set([
-                    'recalc_shipping_rates' => 1
-                ])
                 ->calculateTotals()
                 ->save();
         }
@@ -38,29 +35,39 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
     public function action_customerUpdatesShippingAddress($args)
     {
         if (!empty($args['post']['shipping'])) {
-            $same = $args['cart']->get('same_address');
+            $cart = $args['cart'];
+            $recalc = false;
+            $same = $cart->get('same_address');
             foreach ($args['post']['shipping'] as $k => $v) {
-                $args['cart']->set('shipping_' . $k, $v);
+                if ($cart->get('shipping_' . $k) !== $v) {
+                    $cart->set('shipping_' . $k, $v);
+                    $recalc = true;
+                }
                 if ($same) {
-                    $args['cart']->set('billing_' . $k, $v);
+                    $cart->set('billing_' . $k, $v);
                 }
             }
-            $args['cart']->set('recalc_shipping_rates', 1);
+            if ($recalc) {
+                $cart->set('recalc_shipping_rates', 1);
+            }
         }
     }
 
     public function action_customerUpdatesBillingAddress($args)
     {
         if (!empty($args['post']['billing'])) {
-            $same = $args['cart']->get('same_address');
+            $cart = $args['cart'];
+            $recalc = false;
+            $same = $cart->get('same_address');
             foreach ($args['post']['billing'] as $k => $v) {
-                $args['cart']->set('billing_' . $k, $v);
-                if ($same) {
-                    $args['cart']->set('shipping_' . $k, $v);
+                $cart->set('billing_' . $k, $v);
+                if ($same && $cart->get('shipping_' . $k) !== $v) {
+                    $cart->set('shipping_' . $k, $v);
+                    $recalc = true;
                 }
             }
-            if ($same) {
-                $args['cart']->set('recalc_shipping_rates', 1);
+            if ($recalc) {
+                $cart->set('recalc_shipping_rates', 1);
             }
         }
     }
@@ -75,7 +82,7 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         if (sizeof($method) !== 2) {
             throw new BException('Shipping method is invalid');
         }
-        $cart->setShippingMethod($method[0], $method[1])->calculateTotals()->save();
+        $cart->setShippingMethod($method[0], $method[1])->calculateTotals()->saveAllDetails();
     }
 
     public function action_customerUpdatesPaymentMethod($args)
@@ -109,7 +116,8 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         }
 
         /** @var Sellvana_Sales_Model_Order $order */
-        $order = $this->Sellvana_Sales_Model_Order->create()->importDataFromCart($cart);
+        $order = $this->Sellvana_Sales_Model_Order->create();
+        $order->importDataFromCart($cart);
 
         $result = [];
         if ($order->isPayable()) {
@@ -127,8 +135,6 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
                 $args['result']['redirect_to'] = $result['payment']['redirect_to'];
             }
         }
-
-        $this->Sellvana_Sales_Model_Cart->resetSessionCart();
 
         $this->BSession->set('last_order_id', $order->id());
         $args['result']['order'] = $order;

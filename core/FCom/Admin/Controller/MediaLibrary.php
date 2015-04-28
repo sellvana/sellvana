@@ -23,6 +23,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     public function allowFolder($folder)
     {
         $this->_allowedFolders[$folder] = 1;
+        $this->_allowedFolders[$this->_parseFolder($folder)] = 1;
         return $this;
     }
 
@@ -103,8 +104,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'filters' => [
                     ['field' => 'file_name', 'type' => 'text']
                 ],
+                //callbacks for backbonegrid
                 'grid_before_create' => $id . '_register',
                 'afterMassDelete' => $id .'_afterMassDelete',
+                //callbacks for react griddle
+                'callbacks' => [
+                    'componentDidMount' => 'registerGrid' . $id,
+                ],
                 'actions' => [
                     'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
                     'refresh' => true,
@@ -133,11 +139,11 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         }
 
         if ($options['mode'] && $options['mode'] === 'images') {
-            $download_url = $this->BApp->href('/media/grid/download?folder=' . $folder . '&file=');
+            $downloadUrl = $this->BApp->href('/media/grid/download?folder=' . $folder . '&file=');
             $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
             $config['config']['columns'] = [
                 ['type' => 'row_select'],
-                ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
+                ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
                 ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl],
                 ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
                 ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
@@ -492,7 +498,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
      */
     public function uploadConfig($configId = null)
     {
-        $uploadConfig         = [];
+        $uploadConfig = [];
         if(empty($this->_uploadConfigs)){
             $this->collectUploadConfig();
         }

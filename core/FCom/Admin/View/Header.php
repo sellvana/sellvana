@@ -2,6 +2,8 @@
 
 /**
  * Class FCom_Admin_View_Header
+ *
+ * @property FCom_Admin_Model_Activity $FCom_Admin_Model_Activity
  */
 class FCom_Admin_View_Header extends FCom_Core_View_Abstract
 {
@@ -37,18 +39,38 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
     }
 
     /**
+     * @param string $feed (local, remote, realtime)
      * @return array
      */
-    public function getNotifications()
+    public function getAllNotifications()
     {
-        $notifications = [];
-        $this->BEvents->fire(__METHOD__, ['notifications' => &$notifications]);
+        $items = [];
+        $this->BEvents->fire(__METHOD__, ['items' => &$items]);
+
+        $activity = $this->FCom_Admin_Model_Activity->addActivityItems($items)->getUserVisibleItems();
+
         $conf      = $this->BConfig;
         $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');
-        $result = [];
-        foreach ($notifications as $k => &$item) {
+        $result = [
+            'local' => [
+                'title' => 'Local Alerts',
+                'icon_class' => 'icon-bell',
+                'count' => 0,
+            ],
+            'remote' => [
+                'title' => 'Remote Notifications',
+                'icon_class' => 'icon-rss',
+                'count' => 0,
+            ],
+            'realtime' => [
+                'title' => 'Real-Time Activity',
+                'icon_class' => 'icon-bolt',
+                'count' => 0,
+            ],
+        ];
+        foreach ($activity as $a) {
+            $item = $a->getData() + $a->as_array();
             if ($dismissed && in_array($item['code'], $dismissed)) {
-                unset($notifications[$k]);
                 continue;
             }
             if (empty($item['group'])) {
@@ -58,25 +80,41 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
                 $item['href'] = '#';
             }
             if (empty($item['title'])) {
-                $item['title'] = $item['message'];
+                $item['title'] = $item['content'];
             }
+            $item['ts'] = $this->BLocale->datetimeDbToLocal($item['ts'], true);
+            if (empty($item['icon_class'])) {
+                switch ($item['type']) {
+                    case 'error':
+                        $item['icon_class'] = 'icon_error';
+                        break;
+                    case 'warning':
+                        $item['icon_class'] = 'icon_warning';
+                        break;
+                    default:
+                        $item['icon_class'] = 'icon_info';
+                }
+
+            }
+            /*
             $item['html'] = $this->BUtil->tagHtml('a', [
                 'href' => $item['href'],
                 'title' => $item['title'],
-
-            ], $item['message']);
-            $result[$item['group']][] = $item;
+            ], $this->BResponse->safeHtml($item['message']));
+            */
+            $feed = $item['feed'];
+            if (empty($result[$feed])) {
+                $result[$feed] = [
+                    'title' => !empty($titles[$feed]) ? $titles[$feed] : null,
+                    'icon_class' => !empty($iconClasses[$feed]) ? $iconClasses[$feed] : null,
+                    'count' => 0,
+                    'groups' => [],
+                ];
+            }
+            $result[$feed]['count']++;
+            $result[$feed]['groups'][$item['group']][] = $item;
         }
-        unset($item);
-        return ['count' => sizeof($notifications), 'groups' => $result];
-    }
-
-    /**
-     * @return array
-     */
-    public function getRecentActivity()
-    {
-        return [];
+        return $result;
     }
 
     /**

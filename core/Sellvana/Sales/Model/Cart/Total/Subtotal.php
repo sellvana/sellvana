@@ -23,6 +23,12 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
         $itemNum = 0;
         $itemQty = 0;
         $subtotal = 0;
+        $storeCurrencySubtotal = 0;
+        $baseCurrency = $this->BConfig->get('modules/FCom_Core/base_currency');
+        $storeCurrency = $this->_cart->get('store_currency_code');
+        if (!$storeCurrency) {
+            $storeCurrency = $this->_cart->setStoreCurrency()->get('store_currency_code');
+        }
 
         foreach ($this->_cart->items() as $item) {
             /*
@@ -55,23 +61,43 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
                 }
             }
 
-            $item->set('price', $itemPrice);
+            $storeCurrencyPrice = $itemPrice;
+            if ($storeCurrency != $baseCurrency) {
+                $rate      = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
+                $itemPrice = $storeCurrencyPrice / $rate;
+            }
 
             $itemNum++;
             $itemQty += $item->get('qty');
+
+            $item->set('price', $itemPrice)->setData('store_currency/price', $storeCurrencyPrice);
+
             $rowTotal = $item->calcRowTotal();
             $subtotal += $rowTotal;
-            $item->set('row_total', $rowTotal);
+
+            if ($storeCurrency != $baseCurrency) {
+                $storeCurrencySubtotal = $item->calcRowTotal(true);
+            } else {
+                $storeCurrencySubtotal = $subtotal;
+            }
+
+            $item->set('row_total', $rowTotal)->setData('store_currency/row_total', $storeCurrencySubtotal);
         }
 
         $this->_value = $subtotal;
+        $this->_storeCurrencyValue = $storeCurrencySubtotal;
+
         $this->_cart->set([
             'item_num' => $itemNum,
             'item_qty' => $itemQty,
             'subtotal' => $subtotal,
+        ])->setData([
+            'store_currency/subtotal' => $storeCurrencySubtotal,
         ]);
 
-        $this->_cart->getTotalByType('grand_total')->resetComponents()->addComponent($this->_value, 'subtotal');
+        /** @var Sellvana_Sales_Model_Cart_Total_GrandTotal $grandTotalModel */
+        $grandTotalModel = $this->_cart->getTotalByType('grand_total');
+        $grandTotalModel->resetComponents()->addComponent('subtotal', $this->_value, $this->_storeCurrencyValue);
 
         return $this;
     }

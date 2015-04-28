@@ -1,10 +1,11 @@
 modules:
     Sellvana_Customer:
         version: 0.1.13
-        channel: beta
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.0 } }
         translations: { en: en.php }
         description: Customer Accounts and Management
+        auto_use: [ views ]
 
         observe:
             - [ "FCom_OAuth_Provider_BaseV1::getAccessToken:after", "Sellvana_Customer_Main.onOAuthAfterGetAccessToken" ]

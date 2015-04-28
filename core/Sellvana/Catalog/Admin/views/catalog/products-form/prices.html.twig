@@ -33,6 +33,9 @@
         </div>
     </div>
 </fieldset>
+
+{{ THIS.hook('product_prices_form_after', {'model' : m}) | raw }}
+
 <script type="text/javascript">
     require(['jquery', 'fcom.catalog.product.price', 'jquery.validate', 'daterangepicker'], function ($, Price) {
 
