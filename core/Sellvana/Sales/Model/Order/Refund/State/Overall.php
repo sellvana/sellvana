@@ -28,6 +28,8 @@ class Sellvana_Sales_Model_Order_Refund_State_Overall extends Sellvana_Sales_Mod
         self::CANCELED => 'email/sales/order-refund-state-overall-canceled',
     ];
 
+    protected $_defaultValue = self::PENDING;
+
     public function setPending()
     {
         return $this->changeState(self::PENDING);

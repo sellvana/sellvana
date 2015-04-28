@@ -1,6 +1,6 @@
 modules:
     FCom_PushServer:
-        version: 0.1.4
+        version: 0.5.0.0
         channel: alpha
         description: XHR Push Server implementation for long polling real-time communication C2C and S2C
 

@@ -107,9 +107,9 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         return $this->getQtyAvailable() > 0;
     }
 
-    public function canOrder($qty)
+    public function canOrder($qty = 1)
     {
-        return !$this->getManageInventory() || $this->getAllowBackorder() || $this->getQtyAvailable() > $qty;
+        return !$this->getManageInventory() || $this->getAllowBackorder() || $this->getQtyAvailable() >= $qty;
     }
 
     public function reserveUnits($qty)

@@ -107,4 +107,15 @@ class Sellvana_Sales_Model_Order_Item_State extends FCom_Core_Model_Abstract_Sta
         return $this->_getStateObject(self::CUSTOM);
     }
 
+    public function setDefaultStates()
+    {
+        $this->overall()->setDefaultState();
+        $this->delivery()->setDefaultState();
+        $this->payment()->setDefaultState();
+        $this->returns()->setDefaultState();
+        $this->refund()->setDefaultState();
+        $this->cancel()->setDefaultState();
+        $this->custom()->setDefaultState();
+        return $this;
+    }
 }

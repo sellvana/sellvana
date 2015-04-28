@@ -1,6 +1,7 @@
 modules:
     Sellvana_Feedback:
-        version: 0.1.0
+        version: 0.5.0.0
+        channel: alpha
         description: Enable your customers to report feedback about your site
         require: { module: { FCom_Core: 0.1.0 } }
         auto_use: [ layout, views ]

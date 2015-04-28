@@ -14,6 +14,8 @@ class Sellvana_Sales_Model_Cart_State_Overall extends FCom_Core_Model_Abstract_S
         self::ARCHIVED => 'Archived',
     ];
 
+    protected $_defaultValue = self::ACTIVE;
+
     public function setActive()
     {
         return $this->changeState('active');
