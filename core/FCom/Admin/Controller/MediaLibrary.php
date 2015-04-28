@@ -191,7 +191,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
                     ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
-                        'print' => '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
+                        'print' => '"<a href=\'' . $url . '/download?folder="+rc.row["folder"]+ "&file="+rc.row["file_name"]+"\' target=_blank>'
                             . '<img src=\'' . $baseSrc . '"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
                         'sortable' => false],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
@@ -217,7 +217,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ],
                 'actions' => [
                     'add-image' => [
-                        'caption'  => 'Add Images',
+                        'caption'  => 'Add Files',
                         'type'     => 'button',
                         'id'       => 'add-attachment-from-grid',
                         'class'    => 'btn-primary',
@@ -245,12 +245,57 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     {
         $mediaUrl = $this->BConfig->get('web/media_dir')?: 'media';
         $hlp      = $this->FCom_Core_Main;
+        $images = ['jpeg', 'jpg', 'tiff', 'gif', 'png', 'bmp'];
         foreach ($rows as & $row) {
-            $thumbUrl          = 'image-not-found.png';
-            $row['thumb_path'] = $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]);
+            $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $images)) {
+                $thumbUrl = 'image-not-found.png';
+            } else {
+                $folder = $row["folder"];
+                if (strpos($folder, 'media/') === 0) {
+                    $folder = str_replace('media/', '', $row["folder"]);
+                }
+                $thumbUrl = $folder . $row["subfolder"] . "/" . $row["file_name"];
+            }
+            $row['thumb_path'] = trim($hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]), '/');
         }
 
         return $rows;
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function gridDataAfter($data)
+    {
+        $mediaUrl = $this->BConfig->get('web/media_dir')?: 'media';
+        $hlp      = $this->FCom_Core_Main;
+        $images = ['jpeg', 'jpg', 'tiff', 'gif', 'png', 'bmp'];
+
+        foreach ($data['rows'] as $row) {
+            /** @var Sellvana_Catalog_Model_Product $row */
+            $customRowData = $row->getData();
+            if ($customRowData) {
+                $row->set($customRowData);
+                $row->set('data', null);
+            }
+
+            $ext = strtolower(pathinfo($row->get('file_name'), PATHINFO_EXTENSION));
+            if (!in_array($ext, $images)) {
+                $thumbUrl = 'image-not-found.png';
+            } else {
+                $folder = $row->get("folder");
+                if (strpos($folder, 'media/') === 0) {
+                    $folder = str_replace('media/', '', $row->get('folder'));
+                }
+                $thumbUrl = $folder . $row->get('subfolder') . "/" . $row->get('file_name');
+            }
+            $row->set('thumb_path', trim($hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]), '/'));
+        }
+        unset($row);
+
+        return $data;
     }
 
     public function action_index()
@@ -266,10 +311,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
     public function action_grid_data()
     {
-        if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
-            return;
-        }
+        //if (!$this->BRequest->xhr()) {
+        //    $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+        //    return;
+        //}
         switch ($this->BRequest->param('do')) {
             case 'data':
                 $folder = $this->getFolder();
@@ -294,6 +339,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     }
                 }*/
                 $data = $this->FCom_Core_View_BackboneGrid->processORM($orm);
+                $data = $this->gridDataAfter($data);
                 $this->BResponse->json([
                         ['c' => $data['state']['c']],
                         $this->BDb->many_as_array($data['rows']),
