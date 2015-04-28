@@ -137,7 +137,11 @@
                         });
 
                         //only handle event when not init select2
-                        if (!dom.find(this.selectClass).hasClass('select2-offscreen')) {
+                        if (!dom.find(this.selectClass).hasClass('select2-onchange-added')) {
+
+                            var select = dom.find(variantImages.selectClass);
+                            var list = dom.find(variantImages.listClass);
+
                             //event when select image item
                             dom.on('change', this.selectClass, function () {
                                 var option = $(this).find(':selected');
@@ -152,13 +156,16 @@
                             });
 
                             dom.on('click', '.btn-delete-variant-image', function () {
-                                dom.find(variantImages.selectClass).find('option[value="' + $(this).attr('data-id') + '"]').removeClass('hide');
-                                dom.find(variantImages.selectClass).removeClass('hide');
-                                if (dom.find(variantImages.listClass).find('li').length == 1) {
-                                    dom.find(variantImages.listClass).addClass('hide');
+                                select.find('option[value="' + $(this).attr('data-id') + '"]').removeClass('hide');
+                                select.removeClass('hide');
+                                if (list.find('li').length == 1) {
+                                    list.addClass('hide');
                                 }
+                                $(this).parents('li').remove();
                                 variantImages.updateInputImageValue(id);
                             });
+
+                            select.addClass('select2-onchange-added');
                         }
 
                     } else {
@@ -305,9 +312,6 @@
                     console.log('variantGrid', variantGrid);
                     console.log('this.customFields', this.customFields);
                 }
-            },
-            handleEventFields: function () {
-
             },
             addGridColumn: function (field) {
                 if (variantGrid) {
