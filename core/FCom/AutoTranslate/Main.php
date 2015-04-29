@@ -14,14 +14,15 @@ class FCom_AutoTranslate_Main extends BClass
 
     public function bootstrap()
     {
-        $this->_requestLang = $this->BLocale->getCurrentLanguage();
-        $this->_cacheFile = $this->BConfig->get('fs/cache_dir') . "/auto_translations-{$this->_requestLang}.json";
         $this->_apiKey = $this->BConfig->get('modules/FCom_AutoTranslate/google_api_key');
-        $this->_immediate = $this->BConfig->get('modules/FCom_AutoTranslate/translate_immediately') == 1;
-        $this->BLocale
-            ->addTranslationsFile($this->_cacheFile)
-            ->addCustomTranslator(__CLASS__, [$this, 'translateCallback'])
-        ;
+        if ($this->_apiKey) {
+            $this->_requestLang = $this->BLocale->getCurrentLanguage();
+            $this->_cacheFile = $this->BConfig->get('fs/cache_dir') . "/auto_translations-{$this->_requestLang}.json";
+            $this->_immediate = $this->BConfig->get('modules/FCom_AutoTranslate/translate_immediately') == 1;
+            $this->BLocale
+                ->addTranslationsFile($this->_cacheFile)
+                ->addCustomTranslator(__CLASS__, [$this, 'translateCallback']);
+        }
     }
 
     public function translateCallback($string, $language = null, $module = null)
