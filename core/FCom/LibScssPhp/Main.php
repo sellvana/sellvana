@@ -27,7 +27,6 @@ class FCom_LibScssPhp_Main extends BClass
             return '';
         }
 
-        $filename = basename($origFilename);
         $targetFilename = $this->BUtil->simplifyString(str_replace(FULLERON_ROOT_DIR, '', $origFilename)) . '.css';
         $compiledPath = $this->BConfig->get('fs/media_dir') . '/scss_build';
         $compiledFilename = $compiledPath . '/' . $targetFilename;

@@ -23,6 +23,7 @@
         {{ forms.select(fieldData, { field:'allowed_countries', label:'Allowed Countries'|_, options:LOCALE.getAvailableCountries(), select2: {}, multiple:1 }) }}
         {{ forms.select(fieldData, { field:'default_country', label:'Default Country'|_, options:LOCALE.getAvailableCountries(), select2: {} }) }}
         {{ forms.select(fieldData,  { field:'default_tz', label:'Default Timezone'|_, options:LOCALE.tzOptions(true), select2: {} }) }}
+        {{ forms.select(fieldData,  { field:'base_locale', label:'Base Locale'|_, options:LOCALE.getAvailableLocaleCodes(), select2: {} }) }}
         {{ forms.input(fieldData,  { field:'base_currency', label:'Base Currency'|_ }) }}
         {{ forms.input(fieldData,  { field:'default_currency', label:'Default Currency'|_ }) }}
     {{ forms.accordion_panel_end }}
