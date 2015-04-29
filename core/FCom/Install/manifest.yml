@@ -1,6 +1,6 @@
 modules:
     FCom_Install:
-        version: 0.1.0
+        version: 0.5.0.0
         channel: alpha
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Initial installation wizard"

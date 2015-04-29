@@ -13,6 +13,11 @@
     <div class="col-sm-9 f-col-main">
         <header class="f-page-header">
             <h1 class="f-page-title">{{ "Orders" | _ }} #{{ order.get('unique_id') }} <span class="badge">{{ order.state().overall().getValueLabel() }}</span></h1>
+            <div class="pull-right">
+                <form method="post" action="{{ APP.href('orders/repeat?id=' ~ order.get('unique_id')) }}">
+                    <button type="submit" class="btn btn-primary">{{ 'Repeat Order'|_ }}</button>
+                </form>
+            </div>
             <a href="javascript:void(0);" id="button"
                class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ 'Menu'|_ }}</a>
         </header>

@@ -1,4 +1,4 @@
-<!--{ label: IE/Permissions }-->
+<!--{ label: {{ 'I/E Permissions'|_ }} }-->
 <!--{ pos: 30 }-->
 
 {% set m = THIS.get('model') %}
@@ -101,70 +101,105 @@
 
 <script>
     require(['jquery', 'underscore', 'react'], function($, _, React) {
-        var iePermGrid, iePermNode;
+        var iePermGrid, iePermNode, addedImportModels, addedExportModels;
+
         window.iePermGridRegister = function(grid) {
             iePermGrid = grid;
             iePermNode = $(iePermGrid.getDOMNode());
-            iePermNode.find('input[type=checkbox]').on('click', function(){
+            iePermNode.find('input.role-ie').on('click', function () {
                 var val = this.checked;
                 var id = this.id.split('-');
                 var rowId = id.pop();
                 var op = id.pop();
 
                 var rowsCol = iePermGrid.getRows();
-                var tRow;
-                _.each(rowsCol, function(row) {
-                    if (row.id === rowId) {
-                        tRow = row;
-                        return;
-                    }
+                var tRow = _.find(rowsCol, function (row) {
+                    return row.id === rowId;
                 });
 
-                var children = tRow['children'];
-                if (children) {
-                    _.each(children, function (o) {
-                        var chId = [id[0]];
-                        chId.push(op);
-                        chId.push(o);
-                        chId = chId.join('-');
-                        var $chBox = iePermNode.find('#' + chId);
-                        if (val && !$chBox.is(':checked')) {
-                            $chBox.click();
-                        } else if (!val && $chBox.is(':checked')) {
-                            $chBox.click();
+                if (tRow) {
+                    tRow[op] = val ? 1 : 0;
+                    var children = tRow['children'];
+                    if (children) {
+                        _.each(children, function (o) {
+                            var chId = [id[0]];
+                            chId.push(op);
+                            chId.push(o);
+                            chId = chId.join('-');
+                            var child = _.find(rowsCol, function (row) {
+                                return row.id === o;
+                            });
+                            if (child) {
+                                child[op] = val ? 1 : 0;
+                            }
+                            var $chBox = iePermNode.find('#' + chId);
+                            if (val && !$chBox.is(':checked')) {
+                                $chBox.click();
+                            } else if (!val && $chBox.is(':checked')) {
+                                $chBox.click();
+                            }
+                        });
+                    }
+                    if (!val) {
+                        var parent = tRow['parent'];
+
+                        if (parent) {
+                            var pId = [id[0]];
+                            var parentRow = _.find(rowsCol, function (row) {
+                                return row.id === parent;
+                            });
+                            parentRow[op] = val ? 1 : 0;
+
+                            pId.push(op);
+                            pId.push(parent);
+                            pId = pId.join('-');
+                            $('#' + pId)[0].checked = false;
                         }
-                    });
-                }
-                if (!val) {
-                    var parent = tRow['parent'];
-                    if (parent) {
-                        var pId = [id[0]];
-                        pId.push(op);
-                        pId.push(parent);
-                        pId = pId.join('-');
-                        $('#' + pId)[0].checked = false;
                     }
                 }
                 updateFormData();
             });
-        }
-        function updateFormData() {
-            var addedImportRows = _.filter(iePermGrid.getRows(), function (row) {
-                var id = '#' + iePermGrid.getConfig('id') + '-' + 'import' + '-' + row['id'];
-                var $cb = $(id);
-                var $cb2 = $cb[0];
-                return $cb2 && $cb2.checked;
+            checkSelected();
+        };
+
+        function checkSelected() {
+            var importRows = getImportRows(), exportRows = getExportRows();
+            var id = iePermGrid.getConfig('id');
+            _.each(importRows, function (row) {
+                var elId = id + '-import-' + row.id;
+                var $el = $('#' + elId);
+                if($el.length) {
+                    $el.prop('checked', true);
+                }
             });
+            _.each(exportRows, function (row) {
+                var elId = id + '-export-' + row.id;
+                var $el = $('#' + elId);
+                if($el.length) {
+                    $el.prop('checked', true);
+                }
+            })
+        }
+
+        function getImportRows() {
+            return _.filter(iePermGrid.getRows(), function (row) {
+                return row['import'] === 1;
+            });
+        }
+
+        function getExportRows() {
+            return _.filter(iePermGrid.getRows(), function (row) {
+                return row['export'] === 1;
+            });
+        }
+
+        function updateFormData() {
+            var addedImportRows = getImportRows();
 
             addedImportModels = _.pluck(addedImportRows, 'id');
             $('#ie_perm_ids_add_import').val(addedImportModels.join(','));
 
-            var addedExportRows = _.filter(iePermGrid.getRows(), function (row) {
-                var id = '#' + iePermGrid.getConfig('id') + '-' + 'export' + '-' + row['id'];
-                var $cb = $(id);
-                var $cb2 = $cb[0];
-                return $cb2 && $cb2.checked;
-            });
+            var addedExportRows = getExportRows();
 
             addedExportModels = _.pluck(addedExportRows, 'id');
             $('#ie_perm_ids_add_export').val(addedExportModels.join(','));

@@ -18,7 +18,7 @@ abstract class Sellvana_Sales_Model_StateCustom_ConcreteAbstract extends Sellvan
         return $this->_valueLabels;
     }
 
-    public function setDefault()
+    public function setDefaultState()
     {
         $defaultState = $this->BConfig->get('modules/Sellvana_Sales/default_custom_state_' . static::$_entityType);
         return $this->changeState($defaultState);

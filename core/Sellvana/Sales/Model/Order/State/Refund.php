@@ -14,6 +14,8 @@ class Sellvana_Sales_Model_Order_State_Refund extends Sellvana_Sales_Model_Order
         self::REFUNDED => 'Refunded',
     ];
 
+    protected $_defaultValue = self::NONE;
+
     public function setNone()
     {
         return $this->changeState(self::NONE);
@@ -32,5 +34,22 @@ class Sellvana_Sales_Model_Order_State_Refund extends Sellvana_Sales_Model_Order
     public function setRefunded()
     {
         return $this->changeState(self::REFUNDED);
+    }
+
+    public function calcState()
+    {
+        $itemStates = $this->getItemStateStatistics('refund');
+
+        if (!empty($itemStates[Sellvana_Sales_Model_Order_Item_State_Refund::PROCESSING])) {
+            return $this->setProcessing();
+        }
+        if (!empty($itemStates[Sellvana_Sales_Model_Order_Item_State_Refund::PARTIAL])) {
+            return $this->setPartial();
+        }
+        if (!empty($itemStates[Sellvana_Sales_Model_Order_Item_State_Refund::REFUNDED])) {
+            return $this->setRefunded();
+        }
+
+        return $this;
     }
 }

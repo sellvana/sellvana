@@ -47,6 +47,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 }
             }
         }
+        if(!$folder){
+            return null;
+        }
         if (empty($this->_allowedFolders[$folder])) {
             throw new BException('Folder ' . $folder . ' is not allowed');
         }
@@ -139,11 +142,11 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         }
 
         if ($options['mode'] && $options['mode'] === 'images') {
-            $download_url = $this->BApp->href('/media/grid/download?folder=' . $folder . '&file=');
+            $downloadUrl = $this->BApp->href('/media/grid/download?folder=' . $folder . '&file=');
             $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
             $config['config']['columns'] = [
                 ['type' => 'row_select'],
-                ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
+                ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
                 ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl],
                 ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
                 ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
@@ -163,26 +166,167 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         return $config;
     }
 
+    public function gridConfigLibrary($options = [])
+    {
+        $id = !empty($options['id']) ? $options['id'] : 'media_library';
+        $folder = 'media';
+        $url = $this->BApp->href('/media/grid');
+        $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
+            ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
+            ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder');
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_Catalog')) {
+            $orm->select_expr('(SELECT COUNT(*) FROM ' . $this->Sellvana_Catalog_Model_ProductMedia->table()
+                . ' pm WHERE pm.file_id = a.id)', 'associated_products');
+        }
+        $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
+        $config = [
+            'config' => [
+                'id' => $id,
+                'caption' => 'Media Library',
+                'orm' => $orm,
+                'data_url' => $url . '/data',
+                'edit_url' => $url . '/edit',
+                'columns' => [
+                    ['type' => 'row_select'],
+                    ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
+                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                        'print' => '"<a href=\'' . $url . '/download?folder="+rc.row["folder"]+ "&file="+rc.row["file_name"]+"\' target=_blank>'
+                            . '<img src=\'' . $baseSrc . '"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
+                        'sortable' => false],
+                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
+                    ['name' => 'folder', 'label' => 'Folder', 'width' => 200],
+                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                        'display' => 'file_size'],
+                    ['name' => 'associated_products', 'label' => 'Associated Products', 'width' => 50],
+                    ['type' => 'btn_group',
+                        'buttons' => [
+                            ['name' => 'delete']
+                        ]
+                    ],
+                ],
+                'filters' => [
+                    ['field' => 'file_name', 'type' => 'text']
+                ],
+                //callbacks for backbonegrid
+                //'grid_before_create' => $id . '_register',
+                //'afterMassDelete' => $id .'_afterMassDelete',
+                //callbacks for react griddle
+                'callbacks' => [
+                    //'componentDidMount' => 'registerGrid' . $id,
+                ],
+                'actions' => [
+                    'add-image' => [
+                        'caption'  => 'Add Files',
+                        'type'     => 'button',
+                        'id'       => 'add-attachment-from-grid',
+                        'class'    => 'btn-primary',
+                        'callback' => 'gridShowMedia' . $id
+                    ],
+                    'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
+                    'refresh' => true,
+                ],
+                'page_rows_data_callback' => [$this, 'afterInitialLibraryData']
+            ],
+        ];
+
+        if (!empty($options['config'])) {
+            $config['config'] = $this->BUtil->arrayMerge($config['config'], $options['config']);
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param $rows
+     * @return mixed
+     */
+    public function afterInitialLibraryData($rows)
+    {
+        $mediaUrl = $this->BConfig->get('web/media_dir')?: 'media';
+        $hlp      = $this->FCom_Core_Main;
+        $images = ['jpeg', 'jpg', 'tiff', 'gif', 'png', 'bmp'];
+        foreach ($rows as & $row) {
+            $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $images)) {
+                $thumbUrl = 'image-not-found.png';
+            } else {
+                $folder = $row["folder"];
+                if (strpos($folder, 'media/') === 0) {
+                    $folder = str_replace('media/', '', $row["folder"]);
+                }
+                $thumbUrl = $folder . $row["subfolder"] . "/" . $row["file_name"];
+            }
+            $row['thumb_path'] = trim($hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]), '/');
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function gridDataAfter($data)
+    {
+        $mediaUrl = $this->BConfig->get('web/media_dir')?: 'media';
+        $hlp      = $this->FCom_Core_Main;
+        $images = ['jpeg', 'jpg', 'tiff', 'gif', 'png', 'bmp'];
+
+        foreach ($data['rows'] as $row) {
+            /** @var Sellvana_Catalog_Model_Product $row */
+            $customRowData = $row->getData();
+            if ($customRowData) {
+                $row->set($customRowData);
+                $row->set('data', null);
+            }
+
+            $ext = strtolower(pathinfo($row->get('file_name'), PATHINFO_EXTENSION));
+            if (!in_array($ext, $images)) {
+                $thumbUrl = 'image-not-found.png';
+            } else {
+                $folder = $row->get("folder");
+                if (strpos($folder, 'media/') === 0) {
+                    $folder = str_replace('media/', '', $row->get('folder'));
+                }
+                $thumbUrl = $folder . $row->get('subfolder') . "/" . $row->get('file_name');
+            }
+            $row->set('thumb_path', trim($hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]), '/'));
+        }
+        unset($row);
+
+        return $data;
+    }
+
     public function action_index()
     {
-         $this->layout('/media');
+        $config = [
+            'id' => 'media_library',
+            'title' => $this->_("Media Library"),
+            'gridConfig' => $this->gridConfigLibrary(),
+        ];
+        $this->layout('/media');
+        $view = $this->layout()->view('media')->set('config', $config);
     }
 
     public function action_grid_data()
     {
-        if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
-            return;
-        }
+        //if (!$this->BRequest->xhr()) {
+        //    $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+        //    return;
+        //}
         switch ($this->BRequest->param('do')) {
             case 'data':
                 $folder = $this->getFolder();
     //            $r = $this->BRequest->get();
                 $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
-                    ->where('folder', $folder)
                     ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
                     ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ;
+                if($folder){
+                    $orm->where('folder', $folder);
+                }
+
                 if ($this->BModuleRegistry->isLoaded('Sellvana_Catalog')) {
                     $orm->select_expr('(SELECT COUNT(*) FROM ' . $this->Sellvana_Catalog_Model_ProductMedia->table()
                         . ' pm WHERE pm.file_id = a.id)', 'associated_products');
@@ -195,6 +339,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     }
                 }*/
                 $data = $this->FCom_Core_View_BackboneGrid->processORM($orm);
+                $data = $this->gridDataAfter($data);
                 $this->BResponse->json([
                         ['c' => $data['state']['c']],
                         $this->BDb->many_as_array($data['rows']),
@@ -503,16 +648,33 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $this->collectUploadConfig();
         }
         if (isset($this->_uploadConfigs[$configId])) {
-            $uploadConfig = $this->_uploadConfigs[$configId];
-            $uploadConfig['type'] = $configId;
-            if (isset($uploadConfig['filetype'])) {
-                $uploadConfig['filetype_regex'] = '/(\\.|\\/)(' . str_replace([','], '|', $uploadConfig['filetype']) . ')$/i';
+            $uploadConfig = $this->_processUploadConfig($this->_uploadConfigs[$configId], $configId);
+        } else if(null === $configId){
+            foreach ($this->_uploadConfigs as $id => $config) {
+                $uploadConfig[$id] = $this->_processUploadConfig($config, $id);
             }
+        }
+        return $uploadConfig;
+    }
 
-            if (isset($uploadConfig['permission'])) {
-                $canUpload = $this->FCom_Admin_Model_User->sessionUser()->getPermission($uploadConfig['permission']);
-                $uploadConfig['can_upload'] = $canUpload;
-            }
+    /**
+     * @param array $uploadConfig
+     * @param string $configId
+     * @return mixed
+     */
+    protected function _processUploadConfig($uploadConfig, $configId)
+    {
+        $uploadConfig['type'] = $configId;
+        $uploadConfig['label'] = ucwords(str_replace(['-', '_'], ' ', $configId));
+        if (isset($uploadConfig['filetype'])) {
+            $uploadConfig['filetype_regex'] = '/(\\.|\\/)(' . str_replace([','], '|',
+                    $uploadConfig['filetype']) . ')$/i';
+        }
+
+        if (isset($uploadConfig['permission'])) {
+            $canUpload                  = $this->FCom_Admin_Model_User->sessionUser()
+                                                                      ->getPermission($uploadConfig['permission']);
+            $uploadConfig['can_upload'] = $canUpload;
         }
         return $uploadConfig;
     }

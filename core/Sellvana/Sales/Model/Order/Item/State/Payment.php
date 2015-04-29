@@ -20,6 +20,8 @@ class Sellvana_Sales_Model_Order_Item_State_Payment extends Sellvana_Sales_Model
         self::PARTIAL => 'Partial',
     ];
 
+    protected $_defaultValue = self::UNPAID;
+
     public function setFree()
     {
         return $this->changeState(self::FREE);
@@ -53,5 +55,28 @@ class Sellvana_Sales_Model_Order_Item_State_Payment extends Sellvana_Sales_Model
     public function setPartial()
     {
         return $this->changeState(self::PARTIAL);
+    }
+
+    public function isComplete()
+    {
+        return in_array($this->getValue(), [self::FREE, self::PAID]);
+    }
+
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Item $model */
+        $model = $this->getContext()->getModel();
+
+        if ($model->get('row_total') == 0) {
+            return $this->setFree();
+        }
+        if ($model->get('qty_paid') == $model->get('qty_ordered')) {
+            return $this->setPaid();
+        }
+        if ($model->get('qty_paid') > 0) {
+            return $this->setPartial();
+        }
+
+        return $this;
     }
 }

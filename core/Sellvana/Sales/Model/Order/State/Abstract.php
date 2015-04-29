@@ -29,4 +29,18 @@ class Sellvana_Sales_Model_Order_State_Abstract extends FCom_Core_Model_Abstract
 
         return $newState;
     }
+
+    public function getItemStateStatistics($stateType)
+    {
+        /** @var Sellvana_Sales_Model_Order $model */
+        $model = $this->getContext()->getModel();
+
+        $itemStates = [];
+        foreach ($model->items() as $item) {
+            $itemStateValue = $item->state()->{$stateType}()->calcState()->getValue();
+            $itemStates[$itemStateValue] = !empty($itemStates[$itemStateValue]) ? $itemStates[$itemStateValue]+1 : 1;
+        }
+
+        return $itemStates;
+    }
 }

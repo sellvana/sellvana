@@ -132,6 +132,12 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         return $this->_defaultValue;
     }
 
+    public function setDefaultState()
+    {
+        $this->changeState($this->getDefaultValue());
+        return $this;
+    }
+
     public function getValue()
     {
         return $this->_value;

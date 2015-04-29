@@ -16,6 +16,8 @@ class Sellvana_Sales_Model_Cart_State_Payment extends FCom_Core_Model_Abstract_S
         self::FAILED => 'Failed',
     ];
 
+    protected $_defaultValue = self::UNPAID;
+
     public function setFree()
     {
         return $this->changeState(self::FREE);

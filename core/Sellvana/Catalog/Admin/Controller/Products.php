@@ -83,10 +83,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function afterInitialData($rows)
     {
-        $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+        $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
         foreach ($rows as & $row) {
-            $thumbUrl = $row['thumb_url'] ? $row['thumb_url'] : 'image-not-found.png';
+            $thumbUrl = $row['thumb_url'] ?: 'image-not-found.png';
             $row['thumb_path'] = $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]);
         }
         return $rows;
@@ -98,7 +98,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function gridDataAfter($data)
     {
-        $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+        $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
 
         $data = parent::gridDataAfter($data);
@@ -331,13 +331,16 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
         $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
-            ->order_by_expr('pa.position asc')
-            ->left_outer_join('Sellvana_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
-            ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
-                'a.file_size', 'pa.create_at', 'pa.update_at', 'pa.main_thumb'])
-            ->select('a.id', 'file_id')
+            #->order_by_expr('pa.position asc')
+            #->left_outer_join('Sellvana_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
+            #->group_by('pa.id')
+            #->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
+            #    'a.file_size', 'pa.create_at', 'pa.update_at', 'pa.main_thumb'])
+            #->select('a.id', 'file_id')
+            ->clear_columns()
+            ->select('pa.*')
+            ->select(['a.folder', 'a.subfolder', 'a.file_name', 'a.file_size'])
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
-            ->group_by('pa.id')
             ->find_many());
         $config =  [
             'config' => [

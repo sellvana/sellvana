@@ -18,6 +18,8 @@ class Sellvana_Sales_Model_Order_State_Return extends Sellvana_Sales_Model_Order
         self::RETURNED => 'email/sales/order-state-delivery-returned',
     ];
 
+    protected $_defaultValue = self::NONE;
+
     public function setNone()
     {
         return $this->changeState(self::NONE);
@@ -28,13 +30,30 @@ class Sellvana_Sales_Model_Order_State_Return extends Sellvana_Sales_Model_Order
         return $this->changeState(self::PROCESSING);
     }
 
+    public function setPartial()
+    {
+        return $this->changeState(self::PARTIAL);
+    }
+
     public function setReturned()
     {
         return $this->changeState(self::RETURNED);
     }
 
-    public function setPartial()
+    public function calcState()
     {
-        return $this->changeState(self::PARTIAL);
+        $itemStates = $this->getItemStateStatistics('returns');
+
+        if (!empty($itemStates[Sellvana_Sales_Model_Order_Item_State_Return::PROCESSING])) {
+            return $this->setProcessing();
+        }
+        if (!empty($itemStates[Sellvana_Sales_Model_Order_Item_State_Return::PARTIAL])) {
+            return $this->setPartial();
+        }
+        if (!empty($itemStates[Sellvana_Sales_Model_Order_Item_State_Return::RETURNED])) {
+            return $this->setReturned();
+        }
+
+        return $this;
     }
 }

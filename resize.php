@@ -13,8 +13,8 @@
  */
 
 #$t = microtime(true);
-#ini_set('display_errors', 1);
-#error_reporting(E_ALL | E_NOTICE);
+//ini_set('display_errors', 1);
+//error_reporting(-1);
 ini_set('display_errors', 0);
 error_reporting(0);
 
@@ -29,7 +29,7 @@ class ImageResizer
 
     protected $cacheDir = 'media/thumb_cache';
     protected $useCache = true;
-    
+
     protected $config;
 
     protected $file;
@@ -86,7 +86,7 @@ class ImageResizer
             $this->config = include($configFile);
         }
     }
-    
+
     protected function validateEnvironment()
     {
         if (empty($_SERVER['HTTP_REFERER'])) {

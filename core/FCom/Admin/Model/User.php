@@ -349,6 +349,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
         if ($this->get('timezone')) {
             date_default_timezone_set($this->get('timezone'));
+            $this->BSession->set('_timezone', $this->get('timezone'));
         }
         $this->BEvents->fire('FCom_Admin_Model_User::login:after', ['user' => $this]);
 

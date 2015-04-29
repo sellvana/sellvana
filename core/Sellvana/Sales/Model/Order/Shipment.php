@@ -19,6 +19,8 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
 
     protected $_state;
 
+    protected $_items;
+
     /**
      * @return Sellvana_Sales_Model_Order_Shipment_State
      */
@@ -47,9 +49,9 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
             'shipping_size' => $order->get('shipping_size'),
             'shipping_weight' => $order->get('shipping_weight'),
         ]);
-        $shipment->state()->overall()->setPending();
-        $shipment->state()->carrier()->setPending();
-        $shipment->state()->custom()->setDefault();
+        $shipment->state()->overall()->setDefaultState();
+        $shipment->state()->carrier()->setDefaultState();
+        $shipment->state()->custom()->setDefaultState();
         $shipment->save();
 
         $firstPackage = $this->Sellvana_Sales_Model_Order_Shipment_Package->create([
@@ -88,7 +90,6 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
                 $shipData['qty'] = $qtyToShip;
                 $this->Sellvana_Sales_Model_Order_Shipment_Item->create($shipData)->save();
             }
-            $item->add('qty_shipped', $qtyToShip)->save();
             $numItems += $qtyToShip;
         }
 
@@ -97,7 +98,7 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
         return $shipment;
     }
 
-    public function shipOrderItems($order, $itemsData = null)
+    public function shipOrderItems(Sellvana_Sales_Model_Order $order, $itemsData = null)
     {
         $qtys = null;
         if ($itemsData !== null) {
@@ -116,9 +117,38 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
         }
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order_Shipment_Item[]
+     */
+    public function items()
+    {
+        if (null === $this->_items) {
+            $this->_items = $this->Sellvana_Sales_Model_Order_Shipment_Item->orm()
+                ->where('shipment_id', $this->id())->find_many();
+        }
+        return $this->_items;
+    }
+
+    public function shipItems()
+    {
+        $order = $this->order();
+        $orderItems = $order->items();
+        $shipmentItems = $this->items();
+
+        foreach ($shipmentItems as $sItem) {
+            $oItem = $orderItems[$sItem->get('order_item_id')];
+            $oItem->add('qty_shipped', $sItem->get('qty'));
+        }
+
+        $this->state()->overall()->setShipped();
+        $this->save();
+
+        return $this;
+    }
+
     public function __destruct()
     {
         parent::__destruct();
-        unset($this->_order, $this->_state);
+        unset($this->_order, $this->_items, $this->_state);
     }
 }
