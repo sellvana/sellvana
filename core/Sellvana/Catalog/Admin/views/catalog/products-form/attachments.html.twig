@@ -1,7 +1,6 @@
 {% set m = THIS.get('model') %}
-{% set prodAttachConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
-
-{% import THIS.view('core/form-elements').twigName() as forms %}
+{#{% set prodAttachConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}#}
+{% set prodAttachConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productAttachmentsGridConfigForGriddle(m) %}
 
 {% set type = 'attachments' %}
 {% set targetType = 'product' %}
@@ -19,6 +18,5 @@
     gridConfig: prodAttachConfig
 } %}
 
-{#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
-
-{{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}
+{#{{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}#}
+{{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}

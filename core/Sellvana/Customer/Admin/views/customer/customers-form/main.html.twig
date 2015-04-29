@@ -28,7 +28,10 @@
         {{ forms.input({label: 'New Password'|_, type: "password", name: "model[password]", value: validator.fieldValue('password'), autocomplete:'off' }) }}
         {{ forms.input({label: 'Confirm Password'|_, type: "password", name: "model[password_confirm]", value: validator.fieldValue('password_confirm'), autocomplete:'off' }) }}
     </fieldset>
+
+    {{ THIS.hook('customer_form_main') | raw }}
 </div>
+{{ THIS.hook('customer_main_form_after', {'model' : m}) | raw }}
 
 <script>
     require(['jquery', 'jquery.validate'], function($) {

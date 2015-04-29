@@ -36,19 +36,4 @@ class Sellvana_Promo_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         ]);
         $this->layout('/promo');
     }
-
-    public function hook_promotions()
-    {
-        $cart = $this->Sellvana_Sales_Model_Cart->sessionCart(true);
-        $promoList = $this->Sellvana_Promo_Model_Promo->getPromosByCart($cart->id);
-        $this->BLayout->view('promotions')->promoList = $promoList;
-        return $this->BLayout->view('promotions')->render();
-    }
-
-    public function action_media()
-    {
-        $promoId = $this->BRequest->get('id');
-        $this->layout('/promo/media');
-        $this->view('promo/media')->promo = $this->Sellvana_Promo_Model_Promo->load($promoId);
-    }
 }

@@ -16,21 +16,22 @@ class Sellvana_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abst
     protected $_permission = 'blog';
     protected $_mainTableAlias = 'c';
     protected $_navPath = 'cms/category';
+    protected $_formTitleField = 'name';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'id', 'label' => 'ID'],
             ['name' => 'name', 'label' => 'Name'],
             ['name' => 'description', 'label' => 'Description'],
             ['name' => 'url_key', 'label' => 'URL Key'],
             ['name' => 'post', 'label' => 'Posts', 'href' => $this->BApp->href('blog/post/?category=')],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete'],
-            ]],
         ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
@@ -56,15 +57,6 @@ class Sellvana_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abst
             ->group_by($this->_mainTableAlias . '.id')
             ->select_expr('COUNT(u.category_id)', 'post')
         ;
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $args['view']->set([
-                'title' => $m->id ? 'Edit Blog Category: ' . $m->title : 'Create New Blog Category',
-            ]);
     }
 
     public function formPostAfter($args)

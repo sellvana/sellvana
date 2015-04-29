@@ -1,0 +1,25 @@
+.f-prod-compare-listing {
+  width:auto;
+}
+.f-prod-compare-listing tbody tr th {
+  border-right:1px solid #eee;
+  width:100px;
+}
+.f-prod-compare-listing tbody tr td {
+  border-right:1px solid #eee;
+  width:200px;
+  padding-right:15px;
+  padding-left:15px;
+}
+.f-prod-compare-listing td .trigger-remove {
+  float:right;
+  color:#aaa;
+}
+.f-prod-compare-listing td .product-img {
+  display:block;
+  margin-right:auto;
+  margin-left:auto;
+}
+.f-prod-compare-listing td .product-name {
+  font-size:1.2em;
+}

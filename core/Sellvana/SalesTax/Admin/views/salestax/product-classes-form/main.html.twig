@@ -1,0 +1,15 @@
+<!--{ label: {{ 'Product Tax Class'|_ }} }-->
+<!--{ pos: 10 }-->
+
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% set fieldData = { validator:validator } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<fieldset name="main-product">
+    <div class="f-section">
+        {{ forms.input(fieldData, {field:'title', required:1, label:'Title'|_}) }}
+        {{ forms.textarea(fieldData, {field:'notes', label:'Notes'|_}) }}
+    </div>
+</fieldset>

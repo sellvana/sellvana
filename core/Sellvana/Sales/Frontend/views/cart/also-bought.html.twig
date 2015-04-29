@@ -1,9 +1,10 @@
 {% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
-{% if (cart.itemQty()) %}
+{% set products = [] %}
+{% if cart.itemQty() and products %}
 <div class="f-widget f-widget-featured-prods">
   <header class="f-widget-header">
     <strong class="f-widget-title">Customers who bought items in your cart also bought</strong>
   </header>
-  {{ THIS.view('catalog/product/grid-tiles').set('products', []) | raw }}
+  {{ THIS.view('catalog/product/grid-tiles').set('products', products) | raw }}
 </div><!-- /.f-widget-featured-prods -->
 {% endif %}

@@ -260,6 +260,9 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         if ($outTabs && $outTabs !== 'ALL' && is_string($outTabs)) {
             $outTabs = explode(',', $outTabs);
         }
+
+        $this->collectFormTabs($view);
+
         $out = [];
         if ($outTabs) {
             $layout = $this->BLayout;

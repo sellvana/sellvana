@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_Shipment_State_Overall extends FCom_Core_Model_Abstract_State_Custom
+class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const PENDING = 'pending',
         PACKING = 'packing',
@@ -22,11 +22,13 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends FCom_Core_Model_
         self::CANCELED => 'Canceled',
     ];
 
-    protected $_setValueNotificationTemplates =[
-        self::SHIPPED => 'email/sales/order-shipmend-state-overall-shipped',
-        self::EXCEPTION => 'email/sales/order-shipmend-state-overall-exception',
-        self::DELIVERED => 'email/sales/order-shipmend-state-overall-delivered',
+    protected $_setValueNotificationTemplates = [
+        self::SHIPPED => 'email/sales/order-shipment-state-overall-shipped',
+        self::EXCEPTION => 'email/sales/order-shipment-state-overall-exception',
+        self::DELIVERED => 'email/sales/order-shipment-state-overall-delivered',
     ];
+
+    protected $_defaultValue = self::PENDING;
 
     public function setPending()
     {
@@ -67,4 +69,22 @@ class Sellvana_Sales_Model_Order_Shipment_State_Overall extends FCom_Core_Model_
     {
         return $this->changeState(self::CANCELED);
     }
+
+    /*
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Shipment $shipment * /
+        $shipment = $this->getContext()->getModel();
+        $order = $shipment->order();
+
+        $sItems = $shipment->items();
+        $oItems = $order->items();
+
+        foreach ($sItems as $sItem) {
+            $oItem = $oItems[$sItem->get('order_item_id')];
+        }
+
+        return $this;
+    }
+    */
 }

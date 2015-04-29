@@ -97,6 +97,7 @@ define(fcomAdminDeps, function ($) {
      * @param options
      * @returns {{setOptions: setOptions, getSelectedRows: getSelectedRows}}
      * @constructor
+     * todo: consider use this??????????
      */
     FCom.Admin.MediaLibrary = function (options) {
         var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();

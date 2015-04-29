@@ -34,7 +34,8 @@ class BDb
         CONSTRAINTS = 'CONSTRAINTS',
         KEYS = 'KEYS',
         OPTIONS = 'OPTIONS',
-        DROP = 'DROP';
+        DROP = 'DROP',
+        RENAME = 'RENAME';
     /**
     * Collection of cached named DB connections
     *
@@ -535,6 +536,7 @@ EOT
 
     /**
      * @param string $fullTableName
+     * @param string $connectionName
      * @throws BException
      */
     protected static function checkTable($fullTableName, $connectionName = null)
@@ -701,19 +703,22 @@ EOT
         if ($fields) {
             foreach ($fields as $f => $def) {
                 $fLower = strtolower($f);
-                if ($def === 'DROP') {
+                if ($def === static::DROP) {
                     if (!empty($tableFields[$fLower])) {
                         $alterArr[] = "DROP `{$f}`";
                     }
-                } elseif (strpos($def, 'RENAME') === 0) {
+                } elseif (strpos($def, static::RENAME) === 0) {
                     $a = explode(' ', $def, 3); //TODO: smarter parser, allow spaces in column name??
                     // Why not use a sprintf($def, $f) to fill in column name from $f?
                     $colName = $a[1];
                     $def = $a[2];
-                    if (empty($tableFields[$fLower])) {
-                        $f = $colName;
+                    if (!empty($tableFields[$fLower])) {
+                        $alterArr[] = "CHANGE `{$f}` `{$colName}` {$def}";
+                    } elseif (!empty($tableFields[strtolower($colName)])) {
+                        $alterArr[] = "CHANGE `{$colName}` `{$colName}` {$def}";
+                    } else {
+                        $alterArr[] = "ADD `{$colName}` {$def}";
                     }
-                    $alterArr[] = "CHANGE `{$f}` `{$colName}` {$def}";
                 } elseif (empty($tableFields[$fLower])) {
                     $alterArr[] = "ADD `{$f}` {$def}";
                 } else {
@@ -721,9 +726,11 @@ EOT
                 }
             }
         }
-        if ($indexes) {
+        if ($indexes || $fks) {
             $tableIndexes = static::ddlIndexInfo($fullTableName, null, $connectionName);
             $tableIndexes = array_change_key_case($tableIndexes, CASE_LOWER);
+        }
+        if ($indexes) {
             foreach ($indexes as $idx => $def) {
                 $idxLower = strtolower($idx);
                 if ($def === 'DROP') {
@@ -784,6 +791,9 @@ EOT
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
                     $alterArr[] = "ADD CONSTRAINT `{$idx}` {$def}";
+                }
+                if (!empty($tableIndexes[$idxLower])) {
+                    $dropArr[] = "DROP KEY `{$idx}`";
                 }
             }
             if (!empty($dropArr)) {
@@ -1058,7 +1068,8 @@ class BORM extends ORMWrapper
     protected static function _log_query($query, $parameters)
     {
         $result = parent::_log_query($query, $parameters);
-        static::$_last_profile = BDebug::debug('DB.RUN: ' . (static::$_last_query ? static::$_last_query : 'LOGGING NOT ENABLED'));
+        $msg = 'DB.RUN1: ' . (static::$_last_query ? static::$_last_query : 'LOGGING NOT ENABLED');
+        static::$_last_profile = BDebug::debug($msg);
         return $result;
     }
 
@@ -1130,7 +1141,7 @@ class BORM extends ORMWrapper
 
     public function use_index($index, $type = 'USE', $table = '_')
     {
-        $this->_use_index[$table] = compact('index', 'type');
+        $this->_use_index[$table] = ['index' => $index, 'type' => $type];
         return $this;
     }
 

@@ -8,8 +8,19 @@ class BLocale extends BClass
     static protected $_domainPrefix = 'fulleron/';
     static protected $_domainStack = [];
 
-    static protected $_defaultLanguage = 'en_US';
-    static protected $_currentLanguage;
+    /**
+     * Default locale
+     *
+     * @var string
+     */
+    protected $_defaultLocale = 'en_US';
+
+    /**
+     * Current locale
+     *
+     * @var string
+     */
+    protected $_currentLocale;
 
     /**
     * Default timezone
@@ -17,13 +28,6 @@ class BLocale extends BClass
     * @var string
     */
     protected $_defaultTz = 'America/Los_Angeles';
-
-    /**
-    * Default locale
-    *
-    * @var string
-    */
-    protected $_defaultLocale = 'en_US';
 
     /**
     * Cache for DateTimeZone objects
@@ -69,7 +73,7 @@ class BLocale extends BClass
     {
         date_default_timezone_set($this->_defaultTz);
         setlocale(LC_ALL, $this->_defaultLocale);
-        $this->_tzCache['GMT'] = new DateTimeZone('GMT');
+        $this->_tzCache['UTC'] = new DateTimeZone('UTC');
     }
 
     public function transliterate($str, $filler = '-')
@@ -271,7 +275,7 @@ class BLocale extends BClass
             ['sl', 'Slovene', 'slovenski jezik, slovenščina'],
             ['so', 'Somali', 'Soomaaliga, af Soomaali'],
             ['st', 'Southern Sotho', 'Sesotho'],
-            ['es', 'Spanish, Castilian', 'español, castellano'],
+            ['es', 'Spanish', 'español'],
             ['su', 'Sundanese', 'Basa Sunda'],
             ['sw', 'Swahili', 'Kiswahili'],
             ['ss', 'Swati', 'SiSwati'],
@@ -779,17 +783,46 @@ class BLocale extends BClass
         return in_array($country, $requiredFor);
     }
 
-    public function setCurrentLanguage($lang)
+    public function setCurrentLocale($locale)
     {
-        static::$_currentLanguage = $lang;
+        if (strlen($locale) === 2 && strpos($this->_currentLocale, $locale) !== 0) {
+            //TODO: move locales configuration to FCom_Core ?
+            $allLocales = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales', []);
+            $allLocales += $this->getAvailableLocaleCodes();
+            $found = false;
+            foreach ($allLocales as $l) {
+                if (strpos($l, $locale) === 0) {
+                    $locale = $l;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $this->BDebug->warning('Invalid locale: ' . $locale);
+                $locale = $this->_defaultLocale;
+            }
+        }
+        $this->_currentLocale = $locale;
+        list($lang) = explode('_', $locale, 2);
+        $this->BSession->set('current_language', $lang)->set('current_locale', $locale);
+        return $this;
+    }
+
+    public function getCurrentLocale()
+    {
+        if (empty($this->_currentLocale)) {
+            $this->_currentLocale = $this->BSession->get('current_locale');
+        }
+        if (empty($this->_currentLocale)) {
+            $this->_currentLocale = $this->_defaultLocale;
+        }
+        return $this->_currentLocale;
     }
 
     public function getCurrentLanguage()
     {
-        if (empty(static::$_currentLanguage)) {
-            static::$_currentLanguage = static::$_defaultLanguage;
-        }
-        return static::$_currentLanguage;
+        list($lang) = explode('_', $this->getCurrentLocale());
+        return $lang;
     }
 
     /**
@@ -1084,7 +1117,7 @@ class BLocale extends BClass
         if (empty($this->_tzCache[$tz])) {
             $this->_tzCache[$tz] = new DateTimeZone($tz);
         }
-        return $this->_tzCache[$tz]->getOffset($this->_tzCache['GMT']);
+        return $this->_tzCache[$tz]->getOffset($this->_tzCache['UTC']);
     }
 
     /**
@@ -1134,7 +1167,7 @@ class BLocale extends BClass
     */
     public function datetimeDbToLocal($value, $full = false)
     {
-        return strftime($full ? '%c' : '%x', strtotime($value));
+        return strftime($full ? '%c' : '%x', strtotime($value) + $this->tzOffset());
     }
 
     public function getTranslations()
@@ -1146,6 +1179,8 @@ class BLocale extends BClass
         'USD' => '$',
         'EUR' => '€',
         'GBP' => '£',
+        'CAD' => 'C$',
+        'AUD' => 'A$',
     ];
     static protected $_currencyCode = 'USD';
     static protected $_currencySymbol = '$';
@@ -1168,14 +1203,25 @@ class BLocale extends BClass
         return static::$_currencyCode;
     }
 
-    public function currency($value, $decimals = 2)
+    public function getSymbol($currency)
     {
-        return sprintf('%s%s', static::$_currencySymbol, $this->roundCurrency($value, $decimals));
+        return !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
+    }
+
+    public function currency($value, $currency = null, $decimals = 2)
+    {
+        if ($currency) {
+            $symbol = $this->getSymbol($currency);
+        } else {
+            $symbol = static::$_currencySymbol;
+        }
+        return sprintf('%s%s', $symbol, number_format($value, $decimals));
     }
 
     public function roundCurrency($value, $decimals = 2)
     {
         //TODO: currency specific number of digits
-        return number_format($value, $decimals);
+        $precision = pow(10, $decimals);
+        return round($value * $precision) / $precision;
     }
 }

@@ -306,4 +306,22 @@ class FCom_Admin_Migrate extends BClass
         // Moved Sellvana modules into their own namespace
         $this->FCom_Admin_Model_Personalize->delete_many('1');
     }
+
+    public function upgrade__0_2_0__0_2_1()
+    {
+        $tActivity = $this->FCom_Admin_Model_Activity->table();
+        $this->BDb->ddlTableDef($tActivity, [
+            BDb::COLUMNS => [
+                'status' => "varchar(20) not null default 'new'",
+                'feed' => "varchar(20) not null default 'local'",
+                'type' => "varchar(20) not null default 'info'",
+                'unique_hash' => 'varchar(50) default null',
+                'event_code' => 'varchar(50) default null',
+                'ts' => 'datetime default null',
+            ],
+            BDb::KEYS => [
+                'UNQ_unique_hash' => '(`unique_hash`)',
+            ],
+        ]);
+    }
 }

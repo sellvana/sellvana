@@ -270,7 +270,7 @@ class BUtil extends BClass
     public function arrayToObject($d)
     {
         if (is_array($d)) {
-            return (object) array_map([$this->BUtil, 'objectToArray'], $d);
+            return (object) array_map([$this->BUtil, 'arrayToObject'], $d);
         }
         return $d;
     }
@@ -999,8 +999,9 @@ class BUtil extends BClass
     public function remoteHttp($method, $url, $data = [], $headers = [], $options = [])
     {
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
-        $timeout = 5;
+        $timeout = !empty($options['timeout']) ? $options['timeout'] : 5;
         $userAgent = !empty($options['useragent']) ? $options['useragent'] : 'Mozilla/5.0';
+        $useCurl = isset($options['curl']) ? $options['curl'] : false;
         if (preg_match('#^//#', $url)) {
             $url = 'http:' . $url;
         }
@@ -1014,10 +1015,7 @@ class BUtil extends BClass
             $url .= (strpos($url, '?') === false ? '?' : '&') . $request;
         }
 
-        // curl disabled by default because file upload doesn't work for some reason. TODO: figure out why
-        if (!empty($options['curl']) && function_exists('curl_init')
-            || ini_get('safe_mode') || !ini_get('allow_url_fopen')
-        ) {
+        if ($useCurl && function_exists('curl_init') || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
@@ -1046,6 +1044,13 @@ class BUtil extends BClass
                 ];
             }
 
+            if (is_array($data)) {
+                foreach ($data as $k => $v) {
+                    if (is_string($v) && $v[0] === '@') {
+                        $data[$k] = new CURLFile(substr($v, 1));
+                    }
+                }
+            }
             if ($method === 'POST') {
                 $curlOpt += [
                     CURLOPT_POSTFIELDS => $data,
@@ -1084,6 +1089,14 @@ class BUtil extends BClass
                     CURLOPT_USERPWD => $options['auth'],
                 ];
             }
+            /*
+            $this->BDebug->log(print_r([
+                'ts' => $this->BDb->now(),
+                'data' => $data,
+                'curlopts' => $curlOpt,
+                'consts' => ['POSTFIELDS' => CURLOPT_POSTFIELDS, 'POST' => CURLOPT_POST],
+            ], 1), 'remotehttp.log');
+            */
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
@@ -1098,12 +1111,16 @@ class BUtil extends BClass
             curl_close($ch);
         } else {
             $streamOptions = ['http' => [
+                'protocol_version' => '1.1',
                 'method' => $method,
                 'timeout' => $timeout,
-                'header' => "User-Agent: {$userAgent}\r\n",
+                'header' => [
+                    'User-Agent: ' . $userAgent,
+                    'Connection: close',
+                ],
             ]];
             if ($headers) {
-                $streamOptions['http']['header'] .= join("\r\n", array_values($headers)) . "\r\n";
+                $streamOptions['http']['header'] += array_values($headers);
             }
             if (!empty($options['proxy'])) {
                 $streamOptions['http']['proxy'] = $options['proxy'];
@@ -1144,11 +1161,11 @@ class BUtil extends BClass
                     }
                     $streamOptions['http']['content'] .= "--{$boundary}--\r\n";
                 }
-                $streamOptions['http']['header'] .= "Content-Type: {$contentType}\r\n";
+                $streamOptions['http']['header'][] = "Content-Type: {$contentType}";
                     //."Content-Length: ".strlen($request)."\r\n";
 
                 if (!empty($options['auth'])) {
-                    $streamOptions['http']['header'] .= sprintf("Authorization: Basic %s", base64_encode($options['auth']));
+                    $streamOptions['http']['header'][] = sprintf("Authorization: Basic %s", base64_encode($options['auth']));
                 }
 
                 if (preg_match('#^(ssl|ftps|https):#', $url)) {
@@ -1184,7 +1201,18 @@ class BUtil extends BClass
                 ];
             }
         }
-        #BDebug::log(print_r(compact('method', 'url', 'data', 'response'), 1), 'remotehttp.log');
+/*
+        if ($this->BDebug->is(['DEBUG'])) {
+            $this->BDebug->log(print_r([
+                'ts' => $this->BDb->now(),
+                'method' => $method,
+                'url' => $url,
+                'data' => $data,
+                'response' => $response,
+                'http_info' => static::$_lastRemoteHttpInfo,
+            ], 1), 'remotehttp.log');
+        }
+*/
 
         BDebug::profile($debugProfile);
         return $response;
@@ -1423,13 +1451,28 @@ class BUtil extends BClass
 
 
     /**
-     * @param string $tag
+     * @param string|array $tag
      * @param array  $attrs
-     * @param null   $content
+     * @param string|array $content
      * @return string
+     * @throws BException
      */
-    public function tagHtml($tag, $attrs = [], $content = null)
+    public function tagHtml($tag, $attrs = null, $content = null)
     {
+        if (is_array($tag)) {
+            if (!empty($tag[0])) {
+                list($tag, $attrs, $content) = $tag;
+            } elseif (!empty($tag['tag'])) {
+                $attrs = $tag['attrs'];
+                $content = $tag['content'];
+                $tag = $tag['tag'];
+            } else {
+                throw new BException('Invalid tag argument: ' . print_r($tag));
+            }
+        }
+        if (is_array($content)) {
+            $content = join('', array_map([$this, 'tagHtml'], $content));
+        }
         return '<' . $tag . ' ' . $this->tagAttributes($attrs) . '>' . $content . '</' . $tag . '>';
     }
 
@@ -1444,6 +1487,9 @@ class BUtil extends BClass
             $default = (string)$default;
         }
         $htmlArr = [];
+        if (!$options) {
+            return '';
+        }
         foreach ($options as $k => $v) {
             $k = (string)$k;
             if (is_array($v) && $k !== '' && $k[0] === '@') { // group
@@ -1842,12 +1888,13 @@ class BUtil extends BClass
     }
 
     /**
-     * @param $filename
-     * @param $sourceDir
+     * @param string $filename
+     * @param string $sourceDir
+     * @param string $ignorePattern
      * @return bool
      * @throws BException
      */
-    public function zipCreateFromDir($filename, $sourceDir)
+    public function zipCreateFromDir($filename, $sourceDir, $ignorePattern = null)
     {
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
@@ -1863,6 +1910,9 @@ class BUtil extends BClass
         }
         foreach ($files as $file) {
             $packedFile = str_replace($sourceDir . '/', '', $file);
+            if (!empty($ignorePattern) && preg_match($ignorePattern, $packedFile)) {
+                continue;
+            }
             if (is_dir($file)) {
                 $zip->addEmptyDir($packedFile);
             } else {
@@ -2787,7 +2837,13 @@ class BDebug extends BClass
      */
     public function errorHandlerLogger($code, $message, $file, $line, $context = null)
     {
-        return static::$_errorHandlerLog[] = compact('code', 'message', 'file', 'line', 'context');
+        return static::$_errorHandlerLog[] = [
+            'code' => $code,
+            'message' => $message,
+            'file' => $file,
+            'line' => $line,
+            'context' => $context,
+        ];
     }
 
     /**
@@ -3209,11 +3265,13 @@ class BDebug extends BClass
                 . (!empty($e['module']) ? $e['module'] : '') . "</td></tr>";
         }
 ?></tbody></table></div><script>
+
         if (require) {
             require(['jquery.tablesorter'], function() {
                 $('#buckyball-debug-table').tablesorter();
             })
         }
+
 </script><?php
         $html = ob_get_clean();
         if ($return) {
@@ -3945,7 +4003,7 @@ class BValidate extends BClass
             $this->BSession->set('validator-data:' . $formName, $data);
             foreach ($this->_validateErrors as $field => $errors) {
                 foreach ($errors as $error) {
-                    $msg = compact('error', 'field');
+                    $msg = ['error' => $error, 'field' => $field];
                     $this->BSession->addMessage($msg, 'error', 'validator-errors:' . $formName);
                 }
             }
@@ -3959,6 +4017,15 @@ class BValidate extends BClass
     public function validateErrors()
     {
         return $this->_validateErrors;
+    }
+
+    public function validateErrorsString()
+    {
+        $result = [];
+        foreach ($this->_validateErrors as $field => $errors) {
+            $result[] = $field . ': ' . join('; ', $errors);
+        }
+        return join("\n", $result);
     }
 
     /**

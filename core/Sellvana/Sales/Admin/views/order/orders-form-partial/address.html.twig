@@ -1,0 +1,78 @@
+{% set order = THIS.get('order') %}
+{% set type = THIS.get('type') %}
+{% set addr = order.addressAsArray(type) %}
+{% set countries = APP.instance('FCom_Core_Main').getAllowedCountries() %}
+
+<div id="{{ type }}-section-view">
+    <p><strong>{{ order.fullName(type) }}</strong></p>
+    <p>{{ order.addressAsHtml(type) | raw }}</p>
+    {% if addr.phone %}<p>{{ 'Phone: %s'|_(addr.phone) }}</p>{% endif %}
+    {% if addr.fax %}<p>{{ 'Fax: %s'|_(addr.fax) }}</p>{% endif %}
+</div>
+<div id="{{ type }}-section-edit" hidden>
+    <div class="row no-gutter">
+        <div class="col-md-6">
+            <input type="text" class="form-control input-sm" name="order[{{ type }}_firstname]"
+                   title="{{ 'First Name'|_ }}" placeholder="{{ 'First Name'|_ }}" value="{{ addr.firstname }}">
+        </div>
+        <div class="col-md-6">
+            <input type="text" class="form-control input-sm" name="order[{{ type }}_lastname]"
+                   title="{{ 'Last Name'|_ }}" placeholder="{{ 'Last Name'|_ }}" value="{{ addr.lastname }}">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <input type="text" class="form-control input-sm" name="order[{{ type }}_street1]"
+                   title="{{ 'Street Line 1'|_ }}" placeholder="{{ 'Street Line 1'|_ }}" value="{{ addr.street1 }}">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <input type="text" class="form-control input-sm" name="order[{{ type }}_street2]"
+                   title="{{ 'Street Line 2'|_ }}" placeholder="{{ 'Street Line 2'|_ }}" value="{{ addr.street2 }}">
+        </div>
+    </div>
+    <div class="row no-gutter">
+        <div class="col-md-6">
+            <input type="text" class="form-control input-sm" name="order[{{ type }}_city]"
+                   title="{{ 'City'|_ }}" placeholder="{{ 'City'|_ }}" value="{{ addr.city }}">
+        </div>
+        <div class="col-md-6">
+            <input type="text" class="form-control input-sm" name="order[{{ type }}_postcode]"
+                   title="{{ 'Zip/Postal Code'|_ }}" placeholder="{{ 'Zip/Postal Code'|_ }}" value="{{ addr.postcode }}">
+        </div>
+    </div>
+    <div class="row no-gutter">
+        <div class="col-md-6">
+            <input type="text" class="geo-region form-control input-sm" name="order[{{ type }}_region]"
+                   title="{{ 'State/Region'|_ }}" placeholder="{{ 'State/Region'|_ }}" value="{{ addr.region }}">
+            <select class="geo-region form-control input-sm" name="order[{{ type }}_region]" style="display:none"></select>
+        </div>
+        <div class="col-md-6">
+            <select class="form-control geo-country input-sm" name="order[{{ type }}_country]" title="{{ 'Country'|_ }}">
+                {{ UTIL.optionsHtml(countries, addr.country) | raw }}
+            </select>
+        </div>
+    </div>
+    <div class="row no-gutter">
+        <div class="col-md-6">
+            <input type="text" class="form-control input-sm" name="order[{{ type }}_phone]"
+                   title="{{ 'Phone'|_ }}" placeholder="{{ 'Phone'|_ }}" value="{{ addr.phone }}">
+        </div>
+        <div class="col-md-6">
+            <input type="text" class="form-control input-sm" name="order[{{ type }}_fax]"
+                   title="{{ 'Fax'|_ }}" placeholder="{{ 'Fax'|_ }}" value="{{ addr.fax }}">
+        </div>
+    </div>
+</div>
+
+<script>
+    require(['jquery'], function($) {
+        $('#{{ type }}-section-edit .geo-country').geoCountryRegion({
+            country: '{{ order.get('shipping_country') }}',
+            region: '{{ order.get('shipping_region') }}',
+            regionSelectEl: '#{{ type }}-section-edit select.geo-region',
+            regionInputEl: '#{{ type }}-section-edit input.geo-region'
+        });
+    })
+</script>

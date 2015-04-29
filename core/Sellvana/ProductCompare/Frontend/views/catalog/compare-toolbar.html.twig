@@ -1,12 +1,12 @@
-{% set compareJson = APP.instance('Sellvana_ProductCompare_Model_Set').sessionSet().getCompareProductsDetailsJson(1) %}
 {% set compare = APP.instance('Sellvana_ProductCompare_Model_Set').sessionSet().getCompareProductsDetails(1) %}
+{% set compareJson = UTIL.toJson(compare) %}
 
 <div class="f-widget f-widget-prods-compare">
     <form method="post" action="{{ APP.href('catalog/compare') }}">
         <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-        <strong class="f-widget-title">{{ 'Compare up to 5 products'|_ }}</strong>
+        <strong class="f-widget-title">{{ 'Compare up to 4 products'|_ }}</strong>
         <ul class="f-widget-content">
-            {% for i in 0..4 %}
+            {% for i in 0..3 %}
                 {% set s = compare[i] %}
                 {% if s %}
                     <li class="item">

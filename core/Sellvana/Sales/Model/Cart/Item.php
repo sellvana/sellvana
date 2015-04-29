@@ -25,15 +25,21 @@
  *
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_cart_item';
-
+    protected static $_origClass = __CLASS__;
     /**
      * @var Sellvana_Catalog_Model_Product
      */
     protected $_product;
+
+    /**
+     * @var Sellvana_Catalog_Model_InventorySku
+     */
+    protected $_inventory;
 
     /**
      * @var Sellvana_Sales_Model_Cart
@@ -41,6 +47,17 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     protected $_cart;
 
     protected $_relatedItemsCache = [];
+
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['cart_id', 'product_id', 'inventory_id', 'unique_hash'],
+        'related'    => [
+            'cart_id'        => 'Sellvana_Sales_Model_Cart.id',
+            'product_id'     => 'Sellvana_Catalog_Model_Product.id',
+            'inventory_id'   => 'Sellvana_Catalog_Model_InventorySku.id',
+            'parent_item_id' => 'Sellvana_Sales_Model_Cart_Item.id'
+        ],
+    ];
 
     /**
      * @param Sellvana_Catalog_Model_Product $product
@@ -53,6 +70,7 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param boolean $loadIfMissing
      * @return Sellvana_Catalog_Model_Product
      */
     public function getProduct($loadIfMissing = true)
@@ -61,6 +79,28 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
             $this->_product = $this->relatedModel('Sellvana_Catalog_Model_Product', $this->get('product_id'));
         }
         return $this->_product;
+    }
+
+    /**
+     * @param Sellvana_Catalog_Model_InventorySku $inv
+     * @return $this
+     */
+    public function setInventory(Sellvana_Catalog_Model_InventorySku $inv)
+    {
+        $this->_inventory = $inv;
+        return $this;
+    }
+
+    /**
+     * @param boolean $loadIfMissing
+     * @return Sellvana_Catalog_Model_InventorySku
+     */
+    public function getInventory($loadIfMissing = true)
+    {
+        if (!$this->_inventory && $loadIfMissing) {
+            $this->_inventory = $this->relatedModel('Sellvana_Catalog_Model_InventorySku', $this->get('inventory_id'));
+        }
+        return $this->_inventory;
     }
 
     /**
@@ -87,9 +127,10 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     /**
      * @return mixed
      */
-    public function calcRowTotal()
+    public function calcRowTotal($forStoreCurrency = false)
     {
-        return $this->get('price') * $this->get('qty');
+        $price = $forStoreCurrency ? $this->getData('store_currency/price') : $this->get('price');
+        return $price * $this->get('qty');
     }
 
     /**
@@ -144,6 +185,24 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $this->get('qty');
     }
 
+    public function getPriceFormatted()
+    {
+        $amount = $this->getData('store_currency/price');
+        if (!$amount) {
+            $amount = $this->get('price');
+        }
+        return $this->BLocale->currency($amount);
+    }
+
+    public function getRowTotalFormatted()
+    {
+        $amount = $this->getData('store_currency/row_total');
+        if (!$amount) {
+            $amount = $this->get('row_total');
+        }
+        return $this->BLocale->currency($amount);
+    }
+
     public function calcUniqueHash($signature)
     {
 
@@ -160,7 +219,7 @@ class Sellvana_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     public function __destruct()
     {
         parent::__destruct();
-        unset($this->_product, $this->_cart, $this->_relatedSkuProductCache);
+        unset($this->_product, $this->_inventory, $this->_cart, $this->_relatedSkuProductCache);
     }
 }
 

@@ -95,7 +95,8 @@ class Sellvana_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abs
         try {
             $email = $this->BRequest->request('email');
             $customerModel = $this->Sellvana_Customer_Model_Customer;
-            if ($customerModel->validate(['email' => $email], $customerModel->getPasswordRecoverRules(), 'frontend', true)) {
+            $data = ['email' => $email];
+            if ($customerModel->validate($data, $customerModel->getPasswordRecoverRules(), 'frontend', true)) {
                 $user = $customerModel->load($email, 'email');
                 if ($user) {
                     $user->recoverPassword();

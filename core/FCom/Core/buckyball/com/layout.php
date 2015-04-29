@@ -437,7 +437,8 @@ class BLayout extends BClass
      */
     public function getView($viewName)
     {
-        return isset($this->_views[$viewName]) ? $this->_views[$viewName] : BViewEmpty::i();
+        return isset($this->_views[$viewName]) ? $this->_views[$viewName]
+            : $this->BViewEmpty->i(true)->setParam('view_name', $viewName);
     }
 
     /**
@@ -832,7 +833,7 @@ class BLayout extends BClass
             }
             $d['type'] = trim($d['type']);
             if (empty($d['type']) || empty(static::$_metaDirectives[$d['type']])) {
-                BDebug::error('Unknown directive: ' . $d['type']);
+                BDebug::error('Unknown directive: ' . print_r($d, 1));
                 continue;
             }
             if (empty($d['name']) && !empty($d[1])) {
@@ -1984,6 +1985,8 @@ class BView extends BClass
         $metaData = $this->param('meta_data') ? array_change_key_case($this->param('meta_data'), CASE_LOWER) : [];
         $data = array_merge($metaData, array_change_key_case($p, CASE_LOWER));
         $data['body'] = $body;
+        $data['view_name'] = $this->param('view_name');
+        $data['template'] = $this->param('template');
 
         return $this->BEmail->send($data);
     }
@@ -2396,6 +2399,12 @@ if ($this->BDebug->is('DEBUG')) {
         return $this;
     }
 
+    public function addDefaultTag($type, $params)
+    {
+        $this->_defaultTag[$type] = $params;
+        return $this;
+    }
+
     /**
      * Add element
      * @param       $type
@@ -2495,27 +2504,38 @@ if ($this->BDebug->is('DEBUG')) {
         $args = $this->_elements[$typeName];
 
         $file = !empty($args['file']) ? $args['file'] : $name;
-        $file = $this->src($file, true);
-        if (strpos($file, 'http:') === false && strpos($file, 'https:') === false && $file[0] !== '/') {
+        $webFile = $this->src($file, true);
+        if (strpos($webFile, 'http:') === false && strpos($webFile, 'https:') === false && $webFile[0] !== '/') {
             $module  = !empty($args['module_name']) ? $this->BModuleRegistry->module($args['module_name']) : null;
             $baseUrl = $module ? $module->baseSrc() : $this->BApp->baseUrl();
-            $file    = rtrim($baseUrl, '/') . '/' . $file;
+            $webFile = rtrim($baseUrl, '/') . '/' . $webFile;
         }
 
         if ($type === 'js' && !empty($this->_headJs['loaded']) && $this->_headJs['loaded'] !== $name
             && empty($args['separate']) && empty($args['tag']) && empty($args['params']) && empty($args['if'])
         ) {
             if (empty($this->_headJs['jquery']) && strpos($name, 'jquery') !== false) {
-                $this->_headJs['jquery'] = $file;
+                $this->_headJs['jquery'] = $webFile;
             } else {
-                $this->_headJs['scripts'][] = $file;
+                $this->_headJs['scripts'][] = $webFile;
             }
 
             return '';
         }
 
-        $tag = !empty($args['tag']) ? $args['tag'] : $this->_defaultTag[$type];
-        $tag = str_replace('%s', htmlspecialchars($file), $tag);
+        if (!empty($this->_defaultTag[$type])) {
+            if (is_string($this->_defaultTag[$type])) {
+                $defaultTag = $this->_defaultTag[$type];
+            } elseif (is_callable($this->_defaultTag[$type])) {
+                $args['file'] = $file;
+                $defaultTag   = $this->BUtil->call($this->_defaultTag[$type], $args);
+            } else {
+                throw new BException('Invalid tag declaration: ' . $type);
+            }
+        }
+
+        $tag = !empty($args['tag']) ? $args['tag'] : $defaultTag;
+        $tag = str_replace('%s', htmlspecialchars($webFile), $tag);
         $tag = str_replace('%c', !empty($args['content']) ? $args['content'] : '', $tag);
         $tag = str_replace('%a', !empty($args['params']) ? $args['params'] : '', $tag);
         if (!empty($args['if'])) {

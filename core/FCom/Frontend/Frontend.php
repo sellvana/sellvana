@@ -4,7 +4,7 @@ class FCom_Frontend_Frontend extends BClass
 {
     public function bootstrap()
     {
-        if ($this->BRequest->https()) {
+        if ($this->BRequest->https() && $this->BConfig->get('web/hsts_enable')) {
             $this->BResponse->httpSTS();
         }
 

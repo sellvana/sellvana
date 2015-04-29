@@ -105,6 +105,9 @@ label.success {
 .table tfoot > tr > td {
   vertical-align:top;
   }
+.table tbody > tr > th {
+  background:#f4f4f4;
+  }
   
 /*------------------------------------*\
    PERSISTENT
@@ -313,6 +316,9 @@ label.success {
   display:inline-block;
   background:#eee;
   border:1px solid #bbb;
+  }
+.f-widget-prods-compare ul > li.item a {
+  cursor: alias;
   }
   
 /* Ratings & Reviews */

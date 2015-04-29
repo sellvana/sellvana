@@ -1,0 +1,23 @@
+
+@import "foo.css";
+@import "foo" screen;
+@import "http://foo.com/bar";
+@import url(foo);
+
+@import "imports/simple";
+
+pre {
+    color: red;
+    @import "imports/simple";
+}
+
+code {
+    @import "imports/simple", "imports/simple";
+}
+
+@import "imports/_partial";
+
+body {
+    color: $variable;
+    @include partial-mixin();
+}

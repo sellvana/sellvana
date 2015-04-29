@@ -131,7 +131,7 @@ class Sellvana_Sales_Main extends BClass
     }
 
     /**
-     * @return null
+     * @return Sellvana_Sales_Method_Payment_Abstract[]
      */
     public function getPaymentMethods()
     {
@@ -139,7 +139,7 @@ class Sellvana_Sales_Main extends BClass
     }
 
     /**
-     * @return null
+     * @return Sellvana_Sales_Method_Checkout_Abstract[]
      */
     public function getCheckoutMethods()
     {
@@ -147,7 +147,7 @@ class Sellvana_Sales_Main extends BClass
     }
 
     /**
-     * @return null
+     * @return Sellvana_Sales_Method_Shipping_Abstract[]
      */
     public function getShippingMethods()
     {
@@ -155,13 +155,16 @@ class Sellvana_Sales_Main extends BClass
     }
 
     /**
-     * @return null
+     * @return Sellvana_Sales_Method_Discount_Interface[]
      */
     public function getDiscountMethods()
     {
         return $this->_getHeap('discount_method');
     }
 
+    /**
+     * @return array
+     */
     public function getAllSelectedShippingServices()
     {
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
@@ -193,30 +196,32 @@ class Sellvana_Sales_Main extends BClass
 
 
     /**
-     * @param $args
+     * @param array $args
      */
     public function checkDefaultShippingPayment($args)
     {
         if (!$this->getShippingMethods()) {
-            $args['notifications'][] = [
+            $args['items'][] = [
+                'feed' => 'local',
                 'type' => 'warning',
                 'group' => 'FCom Sales',
-                'message' => 'You have to enable at least one shipping module',
+                'content' => 'You have to enable at least one SHIPPING module',
                 'code' => "sales_missing_shipping",
             ];
         }
         if (!$this->getPaymentMethods()) {
-            $args['notifications'][] = [
+            $args['items'][] = [
+                'feed' => 'local',
                 'type' => 'warning',
                 'group' => 'FCom Sales',
-                'message' => 'You have to enable at least one payment module',
+                'content' => 'You have to enable at least one PAYMENT module',
                 'code' => "sales_missing_payment",
             ];
         }
     }
 
     /**
-     * @param $args
+     * @param array $args
      */
     public function onGetDashboardWidgets($args)
     {
@@ -264,5 +269,10 @@ class Sellvana_Sales_Main extends BClass
     {
         $this->workflowAction('customerLogsOut', $args);
     }
-}
 
+    public function onSwitchCurrency($args)
+    {
+        $cart = $this->Sellvana_Sales_Model_Cart->sessionCart(true);
+        $cart->setStoreCurrency($args['new_currency'])->calculateTotals()->saveAllDetails();
+    }
+}

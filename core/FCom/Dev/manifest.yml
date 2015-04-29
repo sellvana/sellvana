@@ -1,3 +1,4 @@
 modules:
     FCom_Dev:
-        version: 0.1.0
+        version: 0.5.0.0
+        channel: alpha

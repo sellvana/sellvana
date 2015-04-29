@@ -1,0 +1,15 @@
+{% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
+{% if sites %}
+    <select id="multisite-selector">
+        <option value="">{{ 'Default configuration'|_ }}</option>
+        {{ UTIL.optionsHtml(sites, REQUEST.get('site')) | raw }}
+    </select>
+    <script>
+        require(['jquery'], function($) {
+            $('#multisite-selector').change(function(ev) {
+                var site = $(ev.target).val();
+                location.href = '{{ APP.href('settings') }}' + (site ? '?site=' + site : '');
+            })
+        })
+    </script>
+{% endif %}

@@ -17,11 +17,14 @@ class Sellvana_Sales_Model_Cart_Total_GrandTotal extends Sellvana_Sales_Model_Ca
         $cart = $this->_cart;
 
         $this->_value = 0;
+        $this->_storeCurrencyValue = 0;
         foreach ($this->_components as $t) {
             $this->_value += $t['value'];
+            $this->_storeCurrencyValue += $t['store_currency_value'];
         }
 #var_dump($this->_components, $this->_value);
         $this->_cart->set('grand_total', $this->_value);
+        $this->_cart->setData('store_currency/grand_total', $this->_storeCurrencyValue);
 
         if ($this->_value) {
             $cart->state()->payment()->setUnpaid();
@@ -46,9 +49,9 @@ class Sellvana_Sales_Model_Cart_Total_GrandTotal extends Sellvana_Sales_Model_Ca
         return $this;
     }
 
-    public function addComponent($value, $type = null)
+    public function addComponent($type, $value, $storeCurrencyValue = null)
     {
-        $this->_components[] = ['value' => $value, 'type' => $type];
+        $this->_components[] = ['type' => $type, 'value' => $value, 'store_currency_value' => $storeCurrencyValue ?: $value];
         return $this;
     }
 }

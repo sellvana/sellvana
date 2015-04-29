@@ -313,7 +313,10 @@ class FCom_Core_LayoutEditor extends BClass
         }
         $widgets = [];
         if (!empty($post['widgets'])) {
-            foreach ($post['widgets'] as $w) {
+            foreach ($post['widgets'] as $idx => $w) {
+                if($idx === '-ID-'){
+                    continue;
+                }
                 if (!empty($w['custom_params'])) {
                     foreach ($w['custom_params'] as $i => $p) {
                         if (empty($p['k'])) {
@@ -411,6 +414,63 @@ class FCom_Core_LayoutEditor extends BClass
             },
         ]);
 
+        $this->addWidgetType('youtube', [
+            'title' => 'Video Embed (YouTube)',
+            'pos' => 120,
+            'source_view' => 'core/widgets/video',
+            'view_name'   => 'widgets/video',
+            'compile' => function ($args) {
+                $w = $args['widget'];
+                $view_name        = $w['view_name'];
+                $args['layout'][] = ['hook' => $w['area'], 'views' => $view_name];
+                $update = [
+                    'widget_id'  => $w['id'],
+                    'url'        => !empty($w['url'])? $w['url']: null,
+                    'height'     => !empty($w['height'])? $w['height']: null,
+                    'width'      => !empty($w['width'])? $w['width']: null,
+                    'use_iframe' => !empty($w['use_iframe'])? $w['use_iframe']: null,
+                ];
+
+                if (!empty($w['custom_params'])) {
+                    foreach ($w['custom_params'] as $p) {
+                        $update[$p['k']] = $p['v'];
+                    }
+                }
+                $args['layout'][] = ['view' => $view_name, 'set' => $update];
+            },
+        ]);
+/*
+        $this->addWidgetType('file_upload', [
+            'title'       => 'File Upload',
+            'pos'         => 130,
+            'source_view' => 'core/widgets/media',
+            'view_name'   => 'widgets/media',
+            'compile'     => function ($args) {
+                $w                = $args['widget'];
+                $view_name        = $w['view_name'];
+
+                $folder = !empty($w['folder'])? $w['folder']: null;
+                if (!empty($w['subfolder'])) {
+                    $folder .= '/' . trim($w['subfolder'], '/');
+                }
+
+                $args['layout'][] = ['hook' => $w['area'], 'views' => $view_name];
+                $update = [
+                    'widget_id'      => $w['id'],
+                    'folder'         => $folder,
+                    'filetype_regex' => !empty($w['filetype_regex'])? str_replace(',', '|', $w['filetype_regex']): null,
+                    'multiple'       => !empty($w['multiple'])? $w['multiple']: null,
+                ];
+
+                if (!empty($w['custom_params'])) {
+                    foreach ($w['custom_params'] as $p) {
+                        $update[$p['k']] = $p['v'];
+                    }
+                }
+                $args['layout'][] = ['view' => $view_name, 'set' => ['config' => $update]];
+            },
+        ]);
+*/
         $this->addWidgetType('remove', [
             'title' => 'Remove View',
             'pos' => 100,

@@ -15,10 +15,12 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
     protected $_mainTableAlias = 'pr';
     protected $_gridTitle = 'Product Reviews';
     protected $_recordName = 'Product Review';
+    protected $_formTitleField = 'title';
+    protected $_formViewPrefix = 'prodreviews/form/';
     //custom grid view
-    protected $_gridViewName = 'prodreviews/grid';
-    protected $_useDefaultLayout = false;
+    protected $_gridLayoutName = '/prodreviews';
     protected $_permission = 'product_review';
+    protected $_navPath = 'catalog/prodreviews';
 
     public function gridConfig($productModel = false)
     {
@@ -170,25 +172,6 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
         $orm->left_outer_join('Sellvana_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
             ->left_outer_join('Sellvana_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
             ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as author');
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $args['view']->set([
-            'title' => $m->id ? 'Edit Product Review: ' . $m->title : 'Create New Product Review',
-            'actions' => [
-                'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\''
-                    . $this->BApp->href("prodreviews") . '\'"><span>' .  $this->BLocale->_('Back to list') . '</span></button>',
-                'delete' => '<button type="submit" class="st2 sz2 btn" name="do" value="DELETE" '
-                    . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
-                    . $this->BLocale->_('Delete') . '</span></button>',
-                'save' => '<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
-                    . $this->BLocale->_('Save') . '</span></button>',
-            ],
-        ]);
-
     }
 
     public function gridViewBefore($args)

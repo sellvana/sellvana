@@ -17,6 +17,13 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group',
+                'buttons' => [
+                    ['name' => 'edit', 'icon' => 'icon-pencil ', 'cssClass' => 'btn-xs btn-edit-inline'],
+                    ['name' => 'save-inline', 'icon' => ' icon-ok-sign', 'cssClass' => 'btn-xs btn-save-inline hide'],
+                    ['name' => 'delete'],
+                ]
+            ],
             ['name' => 'id', 'label' => 'ID', 'index' => 's.id'],
             ['type' => 'input', 'name' => 'alias_type', 'label' => 'Alias Type', 'width' => 100,
                 'addable' => true, 'editable' => true, 'edit_inline' => true,
@@ -32,15 +39,9 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
                 'editor' => 'text', 'validation' => ['required' => true, 'number' => true, 'maxlength' => 11]],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 's.create_at', 'width' => 100],
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 's.update_at', 'width' => 100],
-            ['type' => 'btn_group',
-                'buttons' => [
-                    ['name' => 'edit', 'icon' => 'icon-pencil ', 'cssClass' => 'btn-xs btn-edit-inline'],
-                    ['name' => 'save-inline', 'icon' => ' icon-ok-sign', 'cssClass' => 'btn-xs btn-save-inline hide'],
-                    ['name' => 'delete'],
-                ]
-            ]
         ];
         $config['actions'] = [
+            'new' => ['caption' => 'Add New Search Term'],
             'delete' => true,
         ];
         $config['filters'] = [
@@ -51,17 +52,7 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'update_at', 'type' => 'date-range'],
         ];
-        $config['new_button'] = '#add_new_index_search_term';
+        $config['new_button'] = '#grid_new_form_button';
         return $config;
-    }
-
-    public function gridViewBefore($args)
-    {
-        parent::gridViewBefore($args);
-        $gridView = $args['page_view'];
-        $actions = $gridView->get('actions');
-        $actions['new'] = '<button type="button" id="add_new_index_search_term" class="btn grid-new btn-primary _modal">'
-            . $this->BLocale->_('Add New Search Term') . '</button>';
-        $gridView->set('actions', $actions);
     }
 }

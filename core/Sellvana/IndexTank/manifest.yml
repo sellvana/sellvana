@@ -1,7 +1,7 @@
 modules:
     Sellvana_IndexTank:
-        version: 0.2.1
-        channel: beta
+        version: 0.5.0.0
+        channel: alpha
         translations: { en: en.php }
         description: "IndexTank API integration"
         require: { module: { FCom_Core: 0.1.0 } }

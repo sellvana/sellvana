@@ -1,0 +1,10 @@
+{% macro widget__youtube(widget, library, context) %}
+    {% import LAYOUT.view('core/form-elements').twigName() as forms %}
+    {% import LAYOUT.view('core/layout-editor').twigName() as layout %}
+    {{ forms.input({label: "Embed URL"|_, name: "#{context.prefix}[widgets][#{widget.id}][url]", value: widget.url, field: "url-#{widget.id}"}) }}
+    {{ forms.input({label: "Width"|_, type: "number", name: "#{context.prefix}[widgets][#{widget.id}][width]", value: widget.width|default(640), field: "width-#{widget.id}"}) }}
+    {{ forms.input({label: "Height"|_, type: "number", name: "#{context.prefix}[widgets][#{widget.id}][height]", value: widget.height|default(390), field: "height-#{widget.id}"}) }}
+    {{ forms.boolean({label: "Embed using iFrame"|_, name:"#{context.prefix}[widgets][#{widget.id}][use_iframe]", value: widget.use_iframe, field: "use_iframe-#{widget.id}"}) }}
+    {{ layout.widget_custom_params(widget, library, context) }}
+{% endmacro %}
+{#https://youtu.be/vBXt4zp8t-M#}

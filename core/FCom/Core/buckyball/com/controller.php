@@ -252,11 +252,11 @@ class BRequest extends BClass
         return substr($toplang, 0, 2);
     }
 
-    public function language()
+    public function language($fallbackToBrowser = false)
     {
         if (null === static::$_language) {
             $this->rawPath();
-            if (null === static::$_language) {
+            if (null === static::$_language && $fallbackToBrowser) {
                 static::$_language = $this->acceptLanguage();
             }
         }
@@ -441,9 +441,11 @@ class BRequest extends BClass
             $basename = basename($this->scriptName());
             $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
 
-            if ($this->BConfig->get('web/language_in_url') && preg_match('#^/([a-z]{2})(/.*|$)#', $path, $match)) {
-                static::$_language = $match[1];
-                $path = $match[2];
+            $re = '#^/(([a-z]{2})(_[A-Z]{2})?)(/.*|$)#';
+            if ($this->BConfig->get('web/language_in_url') && preg_match($re, $path, $match)) {
+                static::$_language = $match[2];
+                $this->BLocale->setCurrentLocale($match[1]);
+                $path = $match[4];
             }
 
             if (!$path) {
@@ -1051,7 +1053,7 @@ class BRequest extends BClass
 
         mb_internal_encoding('UTF-8');
         if (version_compare(PHP_VERSION, '5.6.0', '<')) {
-            // bellow emits deprecated errors on php 5.6
+            // below emits deprecated errors on php 5.6
             iconv_set_encoding('input_encoding', 'UTF-8');
             iconv_set_encoding('internal_encoding', 'UTF-8');
             iconv_set_encoding('output_encoding', 'UTF-8');
@@ -1066,6 +1068,7 @@ class BRequest extends BClass
 
     public function stripTagsRecursive(&$data, $forUrlPath, $curPath = null)
     {
+        $allowedTags = $this->getAllowedTags();
         foreach ($data as $k => &$v) {
             $childPath = null === $curPath ? $k : ($curPath . '/' . $k);
             if (is_array($v)) {
@@ -1078,7 +1081,7 @@ class BRequest extends BClass
                 } else {
                     $tags = $this->_postTagsWhitelist[$forUrlPath][$childPath];
                     if ('+' === $tags) {
-                        $tags = $this->getAllowedTags();
+                        $tags = $allowedTags;
                     }
                     if ('*' !== $tags) {
                         $v = strip_tags($v, $tags);
@@ -1592,6 +1595,24 @@ class BResponse extends BClass
         // continue in background if the browser request was interrupted
         //ignore_user_abort(true);
         return $this;
+    }
+
+    public function safeHtml($html, $tags = null)
+    {
+        if (!$tags) {
+            $tags = $this->BRequest->getAllowedTags();
+        }
+        $html = strip_tags($html, $tags);
+
+        $html = preg_replace('/
+            < [a-z:-]+ \s .*? (
+                [a-z]+ \s* = \s* [\'"] \s* javascript \s* :   # src="javascript:..."
+                |
+                on[a-z]+ \s* = \s*   # onerror="..." onclick="..." onhover="..."
+            ) .*? >
+        /ix', '', $html);
+
+        return $html;
     }
 
     public function shutdown($lastMethod = null)
@@ -2236,7 +2257,7 @@ class BRouteNode extends BClass
 
     public function __destruct()
     {
-        unset($this->_observers, $this->_children, $this->_match);
+        unset($this->_observers);
     }
 }
 

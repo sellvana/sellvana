@@ -35,7 +35,11 @@ class Sellvana_Customer_Model_Address extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_customer_address';
     protected static $_origClass = __CLASS__;
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['customer_id', 'street1'],
+        'related'    => ['customer_id' => 'Sellvana_Customer_Model_Customer.id'],
+    ];
     protected static $_validationRules = [
         /*array('customer_id', '@required'),
         array('email', '@required'),*/

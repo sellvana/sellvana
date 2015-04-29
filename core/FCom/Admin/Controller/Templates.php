@@ -23,16 +23,16 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $config['edit_url_required'] = true;
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group',
+                'buttons' => [
+                    ['name' => 'edit', 'href' => $this->BApp->href('templates/form?id='), 'col' => 'view_name'],
+                    ['name' => 'delete', 'caption' => 'Remove/Revert']
+                ]
+            ],
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
             ['name' => 'view_name', 'label' => 'View Name', 'index' => 'view_name', 'width' => 100, 'overflow' => true],
             ['name' => 'file_ext', 'label' => 'File Ext.', 'index' => 'file_ext', 'width' => 50],
             ['name' => 'module_name', 'label' => 'Module', 'index' => 'module_name', 'width' => 100],
-            ['type' => 'btn_group',
-                  'buttons' => [
-                      ['name' => 'edit', 'href' => $this->BApp->href('templates/form?id='), 'col' => 'view_name'],
-                      ['name' => 'delete', 'caption' => 'Remove/Revert']
-                  ]
-            ],
         ];
 
         $config['state'] = ['s' => 'view_name'];
@@ -41,6 +41,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $data = [];
         foreach ($layout->getAllViews() as $view) {
             $row = [
+                'id' => md5(uniqid('templates_')),
                 'view_name' => $view->param('view_name'),
                 'file_ext' => $view->param('file_ext'),
                 'module_name' => $view->param('module_name'),
@@ -51,7 +52,6 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $config['data_mode'] = 'local';
         $config['filters'] = [
             ['field' => 'name', 'type' => 'text'],
-            ['field' => 'run_level_core', 'type' => 'multiselect']
         ];
         $config['actions'] = [
             'delete' => ['caption' => 'Remove/Revert'],

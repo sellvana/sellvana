@@ -1,6 +1,6 @@
 modules:
     Sellvana_VirtPackCoreEcom:
-        version: 0.2.0
+        version: 0.5.0.0
         channel: alpha
 
         require:
@@ -42,7 +42,7 @@ modules:
                 Sellvana_Referrals: 0.1.0
                 Sellvana_Sales: 0.1.0
                 Sellvana_SalesTax: 0.1.0
-                Sellvana_SampleData: 0.1.0
+                #Sellvana_SampleData: 0.1.0
                 Sellvana_Seo: 0.1.0
                 Sellvana_ShippingPlain: 0.1.0
                 Sellvana_ShippingUps: 0.1.0

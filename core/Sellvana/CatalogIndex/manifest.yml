@@ -1,7 +1,7 @@
 modules:
     Sellvana_CatalogIndex:
-        version: 0.2.2
-        channel: beta
+        version: 0.5.0.0
+        channel: alpha
         require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_CustomField: 0.1.4 } }
         description: "Catalog search and facets indexing engine"
         auto_use: [ bootstrap, views, layout ]
@@ -22,8 +22,6 @@ modules:
                     - [ /catalogindex/fields/.action, Sellvana_CatalogIndex_Admin_Controller_Fields ]
 
             FCom_Frontend:
-                routing:
-                    - [ /catalogindex/search, Sellvana_CatalogIndex_Frontend_Controller.search ]
-                override:
-                    class:
-                        - [ Sellvana_Catalog_Frontend_Controller_Search, Sellvana_CatalogIndex_Frontend_Controller ]
+                observe:
+                    - [ "Sellvana_Catalog_Frontend_Controller_Category::action_index:products_data", Sellvana_CatalogIndex_Frontend.onCategoryProductsData ]
+                    - [ "Sellvana_Catalog_Frontend_Controller_Search::action_index:products_data", Sellvana_CatalogIndex_Frontend.onSearchProductsData ]

@@ -33,7 +33,7 @@ class FCom_PushServer_Main extends BCLass
     public function catchAll($message)
     {
         if (!empty($message['seq'])) {
-            $this->FCom_PushServer_Model_Client->sessionClient()->send([
+            $this->FCom_PushServer_Model_Client->sessionClient(true)->send([
                 'ref_seq' => $message['seq'],
                 'signal' => 'received',
             ]);

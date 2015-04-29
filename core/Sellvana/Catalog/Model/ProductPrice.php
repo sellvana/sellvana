@@ -9,13 +9,25 @@
  * @property float $base_price
  * @property float $sale_price
  * @property int   $qty
+ *
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
 class Sellvana_Catalog_Model_ProductPrice
     extends FCom_Core_Model_Abstract
 {
     protected static $_table     = "fcom_product_price";
     protected static $_origClass = __CLASS__;
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['product_id', 'price_type', 'customer_group_id', 'site_id', 'currency_code','qty','variant_id','promo_id'],
+        'related'    => [
+            'product_id' => 'Sellvana_Catalog_Model_Product.id',
+            'customer_group_id' => 'Sellvana_CustomerGroups_Model_Group.id',
+            'site_id' => 'Sellvana_MultiSite_Model_Site.id',
+            'variant_id' => 'Sellvana_CustomField_Model_ProductVariant.id',
+            'promo_id' => 'Sellvana_Promo_Model_Promo.id'
+        ],
+    ];
     const TYPE_BASE = "base",
         TYPE_MAP = "map",
         TYPE_MSRP = "msrp",
@@ -61,7 +73,7 @@ class Sellvana_Catalog_Model_ProductPrice
                 ['value' => 'sale', 'label' => 'Sale'],
             ],
             "promo" => [
-                ['value' => 'catalog', 'label' => 'Catalog'],
+                ['value' => 'catalog', 'label' => 'Catalog Price'],
                 ['value' => 'cost', 'label' => 'Cost'],
                 ['value' => 'base', 'label' => 'Base'],
                 ['value' => 'sale', 'label' => 'Sale'],
@@ -127,7 +139,18 @@ class Sellvana_Catalog_Model_ProductPrice
             $orm->where('currency_code', $currency_code);
         }
 
-        $prices = $orm->order_by_asc("(case tp.price_type
+        $modHlp = $this->BModuleRegistry;
+        if ($modHlp->isLoaded('Sellvana_MultiSite')) {
+            $orm->order_by_asc('(ifnull(customer_group_id,0))');
+        }
+        if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
+            $orm->order_by_asc('(ifnull(site_id,0))');
+        }
+        if ($modHlp->isLoaded('Sellvana_MultiCurrency')) {
+            $orm->order_by_asc("(ifnull(currency_code,''))");
+        }
+
+        $priceModels = $orm->order_by_asc("(case tp.price_type
             when 'base'  then 1
             when 'cost'  then 2
             when 'map'   then 3
@@ -147,7 +170,8 @@ class Sellvana_Catalog_Model_ProductPrice
         //    }
         //}
 
-        return $prices? $this->BDb->many_as_array($prices): [];
+        $prices = $priceModels ? $this->BDb->many_as_array($priceModels) : [];
+        return $prices;
     }
 
     /**
@@ -211,6 +235,10 @@ class Sellvana_Catalog_Model_ProductPrice
 
     public function onBeforeSave()
     {
+        if (!parent::onBeforeSave()) {
+            return false;
+        }
+
         if ($this->get('sale_period')) {
             $salePeriod = explode(self::SALE_DATE_SEPARATOR, $this->get('sale_period'));
             $count      = count($salePeriod);
@@ -222,7 +250,7 @@ class Sellvana_Catalog_Model_ProductPrice
             }
         }
 
-        return parent::onBeforeSave();
+        return true;
     }
 
     public function onAfterLoad()
@@ -353,11 +381,20 @@ class Sellvana_Catalog_Model_ProductPrice
         return (null === $from || $from <= $date) && (null === $to || $to >= $date);
     }
 
-    public function getPrice($basePrice = null)
+    public function getPrice($basePrice = null, $currency = null)
     {
         $op = $this->get('operation');
+
         if (!$op || '=$' === $op) {
-            return $this->get('amount');
+            $amount = $this->get('amount');
+            if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+                $rate = $this->Sellvana_MultiCurrency_Main->getRate($currency, $this->get('currency_code'));
+                if ($rate && $rate != 1) {
+                    $amount *= $rate;
+                }
+            }
+            $amount = $this->BLocale->roundCurrency($amount);
+            return $amount;
         }
 
         if (!$this->_product) {
@@ -378,10 +415,14 @@ class Sellvana_Catalog_Model_ProductPrice
             if (!$baseModel) {
                 return null;
             }
-            $basePrice = $baseModel->getPrice();
+            $basePrice = $baseModel->getPrice(null, $currency);
         }
 
-        return $this->applyPriceOperation($basePrice, $this->get('amount'), $op);
+        $amount = $this->applyPriceOperation($basePrice, $this->get('amount'), $op);
+
+        $amount = $this->BLocale->roundCurrency($amount);
+
+        return $amount;
     }
 
     public function parseAndSaveDefaultPrices(Sellvana_Catalog_Model_Product $product)
@@ -398,16 +439,24 @@ class Sellvana_Catalog_Model_ProductPrice
                         $priceModel->delete();
                         continue;
                     }
+                    if ($f === 'sale') {
+                        $saleModel = $priceModel;
+                    }
                 } else {
                     $priceModel = $this->create([
                         'product_id' => $product->id(),
                         'price_type' => $f,
                     ]);
                 }
-                $priceModel->set($this->_parsePriceField($v))->save();
+                try {
+                    $priceModel->set($this->_parsePriceField($v))->save();
+                } catch(Exception $e) {
+                    $this->BDebug->logException($e); // probably should not stop import?
+                }
             }
         }
-        $tiers = $product->get('price.tiers');
+
+        $tiers = $product->get('price.tier');
         if ($tiers) {
             if (is_string($tiers)) {
                 $tiersArr = explode(';', $tiers);
@@ -435,13 +484,40 @@ class Sellvana_Catalog_Model_ProductPrice
                         'qty' => $tier,
                     ]);
                 }
-                $priceModels[$tier]->set($this->_parsePriceField($v))->save();
+                try {
+                    $priceModels[$tier]->set($this->_parsePriceField($v))->save();
+                } catch(Exception $e) {
+                    $this->BDebug->logException($e); // probably should not stop import?
+                }
+            }
+        }
+
+        $saleFrom = $product->get('price.sale.from_date');
+        $saleTo = $product->get('price.sale.to_date');
+        if ($saleFrom || $saleTo) {
+            if (empty($saleModel)) {
+                $saleModel = $this->orm()
+                    ->where('product_id', $product->id())->where('price_type', 'sale')->where_null('variant_id')
+                    ->where_null('site_id')->where_null('customer_group_id')->where_null('currency_code')
+                    ->find_one();
+            }
+            if ($saleModel) {
+                if ($saleFrom) {
+                    $saleFrom = new DateTime($saleFrom);
+                    $saleModel->set('valid_from', $saleFrom->format("Y-m-d"));
+                }
+                if ($saleTo) {
+                    $saleTo = new DateTime($saleTo);
+                    $saleModel->set('valid_to', $saleTo->format("Y-m-d"));
+                }
+                $saleModel->save();
             }
         }
     }
 
     protected function _parsePriceField($value)
     {
+        $value = strtolower($value);
         if (is_numeric($value)) {
             return [
                 'operation' => '=$',

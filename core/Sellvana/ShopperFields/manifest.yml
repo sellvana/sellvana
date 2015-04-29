@@ -1,13 +1,14 @@
 modules:
     Sellvana_ShopperFields:
-        version: 0.1.0
+        version: 0.5.0.0
+        channel: alpha
         require: { module: { Sellvana_Catalog: 0.3.2 } }
 
         areas:
             FCom_Frontend:
                 auto_use: [ views ]
                 observe:
-                    - [ "Sellvana_Sales_Workflow_Cart::customerAddsItemsToCart:calcDetails", Sellvana_ShopperFields_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
+                    - [ "Sellvana_Sales_Workflow_Cart::action_customerAddsItemsToCart:calcDetails", Sellvana_ShopperFields_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
 
             FCom_Admin:
                 auto_use: [ views, layout ]

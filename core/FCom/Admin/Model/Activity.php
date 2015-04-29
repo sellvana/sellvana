@@ -42,6 +42,15 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         ],
     ];
 
+    static protected $_importExportProfile = [
+        'skip'    => ['id'],
+        'related' => [
+            'action_user_id' => 'FCom_Admin_Model_User.id',
+            'customer_id'    => 'Sellvana_Customer_Model_Customer.id',
+            'order_id'       => 'Sellvana_Sales_Model_Order.id',
+        ]
+    ];
+
     static protected $_availableFilters = [];
 
     static protected $_permissionsCache = [];
@@ -195,21 +204,96 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function onBeforeSave()
+    public function addActivityItems($items)
     {
-        if (!parent::onBeforeSave()) return false;
-
-        $this->set('status', 'new', 'IFNULL');
-        $this->set('type', 'workflow', 'IFNULL');
-
-        if (($userId = $this->FCom_Admin_Model_User->sessionUserId())) {
-            $this->set('action_user_id', $userId, 'IFNULL');
+        if (!$items) {
+            return $this;
         }
-        /*
-        if (($custId = $this->Sellvana_Customer_Model_Customer->sessionUserId())) {
-            $this->set('customer_id', $userId, 'IFNULL');
+        $hashes = [];
+        foreach ($items as $i => $item) {
+            if (empty($item['hash'])) {
+                $hash = $items[$i]['hash'] = sha1(join('|', $this->BUtil->arrayMask($item, 'ts,content,feed,type,code')));
+            } else {
+                $hash = $item['hash'];
+            }
+            $hashes[$hash] = $i;
         }
-        */
-        return true;
+        $existing = $this->orm()
+            ->where_in('unique_hash', array_keys($hashes))->find_many_assoc('id', 'unique_hash');
+        if ($existing) {
+            foreach ($existing as $hash) {
+                unset($items[$hashes[$hash]]);
+            }
+        }
+        $result = [];
+        if ($items) {
+            $now = $this->BDb->now();
+            foreach ($items as $item) {
+                $data = $item;
+                unset($data['hash'], $data['feed'], $data['type'], $data['code'], $data['ts']);
+                $result[] = $this->create([
+                    'status' => 'new',
+                    'feed' => !empty($item['feed']) ? $item['feed'] : 'local',
+                    'type' => !empty($item['type']) ? $item['type'] : 'info',
+                    'event_code' => !empty($item['code']) ? $item['code'] : null,
+                    'unique_hash' => $item['hash'],
+                    'ts' => !empty($item['ts']) ? $item['ts'] : $now,
+                ])->setData($data)->save();
+            }
+        }
+        return $this;
+    }
+
+    public function getUserVisibleItems($userId = null)
+    {
+        if (!$userId) {
+            $userId = $this->FCom_Admin_Model_User->sessionUserId();
+        } else {
+            $userId = (int)$userId;
+        }
+
+        $items = $this->orm('a')->select('a.*')
+            ->where('a.status', 'new')
+            ->left_outer_join('FCom_Admin_Model_ActivityUser', "au.user_id={$userId} and au.activity_id=a.id
+                and au.alert_user_status in ('new', 'read')", 'au')
+            ->select('au.alert_user_status')
+            ->order_by_desc('ts')
+            ->find_many_assoc();
+
+        foreach ($items as $i => $item) {
+            if (is_array($item->getData('module'))) {
+                $remove = false;
+                foreach ($item->getData('module') as $modName => $cond) {
+                    $mod = $this->BModuleRegistry->module($modName);
+                    if (!$mod) {
+                        $remove = true;
+                        break;
+                    }
+                    if (!empty($conf['version']['include']) && !in_array($mod->version, $conf['version']['include'])) {
+                        $remove = true;
+                        break;
+                    }
+                    if (!empty($conf['version']['exclude']) && in_array($mod->version, $conf['version']['exclude'])) {
+                        $remove = true;
+                        break;
+                    }
+                    if (!empty($conf['version']['range'][0]) && version_compare($mod->version, $conf['version']['range'][0], '<')) {
+                        $remove = true;
+                        break;
+                    }
+                    if (!empty($conf['version']['range'][1]) && version_compare($mod->version, $conf['version']['range'][1], '>')) {
+                        $remove = true;
+                        break;
+                    }
+                }
+                if ($remove) {
+                    // Module version condition can change to positive after being negative
+                    #$item[$i]->set('status', 'dismissed')->save();
+                    unset($item[$i]);
+                }
+            }
+        }
+
+        return $items;
     }
 }
