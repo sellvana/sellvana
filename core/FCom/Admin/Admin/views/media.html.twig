@@ -68,22 +68,25 @@
         });
         var mediaLibGrid{{ config.id }};
 
-        //re-scan image button
-        $('#{{ config.id }}-attach_library').find('.btn-rescan-images').on('click', function () {
-            $.post('{{ APP.href("media/grid/rescan?folder=media") | raw }}', {do: 'rescan'}, function (response) {
-                if (response.status == 'success') {
-                    $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});
-                    mediaLibGrid{{ config.id }}.refresh();
-                } else {
-                    $.bootstrapGrowl("Error:<br>" + response.message, {
-                        type: 'danger',
-                        align: 'center',
-                        width: 'auto',
-                        delay: 5000
-                    });
-                }
+        window.registerGrid{{ config.id }} = function (grid) {
+            mediaLibGrid{{ config.id }} = grid;
+            //re-scan image button
+            $('#{{ config.id }}-attach_library').find('.btn-rescan-images').on('click', function () {
+                $.post('{{ APP.href("media/grid/rescan_library") | raw }}', {do: 'rescan_library'}, function (response) {
+                    if (response.status == 'success') {
+                        $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});
+                        mediaLibGrid{{ config.id }}.refresh();
+                    } else {
+                        $.bootstrapGrowl("Error:<br>" + response.message, {
+                            type: 'danger',
+                            align: 'center',
+                            width: 'auto',
+                            delay: 5000
+                        });
+                    }
+                });
             });
-        });
+        };
 
         window.gridShowMedia{{ config.id }} = function () {
             var mediaModal = $('#{{ config.id }}-upload-modal');
@@ -107,5 +110,36 @@
                 }
             }
         };
+
+        $uploader.bind('fileuploadalways', function (e, data) {
+            //console.log('DEBUG: fileuploadalways.data', data);
+
+            var mediaGrid = mediaLibGrid{{ config.id }};
+
+            if (mediaGrid) {
+                //push data to media grid after upload
+                if ($.isArray(data.result.files)) {
+                    var rows = [], selectedRows = [];
+                    data.result.files.forEach(function (obj) {
+                        {% if config.multiSelAllowed %}
+                        selectedRows.push(obj);
+                        {% endif %}
+
+                        rows.push(obj);
+
+                        $('td.name span').each(function (i) {
+                            if ($(this).html() === obj.file_name) {
+                                $(this).parents('tr:first').remove();
+                            }
+                        });
+                    });
+
+                    if (selectedRows.length) {
+                        mediaGrid.addSelectedRows(selectedRows);
+                    }
+                    mediaGrid.addRows(rows);
+                }
+            }
+        });
     });
 </script>

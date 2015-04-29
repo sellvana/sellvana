@@ -213,7 +213,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 //'afterMassDelete' => $id .'_afterMassDelete',
                 //callbacks for react griddle
                 'callbacks' => [
-                    //'componentDidMount' => 'registerGrid' . $id,
+                    'componentDidMount' => 'registerGrid' . $id,
                 ],
                 'actions' => [
                     'add-image' => [
@@ -412,18 +412,18 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             if (!$type) {
                 throw new BException("Missing upload type");
             }
-            $uploadConfig = $this->uploadConfig($type);
-            if (empty($uploadConfig)) {
+            $uploadConfigs = $this->uploadConfig($type);
+            if (empty($uploadConfigs)) {
                 throw new BException("Unknown upload type.");
             }
-            $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: false;// allow upload in case no permission is configured? Or deny?
+            $canUpload = isset($uploadConfigs['can_upload'])? $uploadConfigs['can_upload']: false;// allow upload in case no permission is configured? Or deny?
             $blacklistExt = [
                 'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
                 'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
             ];
 
-            if (isset($uploadConfig['filetype'])) { // todo figure out how to merge processed config file types
-                $fileTypes = explode(',', $uploadConfig['filetype']);
+            if (isset($uploadConfigs['filetype'])) { // todo figure out how to merge processed config file types
+                $fileTypes = explode(',', $uploadConfigs['filetype']);
                 if (empty($options['whitelist_ext'])) {
                     $options['whitelist_ext'] = $fileTypes;
                 } else {
@@ -613,6 +613,56 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 }
                 $this->BResponse->json(['status' => 'success']);
             } catch (Exception $e) {
+                $this->BResponse->json(['status' => 'error', 'messages' => $e->getMessage()]);
+            }
+            break;
+        case 'rescan_library':
+            try {
+                $uploadConfigs = $this->uploadConfig();
+
+                foreach ($uploadConfigs as $uc) {
+                    $folder = $this->_parseFolder($uc['folder']);
+                    $targetDirLocal = $targetDir . $folder;
+                    $fileSPLObjects = new RecursiveIteratorIterator(
+                        new RecursiveDirectoryIterator($targetDirLocal),
+                        RecursiveIteratorIterator::SELF_FIRST
+                    );
+                    $arrImages      = [];
+
+                    $records = $this->BDb->many_as_array($this->FCom_Core_Model_MediaLibrary->orm()
+                        ->select(['folder', 'subfolder', 'file_name'])
+                        ->where('folder', $folder)->find_many());
+
+                    /** @var SplFileInfo $fileSPLObject */
+                    foreach ($fileSPLObjects as $fullFileName => $fileSPLObject) {
+                        if ($fileSPLObject->isFile() && $fileSPLObject->isReadable() && @getimagesize($fullFileName)) {
+                            $fileName  = $fileSPLObject->getFilename();
+                            $path      = $fileSPLObject->getPath();
+                            $subFolder = null;
+                            if ($path != $targetDirLocal) {
+                                $path      = str_replace('\\', '/', $path);
+                                $subFolder = trim(str_replace($targetDirLocal . '/', '', $path));
+                                $subFolder = ltrim($subFolder, '/');
+                            }
+                            $tmp = ['folder' => $folder, 'subfolder' => $subFolder, 'file_name' => $fileName];
+                            if (!in_array($tmp, $records)) {
+                                array_push($arrImages, $tmp);
+                            }
+                        }
+                    }
+                    foreach ($arrImages as $arr) {
+                        $filePath = $targetDirLocal . '/';
+                        if($arr['subfolder']){
+                            $filePath .= $arr['subfolder'] . '/';
+                        }
+                        $filePath .= $arr['file_name'];
+
+                        $arr['file_size'] = filesize($filePath);
+                        $attModel->create($arr)->save();
+                    }
+                }
+                $this->BResponse->json(['status' => 'success']);
+            } catch(Exception $e) {
                 $this->BResponse->json(['status' => 'error', 'messages' => $e->getMessage()]);
             }
             break;
