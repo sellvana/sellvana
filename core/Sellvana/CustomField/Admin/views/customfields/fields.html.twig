@@ -2,30 +2,26 @@
 {% set fieldsConfig = fieldSetsCtrl.fieldsGridConfig() %}
 {% set optionsGridConfig = fieldSetsCtrl.optionsGridConfig() %}
 {% set optionsConfigCompiled = THIS.view('core/griddle').set('grid', optionsGridConfig).getGridConfig() %}
-<div class="f-admin-main-view">
-    <div class="page-header f-admin-page-header">
-        <h1 class="f-page-title">
-            {#<i class="icon-file"></i>#}
-            <span>{{ "Fields" |_ }}</span>
-        </h1>
-        <div class="btn-group">
-            <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a field" |_ }}</span></button>
-        </div>
-
-    </div>
-
-    <div class="f-admin-main">
-        {{ THIS.view('core/griddle').set('grid', fieldsConfig)| raw }}
-    </div>
-</div>
 
 <script>
-var fieldsGrid, fieldsNode, fieldsForm, optionsGrid, optionsNode, optionsForm, originOptionIds, removedOptionIds;
-window.fieldsGridRegister = function(grid) {
-    fieldsGrid = grid;
-    fieldsNode = $(fieldsGrid.getDOMNode());
-}
 require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, FComModalForm, Components) {
+    var optionsGrid, 
+        optionsNode, 
+        optionsForm,
+        optionsRows, 
+        originOptionIds, 
+        removedOptionIds;
+
+    var fieldsGrid, fieldsNode, fieldsForm;
+    window.fieldsGridRegister = function(grid) {
+        fieldsGrid = grid;
+        fieldsNode = $(fieldsGrid.getDOMNode());
+    }
+
+    window.optionsModalGridRegister = function(grid) {
+        optionsGrid = grid;
+        optionsNode = $(optionsGrid.getDOMNode());
+    }
 
     window.showModalToEditFields = function(row) {
         modalRender(row);
@@ -37,21 +33,31 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
      */
     window.showModalToAddField = function(grid) {
         modalRender();
-        optionsNode.find('#add_new_field').addClass('disabled');
     };
 
     window.saveFieldsModal = function(modal) {
-        var fieldsForm = $(modal.getDOMNode()).find('form'),
+        var fieldsForm = $(modal.getDOMNode()).find('form#fields-modal-form'),
+            optionsForm = $(modal.getDOMNode()).find('form#fields_options_form'),
             id = fieldsForm.find('#id').val(),
-            hash = { oper: id ? 'edit' : 'add' };
+            hash = { oper: id ? 'edit' : 'add', id: id },
+            url = fieldsGrid.getConfig('edit_url');
+            
         fieldsForm.find('textarea, input, select').each(function() {
             var key = $(this).attr('id');
             var val = $(this).val();
-            hash[key] = fieldsForm.html2text(val);
+            hash[key] = fieldsGrid.html2text(val);
         });
 
+        currentOptionIds = _.pluck(optionsGrid.getRows(), 'id');
+        removedOptionIds = _.difference(originOptionIds, currentOptionIds);
+        hash['rows'] = optionsGrid.getRows();
+        hash['rowsDelete'] = removedOptionIds;
+
         if (fieldsForm.valid() && optionsForm.valid()) {
-            
+            $.post(url, hash, function(data) {
+                fieldsGrid.refresh();
+                modal.close();
+            }, 'json');
         } else {
             //error
             console.log('form validated fail');
@@ -79,8 +85,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                                 var node = $(modal.getDOMNode());
                                 node.find('.modal-dialog').css('width', '900px');
                             },
-                            //onConfirm: window.saveFieldsModal
-                            onConfirm: fieldsGrid.saveModalForm
+                            onConfirm: window.saveFieldsModal
                         },
                         React.createElement("div", { className: "row f-grid-wrapper" }, React.createElement("div", { className: "tabbable" },
                                 React.createElement("ul", { className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
@@ -94,23 +99,35 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                                 React.createElement("div", { className: "tab-content" },
                                         React.createElement("div", { className: "tab-pane active", id: '{{ fieldsConfig.config.id }}_form_tab' }, React.createElement(FComModalForm, {columnMetadata: fieldsGrid.props.columnMetadata, id: fieldsGrid.getConfig('id'), row: row})
                                             ),
-                                        React.createElement("div", { className: "tab-pane", id: '{{ fieldsConfig.config.id }}_options_tab' })
+                                        React.createElement("div", { className: "tab-pane", id: '{{ fieldsConfig.config.id }}_options_tab' }, 
+                                                React.createElement("form", {id:'{{ fieldsConfig.config.id }}_options_form'})
+                                            )
                                 )
                         ))),
                 modalContainerEle);
         var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
-        var attachGridContainerEle = document.getElementById('{{ fieldsConfig.config.id }}_options_tab');
-        var instanceAttachGrid = React.render(
+        var attachGridContainerEle = document.getElementById('{{ fieldsConfig.config.id }}_options_form');
+
+        if (typeof row !== 'undefined' && typeof row === 'object') {
+            var getUrl = optionsConfigCompiled.dataUrl + row.id;
+            $.get(getUrl, function(data) {
+                if (typeof data[1] !== 'undefined') {
+                    originOptionIds = _.pluck(data[1], 'id');
+                    optionsGrid.addRows(data[1]);
+                }
+            }, 'json');
+        }
+
+        React.render(
                 React.createElement(FComGriddleComponent, { config: optionsConfigCompiled}),
                 attachGridContainerEle
         );
 
-        if (typeof instanceAttachGrid.refs[optionsConfigCompiled.id] !== 'undefined') {
-            optionsGrid = instanceAttachGrid.refs[optionsConfigCompiled.id];
+        if (row && row.admin_input_type == 'select') {
+            optionsNode.find('button#add_new_field').removeClass('disabled');
+        } else {
+            optionsNode.find('button#add_new_field').addClass('disabled');
         }
-
-        optionsNode = $(optionsGrid.getDOMNode());
-        optionsForm = optionsNode.find('form');
     }
 
     window.insertNewOption = function(grid) {
@@ -118,7 +135,25 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
     }
 
 });
+</script>
+<div class="f-admin-main-view">
+    <div class="page-header f-admin-page-header">
+        <h1 class="f-page-title">
+            {#<i class="icon-file"></i>#}
+            <span>{{ "Fields" |_ }}</span>
+        </h1>
+        <div class="btn-group">
+            <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a field" |_ }}</span></button>
+        </div>
 
+    </div>
+
+    <div class="f-admin-main">
+        {{ THIS.view('core/griddle').set('grid', fieldsConfig)| raw }}
+    </div>
+</div>
+
+<script>
 /* Backbone Grid Section */
 // require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
 //     var fieldsGrid, optionsGrid, selectedRow, originOptionIds, removedOptionIds;
@@ -126,8 +161,8 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 //     var fieldForm = $('#field-modal-form');
     
 //     window.optionsGridRegister = function(grid) {
-//     	optionsGrid = grid;
-//     	optionsGrid.build();
+//      optionsGrid = grid;
+//      optionsGrid.build();
 //     };
 
 //     window.fieldsGridRegister = function(grid) {
@@ -140,10 +175,10 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 //             } else {
 //                 $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
 //             }
-			
-//     		fieldsGrid.getModalForm().modalType = 'editable';
-//     		fieldsGrid.getGridSkeleton().currentRow = this.model;
-//     		fieldsGrid.getModalForm().render();
+            
+//          fieldsGrid.getModalForm().modalType = 'editable';
+//          fieldsGrid.getGridSkeleton().currentRow = this.model;
+//          fieldsGrid.getModalForm().render();
             
 //             optionsGrid.getRows().url = '{{ APP.href('customfields/fieldsets/field_option_grid_data?field_id=') | raw }}' + selectedRow.get('id');
 //             optionsGrid.getRows().fetch({
@@ -156,9 +191,9 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 //                     }
 //                 }
 //             });
-			
+            
 //             $('#field-modal-header').html(selectedRow.get('field_name'));
-// 			$('#btn-field-grid-modal').trigger('click');
+//          $('#btn-field-grid-modal').trigger('click');
 //         };
         
 //         fieldsGrid.getGridSkeleton().Views.ModalForm.prototype.el = '#field-modal-form';
@@ -171,9 +206,9 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 //     };
     
 //     $('#add_new_field').click(function () {
-//     	optionsGrid.getRows().reset();
-//     	optionsGrid.getGridView().clearSelectedRows();
-    	
+//      optionsGrid.getRows().reset();
+//      optionsGrid.getGridView().clearSelectedRows();
+        
 //         fieldsGrid.getModalForm().modalType = 'addable';
 //         fieldsGrid.getModalForm().render();
 //         $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
@@ -198,8 +233,8 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 //             fieldsGrid.getGridSkeleton().modalElementVals = {'rows': rows, 'rowsDelete': removedOptionIds};
 //             if (fieldsGrid.getModalForm().saveChanges()) {
 //                 selectedRow.set('num_options', optionsGrid.getRows().length);
-//             	selectedRow.trigger('render');
-//             	$('button.field-modal-close').trigger('click');
+//              selectedRow.trigger('render');
+//              $('button.field-modal-close').trigger('click');
 //             }
 //         }
 //     });
@@ -250,12 +285,12 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                     <div class='tab-content'>
                         <div class='tab-pane active' id='edit_field_set'>
                             <form class="form form-horizontal validate-form" id="field-modal-form" novalidate="novalidate">
-							</form>
+                            </form>
                         </div>
                         <div class='tab-pane' id='options'>
                             <form action="#" id="options-form">
-								{{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.optionsGridConfig()) | raw }}
-			                </form>
+                                {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.optionsGridConfig()) | raw }}
+                            </form>
                         </div>
                     </div>
                 </div>
