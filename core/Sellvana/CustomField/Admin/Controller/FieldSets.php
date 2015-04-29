@@ -249,9 +249,11 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
             'config' => [
                 'id' => 'options-grid',
                 'caption' => 'Fields',
+                'dataUrl' => $this->BApp->href('customfields/fieldsets/field_option_grid_data?field_id='),
                 'data_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
                 'edit_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
                 'data' => [],
+                'data_mode' => 'local',
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
@@ -275,6 +277,9 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                         'callback' => 'insertNewOption',
                     ],
                     'delete' => ['caption' => 'Remove', 'confirm' => false]
+                ],
+                'callbacks' => [
+                    'componentDidMount' => 'optionsModalGridRegister'
                 ],
                 'grid_before_create' => 'optionsGridRegister',
                 //'after_modalForm_render' => 'optionsGridRendered'

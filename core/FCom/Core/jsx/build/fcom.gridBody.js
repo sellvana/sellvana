@@ -126,7 +126,8 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 //set default value
                 if (defaultValues.length) {
                     _.forEach(defaultValues, function(value) {
-                        row[value.name] = value.default;
+                        if (typeof row[value.name] === 'undefined')
+                            row[value.name] = value.default;
                     });
                 }
 
