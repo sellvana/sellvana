@@ -1,0 +1,184 @@
+{% set config = THIS.get('config') %}
+{% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
+{% set uploadConfig = mediaLib.uploadConfig(config.type) %}
+{% set mediaLibAttachConfig = mediaLib.gridConfig({'id': config.id, 'folder': uploadConfig.folder, 'config': config.config, 'mode': config.mode}) %}
+
+{# need to processe config by class FCom_Core_View_BackboneGrid #}
+{% set mediaLibAttachConfigProcessed = THIS.view('core/griddle').set('grid', mediaLibAttachConfig).getGridConfig() %}
+
+<div id="{{ config.id }}-media-modal-container"></div>
+
+<script type="text/javascript">
+    /**
+     * variable contains React component media library
+     */
+    var mediaLibComponent{{ config.id }};
+    var mediaLibGrid{{ config.id }};
+
+    /**
+     * global media modal config, need to use as javascript instead php twig, because we need to pass onConfirm function
+     * todo: need to find the better way
+     */
+    var mediaModalConfig = {};
+    /**
+     *
+     * @param id
+     * @param config
+     */
+    function setMediaModalConfig(id, config) {
+        mediaModalConfig[id] = config;
+    }
+    /**
+     *
+     * @param id
+     * @returns {*}
+     */
+    function getMediaModalConfig(id) {
+        if (typeof mediaModalConfig[id] != 'undefined') {
+            return mediaModalConfig[id];
+        }
+        return null;
+    }
+
+    require(['underscore', 'react', 'griddle.fcomMediaLib'], function(_, React, FComMediaLib) {
+        var mediaGridId = '{{ config.id }}';
+        var mediaConfig = {{ UTIL.toJSON(mediaLibAttachConfigProcessed) | raw }};
+        var uploadConfig = {{ UTIL.toJSON(uploadConfig) | raw }};
+        var modalConfig = getMediaModalConfig(mediaGridId);
+
+        var modalEle = document.getElementById(mediaGridId + '-media-modal-container');
+        mediaLibComponent{{ config.id }} = React.render(React.createElement(FComMediaLib, { mediaConfig: mediaConfig, uploadConfig: uploadConfig, modalConfig: modalConfig}), modalEle);
+        mediaLibGrid{{ config.id }} = mediaLibComponent{{ config.id }}.getMainGridComponent();
+
+        //re-scan image button
+        $(mediaLibComponent{{ config.id }}.getDOMNode()).find('.btn-rescan-images').on('click', function() {
+            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}', { do: 'rescan'}, function (response) {
+                if (response.status == 'success') {
+                    $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
+                    mediaLibGrid{{ config.id }}.refresh();
+                } else {
+                    $.bootstrapGrowl("Error:<br>" + response.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                }
+            });
+        });
+    });
+
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
+        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
+        $('#{{config.id}}-media-upload').fileupload({
+            url: uploadUrl,
+            multiple: true
+            {% if config.mode and config.mode == 'thumbnail' %}
+            , acceptFileTypes: /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i
+            {% elseif uploadConfig.filetype_regex %}
+            , acceptFileTypes: {{ uploadConfig.filetype_regex }}
+            {% endif %}
+        }).bind('fileuploadalways', function(e, data) {
+            //console.log('DEBUG: fileuploadalways.data', data);
+
+            var mediaGrid = mediaLibGrid{{ config.id }};
+
+            if (mediaGrid) {
+                //push data to media grid after upload
+                if ($.isArray(data.result.files)) {
+                    var rows = [], selectedRows =[];
+                    data.result.files.forEach(function (obj) {
+                        {% if config.multiSelAllowed %}
+                        selectedRows.push(obj);
+                        {% endif %}
+
+                        rows.push(obj);
+
+                        $('td.name span').each(function(i) {
+                            if($(this).html() === obj.file_name) {
+                                $(this).parents('tr:first').remove();
+                            }
+                        });
+                    });
+
+                    if (selectedRows.length) {
+                        mediaGrid.addSelectedRows(selectedRows);
+                    }
+                    mediaGrid.addRows(rows);
+                }
+            }
+        });
+    });
+</script>
+
+<script>
+    var uploadTr = '{{ 'Upload'|_ }}';
+    var errorTr = '{{ 'Error'|_ }}';
+    var cancelTr = '{{ 'Cancel'|_ }}';
+</script>
+
+{% verbatim %}
+<script id="template-upload" type="text/x-tmpl">
+{% for (var i=0, file; file=o.files[i]; i++) { %}
+    <tr class="template-upload fade">
+        <td class="preview"><span class="fade"></span></td>
+        <td class="name"><span>{%=file.name%}</span></td>
+        <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+        {% if (file.error) { %}
+            <td class="error" colspan="2"><span class="label label-important">{%=errorTr%}</span> {%=file.error%}</td>
+        {% } else if (o.files.valid && !i) { %}
+        <td>
+            <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="bar" style="width:0%;"></div>
+            </div>
+        </td>
+        <td>
+            {% if (!o.options.autoUpload) { %}
+                <button class="btn btn-primary start">
+                    <i class="icon-upload icon-white"></i>
+                    <span>{%=uploadTr%}</span>
+                </button>
+            {% } %}
+        </td>
+        {% } else { %}
+            <td colspan="2"></td>
+        {% } %}
+        <td>
+           {% if (!i) { %}
+            <button class="btn btn-warning cancel">
+                <i class="icon-ban-circle icon-white"></i>
+                <span>{%=cancelTr%}</span>
+            </button>
+            {% } %}
+        </td>
+    </tr>
+{% } %}
+</script>
+<!-- The template to display files available for download -->
+
+<script id="template-download" type="text/x-tmpl">
+    {% for (var i=0, file; file=o.files[i]; i++) { %}
+        <tr class="template-download fade">
+           {% if (file.error) { %}
+                <td></td>
+                <td class="name"><span>{%=file.name%}</span></td>
+                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                <td class="error" colspan="2"><span class="label label-important">{%=errorTr%}</span> {%=file.error%}</td>
+            {% } else { %}
+                <td class="preview">
+                {% if (file.thumbnail_url) { %}
+                    <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="gallery" download="{%=file.name%}">
+                        <img src="{%=file.thumbnail_url%}">
+                    </a>
+                {% } %}
+                </td>
+                <td class="name">
+                    <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">
+                        {%=file.name%}
+                    </a>
+                </td>
+                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                <td colspan="2"></td>
+            {% } %}
+            <td>
+                <input type="checkbox" name="delete" value="1" class="toggle">
+            </td>
+        </tr>
+    {% } %}
+</script>
+{% endverbatim %}

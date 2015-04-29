@@ -1,10 +1,11 @@
 {% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
 {% set customer = APP.instance('Sellvana_Customer_Model_Customer').sessionUser() %}
-{% set validator = THIS.validator(type ~ '-form', cart) %}
+{% set validator = THIS.validator('shipping-form', cart) %}
 
 <div class="row">
     <div class="col-md-9">
-        <form action="{{ APP.href('checkout/step1') }}" method="post" id="{{ type }}-form" role="form">
+        {{ THIS.view('core/messages') | raw }}
+        <form action="{{ APP.href('checkout/step1') }}" method="post" id="shipping-form" role="form">
             <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
             <input type="hidden" name="checkout_step" value="1">
 

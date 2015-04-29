@@ -41,14 +41,32 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select',
                         'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => 'Yes', 0 => 'No'], 'default' => 1],
                     ['type' => 'input', 'name' => 'options', 'label' => 'Options', 'width' => 200, 'editable' => 'inline',
-                        'addable' => true],
+                        'addable' => true, 'validation' => ['required' => true]],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 200, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true]],
                     ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
                 ],
+                'filters' => [
+                    ['field' => 'name', 'type' => 'text'],
+                    ['field' => 'label', 'type' => 'text'],
+                    ['field' => 'input_type', 'type' => 'multiselect'],
+                    ['field' => 'required', 'type' => 'multiselect'],
+                    ['field' => 'options', 'type' => 'text']
+                ],
                 'actions' => [
                     'new' => ['caption' => 'Add Fields'],
+                    /*'add-blank-row' => [
+                        'caption'  => 'Add Fields',
+                        'type'     => 'button',
+                        'id'       => 'add-blank-row',
+                        'class'    => 'btn-primary',
+                        'callback' => 'addBlankRows'
+                    ],*/
                     'delete' => ['caption' => 'Remove']
+                ],
+                'callbacks' => [
+                    'componentDidMount' => 'fieldsGridRegister',
+                    //'componentDidUpdate' => 'fieldsGridRegister',
                 ],
                 'grid_before_create' => 'frontendFieldGridRegister'
             ]

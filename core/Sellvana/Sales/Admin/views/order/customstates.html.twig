@@ -1,0 +1,46 @@
+{% set orderCustomStateCtrl = APP.instance('Sellvana_Sales_Admin_Controller_OrderStateCustom') %}
+{% set orderCustomStateConfig = orderCustomStateCtrl.gridConfig() %}
+
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, FComGridBody, FComModalForm, Components) {
+
+        var mainGridId = '{{ orderCustomStateConfig.config.id }}';
+        var mainGrid, mainConfig;
+
+        /**
+         * callback function for top action to show modal to add products
+         * @param that
+         * @param form
+         */
+        window.showModalToAddStateCustom = function(that) {
+            mainGrid = that.props.getCurrentGrid();
+            mainConfig = {{ UTIL.toJson(orderCustomStateConfig.config) | raw }};
+            var modalContainerEle = document.getElementById('{{ orderCustomStateConfig.config.id }}-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "addStateCustomModal",
+                        show: true,
+                        title: '{{ orderCustomStateConfig.config.caption }}',
+                        confirm: 'Add',
+                        cancel: 'Close',
+                        onLoad: function(modal) {
+                            var node = $(modal.getDOMNode());
+                            node.find('.modal-dialog').css('width', '900px');
+                        },
+                        onConfirm: that.props.saveModalForm
+                    },
+                    React.createElement("div", { className: "row f-grid-wrapper" }, React.createElement("div", { className: "tabbable" },
+                        React.createElement("ul", { className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
+                            React.createElement("li", { className: "active" },
+                                React.createElement("a", { "data-toggle": "tab", href: "#{{mainConfig.id}}-form" }, '{{ orderCustomStateConfig.config.caption }}')
+                            )
+                        ),
+                        React.createElement("div", { className: "tab-content" },
+                            React.createElement("div", { className: "tab-pane active", id: "{{mainConfig.id}}-form" },
+                                React.createElement(FComModalForm, {columnMetadata: that.props.columnMetadata, id: that.props.getConfig('id')}))
+                        )
+                    ))), modalContainerEle);
+        };
+    });
+</script>

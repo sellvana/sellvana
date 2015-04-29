@@ -9,9 +9,12 @@
 
 class Sellvana_Email_Migrate extends BClass
 {
-    public function install__0_1_2()
+    public function install__0_1_3()
     {
-        $this->BDb->ddlTableDef($this->Sellvana_Email_Model_Pref->table(), [
+        $tPref = $this->Sellvana_Email_Model_Pref->table();
+        $tMessage = $this->Sellvana_Email_Model_Message->table();
+
+        $this->BDb->ddlTableDef($tPref, [
             BDb::COLUMNS => [
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'email' => 'varchar(100)  NOT NULL',
@@ -20,14 +23,15 @@ class Sellvana_Email_Migrate extends BClass
                 'create_at' => 'datetime NOT NULL',
                 'update_at' => 'datetime NOT NULL',
             ],
-            BDb::PRIMARY => '(`id`)',
+            BDb::PRIMARY => '(id)',
             BDb::KEYS => [
-                'email' => 'UNIQUE (`email`)',
+                'email' => 'UNIQUE (email)',
             ],
         ]);
-        $this->BDb->ddlTableDef($this->Sellvana_Email_Model_Message->table(), [
+        $this->BDb->ddlTableDef($tMessage, [
             BDb::COLUMNS => [
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
+                'view_name' => 'varchar(255) default null',
                 'recipient' => 'varchar(100) NOT NULL',
                 'subject' => 'varchar(255) NOT NULL',
                 'body' => 'MEDIUMTEXT',
@@ -38,16 +42,19 @@ class Sellvana_Email_Migrate extends BClass
                 'create_at' => 'datetime NOT NULL',
                 'resent_at' => 'datetime NULL',
             ],
-            BDb::PRIMARY => '(`id`)',
+            BDb::PRIMARY => '(id)',
             BDb::KEYS => [
-                'recipient' => '(`recipient`)',
+                'recipient' => '(recipient)',
+                'IDX_view_name' => '(view_name)',
             ],
         ]);
     }
 
     public function upgrade__0_1_0__0_1_1()
     {
-        $this->BDb->ddlTableDef($this->Sellvana_Email_Model_Message->table(), [
+        $tMessage = $this->Sellvana_Email_Model_Message->table();
+
+        $this->BDb->ddlTableDef($tMessage, [
             BDb::COLUMNS => [
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'recipient' => 'varchar(100) NOT NULL',
@@ -60,27 +67,41 @@ class Sellvana_Email_Migrate extends BClass
                 'create_dt' => 'datetime NOT NULL',
                 'resent_dt' => 'datetime NULL',
             ],
-            BDb::PRIMARY => '(`id`)',
+            BDb::PRIMARY => '(id)',
             BDb::KEYS => [
-                'recipient' => '(`recipient`)',
+                'recipient' => '(recipient)',
             ],
         ]);
     }
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $table = $this->Sellvana_Email_Model_Message->table();
-        $this->BDb->ddlTableDef($table, [
+        $tPref = $this->Sellvana_Email_Model_Pref->table();
+        $tMessage = $this->Sellvana_Email_Model_Message->table();
+
+        $this->BDb->ddlTableDef($tMessage, [
             BDb::COLUMNS => [
-                  'create_dt'      => 'RENAME create_at datetime NOT NULL',
-                  'resent_dt'      => 'RENAME resent_at datetime NULL',
+                  'create_dt' => 'RENAME create_at datetime NOT NULL',
+                  'resent_dt' => 'RENAME resent_at datetime NULL',
             ],
         ]);
-        $table = $this->Sellvana_Email_Model_Pref->table();
-        $this->BDb->ddlTableDef($table, [
+        $this->BDb->ddlTableDef($tPref, [
             BDb::COLUMNS => [
-                  'create_dt'      => 'RENAME create_at datetime NOT NULL',
-                  'update_dt'      => 'RENAME update_at datetime NOT NULL',
+                  'create_dt' => 'RENAME create_at datetime NOT NULL',
+                  'update_dt' => 'RENAME update_at datetime NOT NULL',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_2__0_1_3()
+    {
+        $tMessage = $this->Sellvana_Email_Model_Message->table();
+        $this->BDb->ddlTableDef($tMessage, [
+            BDb::COLUMNS => [
+                'view_name' => 'varchar(255) default null',
+            ],
+            BDb::KEYS => [
+                'IDX_view_name' => '(view_name)',
             ],
         ]);
     }

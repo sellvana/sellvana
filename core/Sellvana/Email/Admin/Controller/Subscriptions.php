@@ -33,7 +33,7 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
-//            'new' => array('caption' => 'New Email Subscription', 'modal' => true),
+            'new' => array('caption' => 'New Email Subscription', 'modal' => true),
             'export' => true,
             'edit'   => true,
             'delete' => true

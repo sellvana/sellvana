@@ -4,13 +4,80 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
+{% set productClasses = APP.instance('Sellvana_SalesTax_Model_ProductClass').getAllTaxClasses() %}
+{% set customerClasses = APP.instance('Sellvana_SalesTax_Model_CustomerClass').getAllTaxClasses() %}
+{% set zones = APP.instance('Sellvana_SalesTax_Model_Zone').getAllZones() %}
+
+{% set currentProductClasses = m.getProductClassIds() %}
+{% set currentCustomerClasses = m.getCustomerClassIds() %}
+{% set currentZones = m.getZoneIds() %}
+
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
-    <div class="f-section">
+    <div class="f-section" id="salestax-rules">
         {{ forms.input(fieldData, {field:'title', required:1, label:'Title'|_}) }}
-        {{ forms.boolean(fieldData, {field:'match_all_product_classes', label:'Match All Product Classes'}) }}
-        {{ forms.boolean(fieldData, {field:'match_all_customer_classes', label:'Match All Customer Classes'}) }}
-        {{ forms.boolean(fieldData, {field:'match_all_zones', label:'Match All Zones'}) }}
+        {{ forms.input(fieldData, {field:'rule_rate_percent', label:'Rule Rate'|_, type:'number', help_block_text: 'Rule rate as percent'|_}) }}
+        {{ forms.input(fieldData, {field:'fpt_amount', label:'Fixed Product Tax Amount'|_, type:'number', attr:{step: '0.01'}}) }}
+        {{ forms.input(fieldData, {field:'sort_order', label:'Sort Order'|_, type: 'number'}) }}
+
+        {{ forms.boolean(fieldData, {field:'match_all_product_classes', id:'match_all_product_classes', label:'Match All Product Classes'}) }}
+        {{ forms.select(fieldData, {id: 'product_classes',field: 'product_classes', label:'Product Classes'|_, multiple:1, disabled: 1, select2: 1, options: productClasses, value: currentProductClasses}) }}
+
+        {{ forms.boolean(fieldData, {field:'match_all_customer_classes', id:'match_all_customer_classes', label:'Match All Customer Classes'}) }}
+        {{ forms.select(fieldData, {id: 'customer_classes',field: 'customer_classes', label:'Customer Classes'|_, multiple: 1, disabled: 1, select2: 1, options: customerClasses, value: currentCustomerClasses}) }}
+
+        {{ forms.boolean(fieldData, {field:'match_all_zones', id:'match_all_zones', label:'Match All Zones'}) }}
+        {{ forms.select(fieldData, {id: 'zones',field: 'zones', label:'Tax Zones'|_, multiple: 1, disabled: 1, select2: 1, options: zones, value: currentZones}) }}
+
+        {{ forms.boolean(fieldData, {field:'apply_to_shipping', label:'Apply To Shipping'}) }}
     </div>
 </fieldset>
+
+
+<script type="text/javascript">
+    require(['jquery'], function ($) {
+        var $zonesAll = $('#match_all_zones'), $productClassesAll = $('#match_all_product_classes'), $custClassesAll = $('#match_all_customer_classes');
+        var $zones = $('#zones'), $productClasses = $('#product_classes'), $custClasses = $('#customer_classes');
+
+        function toggleZones() {
+            if ($zonesAll.val() == 1) {
+                $zones.attr('disabled', true).parents('.form-group').hide();
+            } else {
+                $zones.attr('disabled', false).parents('.form-group').show();
+            }
+        }
+
+        function toggleProductClasses() {
+            if ($productClassesAll.val() == 1) {
+                $productClasses.attr('disabled', true).parents('.form-group').hide();
+            } else {
+                $productClasses.attr('disabled', false).parents('.form-group').show();
+            }
+        }
+
+        function toggleCustomerClasses() {
+            if ($custClassesAll.val() == 1) {
+                $custClasses.attr('disabled', true).parents('.form-group').hide();
+            } else {
+                $custClasses.attr('disabled', false).parents('.form-group').show();
+            }
+        }
+
+        toggleZones();
+        toggleProductClasses();
+        toggleCustomerClasses();
+        $zonesAll.on('change', function (e) {
+            toggleZones();
+        });
+
+        $productClassesAll.on('change', function (e) {
+            toggleProductClasses();
+        });
+
+        $custClassesAll.on('change', function (e) {
+            toggleCustomerClasses();
+        });
+
+    });
+</script>

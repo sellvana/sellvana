@@ -67,7 +67,16 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     public function urlPrefix()
     {
         if (empty(static::$_urlPrefix)) {
-            static::$_urlPrefix = $this->BConfig->get('modules/Sellvana_Catalog/url_prefix');
+            $prefix = $this->BConfig->get('modules/Sellvana_Catalog/url_prefix');
+            switch ($this->BConfig->get('web/language_in_url')) {
+                case 'lang':
+                    $prefix .= $this->BLocale->getCurrentLanguage() . '/';
+                    break;
+                case 'locale':
+                    $prefix .= $this->BLocale->getCurrentLocale() . '/';
+                    break;
+            }
+            static::$_urlPrefix = $prefix;
         }
         return static::$_urlPrefix;
     }
@@ -352,8 +361,10 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         foreach ($relations as $k => $v) {
             $model = $toUpdate[$k];
             foreach ($v as $field => $r) {
-                $rel = $relatedData[$r];
-                $model->set($field, $rel->get('local_id'));
+                if (!empty($relatedData[$r])) {
+                    $rel = $relatedData[$r];
+                    $model->set($field, $rel->get('local_id'));
+                }
             }
         }
 

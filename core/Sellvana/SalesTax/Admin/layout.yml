@@ -11,3 +11,4 @@ base:
     - view: settings
         do:
             - [ addTab, Sellvana_SalesTax, { label: Sales Tax, group: sales, pos: 20, async: true } ]
+

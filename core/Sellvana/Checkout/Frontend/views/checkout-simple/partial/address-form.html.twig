@@ -9,20 +9,20 @@
         <div class="form-group col-sm-6">
             {% set field = type ~ '_firstname' %}
             <label for="{{ field }}" class="control-label required">{{ "First name" |_ }}</label>
-            <input type="text" name="{{ type }}[firstname]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            <input type="text" name="{{ type }}[firstname]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" required class="required {{ validator.fieldClass(field) }} form-control">
             {{ validator.errorHtml(field, field) | raw }}
         </div>
         <div class="form-group col-sm-6">
             {% set field = type ~ '_lastname' %}
             <label for="{{ field }}" class="control-label required">{{ "Last name" |_ }}</label>
-            <input type="text" name="{{ type }}[lastname]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            <input type="text" name="{{ type }}[lastname]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" required class="required {{ validator.fieldClass(field) }} form-control">
             {{ validator.errorHtml(field, field) | raw }}
         </div>
     </div>
     <div class="form-group">
         {% set field = type ~ '_street1' %}
         <label for="{{ field }}" class="control-label required">{{ "Street 1" |_ }}</label>
-        <input type="text" name="{{ type }}[street1]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+        <input type="text" name="{{ type }}[street1]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" required class="required {{ validator.fieldClass(field) }} form-control">
         {{ validator.errorHtml(field, field) | raw }}
     </div>
     <div class="form-group">
@@ -35,7 +35,7 @@
         <div class="form-group col-sm-6">
             {% set field = type ~ '_city' %}
             <label for="{{ field }}" class="control-label required">{{ "City" |_ }}</label>
-            <input type="text" name="{{ type }}[city]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            <input type="text" name="{{ type }}[city]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" required class="required {{ validator.fieldClass(field) }} form-control">
             {{ validator.errorHtml(field, field) | raw }}
         </div>
 
@@ -46,7 +46,7 @@
             <label for="{{ field }}" class="control-label required">{{ "Country" |_ }}</label>
             {% set countries = THIS.get('countries') %}
             {% set defC = validator.fieldValue(field) %}
-            <select class="geo-country required {{ validator.fieldClass(field) }} form-control" name="{{ type }}[country]" id="{{ field }}">
+            <select required class="geo-country required {{ validator.fieldClass(field) }} form-control" name="{{ type }}[country]" id="{{ field }}">
                 <option value="">{{ "Select an option" |_ }}</option>
                 {% for iso, country in countries %}
                     <option value="{{ iso }}" {{ defC == iso ? "selected" }}>{{ country }}</option>
@@ -59,7 +59,7 @@
         <div class="form-group col-sm-6">
             {% set field = type ~ '_region' %}
             <label for="{{ field }}" class="control-label required">{{ "Region" |_ }}</label>
-            <select class="geo-region required {{ validator.fieldClass(field) }} form-control" style="display: none" name="{{ type }}[region]" id="{{ field }}">
+            <select required class="geo-region required {{ validator.fieldClass(field) }} form-control" style="display: none" name="{{ type }}[region]" id="{{ field }}">
                 <option value="">{{ "Select an option" |_ }}</option>
             </select>
             <input type="text" class="geo-region required {{ validator.fieldClass(field) }} form-control" name="{{ type }}[region]" id="{{ field }}" value="{{ validator.fieldValue(field) }}"/>
@@ -68,7 +68,7 @@
         <div class="form-group col-sm-6">
             {% set field = type ~ '_postcode' %}
             <label for="{{ field }}" class="control-label required">{{ "Zip / Postal Code" |_ }}</label>
-            <input type="text" name="{{ type }}[postcode]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            <input type="text" name="{{ type }}[postcode]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" required class="required {{ validator.fieldClass(field) }} form-control">
             {{ validator.errorHtml(field, field) | raw }}
         </div>
     </div>
@@ -77,7 +77,7 @@
         <div class="form-group col-sm-6">
             {% set field = type ~ '_phone' %}
             <label for="{{ field }}" class="control-label required">{{ "Phone" |_ }}</label>
-            <input type="text" name="{{ type }}[phone]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            <input type="text" name="{{ type }}[phone]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" required class="required {{ validator.fieldClass(field) }} form-control">
             {{ validator.errorHtml(field, field) | raw }}
         </div>
     </div>

@@ -71,7 +71,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     public function getIeConfig($model)
     {
 
-        $config                         = parent::gridConfig();
+        $config                       = parent::gridConfig();
         $config['id']                 = 'role_all_ie_perm_grid_' . $model->id();
         $config['data_mode']          = 'local';
         $config['columns']            = [
@@ -83,6 +83,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 'width'    => 100,
                 'editable' => 'inline',
                 'editor'   => 'checkbox',
+                'cssClass' => 'role-ie',
             ],
             [
                 'type'     => 'input',
@@ -91,47 +92,51 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 'width'    => 100,
                 'editable' => 'inline',
                 'editor'   => 'checkbox',
+                'cssClass' => 'role-ie',
             ],
         ];
         $config['actions']            = [
-            'add' => ['caption' => 'Add selected models']
+            //'add' => ['caption' => 'Add selected models']
         ];
         $config['filters']            = [
             ['field' => 'permission_name', 'type' => 'text'],
         ];
         $config['events']             = ['add'];
         $config['grid_before_create'] = 'iePermGridRegister';
-
-        $data                      = $this->FCom_Core_ImportExport->collectExportableModels();
-        $permissions               = array_flip(explode("\n", $model->get('permissions_data')));
-        $default                   = [
+        $config['callbacks']          = [
+            'componentDidMount'  => 'iePermGridRegister',
+            'componentDidUpdate' => 'iePermGridRegister'
+        ];
+        $data                         = $this->FCom_Core_ImportExport->collectExportableModels();
+        $permissions                  = array_flip(explode("\n", $model->get('permissions_data')));
+        $default                      = [
             'permission_name' => '',
             'import'          => 0,
             'export'          => 0,
             'parent'          => null,
             'children'        => []
         ];
-        $fcom                      = $default;
-        $fcom['id']              = 'FCom';
-        $fcom['permission_name'] = 'FCom';
-        $gridData                  = ['FCom' => $fcom];
+        $fcom                     = $default;
+        $fcom['id']               = 'FCom';
+        $fcom['permission_name']  = 'FCom';
+        $gridData                 = ['FCom' => $fcom];
         foreach ($data as $id => $d) {
             $module = explode('_', $id, 3);
             array_splice($module, 2);
             $module = join('_', $module);
             if (!isset($gridData[$module])) {
-                $mod                                 = $default;
-                $mod['id']                         = $module;
-                $mod['permission_name']            = $module;
-                $mod['parent']                     = 'FCom';
-                $gridData[$module]                 = $mod;
+                $mod                            = $default;
+                $mod['id']                      = $module;
+                $mod['permission_name']         = $module;
+                $mod['parent']                  = 'FCom';
+                $gridData[$module]              = $mod;
                 $gridData['FCom']['children'][] = $module;
             }
-            $obj                                  = $default;
-            $obj['id']                          = $id;
-            $obj['permission_name']             = $id;
-            $obj['parent']                      = $module;
-            $gridData[$id]                      = $obj;
+            $obj                             = $default;
+            $obj['id']                       = $id;
+            $obj['permission_name']          = $id;
+            $obj['parent']                   = $module;
+            $gridData[$id]                   = $obj;
             $gridData[$module]['children'][] = $id;
         }
 

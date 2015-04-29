@@ -12,6 +12,15 @@ class Sellvana_Wishlist_Model_WishlistItem extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_wishlist_items';
     protected static $_origClass = __CLASS__;
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['wishlist_id', 'product_id'],
+        'related'    => [
+            'wishlist_id' => 'Sellvana_Wishlist_Model_Wishlist.id',
+            'product_id'  => 'Sellvana_Catalog_Model_Product.id'
+        ],
+    ];
+
     protected $_product;
 
     /**

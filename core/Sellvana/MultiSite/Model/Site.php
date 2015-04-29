@@ -27,6 +27,12 @@ class Sellvana_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         ['root_category_id', '@integer'],
     ];
 
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['name', 'root_category_id'],
+        'related'    => ['root_category_id' => 'Sellvana_Catalog_Model_Category.id'],
+    ];
+
     public function onAfterSave()
     {
         parent::onAfterSave();
@@ -44,7 +50,10 @@ class Sellvana_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         $map = [];
         $sites = (array)$this->orm()->find_many();
         foreach ($sites as $site) {
-            $domains = explode("\n", $site->match_domains);
+            if (!$site->get('match_domains')) {
+                continue;
+            }
+            $domains = explode("\n", $site->get('match_domains'));
             foreach ($domains as $pattern) {
                 if (empty($pattern)) {
                     continue;
@@ -54,7 +63,7 @@ class Sellvana_MultiSite_Model_Site extends FCom_Core_Model_Abstract
                 } else {
                     $regex = str_replace('*', '.*', str_replace('.', '\\.', strtolower($pattern)));
                 }
-                $map[$regex] = $site->as_array();
+                $map[$regex] = $site->id();
             }
         }
         $this->BCache->save(static::$_mapCacheKey, $map, false);
@@ -67,7 +76,7 @@ class Sellvana_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     public function getDomainMap()
     {
         $map = $this->BCache->load(static::$_mapCacheKey);
-        if (!$map) {
+        if (null === $map) {
             $map = $this->createDomainMap();
         }
         return $map;
@@ -77,21 +86,21 @@ class Sellvana_MultiSite_Model_Site extends FCom_Core_Model_Abstract
      * @param null $domain
      * @return null
      */
-    public function findByDomain($domain = null)
+    public function findIdByDomain($domain = null)
     {
         if (null === $domain) {
             $domain = $this->BRequest->httpHost(false);
         }
         $domain = strtolower($domain);
         $map = (array)$this->getDomainMap();
-        $site = null;
-        foreach ($map as $pattern => $siteData) {
+        $siteId = null;
+        foreach ($map as $pattern => $id) {
             if (preg_match('#' . $pattern . '#i', $domain)) {
-                $site = $siteData;
+                $siteId = $id;
                 break;
             }
         }
-        return $site;
+        return $siteId;
     }
 
     /**
@@ -99,13 +108,6 @@ class Sellvana_MultiSite_Model_Site extends FCom_Core_Model_Abstract
      */
     public function siteOptions()
     {
-        $sites = (array)$this->orm()->find_many();
-        $groups = [];
-        foreach ($sites as $model) {
-            $key            = $model->id;
-            $groups[$key] = $model->name;
-        }
-
-        return $groups;
+        return $this->orm()->find_many_assoc('id', 'name');
     }
 }

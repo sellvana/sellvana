@@ -34,7 +34,7 @@ class Sellvana_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Ab
         }
 
         $productsData = $this->Sellvana_IndexTank_Search->search($q, $sc, $f, $v, $page, $resultPerPage);
-        $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
+        $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_category:products_data_after', ['data' => &$productsData]);
 
         $this->BApp->i()
             ->set('current_category', $category)
@@ -92,7 +92,7 @@ class Sellvana_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Ab
         }
 
         $productsData = $this->Sellvana_IndexTank_Search->search($q, $sc, $f, $v, $page, $resultPerPage);
-        $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
+        $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_search:products_data_after', ['data' => &$productsData]);
 
         $this->BApp->i()
             ->set('current_query', $q)

@@ -22,15 +22,13 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         $model = $args['model'];
         if ($model->isNewRecord()) {
             if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_catalog')) {
-                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
-                    [
-                        'href' => 'catalog/products/form?id=' . $model->id(),
-                        'text' => $this->BLocale->_(
-                                'New %s of products have been added to catalog',
-                                '#' . $model->id()
-                            ),
-                    ]
-                );
+                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+                    'href' => 'catalog/products/form?id=' . $model->id(),
+                    'content' => $this->BLocale->_(
+                        'New %s of products have been added to catalog',
+                        '#' . $model->id()
+                    ),
+                ]);
             }
         }
     }
@@ -40,11 +38,9 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         /** @var Sellvana_Email_Model_Pref $model */
         $model = $args['model'];
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_newsletter')) {
-            $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
-                [
-                    'text' => $model->email . ' ' . $this->BLocale->_('has subscribed to newsletter'),
-                ]
-            );
+            $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+                'content' => $model->email . ' ' . $this->BLocale->_('has subscribed to newsletter'),
+            ]);
         }
     }
 
@@ -54,15 +50,13 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         $model = $args['model'];
         if ($model->isNewRecord()) {
             if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_customer')) {
-                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
-                    [
-                        'href' => 'customers/form/?id=' . $model->id(),
-                        'text' => $this->BLocale->_(
-                                '%s created an account.',
-                                $model->firstname . ' ' . $model->lastname . '(' . $model->email . ')'
-                            )
-                    ]
-                );
+                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+                    'href' => 'customers/form/?id=' . $model->id(),
+                    'content' => $this->BLocale->_(
+                        '%s created an account.',
+                        $model->firstname . ' ' . $model->lastname . '(' . $model->email . ')'
+                    ),
+                ]);
             }
         }
     }
@@ -74,44 +68,43 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         $pCustomerId = $model->customer_id;
         $customer = $this->Sellvana_Customer_Model_Customer->load($pCustomerId);
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_product_reviews')) {
-            $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
-                [
-                    'href' => 'prodreviews/form/?id=' . $model->id(),
-                    'text' => $this->BLocale->_(
-                            '%s has review the product %s',
-                            [$customer->firstname . ' ' . $customer->lastname, '#' . $model->id()]
-                        )
-                ]
-            );
+            $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+                'href' => 'prodreviews/form/?id=' . $model->id(),
+                'content' => $this->BLocale->_(
+                    '%s has review the product %s',
+                    [$customer->firstname . ' ' . $customer->lastname, '#' . $model->id()]
+                ),
+            ]);
         }
     }
 
-    public function onOrderAfterSave($args)
+    public function onOrderPlaced($args)
     {
-        /** @var Sellvana_Sales_Model_Order $model */
-        $model = $args['model'];
-        if ($model->isNewRecord()) {
-            if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_sales')) {
-                $customer = $this->Sellvana_Customer_Model_Customer->load($model->get('customer_id'));
-                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
-                    [
-                        'href' => 'orders/form/?id=' . $model->id(),
-                        'text' => $this->BLocale->_(
-                                'Order %s has been placed by %s',
-                                ['#' . $model->id(), $customer->firstname . ' ' . $customer->lastname]
-                            ),
-                    ]
-                );
-            }
+        if (!$this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_sales')) {
+            return;
         }
+        /** @var Sellvana_Sales_Model_Order_State_Overall $newState */
+        $newState = $args['new_state'];
+        if ($newState->getValue() !== Sellvana_Sales_Model_Order_State_Overall::PLACED) {
+            return;
+        }
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = $newState->getContext()->getModel();
+        $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+            'href' => 'orders/form/?id=' . $order->id(),
+            'content' => $this->BLocale->_(
+                'Order #%s has been placed by %s',
+                [$order->get('unique_id'), $order->fullName('billing')]
+            ),
+        ]);
     }
 
     public function onSearch($args)
     {
         if ( $this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_catalog')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                    'text' => $this->BLocale->_('The term %s has been searched', $args['query']),
-                ]);
+                'content' => $this->BLocale->_('The term %s has been searched', $args['query']),
+            ]);
         }
     }
 
@@ -121,8 +114,8 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
         $model = $args['model'];
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_wishlist')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                    'text' => $this->BLocale->_('Item %s has been added to a wishlist', $model->product_name),
-                ]);
+                'content' => $this->BLocale->_('Item %s has been added to a wishlist', $model->product_name),
+            ]);
         }
     }
 }

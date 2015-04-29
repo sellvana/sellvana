@@ -4,8 +4,8 @@
 <input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 
-{% set catProductConfig = prodCtrl.getCatProdConfigForGriddle(m) %}
-{% set allProductConfig = prodCtrl.getAllProdConfigForGriddle(m) %}
+{% set catProductConfig = prodCtrl.getCatProdConfig(m) %}
+{% set allProductConfig = prodCtrl.getAllProdConfig(m) %}
 {% set prodAttachConfigCompiled = THIS.view('core/griddle').set('grid', allProductConfig).getGridConfig() %}
 
 <script>
@@ -35,7 +35,6 @@
          */
         window.showModalToAddProduct = function(grid) {
             mainGrid = grid;
-            mainGridId = '{{ prodImagesConfig.config.id }}';
             var modalContainerEle = document.getElementById('{{ catProductConfig.config.id }}-modal');
             React.unmountComponentAtNode(modalContainerEle);
             React.renderComponent(

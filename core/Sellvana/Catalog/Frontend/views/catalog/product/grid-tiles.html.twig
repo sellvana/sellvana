@@ -18,7 +18,7 @@
     <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }}">
       <div class="thumbnail">
         {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
-            <span class="sale tooltip-test">Sale</span>
+            <span class="sale tooltip-test">{{ 'Sale'|_ }}</span>
         {% endif %}
         <div class="f-col-listing-prod-img">
           <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>

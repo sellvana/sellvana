@@ -14,6 +14,11 @@ class Sellvana_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
     protected static $_cacheAuto = true;
 
     public $_page;
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['url_path'],
+        'related'    => ['parent_id' => 'Sellvana_Cms_Model_Nav.id'],
+    ];
 
     public function getUrl()
     {

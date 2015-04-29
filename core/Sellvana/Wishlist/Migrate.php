@@ -11,7 +11,7 @@
 
 class Sellvana_Wishlist_Migrate extends BClass
 {
-    public function install__0_1_2()
+    public function install__0_1_3()
     {
         $tWishlist = $this->Sellvana_Wishlist_Model_Wishlist->table();
         $tWishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->table();
@@ -46,7 +46,7 @@ class Sellvana_Wishlist_Migrate extends BClass
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
                 'wishlist' => ['wishlist_id', $tWishlist],
-                'product' => ['wishlist_id', $tProduct],
+                'product' => ['product_id', $tProduct],
             ],
         ]);
     }
@@ -89,9 +89,22 @@ class Sellvana_Wishlist_Migrate extends BClass
         $this->BDb->ddlTableDef($tWishlistItem, [
             BDb::CONSTRAINTS => [
                 'wishlist' => ['wishlist_id', $tWishlist],
-                'product' => ['wishlist_id', $tProduct],
+                'product' => ['product_id', $tProduct],
             ],
         ]);
+    }
 
+    public function upgrade__0_1_2__0_1_3()
+    {
+        $tWishlist = $this->Sellvana_Wishlist_Model_Wishlist->table();
+        $tWishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->table();
+        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
+
+        $this->BDb->ddlTableDef($tWishlistItem, [
+            BDb::CONSTRAINTS => [
+                'wishlist' => ['wishlist_id', $tWishlist],
+                'product' => ['product_id', $tProduct],
+            ],
+        ]);
     }
 }

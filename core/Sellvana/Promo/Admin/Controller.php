@@ -19,12 +19,13 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     protected static $_origClass = __CLASS__;
     protected $_permission = 'promo';
     protected $_modelClass = 'Sellvana_Promo_Model_Promo';
-    protected $_gridLayoutName = '/promo';
     protected $_gridHref = 'promo';
     protected $_gridTitle = 'Promotions';
     protected $_recordName = 'Promotion';
+    protected $_formTitleField = 'description';
     protected $_mainTableAlias = 'p';
     protected $_navPath = 'catalog/promo';
+    protected $_formLayoutName = '/promo/form';
 
     /**
      * @return array
@@ -36,6 +37,10 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         $hlp = $this->Sellvana_Promo_Model_Promo;
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete'],
+            ]],
             ['name' => 'id', 'label' => 'ID', 'width' => 55, 'sorttype' => 'number'],
             ['name' => 'summary', 'label' => 'Summary', 'width' => 250],
             ['name' => 'promo_type', 'label' => 'Promo Type', 'options' => $hlp->fieldOptions('promo_type') ],
@@ -52,10 +57,6 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             ['name' => 'details', 'label' => 'Details', 'hidden' => true],
             ['name' => 'create_at', 'label' => 'Created', 'formatter' => 'date'],
             ['name' => 'update_at', 'label' => 'Updated', 'formatter' => 'date'],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
-                ['name' => 'delete'],
-            ]],
         ];
         $config['actions'] = [
             'edit' => true,
@@ -94,7 +95,6 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         parent::formViewBefore($args);
         /** @var Sellvana_Promo_Model_Promo $m */
         $m = $args['model'];
-        $args['view']->title = $m->id() ? 'Edit Promo: ' . $m->description : 'Create New Promo';
         if (!$m->id()) {
             // todo initiate promo with status 'incomplete'
             $args['view']->numCodes = 0;

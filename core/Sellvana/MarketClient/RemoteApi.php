@@ -2,6 +2,8 @@
 
 /**
  * Class Sellvana_MarketClient_RemoteApi
+ *
+ * @property FCom_Admin_Model_Activity $FCom_Admin_Model_Activity
  */
 final class Sellvana_MarketClient_RemoteApi extends BClass
 {
@@ -13,7 +15,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     /**
      * @var string
      */
-    protected $_apiUrl = 'http://market.sellvana.com/';
+    protected $_apiUrl = 'https://market.sellvana.com/api/';
     #protected $_apiUrl = 'http://127.0.0.1/sellvana/';
 
     /**
@@ -32,9 +34,10 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     }
 
     /**
+     * @param string $data
      * @return array|mixed
      */
-    public function setupConnection()
+    public function setupConnection($data = null)
     {
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
         $redirect = $this->BRequest->get('redirect_to');
@@ -42,11 +45,16 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
             $redirect = '';
         }
 
-        $url = $this->getUrl('api/v1/market/site/connect', [
-            'admin_url' => $this->BApp->href(),
-            'retry_url' => $this->BApp->href('marketclient/site/connect'),
+        $url = $this->getUrl('v1/market/site/connect', [
+            'admin_url' => $this->BApp->adminHref(),
+            'retry_url' => $this->BApp->adminHref('marketclient/site/connect'),
             'redirect_to' => $redirect,
             'site_key' => $siteKey,
+
+            'email' => !empty($data['email']) ? $data['email'] : null,
+            'firstname' => !empty($data['firstname']) ? $data['firstname'] : null,
+            'lastname' => !empty($data['lastname']) ? $data['lastname'] : null,
+            'role' => !empty($data['role']) ? $data['role'] : null,
         ]);
         $response = $this->BUtil->remoteHttp('GET', $url);
         $result = $this->BUtil->fromJson($response);
@@ -66,7 +74,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     public function getModulesVersions($modules, $resetCache = false)
     {
         $cached = $this->BCache->load(static::$_modulesVersionsCacheKey);
-        if ($cached && true === $modules && !$resetCache) {
+        if (null !== $cached && true === $modules && !$resetCache) {
             return $cached;
         }
 
@@ -77,21 +85,31 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         }
 
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
-        $url = $this->getUrl('api/v1/market/module/version', [
+        $url = $this->getUrl('v1/market/module/version', [
             'mod_name' => join(',', $modules),
             'site_key' => $siteKey,
+            'admin_url' => $this->BApp->adminHref(''),
         ]);
+#$t = microtime(1);
         $response = $this->BUtil->remoteHttp("GET", $url);
+#var_dump($url, $response, $this->BUtil->lastRemoteHttpInfo(), microtime(1)-$t); exit;
         $remoteModResult = $this->BUtil->fromJson($response);
         if (!empty($remoteModResult['error'])) {
             $this->BCache->delete(static::$_modulesVersionsCacheKey);
             throw new BException($remoteModResult['message']);
+        }
+        if (!$siteKey && !empty($remoteModResult['site_key'])) {
+            $this->BConfig->set('modules/Sellvana_MarketClient/site_key', $remoteModResult['site_key'], false, true);
+            $this->BConfig->writeConfigFiles('local');
         }
         if (empty($remoteModResult['modules'])) {
             //throw new BException('Unable to retrieve marketplace modules information');
             return []; //TODO: proper notifications and errors handling
         }
         foreach ($remoteModResult['modules'] as $remoteModName => $remoteMod) {
+            if (!is_array($remoteMod)) {
+                continue;
+            }
             if ($remoteMod && empty($remoteMod['name'])) {
                 $remoteMod['name'] = $remoteModName;
             }
@@ -99,7 +117,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
                 $localMod = $this->BApp->m($remoteModName);
                 if (!empty($remoteMod['channels'][$localMod->channel])) {
                     $remoteChannelVer = $remoteMod['channels'][$localMod->channel]['version_uploaded'];
-                    $remoteMod['can_update'] = version_compare($remoteChannelVer, $localMod->version, '<');
+                    $remoteMod['can_update'] = version_compare($remoteChannelVer, $localMod->version, '>');
                 } else {
                     $remoteMod['can_update'] = false;
                 }
@@ -107,7 +125,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
             $cached[$remoteModName] = $remoteMod;
         }
         if (!empty($cached)) {
-            $this->BCache->save(static::$_modulesVersionsCacheKey, $cached, 86400);
+            $this->BCache->save(static::$_modulesVersionsCacheKey, $cached, $cached ? 86400 : 60);
         }
         $result = [];
         foreach ($modules as $remoteModName) {
@@ -123,7 +141,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
      */
     public function getModuleInstallInfo($modules)
     {
-        $url = $this->getUrl('api/v1/market/module/install_info', [
+        $url = $this->getUrl('v1/market/module/install_info', [
             'mod_name' => $modules,
         ]);
         $response = $this->BUtil->remoteHttp("GET", $url);
@@ -161,7 +179,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     public function createModule($modName)
     {
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
-        $url = $this->getUrl('api/v1/market/module/create');
+        $url = $this->getUrl('v1/market/module/create');
         $data = [
             'site_key' => $siteKey,
             'mod_name' => $modName,
@@ -185,9 +203,10 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         $this->BUtil->ensureDir($packageDir);
         $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}-{$mod->getChannel()}.zip";
         @unlink($packageFilename);
-        $this->BUtil->zipCreateFromDir($packageFilename, $mod->root_dir);
+        $ignorePattern = !empty($mod->package['ignore_files']) ? $mod->package['ignore_files'] : null;
+        $this->BUtil->zipCreateFromDir($packageFilename, $mod->root_dir, $ignorePattern);
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
-        $url = $this->getUrl('api/v1/market/module/upload');
+        $url = $this->getUrl('v1/market/module/upload');
         $data = [
             'site_key' => $siteKey,
             'mod_name' => $moduleName,
@@ -203,6 +222,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
      * @param $moduleName
      * @param null $version
      * @param null $channel
+     * @return string
      * @throws BException
      */
     public function downloadPackage($moduleName, $version = null, $channel = null)
@@ -213,7 +233,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         if ($channel === '*') {
             $channel = null;
         }
-        $url = $this->getUrl('api/v1/market/module/download', [
+        $url = $this->getUrl('v1/market/module/download', [
             'mod_name' => $moduleName,
             'version' => $version,
             'channel' => $channel,
@@ -244,5 +264,22 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         } else {
             throw new BException("Problem with write permissions ({$filepath})");
         }
+    }
+
+    public function fetchUpdatesFeed()
+    {
+        $cacheKey = 'marketclient_updates_last_fetch_at';
+        if ($this->BCache->load($cacheKey)) {
+            return;
+        }
+        $this->BCache->save($cacheKey, $this->BDb->now(), 3600);
+
+        $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
+        $url = $this->getUrl('v1/market/site/updates', [
+            'site_key' => $siteKey,
+        ]);
+        $response = $this->BUtil->remoteHttp('GET', $url);
+        $result = $response ? $this->BUtil->fromJson($response) : [];
+        return $result;
     }
 }

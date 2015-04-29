@@ -2,22 +2,49 @@
 
 abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
 {
+    /**
+     * @var FCom_Core_Model_Abstract_State_Context
+     */
     protected $_context;
 
+    /**
+     * @var string
+     */
     protected $_type;
 
+    /**
+     * @var string
+     */
     protected $_value;
 
+    /**
+     * @var array|null
+     */
     protected $_options = [];
 
+    /**
+     * @var string
+     */
     protected $_defaultValue;
 
+    /**
+     * @var string
+     */
     protected $_defaultValueClass;
 
+    /**
+     * @var array
+     */
     protected $_valueLabels;
 
+    /**
+     * @var array
+     */
     protected $_setValueNotificationTemplates = [];
 
+    /**
+     * @var array
+     */
     protected $_unsetValueNotificationTemplates = [];
 
     public function __construct($context = null, $type = null, $value = null, $options = null)
@@ -48,13 +75,21 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
      */
     public function changeState($value, $updateModelField = true)
     {
-        if ($value && empty($this->_valueLabels[$value])) {
+        if ($value === $this->getValue()) {
+            return $this;
+        }
+        
+        $valueLabels = $this->getAllValueLabels();
+        if ($value && empty($valueLabels[$value])) {
             throw new BException("Invalid state value '" . $value . "' for type '" . $this->_type . "'");
         }
 
         $this->sendNotification(true); // Send onUnset notification (going out of state)
         $newState = $this->_context->changeState($this->_type, $value, $updateModelField);
         $newState->sendNotification(); // Send onSet notification (going into state)
+
+        $class = $this->origClass() ?: get_class($this);
+        $this->BEvents->fire($class . '::changeState', ['old_state' => $this, 'new_state' => $newState]);
 
         return $newState;
     }
@@ -67,12 +102,24 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         }
         if (!empty($pool[$value])) {
             foreach ((array)$pool[$value] as $emailViewName) {
-                $this->BLayout->view($emailViewName)
-                    ->set(['context' => $this->_context, 'type' => $this->_type, 'options' => $this->_options])
-                    ->email();
+                $view = $this->BLayout->view($emailViewName);
+                if (!$view instanceof BViewEmpty) {
+                    $view->set(['context' => $this->_context, 'type' => $this->_type, 'options' => $this->_options])
+                        ->email();
+                }
             }
         }
         return $this;
+    }
+
+    public function getContext()
+    {
+        return $this->_context;
+    }
+
+    public function getModel()
+    {
+        return $this->_context->getModel();
     }
 
     public function getState()
@@ -85,9 +132,20 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         return $this->_defaultValue;
     }
 
+    public function setDefaultState()
+    {
+        $this->changeState($this->getDefaultValue());
+        return $this;
+    }
+
     public function getValue()
     {
         return $this->_value;
+    }
+
+    public function getType()
+    {
+        return $this->_type;
     }
 
     public function is($value)

@@ -9,7 +9,7 @@
 
 class Sellvana_Customer_Migrate extends BClass
 {
-    public function install__0_1_13()
+    public function install__0_1_14()
     {
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
         $tAddress = $this->Sellvana_Customer_Model_Address->table();
@@ -30,7 +30,7 @@ class Sellvana_Customer_Migrate extends BClass
                 'token_at' => 'datetime default null',
                 'payment_method' => 'varchar(20) default null',
                 'payment_details' => 'text',
-                'status' => "varchar(10) not null default 'review'",
+                'status' => "varchar(10) not null default 'new'",
                 'password_session_token' => 'varchar(16)',
                 'last_session_id' => 'varchar(40) null',
             ],
@@ -245,6 +245,16 @@ class Sellvana_Customer_Migrate extends BClass
             ],
             BDb::KEYS => [
                 'IDX_session_id' => '(last_session_id)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_13__0_1_14()
+    {
+        $table = $this->Sellvana_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($table, [
+            BDb::COLUMNS => [
+                'status' => "varchar(10) not null default 'new'",
             ],
         ]);
     }

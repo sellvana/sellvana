@@ -16,8 +16,11 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         try {
             $order = $args['order'];
 
+            /** @var Sellvana_Sales_Model_Order_Payment $payment */
             $payment = $this->Sellvana_Sales_Model_Order_Payment->create()->importFromOrder($order);
-            $result = $payment->payOnCheckout();
+
+            $method = $payment->getMethodObject();
+            $result = $method->payOnCheckout($payment);
 
             $args['result']['payment'] = $result;
             $args['result']['payment']['model'] = $payment;
@@ -75,8 +78,6 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
                 break;
         }
 
-        $order->state()->overall()->setPlaced();
-
         $cart->state()->overall()->setOrdered();
         $cart->state()->payment()->setAccepted();
 
@@ -85,7 +86,7 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $cart->save();
 
         $payment->addHistoryEvent('complete',
-            $this->BLocale->_('Customer completed payment by %s', $order->get('payment_method')),
+            $this->BLocale->_('Customer completed payment by %s', $order->getPaymentMethod()->getName()),
             ['entity_id' => $payment->id()]
         );
     }
@@ -140,6 +141,12 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 
     public function action_adminPlacesOrder($args)
     {
+
+    }
+
+    public function action_adminReceivesOfflinePayment($args)
+    {
+
     }
 
     public function action_adminAuthorizesPayment($args)

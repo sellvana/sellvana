@@ -31,7 +31,14 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
        'min' => 0,
        'step' => 1,
     ];
-
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['product_id', 'customer_id', 'create_at'],
+        'related'    => [
+            'product_id'  => 'Sellvana_Catalog_Model_Product.id',
+            'customer_id' => 'Sellvana_Customer_Model_Customer.id'
+        ],
+    ];
     protected static $_validationRules = [
         ['product_id', '@required'],
         ['customer_id', '@required'],

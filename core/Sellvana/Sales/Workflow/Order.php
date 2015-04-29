@@ -1,11 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class Sellvana_Sales_Workflow_Order
+ *
+ * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
+ */
 class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
     public function action_customerPlacesOrder($args)
     {
+        /** @var Sellvana_Sales_Model_Order $order */
         $order = $args['result']['order'];
         $order->state()->overall()->setPlaced();
         $order->addHistoryEvent('placed', 'Order was placed by a customer');
@@ -16,6 +22,8 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         }
 
         $order->save();
+
+        $this->Sellvana_Sales_Model_Order_Shipment->createShipmentFromOrder($order);
     }
 
     public function action_adminPlacesOrder($args)

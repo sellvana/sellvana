@@ -4,6 +4,7 @@ base:
             - [ addNav, system/multisite, { label: Multi Site, pos: 30, href: /multisite } ]
 
 /settings:
+    - { hook: settings_header_title, views: multisite/settings-header-title }
     - view: settings
         do:
             - [ addTab, Sellvana_MultiSite, { label: Multi Site, group: catalog, async: true } ]

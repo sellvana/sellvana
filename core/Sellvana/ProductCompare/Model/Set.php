@@ -77,14 +77,27 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @return Sellvana_ProductCompare_Model_SetItem[]
+     */
+    public function items()
+    {
+        #return [];
+        if (null === $this->items) {
+            $this->items = $this->Sellvana_ProductCompare_Model_SetItem->orm()
+                ->where('set_id', $this->id())->find_many();
+        }
+        return $this->items;
+    }
+
+    /**
      * Fetch and return products compared in current set
      * @return array
      */
-    public function getCompareIds()
+    public function getCompareProductIds()
     {
         $ids = [];
         if ($this->id()) {
-            $items = $this->_getSetItems();
+            $items = $this->items();
             foreach ($items as $item) {
                 /** @var Sellvana_ProductCompare_Model_SetItem $item */
                 $ids[] = $item->get('product_id');
@@ -94,40 +107,23 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @param bool $refresh
-     * @return array
-     */
-    public function getCompareProductsDetails($refresh = false)
-    {
-
-        if (empty($this->_productDetails) || $refresh) {
-            $details = [];
-            $productIds = $this->getCompareIds();
-            foreach ($productIds as $id) {
-                $pDetails = $this->getProductDetails($id);
-                if (!empty($pDetails)) {
-                    $details[] = $pDetails;
-                }
-            }
-            $this->_productDetails = $details;
-        }
-        return $this->_productDetails;
-    }
-
-    /**
-     * @param $id
+     * @param int|Sellvana_Catalog_Model_Product $id
      * @return array
      * @throws BException
      */
-    public function getProductDetails($id)
+    public function getProductDetails($id, $thumbSize = 35)
     {
         $details = [];
         /** @var Sellvana_Catalog_Model_Product $product */
-        $product = $this->Sellvana_Catalog_Model_Product->load($id);
+        if (is_numeric($id)) {
+            $product = $this->Sellvana_Catalog_Model_Product->load($id);
+        } else {
+            $product = $id;
+        }
         if ($product) {
             $details = [
-                'id' => $id,
-                'src' => $product->imageUrl(),
+                'id' => $product->id(),
+                'src' => $product->thumbUrl($thumbSize),
                 'alt' => $product->get('product_name'),
             ];
         }
@@ -136,12 +132,37 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
 
     /**
      * @param bool $refresh
-     * @return string
+     * @return array
      */
-    public function getCompareProductsDetailsJson($refresh = false)
+    public function getCompareProductsDetails($refresh = false)
     {
-        $details = $this->getCompareProductsDetails($refresh);
-        return $this->BUtil->toJson($details);
+        $this->BDebug->debug(__METHOD__ . ':' . $refresh);
+        if (empty($this->_productDetails) || $refresh) {
+            /** @var Sellvana_Catalog_Model_Product[] $products */
+            $products = $this->Sellvana_Catalog_Model_Product->orm('p')->select('p.*')
+                ->join('Sellvana_ProductCompare_Model_SetItem', ['si.product_id', '=', 'p.id'], 'si')
+                ->where('si.set_id', $this->id())->find_many();
+            $details = [];
+            foreach ($products as $p) {
+                $details[] = $this->getProductDetails($p);
+            }
+            $this->_productDetails = $details;
+        }
+        return $this->_productDetails;
+    }
+
+    /**
+     * @param int $pId
+     * @return Sellvana_ProductCompare_Model_SetItem|false
+     */
+    public function findSetItem($pId)
+    {
+        foreach ($this->items() as $item) {
+            if ($item->get('product_id') === $pId) {
+                return $item;
+            }
+        }
+        return false;
     }
 
     /**
@@ -184,7 +205,7 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
     public function clearSet()
     {
         try {
-            $setItems = $this->_getSetItems();
+            $setItems = $this->items();
             foreach ($setItems as $item) {
                 $item->delete();
             }
@@ -194,46 +215,4 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
         }
         return true;
     }
-
-    /**
-     * @param $id
-     * @return Sellvana_ProductCompare_Model_SetItem|false
-     */
-    protected function findSetItem($id)
-    {
-        $data = [
-            'set_id' => $this->id(),
-            'product_id' => $id
-        ];
-
-        $item = $this->Sellvana_ProductCompare_Model_SetItem->orm()->where($data)->find_one();
-        return $item;
-    }
-
-    /**
-     * Find out if product is in compare set
-     * @param $productId
-     * @return bool
-     */
-    public function isInSet($productId)
-    {
-        $details = $this->getCompareProductsDetails();
-        foreach ($details as $detail) {
-            if ($detail['id'] == $productId) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @return Sellvana_ProductCompare_Model_SetItem[]
-     */
-    protected function _getSetItems()
-    {
-        $items = $this->Sellvana_ProductCompare_Model_SetItem->orm()->where('set_id', $this->id())
-                                                         ->find_many();
-        return $items;
-    }
-
 }

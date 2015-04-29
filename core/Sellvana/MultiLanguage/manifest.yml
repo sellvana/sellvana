@@ -1,7 +1,7 @@
 modules:
     Sellvana_MultiLanguage:
-        version: 0.1.1
-        channel: beta
+        version: 0.5.0.0
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0, Sellvana_CatalogIndex: 0.1.0, Sellvana_CustomField: 0.1.0 } }
         translations: { en: en.php }
         auto_use: [ bootstrap ]
@@ -9,6 +9,8 @@ modules:
         areas:
             FCom_Frontend:
                 auto_use: [ views, bootstrap ]
+                routing:
+                    - [ /language/switch/:locale, Sellvana_MultiLanguage_Frontend_Controller.switch ]
                 observe:
                     - [ "Sellvana_Catalog_Model_Product::find_many:after", Sellvana_MultiLanguage_Main.productCollectionLoadLocale ]
                     - [ "Sellvana_Catalog_Model_Product::find_one:after", Sellvana_MultiLanguage_Main.productLoadLocale ]

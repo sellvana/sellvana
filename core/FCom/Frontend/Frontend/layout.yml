@@ -13,6 +13,7 @@ base:
             - [ icon, @FCom_Core/favicon.ico ]
             - [ css, "//fonts.googleapis.com/css?family=Lato:400,700,900,400italic,700italic,900italic" ]
             - [ css, "//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" ]
+            #- [ css, "@FCom_Core/css/font-awesome/css/font-awesome.min.css" ]
             - [ css, "@FCom_Frontend/Frontend/css/bootstrap.css" ]
             - [ css, "@FCom_Core/css/flags.css" ]
             - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
@@ -30,6 +31,8 @@ base:
     - { view: root, set: { use_container: true } }
 
     - { include: common_js_libs }
+    - { include: lib_select2 }
+    - { include: lib_file_upload }
 
     - { callback: FCom_Core_Main.defaultThemeCustomLayout }
     - { callback: FCom_Frontend_Frontend.layout }

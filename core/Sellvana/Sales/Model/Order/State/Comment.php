@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_Sales_Model_Order_State_Comment extends FCom_Core_Model_Abstract_State_Concrete
+class Sellvana_Sales_Model_Order_State_Comment extends Sellvana_Sales_Model_Order_State_Abstract
 {
     const NONE = 'none',
         RECEIVED = 'received',
@@ -30,6 +30,8 @@ class Sellvana_Sales_Model_Order_State_Comment extends FCom_Core_Model_Abstract_
         self::AUTO_CLOSED => 'email/sales/order-state-comment-auto_closed',
     ];
 
+    protected $_defaultValue = self::NONE;
+
     public function setNone()
     {
         return $this->changeState(self::NONE);
@@ -58,5 +60,10 @@ class Sellvana_Sales_Model_Order_State_Comment extends FCom_Core_Model_Abstract_
     public function setAutoClosed()
     {
         return $this->changeState(self::AUTO_CLOSED);
+    }
+
+    public function calcState()
+    {
+        return $this;
     }
 }

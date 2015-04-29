@@ -1,0 +1,36 @@
+{% set w = SESSION.get('w') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { model:w, id_prefix:'account', name_prefix:'w[account]', get_prefix:'account', label_class:'col-lg-4', input_div_class:'col-lg-7' } %}
+
+<hr>
+<div class="form-group">
+    <label class="control-label col-lg-4 required" for="market-email">
+        {{ 'Account Email'|_ }}&nbsp;
+        <a tabindex="-1" id="account-email-help-icon" class="pull-right help-icon" href="#"><i class="fa fa-question-circle"></i></a>
+        <div hidden id="account-email-help-text">
+            <p><strong>{{ 'Creating account on Sellvana Marketplace will allow you install and upgrade your market modules with one click.'|_ }}</strong></p>
+            <p>{{ 'You will receive an email with instructions and a link to confirm your registration and create a password.'|_ }}</p>
+            <p><strong style="color:#0A0">{{ 'We will never sell your email or send you spam!' }}</strong></p>
+        </div>
+    </label>
+    <div class="col-lg-7">
+        <input type="email" id="account-email" name="w[account][email]" class="form-control" required value="{{ w.admin.email }}">
+    </div>
+</div>
+
+{{ forms.input(fieldData, {field:'firstname', label:'First Name'|_, value:w.admin.firstname }) }}
+{{ forms.input(fieldData, {field:'lastname', label:'Last Name'|_, value:w.admin.lastname }) }}
+{{ forms.select(fieldData, {field:'role', label:'I am a'|_, options:{
+    '': 'Please select...'|_,
+    'developer': 'Developer'|_,
+    'merchant': 'Merchant'|_,
+    'designer': 'Designer'|_,
+    'security': 'Security Researcher'|_,
+    'other': 'Other'|_,
+} }) }}
+
+<script>
+    require(['jquery', 'jquery.qtip'], function($) {
+        $('#account-email-help-icon').qtip({ content: { text: $('#account-email-help-text') } });
+    })
+</script>

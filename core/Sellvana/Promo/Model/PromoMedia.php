@@ -13,4 +13,9 @@ class Sellvana_Promo_Model_PromoMedia extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_promo_media';
+    protected static $_importExportProfile = [
+        'skip'       => ['id'],
+        'unique_key' => ['promo_id', 'file_id', 'promo_status'],
+        'related'    => ['promo_id' => 'Sellvana_Promo_Model_Promo.id', 'file_id' => 'FCom_Core_Model_MediaLibrary.id'],
+    ];
 }

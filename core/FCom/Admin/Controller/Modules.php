@@ -9,16 +9,16 @@
 
 class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected $_permission = 'system/modules';
     protected static $_origClass = __CLASS__;
+
+    protected $_permission = 'system/modules';
+    protected $_navPath = 'modules/installed';
     protected $_modelClass = 'FCom_Core_Model_Module';
     protected $_gridHref = 'modules';
+    protected $_gridLayoutName = '/modules';
     protected $_gridTitle = 'Modules';
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'm';
-    protected $_gridViewName = 'core/backbonegrid';
-    protected $_navPath = 'modules/installed';
-    protected $_useDefaultLayout = false;
 
     /**
      * @return array
@@ -111,6 +111,26 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $config['columns'] = [
             ['type' => 'row_select'],
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
+            ['type' => 'btn_group', 'width' => 115,
+                'buttons' => [
+                    /*
+                        array(
+                            'type'=>'link','name'=>'required',
+                            'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
+                            'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_('Required')
+                        ),
+                        array(
+                            'type'=>'link','name'=>'ondemand',
+                            'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
+                            'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
+                        ),
+                    */
+                    [
+                        'type' => 'button', 'name' => 'edit',
+                        'icon' => 'fa fa-toggle-on',
+                    ],
+                ]
+            ],
             ['name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 100, 'overflow' => true],
             ['name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true],
             ['name' => 'version', 'label' => 'Version', 'width' => 80, 'overflow' => true],
@@ -128,26 +148,6 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             ['name' => 'required_by', 'label' => 'Required By', 'width' => 300, 'overflow' => true],
             ['name' => 'dep_errors', 'label' => 'Dependency Errors', 'width' => 300, 'overflow' => true,
                 'hidden' => true],
-            ['type' => 'btn_group', 'width' => 115,
-                'buttons' => [
-                /*
-                    array(
-                        'type'=>'link','name'=>'required',
-                        'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
-                        'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_('Required')
-                    ),
-                    array(
-                        'type'=>'link','name'=>'ondemand',
-                        'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
-                        'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
-                    ),
-                */
-                    [
-                        'type' => 'button', 'name' => 'edit',
-                        'icon' => 'glyphicon glyphicon-repeat',
-                    ],
-                ]
-            ],
         ];
 
         $config['state']['ps'] = 100;
@@ -166,6 +166,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         ];
         $config['events'] = ['edit', 'mass-edit'];
         $config['grid_before_create'] = 'moduleGridRegister';
+        $config['callbacks'] = [
+            'componentDidMount' => 'moduleGridMounted',
+            'componentDidUpdate' => 'moduleGridMounted'
+        ];
         $config['local_personalize'] = true;
 
         //$config['state'] =array(5,6,7,8);
@@ -176,12 +180,19 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     {
         parent::gridViewBefore($args);
 
+        /** @var FCom_Admin_View_Grid $view */
         $view = $args['page_view'];
         $actions = (array)$view->get('actions');
-        $actions += [
-            'run_migration' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \''
-                . $this->BApp->href('modules/migrate') . '\').submit()"><span>' . $this->BLocale->_('Run Migration Scripts')
-                . '</span></button>',
+        $actions['run_migration'] = [
+            'button',
+            [
+                'type' => 'button',
+                'class'=> ['btn', 'btn-primary'],
+                'onclick' => "$('#util-form').attr('action', '{$this->BApp->href('modules/migrate')}').submit()",
+            ],
+            [
+                ['span', null, $this->BLocale->_('Run Migration Scripts')]
+            ]
         ];
         unset($actions['new']);
         $view->set('actions', $actions);
@@ -250,7 +261,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     public function action_migrate__POST()
     {
         try {
-            $this->BMigrate->migrateModules(true, true);
+            $this->BMigrate->migrateModules(true, true, 'modules');
             $this->message('Migration complete');
         } catch (Exception $e) {
             $this->BDebug->logException($e);

@@ -19,7 +19,7 @@ catalog_product_form_tabs:
             - [ addTab, main, { label: General Info, pos: 10 } ]
             - [ addTab, prices, { label: "Prices", pos: 20 } ]
             - [ addTab, inventory, { label: "Inventory & Shipping", pos: 30 } ]
-            - [ addTab, linked-products, { label: Merchandising, pos: 40, async: true } ]
+            - [ addTab, linked-products, { label: Merchandising, pos: 45, async: true } ]
             - [ addTab, categories, { label: Categories, pos: 50, async: true } ]
             - [ addTab, images, { label: Images, pos: 60, async: true } ]
             #- [ addTab, images-griddle, { label: Images (Griddle), pos: 65, async: true } ]
@@ -28,12 +28,13 @@ catalog_product_form_tabs:
 
 
 /catalog/products/form:
+    - { include: default_form }
     - { include: jstree }
     - { include: catalog_product_form_tabs }
     - view: head
         do:
             - [ css, "@Sellvana_Catalog/Admin/css/prices.css" ]
-            - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.product.price, [jquery, react]]
+            - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.product.price, { deps: [ jquery, react ] } ]
 #            - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/src/fcom.catalog.product.price, [jquery, react]]
 
 /catalog/products/import:
@@ -77,6 +78,5 @@ catalog_product_form_tabs:
 
 
 /catalog/inventory:
-    - { include: base }
+    - { include: default_griddle }
     - { hook: main, views: catalog/inventory }
-    - { view: admin/nav, do: [[ setNav, catalog/inventory ]] }

@@ -7,6 +7,9 @@ base:
 /catalog/compare:
     - { include: base }
     - { hook: main, views: catalog/compare }
+    - view: head
+        do:
+            - [ css, @Sellvana_ProductCompare/Frontend/css/sellvana.productcompare.css ]
 
 /catalog/compare/xhr:
     - { root: catalog/compare }

@@ -1,110 +1,110 @@
 {% set fieldSetsCtrl = APP.instance('Sellvana_CustomField_Admin_Controller_FieldSets') %}
 
 <script>
-require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
-    var fieldsGrid, optionsGrid, selectedRow, originOptionIds, removedOptionIds;
-    var optionForm = $('#options-form');
-    var fieldForm = $('#field-modal-form');
-    
-    window.optionsGridRegister = function(grid) {
-    	optionsGrid = grid;
-    	optionsGrid.build();
-    };
+    require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
+        var fieldsGrid, optionsGrid, selectedRow, originOptionIds, removedOptionIds;
+        var optionForm = $('#options-form');
+        var fieldForm = $('#field-modal-form');
 
-    window.fieldsGridRegister = function(grid) {
-        fieldsGrid = grid;
-        fieldsGrid.getGridSkeleton().Views.RowView.prototype._callbackCustom = function (ev) {
-            selectedRow = this.model;
-
-            if (selectedRow.get('admin_input_type') == 'select') {
-                $(optionsGrid.getGridSkeleton().NewButton).removeClass('disabled');
-            } else {
-                $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
-            }
-			
-    		fieldsGrid.getModalForm().modalType = 'editable';
-    		fieldsGrid.getGridSkeleton().currentRow = this.model;
-    		fieldsGrid.getModalForm().render();
-            
-            optionsGrid.getRows().url = '{{ APP.href('customfields/fieldsets/field_option_grid_data?field_id=') | raw }}' + selectedRow.get('id');
-            optionsGrid.getRows().fetch({
-                reset: true,
-                success: function () {
-                    originOptionIds = optionsGrid.getRows().pluck('id');
-                    optionsGrid.getGridView().render();
-                    if (optionsGrid.getRows().length > 0) {
-                        $('#options-form').validate();
-                    }
-                }
-            });
-			
-            $('#field-modal-header').html(selectedRow.get('field_name'));
-			$('#btn-field-grid-modal').trigger('click');
+        window.optionsGridRegister = function(grid) {
+            optionsGrid = grid;
+            optionsGrid.build();
         };
-        
-        fieldsGrid.getGridSkeleton().Views.ModalForm.prototype.el = '#field-modal-form';
-        fieldsGrid.build();
 
-        //force show form when display modal
-        $('#field-grid-modal').on('show.bs.modal', function(e) {
-            $('#fieldset_tab').tab('show');
+        window.fieldsGridRegister = function(grid) {
+            fieldsGrid = grid;
+            fieldsGrid.getGridSkeleton().Views.RowView.prototype._callbackCustom = function (ev) {
+                selectedRow = this.model;
+
+                if (selectedRow.get('admin_input_type') == 'select') {
+                    $(optionsGrid.getGridSkeleton().NewButton).removeClass('disabled');
+                } else {
+                    $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
+                }
+
+                fieldsGrid.getModalForm().modalType = 'editable';
+                fieldsGrid.getGridSkeleton().currentRow = this.model;
+                fieldsGrid.getModalForm().render();
+
+                optionsGrid.getRows().url = '{{ APP.href('customfields/fieldsets/field_option_grid_data?field_id=') | raw }}' + selectedRow.get('id');
+                optionsGrid.getRows().fetch({
+                    reset: true,
+                    success: function () {
+                        originOptionIds = optionsGrid.getRows().pluck('id');
+                        optionsGrid.getGridView().render();
+                        if (optionsGrid.getRows().length > 0) {
+                            $('#options-form').validate();
+                        }
+                    }
+                });
+
+                $('#field-modal-header').html(selectedRow.get('field_name'));
+                $('#btn-field-grid-modal').trigger('click');
+            };
+
+            fieldsGrid.getGridSkeleton().Views.ModalForm.prototype.el = '#field-modal-form';
+            fieldsGrid.build();
+
+            //force show form when display modal
+            $('#field-grid-modal').on('show.bs.modal', function(e) {
+                $('#fieldset_tab').tab('show');
+            });
+        };
+
+        $('#add_new_field').click(function () {
+            optionsGrid.getRows().reset();
+            optionsGrid.getGridView().clearSelectedRows();
+
+            fieldsGrid.getModalForm().modalType = 'addable';
+            fieldsGrid.getModalForm().render();
+            $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
+            //$('.tabbable #options_tab').hide();
+
+            $('#field-modal-header').html('Add Field');
+            $('#btn-field-grid-modal').trigger('click');
         });
-    };
-    
-    $('#add_new_field').click(function () {
-    	optionsGrid.getRows().reset();
-    	optionsGrid.getGridView().clearSelectedRows();
-    	
-        fieldsGrid.getModalForm().modalType = 'addable';
-        fieldsGrid.getModalForm().render();
-        $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
-        //$('.tabbable #options_tab').hide();
-        
-        $('#field-modal-header').html('Add Field');
-        $('#btn-field-grid-modal').trigger('click');
-    });
 
-    $('button.field-modal-save').click(function() {
-        if (optionForm.valid() && fieldForm.valid()) {
-            var dataForm = optionForm.serializeArray();
-            var rows = optionsGrid.getRows().toJSON();
-            /*rows.forEach(function (data, index) {
-                data.label =  dataForm[index]['value'];
-            });*/
+        $('button.field-modal-save').click(function() {
+            if (optionForm.valid() && fieldForm.valid()) {
+                var dataForm = optionForm.serializeArray();
+                var rows = optionsGrid.getRows().toJSON();
+                /*rows.forEach(function (data, index) {
+                 data.label =  dataForm[index]['value'];
+                 });*/
 
-            //delete option
-            removedOptionIds = _.difference(originOptionIds, optionsGrid.getRows().pluck('id'));
-            console.log(removedOptionIds);
-            
-            fieldsGrid.getGridSkeleton().modalElementVals = {'rows': rows, 'rowsDelete': removedOptionIds};
-            if (fieldsGrid.getModalForm().saveChanges()) {
-                selectedRow.set('num_options', optionsGrid.getRows().length);
-            	selectedRow.trigger('render');
-            	$('button.field-modal-close').trigger('click');
+                //delete option
+                removedOptionIds = _.difference(originOptionIds, optionsGrid.getRows().pluck('id'));
+                console.log(removedOptionIds);
+
+                fieldsGrid.getGridSkeleton().modalElementVals = {'rows': rows, 'rowsDelete': removedOptionIds};
+                if (fieldsGrid.getModalForm().saveChanges()) {
+                    selectedRow.set('num_options', optionsGrid.getRows().length);
+                    selectedRow.trigger('render');
+                    $('button.field-modal-close').trigger('click');
+                }
             }
-        }
+        });
     });
-});
 
 </script>
 
 <div class="f-admin-main-view">
-  <div class="page-header f-admin-page-header">
-      <h1 class="f-page-title">
-          {#<i class="icon-file"></i>#}
-          <span>{{ "Fields" |_ }}</span>
-      </h1>
-      {#<div class="page-header">#}
-          {##}
-      {#</div>#}
-      <div class="btn-group">
-          <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a field" |_ }}</span></button>
-      </div>
-  </div>
+    <div class="page-header f-admin-page-header">
+        <h1 class="f-page-title">
+            {#<i class="icon-file"></i>#}
+            <span>{{ "Fields" |_ }}</span>
+        </h1>
+        {#<div class="page-header">#}
+        {##}
+        {#</div>#}
+        <div class="btn-group">
+            <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a field" |_ }}</span></button>
+        </div>
+    </div>
 
-  <div class="f-admin-main">
-      {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsGridConfig())| raw }}
-  </div>
+    <div class="f-admin-main">
+        {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsGridConfig())| raw }}
+    </div>
 </div>
 
 <div class='modal fade' id='field-grid-modal' tabindex='-1'>
@@ -131,17 +131,17 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
                     <div class='tab-content'>
                         <div class='tab-pane active' id='edit_field_set'>
                             <form class="form form-horizontal validate-form" id="field-modal-form" novalidate="novalidate">
-							</form>
+                            </form>
                         </div>
                         <div class='tab-pane' id='options'>
                             <form action="#" id="options-form">
-								{{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.optionsGridConfig()) | raw }}
-			                </form>
+                                {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.optionsGridConfig()) | raw }}
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-             <div class='modal-footer'>
+            <div class='modal-footer'>
                 <button class='btn btn-primary field-modal-save' type='button'>{{ "Save"|_ }}</button>
                 <button class='btn btn-default btn-close field-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
             </div>

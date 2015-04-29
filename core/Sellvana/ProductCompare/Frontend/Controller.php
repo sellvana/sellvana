@@ -17,7 +17,7 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
         $xhr = $this->BRequest->xhr();
         $set = $this->Sellvana_ProductCompare_Model_Set->sessionSet();
         if ($set) {
-            $arr = $set->getCompareIds(); // if there is compare set for current user, get compared products from it
+            $arr = $set->getCompareProductIds(); // if there is compare set for current user, get compared products from it
         } else if (!empty($cookie)) {
             $arr = $this->BUtil->fromJson($cookie);
         }

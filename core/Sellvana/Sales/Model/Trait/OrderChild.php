@@ -31,7 +31,9 @@ trait Sellvana_Sales_Model_Trait_OrderChild
             $entityType = 'return';
         } elseif ($this instanceof Sellvana_Sales_Model_Order_Shipment) {
             $entityType = 'shipment';
-        } elseif ($this instanceof FComSales_Model_Order_Item) {
+        } elseif ($this instanceof Sellvana_Sales_Model_Order_Comment) {
+            $entityType = 'comment';
+        } elseif ($this instanceof Sellvana_Sales_Model_Order_Item) {
             $entityType = 'order_item';
             $orderItemId = $this->id();
         }

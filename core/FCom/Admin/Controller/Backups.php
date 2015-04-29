@@ -14,13 +14,10 @@ class FCom_Admin_Controller_Backups extends FCom_Admin_Controller_Abstract_GridF
 
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'delete', 'caption' => 'Remove/Revert']]],
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
             ['name' => 'file_name', 'label' => 'File Name', 'index' => 'file_name', 'width' => 100, 'overflow' => true],
             ['name' => 'create_at', 'label' => 'Created At', 'index' => 'create_at', 'width' => 100],
-            ['type' => 'btn_group',
-                'buttons' => [
-                    ['name' => 'delete', 'caption' => 'Remove/Revert'],
-                ]],
         ];
 
         $config['state'] = ['s' => 'create_time', 'sd' => 'desc'];
@@ -45,6 +42,7 @@ class FCom_Admin_Controller_Backups extends FCom_Admin_Controller_Abstract_GridF
 
     public function action_form()
     {
+        return;
         $this->layout($this->_formLayoutName);
         $tplViewName = $this->BRequest->get('id');
         $areaLayout = $this->getAreaLayout();

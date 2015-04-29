@@ -1,7 +1,7 @@
 modules:
     Sellvana_PaymentBasic:
-        version: 0.1.0
-        channel: beta
+        version: 0.5.0.0
+        channel: alpha
         translations: { en: en.php }
         description: "Basic payment methods (check/money order, purchase order)"
         require: { module: { Sellvana_Sales: 0.1.10 } }

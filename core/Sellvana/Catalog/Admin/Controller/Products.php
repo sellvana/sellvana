@@ -3,7 +3,7 @@
 /**
  * Class Sellvana_Catalog_Admin_Controller_Products
  *
- *@property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
@@ -26,11 +26,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
     protected $_permission = 'catalog/products';
-
-    //config to use react griddle
-    /*protected $_gridPageViewName = 'admin/griddle';
-    protected $_gridViewName = 'core/griddle';
-    protected $_useDefaultLayout = false;*/
+    protected $_formLayoutName = '/catalog/products/form';
+    protected $_formTitleField = 'product_name';
 
     /**
      * @return array
@@ -40,6 +37,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select', 'width' => 55],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete']
+            ]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
                 'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"'],
@@ -53,10 +54,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100],
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100],
-            ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit', 'href' => $this->BApp->href('catalog/products/form?id=')],
-                ['name' => 'delete']
-            ]],
         ];
         $config['actions'] = [
             'refresh' => true,
@@ -86,10 +83,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function afterInitialData($rows)
     {
-        $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+        $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
         foreach ($rows as & $row) {
-            $thumbUrl = $row['thumb_url'] ? $row['thumb_url'] : 'image-not-found.png';
+            $thumbUrl = $row['thumb_url'] ?: 'image-not-found.png';
             $row['thumb_path'] = $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]);
         }
         return $rows;
@@ -101,7 +98,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function gridDataAfter($data)
     {
-        $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+        $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
 
         $data = parent::gridDataAfter($data);
@@ -129,18 +126,37 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $m = $args['model'];
         $newAction = [];
         if ($m->id) {
-            $newAction['duplicate'] = '<button type="submit" class="btn btn-primary ignore-validate" name="do" value="DUPLICATE" '
-                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->_('Duplicate') . '</span></button>';
+            $newAction['duplicate'] = [
+                'button',
+                [
+                    'type' => 'submit',
+                    'class' => ['btn', 'btn-primary', 'ignore-validate'],
+                    'name' => 'do',
+                    'value' => 'DUPLICATE',
+                    'onclick' => 'return confirm(\'Are you sure?\')',
+                ],
+                [
+                    ['span', null, $this->_('Duplicate')],
+                ]
+            ];
         }
-        $newAction['save_and_continue'] = '<button type="submit" class="btn btn-primary" name="do" value="save_and_continue"><span>'
-            . $this->BLocale->_('Save And Continue') . '</span></button>';
+        $newAction['save_and_continue'] = [
+            'button',
+            [
+                'type' => 'submit',
+                'class' => ['btn', 'btn-primary'],
+                'name' => 'do',
+                'value' => 'save_and_continue',
+            ],
+            [
+                ['span', null, $this->BLocale->_('Save And Continue')],
+            ]
+        ];
         $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set([
             'sidebar_img' => $m->thumbUrl(98),
-            'title' => $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product',
-            'actions' => $actions
+            'actions' => $actions,
         ]);
-        $this->_formTitle = $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product';
     }
 
     /**
@@ -240,15 +256,16 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function productAttachmentsGridConfig($model)
     {
         $download_url = $this->BApp->href('/media/grid/download?folder=media/product/attachment&file=');
+        $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->order_by_expr('pa.position asc')
+            ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name', 'a.file_size', 'pa.create_at', 'pa.update_at'])
+            ->select('a.id', 'file_id')->find_many());
+
         return [
             'config' => [
                 'id' => 'product_attachments',
                 'caption' => 'Product Attachments',
                 'data_mode' => 'local',
-                'data' => $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->order_by_expr('pa.position asc')
-                    ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
-                        'a.file_size', 'pa.create_at', 'pa.update_at'])
-                    ->select('a.id', 'file_id')->find_many()),
+                'data' => $data,
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
@@ -281,6 +298,31 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     }
 
     /**
+     * todo: this method will be remove after test
+     * @param $model Sellvana_Catalog_Model_Product
+     * @return array
+     */
+    public function productAttachmentsGridConfigForGriddle($model) {
+        $config = $this->productAttachmentsGridConfig($model);
+        unset($config['config']['actions']['add']);
+        $config['config']['actions'] += [
+            'add-attachment' => [
+                'caption'  => 'Add attachments',
+                'type'     => 'button',
+                'id'       => 'add-attachment-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'gridShowMedia' . $config['config']['id']
+            ]
+        ];
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'gridRegister' . $config['config']['id']
+        ];
+
+        return $config;
+    }
+
+    /**
      * @param $model Sellvana_Catalog_Model_Product
      * @return array
      */
@@ -289,13 +331,16 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
         $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
-            ->order_by_expr('pa.position asc')
-            ->left_outer_join('Sellvana_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
-            ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
-                'a.file_size', 'pa.create_at', 'pa.update_at', 'pa.main_thumb'])
-            ->select('a.id', 'file_id')
+            #->order_by_expr('pa.position asc')
+            #->left_outer_join('Sellvana_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
+            #->group_by('pa.id')
+            #->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
+            #    'a.file_size', 'pa.create_at', 'pa.update_at', 'pa.main_thumb'])
+            #->select('a.id', 'file_id')
+            ->clear_columns()
+            ->select('pa.*')
+            ->select(['a.folder', 'a.subfolder', 'a.file_name', 'a.file_size'])
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
-            ->group_by('pa.id')
             ->find_many());
         $config =  [
             'config' => [
@@ -353,6 +398,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
             ]
         ];
+
         return $config;
     }
 
@@ -372,12 +418,12 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'type'     => 'button',
                 'id'       => 'add-image-from-grid',
                 'class'    => 'btn-primary',
-                'callback' => 'showModalToAddImage'
+                'callback' => 'gridShowMedia' . $config['config']['id']
             ]
         ];
 
         $config['config']['callbacks'] = [
-            'componentDidMount' => 'setProductImagesMainGrid'
+            'componentDidMount' => 'gridRegister' . $config['config']['id']
         ];
 
         return $config;
@@ -401,7 +447,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
         ];
         $config['actions'] = [
-            'add' => ['caption' => 'Add selected products']
+            #'add' => ['caption' => 'Add selected products']
         ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
@@ -416,12 +462,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
 
         return ['config' => $config];
-    }
-
-    public function getAllProdConfigForGriddle($model) {
-        $config = $this->getAllProdConfig($model);
-        unset($config['config']['actions']['add']);
-        return $config;
     }
 
     /**
@@ -441,41 +481,32 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         // TODO for empty local grid, it throws exception
         unset($config['orm']);
-        $config['data'] = $orm->find_many();
-        $config['id'] = 'category_prods_grid_' . $model->id;
-        $config['data_mode'] = 'local';
-        $config['columns'] = [
+        $config['config']['data'] = $orm->find_many();
+        $config['config']['id'] = 'category_prods_grid_' . $model->id;
+        $config['config']['data_mode'] = 'local';
+        $config['config']['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200]
         ];
-        $config['actions'] = [
-            'add' => ['caption' => 'Add products'],
-            'delete' => ['caption' => 'Remove']
-        ];
-        $config['filters'] = [
-            ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'product_sku', 'type' => 'text']
-        ];
-        $config['data_mode'] = 'local';
-        $config['grid_before_create'] = 'catProdGridRegister';
-
-        return ['config' => $config];
-    }
-
-    public function getCatProdConfigForGriddle($model) {
-        $config = $this->getCatProdConfig($model);
-        unset($config['config']['actions']['add']);
-        $config['config']['actions'] += [
+        $config['config']['actions'] = [
+            #'add' => ['caption' => 'Add products'],
             'add-product' => [
                 'caption'  => 'Add Products',
                 'type'     => 'button',
                 'id'       => 'add-product-from-grid',
                 'class'    => 'btn-primary',
                 'callback' => 'showModalToAddProduct'
-            ]
+            ],
+            'delete' => ['caption' => 'Remove']
         ];
+        $config['config']['filters'] = [
+            ['field' => 'product_name', 'type' => 'text'],
+            ['field' => 'product_sku', 'type' => 'text']
+        ];
+        $config['config']['data_mode'] = 'local';
+        $config['config']['grid_before_create'] = 'catProdGridRegister';
 
         $config['config']['callbacks'] = [
             'componentDidMount' => 'setCatProdMainGrid'
@@ -501,6 +532,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 ->where('link_type', $type)
                 ->where('pl.product_id', $model ? $model->id : 0);
 
+
             //TODO: flexibility for more types
             $caption = $type == 'related' ? 'Related Products' : 'Similar Products';
             break;
@@ -509,9 +541,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $caption = '';
         }
 
+
+
         $gridId = 'linked_products_' . $type;
 
-        $config = [
+        $config['config'] = [
             'id'           => $gridId,
             'data'         => null,
             'data_mode'     => 'local',
@@ -527,7 +561,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'editable' => 'inline', 'validation' => ['number' => true], 'type' => 'input'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add products'],
+                #'add' => ['caption' => 'Add products'],
                 'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
@@ -537,6 +571,42 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             'events' => ['init', 'add', 'mass-delete'],
             'grid_before_create' => $gridId . '_register'
         ];
+
+        switch ($type) {
+            case 'related':
+                $config['config']['actions'] += [
+                    'add-related-product' => [
+                        'caption'  => 'Add Related Products',
+                        'type'     => 'button',
+                        'id'       => $gridId,
+                        'class'    => 'btn-primary',
+                        'callback' => 'showModalToAddProduct'
+                    ]
+                ];
+                break;
+            case 'similar':
+                $config['config']['actions'] += [
+                    'add-similar-product' => [
+                        'caption'  => 'Add Similar Products',
+                        'type'     => 'button',
+                        'id'       => $gridId,
+                        'class'    => 'btn-primary',
+                        'callback' => 'showModalToAddProduct'
+                    ]
+                ];
+                break;
+            case 'cross_sell':
+                $config['config']['actions'] += [
+                    'add-cross-product' => [
+                        'caption'  => 'Add Cross Sell Products',
+                        'type'     => 'button',
+                        'id'       => $gridId,
+                        'class'    => 'btn-primary',
+                        'callback' => 'showModalToAddProduct'
+                    ]
+                ];
+                break;
+        }
 
 
         //$this->BEvents->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
@@ -551,10 +621,16 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             }
         }*/
 
-        $config['data'] = $data;
+        $config['config']['data'] = $data;
+
+        $config['config']['type'] = $type;
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'setLinkedProdMainGrid'
+        ];
 
         //$this->BEvents->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
-        return ['config' => $config];
+        return $config;
     }
 
     public function formPostAfter($args)
@@ -643,7 +719,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function processLinkedProductsPost($model, $data)
     {
-        //echo "<pre>"; print_r($data); echo "</pre>";
+        //echo "<pre>"; print_r($data); echo "</pre>";die;
         $hlp = $this->Sellvana_Catalog_Model_ProductLink;
         foreach (['related', 'similar', 'cross_sell'] as $type) {
             $typeName = 'linked_products_' . $type;
@@ -655,6 +731,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 ]);
             }
             if (isset($data[$typeName])) {
+                //echo "<pre>"; print_r($data[$typeName]); echo "</pre>";die;
                 foreach ($data[$typeName] as $key => $arr) {
                     $productLink = $hlp->loadWhere([
                         'product_id' => $model->id(),
@@ -1031,7 +1108,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         if (!empty($data['prices']['productPrice'])) {
             foreach ($data['prices']['productPrice'] as $id => $priceData) {
                 foreach ($priceData as $field => $pf) {
-                    if (in_array($field, ['customer_group_id', 'site_id', 'currency_code']) && !is_numeric($pf)) {
+                    if (in_array($field, ['customer_group_id', 'site_id']) && !is_numeric($pf)) {
+                        $priceData[$field] = null;
+                    }
+
+                    if($field == 'currency_code' && $pf == '*'){
                         $priceData[$field] = null;
                     }
                 }
@@ -1056,5 +1137,43 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         }
 
+    }
+
+    /**
+     * Fetch list of products to use in conditions
+     */
+    public function action_skus()
+    {
+
+        $r       = $this->BRequest;
+        $page    = $r->get('page')?: 1;
+        $skuTerm = $r->get('q');
+        $limit   = $r->get('o')?: 30;
+        $offset  = ($page - 1) * $limit;
+
+        /** @var BORM $orm */
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->select(['id', 'product_sku', 'product_name'], 'p');
+        if ($skuTerm && $skuTerm != '*') {
+            $orm->where(['OR' => [['product_sku LIKE ?', "%{$skuTerm}%"], ['product_name LIKE ?', "%{$skuTerm}%"]]]);
+        }
+
+        $countOrm = clone $orm;
+        $countOrm->select_expr('COUNT(*)', 'count');
+        $stmt     = $countOrm->execute();
+        $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $count    = $countRes[0]['count'];
+
+        $orm->limit((int) $limit)->offset($offset)->order_by_asc('product_name');
+        $stmt   = $orm->execute();
+        $result = ['total_count' => $count, 'items' => []];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $result['items'][] = [
+                'id'   => $row['product_sku'],
+                'text' => $row['product_name'],
+                'sku'  => $row['product_sku'],
+            ];
+        }
+
+        $this->BResponse->json($result);
     }
 }

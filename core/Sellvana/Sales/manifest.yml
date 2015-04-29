@@ -1,7 +1,7 @@
 modules:
     Sellvana_Sales:
-        version: 0.3.15
-        channel: beta
+        version: 0.5.0.0
+        channel: alpha
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"
         auto_use: [ bootstrap ]
@@ -18,14 +18,13 @@ modules:
             FCom_Admin:
                 auto_use: [ views, layout ]
                 routing:
-                    - [ /orders, Sellvana_Sales_Admin_Controller_Orders.index ]
-                    - [ /orders/.action, Sellvana_Sales_Admin_Controller_Orders ]
-                    - [ /orderstatus, Sellvana_Sales_Admin_Controller_OrderStatus.index ]
-                    - [ /orderstatus/.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
-                    - [ /orderstatecustom, Sellvana_Sales_Admin_Controller_OrderStateCustom.index ]
-                    - [ /orderstatecustom/.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
+                    - [ /carts/?.action, Sellvana_Sales_Admin_Controller_Carts ]
+                    - [ /orders/?.action, Sellvana_Sales_Admin_Controller_Orders ]
+                    - [ /payments/?.action, Sellvana_Sales_Admin_Controller_Payments ]
+                    - [ /orderstatus/?.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
+                    - [ /orderstatecustom/?.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
                 observe:
-                    - [ "FCom_Admin_View_Header::getNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
+                    - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", Sellvana_Sales_Admin_Controller_Orders.onSaveAdminSettings ]
                     - [ "FCom_Admin_Controller_HeaderSearch::action_index", Sellvana_Sales_Admin_Controller_Orders.onHeaderSearch  ]
@@ -46,6 +45,7 @@ modules:
                     - [ "Sellvana_Customer_Model_Customer::login:after", "Sellvana_Sales_Main::onCustomerLogIn" ]
                     - [ "Sellvana_Customer_Model_Customer::logout:before", "Sellvana_Sales_Main::onCustomerLogOut" ]
                     - [ "FCom_Core_Model_Seq::getFirstSeqId", Sellvana_Sales_Model_Order.onGetFirstSeqId ]
+                    - [ "Sellvana_MultiCurrency_Main::switchCurrency", "Sellvana_Sales_Main.onSwitchCurrency" ]
             FCom_Cron:
                 crontab:
                     - [ "* * * * *", Sellvana_Sales_Cron::runEveryMinute ]

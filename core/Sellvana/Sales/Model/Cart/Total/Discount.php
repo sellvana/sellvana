@@ -32,6 +32,7 @@ class Sellvana_Sales_Model_Cart_Total_Discount extends Sellvana_Sales_Model_Cart
          */
 
         $this->_value = !empty($result['discount_amount']) ? $result['discount_amount'] : 0;
+        $this->_storeCurrencyValue = $this->_cart->convertToStoreCurrency($this->_value);
 
         $cart = $this->_cart;
 
@@ -39,10 +40,12 @@ class Sellvana_Sales_Model_Cart_Total_Discount extends Sellvana_Sales_Model_Cart
             foreach ($cart->items() as $item) {
                 $itemId = $item->id();
                 if (!empty($result['items'][$itemId]['row_discount'])) {
-                    $item->set('row_discount', $result['items'][$itemId]['row_discount']);
+                    $rowDiscount = $result['items'][$itemId]['row_discount'];
+                    $storeCurrencyRowDiscount = $this->_cart->convertToStoreCurrency($rowDiscount);
                 } else {
-                    $item->set('row_discount', 0);
+                    $rowDiscount = $storeCurrencyRowDiscount = 0;
                 }
+                $item->set('row_discount', $rowDiscount)->setData('store_currency/row_discount', $storeCurrencyRowDiscount);
                 if (!empty($result['items'][$itemId]['details'])) {
                     $item->setData('discount_details', $result['items'][$itemId]['details']);
                 } else {
@@ -53,15 +56,18 @@ class Sellvana_Sales_Model_Cart_Total_Discount extends Sellvana_Sales_Model_Cart
 
         $shippingPrice = $cart->getTotalByType('shipping')->getValue();
         if (!empty($result['shipping_free'])) {
-            $cart->getTotalByType('grand_total')->addComponent(-$shippingPrice, 'shipping_discount');
+            $cart->getTotalByType('grand_total')->addComponent('shipping_discount', -$shippingPrice);
             $cart->set('shipping_free', 1);
-            $cart->set('shipping_price', 0);
+            $cart->set('shipping_price', 0)->setData('store_currency/shipping_price', 0);
 
         } elseif (!empty($result['shipping_discount'])) {
-            $cart->getTotalByType('grand_total')->addComponent(-$result['shipping_discount'], 'shipping_discount');
+            $storeCurrencyShippingDiscount = $this->_cart->convertToStoreCurrency($result['shipping_discount']);
+            $cart->getTotalByType('grand_total')->addComponent('shipping_discount', -$result['shipping_discount'],
+                $storeCurrencyShippingDiscount);
             $cart->set('shipping_discount', $result['shipping_discount']);
             $cart->set('shipping_free', $shippingPrice == $result['shipping_discount']);
-            $cart->add('shipping_price', -$result['shipping_discount']);
+            $cart->add('shipping_price', -$result['shipping_discount'])
+                ->setData('store_currency/shipping_price', $storeCurrencyShippingDiscount);
         }
 
         $cart->setData('discount_details', !empty($result['details']) ? $result['details'] : []);
@@ -69,7 +75,9 @@ class Sellvana_Sales_Model_Cart_Total_Discount extends Sellvana_Sales_Model_Cart
         $cart->set($this->_cartField, $this->_value);
 
         if ($this->_value) {
-            $cart->getTotalByType('grand_total')->addComponent(-$this->_value, 'discount');
+            /** @var Sellvana_Sales_Model_Cart_Total_GrandTotal $grandTotalModel */
+            $grandTotalModel = $this->_cart->getTotalByType('grand_total');
+            $grandTotalModel->addComponent('discount', -$this->_value, -$this->_storeCurrencyValue);
         }
 
         return $this;

@@ -1,0 +1,14 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'Sellvana_MultiVendor', } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set orderCustomStates = APP.instance('Sellvana_MultiVendor_Main').getAvailableOrderStates() %}
+
+<h2>{{ "MultiVendor Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_MultiVendor'}) }}
+     {{ forms.accordion_panel_start({label:'Vendor Notifications'|_, id:'settings-Sellvana_MultiVendor-group0', in:1}) }}
+        {{ forms.boolean(fieldData, {field:'enable_notifications', label:'Enable Notifications'|_ }) }}
+        {{ forms.input(fieldData, {field:'store_contact_email', label:'Store Contact Email'|_ }) }}
+        {{ forms.input(fieldData, {field:'store_contact_name', label:'Store Contact Name'|_ }) }}
+        {{ forms.select(fieldData, {field:'notify_on_order_states', label:'Notify on Order States'|_, options: orderCustomStates, select2: true, multiple: true }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

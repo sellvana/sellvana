@@ -73,3 +73,23 @@ lib_griddle:
             #build griddle
             - [ requireJs, griddle.custom, @FCom_LibJsCommon/jsx/griddle/build/griddle.custom ]
             - [ requireJs, griddle.gridNoData, @FCom_LibJsCommon/jsx/griddle/build/gridNoData ]
+
+lib_select2:
+    - view: head
+        do:
+            - [ requireJs, select2, @FCom_LibJsCommon/js/select2-4.0.0/js/select2.full.min ]
+            - [ css, @FCom_LibJsCommon/js/select2-4.0.0/css/select2.min.css ]
+
+lib_file_upload:
+    - view: head
+        do:
+            - [ css, "@FCom_LibJsCommon/js/css/plugins/jquery_fileupload/jquery.fileupload-ui.css" ]
+            - [ requireJs, jquery-ui, [ //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min, "@FCom_LibJsCommon/js/jquery-ui.min" ], { deps: [ jquery ] } ]
+            - [ requireJs, tmpl, "@FCom_LibJsCommon/js/plugins/fileupload/tmpl.min", {deps: [ jquery ] } ]
+            - [ requireJs, load-image, "@FCom_LibJsCommon/js/plugins/fileupload/load-image.min", { deps: [ tmpl ] } ]
+            - [ requireJs, canvas-to-blob, "@FCom_LibJsCommon/js/plugins/fileupload/canvas-to-blob.min", { deps: [ tmpl ] } ]
+            - [ requireJs, iframe-transport, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.iframe-transport.min", { deps: [ tmpl ] } ]
+            - [ requireJs, jquery.fileupload, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload.min", { deps: [tmpl ] } ]
+            - [ requireJs, jquery.fileupload-fp, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-fp.min", { deps: [ jquery.fileupload ] } ]
+            - [ requireJs, jquery.fileupload-ui, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-ui.min", { deps: [ jquery.fileupload ] } ]
+            - [ requireJs, jquery.fileupload-init, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-init", { deps: [ jquery.fileupload ] } ]

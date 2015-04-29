@@ -90,7 +90,7 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
                     'price.cost' => $cost,
                     'price.base' => $basePrice,
                     'price.sale' => $salePrice,
-                    'price.tiers' => $tiers,
+                    'price.tier' => $tiers,
                     'color' => $colors[rand(0, sizeof($colors)-1)],
                     'size' => $sizes[rand(0, sizeof($sizes)-1)],
                 ])->save();
@@ -186,7 +186,7 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
                 'price.cost' => rand(1, 1000),
                 'price.base' => 'cost+50%',
                 'price.sale' => 'base-20%',
-                'price.tiers' => '5:sale-5%;10:sale-10%',
+                'price.tier' => '5:sale-5%;10:sale-10%',
             ])->save();
             echo '<hr>' . $p->id() . ': ' . memory_get_usage();
         }

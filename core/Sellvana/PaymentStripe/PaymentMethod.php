@@ -33,8 +33,25 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
     protected function _initialize()
     {
         require_once __DIR__ . '/lib/Stripe.php';
-        $key = $this->getConfig('test') ? $this->getConfig('test_secret_key') : $this->getConfig('live_secret_key');
-        Stripe::setApiKey($key);
+        Stripe::setApiKey($this->getSecretKey());
+    }
+
+    public function can($capability)
+    {
+        if (!$this->getConfig('active') || !$this->getSecretKey() || !$this->getPublicKey()) {
+            return false;
+        }
+        return parent::can($capability);
+    }
+
+    public function getSecretKey()
+    {
+        return $this->getConfig('test') ? $this->getConfig('test_secret_key') : $this->getConfig('live_secret_key');
+    }
+
+    public function getPublicKey()
+    {
+        return $this->getConfig('test') ? $this->getConfig('test_public_key') : $this->getConfig('live_public_key');
     }
 
     /**
@@ -45,7 +62,7 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
     {
         $data = [
             'form_prefix' => $this->getCheckoutFormPrefix(),
-            'public_key' => $this->getConfig('test') ? $this->getConfig('test_public_key') : $this->getConfig('live_public_key'),
+            'public_key' => $this->getPublicKey(),
             'amount' => $this->Sellvana_Sales_Model_Cart->sessionCart()->get('subtotal'),
             'description' => null,//'You will have opportunity to change address and shipping method on the next step',
         ];
@@ -65,7 +82,7 @@ class Sellvana_PaymentStripe_PaymentMethod extends Sellvana_Sales_Method_Payment
             $transType = Sellvana_Sales_Model_Order_Payment_Transaction::SALE;
             $transaction = $payment->createTransaction($transType)->start();
             $charge = Stripe_Charge::create([
-                'amount' => $payment->get('amount_due'),
+                'amount' => round($payment->get('amount_due') * 100),
                 'currency' => $order->get('order_currency') ?: 'USD',
                 'card' => $token,
                 'description' => 'Test',
@@ -108,12 +125,12 @@ echo "<pre>"; var_dump($e); exit;
         }
     }
 
-    public function getConfig($key)
+    public function getConfig($key = null)
     {
         if (!$this->_config) {
             $this->_config = $this->BConfig->get('modules/Sellvana_PaymentStripe');
         }
-        return !empty($this->_config[$key]) ? $this->_config[$key] : null;
+        return !$key ? $this->_config : (!empty($this->_config[$key]) ? $this->_config[$key] : null);
     }
 
     /*
