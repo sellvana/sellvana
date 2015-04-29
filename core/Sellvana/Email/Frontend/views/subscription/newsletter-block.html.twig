@@ -2,7 +2,7 @@
     <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
     <div class="form-group">
         <label for="newsletter-email" class="f-col-title">{{ "Subscribe to our newsletter"|_ }}</label>
-        <input type="email" name="email" class="form-control required" id="newsletter-email" placeholder="Enter your email">
+        <input type="email" name="email" class="form-control required" id="newsletter-email" placeholder="{{ 'Enter your email'|_ }}">
     </div>
     <button type="submit" class="btn btn-default btn-sm">{{ "Subscribe"|_ }}</button>
 </form>

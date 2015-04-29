@@ -53,6 +53,8 @@ class BLocale extends BClass
     */
     protected static $_tr;
 
+    protected static $_customTranslators = [];
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -933,10 +935,11 @@ class BLocale extends BClass
     {
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
         if (empty($ext)) {
-            return;
+            return $this;
         }
         $params['extension'] = $ext;
         static::importTranslations($file, $params);
+        return $this;
     }
 
     protected function addTranslation($r, $module = null)
@@ -976,10 +979,26 @@ class BLocale extends BClass
 
     }
 
+    public function addCustomTranslator($name, $callback)
+    {
+        static::$_customTranslators[$name] = $this->BUtil->extCallback($callback);
+        return $this;
+    }
+
     public function _($string, $params = [], $module = null)
     {
         if (empty(static::$_tr[$string])) { // if no translation at all
-            $tr = $string; // return original string
+            $tr = null;
+            foreach (static::$_customTranslators as $translator) {
+                $tr = call_user_func($translator, $string, null, $module);
+                if ($tr) {
+                    static::$_tr[$string]['_'] = $tr;
+                    break;
+                }
+            }
+            if (!$tr) {
+                $tr = $string; // return original string
+            }
         } else { // if some translation present
             $arr = static::$_tr[$string];
             if (!empty($module) && !empty($arr[$module])) { // if module requested and translation for it present

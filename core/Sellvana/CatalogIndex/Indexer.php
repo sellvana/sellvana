@@ -62,6 +62,10 @@ class Sellvana_CatalogIndex_Indexer extends BClass
 
         $pIds = [];
         $loadIds = [];
+        /**
+         * @var int $i
+         * @var Sellvana_Catalog_Model_Product $p
+         */
         foreach ($products as $i => $p) {
             if (is_numeric($p)) {
                 $loadIds[$i] = (int)$p;
