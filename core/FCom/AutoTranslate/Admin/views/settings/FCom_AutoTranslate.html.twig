@@ -1,0 +1,15 @@
+{% set c = THIS.get('model') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set locales = LOCALE.getAvailableLocaleCodes() %}
+
+<h2>{{ "Admin Settings"|_}}</h2>
+{% set fieldData = { model: c, settings_module:'FCom_AutoTranslate' } %}
+{{ forms.accordion_start({id:'settings-FCom_AutoTranslate'}) }}
+    {{ forms.accordion_panel_start({label:'Google Translate API'|_, id:'settings-FCom_AutoTranslate-group0', in:1}) }}
+        {{ forms.input(fieldData, {field:'google_api_key', label:'API Key'|_ }) }}
+        {{ forms.select(fieldData, {field:'translate_immediately', label:'Translate Immediately?'|_, options:{
+            1: 'YES (translated during request, slower)',
+            0: 'no (translated at the end of request, visible on reload, faster)'
+        }}) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

@@ -439,7 +439,7 @@ class FCom_Core_LayoutEditor extends BClass
                 $args['layout'][] = ['view' => $view_name, 'set' => $update];
             },
         ]);
-
+/*
         $this->addWidgetType('file_upload', [
             'title'       => 'File Upload',
             'pos'         => 130,
@@ -470,7 +470,7 @@ class FCom_Core_LayoutEditor extends BClass
                 $args['layout'][] = ['view' => $view_name, 'set' => ['config' => $update]];
             },
         ]);
-
+*/
         $this->addWidgetType('remove', [
             'title' => 'Remove View',
             'pos' => 100,

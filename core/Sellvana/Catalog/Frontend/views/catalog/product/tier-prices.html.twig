@@ -9,7 +9,7 @@
             {% set tierPrice = tier.getPrice() %}
             {% if tierPrice < catalogPrice %}
                 <tr>
-                    <td>Buy {{ tier.qty }}</td>
+                    <td>{{ 'Buy %s'|_(tier.qty) }}</td>
                     <td>{{ '%s each'|_(tierPrice|currency) }}</td>
                     <td>{{ 'Save %s%%'|_(((catalogPrice-tierPrice)/catalogPrice*100)|number_format(0)) }}</td>
                 </tr>

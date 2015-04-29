@@ -23,6 +23,7 @@
         {{ forms.select(fieldData, { field:'allowed_countries', label:'Allowed Countries'|_, options:LOCALE.getAvailableCountries(), select2: {}, multiple:1 }) }}
         {{ forms.select(fieldData, { field:'default_country', label:'Default Country'|_, options:LOCALE.getAvailableCountries(), select2: {} }) }}
         {{ forms.select(fieldData,  { field:'default_tz', label:'Default Timezone'|_, options:LOCALE.tzOptions(true), select2: {} }) }}
+        {{ forms.select(fieldData,  { field:'base_locale', label:'Base Locale'|_, options:LOCALE.getAvailableLocaleCodes(), select2: {} }) }}
         {{ forms.input(fieldData,  { field:'base_currency', label:'Base Currency'|_ }) }}
         {{ forms.input(fieldData,  { field:'default_currency', label:'Default Currency'|_ }) }}
     {{ forms.accordion_panel_end }}
@@ -65,6 +66,7 @@
         {{ forms.input(fieldData,   { field:'http_host_whitelist', label:'HTTP Host Whitelist (comma separated)'|_ }) }}
         {{ forms.select(fieldData,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:csrfMethods }) }}
         {{ forms.input(fieldData,   { field:'csrf_web_root', label:'CSRF Referrer Web Root Path (optional)'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'hsts_enable', label:'Enable HSTS header (HTTP Strict Transport Security)'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, id_prefix:'staging', name_prefix:'config[staging]', get_prefix:'staging' } %}
@@ -74,4 +76,6 @@
         {{ forms.boolean(fieldData, { field:'email_subject_prepend', label:'Prepend All Emails Subject'|_ }) }}
         {{ forms.input(fieldData,   { field:'email_subject_prepend_prefix', label:'Emails Subject Prefix'|_ }) }}
     {{ forms.accordion_panel_end }}
+
+
 {{ forms.accordion_end }}

@@ -3945,7 +3945,9 @@ class BValidate extends BClass
             }
 
             if (!$result) {
-                $this->_validateErrors[$r['field']][] = $this->BUtil->injectVars($r['message'], $r['args']);
+                $message = $this->BUtil->injectVars($r['message'], $r['args']);
+                $message = $this->BLocale->_($message);
+                $this->_validateErrors[$r['field']][] = $message;
                 if (!empty($r['args']['break'])) {
                     break;
                 }
