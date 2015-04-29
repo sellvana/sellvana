@@ -225,7 +225,7 @@
     });
 
     $('.btn-progress').on('click',function(){
-        var url = '{{ APP.href('/catalogindex/reindex') }}';
+        var url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}';
         $('#progress-bar').css('width', 0);
         $.ajax({
             xhr: function()
