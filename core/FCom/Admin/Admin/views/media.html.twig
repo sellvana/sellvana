@@ -66,6 +66,25 @@
             $uploader.fileupload('option', {url: uploadUrl});
             console.log(uploadUrl);
         });
+        var mediaLibGrid{{ config.id }};
+
+        //re-scan image button
+        $('#{{ config.id }}-attach_library').find('.btn-rescan-images').on('click', function () {
+            $.post('{{ APP.href("media/grid/rescan?folder=media") | raw }}', {do: 'rescan'}, function (response) {
+                if (response.status == 'success') {
+                    $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});
+                    mediaLibGrid{{ config.id }}.refresh();
+                } else {
+                    $.bootstrapGrowl("Error:<br>" + response.message, {
+                        type: 'danger',
+                        align: 'center',
+                        width: 'auto',
+                        delay: 5000
+                    });
+                }
+            });
+        });
+
         window.gridShowMedia{{ config.id }} = function () {
             var mediaModal = $('#{{ config.id }}-upload-modal');
             if (mediaModal) {
