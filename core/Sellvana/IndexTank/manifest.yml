@@ -1,6 +1,6 @@
 modules:
     Sellvana_IndexTank:
-        version: 0.2.1
+        version: 0.5.0.0
         channel: alpha
         translations: { en: en.php }
         description: "IndexTank API integration"

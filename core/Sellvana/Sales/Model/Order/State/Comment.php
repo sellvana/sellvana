@@ -30,6 +30,8 @@ class Sellvana_Sales_Model_Order_State_Comment extends Sellvana_Sales_Model_Orde
         self::AUTO_CLOSED => 'email/sales/order-state-comment-auto_closed',
     ];
 
+    protected $_defaultValue = self::NONE;
+
     public function setNone()
     {
         return $this->changeState(self::NONE);
@@ -58,5 +60,10 @@ class Sellvana_Sales_Model_Order_State_Comment extends Sellvana_Sales_Model_Orde
     public function setAutoClosed()
     {
         return $this->changeState(self::AUTO_CLOSED);
+    }
+
+    public function calcState()
+    {
+        return $this;
     }
 }

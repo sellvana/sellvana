@@ -12,6 +12,10 @@
  * @property Sellvana_Sales_Model_Order_State_Overall $Sellvana_Sales_Model_Order_State_Overall
  * @property Sellvana_Sales_Model_Order_State_Payment $Sellvana_Sales_Model_Order_State_Payment
  * @property Sellvana_Sales_Model_Order_State_Delivery $Sellvana_Sales_Model_Order_State_Delivery
+ * @property Sellvana_Sales_Model_Order_State_Cancel $Sellvana_Sales_Model_Order_State_Cancel
+ * @property Sellvana_Sales_Model_Order_State_Refund $Sellvana_Sales_Model_Order_State_Refund
+ * @property Sellvana_Sales_Model_Order_State_Return $Sellvana_Sales_Model_Order_State_Return
+ * @property Sellvana_Sales_Model_Order_State_Comment $Sellvana_Sales_Model_Order_State_Comment
  * @property Sellvana_Sales_Model_Order_State_Custom $Sellvana_Sales_Model_Order_State_Custom
  * @property Sellvana_Sales_Model_Order_Payment $Sellvana_Sales_Model_Order_Payment
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
@@ -56,6 +60,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $overallStates = $this->Sellvana_Sales_Model_Order_State_Overall->getAllValueLabels();
         $paymentStates = $this->Sellvana_Sales_Model_Order_State_Payment->getAllValueLabels();
         $deliveryStates = $this->Sellvana_Sales_Model_Order_State_Delivery->getAllValueLabels();
+        $cancelStates = $this->Sellvana_Sales_Model_Order_State_Cancel->getAllValueLabels();
+        $refundStates = $this->Sellvana_Sales_Model_Order_State_Refund->getAllValueLabels();
+        $returnStates = $this->Sellvana_Sales_Model_Order_State_Return->getAllValueLabels();
+        $commentStates = $this->Sellvana_Sales_Model_Order_State_Comment->getAllValueLabels();
         $customStates = $this->Sellvana_Sales_Model_Order_State_Custom->getAllValueLabels();
 
         $config = parent::gridConfig();
@@ -79,6 +87,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['name' => 'state_overall', 'label' => 'Overall State', 'index' => 'o.state_overall', 'options' => $overallStates],
             ['name' => 'state_payment', 'label' => 'Payment State', 'index' => 'o.state_payment', 'options' => $paymentStates],
             ['name' => 'state_delivery', 'label' => 'Delivery State', 'index' => 'o.state_delivery', 'options' => $deliveryStates],
+            ['name' => 'state_cancel', 'label' => 'Cancel State', 'index' => 'o.state_cancel', 'options' => $cancelStates],
+            ['name' => 'state_refund', 'label' => 'Refund State', 'index' => 'o.state_refund', 'options' => $refundStates],
+            ['name' => 'state_return', 'label' => 'Return State', 'index' => 'o.state_return', 'options' => $returnStates],
+            ['name' => 'state_comment', 'label' => 'Comment State', 'index' => 'o.state_comment', 'options' => $commentStates],
             ['name' => 'state_custom', 'label' => 'Custom State', 'index' => 'o.state_custom', 'options' => $customStates],
 
             ['name' => 'billing_firstname', 'label' => 'Bill First Name', 'index' => 'billing_firstname'],
@@ -191,13 +203,13 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             $order->state()->custom()->changeState($orderStatePost['custom']);
         }
 
+        if ($args['do'] === 'SHIP_ALL') {
+            $order->shipAllShipments();
+        }
+
         $pay = $this->BRequest->post('pay');
         if (!empty($pay['items'])) {
             $this->Sellvana_Sales_Model_Order_Payment->payOrderItems($order, $pay['items']);
-        }
-
-        if ($args['do'] === 'SHIP_ALL') {
-            $this->Sellvana_Sales_Model_Order_Shipment->shipOrderItems($order);
         }
 
         $ship = $this->BRequest->post('ship');
@@ -248,6 +260,9 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $overallStates = $this->Sellvana_Sales_Model_Order_Item_State_Overall->getAllValueLabels();
         $paymentStates = $this->Sellvana_Sales_Model_Order_Item_State_Payment->getAllValueLabels();
         $deliveryStates = $this->Sellvana_Sales_Model_Order_Item_State_Delivery->getAllValueLabels();
+        $refundStates = $this->Sellvana_Sales_Model_Order_Item_State_Refund->getAllValueLabels();
+        $returnStates = $this->Sellvana_Sales_Model_Order_Item_State_Return->getAllValueLabels();
+        $cancelStates = $this->Sellvana_Sales_Model_Order_Item_State_Cancel->getAllValueLabels();
         $customStates = $this->Sellvana_Sales_Model_Order_Item_State_Custom->getAllValueLabels();
 
         $config = array_merge(
@@ -259,27 +274,30 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 'orm'       => 'Sellvana_Sales_Model_Order_Item',
                 'columns'   => [
                     //todo: add row for image
-                    ['type' => 'row_select'],
-                    ['type' => 'btn_group', 'width' => 50, 'buttons' => [['name' => 'edit']]],
+                    //['type' => 'row_select'],
+                    //['type' => 'btn_group', 'width' => 50, 'buttons' => [['name' => 'edit']]],
                     ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
                     ['name' => 'product_name', 'label' => 'Name'],
                     ['name' => 'product_sku', 'label' => 'Product SKU', 'width' => 100],
-                    ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 100],
+                    ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 100, 'hidden' => true],
                     ['name' => 'price', 'label' => 'Price', 'width' => 50],
                     ['name' => 'qty_ordered', 'label' => 'Qty', 'width' => 50],
-                    ['name' => 'qty_backordered', 'label' => 'Backordered', 'width' => 50],
-                    ['name' => 'qty_canceled', 'label' => 'Canceled', 'width' => 50],
-                    ['name' => 'qty_shipped', 'label' => 'Shipped', 'width' => 50],
-                    ['name' => 'qty_returned', 'label' => 'Returned', 'width' => 50],
+                    ['name' => 'qty_backordered', 'label' => 'Backordered', 'width' => 50, 'hidden' => true],
+                    ['name' => 'qty_canceled', 'label' => 'Canceled', 'width' => 50, 'hidden' => true],
+                    ['name' => 'qty_shipped', 'label' => 'Shipped', 'width' => 50, 'hidden' => true],
+                    ['name' => 'qty_returned', 'label' => 'Returned', 'width' => 50, 'hidden' => true],
                     ['name' => 'row_total', 'label' => 'Total', 'width' => 50],
-                    ['name' => 'row_tax', 'label' => 'Tax', 'width' => 50],
-                    ['name' => 'row_discount', 'label' => 'Discount', 'width' => 50],
+                    ['name' => 'row_tax', 'label' => 'Tax', 'width' => 50, 'hidden' => true],
+                    ['name' => 'row_discount', 'label' => 'Discount', 'width' => 50, 'hidden' => true],
                     ['name' => 'row_discount_percent', 'label' => 'Discount Percent', 'width' => 50, 'hidden' => true],
-                    ['name' => 'shipping_weight', 'label' => 'Ship Weight', 'width' => 50],
+                    ['name' => 'shipping_weight', 'label' => 'Ship Weight', 'width' => 50, 'hidden' => true],
                     ['name' => 'shipping_size', 'label' => 'Ship Size', 'width' => 50, 'hidden' => true],
                     ['name' => 'state_overall', 'label' => 'Overall', 'width' => 50, 'options' => $overallStates],
                     ['name' => 'state_delivery', 'label' => 'Delivery', 'width' => 50, 'options' => $deliveryStates],
                     ['name' => 'state_payment', 'label' => 'Payment', 'width' => 50, 'options' => $paymentStates, 'hidden' => true],
+                    ['name' => 'state_cancel', 'label' => 'Cancel State', 'options' => $cancelStates, 'hidden' => true],
+                    ['name' => 'state_refund', 'label' => 'Refund State', 'options' => $refundStates, 'hidden' => true],
+                    ['name' => 'state_return', 'label' => 'Return State', 'options' => $returnStates, 'hidden' => true],
                     ['name' => 'state_custom', 'label' => 'Custom', 'width' => 50, 'options' => $customStates],
                     ['name' => 'auto_added', 'label' => 'Auto Added', 'width' => 50, 'options' => [1 => 'YES', 0 => 'no']],
                 ],

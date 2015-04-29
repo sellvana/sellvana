@@ -37,22 +37,26 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     /**
      * Get or create client record for current browser session
+     *
+     * @param boolean $refresh
      * @return FCom_PushServer_Model_Client
      */
-    public function sessionClient()
+    public function sessionClient($refresh = false)
     {
         $sessId = $this->BSession->sessionId();
 
-        /*todo: because we need get data from data_serialized which be updated from different connection, so temporary disable load from cache*/
-        /*if (!empty(static::$_clientCache[$sessId])) {
+        if (!$refresh && !empty(static::$_clientCache[$sessId])) {
             return static::$_clientCache[$sessId];
         }
 
+        /*todo: because we need get data from data_serialized which be updated from different connection, so temporary disable load from cache*/
+        /*
         $sessData =& $this->BSession->dataToUpdate();
         if (!empty($sessData['pushserver']['client'])) {
             static::$_clientCache[$sessId] = $this->create($sessData['pushserver']['client'], false);
             return static::$_clientCache[$sessId];
-        }*/
+        }
+        */
 
         $client = $this->load($sessId, 'session_id');
         if (!$client) {
@@ -177,7 +181,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function processRequest($request)
     {
-        $client = $this->sessionClient();
+        $client = $this->sessionClient(true);
 
         if (!isset($request['window_name']) || !isset($request['conn_id'])
             || !is_string($request['window_name']) || !is_numeric($request['conn_id'])

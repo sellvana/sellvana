@@ -109,8 +109,8 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             ])->save();
         }
 
-        $this->state()->overall()->setPending();
-        $this->state()->custom()->setDefault();
+        $this->state()->overall()->setDefaultState();
+        $this->state()->custom()->setDefaultState();
         return $this;
     }
 
@@ -270,6 +270,11 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             $oItem = $orderItems[$oItemId];
             $oItem->set('qty_paid', $oItem->get('qty_ordered'));
         }
+        return $this;
+    }
+
+    public function payOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
+    {
         return $this;
     }
 

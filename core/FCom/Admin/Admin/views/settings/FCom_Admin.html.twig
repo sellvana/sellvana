@@ -18,8 +18,8 @@
             {{ forms.label({label:'IP: mode'|_}) }}
             <div class="col-md-8 group-ip-mode"></div>
         </div>
-        {{ forms.textarea(fieldData, {name:'config[recovery_modules][FCom_Admin]', id:'recovery_modules-FCom_Admin',
-            label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery_modules/FCom_Admin'), raw:1 }) }}
+        {{ forms.textarea(fieldData, {name:'config[recovery][FCom_Admin][modules]', id:'recovery-FCom_Admin-modules',
+            label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery/FCom_Admin/modules'), raw:1 }) }}
 
         {{ forms.boolean(fieldData, {field:'enable_locales', label:'Enable UI Multi Locale'|_ }) }}
         {{ forms.select(fieldData, {field:'default_locale', label:'Default Product Locale', select2: {}, options:locales }) }}

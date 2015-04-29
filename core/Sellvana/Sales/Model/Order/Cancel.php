@@ -30,16 +30,22 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
-    public function cancelOrderItems($order, $itemsData)
+    public function cancelOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
     {
-        $itemLines = preg_match_all('#^\s*([^\s]+)(\s*:\s*([^\s]+))?\s*$#', $itemsData, $matches, PREG_PATTERN_ORDER);
+        if (!preg_match_all('#^\s*([^\s]+)(\s*:\s*([^\s]+))?\s*$#', $itemsData, $matches, PREG_SET_ORDER)) {
+            return $this;
+        }
         $qtys = [];
         foreach ($matches as $m) {
-            $qtys[$m[1]] = $m[3];
+            $qtys[$m[1]] = !empty($m[3]) ? $m[3] : true;
         }
-        $items = $this->Sellvana_Sales_Model_Order_Item->orm('oi')
-            ->where_in('product_sku', array_keys($qtys))
-            ->find_many_assoc('id');
+        $skus = array_keys($qtys);
+        $items = $order->items();
+        foreach ($items as $i => $item) {
+            if (!in_array($item->get('product_sku'), $skus)) {
+                unset($items[$i]);
+            }
+        }
         if (!$items) {
             return [
                 'error' => ['message' => 'No valid SKUs found'],
@@ -48,7 +54,8 @@ class Sellvana_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
 
         foreach ($items as $item) {
             $sku = $item->get('product_sku');
-            $item->set('qty_to_cancel', $qtys[$sku]);
+            $qty = $qtys[$sku] === true ? $item->getQtyCanCancel() : $qtys[$sku];
+            $item->set('qty_to_cancel', $qty);
         }
 
         $result = [];

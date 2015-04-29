@@ -1,6 +1,6 @@
 modules:
     FCom_Frontend:
-        version: 0.1.0
+        version: 0.5.0.0
         channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0 } }
         description: "Base Frontend functionality"
@@ -22,6 +22,7 @@ modules:
                     - [ route, _ /noroute, FCom_Frontend_Controller.noroute, {}, null, false ]
                     - [ /, FCom_Frontend_Controller.index ]
                     - [ /*view, FCom_Frontend_Controller.static ]
+                    - [ /media/upload/:do, FCom_Frontend_Controller_Media.upload ]
 
         themes:
             FCom_Frontend_DefaultTheme:

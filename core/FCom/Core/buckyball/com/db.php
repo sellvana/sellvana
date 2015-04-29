@@ -536,6 +536,7 @@ EOT
 
     /**
      * @param string $fullTableName
+     * @param string $connectionName
      * @throws BException
      */
     protected static function checkTable($fullTableName, $connectionName = null)
@@ -725,9 +726,11 @@ EOT
                 }
             }
         }
-        if ($indexes) {
+        if ($indexes || $fks) {
             $tableIndexes = static::ddlIndexInfo($fullTableName, null, $connectionName);
             $tableIndexes = array_change_key_case($tableIndexes, CASE_LOWER);
+        }
+        if ($indexes) {
             foreach ($indexes as $idx => $def) {
                 $idxLower = strtolower($idx);
                 if ($def === 'DROP') {
@@ -788,6 +791,9 @@ EOT
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
                     $alterArr[] = "ADD CONSTRAINT `{$idx}` {$def}";
+                }
+                if (!empty($tableIndexes[$idxLower])) {
+                    $dropArr[] = "DROP KEY `{$idx}`";
                 }
             }
             if (!empty($dropArr)) {
@@ -1062,7 +1068,8 @@ class BORM extends ORMWrapper
     protected static function _log_query($query, $parameters)
     {
         $result = parent::_log_query($query, $parameters);
-        static::$_last_profile = BDebug::debug('DB.RUN: ' . (static::$_last_query ? static::$_last_query : 'LOGGING NOT ENABLED'));
+        $msg = 'DB.RUN1: ' . (static::$_last_query ? static::$_last_query : 'LOGGING NOT ENABLED');
+        static::$_last_profile = BDebug::debug($msg);
         return $result;
     }
 

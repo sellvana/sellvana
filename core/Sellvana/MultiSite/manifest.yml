@@ -1,6 +1,6 @@
 modules:
     Sellvana_MultiSite:
-        version: 0.1.2
+        version: 0.5.0.0
         channel: alpha
         translations: { en: en.php }
         description: "Enable multiple website management from the same instance"

@@ -28,6 +28,8 @@
 {% set productLinks = prod.getProductLinks() %}
 {% set recentlyViewed = APP.instance('Sellvana_Catalog_Frontend').getRecentlyViewedProducts() %}
 
+{% set canOrder = inventory.canOrder() %}
+
 {{ THIS.view('breadcrumbs') | raw }}
 
 {{ THIS.view('core/messages') | raw }}
@@ -91,9 +93,9 @@
 
                         {{ THIS.view('catalog/product/shopper_fields').set('product', prod) | raw }}
 
-                        <p class="f-stock-notice f-in-stock" {{ not inventory.isInStock ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
+                        <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
 
-                        <p class="f-stock-notice f-out-of-stock" {{ inventory.isInStock ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
+                        <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
 
                         <div class="form-group overflow-hidden">
                             <label class="col-md-3 control-label">{{ 'Quantity:' |_ }}</label>

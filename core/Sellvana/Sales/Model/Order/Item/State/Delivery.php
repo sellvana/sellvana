@@ -23,6 +23,8 @@ class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Mode
         self::DELIVERED => 'email/sales/order-item-state-delivery-delivered',
     ];
 
+    protected $_defaultValue = self::PENDING;
+
     public function setVirtual()
     {
         return $this->changeState(self::VIRTUAL);
@@ -51,5 +53,29 @@ class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Mode
     public function setPartial()
     {
         return $this->changeState(self::PARTIAL);
+    }
+
+    public function isComplete()
+    {
+        return in_array($this->getValue(), [self::VIRTUAL, self::SHIPPED, self::DELIVERED]);
+    }
+
+    public function calcState()
+    {
+        /** @var Sellvana_Sales_Model_Order_Item $model */
+        $model = $this->getContext()->getModel();
+
+        if ($this->getValue() === self::DELIVERED) {
+            return $this;
+        }
+
+        if ($model->get('qty_shipped') == $model->get('qty_ordered')) {
+            return $this->setShipped();
+        }
+        if ($model->get('qty_shipped') > 0) {
+            return $this->setPartial();
+        }
+
+        return $this;
     }
 }

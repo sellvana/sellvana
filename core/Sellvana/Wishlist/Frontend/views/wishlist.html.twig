@@ -1,6 +1,6 @@
-{% set wishlist = THIS.get('wishlist').items() %}
+{% set wishlist = THIS.get('wishlist').items(false, true) %}
 
-        <div class="row f-mb-slideout-menu">
+<div class="row f-mb-slideout-menu">
             <div class="col-sm-9 f-col-main">
             <header class="f-page-header">
                 <h1 class="f-page-title">{{ "Wishlist" | _ }}</h1>
