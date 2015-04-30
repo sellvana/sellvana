@@ -7,11 +7,11 @@
 {% for cat in categories %}
             <li class="dropdown {{ cat.id() in activeIds ? 'active' }}">
                 <a class="dropdown-toggle disabled"
-                    href="{{ cat.url() }}" data-toggle="dropdown">{{ cat.get('node_name') }}</a>
+                    href="{{ cat.url() }}" data-toggle="dropdown">{{ cat.get('node_name')|_ }}</a>
 {% if cat.get('children') %}
                 <ul class="dropdown-menu">
 {% for cat1 in cat.get('children') %}
-                    <li><a href="{{ cat1.url() }}">{{ cat1.get('node_name') }}</a></li>
+                    <li><a href="{{ cat1.url() }}">{{ cat1.get('node_name')|_ }}</a></li>
 {% endfor %}
                 </ul>
 {% endif %}

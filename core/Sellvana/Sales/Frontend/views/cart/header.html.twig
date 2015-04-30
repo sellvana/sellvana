@@ -1,5 +1,5 @@
 {% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
-{% set cartQty = cart.itemQty() %}
+{% set cartQty = cart.itemQty() ?: 0 %}
 
 <li class="dropdown f-header-mini-cart-trigger">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown">

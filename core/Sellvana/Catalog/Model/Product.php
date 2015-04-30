@@ -1314,7 +1314,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $basePriceModel = $this->getPriceModelByType('base', $context);
         $mapPriceModel = $this->getPriceModelByType('map', $context);
         $msrpPriceModel = $this->getPriceModelByType('msrp', $context);
-
         $basePrice = $basePriceModel ? $basePriceModel->getPrice() : 0;
 
         $finalPrice = $this->getCatalogPrice();
@@ -1333,7 +1332,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         if ($finalPrice !== null && $finalPrice < $basePrice) {
-            $prices['base'] = ['type' => 'old', 'label' => 'Price', 'pos' => 20, 'value' => $basePrice];
+            $prices['base'] = ['type' => 'old', 'label' => $msrpPriceModel ? 'Our Price' : 'Price', 'pos' => 20, 'value' => $basePrice];
             $prices['sale'] = ['type' => 'new', 'label' => 'Sale', 'pos' => 30, 'value' => $finalPrice,
                 'formatted' => $finalText, 'final' => 1];
         } else {

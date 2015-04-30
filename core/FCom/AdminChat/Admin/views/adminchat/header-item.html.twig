@@ -3,34 +3,28 @@
     <i class="icon-comments-alt"></i>&nbsp;<span class="badge badge-inverse" style="display:none;" id="totalUnreads"></span>
   </a>
     <ul class="dropdown-menu" id="adminUserList">
+      <li role="presentation" class="dropdown-header">{{'User Chat'|_}}</li>
       <li id="adminStatus">
         <script type='text/template' class='template' id='statusTemplate'>
-        <div class="widget-body">
-          <div class="pull-left icon">
-            <img width="23" height="23" src="<%- rc.avatar %>" alt="<%- rc.username %>">
-          </div>
-          <div class="pull-left text">
-            <%- rc.username %>&nbsp;
-            <small class="text-muted">
-              <select class='js-adminuser-status' value='<%- rc.status %>'>
-                {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
-              </select>
-            </small>
+          <span class="user-avatar <%- rc.status %>">
+            <img width="30" height="30" src="<%- rc.avatar %>" alt="<%- rc.username %>"/>
+          </span>
+          <div class="user-chat-status">
+            <select class='js-adminuser-status' value='<%- rc.status %>'>
+              {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
+            </select>
           </div>
         </script>
       </li>
       <li class="divider"></li>
       <script type='text/template' class='template' id= 'userTemplate'>
-        <div class="widget-body">
-          <div class="pull-left icon">
-            <img width="23" height="23" src="<%- rc.avatar %>" alt="<%- rc.username %>">
-          </div>
-          <div class="pull-left text">
-            <%- rc.username %>&nbsp;
-            <small class="text-muted">-<%- rc.status %>&nbsp;
-              <span class="badge badge-inverse" style="display:none;"></span>
-            </small>
-          </div>
+        <!-- .online OR .offline OR .away OR do-not-disturb -->
+        <span class="user-avatar <%- rc.status %>">
+          <img width="30" height="30" src="<%- rc.avatar %>" alt="<%- rc.username %>">
+        </span>
+        <div class="user-chat-status">
+          <span class="user-name"><%- rc.username %>
+        </div>
       </script>
     </ul>
 </li>

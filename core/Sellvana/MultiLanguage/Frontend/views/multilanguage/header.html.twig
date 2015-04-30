@@ -1,4 +1,4 @@
-{% set allLanguages = LOCALE.getAvailableLanguages() %}
+{% set allLanguages = LOCALE.getAvailableLanguages('native') %}
 {% set allowedLocales = APP.instance('Sellvana_MultiLanguage_Main').getAllowedLocales() %}
 {% set current = LOCALE.getCurrentLocale() %}
 {% set localeArr = current|split('_') %}

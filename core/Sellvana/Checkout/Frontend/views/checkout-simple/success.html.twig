@@ -14,20 +14,25 @@
         <p>{{ 'Our records indicate that you already have an account with this email: %s.'|_(email) }}</p>
         <p>{{ 'If you like to merge this order into your account please <a href="%s">login here</a>.'|_(loginUrl) | raw }}</p>
     {% else %}
-        <p>{{ "If you'd like to save your customer information and track your orders in one place, please enter the password to create an account for this email address: %s"|_(email) }}</p>
+        <p>{{ "If you'd like to save your customer information and track your orders in one place, please enter the password 
+        to create an account for this email address:"|_ }} <strong>{{email}}</strong></p>
 
         {{ THIS.view('core/messages') | raw }}
 
         <form action="{{ APP.href('guest/create_account') }}" method="post">
             <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
             <fieldset>
-                <div class="row">
+                <div class="row form-group">
                     <div class="col-md-2"><label for="password">{{ 'Password'|_ }}</label></div>
-                    <div class="col-md-10"><input type="password" name="password" id="password"/></div>
+                    <div class="col-md-5"><input type="password" name="password" id="password" class="form-control required" required/></div>
                 </div>
-                <div class="row">
+                <div class="row form-group">
                     <div class="col-md-2"><label for="password_confirm">{{ 'Confirm Password'|_ }}</label></div>
-                    <div class="col-md-10"><input type="password" name="password_confirm" id="password_confirm"/></div>
+                    <div class="col-md-5"><input type="password" class="form-control required" required name="password_confirm" id="password_confirm"/></div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-5"><button type="submit" class="btn btn-primary">{{ 'Create Account'|_ }}</button></div>
                 </div>
             </fieldset>
         </form>

@@ -33,9 +33,11 @@ class Sellvana_Sales_Frontend_Controller_Guest extends FCom_Frontend_Controller_
                 'post' => $this->BRequest->post(),
                 'result' => &$result,
             ]);
+            $this->message('Account successfully created');
             $this->BResponse->redirect('orders');
         } catch (Exception $e) {
-
+            $this->message($e->getMessage(), 'error');
+            $this->BResponse->redirect($this->BRequest->referrer());
         }
     }
 

@@ -13,22 +13,22 @@
                     {% if facet['custom_view'] %}
                         {{ THIS.view( facet['custom_view'], { 'facet_key': fKey, 'facet': facet, 'products_data': THIS.get('products_data') })| raw }}
                     {% elseif facet['values'] %}
-                        <dt>{{ facet['display'] }}</dt>
+                        <dt>{{ facet['display']|_ }}</dt>
                         <dd>
                             <ul>
                                 {% for vKey, value in facet['values'] %}
                                     {% if value['selected'] %}
                                         <li><a class="active" href="{{ hlp.getUrl(null, { (fKey): vKey}) }}">
-                                                <span class="glyphicon glyphicon-check"></span> {{ value['display'] }}
+                                                <span class="glyphicon glyphicon-check"></span> {{ value['display']|_ }}
                                             </a></li>
                                         {% if s['save_filter'] %}
                                             <input type="hidden" name="{{ fKey }}" value="{{ vKey }}"/>
                                         {% endif %}
                                     {% else %}
                                         <li><a href="{{ hlp.getUrl({ (fKey): vKey}) }}">
-                                                <span class="glyphicon glyphicon-unchecked"></span> {{ value['display'] }}
+                                                <span class="glyphicon glyphicon-unchecked"></span> {{ value['display']|_ }}
                                                 {% if value['cnt'] %}<span
-                                                        class="count">{{ "(%s)" | _(value['cnt']) }}</span>{% endif %}
+                                                        class="count">({{ value['cnt'] }})</span>{% endif %}
                                             </a></li>
                                     {% endif %}
                                 {% endfor %}
