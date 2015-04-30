@@ -27,6 +27,9 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         ];
         $config['filters']            = [['field' => 'model', 'type' => 'text']];
         $config['grid_before_create'] = 'modelsGridRegister';
+        $config['callbacks'] = [
+            'componentDidMount' => 'modelsGridRegister'
+        ];
         $data                           = $this->FCom_Core_ImportExport->collectExportableModels();
         ksort($data);
         $default         = [
