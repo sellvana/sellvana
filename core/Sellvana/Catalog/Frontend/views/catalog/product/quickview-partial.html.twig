@@ -40,7 +40,7 @@
             <li><a href="#f-tab-detail" data-toggle="tab">{{ 'Details'|_ }}</a></li>
         </ul>
         <div class="tab-pane active" id="f-tab-summary">
-            <h4 class="f-prod-name"><a href="{{ m.url() }}">{{ m.get('product_name') }}</a></h4>
+            <h4 class="f-prod-name"><a href="{{ m.url() }}">{{ m.getName() }}</a></h4>
             <p class="f-sku">{{ m.get('product_sku') }}</p>
 
             {% if MODULES.isLoaded('Sellvana_ProductReviews') %}
@@ -83,7 +83,7 @@
         <!-- /.tab-pane -->
         <div class="tab-pane" id="f-tab-detail">
             <div class="f-prod-short-description">
-                <p>{{ m.get('description') | raw }}</p>
+                <p>{{ m.getDescription() | raw }}</p>
             </div>
         </div>
     </div>

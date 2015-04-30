@@ -124,7 +124,7 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
             $details = [
                 'id' => $product->id(),
                 'src' => $product->thumbUrl($thumbSize),
-                'alt' => $product->get('product_name'),
+                'alt' => $product->getName(),
             ];
         }
         return $details;

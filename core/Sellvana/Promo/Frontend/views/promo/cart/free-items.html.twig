@@ -25,8 +25,8 @@
                     {% for sku, p in pci.products %}
                         {% if not item.already_added[sku] %}
                             <a href="{{ p.url() }}">
-                                <img src="{{ p.thumbUrl(30, 30) }}" width="30" height="30" alt="{{ p.get('product_name') }}"/>
-                                {{ p.get('product_name') }}
+                                <img src="{{ p.thumbUrl(30, 30) }}" width="30" height="30" alt="{{ p.getName() }}"/>
+                                {{ p.getName() }}
                             </a>
                             <a href="{{ UTIL.setUrlQuery(APP.href('promo/cart/add_free_item'), {
                                 promo:pci.get('promo_id'), sku:sku, parent:cartItem.id(), token:token

@@ -1406,6 +1406,36 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $itemPrice;
     }
 
+    public function _getLanguageValue($staticField, $dataField)
+    {
+        $langValuesJson = $this->getData($dataField);
+        if ($langValuesJson) {
+            $langValues = $this->BUtil->fromJson($langValuesJson);
+            $curLocale = str_replace('_', '-', $this->BLocale->getCurrentLocale());
+            foreach ($langValues as $lv) {
+                if ($lv['lang_code'] === $curLocale) {
+                    return $lv['value'];
+                }
+            }
+        }
+        return $this->get($staticField);
+    }
+
+    public function getName()
+    {
+        return $this->_getLanguageValue('product_name', 'name_lang_fields');
+    }
+
+    public function getDescription()
+    {
+        return $this->_getLanguageValue('description', 'desc_lang_fields');
+    }
+
+    public function getShortDescription()
+    {
+        return $this->_getLanguageValue('short_description', 'short_desc_lang_fields');
+    }
+
     public function __destruct()
     {
         parent::__destruct();

@@ -66,7 +66,7 @@
                 <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
                 <input type="hidden" name="id" value="{{ prod.id() }}">
 
-                <h1 class="f-prod-name" itemprop="name">{{ prod.get('product_name') }}</h1>
+                <h1 class="f-prod-name" itemprop="name">{{ prod.getName() }}</h1>
                 <p class="f-sku" itemprop="identifier" content="sku:{{ m.get('product_sku') }}">{{ m.get('product_sku') }}</p>
 
                 {% if prod.getAverageStars() %}
@@ -127,7 +127,7 @@
                 <div class="f-tab-heading">
                     <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>
                 </div>
-                <div itemprop="description">{{ prod.get('description') | raw }}</div>
+                <div itemprop="description">{{ prod.getDescription() | raw }}</div>
                 {% if customFields %}
                     <div class="f-tab-heading">
                         <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
