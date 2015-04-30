@@ -70,6 +70,7 @@
 
         window.registerGrid{{ config.id }} = function (grid) {
             mediaLibGrid{{ config.id }} = grid;
+            window.{{ config.id }}_grid = grid;
             //re-scan image button
             $('#{{ config.id }}-attach_library').find('.btn-rescan-images').on('click', function () {
                 $.post('{{ APP.href("media/grid/rescan_library") | raw }}', {do: 'rescan_library'}, function (response) {

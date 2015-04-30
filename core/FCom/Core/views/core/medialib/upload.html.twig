@@ -127,31 +127,54 @@
             {% endif %}
         })
         .bind('fileuploadalways', function(e, data) {
-
+            var grid = {{config.id}}_grid;
             if ($.isArray(data.result.files)) {
-                data.result.files.forEach(function (obj) {
-                    //get self media grid
+                if (typeof grid.getRows.add == 'function') {//get self media grid
+                    data.result.files.forEach(function (obj) {
 
-                    //insert uploaded file in media grid and get selected
-                    var newRow = obj;
-                    if(newRow.error) {
-                        return;
-                    }
+                        //insert uploaded file in media grid and get selected
+                        var newRow = obj;
+                        if (newRow.error) {
+                            return;
+                        }
 
-                    //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
-                    {% if config.multiSelAllowed %}
-                    newRow.selected = true;
-                    {{config.id}}_grid.getSelectedRows().add(obj);
-                    {% endif %}
+                        //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
+                        {% if config.multiSelAllowed %}
+                        newRow.selected = true;
+                        grid.getSelectedRows().add(obj);
+                        {% endif %}
 
-                    {{config.id}}_grid.getRows().add(newRow,{merge: true}).trigger('render');
+                        grid.getRows().add(newRow, {merge: true}).trigger('render');
 
-                    $('td.name span').each(function(i) {
-                        if($(this).html() === obj.file_name)
-                            $(this).parents('tr:first').remove();
+                        $('td.name span').each(function (i) {
+                            if ($(this).html() === obj.file_name) {
+                                $(this).parents('tr:first').remove();
+                            }
+                        });
+                    })
+                } else {
+                    var rows = [], selectedRows = [];
+                    data.result.files.forEach(function (obj) {
+                        {% if config.multiSelAllowed %}
+                        selectedRows.push(obj);
+                        {% endif %}
+
+                        rows.push(obj);
+
+                        $('td.name span').each(function (i) {
+                            if ($(this).html() === obj.file_name) {
+                                $(this).parents('tr:first').remove();
+                            }
+                        });
                     });
-                })
+
+                    if (selectedRows.length) {
+                        grid.addSelectedRows(selectedRows);
+                    }
+                    grid.addRows(rows);
+                }
             }
         });
     });
+
 </script>

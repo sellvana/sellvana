@@ -224,7 +224,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         'callback' => 'gridShowMedia' . $id
                     ],
                     'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
-                    'refresh' => true,
+                    //'refresh' => true,
                 ],
                 'page_rows_data_callback' => [$this, 'afterInitialLibraryData']
             ],
@@ -243,21 +243,21 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
      */
     public function afterInitialLibraryData($rows)
     {
-        $mediaUrl = $this->BConfig->get('web/media_dir')?: 'media';
+        $baseUrl = $this->BConfig->get('web/base_dir');
         $hlp      = $this->FCom_Core_Main;
         $images = ['jpeg', 'jpg', 'tiff', 'gif', 'png', 'bmp'];
         foreach ($rows as & $row) {
             $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
             if (!in_array($ext, $images)) {
-                $thumbUrl = 'image-not-found.png';
+                $thumbUrl = 'media/image-not-found.png';
             } else {
                 $folder = $row["folder"];
-                if (strpos($folder, 'media/') === 0) {
-                    $folder = str_replace('media/', '', $row["folder"]);
-                }
+                //if (strpos($folder, 'media/') === 0) {
+                //    $folder = str_replace('media/', '', $row["folder"]);
+                //}
                 $thumbUrl = $folder . $row["subfolder"] . "/" . $row["file_name"];
             }
-            $row['thumb_path'] = trim($hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]), '/');
+            $row['thumb_path'] = trim($hlp->resizeUrl($baseUrl . '/' . $thumbUrl, ['s' => 68]), '/');
         }
 
         return $rows;
@@ -269,7 +269,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
      */
     public function gridDataAfter($data)
     {
-        $mediaUrl = $this->BConfig->get('web/media_dir')?: 'media';
+        $baseUrl = $this->BConfig->get('web/base_dir');//?: 'media';
         $hlp      = $this->FCom_Core_Main;
         $images = ['jpeg', 'jpg', 'tiff', 'gif', 'png', 'bmp'];
 
@@ -283,15 +283,15 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
             $ext = strtolower(pathinfo($row->get('file_name'), PATHINFO_EXTENSION));
             if (!in_array($ext, $images)) {
-                $thumbUrl = 'image-not-found.png';
+                $thumbUrl = 'media/image-not-found.png';
             } else {
                 $folder = $row->get("folder");
-                if (strpos($folder, 'media/') === 0) {
-                    $folder = str_replace('media/', '', $row->get('folder'));
-                }
+                //if (strpos($folder, 'media/') === 0) {
+                //    $folder = str_replace('media/', '', $row->get('folder'));
+                //}
                 $thumbUrl = $folder . $row->get('subfolder') . "/" . $row->get('file_name');
             }
-            $row->set('thumb_path', trim($hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]), '/'));
+            $row->set('thumb_path', trim($hlp->resizeUrl($baseUrl . '/' . $thumbUrl, ['s' => 68]), '/'));
         }
         unset($row);
 
