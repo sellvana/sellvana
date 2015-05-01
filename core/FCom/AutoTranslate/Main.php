@@ -72,12 +72,18 @@ class FCom_AutoTranslate_Main extends BClass
         if (file_exists($this->_cacheFile)) {
             $source = file_get_contents($this->_cacheFile);
             $data = $this->BUtil->fromJson($source);
-            $data = array_merge($data, $this->_requestCache);
+            if (is_array($data)) {
+                $data = array_merge($data, $this->_requestCache);
+            } else {
+                $data = $this->_requestCache;
+            }
         } else {
             $data = $this->_requestCache;
         }
-        $result = $this->BUtil->toJson($data);
-        file_put_contents($this->_cacheFile, $result);
+        if (is_array($data)) {
+            $result = $this->BUtil->toJson($data);
+            file_put_contents($this->_cacheFile, $result);
+        }
     }
 
     public function callGoogleTranslateApi($query, $targetLanguage = null, $sourceLanguage = null)
@@ -102,14 +108,16 @@ class FCom_AutoTranslate_Main extends BClass
         foreach ((array)$query as $q) {
             $requestUrl .= '&q=' . urlencode($q);
         }
-        $response = $this->BUtil->remoteHttp('GET', $requestUrl);
+        $response = $this->BUtil->remoteHttp('GET', $requestUrl, [], ['referer: http://www.sellvana.com/'], ['curl' => true]);
         $status = $this->BUtil->lastRemoteHttpInfo();
+        #var_dump($this->BUtil->remoteHttp('GET', 'http://ipinfo.io'));
         if ($status['headers']['http']['code'] != 200) {
-            $this->BDebug->debug('Google Translate API error: ' . $requestUrl . print_r($response, 1) . print_r($status, 1));
+            $this->BDebug->notice('Google Translate API error (1): ' . $requestUrl . "\n" . print_r($response, 1) . "\n" . print_r($status, 1));
+            return false;
         }
         $apiResult = $this->BUtil->fromJson($response);
         if (empty($apiResult['data']['translations'])) {
-            $this->BDebug->warning('Google Translate API error: ' . $requestUrl . print_r($response, 1) . print_r($status, 1));
+            $this->BDebug->notice('Google Translate API error (2): ' . $requestUrl . "\n" . print_r($response, 1) . "\n" . print_r($status, 1));
             return false;
         }
         $translations = $apiResult['data']['translations'];

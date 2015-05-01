@@ -1,39 +1,89 @@
 {% set xhr = REQUEST.xhr() %}
 
-    
-        {% if not xhr %}
-            <a href="{{ APP.instance('FCom_Core_Main').lastNav() }}">&lt;&lt; {{ "Back to results" |_ }}</a>
+{% if not xhr %}
+    <a href="{{ APP.instance('FCom_Core_Main').lastNav() }}">&lt;&lt; {{ "Back to results" |_ }}</a>
+{% endif %}
+
+<header class="f-page-header">
+    <h1 class="f-page-title">{{ 'Compare' |_ }} <span class="compare-num-products">{{ THIS.get('products') | length }}</span> {{ 'products' |_ }}</h1>
+</header>
+
+<table class="table f-prod-listing-grid f-prod-compare-listing">
+  <tr>
+    <th>{{ 'Summary'|_ }}</th>
+{% for i in 0..3 %}
+    <td class="item">
+    {% if THIS.get('products')[i] %}{% set p = THIS.get('products')[i] %}
+    {% set pUrl = p.url() %}
+
+        <a href="{{ APP.href('catalog/compare/remove?id=' ~ p.id()) }}" class="trigger-remove fa fa-times" onclick="$('.block-compare').data('compare').remove({{ p.id() }}, this)" title="{{ "Remove" |_ }}"></a>
+        <p><a href="{{ pUrl }}"><img src="{{ p.thumbUrl(125) }}"class="product-img"/></a></p>
+        <h3 class="product-name"><a href="{{ pUrl }}">{{ p.getName() }}</a></h3>
+        <span class="manuf-name">{{ p.get('mfr_name') }}</span>
+        <span class="sku">{{ "Part #: %s" | _(p.get('product_sku'))  }}</span>
+        {% if p.get('avg_rating') %}
+            <div class="rateit" data-rateit-value="{{p.get('avg_rating')}}"></div>
+            {{ '%s of 5' | _(p.get('avg_rating')) }}
         {% endif %}
+        {% if p.get('num_reviews') %}
+            (<a href="{{p.url(cat)}}#reviews">{{ '%s reviews' | _(p.get('num_reviews')) }}</a>)
+        {% endif %}
+        {{ THIS.view('catalog/product/price', {'product': p}) | raw }}
 
-        <header class="f-page-header">
-            <h1 class="f-page-title">{{ 'Compare' |_ }} <span class="compare-num-products">{{ THIS.get('products') | length }}</span> {{ 'products' |_ }}</h1>
-        </header>
+    {% else %}
+        &nbsp;
+    {% endif %}
+    </td>
+{% endfor %}
+  </tr>
+  <tr>
 
-        <table class="table f-prod-listing-grid f-prod-compare-listing">
-          <tr>
-            <th>Summary</th>
-        {% for i in 0..3 %}
-            <td class="item">
-            {% if THIS.get('products')[i] %}{% set p = THIS.get('products')[i] %}
-                <a href="#" class="trigger-remove fa fa-times" onclick="$('.block-compare').data('compare').remove({{ p.id() }}, this)" title="{{ "Remove" |_ }}"></a>
-                <p><img src="{{ p.thumbUrl(125) }}"class="product-img"/></p>
-                <h3 class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></h3>
-                <span class="manuf-name">{{ p.get('mfr_name') }}</span>
-                <span class="sku">{{ "Part #: %s" | _(p.get('mfr_sku'))  }}</span>
-                <div class="rateit" data-rateit-value="{{p.get('avg_rating')}}"></div>
-                {{ '%s of 5' | _(p.get('avg_rating')) }}
-                {% if p.get('num_reviews') %}
-                    (<a href="{{p.url(cat)}}#reviews">{{ '%s reviews' | _(p.get('num_reviews')) }}</a>)
-                {% endif %}
-                {{ THIS.view('catalog/product/price', {'prod': p}) | raw }}
-                <button class="btn btn-primary btn-add-to-cart" onclick="dentevaCart.add({{ p.id() }})">+ {{ "Add to Cart" |_ }}</button>
-            {% else %}
-                &nbsp;
-            {% endif %}
-            </td>
-        {% endfor %}
-          </tr>
-        </table>
+    <th>&nbsp;</th>
+{% for i in 0..3 %}
+    <td class="item">
+    {% if THIS.get('products')[i] %}{% set p = THIS.get('products')[i] %}
+
+        {% set inventory = p.getInventoryModel() %}
+        {% set canOrder = inventory.canOrder() %}
+
+        <div class="f-prod-select">
+
+            {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
+
+            <div class="f-prod-add-cart">
+
+                {{ THIS.view('catalog/product/variants').set('product', p) | raw }}
+
+                {{ THIS.view('catalog/product/shopper_fields').set('product', p) | raw }}
+
+                <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
+
+                <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
+
+                <div class="form-group overflow-hidden">
+                    <label class="col-md-6 control-label">{{ 'Quantity:' |_ }}</label>
+
+                    <div class="col-md-6">
+                        <input type="number" name="qty" class="form-control" value="1"/>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}"
+                        id="prod-add-to-cart">
+                    <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
+                <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ p.id() }}"
+                   rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
+
+            </div>
+        </div>
+    {% else %}
+        &nbsp;
+    {% endif %}
+    </td>
+{% endfor %}
+  </tr>
+</table>
+
 {% if not xhr %}
     <script>
         require(['fcom.frontend'], function() {
