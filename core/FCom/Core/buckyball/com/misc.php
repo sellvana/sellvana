@@ -526,6 +526,40 @@ class BUtil extends BClass
         return $res;
     }
 
+    public function arrayCleanEmpty($arr)
+    {
+        foreach ($arr as $k => $v) {
+            if (is_array($v)) {
+                $arr[$k] = $this->arrayCleanEmpty($v);
+            } elseif ($v === null || $v === '') {
+                unset($arr[$k]);
+            }
+        }
+        return $arr;
+    }
+
+    public function arrayDiffRecursive($arr1, $arr2)
+    {
+        $result = [];
+
+        foreach ($arr1 as $k => $v) {
+            if (array_key_exists($k, $arr2)) {
+                if (is_array($v)) {
+                    $diff = $this->arrayDiffRecursive($v, $arr2[$k]);
+                    if ($diff) {
+                        $result[$k] = $diff;
+                    }
+                } elseif ($v != $arr2[$k]) {
+                    $result[$k] = $v;
+                }
+            } else {
+                $result[$k] = $v;
+            }
+        }
+
+        return $result;
+    }
+
     /**
     * Insert 1 or more items into array at specific position
     *
@@ -1015,6 +1049,27 @@ class BUtil extends BClass
             $url .= (strpos($url, '?') === false ? '?' : '&') . $request;
         }
 
+        $found = false;
+        foreach ($headers as $h) {
+            if (stripos($h, 'expect:') === 0) {
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            $headers += ['Expect:']; //Fixes the HTTP/1.1 417 Expectation Failed
+        }
+        $found = false;
+        foreach ($headers as $h) {
+            if (stripos($h, 'referer:') === 0) {
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            $headers += ['Referer: ' . $this->BRequest->currentUrl()];
+        }
+        
         if ($useCurl && function_exists('curl_init') || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
@@ -1063,16 +1118,6 @@ class BUtil extends BClass
                 ];
             }
 
-            $found = false;
-            foreach ($headers as $h) {
-                if (stripos($h, 'expect:') === 0) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $headers += ['Expect:']; //Fixes the HTTP/1.1 417 Expectation Failed
-            }
             $curlOpt += [
                 CURLOPT_HTTPHEADER => array_values($headers),
             ];
@@ -1490,6 +1535,7 @@ class BUtil extends BClass
         if (!$options) {
             return '';
         }
+        $locale = $this->BLocale;
         foreach ($options as $k => $v) {
             $k = (string)$k;
             if (is_array($v) && $k !== '' && $k[0] === '@') { // group
@@ -1499,9 +1545,10 @@ class BUtil extends BClass
             }
             if (is_array($v)) {
                 $attr = $v;
-                $v = !empty($attr['text']) ? $attr['text'] : '';
+                $v = !empty($attr['text']) ? $locale->_($attr['text']) : '';
                 unset($attr['text']);
             } else {
+                $v = $locale->_($v);
                 $attr = [];
             }
             $attr['value'] = $k;

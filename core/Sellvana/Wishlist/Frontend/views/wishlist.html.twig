@@ -33,10 +33,10 @@
                                             <label><input type="checkbox" name="selected[]" class="selected-checkbox" value="{{ item.get('id')}}"></label>
                                         </td>
                                         <td>
-                                            <img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img" alt="{{ p.get('product_name') }}"/>
+                                            <img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img" alt="{{ p.getName() }}"/>
                                         </td>
                                         <td>
-                                            <strong class="f-prod-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></strong>
+                                            <strong class="f-prod-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.getName() }}</a></strong>
                                         </td>
                                         <td>
                                             <div class="price-box">

@@ -24,6 +24,6 @@ define(['jquery', 'fcom.pushclient', 'jquery.bootstrap-growl'], function ($, Pus
         $(elId).css({display:'block'});
         $(elId + '-count').html(++numItems);
         $(elId + ' .dropdown-menu').prepend('<li class="divider"></li>').prepend($li);
-        $(elId + ' .dropdown-toggle i').effect('highlight', {}, 1500);
+        //$(elId + ' .dropdown-toggle i').effect('highlight', {}, 1500);
     }
 })

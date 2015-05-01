@@ -17,13 +17,13 @@ class Sellvana_MultiCurrency_Admin_Controller extends FCom_Admin_Controller_Abst
                 $result['success'] = true;
                 $result['rates'] = $this->BConfig->get('modules/Sellvana_MultiCurrency/exchange_rates');
             } else {
-                $this->BSession->addMessage('Exchange Rates Fetched', 'success');
+                $this->message('Exchange Rates Fetched');
             }
         } catch (Exception $e) {
             if ($xhr) {
                 $result['error']['message'] = $e->getMessage();
             } else {
-                $this->BSession->addMessage($e->getMessage(), 'error');
+                $this->message($e->getMessage(), 'error');
             }
         }
         if ($xhr) {

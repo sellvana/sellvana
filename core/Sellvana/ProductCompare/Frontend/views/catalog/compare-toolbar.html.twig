@@ -11,14 +11,14 @@
                 {% if s %}
                     <li class="item">
                         <a href="{{ APP.href('catalog/compare/remove?id=') ~ s.id }}" title="{{ s.alt }}"><img
-                                    src="{{ s.src }}" width="35" height="35" alt="{{ s.alt }}"/></a>
+                                    src="{{ s.src }}" width="40" height="40" alt="{{ s.alt }}"/></a>
                     </li>
                 {% else %}
                     <li class="item"></li>
                 {% endif %}
             {% endfor %}
         </ul>
-      <button name="submit" type="submit" class="btn btn-default btn-sm compare-trigger" rel="#compare-overlay" value="compare"><span>{{ "Compare" |_ }}</span></button>
+      <a href="{{ APP.href('catalog/compare') }}" class="btn btn-default btn-sm compare-trigger" rel="#compare-overlay" value="compare"><span>{{ "Compare" |_ }}</span></a>
       <button name="submit" type="submit" class="btn btn-default btn-sm reset-btn" value="reset">{{ 'Reset' |_ }}</button>
     </form>
 </div>

@@ -13,7 +13,7 @@
 
 {% set count = 0 %}
 {% for p in THIS.get('products') %}
-  {% set productName = p.get('product_name') %}
+  {% set productName = p.getName() %}
   {% set productUrl = p.url(THIS.get('category')) %}
     <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }}">
       <div class="thumbnail">
@@ -32,7 +32,7 @@
           {% endif %}
           <a href="{{ productUrl }}" class="f-prod-name">{{ productName }}</a>
           {{ THIS.view('catalog/product/price').set('product', p) | raw }}
-          <!--{{ p.get('short_description') }}-->
+          <!--{{ p.getShortDescription() }}-->
           <form method="post" action="{{ addToCartUrl }}" class="hidden-xs">
             <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
             <input type="hidden" name="action" value="add">
