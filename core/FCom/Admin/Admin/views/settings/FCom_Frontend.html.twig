@@ -14,13 +14,24 @@
     {{ forms.accordion_panel_end }}
 
     {% set fieldData1 = { model: c, id_prefix:'config-modules-FCom_Frontend-cookie', name_prefix:'config[modules][FCom_Frontend][cookie]', get_prefix:'modules/FCom_Frontend/cookie' } %}
-    {{ forms.accordion_panel_start({label:'Session'|_, id:'settings-FCom_Frontend-group-cookie'}) }}
+    {{ forms.accordion_panel_start({label:'Area Session'|_, id:'settings-FCom_Frontend-group-cookie'}) }}
         {{ forms.select(fieldData1,  { field:'session_handler', label:'Session Handler'|_, options:SESSION.getHandlers() }) }}
         {{ forms.input(fieldData1,   { field:'remember_days', label:'Remember Me Timeout (days)'|_ }) }}
         {{ forms.input(fieldData1,   { field:'domain', label:'Cookie Domain'|_ }) }}
         {{ forms.input(fieldData1,   { field:'path', label:'Cookie Path'|_ }) }}
         {{ forms.input(fieldData1,   { field:'session_namespace', label:'Cookie Namespace'|_ }) }}
-        {{ forms.boolean(fieldData1, { field:'session_check_ip', label:'Verify Session IP'|_ }) }}
+        {{ forms.select(fieldData1, { field:'session_check_ip', label:'Verify Session IP'|_, options:{ '':'', 0:'no', 1:'YES'} }) }}
+    {{ forms.accordion_panel_end }}
+
+    {% set fieldData1 = { model: c, id_prefix:'config-modules-FCom_Frontend-web', name_prefix:'config[modules][FCom_Frontend][web]', get_prefix:'modules/FCom_Frontend/web' } %}
+    {{ forms.accordion_panel_start({label:'Area Web Settings'|_, id:'settings-FCom_Frontend-group-web'}) }}
+        {{ forms.select(fieldData1, { field:'hide_script_name', label:'Hide script file name in URL'|_, options:{'':'', 0:'No', 1:'Automatic', 2:'FORCE'} }) }}
+        {{ forms.input(fieldData1,   { field:'http_host_whitelist', label:'HTTP Host Whitelist (comma separated)'|_ }) }}
+        {{ forms.input(fieldData1,   { field:'force_domain', label:'Force Domain Name'|_ }) }}
+        {{ forms.select(fieldData1, { field:'force_https', label:'Force HTTPS'|_, options:{ '':'', 0:'no', 1:'YES'} }) }}
+        {{ forms.select(fieldData1,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:REQUEST.getAvailableCsrfMethods(true) }) }}
+        {{ forms.input(fieldData1,   { field:'csrf_web_root', label:'CSRF Referrer Web Root Path (optional)'|_ }) }}
+        {{ forms.select(fieldData1, { field:'hsts_enable', label:'Enable HSTS header (HTTP Strict Transport Security)'|_, options:{ '':'', 0:'no', 1:'YES'} }) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Frontend-group1'}) }}
@@ -32,7 +43,7 @@
         {{ forms.textarea(fieldData, {name:'config[recovery][FCom_Frontend][modules]', id:'recovery-FCom_Frontend-modules',
             label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery/FCom_Frontend/modules'), raw:1 }) }}
         {{ forms.input(fieldData, {name:'config[recovery][FCom_Frontend][redirect]', id:'recovery-FCom_Frontend-redirect',
-            label:'URL to redirect in RECOVERY mode'|_, value:c.get('recovery/FCom_Frontend/redirect') }) }} }}
+            label:'URL to redirect in RECOVERY mode'|_, value:c.get('recovery/FCom_Frontend/redirect') }) }}
 
         {{ forms.boolean(fieldData, {field:'enable_locales', label:'Enable UI Multi Locale'|_ }) }}
         {{ forms.select(fieldData, {field:'default_locale', label:'Default Product Locale', options:locales }) }}

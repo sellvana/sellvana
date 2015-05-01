@@ -2013,14 +2013,6 @@ class BSession extends BClass
 
         $config = $this->BConfig->get('cookie');
 
-        $areaConfig = $this->BConfig->get('modules/' . $this->BRequest->area() . '/cookie');
-        if ($areaConfig) {
-            $areaConfig = $this->BUtil->arrayCleanEmpty($areaConfig);
-            if ($areaConfig) {
-                $config = $this->BUtil->arrayMerge($config, $areaConfig);
-            }
-        }
-#var_dump($config);
         if (!empty($config['session_disable'])) {
             return $this;
         }

@@ -676,6 +676,22 @@ class BRequest extends BClass
         return $result;
     }
 
+    public function getAvailableCsrfMethods($includeEmpty = false)
+    {
+        $methods = [
+            'token' => 'Token',
+            'origin' => 'Origin',
+            'referrer' => 'Referrer',
+            'token+referrer' => 'Token & Referrer'
+        ];
+
+        if ($includeEmpty) {
+            $methods = ['' => ''] + $methods;
+        }
+
+        return $methods;
+    }
+
     /**
      * Check whether the request can be CSRF attack
      *

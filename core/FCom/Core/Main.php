@@ -443,6 +443,18 @@ class FCom_Core_Main extends BClass
     public function onBeforeBootstrap()
     {
         $this->BLayout->setDefaultViewClass('FCom_Core_View_Base');
+
+        $area = $this->BRequest->area();
+        $conf = $this->BConfig;
+        foreach (['cookie', 'web'] as $section) {
+            $areaConfig = $conf->get("modules/{$area}/{$section}");
+            if ($areaConfig) {
+                $areaConfig = $this->BUtil->arrayCleanEmpty($areaConfig);
+                if ($areaConfig) {
+                    $conf->set($section, $areaConfig, true);
+                }
+            }
+        }
     }
 
     public function getConfigVersionHash()
