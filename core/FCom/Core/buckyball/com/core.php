@@ -338,8 +338,8 @@ class BApp extends BClass
      */
     public function run()
     {
-        // load session variables
-        $this->BSession->open();
+        // load session variables - moved to between module beforeBootstrap and bootstrap
+        #$this->BSession->open();
 
 #echo "<pre>"; var_dump($this->BConfig->get('cookie'), $_SESSION); exit;
         // bootstrap modules
@@ -2008,7 +2008,19 @@ class BSession extends BClass
         if (null !== $this->data) {
             return $this;
         }
+
+        $this->BEvents->fire(__METHOD__ . ':before', ['id' => $id, 'auto_close' => $autoClose, 'validate' => $validate]);
+
         $config = $this->BConfig->get('cookie');
+
+        $areaConfig = $this->BConfig->get('modules/' . $this->BRequest->area() . '/cookie');
+        if ($areaConfig) {
+            $areaConfig = $this->BUtil->arrayCleanEmpty($areaConfig);
+            if ($areaConfig) {
+                $config = $this->BUtil->arrayMerge($config, $areaConfig);
+            }
+        }
+#var_dump($config);
         if (!empty($config['session_disable'])) {
             return $this;
         }

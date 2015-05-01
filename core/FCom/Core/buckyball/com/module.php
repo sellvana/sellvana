@@ -616,13 +616,21 @@ class BModuleRegistry extends BClass
             $mod->onBeforeBootstrap();
             $this->popModule();
         }
+
+        $this->BResponse->forceProtocolDomain();
+
+        $this->BSession->open();
+
         foreach ($this->_modules as $mod) {
             $this->pushModule($mod->name);
             $mod->bootstrap();
             $this->popModule();
         }
+
         $this->BLayout->collectAllViewsFiles(); // TODO: refactor, decide on a better place
+
         $this->BEvents->fire('BModuleRegistry::bootstrap:after');
+
         return $this;
     }
 }

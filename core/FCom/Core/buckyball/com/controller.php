@@ -1511,6 +1511,36 @@ class BResponse extends BClass
         $this->shutdown(__METHOD__);
     }
 
+    public function forceProtocolDomain()
+    {
+        $conf = $this->BConfig;
+        $req = $this->BRequest;
+
+        $redirectUrl = $currentUrl = $req->currentUrl();
+        $hostIsValid = $req->validateHttpHost();
+
+        if ($conf->get('web/force_https') && !$req->https()) {
+            $redirectUrl = str_replace('http://', 'https://', $redirectUrl);
+        }
+
+        $forceDomain = $conf->get('web/force_domain');
+        if ($forceDomain && $req->httpHost(false) !== $forceDomain && !$hostIsValid) {
+            $redirectUrl = preg_replace('#^(https?://)([^?:/]+)#', '\1' . $forceDomain, $redirectUrl);
+        }
+
+        if ($redirectUrl !== $currentUrl) {
+            $this->redirect($redirectUrl);
+            die();
+        }
+
+        if (!$hostIsValid) {
+            $this->status(404, 'Unapproved HTTP Host header', 'Host not found');
+            die();
+        }
+
+        return $this;
+    }
+
     public function httpsRedirect()
     {
         $this->redirect(str_replace('http://', 'https://', $this->BRequest->currentUrl()));

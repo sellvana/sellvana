@@ -28,11 +28,6 @@ class FCom_Core_Main extends BClass
             $this->initDebug();
             $this->initModules();
 
-            if (!$this->BRequest->validateHttpHost()) {
-                $this->BResponse->status(404, 'Unapproved HTTP Host header', 'Host not found');
-                die();
-            }
-
         } catch (Exception $e) {
             $this->BDebug->dumpLog();
             $this->BDebug->exceptionHandler($e);

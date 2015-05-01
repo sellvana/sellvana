@@ -13,6 +13,15 @@
         {{ forms.textarea(fieldData, {field:'add_css_style', label:'Additional CSS Style'|_, raw:1 }) }}
     {{ forms.accordion_panel_end }}
 
+    {% set fieldData1 = { model: c, id_prefix:'config-modules-FCom_Frontend-cookie', name_prefix:'config[modules][FCom_Frontend][cookie]', get_prefix:'modules/FCom_Frontend/cookie' } %}
+    {{ forms.accordion_panel_start({label:'Session'|_, id:'settings-FCom_Frontend-group-cookie'}) }}
+        {{ forms.select(fieldData1,  { field:'session_handler', label:'Session Handler'|_, options:SESSION.getHandlers() }) }}
+        {{ forms.input(fieldData1,   { field:'remember_days', label:'Remember Me Timeout (days)'|_ }) }}
+        {{ forms.input(fieldData1,   { field:'domain', label:'Cookie Domain'|_ }) }}
+        {{ forms.input(fieldData1,   { field:'path', label:'Cookie Path'|_ }) }}
+        {{ forms.input(fieldData1,   { field:'session_namespace', label:'Cookie Namespace'|_ }) }}
+        {{ forms.boolean(fieldData1, { field:'session_check_ip', label:'Verify Session IP'|_ }) }}
+    {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Frontend-group1'}) }}
         <div class="form-group" >

@@ -526,6 +526,40 @@ class BUtil extends BClass
         return $res;
     }
 
+    public function arrayCleanEmpty($arr)
+    {
+        foreach ($arr as $k => $v) {
+            if (is_array($v)) {
+                $arr[$k] = $this->arrayCleanEmpty($v);
+            } elseif ($v === null || $v === '') {
+                unset($arr[$k]);
+            }
+        }
+        return $arr;
+    }
+
+    public function arrayDiffRecursive($arr1, $arr2)
+    {
+        $result = [];
+
+        foreach ($arr1 as $k => $v) {
+            if (array_key_exists($k, $arr2)) {
+                if (is_array($v)) {
+                    $diff = $this->arrayDiffRecursive($v, $arr2[$k]);
+                    if ($diff) {
+                        $result[$k] = $diff;
+                    }
+                } elseif ($v != $arr2[$k]) {
+                    $result[$k] = $v;
+                }
+            } else {
+                $result[$k] = $v;
+            }
+        }
+
+        return $result;
+    }
+
     /**
     * Insert 1 or more items into array at specific position
     *
