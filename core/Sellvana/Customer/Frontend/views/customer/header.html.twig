@@ -1,12 +1,11 @@
 {% set customer = APP.instance('Sellvana_Customer_Model_Customer').sessionUser() %}
 {% set isLoggedIn = customer.isLoggedIn() %}
 
-<li class="dropdown">
+<li class="dropdown user-dropdown">
     {% if isLoggedIn %}
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <span class="glyphicon glyphicon-user"></span>
+        <a href="#" class="dropdown-toggle logged-in" data-toggle="dropdown">
             <span class="f-header-util-links-label"><img src="{{ UTIL.gravatar(customer.get('email'), {s:20}) }}"
-                                                         width="20" height="20"> {{ 'My Account'|_ }} <b
+                                                         width="20" height="20"> <span> {{ 'My Account'|_ }} </span><b
                         class="caret"></b></span>
         </a>
         <ul class="dropdown-menu">
@@ -17,7 +16,7 @@
             <li><a href="{{ APP.href('logout') }}" rel="nofollow">{{ 'Log Out'|_ }}</a></li>
         </ul>
     {% else %}
-        <a href="{{ APP.href('login') }}">
+        <a href="{{ APP.href('login') }}" class="logged-out">
             <span class="glyphicon glyphicon-user"></span>
             <span class="f-header-util-links-label">{{ 'Log In'|_ }}</span>
         </a>

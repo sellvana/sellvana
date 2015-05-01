@@ -3,8 +3,9 @@
 {% set currentId = current.id() %}
 
 {% if allSites|length > 1 %}
-    <li class="dropdown">
+    <li class="dropdown multisite-dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-globe"></span>
             <span class="f-header-util-links-label"> {{ current.get('name')|_ }} <b class="caret"></b></span>
         </a>
         <ul class="dropdown-menu">
