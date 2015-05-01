@@ -1533,6 +1533,7 @@ class BResponse extends BClass
         $req = $this->BRequest;
 
         $redirectUrl = $currentUrl = $req->currentUrl();
+        $hostWhitelist = $conf->get('web/http_host_whitelist');
         $hostIsValid = $req->validateHttpHost();
 
         if ($conf->get('web/force_https') && !$req->https()) {
@@ -1540,7 +1541,7 @@ class BResponse extends BClass
         }
 
         $forceDomain = $conf->get('web/force_domain');
-        if ($forceDomain && $req->httpHost(false) !== $forceDomain && !$hostIsValid) {
+        if ($forceDomain && $req->httpHost(false) !== $forceDomain && (!$hostWhitelist || !$hostIsValid)) {
             $redirectUrl = preg_replace('#^(https?://)([^?:/]+)#', '\1' . $forceDomain, $redirectUrl);
         }
 
