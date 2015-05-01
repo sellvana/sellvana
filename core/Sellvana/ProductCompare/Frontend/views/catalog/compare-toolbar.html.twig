@@ -18,7 +18,7 @@
                 {% endif %}
             {% endfor %}
         </ul>
-      <button name="submit" type="submit" class="btn btn-default btn-sm compare-trigger" rel="#compare-overlay" value="compare"><span>{{ "Compare" |_ }}</span></button>
+      <a href="{{ APP.href('catalog/compare') }}" class="btn btn-default btn-sm compare-trigger" rel="#compare-overlay" value="compare"><span>{{ "Compare" |_ }}</span></a>
       <button name="submit" type="submit" class="btn btn-default btn-sm reset-btn" value="reset">{{ 'Reset' |_ }}</button>
     </form>
 </div>
