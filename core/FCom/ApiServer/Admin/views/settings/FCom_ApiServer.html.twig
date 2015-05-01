@@ -20,7 +20,7 @@
     {{ forms.input(fieldData1,   { field:'http_host_whitelist', label:'HTTP Host Whitelist (comma separated)'|_ }) }}
     {{ forms.input(fieldData1,   { field:'force_domain', label:'Force Domain Name'|_ }) }}
     {{ forms.select(fieldData1, { field:'force_https', label:'Force HTTPS'|_, options:{ '':'', 0:'no', 1:'YES'} }) }}
-    {{ forms.select(fieldData1,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:merge(REQUEST.getAvailableCsrfMethods(true) }) }}
+    {{ forms.select(fieldData1,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:REQUEST.getAvailableCsrfMethods(true) }) }}
     {{ forms.input(fieldData1,   { field:'csrf_web_root', label:'CSRF Referrer Web Root Path (optional)'|_ }) }}
     {{ forms.select(fieldData1, { field:'hsts_enable', label:'Enable HSTS header (HTTP Strict Transport Security)'|_, options:{ '':'', 0:'no', 1:'YES'} }) }}
 {{ forms.accordion_panel_end }}
