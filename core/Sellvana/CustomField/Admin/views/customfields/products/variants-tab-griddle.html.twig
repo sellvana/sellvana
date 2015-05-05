@@ -179,6 +179,7 @@
             //top section element
             selectId: '#sel_var_field',
             btnAddFieldId: '#btn_add_var_field',
+            btnRemoveFieldClass: '.btn-delete-field',
             listId: '#variants-tab-field',
             //input class in each row
             inputClass: '.select-value-field',
@@ -233,7 +234,6 @@
              * @param value
              */
             saveCombination: function(id, field, value) {
-                //todo: new value for combination
                 if (typeof this.combinations[id] == 'undefined') {
                     this.combinations[id] = {};
                 }
@@ -295,6 +295,35 @@
                                 }
                         );
 
+                    });
+
+                    $(this.btnRemoveFieldClass).on('click', function() {
+                        if (confirm('Are you sure to delete this?')) {
+                            var fieldCode = $(this).attr('data-code');
+
+                            //re-display in select
+                            variantFields.select.find('option[value=' + $(this).attr('data-id') + ']').removeClass('hide');
+                            variantFields.resetSelect();
+
+                            //remove in custom fields
+                            variantFields.customFields = _.reject(variantFields.customFields, function (f) {
+                                return f.field_code == fieldCode;
+                            });
+
+                            //remove from grid column
+                            variantFields.deleteGridColumn({ field_code: fieldCode });
+
+                            //remove from combinations
+                            if (!_.isEmpty(variantFields.combinations)) {
+                                _.forEach(variantFields.combinations, function (comb, key) {
+                                    delete comb[fieldCode];
+                                    variantFields.combinations[key] = comb;
+                                });
+                            }
+
+                            //remove from list
+                            $(this).parents('li.dd-item').remove();
+                        }
                     });
 
                     this.resetSelect();
@@ -360,12 +389,12 @@
             },
             /**
              * add column to variant grid
-             * @param field
+             * @param {object} field
              */
             addGridColumn: function (field) {
                 if (variantGrid) {
                     var columns = variantGrid.getInitColumns();
-                    if (!_.findWhere(columns, { name: field.field_code })) {
+                    if (!_.contains(columns, field.field_code )) {
                         columns.push(field.field_code);
                         var filteredColumns = variantGrid.getColumns();
                         filteredColumns.unshift(field.field_code); //todo: re-calculate the column index
@@ -386,6 +415,24 @@
                         variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
                     }
 
+                }
+            },
+            deleteGridColumn: function(field) {
+                if (variantGrid) {
+                    var columns = variantGrid.getInitColumns();
+                    if (_.contains(columns, field.field_code )) {
+                        columns = _.without(columns, field.field_code);
+                        var filteredColumns = variantGrid.getColumns();
+                        filteredColumns = _.without(filteredColumns, field.field_code);
+
+                        variantGrid.props.columnMetadata = _.reject(variantGrid.props.columnMetadata, function(col) {
+                            return col.name == field.field_code;
+                        });
+
+                        variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
+                    } else {
+                        console.log('DEBUG: cannot find column name ', field.field_code);
+                    }
                 }
             },
             /**
