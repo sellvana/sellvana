@@ -263,6 +263,16 @@
                                         variantFields.customFields.push(field);
                                         variantFields.addGridColumn(field);
                                         variantFields.list.append(variantFields.renderFieldItemForList(field));
+                                        //update combinations value
+                                        if (!_.isEmpty(variantFields.combinations)) {
+                                            _.forEach(variantFields.combinations, function(comb, key) {
+                                                if (typeof comb == 'undefined') {
+                                                    comb = {};
+                                                }
+                                                comb[optSelected.attr('data-code')] = '';
+                                                variantFields.combinations[key] = comb;
+                                            })
+                                        }
                                     }
                                 }
                         );
@@ -354,6 +364,15 @@
             },
             resetSelect: function () {
                 this.select.val('').select2();
+            },
+            validateVariant: function() {
+                var valid = true;
+                $(variantGrid.getDOMNode()).find('input.variantUnique').each(function(el) {
+                    if (!$(this).valid()) {
+                        valid = false;
+                    }
+                });
+                return valid;
             }
         };
 
@@ -393,22 +412,23 @@
                         variantFields.saveCombination(id, $(this).attr('name'), $(this).val());
                     });
                     //validate variant unique
-                    validateVariant();
+                    variantFields.validateVariant();
+                }).on('addedRows.griddle', function(e, rows) { //update combinations when add new rows
+                    _.forEach(rows, function(row) {
+                        var comp = variantGrid.getRowComponent(row.id);
+                        console.log('comp', comp);
+                        console.log('row', row);
+                        var obj = {};
+                        $(comp.getDOMNode()).find('input.variantUnique').each(function() {
+                            obj[$(this).attr('name')] = '';
+                        });
+                        variantFields.combinations[row.id] = obj;
+                    });
                 });
             }
         };
 
     });
-
-    function validateVariant() {
-        var valid = true;
-        $(variantGrid.getDOMNode()).find('input.variantUnique').each(function(el) {
-            if (!$(this).valid()) {
-                valid = false;
-            }
-        });
-        return valid;
-    }
 
     /*
      *custom validation function for checking duplicated input
@@ -424,7 +444,7 @@
                 if (rowEle.attr('id') != id) {
                     var flag = false;
                     rowEle.find('input.select-value-field').each(function() {
-                        if ($(this).val() != comb[$(this).attr('name')]) {
+                        if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined' && $(this).val() != comb[$(this).attr('name')]) {
                             flag = true; // at least one field is different
                         }
                     });
@@ -450,7 +470,7 @@
         //var result = validateVariant();
         //console.log('result', result);
         //todo: put value to input hidden to save when submit
-        return validateVariant;
+        return variantFields.validateVariant();
     });
 </script>
 
