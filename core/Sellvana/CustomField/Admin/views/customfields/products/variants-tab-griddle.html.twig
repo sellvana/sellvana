@@ -183,6 +183,7 @@
             //input class in each row
             inputClass: '.select-value-field',
             customFields: [],
+            combinations: {},
             init: function () {
                 if (variantFieldGrid) {
                     this.customFields = variantFieldGrid.getRows();
@@ -215,6 +216,13 @@
                 if (!_.findWhere(this.customFields, { id: field.id })) {
                     this.customFields.push(field);
                 }
+            },
+            saveCombination: function(id, field, value) {
+                //todo: new value for combination
+                if (typeof this.combinations[id] == 'undefined') {
+                    this.combinations[id] = {};
+                }
+                this.combinations[id][field] = value;
             },
             processTopFieldSection: function () {
                 if (variantGrid && this.customFields.length) {
@@ -249,11 +257,9 @@
                                             field_code: optSelected.attr('data-code'),
                                             options: response.options
                                         };
-                                        variantFields.addField(field);
-
                                         optSelected.addClass('hide');
-                                        select.val('');
-
+                                        variantFields.addField(field);
+                                        variantFields.resetSelect();
                                         variantFields.customFields.push(field);
                                         variantFields.addGridColumn(field);
                                         variantFields.list.append(variantFields.renderFieldItemForList(field));
@@ -281,6 +287,10 @@
 
                     if (component) {
                         var fieldValue = component.props.row.field_values;
+                        //assign variant combinations when init
+                        if (typeof variantFields.combinations[id] == 'undefined') {
+                            variantFields.combinations[id] = fieldValue;
+                        }
                         var dom = $(component.getDOMNode());
                         dom.find(variantFields.inputClass).each(function () {
                             var name = $(this).attr('name');
@@ -302,6 +312,9 @@
                                     $(this).select2('val', fieldValue[name]);
                                 }
                             }
+
+                            $(this).addClass('variantUnique');
+                            $(this).attr('id', id + name);
                         });
                     } else {
                         console.log('DEBUG: cannot find the component of row' + id);
@@ -319,7 +332,7 @@
                     if (!_.findWhere(columns, { name: field.field_code })) {
                         columns.push(field.field_code);
                         var filteredColumns = variantGrid.getColumns();
-                        filteredColumns.unshift(field.field_code);
+                        filteredColumns.unshift(field.field_code); //todo: re-calculate the column index
 
                         variantGrid.props.columnMetadata.push({
                             name: field.field_code,
@@ -334,15 +347,7 @@
                             'default': ''
                         });
 
-                        variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns }, function () {
-                            /*$(variantGrid.getDOMNode()).find(variantFields.inputClass).select2({
-                                placeholder: 'Select field value',
-                                allowClear: true,
-                                data: function () {
-                                    return { results: field.options };
-                                }
-                            });*/
-                        })
+                        variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
                     }
 
                 }
@@ -377,19 +382,75 @@
                 });
             }
 
-
-            //add new variant line
             if (triggerName == 'componentDidMount') {
-
                 variantFields.processTopFieldSection();
 
-                $(variantGrid.getDOMNode()).find('.grid-new').on('click', function () {
-                    //todo: implement this in fcom.row
-                    variantGrid.addRows([{ id: guid() }]);
+                $(grid.getDOMNode()).on('change', 'tr', function(e) {
+                    //console.log('on-change', this);
+                    var id = $(this).attr('id');
+                    //update variant combinations value
+                    $(this).find('input.variantUnique').each(function() {
+                        variantFields.saveCombination(id, $(this).attr('name'), $(this).val());
+                    });
+                    //validate variant unique
+                    validateVariant();
                 });
             }
         };
 
+    });
+
+    function validateVariant() {
+        var valid = true;
+        $(variantGrid.getDOMNode()).find('input.variantUnique').each(function(el) {
+            if (!$(this).valid()) {
+                valid = false;
+            }
+        });
+        return valid;
+    }
+
+    /*
+     *custom validation function for checking duplicated input
+     */
+    function variantUnique(value, elem, params) {
+        //console.log('begin validation unique in ele: ', elem);
+        var valid = true;
+        var rowEle = $(elem).parents('tr');
+        //console.log('row ele', rowEle);
+
+        if (!_.isEmpty(variantFields.combinations)) {
+            _.forEach(variantFields.combinations, function(comb, id) {
+                if (rowEle.attr('id') != id) {
+                    var flag = false;
+                    rowEle.find('input.select-value-field').each(function() {
+                        if ($(this).val() != comb[$(this).attr('name')]) {
+                            flag = true; // at least one field is different
+                        }
+                    });
+                    if (!flag) {
+                        valid = false;
+                    }
+                }
+            });
+        }
+
+        //console.log('valid', valid);
+        return valid;
+    }
+
+    $.validator.addMethod('variantUnique', variantUnique , 'Same variant is already taken place.');
+
+    $.validator.addClassRules("variantUnique", {
+        variantUnique: true
+    });
+
+    $('form').submit(function(ev) {
+        //console.log('abc');
+        //var result = validateVariant();
+        //console.log('result', result);
+        //todo: put value to input hidden to save when submit
+        return validateVariant;
     });
 </script>
 
