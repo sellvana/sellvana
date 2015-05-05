@@ -86,9 +86,9 @@
                 );
             },
             /**
-             * populate image items to dropdown images and list selected images
+             * populate image items to dropdown images and list selected images, also handle events
              */
-            populateImagesAndHandleEvents: function (id) {
+            processImagesForRow: function (id) {
                 if (variantGrid && this.images.length) {
                     var selectClass = this.selectClass;
                     var listClass = this.listClass;
@@ -195,6 +195,11 @@
                 this.btnAddField = $(this.btnAddFieldId);
                 this.list = $(this.listId);
             },
+            /**
+             * render item for list field
+             * @param field
+             * @returns {*|jQuery}
+             */
             renderFieldItemForList: function (field) {
                 return $('<li>', { 'class': 'dd-item dd3-item' }).append(
                         $('<div>', { 'class': 'icon-ellipsis-vertical dd-handle dd3-handle' }),
@@ -209,6 +214,10 @@
                         )
                 )
             },
+            /**
+             * add field to variantFields.customFields
+             * @param field
+             */
             addField: function (field) {
                 if (typeof field.id != 'undefined') {
                     return;
@@ -217,6 +226,12 @@
                     this.customFields.push(field);
                 }
             },
+            /**
+             * save combinations
+             * @param id
+             * @param field
+             * @param value
+             */
             saveCombination: function(id, field, value) {
                 //todo: new value for combination
                 if (typeof this.combinations[id] == 'undefined') {
@@ -224,6 +239,9 @@
                 }
                 this.combinations[id][field] = value;
             },
+            /**
+             * populate data to top field section and handle events
+             */
             processTopFieldSection: function () {
                 if (variantGrid && this.customFields.length) {
                     var select = variantFields.select;
@@ -289,6 +307,10 @@
                     });
                 }
             },
+            /**
+             * populate fields to each row and handle events for them
+             * @param id
+             */
             processFieldForRow: function (id) {
                 if (variantGrid && this.customFields.length) {
 
@@ -336,6 +358,10 @@
                     console.log('this.customFields', this.customFields);
                 }
             },
+            /**
+             * add column to variant grid
+             * @param field
+             */
             addGridColumn: function (field) {
                 if (variantGrid) {
                     var columns = variantGrid.getInitColumns();
@@ -362,9 +388,16 @@
 
                 }
             },
+            /**
+             * reset select
+             */
             resetSelect: function () {
                 this.select.val('').select2();
             },
+            /**
+             * validate variant combination to make sure each variant is unique
+             * @returns {boolean}
+             */
             validateVariant: function() {
                 var valid = true;
                 $(variantGrid.getDOMNode()).find('input.variantUnique').each(function(el) {
@@ -376,6 +409,11 @@
             }
         };
 
+        /**
+         * variant field grid callback
+         * @param grid
+         * @param triggerName
+         */
         window.variantFieldGriddleRegister = function(grid, triggerName) {
             variantFieldGrid = grid;
             variantFields.init();
@@ -396,7 +434,7 @@
             if (!_.isEmpty(rowComponents)) {
                 _.forEach(rowComponents, function(row) {
                     var id = row.props.row.id;
-                    variantImages.populateImagesAndHandleEvents(id);
+                    variantImages.processImagesForRow(id);
                     variantFields.processFieldForRow(id);
                 });
             }
@@ -430,8 +468,12 @@
 
     });
 
-    /*
-     *custom validation function for checking duplicated input
+    /**
+     * custom validation function for checking duplicated input
+     * @param value
+     * @param elem
+     * @param params
+     * @returns {boolean}
      */
     function variantUnique(value, elem, params) {
         //console.log('begin validation unique in ele: ', elem);
@@ -459,8 +501,8 @@
         return valid;
     }
 
+    //add custom validate to jquery validator
     $.validator.addMethod('variantUnique', variantUnique , 'Same variant is already taken place.');
-
     $.validator.addClassRules("variantUnique", {
         variantUnique: true
     });
