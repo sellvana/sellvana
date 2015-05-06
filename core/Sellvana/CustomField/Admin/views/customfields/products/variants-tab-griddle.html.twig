@@ -276,11 +276,11 @@
                                             options: response.options
                                         };
                                         optSelected.addClass('hide');
-                                        variantFields.addField(field);
+                                        //variantFields.addField(field);
                                         variantFields.resetSelect();
                                         variantFields.customFields.push(field);
-                                        variantFields.addGridColumn(field);
                                         variantFields.list.append(variantFields.renderFieldItemForList(field));
+                                        variantFields.addGridColumn(field);
                                         //update combinations value
                                         if (!_.isEmpty(variantFields.combinations)) {
                                             _.forEach(variantFields.combinations, function(comb, key) {
@@ -387,6 +387,27 @@
                     console.log('this.customFields', this.customFields);
                 }
             },
+            calcIndexColumns: function(columns) {
+                var newColumns = [];
+
+                _.forEach(columns, function(col) {
+                    if (col == 0 || col == 'id') {
+                        newColumns.push(col);
+                    }
+                });
+
+                _.forEach(variantFields.customFields, function(cf) {
+                    newColumns.push(cf.field_code);
+                });
+
+                _.forEach(columns, function(col) {
+                    if (col != 0 && col != 'id' && !_.contains(newColumns, col)) {
+                        newColumns.push(col);
+                    }
+                });
+
+                return newColumns
+            },
             /**
              * add column to variant grid
              * @param {object} field
@@ -395,9 +416,13 @@
                 if (variantGrid) {
                     var columns = variantGrid.getInitColumns();
                     if (!_.contains(columns, field.field_code )) {
-                        columns.push(field.field_code);
-                        var filteredColumns = variantGrid.getColumns();
-                        filteredColumns.unshift(field.field_code); //todo: re-calculate the column index
+                        columns = variantFields.calcIndexColumns(columns);
+                        //columns.push(field.field_code);
+
+                        /*var filteredColumns = variantGrid.getColumns();
+                        filteredColumns.unshift(field.field_code);*/
+
+                        var filteredColumns = variantFields.calcIndexColumns(variantGrid.getColumns());
 
                         variantGrid.props.columnMetadata.push({
                             name: field.field_code,
@@ -501,8 +526,6 @@
                 }).on('addedRows.griddle', function(e, rows) { //update combinations when add new rows
                     _.forEach(rows, function(row) {
                         var comp = variantGrid.getRowComponent(row.id);
-                        console.log('comp', comp);
-                        console.log('row', row);
                         var obj = {};
                         $(comp.getDOMNode()).find('input.variantUnique').each(function() {
                             obj[$(this).attr('name')] = '';
