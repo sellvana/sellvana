@@ -17,7 +17,7 @@ base:
             - [ css, "@FCom_Frontend/Frontend/css/bootstrap.css" ]
             - [ css, "@FCom_Core/css/flags.css" ]
             - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
-            - [ css, "@FCom_Frontend/Frontend/css/fulleron-base.css" ]
+            - [ scss, "@FCom_Frontend/Frontend/scss/fulleron-base.scss" ]
             - [ js, //html5shim.googlecode.com/svn/trunk/html5.js, { if: lt IE 9 } ]
 
             - [ requireJs, bootstrap, "@FCom_Frontend/Frontend/js/bootstrap", { deps: [ jquery ] } ]
@@ -40,7 +40,7 @@ base:
     #- { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }
     - { hook: header-components, views: [ header-top, header-nav, header-callouts ] }
-    - { hook: header-top-util, views: [ multilanguage/header, multicurrency/header, customer/header, cart/header ] }
+    - { hook: header-top-util, views: [ multisite/header, multilanguage/header, multicurrency/header, customer/header, cart/header ] }
 
     - { hook: footer, views: footer }
 

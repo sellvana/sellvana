@@ -6,7 +6,7 @@
 {% set checkout_methods = APP.instance('Sellvana_Sales_Main').getCheckoutMethods() %}
 
 <header class="f-page-header">
-    <h1 class="f-page-title">{{ 'Shopping Cart' }}</h1>
+    <h1 class="f-page-title">{{ 'Shopping Cart'|_ }}</h1>
 </header>
 {% if false == cartItems %}
     {{ THIS.view('core/messages') | raw }}

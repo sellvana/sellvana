@@ -1,0 +1,15 @@
+modules:
+    FCom_AutoTranslate:
+        version: 0.5.0.0
+        channel: alpha
+        auto_use: [ bootstrap ]
+
+        observe:
+            - [ BResponse::shutdown, FCom_AutoTranslate_Main.onShutdown ]
+
+        default_config:
+            modules/FCom_AutoTranslate/translate_immediately: 0
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]

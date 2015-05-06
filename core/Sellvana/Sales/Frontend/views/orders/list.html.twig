@@ -34,9 +34,9 @@
                                 {{ order.get('unique_id') }}
                             </a>
                         </td>
-                        <td>{{ order.state().overall().getValueLabel() }} </td>
-                        <td>{{ order.getShippingMethod().getName() }} ({{ order.state().delivery().getValueLabel() }})</td>
-                        <td>{{ order.getPaymentMethod().getName() }} ({{ order.state().payment().getValueLabel() }})</td>
+                        <td>{{ order.state().overall().getValueLabel()|_ }} </td>
+                        <td>{{ order.getShippingMethod().getName()|_ }} ({{ order.state().delivery().getValueLabel()|_ }})</td>
+                        <td>{{ order.getPaymentMethod().getName()|_ }} ({{ order.state().payment().getValueLabel()|_ }})</td>
                         <td class="text-right">{{ order.get('grand_total') | currency }} </td>
                         <td class="text-right">{{ order.get('amount_due') | currency  }} </td>
                     </tr>

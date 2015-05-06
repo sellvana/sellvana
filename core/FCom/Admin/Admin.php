@@ -24,7 +24,7 @@ class FCom_Admin_Admin extends BClass
     {
         $this->FCom_Admin_Main->bootstrap();
 
-        if ($this->BRequest->https()) {
+        if ($this->BRequest->https() && $this->BConfig->get('web/hsts_enable')) {
             $this->BResponse->httpSTS();
         }
 

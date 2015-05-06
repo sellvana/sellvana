@@ -107,7 +107,7 @@ class FCom_AdminChat_Admin extends BClass
                 'username' => $user->get('username'),
                 'firstname' => $user->get('firstname'),
                 'lastname' => $user->get('lastname'),
-                'status' => $user->get('status'),
+                'status' => $user->get('status') ?: 'offline',
                 'avatar' => $this->BUtil->gravatar($user->get('email')),
             ];
         }

@@ -6,7 +6,7 @@
       <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
       <fieldset class="f-authentification-form f-register-form">
       <header class="f-page-header">
-        <h1 class="f-page-title">{{ 'Register on ' |_(CONFIG.get('modules/FCom_Core/site_title')) }}</h1>
+        <h1 class="f-page-title">{{ 'Register on %s' |_(CONFIG.get('modules/FCom_Core/site_title')) }}</h1>
       </header>
         <div class="row">
           <div class="form-group col-sm-6">
@@ -51,13 +51,13 @@
           {% if password_strength == 'true' %}
           <div class="row">
               <div class="form-group col-sm-12">
-                  <span class="help-block f-required-notice">Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.</span>
+                  <span class="help-block f-required-notice">{{ 'Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.'|_ }}</span>
               </div>
           </div>
           {% endif %}
         <div class="form-group">
           <input type="submit" class="btn btn-primary btn-lg" value="{{ "Register" | _ }}"/>
-          <a href="{{ APP.href() }}login" class="btn btn-link">&laquo; Back to login</a>
+          <a href="{{ APP.href() }}login" class="btn btn-link">&laquo; {{ 'Back to login'|_ }}</a>
           <span class="help-block f-required-notice">* {{ "Indicates Required Fields" | _ }}</span>
         </div>
       </fieldset>

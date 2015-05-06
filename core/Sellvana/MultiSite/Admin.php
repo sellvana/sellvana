@@ -21,7 +21,7 @@ class Sellvana_MultiSite_Admin extends BClass
         if ($siteId) {
             $site = $this->Sellvana_MultiSite_Model_Site->load($siteId);
             if ($site) {
-                $args['model'] = $this->BConfig->i(true);
+                $args['model'] = clone $this->BConfig;
                 $config = $site->getData('config');
                 if ($config) {
                     $args['model']->add($config);
@@ -41,7 +41,8 @@ class Sellvana_MultiSite_Admin extends BClass
                 $config = $site->getData('config');
                 $data = $args['post']['config'];
                 unset($data['X-CSRF-TOKEN']);
-                $config = $this->BUtil->arrayMerge($config, $data);
+                $diff = $this->BUtil->arrayDiffRecursive($data, $this->BConfig->get());
+                $config = $this->BUtil->arrayMerge($config, $diff);
                 $site->setData('config', $config)->save();
                 $args['skip_default_handler'] = true;
             } else {

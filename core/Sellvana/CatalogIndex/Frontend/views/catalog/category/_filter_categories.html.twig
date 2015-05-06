@@ -11,11 +11,11 @@
             {% for vKey, value in facet['values'] %}
                 <li style="padding-left:{{ value['level']*10 }}px;">
                     {% if value['selected'] %}
-                        <strong>{{ value['display'] }}</strong>
+                        <strong>{{ value['display']|_ }}</strong>
                     {% elseif value['parent'] %}
-                        <strong><a href="{{ APP.href(prefix ~ vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display'] }}</a></strong>
+                        <strong><a href="{{ APP.href(prefix ~ vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display']|_ }}</a></strong>
                     {% else %}
-                        <a href="{{ APP.href(prefix ~ vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display'] }}
+                        <a href="{{ APP.href(prefix ~ vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display']|_ }}
                             {{ (value['cnt'] ? '<span class="count">(' ~ value['cnt'] ~ ')</span>') | raw }}</a>
                     {% endif %}
                 </li>

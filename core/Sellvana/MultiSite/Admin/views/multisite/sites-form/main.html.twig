@@ -9,6 +9,7 @@
 <fieldset name="main-product">
     <div class="f-section">
         {{ forms.input(fieldData, {field: 'name'|_, required: 1, label: "Name"}) }}
+        {{ forms.input(fieldData, {field: 'home_url'|_, required: 1, label: "Home Page URL"}) }}
         {{ forms.textarea(fieldData, {field: 'match_domains'|_, rows: 2, label: "Domains"}) }}
     </div>
 </fieldset>

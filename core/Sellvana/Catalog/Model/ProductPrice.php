@@ -72,6 +72,10 @@ class Sellvana_Catalog_Model_ProductPrice
                 ['value' => 'base', 'label' => 'Base'],
                 ['value' => 'sale', 'label' => 'Sale'],
             ],
+            "map" => [
+                ['value' => 'base', 'label' => 'Base'],
+                ['value' => 'msrp', 'label' => 'MSRP'],
+            ],
             "promo" => [
                 ['value' => 'catalog', 'label' => 'Catalog Price'],
                 ['value' => 'cost', 'label' => 'Cost'],

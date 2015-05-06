@@ -1314,7 +1314,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $basePriceModel = $this->getPriceModelByType('base', $context);
         $mapPriceModel = $this->getPriceModelByType('map', $context);
         $msrpPriceModel = $this->getPriceModelByType('msrp', $context);
-
         $basePrice = $basePriceModel ? $basePriceModel->getPrice() : 0;
 
         $finalPrice = $this->getCatalogPrice();
@@ -1333,7 +1332,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         if ($finalPrice !== null && $finalPrice < $basePrice) {
-            $prices['base'] = ['type' => 'old', 'label' => 'Price', 'pos' => 20, 'value' => $basePrice];
+            $prices['base'] = ['type' => 'old', 'label' => $msrpPriceModel ? 'Our Price' : 'Price', 'pos' => 20, 'value' => $basePrice];
             $prices['sale'] = ['type' => 'new', 'label' => 'Sale', 'pos' => 30, 'value' => $finalPrice,
                 'formatted' => $finalText, 'final' => 1];
         } else {
@@ -1347,7 +1346,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'final_price' => &$finalPrice,
         ]);
 
-        if ($finalPrice !== null && $finalPrice < $basePrice) {
+        if ($finalPrice !== null && $finalPrice < $basePrice && (!$mapPriceModel || $finalPrice > $mapPrice)) {
             if (!empty($msrpPrice)) {
                 $basePrice = max($basePrice, $msrpPrice);
             }
@@ -1404,6 +1403,36 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         //TODO: implement
         return $itemPrice;
+    }
+
+    public function _getLanguageValue($staticField, $dataField)
+    {
+        $langValuesJson = $this->getData($dataField);
+        if ($langValuesJson) {
+            $langValues = $this->BUtil->fromJson($langValuesJson);
+            $curLocale = str_replace('_', '-', $this->BLocale->getCurrentLocale());
+            foreach ($langValues as $lv) {
+                if ($lv['lang_code'] === $curLocale) {
+                    return $lv['value'];
+                }
+            }
+        }
+        return $this->get($staticField);
+    }
+
+    public function getName()
+    {
+        return $this->_getLanguageValue('product_name', 'name_lang_fields');
+    }
+
+    public function getDescription()
+    {
+        return $this->_getLanguageValue('description', 'desc_lang_fields');
+    }
+
+    public function getShortDescription()
+    {
+        return $this->_getLanguageValue('short_description', 'short_desc_lang_fields');
     }
 
     public function __destruct()

@@ -52,7 +52,7 @@ class ImageResizer
         $this->readConfig();
         $this->validateEnvironment();
 
-        $this->file    = !empty($p['f']) ? $p['f'] : null;
+        $this->file    = !empty($p['f']) ? ltrim($p['f'], '/') : null;
         $this->default = !empty($_GET['d']) ? $_GET['d'] : 'media/image-not-found.jpg';
         $this->txt     = !empty($p['t']) ? $p['t'] : null;
 

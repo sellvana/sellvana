@@ -54,6 +54,15 @@ class Sellvana_MultiSite_Migrate extends BClass
                 'meta_keywords' => BDb::DROP,
             ],
         ]);
-
+    }
+    
+    public function upgrade__0_5_0__0_5_1()
+    {
+        $tSite = $this->Sellvana_MultiSite_Model_Site->table();
+        $this->BDb->ddlTableDef($tSite, [
+            BDb::COLUMNS => [
+                'home_url' => 'varchar(255) default null',
+            ],
+        ]);
     }
 }
