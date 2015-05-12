@@ -508,10 +508,50 @@
     });
 
     $('form').submit(function(ev) {
-        //console.log('abc');
-        //var result = validateVariant();
-        //console.log('result', result);
-        //todo: put value to input hidden to save when submit
+
+        var variantPostFields = [],
+                variantPostData = [];
+
+        variantFieldGrid.getRows().forEach(function(obj){
+            variantPostFields.push({
+                id: obj.id,
+                field_code: obj.field_code,
+                //options: op,
+                name: obj.name
+            });
+        });
+
+        //set object data to submit
+        variantGrid.getRows().forEach(function(obj) {
+            delete obj.list_image;
+            var rowId = obj.id,
+                    $select2Input = $('#'+rowId+' input.select-value-field');
+
+            // set field_values
+            var field_values = {};
+            if($select2Input.length){
+                $select2Input.each(function(){
+                    field_values[$(this).attr('name')] = $(this).val();
+                });
+            }
+
+            if(field_values){
+                obj.field_values = field_values;
+            }
+
+            obj.product_sku = obj.product_sku || '';
+            obj.inventory_sku = obj.inventory_sku || '';
+            obj.variant_price = obj.variant_price || '';
+            obj.variant_qty = obj.variant_qty || '';
+
+            variantPostData.push( obj );
+        });
+
+        $('#vfield_ids').val( JSON.stringify(variantPostFields) );
+        $('#variants').val( JSON.stringify(variantPostData) );
+
+        //return false;
+
         return variantFields.validateVariant();
     });
 </script>
