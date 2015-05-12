@@ -6,40 +6,40 @@
           <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
         </header>
           {{ THIS.view('core/messages') | raw }}
-        <h4>My Accounts</h4>
+        <h4>{{ 'My Accounts'|_ }}</h4>
         <ul>
           <li>
-            <a href="{{ APP.href('customer/myaccount/edit') }}">Edit Account Information</a>
+            <a href="{{ APP.href('customer/myaccount/edit') }}">{{ 'Edit Account Information'|_ }}</a>
           </li>
           <li>
-            <a href="{{ APP.href('customer/myaccount/editpassword') }}">Change Password</a>
+            <a href="{{ APP.href('customer/myaccount/editpassword') }}">{{ 'Change Password'|_ }}</a>
           </li>
           <li>
-            <a href="{{ APP.href('customer/address') }}">Address Book</a>
+            <a href="{{ APP.href('customer/address') }}">{{ 'Address Book'|_ }}</a>
           </li>
           <li>
-            <a href="{{ APP.href('wishlist') }}">Wishlist</a>
+            <a href="{{ APP.href('wishlist') }}">{{ 'Wishlist'|_ }}</a>
           </li>
         </ul>
-        <h4>My Orders</h4>
+        <h4>{{ 'My Orders'|_ }}</h4>
         <ul>
           <li>
-            <a href="{{ APP.href('orders') }}">Order history</a>
+            <a href="{{ APP.href('orders') }}">{{ 'Order history'|_ }}</a>
           </li>
           <li>
-            <a href="{{ APP.href('') }}">Downloads</a>
+            <a href="{{ APP.href('') }}">{{ 'Downloads'|_ }}</a>
           </li>
           <li>
-            <a href="{{ APP.href('') }}">Reward Points</a>
+            <a href="{{ APP.href('') }}">{{ 'Reward Points'|_ }}</a>
           </li>
           <li>
-            <a href="{{ APP.href('') }}">Return Request</a>
+            <a href="{{ APP.href('') }}">{{ 'Return Request'|_ }}</a>
           </li>
         </ul>
-        <h4>Newsletter</h4>
+        <h4>{{ 'Newsletter'|_ }}</h4>
         <ul>
           <li>
-            <a href="{{ APP.href('') }}">Newsletter Subscriptions</a>
+            <a href="{{ APP.href('') }}">{{ 'Newsletter Subscriptions'|_ }}</a>
           </li>
         </ul>
       </div>

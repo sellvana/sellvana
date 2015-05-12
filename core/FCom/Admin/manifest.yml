@@ -3,7 +3,7 @@ modules:
         version: 0.5.0.0
         channel: alpha
         description: Base Admin functionality
-        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0, FCom_LibScssPhp: 0.1.0 } }
 
         translations:
             de: de.php

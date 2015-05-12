@@ -13,32 +13,36 @@ class FCom_LibScssPhp_Main extends BClass
     {
         include_once __DIR__ . '/lib/scss.inc.php';
 
-        $origFilename = $args['file'];
-        if (preg_match('#^@([^/]+)(.*)$#', $origFilename, $m)) {
+        $origFilepath = $args['file'];
+        if (preg_match('#^@([^/]+)(.*)$#', $origFilepath, $m)) {
             $mod = $this->BModuleRegistry->module($m[1]);
             if (!$mod) {
-                BDebug::notice('Module not found: ' . $origFilename);
+                BDebug::notice('Module not found: ' . $origFilepath);
                 return '';
             }
-            $origFilename = $this->BModuleRegistry->module($m[1])->root_dir . $m[2];
+            $origFilepath = $this->BModuleRegistry->module($m[1])->root_dir . $m[2];
         }
-        if (!file_exists($origFilename)) {
-            $this->BDebug->warning('Original SCSS file does not exist: ' . $origFilename);
+        if (!file_exists($origFilepath)) {
+            $this->BDebug->warning('Original SCSS file does not exist: ' . $origFilepath);
             return '';
         }
-
-        $filename = basename($origFilename);
-        $targetFilename = $this->BUtil->simplifyString(str_replace(FULLERON_ROOT_DIR, '', $origFilename)) . '.css';
+        
+        /*
+        $targetFilename = $this->BUtil->simplifyString(str_replace(FULLERON_ROOT_DIR, '', $origFilepath)) . '.css';
         $compiledPath = $this->BConfig->get('fs/media_dir') . '/scss_build';
+        $webFile = $this->BApp->src($this->BConfig->get('web/media_dir') . '/scss_build/' . $targetFilename);
         $compiledFilename = $compiledPath . '/' . $targetFilename;
+        */
+        $compiledFilename = str_replace('.scss', '.build.css', $origFilepath);
+        $webFile = str_replace('.scss', '.build.css', $this->BApp->src($args['file']));
 
         $compile = true;
-        if (file_exists($compiledFilename) && filemtime($compiledFilename) >= filemtime($origFilename)) {
+        if (file_exists($compiledFilename) && filemtime($compiledFilename) >= filemtime($origFilepath)) {
             $compile = false;
         }
 
         if ($compile) {
-            $this->BUtil->ensureDir($compiledPath);
+            $this->BUtil->ensureDir(dirname($compiledFilename));
             $scss = new Leafo\ScssPhp\Compiler();
             if (!empty($args['import'])) {
                 foreach ((array)$args['import'] as $import) {
@@ -47,12 +51,11 @@ class FCom_LibScssPhp_Main extends BClass
             }
             $formatter = !empty($args['formatter']) ? $args['formatter'] : 'compressed';
             $scss->setFormatter('Leafo\\ScssPhp\\Formatter\\' . ucfirst($formatter));
-            $source = file_get_contents($origFilename);
+            $source = file_get_contents($origFilepath);
             $output = $scss->compile($source, 'SOURCE');
             file_put_contents($compiledFilename, $output);
         }
 
-        $webFile = $this->BApp->src($this->BConfig->get('web/media_dir') . '/scss_build/' . $targetFilename);
         $url = htmlspecialchars($webFile);
         $params = !empty($args['params']) ? $args['params'] : '';
         $tagHtml = "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$url}\" {$params}/>";

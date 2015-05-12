@@ -9,7 +9,7 @@
         <div class="f-rslides-container">
             <ul class="thumbnails f-rslides f-prod-imgs" id="quickview-rslides">
                 {% for img in images %}
-                    <li><img class="f-prod-img img-responsive" src="{{ img.imageUrl(true) }}" alt=""/></li>
+                    <li><img class="f-prod-img img-responsive" src="{{ img.thumbUrl(254) }}{#{ img.imageUrl(1) }#}" alt=""/></li>
                 {% endfor %}
             </ul>
             <a href="#" hidden id="display-all-images"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
@@ -40,7 +40,7 @@
             <li><a href="#f-tab-detail" data-toggle="tab">{{ 'Details'|_ }}</a></li>
         </ul>
         <div class="tab-pane active" id="f-tab-summary">
-            <h4 class="f-prod-name"><a href="{{ m.url() }}">{{ m.get('product_name') }}</a></h4>
+            <h4 class="f-prod-name"><a href="{{ m.url() }}">{{ m.getName() }}</a></h4>
             <p class="f-sku">{{ m.get('product_sku') }}</p>
 
             {% if MODULES.isLoaded('Sellvana_ProductReviews') %}
@@ -68,8 +68,8 @@
 
                     <div class="form-group overflow-hidden">
                         <label class="col-md-3 control-label">{{ 'Qty:' |_ }}</label>
-                        <div class="col-md-3">
-                            <input type="text" name="qty" class="form-control" value="1"/>
+                        <div class="col-md-5">
+                            <input type="number" name="qty" class="form-control" value="1"/>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-lg" id="prod-add-to-cart"><span class="glyphicon glyphicon-shopping-cart"></span>{{ 'Add to Cart'|_ }}</button>
@@ -83,7 +83,7 @@
         <!-- /.tab-pane -->
         <div class="tab-pane" id="f-tab-detail">
             <div class="f-prod-short-description">
-                <p>{{ m.get('description') | raw }}</p>
+                <p>{{ m.getDescription() | raw }}</p>
             </div>
         </div>
     </div>

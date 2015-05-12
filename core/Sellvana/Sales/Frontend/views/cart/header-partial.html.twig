@@ -10,7 +10,7 @@
         <strong class="f-widget-title">{{ 'Recently added to cart'|_ }}</strong>
       </header>
       <ul class="f-widget-content">
-      {% for item in items %}{% set p = item.product() %}{% set pUrl = p.url() %}{% set pName = p.get('product_name')  %}
+      {% for item in items %}{% set p = item.product() %}{% set pUrl = p.url() %}{% set pName = p.getName()  %}
           <li>
               <a href="{{ pUrl }}" class="media">
                   <img class="media-object pull-left" src="{{ p.thumbUrl(50) }}" width="50" alt="{{ pName }}">

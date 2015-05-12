@@ -1,0 +1,19 @@
+{% set allSites = APP.instance('Sellvana_MultiSite_Model_Site').orm().order_by_asc('name').find_many() %}
+{% set current = APP.instance('Sellvana_MultiSite_Frontend').getCurrentSite() %}
+{% set currentId = current.id() %}
+
+{% if allSites|length > 1 %}
+    <li class="dropdown multisite-dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-globe"></span>
+            <span class="f-header-util-links-label"> {{ current.get('name')|_ }} <b class="caret"></b></span>
+        </a>
+        <ul class="dropdown-menu">
+            {% for site in allSites %}
+                {% if site.id() != currentId %}
+                    <li><a href="{{ site.get('home_url') }}" rel="nofollow">{{ site.get('name')|_ }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </li>
+{% endif %}

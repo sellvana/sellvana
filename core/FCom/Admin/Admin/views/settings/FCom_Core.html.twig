@@ -1,5 +1,4 @@
 {% set c = THIS.get('model') %}
-{% set csrfMethods = {'token':'Token', 'origin':'Origin', 'referrer':'Referrer', 'token+referrer':'Token & Referrer'} %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <h2>{{ "Core Settings"|_}}</h2>
@@ -23,6 +22,7 @@
         {{ forms.select(fieldData, { field:'allowed_countries', label:'Allowed Countries'|_, options:LOCALE.getAvailableCountries(), select2: {}, multiple:1 }) }}
         {{ forms.select(fieldData, { field:'default_country', label:'Default Country'|_, options:LOCALE.getAvailableCountries(), select2: {} }) }}
         {{ forms.select(fieldData,  { field:'default_tz', label:'Default Timezone'|_, options:LOCALE.tzOptions(true), select2: {} }) }}
+        {{ forms.select(fieldData,  { field:'base_locale', label:'Base Locale'|_, options:LOCALE.getAvailableLocaleCodes(), select2: {} }) }}
         {{ forms.input(fieldData,  { field:'base_currency', label:'Base Currency'|_ }) }}
         {{ forms.input(fieldData,  { field:'default_currency', label:'Default Currency'|_ }) }}
     {{ forms.accordion_panel_end }}
@@ -61,9 +61,11 @@
 
     {% set fieldData = { model: c, id_prefix:'web', name_prefix:'config[web]', get_prefix:'web' } %}
     {{ forms.accordion_panel_start({label:'Web Settings'|_, id:'settings-FCom_Core-group6'}) }}
-        {{ forms.select(fieldData, { field:'hide_script_name', label:'Hide script file name in URL'|_, options:{0:'No', 1:'Automatic', 2:'FORCE'} }) }}
+        {{ forms.select(fieldData, { field:'hide_script_name', label:'Hide script file name in URL'|_, options:{'':'', 0:'No', 1:'Automatic', 2:'FORCE'} }) }}
         {{ forms.input(fieldData,   { field:'http_host_whitelist', label:'HTTP Host Whitelist (comma separated)'|_ }) }}
-        {{ forms.select(fieldData,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:csrfMethods }) }}
+        {{ forms.input(fieldData,   { field:'force_domain', label:'Force Domain Name'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'force_https', label:'Force HTTPS'|_ }) }}
+        {{ forms.select(fieldData,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:REQUEST.getAvailableCsrfMethods() }) }}
         {{ forms.input(fieldData,   { field:'csrf_web_root', label:'CSRF Referrer Web Root Path (optional)'|_ }) }}
         {{ forms.boolean(fieldData, { field:'hsts_enable', label:'Enable HSTS header (HTTP Strict Transport Security)'|_ }) }}
     {{ forms.accordion_panel_end }}

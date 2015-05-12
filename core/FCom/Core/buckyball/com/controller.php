@@ -676,6 +676,22 @@ class BRequest extends BClass
         return $result;
     }
 
+    public function getAvailableCsrfMethods($includeEmpty = false)
+    {
+        $methods = [
+            'token' => 'Token',
+            'origin' => 'Origin',
+            'referrer' => 'Referrer',
+            'token+referrer' => 'Token & Referrer'
+        ];
+
+        if ($includeEmpty) {
+            $methods = ['' => ''] + $methods;
+        }
+
+        return $methods;
+    }
+
     /**
      * Check whether the request can be CSRF attack
      *
@@ -1509,6 +1525,37 @@ class BResponse extends BClass
         }
         $this->header("Location: {$url}", true, $status);
         $this->shutdown(__METHOD__);
+    }
+
+    public function forceProtocolDomain()
+    {
+        $conf = $this->BConfig;
+        $req = $this->BRequest;
+
+        $redirectUrl = $currentUrl = $req->currentUrl();
+        $hostWhitelist = $conf->get('web/http_host_whitelist');
+        $hostIsValid = $req->validateHttpHost();
+
+        if ($conf->get('web/force_https') && !$req->https()) {
+            $redirectUrl = str_replace('http://', 'https://', $redirectUrl);
+        }
+
+        $forceDomain = $conf->get('web/force_domain');
+        if ($forceDomain && $req->httpHost(false) !== $forceDomain && (!$hostWhitelist || !$hostIsValid)) {
+            $redirectUrl = preg_replace('#^(https?://)([^?:/]+)#', '\1' . $forceDomain, $redirectUrl);
+        }
+
+        if ($redirectUrl !== $currentUrl) {
+            $this->redirect($redirectUrl);
+            die();
+        }
+
+        if (!$hostIsValid) {
+            $this->status(404, 'Unapproved HTTP Host header', 'Host not found');
+            die();
+        }
+
+        return $this;
     }
 
     public function httpsRedirect()

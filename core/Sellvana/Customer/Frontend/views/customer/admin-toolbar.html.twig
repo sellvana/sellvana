@@ -9,12 +9,12 @@
         <div style="height:40px"></div>
         <div class="admin-toolbar-wrapper">
             <div class="admin-toolbar">
-                <div class="pull-right">
+                <div class="admin-user">
                     <img class="avatar" src="{{ UTIL.gravatar(user.get('email')) }}" width="25" height="25"/>
                     {{ user.fullName() }}
                 </div>
 
-                <div class="pull-left">
+                <div class="logged-in-as-customer">
                     {{ 'Logged in as customer: '|_ }}
                     <a href="{{ APP.adminHref('customers/form?id=' ~ customer.id()) }}" target="_black">
                         {{ customer.firstname ~ ' ' ~ customer.lastname }}

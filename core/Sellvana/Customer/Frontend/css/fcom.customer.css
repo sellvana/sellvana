@@ -1,16 +1,23 @@
 
 /* WIDGET: Admin bar */
 .admin-toolbar-wrapper {
-    position:fixed;
-    width:100%;
-    top:0;
-    left:0;
-    z-index:5000;
+  position:fixed;
+  width:100%;
+  top:0;
+  left:0;
+  z-index:5000;
 }
 .admin-toolbar-wrapper .admin-toolbar {
-    border:1px solid #e6e6e6;
-    background: #ffccaa;
-    padding:5px 5px 6px;
+  border-bottom:1px solid #edcb62;
+  background: #fddf85;
+}
+.admin-toolbar-wrapper .admin-toolbar .admin-user {
+  float:right;
+  padding:5px 13px;
+}
+.admin-toolbar-wrapper .admin-toolbar .logged-in-as-customer {
+  float:left;
+  padding:5px 13px;
 }
 .admin-toolbar-wrapper + script + .page-wrapper { margin-top:20px; }
-.admin-toolbar-wrapper .avatar { margin:0 5px 3px; border-radius:4px; }
+.admin-toolbar-wrapper .avatar { margin:-2px 5px -2px 0; border-radius:30px; }

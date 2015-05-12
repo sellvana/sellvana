@@ -53,6 +53,8 @@ class BLocale extends BClass
     */
     protected static $_tr;
 
+    protected static $_customTranslators = [];
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -127,7 +129,7 @@ class BLocale extends BClass
     public function getAvailableLanguages($format = 'latin')
     {
         static $languages = [
-            ['ab', 'Abkhaz', 'аҧсуа бызшәа, аҧсшәа'],
+            ['ab', 'Abkhaz', 'аҧсшәа'],
             ['aa', 'Afar', 'Afaraf'],
             ['af', 'Afrikaans', 'Afrikaans'],
             ['ak', 'Akan', 'Akan'],
@@ -137,13 +139,13 @@ class BLocale extends BClass
             ['an', 'Aragonese', 'aragonés'],
             ['hy', 'Armenian', 'Հայերեն'],
             ['as', 'Assamese', 'অসমীয়া'],
-            ['av', 'Avaric', 'авар мацӀ, магӀарул мацӀ'],
+            ['av', 'Avaric', 'магӀарул мацӀ'],
             ['ae', 'Avestan', 'avesta'],
             ['ay', 'Aymara', 'aymar aru'],
             ['az', 'Azerbaijani', 'azərbaycan dili'],
             ['bm', 'Bambara', 'bamanankan'],
             ['ba', 'Bashkir', 'башҡорт теле'],
-            ['eu', 'Basque', 'euskara, euskera'],
+            ['eu', 'Basque', 'euskara'],
             ['be', 'Belarusian', 'беларуская мова'],
             ['bn', 'Bengali, Bangla', 'বাংলা'],
             ['bh', 'Bihari', 'भोजपुरी'],
@@ -159,24 +161,24 @@ class BLocale extends BClass
             ['zh', 'Chinese', '中文 (Zhōngwén), 汉语, 漢語'],
             ['cv', 'Chuvash', 'чӑваш чӗлхи'],
             ['kw', 'Cornish', 'Kernewek'],
-            ['co', 'Corsican', 'corsu, lingua corsa'],
+            ['co', 'Corsican', 'corsu'],
             ['cr', 'Cree', 'ᓀᐦᐃᔭᐍᐏᐣ'],
             ['hr', 'Croatian', 'hrvatski jezik'],
-            ['cs', 'Czech', 'čeština, český jazyk'],
+            ['cs', 'Czech', 'čeština'],
             ['da', 'Danish', 'dansk'],
-            ['dv', 'Divehi, Dhivehi, Maldivian', 'ދިވެހި'],
-            ['nl', 'Dutch', 'Nederlands, Vlaams'],
+            ['dv', 'Divehi, Dhivehi', 'ދިވެހި'],
+            ['nl', 'Dutch', 'Nederlands'],
             ['dz', 'Dzongkha', 'རྫོང་ཁ'],
             ['en', 'English', 'English'],
             ['eo', 'Esperanto', 'Esperanto'],
-            ['et', 'Estonian', 'eesti, eesti keel'],
+            ['et', 'Estonian', 'eesti'],
             ['ee', 'Ewe', 'Eʋegbe'],
             ['fo', 'Faroese', 'føroyskt'],
             ['fj', 'Fijian', 'vosa Vakaviti'],
-            ['fi', 'Finnish', 'suomi, suomen kieli'],
-            ['fr', 'French', 'français, langue française'],
+            ['fi', 'Finnish', 'suomi'],
+            ['fr', 'French', 'Français'],
             ['ff', 'Fula, Fulah, Pulaar, Pular', 'Fulfulde, Pulaar, Pular'],
-            ['gl', 'Galician', 'galego'],
+            ['gl', 'Galician', 'Galego'],
             ['ka', 'Georgian', 'ქართული'],
             ['de', 'German', 'Deutsch'],
             ['el', 'Greek (modern)', 'ελληνικά'],
@@ -188,7 +190,7 @@ class BLocale extends BClass
             ['hz', 'Herero', 'Otjiherero'],
             ['hi', 'Hindi', 'हिन्दी, हिंदी'],
             ['ho', 'Hiri Motu', 'Hiri Motu'],
-            ['hu', 'Hungarian', 'magyar'],
+            ['hu', 'Hungarian', 'Magyar'],
             ['ia', 'Interlingua', 'Interlingua'],
             ['id', 'Indonesian', 'Bahasa Indonesia'],
             ['ie', 'Interlingue', 'Interlingue'],
@@ -201,7 +203,7 @@ class BLocale extends BClass
             ['iu', 'Inuktitut', 'ᐃᓄᒃᑎᑐᑦ'],
             ['ja', 'Japanese', '日本語 (にほんご)'],
             ['jv', 'Javanese', 'basa Jawa'],
-            ['kl', 'Kalaallisut, Greenlandic', 'kalaallisut, kalaallit oqaasii'],
+            ['kl', 'Kalaallisut, Greenlandic', 'kalaallisut'],
             ['kn', 'Kannada', 'ಕನ್ನಡ'],
             ['kr', 'Kanuri', 'Kanuri'],
             ['ks', 'Kashmiri', 'कश्मीरी, كشميري‎'],
@@ -209,7 +211,7 @@ class BLocale extends BClass
             ['km', 'Khmer', 'ខ្មែរ, ខេមរភាសា, ភាសាខ្មែរ'],
             ['ki', 'Kikuyu, Gikuyu', 'Gĩkũyũ'],
             ['rw', 'Kinyarwanda', 'Ikinyarwanda'],
-            ['ky', 'Kyrgyz', 'Кыргызча, Кыргыз тили'],
+            ['ky', 'Kyrgyz', 'Кыргызча'],
             ['kv', 'Komi', 'коми кыв'],
             ['kg', 'Kongo', 'Kikongo'],
             ['ko', 'Korean', '한국어, 조선어'],
@@ -235,7 +237,7 @@ class BLocale extends BClass
             ['mh', 'Marshallese', 'Kajin M̧ajeļ'],
             ['mn', 'Mongolian', 'монгол'],
             ['na', 'Nauru', 'Ekakairũ Naoero'],
-            ['nv', 'Navajo, Navaho', 'Diné bizaad, Dinékʼehǰí'],
+            ['nv', 'Navajo, Navaho', 'Dinékʼehǰí'],
             ['nd', 'Northern Ndebele', 'isiNdebele'],
             ['ne', 'Nepali', 'नेपाली'],
             ['ng', 'Ndonga', 'Owambo'],
@@ -253,10 +255,10 @@ class BLocale extends BClass
             ['pa', 'Panjabi, Punjabi', 'ਪੰਜਾਬੀ, پنجابی‎'],
             ['pi', 'Pāli', 'पाऴि'],
             ['fa', 'Persian (Farsi)', 'فارسی'],
-            ['pl', 'Polish', 'język polski, polszczyzna'],
+            ['pl', 'Polish', 'polszczyzna'],
             ['ps', 'Pashto, Pushto', 'پښتو'],
             ['pt', 'Portuguese', 'português'],
-            ['qu', 'Quechua', 'Runa Simi, Kichwa'],
+            ['qu', 'Quechua', 'Kichwa'],
             ['rm', 'Romansh', 'rumantsch grischun'],
             ['rn', 'Kirundi', 'Ikirundi'],
             ['ro', 'Romanian', 'limba română'],
@@ -292,7 +294,7 @@ class BLocale extends BClass
             ['to', 'Tonga (Tonga Islands)', 'faka Tonga'],
             ['tr', 'Turkish', 'Türkçe'],
             ['ts', 'Tsonga', 'Xitsonga'],
-            ['tt', 'Tatar', 'татар теле, tatar tele'],
+            ['tt', 'Tatar', 'tatar tele'],
             ['tw', 'Twi', 'Twi'],
             ['ty', 'Tahitian', 'Reo Tahiti'],
             ['ug', 'Uyghur, Uighur', 'Uyƣurqə, ئۇيغۇرچە‎'],
@@ -855,8 +857,10 @@ class BLocale extends BClass
                     case 'json':
                         $content = file_get_contents($data);
                         $translations = $this->BUtil->fromJson($content);
-                        foreach ($translations as $word => $tr) {
-                            static::addTranslation([$word, $tr], $module);
+                        if (is_array($translations)) {
+                            foreach ($translations as $word => $tr) {
+                                static::addTranslation([$word, $tr], $module);
+                            }
                         }
                         break;
 
@@ -933,10 +937,11 @@ class BLocale extends BClass
     {
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
         if (empty($ext)) {
-            return;
+            return $this;
         }
         $params['extension'] = $ext;
         static::importTranslations($file, $params);
+        return $this;
     }
 
     protected function addTranslation($r, $module = null)
@@ -976,10 +981,26 @@ class BLocale extends BClass
 
     }
 
+    public function addCustomTranslator($name, $callback)
+    {
+        static::$_customTranslators[$name] = $this->BUtil->extCallback($callback);
+        return $this;
+    }
+
     public function _($string, $params = [], $module = null)
     {
         if (empty(static::$_tr[$string])) { // if no translation at all
-            $tr = $string; // return original string
+            $tr = null;
+            foreach (static::$_customTranslators as $translator) {
+                $tr = call_user_func($translator, $string, null, $module);
+                if ($tr) {
+                    static::$_tr[$string]['_'] = $tr;
+                    break;
+                }
+            }
+            if (!$tr) {
+                $tr = $string; // return original string
+            }
         } else { // if some translation present
             $arr = static::$_tr[$string];
             if (!empty($module) && !empty($arr[$module])) { // if module requested and translation for it present

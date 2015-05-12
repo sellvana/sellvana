@@ -13,9 +13,9 @@
         {% set active = true %}
         {% for p in products %}
             <div class="item {{ active ? 'active' }}">
-                <img src="{{ p.imageUrl(true) }}" alt="{{ p.get("product_name") }}" style="height: {{ THIS.get('height')|default(400)}}px;">
+                <img src="{{ p.imageUrl(true) }}" alt="{{ p.getName() }}" style="height: {{ THIS.get('height')|default(400)}}px;">
                 <div class="carousel-caption">
-                <h3>{{ p.get("product_name") }}</h3>
+                <h3>{{ p.getName() }}</h3>
                 </div>
             </div>
             {% set active = false %}

@@ -12,7 +12,7 @@
 <div class="row f-mb-slideout-menu">
     <div class="col-sm-9 f-col-main">
         <header class="f-page-header">
-            <h1 class="f-page-title">{{ "Orders" | _ }} #{{ order.get('unique_id') }} <span class="badge">{{ order.state().overall().getValueLabel() }}</span></h1>
+            <h1 class="f-page-title">{{ "Orders" | _ }} #{{ order.get('unique_id') }} <span class="badge">{{ order.state().overall().getValueLabel()|_ }}</span></h1>
             <div class="pull-right">
                 <form method="post" action="{{ APP.href('orders/repeat?id=' ~ order.get('unique_id')) }}">
                     <button type="submit" class="btn btn-primary">{{ 'Repeat Order'|_ }}</button>
@@ -74,8 +74,8 @@
                 </tr>
                 </thead>
                 <tr>
-                    <td>{{ order.getShippingMethod().getName() }} ({{ order.state().delivery().getValueLabel() }})</td>
-                    <td>{{ order.getPaymentMethod().getName() }} ({{ order.state().payment().getValueLabel() }})</td>
+                    <td>{{ order.getShippingMethod().getName()|_ }} ({{ order.state().delivery().getValueLabel()|_ }})</td>
+                    <td>{{ order.getPaymentMethod().getName()|_ }} ({{ order.state().payment().getValueLabel()|_ }})</td>
                 </tr>
             </table>
         </div>
