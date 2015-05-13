@@ -577,52 +577,51 @@
         variantUnique: true
     });
 
-    $('form').submit(function(ev) {
+    $('form').submit(function (ev) {
 
-        var variantPostFields = [],
-                variantPostData = [];
+        var variantPostFields = [], variantPostData = [];
 
-        variantFieldGrid.getRows().forEach(function(obj){
+        if (!variantFields.validateVariant()) {
+            return false;
+        }
+
+        variantFieldGrid.getRows().forEach(function (obj) {
             variantPostFields.push({
                 id: obj.id,
                 field_code: obj.field_code,
-                //options: op,
                 name: obj.name
             });
         });
 
         //set object data to submit
-        variantGrid.getRows().forEach(function(obj) {
-            delete obj.list_image;
-            var rowId = obj.id,
-                    $select2Input = $('#'+rowId+' input.select-value-field');
+        variantGrid.getRows().forEach(function (obj) {
+            var newObj = _.clone(obj);
+            //remove list images
+            delete newObj.list_images;
 
-            // set field_values
-            var field_values = {};
-            if($select2Input.length){
-                $select2Input.each(function(){
-                    field_values[$(this).attr('name')] = $(this).val();
+            if (typeof variantFields.combinations[newObj.id] != 'undefined' && variantFields.combinations[newObj.id] != null) {
+                newObj.field_values = variantFields.combinations[newObj.id];
+            } else { //after validate, this case will never be happened
+                newObj = {};
+                variantFields.customFields.each(function(field) {
+                    newObj[field.field_code] = '';
                 });
             }
 
-            if(field_values){
-                obj.field_values = field_values;
-            }
+            //todo: find better way for this
+            newObj.product_sku = newObj.product_sku || '';
+            newObj.inventory_sku = newObj.inventory_sku || '';
+            newObj.variant_price = newObj.variant_price || '';
+            newObj.variant_qty = newObj.variant_qty || '';
 
-            obj.product_sku = obj.product_sku || '';
-            obj.inventory_sku = obj.inventory_sku || '';
-            obj.variant_price = obj.variant_price || '';
-            obj.variant_qty = obj.variant_qty || '';
-
-            variantPostData.push( obj );
+            variantPostData.push(newObj);
         });
 
-        $('#vfield_ids').val( JSON.stringify(variantPostFields) );
-        $('#variants').val( JSON.stringify(variantPostData) );
+        $('#vfield_ids').val(JSON.stringify(variantPostFields));
+        $('#variants').val(JSON.stringify(variantPostData));
 
         //return false;
-
-        return variantFields.validateVariant();
+        return true;
     });
 </script>
 
