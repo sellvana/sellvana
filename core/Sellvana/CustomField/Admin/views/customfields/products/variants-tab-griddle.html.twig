@@ -182,7 +182,7 @@
                         this.customFields = fields;
                     }
 
-                    console.log('customFields', this.customFields);
+                    //console.log('customFields', this.customFields);
                 }
 
                 //cache jquery element
@@ -267,7 +267,7 @@
                                             id: val,
                                             name: optSelected.text(),
                                             field_code: optSelected.attr('data-code'),
-                                            options: response.options
+                                            options: (response.options instanceof Array) ? {} : response.options
                                         };
                                         optSelected.addClass('hide');
                                         //variantFields.addField(field);
@@ -385,9 +385,9 @@
                                     },
                                     createSearchChoice: function (term, data) {
                                         if ($(data).filter(function () {
-                                                    return this.text.toLowerCase().localeCompare(term.toLowerCase()) === 0;
+                                                    return this.text.toLowerCase().localeCompare(term.toLowerCase()) == 0;
                                                 }).length === 0) {
-                                            return {id: term, text: term};
+                                            return { id: term, text: term };
                                         }
                                     }
                                 });
@@ -635,7 +635,7 @@
             return false;
         }
 
-        variantFieldGrid.getRows().forEach(function (obj) {
+        variantFields.customFields.forEach(function (obj) {
             variantPostFields.push({
                 id: obj.id,
                 field_code: obj.field_code,
@@ -644,13 +644,16 @@
         });
 
         //set object data to submit
-        variantGrid.getRows().forEach(function (obj) {
-            var newObj = _.clone(obj);
+        _.forEach(variantGrid.getChildComponent('rows'), function (comp) {
+            var newObj = _.clone(comp.props.row);
             //remove list images
-            delete newObj.list_images;
+            delete newObj.list_image;
 
             if (typeof variantFields.combinations[newObj.id] != 'undefined' && variantFields.combinations[newObj.id] != null) {
                 newObj.field_values = variantFields.combinations[newObj.id];
+                /*_.forEach(variantFields.combinations[newObj.id], function(value, key) {
+                    newObj[key] = value;
+                })*/
             } else { //after validate, this case will never be happened
                 newObj = {};
                 variantFields.customFields.each(function(field) {
@@ -658,12 +661,16 @@
                 });
             }
 
+            //images
+            newObj.variant_file_id = $(comp.getDOMNode()).find(variantImages.inputClass).val();
+
             //todo: find better way for this
             newObj.product_sku = newObj.product_sku || '';
             newObj.inventory_sku = newObj.inventory_sku || '';
             newObj.variant_price = newObj.variant_price || '';
             newObj.variant_qty = newObj.variant_qty || '';
 
+            //console.log('newObj', newObj);
             variantPostData.push(newObj);
         });
 
