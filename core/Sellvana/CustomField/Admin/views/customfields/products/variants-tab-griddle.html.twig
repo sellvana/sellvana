@@ -187,7 +187,23 @@
             combinations: {},
             init: function () {
                 if (variantFieldGrid) {
-                    this.customFields = variantFieldGrid.getRows();
+                    var rows = variantFieldGrid.getRows();
+                    var fields = [];
+
+                    rows.forEach(function(row) {
+                        var options = {};
+                        _.forEach(row.options, function(value) {
+                            options[value] = value;
+                        });
+
+                        row.options = options;
+                        fields.push(row);
+                    });
+
+                    if (fields.length) {
+                        this.customFields = fields;
+                    }
+
                     console.log('customFields', this.customFields);
                 }
 
@@ -353,6 +369,8 @@
                             variantFields.combinations[id] = fieldValue;
                         }
                         var dom = $(component.getDOMNode());
+
+                        //render and init select2 for each fields
                         dom.find(variantFields.inputClass).each(function () {
                             var name = $(this).attr('name');
                             var field = _.findWhere(variantFields.customFields, { field_code: name });
@@ -366,6 +384,13 @@
                                     allowClear: true,
                                     data: function () {
                                         return { results: options };
+                                    },
+                                    createSearchChoice: function (term, data) {
+                                        if ($(data).filter(function () {
+                                                    return this.text.toLowerCase().localeCompare(term.toLowerCase()) === 0;
+                                                }).length === 0) {
+                                            return {id: term, text: term};
+                                        }
                                     }
                                 });
 
@@ -376,6 +401,23 @@
 
                             $(this).addClass('variantUnique');
                             $(this).attr('id', id + name);
+                        });
+
+                        //confirm and add that filled value to dropdown
+                        dom.find(variantFields.inputClass).on('change', function (e) {
+                            var name = $(this).attr('name');
+                            var val = $(this).val();
+                            var field = _.findWhere(variantFields.customFields, { field_code: name });
+                            if (val != '' && field && typeof field.options[val] === 'undefined') {
+                                var confirm = window.confirm("A new field value will be created. Are you sure?");
+                                if (confirm) {
+                                    field.options[val] = val;
+                                    variantGrid.forceUpdate();
+                                    $(this).select2('val', val);
+                                } else {
+                                    $(this).select2('val', '');
+                                }
+                            }
                         });
                     } else {
                         console.log('DEBUG: cannot find the component of row' + id);
