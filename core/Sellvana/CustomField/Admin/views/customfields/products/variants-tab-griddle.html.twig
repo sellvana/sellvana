@@ -28,30 +28,7 @@
                 } else {
                     console.log('DEBUG: no variantGrid');
                 }
-            },
-            /*getImages: function() {
-             return this.images;
-             },
-             addImages: function(images) {
-             var _this = this;
-             if (images instanceof Array && images.length) {
-             _.forEach(images, function(img) {
-             if (img.file_id && !_.findWhere(_this.images, { file_id: img.file_id })) {
-             _this.images.push(img);
-             }
-             });
-             }
-             },
-             removeImages: function(imageFileIds) {
-             var ids = imageFileIds.split(',');
-             if (this.images.length) {
-             var images = _.filter(this.images, function(img) {
-             return _.contains(ids, img.file_id);
-             });
-
-             this.images = images;
-             }
-             },*/
+            }, //todo: missed function to allow add more images from outside
             /**
              * update image id to input hidden of each row, use this when submit
              * @param rowId
@@ -190,6 +167,7 @@
                     var rows = variantFieldGrid.getRows();
                     var fields = [];
 
+                    //convert fields options from id:value to value:value
                     rows.forEach(function(row) {
                         var options = {};
                         _.forEach(row.options, function(value) {
@@ -218,7 +196,7 @@
              * @returns {*|jQuery}
              */
             renderFieldItemForList: function (field) {
-                return $('<li>', { 'class': 'dd-item dd3-item' }).append(
+                return $('<li>', { 'class': 'dd-item dd3-item', 'data-code': field.field_code }).append(
                         $('<div>', { 'class': 'icon-ellipsis-vertical dd-handle dd3-handle' }),
                         $('<div>', { 'class': 'dd3-content' }).append(
                                 $('<label>', { text: field.name }),
@@ -343,11 +321,31 @@
                     });
 
                     this.resetSelect();
-                    this.list.sortable({
+                    list.sortable({
                         scroll: false,
                         axis: 'x',
-                        update: function (event, ui) {
-                            console.log('sortable.update');
+                        stop: function (event, ui) {
+                            var newCustomFieldsPos = list.sortable('toArray', {attribute: 'data-code'});
+                            var newCustomFields = [];
+
+                            //re-sort fields in variantFields.customFields
+                            if (newCustomFieldsPos.length) {
+                                newCustomFieldsPos.forEach(function(fieldCode) {
+                                    var field = _.findWhere(variantFields.customFields, {field_code: fieldCode});
+                                    if (field) {
+                                        newCustomFields.push(field);
+                                    }
+                                });
+                            }
+
+                            //update columns
+                            if (newCustomFields.length) {
+                                variantFields.customFields = newCustomFields;
+                                var columns = variantFields.calcIndexColumns(variantGrid.getInitColumns());
+                                var filteredColumns = variantFields.calcIndexColumns(variantGrid.getColumns());
+                                variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
+                                //todo: store personalization of columns order
+                            }
                         }
                     });
                 }
@@ -429,6 +427,12 @@
                     console.log('this.customFields', this.customFields);
                 }
             },
+            /**
+             * calc index columns following order
+             * - input checkbox, id
+             * - custom fields column
+             * - other columns
+             */
             calcIndexColumns: function(columns) {
                 var newColumns = [];
 
@@ -448,7 +452,7 @@
                     }
                 });
 
-                return newColumns
+                return newColumns;
             },
             /**
              * add column to variant grid
@@ -484,6 +488,10 @@
 
                 }
             },
+            /**
+             * delete grid column from variant grid
+             * @param {object} field
+             */
             deleteGridColumn: function(field) {
                 if (variantGrid) {
                     var columns = variantGrid.getInitColumns();
