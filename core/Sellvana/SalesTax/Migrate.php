@@ -181,10 +181,13 @@ class Sellvana_SalesTax_Migrate extends BClass
             ],
         ]);
 
+        if ($this->Sellvana_SalesTax_Model_CustomerClass->loadWhere(['title' => 'Retail'])) {
+            return;
+        }
         // Default tax classes
-        $retailClass = $this->Sellvana_SalesTax_Model_CustomerClass->create(['title' => 'Retail'])->save();
+        $retailClass  = $this->Sellvana_SalesTax_Model_CustomerClass->create(['title' => 'Retail'])->save();
         $taxableClass = $this->Sellvana_SalesTax_Model_ProductClass->create(['title' => 'Taxable Goods'])->save();
-        $exemptClass = $this->Sellvana_SalesTax_Model_ProductClass->create(['title' => 'Exempt'])->save();
+        $exemptClass  = $this->Sellvana_SalesTax_Model_ProductClass->create(['title' => 'Exempt'])->save();
 
         // Sample tax rule for NY State
         $rule = $this->Sellvana_SalesTax_Model_Rule->create(['title' => 'NY State', 'rule_rate_percent' => 4])->save();
