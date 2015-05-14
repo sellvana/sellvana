@@ -228,7 +228,7 @@
              * @param value
              */
             saveCombination: function(id, field, value) {
-                if (typeof this.combinations[id] == 'undefined') {
+                if (typeof this.combinations[id] == 'undefined' || this.combinations[id] == '') {
                     this.combinations[id] = {};
                 }
                 this.combinations[id][field] = value;
@@ -364,7 +364,7 @@
                         var fieldValue = component.props.row.field_values;
                         //assign variant combinations when init
                         if (typeof variantFields.combinations[id] == 'undefined') {
-                            variantFields.combinations[id] = fieldValue;
+                            variantFields.combinations[id] = (fieldValue != '' ? fieldValue : {});
                         }
                         var dom = $(component.getDOMNode());
 
