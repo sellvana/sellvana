@@ -582,7 +582,14 @@
                         });
                         variantFields.combinations[row.id] = obj;
                     });
-                });
+                }).on('removedRows.griddle', function(e, rows) {
+                    _.forEach(rows, function(row) {
+                        if (typeof (variantFields.combinations[row.id]) != 'undefined') {
+                            delete variantFields.combinations[row.id];
+                        }
+                    });
+                })
+                ;
             }
         };
 
