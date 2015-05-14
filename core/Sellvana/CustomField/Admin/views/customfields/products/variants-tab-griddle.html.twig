@@ -3,16 +3,15 @@
 {% set variantConfig = ctrl.variantGridConfig(model) %}
 
 <script type="text/javascript">
-    var variantGrid, variantFieldGrid;
+    var variantGrid, variantFieldGrid, variantImages, variantFields; //todo: move this to inside scope
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'jquery-ui', 'jquery.validate', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
-
 
         /**
          * object contains property and method to hand variant images
          * @type { {selectClass: string, listClass: string, inputClass: string, thumbUrl: string, images: Array, init: Function, getImages: Function, addImages: Function, removeImages: Function, updateInputImageValue: Function, renderImageItemForList: Function, populateImages: Function, handleEventImages: Function} }
          */
-        var variantImages = {
-            selectClass: '.variant-image',
+        variantImages = {
+            selectClass: 'select.variant-image',
             listClass: '.list-variant-image',
             inputClass: '.store-variant-image-id',
             thumbUrl: '/resize.php?s=30&f=media/product/images/',
@@ -20,7 +19,7 @@
             /**
              * init and set images list from grid config
              */
-            init: function() {
+            init: function () {
                 if (variantGrid) {
                     var listImages = _.findWhere(variantGrid.getConfig('columns'), { name: 'list_image' });
                     if (listImages && typeof listImages.default !== 'undefined' && listImages.default && listImages.default.length) {
@@ -29,40 +28,17 @@
                 } else {
                     console.log('DEBUG: no variantGrid');
                 }
-            },
-            /*getImages: function() {
-                return this.images;
-            },
-            addImages: function(images) {
-                var _this = this;
-                if (images instanceof Array && images.length) {
-                    _.forEach(images, function(img) {
-                        if (img.file_id && !_.findWhere(_this.images, { file_id: img.file_id })) {
-                            _this.images.push(img);
-                        }
-                    });
-                }
-            },
-            removeImages: function(imageFileIds) {
-                var ids = imageFileIds.split(',');
-                if (this.images.length) {
-                    var images = _.filter(this.images, function(img) {
-                        return _.contains(ids, img.file_id);
-                    });
-
-                    this.images = images;
-                }
-            },*/
+            }, //todo: missed function to allow add more images from outside
             /**
              * update image id to input hidden of each row, use this when submit
              * @param rowId
              */
-            updateInputImageValue: function(rowId) {
+            updateInputImageValue: function (rowId) {
                 var el = $(variantGrid.getDOMNode()).find('#' + rowId);
                 if (el) {
                     var id = [];
                     //var idTr = $(el).parents('tr').attr('id');
-                    el.find(this.listClass).find('i').each(function() {
+                    el.find(this.listClass).find('i').each(function () {
                         id.push($(this).attr('data-id'));
                     });
                     var stringId = id.join(',');
@@ -74,7 +50,7 @@
              * @param obj
              * @returns {*|jQuery}
              */
-            renderImageItemForList: function(obj) {
+            renderImageItemForList: function (obj) {
                 return $('<li>', { 'class': 'dd-item dd3-item' }).append(
                         $('<div>', { 'class': 'dd3-content' }).append(
                                 $('<img>', { src: variantImages.thumbUrl + obj.file_name }),
@@ -87,120 +63,140 @@
                 );
             },
             /**
-             * populate image items to dropdown images and list selected images
+             * populate image items to dropdown images and list selected images, also handle events
              */
-            populateImages: function() {
+            processImagesForRow: function (id) {
                 if (variantGrid && this.images.length) {
                     var selectClass = this.selectClass;
                     var listClass = this.listClass;
                     var inputClass = this.inputClass;
                     var images = this.images;
 
-                    _.forEach(variantGrid.getRows(), function(row) {
-                        var component = variantGrid.getRowComponent(row.id);
-                        if (component) {
-                            var dom = $(component.getDOMNode());
-                            var imageIds = dom.find(inputClass).val().split(',');
-                            var selectEle = dom.find(selectClass);
-                            var listEle = dom.find(listClass);
+                    var component = variantGrid.getRowComponent(id);
+                    if (component) {
+                        var dom = $(component.getDOMNode());
+                        var imageIds = dom.find(inputClass).val().split(',');
+                        var selectEle = dom.find(selectClass);
+                        var listEle = dom.find(listClass);
 
-                            //empty html first
-                            selectEle.html('').append('<option>', {value: ''});
-                            listEle.html('');
+                        //empty html first
+                        selectEle.html('').append('<option>', { value: '' });
+                        listEle.html('');
 
-                            //populate items
-                            _.forEach(images, function(img) {
-                                var hide = '';
-                                if (imageIds.indexOf(img.file_id) != '-1') {
-                                    listEle.append(variantImages.renderImageItemForList(img));
-                                    listEle.removeClass('hide');
-                                    hide = 'hide';
-                                }
+                        //populate items
+                        _.forEach(images, function (img) {
+                            var hide = '';
+                            if (imageIds.indexOf(img.file_id) != '-1') {
+                                listEle.append(variantImages.renderImageItemForList(img));
+                                listEle.removeClass('hide');
+                                hide = 'hide';
+                            }
 
-                                selectEle.append($('<option>', {
-                                    value: img.file_id,
-                                    text: img.file_name,
-                                    "data-subfolder": img.folder,
-                                    'class': hide
-                                }));
+                            selectEle.append($('<option>', {
+                                value: img.file_id,
+                                text: img.file_name,
+                                "data-subfolder": img.folder,
+                                'class': hide
+                            }));
+                        });
+
+                        var format = function (state) {
+                            if (!state.id) {
+                                return state.text;
+                            }
+                            return "<img src='" + variantImages.thumbUrl + state.text + "'/>  " + state.text;
+                        };
+
+                        //init select2 with format
+                        dom.find(this.selectClass).select2({
+                            formatResult: format,
+                            formatSelection: format
+                        });
+
+                        //only handle event when not init select2
+                        if (!dom.find(this.selectClass).hasClass('select2-onchange-added')) {
+
+                            var select = dom.find(variantImages.selectClass);
+                            var list = dom.find(variantImages.listClass);
+
+                            //event when select image item
+                            dom.on('change', this.selectClass, function () {
+                                var option = $(this).find(':selected');
+                                var image = {
+                                    file_id: $(this).val(),
+                                    file_name: option.text()
+                                };
+                                dom.find(variantImages.listClass).removeClass('hide').append(variantImages.renderImageItemForList(image));
+                                option.addClass('hide');
+                                variantImages.updateInputImageValue(id);
+                                $(this).select2('data', null);
                             });
-                        } else {
-                            console.log('DEBUG: cannot find the component of row' + row.id, row);
+
+                            dom.on('click', '.btn-delete-variant-image', function () {
+                                select.find('option[value="' + $(this).attr('data-id') + '"]').removeClass('hide');
+                                select.removeClass('hide');
+                                if (list.find('li').length == 1) {
+                                    list.addClass('hide');
+                                }
+                                $(this).parents('li').remove();
+                                variantImages.updateInputImageValue(id);
+                            });
+
+                            select.addClass('select2-onchange-added');
                         }
-                    });
 
-
-                } else {
-                    //empty dropdown images and list images
-                    $(variantGrid.getDOMNode()).find(this.selectClass).html('').append($('<option>', {value: ''}));
-                    $(variantGrid.getDOMNode()).find(this.listClass).html('');
+                    } else {
+                        console.log('DEBUG: cannot find the component of row' + id);
+                    }
                 }
-            },
-            /**
-             * handle event for variant images
-             * - init select 2 for dropdown images
-             * - onChange select
-             * - onClick delete image
-             */
-            handleEventImages: function() {
-                var dom = $(variantGrid.getDOMNode());
-                var format = function (state) {
-                    if (!state.id) {
-                        return state.text;
-                    }
-                    return "<img src='" + variantImages.thumbUrl + state.text + "'/>  " + state.text;
-                };
-
-                //init select2 with format
-                dom.find(this.selectClass).select2({
-                    formatResult: format,
-                    formatSelection: format
-                });
-
-                //event when select image item
-                dom.on('change', this.selectClass, function() {
-                    var option = $(this).find(':selected');
-                    var image = {
-                        file_id: $(this).val(),
-                        file_name: option.text()
-                    };
-                    $(this).parent().find(variantImages.listClass).removeClass('hide').append(variantImages.renderImageItemForList(image));
-                    option.addClass('hide');
-                    var rowId = $(this).parents('tr').attr('id');
-                    //console.log('DEBUG: add image to row id: ' +  rowId);
-                    variantImages.updateInputImageValue(rowId);
-                    $(this).select2('data', null);
-                });
-
-                dom.on('click', '.btn-delete-variant-image', function() {
-                    var td = $(this).parents('td');
-                    td.find(variantImages.selectClass).find('option[value="'+ $(this).attr('data-id') +'"]').removeClass('hide');
-                    td.find(variantImages.selectClass).removeClass('hide');
-                    if (td.find(variantImages.listClass).find('li').length == 1) {
-                        td.find(variantImages.listClass).addClass('hide');
-                    }
-                    $(this).parents('li').remove();
-                    var rowId = td.parents('tr').attr('id');
-                    //console.log('DEBUG: delete image from row id: ' +  rowId);
-                    variantImages.updateInputImageValue(rowId)
-                });
             }
         };
 
-        var variantFields = {
+        variantFields = {
+            //top section element
             selectId: '#sel_var_field',
             btnAddFieldId: '#btn_add_var_field',
+            btnRemoveFieldClass: '.btn-delete-field',
             listId: '#variants-tab-field',
+            //input class in each row
             inputClass: '.select-value-field',
             customFields: [],
-            init: function() {
+            combinations: {},
+            init: function () {
                 if (variantFieldGrid) {
-                    this.customFields = variantFieldGrid.getRows();
-                    console.log('customFields', this.customFields);
+                    var rows = variantFieldGrid.getRows();
+                    var fields = [];
+
+                    //convert fields options from id:value to value:value
+                    rows.forEach(function(row) {
+                        var options = {};
+                        _.forEach(row.options, function(value) {
+                            options[value] = value;
+                        });
+
+                        row.options = options;
+                        fields.push(row);
+                    });
+
+                    if (fields.length) {
+                        this.customFields = fields;
+                    }
+
+                    //console.log('customFields', this.customFields);
                 }
+
+                //cache jquery element
+                this.select = $(this.selectId);
+                this.btnAddField = $(this.btnAddFieldId);
+                this.list = $(this.listId);
             },
-            renderFieldItemForList: function(field) {
-                return $('<li>', { 'class': 'dd-item dd3-item' }).append(
+            /**
+             * render item for list field
+             * @param field
+             * @returns {*|jQuery}
+             */
+            renderFieldItemForList: function (field) {
+                return $('<li>', { 'class': 'dd-item dd3-item', 'data-code': field.field_code }).append(
                         $('<div>', { 'class': 'icon-ellipsis-vertical dd-handle dd3-handle' }),
                         $('<div>', { 'class': 'dd3-content' }).append(
                                 $('<label>', { text: field.name }),
@@ -213,7 +209,11 @@
                         )
                 )
             },
-            addField: function(field) {
+            /**
+             * add field to variantFields.customFields
+             * @param field
+             */
+            addField: function (field) {
                 if (typeof field.id != 'undefined') {
                     return;
                 }
@@ -221,12 +221,28 @@
                     this.customFields.push(field);
                 }
             },
-            populateFields: function() {
-                var select = $(this.selectId);
-                var list = $(this.listId);
-                if (variantFieldGrid && variantGrid && this.customFields.length) {
+            /**
+             * save combinations
+             * @param id
+             * @param field
+             * @param value
+             */
+            saveCombination: function(id, field, value) {
+                if (typeof this.combinations[id] == 'undefined' || this.combinations[id] == '') {
+                    this.combinations[id] = {};
+                }
+                this.combinations[id][field] = value;
+            },
+            /**
+             * populate data to top field section and handle events
+             */
+            processTopFieldSection: function () {
+                if (variantGrid && this.customFields.length) {
+                    var select = variantFields.select;
+                    var list = variantFields.list;
 
                     //populate data to top fields
+                    list.html('');
                     _.forEach(variantGrid.props.columnMetadata, function (col) {
                         _.forEach(variantFields.customFields, function (field) {
                             if (field.id == col.field_id) {
@@ -236,88 +252,224 @@
                         })
                     });
 
-                    //populate data to dropdown fields in each row
-                    _.forEach(variantGrid.getRows(), function(row) {
-                        var component = variantGrid.getRowComponent(row.id);
-                        var fieldValue = row.field_values;
-                        if (component) {
-                            var dom = $(component.getDOMNode());
-                            dom.find(variantFields.inputClass).each(function() {
-                                var name = $(this).attr('name');
-                                var field = _.findWhere(variantFields.customFields, {field_code: name});
-                                if (field) {
-                                    var options = [];
-                                    _.forEach(field.options, function(value, key) {
-                                        options.push({ id: value, text: value });
-                                    });
-                                    $(this).select2({
-                                        placeholder: 'Select field value',
-                                        allowClear: true,
-                                        data: function () {
-                                            return { results: options };
-                                        }
-                                    });
+                    //add field to list and variantGrid
+                    this.btnAddField.on('click', function () {
+                        var val = select.val();
+                        var optSelected = select.find("option:selected");
+                        if (!val) {
+                            return;
+                        }
 
-                                    console.log(fieldValue[name]);
-                                    if (typeof fieldValue[name] != 'undefined') {
-                                        $(this).select2('val', fieldValue[name]);
+                        $.get('{{ APP.href('/customfields/fields/options?id=') | raw }}' + val,
+                                function (response) {
+                                    if (response.success) {
+                                        var field = {
+                                            id: val,
+                                            name: optSelected.text(),
+                                            field_code: optSelected.attr('data-code'),
+                                            options: (response.options instanceof Array) ? {} : response.options
+                                        };
+                                        optSelected.addClass('hide');
+                                        //variantFields.addField(field);
+                                        variantFields.resetSelect();
+                                        variantFields.customFields.push(field);
+                                        variantFields.list.append(variantFields.renderFieldItemForList(field));
+                                        variantFields.addGridColumn(field);
+                                        //update combinations value
+                                        if (!_.isEmpty(variantFields.combinations)) {
+                                            _.forEach(variantFields.combinations, function(comb, key) {
+                                                if (typeof comb == 'undefined') {
+                                                    comb = {};
+                                                }
+                                                comb[optSelected.attr('data-code')] = '';
+                                                variantFields.combinations[key] = comb;
+                                            })
+                                        }
                                     }
                                 }
-                            })
+                        );
+
+                    });
+
+                    $(this.btnRemoveFieldClass).on('click', function() {
+                        if (confirm('Are you sure to delete this?')) {
+                            var fieldCode = $(this).attr('data-code');
+
+                            //re-display in select
+                            variantFields.select.find('option[value=' + $(this).attr('data-id') + ']').removeClass('hide');
+                            variantFields.resetSelect();
+
+                            //remove in custom fields
+                            variantFields.customFields = _.reject(variantFields.customFields, function (f) {
+                                return f.field_code == fieldCode;
+                            });
+
+                            //remove from grid column
+                            variantFields.deleteGridColumn({ field_code: fieldCode });
+
+                            //remove from combinations
+                            if (!_.isEmpty(variantFields.combinations)) {
+                                _.forEach(variantFields.combinations, function (comb, key) {
+                                    delete comb[fieldCode];
+                                    variantFields.combinations[key] = comb;
+                                });
+                            }
+
+                            //remove from list
+                            $(this).parents('li.dd-item').remove();
                         }
                     });
+
+                    this.resetSelect();
+                    list.sortable({
+                        scroll: false,
+                        axis: 'x',
+                        stop: function (event, ui) {
+                            var newCustomFieldsPos = list.sortable('toArray', {attribute: 'data-code'});
+                            var newCustomFields = [];
+
+                            //re-sort fields in variantFields.customFields
+                            if (newCustomFieldsPos.length) {
+                                newCustomFieldsPos.forEach(function(fieldCode) {
+                                    var field = _.findWhere(variantFields.customFields, {field_code: fieldCode});
+                                    if (field) {
+                                        newCustomFields.push(field);
+                                    }
+                                });
+                            }
+
+                            //update columns
+                            if (newCustomFields.length) {
+                                variantFields.customFields = newCustomFields;
+                                var columns = variantFields.calcIndexColumns(variantGrid.getInitColumns());
+                                var filteredColumns = variantFields.calcIndexColumns(variantGrid.getColumns());
+                                variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
+                                //todo: store personalization of columns order
+                            }
+                        }
+                    });
+                }
+            },
+            /**
+             * populate fields to each row and handle events for them
+             * @param id
+             */
+            processFieldForRow: function (id) {
+                if (variantGrid && this.customFields.length) {
+
+                    //populate data to dropdown fields in each row
+                    var component = (id instanceof Object) ? id : variantGrid.getRowComponent(id);
+
+                    if (component) {
+                        var fieldValue = component.props.row.field_values;
+                        //assign variant combinations when init
+                        if (typeof variantFields.combinations[id] == 'undefined') {
+                            variantFields.combinations[id] = (fieldValue != '' ? fieldValue : {});
+                        }
+                        var dom = $(component.getDOMNode());
+
+                        //render and init select2 for each fields
+                        dom.find(variantFields.inputClass).each(function () {
+                            var name = $(this).attr('name');
+                            var field = _.findWhere(variantFields.customFields, { field_code: name });
+                            if (field) {
+                                var options = [];
+                                _.forEach(field.options, function (value, key) {
+                                    options.push({ id: value, text: value });
+                                });
+                                $(this).select2({
+                                    placeholder: 'Select field value',
+                                    allowClear: true,
+                                    data: function () {
+                                        return { results: options };
+                                    },
+                                    createSearchChoice: function (term, data) {
+                                        if ($(data).filter(function () {
+                                                    return this.text.toLowerCase().localeCompare(term.toLowerCase()) == 0;
+                                                }).length === 0) {
+                                            return { id: term, text: term };
+                                        }
+                                    }
+                                });
+
+                                if (fieldValue && typeof fieldValue[name] != 'undefined') {
+                                    $(this).select2('val', fieldValue[name]);
+                                }
+                            }
+
+                            $(this).addClass('variantUnique');
+                            $(this).attr('id', id + name);
+                        });
+
+                        //confirm and add that filled value to dropdown
+                        dom.find(variantFields.inputClass).on('change', function (e) {
+                            var name = $(this).attr('name');
+                            var val = $(this).val();
+                            var field = _.findWhere(variantFields.customFields, { field_code: name });
+                            if (val != '' && field && typeof field.options[val] === 'undefined') {
+                                var confirm = window.confirm("A new field value will be created. Are you sure?");
+                                if (confirm) {
+                                    field.options[val] = val;
+                                    variantGrid.forceUpdate();
+                                    $(this).select2('val', val);
+                                } else {
+                                    $(this).select2('val', '');
+                                }
+                            }
+                        });
+                    } else {
+                        console.log('DEBUG: cannot find the component of row' + id);
+                    }
 
                 } else {
                     console.log('DEBUG: cannot populate fields');
                     console.log('variantGrid', variantGrid);
-                    console.log('variantFieldGrid', variantFieldGrid);
                     console.log('this.customFields', this.customFields);
                 }
             },
-            handleEventFields: function() {
-                this.resetSelect();
-                $(this.listId).sortable({
-                    scroll: false,
-                    axis:'x',
-                    update: function(event, ui) {
-                        console.log('sortable.update');
+            /**
+             * calc index columns following order
+             * - input checkbox, id
+             * - custom fields column
+             * - other columns
+             */
+            calcIndexColumns: function(columns) {
+                var newColumns = [];
+
+                _.forEach(columns, function(col) {
+                    if (col == 0 || col == 'id') {
+                        newColumns.push(col);
                     }
                 });
 
-                //add field to list and variantGrid
-                $(this.btnAddFieldId).on('click', function() {
-                    var select = $(variantFields.selectId);
-                    var list = $(variantFields.listId);
-                    var val = select.val();
-                    var optSelected = select.find("option:selected");
-                    if(!val) {
-                        return;
-                    }
-
-                    $.get('{{ APP.href('/customfields/fields/options?id=') | raw }}'+val,
-                            function(response) {
-                                if (response.success) {
-                                    var field = { id: val, name: optSelected.text(), field_code: optSelected.attr('data-code'), options: response.options };
-                                    variantFields.addField(field);
-
-                                    optSelected.addClass('hide');
-                                    select.val('');
-
-                                    list.append(variantFields.renderFieldItemForList(field));
-                                    variantFields.addGridColumn(field);
-                                }
-                            }
-                    );
-
+                _.forEach(variantFields.customFields, function(cf) {
+                    newColumns.push(cf.field_code);
                 });
+
+                _.forEach(columns, function(col) {
+                    if (col != 0 && col != 'id' && !_.contains(newColumns, col)) {
+                        newColumns.push(col);
+                    }
+                });
+
+                return newColumns;
             },
-            addGridColumn: function(field) {
+            /**
+             * add column to variant grid
+             * @param {object} field
+             */
+            addGridColumn: function (field) {
                 if (variantGrid) {
                     var columns = variantGrid.getInitColumns();
-                    if (!_.findWhere(columns, {name: field.field_code})) {
-                        columns.push(field.field_code);
-                        var filteredColumns = variantGrid.getColumns();
-                        filteredColumns.push(field.field_code);
+                    if (!_.contains(columns, field.field_code )) {
+                        columns = variantFields.calcIndexColumns(columns);
+                        //columns.push(field.field_code);
+
+                        /*var filteredColumns = variantGrid.getColumns();
+                        filteredColumns.unshift(field.field_code);*/
+
+                        var filteredColumns = variantFields.calcIndexColumns(variantGrid.getColumns());
+
                         variantGrid.props.columnMetadata.push({
                             name: field.field_code,
                             label: field.name,
@@ -326,30 +478,67 @@
                             addable: true,
                             position: 1,
                             display: 'eval',
-                            print: '"<p style=\'overflow: hidden\'><input type=\'hidden\' name=\''+ field.field_code +'\' class=\'select-value-field required\' style=\'width: 170px;\' /></p>"',
+                            print: '"<p style=\'overflow: hidden\'><input type=\'hidden\' name=\'' + field.field_code + '\' class=\'select-value-field required\' style=\'width: 170px;\' /></p>"',
                             options: field.options,
                             'default': ''
                         });
 
-                        variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns }, function() {
-                            $(variantGrid.getDOMNode()).find('td[data-col='+field.field_code+']').find(variantFields.inputClass).select2({
-                                placeholder: 'Select field value',
-                                allowClear: true,
-                                data: function () {
-                                    return { results: field.options };
-                                }
-                            });
-                        })
+                        variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
                     }
 
                 }
             },
-            resetSelect: function() {
-                $(this.selectId).val('').select2();
-            },
-            validateUniqueVariant: function() {
+            /**
+             * delete grid column from variant grid
+             * @param {object} field
+             */
+            deleteGridColumn: function(field) {
+                if (variantGrid) {
+                    var columns = variantGrid.getInitColumns();
+                    if (_.contains(columns, field.field_code )) {
+                        columns = _.without(columns, field.field_code);
+                        var filteredColumns = variantGrid.getColumns();
+                        filteredColumns = _.without(filteredColumns, field.field_code);
 
+                        variantGrid.props.columnMetadata = _.reject(variantGrid.props.columnMetadata, function(col) {
+                            return col.name == field.field_code;
+                        });
+
+                        variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
+                    } else {
+                        console.log('DEBUG: cannot find column name ', field.field_code);
+                    }
+                }
+            },
+            /**
+             * reset select
+             */
+            resetSelect: function () {
+                this.select.val('').select2();
+            },
+            /**
+             * validate variant combination to make sure each variant is unique
+             * @returns {boolean}
+             */
+            validateVariant: function() {
+                var valid = true;
+                $(variantGrid.getDOMNode()).find('input.variantUnique').each(function(el) {
+                    if (!$(this).valid()) {
+                        valid = false;
+                    }
+                });
+                return valid;
             }
+        };
+
+        /**
+         * variant field grid callback
+         * @param grid
+         * @param triggerName
+         */
+        window.variantFieldGriddleRegister = function(grid, triggerName) {
+            variantFieldGrid = grid;
+            variantFields.init();
         };
 
         /**
@@ -362,25 +551,141 @@
             if (triggerName == 'componentDidMount') {
                 variantImages.init();
             }
-            variantImages.populateImages();
-            variantImages.handleEventImages();
-            if (triggerName == 'componentDidUpdate') {
-                variantFields.populateFields();
+
+            var rowComponents = grid.getChildComponent('rows');
+            if (!_.isEmpty(rowComponents)) {
+                _.forEach(rowComponents, function(row) {
+                    var id = row.props.row.id;
+                    variantImages.processImagesForRow(id);
+                    variantFields.processFieldForRow(id);
+                });
+            }
+
+            if (triggerName == 'componentDidMount') {
+                variantFields.processTopFieldSection();
+
+                $(grid.getDOMNode()).on('change', 'tr', function(e) {
+                    //console.log('on-change', this);
+                    var id = $(this).attr('id');
+                    //update variant combinations value
+                    $(this).find('input.variantUnique').each(function() {
+                        variantFields.saveCombination(id, $(this).attr('name'), $(this).val());
+                    });
+                    //validate variant unique
+                    variantFields.validateVariant();
+                }).on('addedRows.griddle', function(e, rows) { //update combinations when add new rows
+                    _.forEach(rows, function(row) {
+                        var comp = variantGrid.getRowComponent(row.id);
+                        var obj = {};
+                        $(comp.getDOMNode()).find('input.variantUnique').each(function() {
+                            obj[$(this).attr('name')] = '';
+                        });
+                        variantFields.combinations[row.id] = obj;
+                    });
+                }).on('removedRows.griddle', function(e, rows) {
+                    _.forEach(rows, function(row) {
+                        if (typeof (variantFields.combinations[row.id]) != 'undefined') {
+                            delete variantFields.combinations[row.id];
+                        }
+                    });
+                })
+                ;
             }
         };
 
+    });
 
-        window.variantFieldGriddleRegister = function(grid, triggerName) {
-            variantFieldGrid = grid;
-            if (triggerName == 'componentDidMount') {
-                variantFields.init();
-            }
-            variantFields.populateFields();
-            if (triggerName == 'componentDidMount') {
-                variantFields.handleEventFields();
-            }
+    /**
+     * custom validation function for checking duplicated input
+     * @param value
+     * @param elem
+     * @param params
+     * @returns {boolean}
+     */
+    function variantUnique(value, elem, params) {
+        //console.log('begin validation unique in ele: ', elem);
+        var valid = true;
+        var rowEle = $(elem).parents('tr');
+        //console.log('row ele', rowEle);
+
+        if (!_.isEmpty(variantFields.combinations)) {
+            _.forEach(variantFields.combinations, function(comb, id) {
+                if (rowEle.attr('id') != id) {
+                    var flag = false;
+                    rowEle.find('input.select-value-field').each(function() {
+                        if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined' && $(this).val() != comb[$(this).attr('name')]) {
+                            flag = true; // at least one field is different
+                        }
+                    });
+                    if (!flag) {
+                        valid = false;
+                    }
+                }
+            });
         }
 
+        //console.log('valid', valid);
+        return valid;
+    }
+
+    //add custom validate to jquery validator
+    $.validator.addMethod('variantUnique', variantUnique , 'Same variant is already taken place.');
+    $.validator.addClassRules("variantUnique", {
+        variantUnique: true
+    });
+
+    $('form').submit(function (ev) {
+
+        var variantPostFields = [], variantPostData = [];
+
+        if (!variantFields.validateVariant()) {
+            return false;
+        }
+
+        variantFields.customFields.forEach(function (obj) {
+            variantPostFields.push({
+                id: obj.id,
+                field_code: obj.field_code,
+                name: obj.name
+            });
+        });
+
+        //set object data to submit
+        _.forEach(variantGrid.getChildComponent('rows'), function (comp) {
+            var newObj = _.clone(comp.props.row);
+            //remove list images
+            delete newObj.list_image;
+
+            if (typeof variantFields.combinations[newObj.id] != 'undefined' && variantFields.combinations[newObj.id] != null) {
+                newObj.field_values = variantFields.combinations[newObj.id];
+                /*_.forEach(variantFields.combinations[newObj.id], function(value, key) {
+                    newObj[key] = value;
+                })*/
+            } else { //after validate, this case will never be happened
+                newObj = {};
+                variantFields.customFields.each(function(field) {
+                    newObj[field.field_code] = '';
+                });
+            }
+
+            //images
+            newObj.variant_file_id = $(comp.getDOMNode()).find(variantImages.inputClass).val();
+
+            //todo: find better way for this
+            newObj.product_sku = newObj.product_sku || '';
+            newObj.inventory_sku = newObj.inventory_sku || '';
+            newObj.variant_price = newObj.variant_price || '';
+            newObj.variant_qty = newObj.variant_qty || '';
+
+            //console.log('newObj', newObj);
+            variantPostData.push(newObj);
+        });
+
+        $('#vfield_ids').val(JSON.stringify(variantPostFields));
+        $('#variants').val(JSON.stringify(variantPostData));
+
+        //return false;
+        return true;
     });
 </script>
 
@@ -395,14 +700,14 @@
         <ol id="variants-tab-field" class="dd-list columns dd-list-axis-x"></ol>
     </div>
 </div>
+{#todo: check to load data without render this grid#}
+<div class="hidden" id="grid-field-hidden">
+    {{ THIS.view('core/griddle').set('grid', fieldConfig) | raw }}
+</div>
 <div class="f-variants-col row">
     <div class="col-sm-12">
         {{ THIS.view('core/griddle').set('grid', variantConfig) | raw }}
     </div>
-</div>
-{#todo: check to load data without render this grid#}
-<div class="hidden" id="grid-field-hidden">
-    {{ THIS.view('core/griddle').set('grid', fieldConfig) | raw }}
 </div>
 
 <input type='hidden' id='vfield_ids' name='vfields' />

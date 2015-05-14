@@ -54,19 +54,18 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ['field' => 'options', 'type' => 'text']
                 ],
                 'actions' => [
-                    'new' => ['caption' => 'Add Fields'],
-                    /*'add-blank-row' => [
+                    //'new' => ['caption' => 'Add Fields'],
+                    'add-blank-row' => [
                         'caption'  => 'Add Fields',
                         'type'     => 'button',
                         'id'       => 'add-blank-row',
                         'class'    => 'btn-primary',
                         'callback' => 'addBlankRows'
-                    ],*/
+                    ],
                     'delete' => ['caption' => 'Remove']
                 ],
                 'callbacks' => [
-                    'componentDidMount' => 'fieldsGridRegister',
-                    //'componentDidUpdate' => 'fieldsGridRegister',
+                    'componentDidMount' => 'fieldsGridRegister'
                 ],
                 'grid_before_create' => 'frontendFieldGridRegister'
             ]

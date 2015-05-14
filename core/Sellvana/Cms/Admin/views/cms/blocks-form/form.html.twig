@@ -3,11 +3,436 @@
 
 {% set blockCtrl = APP.instance('Sellvana_Cms_Admin_Controller_Blocks') %}
 {% set grid = blockCtrl.formFieldGrid(model) %}
-{% set validator = THIS.get('validator') %}
-{% set fieldData = { validator:validator } %}
-{% import THIS.view('core/form-elements').twigName() as forms %}
 <fieldset class="form-horizontal">
-<div class="f-section">
+    <div class="f-section">
+        <div class="form-group">
+            {% set emailOptions = blockCtrl.getEmailOptions() %}
+
+            {{ forms.boolean(fieldData, {field:'form_enable', label:'Form Enabled'|_, select2:true}) }}
+            {{ forms.select(fieldData, {field:'form_email', label:'Send form data to'|_, select2: true, options:emailOptions}) }}
+            {{ forms.input(fieldData, {field:'form_custom_email', label:'Custom email'|_, attr:'disabled', input_class:"email"}) }}
+            <script type="text/javascript">
+                require(['jquery', 'select2'], function ($) {
+                    $(function () {
+                        var $formCustomEmail = $('#model-form_custom_email');
+                        var $formEmail = $("#model-form_email");
+                        if($formEmail.val() == 'other') {
+                            $formCustomEmail.prop('disabled', false);
+                        }
+                        $formEmail.on("change", function (e) {
+                            var val = $(this).val();
+                            if (val == 'other') {
+                                $formCustomEmail.prop('disabled', false);
+                            } else {
+                                $formCustomEmail.prop('disabled', true);
+                            }
+                        });
+                    })
+                });
+            </script>
+            <input type='hidden' id='block_form_fields_data' name='model[form_fields]'/>
+        </div>
+        <div class="row">
+            <div class="col-sm-10">
+                {{ THIS.view('core/griddle').set('grid', grid) | raw }}
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+<script>
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'select2'], function (React, _, $, Components) {
+        var formFieldsGrid, formFieldsNode, formFieldsModalNode;
+        var inputName = 'input[data-col="name"]';
+        var inputOption = 'input[data-col="options"]';
+        var selectFieldType = 'select[data-col="input_type"]';
+
+        window.formFieldGridRegister = function(grid) {
+            formFieldsGrid = grid;
+            formFieldsNode = $(formFieldsGrid.getDOMNode());
+        }
+
+        $('#default-form').submit(function (ev) {
+            var rows = formFieldsGrid.getRows();
+
+            var res = [];
+            for (var i in rows) {
+                if (rows[i].position == 0) {
+                    rows[i].position = 0;
+                }
+                res.push(_.pick(rows[i], 'id', 'name', 'label', 'input_type', 'required', 'options', 'position'));
+            }
+
+            $("#block_form_fields_data").val(JSON.stringify(res));
+        });
+
+        /**
+         * Add form fields
+         */
+        window.addFormField = function(modal) {
+            var fields = formFieldsModalNode.find('select,input,textarea'),
+                form = formFieldsModalNode.find('form'),
+                addBtn = formFieldsModalNode.find('button.save'),
+                options = {},
+                addRows = {};
+
+            var mainFields = {
+                name: 1,
+                label: 1,
+                input_type: 1,
+                required: 1,
+                position: 1
+            };
+
+            var rows = formFieldsGrid.getRows();
+            if($.isEmptyObject(addRows) == true) {
+                addRows['id'] = 0;
+            }
+
+            if (form.valid()) {
+                fields.each(function (i, field) {
+                    var fieldName = $(field).prop('name');
+                    var fieldType = $(field).prop('type');
+                    var fieldValue = $(field).val();
+                    if ((fieldType == 'checkbox' || fieldType == 'radio') && !$(field).prop('checked')) {
+                        return;
+                    }
+                    if (mainFields[fieldName]) {
+                        addRows[fieldName] = fieldValue;
+                    } else if (fieldName != '') {
+                        options[fieldName] = fieldValue;
+                    }
+                });
+
+                if ($.isEmptyObject(options) == false) {
+                    addRows['options'] = JSON.stringify(options);
+                }
+
+                if (addRows['id'] == 0) {
+                    var rowsSize = rows.length;
+                    var id = 1;
+                    if (rowsSize != 0) {
+                        // some rows in collection
+                        var last = rows[rowsSize - 1];
+                        id = last['id'] - 0; // make sure it is number
+                    }
+                    addRows['_new'] = true;
+                    addRows['id'] = id + 1;
+                }
+
+                formFieldsGrid.addRows([addRows]);
+                modal.close();
+            }
+        }
+
+        var formColumns = [
+            {
+                'name': 'input_type', 'label': 'Field Type', 'labelClass': 'col-sm-3', 'width': 200, 'editor': 'select', 'addable': true, 'editable': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true},
+                options: {
+                    '': '-- Select field type --',
+                    'text': 'Single Line Text',
+                    'textarea': 'Paragraph Text',
+                    'wysiwyg': 'Rich Text',
+                    'number': 'Number',
+                    'email': 'Email Address',
+                    'url': 'Website/URL',
+                    'image': 'Image URL',
+                    'file': 'File Upload',
+                    'date': 'Date',
+                    'tel': 'Phone Number',
+                    'hidden': 'Hidden Field',
+                    'time': 'Time',
+                    'password': 'Password',
+                    'checkbox': 'Checkbox',
+                    'radio': 'Radio',
+                    'select': 'Dropdown',
+                    'select-multi': 'select-multi'
+                }
+            },
+            {'name': 'position', 'label': 'Position', 'labelClass': 'col-sm-5', 'cssClass': 'col-sm-7', 'hidden': true, 'addable': true, 'editable': true, 'formGroupClass': 'form-group col-sm-4', 'validation': {'required': true}},
+
+            {'name': 'name', 'label': 'Field Name', 'labelClass': 'col-sm-3', 'width': 200, 'addable': true, 'editable': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true}},
+
+            {'name': 'required', 'label': 'Required', 'labelClass': 'col-sm-5', 'addable': true, 'editable': true, 'editor': 'select', 'cssClass': 'col-sm-7', 'width': 150,'options': {'0': 'No', '1': 'Yes'}, 'formGroupClass': 'form-group col-sm-4', 'validation': {'required': true}},
+
+            {'name': 'field_id', 'label': 'Field Id', 'labelClass': 'col-sm-3', 'addable': true, 'editable': true, 'hidden': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true}},
+
+            {'name': 'readonly', 'label': 'Read Only', 'labelClass': 'col-sm-5', 'hidden': true, 'addable': true, 'editable': true, 'editor': 'select', 'cssClass': 'col-sm-7', 'options': {'0': 'No', '1': 'Yes'}, 'formGroupClass': 'form-group col-sm-4', 'validation': {'required': true}},
+
+            {'addable': true, 'editable': true, 'editor': 'clearfix', 'formGroupClass': 'clearfix', 'style': {clear: 'both'}},
+
+            {'name': 'label', 'label': 'Field Label', 'labelClass': 'col-sm-2', 'width': 200, 'addable': true, 'editable': true, 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group ', 'validation': {'required': true}},
+
+            {'name': 'css_class', 'label': 'CSS Classes', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group '},
+
+            {'name': 'field_default_value', 'label': 'Default Value', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'editor': 'textarea', 'cols': 20, 'rows': 5, 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group '},
+
+            {'name': 'field_placeholder', 'label': 'Placeholder', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'cssClass': ' col-sm-9', 'formGroupClass': 'form-group managed textarea-field text-field url-field tel-field email-field password-field', 'managable': ['textarea', 'text', 'url', 'tel', 'email', 'password']},
+
+            {'formGroupClass': 'form-group managed number-field date-field time-field text-field url-field tel-field email-field password-field textarea-field select-field select-multi-field', addable: true, 'editable': true, 'hidden': true, 'managable': ['textarea'], 'child': [
+                    {'name': 'maxlength', 'label': 'Max Length', 'labelClass': 'col-sm-2', cssClass: 'digits nonegative col-sm-3'}
+                ]
+            },
+
+            {'formGroupClass': 'form-group managed number-field date-field time-field text-field url-field tel-field email-field password-field textarea-field select-field select-multi-field', 'addable': true, 'editable': true, 'hidden': true, 'managable': ['number', 'date', 'select', 'text', 'url', 'tel', 'email', 'password', 'select-multi', 'time'], 
+                'child': [
+                    {'name': 'size', 'label': 'Size', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3'}
+                ]
+            },
+
+            {'formGroupClass': 'form-group managed textarea-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['textarea'],
+                'child': [
+                    {'name': 'rows', 'label': 'Rows', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3'},
+                    {'name': 'cols', 'label': 'Cols', 'labelClass': 'col-sm-3', 'cssClass': 'digits nonegative col-sm-3'}
+                ]
+            },
+
+            {'name': 'options', 'label': 'Add/Remove options', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed select-field select-multi-field radio-field checkbox-field', 'cssClass': 'col-sm-9', 'addable': true, 'editable': true, 'managable': ['select', 'select-multi', 'radio']},
+
+            {'name': 'checked', 'label': 'Default checked', 'labelClass': 'col-sm-2', 'cssClass': 'col-sm-2', 'formGroupClass': 'form-group managed checkbox-field radio-field', 'addable': true, 'editable': true, 'editor': 'select', 'managable': ['checkbox', 'radio'], 
+                'options': {
+                    '0': 'No', '1': 'Yes'
+                }
+            },
+
+            {'name': 'formaction', 'label': 'Form action', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed image-field submit-field', 'cssClass': 'col-sm-9', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['image', 'submit'], 'cssClass': 'col-sm-9'},
+
+            {'name': 'formnovalidate', 'label': 'No form validate', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['submit'], 'cssClass': 'col-sm-2', 'editor': 'select', 'formGroupClass': 'form-group managed submit-field', 
+                'options': {
+                    '0': 'No', '1': 'Yes'
+                }
+            },
+
+            {'name': 'src', 'label': 'Src', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['image'], 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group managed image-field'},
+
+            {'formGroupClass': 'form-group managed image-field', 'hidden': true, 'addable': true, 'managable': ['image'], 'editable': true, 
+                'child': [
+                    {'name': 'height', 'label': 'Height', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3', 'formGroupClass': ''},
+                    {'name': 'width', 'label': 'Width', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3', 'formGroupClass': ''}
+                ]
+            },
+
+            {'formGroupClass': 'form-group managed number-field date-field time-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['number', 'date', 'time'], 
+                'child': [
+                    {'name': 'min', 'label': 'Min value', 'labelClass': 'col-sm-6', 'cssClass': 'digits nonegative col-sm-6', 'formGroupClass': 'col-sm-4'},
+                    {'name': 'max', 'label': 'Max value', 'labelClass': 'col-sm-5', 'cssClass': 'digits nonegative col-sm-6', 'formGroupClass': 'col-sm-4'},
+                    {'name': 'step', 'label': 'Step', 'labelClass': 'col-sm-3', 'cssClass': 'digits nonegative col-sm-6', 'formGroupClass': 'col-sm-4'}
+                ]
+            },
+
+            {'name': 'multiple', 'label': 'Multiple', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed email-field file-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['email', 'file'], 'cssClass': 'col-sm-2', 'editor': 'select', 
+                'options': {
+                    '0': 'No', '1': 'Yes'
+                }
+            },
+
+            {'formGroupClass': 'form-group managed image-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['text', 'email', 'url', 'tel', 'password'], 
+                'child': [
+                    {'name': 'pattern', 'label': 'Pattern', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-4', 'formGroupClass': ''},
+                    {'name': 'autocomplete', 'label': 'Autocomplete', 'labelClass': 'col-sm-3', 'cssClass': 'col-sm-2', 'formGroupClass': '', 'editor': 'select', 
+                        'options': {
+                            '0': 'No', '1': 'Yes'
+                        }
+                    }
+                ]
+            },
+
+            {'name': 'validation', 'label': 'Validation', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['text', 'textarea', 'wysiwyg', 'number', 'email', 'url', 'image', 'file', 'date', 'tel', 'time', 'password'], 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group validation -rte-field -hidden-field -select-field -select-multi-field -radio-field -checkbox-field'},
+        ];
+        var FormFieldModalForm = React.createClass({
+            displayName: "FormFieldModalForm",
+            getInitialState: function(){
+                return { inputType: '' };
+            },
+            getDefaultProps: function () {
+                return {
+                    'row': {},
+                    'id': 'modal-form',
+                    'columnMetadata': []
+                }
+            },
+            componentDidMount: function() {
+                
+            },
+            setInputType: function(e) {
+                this.removeErrorEles();
+                this.setState({inputType: e.target.value});
+            },
+            removeFormFields: function(cols, fields) {
+                _.each(cols, function(col, i) {
+                    _.each(fields, function(field, index) {
+                        if (field === col.name) cols.splice(i, 1);
+                    });
+                });
+            },
+            removeErrorEles: function() {
+                formFieldsModalNode.find('label.error').each(function() {
+                    $(this).remove();
+                });
+            },
+            render: function () {
+                var that = this;
+                var gridId = this.props.id;
+                var columns = this.props.columnMetadata;
+                var renderColumns = [];
+                var inputType = this.state.inputType;
+
+                if (inputType !== '') {
+                    _.each(columns, function(col, index) {
+                        var bool = _.findWhere(col.managable, inputType);
+                        if (typeof bool !== 'undefined' || !col.managable) renderColumns.push(col);
+                    });
+                } else {
+                    _.each(columns, function(col, index) {
+                        if (!col.managable) renderColumns.push(col);
+                    });
+                }
+
+                switch(inputType) {
+                    case 'file':
+                    case 'image':
+                        this.removeFormFields(renderColumns, ['field_default_value']);
+                        break;
+                    case 'hidden':
+                        this.removeFormFields(renderColumns, [
+                                'position', 'required', 'readonly'
+                            ]);
+                        break;
+                    case 'select-multi':
+                    case 'password':
+                        this.removeFormFields(renderColumns, ['required']);
+                        break;
+                }
+
+                var nodes = renderColumns.map(function(column) {
+                    if((that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
+                    if (column.name === 'input_type') {
+                        return React.createElement(formFieldsModalElement, {column: column, value: that.props.row[column.name], setInputTypeHandle: that.setInputType})
+                    }
+                    return React.createElement(formFieldsModalElement, {column: column, value: that.props.row[column.name]})
+                });
+
+                return (
+                    React.createElement("div", {className: " field-element-wrapper"}, nodes)
+                )
+            }
+        });
+
+        var formFieldsModalElement = React.createClass({
+            displayName: "formFieldsModalElement",
+            mixins: [FCom.Mixin, FCom.FormMixin],
+            getDefaultProps: function() {
+                return {
+                    'value': '', //default value
+                    'column': {}, //column info and option,
+                    'removeFieldDisplay': false, //remove field button for mass-edit
+                    'removeFieldHandle': null,
+                    'setInputTypeHandle': null
+                }
+            },
+            componentDidMount: function() {
+                //console.log(this.props.callback);
+            },
+            renderCustomNode: function(columns) {
+                var that = this;
+                var inputs = columns.map(function(column, index) {
+                    return (
+                        React.createElement("div", {className: column.formGroupClass, style: column.style}, 
+                            that.renderLabel(column), React.createElement("div", {className: "controls " + column.cssClass}, that.renderNode(column))
+                        )
+                    );
+                });
+
+                return inputs;
+            },
+            renderLabel: function(column) {
+                var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
+                return (
+                    React.createElement("div", {className: "control-label " + column.labelClass}, 
+                        React.createElement("label", {htmlFor: column.name}, 
+                            column.label, iconRequired
+                        )
+                    )
+                );
+            },
+            renderNode: function(column) {
+                var that = this;
+                var validationRules = that.validationRules(column.validation);
+                switch (column.editor) {
+                    case 'select':
+                        var options = [];
+                        _.forEach(column.options, function(text, value) {
+                            options.push(React.createElement("option", {value: value}, text));
+                        });
+                        if (typeof this.props.setInputTypeHandle !== 'undefined') {
+                            return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: '', onChange: that.props.setInputTypeHandle},  validationRules), options);
+                        } else {
+                            return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules), options);
+                        }
+                        break;
+                    case 'textarea':
+                        return React.createElement("textarea", React.__spread({name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: ''},  validationRules));
+                        break;
+                    default:
+                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules));
+                        break;
+                }   
+            },
+            render: function() {
+                var that = this;
+                var column = this.props.column;
+
+                if (column.editor == 'clearfix') {
+                    return React.createElement('div', {className: 'clearfix', style: column.style});
+                }
+
+                if (typeof column.child !== 'undefined') {
+                    return (
+                        React.createElement("div", {className: column.formGroupClass, style: column.style, id: column.name}, this.renderCustomNode(column.child))
+                    );
+                }
+
+                return (
+                    React.createElement("div", {className: column.formGroupClass, style: column.style, id: column.name}, 
+                        this.renderLabel(column), React.createElement("div", {className: "controls " + column.cssClass, style: column.style}, this.renderNode(column))
+                    )
+                )
+
+            }
+        });
+
+        window.showModalToAddFormField = function(grid) {
+            formFieldsGrid = grid;
+            var modalContainerEle = document.getElementById('{{ grid.config.id }}-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                            className: "formFieldsModal",
+                            show: true,
+                            title: 'Add Field',
+                            confirm: 'Add',
+                            cancel: 'Close',
+                            onLoad: function(modal) {
+                                formFieldsModalNode = $(modal.getDOMNode());
+                                formFieldsModalNode.find('.modal-dialog').css('width', '900px');
+                            },
+                            onConfirm: window.addFormField
+                        },
+                        React.createElement('div', {className: 'f-grid-wrapper', id: formFieldsGrid.getConfig('id')+'-wrap'})
+                ), modalContainerEle);
+
+            var modalWrapEle = $('#{{ grid.config.id }}-wrap');
+            modalWrapEle.append('<form id="{{ grid.config.id }}-modal-form" class="form form-horizontal validate-form"></form>');
+            var modalFormEle = document.getElementById('{{ grid.config.id }}-modal-form');
+            React.unmountComponentAtNode(modalFormEle);
+            React.render(
+                React.createElement(FormFieldModalForm, {columnMetadata: formColumns, id: formFieldsGrid.getConfig('id')}), modalFormEle
+            );
+        }
+    });
+</script>
+
+{#<div class="f-section">
 <script type="text/javascript">
     require(['backbone', 'underscore', 'jquery'], function (Backbone, _, $) {
 
@@ -301,9 +726,9 @@
         });
     </script>
     <input type='hidden' id='block_form_fields_data' name='model[form_fields]'/>
-</div>
+</div> #}
 {#<div class='' id='frontend-field-grid-modal' tabindex='-1'>#}
-<div id="{{grid.config.id}}-custom-modal">
+{# <div id="{{grid.config.id}}-custom-modal">
     <div class='modal fade in' id='{{grid.config.id}}-custom-form' tabindex='-1'>
     <div class='modal-dialog'>
     <div class='modal-content'>
@@ -575,4 +1000,4 @@
     </div>
 </div>
 </div>
-</fieldset>
+</fieldset> #}

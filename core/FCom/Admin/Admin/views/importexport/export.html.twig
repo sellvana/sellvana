@@ -1,10 +1,10 @@
 <!--{ label: IE/Export }-->
 <!--{ pos: 10 }-->
 {% set m = THIS.get('model') %}
-{% set grid = m['export_config'] %}
+{% set ieConfig = APP.instance('FCom_Admin_Controller_ImportExport') %}
 
 <script type="text/javascript">
-    require(['jquery'], function ($) {
+    /*require(['jquery'], function ($) {
         window.modelsGridRegister = function (grid) {
             grid.build();
             $('#' + grid.id).find('input[type=checkbox]').on('click', function(){
@@ -49,10 +49,10 @@
                 });
             });
         }
-    });
+    });*/
 </script>
 <div class="panel-body">
-    {{ THIS.view('core/backbonegrid').set('grid', grid) | raw }}
+    {{ THIS.view('core/griddle').set('grid', ieConfig.getExportConfig(m)) | raw }}
     <div class="form-group">
         <label for="export_file_name" class="col-md-2 control-label">{{ "Export file name"|_ }}</label>
         <div class="col-md-5"><input type="text" class="form-control" id="export_file_name" name="ie_export_grid[export_file_name]" placeholder="{{"Leave empty for default"|_}}">
@@ -61,3 +61,55 @@
     </div>
     <button type="button" class="btn btn-lg btn-primary" id="btn_export_start">{{ "Export selected models"|_ }}</button>
 </div>
+
+<script>
+    /*==========  React section  ==========*/
+    require(['jquery', 'underscore', 'react'], function($, _, React) {
+        var modelsGrid, modelsNode;
+        window.modelsGridRegister = function (grid) {
+            modelsGrid = grid;
+            var modelsNode = $(modelsGrid.getDOMNode());
+            modelsNode.find('input[type=checkbox]').on('click', function(){
+                var isChecked = this.checked;
+                var addRows = [];
+                var id = this.name.replace(modelsGrid.getConfig('id') + '[checked][','').replace(']','');
+
+                var rowsCol = modelsGrid.getRows();
+                var tRow = _.find(rowsCol, function(row) {
+                    if (row.id === id) return row;
+                });
+                addRows.push(_.findWhere(rowsCol, {id: id}));
+                var children = tRow['children'];
+                if (children) {
+                    _.each(children, function (child) {
+                        var fRow = _.findWhere(rowsCol, {id: child});
+                        if (fRow) {
+                            addRows.push(fRow);
+                            if (fRow.children.length) {
+                                _.each(fRow.children, function(subChild) {
+                                    var sRow = _.findWhere(rowsCol, {id: subChild});
+                                    addRows.push(sRow);
+                                });
+                            }
+                        }
+                        if (isChecked) {
+                            modelsGrid.addSelectedRows(addRows);
+                            addRows.push(_.findWhere(rowsCol, {id: id}));
+                        } else {
+                            modelsGrid.removeSelectedRows(addRows);
+                        }
+                    });
+                }
+            });
+
+            $('#btn_export_start').click(function(e){
+                e.preventDefault();
+                var url = '{{ APP.href('importexport/export') }}';
+                var data = $('input[name^=ie_export_grid]').serializeArray();
+                $.post(url, data).done(function(d){
+                    console.log(d);
+                });
+            });
+        }
+    });
+</script>

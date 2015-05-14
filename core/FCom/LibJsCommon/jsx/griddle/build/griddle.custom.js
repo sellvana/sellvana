@@ -461,9 +461,9 @@ var Griddle = React.createClass({displayName: "Griddle",
             ? React.createElement(this.props.customSettings, {columnMetadata: this.props.columnMetadata, selectedColumns: this.getColumns, setColumns: this.setColumns, 
                 getConfig: this.getConfig, searchWithinResults: this.searchWithinResults, getSelectedRows: this.getSelectedRows, refresh: this.refresh, 
                 setHeaderSelection: this.setHeaderSelection, getHeaderSelection: this.getHeaderSelection, getGriddleState: this.getGriddleState, 
-                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, removeRows: this.removeRows, getCurrentGrid: this.getCurrentGrid, 
-                ref: 'gridSettings', hasExternalResults: this.hasExternalResults, updateRows: this.updateRows, saveModalForm: this.saveModalForm, 
-                clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows}
+                updateInitColumns: this.updateInitColumns, getInitColumns: this.getInitColumns, addRows: this.addRows, removeRows: this.removeRows, 
+                getCurrentGrid: this.getCurrentGrid, ref: 'gridSettings', hasExternalResults: this.hasExternalResults, updateRows: this.updateRows, 
+                saveModalForm: this.saveModalForm, clearSelectedRows: this.clearSelectedRows, removeSelectedRows: this.removeSelectedRows}
             )
             : React.createElement("span", {className: "settings", onClick: this.toggleColumnChooser}, this.props.settingsText, " ", React.createElement("i", {className: "glyphicon glyphicon-cog"}))
         ) : "";
@@ -1167,6 +1167,11 @@ var Griddle = React.createClass({displayName: "Griddle",
                     break;
                 case 'rows':
                     child = refs.gridBody.refs;
+                    delete child.gridTitle;
+                    break;
+                case 'title':
+                case 'gridTitle':
+                    child = refs.gridBody.refs.gridTitle;
                     break;
             }
         }
