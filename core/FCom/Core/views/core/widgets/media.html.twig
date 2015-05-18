@@ -4,29 +4,29 @@
     {{ forms.input({label: "Width"|_, name: "#{context.prefix}[widgets][#{widget.id}][width]", value: widget.width|default('640'), field: "width-#{widget.id}"}) }}
     {{ forms.input({label: "Height"|_, name: "#{context.prefix}[widgets][#{widget.id}][height]", value: widget.height|default('320'), field: "height-#{widget.id}"}) }}
     {{ forms.hidden({name: "#{context.prefix}[widgets][#{widget.id}][src]", value: widget.src, field: "src-#{widget.id}"}) }}
-    <div id="lib-images-{{ widget.id }}"></div>
-    {% set type = 'images' %}
-    {% set medialibConfig = {
-    id: 'all_' ~ type,
-        mode: 'images',
-        type: 'images',
-        title: 'Images',
-        folder: 'media/product/images',
-        config: {actions: {delete: {caption : 'Remove'}}}
-    } %}
+    <div id="lib-images-{{ widget.id }}">
+        {% set type = 'images' %}
+        {% set medialibConfig = {
+            id: 'all_' ~ type,
+            type: type,
+            config:  APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({'id': 'all_' ~ type})
+        } %}
 
-    {% set imageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({id: 'insert_media_main_grid' ~ widget.id}) %}
-    {% set attachmentsConfig = {
-        type: type,
-        targetType: 'images',
-        elementContainer: '#lib-images-' ~ widget.id,
-        medialibConfig: medialibConfig,
-        gridConfig: imageConfig
-    } %}
-    {#{{ dump(attachmentsConfig) }}#}
-    <!-- Att -->
-    {{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig)|raw }}
-    <!-- Att end -->
-
+        <!-- Att -->
+        <button type="button" class='btn btn-primary' id='{{ medialibConfig.id }}-media-modal-toggle'>{{ "Select Image"|_ }}</button>
+        {#{{ dump(medialibConfig) }}#}
+        {{ LAYOUT.view('core/medialib-griddle').set('config', medialibConfig)|raw }}
+        <script type="text/javascript">
+            require(['jquery'], function ($) {
+                var mediaModal = $('#{{ medialibConfig.id }}-media-modal');
+                if (mediaModal) {
+                    $('#{{ medialibConfig.id }}-media-modal-toggle').on('click', function () {
+                        mediaModal.modal('show');
+                    });
+                }
+            });
+        </script>
+        <!-- Att end -->
+    </div>
     {{ layout.widget_custom_params(widget, library, context) }}
 {% endmacro %}
