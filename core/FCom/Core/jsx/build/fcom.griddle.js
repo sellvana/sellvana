@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
-function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle, Backbone) {
+define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'bootstrap', 'unique'],
+function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle) {
 
     /**
      * FCom Griddle Componnent
@@ -500,17 +500,21 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 }
             });
         },
-        handleClick: function() {
+        handleClick: function(event) {
             var that = this;
             var gridId = that.props.getConfig('id');
-            var modalEleContainer = document.getElementById(gridId + '-modal');
-            React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
-            React.render(
-                React.createElement(Components.Modal, {show: true, title: "Create Form", confirm: "Save changes", cancel: "Close", onConfirm: that.props.saveModalForm}, 
-                    React.createElement(FComModalForm, {columnMetadata: that.props.columnMetadata, id: gridId})
-                ),
-                modalEleContainer
-            );
+            if ($(event.target).hasClass('_modal')) {
+                var modalEleContainer = document.getElementById(gridId + '-modal');
+                React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
+                React.render(
+                    React.createElement(Components.Modal, {show: true, title: "Create Form", confirm: "Save changes", cancel: "Close", onConfirm: that.props.saveModalForm}, 
+                        React.createElement(FComModalForm, {columnMetadata: that.props.columnMetadata, id: gridId})
+                    ),
+                    modalEleContainer
+                );
+            } else {
+                this.props.addRows([{ id: guid() }]);
+            }
         },
         handleCustom: function(callback, event) {
             if (typeof window[callback] === 'function') {
@@ -534,7 +538,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var actionProps = {
                         key: gridId + '-fcom-settings-action-' + name,
                         class: action.class
-                    }
+                    };
                     switch (name) {
                         case 'refresh':
                             node = React.createElement("a", {href: "#", className: action.class, key: actionKey}, action.caption);
@@ -551,6 +555,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                         case 'delete':
                             node = React.createElement("button", {className: action.class + disabledClass, type: "button", "data-action": "mass-delete", onClick: that.doMassAction, key: actionKey}, action.caption);
                             break;
+                        //todo: checking again new and add type
                         case 'add':
                             node = React.createElement("button", {className: action.class, type: "button", key: actionKey}, action.caption);
                             break;
