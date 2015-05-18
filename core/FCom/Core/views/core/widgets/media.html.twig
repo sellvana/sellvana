@@ -16,7 +16,6 @@
     } %}
 
     {% set imageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({id: 'insert_media_main_grid' ~ widget.id}) %}
-
     {% set attachmentsConfig = {
         type: type,
         targetType: 'images',
@@ -24,8 +23,9 @@
         medialibConfig: medialibConfig,
         gridConfig: imageConfig
     } %}
+    {#{{ dump(attachmentsConfig) }}#}
     <!-- Att -->
-    {{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}
+    {{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig)|raw }}
     <!-- Att end -->
 
     {{ layout.widget_custom_params(widget, library, context) }}
