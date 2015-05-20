@@ -57,6 +57,14 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         return $config;
     }
 
+    public function gridORMConfig($orm)
+    {
+        parent::gridOrmConfig($orm);
+        if ($this->BRequest->get('is_superadmin') == '0') {
+            $orm->where('is_superadmin', 0);
+        }
+    }
+
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
@@ -164,6 +172,9 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         }
         $config['grid_before_create'] = 'userGridRegister';
         $config['events'] = ['add'];
+
+        //add params to get only normal users
+        $config['data_url'] = $gridDataUrl = $this->BApp->href($this->_gridHref . '/grid_data').'?is_superadmin=0';
 
         return ['config' => $config];
     }
