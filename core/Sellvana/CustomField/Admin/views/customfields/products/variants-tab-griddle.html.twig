@@ -28,7 +28,43 @@
                 } else {
                     console.log('DEBUG: no variantGrid');
                 }
-            }, //todo: missed function to allow add more images from outside
+            },
+            /**
+             * save image to list variant images
+             * @param {Array} images
+             */
+            updateImages: function (images) {
+                console.log('variantImages.updateImages', images);
+                var forceUpdateGrid = false;
+                _.forEach(images, function(image) {
+                    if (typeof image.file_id != 'undefined') {
+                        if (!_.findWhere(variantImages.images, { file_id: image.file_id })) {
+                            variantImages.images.push(image);
+                        } else {
+                            for (var i = 0; i < this.images.length; i++) {
+                                if (this.images[i].file_id == image.file_id) {
+                                    this.images[i] = image;
+                                }
+                            }
+                        }
+                        forceUpdateGrid = true;
+                    } else {
+                        console.log('DEBUG: missing image.file_id', image);
+                    }
+                });
+
+                if (forceUpdateGrid) {
+                    variantGrid.forceUpdate();
+                }
+            },
+            removeImages: function(images) {
+                console.log('variantImages.removeImages', images);
+                var listFileIds = _.pluck(images, 'file_id');
+                this.images = _.reject(variantImages.images, function(image) {
+                    return _.contains(listFileIds, image.file_id);
+                });
+                variantGrid.forceUpdate();
+            },
             /**
              * update image id to input hidden of each row, use this when submit
              * @param rowId
@@ -36,12 +72,13 @@
             updateInputImageValue: function (rowId) {
                 var el = $(variantGrid.getDOMNode()).find('#' + rowId);
                 if (el) {
-                    var id = [];
+                    var ids = [];
                     //var idTr = $(el).parents('tr').attr('id');
                     el.find(this.listClass).find('i').each(function () {
-                        id.push($(this).attr('data-id'));
+                        var id =
+                        ids.push($(this).attr('data-id'));
                     });
-                    var stringId = id.join(',');
+                    var stringId = ids.join(',');
                     el.find(this.inputClass).val(stringId);
                 }
             },
@@ -51,21 +88,26 @@
              * @returns {*|jQuery}
              */
             renderImageItemForList: function (obj) {
-                return $('<li>', { 'class': 'dd-item dd3-item' }).append(
-                        $('<div>', { 'class': 'dd3-content' }).append(
-                                $('<img>', { src: variantImages.thumbUrl + obj.file_name }),
-                                $('<label>', { text: obj.file_name }),
-                                $('<i>', {
-                                    'class': 'icon-remove pull-right btn-link btn-delete-variant-image',
-                                    'data-id': obj.file_id
-                                })
-                        )
-                );
+                //console.log('renderImageItemForList.obj', obj);
+                if (typeof obj.file_id != 'undefined') {
+                    return $('<li>', { 'class': 'dd-item dd3-item' }).append(
+                            $('<div>', { 'class': 'dd3-content' }).append(
+                                    $('<img>', { src: variantImages.thumbUrl + obj.file_name }),
+                                    $('<label>', { text: obj.file_name }),
+                                    $('<i>', {
+                                        'class': 'icon-remove pull-right btn-link btn-delete-variant-image',
+                                        'data-id': obj.file_id
+                                    })
+                            )
+                    );
+                }
+                return null;
             },
             /**
              * populate image items to dropdown images and list selected images, also handle events
              */
             processImagesForRow: function (id) {
+                //console.log('processImagesForRow');
                 if (variantGrid && this.images.length) {
                     var selectClass = this.selectClass;
                     var listClass = this.listClass;
@@ -84,6 +126,7 @@
                         listEle.html('');
 
                         //populate items
+                        //console.log('populate images', images);
                         _.forEach(images, function (img) {
                             var hide = '';
                             if (imageIds.indexOf(img.file_id) != '-1') {
@@ -99,6 +142,7 @@
                                 'class': hide
                             }));
                         });
+                        variantImages.updateInputImageValue(id);
 
                         var format = function (state) {
                             if (!state.id) {
@@ -116,33 +160,40 @@
                         //only handle event when not init select2
                         if (!dom.find(this.selectClass).hasClass('select2-onchange-added')) {
 
-                            var select = dom.find(variantImages.selectClass);
-                            var list = dom.find(variantImages.listClass);
+                            /*var select = dom.find(variantImages.selectClass);
+                            var list = dom.find(variantImages.listClass);*/
 
                             //event when select image item
                             dom.on('change', this.selectClass, function () {
-                                var option = $(this).find(':selected');
-                                var image = {
-                                    file_id: $(this).val(),
-                                    file_name: option.text()
-                                };
-                                dom.find(variantImages.listClass).removeClass('hide').append(variantImages.renderImageItemForList(image));
-                                option.addClass('hide');
-                                variantImages.updateInputImageValue(id);
-                                $(this).select2('data', null);
+                                var value = $(this).val();
+                                //console.log('this', this);
+                                //console.log('value', value);
+                                if (value != '') {
+                                    //console.log('value is not empty')
+                                    var option = $(this).find(':selected');
+                                    var image = {
+                                        file_id: value,
+                                        file_name: option.text()
+                                    };
+                                    //console.log('imageEle', imageEle);
+                                    listEle.removeClass('hide').append(variantImages.renderImageItemForList(image));
+                                    option.addClass('hide');
+                                    variantImages.updateInputImageValue(id);
+                                    $(this).select2('data', null);
+                                }
                             });
 
                             dom.on('click', '.btn-delete-variant-image', function () {
-                                select.find('option[value="' + $(this).attr('data-id') + '"]').removeClass('hide');
-                                select.removeClass('hide');
-                                if (list.find('li').length == 1) {
-                                    list.addClass('hide');
+                                selectEle.find('option[value="' + $(this).attr('data-id') + '"]').removeClass('hide');
+                                selectEle.removeClass('hide');
+                                if (listEle.find('li').length == 1) {
+                                    listEle.addClass('hide');
                                 }
                                 $(this).parents('li').remove();
                                 variantImages.updateInputImageValue(id);
                             });
 
-                            select.addClass('select2-onchange-added');
+                            selectEle.addClass('select2-onchange-added');
                         }
 
                     } else {
@@ -542,7 +593,7 @@
         };
 
         /**
-         * variant grid callback trigger when componentDidMount | componentDidUpdate
+         * variant grid callback trigger in componentDidMount | componentDidUpdate
          * @param grid
          * @param triggerName
          */
@@ -582,7 +633,7 @@
                         });
                         variantFields.combinations[row.id] = obj;
                     });
-                }).on('removedRows.griddle', function(e, rows) {
+                }).on('removedRows.griddle', function(e, rows) { //remove combination when remove rows
                     _.forEach(rows, function(row) {
                         if (typeof (variantFields.combinations[row.id]) != 'undefined') {
                             delete variantFields.combinations[row.id];

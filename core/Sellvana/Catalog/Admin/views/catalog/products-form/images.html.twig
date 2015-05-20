@@ -26,7 +26,7 @@
 {{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}
 
 <script>
-    $(document).ready(function() {
+    /*$(document).ready(function() {
         var id = "{{ m.id }}";
         var url = "{{ formUrl }}?id="+id+"&tabs=variants";
         {# load variants tab before update image list when add image for product #}
@@ -38,6 +38,20 @@
                 });
             });
         }
+    });*/
+
+    $(document).ready(function() {
+        var id = "{{ m.id }}";
+        var url = "{{ formUrl }}?id="+id+"&tabs=variants-griddle";
+        {# load variants tab before update image list when add image for product #}
+        if (typeof(variantImages) != "undefined") {
+            $.getJSON(url, function (data, status, req) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-variants-griddle').html(tabHtml).data('loaded', true);
+                    $('#tab-variants-griddle' + ' .collapse').collapse();
+                });
+            });
+        }
     });
 
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
@@ -45,40 +59,49 @@
         if (productImagesGrid) {
             $(productImagesGrid.getDOMNode())
                     .on('removedRows.griddle', function (e, rows) {
-                        pushImageToVariantsList(rows, false);
+                        updateImageInVariantList(rows, true);
                     }).on('addedRows.griddle', function (e, rows) {
-                        pushImageToVariantsList(rows, true);
+                        updateImageInVariantList(rows);
                     });
         }
     });
 
     /**
-     * push image to variant lists image in Variants tab
+     * update image to variant lists image in Variants tab
      * @param {array} rows
-     * @param {boolean} isAdd
+     * @param {boolean} isRemove
      */
-    function pushImageToVariantsList(rows, isAdd)
+    function updateImageInVariantList(rows, isRemove)
     {
-        //console.log('pushImageToVariantsList.rows', rows);
-        if (typeof isAdd === 'undefined') {
-            isAdd = false;
+        //console.log('updateImageInVariantList.rows', rows);
+        if (typeof isRemove === 'undefined') {
+            isRemove = false;
         }
 
-        if (typeof(updateListVariantImage) == "function") {
+        if (typeof variantImages != 'undefined') {
             var images = [];
 
             _.forEach(rows, function(row) {
                 images.push({
                     file_id: row.file_id,
+                    folder: row.folder,
+                    file_name: row.file_name,
+                    file_size: row.file_size,
+                    label: row.label,
+                    position: row.position,
                     subfolder: row.subfolder,
-                    file_name: row.file_name
+                    id: guid()
                 });
             });
 
-            updateListVariantImage({
-                add: isAdd,
-                image: images
-            });
+            /*console.log('images to add', images);
+            console.log('rows to add', rows);*/
+
+            if (isRemove) {
+                variantImages.removeImages(images);
+            } else {
+                variantImages.updateImages(images);
+            }
         }
     }
 
@@ -203,7 +226,7 @@
 
         $(document)
                 .bind('dragover', function (e) {
-                    console.log('drag');
+                    //console.log('drag');
                     var span = $('.fileinput-button').find('span');
                     if (!span.attr('data-text')) {
                         span.attr('data-text', span.html());
@@ -211,7 +234,7 @@
                     span.html('Drop images to here');
                 })
                 .bind('drop dragleave', function (e) {
-                    console.log('drop');
+                    //console.log('drop');
                     var span = $('.fileinput-button').find('span');
                     span.html(span.attr('data-text'));
                 });
