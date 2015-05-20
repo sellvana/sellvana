@@ -50,7 +50,7 @@
 </div>
 <!--End Modal -->
 <script>
-    require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
+    require(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'jquery.validate', 'unique'], function($, _, Backbone, PushClient) {
         var indexFieldGrid = null;
         var BackboneGrid = null;
         var rowsCollection = null;
@@ -222,33 +222,51 @@
             }
 
         });
-    });
 
-    $('.btn-progress').on('click',function(){
-        var url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}';
-        $('#progress-bar').css('width', 0);
-        $.ajax({
-            xhr: function()
-            {
-                var xhr = new window.XMLHttpRequest();
-                xhr.upload.addEventListener("progress", function(evt){
-                    if (evt.lengthComputable) {
-                        var percentComplete = 100 * evt.loaded / evt.total;
-                        $('#progress-bar').css({
-                            width:  percentComplete + '%'
-                        });
-                    }
-                }, false);
-                return xhr;
-            },
-            type: 'POST',
-            url: url,
-            data: {CLEAR: 1},
-            complete: function(data) {
-                $('#progress-bar').append($('<span/>').html('{{ "Reindexing completed."|_ }}'));
+        $('.btn-progress').on('click', function () {
+            var url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}';
+            $('#progress-bar').css('width', 0);
+            PushClient.listen({channel: 'index', callback: channel_index_progress});
+
+            var total = 0;
+            var $msgBoard = $('<span/>');
+            function channel_index_progress(msg) {
+                console.log(msg);
+                if(msg.total != undefined) {
+                    total = parseInt(msg.total);
+                    $('#progress-bar').append($msgBoard.html( total + '{{ " products being reindexed"|_ }}'));
+                } else if(msg.signal && msg.signal =='progress' && msg.reindexed != undefined && total != 0) {
+                    var reindexed = parseInt(msg.reindexed);
+                    var percentComplete = (reindexed * 100 / total);
+                    $('#progress-bar').css({
+                        width: percentComplete + '%'
+                    });
+                    $msgBoard.text(total + ' / ' + reindexed);
+                }
             }
-        });
 
+            $.ajax({
+               /* xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                     xhr.upload.addEventListener("progress", function(evt){
+                     if (evt.lengthComputable) {
+                     var percentComplete = 100 * evt.loaded / evt.total;
+                     $('#progress-bar').css({
+                     width:  percentComplete + '%'
+                     });
+                     }
+                     }, false);
+                    return xhr;
+                },*/
+                type: 'POST',
+                url: url,
+                data: {CLEAR: 1},
+                complete: function (data) {
+                    $('#progress-bar').append($('<span/>').html('{{ " Reindexing completed."|_ }}'));
+                }
+            });
+
+        });
     });
 
 </script>
