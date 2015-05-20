@@ -9,7 +9,7 @@
         <div class="f-rslides-container">
             <ul class="thumbnails f-rslides f-prod-imgs" id="quickview-rslides">
                 {% for img in images %}
-                    <li><img class="f-prod-img img-responsive" src="{{ img.imageUrl(1) }}" alt=""/></li>
+                    <li><img class="f-prod-img img-responsive" src="{{ img.thumbUrl(254) }}{#{ img.imageUrl(1) }#}" alt=""/></li>
                 {% endfor %}
             </ul>
             <a href="#" hidden id="display-all-images"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>

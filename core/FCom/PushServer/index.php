@@ -1,6 +1,6 @@
 <?php
 
-$rootDir = dirname(dirname(dirname(__DIR__)));
+$rootDir = str_replace('\\', '/', dirname(dirname(dirname(dirname($_SERVER['SCRIPT_FILENAME'])))));
 require_once $rootDir . '/core/FCom/Core/Main.php';
 $webRoot = BRequest::i()->webRoot(3);
 BConfig::i()

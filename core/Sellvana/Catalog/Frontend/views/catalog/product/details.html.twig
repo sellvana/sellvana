@@ -41,7 +41,7 @@
             <div class="f-rslides-container">
                 <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
                     {% for img in images %}
-                        <li><img data-id="{{ img.id() }}" class="f-prod-img img-responsive" src="{{ img.imageUrl(1) }}"
+                        <li><img data-id="{{ img.id() }}" class="f-prod-img img-responsive" src="{{ img.thumbUrl(458) }}{#{ img.imageUrl(1) }#}"
                                  alt="" itemprop="image"/></li>
                     {% endfor %}
                 </ul>
@@ -67,7 +67,7 @@
                 <input type="hidden" name="id" value="{{ prod.id() }}">
 
                 <h1 class="f-prod-name" itemprop="name">{{ prod.getName() }}</h1>
-                <p class="f-sku" itemprop="identifier" content="sku:{{ m.get('product_sku') }}">{{ m.get('product_sku') }}</p>
+                <p class="f-sku" itemprop="identifier" content="sku:{{ prod.get('product_sku') }}">{{ prod.get('product_sku') }}</p>
 
                 {% if prod.getAverageStars() %}
                     <div class="f-prod-avg-rating" itemprop="review" itemscope itemtype="http://data-vocabulary.org/Review-aggregate">

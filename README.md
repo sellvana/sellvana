@@ -6,10 +6,14 @@ Current state: public alpha.
 Installation
 ------------
 
-1. Checkout from bitbucket into web accessible folder e.g. `{webroot}/sellvana`, make sure to clone submodules too:
+1. Checkout from bitbucket into web accessible folder e.g. `{webroot}/sellvana`:
 
-        git clone --recursive git@bitbucket.org:sellvana/core.git
+        git clone git@bitbucket.org:sellvana/core.git
 
+    * If you did not setup public key authentication with bitbucket, use HTTPS link:
+     
+        git clone https://your_bitbucket_user@bitbucket.org/sellvana/core.git
+    
 2. Make sure `dlc/`, `storage/` and `media/` folders are recursively writable for web service
 3. Create database and db user for sellvana (make sure db collation is utf8_general_ci)
 4. Open the selvana folder in browser

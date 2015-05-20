@@ -652,18 +652,19 @@ label {
 			float: left;
 		}
 		.navbar-nav {
-			margin: 10px 0;
+		  border-top:1px solid #ddd;
+			margin: 10px -15px 0;
 		}
 		.navbar-brand {
 			padding: 0;
 			img {
 				max-width: 120px;
-				margin-top: 7px;
 			}
 		}
 		.f-header-util-links {
-			float: right;
-			margin-bottom: 10px;
+			float:none;
+			clear:both;
+			display:table;
 			padding: 0;
 		}
 	}
@@ -672,8 +673,9 @@ label {
 			display: block;
 		}
 		> li {
-			display: inline-block;
-			padding: 0 1px;
+		  width:20%;
+			display:table-cell;
+			vertical-align:top;
 			&:hover {
 				.dropdown-toggle {
 					border-bottom-right-radius: 0;
@@ -699,12 +701,36 @@ label {
 					position: absolute;
 					right: 1px;
 					left: auto;
-					margin-top: -1px;
+					border-top-left-radius: 0;
 					border-top-right-radius: 0;
 					box-shadow: 0 3px 5px rgba(0,0,0,0.125);
 					border: 1px solid rgba(0,0,0,0.20);
 					background: #fff;
 				}
+			}
+			&.multisite-dropdown {
+  			.dropdown-menu {
+    			left:-1px;
+    			right:auto;
+  			}
+			}
+			&.currency-dropdown,
+			&.language-dropdown {
+  			.f-header-util-links-label {
+    			display:block;
+    			line-height:1.15em; 
+    			> span { display:none; }
+  			}
+			}
+			&.user-dropdown {
+  			.logged-in {
+    			.f-header-util-links-label {
+    			  display:block;
+            line-height:1.15em; 
+            > img { border-radius:30px; }
+            > span { display:none; }
+          }
+  			}
 			}
 			.f-header-util-links-label {
 				display: none;
@@ -713,7 +739,7 @@ label {
 				float: right;
 				min-width: 15px;
 				height: 15px;
-				margin: -30px -13px 0 0;
+				margin:-23px -4px 0 0;
 				background: #cf0000;
 				border-radius: 15px;
 				font-size: 10px;
@@ -722,15 +748,18 @@ label {
 				text-align: center;
 			}
 			> a {
+			  border-right:1px solid #eee;
 				display: block;
-				width: 40px;
-				height: 40px;
-				border: 1px solid #ddd;
-				border-radius: 3px;
+				height:40px;
+				background:#f6f6f6;
 				padding: 6px 7px;
 				font-size: 1.4em;
 				line-height: 1em;
 				text-align: center;
+				overflow:hidden;
+			}
+			&:last-child {
+  			> a { border-right:0; }
 			}
 		}
 	}
@@ -1029,6 +1058,7 @@ label {
 		border: 1px solid #bbb;
 		a {
 			cursor: alias;
+			> img { width:38px; height:38px; }
 		}
 	}
 }
