@@ -26,11 +26,11 @@
 {{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}
 
 <script>
-    /*$(document).ready(function() {
+    $(document).ready(function() {
         var id = "{{ m.id }}";
         var url = "{{ formUrl }}?id="+id+"&tabs=variants";
         {# load variants tab before update image list when add image for product #}
-        if (typeof(updateListVariantImage) != "function") {
+        if (typeof(variantImages) != "function") {
             $.getJSON(url, function (data, status, req) {
                 _.each(data.tabs, function (tabHtml, i) {
                     $('#tab-variants').html(tabHtml).data('loaded', true);
@@ -38,9 +38,9 @@
                 });
             });
         }
-    });*/
+    });
 
-    $(document).ready(function() {
+    /*$(document).ready(function() {
         var id = "{{ m.id }}";
         var url = "{{ formUrl }}?id="+id+"&tabs=variants-griddle";
         {# load variants tab before update image list when add image for product #}
@@ -52,7 +52,7 @@
                 });
             });
         }
-    });
+    });*/
 
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
         var productImagesGrid = {{ combineType }}Grid;
