@@ -216,7 +216,7 @@ class BRequest extends BClass
     }
 
     /**
-     * Retrive language based on HTTP_ACCEPT_LANGUAGE
+     * Retrieve language based on HTTP_ACCEPT_LANGUAGE
      * @return string
      */
     public function acceptLanguage()

@@ -23,6 +23,7 @@ class Sellvana_CatalogIndex_Indexer extends BClass
     protected static $_indexData;
     protected static $_filterValues;
     protected static $_cnt_reindexed;
+    protected static $_cnt_total;
 
     public function indexProducts($products)
     {
@@ -35,10 +36,16 @@ class Sellvana_CatalogIndex_Indexer extends BClass
             $i = 0;
             //$start = 0;
             $t = time();
+            $orm = $this->Sellvana_Catalog_Model_Product
+                ->orm('p')->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
+                ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']]);
+            if (empty(static::$_cnt_total)) {
+                $count              = clone $orm;
+                static::$_cnt_total = $count->count();
+                $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'total' => static::$_cnt_total]);
+            }
             do {
-                $products = $this->Sellvana_Catalog_Model_Product->orm('p')
-                    ->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
-                    ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']])
+                $products = $orm
                     ->limit(static::$_maxChunkSize)
                     //->offset($start)
                     ->find_many();
