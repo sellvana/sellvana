@@ -6,7 +6,7 @@ if (version_compare(PHP_VERSION, '5.4.0', '<')) {
     die('<h1>Unsupported PHP version: ' . PHP_VERSION . '</h1><p>PHP 5.4.0 or higher required</p>');
 }
 
-$rootDir = dirname(__DIR__);
+$rootDir = str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_FILENAME'])));
 require_once $rootDir . '/core/FCom/Core/Main.php';
 
 $storeRoot = BRequest::i()->webRoot(1);
