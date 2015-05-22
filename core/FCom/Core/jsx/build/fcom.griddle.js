@@ -74,6 +74,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
 
             return (
                 React.createElement("div", {className: "fcom-htmlgrid responsive-table"}, 
+                
                     React.createElement(Griddle, React.__spread({showTableHeading: false, tableClassName: this.props.tableClassName, ref: config.id, 
                         config: config, initColumns: this.getColumn(), 
                         sortColumn: state.s, sortAscending: state.sd == 'asc', 

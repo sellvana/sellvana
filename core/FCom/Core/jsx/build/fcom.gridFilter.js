@@ -189,7 +189,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         },
         render: function() {
             //console.log('begin render filters');
-            if(_isEmpty(this.state.filters)){
+            if(_.isEmpty(this.state.filters)){
                 return null;
             }
             var that = this;
