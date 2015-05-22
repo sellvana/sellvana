@@ -591,6 +591,11 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
 
                 var checked = _.contains(that.props.selectedColumns(), column);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
+
+                if(colInfo.hidden){
+                    return null;
+                }
+
                 return (
                     React.createElement("li", {"data-id": column, id: column, key: gridId + '-fcom-settings-' + column, className: "dd-item dd3-item"}, 
                         React.createElement("div", {className: "icon-ellipsis-vertical dd-handle dd3-handle"}), 
