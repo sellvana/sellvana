@@ -177,7 +177,14 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var dataMode = this.props.getConfig('data_mode');
             this.setStateFilter(field, 'submit', !isClear);
 
-            var submitFilters = this.prepareFilter();
+            var submitAll = this.prepareFilter();
+            var submitFilters = {};
+
+            for (item in submitAll) {
+                if(submitAll[item] && submitAll[item].val ){
+                    submitFilters[item] = submitAll[item];
+                }
+            }
             //console.log('submitFilters', submitFilters);
 
             if (dataMode == 'local') {
