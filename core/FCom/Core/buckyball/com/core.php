@@ -2084,6 +2084,7 @@ class BSession extends BClass
         } else {
             $this->data =& $_SESSION[$namespace];
         }
+        $this->data['_'] = time();
 
         if (empty($this->data['current_language'])) {
             $lang = $this->BRequest->language(true);
@@ -2117,6 +2118,7 @@ class BSession extends BClass
             $this->_phpSessionOpen = false;
         }
 BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
+
         return $this;
     }
 
@@ -2132,6 +2134,8 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
         if (null === $flag) {
             return $this->_dirty;
         }
+        $this->open();
+
         BDebug::debug('SESSION.DIRTY ' . ($flag ? 'TRUE' : 'FALSE'), 2);
         $this->_dirty = $flag;
         return $this;
@@ -2144,6 +2148,8 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
 
     public function setDirty($flag = true)
     {
+        $this->open();
+
         BDebug::debug('SESSION.DIRTY ' . ($flag ? 'TRUE' : 'FALSE'), 2);
         $this->_dirty = $flag;
         return $this;
@@ -2151,11 +2157,15 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
 
     public function get($key, $default = null)
     {
+        $this->open();
+
         return isset($this->data[$key]) ? $this->data[$key] : $default;
     }
 
     public function set($key, $value = null)
     {
+        $this->open();
+
         if (is_array($key)) {
             foreach ($key as $k => $v) {
                 $this->set($k, $v);
@@ -2262,6 +2272,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
 
     public function regenerateId()
     {
+        $this->open();
+
         $oldSessionId = session_id();
         @session_regenerate_id(true);
         $this->BEvents->fire(__METHOD__, ['old_session_id' => $oldSessionId, 'session_id' => session_id()]);
@@ -2277,6 +2289,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     */
     public function sessionId()
     {
+        $this->open();
+
         return $this->_sessionId;
     }
 
@@ -2320,6 +2334,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     */
     public function messages($tags = '_')
     {
+        $this->open();
+
         if (empty($this->data['_messages'])) {
             return [];
         }

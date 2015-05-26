@@ -619,7 +619,7 @@ class BModuleRegistry extends BClass
 
         $this->BResponse->forceProtocolDomain();
 
-        $this->BSession->open();
+        #$this->BSession->open();
 
         foreach ($this->_modules as $mod) {
             $this->pushModule($mod->name);
