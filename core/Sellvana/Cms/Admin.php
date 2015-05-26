@@ -9,11 +9,13 @@ class Sellvana_Cms_Admin extends BClass
 {
     public function bootstrap()
     {
+        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'cms' => 'CMS',
-            'cms/pages' => 'Manage Pages',
-            'cms/blocks' => 'Manage Blocks',
-            'cms/nav' => 'Manage Navigation',
+            'settings/cms' => $locale->_('CMS Settings'),
+            'cms' => $locale->_('CMS'),
+            'cms/pages' => $locale->_('Manage Pages'),
+            'cms/blocks' => $locale->_('Manage Blocks'),
+            'cms/nav' => $locale->_('Manage Navigation'),
         ]);
     }
 }

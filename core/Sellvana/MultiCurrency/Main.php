@@ -3,10 +3,19 @@
 /**
  * Class Sellvana_MultiSite_Main
  *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
 class Sellvana_MultiCurrency_Main extends BClass
 {
     static protected $_rates;
+
+    public function bootstrap()
+    {
+        $this->FCom_Admin_Model_Role->createPermission([
+            'settings/multi_currency' => BLocale::i()->_('Multi Currency Settings'),
+        ]);
+
+    }
 
     public function switchCurrency($newCurrency)
     {

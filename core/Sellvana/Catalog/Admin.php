@@ -55,12 +55,14 @@ class Sellvana_Catalog_Admin extends BClass
             ->allowFolder('{random}/import/products')
         ;
 
+        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'catalog' => 'Catalog',
-            'catalog/products' => 'Manage Products',
-            'catalog/categories' => 'Manage Categories',
-            'catalog/families' => 'Manage Families',
-            'catalog/stocks' => 'Manage Stocks',
+            'settings/catalog' => $locale->_('Catalog Settings'),
+            'catalog' => $locale->_('Catalog'),
+            'catalog/products' => $locale->_('Manage Products'),
+            'catalog/categories' => $locale->_('Manage Categories'),
+            'catalog/families' => $locale->_('Manage Families'),
+            'catalog/stocks' => $locale->_('Manage Stocks'),
         ]);
     }
 

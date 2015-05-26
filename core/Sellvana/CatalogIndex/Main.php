@@ -128,7 +128,8 @@ class Sellvana_CatalogIndex_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'catalog_index' => 'Product Indexing',
+            'settings/catalog_index' => BLocale::i()->_('Product Indexing Settings'),
+            'catalog_index' => BLocale::i()->_('Product Indexing'),
         ]);
     }
 }
