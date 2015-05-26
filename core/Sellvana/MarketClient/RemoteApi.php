@@ -107,6 +107,9 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
             return []; //TODO: proper notifications and errors handling
         }
         foreach ($remoteModResult['modules'] as $remoteModName => $remoteMod) {
+            if (!is_array($remoteMod)) {
+                continue;
+            }
             if ($remoteMod && empty($remoteMod['name'])) {
                 $remoteMod['name'] = $remoteModName;
             }
@@ -157,7 +160,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
                     if (version_compare($localMod->version, $modInfo['version'], '<')) {
                         $modInfo['status'] = 'upgrade';
                     } else {
-                        #unset($result[$modName]);
+                        unset($modules[$modName]);
                         $modInfo['status'] = 'latest';
                     }
                 }

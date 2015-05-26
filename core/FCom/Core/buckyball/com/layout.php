@@ -2399,6 +2399,12 @@ if ($this->BDebug->is('DEBUG')) {
         return $this;
     }
 
+    public function addDefaultTag($type, $params)
+    {
+        $this->_defaultTag[$type] = $params;
+        return $this;
+    }
+
     /**
      * Add element
      * @param       $type
@@ -2498,27 +2504,38 @@ if ($this->BDebug->is('DEBUG')) {
         $args = $this->_elements[$typeName];
 
         $file = !empty($args['file']) ? $args['file'] : $name;
-        $file = $this->src($file, true);
-        if (strpos($file, 'http:') === false && strpos($file, 'https:') === false && $file[0] !== '/') {
+        $webFile = $this->src($file, true);
+        if (strpos($webFile, 'http:') === false && strpos($webFile, 'https:') === false && $webFile[0] !== '/') {
             $module  = !empty($args['module_name']) ? $this->BModuleRegistry->module($args['module_name']) : null;
             $baseUrl = $module ? $module->baseSrc() : $this->BApp->baseUrl();
-            $file    = rtrim($baseUrl, '/') . '/' . $file;
+            $webFile = rtrim($baseUrl, '/') . '/' . $webFile;
         }
 
         if ($type === 'js' && !empty($this->_headJs['loaded']) && $this->_headJs['loaded'] !== $name
             && empty($args['separate']) && empty($args['tag']) && empty($args['params']) && empty($args['if'])
         ) {
             if (empty($this->_headJs['jquery']) && strpos($name, 'jquery') !== false) {
-                $this->_headJs['jquery'] = $file;
+                $this->_headJs['jquery'] = $webFile;
             } else {
-                $this->_headJs['scripts'][] = $file;
+                $this->_headJs['scripts'][] = $webFile;
             }
 
             return '';
         }
 
-        $tag = !empty($args['tag']) ? $args['tag'] : $this->_defaultTag[$type];
-        $tag = str_replace('%s', htmlspecialchars($file), $tag);
+        if (!empty($this->_defaultTag[$type])) {
+            if (is_string($this->_defaultTag[$type])) {
+                $defaultTag = $this->_defaultTag[$type];
+            } elseif (is_callable($this->_defaultTag[$type])) {
+                $args['file'] = $file;
+                $defaultTag   = $this->BUtil->call($this->_defaultTag[$type], $args);
+            } else {
+                throw new BException('Invalid tag declaration: ' . $type);
+            }
+        }
+
+        $tag = !empty($args['tag']) ? $args['tag'] : $defaultTag;
+        $tag = str_replace('%s', htmlspecialchars($webFile), $tag);
         $tag = str_replace('%c', !empty($args['content']) ? $args['content'] : '', $tag);
         $tag = str_replace('%a', !empty($args['params']) ? $args['params'] : '', $tag);
         if (!empty($args['if'])) {

@@ -143,7 +143,16 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
 
     public function action_customerCreatesAccountFromOrder($args)
     {
-
+        $order = $this->Sellvana_Sales_Model_Order->load($args['order_id']);
+        $email = $order->get('customer_email');
+        if (empty($args['post']['password']) || empty($args['post']['password_confirm']) 
+            || $args['post']['password'] !== $args['post']['password_confirm']
+        ) {
+            throw new BException('Invalid password form data');
+        }
+        $pass = $args['post']['password'];
+        
+        throw new BException('TODO: Pending Implementation');
     }
 
     public function action_customerMergesOrderToAccount($args)

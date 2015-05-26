@@ -338,8 +338,8 @@ class BApp extends BClass
      */
     public function run()
     {
-        // load session variables
-        $this->BSession->open();
+        // load session variables - moved to between module beforeBootstrap and bootstrap
+        #$this->BSession->open();
 
 #echo "<pre>"; var_dump($this->BConfig->get('cookie'), $_SESSION); exit;
         // bootstrap modules
@@ -2008,7 +2008,11 @@ class BSession extends BClass
         if (null !== $this->data) {
             return $this;
         }
+
+        $this->BEvents->fire(__METHOD__ . ':before', ['id' => $id, 'auto_close' => $autoClose, 'validate' => $validate]);
+
         $config = $this->BConfig->get('cookie');
+
         if (!empty($config['session_disable'])) {
             return $this;
         }
@@ -2286,7 +2290,7 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     * @param array $options
     * @return BSession
     */
-    public function addMessage($msg, $type = 'info', $tag = '_', $options = [])
+    public function addMessage($msg, $type = 'info', $tag = null, $options = [])
     {
         $this->setDirty();
         $message = ['type' => $type];
@@ -2300,6 +2304,9 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         }
         if (isset($options['icon'])) {
             $message['icon'] = $options['icon'];
+        }
+        if (null === $tag) {
+            $tag = '_';
         }
         $this->data['_messages'][$tag][] = $message;
         return $this;
@@ -2322,6 +2329,7 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
             if (empty($this->data['_messages'][$tag])) {
                 continue;
             }
+
             foreach ($this->data['_messages'][$tag] as $i => $m) {
                 $msgs[] = $m;
                 unset($this->data['_messages'][$tag][$i]);

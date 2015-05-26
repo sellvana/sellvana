@@ -68,8 +68,8 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
 
         $this->BApp->set('current_page_type', 'product');
 
-        $head->addTitle($product->get('product_name'));
-        $crumbs[] = ['label' => $product->get('product_name'), 'active' => true];
+        $head->addTitle($product->getName());
+        $crumbs[] = ['label' => $product->getName(), 'active' => true];
 
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 

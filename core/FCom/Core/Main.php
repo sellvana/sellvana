@@ -28,11 +28,6 @@ class FCom_Core_Main extends BClass
             $this->initDebug();
             $this->initModules();
 
-            if (!$this->BRequest->validateHttpHost()) {
-                $this->BResponse->status(404, 'Unapproved HTTP Host header', 'Host not found');
-                die();
-            }
-
         } catch (Exception $e) {
             $this->BDebug->dumpLog();
             $this->BDebug->exceptionHandler($e);
@@ -123,10 +118,10 @@ class FCom_Core_Main extends BClass
         }
 
         if (!$config->get('web/media_dir')) {
-            if (strpos($mediaDir, $baseSrc) === 0) {
-                $mediaUrl = str_replace($baseSrc, '', $mediaDir);
-            } elseif (strpos($mediaDir, FULLERON_ROOT_DIR) === 0) {
-                $mediaUrl = str_replace(FULLERON_ROOT_DIR, '', $mediaDir);
+            if (strpos($mediaDir, FULLERON_ROOT_DIR) === 0) {
+                $mediaUrl = preg_replace('#^' . preg_quote(FULLERON_ROOT_DIR, '#') . '#', '', $mediaDir);
+            } elseif (strpos($mediaDir, $baseSrc) === 0) {
+                $mediaUrl = preg_replace('#^' . preg_quote($baseSrc, '#') . '#', '', $mediaDir);
             #} elseif (strpos($mediaDir, $docRoot) === 0) {
             #    $mediaUrl = str_replace($docRoot, '', $mediaDir);
             #} elseif (strpos($mediaDir, $rootDir) === 0) {
@@ -448,6 +443,18 @@ class FCom_Core_Main extends BClass
     public function onBeforeBootstrap()
     {
         $this->BLayout->setDefaultViewClass('FCom_Core_View_Base');
+
+        $area = $this->BRequest->area();
+        $conf = $this->BConfig;
+        foreach (['cookie', 'web'] as $section) {
+            $areaConfig = $conf->get("modules/{$area}/{$section}");
+            if ($areaConfig) {
+                $areaConfig = $this->BUtil->arrayCleanEmpty($areaConfig);
+                if ($areaConfig) {
+                    $conf->set($section, $areaConfig, true);
+                }
+            }
+        }
     }
 
     public function getConfigVersionHash()

@@ -213,7 +213,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
                 $result['error']['message'] = $locale->_('Your account is disabled. Please contact us for more details.');
                 break;
             default:
-                $result['error']['message'] = $locale->_('Your account status have problem. Please contact us for more details.');
+                $result['error']['message'] = $locale->_('Your account status has a problem. Please contact us for more details.');
                 break;
         }
         return $result;

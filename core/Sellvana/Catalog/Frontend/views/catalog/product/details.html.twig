@@ -28,6 +28,8 @@
 {% set productLinks = prod.getProductLinks() %}
 {% set recentlyViewed = APP.instance('Sellvana_Catalog_Frontend').getRecentlyViewedProducts() %}
 
+{% set canOrder = inventory.canOrder() %}
+
 {{ THIS.view('breadcrumbs') | raw }}
 
 {{ THIS.view('core/messages') | raw }}
@@ -39,7 +41,7 @@
             <div class="f-rslides-container">
                 <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
                     {% for img in images %}
-                        <li><img data-id="{{ img.id() }}" class="f-prod-img img-responsive" src="{{ img.imageUrl(1) }}"
+                        <li><img data-id="{{ img.id() }}" class="f-prod-img img-responsive" src="{{ img.thumbUrl(458) }}{#{ img.imageUrl(1) }#}"
                                  alt="" itemprop="image"/></li>
                     {% endfor %}
                 </ul>
@@ -64,8 +66,8 @@
                 <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
                 <input type="hidden" name="id" value="{{ prod.id() }}">
 
-                <h1 class="f-prod-name" itemprop="name">{{ prod.get('product_name') }}</h1>
-                <p class="f-sku" itemprop="identifier" content="sku:{{ m.get('product_sku') }}">{{ m.get('product_sku') }}</p>
+                <h1 class="f-prod-name" itemprop="name">{{ prod.getName() }}</h1>
+                <p class="f-sku" itemprop="identifier" content="sku:{{ prod.get('product_sku') }}">{{ prod.get('product_sku') }}</p>
 
                 {% if prod.getAverageStars() %}
                     <div class="f-prod-avg-rating" itemprop="review" itemscope itemtype="http://data-vocabulary.org/Review-aggregate">
@@ -91,15 +93,15 @@
 
                         {{ THIS.view('catalog/product/shopper_fields').set('product', prod) | raw }}
 
-                        <p class="f-stock-notice f-in-stock" {{ not inventory.isInStock ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
+                        <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
 
-                        <p class="f-stock-notice f-out-of-stock" {{ inventory.isInStock ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
+                        <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
 
                         <div class="form-group overflow-hidden">
                             <label class="col-md-3 control-label">{{ 'Quantity:' |_ }}</label>
 
                             <div class="col-md-2">
-                                <input type="text" name="qty" class="form-control col-md-3" value="1"/>
+                                <input type="number" name="qty" class="form-control col-md-3" value="1"/>
                             </div>
                         </div>
 
@@ -109,7 +111,7 @@
                         <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
                            rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
 
-                        {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
+                        {{ THIS.view('catalog/compare-link').set('product_id', prod.id()) | raw }}
 
                     </div>
                 </div>
@@ -125,7 +127,7 @@
                 <div class="f-tab-heading">
                     <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>
                 </div>
-                <div itemprop="description">{{ prod.get('description') | raw }}</div>
+                <div itemprop="description">{{ prod.getDescription() | raw }}</div>
                 {% if customFields %}
                     <div class="f-tab-heading">
                         <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>

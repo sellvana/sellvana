@@ -72,6 +72,10 @@ class Sellvana_Catalog_Model_ProductPrice
                 ['value' => 'base', 'label' => 'Base'],
                 ['value' => 'sale', 'label' => 'Sale'],
             ],
+            "map" => [
+                ['value' => 'base', 'label' => 'Base'],
+                ['value' => 'msrp', 'label' => 'MSRP'],
+            ],
             "promo" => [
                 ['value' => 'catalog', 'label' => 'Catalog Price'],
                 ['value' => 'cost', 'label' => 'Cost'],
@@ -235,6 +239,10 @@ class Sellvana_Catalog_Model_ProductPrice
 
     public function onBeforeSave()
     {
+        if (!parent::onBeforeSave()) {
+            return false;
+        }
+
         if ($this->get('sale_period')) {
             $salePeriod = explode(self::SALE_DATE_SEPARATOR, $this->get('sale_period'));
             $count      = count($salePeriod);
@@ -246,7 +254,7 @@ class Sellvana_Catalog_Model_ProductPrice
             }
         }
 
-        return parent::onBeforeSave();
+        return true;
     }
 
     public function onAfterLoad()
@@ -488,8 +496,8 @@ class Sellvana_Catalog_Model_ProductPrice
             }
         }
 
-        $saleFrom = new DateTime($product->get('price.sale.from_date'));
-        $saleTo = new DateTime($product->get('price.sale.to_date'));
+        $saleFrom = $product->get('price.sale.from_date');
+        $saleTo = $product->get('price.sale.to_date');
         if ($saleFrom || $saleTo) {
             if (empty($saleModel)) {
                 $saleModel = $this->orm()
@@ -499,9 +507,11 @@ class Sellvana_Catalog_Model_ProductPrice
             }
             if ($saleModel) {
                 if ($saleFrom) {
+                    $saleFrom = new DateTime($saleFrom);
                     $saleModel->set('valid_from', $saleFrom->format("Y-m-d"));
                 }
                 if ($saleTo) {
+                    $saleTo = new DateTime($saleTo);
                     $saleModel->set('valid_to', $saleTo->format("Y-m-d"));
                 }
                 $saleModel->save();

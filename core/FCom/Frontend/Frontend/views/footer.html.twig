@@ -2,25 +2,17 @@
     <div class="container">
         <div class="row">
             <dl class="col-md-3 col-sm-3">
-                <dt class="col-title">Customer Service</dt>
-                <dd><a href="#">Contact Us</a></dd>
-                <dd><a href="#">Return Policy</a></dd>
-                <dd><a href="#">Shipping Policy</a></dd>
-                <dd><a href="#">Help</a></dd>
+                <dt class="col-title">{{ 'Customer Service'|_ }}</dt>
+                <dd><a href="#">{{ 'Contact Us'|_ }}</a></dd>
+                <dd><a href="#">{{ 'Return Policy'|_ }}</a></dd>
+                <dd><a href="#">{{ 'Shipping Policy'|_ }}</a></dd>
+                <dd><a href="#">{{ 'Help'|_ }}</a></dd>
             </dl>
             <dl class="col-md-3 col-sm-3">
-                <dt class="col-title">Customer Service</dt>
-                <dd><a href="#">Contact Us</a></dd>
-                <dd><a href="#">Return Policy</a></dd>
-                <dd><a href="#">Shipping Policy</a></dd>
-                <dd><a href="#">Help</a></dd>
+                <dt class="col-title">{{ 'Recommended Categories'|_ }}</dt>
             </dl>
             <dl class="col-md-3 col-sm-3">
-                <dt class="col-title">Customer Service</dt>
-                <dd><a href="#">Contact Us</a></dd>
-                <dd><a href="#">Return Policy</a></dd>
-                <dd><a href="#">Shipping Policy</a></dd>
-                <dd><a href="#">Help</a></dd>
+                <dt class="col-title">{{ 'Recommended Products'|_ }}</dt>
             </dl>
             {{ THIS.hook('footer-widget') | raw }}
         </div>

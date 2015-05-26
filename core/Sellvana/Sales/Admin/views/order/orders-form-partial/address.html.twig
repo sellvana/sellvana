@@ -4,8 +4,8 @@
 {% set countries = APP.instance('FCom_Core_Main').getAllowedCountries() %}
 
 <div id="{{ type }}-section-view">
-    <p><strong>{{ order.fullName(type) }}</strong></p>
-    <p>{{ order.addressAsHtml(type) | raw }}</p>
+    {{ order.fullName(type) }}<br/>
+    {{ order.addressAsHtml(type) | raw }}</p>
     {% if addr.phone %}<p>{{ 'Phone: %s'|_(addr.phone) }}</p>{% endif %}
     {% if addr.fax %}<p>{{ 'Fax: %s'|_(addr.fax) }}</p>{% endif %}
 </div>

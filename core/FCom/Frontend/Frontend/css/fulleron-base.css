@@ -269,8 +269,12 @@ label.success {
   margin-top:5px;
   font-size:.9em;
   }
+.f-prod-listing-filter dd {
+  margin-bottom:0;
+  }
 .f-prod-listing-filter dd ul {
   padding-left:13px;
+  margin-bottom:0;
   }
 .f-prod-listing-filter dd li {
   list-style:none;
@@ -316,6 +320,9 @@ label.success {
   display:inline-block;
   background:#eee;
   border:1px solid #bbb;
+  }
+.f-widget-prods-compare ul > li.item a {
+  cursor: alias;
   }
   
 /* Ratings & Reviews */

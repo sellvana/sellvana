@@ -1,9 +1,9 @@
 modules:
     FCom_Admin:
-        version: 0.2.1
+        version: 0.5.0.0
         channel: alpha
         description: Base Admin functionality
-        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0, FCom_LibScssPhp: 0.1.0 } }
 
         translations:
             de: de.php
@@ -64,7 +64,7 @@ modules:
 
                     - [ /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
 
-                    - [ /media, FCom_Admin_Controller_MediaLibrary.index ]
+                    - [ /media_library, FCom_Admin_Controller_MediaLibrary.index ]
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
                     - [ /generate_sitemap, FCom_Admin_Controller.generate_sitemap ]
 

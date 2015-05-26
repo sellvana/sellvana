@@ -12,7 +12,20 @@
             <div class="col-md-8 group-ip-mode"></div>
         </div>
     {{ forms.accordion_panel_end }}
+
+    {% set fieldData1 = { model: c, id_prefix:'config-modules-FCom_ApiServer-web', name_prefix:'config[modules][FCom_ApiServer][web]', get_prefix:'modules/FCom_ApiServer/web' } %}
+    {{ forms.accordion_panel_start({label:'Area Web Settings'|_, id:'settings-FCom_ApiServer-group-web'}) }}
+        {{ forms.select(fieldData1, { field:'hide_script_name', label:'Hide script file name in URL'|_, options:{'':'', 0:'No', 1:'Automatic', 2:'FORCE'} }) }}
+        {{ forms.input(fieldData1,   { field:'http_host_whitelist', label:'HTTP Host Whitelist (comma separated)'|_ }) }}
+        {{ forms.input(fieldData1,   { field:'force_domain', label:'Force Domain Name'|_ }) }}
+        {{ forms.select(fieldData1, { field:'force_https', label:'Force HTTPS'|_, options:{ '':'', 0:'no', 1:'YES'} }) }}
+        {{ forms.select(fieldData1,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:REQUEST.getAvailableCsrfMethods(true) }) }}
+        {{ forms.input(fieldData1,   { field:'csrf_web_root', label:'CSRF Referrer Web Root Path (optional)'|_ }) }}
+        {{ forms.select(fieldData1, { field:'hsts_enable', label:'Enable HSTS header (HTTP Strict Transport Security)'|_, options:{ '':'', 0:'no', 1:'YES'} }) }}
+    {{ forms.accordion_panel_end }}
+
 {{ forms.accordion_end }}
+
 
 <script  type="text/javascript">
     require(['backbone', 'jquery', 'fcom.ipmode', 'select2'], function(Backbone, $, ipMode) {

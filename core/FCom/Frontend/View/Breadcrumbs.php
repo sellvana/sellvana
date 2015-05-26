@@ -35,7 +35,7 @@ class FCom_Frontend_View_Breadcrumbs extends BView
                         if (!$this->BUtil->isUrlFull($url)) {
                             $url = $this->BApp->href($url);
                         }
-                        $c = ['href' => $url, 'label' => 'Home', 'li_class' => 'home'];
+                        $c = ['href' => $url, 'label' => $this->BLocale->_('Home'), 'li_class' => 'home'];
                     }
                     if (!isset($c['title'])) {
                         $c['title'] = $c['label'];

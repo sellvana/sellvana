@@ -557,8 +557,8 @@ LAYOUT
 
 .main-nav-opened .f-admin-main-view { margin-left:200px; }
 .main-nav-closed .f-admin-main-view { margin-left:35px; }
-.f-admin-main-view f-admin-page-header + .nav { margin-top:-20px;  }
-.f-admin-main-view f-admin-page-header + .nav > li > a { padding:7px 12px; }
+.f-admin-main-view .f-admin-page-header + .nav { margin-top:-20px;  }
+.f-admin-main-view .f-admin-page-header + .nav > li > a { padding:7px 12px; }
 
 
 
@@ -3495,7 +3495,7 @@ MEDIA QUERIES
     }
  .accordion .collapse,
  .accordion .panel-collapse .collapse,
- .accordion panel-collapse.collapse,
+ .accordion .panel-collapse.collapse,
  .accordion .accordion-group .accordion-body.collapse {
     display:block !important;
     height:auto !important;
