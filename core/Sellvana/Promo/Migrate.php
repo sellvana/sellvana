@@ -17,11 +17,16 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Promo_Model_PromoDisplay   $Sellvana_Promo_Model_PromoDisplay
  * @property FCom_Admin_Model_User               $FCom_Admin_Model_User
+ * @property FCom_Core_Model_Module              $FCom_Core_Model_Module
  */
 class Sellvana_Promo_Migrate extends BClass
 {
     public function install__0_2_2()
     {
+        if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
+            $this->BMigrate->migrateModules('FCom_Admin', true);
+        }
+
         $tAdminUser     = $this->FCom_Admin_Model_User->table();
         $tCustomer      = $this->Sellvana_Customer_Model_Customer->table();
         $tProductPrice  = $this->Sellvana_Catalog_Model_ProductPrice->table();
