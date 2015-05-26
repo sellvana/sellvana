@@ -392,7 +392,11 @@ class Sellvana_Catalog_Model_ProductPrice
         if (!$op || '=$' === $op) {
             $amount = $this->get('amount');
             if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
-                $rate = $this->Sellvana_MultiCurrency_Main->getRate($currency, $this->get('currency_code'));
+                $priceCurrency = $this->get('currency_code');
+                if (!$priceCurrency) {
+                    $priceCurrency = null;
+                }
+                $rate = $this->Sellvana_MultiCurrency_Main->getRate($currency, $priceCurrency);
                 if ($rate && $rate != 1) {
                     $amount *= $rate;
                 }
