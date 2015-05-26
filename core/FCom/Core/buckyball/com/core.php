@@ -2235,13 +2235,13 @@ class BSession extends BClass
         BDebug::debug(__METHOD__, 1);
         session_write_close();
         $this->_phpSessionOpen = false;
-
+/*
         if ($this->get('_regenerate_id')) {
             #session_regenerate_id(true);
             session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
             $this->set('_regenerate_id', 0);
         }
-
+*/
         /*
 echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $sessionCookie = null;
