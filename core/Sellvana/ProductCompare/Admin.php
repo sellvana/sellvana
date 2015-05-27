@@ -1,14 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
+ * Class Sellvana_PaymentStripe_Main
+ *
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
-class Sellvana_PaymentAuthorizeNet_Admin extends BClass {
+class Sellvana_PaymentStripe_Main extends BClass
+{
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'authorize_net'          => BLocale::i()->_('Authorize Net'),
-            'settings/authorize_net' => BLocale::i()->_('Authorize Net Settings'),
+            'settings/product_compare' => BLocale::i()->_('Product Compare Settings'),
         ]);
     }
 }

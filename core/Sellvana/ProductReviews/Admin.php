@@ -16,7 +16,8 @@ class Sellvana_ProductReviews_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'product_review' => 'Product Reviews',
+            'product_review' => BLocale::i()->_('Product Reviews'),
+            'settings/product_review' => BLocale::i()->_('Product Reviews Settings'),
         ]);
     }
 

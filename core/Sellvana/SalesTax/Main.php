@@ -11,9 +11,22 @@
  * @property Sellvana_SalesTax_Model_RuleProductClass $Sellvana_SalesTax_Model_RuleProductClass
  * @property Sellvana_SalesTax_Model_RuleZone $Sellvana_SalesTax_Model_RuleZone
  * @property Sellvana_SalesTax_Model_Zone $Sellvana_SalesTax_Model_Zone
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
 class Sellvana_SalesTax_Main extends BClass
 {
+    public function bootstrap()
+    {
+        $locale = BLocale::i();
+        $this->FCom_Admin_Model_Role->createPermission([
+            'sales/tax'                  => $locale->_('Sales Tax'),
+            'sales/tax/zones'            => $locale->_('Sales Tax Zones'),
+            'sales/tax/rules'            => $locale->_('Sales Tax Rules'),
+            'sales/tax/product_classes'  => $locale->_('Sales Tax Product Classes'),
+            'sales/tax/customer_classes' => $locale->_('Sales Tax Customer Classes'),
+            'settings/sales_tax'         => $locale->_('Sales Tax Settings'),
+        ]);
+    }
     public function onCartTaxCalculate($args)
     {
         /** @var Sellvana_Sales_Model_Cart $cart */

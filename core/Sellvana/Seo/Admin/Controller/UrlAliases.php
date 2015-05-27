@@ -15,6 +15,7 @@ class Sellvana_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abs
     protected $_recordName = 'URL Alias';
     protected $_mainTableAlias = 'a';
     protected $_navPath = 'seo/urlaliases';
+    protected $_permission = 'seo/urlaliases';
 
     public function gridConfig()
     {

@@ -1,3 +1,4 @@
+<!--{permission: settings/sales}-->
 {% set c = THIS.get('model') %}
 {% set paymentMethods = UTIL.arrayToOptions(APP.instance('Sellvana_Sales_Main').getPaymentMethods(), '.getName') %}
 {% set shippingMethods = UTIL.arrayToOptions(APP.instance('Sellvana_Sales_Main').getShippingMethods(), '.getName') %}
