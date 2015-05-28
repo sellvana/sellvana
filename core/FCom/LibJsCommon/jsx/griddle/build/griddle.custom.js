@@ -822,7 +822,7 @@ var Griddle = React.createClass({displayName: "Griddle",
 
             var results = this.state.results;
             //console.log('state.filter', this.state.filter);
-            if (this.state.filter != '') { //if have filter, need to filter data then search in results
+            if (this.state.filter != '' && this.props.config.data_mode) { //if have filter, need to filter data then search in results
                 results = this.filterLocalData(null, JSON.parse(this.state.filter));
                 //console.log('results before search', results);
             }
