@@ -181,7 +181,8 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var submitFilters = {};
 
             for (item in submitAll) {
-                if(submitAll[item] && submitAll[item].val ){
+                // update submitFilters added object with field is status
+                if((submitAll[item] && submitAll[item].val) ||  submitAll[item].field !=="status" ){
                     submitFilters[item] = submitAll[item];
                 }
             }
