@@ -1,3 +1,4 @@
+<!--{permission: settings/cron}-->
 {% set c = THIS.get('model') %}
 {% set mode = c.get("mode_by_ip/FCom_Cron")|split("\n")|join('|') %}
 {% set fieldData = { model: c, settings_module:'FCom_Cron' } %}

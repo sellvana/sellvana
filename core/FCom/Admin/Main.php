@@ -11,15 +11,20 @@ class FCom_Admin_Main extends BClass
     {
         $this->FCom_Admin_Model_User;
 
+        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'system' => 'System',
-            'system/users' => 'Manage Users',
-            'system/roles' => 'Manage Roles and Permissions',
-            'system/settings' => 'Update Settings',
-            'system/modules' => 'Manage Modules',
-            'system/templates' => 'Edit System Templates',
-            'system/backups' => 'System Backups',
-            'system/importexport' => 'Import Export',
+            'system' => $locale->_('System'),
+            'system/users' => $locale->_('Manage Users'),
+            'system/roles' => $locale->_('Manage Roles and Permissions'),
+            'system/settings' => $locale->_('Update Settings'),
+            'system/modules' => $locale->_('Manage Modules'),
+            'system/templates' => $locale->_('Edit System Templates'),
+            'system/backups' => $locale->_('System Backups'),
+            'system/importexport' => $locale->_('Import Export'),
+            'settings/admin' => $locale->_('Admin Settings'),
+            'settings/core' => $locale->_('Core Settings'),
+            'settings/frontend' => $locale->_('Frontend Settings'),
+            'settings/frontend/theme' => $locale->_('Frontend Theme Settings'),
         ]);
     }
 
