@@ -451,10 +451,10 @@ class FCom_Core_LayoutEditor extends BClass
 
                 $args['layout'][] = ['hook' => $w['area'], 'views' => $view_name];
                 $update = [
-                    'widget_id'      => $w['id'],
-                    'src' => $w['src'],
-                    'width' => $w['width'],
-                    'height' => $w['height'],
+                    'id'     => $w['id'],
+                    'src'    => isset($w['src'])? $w['src']: null,
+                    'width'  => isset($w['width'])? $w['width']: null,
+                    'height' => isset($w['height'])? $w['height']: null,
                 ];
 
                 if (!empty($w['custom_params'])) {
