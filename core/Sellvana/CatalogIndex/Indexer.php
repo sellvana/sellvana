@@ -42,6 +42,7 @@ class Sellvana_CatalogIndex_Indexer extends BClass
             if (empty(static::$_cnt_total)) {
                 $count              = clone $orm;
                 static::$_cnt_total = $count->count();
+                $this->BCache->save('index_progress_total', static::$_cnt_total);
                 $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'total' => static::$_cnt_total]);
             }
             do {
@@ -111,6 +112,7 @@ class Sellvana_CatalogIndex_Indexer extends BClass
         $this->_indexSaveSearchData();
         $this->indexCleanMemory();
         $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'reindexed' => static::$_cnt_reindexed]);
+        $this->BCache->save('index_progress_reindexed', static::$_cnt_reindexed);
     }
 
     public function indexDropDocs($pIds)

@@ -225,25 +225,29 @@
 
         $('.btn-progress').on('click', function () {
             var url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}';
+            var progressUrl = '{{ APP.href('/catalogindex/progress') }}';
             $('#progress-bar').css('width', 0);
-            PushClient.listen({channel: 'index', callback: channel_index_progress});
+//            PushClient.listen({channel: 'index', callback: channel_index_progress});
 
             var total = 0;
             var $msgBoard = $('<span/>');
-            function channel_index_progress(msg) {
-                console.log(msg);
-                if(msg.total != undefined) {
-                    total = parseInt(msg.total);
-                    $('#progress-bar').append($msgBoard.html( total + '{{ " products being reindexed"|_ }}'));
-                } else if(msg.signal && msg.signal =='progress' && msg.reindexed != undefined && total != 0) {
-                    var reindexed = parseInt(msg.reindexed);
-                    var percentComplete = (reindexed * 100 / total);
-                    $('#progress-bar').css({
-                        width: percentComplete + '%'
-                    });
-                    $msgBoard.text(total + ' / ' + reindexed);
-                }
+            $('#progress-bar').append($msgBoard);
+            function channel_index_progress() {
+                $.get(progressUrl, function (msg) {
+                    console.log(msg);
+                    if (msg.total && msg.reindexed != undefined && msg.total != 0) {
+                        var reindexed = parseInt(msg.reindexed);
+                        var total = parseInt(msg.total);
+                        var percentComplete = (reindexed * 100 / total);
+                        $('#progress-bar').css({
+                            width: percentComplete + '%'
+                        });
+                        $msgBoard.text(total + ' / ' + reindexed);
+                    }
+                });
             }
+
+            var updateInterval = setInterval(channel_index_progress, 3000);
 
             $.ajax({
                /* xhr: function () {
@@ -262,7 +266,11 @@
                 url: url,
                 data: {CLEAR: 1},
                 complete: function (data) {
-                    $('#progress-bar').append($('<span/>').html('{{ " Reindexing completed."|_ }}'));
+                    clearInterval(updateInterval);
+                    $('#progress-bar').css({
+                        width: '100%'
+                    });
+                    $msgBoard.html('{{ "Reindexing completed."|_ }}');
                 }
             });
 
