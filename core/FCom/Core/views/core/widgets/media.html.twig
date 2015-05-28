@@ -6,21 +6,35 @@
     {{ forms.hidden({name: "#{context.prefix}[widgets][#{widget.id}][src]", value: widget.src, field: "src-#{widget.id}"}) }}
     <div id="lib-images-{{ widget.id }}">
         {% set type = 'images' %}
-        {% set medialibConfig = {
-            id: 'all_' ~ type,
-            type: type,
-            config:  APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({'id': 'all_' ~ type})
-        } %}
-
+        {% set medialibConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({'id': 'all_' ~ type}) %}
         <!-- Att -->
         <button type="button" class='btn btn-primary' id='{{ medialibConfig.id }}-media-modal-toggle'>{{ "Select Image"|_ }}</button>
-        {#{{ dump(medialibConfig) }}#}
-        {{ LAYOUT.view('core/medialib-griddle').set('config', medialibConfig)|raw }}
+        {{ dump(medialibConfig.config.id) }}
+        <div id="{{ medialibConfig.config.id }}-media-modal" class="fade modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">{{ "Choose Image"|_ }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        {{ LAYOUT.view('core/griddle').set('grid', medialibConfig) | raw }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script type="text/javascript">
             require(['jquery'], function ($) {
-                var mediaModal = $('#{{ medialibConfig.id }}-media-modal');
+                var mediaModal = $('#{{ medialibConfig.config.id }}-media-modal');
                 if (mediaModal) {
-                    $('#{{ medialibConfig.id }}-media-modal-toggle').on('click', function () {
+                    $('#{{ medialibConfig.config.id }}-media-modal-toggle').on('click', function () {
                         mediaModal.modal('show');
                     });
                 }
