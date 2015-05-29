@@ -64,7 +64,9 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
             $storeCurrencyPrice = $itemPrice;
             if ($storeCurrency != $baseCurrency) {
                 $rate      = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
-                $itemPrice = $storeCurrencyPrice / $rate;
+                if ($rate) {
+                    $itemPrice = $storeCurrencyPrice / $rate;
+                }
             }
 
             $itemNum++;

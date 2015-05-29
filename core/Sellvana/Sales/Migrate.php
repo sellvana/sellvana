@@ -28,13 +28,18 @@
  * @property Sellvana_Sales_Model_Order_Cancel $Sellvana_Sales_Model_Order_Cancel
  * @property Sellvana_Sales_Model_Order_Cancel_Item $Sellvana_Sales_Model_Order_Cancel_Item
  * @property Sellvana_Sales_Model_StateCustom $Sellvana_Sales_Model_StateCustom
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
  */
 
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_22()
+    public function install__0_5_1()
     {
+        if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
+            $this->BMigrate->migrateModules('FCom_Admin', true);
+        }
+
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
         $tUser = $this->FCom_Admin_Model_User->table();
         $tProduct = $this->Sellvana_Catalog_Model_Product->table();
@@ -252,10 +257,13 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_custom' => "varchar(20) default null",
 
                 'store_currency_code' => 'char(3) null',
+
+                'token' => "binary(20) default null",
+                'token_at' => "datetime default null",
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
-                'UNQ_cart_id' => 'UNIQUE (cart_id)',
+                'UNQ_token' => 'UNIQUE (token)',
             ],
             BDb::CONSTRAINTS => [
                 'cart' => ['cart_id', $tCart, 'id', 'CASCADE', 'SET NULL'],
@@ -2046,9 +2054,8 @@ class Sellvana_Sales_Migrate extends BClass
         $tOrder = $this->Sellvana_Sales_Model_Order->table();
         $tOrderItem = $this->Sellvana_Sales_Model_Order_Item->table();
 
-
         $this->BDb->ddlTableDef($tOrder, [
-            BDB::COLUMNS => [
+            BDb::COLUMNS => [
                 'state_return' => "varchar(20) not null default 'none'",
                 'state_refund' => "varchar(20) not null default 'none'",
                 'state_cancel' => "varchar(20) not null default 'none'",
@@ -2062,6 +2069,22 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_refund' => "varchar(20) not null default 'none'",
                 'state_cancel' => "varchar(20) not null default 'none'",
             ],
+        ]);
+    }
+
+    public function upgrade__0_5_0__0_5_1()
+    {
+        $tOrder = $this->Sellvana_Sales_Model_Order->table();
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDb::COLUMNS => [
+                'token' => "binary(20) default null",
+                'token_at' => "datetime default null",
+            ],
+            BDb::KEYS => [
+                'UNQ_cart_id' => BDb::DROP,
+                'UNQ_token' => 'UNIQUE (token)',
+            ]
         ]);
     }
 }

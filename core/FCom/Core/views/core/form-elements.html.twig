@@ -184,7 +184,7 @@ Using custom id/name:
 {% macro accordion_panel_start(p) %}
     <div class="panel panel-default">
         <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ p.label }}</a>
+            <a class="accordion-toggle" href="#{{ p.id }}" data-toggle="collapse">{{ p.label }}</a>
         </div>
         <div class="panel-collapse accordion-body {{ p.in ? 'in' }}" id="{{ p.id }}">
             <div class="panel-body">

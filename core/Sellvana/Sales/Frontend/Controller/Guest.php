@@ -18,6 +18,75 @@ class Sellvana_Sales_Frontend_Controller_Guest extends FCom_Frontend_Controller_
         return true;
     }
 
+    public function authenticate($args = [])
+    {
+        if ($this->Sellvana_Customer_Model_Customer->isLoggedIn()) {
+            return true;
+        }
+        if ($this->_action === 'add_to_account') {
+            return false;
+        }
+        return true;
+    }
+
+    public function getGuestOrder()
+    {
+        $lastOrderId = $this->BSession->get('last_order_id');
+        if ($lastOrderId) {
+            $order = $this->Sellvana_Sales_Model_Order->load($lastOrderId);
+            if (!$order) {
+                return false;
+            }
+        } else {
+            $reqOrder = $this->BRequest->get('id');
+            $reqToken = $this->BRequest->get('token');
+            if (!$reqOrder || !$reqToken) {
+                return false;
+            }
+            $order = $this->Sellvana_Sales_Model_Order->load($reqOrder, 'unique_id');
+            if (!$order || $order->get('token') !== $reqToken) {
+                return false;
+            }
+        }
+        return $order;
+    }
+
+    public function action_add_to_account()
+    {
+        $order = $this->getGuestOrder();
+        if (!$order) {
+            $this->forward(false);
+            return;
+        }
+
+        $result = [];
+        $this->Sellvana_Sales_Main->workflowAction('customerMergesOrderToAccount', [
+            'order' => $order,
+            'result' => &$result,
+        ]);
+
+        if (empty($result['error'])) {
+            $this->message('Order has been merged to your account');
+            $this->BResponse->redirect('orders/view?id=' . $order->get('unique_id'));
+        } else {
+            $this->message($result['error']['message'], 'error');
+            $this->BResponse->redirect('orders');
+        }
+
+    }
+
+    public function action_create_account()
+    {
+        $order = $this->getGuestOrder();
+        if (!$order) {
+            $this->forward(false);
+            return;
+        }
+
+        $this->view('guest/create-account')->set('order', $order);
+
+        $this->layout('/guest/create_account');
+    }
 
     public function action_create_account__POST()
     {
@@ -33,36 +102,12 @@ class Sellvana_Sales_Frontend_Controller_Guest extends FCom_Frontend_Controller_
                 'post' => $this->BRequest->post(),
                 'result' => &$result,
             ]);
+
             $this->message('Account successfully created');
             $this->BResponse->redirect('orders');
         } catch (Exception $e) {
             $this->message($e->getMessage(), 'error');
             $this->BResponse->redirect($this->BRequest->referrer());
-        }
-    }
-
-    public function action_merge_order__POST()
-    {
-        try {
-            $post = $this->BRequest->post('merge');
-            if (!empty($post['id'])) {
-
-            }
-            $orderId = $this->BSession->get('last_order_id');
-            if (!$orderId) {
-                $this->BResponse->redirect('');
-                return;
-            }
-            $result = [];
-            $this->Sellvana_Sales_Main->workflowAction('customerMergesOrderToAccount', [
-                'order_id' => $orderId,
-                'post' => $this->BRequest->post(),
-                'result' => &$result,
-            ]);
-            $this->BResponse->redirect('orders');
-
-        } catch (Exception $e) {
-
         }
     }
 
