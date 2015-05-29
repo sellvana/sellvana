@@ -89,6 +89,30 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
         ]);
     }
 
+    /**
+     * @return Sellvana_Sales_Model_Order
+     * @throws BException
+     */
+    public function getOrder()
+    {
+        $uniqueId = $this->BRequest->get('id');
+        $customerId = $this->Sellvana_Customer_Model_Customer->sessionUserId();
+
+        $order = null;
+        $allowedOrders = $this->BSession->get('allowed_orders');
+        if (!empty($allowedOrders[$uniqueId])) {
+            $order = $this->Sellvana_Sales_Model_Order->load($allowedOrders[$uniqueId]);
+        }
+        if (!$order && $customerId) {
+            $order = $this->Sellvana_Sales_Model_Order->isOrderExists($uniqueId, $customerId);
+        }
+        if (!$order) {
+            $this->BResponse->redirect('orders');
+            return false;
+        }
+        return $order;
+    }
+
     public function action_view()
     {
         $order = $this->getOrder();
@@ -119,27 +143,4 @@ class Sellvana_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller
         $this->BResponse->redirect('checkout');
     }
 
-    /**
-     * @return Sellvana_Sales_Model_Order
-     * @throws BException
-     */
-    public function getOrder()
-    {
-        $uniqueId = $this->BRequest->get('id');
-        $customerId = $this->Sellvana_Customer_Model_Customer->sessionUserId();
-
-        $order = null;
-        $allowedOrders = $this->BSession->get('allowed_orders');
-        if (!empty($allowedOrders[$uniqueId])) {
-            $order = $this->Sellvana_Sales_Model_Order->load($allowedOrders[$uniqueId]);
-        }
-        if (!$order && $customerId) {
-            $order = $this->Sellvana_Sales_Model_Order->isOrderExists($uniqueId, $customerId);
-        }
-        if (!$order) {
-            $this->BResponse->redirect('orders');
-            return false;
-        }
-        return $order;
-    }
 }
