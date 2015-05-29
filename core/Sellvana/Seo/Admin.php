@@ -12,7 +12,7 @@ class Sellvana_Seo_Admin extends BClass
     {
         $this->FCom_Admin_Model_Role->createPermission([
             'seo/urlaliases' => BLocale::i()->_('Seo Url Aliases'),
-            'settings/seo'   => BLocale::i()->_('Seo Settings'),
+            'settings/Sellvana_Seo'   => BLocale::i()->_('Seo Settings'),
         ]);
     }
 }

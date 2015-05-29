@@ -24,7 +24,7 @@ class Sellvana_SalesTax_Main extends BClass
             'sales/tax/rules'            => $locale->_('Sales Tax Rules'),
             'sales/tax/product_classes'  => $locale->_('Sales Tax Product Classes'),
             'sales/tax/customer_classes' => $locale->_('Sales Tax Customer Classes'),
-            'settings/sales_tax'         => $locale->_('Sales Tax Settings'),
+            'settings/Sellvana_SalesTax' => $locale->_('Sales Tax Settings'),
         ]);
     }
     public function onCartTaxCalculate($args)

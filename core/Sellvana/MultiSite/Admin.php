@@ -12,7 +12,7 @@ class Sellvana_MultiSite_Admin extends BClass
     {
         $this->FCom_Admin_Model_Role->createPermission([
             'multi_site' => BLocale::i()->_('Multi Site'),
-            'settings/multi_site' => BLocale::i()->_('Multi Site Settings'),
+            'settings/Sellvana_MultiSite' => BLocale::i()->_('Multi Site Settings'),
         ]);
     }
 

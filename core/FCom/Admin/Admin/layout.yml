@@ -314,10 +314,10 @@ form:
             - [ addTabGroup, areas, { label: Areas, pos: 10 } ]
             - [ addTabGroup, themes, { label: Themes, pos: 800 } ]
             - [ addTabGroup, other, { label: Other, pos: 900 } ]
-            - [ addTab, FCom_Core, { label: Fulleron Core, group: areas, async: true, pos: 10 } ]
-            - [ addTab, FCom_Admin, { label: Fulleron Admin, group: areas, async: true, pos: 20 } ]
-            - [ addTab, FCom_Frontend, { label: Fulleron Frontend, group: areas, async: true, pos: 30 } ]
-            - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10 } ]
+            - [ addTab, FCom_Core, { label: Fulleron Core, group: areas, async: true, pos: 10, permission: settings/FCom_Core } ]
+            - [ addTab, FCom_Admin, { label: Fulleron Admin, group: areas, async: true, pos: 20, permission: settings/FCom_Admin } ]
+            - [ addTab, FCom_Frontend, { label: Fulleron Frontend, group: areas, async: true, pos: 30, permission: settings/FCom_Frontend } ]
+            - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10, permission: settings/FCom_FrontendTheme } ]
 
 /modules:
     - { include: default_griddle }

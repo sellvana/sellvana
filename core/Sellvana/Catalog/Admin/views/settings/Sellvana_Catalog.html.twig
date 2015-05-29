@@ -1,4 +1,3 @@
-<!--{permission: settings/catalog}-->
 {% set c = THIS.get('model') %}
 {% set fieldData = { model: c, settings_module:'Sellvana_Catalog', } %}
 {% set fieldValidate = fieldData|merge({  attr: 'data-rule-number="true"', input_class: 'input-stock' }) %}

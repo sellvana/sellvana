@@ -57,7 +57,7 @@ class Sellvana_Catalog_Admin extends BClass
 
         $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/catalog' => $locale->_('Catalog Settings'),
+            'settings/Sellvana_Catalog' => $locale->_('Catalog Settings'),
             'catalog' => $locale->_('Catalog'),
             'catalog/products' => $locale->_('Manage Products'),
             'catalog/categories' => $locale->_('Manage Categories'),

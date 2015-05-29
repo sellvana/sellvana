@@ -1,4 +1,4 @@
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_PaymentPaypal, { label: PayPal, group: payment_methods, async: true } ]
+            - [ addTab, Sellvana_PaymentPaypal, { label: PayPal, group: payment_methods, async: true, permission: settings/Sellvana_PaymentPaypal } ]

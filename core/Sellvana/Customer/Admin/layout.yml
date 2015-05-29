@@ -15,7 +15,7 @@ base:
     - view: settings
         do:
             - [ addTabGroup, customers, { label: Customers, pos: 50 } ]
-            - [ addTab, Sellvana_Customer, { label: Customers, group: customers, async: true } ]
+            - [ addTab, Sellvana_Customer, { label: Customers, group: customers, async: true, permission: settings/Sellvana_Customers } ]
 
 /header_search:
     - { hook: main, views: 'header-search/Sellvana_Customer' }

@@ -8,7 +8,7 @@ class Sellvana_PaymentAuthorizeNet_Admin extends BClass {
     {
         $this->FCom_Admin_Model_Role->createPermission([
             'authorize_net'          => BLocale::i()->_('Authorize Net'),
-            'settings/authorize_net' => BLocale::i()->_('Authorize Net Settings'),
+            'settings/Sellvana_PaymentAuthorizeNet' => BLocale::i()->_('Authorize Net Settings'),
         ]);
     }
 }

@@ -10,7 +10,7 @@ class Sellvana_PaymentStripe_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/product_compare' => BLocale::i()->_('Product Compare Settings'),
+            'settings/Sellvana_ProductCompare' => BLocale::i()->_('Product Compare Settings'),
         ]);
     }
 }

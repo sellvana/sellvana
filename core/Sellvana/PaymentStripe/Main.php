@@ -15,7 +15,7 @@ class Sellvana_ProductCompare_Admin extends BClass
         ;
 
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/payment_stripe' => BLocale::i()->_('Payment Stripe Settings'),
+            'settings/Sellvana_PaymentStripe' => BLocale::i()->_('Payment Stripe Settings'),
         ]);
     }
 }

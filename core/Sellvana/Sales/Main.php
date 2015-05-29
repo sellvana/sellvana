@@ -23,8 +23,9 @@ class Sellvana_Sales_Main extends BClass
             'sales/order_custom_state' => $locale->_('Order Custom State'),
             'sales/carts' => $locale->_('Carts'),
             'sales/reports' => $locale->_('Reports'),
-            'settings/sales' => $locale->_('Sales Settings'),
-            'settings/sales_shipping' => $locale->_('Sales Shipping Settings'),
+            'settings/Sellvana_Sales' => $locale->_('Sales Settings'),
+            'settings/Sellvana_SalesShipping' => $locale->_('Sales Shipping Settings'),
+            'settings/Sellvana_SalesPaymentMethods' => $locale->_('Sales Payment Methods Settings'),
         ]);
 
         foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal'] as $total) {

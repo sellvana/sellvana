@@ -15,7 +15,7 @@ class Sellvana_ShippingFree_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/shipping/free' => BLocale::i()->_('Shipping Free Settings'),
+            'settings/Sellvana_ShippingFree' => BLocale::i()->_('Shipping Free Settings'),
         ]);
         return;
 

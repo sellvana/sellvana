@@ -9,4 +9,4 @@ base:
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_Seo, { label: SEO, group: catalog, async: true } ]
+            - [ addTab, Sellvana_Seo, { label: SEO, group: catalog, async: true, permission: settings/Sellvana_Seo } ]

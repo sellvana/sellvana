@@ -15,7 +15,7 @@ class Sellvana_Customer_Admin extends BClass
             'api/customers' => $locale->_('Customers'),
             'api/customers/view' => $locale->_('View'),
             'api/customers/update' => $locale->_('Update'),
-            'settings/customers' => $locale->_('Customers Settings'),
+            'settings/Sellvana_Customers' => $locale->_('Customers Settings'),
             'customers' => $locale->_('Customers'),
             'customers/manage' => $locale->_('Manage'),
             'customers/import' => $locale->_('Import'),

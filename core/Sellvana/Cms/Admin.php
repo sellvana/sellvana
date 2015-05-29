@@ -11,7 +11,7 @@ class Sellvana_Cms_Admin extends BClass
     {
         $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/cms' => $locale->_('CMS Settings'),
+            'settings/Sellvana_Cms' => $locale->_('CMS Settings'),
             'cms' => $locale->_('CMS'),
             'cms/pages' => $locale->_('Manage Pages'),
             'cms/blocks' => $locale->_('Manage Blocks'),

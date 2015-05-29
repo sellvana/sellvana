@@ -15,9 +15,9 @@ base:
             - [ addTabGroup, shipping_methods, { label: Shipping, pos: 110 } ]
             - [ addTabGroup, payment_methods, { label: Payment, pos: 120 } ]
             - [ addTabGroup, checkout_methods, { label: Checkout, pos: 130 } ]
-            - [ addTab, Sellvana_Sales, { label: Sales, group: sales, pos: 10, async: true } ]
-            - [ addTab, Sellvana_SalesShipping, { label: General, group: shipping_methods, pos: 10, async: true } ]
-            - [ addTab, Sellvana_SalesPayment, { label: General, group: payment_methods, pos: 10, async: true } ]
+            - [ addTab, Sellvana_Sales, { label: Sales, group: sales, pos: 10, async: true, permission: settings/Sellvana_Sales } ]
+            - [ addTab, Sellvana_SalesShipping, { label: General, group: shipping_methods, pos: 10, async: true, permission: settings/Sellvana_SalesShipping } ]
+            - [ addTab, Sellvana_SalesPayment, { label: General, group: payment_methods, pos: 10, async: true, permission: settings/Sellvana_SalesPaymentMethods } ]
 
 /orders/form:
     - { include: default_form }

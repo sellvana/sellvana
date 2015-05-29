@@ -11,7 +11,7 @@ class Sellvana_MarketClient_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/market_client' => BLocale::i()->_('Market Client Settings'),
+            'settings/Sellvana_MarketClient' => BLocale::i()->_('Market Client Settings'),
             'market_client' => BLocale::i()->_('Market Client'),
             'market_client/install' => BLocale::i()->_('Market Client Install'),
             'market_client/publish' => BLocale::i()->_('Market Client Publish'),

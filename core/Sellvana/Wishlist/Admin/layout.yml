@@ -1,2 +1,2 @@
 /settings:
-    - { view: settings, do: [[ addTab, Sellvana_Wishlist, { label: Wishlist, group: customers, async: true } ]] }
+    - { view: settings, do: [[ addTab, Sellvana_Wishlist, { label: Wishlist, group: customers, async: true, permission: settings/Sellvana_Wishlist } ]] }

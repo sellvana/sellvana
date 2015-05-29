@@ -12,7 +12,7 @@ class Sellvana_Wishlist_Admin extends BClass
     {
         $this->FCom_Admin_Model_Role->createPermission([
             'wishlist' => BLocale::i()->_('Wishlist'),
-            'settings/wishlist' => BLocale::i()->_('Wishlist Settings'),
+            'settings/Sellvana_Wishlist' => BLocale::i()->_('Wishlist Settings'),
         ]);
     }
 }

@@ -21,10 +21,10 @@ class FCom_Admin_Main extends BClass
             'system/templates' => $locale->_('Edit System Templates'),
             'system/backups' => $locale->_('System Backups'),
             'system/importexport' => $locale->_('Import Export'),
-            'settings/admin' => $locale->_('Admin Settings'),
-            'settings/core' => $locale->_('Core Settings'),
-            'settings/frontend' => $locale->_('Frontend Settings'),
-            'settings/frontend/theme' => $locale->_('Frontend Theme Settings'),
+            'settings/FCom_Admin' => $locale->_('Admin Settings'),
+            'settings/FCom_Core' => $locale->_('Core Settings'),
+            'settings/FCom_Frontend' => $locale->_('Frontend Settings'),
+            'settings/FCom_FrontendTheme' => $locale->_('Frontend Theme Settings'),
         ]);
     }
 

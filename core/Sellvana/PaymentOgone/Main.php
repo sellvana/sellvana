@@ -17,7 +17,7 @@ class Sellvana_PaymentOgone_Main extends BClass
         ;
 
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/payment_ogone' => BLocale::i()->_('Payment Ogone Settings'),
+            'settings/Sellvana_PaymentOgone' => BLocale::i()->_('Payment Ogone Settings'),
         ]);
     }
 }
