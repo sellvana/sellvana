@@ -639,8 +639,11 @@ var Griddle = React.createClass({displayName: "Griddle",
         var filteredResults = originalResults;
 
         _.each(filters, function(filter, key) { //key is field name
+
             if (filter.submit == true && typeof filter.val != 'undefined') {
                 var filterVal = filter.val.toLowerCase();
+
+                console.log('filter:', filter,'key:', key);
 
                 switch (filter.type) {
                     case 'text':
@@ -821,10 +824,9 @@ var Griddle = React.createClass({displayName: "Griddle",
                 };
 
             var results = this.state.results;
-            //console.log('state.filter', this.state.filter);
-            if (this.state.filter != '' && this.props.config.data_mode) { //if have filter, need to filter data then search in results
+            //console.log('state.filter', this.state.filter, ' within total:',results.length, 'total');
+            if (this.state.filter != '' && ! this.hasExternalResults()) { //if have filter, need to filter data then search in results
                 results = this.filterLocalData(null, JSON.parse(this.state.filter));
-                //console.log('results before search', results);
             }
 
             state.filteredResults = _.filter(results,
