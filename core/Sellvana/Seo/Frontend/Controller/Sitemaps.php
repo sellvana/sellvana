@@ -12,12 +12,17 @@ class Sellvana_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller
         $output = '<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         $sitemaps = [//TODO: fetch real paginated sitemaps
-            ['loc' => $this->BApp->href('sitemap.xml.gz')],
+            //['loc' => $this->BApp->href('sitemap.xml.gz')],
         ];
+
+        $this->BEvents->fire(__METHOD__ . ':before', ['sitemaps' => &$sitemaps]);
+
+        $now = date('c');
         foreach ($sitemaps as $sitemap) {
+            $ts = (!empty($sitemap['ts']) ? date('c', strtotime($sitemap['ts'])) : $now);
             $output .= '<sitemap>'
                 . '<loc>' . $sitemap['loc'] . '</loc>'
-                . '<lastmod>' . date('c') . '</lastmod>' //TODO: figure out how to get lastmod
+                . '<lastmod>' . $ts . '</lastmod>' //TODO: figure out how to get lastmod
                 . '</sitemap>';
         }
         $output .= '</sitemapindex>';
@@ -32,7 +37,7 @@ class Sellvana_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller
         $type = $params[3];
 
         $urls = [];
-        $this->BEvents->fire('Sellvana_Seo_Frontend_Controller_Sitemaps.sitemap',
+        $this->BEvents->fire(__METHOD__ . ':before',
             ['urls' => &$urls, 'page' => $page, 'filetype' => $type]);
 
         switch ($type) {
@@ -51,10 +56,10 @@ class Sellvana_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller
                 $url = ['loc' => $url];
             }
             switch ($type) {
-                case '.txt':
+                case 'txt':
                     $output .= $url['loc'] . "\n";
                     break;
-                case '.xml':
+                case 'xml':
                     $output .= '<url><loc>' . $url['loc'] . '</loc>';
                     if (!empty($url['lastmod'])) {
                         $lastmod = $url['lastmod'];
