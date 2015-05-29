@@ -36,9 +36,9 @@ class Sellvana_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller
         $page = $params[2];
         $type = $params[3];
 
-        $urls = [];
+        $items = [];
         $this->BEvents->fire(__METHOD__ . ':before',
-            ['urls' => &$urls, 'page' => $page, 'filetype' => $type]);
+            ['items' => &$items, 'page' => $page, 'filetype' => $type]);
 
         switch ($type) {
             case 'txt':
@@ -51,28 +51,33 @@ class Sellvana_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 ';
         }
-        foreach ($urls as $url) {
-            if (!is_array($url)) {
-                $url = ['loc' => $url];
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                $item = ['loc' => $item];
             }
             switch ($type) {
                 case 'txt':
-                    $output .= $url['loc'] . "\n";
+                    $output .= $item['loc'] . "\n";
                     break;
                 case 'xml':
-                    $output .= '<url><loc>' . $url['loc'] . '</loc>';
-                    if (!empty($url['lastmod'])) {
-                        $lastmod = $url['lastmod'];
+                    $output .= '<url><loc>' . htmlspecialchars($item['loc']) . '</loc>';
+                    if (!empty($item['lastmod'])) {
+                        $lastmod = $item['lastmod'];
                         if (!is_numeric($lastmod)) {
                             $lastmod = strtotime($lastmod);
                         }
                         $output .= '<lastmod>' . date('c', $lastmod) . '</lastmod>';
                     }
-                    if (!empty($url['changefreq'])) {
-                        $output .= '<changefreq>' . $url['changefreq'] . '</changefreq>';
+                    if (!empty($item['changefreq'])) {
+                        $output .= '<changefreq>' . $item['changefreq'] . '</changefreq>';
                     }
-                    if (!empty($url['priority'])) {
-                        $output .= '<priority>' . $url['priority'] . '</priority>';
+                    if (!empty($item['priority'])) {
+                        $output .= '<priority>' . $item['priority'] . '</priority>';
+                    }
+                    if (!empty($item['images'])) {
+                        foreach ($item['images'] as $img) {
+                            $output .= '<image:image>' . htmlspecialchars($img) . '</image:image>';
+                        }
                     }
                     $output .= '</url>';
                     break;
