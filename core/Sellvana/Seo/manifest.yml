@@ -19,7 +19,7 @@ modules:
                 routing:
                     - [ /sitemap, Sellvana_Seo_Frontend_Controller_Sitemaps.sitemap ]
                     # https://support.google.com/webmasters/bin/answer.py?hl=en&answer=71453
-                    - [ /sitemap-index.xml, Sellvana_Seo_Frontend_Controller_Sitemaps.index_xml ]
+                    - [ /sitemap.xml, Sellvana_Seo_Frontend_Controller_Sitemaps.index_xml ]
                     # https://support.google.com/webmasters/bin/answer.py?hl=en&answer=183668 */
                     - [ "^GET /sitemap(-([a-z0-9-]+))?\.(xml|txt)(\.gz)?$", Sellvana_Seo_Frontend_Controller_Sitemaps.sitemap_data ]
                     - [ /*url, Sellvana_Seo_Frontend_Controller_UrlAliases.index ]

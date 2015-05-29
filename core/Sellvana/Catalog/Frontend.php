@@ -43,7 +43,7 @@ class Sellvana_Catalog_Frontend extends BClass
 
     public function onSitemapsIndexXmlBefore($args)
     {
-        $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size', 100);
+        $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size', 1000);
 
         $categoryCount = $this->Sellvana_Catalog_Model_Category->orm()->where('is_enabled', 1)->count();
         $pages = ceil($categoryCount / $pageSize);
@@ -66,7 +66,7 @@ class Sellvana_Catalog_Frontend extends BClass
         }
         $dataType = $m[1];
         $page = $m[2];
-        $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size', 100);
+        $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size', 1000);
         switch ($dataType) {
             case 'categories':
                 $categories = $this->Sellvana_Catalog_Model_Category->orm()->where('is_enabled', 1)
