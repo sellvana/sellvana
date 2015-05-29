@@ -19,7 +19,7 @@ class Sellvana_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller
 
         $now = date('c');
         foreach ($sitemaps as $sitemap) {
-            $ts = (!empty($sitemap['ts']) ? date('c', strtotime($sitemap['ts'])) : $now);
+            $ts = (!empty($sitemap['lastmod']) ? date('c', strtotime($sitemap['lastmod'])) : $now);
             $output .= '<sitemap>'
                 . '<loc>' . $sitemap['loc'] . '</loc>'
                 . '<lastmod>' . $ts . '</lastmod>' //TODO: figure out how to get lastmod

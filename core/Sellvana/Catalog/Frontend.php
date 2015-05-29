@@ -43,7 +43,7 @@ class Sellvana_Catalog_Frontend extends BClass
 
     public function onSitemapsIndexXmlBefore($args)
     {
-        $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size', 1000);
+        $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size');
 
         $categoryCount = $this->Sellvana_Catalog_Model_Category->orm()->where('is_enabled', 1)->count();
         $pages = ceil($categoryCount / $pageSize);
@@ -66,17 +66,28 @@ class Sellvana_Catalog_Frontend extends BClass
         }
         $dataType = $m[1];
         $page = $m[2];
-        $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size', 1000);
+        $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size');
         switch ($dataType) {
             case 'categories':
+                $categoryChangeFreq = $this->BConfig->get('modules/Sellvana_Seo/category_changefreq');
+                $categoryPriority = $this->BConfig->get('modules/Sellvana_Seo/category_priority');
+
                 $categories = $this->Sellvana_Catalog_Model_Category->orm()->where('is_enabled', 1)
                     ->order_by_asc('id')->offset($page * $pageSize)->limit($pageSize)->find_many();
                 foreach ($categories as $c) {
-                    $args['items'][] = ['loc' => $c->url()];
+                    $args['items'][] = [
+                        'loc' => $c->url(),
+                        'lastmod' => $c->get('update_at'),
+                        'changefreq' => $categoryChangeFreq,
+                        'priority' => $categoryPriority,
+                    ];
                 }
                 break;
 
             case 'products':
+                $productChangeFreq = $this->BConfig->get('modules/Sellvana_Seo/product_changefreq');
+                $productPriority = $this->BConfig->get('modules/Sellvana_Seo/product_priority');
+
                 $products = $this->Sellvana_Catalog_Model_Product->orm()->where('is_hidden', 0)
                     ->order_by_asc('id')->offset($page * $pageSize)->limit($pageSize)->find_many_assoc();
                 $media = $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
@@ -91,7 +102,13 @@ class Sellvana_Catalog_Frontend extends BClass
                             $images[] = $m->imageUrl(true);
                         }
                     }
-                    $args['items'][] = ['loc' => $p->url(), 'images' => $images];
+                    $args['items'][] = [
+                        'loc' => $p->url(),
+                        'lastmod' => $p->get('update_at'),
+                        'changefreq' => $productChangeFreq,
+                        'priority' => $productPriority,
+                        'images' => $images,
+                    ];
                 }
                 break;
         }
