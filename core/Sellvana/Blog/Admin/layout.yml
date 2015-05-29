@@ -5,6 +5,7 @@ base:
             - [ addNav, cms/category, { label: Blog Categories, href: /blog/category, pos: 110 } ]
 
 /blog/post/form:
+    - { include: default_form }
     - { include: lib_tokeninput }
     - { include: lib_wysihtml5 }
     - { include: jstree }

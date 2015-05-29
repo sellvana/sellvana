@@ -1,7 +1,7 @@
 Sellvana
 ========
 
-Current state: private alpha, not ready for demonstration.
+Current state: public alpha.
 
 Installation
 ------------
@@ -28,21 +28,21 @@ Test Data
 If you'd like to generate test catalog data, please open this URL (replace 127.0.0.1/sellvana with your location):
 
         http://127.0.0.1/sellvana/admin/index.php/catalogindex/test
-        
+
 This is a simple test script and should be ran only once.
 
 Fastest Performance Configuration
 ---------------------
 
-To test fastest configuration timing and best memory consumption, set the following configuration: 
+To test fastest configuration timing and best memory consumption, set the following configuration:
 
-1. Go to Admin > System > Settings 
+1. Go to Admin > System > Settings
 2. Areas > Fulleron Core
-   
+
     * DB Settings > Enable Logging = No
     * DB Settings > Implicit Migration = No
     * Optimizations > **All settings** = Enable Always
-    
+
 3. Areas > Fulleron Admin > Area Settings > IP: mode >  Default = DEVELOPMENT
 4. Areas > Fulleron Frontend > Area Settings > IP: mode >  Default = DEVELOPMENT
 
@@ -50,18 +50,18 @@ After setting this configuration and the first page load for cache warm up, clic
 
 The first line will have numbers like: `DELTA: 0.091005086898804, PEAK: 4456448, EXIT: 4456448`
 
-The first number is total seconds to load the page, PEAK is maximum memory used, and EXIT what was the memory usage at 
+The first number is total seconds to load the page, PEAK is maximum memory used, and EXIT what was the memory usage at
 the end of page request.
 
 Please note, that having `xdebug` or other debugging/profiling php extension enabled significantly reduces performance.
 
 Since the project is still in rapid development, restore the configuration to allow automatic code and data updates:
- 
+
 1. Areas > Fulleron Core
 
     * DB Settings > Implicit Migration = Yes
     * Optimizations > **All settings** = Enable in staging or production modes
- 
+
 
 Issues
 -------
@@ -155,14 +155,14 @@ Versioning
 
 Since all the functionality is contained in modules, the global Sellvana version is only an initial download package version.
 All the issue reports will require full list of currently installed module versions. If using built-in reporting, this will be done automatically.
- 
+
 The global Sellvana package versions are: `[X].[Y].[Z]` (example: `1.0.5`), where:
- 
+
   * `[X]` - Sellvana generation version, before stable is `0`, the first version is `1`, etc.
   * `[Y]` - Main release iteration version within the generation
   * `[Z]` - Bug and Security fixes releases version
   * All parts start from `0`.
- 
+
 The module versions are: `[X].[Y].[Z].[P]` (example: `1.0.12.1`), where:
 
   * `[X]` - Sellvana generation version, before stable is `0`, the first version is `1`, etc.

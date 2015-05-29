@@ -19,11 +19,10 @@ define(['backbone',  'jquery', 'unique', 'select2'], function(Backbone, $) {
                     class_button: 'remove-ip-mode btn-danger'
                 };
             }
-	    console.log(data);
-	    this.setElement(this.template(data));            
-            var select = this.$el.find('select').select2();
+            this.setElement(this.template(data));
+            var $select = this.$el.find('select').select2();
             if (typeof (mode) !== 'undefined') {
-                select.select2('val', mode);
+                $select.select2('val', mode);
             }
             return this;
         },
