@@ -2072,7 +2072,7 @@ class Sellvana_Sales_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_5_0__0_5_1()
+    public function upgrade__0_5_0_0__0_5_1()
     {
         $tOrder = $this->Sellvana_Sales_Model_Order->table();
 

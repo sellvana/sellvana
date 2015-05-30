@@ -1,0 +1,20 @@
+modules:
+    Sellvana_RecentlyViewed:
+        version: 0.5.0.0
+        channel: alpha
+        require: { module: { Sellvana_Catalog: 0.5.0.0, Sellvana_Customer: 0.5.0.0 } }
+
+        auto_use: [ layout, views ]
+
+        observe:
+            - [ "FCom_Core_LayoutEditor::fetchLibrary", "Sellvana_RecentlyViewed_Main.onLayoutEditorFetchLibrary" ]
+
+        areas:
+            FCom_Frontend:
+                observe:
+                    - [ "Sellvana_Catalog_Frontend_Controller_Product::action_index:product", "Sellvana_RecentlyViewed_Main.onProductView" ]
+
+        default_config:
+            modules:
+                Sellvana_RecentlyViewed:
+                    cookie_token_ttl_days: 365

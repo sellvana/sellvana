@@ -1,0 +1,2 @@
+/:
+    - { hook: homepage-additional, views: catalog/recently-viewed }

@@ -30,5 +30,5 @@ modules:
                     page_size: 1000
                     category_changefreq: weekly
                     category_priority: .6
-                    product_changefreq: daily
+                    product_changefreq: weekly
                     product_priority: .9
