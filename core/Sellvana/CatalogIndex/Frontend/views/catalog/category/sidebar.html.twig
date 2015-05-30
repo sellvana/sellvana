@@ -1,6 +1,8 @@
 {% set facets = THIS.get('products_data')['facets'] %}
 {% set s = THIS.products_data['state'] %}
 {% set hlp = APP.instance('Sellvana_CatalogIndex_Main') %}
+{% set collapsed = UTIL.fromJson(REQUEST.cookie('collapsed_facets')) %}
+
 <section class="f-prod-listing-filter">
     <header class="f-widget-header">
         <strong class="f-widget-title">{{ "Narrow Results" |_ }}</strong>
@@ -13,23 +15,31 @@
                     {% if facet['custom_view'] %}
                         {{ THIS.view( facet['custom_view'], { 'facet_key': fKey, 'facet': facet, 'products_data': THIS.get('products_data') })| raw }}
                     {% elseif facet['values'] %}
-                        <dt>{{ facet['display']|_ }}</dt>
+                        <dt>
+                            <a href="#" id="facet-chevron-{{ fKey }}" class="f-facet-title" data-facet-key="{{ fKey }}">
+                                {{ facet['display']|_ }} <span class="glyphicon glyphicon-chevron-{{ collapsed[fKey] ? 'up' : 'down' }}"></span>
+                            </a>
+                        </dt>
                         <dd>
                             <ul>
                                 {% for vKey, value in facet['values'] %}
                                     {% if value['selected'] %}
-                                        <li><a class="active" href="{{ hlp.getUrl(null, { (fKey): vKey}) }}">
+                                        <li class="active">
+                                            <a class="active" href="{{ hlp.getUrl(null, { (fKey): vKey}) }}">
                                                 <span class="glyphicon glyphicon-check"></span> {{ value['display']|_ }}
-                                            </a></li>
+                                            </a>
+                                        </li>
                                         {% if s['save_filter'] %}
                                             <input type="hidden" name="{{ fKey }}" value="{{ vKey }}"/>
                                         {% endif %}
                                     {% else %}
-                                        <li><a href="{{ hlp.getUrl({ (fKey): vKey}) }}">
+                                        <li {{ collapsed[fKey] ? 'style="display:none"' }}>
+                                            <a href="{{ hlp.getUrl({ (fKey): vKey}) }}">
                                                 <span class="glyphicon glyphicon-unchecked"></span> {{ value['display']|_ }}
                                                 {% if value['cnt'] %}<span
                                                         class="count">({{ value['cnt'] }})</span>{% endif %}
-                                            </a></li>
+                                            </a>
+                                        </li>
                                     {% endif %}
                                 {% endfor %}
                             </ul>
@@ -40,3 +50,22 @@
         {% endif %}
     </form>
 </section>
+
+<script>
+    require(['jquery', 'jquery.cookie'], function($) {
+        var collapsed = {{ REQUEST.cookie('collapsed_facets') | default('{}') | raw }};
+        $('.f-prod-listing-filter .f-facet-title').each(function(idx, el) {
+            var $a = $(el), fKey = $a.data('facet-key'), $ul = $a.parent().next('dd').find('ul');
+
+            $a.click(function(ev) {
+                $a.find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+                $ul.find('li:not(.active)').toggle();
+
+                collapsed[fKey] = collapsed[fKey] ? false : true;
+                $.cookie('collapsed_facets', JSON.stringify(collapsed));
+
+                return false;
+            });
+        })
+    });
+</script>
