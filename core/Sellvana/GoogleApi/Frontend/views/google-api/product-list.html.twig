@@ -1,0 +1,21 @@
+{% set conf = CONFIG.get('modules/Sellvana_GoogleApi') %}
+
+{% if conf.ua_enable and conf.ua_key and conf.ua_enable_ec %}
+    {% set ga = APP.instance('Sellvana_GoogleApi_Frontend').getProductListData(THIS) %}
+
+    <script>
+        (function() {
+            var items = {{ UTIL.toJson(ga.items) | raw }}, i;
+            for (i in items) {
+                items[i].list = '{{ THIS.get('list_name') }}';
+                ga('ec:addImpression', items[i]);
+            }
+
+            gaProductLists['{{ THIS.get('list_id') }}'] = {
+                name: '{{ THIS.get('list_name') }}',
+                items: items
+            };
+
+        })();
+    </script>
+{% endif %}

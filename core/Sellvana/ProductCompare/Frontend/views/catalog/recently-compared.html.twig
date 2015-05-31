@@ -6,13 +6,17 @@
         <header class="f-widget-header">
             <strong class="f-widget-title">{{ 'Recently Compared Products'|_ }}</strong>
         </header>
-        {{ THIS.view('catalog/product/grid-tiles').set({
-            lg_columns: cnt,
-            md_columns: cnt,
-            sm_columns: 4,
-            xs_columns: 2,
-            products: products
-        }) | raw }}
+        <div class="f-widget-content">
+            {{ THIS.view('catalog/product/grid-tiles').set({
+                lg_columns: cnt,
+                md_columns: cnt,
+                sm_columns: 4,
+                xs_columns: 2,
+                products: products,
+                simple_view: true,
+                list_name: 'Recently Compared',
+            }) | raw }}
+        </div>
     </div><!-- /.f-widget-recently-compared-prods -->
     <div class="clearfix"></div>
 

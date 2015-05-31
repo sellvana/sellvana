@@ -42,7 +42,7 @@ require(['jquery', 'jquery.validate', 'jquery.cookie'], function($) {
         $('#login-form').validate();
     })
 
-    $.cookie('check-cookies', true);
+    $.cookie('check-cookies', true, FCom.cookie_options);
     if (!$.cookie('check-cookies')) {
         $("#login-cookie-message").html('<div class="alert alert-danger">{{ "This login form requires cookies enabled"|_ }}</div>');
     }

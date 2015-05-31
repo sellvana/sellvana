@@ -25,6 +25,7 @@ modules:
                 Sellvana_Email: 0.5.0.0
                 Sellvana_Feedback: 0.5.0.0
                 Sellvana_FrontendThemeBootSimple: 0.5.0.0
+                Sellvana_GoogleApi: 0.5.0.0
                 Sellvana_MarketClient: 0.5.0.0
                 Sellvana_MultiCurrency: 0.5.0.0
                 Sellvana_MultiLanguage: 0.5.0.0

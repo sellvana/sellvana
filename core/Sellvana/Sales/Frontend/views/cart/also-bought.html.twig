@@ -2,9 +2,15 @@
 {% set products = [] %}
 {% if cart.itemQty() and products %}
 <div class="f-widget f-widget-featured-prods">
-  <header class="f-widget-header">
-    <strong class="f-widget-title">Customers who bought items in your cart also bought</strong>
-  </header>
-  {{ THIS.view('catalog/product/grid-tiles').set('products', products) | raw }}
+    <header class="f-widget-header">
+        <strong class="f-widget-title">Customers who bought items in your cart also bought</strong>
+    </header>
+    <div class="f-widget-content">
+      {{ THIS.view('catalog/product/grid-tiles').set({
+          products: products,
+          simple_view: true,
+          list_name: 'Also Bought',
+      }) | raw }}
+    </div>
 </div><!-- /.f-widget-featured-prods -->
 {% endif %}

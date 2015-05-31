@@ -36,11 +36,6 @@ class Sellvana_Catalog_Frontend extends BClass
         return $this->Sellvana_Catalog_Model_Product->orm()->where('is_popular', 1)->limit($cnt)->find_many();
     }
 
-    public function getRecentlyViewedProducts()
-    {
-        return [];
-    }
-
     public function onSitemapsIndexXmlBefore($args)
     {
         $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size');

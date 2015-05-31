@@ -1,2 +1,5 @@
 /:
     - { hook: homepage-additional, views: catalog/recently-viewed }
+
+/catalog/product:
+    - { hook: main, views: catalog/recently-viewed }

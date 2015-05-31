@@ -1,5 +1,5 @@
 modules:
-    Sellvana_GoogleAnalytics:
+    Sellvana_GoogleApi:
         version: 0.5.0.0
         channel: alpha
 

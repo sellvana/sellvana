@@ -62,7 +62,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                     var s = result.product;
                     selected.push(s);
                     thumb(s, selected.length - 1);
-                    $.cookie(cookieName, JSON.stringify(selected), {expires: 1});
+                    $.cookie(cookieName, JSON.stringify(selected), FCom.cookie_options);
                     $('.compare-num-products').html(selected.length);
                     $(opt.thumbContainer).addClass('set');
                     //console.log('animate start');
@@ -99,7 +99,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                     ul.children().get(i).remove();
                     ul.append('<li class="item"/>');
                     selected.splice(i, 1);
-                    $.cookie(cookieName, JSON.stringify(selected), {expires: 1});
+                    $.cookie(cookieName, JSON.stringify(selected), FCom.cookie_options);
 
                     if (trigger) {
                         var colIdx = $(trigger).closest('th,td').get(0).cellIndex;

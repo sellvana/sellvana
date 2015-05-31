@@ -62,7 +62,7 @@
                 $ul.find('li:not(.active)').toggle();
 
                 collapsed[fKey] = collapsed[fKey] ? false : true;
-                $.cookie('collapsed_facets', JSON.stringify(collapsed));
+                $.cookie('collapsed_facets', JSON.stringify(collapsed), FCom.cookie_options);
 
                 return false;
             });
