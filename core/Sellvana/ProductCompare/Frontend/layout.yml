@@ -13,3 +13,6 @@ base:
 
 /catalog/compare/xhr:
     - { root: catalog/compare }
+
+/:
+    - { hook: homepage-additional, views: catalog/recently-compared }

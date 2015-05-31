@@ -56,7 +56,7 @@ class Sellvana_MultiSite_Migrate extends BClass
         ]);
     }
     
-    public function upgrade__0_5_0__0_5_1()
+    public function upgrade__0_5_0_0__0_5_1()
     {
         $tSite = $this->Sellvana_MultiSite_Model_Site->table();
         $this->BDb->ddlTableDef($tSite, [

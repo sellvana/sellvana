@@ -570,6 +570,17 @@ class BRequest extends BClass
         return $path;
     }
 
+    public function getCookieConfigJson()
+    {
+        $config = $this->BConfig->get('cookie');
+        return $this->BUtil->toJson([
+            'domain' => $this->getCookieDomain(),
+            'path' => $this->getCookiePath(),
+            'expires' => (!empty($config['timeout']) ? $config['timeout'] / 86400 : null),
+            'secure' => $this->https(),
+        ]);
+    }
+
     /**
      * Set or retrieve cookie value
      *

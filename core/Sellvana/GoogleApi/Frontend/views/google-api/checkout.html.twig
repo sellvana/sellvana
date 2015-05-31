@@ -1,0 +1,18 @@
+{% set conf = CONFIG.get('modules/Sellvana_GoogleApi') %}
+
+{% if conf.ua_enable and conf.ua_key and conf.ua_enable_ec %}
+    {% set ga = APP.instance('Sellvana_GoogleApi_Frontend').getCartData() %}
+    <script>
+
+        (function() {
+
+            var items = {{ UTIL.toJson(ga.items) | raw }}, i;
+            for (i in items) {
+                ga('ec:addProduct', items[i]);
+            }
+            ga('ec:setAction', 'checkout', {'step': '{{ THIS.get('step') }}' });
+
+        })()
+
+    </script>
+{% endif %}

@@ -565,10 +565,7 @@ class FCom_Core_Main extends BClass
 
         $text = "
 FCom = {};
-FCom.cookie_options = " . $this->BUtil->toJson([
-                'domain' => !empty($cookieConfig['domain']) ? $cookieConfig['domain'] : null,
-                'path' => !empty($cookieConfig['path']) ? $cookieConfig['path'] : null,
-            ]) . ";
+FCom.cookie_options = " . $this->BRequest->getCookieConfigJson() . ";
 FCom.base_href = '" . $this->BApp->baseUrl() . "';
 FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
         ";

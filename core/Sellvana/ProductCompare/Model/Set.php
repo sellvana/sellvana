@@ -13,6 +13,7 @@
  * @property Sellvana_ProductCompare_Model_SetItem Sellvana_ProductCompare_Model_SetItem
  * @property Sellvana_Customer_Model_Customer Sellvana_Customer_Model_Customer
  * @property Sellvana_Catalog_Model_Product Sellvana_Catalog_Model_Product
+ * @property Sellvana_ProductCompare_Model_History $Sellvana_ProductCompare_Model_History
  */
 class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
 {
@@ -182,6 +183,9 @@ class Sellvana_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
             $item = $this->Sellvana_ProductCompare_Model_SetItem->create($data);
             $item->set('create_at', BDb::now())->save();
         }
+
+        $this->Sellvana_ProductCompare_Model_History->addItem($item, $this);
+
         return $item;
     }
 
