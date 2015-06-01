@@ -2082,6 +2082,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'token_at' => "datetime default null",
             ],
             BDb::KEYS => [
+                'FK_cart_id' => '(cart_id)',
                 'UNQ_cart_id' => BDb::DROP,
                 'UNQ_token' => 'UNIQUE (token)',
             ]
