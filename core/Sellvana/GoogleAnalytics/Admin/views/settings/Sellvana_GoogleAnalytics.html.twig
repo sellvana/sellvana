@@ -1,0 +1,10 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'Sellvana_GoogleAnalytics' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+<h2>{{ "Google Analytics Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_GoogleAnalytics'}) }}
+    {{ forms.accordion_panel_start({label:'Google Analytics Settings'|_, id:'settings-Sellvana_GoogleAnalytics-group0', in:1}) }}
+        {{ forms.input(fieldData, {field:'key', label:'GA Account Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'domain', label:'GA Account Domain'|_ }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

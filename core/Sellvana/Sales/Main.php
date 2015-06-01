@@ -258,7 +258,14 @@ class Sellvana_Sales_Main extends BClass
                 $this->_registry['workflow'][$workflow] = $class;
             }
             if (method_exists($class, $method)) {
-                $result[] = $class->$method($args);
+                try {
+                    $result[] = $class->$method($args);
+                } catch (Sellvana_Sales_Workflow_Exception_Recoverable $e) {
+                    $result['errors'][] = [
+                        'workflow' => $workflow,
+                        'message' => $e->getMessage(),
+                    ];
+                }
             }
         }
         return $result;
