@@ -439,9 +439,9 @@ class FCom_Core_LayoutEditor extends BClass
                 $args['layout'][] = ['view' => $view_name, 'set' => $update];
             },
         ]);
-/*
-        $this->addWidgetType('file_upload', [
-            'title'       => 'File Upload',
+
+        $this->addWidgetType('insert_media', [
+            'title'       => 'Insert Media',
             'pos'         => 130,
             'source_view' => 'core/widgets/media',
             'view_name'   => 'widgets/media',
@@ -449,17 +449,12 @@ class FCom_Core_LayoutEditor extends BClass
                 $w                = $args['widget'];
                 $view_name        = $w['view_name'];
 
-                $folder = !empty($w['folder'])? $w['folder']: null;
-                if (!empty($w['subfolder'])) {
-                    $folder .= '/' . trim($w['subfolder'], '/');
-                }
-
                 $args['layout'][] = ['hook' => $w['area'], 'views' => $view_name];
                 $update = [
                     'widget_id'      => $w['id'],
-                    'folder'         => $folder,
-                    'filetype_regex' => !empty($w['filetype_regex'])? str_replace(',', '|', $w['filetype_regex']): null,
-                    'multiple'       => !empty($w['multiple'])? $w['multiple']: null,
+                    'src' => $w['src'],
+                    'width' => $w['width'],
+                    'height' => $w['height'],
                 ];
 
                 if (!empty($w['custom_params'])) {
@@ -470,7 +465,7 @@ class FCom_Core_LayoutEditor extends BClass
                 $args['layout'][] = ['view' => $view_name, 'set' => ['config' => $update]];
             },
         ]);
-*/
+
         $this->addWidgetType('remove', [
             'title' => 'Remove View',
             'pos' => 100,

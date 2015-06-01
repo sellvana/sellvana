@@ -1,4 +1,4 @@
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_PaymentIdeal, { label: iDEAL, group: payment_methods, async: true } ]
+            - [ addTab, Sellvana_PaymentIdeal, { label: iDEAL, group: payment_methods, async: true, permission: settings/Sellvana_PaymentIdeal } ]

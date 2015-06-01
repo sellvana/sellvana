@@ -1,2 +1,2 @@
 /settings:
-    - { view: settings, do: [[ addTab, Sellvana_ProductCompare, { label: Product Comparison, group: catalog, async: true } ]] }
+    - { view: settings, do: [[ addTab, Sellvana_ProductCompare, { label: Product Comparison, group: catalog, async: true, permission: settings/Sellvana_ProductCompare } ]] }

@@ -2,7 +2,9 @@
 
 /**
  * Class FCom_AutoTranslate_Main
- */
+ *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+*/
 class FCom_AutoTranslate_Main extends BClass
 {
     protected $_cacheFile;
@@ -14,6 +16,10 @@ class FCom_AutoTranslate_Main extends BClass
 
     public function bootstrap()
     {
+        $this->FCom_Admin_Model_Role->createPermission([
+            'settings/FCom_AutoTranslate' => BLocale::i()->_('Auto Translate Settings'),
+        ]);
+
         $this->_apiKey = $this->BConfig->get('modules/FCom_AutoTranslate/google_api_key');
         if ($this->_apiKey) {
             $this->_requestLang = $this->BLocale->getCurrentLanguage();

@@ -27,6 +27,7 @@ class Sellvana_Email_Main extends BClass
 
         $this->FCom_Admin_Model_Role->createPermission([
             'subscriptions' => 'Email Subscriptions',
+            'settings/email' => 'Email Settings',
         ]);
     }
 

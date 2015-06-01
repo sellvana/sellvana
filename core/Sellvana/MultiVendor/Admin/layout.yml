@@ -11,4 +11,4 @@ catalog_product_form_tabs:
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_MultiVendor, { label: Multi Vendor, group: catalog, async: true } ]
+            - [ addTab, Sellvana_MultiVendor, { label: Multi Vendor, group: catalog, async: true, permission: settings/Sellvana_MultiVendor } ]

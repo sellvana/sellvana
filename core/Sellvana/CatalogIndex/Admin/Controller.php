@@ -26,10 +26,21 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
             //$this->Sellvana_CatalogIndex_Indexer->indexDropDocs(true);
             $this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
         }
+        $this->BCache->save('index_progress_total', 0);
+        $this->BCache->save('index_progress_reindexed', 0);
+
         $this->Sellvana_CatalogIndex_Indexer->indexProducts(true);
         $this->Sellvana_CatalogIndex_Indexer->indexGC();
         echo 'DONE';
         exit;
+    }
+
+    public function action_progress()
+    {
+        $this->BResponse->json([
+            'total'     => $this->BCache->load('index_progress_total'),
+            'reindexed' => $this->BCache->load('index_progress_reindexed')
+        ]);
     }
 
     public function action_test()

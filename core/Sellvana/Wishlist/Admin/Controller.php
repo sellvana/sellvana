@@ -12,6 +12,7 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
     protected $_modelClass = 'Sellvana_Wishlist_Model_Wishlist';
     protected $_gridTitle = 'Wishlist';
     protected $_mainTableAlias = 'w';
+    protected $_permission = 'wishlist';
 
     public function gridConfig()
     {

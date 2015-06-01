@@ -4,4 +4,4 @@ base:
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_MultiLanguage, { label: Multi Language, group: catalog, pos: 150, async: true } ]
+            - [ addTab, Sellvana_MultiLanguage, { label: Multi Language, group: catalog, pos: 150, async: true, permission: settings/Sellvana_MultiLanguage } ]

@@ -177,7 +177,15 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var dataMode = this.props.getConfig('data_mode');
             this.setStateFilter(field, 'submit', !isClear);
 
-            var submitFilters = this.prepareFilter();
+            var submitAll = this.prepareFilter();
+            var submitFilters = {};
+
+            for (item in submitAll) {
+                // update submitFilters added object with field is status
+                if((submitAll[item] && submitAll[item].val) ||  submitAll[item].field !=="status" ){
+                    submitFilters[item] = submitAll[item];
+                }
+            }
             //console.log('submitFilters', submitFilters);
 
             if (dataMode == 'local') {
@@ -189,6 +197,9 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         },
         render: function() {
             //console.log('begin render filters');
+            if(_.isEmpty(this.state.filters)){
+                return null;
+            }
             var that = this;
             var id = this.props.getConfig('id');
             var filters = this.state.filters;

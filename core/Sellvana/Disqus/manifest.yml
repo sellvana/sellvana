@@ -15,6 +15,7 @@ modules:
                     #- [ BLayout::loadTheme:after, Sellvana_Disqus_Frontend::layout ]
 
             FCom_Admin:
+                auto_use: [ bootstrap ]
                 security:
                     request_fields_whitelist:
                         /settings:

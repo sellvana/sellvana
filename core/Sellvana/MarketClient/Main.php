@@ -4,9 +4,21 @@
  * Class Sellvana_MarketClient_Main
  *
  * @property Sellvana_MarketClient_RemoteApi $Sellvana_MarketClient_RemoteApi
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
 class Sellvana_MarketClient_Main extends BClass
 {
+    public function bootstrap()
+    {
+        $this->FCom_Admin_Model_Role->createPermission([
+            'settings/Sellvana_MarketClient' => BLocale::i()->_('Market Client Settings'),
+            'market_client' => BLocale::i()->_('Market Client'),
+            'market_client/install' => BLocale::i()->_('Market Client Install'),
+            'market_client/publish' => BLocale::i()->_('Market Client Publish'),
+        ]);
+
+    }
+
     /**
      * @param null $data
      * @param bool $reset
@@ -23,8 +35,9 @@ class Sellvana_MarketClient_Main extends BClass
     }
 
     /**
-     * @param $modules
+     * @param array $modules
      * @param bool $force
+     * @return array
      * @throws BException
      */
     public function downloadAndInstall($modules, $force = false)

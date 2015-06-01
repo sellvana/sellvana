@@ -1,7 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ */
 class Sellvana_ShopperFields_Admin extends BClass
 {
+    public function bootstrap()
+    {
+        $this->FCom_Admin_Model_Role->createPermission([
+            'shopper_fields' => BLocale::i()->_('Product Shopper Fields'),
+        ]);
+    }
+
     public function onProductFormPostAfterValidate($args)
     {
         $model = $args['model'];
@@ -54,19 +64,18 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ['field' => 'options', 'type' => 'text']
                 ],
                 'actions' => [
-                    'new' => ['caption' => 'Add Fields'],
-                    /*'add-blank-row' => [
+                    //'new' => ['caption' => 'Add Fields'],
+                    'add-blank-row' => [
                         'caption'  => 'Add Fields',
                         'type'     => 'button',
                         'id'       => 'add-blank-row',
                         'class'    => 'btn-primary',
                         'callback' => 'addBlankRows'
-                    ],*/
+                    ],
                     'delete' => ['caption' => 'Remove']
                 ],
                 'callbacks' => [
-                    'componentDidMount' => 'fieldsGridRegister',
-                    //'componentDidUpdate' => 'fieldsGridRegister',
+                    'componentDidMount' => 'fieldsGridRegister'
                 ],
                 'grid_before_create' => 'frontendFieldGridRegister'
             ]

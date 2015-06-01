@@ -1,4 +1,4 @@
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_ShippingUps, { label: UPS, group: shipping_methods, async: true } ]
+            - [ addTab, Sellvana_ShippingUps, { label: UPS, group: shipping_methods, async: true, permission: settings/Sellvana_ShippingUps } ]
