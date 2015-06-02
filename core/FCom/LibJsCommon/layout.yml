@@ -21,6 +21,10 @@ common_js_libs:
             - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
             - [ requireJs, bootstrap-notify, @FCom_LibJsCommon/js/bootstrap-notify.min, { deps: [ jquery, bootstrap ] } ]
 
+            - [ requireJs, typeahead-bundle, "@FCom_LibJsCommon/js/typeahead/typeahead-bundle" ]
+            - [ requireJs, bloodhound, "@FCom_LibJsCommon/js/typeahead/bloodhound" ]
+            - [ requireJs, typeahead, "@FCom_LibJsCommon/js/typeahead/typeahead.jquery" ]
+
             #ReactJs
             - [ requireConfig, { jsx: { fileExtension: '.jsx', harmony: true } } ]
             - [ requireJs, text, @FCom_LibJsCommon/js/text ]

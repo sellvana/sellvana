@@ -176,7 +176,7 @@ lib_admin_theme1:
             - [ requireJs, sparklines, "@FCom_Admin/Admin/theme1/assets/js/plugins/sparklines/jquery.sparkline.min", { deps: [ jquery ] } ]
             - [ requireJs, tabdrop, "@FCom_Admin/Admin/theme1/assets/js/plugins/tabdrop/bootstrap-tabdrop", { deps: [ jquery ] } ]
             - [ requireJs, timeago, "@FCom_Admin/Admin/theme1/assets/js/plugins/timeago/jquery.timeago", { deps: [ jquery ] } ]
-            - [ requireJs, typeahead, "@FCom_Admin/Admin/theme1/assets/js/plugins/typeahead/typeahead", { deps: [ jquery ] } ]
+            #- [ requireJs, typeahead, "@FCom_Admin/Admin/theme1/assets/js/plugins/typeahead/typeahead", { deps: [ jquery ] } ]
             - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/js/plugins/validate/jquery.validate.min", { deps: [ jquery ] } ]
 #            - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/js/plugins/validate/jquery.validate", { deps: [ jquery ] } ]
 
