@@ -368,8 +368,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'main_thumb', 'label' => 'Thumbnail', 'width' => 50, 'display' => 'eval',
                         'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
                             . ' "+(rc.row["main_thumb"]==1 ? checked=\'checked\' : \'\')+" '
-                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' '
-                            . 'data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'],
+                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' />"'],
+                    ['name' => 'rollover_thumb', 'label' => 'Rollover', 'width' => 50, 'display' => 'eval',
+                        'print' => '"<input class=\'rollover-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+                            . ' "+(rc.row["rollover_thumb"]==1 ? checked=\'checked\' : \'\')+" '
+                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[rollover_thumb]\' />"'],
                     ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
                     ['name' => 'update_at', 'label' => 'Updated', 'width' => 200],
                     ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
@@ -381,7 +384,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'quick_add' => [
                         'html' => '<span class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
                                      <i class="icon-plus icon-white"></i>
-                                     <span>Quick add images</span> <input type="file" name="upload[]" id="quick-add-images" multiple="">
+                                     <span>' . $this->BLocale->_('Quick add images') . '</span>
+                                     <input type="file" name="upload[]" id="quick-add-images" multiple="">
                                    </span>'
                     ],
                     'delete' => ['caption' => 'Remove'],

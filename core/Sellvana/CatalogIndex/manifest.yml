@@ -14,6 +14,7 @@ modules:
         default_config:
             modules/Sellvana_CatalogIndex/show_root_categories: 1
             modules/Sellvana_CatalogIndex/show_sibling_categories: 1
+            modules/Sellvana_CatalogIndex/active_indexer: builtin
         areas:
             FCom_Admin:
                 routing:

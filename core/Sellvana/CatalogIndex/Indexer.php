@@ -3,7 +3,6 @@
 /**
  * Class Sellvana_CatalogIndex_Indexer
  *
- * @method static Sellvana_CatalogIndex_Indexer i()
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
  * @property Sellvana_CatalogIndex_Model_DocSort $Sellvana_CatalogIndex_Model_DocSort
@@ -17,104 +16,9 @@
  * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  */
-class Sellvana_CatalogIndex_Indexer extends BClass
+class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstract
+    implements Sellvana_CatalogIndex_Indexer_Interface
 {
-    protected static $_maxChunkSize = 100;
-    protected static $_indexData;
-    protected static $_filterValues;
-    protected static $_cnt_reindexed;
-    protected static $_cnt_total;
-
-    public function indexProducts($products)
-    {
-        if (empty($products)) {
-            return;
-        }
-        /** @var FCom_PushServer_Model_Client $pushClient */
-        $pushClient = $this->FCom_PushServer_Model_Client->sessionClient();
-        if ($products === true) {
-            $i = 0;
-            //$start = 0;
-            $t = time();
-            $orm = $this->Sellvana_Catalog_Model_Product
-                ->orm('p')->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
-                ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']]);
-            if (empty(static::$_cnt_total)) {
-                $count              = clone $orm;
-                static::$_cnt_total = $count->count();
-                $this->BCache->save('index_progress_total', static::$_cnt_total);
-                $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'total' => static::$_cnt_total]);
-            }
-            do {
-                $products = $orm
-                    ->limit(static::$_maxChunkSize)
-                    //->offset($start)
-                    ->find_many();
-                $this->indexProducts($products);
-                echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
-                    . ' - ' . (time() - $t) . "s\n";
-                $t = time();
-                //$start += static::$_maxChunkSize;
-            } while (sizeof($products) == static::$_maxChunkSize);
-            return;
-        }
-
-        if (sizeof($products) > static::$_maxChunkSize) {
-            $chunks = array_chunk($products, static::$_maxChunkSize);
-            foreach ($chunks as $i => $chunk) {
-                $this->indexProducts($chunk);
-                echo 'DONE CHUNK ' . $i . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true) . "\n";
-            }
-            return;
-        }
-
-        $pIds = [];
-        $loadIds = [];
-        /**
-         * @var int $i
-         * @var Sellvana_Catalog_Model_Product $p
-         */
-        foreach ($products as $i => $p) {
-            if (is_numeric($p)) {
-                $loadIds[$i] = (int)$p;
-                $pIds[] = (int)$p;
-            } else {
-                $pIds[] = $p->id();
-            }
-        }
-        if ($loadIds) {
-            $loadProducts = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $loadIds)->find_many_assoc();
-            foreach ($loadIds as $i => $p) {
-                if (!empty($loadProducts[$p])) {
-                    $products[$i] = $loadProducts[$p];
-                } else {
-                    unset($products[$i]);
-                }
-            }
-        }
-        if ($pIds) {
-            $this->indexDropDocs($pIds);
-        }
-        // TODO: Improve filtering out disabled products
-        foreach ($products as $i => $p) {
-            if ($p->isDisabled()) {
-                unset($products[$i]);
-            }
-        }
-
-        //TODO: for less memory usage chunk the products data
-        $this->_indexFetchProductsData($products);
-        $this->_indexFetchVariantsData($products);
-        static::$_cnt_reindexed += count($products);
-        unset($products);
-        $this->_indexSaveDocs();
-        $this->_indexSaveFilterData();
-        $this->_indexSaveSearchData();
-        $this->indexCleanMemory();
-        $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'reindexed' => static::$_cnt_reindexed]);
-        $this->BCache->save('index_progress_reindexed', static::$_cnt_reindexed);
-    }
-
     public function indexDropDocs($pIds)
     {
         if ($pIds === true) {
@@ -124,69 +28,12 @@ class Sellvana_CatalogIndex_Indexer extends BClass
         }
     }
 
-    protected function _indexFetchProductsData($products)
+    protected function _indexSaveData()
     {
-        $fields = $this->Sellvana_CatalogIndex_Model_Field->getFields();
-        static::$_indexData = [];
-
-        foreach ($fields as $fName => $field) {
-            $source = $field->source_callback ? $field->source_callback : $fName;
-            switch ($field->source_type) {
-            case 'field':
-                foreach ($products as $p) {
-                    static::$_indexData[$p->id()][$fName] = $p->get($source);
-                }
-                break;
-            case 'method':
-                foreach ($products as $p) {
-                    static::$_indexData[$p->id()][$fName] = $p->$source($field);
-                }
-                break;
-            case 'callback':
-                $fieldData = $this->BUtil->call($source, [$products, $field], true);
-                foreach ($fieldData as $pId => $value) {
-                    static::$_indexData[$pId][$fName] = $value;
-                }
-                break;
-            default:
-                throw new BException('Invalid source type');
-            }
-        }
-    }
-
-    protected function _indexFetchVariantsData($products)
-    {
-        if (!$this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
-            return;
-        }
-        $pIds = [];
-        foreach ($products as $p) {
-            $pIds[] = $p->id();
-        }
-        if (!$pIds) {
-            return;
-        }
-        $variants = $this->Sellvana_CustomField_Model_ProductVariant->orm()
-            ->where_in('product_id', $pIds)->find_many();
-        if (!$variants) {
-            return;
-        }
-        foreach ($variants as $v) {
-            $pId = $v->get('product_id');
-            $vFieldValues = $this->BUtil->fromJson($v->get('field_values'));
-            $fValues = [];
-            foreach ($vFieldValues as $field => $value) {
-                if (empty(static::$_indexData[$pId][$field])) {
-                    $fValues[$field] = [];
-                } else {
-                    $fValues[$field] = (array)static::$_indexData[$pId][$field];
-                }
-                $fValues[$field][] = $value;
-            }
-            foreach ($fValues as $field => $values) {
-                static::$_indexData[$pId][$field] = array_unique($values);
-            }
-        }
+        $this->_indexSaveDocs();
+        $this->_indexSaveFilterData();
+        $this->_indexSaveSearchData();
+        $this->_indexCleanMemory();
     }
 
     protected function _indexSaveDocs()
@@ -263,13 +110,6 @@ class Sellvana_CatalogIndex_Indexer extends BClass
     }
 
 
-    protected function _retrieveTerms($string)
-    {
-        $string = strtolower(strip_tags($string));
-        $string = preg_replace('#[^a-z0-9 \t\n\r]#', '', $string);
-        return preg_split('#[ \t\n\r]#', $string, null, PREG_SPLIT_NO_EMPTY);
-    }
-
     protected function _indexSaveSearchData()
     {
         $termHlp = $this->Sellvana_CatalogIndex_Model_Term;
@@ -308,6 +148,44 @@ class Sellvana_CatalogIndex_Indexer extends BClass
         }
     }
 
+    public function indexPendingProducts()
+    {
+        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {
+            /** @var FCom_PushServer_Model_Client $pushClient */
+            $pushClient = $this->FCom_PushServer_Model_Client->sessionClient();
+        } else {
+            $pushClient = null;
+        }
+
+        $i = 0;
+        //$start = 0;
+        $t = time();
+        $orm = $this->Sellvana_Catalog_Model_Product
+            ->orm('p')->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
+            ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']]);
+        if (empty(static::$_cnt_total)) {
+            $count = clone $orm;
+            static::$_cnt_total = $count->count();
+            $this->BCache->save('index_progress_total', static::$_cnt_total);
+            if ($pushClient) {
+                $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'total' => static::$_cnt_total]);
+            }
+        }
+        do {
+            $products = $orm
+                ->limit(static::$_maxChunkSize)
+                //->offset($start)
+                ->find_many();
+            $this->indexProducts($products);
+            echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
+                . ' - ' . (time() - $t) . "s\n";
+            $t = time();
+            //$start += static::$_maxChunkSize;
+        } while (sizeof($products) == static::$_maxChunkSize);
+
+        return $this;
+    }
+
     public function reindexField($field)
     {
         //TODO: implement 1 field reindexing for all affected products
@@ -316,13 +194,6 @@ class Sellvana_CatalogIndex_Indexer extends BClass
     public function reindexFieldValue($field, $value)
     {
         //TODO: implement 1 field value reindexing
-    }
-
-    public function indexCleanMemory($all = false)
-    {
-        static::$_indexData = null;
-        static::$_filterValues = null;
-        gc_collect_cycles();
     }
 
     public function indexGC()
@@ -338,34 +209,49 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         ");
     }
 
+
     /**
      * Search for products, facets and facet counts in index
      *
-     * @param string $search
-     * @param array $filters
-     * @param string $sort
-     * @param array $options
-     * @return array ['orm'=>$orm, 'facets'=>$facets]
+     * @param array $params
+     * @return array ['orm'=>$orm, 'facets'=>$bus['result']['facets']]
      */
-    public function searchProducts($search = null, $filters = null, $sort = null, $options = [])
+    public function searchProducts(array $params = [])
     {
-        $config = $this->BConfig->get('modules/Sellvana_CatalogIndex');
-        if (is_null($filters)) {
-            $filters = $this->Sellvana_CatalogIndex_Main->parseUrl();
+        $bus = $this->_buildBus($params);
+
+        $this->_searchQuery($bus);
+        if (!empty($bus['ready'])) {
+            return $bus['result'];
         }
 
-        // base products ORM object
-        $productsOrm = $this->Sellvana_Catalog_Model_Product->orm('p')
-            ->join('Sellvana_CatalogIndex_Model_Doc', ['d.id', '=', 'p.id'], 'd');
+        $this->_searchRetrieveFilterFields($bus);
+        $this->_searchRetrieveFilterFieldValues($bus);
+        $this->_searchApplyFacetFilters($bus);
 
-        $req = $this->BRequest;
-        // apply term search
-
-        if (is_null($search)) {
-            $search = $req->get('q');
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
+            $this->Sellvana_CustomField_Main->disable(true);
         }
-        if ($search) {
-            $terms = $this->_retrieveTerms($search);
+
+        $this->_searchCalcFacetValueCounts($bus);
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
+            $this->Sellvana_CustomField_Main->disable(false);
+        }
+
+        $this->_searchFormatCategoryFacets($bus);
+        $this->_searchSort($bus);
+
+        return $bus['result'];
+    }
+
+    protected function _searchQuery(&$bus)
+    {
+        if (is_null($bus['request']['query'])) {
+            $bus['request']['query'] = $bus['request']['http']->get('q');
+        }
+        if ($bus['request']['query']) {
+            $terms = $this->_retrieveTerms($bus['request']['query']);
             //TODO: put weight for `position` in search relevance
             $tDocTerm = $tDocTerm = $this->Sellvana_CatalogIndex_Model_DocTerm->table();
             $orm = $this->Sellvana_CatalogIndex_Model_Term->orm();
@@ -373,86 +259,85 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $orm->where_raw("term regexp '(" . join('|', $terms) . ")'");
             $termIds = $orm->find_many_assoc('term', 'id');
             if ($termIds) {
-                $productsOrm->where([
+                $bus['products_orm']->where([
                     ["(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt WHERE term_id IN (?)))", array_values($termIds)],
                 ]);
             } else {
-                $productsOrm->where_raw('0');
-                return ['orm' => $productsOrm, 'facets' => []];
+                $bus['result']['orm']->where_raw('0');
+                $bus['result']['facets'] = [];
+                $bus['ready'] = true;
             }
         }
+    }
 
-        // result for facet counts
-        $facets = [];
-
-        // retrieve facet field information
-        $filterFields = $this->BDb->many_as_array($this->Sellvana_CatalogIndex_Model_Field->getFields('filter'));
-        $filterFieldNamesById = [];
-        foreach ($filterFields as $fName => $field) {
-            $filterFieldNamesById[$field['id']] = $fName;
-            $facets[$fName] = [// init for sorting
+    protected function _searchRetrieveFilterFields(&$bus)
+    {
+        $bus['filter']['fields'] = $this->Sellvana_CatalogIndex_Model_Field->getFields('filter');
+        $bus['filter']['fields'] = $this->BDb->many_as_array($bus['filter']['fields']);
+        $bus['filter']['field_names_by_id'] = [];
+        foreach ($bus['filter']['fields'] as $fName => $field) {
+            $bus['filter']['field_names_by_id'][$field['id']] = $fName;
+            $bus['result']['facets'][$fName] = [// init for sorting
                 'display' => $field['field_label'],
                 'custom_view' => !empty($field['filter_custom_view']) ? $field['filter_custom_view'] : null,
             ];
-            $filterFields[$fName]['values'] = [];
-            $filterFields[$fName]['value_ids'] = [];
+            $bus['filter']['fields'][$fName]['values'] = [];
+            $bus['filter']['fields'][$fName]['value_ids'] = [];
             // take category filter from options if available
-            if (!empty($options['category']) && $field['field_type'] == 'category') {
-                $filters[$fName] = $options['category']->get('url_path');
+            if (!empty($bus['request']['params']['options']['category']) && $field['field_type'] == 'category') {
+                /** @var Sellvana_Catalog_Model_Category $category */
+                $category = $bus['request']['params']['options']['category'];
+                $bus['request']['filters'][$fName] = $category->get('url_path');
             }
         }
+    }
 
-        // retrieve facet field values information
-        $filterValues = $this->BDb->many_as_array($this->Sellvana_CatalogIndex_Model_FieldValue->orm()
-            ->where_in('field_id', array_keys($filterFieldNamesById))->find_many_assoc('id'));
-        $filterValueIdsByVal = [];
-        foreach ($filterValues as $vId => $v) {
-            $fName = $filterFieldNamesById[$v['field_id']];
-            $field = $filterFields[$fName];
+    protected function _searchRetrieveFilterFieldValues(&$bus)
+    {
+        $bus['filter']['values'] = $this->BDb->many_as_array($this->Sellvana_CatalogIndex_Model_FieldValue->orm()
+            ->where_in('field_id', array_keys($bus['filter']['field_names_by_id']))->find_many_assoc('id'));
+        $bus['filter']['value_ids_by_val'] = [];
+        foreach ($bus['filter']['values'] as $vId => $v) {
+            $fName = $bus['filter']['field_names_by_id'][$v['field_id']];
+            $field = $bus['filter']['fields'][$fName];
             if ($field['field_type'] == 'category') {
                 $lvl = sizeof(explode('/', $v['val']));
-                if (empty($filters[$field['field_name']]) && $lvl > 1) {
-                    unset($filterValues[$vId]); // show only top level categories if no category selected
+                if (empty($bus['request']['filters'][$field['field_name']]) && $lvl > 1) {
+                    unset($bus['filter']['values'][$vId]); // show only top level categories if no category selected
                     continue;
                 }
-                $filterValues[$vId]['category_level'] = $lvl;
+                $bus['filter']['values'][$vId]['category_level'] = $lvl;
             }
-            $filterFields[$fName]['values'][$vId] = $v;
-            $filterFields[$fName]['value_ids'][$vId] = $vId;
-            $filterValueIdsByVal[$v['field_id']][$v['val']] = $vId;
+            $bus['filter']['fields'][$fName]['values'][$vId] = $v;
+            $bus['filter']['fields'][$fName]['value_ids'][$vId] = $vId;
+            $bus['filter']['value_ids_by_val'][$v['field_id']][$v['val']] = $vId;
         }
+    }
 
-        // apply facet filters
-        $facetFilters = [];
+    protected function _searchApplyFacetFilters(&$bus)
+    {
+        $config = $bus['config'];
+        /** @var BRequest $req */
+        $req = $bus['request']['http'];
+
+        $bus['filter']['facets'] = [];
         //$tFieldValue = $this->Sellvana_CatalogIndex_Model_FieldValue->table();
         $tDocValue = $this->Sellvana_CatalogIndex_Model_DocValue->table();
-        foreach ($filterFields as $fName => $field) {
+        foreach ($bus['filter']['fields'] as $fName => $field) {
             if ($field['filter_type'] === 'range') {
-                $rangeWhere = [];
-                $from = (int)$req->request($fName . '_from');
-                $to = (int)$req->request($fName . '_to');
-                if ($from) {
-                    $rangeWhere[] = 'dv.value_decimal >= ' . $from;
-                }
-                if ($to) {
-                    $rangeWhere[] = 'dv.value_decimal <= ' . $to;
-                }
-                if ($rangeWhere) {
-                    $productsOrm->where_raw("(p.id in (SELECT dv.doc_id from {$tDocValue} dv WHERE field_id={$field['id']} AND "
-                         . join(' AND ', $rangeWhere) . '))');
-                }
+                $this->_searchApplyFacetFilters_processRange($bus, $fName, $field, $tDocValue);
                 continue;
             }
 
-            $fReqValues = !empty($filters[$fName]) ? (array)$filters[$fName] : null;
+            $fReqValues = !empty($bus['request']['filters'][$fName]) ? (array)$bus['request']['filters'][$fName] : null;
             if (!empty($fReqValues)) { // request has filter by this field
                 $fReqValueIds = [];
                 foreach ($fReqValues as $v) {
-                    if (empty($filterValueIdsByVal[$field['id']][$v])) {
+                    if (empty($bus['filter']['value_ids_by_val'][$field['id']][$v])) {
                         //TODO: error on invalid filter requested value?
                         continue;
                     }
-                    $fReqValueIds[] = $filterValueIdsByVal[$field['id']][$v];
+                    $fReqValueIds[] = $bus['filter']['value_ids_by_val'][$field['id']][$v];
                 }
                 if (empty($fReqValueIds)) {
                     $whereArr = [
@@ -465,125 +350,156 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 }
                 // order of following actions is important!
                 // 1. add filter condition to already created filter ORMs
-                foreach ($facetFilters as $ff) {
+                foreach ($bus['filter']['facets'] as $ff) {
                     if ($ff['orm'] !== true) {
                         $ff['orm']->where($whereArr);
                     }
                 }
                 // 2. clone filter facets condition before adding current filter
                 if ($field['filter_type'] == 'inclusive' || $field['filter_multivalue']) {
-                    $facetFilters[$fName] = [
-                        'orm'        => clone $productsOrm,
+                    $bus['filter']['facets'][$fName] = [
+                        'orm' => clone $bus['result']['orm'],
                         'multivalue' => $field['filter_multivalue'],
-                        'field_ids'  => [$field['id']],
+                        'field_ids' => [$field['id']],
                         'skip_value_ids' => [],
                     ];
                 }
                 // 3. add filter condition to products ORM
-                $productsOrm->where($whereArr);
-
+                $bus['result']['orm']->where($whereArr);
 
                 foreach ($fReqValues as $v) {
                     $v = strtolower($v);
-                    if (empty($filterValueIdsByVal[$field['id']][$v])) {
+                    if (empty($bus['filter']['value_ids_by_val'][$field['id']][$v])) {
                         continue;
                     }
-                    $vId = $filterValueIdsByVal[$field['id']][$v];
-                    $value = $filterValues[$vId];
+                    $vId = $bus['filter']['value_ids_by_val'][$field['id']][$v];
+                    $value = $bus['filter']['values'][$vId];
                     $display = !empty($value['display']) ? $value['display'] : $v;
                     $fName = $field['field_name'];
-                    $facets[$fName]['values'][$v]['display'] = $display;
-                    $facets[$fName]['values'][$v]['selected'] = 1;
+                    $bus['result']['facets'][$fName]['values'][$v]['display'] = $display;
+                    $bus['result']['facets'][$fName]['values'][$v]['selected'] = 1;
 
                     if ($field['field_type'] == 'category') {
-                        $valueArr = explode('/', $v);
-                        $curLevel = sizeof($valueArr);
-                        $valueParent = join('/', array_slice($valueArr, 0, $curLevel - 1));
-                        $facets[$fName]['values'][$v]['level'] = $value['category_level'];
-                        //$countValueIds = [];
-                        foreach ($filterValues as $vId1 => $value1) {
-                            $vVal = $value1['val'];
-                            if (empty($value1['category_level']) || $vId === $vId1) {
-                                continue; // skip other fields or same category value
-                            }
-                            $showCategory = false;
-                            $showCount = false;
-                            $isParent = false;
-                            if ($value1['category_level'] === $curLevel + 1 && strpos($vVal . '/', $v . '/') === 0) {
-                                // display and count children
-                                $showCategory = true;
-                                $showCount = true;
-                            } elseif (strpos($v, $vVal . '/') === 0) {
-                                // display parent categories
-                                $showCategory = true;
-                                $isParent = true;
-                            } elseif (!empty($config['show_root_categories']) && $value1['category_level'] === 1) {
-                                // display root categories
-                                $showCategory = true;
-                                $isParent = true;
-                                //$showCount = true;
-                            } elseif (!empty($config['show_sibling_categories'])
-                                && $value1['category_level'] === $curLevel && strpos($vVal, $valueParent . '/') === 0
-                            ) {
-                                // display siblings of current category
-                                $showCategory = true;
-                                $showCount = true;
-                            }
-                            if ($showCategory) {
-                                $facets[$fName]['values'][$vVal]['display'] = $value1['display'];
-                                $facets[$fName]['values'][$vVal]['level'] = $value1['category_level'];
-                                if ($isParent) {
-                                    $facets[$fName]['values'][$vVal]['parent'] = 1;
-                                }
-                                if ($showCount) {
-                                    $facetFilters[$fName]['count_value_ids'][$vId1] = $vId1;
-                                }
-                            }
-                        }
-                        if (empty($facetFilters[$fName]['count_value_ids'])) {
-                            $facetFilters[$fName]['skip_value_ids'] = true;
-                        }
+                        $this->_searchApplyFacetFilters_processCategory($bus, $vId, $v, $fName, $value);
                     } else {
                         // don't calculate counts for selected facet values
-                        if (!empty($facetFilters[$fName])) {
-                            $facetFilters[$fName]['skip_value_ids'][$vId] = $vId;
+                        if (!empty($bus['filter']['facets'][$fName])) {
+                            $bus['filter']['facets'][$fName]['skip_value_ids'][$vId] = $vId;
                         }
                     }
                 }
             } else { // not filtered by this field
                 if ($field['filter_multivalue']) {
-                    if (empty($facetFilters['_multivalue'])) {
-                        $facetFilters['_multivalue'] = ['orm' => true, 'multivalue' => true, 'field_ids' => []];
+                    if (empty($bus['filter']['facets']['_multivalue'])) {
+                        $bus['filter']['facets']['_multivalue'] = [
+                            'orm' => true,
+                            'multivalue' => true,
+                            'field_ids' => [],
+                        ];
                     }
-                    $facetFilters['_multivalue']['field_ids'][] = $field['id'];
+                    $bus['filter']['facets']['_multivalue']['field_ids'][] = $field['id'];
                 } else {
-                    $facetFilters[$fName] = ['orm' => true, 'field_ids' => [$field['id']]];
+                    $bus['filter']['facets'][$fName] = ['orm' => true, 'field_ids' => [$field['id']]];
                 }
             }
-            if ($field['filter_show_empty']) {
-                foreach ($field['values'] as $vId => $v) {
-                    if (empty($facets[$field['field_name']]['values'][$v['val']])) {
-                        $facets[$field['field_name']]['values'][$v['val']]['display'] = !empty($v['display']) ? $v['display'] : $v['val'];
-                        $facets[$field['field_name']]['values'][$v['val']]['cnt'] = 0;
-                    }
+            $this->_searchApplyFacetFilters_processEmptyValues($bus, $field);
+        }
+    }
+
+    protected function _searchApplyFacetFilters_processRange(&$bus, $fName, $field, $tDocValue)
+    {
+        $rangeWhere = [];
+        $req = $bus['request']['http'];
+        $from = (int)$req->request($fName . '_from');
+        $to = (int)$req->request($fName . '_to');
+        if ($from) {
+            $rangeWhere[] = 'dv.value_decimal >= ' . $from;
+        }
+        if ($to) {
+            $rangeWhere[] = 'dv.value_decimal <= ' . $to;
+        }
+        if ($rangeWhere) {
+            $bus['result']['orm']->where_raw("(p.id in (SELECT dv.doc_id from {$tDocValue} dv WHERE field_id={$field['id']} AND "
+                . join(' AND ', $rangeWhere) . '))');
+        }
+    }
+
+    protected function _searchApplyFacetFilters_processCategory(&$bus, $vId, $v, $fName, $value)
+    {
+        $valueArr = explode('/', $v);
+        $curLevel = sizeof($valueArr);
+        $valueParent = join('/', array_slice($valueArr, 0, $curLevel - 1));
+        $bus['result']['facets'][$fName]['values'][$v]['level'] = $value['category_level'];
+        //$countValueIds = [];
+        foreach ($bus['filter']['values'] as $vId1 => $value1) {
+            $vVal = $value1['val'];
+            if (empty($value1['category_level']) || $vId === $vId1) {
+                continue; // skip other fields or same category value
+            }
+            $showCategory = false;
+            $showCount = false;
+            $isParent = false;
+            if ($value1['category_level'] === $curLevel + 1 && strpos($vVal . '/', $v . '/') === 0) {
+                // display and count children
+                $showCategory = true;
+                $showCount = true;
+            } elseif (strpos($v, $vVal . '/') === 0) {
+                // display parent categories
+                $showCategory = true;
+                $isParent = true;
+            } elseif (!empty($config['show_root_categories']) && $value1['category_level'] === 1) {
+                // display root categories
+                $showCategory = true;
+                $isParent = true;
+                //$showCount = true;
+            } elseif (!empty($config['show_sibling_categories'])
+                && $value1['category_level'] === $curLevel && strpos($vVal, $valueParent . '/') === 0
+            ) {
+                // display siblings of current category
+                $showCategory = true;
+                $showCount = true;
+            }
+            if ($showCategory) {
+                $bus['result']['facets'][$fName]['values'][$vVal]['display'] = $value1['display'];
+                $bus['result']['facets'][$fName]['values'][$vVal]['level'] = $value1['category_level'];
+                if ($isParent) {
+                    $bus['result']['facets'][$fName]['values'][$vVal]['parent'] = 1;
+                }
+                if ($showCount) {
+                    $bus['filter']['facets'][$fName]['count_value_ids'][$vId1] = $vId1;
                 }
             }
         }
-
-        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
-            $this->Sellvana_CustomField_Main->disable(true);
+        if (empty($bus['filter']['facets'][$fName]['count_value_ids'])) {
+            $bus['filter']['facets'][$fName]['skip_value_ids'] = true;
         }
+    }
 
-        // calculate facet value counts
-        foreach ($facetFilters as $fName => $ff) {
-            if (empty($filterFields[$fName])) {
+    protected function _searchApplyFacetFilters_processEmptyValues(&$bus, $field)
+    {
+        if ($field['filter_show_empty']) {
+            foreach ($field['values'] as $vId => $v) {
+                if (empty($bus['result']['facets'][$field['field_name']]['values'][$v['val']])) {
+                    $facetValue =& $bus['result']['facets'][$field['field_name']]['values'][$v['val']];
+                    $facetValue['display'] = !empty($v['display']) ? $v['display'] : $v['val'];
+                    $facetValue['cnt'] = 0;
+                }
+            }
+        }
+    }
+
+    protected function _searchCalcFacetValueCounts(&$bus)
+    {
+        foreach ($bus['filter']['facets'] as $fName => $ff) {
+            if (empty($bus['filter']['fields'][$fName])) {
                 continue;
             }
-            $field = $filterFields[$fName];
+            $field = $bus['filter']['fields'][$fName];
             if (!$field['filter_counts']) {
                 continue;
             }
-            $orm = $ff['orm'] === true ? clone $productsOrm : $ff['orm'];
+            /** @var BORM $orm */
+            $orm = $ff['orm'] === true ? clone $bus['result']['orm'] : $ff['orm'];
             $orm->join('Sellvana_CatalogIndex_Model_DocValue', ['dv.doc_id', '=', 'p.id'], 'dv');
 
             if (!empty($ff['count_value_ids'])) {
@@ -591,8 +507,8 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             } elseif (!empty($ff['skip_value_ids'])) {
                 if (true === $ff['skip_value_ids']) {
                     continue;
-                } elseif (!empty($filterFields[$fName])) {
-                    $includeValueIds = $filterFields[$fName]['value_ids'];
+                } elseif (!empty($bus['filter']['fields'][$fName])) {
+                    $includeValueIds = $bus['filter']['fields'][$fName]['value_ids'];
                     $sizeofSkip = !empty($ff['skip_value_ids']) ? sizeof($ff['skip_value_ids']) : 0;
                     $sizeofInclude = !empty($includeValueIds) ? sizeof($includeValueIds) : 0;
                     if ($sizeofSkip == $sizeofInclude) {
@@ -612,7 +528,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             if (!empty($ff['multivalue'])) {
                 $orm->where_in('dv.field_id', $ff['field_ids']);
                 foreach ($ff['field_ids'] as $fId) {
-                    $field = $filterFields[$filterFieldNamesById[$fId]];
+                    $field = $bus['filter']['fields'][$bus['filter']['field_names_by_id'][$fId]];
                     foreach ($field['values'] as $vId => $value) {
                         if (!empty($ff['count_value_ids'])) {
                             if (empty($ff['count_value_ids'][$vId])) {
@@ -628,57 +544,64 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     $counts = $countsModel->as_array();
                     if ($counts) {
                         foreach ($counts as $vId => $cnt) {
-                            if (!isset($filterValues[$vId]) || !is_array($filterValues[$vId])) {
+                            if (!isset($bus['filter']['values'][$vId]) || !is_array($bus['filter']['values'][$vId])) {
                                 continue;
                             }
-                            $v = $filterValues[$vId];
-                            if (!isset($filterFields[$filterFieldNamesById[$v['field_id']]])) {
+                            $v = $bus['filter']['values'][$vId];
+                            if (!isset($bus['filter']['fields'][$bus['filter']['field_names_by_id'][$v['field_id']]])) {
                                 continue;
                             }
-                            $f = $filterFields[$filterFieldNamesById[$v['field_id']]];
-                            $facets[$f['field_name']]['values'][$v['val']]['display'] = !empty($v['display']) ? $v['display'] : $v['val'];
-                            $facets[$f['field_name']]['values'][$v['val']]['cnt'] = $cnt;
+                            $f = $bus['filter']['fields'][$bus['filter']['field_names_by_id'][$v['field_id']]];
+                            $facetValue =& $bus['result']['facets'][$f['field_name']]['values'][$v['val']];
+                            $facetValue['display'] = !empty($v['display']) ? $v['display'] : $v['val'];
+                            $facetValue['cnt'] = $cnt;
                         }
                     }
                 }
             } else { // TODO: benchmark whether vertical count is faster than horizontal
-                //$fName = $filterFieldNamesById[$ff['field_ids'][0]]; // single value fields always separate (1 field per facet query)
-                //$field = $filterFields[$fName];
+                //$fName = $bus['filter']['field_names_by_id'][$ff['field_ids'][0]]; // single value fields always separate (1 field per facet query)
+                //$field = $bus['filter']['fields'][$fName];
                 $counts = $orm->select('dv.value_id')->select_expr('COUNT(*)', 'cnt')
                     ->where_in('dv.field_id', $ff['field_ids']) //TODO: maybe filter by value_id? preferred index conflict?
                     ->group_by('dv.value_id')->find_many();
+                /** @var BModel $c */
                 foreach ($counts as $c) {
-                    $v = $filterValues[$c->get('value_id')];
-                    $f = $filterFields[$filterFieldNamesById[$v['field_id']]];
-                    $facets[$f['field_name']]['values'][$v['val']]['display'] = $v['display'] ? $v['display'] : $v['val'];
-                    $facets[$f['field_name']]['values'][$v['val']]['cnt'] = $c->get('cnt');
+                    $v = $bus['filter']['values'][$c->get('value_id')];
+                    $f = $bus['filter']['fields'][$bus['filter']['field_names_by_id'][$v['field_id']]];
+                    $facetValue =& $bus['result']['facets'][$f['field_name']]['values'][$v['val']];
+                    $facetValue['display'] = $v['display'] ? $v['display'] : $v['val'];
+                    $facetValue['cnt'] = $c->get('cnt');
                 }
             }
         }
+    }
 
-        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
-            $this->Sellvana_CustomField_Main->disable(false);
-        }
-
-        // format categories facet result
-        foreach ($filterFields as $fName => $field) {
-            if (empty($facets[$field['field_name']]['values'])) {
+    protected function _searchFormatCategoryFacets(&$bus)
+    {
+        foreach ($bus['filter']['fields'] as $fName => $field) {
+            if (empty($bus['result']['facets'][$field['field_name']]['values'])) {
                 $this->BDebug->debug('Empty values for facet field ' . $field['field_name']);
                 continue;
             }
-            ksort($facets[$field['field_name']]['values'], SORT_NATURAL | SORT_FLAG_CASE);
-            if ($field['field_type'] == 'category' && !empty($facets[$field['field_name']]['values'])) {
-                foreach ($facets[$field['field_name']]['values'] as $vKey => &$fValue) {
-                    $vId = $filterValueIdsByVal[$field['id']][$vKey];
-                    if (!empty($filterValues[$vId])) {
-                        $fValue['level'] = $filterValues[$vId]['category_level'];
+            ksort($bus['result']['facets'][$field['field_name']]['values'], SORT_NATURAL | SORT_FLAG_CASE);
+            if ($field['field_type'] == 'category') {
+                foreach ($bus['result']['facets'][$field['field_name']]['values'] as $vKey => &$fValue) {
+                    $vId = $bus['filter']['value_ids_by_val'][$field['id']][$vKey];
+                    if (!empty($bus['filter']['values'][$vId])) {
+                        $fValue['level'] = $bus['filter']['values'][$vId]['category_level'];
                     }
                 }
-                unset($value);
+                unset($fValue);
             }
         }
+    }
 
-        // apply sorting
+    protected function _searchSort(&$bus)
+    {
+        $sort = $bus['request']['sort'];
+        /** @var BRequest $req */
+        $req = $bus['request']['http'];
+
         if (is_null($sort)) {
             if (!($sort = trim($req->get('sc')))) {
                 $sort = trim($req->get('s') . ' ' . $req->get('sd'));
@@ -687,8 +610,8 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         if ($sort) {
             list($field, $dir) = is_string($sort) ? explode(' ', $sort) + ['', ''] : $sort;
             $method = 'order_by_' . (strtolower($dir) == 'desc' ? 'desc' : 'asc');
-            $productsOrm->$method('sort_' . $field);
+
+            $bus['result']['orm']->$method('sort_' . $field);
         }
-        return ['orm' => $productsOrm, 'facets' => $facets];
     }
 }

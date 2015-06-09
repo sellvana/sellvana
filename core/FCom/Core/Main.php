@@ -430,6 +430,7 @@ class FCom_Core_Main extends BClass
         $this->BClassAutoload->addPath($dirConf['local_dir']);
         $this->BClassAutoload->addPath($dirConf['dlc_dir']);
         $this->BClassAutoload->addPath($dirConf['core_dir']);
+        #$this->BClassAutoload->addPath($modReg->module('FCom_Core')->root_dir . '/lib');
 
         return $this;
     }

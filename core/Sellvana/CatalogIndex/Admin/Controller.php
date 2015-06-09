@@ -4,7 +4,6 @@
  * Class Sellvana_CatalogIndex_Admin_Controller
  *
  * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
- * @property Sellvana_CatalogIndex_Indexer $Sellvana_CatalogIndex_Indexer
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
@@ -23,14 +22,13 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
 
         echo $this->_("<pre>Starting...\n");
         if ($this->BRequest->request('CLEAR')) {
-            //$this->Sellvana_CatalogIndex_Indexer->indexDropDocs(true);
+            //$this->Sellvana_CatalogIndex_Main->getIndexer()->indexDropDocs(true);
             $this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
         }
         $this->BCache->save('index_progress_total', 0);
         $this->BCache->save('index_progress_reindexed', 0);
 
-        $this->Sellvana_CatalogIndex_Indexer->indexProducts(true);
-        $this->Sellvana_CatalogIndex_Indexer->indexGC();
+        $this->Sellvana_CatalogIndex_Main->getIndexer()->indexPendingProducts()->indexGC();
         echo 'DONE';
         exit;
     }
@@ -155,22 +153,25 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
 
             echo "<pre>Starting...\n";
             if ($this->BRequest->request('CLEAR')) {
-                //$this->Sellvana_CatalogIndex_Indexer->indexDropDocs(true);
+                //$this->Sellvana_CatalogIndex_Main->getIndexer()->indexDropDocs(true);
                 $this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
             }
-            $this->Sellvana_CatalogIndex_Indexer->indexProducts(true);
-            $this->Sellvana_CatalogIndex_Indexer->indexGC();
+            $this->Sellvana_CatalogIndex_Main->getIndexer()->indexPendingProducts()->indexGC();
             echo 'DONE';
             exit;
         }
 
         // show sample search result
         if (false) {
-            $result = $this->Sellvana_CatalogIndex_Indexer->searchProducts('lorem', [
-                'category' => 'category-1/subcategory-1-1',
-                'color' => 'Green',
-                'size' => 'Medium',
-            ], 'product_name');
+            $result = $this->Sellvana_CatalogIndex_Main->getIndexer()->searchProducts([
+                'query' => 'lorem',
+                'filters' => [
+                    'category' => 'category-1/subcategory-1-1',
+                    'color' => 'Green',
+                    'size' => 'Medium',
+                ],
+                'sort' => 'product_name'
+            ]);
             echo "<pre>";
             print_r($result['facets']);
             $pageData = $result['orm']->paginate();
@@ -204,8 +205,7 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
 
         echo '<hr>Indexing... ' . memory_get_usage() . '<br>';
         //$this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
-        $this->Sellvana_CatalogIndex_Indexer->indexProducts(true);
-        $this->Sellvana_CatalogIndex_Indexer->indexGC();
+        $this->Sellvana_CatalogIndex_Main->getIndexer()->indexPendingProducts()->indexGC();
         echo '<hr>ALL DONE... ' . memory_get_usage() . '</pre>';
         exit;
     }
