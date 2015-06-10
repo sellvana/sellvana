@@ -82,14 +82,52 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
         $this->BCache->save('index_progress_reindexed', static::$_cnt_reindexed);
     }
 
+    public function indexPendingProducts()
+    {
+        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {
+            /** @var FCom_PushServer_Model_Client $pushClient */
+            $pushClient = $this->FCom_PushServer_Model_Client->sessionClient();
+        } else {
+            $pushClient = null;
+        }
+
+        $i = 0;
+        //$start = 0;
+        $t = time();
+        $orm = $this->Sellvana_Catalog_Model_Product
+            ->orm('p')->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
+            ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']]);
+        if (empty(static::$_cnt_total)) {
+            $count = clone $orm;
+            static::$_cnt_total = $count->count();
+            $this->BCache->save('index_progress_total', static::$_cnt_total);
+            if ($pushClient) {
+                $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'total' => static::$_cnt_total]);
+            }
+        }
+        do {
+            $products = $orm
+                ->limit(static::$_maxChunkSize)
+                //->offset($start)
+                ->find_many();
+            $this->indexProducts($products);
+            echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
+                . ' - ' . (time() - $t) . "s\n";
+            $t = time();
+            //$start += static::$_maxChunkSize;
+        } while (sizeof($products) == static::$_maxChunkSize);
+
+        return $this;
+    }
+
     protected function _indexFetchProductsData($products)
     {
         $fields = $this->Sellvana_CatalogIndex_Model_Field->getFields();
         static::$_indexData = [];
 
-        foreach ($products as $p) {
-            static::$_indexData[$p->id()]['timestamp'] = $p->get('update_at');
-        }
+//        foreach ($products as $p) {
+//            static::$_indexData[$p->id()]['timestamp'] = $p->get('update_at');
+//        }
 
         foreach ($fields as $fName => $field) {
             $source = $field->source_callback ? $field->source_callback : $fName;

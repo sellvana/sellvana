@@ -1,6 +1,6 @@
 <?php
 
-class Sellvana_Elasticsearch_Indexer extends Sellvana_CatalogIndex_Indexer_Abstract
+class Sellvana_IndexElasticsearch_Indexer extends Sellvana_CatalogIndex_Indexer_Abstract
     implements Sellvana_CatalogIndex_Indexer_Interface
 {
 //
@@ -56,8 +56,8 @@ class Sellvana_Elasticsearch_Indexer extends Sellvana_CatalogIndex_Indexer_Abstr
         #$client = $this->_getClient();
         #$indexName = $this->_getIndexName();
         foreach (static::$_indexData as $id => $data) {
-            $ts = strtotime($data['timestamp']);
-            unset($data['timestamp']);
+            #$ts = strtotime($data['timestamp']);
+            #unset($data['timestamp']);
             $doc = [
                 #'index' => $indexName,
                 'type' => 'product',
@@ -76,11 +76,6 @@ class Sellvana_Elasticsearch_Indexer extends Sellvana_CatalogIndex_Indexer_Abstr
         // $this->_getClient()->bulk($bulk); //TODO: implement bulk indexing
         $this->_indexCleanMemory();
         return $this;
-    }
-
-    public function indexPendingProducts()
-    {
-
     }
 
     public function indexDropDocs($pIds)

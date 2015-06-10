@@ -19,15 +19,6 @@
 class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstract
     implements Sellvana_CatalogIndex_Indexer_Interface
 {
-    public function indexDropDocs($pIds)
-    {
-        if ($pIds === true) {
-            return $this->BDb->run("DELETE FROM " . $this->Sellvana_CatalogIndex_Model_Doc->table());
-        } else {
-            return $this->Sellvana_CatalogIndex_Model_Doc->delete_many(['id' => $pIds]);
-        }
-    }
-
     protected function _indexSaveData()
     {
         $this->_indexSaveDocs();
@@ -109,7 +100,6 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
         }
     }
 
-
     protected function _indexSaveSearchData()
     {
         $termHlp = $this->Sellvana_CatalogIndex_Model_Term;
@@ -148,44 +138,6 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
         }
     }
 
-    public function indexPendingProducts()
-    {
-        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {
-            /** @var FCom_PushServer_Model_Client $pushClient */
-            $pushClient = $this->FCom_PushServer_Model_Client->sessionClient();
-        } else {
-            $pushClient = null;
-        }
-
-        $i = 0;
-        //$start = 0;
-        $t = time();
-        $orm = $this->Sellvana_Catalog_Model_Product
-            ->orm('p')->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
-            ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']]);
-        if (empty(static::$_cnt_total)) {
-            $count = clone $orm;
-            static::$_cnt_total = $count->count();
-            $this->BCache->save('index_progress_total', static::$_cnt_total);
-            if ($pushClient) {
-                $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'total' => static::$_cnt_total]);
-            }
-        }
-        do {
-            $products = $orm
-                ->limit(static::$_maxChunkSize)
-                //->offset($start)
-                ->find_many();
-            $this->indexProducts($products);
-            echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
-                . ' - ' . (time() - $t) . "s\n";
-            $t = time();
-            //$start += static::$_maxChunkSize;
-        } while (sizeof($products) == static::$_maxChunkSize);
-
-        return $this;
-    }
-
     public function reindexField($field)
     {
         //TODO: implement 1 field reindexing for all affected products
@@ -194,6 +146,15 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
     public function reindexFieldValue($field, $value)
     {
         //TODO: implement 1 field value reindexing
+    }
+
+    public function indexDropDocs($pIds)
+    {
+        if ($pIds === true) {
+            return $this->BDb->run("DELETE FROM " . $this->Sellvana_CatalogIndex_Model_Doc->table());
+        } else {
+            return $this->Sellvana_CatalogIndex_Model_Doc->delete_many(['id' => $pIds]);
+        }
     }
 
     public function indexGC()
