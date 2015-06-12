@@ -207,7 +207,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
     {
         $bus = [
             'request' => [
-                'search' => isset($params['query']) ? $params['query'] : null,
+                'query' => isset($params['query']) ? $params['query'] : null,
                 'filters' => isset($params['filters']) ? $params['filters'] : null,
                 'sort' => isset($params['sort']) ? $params['sort'] : null,
                 'options' => isset($params['options']) ? $params['options'] : [],
