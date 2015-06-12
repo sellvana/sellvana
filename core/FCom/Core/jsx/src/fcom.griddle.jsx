@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'backbone', 'bootstrap'],
-function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle, Backbone) {
+define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'bootstrap', 'unique'],
+function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle) {
 
     /**
      * FCom Griddle Componnent
@@ -74,6 +74,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
 
             return (
                 <div className="fcom-htmlgrid responsive-table">
+                
                     <Griddle showTableHeading={false} tableClassName={this.props.tableClassName} ref={config.id}
                         config={config} initColumns={this.getColumn()}
                         sortColumn={state.s} sortAscending={state.sd == 'asc'}
@@ -500,17 +501,21 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 }
             });
         },
-        handleClick: function() {
+        handleClick: function(event) {
             var that = this;
             var gridId = that.props.getConfig('id');
-            var modalEleContainer = document.getElementById(gridId + '-modal');
-            React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
-            React.render(
-                <Components.Modal show={true} title="Create Form" confirm="Save changes" cancel="Close" onConfirm={that.props.saveModalForm}>
-                    <FComModalForm columnMetadata={that.props.columnMetadata} id={gridId} />
-                </Components.Modal>,
-                modalEleContainer
-            );
+            if ($(event.target).hasClass('_modal')) {
+                var modalEleContainer = document.getElementById(gridId + '-modal');
+                React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
+                React.render(
+                    <Components.Modal show={true} title="Create Form" confirm="Save changes" cancel="Close" onConfirm={that.props.saveModalForm}>
+                        <FComModalForm columnMetadata={that.props.columnMetadata} id={gridId} />
+                    </Components.Modal>,
+                    modalEleContainer
+                );
+            } else {
+                this.props.addRows([{ id: guid() }]);
+            }
         },
         handleCustom: function(callback, event) {
             if (typeof window[callback] === 'function') {
@@ -534,7 +539,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var actionProps = {
                         key: gridId + '-fcom-settings-action-' + name,
                         class: action.class
-                    }
+                    };
                     switch (name) {
                         case 'refresh':
                             node = <a href="#" className={action.class} key={actionKey}>{action.caption}</a>;
@@ -551,6 +556,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                         case 'delete':
                             node = <button className={action.class + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction} key={actionKey}>{action.caption}</button>;
                             break;
+                        //todo: checking again new and add type
                         case 'add':
                             node = <button className={action.class} type="button" key={actionKey}>{action.caption}</button>;
                             break;
@@ -585,6 +591,11 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
 
                 var checked = _.contains(that.props.selectedColumns(), column);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
+
+                if(colInfo.hidden){
+                    return null;
+                }
+
                 return (
                     <li data-id={column} id={column} key={gridId + '-fcom-settings-' + column} className="dd-item dd3-item">
                         <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>

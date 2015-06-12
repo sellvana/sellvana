@@ -26,4 +26,4 @@ base:
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_ProductReviews, { label: Product Reviews, group: catalog, async: true } ]
+            - [ addTab, Sellvana_ProductReviews, { label: Product Reviews, group: catalog, async: true, permission: settings/Sellvana_ProductReviews } ]

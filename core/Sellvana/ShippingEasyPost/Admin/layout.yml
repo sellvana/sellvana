@@ -1,4 +1,4 @@
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_ShippingEasyPost, { label: EasyPost, group: shipping_methods, async: true } ]
+            - [ addTab, Sellvana_ShippingEasyPost, { label: EasyPost, group: shipping_methods, async: true, permission: settings/Sellvana_ShippingEasyPost } ]

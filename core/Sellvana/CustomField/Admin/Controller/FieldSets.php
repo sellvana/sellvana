@@ -104,7 +104,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
         ];
 
         $config['config']['callbacks'] = [
-            'componentDidMount' => 'selectedGridRegister'
+            'componentDidMount' => 'selectedModalGridRegister'
         ];
 
         return $config;
@@ -145,7 +145,7 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
         ];
 
         $config['config']['callbacks'] = [
-            'componentDidMount' => 'fieldsGridRegister'
+            'componentDidMount' => 'fieldsModalGridRegister'
         ];
 
         return $config;
@@ -168,7 +168,12 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                 'columns' => [
                     ['type' => 'row_select'],
                     ['type' => 'btn_group', 'buttons' => [
-                        ['name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
+                        [
+                            'name' => 'custom',
+                            'icon' => 'icon-edit-sign',
+                            'cssClass' => 'btn-custom',
+                            'callback' => 'showModalToEditFields'
+                        ],
                         //['name' => 'edit'],
                         ['name' => 'delete']
                     ]],
@@ -218,17 +223,20 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                     '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
                 ],
                 'actions' => [
-                    /*'add-field' => [
+                    'add-field' => [
                         'caption' => 'Add a field',
                         'type' => 'button',
                         'id' => 'add-field-from-grid',
                         'class' => 'btn-primary',
                         'callback' => 'showModalToAddField',
-                    ],*/
+                    ],
                     'edit' => true,
                     'delete' => true
                 ],
                 'grid_before_create' => 'fieldsGridRegister',
+                'callbacks' => [
+                    'componentDidMount' => 'fieldsGridRegister'
+                ]
                 //'new_button' => '#add_new_field'
             ]
         ];
@@ -241,9 +249,11 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
             'config' => [
                 'id' => 'options-grid',
                 'caption' => 'Fields',
+                'dataUrl' => $this->BApp->href('customfields/fieldsets/field_option_grid_data?field_id='),
                 'data_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
                 'edit_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
                 'data' => [],
+                'data_mode' => 'local',
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
@@ -258,8 +268,18 @@ class Sellvana_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Control
                     '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
                 ],
                 'actions' => [
-                    'new' => ['caption' => 'Insert New Option'],
+                    //'new' => ['caption' => 'Insert New Option'],
+                    'add-options' => [
+                        'caption' => 'Insert New Option',
+                        'type' => 'button',
+                        'id' => 'add_new_field',
+                        'class' => 'btn-primary',
+                        'callback' => 'insertNewOption',
+                    ],
                     'delete' => ['caption' => 'Remove', 'confirm' => false]
+                ],
+                'callbacks' => [
+                    'componentDidMount' => 'optionsModalGridRegister'
                 ],
                 'grid_before_create' => 'optionsGridRegister',
                 //'after_modalForm_render' => 'optionsGridRendered'

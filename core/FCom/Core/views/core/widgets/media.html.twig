@@ -1,7 +1,32 @@
-{% macro widget__file_upload(widget, library, context) %}
+{% macro widget__insert_media(widget, library, context) %}
     {% import LAYOUT.view('core/form-elements').twigName() as forms %}
-    {{ forms.input({label: "Folder"|_, name: "#{context.prefix}[widgets][#{widget.id}][folder]", value: widget.folder|default('upload'), field: "folder-#{widget.id}"}) }}
-    {{ forms.input({label: "Subfolder"|_, name: "#{context.prefix}[widgets][#{widget.id}][subfolder]", value: widget.subfolder, field: "subfolder-#{widget.id}"}) }}
-    {{ forms.input({label: "Allowed File Types"|_, name: "#{context.prefix}[widgets][#{widget.id}][filetype_regex]", value: widget.filetype_regex, field: "filetype_regex-#{widget.id}"}) }}
-    {{ forms.boolean({label: "Allow Multiple Files Upload"|_, name:"#{context.prefix}[widgets][#{widget.id}][multiple]", value: widget.multiple, field: "multiple-#{widget.id}"}) }}
+    {% import LAYOUT.view('core/layout-editor').twigName() as layout %}
+    {{ forms.input({label: "Width"|_, name: "#{context.prefix}[widgets][#{widget.id}][width]", value: widget.width|default('640'), field: "width-#{widget.id}"}) }}
+    {{ forms.input({label: "Height"|_, name: "#{context.prefix}[widgets][#{widget.id}][height]", value: widget.height|default('320'), field: "height-#{widget.id}"}) }}
+    {{ forms.hidden({name: "#{context.prefix}[widgets][#{widget.id}][src]", value: widget.src, field: "src-#{widget.id}"}) }}
+    <div id="lib-images-{{ widget.id }}"></div>
+    {% set type = 'images' %}
+    {% set medialibConfig = {
+    id: 'all_' ~ type,
+        mode: 'images',
+        type: 'images',
+        title: 'Images',
+        folder: 'media/product/images',
+        config: {actions: {delete: {caption : 'Remove'}}}
+    } %}
+
+    {% set imageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({id: 'insert_media_main_grid' ~ widget.id}) %}
+
+    {% set attachmentsConfig = {
+        type: type,
+        targetType: 'images',
+        elementContainer: '#lib-images-' ~ widget.id,
+        medialibConfig: medialibConfig,
+        gridConfig: imageConfig
+    } %}
+    <!-- Att -->
+    {{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}
+    <!-- Att end -->
+
+    {{ layout.widget_custom_params(widget, library, context) }}
 {% endmacro %}

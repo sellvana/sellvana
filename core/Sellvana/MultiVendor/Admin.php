@@ -5,10 +5,19 @@
  *
  * @property Sellvana_MultiVendor_Model_Vendor $Sellvana_MultiVendor_Model_Vendor
  * @property Sellvana_MultiVendor_Model_VendorProduct $Sellvana_MultiVendor_Model_VendorProduct
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
 
 class Sellvana_MultiVendor_Admin extends BClass
 {
+    public function bootstrap()
+    {
+        $this->FCom_Admin_Model_Role->createPermission([
+            'multi_vendor'          => BLocale::i()->_('Multi Vendor'),
+            'settings/multi_vendor' => BLocale::i()->_('Multi Vendor Settings'),
+        ]);
+    }
+
     public function onProductFormPostAfterValidate($args)
     {
         $vpData = $this->BRequest->post('vendor_product');

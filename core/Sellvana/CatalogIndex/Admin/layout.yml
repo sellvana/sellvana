@@ -6,7 +6,7 @@ base:
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_CatalogIndex, { label: Catalog Index, group: catalog, async: true } ]
+            - [ addTab, Sellvana_CatalogIndex, { label: Catalog Index, group: catalog, async: true, permission: settings/Sellvana_CatalogIndex } ]
 
 /catalogindex/fields:
      - { include: default_griddle }

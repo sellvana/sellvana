@@ -8,6 +8,8 @@ modules:
         auto_use: [ layout, views ]
 
         areas:
+            FCom_Admin:
+                auto_use: [ bootstrap ]
             FCom_Frontend:
                 routing:
                     - [ "/wishlist/?.action", Sellvana_Wishlist_Frontend_Controller ]

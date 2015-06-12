@@ -461,9 +461,9 @@ var Griddle = React.createClass({
             ? <this.props.customSettings columnMetadata={this.props.columnMetadata} selectedColumns={this.getColumns} setColumns={this.setColumns}
                 getConfig={this.getConfig} searchWithinResults={this.searchWithinResults} getSelectedRows={this.getSelectedRows} refresh={this.refresh}
                 setHeaderSelection={this.setHeaderSelection} getHeaderSelection={this.getHeaderSelection} getGriddleState={this.getGriddleState}
-                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} removeRows={this.removeRows} getCurrentGrid={this.getCurrentGrid}
-                ref={'gridSettings'} hasExternalResults={this.hasExternalResults} updateRows={this.updateRows} saveModalForm={this.saveModalForm}
-                clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
+                updateInitColumns={this.updateInitColumns} getInitColumns={this.getInitColumns} addRows={this.addRows} removeRows={this.removeRows}
+                getCurrentGrid={this.getCurrentGrid} ref={'gridSettings'} hasExternalResults={this.hasExternalResults} updateRows={this.updateRows}
+                saveModalForm={this.saveModalForm} clearSelectedRows={this.clearSelectedRows} removeSelectedRows={this.removeSelectedRows}
             />
             : <span className="settings" onClick={this.toggleColumnChooser}>{this.props.settingsText} <i className="glyphicon glyphicon-cog"></i></span>
         ) : "";
@@ -822,7 +822,7 @@ var Griddle = React.createClass({
 
             var results = this.state.results;
             //console.log('state.filter', this.state.filter);
-            if (this.state.filter != '') { //if have filter, need to filter data then search in results
+            if (this.state.filter != '' && ! this.hasExternalResults() ) { //if have filter, need to filter data then search in results
                 results = this.filterLocalData(null, JSON.parse(this.state.filter));
                 //console.log('results before search', results);
             }
@@ -1167,6 +1167,11 @@ var Griddle = React.createClass({
                     break;
                 case 'rows':
                     child = refs.gridBody.refs;
+                    delete child.gridTitle;
+                    break;
+                case 'title':
+                case 'gridTitle':
+                    child = refs.gridBody.refs.gridTitle;
                     break;
             }
         }

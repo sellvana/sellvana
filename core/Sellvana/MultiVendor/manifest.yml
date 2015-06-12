@@ -7,7 +7,7 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: [ layout, views ]
+                auto_use: [ layout, views, bootstrap ]
                 routing:
                     - [ /multivendor/vendors/?.action, Sellvana_MultiVendor_Admin_Controller_Vendors ]
                 observe:

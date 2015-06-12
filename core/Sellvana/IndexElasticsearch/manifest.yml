@@ -1,0 +1,7 @@
+modules:
+    Sellvana_IndexElasticsearch:
+        version: 0.5.0.0
+        channel: alpha
+        require: { module: { Sellvana_CatalogIndex: 0.5.0.0 } }
+
+        auto_use: [ bootstrap, views ]

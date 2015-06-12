@@ -78,9 +78,26 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
             ['name' => 'options', 'label' => 'Options', 'width' => 200, 'hidden' => true],
             ['type' => 'btn_group', 'buttons' => [['name' => 'delete'], ['name' => 'edit']]]
         ];
+
+        $config['filters'] = [
+            ['field' => 'name', 'type' => 'text'],
+            ['field' => 'label', 'type' => 'text'],
+            ['field' => 'input_type', 'type' => 'text']
+        ];
+        
         $config['actions'] = [
-            'add' => ['caption' => 'Add Fields'],
+            //'add' => ['caption' => 'Add Fields'],
+            'add-form-field' => [
+                'caption' => 'Add Field',
+                'type' => 'button',
+                'id' => 'add-field-from-grid',
+                'class' => 'btn btn-primary',
+                'callback' => 'showModalToAddFormField'
+            ],
             'delete' => ['caption' => 'Remove']
+        ];
+        $config['callbacks'] = [
+            'componentDidMount' => 'formFieldGridRegister'
         ];
         $config['grid_before_create'] = 'formFieldGridRegister';
         //$config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');

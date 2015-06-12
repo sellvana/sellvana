@@ -132,9 +132,9 @@ define(['underscore', 'react'], function (_, React) {
                                             selectOptions.push(<option value={key}>{col.options[key]}</option>);
                                         }
                                     }
-
+                                    
                                     node = (
-                                        <select {...inlineProps} {...validationRules}>{selectOptions}</select>
+                                        <select defaultValue={defaultValue} {...inlineProps} {...validationRules} onChange={that.handleChange}>{selectOptions}</select>
                                     );
                                     break;
                                 default:

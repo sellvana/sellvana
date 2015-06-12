@@ -15,13 +15,17 @@ class Sellvana_Sales_Main extends BClass
 
     public function bootstrap()
     {
+        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'sales' => 'Sales',
-            'sales/orders' => 'Orders',
-            'sales/order_status' => 'Order Status',
-            'sales/order_custom_state' => 'Order Custom State',
-            'sales/carts' => 'Carts',
-            'sales/reports' => 'Reports',
+            'sales' => $locale->_('Sales'),
+            'sales/orders' => $locale->_('Orders'),
+            'sales/order_status' => $locale->_('Order Status'),
+            'sales/order_custom_state' => $locale->_('Order Custom State'),
+            'sales/carts' => $locale->_('Carts'),
+            'sales/reports' => $locale->_('Reports'),
+            'settings/Sellvana_Sales' => $locale->_('Sales Settings'),
+            'settings/Sellvana_SalesShipping' => $locale->_('Sales Shipping Settings'),
+            'settings/Sellvana_SalesPaymentMethods' => $locale->_('Sales Payment Methods Settings'),
         ]);
 
         foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal'] as $total) {

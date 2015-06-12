@@ -60,7 +60,7 @@ modules:
             FCom_Frontend:
                 routing:
                     - [ /*category, Sellvana_Catalog_Frontend_Controller_Category.index ]
-                    - [ /catalog/search, Sellvana_Catalog_Frontend_Controller_Search.index ]
+                    - [ /catalog/search/?.action, Sellvana_Catalog_Frontend_Controller_Search ]
                     - [ "/:product", Sellvana_Catalog_Frontend_Controller_Product.index ]
                     - [ "/*category/:product", Sellvana_Catalog_Frontend_Controller_Product.index ]
                     - [ /catalog/quickview, Sellvana_Catalog_Frontend_Controller_Product.quickview ]

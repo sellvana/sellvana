@@ -79,4 +79,14 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
 
         $this->FCom_Core_Main->lastNav(true);
     }
+
+    public function action_autocomplete()
+    {
+        $result = [
+            'abc',
+            'def',
+            'efg',
+        ];
+        $this->BResponse->json($result);
+    }
 }

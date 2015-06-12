@@ -106,6 +106,7 @@ class Sellvana_GoogleApi_Frontend extends BClass
 
     public function getTransactionData()
     {
+        $ecEnabled = $this->BConfig->get('modules/Sellvana_GoogleApi/ua_enable_ec');
         $orderId = $this->BSession->get('last_order_id');
         $order = $this->Sellvana_Sales_Model_Order->load($orderId);
 
@@ -121,10 +122,12 @@ class Sellvana_GoogleApi_Frontend extends BClass
         $items = [];
         foreach ($order->items() as $item) {
             $items[] = [
-                'id' => $order->get('unique_id'),
+                'id' => $ecEnabled ? $item->get('product_sku') : $order->get('unique_id'),
                 'name' => $item->get('product_name'),
-                'sku' => $item->get('product_sku'),
+                'sku' => $ecEnabled ? null : $item->get('product_sku'),
                 // 'category' => null, //TODO: implement cart/order original product category tracking?
+                // 'variant' => null, //TODO: implement variant data
+                // 'coupon' => null, //TODO: implement item coupon
                 'price' => $item->get('price'),
                 'quantity' => $item->get('qty_ordered'),
             ];
