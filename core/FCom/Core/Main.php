@@ -120,12 +120,12 @@ class FCom_Core_Main extends BClass
         if (!$config->get('web/media_dir')) {
             if (strpos($mediaDir, FULLERON_ROOT_DIR) === 0) {
                 $mediaUrl = preg_replace('#^' . preg_quote(FULLERON_ROOT_DIR, '#') . '#', '', $mediaDir);
-            } elseif (strpos($mediaDir, $baseSrc) === 0) {
+            } elseif ($rootDir && $rootDir !== '/' && strpos($mediaDir, $rootDir) === 0) {
+                $mediaUrl = preg_replace('#^' . preg_quote($rootDir, '#'), '', $mediaDir);
+            } elseif ($baseSrc && $baseSrc !== '/' && strpos($mediaDir, $baseSrc) === 0) {
                 $mediaUrl = preg_replace('#^' . preg_quote($baseSrc, '#') . '#', '', $mediaDir);
             #} elseif (strpos($mediaDir, $docRoot) === 0) {
             #    $mediaUrl = str_replace($docRoot, '', $mediaDir);
-            #} elseif (strpos($mediaDir, $rootDir) === 0) {
-            #    $mediaUrl = $baseStore . str_replace($rootDir, '', $mediaDir);
             } else {
                 $mediaUrl = 'media';
             }

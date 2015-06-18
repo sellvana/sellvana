@@ -1709,15 +1709,16 @@ class BView extends BClass
     {
         $debug = $this->BDebug->is('DEBUG') && !$this->get('no_debug');
         $viewName = $this->param('view_name');
+        $modName = $this->param('module_name');
 
-        $timer = BDebug::debug('RENDER.VIEW ' . $viewName);
+        $timer = BDebug::debug('RENDER.VIEW @' . $modName . '/' . $viewName);
         if ($this->param('raw_text') !== null) {
             return $this->param('raw_text');
         }
         foreach ($args as $k => $v) {
             $this->_params['args'][$k] = $v;
         }
-        if (($modName = $this->param('module_name'))) {
+        if ($modName) {
             //$this->BModuleRegistry->pushModule($modName);
         }
         $result = '';

@@ -252,6 +252,12 @@ class FCom_Core_LayoutEditor extends BClass
      */
     public function compileLayout($layoutData, $context = [])
     {
+        if (empty($layoutData['widgets'])
+            || sizeof($layoutData['widgets']) === 1 && $layoutData['widgets'][0]['type'] === 'main'
+        ) {
+            return [];
+        }
+
         $layoutType = !empty($context['type']) ? $context['type'] : null;
         $layoutData = $this->normalizeLayoutData($layoutData, ['layout_type' => $layoutType]);
 
@@ -423,9 +429,13 @@ class FCom_Core_LayoutEditor extends BClass
                 $w = $args['widget'];
                 $view_name        = $w['view_name'];
                 $args['layout'][] = ['hook' => $w['area'], 'views' => $view_name];
+                $url = !empty($w['url'])? $w['url']: null;
+                if (preg_match('#(/|v=)([A-Za-z0-9_]+)#', $url, $urlPatternMatch)) {
+                    $url = 'https://www.youtube.com/embed/' . $urlPatternMatch[2];
+                }
                 $update = [
                     'widget_id'  => $w['id'],
-                    'url'        => !empty($w['url'])? $w['url']: null,
+                    'url'        => $url,
                     'height'     => !empty($w['height'])? $w['height']: null,
                     'width'      => !empty($w['width'])? $w['width']: null,
                     'use_iframe' => !empty($w['use_iframe'])? $w['use_iframe']: null,
