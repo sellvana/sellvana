@@ -365,11 +365,26 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline'],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
-                    ['name' => 'main_thumb', 'label' => 'Thumbnail', 'width' => 50, 'display' => 'eval',
-                        'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
-                            . ' "+(rc.row["main_thumb"]==1 ? checked=\'checked\' : \'\')+" '
-                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' '
-                            . 'data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'],
+                    ['name' => 'is_default', 'label' => 'Image', 'width' => 50, 'display' => 'eval',
+                        'print' => '"<input class=\'is-default\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+                            . ' "+(rc.row["is_default"]==1 ? checked=\'checked\' : \'\')+" '
+                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[is_default]\' '
+                            . 'data-is-default=\'"+rc.row["is_default"]+"\'/>"'],
+                    ['name' => 'is_thumb', 'label' => 'Thumbnail', 'width' => 50, 'display' => 'eval',
+                        'print' => '"<input class=\'is-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+                            . ' "+(rc.row["is_thumb"]==1 ? checked=\'checked\' : \'\')+" '
+                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[is_thumb]\' '
+                            . 'data-is-thumb=\'"+rc.row["is_thumb"]+"\'/>"'],
+                    ['name' => 'is_rollover', 'label' => 'Rollover', 'width' => 50, 'display' => 'eval',
+                        'print' => '"<input class=\'is-rollover\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+                            . ' "+(rc.row["is_rollover"]==1 ? checked=\'checked\' : \'\')+" '
+                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[is_rollover]\' '
+                            . 'data-is-rollover=\'"+rc.row["is_rollover"]+"\'/>"'],
+                    ['name' => 'in_gallery', 'label' => 'In Gallery', 'width' => 50, 'display' => 'eval',
+                        'print' => '"<input class=\'in-gallery\' value=\'1\' type=\'checkbox\' '
+                            . ' "+(rc.row["in_gallery"]==1 ? checked=\'checked\' : \'\')+" '
+                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images["+rc.row["id"]+"][in_gallery]\' '
+                            . 'data-in-gallery=\'"+rc.row["in_gallery"]+"\'/>"'],
                     ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
                     ['name' => 'update_at', 'label' => 'Updated', 'width' => 200],
                     ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
@@ -784,16 +799,30 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 foreach ($rows as $image) {
                     $key = $image['id'];
                     unset($image['id']);
-                    if ($key != 'main_thumb') {
+                    if (!in_array($key, ['is_thumb', 'is_default', 'is_rollover'])) {
                         $mediaModel =  $hlp->load($key);
-                        $main_thumb = 0;
+                        $is_thumb = $is_default = $is_rollover = 0;
                         if ($type == 'I') {
-                            if (isset($data['product_' . $typeName]['main_thumb'])
-                                && $data['product_' . $typeName]['main_thumb'] == $key
+                            if (isset($data['product_' . $typeName]['is_thumb'])
+                                && $data['product_' . $typeName]['is_thumb'] == $key
                             ) {
-                                $main_thumb = 1;
+                                $is_thumb = 1;
                             }
-                            $image['main_thumb'] = $main_thumb;
+                            $image['is_thumb'] = $is_thumb;
+
+                            if (isset($data['product_' . $typeName]['is_default'])
+                                && $data['product_' . $typeName]['is_default'] == $key
+                            ) {
+                                $is_default = 1;
+                            }
+                            $image['is_default'] = $is_default;
+
+                            if (isset($data['product_' . $typeName]['is_rollover'])
+                                && $data['product_' . $typeName]['is_rollover'] == $key
+                            ) {
+                                $is_rollover = 1;
+                            }
+                            $image['is_rollover'] = $is_rollover;
                         }
 
                         if (isset($image['position'])) {
@@ -821,23 +850,24 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             }
 
         }
-        $productMediaModel = $hlp->orm()->where('media_type', 'I')->where('product_id', $model->id)
-            ->where('main_thumb', 1)->find_one();
-        $thumbUrl = NULL;
-        if ($productMediaModel) {
-            $mediaLibModel = $this->FCom_Core_Model_MediaLibrary->load($productMediaModel->get('file_id'));
-            $thumbUrl = ($mediaLibModel->get('subfolder') != null)
-                ? $mediaLibModel->get('folder') . '/' . $mediaLibModel->get('subfolder') . '/' . $mediaLibModel->get('file_name')
-                : $mediaLibModel->get('folder') . '/' . $mediaLibModel->get('file_name');
-            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
-        }
-        $model->set('thumb_url', $thumbUrl)->save();
+        //$productMediaModel = $hlp->orm()->where('media_type', 'I')->where('product_id', $model->id)
+        //    ->where('is_thumb', 1)->find_one();
+        //$thumbUrl = NULL;
+        //if ($productMediaModel) {
+        //    $mediaLibModel = $this->FCom_Core_Model_MediaLibrary->load($productMediaModel->get('file_id'));
+        //    $thumbUrl = ($mediaLibModel->get('subfolder') != null)
+        //        ? $mediaLibModel->get('folder') . '/' . $mediaLibModel->get('subfolder') . '/' . $mediaLibModel->get('file_name')
+        //        : $mediaLibModel->get('folder') . '/' . $mediaLibModel->get('file_name');
+        //    $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
+        //}
+        //$model->set('thumb_url', $thumbUrl)->save();
         return $this;
     }
 
     /**
      * @param Sellvana_Catalog_Model_Product $model
-     * @param $data
+     * @param array $data
+     * @throws BException
      */
     public function processInventoryPost($model, $data)
     {

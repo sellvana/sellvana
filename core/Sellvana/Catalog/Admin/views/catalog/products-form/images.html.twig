@@ -89,6 +89,7 @@
                     file_size: row.file_size,
                     label: row.label,
                     position: row.position,
+                    in_gallery: row.in_galery,
                     subfolder: row.subfolder,
                     id: guid()
                 });
@@ -191,6 +192,7 @@
                                         create_at: current,
                                         //temporary value before implement edit inline
                                         position: 0,
+                                        in_gallery: 1,
                                         label: FCom.Mixin.removeSpecialChars(obj.file_name)
                                     });
                                     combineAddRows.push(combineRow);
