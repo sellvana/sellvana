@@ -180,9 +180,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         static $default;
 
         $media = $this->BConfig->get('web/media_dir');# ? $this->BConfig->get('web/media_dir') : 'media/';
-        $url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();
-        $thumbUrl = $this->get('thumb_url');
-        if ($thumbUrl) {
+        //$url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();// what is the point in this? Image resources are always in same path
+        $url = '';
+        //$thumbUrl = $this->get('thumb_url');
+        //if ($thumbUrl) {
+        //    return $url . $media . '/' . $thumbUrl;
+        //}
+        $productId    = $this->id();
+        $thumbUrl = $this->getThumbPath($productId);
+        if($thumbUrl){
             return $url . $media . '/' . $thumbUrl;
         }
 
@@ -1439,5 +1445,25 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         parent::__destruct();
         unset($this->_priceModels);
+    }
+
+    /**
+     * @param $productId
+     * @return mixed|null|string
+     */
+    public function getThumbPath($productId)
+    {
+        $thumbUrl = null;
+        $productMedia = $this->Sellvana_Catalog_Model_ProductMedia
+            ->orm("fpm")
+            ->join($this->FCom_Core_Model_MediaLibrary->table(), "fpm.file_id=fml.id", "fml")
+            ->where(["fpm.is_thumb" => 1, "fpm.media_type" => "I", "fpm.product_id" => $productId])->find_one();
+        if ($productMedia) {
+            $thumbUrl = ($productMedia->get('subfolder') != null)
+                ? $productMedia->get('folder') . '/' . $productMedia->get('subfolder') . '/' . $productMedia->get('file_name')
+                : $productMedia->get('folder') . '/' . $productMedia->get('file_name');
+            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
+        }
+        return $thumbUrl;
     }
 }

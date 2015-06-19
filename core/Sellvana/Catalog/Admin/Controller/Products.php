@@ -86,10 +86,16 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
         foreach ($rows as & $row) {
-            $thumbUrl = $row['thumb_url'] ?: 'image-not-found.png';
+            $thumbUrl = $this->_getThumbUrl($row['id']);
             $row['thumb_path'] = $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]);
         }
         return $rows;
+    }
+
+    protected function _getThumbUrl($productId)
+    {
+        $thumbUrl     = $this->Sellvana_Catalog_Model_Product->getThumbPath($productId)?:'image-not-found.png';
+        return $thumbUrl;
     }
 
     /**
@@ -109,7 +115,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $row->set($customRowData);
                 $row->set('data', null);
             }
-            $thumbUrl = $row->get('thumb_url') ? $row->get('thumb_url') : 'image-not-found.png';
+            $thumbUrl = $this->_getThumbUrl($row['id']);
             $row->set('thumb_path', $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]));
         }
         unset($row);
@@ -801,7 +807,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     unset($image['id']);
                     if (!in_array($key, ['is_thumb', 'is_default', 'is_rollover'])) {
                         $mediaModel =  $hlp->load($key);
-                        $is_thumb = $is_default = $is_rollover = 0;
+                        $is_thumb = $is_default = $is_rollover = $in_gallery = 0;
                         if ($type == 'I') {
                             if (isset($data['product_' . $typeName]['is_thumb'])
                                 && $data['product_' . $typeName]['is_thumb'] == $key
@@ -823,6 +829,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                                 $is_rollover = 1;
                             }
                             $image['is_rollover'] = $is_rollover;
+
+                            if(isset($data['product_' . $typeName][$key]['in_gallery'])){
+                                $in_gallery = $data['product_' . $typeName][$key]['in_gallery'];
+                            }
+                            $image['in_gallery'] = $in_gallery;
                         }
 
                         if (isset($image['position'])) {
