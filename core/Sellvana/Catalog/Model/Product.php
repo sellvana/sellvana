@@ -175,7 +175,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->BApp->frontendHref($prefix . ($category ? $category->get('url_path') . '/' : '') . $this->get('url_key'));
     }
 
-    public function imageUrl($full = false)
+    public function imageUrl($full = false, $imgType = 'default')
     {
         static $default;
 
@@ -187,7 +187,18 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //    return $url . $media . '/' . $thumbUrl;
         //}
         $productId    = $this->id();
-        $thumbUrl = $this->getThumbPath($productId);
+        switch ($imgType) {
+            case 'thumb':
+                $thumbUrl = $this->getThumbPath($productId);
+                break;
+            case 'rollover':
+                $thumbUrl = $this->getRolloverPath($productId);
+                break;
+            default :
+                $thumbUrl = $this->getDefaultPath($productId);
+                break;
+        }
+
         if($thumbUrl){
             return $url . $media . '/' . $thumbUrl;
         }
@@ -205,9 +216,19 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $default;
     }
 
+    public function defaultImgUrl($w, $h = null, $full = false)
+    {
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'default'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+    }
+
     public function thumbUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'thumb'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+    }
+
+    public function rolloverUrl($w, $h = null, $full = false)
+    {
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'rollover'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
     }
 
     public function onBeforeSave()
@@ -470,7 +491,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * @param $type
-     * @return ORM
+     * @return BORM
      */
     public function mediaORM($type)
     {
@@ -489,6 +510,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function media($type)
     {
         return $this->mediaORM($type)->find_many_assoc();
+    }
+
+    public function gallery()
+    {
+        return $this->mediaORM('I')->where("pa.in_gallery", 1)->find_many_assoc();
     }
 
     /**
@@ -1453,17 +1479,47 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getThumbPath($productId)
     {
-        $thumbUrl = null;
-        $productMedia = $this->Sellvana_Catalog_Model_ProductMedia
+        return $this->getProductImage($productId, 'thumb');
+    }
+
+    public function getRolloverPath($productId)
+    {
+        return $this->getProductImage($productId, 'rollover');
+    }
+
+    public function getDefaultPath($productId)
+    {
+        return $this->getProductImage($productId, 'default');
+    }
+
+    protected function getProductImage($productId, $imgType = 'default')
+    {
+        $thumbUrl     = null;
+        $productMediaOrm = $this->Sellvana_Catalog_Model_ProductMedia
             ->orm("fpm")
             ->join($this->FCom_Core_Model_MediaLibrary->table(), "fpm.file_id=fml.id", "fml")
-            ->where(["fpm.is_thumb" => 1, "fpm.media_type" => "I", "fpm.product_id" => $productId])->find_one();
+            ->where(["fpm.media_type" => "I", "fpm.product_id" => $productId]);
+
+        switch ($imgType) {
+            case 'thumb':
+                $productMediaOrm->where("fpm.is_thumb", 1);
+                break;
+            case 'rollover':
+                $productMediaOrm->where("fpm.is_rollover", 1);
+                break;
+            default :
+                $productMediaOrm->where("fpm.is_default", 1);
+                break;
+        }
+
+        $productMedia = $productMediaOrm->find_one();
         if ($productMedia) {
             $thumbUrl = ($productMedia->get('subfolder') != null)
                 ? $productMedia->get('folder') . '/' . $productMedia->get('subfolder') . '/' . $productMedia->get('file_name')
                 : $productMedia->get('folder') . '/' . $productMedia->get('file_name');
             $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
         }
+
         return $thumbUrl;
     }
 }
