@@ -121,7 +121,7 @@ class FCom_Core_Main extends BClass
             if (strpos($mediaDir, FULLERON_ROOT_DIR) === 0) {
                 $mediaUrl = preg_replace('#^' . preg_quote(FULLERON_ROOT_DIR, '#') . '#', '', $mediaDir);
             } elseif ($rootDir && $rootDir !== '/' && strpos($mediaDir, $rootDir) === 0) {
-                $mediaUrl = preg_replace('#^' . preg_quote($rootDir, '#'), '', $mediaDir);
+                $mediaUrl = preg_replace('#^' . preg_quote($rootDir, '#') . '#', '', $mediaDir);
             } elseif ($baseSrc && $baseSrc !== '/' && strpos($mediaDir, $baseSrc) === 0) {
                 $mediaUrl = preg_replace('#^' . preg_quote($baseSrc, '#') . '#', '', $mediaDir);
             #} elseif (strpos($mediaDir, $docRoot) === 0) {

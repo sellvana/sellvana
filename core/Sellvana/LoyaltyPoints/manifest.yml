@@ -1,0 +1,15 @@
+modules:
+    Sellvana_LoyaltyPoints:
+        version: 0.5.0.0
+        channel: alpha
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views ]
+                routing:
+                    - [ /loyaltypoints/balances/.action, Sellvana_LoyaltyPoints_Admin_Controller_Balances ]
+
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ /loyaltypoints/account/.action, Sellvana_LoyaltyPoints_Frontend_Controller_Account ]
