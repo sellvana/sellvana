@@ -15,6 +15,8 @@
 {% for p in THIS.get('products') %}
   {% set productName = p.getName() %}
   {% set productUrl = p.url(THIS.get('category')) %}
+  {% set productImg = p.thumbUrl(350, 350) %}
+  {% set productRollover = p.rolloverUrl(350, 350) %}
     <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }}">
       <div class="thumbnail">
         {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
@@ -22,8 +24,11 @@
         {% endif %}
         <div class="f-col-listing-prod-img">
           <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>
-          <a href="{{ productUrl }}" class="f-prod-img" title="{{ productName }}">
-            <img alt="{{ productName }}" src="{{ p.thumbUrl(350, 350) }}"/>
+          <a href="{{ productUrl }}" class="f-prod-img" title="{{ productName }}" style="position: relative;">
+            {% if productImg != productRollover %}
+            <div style="display: none; position: absolute;" class="f-prod-img-over"><img src="{{ productRollover }}" alt="{{ productName }}"/></div>
+            {% endif %}
+            <div class="f-prod-img-base"><img alt="{{ productName }}" src="{{ productImg }}"/></div>
           </a>
         </div>
         <div class="caption">
@@ -62,3 +67,29 @@
         <div class="visible-xs clearfix"></div>
     {% endif %}
 {% endfor %}
+
+<script type="text/javascript">
+    require(['jquery', 'jquery-ui'], function ($) {
+        var $imgs = $('.f-prod-img');
+        console.log($imgs);
+        // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
+        var effect = 'slide';
+        $imgs.hover(function () {
+            var $cont = $(this);
+            var $over = $cont.find('.f-prod-img-over');
+            if ($over.length) {
+                var h = $cont.height();
+                $cont.height(h);
+                $cont.find('.f-prod-img-base').hide(effect);
+                $over.show(effect);
+            }
+        }, function () {
+            var $cont = $(this);
+            var $over = $cont.find('.f-prod-img-over');
+            if ($over.length) {
+                $over.hide(effect);
+                $cont.find('.f-prod-img-base').show(effect);
+            }
+        });
+    });
+</script>
