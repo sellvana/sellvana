@@ -514,7 +514,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function gallery()
     {
-        return $this->mediaORM('I')->where("pa.in_gallery", 1)->find_many_assoc();
+        return $this->mediaORM('I')->where(["pa.in_gallery" => 1])->order_by_desc('is_default')->find_many_assoc();
     }
 
     /**

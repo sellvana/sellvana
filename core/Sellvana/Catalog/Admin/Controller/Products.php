@@ -833,6 +833,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                             if(isset($data['product_' . $typeName][$key]['in_gallery'])){
                                 $in_gallery = $data['product_' . $typeName][$key]['in_gallery'];
                             }
+                            if($image['is_default']){
+                                $in_gallery = 1;
+                            }
                             $image['in_gallery'] = $in_gallery;
                         }
 
