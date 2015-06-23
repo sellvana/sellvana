@@ -1,5 +1,5 @@
 {% set m = THIS.get('model') %}
-{% set images = m.media('I') %}
+{% set images = m.gallery() %}
 {% set inventory = m.getInventoryModel() %}
 {% set canOrder = inventory.canOrder() %}
 

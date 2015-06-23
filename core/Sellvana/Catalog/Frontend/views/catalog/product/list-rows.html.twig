@@ -2,9 +2,14 @@
 {% set priceView = THIS.view('catalog/product/price') %}
 {% set addToCartUrl = THIS.url('cart/add') %}
 
+{% set useRollover = CONFIG.get('modules/Sellvana_Catalog/enable_rollover') %}
+{% set rolloverEffect = CONFIG.get('modules/Sellvana_Catalog/rollover_effect') %}
+
 {% for p in THIS.get('products') %}
     {% set productName = p.getName() %}
     {% set productUrl = p.url(THIS.get('category')) %}
+    {% set productImg = p.thumbUrl(350, 350) %}
+    {% set productRollover = p.rolloverUrl(350, 350) %}
   <div class="row">
     {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
         <span class="sale tooltip-test">Sale</span>
@@ -12,7 +17,12 @@
     <div class="f-col-listing-prod-img col-sm-4">
       <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>
       <a href="{{ productUrl }}" class="f-prod-img">
-        <img alt="{{ productName }}" src="{{ p.thumbUrl(350, 350) }}"/>
+          {% if useRollover and productImg != productRollover %}
+              <div style="display: none; position: absolute;" class="f-prod-img-over">
+                  <img src="{{ productRollover }}" alt="{{ productName }}"/>
+              </div>
+          {% endif %}
+          <div class="f-prod-img-base"><img alt="{{ productName }}" src="{{ productImg }}"/></div>
       </a>
     </div>
     <div class="caption col-sm-8">
@@ -36,3 +46,28 @@
   </div>
 {% endfor %}
 
+<script type="text/javascript">
+    require(['jquery', 'jquery-ui'], function ($) {
+        var $imgs = $('.f-prod-img');
+        console.log($imgs);
+        // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
+        var effect = '{{ rolloverEffect?:'fade' }}';
+        $imgs.hover(function () {
+            var $cont = $(this);
+            var $over = $cont.find('.f-prod-img-over');
+            if ($over.length) {
+                var h = $cont.height();
+                $cont.height(h);
+                $cont.find('.f-prod-img-base').hide(effect);
+                $over.show(effect);
+            }
+        }, function () {
+            var $cont = $(this);
+            var $over = $cont.find('.f-prod-img-over');
+            if ($over.length) {
+                $over.hide(effect);
+                $cont.find('.f-prod-img-base').show(effect);
+            }
+        });
+    });
+</script>

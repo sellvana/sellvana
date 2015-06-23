@@ -10,6 +10,8 @@
 
 {% set addToCartUrl = THIS.url('cart/add') %}
 
+{% set useRollover = CONFIG.get('modules/Sellvana_Catalog/enable_rollover') %}
+{% set rolloverEffect = CONFIG.get('modules/Sellvana_Catalog/rollover_effect') %}
 
 {% set count = 0 %}
 {% for p in THIS.get('products') %}
@@ -25,7 +27,7 @@
         <div class="f-col-listing-prod-img">
           <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>
           <a href="{{ productUrl }}" class="f-prod-img" title="{{ productName }}" style="position: relative;">
-            {% if productImg != productRollover %}
+            {% if useRollover and productImg != productRollover %}
             <div style="display: none; position: absolute;" class="f-prod-img-over"><img src="{{ productRollover }}" alt="{{ productName }}"/></div>
             {% endif %}
             <div class="f-prod-img-base"><img alt="{{ productName }}" src="{{ productImg }}"/></div>
@@ -73,7 +75,7 @@
         var $imgs = $('.f-prod-img');
         console.log($imgs);
         // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
-        var effect = 'slide';
+        var effect = '{{ rolloverEffect?:'fade' }}';
         $imgs.hover(function () {
             var $cont = $(this);
             var $over = $cont.find('.f-prod-img-over');

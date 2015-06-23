@@ -65,6 +65,17 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'vendor_disc' => 'Supplier Discontinued',
             'mfr_disc' => 'MFR Discontinued',
         ],
+        'rollover_effects' => [
+            'fade' => 'Fade',
+            'clip' => 'Clip',
+            'blind' => 'Blinds',
+            'drop' => 'Drop',
+            'fold' => 'Fold',
+            'highlight' => 'Highlight',
+            'puff' => 'Puff',
+            'pulsate' => 'Pulsate',
+            'slide' => 'Slide'
+        ],
     ];
 
     protected static $_validationRules = [
@@ -1175,6 +1186,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             "NOT_BACK_ORDERS"         => $this->BLocale->_("No Back Orders"),
             "ALLOW_QUANTITY_BELOW" => $this->BLocale->_("Allow Quantity Below 0")
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRolloverEffects()
+    {
+        // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
+        return $this->fieldOptions('rollover_effects');
     }
 
     /**
