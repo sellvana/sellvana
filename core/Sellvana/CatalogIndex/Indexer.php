@@ -220,7 +220,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $orm->where_raw("term regexp '(" . join('|', $terms) . ")'");
             $termIds = $orm->find_many_assoc('term', 'id');
             if ($termIds) {
-                $bus['products_orm']->where([
+                $bus['result']['orm']->where([
                     ["(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt WHERE term_id IN (?)))", array_values($termIds)],
                 ]);
             } else {
