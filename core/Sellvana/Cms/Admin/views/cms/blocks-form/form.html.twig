@@ -50,7 +50,7 @@
         window.formFieldGridRegister = function(grid) {
             formFieldsGrid = grid;
             formFieldsNode = $(formFieldsGrid.getDOMNode());
-        }
+        };
 
         $('#default-form').submit(function (ev) {
             var rows = formFieldsGrid.getRows();
@@ -123,11 +123,11 @@
                 formFieldsGrid.addRows([addRows]);
                 modal.close();
             }
-        }
+        };
 
         var formColumns = [
             {
-                'name': 'input_type', 'label': 'Field Type', 'labelClass': 'col-sm-3', 'width': 200, 'editor': 'select', 'addable': true, 'editable': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true},
+                name: 'input_type', 'label': 'Field Type', 'labelClass': 'col-sm-3', 'width': 200, 'editor': 'select', 'addable': true, 'editable': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true},
                 options: {
                     '': '-- Select field type --',
                     'text': 'Single Line Text',
@@ -153,11 +153,11 @@
 
             {'name': 'name', 'label': 'Field Name', 'labelClass': 'col-sm-3', 'width': 200, 'addable': true, 'editable': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true}},
 
-            {'name': 'required', 'label': 'Required', 'labelClass': 'col-sm-5', 'addable': true, 'editable': true, 'editor': 'select', 'cssClass': 'col-sm-7', 'width': 150,'options': {'0': 'No', '1': 'Yes'}, 'formGroupClass': 'form-group col-sm-4', 'validation': {'required': true}},
+            {'name': 'required', 'label': 'Required', 'labelClass': 'col-sm-5', 'addable': true, 'editable': true, 'editor': 'select', 'cssClass': 'col-sm-7', 'width': 150,'options': {'0': 'No', '1': 'Yes'}, 'formGroupClass': 'form-group col-sm-4'},
 
             {'name': 'field_id', 'label': 'Field Id', 'labelClass': 'col-sm-3', 'addable': true, 'editable': true, 'hidden': true, 'cssClass': 'col-sm-8', 'formGroupClass': 'form-group col-sm-8', 'validation': {'required': true}},
 
-            {'name': 'readonly', 'label': 'Read Only', 'labelClass': 'col-sm-5', 'hidden': true, 'addable': true, 'editable': true, 'editor': 'select', 'cssClass': 'col-sm-7', 'options': {'0': 'No', '1': 'Yes'}, 'formGroupClass': 'form-group col-sm-4', 'validation': {'required': true}},
+            {'name': 'readonly', 'label': 'Read Only', 'labelClass': 'col-sm-5', 'hidden': true, 'addable': true, 'editable': true, 'editor': 'select', 'cssClass': 'col-sm-7', 'options': {'0': 'No', '1': 'Yes'}, 'formGroupClass': 'form-group col-sm-4'},
 
             {'addable': true, 'editable': true, 'editor': 'clearfix', 'formGroupClass': 'clearfix', 'style': {clear: 'both'}},
 
@@ -174,7 +174,7 @@
                 ]
             },
 
-            {'formGroupClass': 'form-group managed number-field date-field time-field text-field url-field tel-field email-field password-field textarea-field select-field select-multi-field', 'addable': true, 'editable': true, 'hidden': true, 'managable': ['number', 'date', 'select', 'text', 'url', 'tel', 'email', 'password', 'select-multi', 'time'], 
+            {'formGroupClass': 'form-group managed number-field date-field time-field text-field url-field tel-field email-field password-field textarea-field select-field select-multi-field', 'addable': true, 'editable': true, 'hidden': true, 'managable': ['number', 'date', 'select', 'text', 'url', 'tel', 'email', 'password', 'select-multi', 'time'],
                 'child': [
                     {'name': 'size', 'label': 'Size', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3'}
                 ]
@@ -189,7 +189,7 @@
 
             {'name': 'options', 'label': 'Add/Remove options', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed select-field select-multi-field radio-field checkbox-field', 'cssClass': 'col-sm-9', 'addable': true, 'editable': true, 'managable': ['select', 'select-multi', 'radio']},
 
-            {'name': 'checked', 'label': 'Default checked', 'labelClass': 'col-sm-2', 'cssClass': 'col-sm-2', 'formGroupClass': 'form-group managed checkbox-field radio-field', 'addable': true, 'editable': true, 'editor': 'select', 'managable': ['checkbox', 'radio'], 
+            {'name': 'checked', 'label': 'Default checked', 'labelClass': 'col-sm-2', 'cssClass': 'col-sm-2', 'formGroupClass': 'form-group managed checkbox-field radio-field', 'addable': true, 'editable': true, 'editor': 'select', 'managable': ['checkbox', 'radio'],
                 'options': {
                     '0': 'No', '1': 'Yes'
                 }
@@ -197,7 +197,7 @@
 
             {'name': 'formaction', 'label': 'Form action', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed image-field submit-field', 'cssClass': 'col-sm-9', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['image', 'submit'], 'cssClass': 'col-sm-9'},
 
-            {'name': 'formnovalidate', 'label': 'No form validate', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['submit'], 'cssClass': 'col-sm-2', 'editor': 'select', 'formGroupClass': 'form-group managed submit-field', 
+            {'name': 'formnovalidate', 'label': 'No form validate', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['submit'], 'cssClass': 'col-sm-2', 'editor': 'select', 'formGroupClass': 'form-group managed submit-field',
                 'options': {
                     '0': 'No', '1': 'Yes'
                 }
@@ -205,14 +205,14 @@
 
             {'name': 'src', 'label': 'Src', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['image'], 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group managed image-field'},
 
-            {'formGroupClass': 'form-group managed image-field', 'hidden': true, 'addable': true, 'managable': ['image'], 'editable': true, 
+            {'formGroupClass': 'form-group managed image-field', 'hidden': true, 'addable': true, 'managable': ['image'], 'editable': true,
                 'child': [
                     {'name': 'height', 'label': 'Height', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3', 'formGroupClass': ''},
                     {'name': 'width', 'label': 'Width', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-3', 'formGroupClass': ''}
                 ]
             },
 
-            {'formGroupClass': 'form-group managed number-field date-field time-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['number', 'date', 'time'], 
+            {'formGroupClass': 'form-group managed number-field date-field time-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['number', 'date', 'time'],
                 'child': [
                     {'name': 'min', 'label': 'Min value', 'labelClass': 'col-sm-6', 'cssClass': 'digits nonegative col-sm-6', 'formGroupClass': 'col-sm-4'},
                     {'name': 'max', 'label': 'Max value', 'labelClass': 'col-sm-5', 'cssClass': 'digits nonegative col-sm-6', 'formGroupClass': 'col-sm-4'},
@@ -220,16 +220,16 @@
                 ]
             },
 
-            {'name': 'multiple', 'label': 'Multiple', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed email-field file-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['email', 'file'], 'cssClass': 'col-sm-2', 'editor': 'select', 
+            {'name': 'multiple', 'label': 'Multiple', 'labelClass': 'col-sm-2', 'formGroupClass': 'form-group managed email-field file-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['email', 'file'], 'cssClass': 'col-sm-2', 'editor': 'select',
                 'options': {
                     '0': 'No', '1': 'Yes'
                 }
             },
 
-            {'formGroupClass': 'form-group managed image-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['text', 'email', 'url', 'tel', 'password'], 
+            {'formGroupClass': 'form-group managed image-field', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['text', 'email', 'url', 'tel', 'password'],
                 'child': [
                     {'name': 'pattern', 'label': 'Pattern', 'labelClass': 'col-sm-2', 'cssClass': 'digits nonegative col-sm-4', 'formGroupClass': ''},
-                    {'name': 'autocomplete', 'label': 'Autocomplete', 'labelClass': 'col-sm-3', 'cssClass': 'col-sm-2', 'formGroupClass': '', 'editor': 'select', 
+                    {'name': 'autocomplete', 'label': 'Autocomplete', 'labelClass': 'col-sm-3', 'cssClass': 'col-sm-2', 'formGroupClass': '', 'editor': 'select',
                         'options': {
                             '0': 'No', '1': 'Yes'
                         }
@@ -252,7 +252,7 @@
                 }
             },
             componentDidMount: function() {
-                
+
             },
             setInputType: function(e) {
                 this.removeErrorEles();
@@ -303,13 +303,17 @@
                         this.removeFormFields(renderColumns, ['required']);
                         break;
                 }
+                var key = 1;
 
                 var nodes = renderColumns.map(function(column) {
                     if((that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
                     if (column.name === 'input_type') {
-                        return React.createElement(formFieldsModalElement, {column: column, value: that.props.row[column.name], setInputTypeHandle: that.setInputType})
+                        return React.createElement(formFieldsModalElement, {
+                            key: column.name + (key++), column: column, value: that.props.row[column.name],
+                            setInputTypeHandle: that.setInputType})
                     }
-                    return React.createElement(formFieldsModalElement, {column: column, value: that.props.row[column.name]})
+                    return React.createElement(formFieldsModalElement, {
+                        key: column.name + (key++), column: column, value: that.props.row[column.name]})
                 });
 
                 return (
@@ -337,7 +341,7 @@
                 var that = this;
                 var inputs = columns.map(function(column, index) {
                     return (
-                        React.createElement("div", {className: column.formGroupClass, style: column.style}, 
+                        React.createElement("div", {className: column.formGroupClass, style: column.style},
                             that.renderLabel(column), React.createElement("div", {className: "controls " + column.cssClass}, that.renderNode(column))
                         )
                     );
@@ -348,8 +352,8 @@
             renderLabel: function(column) {
                 var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
                 return (
-                    React.createElement("div", {className: "control-label " + column.labelClass}, 
-                        React.createElement("label", {htmlFor: column.name}, 
+                    React.createElement("div", {className: "control-label " + column.labelClass},
+                        React.createElement("label", {htmlFor: column.name},
                             column.label, iconRequired
                         )
                     )
@@ -376,7 +380,7 @@
                     default:
                         return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules));
                         break;
-                }   
+                }
             },
             render: function() {
                 var that = this;
@@ -393,13 +397,38 @@
                 }
 
                 return (
-                    React.createElement("div", {className: column.formGroupClass, style: column.style, id: column.name}, 
+                    React.createElement("div", {className: column.formGroupClass, style: column.style, id: column.name},
                         this.renderLabel(column), React.createElement("div", {className: "controls " + column.cssClass, style: column.style}, this.renderNode(column))
                     )
                 )
 
             }
         });
+
+        var setValidateForm = function (selector) {
+            if (selector == null) {
+                selector = $(".validate-form");
+            }
+            if (jQuery().validate) {
+                return selector.each(function (i, elem) {
+                    return $(elem).validate({
+                        errorElement: "span",
+                        errorClass: "help-block has-error",
+                        errorPlacement: function (e, t) {
+                            return t.parents(".controls").first().append(e);
+                        },
+                        highlight: function (e) {
+                            $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
+                            return $(e).closest('span.help-block').css('display', 'block');
+                        },
+                        success: function (e) {
+                            e.closest(".form-group").removeClass("has-error");
+                            return e.closest("span.help-block").css('display', 'none');
+                        }
+                    });
+                });
+            }
+        };
 
         window.showModalToAddFormField = function(grid) {
             formFieldsGrid = grid;
@@ -428,6 +457,7 @@
             React.render(
                 React.createElement(FormFieldModalForm, {columnMetadata: formColumns, id: formFieldsGrid.getConfig('id')}), modalFormEle
             );
+            setValidateForm($(modalFormEle));
         }
     });
 </script>
