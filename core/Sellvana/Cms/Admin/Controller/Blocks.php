@@ -7,6 +7,7 @@
  * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
+ * @property FCom_Frontend_Main $FCom_Frontend_Main
  */
 class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -84,7 +85,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
             ['field' => 'label', 'type' => 'text'],
             ['field' => 'input_type', 'type' => 'text']
         ];
-        
+
         $config['actions'] = [
             //'add' => ['caption' => 'Add Fields'],
             'add-form-field' => [
@@ -118,7 +119,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
                     'ts' => ['label' => 'TimeStamp', 'formatter' => 'date'],
                     'version' => ['label' => 'Version'],
                     'user_id' => ['type' => 'input', 'label' => 'User', 'editor' => 'select',
-                        'options' => $this->FCom_Admin_Model_User->options()],
+                        'options' => $this->getAdminUsers()],
                     'username' => ['Label' => 'User Name', 'hidden' => true],
                     'comments' => ['labl' => 'Comments'],
                 ],
@@ -141,6 +142,27 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         ];
 
         return $emailOptions;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminUsers()
+    {
+        $options = $this->FCom_Admin_Model_User->options();
+        return $options;
+    }
+
+    public function getEmailTemplates()
+    {
+        $templates = $this->FCom_Frontend_Main->getLayout()->findViewsRegex('#^email/#');
+        $options   = [];
+        if ($templates) {
+            foreach ($templates as $t) {
+                $options[$t->getParam('view_name')] = $t->twigName();
+            }
+        }
+        return $options;
     }
 
     public function action_history_grid_data()

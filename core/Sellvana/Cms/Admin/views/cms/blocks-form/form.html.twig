@@ -2,7 +2,11 @@
 <!--{ pos: 30 }-->
 
 {% set blockCtrl = APP.instance('Sellvana_Cms_Admin_Controller_Blocks') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator } %}
 {% set grid = blockCtrl.formFieldGrid(model) %}
+{% set adminUsers = blockCtrl.getAdminUsers() %}
+{% set templates = blockCtrl.getEmailTemplates() %}
 <fieldset class="form-horizontal">
     <div class="f-section">
         <div class="form-group">
@@ -11,6 +15,18 @@
             {{ forms.boolean(fieldData, {field:'form_enable', label:'Form Enabled'|_, select2:true}) }}
             {{ forms.select(fieldData, {field:'form_email', label:'Send form data to'|_, select2: true, options:emailOptions}) }}
             {{ forms.input(fieldData, {field:'form_custom_email', label:'Custom email'|_, attr:'disabled', input_class:"email"}) }}
+
+            {% if adminUsers %}
+            {{ forms.boolean(fieldData, {field: 'form_notify_admin', label: 'Send notification to admin'|_, select2: true}) }}
+            {{ forms.select(fieldData, {field: 'form_notify_admin_user', label: 'Admin users to notify', multiple: true, options: adminUsers, select2: true}) }}
+            {% endif %}
+
+            {{ forms.boolean(fieldData, {field: 'form_notify_customer', label: 'Send confirmation to customer'|_, select2: true}) }}
+            {% if templates %}
+            {{ forms.select(fieldData, {field: 'form_notify_customer_tpl', label: 'Email template', options: templates, select2: true}) }}
+            {% endif %}
+            {{ forms.input(fieldData, {field: 'form_user_email_field', label: 'Form Email Field'|_}) }}
+
             <script type="text/javascript">
                 require(['jquery', 'select2'], function ($) {
                     $(function () {
