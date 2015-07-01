@@ -1607,7 +1607,7 @@ class BUtil extends BClass
 
     /**
      * @param $callback
-     * @return array
+     * @return callable
      */
     public function extCallback($callback)
     {

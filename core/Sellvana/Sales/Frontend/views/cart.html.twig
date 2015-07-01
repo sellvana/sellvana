@@ -1,6 +1,6 @@
 {% set loggedIn = APP.instance('Sellvana_Customer_Model_Customer').isLoggedIn() %}
 {% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
-{% set field = APP.instance('Sellvana_CustomField_Model_Field') %}
+{% set field = APP.instance('Sellvana_CatalogFields_Model_Field') %}
 {% set cartItems = cart.items() %}
 {% set shipping_estimates = SESSION.get('shipping_estimate') %}
 {% set checkout_methods = APP.instance('Sellvana_Sales_Main').getCheckoutMethods() %}

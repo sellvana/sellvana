@@ -161,6 +161,10 @@
                         <div class="tab-pane js-main-form-tab" id="tab-{{ k }}" {% if not tab.async %} data-loaded="true" {% endif %}>
                             {% if not tab.async %}
                                 {{ THIS.view(tab.view).set({validator: validator}) | raw }}
+                            {% else %}
+                                <div style="margin:20px;">
+                                    <p>{{ 'Please wait, loading tab contents..'|_ }}</p>
+                                </div>
                             {% endif %}
                         </div>
                     {% endfor %}

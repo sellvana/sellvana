@@ -2,7 +2,7 @@ modules:
     Sellvana_MultiLanguage:
         version: 0.5.0.0
         channel: alpha
-        require: { module: { FCom_Core: 0.1.0, Sellvana_CatalogIndex: 0.1.0, Sellvana_CustomField: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, Sellvana_CatalogIndex: 0.1.0, Sellvana_CatalogFields: 0.1.0 } }
         translations: { en: en.php }
         auto_use: [ bootstrap ]
 

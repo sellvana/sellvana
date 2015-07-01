@@ -1,0 +1,10 @@
+{% set prod = THIS.get('prod') %}
+{% set fields = APP.instance('Sellvana_CatalogFields_Main').customFieldsShowOnFrontend(prod) %}
+
+{% if (fields) %}
+    <h2>{{ "Custom fields here" | _ }}</h2>
+    {% for f in fields %}
+    {{ f.get('frontend_label') }}: {{ prod.get(f.get('field_code')) }} <br/>
+    {% endfor %}
+    <hr/>
+{% endif %}

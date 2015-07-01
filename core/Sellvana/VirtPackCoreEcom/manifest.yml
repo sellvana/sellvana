@@ -14,13 +14,13 @@ modules:
                 Sellvana_AdapterExcel: 0.5.0.0
                 Sellvana_Blog: 0.5.0.0
                 Sellvana_Catalog: 0.5.0.0
+                Sellvana_CatalogFields: 0.5.0.0
                 Sellvana_CatalogIndex: 0.5.0.0
                 Sellvana_Checkout: 0.5.0.0
                 Sellvana_Cms: 0.5.0.0
                 Sellvana_Customer: 0.5.0.0
                 #Sellvana_CustomerAssist: 0.5.0.0
                 Sellvana_CustomerGroups: 0.5.0.0
-                Sellvana_CustomField: 0.5.0.0
                 Sellvana_Disqus: 0.5.0.0
                 Sellvana_Email: 0.5.0.0
                 Sellvana_Feedback: 0.5.0.0

@@ -156,7 +156,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
 
     protected function _indexFetchVariantsData($products)
     {
-        if (!$this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
+        if (!$this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
             return;
         }
         $pIds = [];
@@ -166,7 +166,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
         if (!$pIds) {
             return;
         }
-        $variants = $this->Sellvana_CustomField_Model_ProductVariant->orm()
+        $variants = $this->Sellvana_CatalogFields_Model_ProductVariant->orm()
             ->where_in('product_id', $pIds)->find_many();
         if (!$variants) {
             return;
