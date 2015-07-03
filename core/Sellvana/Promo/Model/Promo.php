@@ -35,7 +35,7 @@
  * @property Sellvana_Catalog_Model_InventorySku    $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Catalog_Model_Category        $Sellvana_Catalog_Model_Category
  * @property Sellvana_Promo_Main                    $Sellvana_Promo_Main
- * @property Sellvana_CustomField_Main              $Sellvana_CustomField_Main
+ * @property Sellvana_CatalogFields_Main              $Sellvana_CatalogFields_Main
  */
 class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
 {
@@ -238,8 +238,8 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         $result = [];
         if (!$conditionRules || !$matchType || $matchType === 'always') {
             //TODO: optimize applying to all products in catalog when a lot of products
-            if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
-                $this->Sellvana_CustomField_Main->disable();
+            if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
+                $this->Sellvana_CatalogFields_Main->disable();
             }
             $products = $this->Sellvana_Catalog_Model_Product->orm('p')
                 ->clear_columns()
@@ -247,8 +247,8 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
                 ->select("('promo')", 'price_type')
                 ->find_many_assoc('product_id');
 
-            if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
-                $this->Sellvana_CustomField_Main->disable(false);
+            if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
+                $this->Sellvana_CatalogFields_Main->disable(false);
             }
             $result['products'] = $this->BDb->many_as_array($products);
             return $result;

@@ -187,7 +187,7 @@ class BClass
 
     public function getGlobalDependencyInstance($name, $diConfig)
     {
-        if (!ctype_upper($name[0])) {
+        if ($name[0] < 'A' || $name[0] > 'Z') {
             return false;
         }
         if (isset(static::$_diGlobal[$name])) {
@@ -1706,7 +1706,7 @@ class BEvents extends BClass
     /**
      * Shortcut to help with IDE autocompletion
      *
-     * @param bool  $new
+     * @param bool $new
      * @param array $args
      * @return BEvents
      */
@@ -1732,7 +1732,7 @@ class BEvents extends BClass
             }
             return $this;
         }
-        $eventName = strtolower($eventName);
+        $eventName                 = strtolower($eventName);
         $this->_events[$eventName] = [
             'observers' => [],
             'args' => $args,
@@ -1746,12 +1746,12 @@ class BEvents extends BClass
      * observe|watch|on|sub|subscribe ?
      *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
-     * @param mixed        $callback
+     * @param mixed $callback
      * @param array|object $args
-     * @param null         $alias
+     * @param arary $params - alias, insert (function, 0=skip, -1=before, 1=after)
      * @return BEvents
      */
-    public function on($eventName, $callback = null, $args = [], $alias = null)
+    public function on($eventName, $callback = null, $args = [], $params = null)
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
@@ -1759,16 +1759,38 @@ class BEvents extends BClass
             }
             return $this;
         }
-        if (null === $alias && is_string($callback)) {
-            $alias = $callback;
+        if (is_string($params)) {
+            $params = ['alias' => $params];
         }
-        $observer = ['callback' => $callback, 'args' => $args, 'alias' => $alias];
+        if (empty($params['alias']) && is_string($callback)) {
+            $params['alias'] = $callback;
+        }
+        $observer = ['callback' => $callback, 'args' => $args, 'alias' => $params['alias']];
         if (($moduleName = $this->BModuleRegistry->currentModuleName())) {
             $observer['module_name'] = $moduleName;
         }
         //TODO: create named observers
         $eventName = strtolower($eventName);
-        $this->_events[$eventName]['observers'][] = $observer;
+        if (empty($params['insert'])) {
+            $this->_events[$eventName]['observers'][] = $observer;
+        } else {
+            $insertCallable = $this->BUtil->extCallback($params['insert']);
+            $inserted = false;
+            foreach ($this->_events[$eventName]['observers'] as $i => $obs) {
+                if (!empty($insertCallable)) {
+                    $result = $insertCallable($obs, $eventName, $callback);
+                    if ($result) {
+                        $beforeAfter = $result === -1 ? $i : ($i + 1);
+                        array_splice($this->_events[$eventName]['observers'], $beforeAfter, 0, [$observer]);
+                        $inserted = true;
+                        break;
+                    }
+                }
+            }
+            if (!$inserted) {
+                $this->_events[$eventName]['observers'][] = $observer;
+            }
+        }
         BDebug::debug('SUBSCRIBE ' . $eventName, 1);
         return $this;
     }
@@ -1777,12 +1799,12 @@ class BEvents extends BClass
      * Run callback on event only once, and remove automatically
      *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
-     * @param mixed        $callback
+     * @param mixed $callback
      * @param array|object $args
-     * @param null         $alias
+     * @param array $params
      * @return BEvents
      */
-    public function once($eventName, $callback = null, $args = [], $alias = null)
+    public function once($eventName, $callback = null, $args = [], $params = [])
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
@@ -1790,11 +1812,11 @@ class BEvents extends BClass
             }
             return $this;
         }
-        $this->on($eventName, $callback, $args, $alias);
+        $this->on($eventName, $callback, $args, $params);
         $lastId = sizeof($this->_events[$eventName]['observers']);
-        $this->on($eventName, function() use ($eventName, $lastId) {
+        $this->on($eventName, function () use ($eventName, $lastId) {
             $this->BEvents
-                ->off($eventName, $lastId-1) // remove the observer
+                ->off($eventName, $lastId - 1)// remove the observer
                 ->off($eventName, $lastId) // remove the remover
             ;
         });
@@ -1805,7 +1827,7 @@ class BEvents extends BClass
      * Disable all observers for an event or a specific observer
      *
      * @param string $eventName
-     * @param null   $alias
+     * @param null $alias
      * @return BEvents
      */
     public function off($eventName, $alias = null)
@@ -1840,9 +1862,10 @@ class BEvents extends BClass
      */
     public function fire($eventName, $args = [])
     {
-        $eventName = strtolower($eventName);
-        $profileStart = BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
-        $result = [];
+        $eventName    = strtolower($eventName);
+        $profileStart =
+            BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
+        $result       = [];
         if (empty($this->_events[$eventName])) {
             return $result;
         }
@@ -1854,8 +1877,8 @@ class BEvents extends BClass
                 if (!empty($observer['args']['position']) && empty($observer['ordered'])) {
                     unset($observers[$i]);
                     $observer['ordered'] = true;
-                    $observers = $this->BUtil->arrayInsert($observers, $observer, $observer['position']);
-                    $dirty = true;
+                    $observers           = $this->BUtil->arrayInsert($observers, $observer, $observer['position']);
+                    $dirty               = true;
                     break;
                 }
             }
@@ -1891,9 +1914,11 @@ class BEvents extends BClass
                     $r = explode($sep, $cb);
                     if (sizeof($r) == 2) {
                         if (!class_exists($r[0]) && $this->BDebug->is('DEBUG')) {
-                            echo "<pre>"; BDebug::cleanBacktrace(); echo "</pre>";
+                            echo "<pre>";
+                            BDebug::cleanBacktrace();
+                            echo "</pre>";
                         }
-                        $cb = [$r[0]::i(), $r[1]];
+                        $cb                   = [$r[0]::i(), $r[1]];
                         $observer['callback'] = $cb;
                         // remember for next call, don't want to use &$observer
                         $observers[$i]['callback'] = $cb;
@@ -1927,6 +1952,11 @@ class BEvents extends BClass
             }
         }
         return $results;
+    }
+
+    public function observers($eventName)
+    {
+        return !empty($this->_events[$eventName]) ? $this->_events[$eventName] : [];
     }
 
     public function debug()

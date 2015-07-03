@@ -45,7 +45,7 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
         $post = $this->BRequest->post();
         $result = [];
 
-        // Sellvana_Sales_Workflow_Cart -> Sellvana_CustomField_Frontend -> Sellvana_Sales_Model_Cart
+        // Sellvana_Sales_Workflow_Cart -> Sellvana_CatalogFields_Frontend -> Sellvana_Sales_Model_Cart
         $this->Sellvana_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
 
         $item = $result['items'][0];

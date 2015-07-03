@@ -25,3 +25,4 @@ modules:
 
         default_config:
             modules/FCom_PushServer/delay_sec: 1
+            modules/FCom_PushServer/only_admin: true

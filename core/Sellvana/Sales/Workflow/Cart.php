@@ -209,7 +209,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
 
     /**
      * @todo normalize API
-     * @todo move "variants" code to Sellvana_CustomFields module
+     * @todo move "variants" code to Sellvana_CatalogFields module
      */
     public function action_customerUpdatesCart($args)
     {

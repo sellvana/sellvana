@@ -2,7 +2,6 @@
 
 /**
  * Class Sellvana_Catalog_ProductsImport
- * @property Sellvana_CustomField_Model_Field $Sellvana_CustomField_Model_Field
  */
 class Sellvana_Catalog_ProductsImport extends BImport
 {
@@ -41,24 +40,6 @@ class Sellvana_Catalog_ProductsImport extends BImport
 
     public function updateFieldsDueToInfo($info = null)
     {
-        $cfFields = $this->Sellvana_CustomField_Model_Field->getListAssoc();
-        $cfKeys = array_keys($cfFields);
-//        $dataKeys = $info['first_row'];
-        //$cfIntersection = array_intersect($cfKeys, $dataKeys);
-        foreach ($cfKeys as $key) {
-            if (!isset($this->fields['product.' . $key])) {
-                $this->fields['product.' . $key] = ['pattern' => $key];
-            }
-        }
-        /*
-        if ($dataKeys) {
-            foreach ($dataKeys as $f) {
-                if (!isset($this->fields['product.'.$f])) {
-                    $this->fields['product.'.$f] = array('pattern' => $f);
-                }
-            }
-        }
-         *
-         */
+        $this->BEvents->fire(__METHOD__, ['info' => $info, 'object' => $this]);
     }
 }

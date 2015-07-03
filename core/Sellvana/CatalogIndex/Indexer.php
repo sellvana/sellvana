@@ -12,8 +12,8 @@
  * @property Sellvana_CatalogIndex_Model_FieldValue $Sellvana_CatalogIndex_Model_FieldValue
  * @property Sellvana_CatalogIndex_Model_Term $Sellvana_CatalogIndex_Model_Term
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_CustomField_Main $Sellvana_CustomField_Main
- * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
+ * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
+ * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  */
 class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstract
@@ -190,14 +190,14 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         $this->_searchRetrieveFilterFieldValues($bus);
         $this->_searchApplyFacetFilters($bus);
 
-        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
-            $this->Sellvana_CustomField_Main->disable(true);
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
+            $this->Sellvana_CatalogFields_Main->disable(true);
         }
 
         $this->_searchCalcFacetValueCounts($bus);
 
-        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
-            $this->Sellvana_CustomField_Main->disable(false);
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
+            $this->Sellvana_CatalogFields_Main->disable(false);
         }
 
         $this->_searchFormatCategoryFacets($bus);

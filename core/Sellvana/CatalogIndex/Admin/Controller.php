@@ -7,7 +7,7 @@
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
- * @property Sellvana_CustomField_Main $Sellvana_CustomField_Main
+ * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  */
@@ -79,9 +79,9 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
 
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
-            $this->Sellvana_CustomField_Main->disable(true);
+            $this->Sellvana_CatalogFields_Main->disable(true);
             $max = $this->Sellvana_Catalog_Model_Product->orm()->select_expr('(max(id))', 'id')->find_one();
-            $this->Sellvana_CustomField_Main->disable(false);
+            $this->Sellvana_CatalogFields_Main->disable(false);
             $maxId = $max->id();
 //            $categories = $this->Sellvana_Catalog_Model_Category->orm()->where_raw("id_path like '1/%/%'")->select('id')->find_many();
             $products = [];
@@ -127,7 +127,7 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
             $catIds = array_keys($categories);
             $hlp = $this->Sellvana_Catalog_Model_CategoryProduct;
 
-            $this->Sellvana_CustomField_Main->disable(true);
+            $this->Sellvana_CatalogFields_Main->disable(true);
             $this->Sellvana_Catalog_Model_Product->orm()->select('id')->iterate(function($row) use($catIds, $exists, $hlp) {
                 $pId = $row->id;
                 $exists = [];
@@ -139,7 +139,7 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
                     $exists[$pId . '-' . $cId] = true;
                 }
             });
-            $this->Sellvana_CustomField_Main->disable(false);
+            $this->Sellvana_CatalogFields_Main->disable(false);
         }
 
         // reindex products
