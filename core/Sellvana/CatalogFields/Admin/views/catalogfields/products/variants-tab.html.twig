@@ -109,7 +109,7 @@
              */
             processImagesForRow: function (id) {
                 //console.log('processImagesForRow');
-                if (variantGrid && this.images.length) {
+                if (variantGrid) {
                     var selectClass = this.selectClass;
                     var listClass = this.listClass;
                     var inputClass = this.inputClass;
@@ -212,7 +212,7 @@
             listId: '#variants-tab-field',
             //input class in each row
             inputClass: '.select-value-field',
-            customFields: [],
+            customFields: [], //custom fields already attached to this product
             combinations: {},
             init: function () {
                 if (variantFieldGrid) {
@@ -288,7 +288,7 @@
              * populate data to top field section and handle events
              */
             processTopFieldSection: function () {
-                if (variantGrid && this.customFields.length) {
+                if (variantGrid) {
                     var select = variantFields.select;
                     var list = variantFields.list;
 
@@ -344,12 +344,16 @@
                     });
 
                     $(this.btnRemoveFieldClass).on('click', function() {
-                        if (confirm('Are you sure to delete this?')) {
+                        //todo: use modal to display more details message
+                        if (confirm('Deleting this field will remove all associated variants of this product. Are you sure you want to delete?')) {
                             var fieldCode = $(this).attr('data-code');
 
                             //re-display in select
                             variantFields.select.find('option[value=' + $(this).attr('data-id') + ']').removeClass('hide');
                             variantFields.resetSelect();
+
+                            //remove from list
+                            $(this).parents('li.dd-item').remove();
 
                             //remove in custom fields
                             variantFields.customFields = _.reject(variantFields.customFields, function (f) {
@@ -359,16 +363,21 @@
                             //remove from grid column
                             variantFields.deleteGridColumn({ field_code: fieldCode });
 
+                            //remove rows from grid
+                            var deleteCombinations = [];
+                            _.forEach(variantFields.combinations, function(comb, key) {
+                                comb['id'] = key;
+                                deleteCombinations.push(comb);
+                            });
+                            variantGrid.removeRows(deleteCombinations);
+
                             //remove from combinations
-                            if (!_.isEmpty(variantFields.combinations)) {
+                            /*if (!_.isEmpty(variantFields.combinations)) {
                                 _.forEach(variantFields.combinations, function (comb, key) {
                                     delete comb[fieldCode];
                                     variantFields.combinations[key] = comb;
                                 });
-                            }
-
-                            //remove from list
-                            $(this).parents('li.dd-item').remove();
+                            }*/
                         }
                     });
 
