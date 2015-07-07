@@ -5,6 +5,7 @@
  *
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
+ * @property Sellvana_MultiSite_Model_SiteUser $Sellvana_MultiSite_Model_SiteUser
  */
 class Sellvana_MultiSite_Admin extends BClass
 {
@@ -48,6 +49,34 @@ class Sellvana_MultiSite_Admin extends BClass
                 $args['skip_default_handler'] = true;
             } else {
                 throw new BException('Invalid site ID');
+            }
+        }
+    }
+
+    public function onUsersFormPostAfter($args)
+    {
+        $uId = $args['model']->id();
+        $new = $this->BRequest->post('multisite');
+        foreach ($new as $sId => $roles) {
+            $new[$sId] = array_flip($roles);
+        }
+        $hlp = $this->Sellvana_MultiSite_Model_SiteUser;
+        $exists = $hlp->orm()->where('user_id', $uId)->find_many_assoc(['site_id', 'role_id']);
+        if ($exists) {
+            foreach ($exists as $sId => $roles) {
+                foreach ($roles as $rId => $r) {
+                    if (empty($new[$sId][$rId])) {
+                        $r->delete();
+                        unset($exists[$sId][$rId]);
+                    }
+                }
+            }
+        }
+        foreach ($new as $sId => $roles) {
+            foreach ($roles as $rId => $_) {
+                if (empty($exists[$sId][$rId])) {
+                    $hlp->create(['user_id' => $uId, 'site_id' => $sId, 'role_id' => $rId])->save();
+                }
             }
         }
     }

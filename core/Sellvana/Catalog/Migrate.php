@@ -816,4 +816,15 @@ class Sellvana_Catalog_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $tSearchAlias = $this->Sellvana_Catalog_Model_SearchAlias->table();
+        $this->BDb->ddlTableDef($tSearchAlias, [
+            BDb::COLUMNS => [
+                'target_url' => 'text default null',
+                'data_serialized' => 'text default null',
+            ],
+        ]);
+    }
 }
