@@ -38,32 +38,50 @@ abstract class Util
         return $results;
     }
 
-    public static function convertToEasyPostObject($response, $apiKey)
+    public static function convertToEasyPostObject($response, $apiKey, $parent = null, $name = null)
     {
         $types = array(
-            'Address'      => '\EasyPost\Address',
-            'ScanForm'     => '\EasyPost\ScanForm',
-            'CustomsItem'  => '\EasyPost\CustomsItem',
-            'CustomsInfo'  => '\EasyPost\CustomsInfo',
-            'Parcel'       => '\EasyPost\Parcel',
-            'Shipment'     => '\EasyPost\Shipment',
-            'Rate'         => '\EasyPost\Rate',
-            'PostageLabel' => '\EasyPost\PostageLabel',
-            'Batch'        => '\EasyPost\Batch',
-            'Refund'       => '\EasyPost\Refund'
+            'Address'         => '\EasyPost\Address',
+            'Batch'           => '\EasyPost\Batch',
+            'CarrierAccount'  => '\EasyPost\CarrierAccount',
+            'Container'       => '\EasyPost\Container',
+            'CustomsInfo'     => '\EasyPost\CustomsInfo',
+            'CustomsItem'     => '\EasyPost\CustomsItem',
+            'Event'           => '\EasyPost\Event',
+            'Fee'             => '\EasyPost\Fee',
+            'Item'            => '\EasyPost\Item',
+            'Order'           => '\EasyPost\Order',
+            'Parcel'          => '\EasyPost\Parcel',
+            'Pickup'          => '\EasyPost\Pickup',
+            'PostageLabel'    => '\EasyPost\PostageLabel',
+            'Rate'            => '\EasyPost\Rate',
+            'Refund'          => '\EasyPost\Refund',
+            'ScanForm'        => '\EasyPost\ScanForm',
+            'Shipment'        => '\EasyPost\Shipment',
+            'Tracker'         => '\EasyPost\Tracker',
+            'User'            => '\EasyPost\User'
         );
 
         $prefixes = array(
-            'adr'     => '\EasyPost\Address',
-            'sf'      => '\EasyPost\ScanForm',
-            'cstitem' => '\EasyPost\CustomsItem',
-            'cstinfo' => '\EasyPost\CustomsInfo',
-            'prcl'    => '\EasyPost\Parcel',
-            'shp'     => '\EasyPost\Shipment',
-            'rate'    => '\EasyPost\Rate',
-            'pl'      => '\EasyPost\PostageLabel',
-            'batch'   => '\EasyPost\Batch',
-            'rfnd'    => '\EasyPost\Refund'
+            'adr'       => '\EasyPost\Address',
+            'batch'     => '\EasyPost\Batch',
+            'ca'        => '\EasyPost\CarrierAccount',
+            'container' => '\EasyPost\Container',
+            'cstinfo'   => '\EasyPost\CustomsInfo',
+            'cstitem'   => '\EasyPost\CustomsItem',
+            'evt'       => '\EasyPost\Event',
+            'fee'       => '\EasyPost\Fee',
+            'item'      => '\EasyPost\Item',
+            'order'     => '\EasyPost\Order',
+            'prcl'      => '\EasyPost\Parcel',
+            'pickup'    => '\EasyPost\Pickup',
+            'pl'        => '\EasyPost\PostageLabel',
+            'rate'      => '\EasyPost\Rate',
+            'rfnd'      => '\EasyPost\Refund',
+            'sf'        => '\EasyPost\ScanForm',
+            'shp'       => '\EasyPost\Shipment',
+            'trk'       => '\EasyPost\Tracker',
+            'user'      => '\EasyPost\User'
         );
 
         if (self::isList($response)) {
@@ -72,7 +90,7 @@ abstract class Util
                 if (is_string($object) && isset($types[$object])) {
                     $v['object'] = $object;
                 }
-                array_push($mapped, self::convertToEasyPostObject($v, $apiKey));
+                array_push($mapped, self::convertToEasyPostObject($v, $apiKey, $parent, $name));
             }
 
             return $mapped;
@@ -85,7 +103,7 @@ abstract class Util
                 $class = '\EasyPost\Object';
             }
 
-            return Object::constructFrom($response, $class, $apiKey);
+            return Object::constructFrom($response, $class, $apiKey, $parent, $name);
         } else {
 
             return $response;

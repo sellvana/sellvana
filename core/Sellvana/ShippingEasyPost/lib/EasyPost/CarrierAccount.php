@@ -4,7 +4,7 @@ namespace EasyPost;
 
 defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Rate extends Resource
+class CarrierAccount extends Resource
 {
     public static function retrieve($id, $apiKey = null)
     {
@@ -21,19 +21,26 @@ class Rate extends Resource
         return self::_save(get_class());
     }
 
+    public function delete()
+    {
+        return self::_delete(get_class());
+    }
+
     public static function create($params = null, $apiKey = null)
     {
-        if (!isset($params['rate']) || !is_array($params['rate'])) {
+        if (!isset($params['carrier_account']) || !is_array($params['carrier_account'])) {
             $clone = $params;
             unset($params);
-            $params['rate'] = $clone;
+            $params['carrier_account'] = $clone;
         }
-        if (isset($params['rate']['id']) && strpos($params['rate']['id'], "shp") !== -1) {
-            $clone = $params;
-            unset($params);
-            $params['rate']['shipment'] = $clone['rate'];
-        }
-
         return self::_create(get_class(), $params, $apiKey);
     }
+
+    public static function types($params = null, $apiKey = null)
+    {
+        $requestor = new Requestor($apiKey);
+        list($response, $apiKey) = $requestor->request('get', '/carrier_types', $params);
+        return Util::convertToEasyPostObject($response, $apiKey);
+    }
 }
+
