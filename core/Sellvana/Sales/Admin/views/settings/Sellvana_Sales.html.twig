@@ -13,10 +13,15 @@
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Store Origin'|_, id:'settings-Sellvana_Sales-group1'}) }}
+        {{ forms.input(fieldData, {field:'store_name', label:'Store Name'|_ }) }}
+        {{ forms.input(fieldData, {field:'store_email', label:'Store Email'|_ }) }}
         {{ forms.input(fieldData, {field:'store_city', label:'Store City'|_ }) }}
         {{ forms.input(fieldData, {field:'store_region', label:'Store State / Region'|_ }) }}
         {{ forms.input(fieldData, {field:'store_postcode', label:'Store Zip / Postal Code'|_ }) }}
         {{ forms.select(fieldData, {field:'store_country', label:'Store Country'|_, options:countries, default:defCountry }) }}
+        {{ forms.input(fieldData, {field:'store_street1', label:'Store Street 1'|_ }) }}
+        {{ forms.input(fieldData, {field:'store_street2', label:'Store Street 2'|_ }) }}
+        {{ forms.input(fieldData, {field:'store_phone', label:'Store Phone'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Carts'|_, id:'settings-Sellvana_Sales-group2'}) }}
