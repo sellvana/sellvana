@@ -1,6 +1,8 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 namespace EasyPost;
+
+defined('BUCKYBALL_ROOT_DIR') || die();
 
 class Parcel extends Resource
 {
