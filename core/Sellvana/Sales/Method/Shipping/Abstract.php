@@ -94,7 +94,6 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         foreach ($packages as $package) {
             $package['services'] = array_keys($ratedServices);
             $packageRates = $this->fetchPackageRates($package);
-            echo "zzz";
             if (!empty($packageRates['error'])) {
                 return $packageRates; // if for any package there's an error, return immediately
             }

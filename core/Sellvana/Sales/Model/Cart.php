@@ -850,7 +850,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $allServices = $method->getServices();
             $services = [];
             foreach ($servicesArr as $serviceCode => $serviceRate) {
-                $serviceTitle = $allServices[$serviceCode];
+                $serviceTitle = (isset($allServices[$serviceCode])) ? $allServices[$serviceCode] : $serviceCode;
                 $services[$serviceCode] = [
                     'value' => $methodCode . ':' . $serviceCode,
                     'title' => $serviceTitle,
