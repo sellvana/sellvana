@@ -9,6 +9,7 @@ define(['jquery'], function($) {
                 $el.toggleClass('active').data('active', !$el.data('active'));
             }
         });
+        ev.preventDefault();
         return false;
     })
 });
