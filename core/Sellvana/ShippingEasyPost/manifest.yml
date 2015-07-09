@@ -7,6 +7,10 @@ modules:
 
         auto_use: [ bootstrap ]
 
+        observe:
+            - [ Sellvana_Sales_Model_Cart::serviceCheckNeeded, Sellvana_ShippingEasyPost_Main.serviceCheckNeeded ]
+            - [ Sellvana_Sales_Model_Order_Shipment_State_Overall::changeState, Sellvana_ShippingEasyPost_Main.onShipmentStateChange ]
+
         areas:
             FCom_Admin:
                 auto_use: [ layout, views, bootstrap ]

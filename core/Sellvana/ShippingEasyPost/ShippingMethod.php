@@ -35,15 +35,55 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
             return $result;
         }
 
-        \EasyPost\EasyPost::setApiKey($data['test_access_key']);
+        \EasyPost\EasyPost::setApiKey($data['access_key']);
 
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
 
-        $name = 'John Doe';
+        $data['name'] = 'John Doe';
         if ($cart->get('shipping_firstname') && $cart->get('shipping_lastname')) {
-            $name = $cart->get('shipping_firstname') . ' ' . $cart->get('shipping_lastname');
+            $data['name'] = $cart->get('shipping_firstname') . ' ' . $cart->get('shipping_lastname');
         }
 
+        $rates = $this->getRates($data, $cart);
+
+        foreach ($rates as $rate) {
+            if (!isset($result['rates'][$rate->carrier])) {
+                $result['rates'][$rate->carrier] = [];
+            }
+
+            $result['rates'][$rate->carrier][$rate->service] = [
+                'id' => $rate->id,
+                'shipment_id' => $rate->shipment_id,
+                'price' => $rate->rate,
+            ];
+        }
+
+        if (!isset($result['error'])) {
+            $result['success'] = 1;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function getRates($data)
+    {
+        $shipmentData = $this->_prepareShipmentData($data);
+        if ($data['from_country'] !== $data['to_country']) {
+            //$shipmentData = array_merge($shipmentData, $this->_prepareCustomsData($data));
+        }
+        $shipment = \EasyPost\Shipment::create($shipmentData);
+
+        $rates = \EasyPost\Rate::create($shipment);
+
+        return $rates;
+    }
+
+    protected function _prepareShipmentData($data)
+    {
         $weight = $data['weight'];
 
         // unit conversion
@@ -55,7 +95,8 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
             $weight *= 16;
         }
         $weight = round($weight, 1);
-        $dimensions = explode('x', $data['size']);
+
+        $dimensions = explode('x', $data['package_size']);
         if (count($dimensions) !== 3) {
             $result = [
                 'error' => 1,
@@ -72,9 +113,9 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         }
         unset($size);
 
-        $shipment = \EasyPost\Shipment::create(array(
+        return [
             'to_address' => array(
-                'name' => $name,
+                'name' => $data['name'],
                 'street1' => $data['to_street1'],
                 'street2' => $data['to_street2'],
                 'city' => $data['to_city'],
@@ -96,30 +137,23 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
                 'email' => $data['from_email'],
             ),
             'parcel' => array(
-                'width' => $dimensions[0],
-                'length' => $dimensions[1],
+                'length' => $dimensions[0],
+                'width' => $dimensions[1],
                 'height' => $dimensions[2],
                 'weight' => $weight
             )
-        ));
+        ];
+    }
 
-        $rates = \EasyPost\Rate::create($shipment);
+    protected function _prepareCustomsData($data)
+    {
+        $customsData = [
+            'customs_info' => [
+                'customs_certify' => false,
+                'contents_type' => 'merchandise'
+            ]
+        ];
 
-        foreach ($rates as $rate) {
-            if (!isset($result['rates'][$rate->carrier])) {
-                $result['rates'][$rate->carrier] = [];
-            }
-
-            $result['rates'][$rate->carrier][$rate->service] = [
-                'price' => $rate->rate,
-            ];
-        }
-
-        if (!isset($result['error'])) {
-            $result['success'] = 1;
-        }
-
-        return $result;
     }
 
     public function fetchCartRates($cart = null)
@@ -127,6 +161,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         if (!$cart) {
             $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
         }
+
         $packages = $this->calcCartPackages($cart);
         $ratedCarriers = $this->getServicesSelected();
 
@@ -172,40 +207,6 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         });
 
         return $cartRates;
-    }
-
-    public function calcCartPackages($cart)
-    {
-        $packages = [];
-        $pkgIdx = 0;
-        $pkgTpl = [
-            'customer_context' => $cart->id(),
-            'to_street1' => $cart->get('shipping_street1'),
-            'to_street2' => $cart->get('shipping_street2'),
-            'to_city' => $cart->get('shipping_city'),
-            'to_region' => $cart->get('shipping_region'),
-            'to_postcode' => $cart->get('shipping_postcode'),
-            'to_country' => $cart->get('shipping_country'),
-            'to_phone' => $cart->get('shipping_phone'),
-            'to_email' => $cart->get('customer_email'),
-        ];
-
-        foreach ($cart->items() as $item) {
-            $qty = $item->get('qty');
-            $weight = $item->get('shipping_weight');
-            $size = $item->get('shipping_size');
-            for ($i = 0; $i < $qty; $i++) {
-                $pkg = array_merge($pkgTpl, [
-                    'qty' => 1,
-                    'weight' => $weight,
-                    'size' => $size,
-                    'items' => [$item->id() => 1],
-                ]);
-                $packages[$pkgIdx] = $pkg;
-                $pkgIdx++;
-            }
-        }
-        return $packages;
     }
 
     public function getServices()

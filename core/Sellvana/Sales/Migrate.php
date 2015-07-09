@@ -2088,6 +2088,26 @@ class Sellvana_Sales_Migrate extends BClass
             ]
         ]);
     }
+
+    public function upgrade__0_5_1_0__0_5_2(){
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'shipping_service' => "CHAR(50)  NULL"
+            ]
+        ]);
+    }
+
+    public function upgrade__0_5_2_0__0_5_3(){
+        $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'shipping_service' => "varchar(50)"
+            ]
+        ]);
+    }
 }
 
 class Sellvana_Sales_Migrate_Model_Cart_Address extends BModel

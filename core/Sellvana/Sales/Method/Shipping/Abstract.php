@@ -55,7 +55,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         if (!empty($services[$serviceKey])) {
             return $services[$serviceKey];
         }
-        return false;
+        return $serviceKey;
     }
 
     public function getServices()

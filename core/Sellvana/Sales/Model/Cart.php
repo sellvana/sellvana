@@ -719,9 +719,17 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$ignoreInvalid && empty($methods[$method])) {
             throw new BException('Invalid shipping method: '. $method);
         }
+
         if (!empty($methods[$method])) {
             $services = $methods[$method]->getServices();
-            if (null !== $service && empty($services[$service])) {
+
+            $serviceCheckNeeded = true;
+            $this->BEvents->fire('Sellvana_Sales_Model_Cart::serviceCheckNeeded', [
+                'service_check_needed' => &$serviceCheckNeeded,
+                'shipping_method' => $method
+            ]);
+
+            if ($serviceCheckNeeded && null !== $service && empty($services[$service])) {
                 throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
             }
         } else {

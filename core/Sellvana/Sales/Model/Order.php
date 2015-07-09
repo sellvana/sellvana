@@ -385,12 +385,13 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $service = $cart->get('shipping_service');
         $methods = $this->Sellvana_Sales_Main->getShippingMethods();
         $services = $methods[$method]->getServices();
+        $serviceTitle = isset($services[$service]) ? $services[$service] : $service;
 
         $this->set([
             'shipping_price' => $cart->get('shipping_price'),
             'shipping_method' => $method,
             'shipping_service' => $service,
-            'shipping_service_title' => $methods[$method]->getDescription() . ' - ' . $services[$service]
+            'shipping_service_title' => $methods[$method]->getDescription() . ' - ' . $serviceTitle
         ]);
 
         return $this;
