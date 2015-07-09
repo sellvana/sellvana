@@ -27,6 +27,7 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         "title" => "N/A",
         'qty_in_stock' => 0,
         'qty_buffer' => 0,
+        'qty_cart_inc' => 1,
     ];
 
     protected static $_importExportProfile = [
