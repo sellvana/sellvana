@@ -265,11 +265,11 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->_cart = $cart;
         $this
             ->_importBasicFieldsFromCart()
+            ->_importTotalsDataFromCart()
             ->save() // create unique id
 
             ->_importAddressDataFromCart()
             ->_importItemsDataFromCart()
-            ->_importTotalsDataFromCart()
             ->_importShippingDataFromCart()
             ->_importPaymentDataFromCart()
             ->_importDiscountDataFromCart()
