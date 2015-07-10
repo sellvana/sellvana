@@ -36,7 +36,9 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
             $cart->set([
                 'customer_id' => $customer->id(),
                 'customer_email' => $customer->get('email'),
-            ])->importAddressesFromCustomer($customer)->calculateTotals();
+            ]);
+            $cart->importAddressesFromCustomer($customer);
+            $cart->calculateTotals();
         }
 
         $cart->save();

@@ -2,7 +2,7 @@
 <!--{ pos: 10 }-->
 
 {% set m = THIS.get('model') %}
-{% if APP.m('Sellvana_CustomerGroups').run_status == 'LOADED' %}
+{% if MODULES.isLoaded('Sellvana_CustomerGroups') %}
     {% set customerGroups = APP.instance('Sellvana_CustomerGroups_Model_Group').groupsOptions() %}
 {% endif %}
 {% set validator = THIS.get('validator') %}
