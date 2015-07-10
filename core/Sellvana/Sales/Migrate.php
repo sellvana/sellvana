@@ -2104,7 +2104,7 @@ class Sellvana_Sales_Migrate extends BClass
 
         $this->BDb->ddlTableDef($tOrderShipment, [
             BDb::COLUMNS => [
-                'shipping_service' => "varchar(50)"
+                'service_code' => "varchar(50)"
             ]
         ]);
     }
