@@ -369,8 +369,8 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             'tax_amount' => $cart->get('tax_amount'),
             'discount_amount' => $cart->get('discount_amount'),
             'grand_total' => $cart->get('grand_total'),
-            'amount_paid' => 0,
-            'amount_due' => $cart->get('grand_total'),
+            'amount_paid' => $cart->get('amount_paid'),
+            'amount_due' => $cart->get('amount_due'),
         ]);
 
         $this->setData('totals', $cart->getData('totals'));

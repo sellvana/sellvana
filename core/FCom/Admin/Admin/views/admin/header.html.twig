@@ -57,7 +57,7 @@
                         <i class="{{ item.icon_class }}"></i>
                       </div>
                       <div class="pull-left text">
-                        {{ item.content | safehtml }}
+                        {{ item.content | safehtml | raw }}
                       </div>
                         <small class="pull-right text-muted timeago" title="{{ item.ts }}">{{ item.ts }}</small>
                     </div>

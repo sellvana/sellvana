@@ -34,7 +34,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_5_1()
+    public function install__0_5_2_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);
@@ -83,6 +83,8 @@ class Sellvana_Sales_Migrate extends BClass
                 'discount_amount' => "decimal(12,2) NOT NULL default 0",
                 'discount_percent' => 'decimal(5,2) not null default 0',
                 'grand_total' => "decimal(12,2) NOT NULL default 0",
+                'amount_paid' => "decimal(12,2) NOT NULL default 0",
+                'amount_due' => "decimal(12,2) NOT NULL default 0",
                 'cookie_token' => 'varchar(40) default null',
                 'customer_id' => "int unsigned default NULL",
                 'customer_email' => "varchar(100) NULL",
@@ -2072,7 +2074,7 @@ class Sellvana_Sales_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_5_0_0__0_5_1()
+    public function upgrade__0_5_0_0__0_5_1_0()
     {
         $tOrder = $this->Sellvana_Sales_Model_Order->table();
 
@@ -2089,17 +2091,20 @@ class Sellvana_Sales_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_5_1_0__0_5_2(){
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
         $tCart = $this->Sellvana_Sales_Model_Cart->table();
 
         $this->BDb->ddlTableDef($tCart, [
             BDb::COLUMNS => [
-                'shipping_service' => "CHAR(50)  NULL"
-            ]
+                'shipping_service' => "CHAR(50)  NULL",
+                'amount_paid' => "decimal(12,2) NOT NULL default 0",
+                'amount_due' => "decimal(12,2) NOT NULL default 0",
+            ],
         ]);
     }
 
-    public function upgrade__0_5_2_0__0_5_3(){
+    public function upgrade__0_5_2_0__0_5_3_0(){
         $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
 
         $this->BDb->ddlTableDef($tOrderShipment, [

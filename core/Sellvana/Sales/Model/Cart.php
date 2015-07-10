@@ -143,7 +143,6 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$cart && ($customer || $createAnonymousIfNeeded)) {
             $this->Sellvana_Sales_Main->workflowAction('customerCreatesNewCart');
         }
-
         return static::$_sessionCart;
     }
 
@@ -907,19 +906,20 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function convertToStoreCurrency($amount)
+    public function getCurrencyRate()
     {
         $baseCurrency = $this->BConfig->get('modules/FCom_Core/base_currency');
         $storeCurrency = $this->get('store_currency_code');
         if ($storeCurrency === $baseCurrency || !$this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
-            return $amount;
+            return 1;
         }
         $rate = $this->Sellvana_MultiCurrency_Main->getRate($storeCurrency, $baseCurrency);
-        if ($rate) {
-            $amount *= $rate;
-        }
-        $amount = $this->BLocale->roundCurrency($amount);
-        return $amount;
+        return $rate ?: 1;
+    }
+
+    public function convertToStoreCurrency($amount)
+    {
+        return $this->BLocale->roundCurrency($amount * $this->getCurrencyRate());
     }
 
     public function importDataFromOrder(Sellvana_Sales_Model_Order $order)
