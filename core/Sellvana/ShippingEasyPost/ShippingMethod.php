@@ -46,16 +46,24 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
 
         $rates = $this->getRates($data, $cart);
 
-        foreach ($rates as $rate) {
-            if (!isset($result['rates'][$rate->carrier])) {
-                $result['rates'][$rate->carrier] = [];
-            }
+        if (count($rates)) {
+            foreach ($rates as $rate) {
+                if (!isset($result['rates'][$rate->carrier])) {
+                    $result['rates'][$rate->carrier] = [];
+                }
 
-            $result['rates'][$rate->carrier][$rate->service] = [
-                'id' => $rate->id,
-                'shipment_id' => $rate->shipment_id,
-                'price' => $rate->rate,
+                $result['rates'][$rate->carrier][$rate->service] = [
+                    'id' => $rate->id,
+                    'shipment_id' => $rate->shipment_id,
+                    'price' => $rate->rate,
+                ];
+            }
+        } else {
+            $result = [
+                'error' => 1,
+                'message' => 'No rates for one of the packages',
             ];
+            return $result;
         }
 
         if (!isset($result['error'])) {
@@ -73,7 +81,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
     {
         $shipmentData = $this->_prepareShipmentData($data);
         if ($data['from_country'] !== $data['to_country']) {
-            //$shipmentData = array_merge($shipmentData, $this->_prepareCustomsData($data));
+            $shipmentData = array_merge($shipmentData, $this->_prepareCustomsData($data));
         }
         $shipment = \EasyPost\Shipment::create($shipmentData);
 
@@ -147,13 +155,37 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
 
     protected function _prepareCustomsData($data)
     {
+        $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
+        $items = $cart->items();
+        $packageSum = 0;
+        $customsItems = [];
+        foreach ($items as $item) {
+            if (in_array($item->id, array_keys($data['items']))) {
+                $packageSum += $item->row_total;
+                $inventory = $item->getProduct()->getInventoryModel();
+                $hsNumber = $inventory->get('hs_tariff_number');
+                $hsNumber = substr(str_replace('.', '', $hsNumber), 0, 6);
+                $customsItems[] = [
+                    'description' => $item->get('product_name'),
+                    'quantity' => $item->getQty(),
+                    'weight' => $inventory->get('shipping_weight') * $item->getQty(),
+                    'value' => $item->get('row_total'),
+                    'hs_tariff_number' => $hsNumber,
+                    'origin_country' => $inventory->get('origin_country')
+                ];
+            }
+        }
+
         $customsData = [
             'customs_info' => [
                 'customs_certify' => false,
-                'contents_type' => 'merchandise'
+                'contents_type' => 'merchandise',
+                'eel_pfc' => 'NOEEI 30.37(a)',
+                'customs_items' => $customsItems
             ]
         ];
 
+        return $customsData;
     }
 
     public function fetchCartRates($cart = null)

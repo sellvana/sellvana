@@ -35,8 +35,7 @@ class Sellvana_ShippingEasyPost_Main extends BClass
             $orderId = $newState->getModel()->get('order_id');
             $order = $this->Sellvana_Sales_Model_Order->load($orderId);
             if ($order->get('shipping_method') === $this->_methodCode) {
-                $cartData = $this->BUtil->fromJson($order->cart()->get('data_serialized'));
-                $rates = $cartData['shipping_rates'][$this->_methodCode];
+                $rates = $order->cart()->getData('shipping_rates/' . $this->_methodCode);
                 if (isset($rates[$order->get('shipping_service')])) {
                     $config = $this->BConfig->get($this->_configPath);
                     if ($config['mode'] === Sellvana_ShippingEasyPost_ShippingMethod::MODE_TEST) {
