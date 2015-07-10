@@ -118,7 +118,6 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         $cart = $this->_getCart($args);
 
         $cart->calculateTotals()->saveAllDetails();
-
         /** @var Sellvana_Sales_Model_Order[] $oldOrdersFromCart */
         $oldOrdersFromCart = $this->Sellvana_Sales_Model_Order->orm()->where('cart_id', $cart->id())->find_many();
         if ($oldOrdersFromCart) {

@@ -53,6 +53,7 @@ class Sellvana_CatalogFields_Frontend extends BClass
     {
         $varfieldHlp = $this->Sellvana_CatalogFields_Model_ProductVarfield;
         $variantHlp = $this->Sellvana_CatalogFields_Model_ProductVariant;
+        $utilHlp = $this->BUtil;
 
         foreach ($args['items'] as &$item) {
             if (empty($item['product'])) {
@@ -86,10 +87,11 @@ class Sellvana_CatalogFields_Frontend extends BClass
                     $valArr[$code] = $varValues[$code];
                 }
                 ksort($valArr);
-                $valJson = $this->BUtil->toJson($valArr);
                 $variant = null;
                 foreach ($variants as $v) {
-                    if ($v->get('field_values') === $valJson) {
+                    $vData = $utilHlp->fromJson($v->get('field_values'));
+                    ksort($vData);
+                    if ($vData === $valArr) {
                         $variant = $v;
                         break;
                     }
