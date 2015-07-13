@@ -85,6 +85,7 @@ class Sellvana_MultiCurrency_Main extends BClass
             $ratesArr = explode("\n", $ratesConfig);
             foreach ($ratesArr as $r) {
                 list($cur, $rate) = explode(':', $r, 2) + [null];
+                $rate = trim($rate);
                 if ($cur && is_numeric($rate)) {
                     static::$_rates[$baseCurrency][$cur] = $rate;
                 }

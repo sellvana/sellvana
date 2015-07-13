@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
+ * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
 class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shipping_Abstract
 {
@@ -159,17 +160,19 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         $items = $cart->items();
         $packageSum = 0;
         $customsItems = [];
+        $rate = $this->Sellvana_MultiCurrency_Main->getRate('USD');
         foreach ($items as $item) {
             if (in_array($item->id, array_keys($data['items']))) {
                 $packageSum += $item->row_total;
                 $inventory = $item->getProduct()->getInventoryModel();
                 $hsNumber = $inventory->get('hs_tariff_number');
                 $hsNumber = substr(str_replace('.', '', $hsNumber), 0, 6);
+                $itemValue = $item->get('row_total') + $item->get('row_tax');
                 $customsItems[] = [
                     'description' => $item->get('product_name'),
                     'quantity' => $item->getQty(),
                     'weight' => $inventory->get('shipping_weight') * $item->getQty(),
-                    'value' => $item->get('row_total'),
+                    'value' => $itemValue * $rate,
                     'hs_tariff_number' => $hsNumber,
                     'origin_country' => $inventory->get('origin_country')
                 ];
@@ -186,6 +189,28 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         ];
 
         return $customsData;
+    }
+
+    protected function _itemCanBeAdded($package, $item, $qty)
+    {
+        if (!parent::_itemCanBeAdded($package, $item, $qty)) {
+            return false;
+        }
+
+        $config = $this->BConfig->get($this->_configPath);
+        $data = array_merge($config, $package);
+        $data = $this->_applyDefaultPackageConfig($data);
+
+        if ($data['from_country'] === $data['to_country']) {
+            return true;
+        }
+
+        $maxIntlPackageTotal = 2500; // USD
+        $rate = $this->Sellvana_MultiCurrency_Main->getRate('USD');
+        $itemTotal = ($item->get('row_total') + $item->get('row_tax')) / $item->get('qty');
+        $potentialTotal = ($package['total'] + ($itemTotal * $qty)) * $rate;
+
+        return ($potentialTotal <= $maxIntlPackageTotal);
     }
 
     public function fetchCartRates($cart = null)
