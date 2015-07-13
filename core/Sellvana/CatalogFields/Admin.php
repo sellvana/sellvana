@@ -118,11 +118,15 @@ class Sellvana_CatalogFields_Admin extends BClass
             if ($fieldIdsToDelete) {
                 $prodVarfieldHlp->delete_many(['product_id' => $pId, 'field_id' => $fieldIdsToDelete]);
 
-                foreach ($prodVarfieldModels as $fId => $m) {
+                //remove all variants in case remove field
+                $this->Sellvana_CatalogFields_Model_ProductVariant->removeAllVariants($pId);
+                return true; //stop this function at here
+
+                /*foreach ($prodVarfieldModels as $fId => $m) {
                     if (in_array($fId, $fieldIdsToDelete)) {
                         unset($prodVarfieldModels[$fId]);
                     }
-                }
+                }*/
             }
         }
         /** @var Sellvana_CatalogFields_Model_Field[] $fieldModels */
@@ -318,6 +322,9 @@ class Sellvana_CatalogFields_Admin extends BClass
             if ($fileIdsToDelete) {
                 $prodVariantImageHlp->delete_many(['product_id' => $pId, 'id' => $fileIdsToDelete]);
             }
+        } else {
+            //remove all variants data
+            $this->Sellvana_CatalogFields_Model_ProductVariant->removeAllVariants($pId);
         }
     }
 }

@@ -5,7 +5,8 @@
 
 <script type="text/javascript">
     var variantGrid, variantFieldGrid, variantImages, variantFields; //todo: move this to inside scope
-    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'jquery-ui', 'jquery.validate', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'jquery-ui', 'jquery.validate', 'unique'],
+            function ($, _, React, FComGriddleComponent, Components) {
 
         /**
          * object contains property and method to hand variant images
@@ -343,7 +344,7 @@
 
                     });
 
-                    $(this.btnRemoveFieldClass).on('click', function() {
+                    $(this.listId).on('click', this.btnRemoveFieldClass, function() {
                         //todo: use modal to display more details message
                         if (confirm('Deleting this field will remove all associated variants of this product. Are you sure you want to delete?')) {
                             var fieldCode = $(this).attr('data-code');
@@ -599,7 +600,9 @@
          */
         window.variantFieldGriddleRegister = function(grid, triggerName) {
             variantFieldGrid = grid;
-            variantFields.init();
+            if (triggerName == 'componentDidMount') {
+                variantFields.init();
+            }
         };
 
         /**
@@ -674,7 +677,8 @@
                 if (rowEle.attr('id') != id) {
                     var flag = false;
                     rowEle.find('input.select-value-field').each(function() {
-                        if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined' && $(this).val() != comb[$(this).attr('name')]) {
+                        if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined'
+                                && $(this).val() != comb[$(this).attr('name')]) {
                             flag = true; // at least one field is different
                         }
                     });

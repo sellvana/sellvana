@@ -17,10 +17,10 @@
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
- * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_CatalogFields_Model_ProductVariantField $Sellvana_CatalogFields_Model_ProductVariantField
  */
 class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstract
 {
@@ -146,7 +146,7 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
     /**
      * @param Sellvana_Catalog_Model_Product $product
      * @param array $fieldValues
-     * @return BModel
+     * @return self[]
      * @throws BException
      */
     public function findByProductFieldValues($product, $fieldValues)
@@ -163,6 +163,18 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
         $valJson = $this->BUtil->toJson($valArr);
         $variant = $this->loadWhere(['product_id' => $product->id(), 'field_values' => $valJson]);
         return $variant;
+    }
+
+    /**
+     * remove all variants of specific product
+     * @param int|Sellvana_Catalog_Model_Product $product
+     */
+    public function removeAllVariants($product)
+    {
+        $productId = is_object($product) ? $product->id() : $product;
+        $this->delete_many(['product_id' => $productId]);
+        $this->Sellvana_CatalogFields_Model_ProductVariantField->delete_many(['product_id' => $productId]);
+        $this->Sellvana_CatalogFields_Model_ProductVariantImage->delete_many(['product_id' => $productId]);
     }
 
     public function checkEmptyVariant($product)
