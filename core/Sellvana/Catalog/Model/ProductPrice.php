@@ -24,7 +24,7 @@ class Sellvana_Catalog_Model_ProductPrice
             'product_id' => 'Sellvana_Catalog_Model_Product.id',
             'customer_group_id' => 'Sellvana_CustomerGroups_Model_Group.id',
             'site_id' => 'Sellvana_MultiSite_Model_Site.id',
-            'variant_id' => 'Sellvana_CustomField_Model_ProductVariant.id',
+            'variant_id' => 'Sellvana_CatalogFields_Model_ProductVariant.id',
             'promo_id' => 'Sellvana_Promo_Model_Promo.id'
         ],
     ];
@@ -75,6 +75,10 @@ class Sellvana_Catalog_Model_ProductPrice
             "map" => [
                 ['value' => 'base', 'label' => 'Base'],
                 ['value' => 'msrp', 'label' => 'MSRP'],
+            ],
+            "msrp" => [
+                ['value' => 'cost', 'label' => 'Cost'],
+                ['value' => 'base', 'label' => 'Base'],
             ],
             "promo" => [
                 ['value' => 'catalog', 'label' => 'Catalog Price'],

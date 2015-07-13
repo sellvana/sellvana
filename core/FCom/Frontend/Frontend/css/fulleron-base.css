@@ -223,6 +223,7 @@ label.success {
   }
 .f-prod-listing .f-prod-img {
   display:block;
+  margin-bottom:10px;
   }
 .f-prod-listing .f-prod-img img {
   width:100%;

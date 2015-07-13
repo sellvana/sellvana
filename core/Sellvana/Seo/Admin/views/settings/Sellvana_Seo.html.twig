@@ -1,0 +1,23 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'Sellvana_Seo' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set changeFreqOptions = {
+    never: 'Never',
+    yearly: 'Yearly',
+    monthly: 'Monthly',
+    weekly: 'Weekly',
+    daily: 'Daily',
+    hourly: 'Hourly',
+    always: 'Always',
+} %}
+
+<h2>{{ "SEO Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_Seo'}) }}
+    {{ forms.accordion_panel_start({label:'Google Sitemaps'|_, in:1}) }}
+        {{ forms.input(fieldData, {field:'page_size', label:'Sitemap Page Size (entries)'|_, type: number }) }}
+        {{ forms.select(fieldData, {field:'category_changefreq', label:'Category Change Frequency'|_, options: changeFreqOptions }) }}
+        {{ forms.input(fieldData, {field:'category_priority', label:'Category Priority (0.0-1.0)'|_, type: number }) }}
+        {{ forms.select(fieldData, {field:'product_changefreq', label:'Product Change Frequency'|_, options: changeFreqOptions }) }}
+        {{ forms.input(fieldData, {field:'product_priority', label:'Product Priority (0.0-1.0)'|_, type: number }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

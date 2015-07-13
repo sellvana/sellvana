@@ -1,0 +1,15 @@
+modules:
+    Sellvana_StoreCredit:
+        version: 0.5.0.0
+        channel: alpha
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views ]
+                routing:
+                    - [ /storecredit/balances/.action, Sellvana_StoreCredit_Admin_Controller_Balances ]
+
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ /storecredit/account/.action, Sellvana_StoreCredit_Frontend_Controller_Account ]

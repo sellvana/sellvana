@@ -1,0 +1,550 @@
+{% set ctrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products') %}
+{% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
+{% set variantConfig = ctrl.variantGridConfig(model) %}
+<script>
+var variantThumbUrl = '';
+var prodVariantRowsCollection;
+function updateListVariantImage(imageObject) {
+    if (prodVariantGrid.find('tr').length > 0) {
+        var file_id = [];
+        prodVariantGrid.find('tr').each(function() {
+            var self = this;
+            var imageItems = $(this).find('.list-variant-image');
+            var select = $(this).find('.variant-image');
+            if (imageObject.add == false) {
+                var tmp = [];
+                imageObject.image.forEach(function (obj) {
+                    imageItems.find('i[data-id="'+ obj.file_id +'"]').parents('li').remove();
+                    select.find('option[value="'+ obj.file_id +'"]').remove();
+                    tmp.push(obj.file_id);
+                });
+                file_id.push({variant_id: $(self).attr('id'), file_id: tmp});
+            } else  {
+                var tmp = [];
+                imageObject.image.forEach(function (obj) {
+                    var storeImageId = $(self).find('.store-variant-image-id').val().split(',');
+                    var hide = '';
+                    if (storeImageId.indexOf(obj.file_id) != -1) {
+                        var imageItem = '<li class="dd-item dd3-item"><div class="dd3-content"><img src="'+ variantThumbUrl + obj.subfolder+ '/' + obj.file_name +'"/><label>'+ obj.file_name
+                                +'</label> <i data-id="'+ obj.file_id +'" class="icon-remove pull-right btn-link btn-delete-variant-image"></i></div></li>';
+                        $(self).find('.list-variant-image').append(imageItem);
+                        hide = 'hide';
+                        tmp.push(obj.file_id);
+                    }
+                    $(self).find('select.variant-image').append("<option class='"+ hide +"' data-subfolder='"+ obj.subfolder +"' value='"+ obj.file_id +"'>"+ obj.file_name +"</option>")
+                });
+                file_id.push({variant_id: $(self).attr('id'), file_id: tmp});
+            }
+
+        });
+
+        updateFileIdVariant(file_id, imageObject.add);
+    }
+}
+
+function updateFileIdVariant(arr, add) {
+    prodVariantRowsCollection.each(function (obj) {
+        var file_id = obj.get('variant_file_id').split(',');
+        if (add) {
+            file_id = $.map(file_id, function(val) {
+                if (arr.indexOf(val) === -1) {
+                    return val;
+                }
+            })
+        } else {
+            var objF = _.findWhere(arr, {variant_id: obj.get('id')});
+            var file_id = _.difference(file_id, objF.file_id);
+        }
+
+        obj.set('variant_file_id', file_id.join(','));
+    });
+}
+require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.validate'], function(Backbone, _, $) {
+    var fieldCollection = null;
+    var vColsCollection = null;
+    var vRowsCollection = null;
+    var options = [];
+    var tr = null;
+    var valueCurrentField = [];
+    var vField = $('#variants-tab-field');
+    var bodyGrid = $('#variant-grid').find('tbody');
+    prodVariantGrid = bodyGrid;
+    var arrField = [];
+    var field;
+
+    function updateStoreVariantImageId(el) {
+        var id = [];
+        var idTr = $(el).parents('tr').attr('id');
+        el.find('.list-variant-image').find('i').each(function() {
+           id.push($(this).attr('data-id'));
+        });
+        var stringId = id.join(',');
+        el.find('.store-variant-image-id').val(stringId);
+        prodVariantRowsCollection.each(function (obj) {
+            if (obj.get('id') == idTr) {
+                obj.set('variant_file_id', stringId);
+            }
+        });
+    }
+
+    window.variantFieldGridRegister = function(grid) {
+        grid.build();
+        fieldCollection = grid.getRows();
+    }
+    window.variantGridRegister = function(grid) {
+        var thumb_url = '';
+        grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+            var select2 = this.$el.find('select.variant-image');
+            var self = this;
+            if (vColsCollection == null) {
+                vColsCollection = grid.getCols();
+            }
+            var colsJson = vColsCollection.toJSON();
+            this.$el.find('input.select-value-field').each(function(obj) {
+                var name = $(this).attr('name');
+                var selfValue = this;
+                var field = self.model.get('field_values');
+                var tmp = _.findWhere(colsJson, {name: name}).options;
+                var arr = $.map(tmp, function(value, key) {
+                    return [{id: key, text: value}];
+                });
+                if (typeof (_.findWhere(options, {name: name})) === 'undefined') {
+                    options.push({name: name, options: arr});
+                }
+                var sel2 = $(this).select2({
+                    placeholder: 'Select field value',
+                    allowClear: true,
+                    data: function() {
+                        return {results: _.findWhere(options, {name: name}).options};
+                    },
+                    createSearchChoice: function (term, data) {
+                        if ($(data).filter(function () {
+                                    return this.text.toLowerCase().localeCompare(term.toLowerCase()) === 0;
+                                }).length === 0) {
+                            return {id: term, text: term};
+                        }
+                    }
+                }).data('select2');
+                sel2.onSelect = (function(fn) {
+                    return function(data, op) {
+                        var target;
+
+                        if (op != null) {
+                            target = $(op.target);
+                        }
+
+                        if (target && target.hasClass('remove-value-field')) {
+                            if (data.id == $(selfValue).val()) {
+                                $(selfValue).select2('val', '');
+                            }
+                            _.findWhere(options, {name: name}).options = _.filter(_.findWhere(options, {name: name}).options, function (num) {
+                                return num.text != data.text;
+                            });
+                            target.parents('li').addClass('hide');
+                        } else {
+                            return fn.apply(this, arguments);
+                        }
+                    }
+                })(sel2.onSelect);
+                if (field != '' && typeof (field[name]) !== 'undefined') {
+                    $(this).select2('val', field[name]);
+                }
+            });
+
+            this.$el.find('input.select-value-field').on('change', function(e) {
+                var el = $(e.target);
+                var name = el.attr('name');
+                var val = $(this).val();
+                if (val != '' && typeof (_.findWhere(_.findWhere(options, {name: name}).options, {id: val, text: val})) === 'undefined') {
+                    var confirm = window.confirm("A new field value will be created. Are you sure?");
+                    if (confirm) {
+                        _.findWhere(options, {name: name}).options.push({id: val, text: val});
+                    } else {
+                        $(this).select2('val', '');
+                    }
+                }
+            }).on('select2-selecting', function (ev) {
+                var field_values = (self.model.get('field_values') == '')? {}: self.model.get('field_values');
+                field_values[$(ev.target).attr('name')] = ev.val;
+                self.model.set('field_values', field_values);
+            });
+            variantThumbUrl = thumb_url = this.model.get('thumb_url');
+            var imageId = [];
+            if (this.model.get('variant_file_id') != null && this.model.get('variant_file_id') != '') {
+                imageId = this.model.get('variant_file_id').split(',');
+                self.$el.find('.list-variant-image').removeClass('hide');
+            }
+            function format(state) {
+                if (!state.id) return state.text;
+                return "<img src='" + thumb_url + $(state.element[0]).attr('data-subfolder') + '/' + state.text + "'/>  " + state.text;
+            }
+            if (this.model.get('list_image').length > 0) {
+                this.model.get('list_image').forEach(function (obj) {
+                    var hide = '';
+                     if (imageId.indexOf(obj.file_id) != -1) {
+                         var imageItem = '<li class="dd-item dd3-item"><div class="dd3-content"><img src="'+ thumb_url + obj.subfolder+ '/' + obj.file_name +'"/><label>'+ obj.file_name
+                                 +'</label> <i data-id="'+ obj.file_id +'" class="icon-remove pull-right btn-link btn-delete-variant-image"></i></div></li>';
+                         self.$el.find('.list-variant-image').append(imageItem);
+                         hide = 'hide';
+                     }
+                    select2.append($('<option>').val(obj.file_id).html(obj.file_name).attr('data-subfolder', obj.subfolder).addClass(hide));
+                })
+            } else {
+                if (typeof (imagesGrid) !== 'undefined') {
+                    imagesGrid.getRows().each(function (obj) {
+                        select2.append($('<option>').val(obj.get('file_id')).html(obj.get('file_name')).attr('data-subfolder', obj.get('subfolder')));
+                    })
+                }
+            }
+            select2.select2({
+                formatResult: format,
+                formatSelection: format
+            });
+
+            this.$el.find('input.select-value-field').each(function () {
+                $(this).addClass('variantUnique');
+                $(this).attr('id', guid());
+            })
+        };
+
+        grid.getGridSkeleton().Views.RowView.prototype._deleteRow = function() {
+            grid.getRows().remove(this.model/*, {silent: true}*/);
+            grid.getSelectedRows().remove(this.model, {silent: true});
+        };
+        grid.build();
+        vColsCollection = grid.getCols();
+        prodVariantRowsCollection = vRowsCollection = dataRowsCollection = grid.getRows();
+        vFieldGridInit();
+        grayGrid();
+        bodyGrid.on('change', '.variant-image', function (){
+            var option = $(this).find(':selected');
+            var imageItem = '<li class="dd-item dd3-item"><div class="dd3-content"><img src="'+ thumb_url + option.attr('data-subfolder')+ '/' + option.text() +'"/><label>'+ option.text()
+                    +'</label> <i data-id="'+ $(this).val() +'" class="icon-remove pull-right btn-link btn-delete-variant-image"></i></div></li>';
+            $(this).parent().find('.list-variant-image').append(imageItem);
+            $(this).parent().find('.list-variant-image').removeClass('hide');
+            option.addClass('hide');
+            updateStoreVariantImageId($(this).parents('td'));
+            $(this).select2('data', null);
+
+        });
+        bodyGrid.on('click', '.btn-delete-variant-image', function() {
+            var td = $(this).parents('td');
+            td.find('.variant-image').find('option[value="'+ $(this).attr('data-id') +'"]').removeClass('hide');
+            td.find('.variant-image').removeClass('hide');
+            if (td.find('.list-variant-image').find('li').length == 1) {
+                td.find('.list-variant-image').addClass('hide');
+            }
+            $(this).parents('li').remove();
+            updateStoreVariantImageId(td);
+        });
+    }
+    function grayGrid() {
+        if ($('#variants-tab-field').children().length) {
+            $('#variant-grid').find('.grid-new').prop('disabled', false);
+            //if new field column is added, we need to add  blank row
+            if (vRowsCollection.length === 0) {
+                vRowsCollection.reset({id: (Math.random() + '').replace(/^0\./, 'f-')});
+            }
+        } else {
+            //if all field columns are removed, we need to remove all rows
+            if (vRowsCollection) {
+                vRowsCollection.reset();
+            }
+            $('#variant-grid').find('.grid-new').prop('disabled', true);
+        }
+
+    }
+
+    function resetSelect() {
+        $('#sel_var_field').val('').select2();
+    }
+
+    function vFieldGridInit() {
+        var mapField = fieldCollection.map(function (obj) {
+            return {id: obj.id, name: obj.get('name'), field_code: obj.get('field_code')};
+        });
+        vColsCollection.each(function (obj) {
+            mapField.forEach(function (field) {
+                if (field.id == obj.get('field_id')) {
+                    $("#sel_var_field").find("option[value='"+field.id+"']").remove();
+                    var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
+                            '<label>'+ field.name +'</label> <i data-name="'+ field.name +'" data-code="'+ field.field_code +'" data-id="'+ field.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                    vField.append(fields);
+                }
+            });
+        });
+        vField.sortable({
+            scroll: false,
+            axis:'x',
+            update: function(event, ui) {
+                renderGrid();
+            }
+        });
+        resetSelect();
+    }
+
+
+
+    $('form').submit(function(ev) {
+
+        var variant_fields = [];
+        var tmp_fields = [];
+        vField.find('i.icon-remove').each(function () {
+            /*var op = {};
+            _.findWhere(options, {name: $(this).attr('data-code')}).options.forEach(function (obj) {
+                op[obj.id] = obj.text;
+            });*/
+            variant_fields.push({
+                id: $(this).attr('data-id'),
+                field_code: $(this).attr('data-code'),
+                //options: op,
+                name: $(this).attr('data-name')
+            });
+            tmp_fields.push($(this).attr('data-code'));
+        });
+        $('#vfield_ids').val(JSON.stringify(variant_fields));
+
+        //remove data to submit
+        var variantPostData = vRowsCollection;
+        variantPostData.forEach(function(obj) {
+            obj.unset('list_image');
+        });
+        $('#variants').val( JSON.stringify(variantPostData.toJSON()));
+        return validateVariant();
+    });
+
+    $('#btn_add_var_field').click(function() {
+        var sel_val_field = $('#sel_var_field');
+        var val = sel_val_field.val();
+        var selected = sel_val_field.find("option:selected");
+        if(!val) {
+            return;
+        }
+        var text = selected.text();
+        var field_code = selected.attr('data-code');
+        fieldCollection.add({id: val, name: text , field_code: field_code});
+        fieldCollection.trigger('render');
+
+        sel_val_field.find("option[value='"+val+"']").remove();
+        resetSelect();
+
+        $.get('{{ APP.href('/catalogfields/fields/options?id=') | raw }}'+val,
+                function(response) {
+                    if (response.success) {
+                        addColumn(text, response.options, val, field_code);
+                        vRowsCollection.each( function(row) { row.set(text, ''); } );
+                        var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
+                                '<label>'+ text +'</label> <i data-code="'+ field_code +'" data-name="'+ text +'" data-id="'+ val +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                        vField.append(fields);
+                        renderGrid();
+                    }
+                }
+        );
+
+    });
+
+    function removeColumn(row) {
+        var col = vColsCollection.findWhere({name: row.name});
+        var delPos = col.get('position');
+        vColsCollection.each(function(c) {
+            if (c.get('position')>delPos) {
+                c.set(col.get('position')-1);
+            }
+        });
+
+        vColsCollection.remove(col);
+        vRowsCollection.each(function(r) {
+            delete r.attributes[row.field_code];
+        });
+
+
+    }
+
+    function renderGrid() {
+        arrField = Array();
+        vField.find('i.icon-remove').each(function () {
+            var col = vColsCollection.findWhere({name: $(this).attr('data-code')});
+            removeColumn(col.attributes);
+            arrField.push({id: $(this).attr('data-id'), name: $(this).attr('data-code'), options: col.get('options'), label: col.get('label') });
+        });
+        arrField.forEach(function (data) {
+            addColumn(data.label, data.options, data.id, data.name);
+        });
+        valueCurrentField = [];
+        bodyGrid.find('tr').each(function () {
+            var fields =  {};
+            var row = _.findWhere(vRowsCollection.toJSON(), {id : $(this).attr('id')});
+            $(this).find('td').each(function () {
+                var self = this;
+                var col = $(this).attr('data-col');
+                switch (col) {
+                    case 'product_sku':case 'inventory_sku':case 'variant_price':case 'variant_qty':
+                        row[col] = $(this).find('input').val();
+                        break;
+                    case 'image':
+                        row.variant_file_id =  $(this).find('.store-variant-image-id').val();
+                        if (typeof (imagesGrid) !== 'undefined') {
+                            var image = [];
+                            imagesGrid.getRows().forEach(function (row) {
+                                image.push({
+                                    file_id: row.get('file_id'),
+                                    subfolder: row.get('subfolder'),
+                                    file_name: row.get('file_name')
+                                })
+                            });
+                            row.list_image = image;
+                        }
+                        break;
+                    default:
+                        arrField.forEach(function (data) {
+                            if (data.name == $(self).attr('data-col')) {
+                                fields[data.name] = $(self).find('input.select-value-field').val();
+                            }
+                        });
+                        break;
+                }
+            });
+            row.field_values = fields;
+            vRowsCollection.each(function(obj) {
+                if (obj.get('id') == row.id) {
+                    obj.attributes = row;
+                }
+            });
+        })
+        vColsCollection.trigger('render');
+        vRowsCollection.trigger('render');
+
+    }
+
+    function addColumn(text, options, field_id, field_code) {
+        vColsCollection.each(function(col) {
+            if (col.get('position')>0) {
+                col.set(col.get('postion')+1);
+            }
+        });
+        vColsCollection.add({
+            name: field_code,
+            label: text,
+            field_id: field_id,
+            width: 200,
+            addable: true,
+            position: 1,
+            display: 'eval',
+            print: '"<p style=\'overflow: hidden\'><input type=\'hidden\' name=\''+ field_code +'\' class=\'select-value-field required\' style=\'width: 170px;\' /></p>"',
+            options: options,
+            'default': ''
+        });
+        grayGrid();
+    }
+
+    $('body').on('click', '.btn-delete-field', function () {
+        $('#confirm-delete-field-variant').modal('show');
+        field = this;
+    });
+
+    $('.modal-delete-field-variant').click(function () {
+        var row;
+        fieldCollection.each(function (r) {
+            if (r.id == $(field).attr('data-id')) {
+                row = r.attributes;
+            }
+        });
+        $('#sel_var_field').append($('<option>').val(row.id).html(row.name).attr('data-code', row.field_code));
+        resetSelect();
+        removeColumn({name: row.field_code});
+        $(field).parents('li').remove();
+        renderGrid();
+        grayGrid();
+
+    });
+
+    function validateVariant() {
+        var valid = true;
+        bodyGrid.find('input.variantUnique').each(function(el) {
+            if (!$(this).valid()) {
+                valid = false;
+            }
+        });
+        return valid;
+    }
+
+    /*
+    *custom validation function for checking duplicated input
+    */
+    function variantUnique(value, elem, params) {
+        var error = true;
+        if (typeof (elem) !== 'undefined') {
+            var parent = $(elem).parents('tr');
+            vRowsCollection.each(function(obj) {
+                var flag = false;
+                var field_values = obj.get('field_values');
+                if (obj.get('id') != parent.attr('id')) {
+                    parent.find('input.select-value-field').each(function() {
+                        if ($(this).val() != field_values[$(this).attr('name')]) {
+                            flag = true; // at least one field is different
+                        }
+                    });
+                    if (!flag) {
+                        error = false;
+                    }
+                } else {
+                    field_values[$(elem).attr('name')] = value;
+                    obj.set('field_values', field_values);
+                }
+            })
+        }
+
+        return error;
+    }
+    bodyGrid.on('change', '.variantUnique', function() {
+        validateVariant();
+    });
+    $.validator.addMethod('variantUnique',variantUnique , 'Same variant is already taken place.');
+
+    $.validator.addClassRules("variantUnique", {
+        variantUnique: true
+    });
+
+
+});
+</script>
+
+<div class="well clearfix">
+    <div class="pull-left" style="width: 245px">
+        <select id="sel_var_field" class="form-control" style="width:150px;">
+            {{ UTIL.optionsHtml(APP.instance('Sellvana_CatalogFields_Model_Field').getDropdowns()) | raw }}
+        </select>
+        <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
+    </div>
+    <div class="col-sm-8" style="position: relative">
+        <ol id="variants-tab-field" class="dd-list columns dd-list-axis-x"></ol>
+    </div>
+</div>
+<div class="hidden" id="grid-field-hidden">
+    {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
+</div>
+<div class="f-variants-col row">
+  <div class="col-sm-12">
+    {{ THIS.view('core/backbonegrid').set('grid', variantConfig) | raw }}
+  </div>
+</div>
+
+<div class='modal fade' id='confirm-delete-field-variant' tabindex='-1'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{ "Delete"|_ }}</h4>
+            </div>
+            <div class='modal-body'>
+                {{ "Deleting this field will remove all associated variants of this product. Are you sure you want to delete?"|_ }}
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-primary btn-add modal-delete-field-variant' data-dismiss='modal' type='button'>{{ "Yes"|_ }}</button>
+                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Cancel"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<input type='hidden' id='vfield_ids' name='vfields' />
+<input type='hidden' id='variants' name='variants' />

@@ -50,13 +50,14 @@ class FCom_PushServer_Main extends BCLass
         /** @var FCom_Core_View_Text $script */
         $script = $this->BLayout->view('head_script');
 
-        //if ($this->FCom_Admin_Model_User->isLoggedIn()) {
+        $onlyAdmin = $this->BConfig->get('modules/FCom_PushServer/only_admin');
+        if (!$onlyAdmin || $this->BRequest->area() === 'FCom_Admin' && $this->FCom_Admin_Model_User->isLoggedIn()) {
             $text = "
 FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
 ";
             $head->js_raw('pushserver_init', $text);
             $script->addText('FCom_PushServer:init', $text);
-        //}
+        }
     }
 
     /**

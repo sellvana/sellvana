@@ -18,7 +18,6 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
- * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  */
 class Sellvana_Catalog_Migrate extends BClass
 {
@@ -805,7 +804,31 @@ class Sellvana_Catalog_Migrate extends BClass
         }
     }
 
-    public function upgrade__0_5_0_0__0_5_0_1()
+    public function upgrade__0_5_0_0__0_5_1_0()
+    {
+        $tPrice = $this->Sellvana_Catalog_Model_ProductPrice->table();
+        $this->BDb->ddlTableDef($tPrice, [
+            BDb::COLUMNS => [
+                'valid_from' => 'DATE NULL DEFAULT NULL',
+                'valid_to'   => 'DATE NULL DEFAULT NULL',
+                'operation'  => 'CHAR(3) NULL DEFAULT NULL',
+                'base_field' => 'varchar(20) null'
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $tSearchAlias = $this->Sellvana_Catalog_Model_SearchAlias->table();
+        $this->BDb->ddlTableDef($tSearchAlias, [
+            BDb::COLUMNS => [
+                'target_url' => 'text default null',
+                'data_serialized' => 'text default null',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_2_0__0_5_3_0()
     {
         $tProductMedia = $this->Sellvana_Catalog_Model_ProductMedia->table();
         $this->BDb->ddlTableDef($tProductMedia, [

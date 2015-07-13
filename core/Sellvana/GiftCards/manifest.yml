@@ -1,0 +1,4 @@
+modules:
+    Sellvana_GiftCards:
+        version: 0.5.0.0
+        channel: alpha

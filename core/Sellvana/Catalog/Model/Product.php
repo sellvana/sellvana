@@ -41,9 +41,6 @@
  * @property Sellvana_Catalog_Model_ProductPrice     $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Customer_Model_Customer        $Sellvana_Customer_Model_Customer
  * @property Sellvana_CustomerGroups_Model_Group     $Sellvana_CustomerGroups_Model_Group
- * @property Sellvana_CustomField_Model_Field        $Sellvana_CustomField_Model_Field
- * @property Sellvana_CustomField_Model_FieldOption  $Sellvana_CustomField_Model_FieldOption
- * @property Sellvana_CustomField_Model_ProductField $Sellvana_CustomField_Model_ProductField
  * @property Sellvana_ProductReviews_Model_Review    $Sellvana_ProductReviews_Model_Review
  * @property Sellvana_MultiSite_Frontend             $Sellvana_MultiSite_Frontend
  * @property Sellvana_MultiCurrency_Main             $Sellvana_MultiCurrency_Main
@@ -441,29 +438,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         return $categories;
     }
-/*
-    public function customFields($product)
-    {
-        return $this->Sellvana_CustomField_Model_ProductField->productFields($product);
-    }
-*/
-
-    /**
-     * @return array
-     */
-    public function customFieldsShowOnFrontend()
-    {
-        $result = [];
-        $fields = $this->Sellvana_CustomField_Model_ProductField->productFields($this);
-        if ($fields) {
-            foreach ($fields as $f) {
-                if ($f->get('frontend_show')) {
-                    $result[] = $f;
-                }
-            }
-        }
-        return $result;
-    }
 
     /**
      * @param string $q
@@ -609,8 +583,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $result = [];
         //$result['status'] = '';
 
-        $customFieldsOptions = $this->Sellvana_CustomField_Model_FieldOption->getListAssoc();
-
         //HANDLE IMPORT
         static $cfIntersection = '';
         $customFields = [];
@@ -643,43 +615,12 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 }
             }
 
-
             //HANDLE CUSTOM FIELDS
-            if ($config['import']['custom_fields']['import']) {
-                //find intersection of custom fields with data fields
-                    $cfFields = $this->Sellvana_CustomField_Model_Field->getListAssoc();
-                    $cfKeys = array_keys($cfFields);
-                    $dataKeys = array_keys($d);
-                    $cfIntersection = array_intersect($cfKeys, $dataKeys);
-
-                    if ($cfIntersection) {
-                        //get custom fields values from data
-                        foreach ($cfIntersection as $cfk) {
-                            $field = $cfFields[$cfk];
-                            $dataValue = $d[$cfk];
-                            if ($config['import']['custom_fields']['create_missing_options']) {
-                                //create missing custom field options
-                                if (!empty($customFieldsOptions[$field->id()])) {
-                                    if (!in_array($dataValue, $customFieldsOptions[$field->id()])) {
-                                        try {
-                                            $this->Sellvana_CustomField_Model_FieldOption->orm()
-                                                    ->create(['field_id' => $field->id(), 'label' => $dataValue])
-                                                    ->save();
-                                        } catch (Exception $e) {
-                                            $errors[] = $e->getMessage();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
+            $this->BEvents->fire(__METHOD__ . ':row', ['config' => $config, 'data' => $d]);
 
             //HANDLE PRODUCT
             $p = false;
-            if ('create_or_update' == $config['import']['actions'] ||
-                    'update' == $config['import']['actions']
-                    ) {
+            if ('create_or_update' == $config['import']['actions'] || 'update' == $config['import']['actions']) {
                 if (isset($d['product_sku'])) {
                     $p = $this->orm()->where("product_sku", $d['product_sku'])->find_one();
                 }
@@ -833,39 +774,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         //HANDLE CUSTOM FIELDS to product relations
-        if ($config['import']['custom_fields']['import']
-            && !empty($cfIntersection) && !empty($productIds) && !empty($cfFields)) {
-            //get custom fields values from data
-            $fieldIds = [];
-            foreach ($cfIntersection as $cfk) {
-                $field = $cfFields[$cfk];
-                $fieldIds[] = $field->id();
-            }
-
-            //get or create product custom field
-            $customsResult = $this->Sellvana_CustomField_Model_ProductField->orm()->where_in("product_id", $productIds)->find_many();
-            foreach ($customsResult as $cus) {
-                $customsResult[$cus->product_id] = $cus;
-            }
-            $productCustomFields = [];
-            foreach ($productIds as $pId) {
-                if (!empty($customFields[$pId])) {
-                    $productCustomFields = $customFields[$pId];
-                }
-                $productCustomFields['_add_field_ids'] = implode(",", $fieldIds);
-                $productCustomFields['product_id'] = $pId;
-                if (!empty($customsResult[$pId])) {
-                    $custom = $customsResult[$pId];
-                } else {
-                    $custom = $this->Sellvana_CustomField_Model_ProductField->create();
-                }
-                $custom->set($productCustomFields);
-                $custom->save();
-                unset($custom);
-            }
-            unset($customFields);
-            unset($customsResult);
-        }
+        $this->BEvents->fire(__METHOD__ . ':after_loop', ['config' => $config, 'data' => $d]);
 
         if (!empty($relatedProducts)) {
             $relatedResult = $this->_importRelatedProducts($relatedProducts);

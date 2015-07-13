@@ -1,0 +1,22 @@
+{% set cnt = THIS.get('cnt') ?: 6 %}
+{% set products = APP.instance('Sellvana_RecentlyViewed_Model_History').getVisitorProducts(cnt) %}
+
+{% if products %}
+    <div class="f-widget f-widget-featured-prods f-prod-listing f-prod-listing-grid f-widget-recently-viewed-prods">
+        <header class="f-widget-header">
+            <strong class="f-widget-title">{{ 'Recently Viewed Products'|_ }}</strong>
+        </header>
+        <div class="f-widget-content">
+            {{ THIS.view('catalog/product/grid-tiles').set({
+                lg_columns: cnt,
+                md_columns: cnt,
+                sm_columns: 4,
+                xs_columns: 2,
+                products: products,
+                simple_view: true,
+                list_name: 'Recently Viewed',
+            }) | raw }}
+        </div>
+    </div><!-- /.f-widget-recently-viewed-prods -->
+    <div class="clearfix"></div>
+{% endif %}

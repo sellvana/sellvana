@@ -15,14 +15,16 @@ base:
             - [ css, "//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" ]
             #- [ css, "@FCom_Core/css/font-awesome/css/font-awesome.min.css" ]
             - [ css, "@FCom_Frontend/Frontend/css/bootstrap.css" ]
+            #- [ css, "@FCom_LibJsCommon/js/bootstrap-3.3.5/css/bootstrap" ]
             - [ css, "@FCom_Core/css/flags.css" ]
             - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
             - [ scss, "@FCom_Frontend/Frontend/scss/fulleron-base.scss" ]
             - [ js, //html5shim.googlecode.com/svn/trunk/html5.js, { if: lt IE 9 } ]
 
+            #- [ requireJs, bootstrap, "@FCom_LibJsCommon/js/bootstrap-3.3.5/js/bootstrap", { deps: [ jquery ] } ]
             - [ requireJs, bootstrap, "@FCom_Frontend/Frontend/js/bootstrap", { deps: [ jquery ] } ]
             - [ requireJs, responsiveslides, "@FCom_Frontend/Frontend/js/vendor/responsiveslides.min", { deps: [ jquery ] } ]
-            - [ requireJs, typeahead, "@FCom_Frontend/Frontend/js/vendor/typeahead.min", { deps: [ jquery ] } ]
+            #- [ requireJs, typeahead, "@FCom_Frontend/Frontend/js/vendor/typeahead.min", { deps: [ jquery ] } ]
 
             - [ requireJs, fcom.core, "@FCom_Core/js/fcom.core" ]
             - [ requireJs, fcom.frontend, "@FCom_Frontend/Frontend/js/fcom.frontend" ]

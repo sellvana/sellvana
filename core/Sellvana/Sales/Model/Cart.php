@@ -379,7 +379,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     /**
      * @todo combine variants and shopper fields into structure grouped differently, i.e. all output in the same array
-     * @todo move variants to Sellvana_CustomField
+     * @todo move variants to Sellvana_CatalogFields
      *
      * @param Sellvana_Catalog_Model_Product|int $product
      * @param array $params

@@ -1,0 +1,36 @@
+base:
+    - view: head
+        do:
+            - [ requireJs, fcom.catalogfields, "@Sellvana_CatalogFields/Admin/js/fcom.catalogfields" ]
+
+    - view: admin/nav
+        do:
+            - [ addNav, catalog/fieldsets, { label: Field Sets, href: /catalogfields/fieldsets } ]
+            - [ addNav, catalog/fields, { label: Fields, href: /catalogfields/fields } ]
+
+catalog_product_form_tabs:
+    - view: admin/form
+        do:
+            - [ addTab, fields, { label: Additional Info, pos: 82, view: catalogfields/products/fields-tab, async: true } ]
+            #- [ addTab, variants, { label: Variants, pos: 84, view: customfields/products/variants-tab, async: true } ]
+            - [ addTab, variants-backbone, { label: Variants, pos: 84, view: catalogfields/products/variants-tab-backbone, async: true } ]
+
+/catalogfields/fieldsets:
+    - { include: base }
+    - { hook: main, views: catalogfields/fieldsets }
+    - { view: admin/nav, do: [[ setNav, catalog/fieldsets ]] }
+
+/catalogfields/fields:
+    - { include: base }
+    - { hook: main, views: catalogfields/fields }
+    - { view: admin/nav, do: [[ setNav, catalog/fields ]] }
+
+/catalogfields/fieldsets/form:
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: catalogfields/fieldsets/form }
+
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_CatalogFields, { label: Catalog Fields, group: catalog, async: true } ]

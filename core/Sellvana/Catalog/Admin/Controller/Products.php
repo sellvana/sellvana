@@ -4,12 +4,10 @@
  * Class Sellvana_Catalog_Admin_Controller_Products
  *
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_CustomField_Model_ProductVariant $Sellvana_CustomField_Model_ProductVariant
  * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
  * @property Sellvana_Catalog_Model_ProductLink $Sellvana_Catalog_Model_ProductLink
  * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
- * @property Sellvana_CustomField_Model_FieldOption $Sellvana_CustomField_Model_FieldOption
  * @property Sellvana_ProductReviews_Model_Review $Sellvana_ProductReviews_Model_Review
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property FCom_Core_Main $FCom_Core_Main
@@ -402,7 +400,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'quick_add' => [
                         'html' => '<span class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
                                      <i class="icon-plus icon-white"></i>
-                                     <span>Quick add images</span> <input type="file" name="upload[]" id="quick-add-images" multiple="">
+                                     <span>' . $this->BLocale->_('Quick add images') . '</span>
+                                     <input type="file" name="upload[]" id="quick-add-images" multiple="">
                                    </span>'
                     ],
                     'delete' => ['caption' => 'Remove'],
@@ -671,10 +670,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $this->processInventoryPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
                 $this->processPricesPost($model, $data);
-                // moved to Sellvana_CustomFields
-                #$this->processVariantPost($model, $data);
-                #$this->processCustomFieldPost($model, $data);
-                #$this->processFrontendPost($model, $data);
                 $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
                 $model->save();
             }

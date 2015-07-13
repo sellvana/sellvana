@@ -1,6 +1,6 @@
 modules:
     Sellvana_Catalog:
-        version: 0.5.0.1
+        version: 0.5.3.0
         channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
@@ -60,7 +60,7 @@ modules:
             FCom_Frontend:
                 routing:
                     - [ /*category, Sellvana_Catalog_Frontend_Controller_Category.index ]
-                    - [ /catalog/search, Sellvana_Catalog_Frontend_Controller_Search.index ]
+                    - [ /catalog/search/?.action, Sellvana_Catalog_Frontend_Controller_Search ]
                     - [ "/:product", Sellvana_Catalog_Frontend_Controller_Product.index ]
                     - [ "/*category/:product", Sellvana_Catalog_Frontend_Controller_Product.index ]
                     - [ /catalog/quickview, Sellvana_Catalog_Frontend_Controller_Product.quickview ]
@@ -68,6 +68,8 @@ modules:
                 observe:
                     - [ "Sellvana_FrontendCP_Frontend_Controller::action_update:after", "Sellvana_Catalog_Frontend_ControlPanel::onAfterUpdate" ]
                     - [ "FCom_Core_View_BackboneGrid::getPageRowsData", "Sellvana_Catalog_Admin_Controller_Products::processInitalData" ]
+                    - [ "Sellvana_Seo_Frontend_Controller_Sitemaps::action_index_xml:before", "Sellvana_Catalog_Frontend.onSitemapsIndexXmlBefore" ]
+                    - [ "Sellvana_Seo_Frontend_Controller_Sitemaps::action_sitemap_data:before", "Sellvana_Catalog_Frontend.onSitemapsDataBefore" ]
 
                 views:
                     - [ catalog/product/pager, { view_class: Sellvana_Catalog_Frontend_View_Pager } ]

@@ -7,7 +7,6 @@
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_CatalogIndex_Indexer $Sellvana_CatalogIndex_Indexer
  */
 class Sellvana_SampleData_Admin extends BClass
 {
@@ -95,7 +94,7 @@ class Sellvana_SampleData_Admin extends BClass
         $client->send(['channel' => 'import', 'signal' => 'progress', 'progress' => $remaining]);
         $client->send(['channel' => 'import', 'signal' => 'import_time', 'time' => round(microtime(true) - $start, 4)]);
         $client->send(['channel' => 'import', 'signal' => 'reindex', 'reindex' => 'start']);
-        $this->Sellvana_CatalogIndex_Indexer->indexProducts(true);
+        $this->Sellvana_CatalogIndex_Main->getIndexer()->indexPendingProducts();
         $end = microtime(true);
         $msg = "Sample data imported in: " . round($end - $start, 4) . " seconds.";
         $client->send(['channel' => 'import', 'signal' => 'reindex', 'reindex' => 'end']);
