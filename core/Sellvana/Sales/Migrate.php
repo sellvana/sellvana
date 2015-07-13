@@ -2072,7 +2072,7 @@ class Sellvana_Sales_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_5_0__0_5_1()
+    public function upgrade__0_5_0_0__0_5_1()
     {
         $tOrder = $this->Sellvana_Sales_Model_Order->table();
 
@@ -2082,6 +2082,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'token_at' => "datetime default null",
             ],
             BDb::KEYS => [
+                'FK_cart_id' => '(cart_id)',
                 'UNQ_cart_id' => BDb::DROP,
                 'UNQ_token' => 'UNIQUE (token)',
             ]

@@ -4,7 +4,7 @@
  * Class Sellvana_CatalogIndex_Frontend
  *
  * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
- * @property Sellvana_CatalogIndex_Indexer $Sellvana_CatalogIndex_Indexer
+ * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  */
 
 class Sellvana_CatalogIndex_Frontend extends BClass
@@ -17,8 +17,9 @@ class Sellvana_CatalogIndex_Frontend extends BClass
 
     public function onCategoryProductsData($args)
     {
-        $productsData = $this->Sellvana_CatalogIndex_Indexer->searchProducts(null, null, false, [
-            'category' => $args['category'],
+        $productsData = $this->Sellvana_CatalogIndex_Main->getIndexer()->searchProducts([
+            'sort' => false,
+            'options' => ['category' => $args['category']]
         ]);
         $productsOrm = $productsData['orm'];
 
@@ -48,7 +49,10 @@ class Sellvana_CatalogIndex_Frontend extends BClass
 
         $pagerView->set('sort_options', $this->Sellvana_CatalogIndex_Model_Field->getSortingArray());
 
-        $productsData = $this->Sellvana_CatalogIndex_Indexer->searchProducts($args['query'], null, false);
+        $productsData = $this->Sellvana_CatalogIndex_Main->getIndexer()->searchProducts([
+            'query' => $args['query'],
+            'sort' => false,
+        ]);
         $productsOrm = $productsData['orm'];
         $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Search::action_index:products_orm', ['orm' => $productsOrm]);
 

@@ -2,7 +2,7 @@ modules:
     Sellvana_CatalogIndex:
         version: 0.5.0.0
         channel: alpha
-        require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_CustomField: 0.1.4 } }
+        require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_CatalogFields: 0.1.4 } }
         description: "Catalog search and facets indexing engine"
         auto_use: [ bootstrap, views, layout ]
         observe:
@@ -10,10 +10,11 @@ modules:
             - [ "Sellvana_Catalog_Model_Product::import:before", "Sellvana_CatalogIndex_Main::onProductBeforeImport" ]
             - [ "Sellvana_Catalog_Model_Product::import:after", "Sellvana_CatalogIndex_Main::onProductAfterImport" ]
             - [ "Sellvana_Catalog_Model_Category::onAfterSave:products", "Sellvana_CatalogIndex_Main::onCategoryAfterSave" ]
-            - [ "Sellvana_CustomField_Model_Field::onAfterSave", "Sellvana_CatalogIndex_Main::onCustomFieldAfterSave" ]
+            - [ "Sellvana_CatalogFields_Model_Field::onAfterSave", "Sellvana_CatalogIndex_Main::onCustomFieldAfterSave" ]
         default_config:
             modules/Sellvana_CatalogIndex/show_root_categories: 1
             modules/Sellvana_CatalogIndex/show_sibling_categories: 1
+            modules/Sellvana_CatalogIndex/active_indexer: builtin
         areas:
             FCom_Admin:
                 routing:

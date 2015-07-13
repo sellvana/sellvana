@@ -1,0 +1,18 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'Sellvana_GoogleApi' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+<h2>{{ "Google APIs Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_GoogleApi'}) }}
+    {{ forms.accordion_panel_start({label:'Google Universal Analytics Settings'|_, id:'settings-Sellvana_GoogleApi-group0', in:1}) }}
+        {{ forms.boolean(fieldData, {field:'ua_enable', label:'Enable UA'|_ }) }}
+        {{ forms.input(fieldData, {field:'ua_key', label:'UA Account Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'ua_domain', label:'UA Account Domain'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'ua_enable_ec', label:'Enable UA Enhanced Ecommerce'|_ }) }}
+    {{ forms.accordion_panel_end }}
+<!--
+    {{ forms.accordion_panel_start({label:'Google Tag Manager Settings'|_, id:'settings-Sellvana_GoogleApi-group1'}) }}
+        {{ forms.boolean(fieldData, {field:'gtm_enable', label:'Enable GTM'|_ }) }}
+        {{ forms.input(fieldData, {field:'gtm_key', label:'GTM Account Key'|_ }) }}
+    {{ forms.accordion_panel_end }}
+-->
+{{ forms.accordion_end }}

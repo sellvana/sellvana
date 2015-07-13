@@ -4,6 +4,9 @@
  * Class Sellvana_MultiSite_Migrate
  *
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
+ * @property Sellvana_MultiSite_Model_SiteUser $Sellvana_MultiSite_Model_SiteUser
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
 
 class Sellvana_MultiSite_Migrate extends BClass
@@ -56,12 +59,38 @@ class Sellvana_MultiSite_Migrate extends BClass
         ]);
     }
     
-    public function upgrade__0_5_0__0_5_1()
+    public function upgrade__0_5_0_0__0_5_1_0()
     {
         $tSite = $this->Sellvana_MultiSite_Model_Site->table();
         $this->BDb->ddlTableDef($tSite, [
             BDb::COLUMNS => [
                 'home_url' => 'varchar(255) default null',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $tSite = $this->Sellvana_MultiSite_Model_Site->table();
+        $tUser = $this->FCom_Admin_Model_User->table();
+        $tRole = $this->FCom_Admin_Model_Role->table();
+        $tSiteUser = $this->Sellvana_MultiSite_Model_SiteUser->table();
+
+        $this->BDb->ddlTableDef($tSiteUser, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'site_id' => 'int unsigned not null',
+                'user_id' => 'int unsigned not null',
+                'role_id' => 'int unsigned not null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_site_user_role' => 'UNIQUE (site_id, user_id, role_id)',
+            ],
+            BDb::CONSTRAINTS => [
+                'site' => ['site_id', $tSite],
+                'user' => ['user_id', $tUser],
+                'role' => ['role_id', $tRole],
             ],
         ]);
     }

@@ -1607,7 +1607,7 @@ class BUtil extends BClass
 
     /**
      * @param $callback
-     * @return array
+     * @return callable
      */
     public function extCallback($callback)
     {
@@ -3313,7 +3313,7 @@ class BDebug extends BClass
         }
 ?></tbody></table></div><script>
 
-        if (require) {
+        if (typeof require !== 'undefined') {
             require(['jquery.tablesorter'], function() {
                 $('#buckyball-debug-table').tablesorter();
             })

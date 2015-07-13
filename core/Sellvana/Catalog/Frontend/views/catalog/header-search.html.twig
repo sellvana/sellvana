@@ -1,15 +1,68 @@
 <form class="navbar-form f-header-search-form {{ THIS.get('for_mobile') ? 'visible-xs' : 'hidden-xs' }}" role="search" action="{{ APP.href('catalog/search') }}">
-  <input type="text" class="form-control typeahead" placeholder="{{ 'Search the store'|_ }}" name="q" value="{{ THIS.get('query') }}">
+  <input type="text" class="form-control" autocomplete="off" placeholder="{{ 'Search the store'|_ }}" name="q" value="{{ THIS.get('query') }}">
   <button type="submit" class="btn btn-default {{ THIS.get('for_mobile') ? 'btn-sm' }}"><span class="glyphicon glyphicon-search"></span></button>
 </form>
 {% if not THIS.get('for_mobile') %}
   <script type="text/javascript">
-    require(['jquery', 'typeahead'], function($) {
-      $('.header-search-form input.typeahead').typeahead({
-        name: 'countries',
-        prefetch: 'test-countries.json',
-        limit: 10
-      });
-    })
+    require(['jquery', /*'bloodhound', */'typeahead'], function($/*, Bloodhound*/) {
+        var $input = $('.f-header-search-form input[name=q]');
+        var url = '{{ APP.href('catalog/search/autocomplete') }}';
+        /*
+        var engine = new Bloodhound({
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            local: ["(A)labama","Alaska","Arizona","Arkansas","Arkansas2","Barkansas"]
+            //remote: {
+            //    url: url
+            //}
+        });
+        engine.initialize();
+        $input.typeahead({source: engine.ttAdapter()});
+        */
+        var queryCache = {};
+        /*$input.typeahead({
+            //source: ['A', 'B', 'C']
+            source: function(query, sync, async) {
+                console.log(query, sync, async);
+            }
+        });*/
+        /*
+        $input.keyup(function(ev) {
+            var q = $(this).val();
+            if (queryCache[q]) {
+                $input.typeahead({source:queryCache[q]});
+            } else {
+                $.get(url, {q: q}, function (data) {
+                    $input.typeahead({source:data});
+                    queryCache[q] = data;
+                });
+            }
+        })
+        */
+
+        //$input.typeahead({source:function(q) { return ['abc','def','gth'] }, autoSelect: true});
+        /*
+        console.log(2);
+        $input.change(function() {
+            console.log(3);
+            var current = $input.typeahead("getActive");
+            if (current) {
+                console.log(4, current);
+                // Some item from your model is active!
+                if (current.name == $input.val()) {
+                    console.log(5);
+                    // This means the exact match is found. Use toLowerCase() if you want case insensitive match.
+                } else {
+                    console.log(6);
+                    // This means it is only a partial match, you can either add a new item
+                    // or take the active if you don't want new items
+                }
+            } else {
+                console.log(7);
+                // Nothing is active so it is a new value (or maybe empty value)
+            }
+        });
+        */
+    });
   </script>
 {% endif %}

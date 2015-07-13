@@ -40,7 +40,7 @@ require(['jquery', 'jquery.validate', 'jquery.cookie'], function($) {
         $('#login-username').focus();
     });
 
-    $.cookie('check-cookies', true);
+    $.cookie('check-cookies', true, FCom.cookie_options);
     if (!$.cookie('check-cookies')) {
         $("#login-cookie-message").html('<div class="alert alert-danger"><h4><i class="icon-remove-sign"></i> {{ "Warning"|_ }}</h4>{{ "Admin interface requires cookies enabled"|_ }}</div>');
     }

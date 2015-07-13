@@ -15,16 +15,14 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         // TODO: figure out for virtual orders ($c->isShippable())
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
 
-        if ($cart->hasCompleteAddress('shipping')) {
-            return;
-        }
-
         $recalc = false;
 
-        $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-        if ($customer) {
-            $cart->importAddressesFromCustomer($customer);
-            $recalc = true;
+        if (!$cart->hasCompleteAddress('shipping')) {
+            $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+            if ($customer) {
+                $cart->importAddressesFromCustomer($customer);
+                $recalc = true;
+            }
         }
 
         if (!$cart->getData('shipping_estimate')) {

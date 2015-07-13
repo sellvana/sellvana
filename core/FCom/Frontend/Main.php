@@ -50,6 +50,11 @@ class FCom_Frontend_Main extends BClass
     {
         return $this->BApp->frontendHref($url);
     }
+
+    public function onFetchLibrary($args)
+    {
+
+    }
 }
 
 

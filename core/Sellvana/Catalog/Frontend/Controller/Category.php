@@ -47,7 +47,17 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
             $q = join(' ', $q);
         }
         if ($q !== '' && !is_null($q)) {
-            $q = $this->Sellvana_Catalog_Model_SearchAlias->processSearchQuery($q);
+            $alias = $this->Sellvana_Catalog_Model_SearchAlias->fetchSearchAlias($q);
+            $targetUrl = $alias->get('target_url');
+            if ($alias->get('alias_type') === Sellvana_Catalog_Model_SearchAlias::TYPE_FULL && $targetUrl) {
+                if (!$this->BUtil->isUrlFull($targetUrl)) {
+                    $targetUrl = $this->BApp->href($targetUrl);
+                }
+                $this->BResponse->redirect($targetUrl);
+                return;
+            } else {
+                $q = $alias->get('target_term');
+            }
         }
 
         $productsData = null;

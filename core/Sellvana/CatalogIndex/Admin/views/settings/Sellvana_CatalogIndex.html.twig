@@ -1,0 +1,10 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'Sellvana_CatalogIndex', } %}
+{% set allIndexers = APP.instance('Sellvana_CatalogIndex_Main').getAllIndexers() %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+<h2>{{ "Catalog Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_CatalogIndex'}) }}
+     {{ forms.accordion_panel_start({label:'Catalog Products Indexing'|_, id:'settings-Sellvana_CatalogIndex-group0', in:1}) }}
+        {{ forms.select(fieldData, {field:'active_indexer', label:'Active Indexer'|_, options: allIndexers }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

@@ -1,0 +1,11 @@
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'Sellvana_IndexSolr', } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+<h2>{{ "Apache Solr Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_IndexSolr'}) }}
+     {{ forms.accordion_panel_start({label:'Service connection'|_, id:'settings-Sellvana_IndexSolr-group0', in:1}) }}
+        {{ forms.input(fieldData, {field:'host', label:'Host'|_ }) }}
+        {{ forms.input(fieldData, {field:'port', label:'Port'|_ }) }}
+        {{ forms.input(fieldData, {field:'path', label:'Path'|_ }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

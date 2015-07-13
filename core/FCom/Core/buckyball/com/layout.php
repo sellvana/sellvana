@@ -581,11 +581,12 @@ class BLayout extends BClass
      * @param string $hookName
      * @param mixed  $callback
      * @param array  $args
+     * @param array  $params
      * @return $this
      */
-    public function hook($hookName, $callback, $args = [], $alias = null)
+    public function hook($hookName, $callback, $args = [], $params = [])
     {
-        $this->BEvents->on('BLayout::hook:' . $hookName, $callback, $args, $alias);
+        $this->BEvents->on('BLayout::hook:' . $hookName, $callback, $args, $params);
 
         return $this;
     }
@@ -598,14 +599,15 @@ class BLayout extends BClass
      * @param string $hookName
      * @param string|array $viewName
      * @param array $args
+     * @param array  $params
      * @return $this
      */
-    public function hookView($hookName, $viewName, $args = [])
+    public function hookView($hookName, $viewName, $args = [], $params = [])
     {
         if (is_array($viewName)) {
-            $params   = $viewName;
-            $viewName = array_shift($params);
-            static::addView($viewName, $params);
+            $viewParams = $viewName;
+            $viewName = array_shift($viewParams);
+            static::addView($viewName, $viewParams);
         }
         $view = static::getView($viewName);
         if (!$view) {
@@ -614,7 +616,10 @@ class BLayout extends BClass
             return $this;
         }
         //$view->set($args);
-        return $this->hook($hookName, $view, $args, $viewName);
+        if (empty($params['alias'])) {
+            $params['alias'] = $viewName;
+        }
+        return $this->hook($hookName, $view, $args, $params);
     }
 
     public function hookText($hookName, $text)
@@ -812,9 +817,6 @@ class BLayout extends BClass
                 }
             }
             if (empty($d['type'])) {
-                if (!is_array($d)) {
-                    var_dump($layoutName, $d);
-                }
                 if (!empty($d[0])) {
                     $d['type'] = $d[0];
                 } else {
@@ -913,9 +915,11 @@ class BLayout extends BClass
         if (!empty($d['position'])) {
             $args['position'] = $d['position'];
         }
+        $params = !empty($d['params']) ? $d['params'] : [];
+
         if (!empty($d['callbacks'])) {
             foreach ($d['callbacks'] as $cb) {
-                $this->hook($d['name'], $cb, $args);
+                $this->hook($d['name'], $cb, $args, $params);
             }
         }
         if (!empty($d['clear'])) {
@@ -923,7 +927,7 @@ class BLayout extends BClass
         }
         if (!empty($d['views'])) {
             foreach ((array)$d['views'] as $v) {
-                $this->hookView($d['name'], $v, $args);
+                $this->hookView($d['name'], $v, $args, $params);
             }
             if (!empty($d['use_meta'])) {
                 $this->view($v)->useMetaData();
@@ -1709,15 +1713,16 @@ class BView extends BClass
     {
         $debug = $this->BDebug->is('DEBUG') && !$this->get('no_debug');
         $viewName = $this->param('view_name');
+        $modName = $this->param('module_name');
 
-        $timer = BDebug::debug('RENDER.VIEW ' . $viewName);
+        $timer = BDebug::debug('RENDER.VIEW @' . $modName . '/' . $viewName);
         if ($this->param('raw_text') !== null) {
             return $this->param('raw_text');
         }
         foreach ($args as $k => $v) {
             $this->_params['args'][$k] = $v;
         }
-        if (($modName = $this->param('module_name'))) {
+        if ($modName) {
             //$this->BModuleRegistry->pushModule($modName);
         }
         $result = '';

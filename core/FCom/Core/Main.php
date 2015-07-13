@@ -120,12 +120,12 @@ class FCom_Core_Main extends BClass
         if (!$config->get('web/media_dir')) {
             if (strpos($mediaDir, FULLERON_ROOT_DIR) === 0) {
                 $mediaUrl = preg_replace('#^' . preg_quote(FULLERON_ROOT_DIR, '#') . '#', '', $mediaDir);
-            } elseif (strpos($mediaDir, $baseSrc) === 0) {
+            } elseif ($rootDir && $rootDir !== '/' && strpos($mediaDir, $rootDir) === 0) {
+                $mediaUrl = preg_replace('#^' . preg_quote($rootDir, '#') . '#', '', $mediaDir);
+            } elseif ($baseSrc && $baseSrc !== '/' && strpos($mediaDir, $baseSrc) === 0) {
                 $mediaUrl = preg_replace('#^' . preg_quote($baseSrc, '#') . '#', '', $mediaDir);
             #} elseif (strpos($mediaDir, $docRoot) === 0) {
             #    $mediaUrl = str_replace($docRoot, '', $mediaDir);
-            #} elseif (strpos($mediaDir, $rootDir) === 0) {
-            #    $mediaUrl = $baseStore . str_replace($rootDir, '', $mediaDir);
             } else {
                 $mediaUrl = 'media';
             }
@@ -430,6 +430,7 @@ class FCom_Core_Main extends BClass
         $this->BClassAutoload->addPath($dirConf['local_dir']);
         $this->BClassAutoload->addPath($dirConf['dlc_dir']);
         $this->BClassAutoload->addPath($dirConf['core_dir']);
+        #$this->BClassAutoload->addPath($modReg->module('FCom_Core')->root_dir . '/lib');
 
         return $this;
     }
@@ -565,10 +566,7 @@ class FCom_Core_Main extends BClass
 
         $text = "
 FCom = {};
-FCom.cookie_options = " . $this->BUtil->toJson([
-                'domain' => !empty($cookieConfig['domain']) ? $cookieConfig['domain'] : null,
-                'path' => !empty($cookieConfig['path']) ? $cookieConfig['path'] : null,
-            ]) . ";
+FCom.cookie_options = " . $this->BRequest->getCookieConfigJson() . ";
 FCom.base_href = '" . $this->BApp->baseUrl() . "';
 FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
         ";

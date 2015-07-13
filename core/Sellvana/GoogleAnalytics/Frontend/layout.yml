@@ -1,2 +1,0 @@
-base:
-    - { hook: before_body_end, views: google-analytics/init }

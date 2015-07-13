@@ -1,0 +1,24 @@
+<!--{ label: Multi Site }-->
+<!--{ pos: 15 }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% set userSiteRoles = APP.instance('Sellvana_MultiSite_Model_SiteUser').getUserSiteRoles(m.id()) %}
+{% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
+{% set roles = APP.instance('FCom_Admin_Model_Role').options() %}
+
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldData = { id_prefix:'multisite-', name_prefix:'multisite', multiple:1, select2:{}, options:roles } %}
+
+<fieldset class="form-horizontal">
+    <div class="f-section">
+        {% if sites %}
+            <div class="row"><div class="col-md-offset-2 col-md-5"><h3>{{ 'Roles per site'|_ }}</h3></div></div>
+            {% for sId, sName in sites %}
+                {{ forms.select(fieldData, {field:sId, label:sName, value:userSiteRoles[sId] }) }}
+            {% endfor %}
+        {% else %}
+            <p>{{ 'No multi sites configured'|_ }}</p>
+        {% endif %}
+    </div>
+</fieldset>

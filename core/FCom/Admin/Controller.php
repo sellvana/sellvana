@@ -15,6 +15,11 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         //$this->BLayout->layout('/');
     }
 
+    public function action_login()
+    {
+        $this->BResponse->redirect('');
+    }
+
     public function action_static()
     {
         $this->viewProxy('static', 'index', 'main', 'base');
