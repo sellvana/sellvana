@@ -86,12 +86,14 @@
                 <tr>
                     <th>{{ "Subtotal" | _ }}</th>
                     <th>{{ "Grand Total" | _ }}</th>
+                    <th>{{ "Amount Paid" | _ }}</th>
                     <th>{{ "Balance Due" | _ }}</th>
                 </tr>
                 </thead>
                 <tr>
                     <td>{{ order.get('subtotal') | currency }} </td>
                     <td>{{ order.get('grand_total') | currency }} </td>
+                    <td>{{ order.get('amount_paid') | currency }} </td>
                     <td>{{ order.get('amount_due') | currency }} </td>
                 </tr>
             </table>

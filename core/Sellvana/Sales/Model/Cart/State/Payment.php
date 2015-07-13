@@ -4,6 +4,7 @@ class Sellvana_Sales_Model_Cart_State_Payment extends FCom_Core_Model_Abstract_S
 {
     const FREE = 'free',
         UNPAID = 'unpaid',
+        PAID = 'paid', // ex. store_credit
         EXTERNAL = 'external',
         ACCEPTED = 'accepted',
         FAILED = 'failed';
@@ -11,6 +12,7 @@ class Sellvana_Sales_Model_Cart_State_Payment extends FCom_Core_Model_Abstract_S
     protected $_valueLabels = [
         self::FREE => 'Free',
         self::UNPAID => 'Unpaid',
+        self::PAID => 'Paid',
         self::EXTERNAL => 'External',
         self::ACCEPTED => 'Accepted',
         self::FAILED => 'Failed',
@@ -26,6 +28,11 @@ class Sellvana_Sales_Model_Cart_State_Payment extends FCom_Core_Model_Abstract_S
     public function setUnpaid()
     {
         return $this->changeState(self::UNPAID);
+    }
+
+    public function setPaid()
+    {
+        return $this->changeState(self::PAID);
     }
 
     public function setExternal()
