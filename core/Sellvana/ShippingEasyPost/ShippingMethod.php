@@ -191,9 +191,9 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         return $customsData;
     }
 
-    protected function _itemCanBeAdded($package, $item, $qty)
+    protected function _itemCanBeAddedToPackage($package, $item, $qty)
     {
-        if (!parent::_itemCanBeAdded($package, $item, $qty)) {
+        if (!parent::_itemCanBeAddedToPackage($package, $item, $qty)) {
             return false;
         }
 

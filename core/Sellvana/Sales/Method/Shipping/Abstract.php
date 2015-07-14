@@ -170,7 +170,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                 $packages[$pkgIdx] = array_merge($pkgTpl, ['qty' => 0, 'weight' => 0, 'total' => 0, 'items' => []]);
             }
             for ($i = 0; $i < $qty; $i++) {
-                if (!empty($packages[$pkgIdx]) && !$this->_itemCanBeAdded($packages[$pkgIdx], $item, $packageQty+1)) {
+                if (!empty($packages[$pkgIdx]) && !$this->_itemCanBeAddedToPackage($packages[$pkgIdx], $item, $packageQty+1)) {
                     if ($packageQty > 0) {
                         $packages[$pkgIdx]['items'][$item->id()] = $packageQty;
                         $packages[$pkgIdx]['qty'] += $packageQty;
@@ -209,7 +209,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
      * @param int $qty
      * @return bool
      */
-    protected function _itemCanBeAdded($package, $item, $qty)
+    protected function _itemCanBeAddedToPackage($package, $item, $qty)
     {
         $maxPkgWeight = $this->getConfig('max_package_weight', 1000);
         $rowWeight = $qty * $item->get('shipping_weight');
