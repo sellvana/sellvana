@@ -203,7 +203,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $thumbUrl = $this->getRolloverPath($productId);
                 break;
             default :
-                $thumbUrl = $this->getDefaultPath($productId);
+                $thumbUrl = $this->getDefaultImagePath($productId);
                 break;
         }
 
@@ -1416,7 +1416,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->getProductImage($productId, 'rollover');
     }
 
-    public function getDefaultPath($productId)
+    public function getDefaultImagePath($productId)
     {
         return $this->getProductImage($productId, 'default');
     }

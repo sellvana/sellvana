@@ -425,7 +425,7 @@
             if (selector == null) {
                 selector = $(".validate-form");
             }
-            if (jQuery().validate) {
+            if ($().validate) {
                 return selector.each(function (i, elem) {
                     return $(elem).validate({
                         errorElement: "span",

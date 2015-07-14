@@ -91,13 +91,15 @@
                 var h = $cont.height();
                 $cont.height(h);
                 $cont.find('.f-prod-img-base').hide(effect);
-                $over.show(effect);
+                $over.show(effect, function () {
+                    $over.css('position', 'inherit');
+                });
             }
         }, function () {
             var $cont = $(this);
             var $over = $cont.find('.f-prod-img-over');
             if ($over.length) {
-                $over.hide(effect);
+                $over.css('position', 'absolute').hide(effect);
                 $cont.find('.f-prod-img-base').show(effect);
             }
         });

@@ -4,7 +4,7 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set hlp = APP.instance('FCom_Admin_Model_Role') %}
-{% set hlpr = APP.instance('FCom_Admin_Controller_Roles') %}
+{% set rolesHlp = APP.instance('FCom_Admin_Controller_Roles') %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset>
@@ -15,7 +15,7 @@
 
             <div class="col-md-6">
                 <div id="permissions-grid">
-                    {{ THIS.view('core/griddle').set('grid', hlpr.gridPermissionsConfig())|raw }}
+                    {{ THIS.view('core/griddle').set('grid', rolesHlp.gridPermissionsConfig())|raw }}
                 </div>
             </div>
         </div>
