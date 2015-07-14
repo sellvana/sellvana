@@ -8,6 +8,7 @@
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
+ * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
  */
 
 class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Controller_Abstract
@@ -136,6 +137,10 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
     public function action_step2()
     {
         $this->layout('/checkout-simple/step2');
+        $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+        $addresses = $customer->getAddresses();
+        $this->view('checkout-simple/step2')->addresses = $addresses;
+        $this->view('checkout-simple/partial/address-book')->customer = $customer;
     }
 
     public function action_step2__POST()
@@ -175,6 +180,29 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
             'sess_customer' => $custHlp->sessionUser(),
         ]);
         $this->layout('/checkout-simple/success');
+    }
+
+    public function action_changeAddress()
+    {
+        $type = $this->BRequest->get('type');
+        $addressId = (int)$this->BRequest->get('id');
+        if ($type && $addressId) {
+            $address = $this->Sellvana_Customer_Model_Address->load($addressId);
+
+            $post = ['address_id' => $addressId, $type => []];
+            foreach (Sellvana_Customer_Model_Address::$fields as $field) {
+                $post[$type][$field] = $address->get($field);
+            }
+
+            $result = [];
+            $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
+            if ($type === 'shipping') {
+                $this->Sellvana_Sales_Main->workflowAction('customerUpdatesShippingAddress', $args);
+                $this->_cart->calculateTotals()->saveAllDetails();
+            }
+        }
+
+        $this->BResponse->redirect('checkout');
     }
 
     public function action_xhr_shipping_address__POST()

@@ -1,5 +1,6 @@
 {% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
 {% set validator = THIS.validator(type ~ '-form', cart) %}
+{% set addresses = THIS.get('addresses') %}
 
 <div class="row">
     <div class="col-md-9">
@@ -10,7 +11,11 @@
 
             <div class="f-checkout-form">
 
-                {{ THIS.view('checkout-simple/partial/address-card').set('address_type', 'shipping') | raw }}
+                {% if addresses|length > 0 %}
+                    {{ THIS.view('checkout-simple/partial/address-book').set('address_type', 'shipping').set('addresses', addresses) | raw }}
+                {% else %}
+                    {{ THIS.view('checkout-simple/partial/address-card').set('address_type', 'shipping') | raw }}
+                {% endif %}
 
                 <a href="{{ APP.href('checkout/step1') }}">{{ 'Edit'|_ }}</a>
 

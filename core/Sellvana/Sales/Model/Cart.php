@@ -655,7 +655,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
 
         $this->set([
-            'same_address' => $defBilling && $defShipping && $defBilling->id() == $defShipping->id(),
+            'same_address' => (int)($defBilling && $defShipping && $defBilling->id() == $defShipping->id()),
             'recalc_shipping_rates' => 1,
         ]);
 
