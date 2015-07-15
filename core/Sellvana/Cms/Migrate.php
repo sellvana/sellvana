@@ -287,4 +287,18 @@ class Sellvana_Cms_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_5_0_0__0_5_0_1()
+    {
+        $tBlock = $this->Sellvana_Cms_Model_Block->table();
+        $this->BDb->ddlTableDef($tBlock, [
+            BDb::COLUMNS => [
+                'form_notify_admin'        => 'BOOLEAN NULL DEFAULT 0',
+                'form_notify_admin_user'   => 'INT(10) UNSIGNED NULL DEFAULT NULL',
+                'form_notify_customer'     => 'BOOLEAN NULL DEFAULT 0',
+                'form_notify_customer_tpl' => 'VARCHAR(100) NULL DEFAULT NULL',
+                'form_user_email_field'    => 'VARCHAR(20) NULL DEFAULT NULL',
+            ],
+        ]);
+    }
 }
