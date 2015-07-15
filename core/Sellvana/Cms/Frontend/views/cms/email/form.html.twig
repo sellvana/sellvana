@@ -1,0 +1,13 @@
+{% set data = THIS.get('data') %}
+
+<table>
+    <tr><th>{{ "Block \"%s\""|_(data['handle']) }}</th><th>{{data['date']}}</th></tr>
+    {% for k, d in data %}
+        {% if k != 'handle' and k != 'date' %}
+            <tr>
+                <td>{{ k }}</td>
+                <td>{{ d }}</td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+</table>

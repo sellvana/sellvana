@@ -117,7 +117,7 @@ class Sellvana_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
      */
     protected function _prepareFormFields()
     {
-
+        /** @var Sellvana_Cms_Model_Block $model */
         $model = $this->getBlockModel($this);
         $formEnable = $model->get('form_enable');
         if (!$formEnable) {

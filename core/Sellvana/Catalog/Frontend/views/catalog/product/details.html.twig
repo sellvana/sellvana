@@ -21,7 +21,7 @@
 
 {% set prod = THIS.get('product') %}
 {% set inventory = prod.getInventoryModel() %}
-{% set images = prod.media('I') %}
+{% set images = prod.gallery() %}
 {% set cat = THIS.get('category') %}
 {% set customFields = prod.getData('custom_fields') %}
 
