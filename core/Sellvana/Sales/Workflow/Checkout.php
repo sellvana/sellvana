@@ -58,8 +58,9 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
             if ($recalc) {
                 $cart->set('recalc_shipping_rates', 1);
             }
-            $addressId = isset($args['post']['address_id']) ? $args['post']['address_id'] : null;
-            $this->BSession->set('shipping_address_id', $addressId);
+            if (isset($args['post']['address_id'])) {
+                $this->BSession->set('shipping_address_id', $args['post']['address_id']);
+            }
         }
     }
 

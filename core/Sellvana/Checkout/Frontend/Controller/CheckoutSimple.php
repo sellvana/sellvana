@@ -127,8 +127,21 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
         $this->_cart->calculateTotals()->saveAllDetails();
 
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-        if ($customer && !$customer->getDefaultShippingAddress()) {
-            $customer->addAddress($this->_cart->addressAsArray('shipping'), true);
+        if ($customer) {
+            $address = false;
+            if (!$customer->getDefaultShippingAddress()) {
+                $address = $customer->addAddress($this->_cart->addressAsArray('shipping'), true);
+            } elseif(isset($post['save']) && isset($post['save_as']) && $post['save_as'] === 'new') {
+                $address = $customer->addAddress($this->_cart->addressAsArray('shipping'), false);
+            } elseif(isset($post['save']) && $this->BSession->get('shipping_address_id')) {
+                $address = $this->Sellvana_Customer_Model_Address->load($this->BSession->get('shipping_address_id'));
+                $address->set($post['shipping']);
+                $address->save(true, true);
+            }
+
+            if ($address) {
+                $this->BSession->set('shipping_address_id', $address->get('id'));
+            }
         }
 
         $this->BResponse->redirect('checkout');
@@ -138,7 +151,7 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
     {
         $this->layout('/checkout-simple/step2');
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-        $addresses = $customer->getAddresses();
+        $addresses = ($customer) ? $customer->getAddresses() : [];
         $this->view('checkout-simple/step2')->addresses = $addresses;
         $this->view('checkout-simple/partial/address-book')->customer = $customer;
     }
@@ -190,7 +203,8 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
             $address = $this->Sellvana_Customer_Model_Address->load($addressId);
 
             $post = ['address_id' => $addressId, $type => []];
-            foreach (Sellvana_Customer_Model_Address::$fields as $field) {
+            $fields = $this->Sellvana_Customer_Model_Address->getFields();
+            foreach ($fields as $field) {
                 $post[$type][$field] = $address->get($field);
             }
 

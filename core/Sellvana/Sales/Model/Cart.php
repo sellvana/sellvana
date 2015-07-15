@@ -652,6 +652,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $defShipping = $customer->getDefaultShippingAddress();
         if ($defShipping) {
             $this->importAddressFromObject($defShipping, 'shipping');
+            $this->BSession->set('shipping_address_id', $defShipping->get('id'));
         }
 
         $this->set([

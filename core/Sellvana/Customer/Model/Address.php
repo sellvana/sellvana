@@ -58,7 +58,7 @@ class Sellvana_Customer_Model_Address extends FCom_Core_Model_Abstract
         ['lng', '@numeric'],
     ];
 
-    public static $fields = [
+    protected static $fields = [
         'company',
         'attn',
         'firstname',
@@ -257,5 +257,10 @@ class Sellvana_Customer_Model_Address extends FCom_Core_Model_Abstract
         }
 
         return $addr;
+    }
+
+    public function getFields()
+    {
+        return static::$fields;
     }
 }
