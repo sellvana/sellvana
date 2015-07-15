@@ -2,3 +2,4 @@
 .f-checkout-form .f-address-list-item { display: inline-block; padding: 10px; }
 .f-checkout-form .f-address-list-item.selected { border: 2px solid #516fc8; border-radius: 5px; }
 .f-checkout-form .f-address-list-item address { margin: 0; }
+.f-checkout-form .form-group { margin-top: 20px; }

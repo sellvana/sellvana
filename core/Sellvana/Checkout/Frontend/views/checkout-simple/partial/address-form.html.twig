@@ -1,4 +1,5 @@
 {% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set customer = APP.instance('Sellvana_Customer_Model_Customer').sessionUser() %}
 {% set type = THIS.get('address_type') %}
 {% set validator = THIS.validator(type ~ '-form', cart) %}
 
@@ -82,6 +83,7 @@
         </div>
     </div>
 
+    {% if customer %}
     <div class="row">
         <div class="form-group col-sm-6">
             {% set field = 'save' %}
@@ -89,16 +91,7 @@
             <label for="{{ field }}" class="control-label">{{ "Save to address book"|_ }}</label>
         </div>
     </div>
-
-    <div class="row" id="save-types">
-        <div class="form-group col-sm-6">
-            {% set field = 'save_as' %}
-            <input type="radio" name="{{ field }}" id="{{ field }}_new" value="new">
-            <label for="{{ field }}_new" class="control-label">{{ "Save as new address"|_ }}</label><br />
-            <input type="radio" name="{{ field }}" id="{{ field }}_replace" value="replace">
-            <label for="{{ field }}_replace" class="control-label">{{ "Save instead of current address"|_ }}</label>
-        </div>
-    </div>
+    {% endif %}
 </fieldset>
 
 <script>
@@ -107,13 +100,5 @@
             $('.geo-country').geoCountryRegion({country:'{{ validator.fieldValue(type ~ '_country') }}', region:'{{ validator.fieldValue(type ~ '_region') }}'});
             $('#{{ type }}-form').validate();
         });
-
-        function updateAddressForm(save) {
-            $('#save-types').prop('hidden', !save);
-            $('#billing_address_form').find('input').prop('disabled', save);
-        }
-
-        updateAddressForm($('#same_address').prop('checked'));
-        $('#save').click(function(ev) { updateAddressForm(this.checked); })
     })
 </script>

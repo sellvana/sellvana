@@ -131,12 +131,8 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
             $address = false;
             if (!$customer->getDefaultShippingAddress()) {
                 $address = $customer->addAddress($this->_cart->addressAsArray('shipping'), true);
-            } elseif(isset($post['save']) && isset($post['save_as']) && $post['save_as'] === 'new') {
+            } elseif(isset($post['save'])) {
                 $address = $customer->addAddress($this->_cart->addressAsArray('shipping'), false);
-            } elseif(isset($post['save']) && $this->BSession->get('shipping_address_id')) {
-                $address = $this->Sellvana_Customer_Model_Address->load($this->BSession->get('shipping_address_id'));
-                $address->set($post['shipping']);
-                $address->save(true, true);
             }
 
             if ($address) {
@@ -160,9 +156,17 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
     {
         $post = $this->BRequest->post();
         $result = [];
+        if (!empty($post['save'])) {
+
+        }
         $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
-        if (!empty($post['same_address'])) {
+        if (empty($post['same_address'])) {
             $this->Sellvana_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
+            $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+            if ($customer && !empty($post['save'])) {
+                $address = $customer->addAddress($this->_cart->addressAsArray('billing'), false);
+                $this->BSession->set('shipping_address_id', $address->get('id'));
+            }
         }
         $this->Sellvana_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
         $this->Sellvana_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
@@ -203,6 +207,10 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
             $address = $this->Sellvana_Customer_Model_Address->load($addressId);
 
             $post = ['address_id' => $addressId, $type => []];
+            if (($type == 'shipping' && $addressId == $this->BSession->get('billing_address_id')) ||
+                ($type == 'billing'  && $addressId == $this->BSession->get('shipping_address_id'))) {
+                $post['same_address'] = 1;
+            }
             $fields = $this->Sellvana_Customer_Model_Address->getFields();
             foreach ($fields as $field) {
                 $post[$type][$field] = $address->get($field);
@@ -210,10 +218,8 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
 
             $result = [];
             $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
-            if ($type === 'shipping') {
-                $this->Sellvana_Sales_Main->workflowAction('customerUpdatesShippingAddress', $args);
-                $this->_cart->calculateTotals()->saveAllDetails();
-            }
+            $this->Sellvana_Sales_Main->workflowAction('customerUpdates' . ucfirst($type) . 'Address', $args);
+            $this->_cart->calculateTotals()->saveAllDetails();
         }
 
         $this->BResponse->redirect('checkout');

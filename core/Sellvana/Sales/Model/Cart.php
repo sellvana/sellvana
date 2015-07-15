@@ -648,6 +648,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $defBilling = $customer->getDefaultBillingAddress();
         if ($defBilling) {
             $this->importAddressFromObject($defBilling, 'billing');
+            $this->BSession->set('billing_address_id', $defBilling->get('id'));
         }
         $defShipping = $customer->getDefaultShippingAddress();
         if ($defShipping) {

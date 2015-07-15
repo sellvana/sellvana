@@ -213,7 +213,7 @@ class Sellvana_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
      */
     private function formNotifyAdmin($block, $data)
     {
-        if(!$block->get('form_notify_admin') || empty($block->get('form_notify_admin_user'))){
+        if(!$block->get('form_notify_admin') || $block->get('form_notify_admin_user')){
             // if admin notification is not enabled, or admin users are not selected, do nothing
             return;
         }
