@@ -7,12 +7,12 @@
  */
 class Sellvana_MultiCurrency_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
-    public function action_fetch_open_exchange_rates__POST()
+    public function action_fetch_exchange_rates__POST()
     {
         $xhr = $this->BRequest->xhr();
         $result = [];
         try {
-            $this->Sellvana_MultiCurrency_Main->fetchOpenExchangeRates();
+            $this->Sellvana_MultiCurrency_Main->getActiveRateSource()->fetchRates();
             if ($xhr) {
                 $result['success'] = true;
                 $result['rates'] = $this->BConfig->get('modules/Sellvana_MultiCurrency/exchange_rates');

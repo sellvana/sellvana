@@ -1,0 +1,21 @@
+<!--{ label: Rewards }-->
+<!--{ pos: 110 }-->
+<!--{ async: true }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% set balance = APP.instance('Sellvana_Rewards_Model_Balance').load(m.id(), 'customer_id') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<div class="col-md-12">
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Rewards"|_ }}</h3>
+        {{ forms.input({label: 'Balance'|_,  readonly: 1, type: 'number', id: 'rewards-amount', name: "rewards[amount]", value: balance ? balance.get('amount') : 0 }) }}
+        {{ forms.input({label: 'Adjust'|_,  type: 'number', id: 'rewards-adjust_amount', name: "rewards[adjust_amount]", value: '' }) }}
+        {% if m.id() %}
+            <h3 class="f-fieldset-group-title">{{ "History"|_ }}</h3>
+            {% set historyGrid = APP.instance('Sellvana_Rewards_Admin').getCustomerHistoryGridConfig(m) %}
+            {{ THIS.view('core/griddle').set('grid', historyGrid) | raw}}
+        {% endif %}
+    </fieldset>
+</div>
