@@ -50,6 +50,7 @@ class Sellvana_StoreCredit_Migrate extends BClass
             ],
         ]);
     }
+
     public function upgrade__0_5_0_0__0_5_1_0()
     {
         $tTransaction = $this->Sellvana_StoreCredit_Model_Transaction->table();
