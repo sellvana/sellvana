@@ -1,2 +1,2 @@
 settings-tabs:
-    - { hook: multicurrency_ratesources, views: multicurrency/settings/openexchangerates }
+    - { hook: multicurrency_rateproviders, views: "^multicurrency/settings/" }

@@ -5,19 +5,19 @@
 {% set fieldData = { model: c, settings_module:'Sellvana_MultiCurrency' } %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
-{% set rateSources = APP.instance('Sellvana_MultiCurrency_Main').getRateSourceOptions() %}
+{% set rateSources = APP.instance('Sellvana_MultiCurrency_Main').getRateProviderOptions() %}
 
 <h2>{{ "Multi Currency Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-Sellvana_Currency'}) }}
     {{ forms.accordion_panel_start({label:'Multi Currency'|_, id:'settings-Sellvana_MultiCurrency-group1', in:1}) }}
         {{ forms.input(fieldData, {field:'available_currencies', label:'Enabled Currencies' }) }}
         {{ forms.textarea(fieldData, {field:'exchange_rates', label:'Exhange Rates (' ~ baseCur ~ ':1.0)' }) }}
-        {{ forms.select(fieldData, {field:'active_ratesource', label:'Use Rate Source', options: rateSources }) }}
+        {{ forms.select(fieldData, {field:'active_rateprovider', label:'Use Rates Provider', options: rateSources }) }}
         {{ forms.boolean(fieldData, {field:'autofetch', label:'Auto Fetch Daily' }) }}
         <button type="button" class="btn btn-primary" id="fetch-exchange-rates">{{ 'Fetch Exchange Rates'|_ }}</button>
     {{ forms.accordion_panel_end }}
 
-    {{ THIS.hook('multicurrency_ratesources', {model:c}) | raw }}
+    {{ THIS.hook('multicurrency_rateproviders', {model:c}) | raw }}
 
 {{ forms.accordion_end }}
 

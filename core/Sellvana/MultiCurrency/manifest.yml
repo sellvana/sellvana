@@ -26,4 +26,4 @@ modules:
             modules:
                 Sellvana_MultiCurrency:
                     available_currencies: USD,EUR,GBP,CAD
-                    active_ratesource: Sellvana_MultiCurrency_RateSource_OpenExchangeRates
+                    active_rateprovider: Sellvana_MultiCurrency_RateProvider_OpenExchangeRates

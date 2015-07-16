@@ -8,13 +8,13 @@ class Sellvana_MultiCurrency_Main extends BClass
 {
     static protected $_rateSources = [];
 
-    static protected $_defaultRateSource = 'Sellvana_MultiCurrency_RateSource_OpenExchangeRates';
+    static protected $_defaultRateProvider = 'Sellvana_MultiCurrency_RateProvider_OpenExchangeRates';
 
     static protected $_rates;
 
     public function bootstrap()
     {
-        $this->addRateSource('Sellvana_MultiCurrency_RateSource_OpenExchangeRates');
+        $this->addRateProvider(static::$_defaultRateProvider);
     }
 
     public function switchCurrency($newCurrency)
@@ -94,31 +94,35 @@ class Sellvana_MultiCurrency_Main extends BClass
     }
 
 
-    public function addRateSource($class)
+    public function addRateProvider($class)
     {
         static::$_rateSources[$class] = $this->BClassRegistry->instance($class);
         return $this;
     }
 
-    public function getAllRateSources()
+    public function getAllRateProviders()
     {
         return static::$_rateSources;
     }
 
-    public function getRateSourceOptions()
+    public function getRateProviderOptions()
     {
         $options = [];
-        foreach ($this->getAllRateSources() as $class => $instance) {
+        /**
+         * @var string $class
+         * @var Sellvana_MultiCurrency_RateProvider_Interface $instance
+         */
+        foreach ($this->getAllRateProviders() as $class => $instance) {
             $options[$class] = $instance->getLabel();
         }
         return $options;
     }
 
-    public function getActiveRateSource()
+    public function getActiveRateProvider()
     {
-        $class = $this->BConfig->get('modules/Sellvana_MultiCurrency/active_ratesource');
+        $class = $this->BConfig->get('modules/Sellvana_MultiCurrency/active_rateprovider');
         if (!$class || empty(static::$_rateSources[$class])) {
-            return $this->BClassRegistry->instance(static::$_defaultRateSource);
+            return $this->BClassRegistry->instance(static::$_defaultRateProvider);
         } else {
             return static::$_rateSources[$class];
         }

@@ -10,7 +10,7 @@ class Sellvana_MultiCurrency_Cron extends BClass
     public function runDaily($args)
     {
         if ($this->BConfig->get('modules/Sellvana_MultiCurrency/autofetch')) {
-            $this->Sellvana_MultiCurrency_Main->getActiveRateSource()->fetchRates();
+            $this->Sellvana_MultiCurrency_Main->getActiveRateProvider()->fetchRates();
         }
     }
 }

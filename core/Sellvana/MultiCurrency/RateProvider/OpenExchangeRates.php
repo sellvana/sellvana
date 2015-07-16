@@ -1,7 +1,7 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Sellvana_MultiCurrency_RateSource_OpenExchangeRates extends Sellvana_MultiCurrency_RateSource_Abstract
-    implements Sellvana_MultiCurrency_RateSource_Interface
+class Sellvana_MultiCurrency_RateProvider_OpenExchangeRates extends Sellvana_MultiCurrency_RateProvider_Abstract
+    implements Sellvana_MultiCurrency_RateProvider_Interface
 {
     static protected $_origClass = __CLASS__;
 

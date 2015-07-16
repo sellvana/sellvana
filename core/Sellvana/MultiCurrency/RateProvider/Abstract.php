@@ -1,11 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Class Sellvana_MultiCurrency_RateSource_Abstract
+ * Class Sellvana_MultiCurrency_RateProvider_Abstract
  *
  * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  */
-class Sellvana_MultiCurrency_RateSource_Abstract extends BClass
+class Sellvana_MultiCurrency_RateProvider_Abstract extends BClass
 {
     public function getLabel()
     {
