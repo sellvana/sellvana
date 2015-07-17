@@ -1,0 +1,32 @@
+<!--{ label: Rewards }-->
+<!--{ pos: 110 }-->
+<!--{ async: true }-->
+
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% set rules = APP.instance('Sellvana_Rewards_Model_RuleProduct').fetchProductRules(m.id()) %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<div class="col-md-12">
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Rewards Rules"|_ }}</h3>
+        {% if rules %}
+            <table class="table">
+                <thead><th>{{ 'Rule Name'|_ }}</th><th>{{ 'Points' }}</th></thead>
+                <tbody>
+                {% for rule in rules %}
+                    <tr><td>{{ rule.get('title') }}</td><th>{{ rule.get('points') }}</th></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>{{ 'No rewards rules found for this product'|_ }}</p>
+        {% endif %}
+
+        {% if m.id() %}
+            <h3 class="f-fieldset-group-title">{{ "History"|_ }}</h3>
+            {% set historyGrid = APP.instance('Sellvana_Rewards_Admin').getProductHistoryGridConfig(m) %}
+            {{ THIS.view('core/griddle').set('grid', historyGrid) | raw}}
+        {% endif %}
+    </fieldset>
+</div>

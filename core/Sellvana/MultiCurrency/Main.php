@@ -3,18 +3,18 @@
 /**
  * Class Sellvana_MultiSite_Main
  *
- * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
 class Sellvana_MultiCurrency_Main extends BClass
 {
+    static protected $_rateSources = [];
+
+    static protected $_defaultRateProvider = 'Sellvana_MultiCurrency_RateProvider_OpenExchangeRates';
+
     static protected $_rates;
 
     public function bootstrap()
     {
-        $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_MultiCurrency' => BLocale::i()->_('Multi Currency Settings'),
-        ]);
-
+        $this->addRateProvider(static::$_defaultRateProvider);
     }
 
     public function switchCurrency($newCurrency)
@@ -42,35 +42,6 @@ class Sellvana_MultiCurrency_Main extends BClass
     {
         $def = $this->BConfig->get('modules/FCom_Core/default_currency');
         return $this->BSession->get('current_currency', $def);
-    }
-
-    public function fetchOpenExchangeRates()
-    {
-        $appId = $this->BConfig->get('modules/Sellvana_MultiCurrency/open_exchange_rates_app_id');
-        if (!$appId) {
-            throw new BException('Could not retrieve rates because App ID is not configured');
-        }
-        $baseCur = $this->BConfig->get('modules/FCom_Core/base_currency', 'USD');
-        $url = $this->BUtil->setUrlQuery('https://openexchangerates.org/api/latest.json',
-            ['app_id' => $appId, 'base' => $baseCur]);
-        $response = $this->BUtil->remoteHttp('GET', $url);
-        if (!$response) {
-            throw new BException('Invalid OpenExchangeRates response: ' . $response);
-        }
-        $result = $this->BUtil->fromJson($response);
-        if (empty($result['rates'])) {
-            throw new BException('Invalid OpenExchangeRates response: ' . print_r($result, 1));
-        }
-        $currencies = $this->getAvailableCurrencies();
-        $rates = [];
-        foreach ($currencies as $cur) {
-            if (!empty($result['rates'][$cur]) && $cur !== $baseCur) {
-                $rates[$cur] = $cur . ':' . $result['rates'][$cur];
-            }
-        }
-        $this->BConfig->set('modules/Sellvana_MultiCurrency/exchange_rates', join("\n", $rates), false, true);
-        $this->BConfig->writeConfigFiles('local');
-        return $this;
     }
 
     public function getAvailableRates()
@@ -121,4 +92,40 @@ class Sellvana_MultiCurrency_Main extends BClass
         }
         return $rate / $baseRate;
     }
+
+
+    public function addRateProvider($class)
+    {
+        static::$_rateSources[$class] = $this->BClassRegistry->instance($class);
+        return $this;
+    }
+
+    public function getAllRateProviders()
+    {
+        return static::$_rateSources;
+    }
+
+    public function getRateProviderOptions()
+    {
+        $options = [];
+        /**
+         * @var string $class
+         * @var Sellvana_MultiCurrency_RateProvider_Interface $instance
+         */
+        foreach ($this->getAllRateProviders() as $class => $instance) {
+            $options[$class] = $instance->getLabel();
+        }
+        return $options;
+    }
+
+    public function getActiveRateProvider()
+    {
+        $class = $this->BConfig->get('modules/Sellvana_MultiCurrency/active_rateprovider');
+        if (!$class || empty(static::$_rateSources[$class])) {
+            return $this->BClassRegistry->instance(static::$_defaultRateProvider);
+        } else {
+            return static::$_rateSources[$class];
+        }
+    }
+
 }
