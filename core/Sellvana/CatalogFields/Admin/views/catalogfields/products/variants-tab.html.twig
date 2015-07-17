@@ -365,20 +365,28 @@
                             variantFields.deleteGridColumn({ field_code: fieldCode });
 
                             //remove rows from grid
-                            var deleteCombinations = [];
+                            /*var deleteCombinations = [];
                             _.forEach(variantFields.combinations, function(comb, key) {
                                 comb['id'] = key;
                                 deleteCombinations.push(comb);
                             });
-                            variantGrid.removeRows(deleteCombinations);
+                            variantGrid.removeRows(deleteCombinations);*/
 
                             //remove from combinations
-                            /*if (!_.isEmpty(variantFields.combinations)) {
+                            if (!_.isEmpty(variantFields.combinations)) {
                                 _.forEach(variantFields.combinations, function (comb, key) {
                                     delete comb[fieldCode];
                                     variantFields.combinations[key] = comb;
                                 });
-                            }*/
+
+                                //run the validation again
+                                variantFields.validateVariant();
+                            }
+
+                            //if empty custom fields, remove all rows
+                            if (!variantFields.customFields.length) {
+                                variantGrid.removeRows(variantGrid.getRows());
+                            }
                         }
                     });
 
@@ -547,7 +555,7 @@
 
                         variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
                     }
-
+                    toggleAddNewVariantsButton();
                 }
             },
             /**
@@ -570,6 +578,8 @@
                     } else {
                         console.log('DEBUG: cannot find column name ', field.field_code);
                     }
+
+                    toggleAddNewVariantsButton();
                 }
             },
             /**
@@ -627,6 +637,7 @@
 
             if (triggerName == 'componentDidMount') {
                 variantFields.processTopFieldSection();
+                toggleAddNewVariantsButton();
 
                 $(grid.getDOMNode()).on('change', 'tr', function(e) {
                     //console.log('on-change', this);
@@ -658,6 +669,15 @@
         };
 
     });
+
+    /**
+     * toggle Add New Variant button
+     * todo: need to add to FComSettings or better components
+     */
+    function toggleAddNewVariantsButton() {
+        var newVariantButton = $(variantGrid.getDOMNode()).find('.btn.grid-new');
+        newVariantButton.prop('disabled', !(variantFields.customFields.length > 0));
+    }
 
     /**
      * custom validation function for checking duplicated input

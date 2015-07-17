@@ -117,16 +117,17 @@ class Sellvana_CatalogFields_Admin extends BClass
             $fieldIdsToDelete = array_diff(array_keys($prodVarfieldModels), array_keys($varFieldsData));
             if ($fieldIdsToDelete) {
                 $prodVarfieldHlp->delete_many(['product_id' => $pId, 'field_id' => $fieldIdsToDelete]);
-
-                //remove all variants in case remove field
-                $this->Sellvana_CatalogFields_Model_ProductVariant->removeAllVariants($pId);
-                return true; //stop this function at here
-
-                /*foreach ($prodVarfieldModels as $fId => $m) {
+                foreach ($prodVarfieldModels as $fId => $m) {
                     if (in_array($fId, $fieldIdsToDelete)) {
                         unset($prodVarfieldModels[$fId]);
                     }
-                }*/
+                }
+            }
+
+            //remove all variants when delete all catalog fields
+            if (empty($prodVarfieldModels)) {
+                $this->Sellvana_CatalogFields_Model_ProductVariant->removeAllVariants($pId);
+                return true;
             }
         }
         /** @var Sellvana_CatalogFields_Model_Field[] $fieldModels */
@@ -322,8 +323,9 @@ class Sellvana_CatalogFields_Admin extends BClass
             if ($fileIdsToDelete) {
                 $prodVariantImageHlp->delete_many(['product_id' => $pId, 'id' => $fileIdsToDelete]);
             }
-        } else {
-            //remove all variants data
+        } else if (is_array($data['variants'])) {
+            //remove all variants data in case data submit from frontend is empty array
+            //todo: make sure all variants will not be gone by bug in javascript frontend
             $this->Sellvana_CatalogFields_Model_ProductVariant->removeAllVariants($pId);
         }
     }
