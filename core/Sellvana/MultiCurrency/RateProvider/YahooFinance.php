@@ -23,7 +23,7 @@ class Sellvana_MultiCurrency_RateProvider_YahooFinance extends Sellvana_MultiCur
             $url = $this->BUtil->setUrlQuery($this->_apiUrl, ['s' => $baseCur . $cur . '=x', 'f' => 'l1', 'e' => '.csv']);
             $response = $this->BUtil->remoteHttp('GET', $url);
             if (!$response) {
-                throw new BException('Invalid OpenExchangeRates response: ' . $response);
+                throw new BException('Invalid Yahoo Finance response: ' . $response);
             }
             $rates[$cur] = $cur . ':' . trim($response);
         }

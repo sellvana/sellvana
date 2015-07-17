@@ -19,7 +19,7 @@ class Sellvana_MultiCurrency_RateProvider_GoogleFinance extends Sellvana_MultiCu
             $url = $this->BUtil->setUrlQuery($this->_apiUrl, ['a' => 1, 'from' => $baseCur, 'to' => $cur]);
             $response = $this->BUtil->remoteHttp('GET', $url);
             if (!$response) {
-                throw new BException('Invalid OpenExchangeRates response: ' . $response);
+                throw new BException('Invalid Google Finance response: ' . $response);
             }
             if (preg_match("'<span class=bld>([0-9\.]+)\s\w+</span>'", $response, $m)) {
                 $rates[$cur] = $cur . ':' . $m[1];
