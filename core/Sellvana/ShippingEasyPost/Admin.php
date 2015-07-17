@@ -12,7 +12,6 @@ class Sellvana_ShippingEasyPost_Admin extends BClass
 
     public function bootstrap()
     {
-        $this->Sellvana_Sales_Main->addShippingMethod($this->_methodCode, 'Sellvana_ShippingEasyPost_ShippingMethod');
         $this->FCom_Admin_Model_Role->createPermission([
             'settings/Sellvana_ShippingEasyPost' => BLocale::i()->_('Shipping EasyPost Settings'),
         ]);

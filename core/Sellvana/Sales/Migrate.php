@@ -2097,7 +2097,7 @@ class Sellvana_Sales_Migrate extends BClass
 
         $this->BDb->ddlTableDef($tCart, [
             BDb::COLUMNS => [
-                'shipping_service' => "CHAR(50)  NULL",
+                'shipping_service' => "varchar(50)  NULL",
                 'amount_paid' => "decimal(12,2) NOT NULL default 0",
                 'amount_due' => "decimal(12,2) NOT NULL default 0",
             ],
@@ -2108,6 +2108,16 @@ class Sellvana_Sales_Migrate extends BClass
         $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
 
         $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'service_code' => "varchar(50)"
+            ]
+        ]);
+    }
+
+    public function upgrade__0_5_3_0__0_5_4_0(){
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
+
+        $this->BDb->ddlTableDef($tCart, [
             BDb::COLUMNS => [
                 'service_code' => "varchar(50)"
             ]

@@ -202,8 +202,14 @@ class Sellvana_Customer_Frontend_Controller_Address extends FCom_Frontend_Contro
     public function action_delete()
     {
         $id = $this->BRequest->get('id');
-        $address = $this->Sellvana_Customer_Model_Address->load($id);
-        $address->delete();
+        $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+        $addresses = $customer->getAddresses();
+        foreach ($addresses as $addr) {
+            if ($addr->get('id') == $id) {
+                $address = $this->Sellvana_Customer_Model_Address->load($id);
+                $address->delete();
+            }
+        }
         $this->BResponse->redirect($this->BApp->href('customer/address'));
     }
 }
