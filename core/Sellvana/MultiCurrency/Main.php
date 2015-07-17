@@ -15,6 +15,8 @@ class Sellvana_MultiCurrency_Main extends BClass
     public function bootstrap()
     {
         $this->addRateProvider(static::$_defaultRateProvider);
+        $this->addRateProvider('Sellvana_MultiCurrency_RateProvider_YahooFinance');
+        $this->addRateProvider('Sellvana_MultiCurrency_RateProvider_GoogleFinance');
     }
 
     public function switchCurrency($newCurrency)
