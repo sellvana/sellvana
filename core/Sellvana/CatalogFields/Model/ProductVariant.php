@@ -172,21 +172,6 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
     public function removeAllVariants($product)
     {
         $productId = is_object($product) ? $product->id() : $product;
-
-        //delete inventory sku
-        $inventoriesSku = [];
-        $variants = $this->orm('v')->where('product_id', $productId)->find_many();
-        if ($variants) {
-            foreach ($variants as $variant) {
-                $inventoriesSku[] = $variant->get('inventory_sku');
-            }
-        }
-
-        if (!empty($inventoriesSku)) {
-            $skuHlp = $this->Sellvana_Catalog_Model_InventorySku;
-            $skuHlp->delete_many(['inventory_sku' => $inventoriesSku]);
-        }
-
         //delete variants, variant fields, and images
         $this->delete_many(['product_id' => $productId]);
         $this->Sellvana_CatalogFields_Model_ProductVariantField->delete_many(['product_id' => $productId]);
