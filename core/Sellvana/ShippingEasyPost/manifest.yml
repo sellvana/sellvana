@@ -2,7 +2,7 @@ modules:
     Sellvana_ShippingEasyPost:
         version: 0.5.0.0
         channel: alpha
-        require: { module: { FCom_Core: 0.1.0, Sellvana_Sales: 0.5.4.0, Sellvana_Customer: 0.5.0.0, Sellvana_MultiCurrency: 0.5.0.0 } }
+        require: { module: { FCom_Core: 0.1.0, Sellvana_Sales: 0.5.4.0 } }
         autoload: lib
 
         auto_use: [ bootstrap ]

@@ -554,12 +554,6 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
             if ($this->default_billing_id === $addr->id()) {
-                return $this->Sellvana_Customer_Model_Address->load($this->default_billing_id);
-            }
-        }
-
-        foreach ($addresses as $addr) {
-            if ($addr->is_default_billing) {
                 return $addr;
             }
         }
@@ -574,12 +568,6 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
             if ($this->default_shipping_id === $addr->id()) {
-                return $this->Sellvana_Customer_Model_Address->load($this->default_shipping_id);
-            }
-        }
-
-        foreach ($addresses as $addr) {
-            if ($addr->is_default_shipping) {
                 return $addr;
             }
         }

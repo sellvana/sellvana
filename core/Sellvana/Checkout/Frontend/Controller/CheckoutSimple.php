@@ -203,8 +203,30 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
     {
         $type = $this->BRequest->get('type');
         $addressId = (int)$this->BRequest->get('id');
+
         if ($type && $addressId) {
-            $address = $this->Sellvana_Customer_Model_Address->load($addressId);
+            if (!in_array($type, ['shipping', 'billing'])) {
+                $this->message('Incorrect address type', 'error');
+                $this->BResponse->redirect('checkout');
+                return;
+            }
+
+            $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+            $addresses = $customer->getAddresses();
+
+            $address = false;
+            foreach ($addresses as $addr) {
+                if ($addr->get('id') == $addressId) {
+                    $address = $addr;
+                    break;
+                }
+            }
+
+            if (!$address) {
+                $this->message('You can\'t choose an address which doesn\'t belong to you', 'error');
+                $this->BResponse->redirect('checkout');
+                return;
+            }
 
             $post = ['address_id' => $addressId, $type => []];
             if (($type == 'shipping' && $addressId == $this->BSession->get('billing_address_id')) ||
