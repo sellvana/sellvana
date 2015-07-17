@@ -29,7 +29,6 @@ class Sellvana_ShippingEasyPost_Main extends BClass
         /**
          * @var Sellvana_Sales_Model_Order_Shipment_State_Overall $newState
          */
-        //var_dump($args);
         $newState = $args['new_state'];
         if ($newState->getValue() === Sellvana_Sales_Model_Order_Shipment_State_Overall::SHIPPED) {
             $orderId = $newState->getModel()->get('order_id');
