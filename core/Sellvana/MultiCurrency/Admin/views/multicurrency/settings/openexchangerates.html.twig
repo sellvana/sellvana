@@ -1,0 +1,8 @@
+{% set fieldData = { model: THIS.get('model'), settings_module:'Sellvana_MultiCurrency' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+{{ forms.accordion_panel_start({label:'Open Exchange Rates Auto Update'|_, id:'settings-Sellvana_MultiCurrency-group2'}) }}
+    <p>{{ 'Automatically get free daily update rates' }}</p>
+    {{ forms.input(fieldData, {field:'open_exchange_rates_app_id', label:'API App ID' }) }}
+{{ forms.accordion_panel_end }}
+

@@ -7,14 +7,14 @@ modules:
         observe:
             - [ Sellvana_Catalog_Model_Product::getCatalogPrice, Sellvana_Promo_Main.onProductGetCatalogPrice ]
 
+        auto_use: [ bootstrap, layout, views ]
+
         areas:
             FCom_Admin:
-                auto_use: [ views ]
                 routing:
                     - [ /multicurrency/.action, Sellvana_MultiCurrency_Admin_Controller ]
 
             FCom_Frontend:
-                auto_use: [ bootstrap, views ]
                 routing:
                     - [ /currency/switch/:currency, Sellvana_MultiCurrency_Frontend_Controller.switch ]
 
@@ -23,4 +23,7 @@ modules:
                     - [ "0 0 * * *", Sellvana_MultiCurrency_Cron.runDaily ]
 
         default_config:
-            modules/Sellvana_MultiCurrency/available_currencies: USD,EUR,GBP,CAD
+            modules:
+                Sellvana_MultiCurrency:
+                    available_currencies: USD,EUR,GBP,CAD
+                    active_rateprovider: Sellvana_MultiCurrency_RateProvider_OpenExchangeRates
