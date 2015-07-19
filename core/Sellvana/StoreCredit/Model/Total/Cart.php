@@ -30,7 +30,7 @@ class Sellvana_StoreCredit_Model_Total_Cart extends Sellvana_Sales_Model_Cart_To
         $args['amount_due'] -= $this->getValue();
     }
 
-    public function getValue()
+    public function getValue($calculated = false)
     {
         $use = $this->_cart->getData('store_credit/use');
         $amount = $this->_cart->getData('store_credit/amount');
