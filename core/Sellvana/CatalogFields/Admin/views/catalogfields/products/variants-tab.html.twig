@@ -658,11 +658,16 @@
                         variantFields.combinations[row.id] = obj;
                     });
                 }).on('removedRows.griddle', function(e, rows) { //remove combination when remove rows
+                    var deleteInputEle = $('#variants_remove');
+                    var currentDeleteIds = deleteInputEle.val() ? deleteInputEle.val().split(',') : [];
                     _.forEach(rows, function(row) {
+                        currentDeleteIds.push(row.id);
                         if (typeof (variantFields.combinations[row.id]) != 'undefined') {
                             delete variantFields.combinations[row.id];
                         }
                     });
+
+                    deleteInputEle.val(_.uniq(currentDeleteIds).join(','));
                 })
                 ;
             }
@@ -796,4 +801,5 @@
 </div>
 
 <input type='hidden' id='vfield_ids' name='vfields' />
+<input type='hidden' id='variants_remove' name='variants_remove' />
 <input type='hidden' id='variants' name='variants' />

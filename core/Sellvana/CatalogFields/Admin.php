@@ -108,8 +108,15 @@ class Sellvana_CatalogFields_Admin extends BClass
         /** @var Sellvana_CatalogFields_Model_ProductVarfield[] $prodVarfieldModels */
         $prodVarfieldModels = $prodVarfieldHlp->orm()->where('product_id', $pId)->find_many_assoc('field_id');
 
-        // retrieve product variant models
         $prodVariantHlp = $this->Sellvana_CatalogFields_Model_ProductVariant;
+
+        //delete variants in remove list
+        if (!empty($data['variants_remove'])) {
+            $variantRemoveIds = explode(',', $data['variants_remove']);
+            $prodVariantHlp->delete_many(['product_id' => $pId, 'id' => $variantRemoveIds]);
+        }
+
+        // retrieve product variant models
         $prodVariantModels = $prodVariantHlp->orm()->where('product_id', $pId)->find_many_assoc();
 
         // delete removed fields
@@ -323,10 +330,6 @@ class Sellvana_CatalogFields_Admin extends BClass
             if ($fileIdsToDelete) {
                 $prodVariantImageHlp->delete_many(['product_id' => $pId, 'id' => $fileIdsToDelete]);
             }
-        } else if (is_array($data['variants'])) {
-            //remove all variants data in case data submit from frontend is empty array
-            //todo: make sure all variants will not be gone by bug in javascript frontend
-            $this->Sellvana_CatalogFields_Model_ProductVariant->removeAllVariants($pId);
         }
     }
 }
