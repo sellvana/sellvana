@@ -1,0 +1,5 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, customer/customer-segments, { label: Customer Segments, href: /customer-segments, pos: 25 } ]
+

@@ -3,6 +3,7 @@ base:
         do:
             - [ requireJs, fcom.checkout, "@Sellvana_Checkout/Frontend/js/fcom.checkout" ]
             - [ requireRun, fcom.checkout]
+            - [ css, "@Sellvana_Checkout/Frontend/css/fcom.checkout.css" ]
 
 checkout/base:
     - { include: base }

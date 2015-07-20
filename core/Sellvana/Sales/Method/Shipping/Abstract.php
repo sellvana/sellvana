@@ -55,7 +55,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         if (!empty($services[$serviceKey])) {
             return $services[$serviceKey];
         }
-        return false;
+        return $serviceKey;
     }
 
     public function getServices()
@@ -128,10 +128,12 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         return $cartRates;
     }
 
-    public function calcCartPackages($cart)
+    /**
+     * @param Sellvana_Sales_Model_Cart $cart
+     * @return array
+     */
+    public function calcCartPackages(Sellvana_Sales_Model_Cart $cart)
     {
-        $maxPkgWeight = $this->getConfig('max_package_weight', 1000);
-
         $packages = [];
         $pkgIdx = 0;
         $pkgTpl = [
@@ -142,6 +144,8 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
             'to_region' => $cart->get('shipping_region'),
             'to_postcode' => $cart->get('shipping_postcode'),
             'to_country' => $cart->get('shipping_country'),
+            'to_phone' => $cart->get('shipping_phone'),
+            'to_email' => $cart->get('customer_email'),
         ];
 
         foreach ($cart->items() as $item) {
@@ -151,6 +155,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                     $pkg = array_merge($pkgTpl, [
                         'qty' => 1,
                         'weight' => $item->get('shipping_weight'),
+                        'total' => ($item->get('row_total') + $item->get('row_tax')) / $qty,
                         'items' => [$item->id() => 1],
                     ]);
                     $packages[$pkgIdx] = $pkg;
@@ -158,18 +163,57 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                 }
                 continue;
             }
-            $rowWeight = $qty * $item->get('shipping_weight');
-            if (!empty($packages[$pkgIdx]) && ($packages[$pkgIdx]['weight'] + $rowWeight) > $maxPkgWeight) {
-                $pkgIdx++;
-            }
+
+            $rowWeight = $rowTotal = 0;
+            $packageQty = 0;
             if (empty($packages[$pkgIdx])) {
-                $packages[$pkgIdx] = array_merge($pkgTpl, ['qty' => 0, 'weight' => 0, 'items' => []]);
+                $packages[$pkgIdx] = array_merge($pkgTpl, ['qty' => 0, 'weight' => 0, 'total' => 0, 'items' => []]);
             }
-            $packages[$pkgIdx]['items'][$item->id()] = $qty;
-            $packages[$pkgIdx]['qty'] += $qty;
-            $packages[$pkgIdx]['weight'] += $rowWeight;
+            for ($i = 0; $i < $qty; $i++) {
+                if (!empty($packages[$pkgIdx]) && !$this->_itemCanBeAddedToPackage($packages[$pkgIdx], $item, $packageQty+1)) {
+                    if ($packageQty > 0) {
+                        $packages[$pkgIdx]['items'][$item->id()] = $packageQty;
+                        $packages[$pkgIdx]['qty'] += $packageQty;
+                        $packages[$pkgIdx]['weight'] += $rowWeight;
+                        $packages[$pkgIdx]['total'] += $rowTotal;
+                    }
+
+                    $pkgIdx++;
+                    $rowWeight = $rowTotal = 0;
+                    $packageQty = 0;
+
+                    if (empty($packages[$pkgIdx])) {
+                        $packages[$pkgIdx] = array_merge($pkgTpl, ['qty' => 0, 'weight' => 0, 'total' => 0, 'items' => []]);
+                    }
+                }
+
+                $packageQty++;
+                $rowWeight += $item->get('shipping_weight');
+                $rowTotal += ($item->get('row_total') + $item->get('row_tax')) / $qty;
+            }
+
+            if ($packageQty > 0) {
+                $packages[$pkgIdx]['items'][$item->id()] = $packageQty;
+                $packages[$pkgIdx]['qty'] += $packageQty;
+                $packages[$pkgIdx]['weight'] += $rowWeight;
+                $packages[$pkgIdx]['total'] += $rowTotal;
+            }
         }
+
         return $packages;
+    }
+
+    /**
+     * @param array $package
+     * @param Sellvana_Sales_Model_Cart_Item $item
+     * @param int $qty
+     * @return bool
+     */
+    protected function _itemCanBeAddedToPackage($package, $item, $qty)
+    {
+        $maxPkgWeight = $this->getConfig('max_package_weight', 1000);
+        $rowWeight = $qty * $item->get('shipping_weight');
+        return (($package['weight'] + $rowWeight) <= $maxPkgWeight);
     }
 
     public function fetchPackageRates($package)
@@ -181,14 +225,35 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
     {
         $config = $this->BConfig->get('modules/Sellvana_Sales');
 
-        if (empty($data['from_country'])) {
-            $data['from_country'] =  !empty($config['store_country']) ? $config['store_country'] : null;
+        if (empty($data['to_country'])) {
+            $data['to_country'] = !empty($config['store_country']) ? $config['store_country'] : null;
+        }
+        if (empty($data['from_name'])) {
+            $data['from_name'] =  !empty($config['store_name']) ? $config['store_name'] : null;
+        }
+        if (empty($data['from_email'])) {
+            $data['from_email'] =  !empty($config['store_email']) ? $config['store_email'] : null;
+        }
+        if (empty($data['from_city'])) {
+            $data['from_city'] =  !empty($config['store_city']) ? $config['store_city'] : null;
+        }
+        if (empty($data['from_region'])) {
+            $data['from_region'] =  !empty($config['store_region']) ? $config['store_region'] : null;
         }
         if (empty($data['from_postcode'])) {
             $data['from_postcode'] = !empty($config['store_postcode']) ? $config['store_postcode'] : null;
         }
-        if (empty($data['to_country'])) {
-            $data['to_country'] = !empty($config['store_country']) ? $config['store_country'] : null;
+        if (empty($data['from_country'])) {
+            $data['from_country'] =  !empty($config['store_country']) ? $config['store_country'] : null;
+        }
+        if (empty($data['from_street1'])) {
+            $data['from_street1'] =  !empty($config['store_street1']) ? $config['store_street1'] : null;
+        }
+        if (empty($data['from_street2'])) {
+            $data['from_street2'] =  !empty($config['store_street2']) ? $config['store_street2'] : null;
+        }
+        if (empty($data['from_phone'])) {
+            $data['from_phone'] =  !empty($config['store_phone']) ? $config['store_phone'] : null;
         }
 
         if (empty($data['customer_context'])) {

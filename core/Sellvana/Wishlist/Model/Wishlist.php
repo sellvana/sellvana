@@ -39,7 +39,7 @@ class Sellvana_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         if (!static::$_sessionWishlist) {
             $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
             if ($customer) {
-                $wishlist = $this->loadOrCreate(["customer_id" => $customer->id()]);
+                $wishlist = $this->loadOrCreate(["customer_id" => $customer->id(), 'is_default' => 1]);
                 $id = $wishlist->id();
                 if(empty($id)){
                     $wishlist->save(); // make sure wishlist has an ID
@@ -218,7 +218,7 @@ class Sellvana_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
             return;
         }
         // load customer's wishlist
-        $custWishlist = $this->load($customer->id(), 'customer_id');
+        $custWishlist = $this->loadWhere(['customer_id' => $customer->id(), 'is_default' => 1]);
         if (!$custWishlist) {
             // if no customer wishlist, make cookie wishlist customer's
             $cookieWishlist->set([
