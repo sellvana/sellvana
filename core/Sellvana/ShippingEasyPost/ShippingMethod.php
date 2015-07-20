@@ -18,6 +18,15 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
 
     protected function _fetchRates($data)
     {
+        $baseCur = $this->BConfig->get('modules/FCom_Core/base_currency', 'USD');
+        if ($baseCur !== 'USD' && !$this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+            $result = [
+                'error' => 1,
+                'message' => 'EasyPost works only with USD prices. Either change the base currency, or enable Sellvana_MultiCurrency extension',
+            ];
+            return $result;
+
+        }
         $config = $this->BConfig->get($this->_configPath);
         $data = array_merge($config, $data);
 
@@ -160,7 +169,12 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         $items = $cart->items();
         $packageSum = 0;
         $customsItems = [];
-        $rate = $this->Sellvana_MultiCurrency_Main->getRate('USD');
+
+        $rate = 1;
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+            $rate = $this->Sellvana_MultiCurrency_Main->getRate('USD');
+        }
+
         foreach ($items as $item) {
             if (in_array($item->id, array_keys($data['items']))) {
                 $packageSum += $item->row_total;
@@ -206,7 +220,12 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         }
 
         $maxIntlPackageTotal = 2500; // USD
-        $rate = $this->Sellvana_MultiCurrency_Main->getRate('USD');
+
+        $rate = 1;
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiCurrency')) {
+            $rate = $this->Sellvana_MultiCurrency_Main->getRate('USD');
+        }
+
         $itemTotal = ($item->get('row_total') + $item->get('row_tax')) / $item->get('qty');
         $potentialTotal = ($package['total'] + ($itemTotal * $qty)) * $rate;
 

@@ -551,13 +551,9 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function getDefaultBillingAddress()
     {
-        if ($this->default_billing_id) {
-            return $this->Sellvana_Customer_Model_Address->load($this->default_billing_id);
-        }
-
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_billing || $this->default_billing_id === $addr->id()) {
+            if ($this->default_billing_id === $addr->id()) {
                 return $addr;
             }
         }
@@ -569,13 +565,9 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function getDefaultShippingAddress()
     {
-        if ($this->default_shipping_id) {
-            return $this->Sellvana_Customer_Model_Address->load($this->default_shipping_id);
-        }
-
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_shipping) {
+            if ($this->default_shipping_id === $addr->id()) {
                 return $addr;
             }
         }
