@@ -47,6 +47,7 @@ trait Sellvana_Sales_Model_Trait_Address
         $country = $this->get($atype . '_country');
         $arr = [
             'atype'     => $atype,
+            'email'     => $this->get('customer_email'),
             'company'   => $this->get($atype . '_company'),
             'attn'      => $this->get($atype . '_attn'),
             'firstname' => $this->get($atype . '_firstname'),

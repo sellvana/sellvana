@@ -1,59 +1,63 @@
+{% set wishlists = THIS.get('wishlists') %}
 {% set wishlist = THIS.get('wishlist').items(false, true) %}
 
 <div class="row f-mb-slideout-menu">
     <div class="col-sm-9 f-col-main">
     <header class="f-page-header">
-        <h1 class="f-page-title">{{ "Wishlist" | _ }}</h1>
+        <h1 class="f-page-title">{{ "Wishlists" | _ }}</h1>
         <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ 'Menu'|_ }}</a>
     </header>
     {{ THIS.view('core/messages') | raw }}
-    {% if wishlist %}
+    {% if wishlists %}
         <form name="cart" action="{{ APP.href('wishlist') }}" method="post">
-            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-            <div class="table-responsive">
-                <table class="table">
-                    <col width="30"/>
-                    <col width="60"/>
-                    <col/>
-                    <col width="180"/>
-                    <col width="70"/>
-                    <col width="70"/>
-                    <thead>
-                        <tr>
-                            <th>{{ "Select" | _ }}</th>
-                            <th colspan="2">{{ "Product" | _ }}</th>
-                            <th>{{ "Price" | _ }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in wishlist %}
-                            {% set p = item.product() %}
-                            <tr id="f-product-row-{{ p.get('id')}}">
-                                <td>
-                                    <label><input type="checkbox" name="selected[]" class="selected-checkbox" value="{{ item.get('id')}}"></label>
-                                </td>
-                                <td>
-                                    <img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img" alt="{{ p.getName() }}"/>
-                                </td>
-                                <td>
-                                    <strong class="f-prod-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.getName() }}</a></strong>
-                                </td>
-                                <td>
-                                    <div class="price-box">
-                                        <span class="price">$ {{ p.get('base_price') | number_format }}</span>
-                                    </div>
-                                </td>
+            {% for wId, wishlist in wishlists %}
+                <h2>{{ wishlist.get('title')|default('Default Wishlist') }}</h2>
+                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                <div class="table-responsive">
+                    <table class="table">
+                        <col width="30"/>
+                        <col width="60"/>
+                        <col/>
+                        <col width="180"/>
+                        <col width="70"/>
+                        <col width="70"/>
+                        <thead>
+                            <tr>
+                                <th>{{ "Select" | _ }}</th>
+                                <th colspan="2">{{ "Product" | _ }}</th>
+                                <th>{{ "Price" | _ }}</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <td colspan="4">
-                            <button type="submit" class="btn btn-primary btn-xs" name="do" value="add_to_cart">{{ "Add Selected To Cart" | _ }}</button>
-                            <button type="submit" class="btn btn-warning btn-xs" name="do" value="remove">{{ "Remove Selected" | _ }}</button>
-                        </td>
-                    </tfoot>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {% for item in wishlist.items() %}
+                                {% set p = item.product() %}
+                                <tr id="f-product-row-{{ p.get('id')}}">
+                                    <td>
+                                        <label><input type="checkbox" name="selected[]" class="selected-checkbox" value="{{ item.get('id')}}"></label>
+                                    </td>
+                                    <td>
+                                        <img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img" alt="{{ p.getName() }}"/>
+                                    </td>
+                                    <td>
+                                        <strong class="f-prod-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.getName() }}</a></strong>
+                                    </td>
+                                    <td>
+                                        <div class="price-box">
+                                            <span class="price">{{ p.getCatalogPrice() | currency }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <td colspan="4">
+                                <button type="submit" class="btn btn-primary btn-xs" name="do" value="add_to_cart">{{ "Add Selected To Cart" | _ }}</button>
+                                <button type="submit" class="btn btn-warning btn-xs" name="do" value="remove">{{ "Remove Selected" | _ }}</button>
+                            </td>
+                        </tfoot>
+                    </table>
+                </div>
+            {% endfor %}
         </form>
     {% else %}
         <div class="alert alert-info">{{ "There are no products in wishlist" | _ }}.</div>

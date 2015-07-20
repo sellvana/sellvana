@@ -2,6 +2,8 @@
 
 class Sellvana_Sales_Model_Order_Shipment_State_Overall extends Sellvana_Sales_Model_Order_State_Abstract
 {
+    protected static $_origClass = __CLASS__;
+
     const PENDING = 'pending',
         PACKING = 'packing',
         SHIPPING = 'shipping',

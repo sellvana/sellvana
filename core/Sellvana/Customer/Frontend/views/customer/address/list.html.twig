@@ -18,6 +18,7 @@
         {% endif %}
         {{ APP.instance('Sellvana_Customer_Model_Address').as_html(address) | raw }}
         <a href="{{ APP.href("customer/address/edit") }}?id={{ address.get('id') }}">{{ "Edit" | _ }}</a>
+        <a href="{{ APP.href("customer/address/delete") }}?id={{ address.get('id') }}">{{ "Remove" | _ }}</a>
       </div>
     {% endfor %}
     </div>

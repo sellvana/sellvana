@@ -1233,7 +1233,7 @@ class BUtil extends BClass
             $respHeaders = isset($http_response_header) ? $http_response_header : [];
         }
         foreach ($respHeaders as $i => $line) {
-            if ($i) {
+            if ($i && strpos($line, ':')) {
                 $arr = explode(':', $line, 2);
                 static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {

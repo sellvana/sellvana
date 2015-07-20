@@ -22,8 +22,28 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout = $this->BLayout;
         $this->layout('/wishlist');
         $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
-        $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->sessionWishlist();
-        $layout->view('wishlist')->wishlist = $wishlist;
+
+        $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()
+            ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
+            ->order_by_desc('is_default')
+            ->order_by_asc('title')
+            ->find_many_assoc();
+
+        $itemRows = $this->Sellvana_Wishlist_Model_WishlistItem->orm('wi')
+            ->join('Sellvana_Catalog_Model_Product', ['p.id', '=', 'wi.product_id'], 'p')
+            ->select('wi.*')
+            ->select('p.id', 'product_id')
+            ->where_in('wishlist_id', array_keys($wishlists))
+            ->find_many();
+
+        foreach ($itemRows as $item) {
+            $wishlistItems[$item->get('wishlist_id')][] = $item;
+        }
+        foreach ($wishlistItems as $wId => $items) {
+            $wishlists[$wId]->items = $items;
+        }
+
+        $layout->view('wishlist')->wishlists = $wishlists;
     }
 
     public function action_index__POST()
@@ -74,6 +94,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                         foreach ($post['selected'] as $id) {
                             $wishlist->removeItem($id);
                         }
+                        $wishlistHref = $this->BApp->href('cart');
                         break;
 
                     case 'remove':
