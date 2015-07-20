@@ -130,12 +130,6 @@ class Sellvana_CatalogFields_Admin extends BClass
                     }
                 }
             }
-
-            //remove all variants when delete all catalog fields
-            if (empty($prodVarfieldModels)) {
-                $this->Sellvana_CatalogFields_Model_ProductVariant->removeAllVariants($pId);
-                return true;
-            }
         }
         /** @var Sellvana_CatalogFields_Model_Field[] $fieldModels */
         $fieldModels = [];

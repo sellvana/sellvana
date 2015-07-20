@@ -165,19 +165,6 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
         return $variant;
     }
 
-    /**
-     * remove all variants of specific product
-     * @param int|Sellvana_Catalog_Model_Product $product
-     */
-    public function removeAllVariants($product)
-    {
-        $productId = is_object($product) ? $product->id() : $product;
-        //delete variants, variant fields, and images
-        $this->delete_many(['product_id' => $productId]);
-        $this->Sellvana_CatalogFields_Model_ProductVariantField->delete_many(['product_id' => $productId]);
-        $this->Sellvana_CatalogFields_Model_ProductVariantImage->delete_many(['product_id' => $productId]);
-    }
-
     public function checkEmptyVariant($product)
     {
         return $this->load($product, 'product_id');
