@@ -1,4 +1,5 @@
 {% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set customer = APP.instance('Sellvana_Customer_Model_Customer').sessionUser() %}
 {% set type = THIS.get('address_type') %}
 {% set validator = THIS.validator(type ~ '-form', cart) %}
 
@@ -81,6 +82,16 @@
             {{ validator.errorHtml(field, field) | raw }}
         </div>
     </div>
+
+    {% if customer %}
+    <div class="row">
+        <div class="form-group col-sm-6">
+            {% set field = 'save' %}
+            <input type="checkbox" name="{{ field }}" id="{{ field }}">
+            <label for="{{ field }}" class="control-label">{{ "Save to address book"|_ }}</label>
+        </div>
+    </div>
+    {% endif %}
 </fieldset>
 
 <script>
@@ -88,6 +99,6 @@
         $(function() {
             $('.geo-country').geoCountryRegion({country:'{{ validator.fieldValue(type ~ '_country') }}', region:'{{ validator.fieldValue(type ~ '_region') }}'});
             $('#{{ type }}-form').validate();
-        })
+        });
     })
 </script>

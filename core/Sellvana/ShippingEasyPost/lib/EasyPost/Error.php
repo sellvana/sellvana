@@ -1,6 +1,8 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 namespace EasyPost;
+
+defined('BUCKYBALL_ROOT_DIR') || die();
 
 class Error extends \Exception
 {
@@ -17,6 +19,18 @@ class Error extends \Exception
             } else {
                 $this->param = null;
             }
+
+            if (isset($this->jsonBody) && !empty($this->jsonBody['error']['errors'])) {
+                $this->errors = $this->jsonBody['error']['errors'];
+            } else {
+                $this->errors = null;
+            }
+
+            if (isset($this->jsonBody) && !empty($this->jsonBody['error']['code'])) {
+                $this->ecode = $this->jsonBody['error']['code'];
+            } else {
+                $this->ecode = null;
+            }
         } catch (\Exception $e) {
             $this->jsonBody = null;
         }
@@ -30,5 +44,20 @@ class Error extends \Exception
     public function getHttpBody()
     {
         return $this->httpBody;
+    }
+
+    public function prettyPrint()
+    {
+        print($this->ecode . " (" . $this->getHttpStatus() . "): " .
+            $this->getMessage() . "\n");
+        if (!empty($this->errors)) {
+            print("Field errors:\n");
+            foreach($this->errors as $field_error) {
+                foreach($field_error as $k => $v) {
+                    print("  " . $k . ": " . $v . "\n");
+                }
+                print("\n");
+            }
+        }
     }
 }
