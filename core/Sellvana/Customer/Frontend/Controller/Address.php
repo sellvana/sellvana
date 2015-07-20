@@ -202,8 +202,44 @@ class Sellvana_Customer_Frontend_Controller_Address extends FCom_Frontend_Contro
     public function action_delete()
     {
         $id = $this->BRequest->get('id');
-        $address = $this->Sellvana_Customer_Model_Address->load($id);
-        $address->delete();
+        $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+        $addresses = $customer->getAddresses();
+
+        $found = false;
+        $firstAddress = false;
+        $changeBillingAddress = false;
+        $changeShippingAddress = false;
+
+        /** @var Sellvana_Customer_Model_Address $addr */
+        foreach ($addresses as $addr) {
+            if ($addr->get('id') == $id) {
+                $found = true;
+                $changeBillingAddress = ($customer->getDefaultBillingAddress()->get('id') === $addr->get('id'));
+                $changeShippingAddress = ($customer->getDefaultShippingAddress()->get('id') === $addr->get('id'));
+                $addr->delete();
+                if (!$changeBillingAddress && !$changeShippingAddress) {
+                    break;
+                }
+            } elseif (!$firstAddress) {
+                $firstAddress = $addr;
+            }
+
+            if ($found && $firstAddress) {
+                if ($changeBillingAddress) {
+                    $customer->setDefaultAddress($firstAddress, 'billing');
+                }
+                if ($changeShippingAddress) {
+                    $customer->setDefaultAddress($firstAddress, 'shipping');
+                }
+                $customer->save();
+                break;
+            }
+        }
+
+        if (!$found) {
+            $this->message('You can\'t delete an address which doesn\'t belong to you', 'error');
+        }
+
         $this->BResponse->redirect($this->BApp->href('customer/address'));
     }
 }
