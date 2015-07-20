@@ -41,7 +41,7 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="progress progress-striped active" style="margin-bottom: 0;">
-                    <div id="progress-bar" class="progress-bar"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 1%">
+                    <div id="progress-bar" class="progress-bar"  role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 1%">
                     </div>
                 </div>
             </div>
@@ -50,7 +50,7 @@
 </div>
 <!--End Modal -->
 <script>
-    require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
+    require(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'jquery.validate', 'unique'], function($, _, Backbone, PushClient) {
         var indexFieldGrid = null;
         var BackboneGrid = null;
         var rowsCollection = null;
@@ -222,33 +222,59 @@
             }
 
         });
-    });
 
-    $('.btn-progress').on('click',function(){
-        var url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}';
-        $('#progress-bar').css('width', 0);
-        $.ajax({
-            xhr: function()
-            {
-                var xhr = new window.XMLHttpRequest();
-                xhr.upload.addEventListener("progress", function(evt){
-                    if (evt.lengthComputable) {
-                        var percentComplete = 100 * evt.loaded / evt.total;
+        $('.btn-progress').on('click', function () {
+            var url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}';
+            var progressUrl = '{{ APP.href('/catalogindex/progress') }}';
+            $('#progress-bar').css('width', 0);
+//            PushClient.listen({channel: 'index', callback: channel_index_progress});
+
+            var total = 0;
+            var $msgBoard = $('<span/>');
+            $('#progress-bar').append($msgBoard);
+            function channel_index_progress() {
+                $.get(progressUrl, function (msg) {
+                    console.log(msg);
+                    if (msg.total && msg.reindexed != undefined && msg.total != 0) {
+                        var reindexed = parseInt(msg.reindexed);
+                        var total = parseInt(msg.total);
+                        var percentComplete = (reindexed * 100 / total);
                         $('#progress-bar').css({
-                            width:  percentComplete + '%'
+                            width: percentComplete + '%'
                         });
+                        $msgBoard.text(total + ' / ' + reindexed);
                     }
-                }, false);
-                return xhr;
-            },
-            type: 'POST',
-            url: url,
-            data: {CLEAR: 1},
-            complete: function(data) {
-                $('#progress-bar').append($('<span/>').html('{{ "Reindexing completed."|_ }}'));
+                });
             }
-        });
 
+            var updateInterval = setInterval(channel_index_progress, 3000);
+
+            $.ajax({
+               /* xhr: function () {
+                    var xhr = new window.XMLHttpRequest();
+                     xhr.upload.addEventListener("progress", function(evt){
+                     if (evt.lengthComputable) {
+                     var percentComplete = 100 * evt.loaded / evt.total;
+                     $('#progress-bar').css({
+                     width:  percentComplete + '%'
+                     });
+                     }
+                     }, false);
+                    return xhr;
+                },*/
+                type: 'POST',
+                url: url,
+                data: {CLEAR: 1},
+                complete: function (data) {
+                    clearInterval(updateInterval);
+                    $('#progress-bar').css({
+                        width: '100%'
+                    });
+                    $msgBoard.html('{{ "Reindexing completed."|_ }}');
+                }
+            });
+
+        });
     });
 
 </script>

@@ -52,6 +52,7 @@
                                 create_at: current,
                                 //temporary value before implement edit inline
                                 position: 0,
+                                in_gallery: 1,
                                 label: FCom.Mixin.removeSpecialChars(attachRow.file_name)
                             });
                             addRows.push(row);
@@ -105,6 +106,7 @@
                 file_id: row.file_id,
                 label: row.label,
                 position: row.position,
+                in_gallery: row.in_gallery,
                 create_at: row.create_at,
                 update_at: row.update_at,
                 _new: row._new

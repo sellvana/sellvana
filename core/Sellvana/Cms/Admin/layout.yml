@@ -23,4 +23,4 @@ base:
             - [ addTab, form, { label: Form Fields, pos: 30 } ]
 
 /settings:
-    - { view: settings, do: [[ addTab, Sellvana_Cms, { label: Cms, group: catalog, async: true } ]] }
+    - { view: settings, do: [[ addTab, Sellvana_Cms, { label: Cms, group: catalog, async: true, permission: settings/Sellvana_Cms } ]] }

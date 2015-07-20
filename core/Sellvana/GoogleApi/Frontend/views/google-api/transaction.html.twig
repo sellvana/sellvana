@@ -1,0 +1,46 @@
+{% set conf = CONFIG.get('modules/Sellvana_GoogleApi') %}
+
+{% if (conf.ua_enable and conf.ua_key) or (conf.gtm_enable and conf.gtm_key) %}
+
+    {% set ga = APP.instance('Sellvana_GoogleApi_Frontend').getTransactionData() %}
+
+    <script>
+        (function() {
+
+            var items = {{ UTIL.toJson(ga.items) | raw }}, trans = {{ UTIL.toJson(ga.transaction) | raw }};
+
+            {% if conf.ua_enable and conf.ua_key %}
+                {% if conf.ua_enable_ec %}
+
+                    for (i = 0, l = items.length; i < l; i++) {
+                        ga('ec:addProduct', items[i]);
+                    }
+                    ga('ec:setAction', 'purchase', trans);
+
+                {% else %}
+
+                    ga('ecommerce:addTransaction', trans);
+                    for (i = 0, l = items.length; i < l; i++) {
+                        ga('ecommerce:addItem', items[i]);
+                    }
+                    ga('ecommerce:send');
+
+                {% endif %}
+            {% endif %}
+
+            {% if conf.gtm_enable and conf.gtm_key %}
+
+                dataLayer.push({
+                    ecommerce: {
+                        purchase: {
+                            actionField: trans
+                        },
+                        products: items
+                    }
+                });
+
+            {% endif %}
+
+        })();
+    </script>
+{% endif %}

@@ -4,8 +4,8 @@
  * Class Sellvana_MultiLanguage_Migrate
  *
  * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
- * @property Sellvana_CustomField_Model_Field $Sellvana_CustomField_Model_Field
- * @property Sellvana_CustomField_Model_FieldOption $Sellvana_CustomField_Model_FieldOption
+ * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_MultiLanguage_Model_Translation $Sellvana_MultiLanguage_Model_Translation
  */
 
@@ -15,8 +15,8 @@ class Sellvana_MultiLanguage_Migrate extends BClass
     {
         $tTrans = $this->Sellvana_MultiLanguage_Model_Translation->table();
         $tIndexField = $this->Sellvana_CatalogIndex_Model_Field->table();
-        $tCustomField = $this->Sellvana_CustomField_Model_Field->table();
-        $tCustomFieldOption = $this->Sellvana_CustomField_Model_FieldOption->table();
+        $tCustomField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tCustomFieldOption = $this->Sellvana_CatalogFields_Model_FieldOption->table();
         $this->BDb->ddlTableDef($tTrans, [
             BDb::COLUMNS => [
                 'id' => 'INT UNSIGNED NOT NULL AUTO_INCREMENT',
@@ -55,8 +55,8 @@ class Sellvana_MultiLanguage_Migrate extends BClass
     public function upgrade__0_1_0__0_1_1()
     {
         $tIndexField = $this->Sellvana_CatalogIndex_Model_Field->table();
-        $tCustField = $this->Sellvana_CustomField_Model_Field->table();
-        $tCustFieldOption = $this->Sellvana_CustomField_Model_FieldOption->table();
+        $tCustField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tCustFieldOption = $this->Sellvana_CatalogFields_Model_FieldOption->table();
         $tTrans = $this->Sellvana_MultiLanguage_Model_Translation->table();
 
         $this->BDb->ddlTableDef($tTrans, [

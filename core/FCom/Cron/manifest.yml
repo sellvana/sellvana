@@ -12,7 +12,7 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: [ layout, views ]
+                auto_use: [ layout, views, bootstrap ]
 
             FCom_Cron:
                 routing:

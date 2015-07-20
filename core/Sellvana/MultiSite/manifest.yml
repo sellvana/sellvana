@@ -1,6 +1,6 @@
 modules:
     Sellvana_MultiSite:
-        version: 0.5.1.0
+        version: 0.5.2.0
         channel: alpha
         translations: { en: en.php }
         description: "Enable multiple website management from the same instance"
@@ -15,6 +15,7 @@ modules:
                 observe:
                     - [ "FCom_Admin_Controller_Settings::action_index", Sellvana_MultiSite_Admin.onSettingsIndexGet ]
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", Sellvana_MultiSite_Admin.onSettingsIndexPost ]
+                    - [ "FCom_Admin_Controller_Users::formPostAfter", Sellvana_MultiSite_Admin.onUsersFormPostAfter ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]

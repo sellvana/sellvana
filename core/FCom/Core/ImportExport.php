@@ -7,7 +7,7 @@
  * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
  * @property FCom_Core_Model_ImportExport_Model $FCom_Core_Model_ImportExport_Model
  * @property FCom_Core_Model_ImportExport_Site $FCom_Core_Model_ImportExport_Site
- * @property Sellvana_CustomField_Main $Sellvana_CustomField_Main
+ * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
  */
 class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
@@ -153,9 +153,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             if ( !isset( $s[ 'skip' ] ) ) {
                 $s[ 'skip' ] = [];
             }
-            if ($model == 'Sellvana_Catalog_Model_Product' && $this->BModuleRegistry->isLoaded('Sellvana_CustomField')) {
+            if ($model == 'Sellvana_Catalog_Model_Product' && $this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
                 // disable custom fields to avoid them adding bunch of fields to export
-                $this->Sellvana_CustomField_Main->disable(true);
+                $this->Sellvana_CatalogFields_Main->disable(true);
             }
 
             try {

@@ -6,4 +6,4 @@ base:
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_AdminLiveFeed, { label: Recent Activity, group: pushserver, async: true } ]
+            - [ addTab, Sellvana_AdminLiveFeed, { label: Recent Activity, group: pushserver, async: true, permission: settings/Sellvana_AdminLiveFeed } ]

@@ -21,12 +21,11 @@
 
 {% set prod = THIS.get('product') %}
 {% set inventory = prod.getInventoryModel() %}
-{% set images = prod.media('I') %}
+{% set images = prod.gallery() %}
 {% set cat = THIS.get('category') %}
 {% set customFields = prod.getData('custom_fields') %}
 
 {% set productLinks = prod.getProductLinks() %}
-{% set recentlyViewed = APP.instance('Sellvana_Catalog_Frontend').getRecentlyViewedProducts() %}
 
 {% set canOrder = inventory.canOrder() %}
 
@@ -158,23 +157,17 @@
                 <strong class="f-widget-title">{{ link.title }}</strong>
             </header>
 
-            {{ THIS.view('catalog/product/grid-tiles').set('products', link.products) | raw }}
+            <div class="f-widget-content">
+                {{ THIS.view('catalog/product/grid-tiles').set({
+                    products: link.products,
+                    simple_view: true,
+                    list_name: link.title,
+                }) | raw }}
+            </div>
 
         </div><!-- /.f-widget -->
     {% endif %}
 {% endfor %}
-
-{% if recentlyViewed %}
-    <!-- You may also like -->
-    <div class="f-widget f-widget-featured-prods">
-        <header class="f-widget-header">
-            <strong class="f-widget-title">{{ "You recently viewed these items"|_ }}</strong>
-        </header>
-
-        {{ THIS.view('catalog/product/grid-tiles').set('products', recentlyViewed) | raw }}
-
-    </div>
-{% endif %}
 
 {{ THIS.view('catalog/product/quickview') | raw }}
 

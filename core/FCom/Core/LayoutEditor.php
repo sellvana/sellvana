@@ -252,12 +252,16 @@ class FCom_Core_LayoutEditor extends BClass
      */
     public function compileLayout($layoutData, $context = [])
     {
+        if (empty($layoutData['widgets'])
+            || sizeof($layoutData['widgets']) === 1 && $layoutData['widgets'][0]['type'] === 'main'
+        ) {
+            return [];
+        }
+
         $layoutType = !empty($context['type']) ? $context['type'] : null;
         $layoutData = $this->normalizeLayoutData($layoutData, ['layout_type' => $layoutType]);
 
-        $layout = [
-            ['hook' => 'main', 'clear' => $context['main_view']],
-        ];
+        $layout = [];
 
         $rootLayout = ['view' => $this->BLayout->getRootViewName()];
         if (!empty($layoutData['area']['header']) && $layoutData['area']['header'] === 'hide') {
@@ -285,10 +289,23 @@ class FCom_Core_LayoutEditor extends BClass
         }
 
         foreach ($layoutData['widgets'] as $widget) {
-            $args = ['layout' => &$layout, 'context' => $context, 'widget' => $widget];
-            $this->BUtil->call($widget['compile'], $args);
+            $args = ['layout' => &$layout, 'context' => &$context, 'widget' => $widget];
+            $layoutUpdate = $this->BUtil->call($widget['compile'], $args);
+
+            foreach ($layoutUpdate as $i => $update) {
+                if (!empty($update['hook']) && $update['hook'] === 'main') {
+                    $update['params']['insert'] = function ($obs) use ($context) {
+                        if ($obs['alias'] !== $context['main_view']) {
+                            return 0;
+                        }
+                        return empty($context['after_main_view']) ? -1 : 1;
+                    };
+                }
+                if ($update) {
+                    $layout[] = $update;
+                }
+            }
         }
-        #$this->BDebug->dump($layout);
         return $layout;
     }
 
@@ -342,8 +359,12 @@ class FCom_Core_LayoutEditor extends BClass
      */
     public function onFetchLibrary($args)
     {
+        if ($this->BRequest->area() === 'FCom_Frontend') {
+            $views = $this->BLayout->getAllViews();
+        } else {
+            $views = $this->FCom_Frontend_Main->getLayout()->getAllViews();
+        }
         $templates = [];
-        $views = $this->FCom_Frontend_Main->getLayout()->getAllViews();
         foreach ($views as $k => $view) {
             $templates[$k] = $view->param('view_name');
         }
@@ -355,7 +376,9 @@ class FCom_Core_LayoutEditor extends BClass
             'box_class' => 'box-main-contents',
             'compile' => function ($args) {
                 $w = $args['widget'];
-                $args['layout'][] = ['hook' => $w['area'], 'views' => $args['context']['main_view']];
+                $args['context']['after_main_view'] = true;
+                //$args['layout'][] = ['hook' => $w['area'], 'views' => $args['context']['main_view']];
+                return [];
             },
         ]);
 
@@ -365,10 +388,12 @@ class FCom_Core_LayoutEditor extends BClass
             'compile' => function ($args) {
                 $w = $args['widget'];
                 $viewName = uniqid();
-                $args['layout'][] = ['view' => $viewName, 'view_class' => 'FCom_Core_View_Text', 'do' => [
-                    ['addText', $viewName, $w['value']],
-                ]];
-                $args['layout'][] = ['hook' => $w['area'], 'views' => $viewName];
+                return [
+                    ['view' => $viewName, 'view_class' => 'FCom_Core_View_Text', 'do' => [
+                        ['addText', $viewName, $w['value']],
+                    ]],
+                    ['hook' => $w['area'], 'views' => $viewName],
+                ];
             },
         ]);
 
@@ -383,17 +408,19 @@ class FCom_Core_LayoutEditor extends BClass
                     return;
                 }
                 $declared = $library['declared'][$w['value']];
-                $args['layout'][] = ['hook' => $w['area'], 'views' => $declared['view_name']];
+                $result = [];
+                $result[] = ['hook' => $w['area'], 'views' => $declared['view_name']];
                 if (!empty($w['params'])) {
-                    $args['layout'][] = ['view' => $declared['view_name'], 'set' => $w['params']];
+                    $result[] = ['view' => $declared['view_name'], 'set' => $w['params']];
                 }
                 if (!empty($w['custom_params'])) {
                     $update = [];
                     foreach ($w['custom_params'] as $p) {
                         $update[$p['k']] = $p['v'];
                     }
-                    $args['layout'][] = ['view' => $declared['view_name'], 'set' => $update];
+                    $result[] = ['view' => $declared['view_name'], 'set' => $update];
                 }
+                return $result;
             },
         ]);
 
@@ -403,29 +430,36 @@ class FCom_Core_LayoutEditor extends BClass
             'options' => $templates,
             'compile' => function ($args) {
                 $w = $args['widget'];
-                $args['layout'][] = ['hook' => $w['area'], 'views' => $w['value']];
+                $result = [];
+                $result[] = ['hook' => $w['area'], 'views' => $w['value']];
                 if (!empty($w['custom_params'])) {
                     $update = [];
                     foreach ($w['custom_params'] as $p) {
                         $update[$p['k']] = $p['v'];
                     }
-                    $args['layout'][] = ['view' => $w['value'], 'set' => $update];
+                    $result[] = ['view' => $w['value'], 'set' => $update];
                 }
+                return $result;
             },
         ]);
 
         $this->addWidgetType('youtube', [
             'title' => 'Video Embed (YouTube)',
             'pos' => 120,
-            'source_view' => 'core/widgets/video',
+            'source_view' => 'admin/layout-editor/video',
             'view_name'   => 'widgets/video',
             'compile' => function ($args) {
                 $w = $args['widget'];
-                $view_name        = $w['view_name'];
-                $args['layout'][] = ['hook' => $w['area'], 'views' => $view_name];
+                $view_name = $w['view_name'];
+                $result = [];
+                $result[] = ['hook' => $w['area'], 'views' => $view_name];
+                $url = !empty($w['url']) ? $w['url'] : null;
+                if (preg_match('#(\.be/|[?&]v=)([A-Za-z0-9_]+)#', $url, $urlPatternMatch)) {
+                    $url = 'https://www.youtube.com/embed/' . $urlPatternMatch[2];
+                }
                 $update = [
                     'widget_id'  => $w['id'],
-                    'url'        => !empty($w['url'])? $w['url']: null,
+                    'url'        => $url,
                     'height'     => !empty($w['height'])? $w['height']: null,
                     'width'      => !empty($w['width'])? $w['width']: null,
                     'use_iframe' => !empty($w['use_iframe'])? $w['use_iframe']: null,
@@ -436,20 +470,22 @@ class FCom_Core_LayoutEditor extends BClass
                         $update[$p['k']] = $p['v'];
                     }
                 }
-                $args['layout'][] = ['view' => $view_name, 'set' => $update];
+                $result[] = ['view' => $view_name, 'set' => $update];
+                return $result;
             },
         ]);
 
         $this->addWidgetType('insert_media', [
             'title'       => 'Insert Media',
             'pos'         => 130,
-            'source_view' => 'core/widgets/media',
+            'source_view' => 'admin/layout-editor/media',
             'view_name'   => 'widgets/media',
             'compile'     => function ($args) {
                 $w                = $args['widget'];
                 $view_name        = $w['view_name'];
+                $result = [];
 
-                $args['layout'][] = ['hook' => $w['area'], 'views' => $view_name];
+                $result[] = ['hook' => $w['area'], 'views' => $view_name];
                 $update = [
                     'id'     => $w['id'],
                     'src'    => isset($w['src'])? $w['src']: null,
@@ -462,7 +498,8 @@ class FCom_Core_LayoutEditor extends BClass
                         $update[$p['k']] = $p['v'];
                     }
                 }
-                $args['layout'][] = ['view' => $view_name, 'set' => ['config' => $update]];
+                $result[] = ['view' => $view_name, 'set' => ['config' => $update]];
+                return $result;
             },
         ]);
 
@@ -471,7 +508,9 @@ class FCom_Core_LayoutEditor extends BClass
             'pos' => 100,
             'compile' => function ($args) {
                 $w = $args['widget'];
-                $args['layout'][] = ['hook' => $w['area'], 'clear' => $w['value']];
+                return [
+                    ['hook' => $w['area'], 'clear' => $w['value']],
+                ];
             },
         ]);
 
@@ -479,7 +518,7 @@ class FCom_Core_LayoutEditor extends BClass
             'title' => 'Split 2 Columns',
             'pos' => 50,
             'compile' => function ($args) {
-
+                return [];
             },
         ]);
 
@@ -487,7 +526,7 @@ class FCom_Core_LayoutEditor extends BClass
             'title' => 'Split 3 Columns',
             'pos' => 50,
             'compile' => function ($args) {
-
+                return [];
             },
         ]);
     }

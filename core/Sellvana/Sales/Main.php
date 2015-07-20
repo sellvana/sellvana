@@ -15,16 +15,20 @@ class Sellvana_Sales_Main extends BClass
 
     public function bootstrap()
     {
+        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'sales' => 'Sales',
-            'sales/orders' => 'Orders',
-            'sales/order_status' => 'Order Status',
-            'sales/order_custom_state' => 'Order Custom State',
-            'sales/carts' => 'Carts',
-            'sales/reports' => 'Reports',
+            'sales' => $locale->_('Sales'),
+            'sales/orders' => $locale->_('Orders'),
+            'sales/order_status' => $locale->_('Order Status'),
+            'sales/order_custom_state' => $locale->_('Order Custom State'),
+            'sales/carts' => $locale->_('Carts'),
+            'sales/reports' => $locale->_('Reports'),
+            'settings/Sellvana_Sales' => $locale->_('Sales Settings'),
+            'settings/Sellvana_SalesShipping' => $locale->_('Sales Shipping Settings'),
+            'settings/Sellvana_SalesPaymentMethods' => $locale->_('Sales Payment Methods Settings'),
         ]);
 
-        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal'] as $total) {
+        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal', 'AmountDue'] as $total) {
             $this->Sellvana_Sales_Model_Cart->registerTotalRowHandler('Sellvana_Sales_Model_Cart_Total_' . $total);
         }
 
@@ -254,7 +258,14 @@ class Sellvana_Sales_Main extends BClass
                 $this->_registry['workflow'][$workflow] = $class;
             }
             if (method_exists($class, $method)) {
-                $result[] = $class->$method($args);
+                try {
+                    $result[] = $class->$method($args);
+                } catch (Sellvana_Sales_Workflow_Exception_Recoverable $e) {
+                    $result['errors'][] = [
+                        'workflow' => $workflow,
+                        'message' => $e->getMessage(),
+                    ];
+                }
             }
         }
         return $result;

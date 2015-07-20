@@ -41,9 +41,6 @@
  * @property Sellvana_Catalog_Model_ProductPrice     $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Customer_Model_Customer        $Sellvana_Customer_Model_Customer
  * @property Sellvana_CustomerGroups_Model_Group     $Sellvana_CustomerGroups_Model_Group
- * @property Sellvana_CustomField_Model_Field        $Sellvana_CustomField_Model_Field
- * @property Sellvana_CustomField_Model_FieldOption  $Sellvana_CustomField_Model_FieldOption
- * @property Sellvana_CustomField_Model_ProductField $Sellvana_CustomField_Model_ProductField
  * @property Sellvana_ProductReviews_Model_Review    $Sellvana_ProductReviews_Model_Review
  * @property Sellvana_MultiSite_Frontend             $Sellvana_MultiSite_Frontend
  * @property Sellvana_MultiCurrency_Main             $Sellvana_MultiCurrency_Main
@@ -64,6 +61,17 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'temp_unavail' => 'Temporarily Unavailable',
             'vendor_disc' => 'Supplier Discontinued',
             'mfr_disc' => 'MFR Discontinued',
+        ],
+        'rollover_effects' => [
+            'fade' => 'Fade',
+            'clip' => 'Clip',
+            'blind' => 'Blinds',
+            'drop' => 'Drop',
+            'fold' => 'Fold',
+            'highlight' => 'Highlight',
+            'puff' => 'Puff',
+            'pulsate' => 'Pulsate',
+            'slide' => 'Slide'
         ],
     ];
 
@@ -175,14 +183,31 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->BApp->frontendHref($prefix . ($category ? $category->get('url_path') . '/' : '') . $this->get('url_key'));
     }
 
-    public function imageUrl($full = false)
+    public function imageUrl($full = false, $imgType = 'default')
     {
         static $default;
 
         $media = $this->BConfig->get('web/media_dir');# ? $this->BConfig->get('web/media_dir') : 'media/';
-        $url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();
-        $thumbUrl = $this->get('thumb_url');
-        if ($thumbUrl) {
+        //$url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();// what is the point in this? Image resources are always in same path
+        $url = '';
+        //$thumbUrl = $this->get('thumb_url');
+        //if ($thumbUrl) {
+        //    return $url . $media . '/' . $thumbUrl;
+        //}
+        $productId    = $this->id();
+        switch ($imgType) {
+            case 'thumb':
+                $thumbUrl = $this->getThumbPath($productId);
+                break;
+            case 'rollover':
+                $thumbUrl = $this->getRolloverPath($productId);
+                break;
+            default :
+                $thumbUrl = $this->getDefaultImagePath($productId);
+                break;
+        }
+
+        if($thumbUrl){
             return $url . $media . '/' . $thumbUrl;
         }
 
@@ -199,9 +224,19 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $default;
     }
 
+    public function defaultImgUrl($w, $h = null, $full = false)
+    {
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'default'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+    }
+
     public function thumbUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'thumb'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+    }
+
+    public function rolloverUrl($w, $h = null, $full = false)
+    {
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'rollover'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
     }
 
     public function onBeforeSave()
@@ -403,29 +438,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         return $categories;
     }
-/*
-    public function customFields($product)
-    {
-        return $this->Sellvana_CustomField_Model_ProductField->productFields($product);
-    }
-*/
-
-    /**
-     * @return array
-     */
-    public function customFieldsShowOnFrontend()
-    {
-        $result = [];
-        $fields = $this->Sellvana_CustomField_Model_ProductField->productFields($this);
-        if ($fields) {
-            foreach ($fields as $f) {
-                if ($f->get('frontend_show')) {
-                    $result[] = $f;
-                }
-            }
-        }
-        return $result;
-    }
 
     /**
      * @param string $q
@@ -464,7 +476,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * @param $type
-     * @return ORM
+     * @return BORM
      */
     public function mediaORM($type)
     {
@@ -483,6 +495,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function media($type)
     {
         return $this->mediaORM($type)->find_many_assoc();
+    }
+
+    public function gallery()
+    {
+        return $this->mediaORM('I')->where(["pa.in_gallery" => 1])->order_by_desc('is_default')->find_many_assoc();
     }
 
     /**
@@ -566,8 +583,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $result = [];
         //$result['status'] = '';
 
-        $customFieldsOptions = $this->Sellvana_CustomField_Model_FieldOption->getListAssoc();
-
         //HANDLE IMPORT
         static $cfIntersection = '';
         $customFields = [];
@@ -600,43 +615,12 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 }
             }
 
-
             //HANDLE CUSTOM FIELDS
-            if ($config['import']['custom_fields']['import']) {
-                //find intersection of custom fields with data fields
-                    $cfFields = $this->Sellvana_CustomField_Model_Field->getListAssoc();
-                    $cfKeys = array_keys($cfFields);
-                    $dataKeys = array_keys($d);
-                    $cfIntersection = array_intersect($cfKeys, $dataKeys);
-
-                    if ($cfIntersection) {
-                        //get custom fields values from data
-                        foreach ($cfIntersection as $cfk) {
-                            $field = $cfFields[$cfk];
-                            $dataValue = $d[$cfk];
-                            if ($config['import']['custom_fields']['create_missing_options']) {
-                                //create missing custom field options
-                                if (!empty($customFieldsOptions[$field->id()])) {
-                                    if (!in_array($dataValue, $customFieldsOptions[$field->id()])) {
-                                        try {
-                                            $this->Sellvana_CustomField_Model_FieldOption->orm()
-                                                    ->create(['field_id' => $field->id(), 'label' => $dataValue])
-                                                    ->save();
-                                        } catch (Exception $e) {
-                                            $errors[] = $e->getMessage();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
+            $this->BEvents->fire(__METHOD__ . ':row', ['config' => $config, 'data' => $d]);
 
             //HANDLE PRODUCT
             $p = false;
-            if ('create_or_update' == $config['import']['actions'] ||
-                    'update' == $config['import']['actions']
-                    ) {
+            if ('create_or_update' == $config['import']['actions'] || 'update' == $config['import']['actions']) {
                 if (isset($d['product_sku'])) {
                     $p = $this->orm()->where("product_sku", $d['product_sku'])->find_one();
                 }
@@ -790,39 +774,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
 
         //HANDLE CUSTOM FIELDS to product relations
-        if ($config['import']['custom_fields']['import']
-            && !empty($cfIntersection) && !empty($productIds) && !empty($cfFields)) {
-            //get custom fields values from data
-            $fieldIds = [];
-            foreach ($cfIntersection as $cfk) {
-                $field = $cfFields[$cfk];
-                $fieldIds[] = $field->id();
-            }
-
-            //get or create product custom field
-            $customsResult = $this->Sellvana_CustomField_Model_ProductField->orm()->where_in("product_id", $productIds)->find_many();
-            foreach ($customsResult as $cus) {
-                $customsResult[$cus->product_id] = $cus;
-            }
-            $productCustomFields = [];
-            foreach ($productIds as $pId) {
-                if (!empty($customFields[$pId])) {
-                    $productCustomFields = $customFields[$pId];
-                }
-                $productCustomFields['_add_field_ids'] = implode(",", $fieldIds);
-                $productCustomFields['product_id'] = $pId;
-                if (!empty($customsResult[$pId])) {
-                    $custom = $customsResult[$pId];
-                } else {
-                    $custom = $this->Sellvana_CustomField_Model_ProductField->create();
-                }
-                $custom->set($productCustomFields);
-                $custom->save();
-                unset($custom);
-            }
-            unset($customFields);
-            unset($customsResult);
-        }
+        $this->BEvents->fire(__METHOD__ . ':after_loop', ['config' => $config, 'data' => $d]);
 
         if (!empty($relatedProducts)) {
             $relatedResult = $this->_importRelatedProducts($relatedProducts);
@@ -1146,6 +1098,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @return array
+     */
+    public function getRolloverEffects()
+    {
+        // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
+        return $this->fieldOptions('rollover_effects');
+    }
+
+    /**
      * @return Sellvana_Catalog_Model_InventorySku
      * @throws BException
      */
@@ -1439,5 +1400,55 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         parent::__destruct();
         unset($this->_priceModels);
+    }
+
+    /**
+     * @param $productId
+     * @return mixed|null|string
+     */
+    public function getThumbPath($productId)
+    {
+        return $this->getProductImage($productId, 'thumb');
+    }
+
+    public function getRolloverPath($productId)
+    {
+        return $this->getProductImage($productId, 'rollover');
+    }
+
+    public function getDefaultImagePath($productId)
+    {
+        return $this->getProductImage($productId, 'default');
+    }
+
+    protected function getProductImage($productId, $imgType = 'default')
+    {
+        $thumbUrl     = null;
+        $productMediaOrm = $this->Sellvana_Catalog_Model_ProductMedia
+            ->orm("fpm")
+            ->join($this->FCom_Core_Model_MediaLibrary->table(), "fpm.file_id=fml.id", "fml")
+            ->where(["fpm.media_type" => "I", "fpm.product_id" => $productId]);
+
+        switch ($imgType) {
+            case 'thumb':
+                $productMediaOrm->where("fpm.is_thumb", 1);
+                break;
+            case 'rollover':
+                $productMediaOrm->where("fpm.is_rollover", 1);
+                break;
+            default :
+                $productMediaOrm->where("fpm.is_default", 1);
+                break;
+        }
+
+        $productMedia = $productMediaOrm->find_one();
+        if ($productMedia) {
+            $thumbUrl = ($productMedia->get('subfolder') != null)
+                ? $productMedia->get('folder') . '/' . $productMedia->get('subfolder') . '/' . $productMedia->get('file_name')
+                : $productMedia->get('folder') . '/' . $productMedia->get('file_name');
+            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
+        }
+
+        return $thumbUrl;
     }
 }

@@ -1,0 +1,96 @@
+{% set conf = CONFIG.get('modules/Sellvana_GoogleApi') %}
+
+{% if (conf.ua_enable and conf.ua_key and conf.ua_enable_ec) or (conf.gtm_enable and conf.gtm_key) %}
+    <script>
+
+        {% if conf.ua_enable %}
+            ga('send', 'pageview');
+        {% endif %}
+
+        require(['jquery'], function($) {
+            var $body = $('body');
+
+            $body.on('click', '.js-ga-product-view-trigger', function(ev) {
+                var $trigger = $(ev.currentTarget);
+                var $prodContainer = $trigger.parents('.js-ga-product-container');
+                if (!$prodContainer) {
+                    return;
+                }
+                var prodId = $prodContainer.data('product-id');
+                if (!prodId) {
+                    return;
+                }
+                var $listContainer = $prodContainer.parents('.js-ga-product-list');
+                if (!$listContainer) {
+                    return;
+                }
+                var listId = $listContainer.attr('id');
+                if (!listId) {
+                    return;
+                }
+                var list = gaProductLists[listId];
+                if (!list) {
+                    return;
+                }
+                var listName = list.name, item = list.items[prodId];
+
+                ga('ec:addProduct', item);
+                ga('ec:setAction', 'click', { list: listName });
+                ga('send', 'event', 'UX', 'click', listName, {
+                    hitCallback: function() {
+                        var href = $trigger.attr('href');
+                        document.location.href = href;
+                    }
+                });
+                return !ga.loaded;
+            });
+            
+            $body.on('click', '.js-ga-add-to-cart', function(ev) {
+                var $trigger = $(ev.currentTarget);
+console.log(0);
+                if ($trigger.attr('name') === 'id') {
+                    prodId = $trigger.val();
+                } else {
+                    var $formContainer = $trigger.parents('form,.js-ga-form-container');
+                    if (!$formContainer) {
+console.log(1); return false;
+                        return;
+                    }
+                    var $prodIdInput = $formContainer.find('input[name=id]');
+                    if (!$prodIdInput) {
+console.log(2); return false;
+                        return;
+                    }
+                    var prodId = $prodIdInput.val();
+                    var $qtyInput = $formContainer.find('input[name=qty]');
+                }
+                var item = null;
+                if (gaProductForms[prodId]) {
+                    item = gaProductForms[prodId];
+                }
+                /*
+                var $listContainer = $prodContainer.parents('.js-ga-product-list');
+                if (!$listContainer) {
+                    return;
+                }
+                */
+                if (!item) {
+console.log(3); return false;
+                    return;
+                }
+                if ($qtyInput) {
+                    item.quantity = $qtyInput.val();
+                }
+                ga('ec:addProduct', item);
+                ga('ec:setAction', 'add');
+                ga('send', 'event', 'UX', 'click', 'Add To Cart', {
+                    hitCallback: function() {
+console.log(4);
+                        document.location = $trigger.attr('href');
+                    }
+                });
+            });
+        })
+
+    </script>
+{% endif %}

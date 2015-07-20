@@ -15,15 +15,23 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         // TODO: figure out for virtual orders ($c->isShippable())
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
 
-        if ($cart->hasCompleteAddress('shipping')) {
-            return;
+        $recalc = false;
+
+        if (!$cart->hasCompleteAddress('shipping')) {
+            $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+            if ($customer) {
+                $cart->importAddressesFromCustomer($customer);
+                $recalc = true;
+            }
         }
 
-        $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-        if ($customer) {
-            $cart->importAddressesFromCustomer($customer)
-                ->calculateTotals()
-                ->save();
+        if (!$cart->getData('shipping_estimate')) {
+            $cart->set(['recalc_shipping_rates' => 1]);
+            $recalc = true;
+        }
+
+        if ($recalc) {
+            $cart->calculateTotals()->save();
         }
     }
 
@@ -55,20 +63,25 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
 
     public function action_customerUpdatesBillingAddress($args)
     {
-        if (!empty($args['post']['billing'])) {
-            $cart = $args['cart'];
-            $recalc = false;
-            $same = $cart->get('same_address');
+        $cart = $args['cart'];
+        $recalc = false;
+        $same = !empty($args['post']['same_address']);
+        $cart->set('same_address', $same);
+        if (!$same) {
             foreach ($args['post']['billing'] as $k => $v) {
                 $cart->set('billing_' . $k, $v);
+                /*
                 if ($same && $cart->get('shipping_' . $k) !== $v) {
                     $cart->set('shipping_' . $k, $v);
                     $recalc = true;
                 }
+                */
             }
+            /*
             if ($recalc) {
                 $cart->set('recalc_shipping_rates', 1);
             }
+            */
         }
     }
 
@@ -105,7 +118,6 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         $cart = $this->_getCart($args);
 
         $cart->calculateTotals()->saveAllDetails();
-
         /** @var Sellvana_Sales_Model_Order[] $oldOrdersFromCart */
         $oldOrdersFromCart = $this->Sellvana_Sales_Model_Order->orm()->where('cart_id', $cart->id())->find_many();
         if ($oldOrdersFromCart) {
@@ -137,26 +149,12 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         }
 
         $this->BSession->set('last_order_id', $order->id());
+
+        $orderIds = (array)$this->BSession->get('allowed_orders');
+        $orderIds[$order->get('unique_id')] = $order->id();
+        $this->BSession->set('allowed_orders', $orderIds);
+
         $args['result']['order'] = $order;
         $args['result']['success'] = true;
-    }
-
-    public function action_customerCreatesAccountFromOrder($args)
-    {
-        $order = $this->Sellvana_Sales_Model_Order->load($args['order_id']);
-        $email = $order->get('customer_email');
-        if (empty($args['post']['password']) || empty($args['post']['password_confirm']) 
-            || $args['post']['password'] !== $args['post']['password_confirm']
-        ) {
-            throw new BException('Invalid password form data');
-        }
-        $pass = $args['post']['password'];
-        
-        throw new BException('TODO: Pending Implementation');
-    }
-
-    public function action_customerMergesOrderToAccount($args)
-    {
-
     }
 }

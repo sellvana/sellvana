@@ -1,0 +1,4 @@
+base:
+    - view: head
+      do:
+          - [ less, @FCom_LibLessPhp/less/test.less ]

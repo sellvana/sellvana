@@ -33,8 +33,8 @@ class FCom_LibScssPhp_Main extends BClass
         $webFile = $this->BApp->src($this->BConfig->get('web/media_dir') . '/scss_build/' . $targetFilename);
         $compiledFilename = $compiledPath . '/' . $targetFilename;
         */
-        $compiledFilename = str_replace('.scss', '.build.css', $origFilepath);
-        $webFile = str_replace('.scss', '.build.css', $this->BApp->src($args['file']));
+        $compiledFilename = preg_replace('#\.scss$#', '.build.css', $origFilepath);
+        $webFile = preg_replace('#\.scss$#', '.build.css', $this->BApp->src($args['file']));
 
         $compile = true;
         if (file_exists($compiledFilename) && filemtime($compiledFilename) >= filemtime($origFilepath)) {
@@ -42,7 +42,7 @@ class FCom_LibScssPhp_Main extends BClass
         }
 
         if ($compile) {
-            $this->BUtil->ensureDir(dirname($compiledFilename));
+            #$this->BUtil->ensureDir(dirname($compiledFilename)); // neeeded if target dir is different
             $scss = new Leafo\ScssPhp\Compiler();
             if (!empty($args['import'])) {
                 foreach ((array)$args['import'] as $import) {

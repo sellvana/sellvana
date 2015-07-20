@@ -3,12 +3,21 @@
 /**
  * Class Sellvana_AdminLiveFeed_Main
  *
- * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
- * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_PushServer_Model_Client     $FCom_PushServer_Model_Client
+ * @property FCom_PushServer_Model_Channel    $FCom_PushServer_Model_Channel
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property FCom_Admin_Model_Role            $FCom_Admin_Model_Role
  */
 class Sellvana_AdminLiveFeed_Main extends BCLass
 {
+
+    public function bootstrap()
+    {
+        $this->FCom_Admin_Model_Role->createPermission([
+            'settings/Sellvana_AdminLiveFeed' => BLocale::i()->_('Admin Live Feed Settings'),
+        ]);
+    }
+
     public function onGetHeaderNotifications()
     {
         if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {

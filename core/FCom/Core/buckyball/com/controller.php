@@ -216,7 +216,7 @@ class BRequest extends BClass
     }
 
     /**
-     * Retrive language based on HTTP_ACCEPT_LANGUAGE
+     * Retrieve language based on HTTP_ACCEPT_LANGUAGE
      * @return string
      */
     public function acceptLanguage()
@@ -568,6 +568,17 @@ class BRequest extends BClass
             $path = $this->webRoot();
         }
         return $path;
+    }
+
+    public function getCookieConfigJson()
+    {
+        $config = $this->BConfig->get('cookie');
+        return $this->BUtil->toJson([
+            'domain' => $this->getCookieDomain(),
+            'path' => $this->getCookiePath(),
+            'expires' => (!empty($config['timeout']) ? $config['timeout'] / 86400 : null),
+            'secure' => $this->https(),
+        ]);
     }
 
     /**

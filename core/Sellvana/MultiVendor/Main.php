@@ -72,22 +72,26 @@ class Sellvana_MultiVendor_Main extends BClass
             $items = [];
             foreach ($order->items() as $item) {
                 $itemId = $item->id();
-                $vp = $vendorProducts[$itemId];
-                $items[] = [
-                    'sku' => $vp->get('vendor_sku') ?: $item->get('product_sku'),
-                    'name' => $vp->get('vendor_product_name') ?: $item->get('product_name'),
-                    'qty' => $item->get('qty_ordered'),
-                ];
+                if (!empty($vendorProducts[$itemId])) {
+                    $vp = $vendorProducts[$itemId];
+                    $items[] = [
+                        'sku' => $vp->get('vendor_sku') ?: $item->get('product_sku'),
+                        'name' => $vp->get('vendor_product_name') ?: $item->get('product_name'),
+                        'qty' => $item->get('qty_ordered'),
+                    ];
+                }
             }
-            $this->BLayout->view('email/multivendor_vendor_notify')->set([
-                'order' => $order,
-                'vendor' => $vendor,
-                'items' => $items,
-                'shipping' => [
-                    'method' => $shippingMethod->getDescription(),
-                    'service' => $shippingMethod->getService($order->get('shipping_service')),
-                ],
-            ])->email();
+            if ($items) {
+                $this->BLayout->view('email/multivendor_vendor_notify')->set([
+                    'order' => $order,
+                    'vendor' => $vendor,
+                    'items' => $items,
+                    'shipping' => [
+                        'method' => $shippingMethod->getDescription(),
+                        'service' => $shippingMethod->getService($order->get('shipping_service')),
+                    ],
+                ])->email();
+            }
         }
     }
 }

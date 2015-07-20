@@ -5,11 +5,11 @@
  * User: pp
  * Date: 24.Nov14
  *
- * @property Sellvana_CustomField_Model_Field       $Sellvana_CustomField_Model_Field
+ * @property Sellvana_CatalogFields_Model_Field       $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_Catalog_Model_Product         $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_Category        $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_InventorySku    $Sellvana_Catalog_Model_InventorySku
- * @property Sellvana_CustomField_Model_FieldOption $Sellvana_CustomField_Model_FieldOption
+ * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_Sales_Main                    $Sellvana_Sales_Main
  * @property Sellvana_Cms_Model_Block               $Sellvana_Cms_Model_Block
  */
@@ -127,7 +127,7 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
         $type   = $r->get('promo_type')?: 'cart';
         $offset = ($page - 1) * $limit;
 
-        $orm = $this->Sellvana_CustomField_Model_Field->orm()->where('field_type', 'product');
+        $orm = $this->Sellvana_CatalogFields_Model_Field->orm()->where('field_type', 'product');
 
         if ($term && $term != '*') {
             $orm->where(['OR' => [['field_code LIKE ?', "%{$term}%"], ['field_name LIKE ?', "%{$term}%"]]]);
@@ -212,12 +212,12 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
         $fieldType = $fieldCode[0];
         $fieldCode = $fieldCode[1];
 
-        $field = $this->Sellvana_CustomField_Model_Field->load($fieldCode, 'field_code');
+        $field = $this->Sellvana_CatalogFields_Model_Field->load($fieldCode, 'field_code');
         $options = [];
 
         if ($fieldType == 'field') {
             if ($field) {
-                $options = $this->Sellvana_CustomField_Model_FieldOption->getListAssocbyId($field->id());
+                $options = $this->Sellvana_CatalogFields_Model_FieldOption->getListAssocbyId($field->id());
             } else {
                 $options = [];
             }

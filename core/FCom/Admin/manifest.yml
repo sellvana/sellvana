@@ -29,6 +29,7 @@ modules:
                 routing:
                     - [ route, _ /noroute, FCom_Admin_Controller.noroute, {}, null, false ]
                     - [ /, FCom_Admin_Controller.index ]
+                    #- [ /login, FCom_Admin_Controller.login ]
                     - [ /*view, FCom_Admin_Controller.static ]
                     - [ /blank, FCom_Admin_Controller.blank ]
 

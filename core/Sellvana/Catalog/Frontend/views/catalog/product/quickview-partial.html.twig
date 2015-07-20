@@ -1,9 +1,9 @@
 {% set m = THIS.get('model') %}
-{% set images = m.media('I') %}
+{% set images = m.gallery() %}
 {% set inventory = m.getInventoryModel() %}
 {% set canOrder = inventory.canOrder() %}
 
-<div class="row">
+<div class="row js-product-container">
     <!-- Product Image Column -->
     <div class="f-col-prod-img col-sm-6">
         <div class="f-rslides-container">
@@ -40,7 +40,7 @@
             <li><a href="#f-tab-detail" data-toggle="tab">{{ 'Details'|_ }}</a></li>
         </ul>
         <div class="tab-pane active" id="f-tab-summary">
-            <h4 class="f-prod-name"><a href="{{ m.url() }}">{{ m.getName() }}</a></h4>
+            <h4 class="f-prod-name"><a href="{{ m.url() }}" class="js-ga-product-view-trigger">{{ m.getName() }}</a></h4>
             <p class="f-sku">{{ m.get('product_sku') }}</p>
 
             {% if MODULES.isLoaded('Sellvana_ProductReviews') %}

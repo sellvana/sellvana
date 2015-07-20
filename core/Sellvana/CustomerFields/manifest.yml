@@ -1,0 +1,11 @@
+modules:
+    Sellvana_CustomerFields:
+        version: 0.5.0.0
+        channel: alpha
+        require: { module: { Sellvana_Customer: 0.5.0.0 } }
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ /customerfields/.action, Sellvana_CustomerFields_Admin_Controller_Fields ]

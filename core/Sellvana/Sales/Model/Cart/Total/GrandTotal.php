@@ -26,12 +26,6 @@ class Sellvana_Sales_Model_Cart_Total_GrandTotal extends Sellvana_Sales_Model_Ca
         $this->_cart->set('grand_total', $this->_value);
         $this->_cart->setData('store_currency/grand_total', $this->_storeCurrencyValue);
 
-        if ($this->_value) {
-            $cart->state()->payment()->setUnpaid();
-        } else {
-            $cart->state()->payment()->setFree();
-        }
-
         return $this;
     }
 

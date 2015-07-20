@@ -5,7 +5,7 @@
 
 <form class="cms-block-form" method="{{ THIS.getFormMethod() }}" action="{{ THIS.getFormAction() }}" enctype="{{ THIS.getFormEncType() }}">
     {% for field in fieldOptions %}
-        {% set nm = field.name %}
+        {% set nm = 'form['~field.name~']' %}
         {% set lbl = field.label %}
         {% set typ = field.input_type %}
         {% set req = field.required %}

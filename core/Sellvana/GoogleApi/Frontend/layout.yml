@@ -1,0 +1,24 @@
+base:
+    - { hook: body_start, views: google-api/body-start }
+    - { hook: before_body_end, views: google-api/body-end }
+
+    - { hook: catalog_grid_tiles, views: google-api/product-list }
+    - { hook: catalog_list_rows, views: google-api/product-list }
+
+/catalog/product:
+    - { hook: main, views: google-api/product-view }
+
+/cart:
+    - { hook: main, views: google-api/checkout }
+    - { view: google-api/checkout, set: { step: 'cart' } }
+
+/checkout-simple/step1:
+    - { hook: main, views: google-api/checkout }
+    - { view: google-api/checkout, set: { step: 1 } }
+
+/checkout-simple/step2:
+    - { hook: main, views: google-api/checkout }
+    - { view: google-api/checkout, set: { step: 2 } }
+
+/checkout-simple/success:
+    - { hook: main, views: google-api/transaction }

@@ -124,8 +124,12 @@ lib_admin_theme1:
             #- [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/dynatree/ui.dynatree.css" ]
             - [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/bootstrap_switch/bootstrap-switch.css" ]
             - [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/common/bootstrap-wysihtml5.css" ]
+
             - [ css, "@FCom_Admin/Admin/theme1/assets/css/bootstrap/bootstrap.css" ]
             - [ css, "@FCom_Admin/Admin/theme1/assets/css/bootstrap/fontawesome.css" ]
+
+            #- [ css, "@FCom_LibJsCommon/js/bootstrap-3.3.5/css/bootstrap" ]
+
             - [ css, "@FCom_Core/css/font-awesome/css/font-awesome.min.css" ]
             - [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/select2/select2.css" ]
             #- [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/select2/select2-override.css" ]
@@ -176,7 +180,7 @@ lib_admin_theme1:
             - [ requireJs, sparklines, "@FCom_Admin/Admin/theme1/assets/js/plugins/sparklines/jquery.sparkline.min", { deps: [ jquery ] } ]
             - [ requireJs, tabdrop, "@FCom_Admin/Admin/theme1/assets/js/plugins/tabdrop/bootstrap-tabdrop", { deps: [ jquery ] } ]
             - [ requireJs, timeago, "@FCom_Admin/Admin/theme1/assets/js/plugins/timeago/jquery.timeago", { deps: [ jquery ] } ]
-            - [ requireJs, typeahead, "@FCom_Admin/Admin/theme1/assets/js/plugins/typeahead/typeahead", { deps: [ jquery ] } ]
+            #- [ requireJs, typeahead, "@FCom_Admin/Admin/theme1/assets/js/plugins/typeahead/typeahead", { deps: [ jquery ] } ]
             - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/js/plugins/validate/jquery.validate.min", { deps: [ jquery ] } ]
 #            - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/js/plugins/validate/jquery.validate", { deps: [ jquery ] } ]
 
@@ -185,7 +189,9 @@ lib_admin_theme1:
             - [ requireJs, jquery-mobile, "@FCom_Admin/Admin/theme1/assets/js/jquery/jquery.mobile.custom.min", { deps: [ jquery ] } ]
             #- [ requireJs, jquery-ui, "@FCom_Admin/Admin/theme1/assets/js/jquery/jquery-ui.min", { deps: [ jquery ] } ]
             - [ requireJs, jquery-migrate, "@FCom_Admin/Admin/theme1/assets/js/jquery/jquery-migrate.min", { deps: [ jquery ] } ]
+
             - [ requireJs, bootstrap, "@FCom_Admin/Admin/theme1/assets/js/bootstrap/bootstrap.min", { deps: [ jquery ] } ]
+            #- [ requireJs, bootstrap, "@FCom_LibJsCommon/js/bootstrap-3.3.5/js/bootstrap", { deps: [ jquery ] } ]
 
             - [ requireJs, admin.theme, "@FCom_Admin/Admin/theme1/assets/js/theme", { deps: [ jquery, timeago ] } ]
             - [ requireJs, admin.demo, "@FCom_Admin/Admin/theme1/assets/js/demo", { deps: [ jquery ] } ]
@@ -314,10 +320,10 @@ form:
             - [ addTabGroup, areas, { label: Areas, pos: 10 } ]
             - [ addTabGroup, themes, { label: Themes, pos: 800 } ]
             - [ addTabGroup, other, { label: Other, pos: 900 } ]
-            - [ addTab, FCom_Core, { label: Fulleron Core, group: areas, async: true, pos: 10 } ]
-            - [ addTab, FCom_Admin, { label: Fulleron Admin, group: areas, async: true, pos: 20 } ]
-            - [ addTab, FCom_Frontend, { label: Fulleron Frontend, group: areas, async: true, pos: 30 } ]
-            - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10 } ]
+            - [ addTab, FCom_Core, { label: Fulleron Core, group: areas, async: true, pos: 10, permission: settings/FCom_Core } ]
+            - [ addTab, FCom_Admin, { label: Fulleron Admin, group: areas, async: true, pos: 20, permission: settings/FCom_Admin } ]
+            - [ addTab, FCom_Frontend, { label: Fulleron Frontend, group: areas, async: true, pos: 30, permission: settings/FCom_Frontend } ]
+            - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10, permission: settings/FCom_FrontendTheme } ]
 
 /modules:
     - { include: default_griddle }

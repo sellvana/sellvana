@@ -205,16 +205,6 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @param $orm
-     * @param $role
-     * @return mixed
-     */
-    public function has_role($orm, $role)
-    {
-        return $orm->where('role', $role);
-    }
-
-    /**
      * @return array
      */
     public function options()
@@ -493,17 +483,27 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if ($this->get('is_superadmin')) {
             return true;
         }
-        if (!$this->get('role_id')) {
-            return false;
-        }
-        if (!$this->get('permissions')) {
-            $this->set('permissions', $this->FCom_Admin_Model_Role->load($this->role_id)->get('permissions'));
+        $perms = $this->get('permissions');
+        if (!$perms) {
+            $roleIds = [];
+            if ($this->get('role_id')) {
+                $roleIds[] = $this->get('role_id');
+            }
+            $this->BEvents->fire(__METHOD__ . ':roles', ['role_ids' => &$roleIds, 'user' => $this, 'paths' => $paths]);
+            if (!$roleIds) {
+                return false;
+            }
+            $roles = $this->FCom_Admin_Model_Role->orm()->where_in('id', $roleIds)->find_many();
+            $perms = [];
+            foreach ($roles as $role) {
+                $perms = array_merge($perms, $role->get('permissions'));
+            }
+            $this->set('permissions', $perms);
         }
         if (is_string($paths)) {
             $paths = explode(',', $paths);
         }
         foreach ($paths as $p) {
-            $perms = $this->get('permissions');
             if (!empty($perms[$p])) {
                 return true;
             }

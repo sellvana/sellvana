@@ -6,9 +6,7 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: [ views, layout ]
-                observe:
-                    - [ Sellvana_Catalog_Model_Product::onAfterSave, Sellvana_SalesTax_Main.onProductAfterSave ]
+                auto_use: [ views, layout, bootstrap ]
                 routing:
                     - [ /salestax/customer-classes/?.action, Sellvana_SalesTax_Admin_Controller_CustomerClasses ]
                     - [ /salestax/product-classes/?.action, Sellvana_SalesTax_Admin_Controller_ProductClasses ]
@@ -17,6 +15,8 @@ modules:
 
         observe:
             - [ Sellvana_Sales_Model_Cart_Total_Tax::calculate, Sellvana_SalesTax_Main.onCartTaxCalculate ]
+            - [ Sellvana_Catalog_Model_Product::onAfterSave, Sellvana_SalesTax_Main.onProductAfterSave ]
+            - [ Sellvana_Customer_Model_Customer::onAfterSave, Sellvana_SalesTax_Main.onCustomerAfterSave ]
 
         default_config:
             modules:

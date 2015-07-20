@@ -19,6 +19,7 @@ class Sellvana_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract
     protected $_mainTableAlias = 'p';
     protected $_navPath = 'cms/blog';
     protected $_formTitleField = 'title';
+    protected $_formLayoutName = '/blog/post/form';
 
     public function gridConfig()
     {

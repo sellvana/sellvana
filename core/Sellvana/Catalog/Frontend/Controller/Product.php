@@ -83,6 +83,7 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
         if ($layoutData) {
             $context = ['type' => 'product', 'main_view' => $viewName];
             $layoutUpdate = $this->FCom_Core_LayoutEditor->compileLayout($layoutData, $context);
+#echo "<pre>"; var_dump(__METHOD__, $layoutUpdate); echo "</pre>";
             if ($layoutUpdate) {
                 $this->BLayout->addLayout('product_page', $layoutUpdate)->applyLayout('product_page');
             }

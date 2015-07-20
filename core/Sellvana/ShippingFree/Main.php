@@ -7,12 +7,16 @@
  * @property Sellvana_Promo_Model_Promo $Sellvana_Promo_Model_Promo
  * @property Sellvana_Promo_Model_PromoCart $Sellvana_Promo_Model_PromoCart
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
 class Sellvana_ShippingFree_Main extends BClass
 {
 
     public function bootstrap()
     {
+        $this->FCom_Admin_Model_Role->createPermission([
+            'settings/Sellvana_ShippingFree' => BLocale::i()->_('Shipping Free Settings'),
+        ]);
         return;
 
         // only check cart if module is enabled

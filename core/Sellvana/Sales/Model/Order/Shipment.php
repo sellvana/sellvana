@@ -59,7 +59,6 @@ class Sellvana_Sales_Model_Order_Shipment extends FCom_Core_Model_Abstract
             'shipment_id' => $shipment->id(),
         ])->save();
 
-        $shipData =
         $numItems = 0;
         /** @var Sellvana_Sales_Model_Order_Item $item */
         foreach ($order->items() as $item) {

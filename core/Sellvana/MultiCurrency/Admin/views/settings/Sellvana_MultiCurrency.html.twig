@@ -1,26 +1,30 @@
+<!--{ permission: settings/Sellvana_MultiCurrency }-->
+
 {% set c = THIS.get('model') %}
 {% set baseCur = CONFIG.get('modules/FCom_Core/base_currency') %}
 {% set fieldData = { model: c, settings_module:'Sellvana_MultiCurrency' } %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
+
+{% set rateSources = APP.instance('Sellvana_MultiCurrency_Main').getRateProviderOptions() %}
 
 <h2>{{ "Multi Currency Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-Sellvana_Currency'}) }}
     {{ forms.accordion_panel_start({label:'Multi Currency'|_, id:'settings-Sellvana_MultiCurrency-group1', in:1}) }}
         {{ forms.input(fieldData, {field:'available_currencies', label:'Enabled Currencies' }) }}
         {{ forms.textarea(fieldData, {field:'exchange_rates', label:'Exhange Rates (' ~ baseCur ~ ':1.0)' }) }}
+        {{ forms.select(fieldData, {field:'active_rateprovider', label:'Use Rates Provider', options: rateSources }) }}
+        {{ forms.boolean(fieldData, {field:'autofetch', label:'Auto Fetch Daily' }) }}
+        <button type="button" class="btn btn-primary" id="fetch-exchange-rates">{{ 'Fetch Exchange Rates'|_ }}</button>
     {{ forms.accordion_panel_end }}
 
-    {{ forms.accordion_panel_start({label:'Open Exchange Rates Auto Update'|_, id:'settings-Sellvana_MultiCurrency-group2'}) }}
-        <p>{{ 'Automatically get free daily update rates' }}</p>
-        {{ forms.input(fieldData, {field:'open_exchange_rates_app_id', label:'API App ID' }) }}
-        <button type="button" class="btn btn-primary" id="fetch-open-exchange-rates">{{ 'Fetch Rates'|_ }}</button>
-    {{ forms.accordion_panel_end }}
+    {{ THIS.hook('multicurrency_rateproviders', {model:c}) | raw }}
+
 {{ forms.accordion_end }}
 
 <script>
     require(['jquery', 'fcom.locale'], function($, Locale) {
-        $('#fetch-open-exchange-rates').click(function() {
-            $.post('{{ APP.href('multicurrency/fetch_open_exchange_rates') }}', {}, function(response, status, xhr) {
+        $('#fetch-exchange-rates').click(function() {
+            $.post('{{ APP.href('multicurrency/fetch_exchange_rates') }}', {}, function(response, status, xhr) {
                 if (response.success) {
                     $.bootstrapGrowl(Locale._('Rates fetched successfully'), {type: 'success', align:'center', width:'auto'});
                     $('#modules-Sellvana_MultiCurrency-exchange_rates').val(response.rates);

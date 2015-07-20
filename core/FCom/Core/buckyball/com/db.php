@@ -1207,11 +1207,12 @@ class BORM extends ORMWrapper
     }
 
     /**
-    * Return select sql statement built from the ORM object
-    * Extended with argument for options skipping of values calculation
-    *
-    * @return string
-    */
+     * Return select sql statement built from the ORM object
+     * Extended with argument for options skipping of values calculation
+     *
+     * @param bool $calculate_values
+     * @return string
+     */
     public function as_sql($calculate_values = true)
     {
         return $this->_build_select($calculate_values);

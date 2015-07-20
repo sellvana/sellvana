@@ -1749,6 +1749,7 @@ FULLERON
 
 /* Chat */
 ul#adminUserList li { cursor: pointer; }
+ul#adminUserList li .widget-body { padding-right:10px; padding-left:10px; }
 .chat .box-collapsed .box-header .actions .box-collapse i:before {
   content:"\f077" !important;
   }

@@ -1,99 +1,99 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
-* Copyright 2014 Boris Gurvich
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-* @package BuckyBall
-* @link http://github.com/unirgy/buckyball
-* @author Boris Gurvich <boris@sellvana.com>
-* @copyright (c) 2010-2014 Boris Gurvich
-* @license http://www.apache.org/licenses/LICENSE-2.0.html
-*/
+ * Copyright 2014 Boris Gurvich
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @package BuckyBall
+ * @link http://github.com/unirgy/buckyball
+ * @author Boris Gurvich <boris@sellvana.com>
+ * @copyright (c) 2010-2014 Boris Gurvich
+ * @license http://www.apache.org/licenses/LICENSE-2.0.html
+ */
 
 /**
-* Base class that allows easy singleton/instance creation and method overrides (decorator)
-*
-* This class is used for all BuckyBall framework base classes
-*
-* @see BClassRegistry for invokation
-*
-* core
-* @property BApp $BApp
-* @property BException $BException
-* @property BConfig $BConfig
-* @property BClassRegistry $BClassRegistry
-* @property BClassAutoload $BClassAutoload
-* @property BEvents $BEvents
-* @property BSession $BSession
-*
-* controller
-* @property BRequest $BRequest
-* @property BResponse $BResponse
-* @property BRouting $BRouting
-*
-* layout
-* @property BLayout $BLayout
-* @property BView $BView
-* @property BViewEmpty $BViewEmpty
-* @property BViewHead $BViewHead
-* @property BViewList $BViewList
-*
-* db
-* @property BDb $BDb
-*
-* locale
-* @property BLocale $BLocale
-*
-* module
-* @property BModuleRegistry $BModuleRegistry
-* @property BModule $BModule
-* @property BMigrate $BMigrate
-* @property BDbModule $BDbModule
-*
-* cache
-* @property BCache $BCache
-*
-* misc
-* @property BUtil $BUtil
-* @property BHtml $BHtml
-* @property BUrl $BUrl
-* @property BEmail $BEmail
-* @property BValue $BValue
-* @property BData $BData
-* @property BDebug $BDebug
-* @property BLoginThrottle $BLoginThrottle
-* @property BYAML $BYAML
-* @property BValidate $BValidate
-* @property BValidateViewHelper $BValidateViewHelper
-* @property Bcrypt $Bcrypt
-* @property BRSA $BRSA
-*/
+ * Base class that allows easy singleton/instance creation and method overrides (decorator)
+ *
+ * This class is used for all BuckyBall framework base classes
+ *
+ * @see BClassRegistry for invokation
+ *
+ * core
+ * @property BApp $BApp
+ * @property BException $BException
+ * @property BConfig $BConfig
+ * @property BClassRegistry $BClassRegistry
+ * @property BClassAutoload $BClassAutoload
+ * @property BEvents $BEvents
+ * @property BSession $BSession
+ *
+ * controller
+ * @property BRequest $BRequest
+ * @property BResponse $BResponse
+ * @property BRouting $BRouting
+ *
+ * layout
+ * @property BLayout $BLayout
+ * @property BView $BView
+ * @property BViewEmpty $BViewEmpty
+ * @property BViewHead $BViewHead
+ * @property BViewList $BViewList
+ *
+ * db
+ * @property BDb $BDb
+ *
+ * locale
+ * @property BLocale $BLocale
+ *
+ * module
+ * @property BModuleRegistry $BModuleRegistry
+ * @property BModule $BModule
+ * @property BMigrate $BMigrate
+ * @property BDbModule $BDbModule
+ *
+ * cache
+ * @property BCache $BCache
+ *
+ * misc
+ * @property BUtil $BUtil
+ * @property BHtml $BHtml
+ * @property BUrl $BUrl
+ * @property BEmail $BEmail
+ * @property BValue $BValue
+ * @property BData $BData
+ * @property BDebug $BDebug
+ * @property BLoginThrottle $BLoginThrottle
+ * @property BYAML $BYAML
+ * @property BValidate $BValidate
+ * @property BValidateViewHelper $BValidateViewHelper
+ * @property Bcrypt $Bcrypt
+ * @property BRSA $BRSA
+ */
 class BClass
 {
     /**
-    * Original class to be used as event prefix to remain constant in overridden classes
-    *
-    * Usage:
-    *
-    * class Some_Class extends BClass
-    * {
-    *    static protected $_origClass = __CLASS__;
-    * }
-    *
-    * @var string
-    */
+     * Original class to be used as event prefix to remain constant in overridden classes
+     *
+     * Usage:
+     *
+     * class Some_Class extends BClass
+     * {
+     *    static protected $_origClass = __CLASS__;
+     * }
+     *
+     * @var string
+     */
     static protected $_origClass;
 
     /**
@@ -125,23 +125,23 @@ class BClass
     protected $_diLocal = [];
 
     /**
-    * Retrieve original class name
-    *
-    * @return string
-    */
+     * Retrieve original class name
+     *
+     * @return string
+     */
     static public function origClass()
     {
         return static::$_origClass;
     }
 
     /**
-    * Fallback singleton/instance factory
-    *
-    * @param bool|object $new if true returns a new instance, otherwise singleton
-    *                         if object, returns singleton of the same class
-    * @param array $args
-    * @return BClass
-    */
+     * Fallback singleton/instance factory
+     *
+     * @param bool|object $new if true returns a new instance, otherwise singleton
+     *                         if object, returns singleton of the same class
+     * @param array $args
+     * @return BClass
+     */
     static public function i($new = false, array $args = [])
     {
         if (is_object($new)) {
@@ -187,7 +187,7 @@ class BClass
 
     public function getGlobalDependencyInstance($name, $diConfig)
     {
-        if (!ctype_upper($name[0])) {
+        if ($name[0] < 'A' || $name[0] > 'Z') {
             return false;
         }
         if (isset(static::$_diGlobal[$name])) {
@@ -214,52 +214,52 @@ class BClass
 }
 
 /**
-* Main BuckyBall Framework class
-*
-*/
+ * Main BuckyBall Framework class
+ *
+ */
 class BApp extends BClass
 {
     /**
-    * Registry of supported features
-    *
-    * @var array
-    */
+     * Registry of supported features
+     *
+     * @var array
+     */
     protected static $_compat = [];
 
     /**
-    * Global app vars registry
-    *
-    * @var array
-    */
+     * Global app vars registry
+     *
+     * @var array
+     */
     protected $_vars = [];
 
     /**
-    * Flags whether vars shouldn't be changed
-    *
-    * @var mixed
-    */
+     * Flags whether vars shouldn't be changed
+     *
+     * @var mixed
+     */
     protected $_isConst = [];
 
     /**
-    * Verify if a feature is currently supported. Features:
-    *
-    * - PHP5.3
-    *
-    * @param mixed $feature
-    * @return boolean
-    */
+     * Verify if a feature is currently supported. Features:
+     *
+     * - PHP5.3
+     *
+     * @param mixed $feature
+     * @return boolean
+     */
     public function compat($feature)
     {
         if (!empty(static::$_compat[$feature])) {
             return static::$_compat[$feature];
         }
         switch ($feature) {
-        case 'PHP5.3':
-            $compat = version_compare(phpversion(), '5.3.0', '>=');
-            break;
+            case 'PHP5.3':
+                $compat = version_compare(phpversion(), '5.3.0', '>=');
+                break;
 
-        default:
-            BDebug::error($this->BLocale->_('Unknown feature: %s', $feature));
+            default:
+                BDebug::error($this->BLocale->_('Unknown feature: %s', $feature));
         }
         static::$_compat[$feature] = $compat;
         return $compat;
@@ -281,12 +281,12 @@ class BApp extends BClass
     }
 
     /**
-    * Application constructor
-    *
-    * Starts debugging session for timing
-    *
-    * @return BApp
-    */
+     * Application constructor
+     *
+     * Starts debugging session for timing
+     *
+     * @return BApp
+     */
     public function __construct()
     {
         BDebug::i();
@@ -358,23 +358,23 @@ class BApp extends BClass
     }
 
     /**
-    * Shortcut for translation
-    *
-    * @param string $string Text to be translated
-    * @param string|array $args Arguments for the text
-    * @return string
-    */
+     * Shortcut for translation
+     *
+     * @param string $string Text to be translated
+     * @param string|array $args Arguments for the text
+     * @return string
+     */
     public function t($string, $args = [])
     {
         return $this->BLocale->_($string, $args);
     }
 
     /**
-    * Shortcut to get a current module or module by name
-    *
-    * @param string $modName
-    * @return BModule
-    */
+     * Shortcut to get a current module or module by name
+     *
+     * @param string $modName
+     * @return BModule
+     */
     public function m($modName = null)
     {
         $reg = $this->BModuleRegistry;
@@ -574,17 +574,17 @@ class BApp extends BClass
 
 
 /**
-* Bucky specialized exception
-*/
+ * Bucky specialized exception
+ */
 class BException extends Exception
 {
     /**
-    * Logs exceptions
-    *
-    * @param string $message
-    * @param int $code
-    * @return BException
-    */
+     * Logs exceptions
+     *
+     * @param string $message
+     * @param int $code
+     * @return BException
+     */
     public function __construct($message = "", $code = 0)
     {
         parent::__construct($message, $code);
@@ -593,50 +593,50 @@ class BException extends Exception
 }
 
 /**
-* Global configuration storage class
-*/
+ * Global configuration storage class
+ */
 class BConfig extends BClass
 {
     /**
-    * Configuration storage
-    *
-    * @var array
-    */
+     * Configuration storage
+     *
+     * @var array
+     */
     protected $_config = [];
 
     /**
-    * Configuration that will be saved on request
-    *
-    * @var array
-    */
+     * Configuration that will be saved on request
+     *
+     * @var array
+     */
     protected $_configToSave = [];
 
     /**
-    * Enable double data storage for saving?
-    *
-    * @var boolean
-    */
+     * Enable double data storage for saving?
+     *
+     * @var boolean
+     */
     protected $_enableSaving = true;
 
     protected $_encryptedPaths = [];
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BConfig
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @return BConfig
+     */
     static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
-    * Add configuration fragment to global tree
-    *
-    * @param array $config
-    * @param boolean $toSave whether this config should be saved in file
-    * @return BConfig
-    */
+     * Add configuration fragment to global tree
+     *
+     * @param array $config
+     * @param boolean $toSave whether this config should be saved in file
+     * @return BConfig
+     */
     public function add(array $config, $toSave = false)
     {
         $this->_config = $this->BUtil->arrayMerge($this->_config, $config);
@@ -647,10 +647,10 @@ class BConfig extends BClass
     }
 
     /**
-    * Add configuration from file
-    *
-    * @param string $filename
-    */
+     * Add configuration from file
+     *
+     * @param string $filename
+     */
     public function addFile($filename, $toSave = false)
     {
         if (preg_match('#^@([^/]+)(.*)#', $filename, $m)) {
@@ -674,20 +674,20 @@ class BConfig extends BClass
         }
 
         switch ($ext) {
-        case 'php':
-            if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT']) && function_exists('opcache_invalidate')) {
-                opcache_invalidate($filename);
-            }
-            $config = include($filename);
-            break;
+            case 'php':
+                if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT']) && function_exists('opcache_invalidate')) {
+                    opcache_invalidate($filename);
+                }
+                $config = include($filename);
+                break;
 
-        case 'yml':
-            $config = $this->BYAML->load($filename);
-            break;
+            case 'yml':
+                $config = $this->BYAML->load($filename);
+                break;
 
-        case 'json':
-            $config = $this->BUtil->fromJson(file_get_contents($filename));
-            break;
+            case 'json':
+                $config = $this->BUtil->fromJson(file_get_contents($filename));
+                break;
         }
         if (!is_array($config)) {
             BDebug::error($this->BLocale->_('Invalid configuration contents: %s', $filename));
@@ -741,15 +741,15 @@ class BConfig extends BClass
     }
 
     /**
-    * Get configuration data using path
-    *
-    * Ex: $this->BConfig->get('some/deep/config')
-    *
-    * @param string $path
-    * @param mixed $default return if node not found
-    * @param boolean $toSave if true, get the configuration from config tree to save
-    * @return mixed
-    */
+     * Get configuration data using path
+     *
+     * Ex: $this->BConfig->get('some/deep/config')
+     *
+     * @param string $path
+     * @param mixed $default return if node not found
+     * @param boolean $toSave if true, get the configuration from config tree to save
+     * @return mixed
+     */
     public function get($path = null, $default = null, $toSave = false)
     {
         $node = $toSave ? $this->_configToSave : $this->_config;
@@ -860,9 +860,9 @@ class BConfig extends BClass
     {
         $tokens = token_get_all($contents);
         $allowed = [T_OPEN_TAG => 1, T_RETURN => 1, T_WHITESPACE => 1, T_COMMENT => 1,
-                    T_ARRAY => 1, T_CONSTANT_ENCAPSED_STRING => 1, T_DOUBLE_ARROW => 1,
-                    T_DNUMBER => 1, T_LNUMBER => 1, T_STRING => 1,
-                    '(' => 1, ',' => 1, ')' => 1, ';' => 1];
+            T_ARRAY => 1, T_CONSTANT_ENCAPSED_STRING => 1, T_DOUBLE_ARROW => 1,
+            T_DNUMBER => 1, T_LNUMBER => 1, T_STRING => 1,
+            '(' => 1, ',' => 1, ')' => 1, ';' => 1];
         $denied = [];
         foreach ($tokens as $t) {
             if (is_string($t) && !isset($t)) {
@@ -880,67 +880,67 @@ class BConfig extends BClass
 }
 
 /**
-* Registry of classes, class overrides and method overrides
-*/
+ * Registry of classes, class overrides and method overrides
+ */
 class BClassRegistry extends BClass
 {
     /**
-    * Self instance for singleton
-    *
-    * @var BClassRegistry
-    */
+     * Self instance for singleton
+     *
+     * @var BClassRegistry
+     */
     static protected $_instance;
 
     /**
-    * Class overrides
-    *
-    * @var array
-    */
+     * Class overrides
+     *
+     * @var array
+     */
     static protected $_classes = [];
 
     /**
-    * Registry of singletons
-    *
-    * @var array
-    */
+     * Registry of singletons
+     *
+     * @var array
+     */
     static protected $_singletons = [];
 
     /**
-    * Classes that require decoration because of overridden methods
-    *
-    * @var array
-    */
+     * Classes that require decoration because of overridden methods
+     *
+     * @var array
+     */
     static protected $_decoratedClasses = [];
 
     /**
-    * Method overrides and augmentations
-    *
-    * @var array
-    */
+     * Method overrides and augmentations
+     *
+     * @var array
+     */
     static protected $_methods = [];
 
     /**
-    * Cache for method callbacks
-    *
-    * @var array
-    */
+     * Cache for method callbacks
+     *
+     * @var array
+     */
     static protected $_methodOverrideCache = [];
 
     /**
-    * Property setter/getter overrides and augmentations
-    *
-    * @var array
-    */
+     * Property setter/getter overrides and augmentations
+     *
+     * @var array
+     */
     static protected $_properties = [];
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @param bool $new
-    * @param array $args
-    * @param bool $forceRefresh force the recreation of singleton
-    * @return BClassRegistry
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @param bool $new
+     * @param array $args
+     * @param bool $forceRefresh force the recreation of singleton
+     * @return BClassRegistry
+     */
     static public function i($new = false, array $args = [], $forceRefresh = false)
     {
         if (!static::$_instance) {
@@ -999,16 +999,16 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Dynamically add a class method
-    *
-    * @param string $class
-    *   - '*' - will add method to all classes
-    *   - 'extends AbstractClass' - will add method to all classes extending AbstractClass
-    *   - 'implements Interface' - will add method to all classes implementing Interface
-    * @param string $name
-    * @param callback $callback
-    * @return BClassRegistry
-    */
+     * Dynamically add a class method
+     *
+     * @param string $class
+     *   - '*' - will add method to all classes
+     *   - 'extends AbstractClass' - will add method to all classes extending AbstractClass
+     *   - 'implements Interface' - will add method to all classes implementing Interface
+     * @param string $name
+     * @param callback $callback
+     * @return BClassRegistry
+     */
     public function addMethod($class, $method, $callback, $static = false)
     {
         $arr = explode(' ', $class);
@@ -1025,39 +1025,39 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Dynamically override a class method (decorator pattern)
-    *
-    * Already existing instances of the class will not be affected.
-    *
-    * Usage: $this->BClassRegistry->overrideMethod('BaseClass', 'someMethod', array('MyClass', 'someMethod'));
-    *
-    * Overridden class should be called one of the following ways:
-    * - BClassRegistry::instance('BaseClass')
-    * - BaseClass:i() -- if it extends BClass or has the shortcut defined
-    *
-    * Callback method example (original method had 2 arguments):
-    *
-    * class MyClass {
-    *   public function someMethod($origObject, $arg1, $arg2)
-    *   {
-    *       // do some custom stuff before call to original method here
-    *
-    *       $origObject->someMethod($arg1, $arg2);
-    *
-    *       // do some custom stuff after call to original method here
-    *
-    *       return $origObject;
-    *   }
-    * }
-    *
-    * Remembering the module that overrode the method for debugging
-    *
-    * @param string $class Class to be overridden
-    * @param string $method Method to be overridden
-    * @param mixed $callback Callback to invoke on method call
-    * @param bool $static Whether the static method call should be overridden
-    * @return BClassRegistry
-    */
+     * Dynamically override a class method (decorator pattern)
+     *
+     * Already existing instances of the class will not be affected.
+     *
+     * Usage: $this->BClassRegistry->overrideMethod('BaseClass', 'someMethod', array('MyClass', 'someMethod'));
+     *
+     * Overridden class should be called one of the following ways:
+     * - BClassRegistry::instance('BaseClass')
+     * - BaseClass:i() -- if it extends BClass or has the shortcut defined
+     *
+     * Callback method example (original method had 2 arguments):
+     *
+     * class MyClass {
+     *   public function someMethod($origObject, $arg1, $arg2)
+     *   {
+     *       // do some custom stuff before call to original method here
+     *
+     *       $origObject->someMethod($arg1, $arg2);
+     *
+     *       // do some custom stuff after call to original method here
+     *
+     *       return $origObject;
+     *   }
+     * }
+     *
+     * Remembering the module that overrode the method for debugging
+     *
+     * @param string $class Class to be overridden
+     * @param string $method Method to be overridden
+     * @param mixed $callback Callback to invoke on method call
+     * @param bool $static Whether the static method call should be overridden
+     * @return BClassRegistry
+     */
     public function overrideMethod($class, $method, $callback, $static = false)
     {
         static::addMethod($class, $method, $callback, $static);
@@ -1065,35 +1065,35 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Dynamically augment class method result
-    *
-    * Allows to change result of a method for every invocation.
-    * Syntax similar to overrideMethod()
-    *
-    * Callback method example (original method had 2 arguments):
-    *
-    * class MyClass {
-    *   public function someMethod($result, $origObject, $arg1, $arg2)
-    *   {
-    *       // augment $result of previous object method call
-    *       $result['additional_info'] = 'foo';
-    *
-    *       return $result;
-    *   }
-    * }
-    *
-    * A difference between overrideModule and augmentModule is that
-    * you can override only with one another method, but augment multiple times.
-    *
-    * If augmented multiple times, each consecutive callback will receive result
-    * changed by previous callback.
-    *
-    * @param string $class
-    * @param string $method
-    * @param mixed $callback
-    * @param boolean $static
-    * @return BClassRegistry
-    */
+     * Dynamically augment class method result
+     *
+     * Allows to change result of a method for every invocation.
+     * Syntax similar to overrideMethod()
+     *
+     * Callback method example (original method had 2 arguments):
+     *
+     * class MyClass {
+     *   public function someMethod($result, $origObject, $arg1, $arg2)
+     *   {
+     *       // augment $result of previous object method call
+     *       $result['additional_info'] = 'foo';
+     *
+     *       return $result;
+     *   }
+     * }
+     *
+     * A difference between overrideModule and augmentModule is that
+     * you can override only with one another method, but augment multiple times.
+     *
+     * If augmented multiple times, each consecutive callback will receive result
+     * changed by previous callback.
+     *
+     * @param string $class
+     * @param string $method
+     * @param mixed $callback
+     * @param boolean $static
+     * @return BClassRegistry
+     */
     public function augmentMethod($class, $method, $callback, $static = false)
     {
         static::$_methods[$method][$static ? 1 : 0]['augment']['is'][$class][] = [
@@ -1104,34 +1104,34 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Augment class property setter/getter
-    *
-    * $this->BClassRegistry->augmentProperty('SomeClass', 'foo', 'set', 'override', 'MyClass::newSetter');
-    * $this->BClassRegistry->augmentProperty('SomeClass', 'foo', 'get', 'after', 'MyClass::newGetter');
-    *
-    * class MyClass {
-    *   public function newSetter($object, $property, $value)
-    *   {
-    *     $object->$property = myCustomProcess($value);
-    *   }
-    *
-    *   public function newGetter($object, $property, $prevResult)
-    *   {
-    *     return $prevResult+5;
-    *   }
-    * }
-    *
-    * @param string $class
-    * @param string $property
-    * @param string $op {set|get}
-    * @param string $type {override|before|after} get_before is not implemented
-    * @param mixed $callback
-    * @return BClassRegistry
-    */
+     * Augment class property setter/getter
+     *
+     * $this->BClassRegistry->augmentProperty('SomeClass', 'foo', 'set', 'override', 'MyClass::newSetter');
+     * $this->BClassRegistry->augmentProperty('SomeClass', 'foo', 'get', 'after', 'MyClass::newGetter');
+     *
+     * class MyClass {
+     *   public function newSetter($object, $property, $value)
+     *   {
+     *     $object->$property = myCustomProcess($value);
+     *   }
+     *
+     *   public function newGetter($object, $property, $prevResult)
+     *   {
+     *     return $prevResult+5;
+     *   }
+     * }
+     *
+     * @param string $class
+     * @param string $property
+     * @param string $op {set|get}
+     * @param string $type {override|before|after} get_before is not implemented
+     * @param mixed $callback
+     * @return BClassRegistry
+     */
     public function augmentProperty($class, $property, $op, $type, $callback)
     {
         if ($op !== 'set' && $op !== 'get') {
-             BDebug::error($this->BLocale->_('Invalid property augmentation operator: %s', $op));
+            BDebug::error($this->BLocale->_('Invalid property augmentation operator: %s', $op));
         }
         if ($type !== 'override' && $type !== 'before' && $type !== 'after') {
             BDebug::error($this->BLocale->_('Invalid property augmentation type: %s', $type));
@@ -1189,11 +1189,11 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Check if the callback is callable, accounting for dynamic methods
-    *
-    * @param mixed $cb
-    * @return boolean
-    */
+     * Check if the callback is callable, accounting for dynamic methods
+     *
+     * @param mixed $cb
+     * @return boolean
+     */
     public function isCallable($cb)
     {
         if (is_string($cb)) { // plain string callback?
@@ -1225,13 +1225,13 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Call overridden method
-    *
-    * @param object $origObject
-    * @param string $method
-    * @param mixed $args
-    * @return mixed
-    */
+     * Call overridden method
+     *
+     * @param object $origObject
+     * @param string $method
+     * @param mixed $args
+     * @return mixed
+     */
     public function callMethod($origObject, $method, array $args = [], $origClass = null)
     {
         //$class = $origClass ? $origClass : get_class($origObject);
@@ -1267,16 +1267,16 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Call static overridden method
-    *
-    * Static class properties will not be available to callbacks
-    *
-    * @todo decide if this is needed
-    *
-    * @param string $class
-    * @param string $method
-    * @param array $args
-    */
+     * Call static overridden method
+     *
+     * Static class properties will not be available to callbacks
+     *
+     * @todo decide if this is needed
+     *
+     * @param string $class
+     * @param string $method
+     * @param array $args
+     */
     public function callStaticMethod($class, $method, array $args = [], $origClass = null)
     {
         if (($info = static::findMethodInfo($class, $method, 1, 'override'))) {
@@ -1303,12 +1303,12 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Call augmented property setter
-    *
-    * @param object $origObject
-    * @param string $property
-    * @param mixed $value
-    */
+     * Call augmented property setter
+     *
+     * @param object $origObject
+     * @param string $property
+     * @param mixed $value
+     */
     public function callSetter($origObject, $property, $value)
     {
         $class = get_class($origObject);
@@ -1334,12 +1334,12 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Call augmented property getter
-    *
-    * @param object $origObject
-    * @param string $property
-    * @return mixed
-    */
+     * Call augmented property getter
+     *
+     * @param object $origObject
+     * @param string $property
+     * @return mixed
+     */
     public function callGetter($origObject, $property)
     {
         $class = get_class($origObject);
@@ -1363,26 +1363,26 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Get actual class name for potentially overridden class
-    *
-    * @param mixed $class
-    * @return mixed
-    */
+     * Get actual class name for potentially overridden class
+     *
+     * @param mixed $class
+     * @return mixed
+     */
     static public function className($class)
     {
         return !empty(static::$_classes[$class]) ? static::$_classes[$class]['class_name'] : $class;
     }
 
     /**
-    * Get a new instance or a singleton of a class
-    *
-    * If at least one method of the class if overridden, returns decorator
-    *
-    * @param string $class
-    * @param mixed $args
-    * @param bool $singleton
-    * @return object
-    */
+     * Get a new instance or a singleton of a class
+     *
+     * If at least one method of the class if overridden, returns decorator
+     *
+     * @param string $class
+     * @param mixed $args
+     * @param bool $singleton
+     * @return object
+     */
     static public function instance($class, array $args = [], $singleton = false)
     {
         // if singleton is requested and already exists, return the singleton
@@ -1458,16 +1458,16 @@ class BClassRegistry extends BClass
 }
 
 /**
-* Decorator class to allow easy method overrides
-*
-*/
+ * Decorator class to allow easy method overrides
+ *
+ */
 class BClassDecorator
 {
     /**
-    * Contains the decorated (original) object
-    *
-    * @var object
-    */
+     * Contains the decorated (original) object
+     *
+     * @var object
+     */
     protected $_decoratedComponent;
 
     /**
@@ -1475,11 +1475,11 @@ class BClassDecorator
      */
     protected $BClassRegistry;
     /**
-    * Decorator constructor, creates an instance of decorated class
-    *
-    * @param array(object|string $class)
-    * @return BClassDecorator
-    */
+     * Decorator constructor, creates an instance of decorated class
+     *
+     * @param array(object|string $class)
+     * @return BClassDecorator
+     */
     public function __construct($args)
     {
 //echo '1: '; print_r($class);
@@ -1494,35 +1494,35 @@ class BClassDecorator
     }
 
     /**
-    * Method override facility
-    *
-    * @param string $name
-    * @param array $args
-    * @return mixed Result of callback
-    */
+     * Method override facility
+     *
+     * @param string $name
+     * @param array $args
+     * @return mixed Result of callback
+     */
     public function __call($name, array $args)
     {
         return $this->BClassRegistry->callMethod($this->_decoratedComponent, $name, $args);
     }
 
     /**
-    * Static method override facility
-    *
-    * @param mixed $name
-    * @param mixed $args
-    * @return mixed Result of callback
-    */
+     * Static method override facility
+     *
+     * @param mixed $name
+     * @param mixed $args
+     * @return mixed Result of callback
+     */
     static public function __callStatic($name, array $args)
     {
         return BClassRegistry::i()->callStaticMethod(get_called_class(), $name, $args);
     }
 
     /**
-    * Proxy to set decorated component property or a setter
-    *
-    * @param string $name
-    * @param mixed $value
-    */
+     * Proxy to set decorated component property or a setter
+     *
+     * @param string $name
+     * @param mixed $value
+     */
     public function __set($name, $value)
     {
         //$this->_decoratedComponent->$name = $value;
@@ -1530,11 +1530,11 @@ class BClassDecorator
     }
 
     /**
-    * Proxy to get decorated component property or a getter
-    *
-    * @param string $name
-    * @return mixed
-    */
+     * Proxy to get decorated component property or a getter
+     *
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         //return $this->_decoratedComponent->$name;
@@ -1542,40 +1542,40 @@ class BClassDecorator
     }
 
     /**
-    * Proxy to unset decorated component property
-    *
-    * @param string $name
-    */
+     * Proxy to unset decorated component property
+     *
+     * @param string $name
+     */
     public function __unset($name)
     {
         unset($this->_decoratedComponent->$name);
     }
 
     /**
-    * Proxy to check whether decorated component property is set
-    *
-    * @param string $name
-    * @return boolean
-    */
+     * Proxy to check whether decorated component property is set
+     *
+     * @param string $name
+     * @return boolean
+     */
     public function __isset($name)
     {
         return isset($this->_decoratedComponent->$name);
     }
 
     /**
-    * Proxy to return decorated component as string
-    *
-    * @return string
-    */
+     * Proxy to return decorated component as string
+     *
+     * @return string
+     */
     public function __toString()
     {
         return (string)$this->_decoratedComponent;
     }
 
     /**
-    * Proxy method to serialize decorated component
-    *
-    */
+     * Proxy method to serialize decorated component
+     *
+     */
     public function __sleep()
     {
         if (method_exists($this->_decoratedComponent, '__sleep')) {
@@ -1585,9 +1585,9 @@ class BClassDecorator
     }
 
     /**
-    * Proxy method to perform for decorated component on unserializing
-    *
-    */
+     * Proxy method to perform for decorated component on unserializing
+     *
+     */
     public function __wakeup()
     {
         if (method_exists($this->_decoratedComponent, '__wakeup')) {
@@ -1596,9 +1596,9 @@ class BClassDecorator
     }
 
     /**
-    * Proxy method to invoke decorated component as a method if it is callable
-    *
-    */
+     * Proxy method to invoke decorated component as a method if it is callable
+     *
+     */
     public function __invoke()
     {
         if (is_callable($this->_decoratedComponent)) {
@@ -1663,10 +1663,10 @@ class BClassAutoload extends BClass
     }
 
     /**
-    * Default autoload callback
-    *
-    * @param string $class
-    */
+     * Default autoload callback
+     *
+     * @param string $class
+     */
     public function callbackMulti($class)
     {
 #echo $this->root_dir.' : '.$class.'<br>';
@@ -1690,23 +1690,23 @@ class BClassAutoload extends BClass
 }
 
 /**
-* Events and observers registry
-*/
+ * Events and observers registry
+ */
 class BEvents extends BClass
 {
     /**
-    * Stores events and observers
-    *
-    * @todo figure out how to update events on class override
-    *
-    * @var array
-    */
+     * Stores events and observers
+     *
+     * @todo figure out how to update events on class override
+     *
+     * @var array
+     */
     protected $_events = [];
 
     /**
      * Shortcut to help with IDE autocompletion
      *
-     * @param bool  $new
+     * @param bool $new
      * @param array $args
      * @return BEvents
      */
@@ -1716,14 +1716,14 @@ class BEvents extends BClass
     }
 
     /**
-    * Declare event with default arguments in bootstrap function
-    *
-    * This method is optional and currently not used.
-    *
-    * @param string|array $eventName accepts multiple events in form of non-associative array
-    * @param array|object $args
-    * @return BEvents
-    */
+     * Declare event with default arguments in bootstrap function
+     *
+     * This method is optional and currently not used.
+     *
+     * @param string|array $eventName accepts multiple events in form of non-associative array
+     * @param array|object $args
+     * @return BEvents
+     */
     public function event($eventName, $args = [])
     {
         if (is_array($eventName)) {
@@ -1732,7 +1732,7 @@ class BEvents extends BClass
             }
             return $this;
         }
-        $eventName = strtolower($eventName);
+        $eventName                 = strtolower($eventName);
         $this->_events[$eventName] = [
             'observers' => [],
             'args' => $args,
@@ -1746,12 +1746,12 @@ class BEvents extends BClass
      * observe|watch|on|sub|subscribe ?
      *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
-     * @param mixed        $callback
+     * @param mixed $callback
      * @param array|object $args
-     * @param null         $alias
+     * @param arary $params - alias, insert (function, 0=skip, -1=before, 1=after)
      * @return BEvents
      */
-    public function on($eventName, $callback = null, $args = [], $alias = null)
+    public function on($eventName, $callback = null, $args = [], $params = null)
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
@@ -1759,16 +1759,38 @@ class BEvents extends BClass
             }
             return $this;
         }
-        if (null === $alias && is_string($callback)) {
-            $alias = $callback;
+        if (is_string($params)) {
+            $params = ['alias' => $params];
         }
-        $observer = ['callback' => $callback, 'args' => $args, 'alias' => $alias];
+        if (empty($params['alias']) && is_string($callback)) {
+            $params['alias'] = $callback;
+        }
+        $observer = ['callback' => $callback, 'args' => $args, 'alias' => $params['alias']];
         if (($moduleName = $this->BModuleRegistry->currentModuleName())) {
             $observer['module_name'] = $moduleName;
         }
         //TODO: create named observers
         $eventName = strtolower($eventName);
-        $this->_events[$eventName]['observers'][] = $observer;
+        if (empty($params['insert'])) {
+            $this->_events[$eventName]['observers'][] = $observer;
+        } else {
+            $insertCallable = $this->BUtil->extCallback($params['insert']);
+            $inserted = false;
+            foreach ($this->_events[$eventName]['observers'] as $i => $obs) {
+                if (!empty($insertCallable)) {
+                    $result = $insertCallable($obs, $eventName, $callback);
+                    if ($result) {
+                        $beforeAfter = $result === -1 ? $i : ($i + 1);
+                        array_splice($this->_events[$eventName]['observers'], $beforeAfter, 0, [$observer]);
+                        $inserted = true;
+                        break;
+                    }
+                }
+            }
+            if (!$inserted) {
+                $this->_events[$eventName]['observers'][] = $observer;
+            }
+        }
         BDebug::debug('SUBSCRIBE ' . $eventName, 1);
         return $this;
     }
@@ -1777,12 +1799,12 @@ class BEvents extends BClass
      * Run callback on event only once, and remove automatically
      *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
-     * @param mixed        $callback
+     * @param mixed $callback
      * @param array|object $args
-     * @param null         $alias
+     * @param array $params
      * @return BEvents
      */
-    public function once($eventName, $callback = null, $args = [], $alias = null)
+    public function once($eventName, $callback = null, $args = [], $params = [])
     {
         if (is_array($eventName)) {
             foreach ($eventName as $obs) {
@@ -1790,11 +1812,11 @@ class BEvents extends BClass
             }
             return $this;
         }
-        $this->on($eventName, $callback, $args, $alias);
+        $this->on($eventName, $callback, $args, $params);
         $lastId = sizeof($this->_events[$eventName]['observers']);
-        $this->on($eventName, function() use ($eventName, $lastId) {
+        $this->on($eventName, function () use ($eventName, $lastId) {
             $this->BEvents
-                ->off($eventName, $lastId-1) // remove the observer
+                ->off($eventName, $lastId - 1)// remove the observer
                 ->off($eventName, $lastId) // remove the remover
             ;
         });
@@ -1805,7 +1827,7 @@ class BEvents extends BClass
      * Disable all observers for an event or a specific observer
      *
      * @param string $eventName
-     * @param null   $alias
+     * @param null $alias
      * @return BEvents
      */
     public function off($eventName, $alias = null)
@@ -1830,19 +1852,20 @@ class BEvents extends BClass
     }
 
     /**
-    * Dispatch event observers
-    *
-    * dispatch|fire|notify|pub|publish ?
-    *
-    * @param string $eventName
-    * @param array|object $args
-    * @return array Collection of results from observers
-    */
+     * Dispatch event observers
+     *
+     * dispatch|fire|notify|pub|publish ?
+     *
+     * @param string $eventName
+     * @param array|object $args
+     * @return array Collection of results from observers
+     */
     public function fire($eventName, $args = [])
     {
-        $eventName = strtolower($eventName);
-        $profileStart = BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
-        $result = [];
+        $eventName    = strtolower($eventName);
+        $profileStart =
+            BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
+        $result       = [];
         if (empty($this->_events[$eventName])) {
             return $result;
         }
@@ -1854,8 +1877,8 @@ class BEvents extends BClass
                 if (!empty($observer['args']['position']) && empty($observer['ordered'])) {
                     unset($observers[$i]);
                     $observer['ordered'] = true;
-                    $observers = $this->BUtil->arrayInsert($observers, $observer, $observer['position']);
-                    $dirty = true;
+                    $observers           = $this->BUtil->arrayInsert($observers, $observer, $observer['position']);
+                    $dirty               = true;
                     break;
                 }
             }
@@ -1890,10 +1913,12 @@ class BEvents extends BClass
                 foreach (['.', '->'] as $sep) {
                     $r = explode($sep, $cb);
                     if (sizeof($r) == 2) {
-if (!class_exists($r[0]) && $this->BDebug->is('DEBUG')) {
-    echo "<pre>"; BDebug::cleanBacktrace(); echo "</pre>";
-}
-                        $cb = [$r[0]::i(), $r[1]];
+                        if (!class_exists($r[0]) && $this->BDebug->is('DEBUG')) {
+                            echo "<pre>";
+                            BDebug::cleanBacktrace();
+                            echo "</pre>";
+                        }
+                        $cb                   = [$r[0]::i(), $r[1]];
                         $observer['callback'] = $cb;
                         // remember for next call, don't want to use &$observer
                         $observers[$i]['callback'] = $cb;
@@ -1929,6 +1954,11 @@ if (!class_exists($r[0]) && $this->BDebug->is('DEBUG')) {
         return $results;
     }
 
+    public function observers($eventName)
+    {
+        return !empty($this->_events[$eventName]) ? $this->_events[$eventName] : [];
+    }
+
     public function debug()
     {
         echo "<pre>"; print_r($this->_events); echo "</pre>";
@@ -1936,36 +1966,43 @@ if (!class_exists($r[0]) && $this->BDebug->is('DEBUG')) {
 }
 
 /**
-* Facility to handle session state
-*/
+ * Facility to handle session state
+ */
 class BSession extends BClass
 {
     /**
-    * Session data, specific to the application namespace
-    *
-    * @var array
-    */
+     * Session data, specific to the application namespace
+     *
+     * @var array
+     */
     public $data = null;
 
     /**
-    * Current sesison ID
-    *
-    * @var string
-    */
+     * Is abstract session open
+     *
+     * @var boolean
+     */
+    protected $_isOpen = false;
+
+    /**
+     * Current sesison ID
+     *
+     * @var string
+     */
     protected $_sessionId;
 
     /**
-    * Whether PHP session is currently open
-    *
-    * @var bool
-    */
+     * Whether PHP session is currently open
+     *
+     * @var bool
+     */
     protected $_phpSessionOpen = false;
 
     /**
-    * Whether any session variable was changed since last session save
-    *
-    * @var bool
-    */
+     * Whether any session variable was changed since last session save
+     *
+     * @var bool
+     */
     protected $_dirty = false;
 
     protected $_availableHandlers = [
@@ -1974,10 +2011,10 @@ class BSession extends BClass
 
     protected $_defaultSessionCookieName = 'fulleron';
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BSession
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @return BSession
+     */
     static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
@@ -2005,7 +2042,7 @@ class BSession extends BClass
      */
     public function open($id = null, $autoClose = false, $validate = true)
     {
-        if (null !== $this->data) {
+        if ($this->_isOpen) {
             return $this;
         }
 
@@ -2016,6 +2053,8 @@ class BSession extends BClass
         if (!empty($config['session_disable'])) {
             return $this;
         }
+
+        $this->_isOpen = true;
 
         $rememberMeTtl = 86400 * (!empty($config['remember_days']) ? $config['remember_days'] : 30);
         if ($this->BRequest->cookie('remember_me')) {
@@ -2084,6 +2123,7 @@ class BSession extends BClass
         } else {
             $this->data =& $_SESSION[$namespace];
         }
+        $this->data['_'] = time();
 
         if (empty($this->data['current_language'])) {
             $lang = $this->BRequest->language(true);
@@ -2116,22 +2156,25 @@ class BSession extends BClass
             session_write_close();
             $this->_phpSessionOpen = false;
         }
-BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
+        BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
+
         return $this;
     }
 
     /**
-    * Set or retrieve dirty session flag
-    *
-    * @deprecated
-    * @param bool $flag
-    * @return bool
-    */
+     * Set or retrieve dirty session flag
+     *
+     * @deprecated
+     * @param bool $flag
+     * @return bool
+     */
     public function dirty($flag = null)
     {
         if (null === $flag) {
             return $this->_dirty;
         }
+        $this->open();
+
         BDebug::debug('SESSION.DIRTY ' . ($flag ? 'TRUE' : 'FALSE'), 2);
         $this->_dirty = $flag;
         return $this;
@@ -2144,6 +2187,8 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
 
     public function setDirty($flag = true)
     {
+        $this->open();
+
         BDebug::debug('SESSION.DIRTY ' . ($flag ? 'TRUE' : 'FALSE'), 2);
         $this->_dirty = $flag;
         return $this;
@@ -2151,11 +2196,15 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
 
     public function get($key, $default = null)
     {
+        $this->open();
+
         return isset($this->data[$key]) ? $this->data[$key] : $default;
     }
 
     public function set($key, $value = null)
     {
+        $this->open();
+
         if (is_array($key)) {
             foreach ($key as $k => $v) {
                 $this->set($k, $v);
@@ -2177,10 +2226,10 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
     }
 
     /**
-    * Get reference to session data and set dirty flag true
-    *
-    * @return array
-    */
+     * Get reference to session data and set dirty flag true
+     *
+     * @return array
+     */
     public function &dataToUpdate()
     {
         $this->setDirty();
@@ -2188,14 +2237,15 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
     }
 
     /**
-    * Write session variable changes and close PHP session
-    *
-    * @return BSession
-    */
+     * Write session variable changes and close PHP session
+     *
+     * @return BSession
+     */
     public function close()
     {
         if (!$this->_dirty/* || !empty( $_SESSION )*/) {
 #echo "<pre>"; var_dump($this->_dirty, $_SESSION); echo "</pre>";
+            $this->_isOpen = false;
             return;
         }
 #BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
@@ -2215,13 +2265,13 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
         BDebug::debug(__METHOD__, 1);
         session_write_close();
         $this->_phpSessionOpen = false;
-
+/*
         if ($this->get('_regenerate_id')) {
             #session_regenerate_id(true);
             session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
             $this->set('_regenerate_id', 0);
         }
-
+*/
         /*
 echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $sessionCookie = null;
@@ -2241,6 +2291,7 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         }
         */
         //$this->setDirty();
+        $this->_isOpen = false;
         return $this;
     }
 
@@ -2262,6 +2313,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
 
     public function regenerateId()
     {
+        $this->open();
+
         $oldSessionId = session_id();
         @session_regenerate_id(true);
         $this->BEvents->fire(__METHOD__, ['old_session_id' => $oldSessionId, 'session_id' => session_id()]);
@@ -2271,25 +2324,27 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     }
 
     /**
-    * Get session ID
-    *
-    * @return string
-    */
+     * Get session ID
+     *
+     * @return string
+     */
     public function sessionId()
     {
+        $this->open();
+
         return $this->_sessionId;
     }
 
     /**
-    * Add session message
-    *
-    * @todo come up with sensible data structure
-    * @param string $msg
-    * @param string $type
-    * @param string $tag
-    * @param array $options
-    * @return BSession
-    */
+     * Add session message
+     *
+     * @todo come up with sensible data structure
+     * @param string $msg
+     * @param string $type
+     * @param string $tag
+     * @param array $options
+     * @return BSession
+     */
     public function addMessage($msg, $type = 'info', $tag = null, $options = [])
     {
         $this->setDirty();
@@ -2313,13 +2368,15 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     }
 
     /**
-    * Return any buffered messages for a tag and clear them from session
-    *
-    * @param string $tags comma separated
-    * @return array
-    */
+     * Return any buffered messages for a tag and clear them from session
+     *
+     * @param string $tags comma separated
+     * @return array
+     */
     public function messages($tags = '_')
     {
+        $this->open();
+
         if (empty($this->data['_messages'])) {
             return [];
         }

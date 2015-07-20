@@ -7,6 +7,7 @@
  */
 class Sellvana_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'sample_data';
     public function action_load()
     {
         $xhr    = $this->BRequest->xhr();

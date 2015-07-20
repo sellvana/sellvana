@@ -94,6 +94,10 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
         $response = $this->BUtil->remoteHttp("GET", $url);
 #var_dump($url, $response, $this->BUtil->lastRemoteHttpInfo(), microtime(1)-$t); exit;
         $remoteModResult = $this->BUtil->fromJson($response);
+        if (!$remoteModResult) {
+            $this->BCache->save(static::$_modulesVersionsCacheKey, [], 60);
+            return [];
+        }
         if (!empty($remoteModResult['error'])) {
             $this->BCache->delete(static::$_modulesVersionsCacheKey);
             throw new BException($remoteModResult['message']);

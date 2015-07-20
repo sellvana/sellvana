@@ -1,6 +1,6 @@
 modules:
     Sellvana_Wishlist:
-        version: 0.5.0.0
+        version: 0.5.1.0
         channel: alpha
         translations: { en: en.php }
         require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_Customer: 0.1.3, Sellvana_Sales: 0.3.7 } }
@@ -8,6 +8,8 @@ modules:
         auto_use: [ layout, views ]
 
         areas:
+            FCom_Admin:
+                auto_use: [ bootstrap ]
             FCom_Frontend:
                 routing:
                     - [ "/wishlist/?.action", Sellvana_Wishlist_Frontend_Controller ]

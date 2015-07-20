@@ -8,6 +8,7 @@ base:
     - view: head
         do:
             - [ css, "@FCom_Core/css/bootstrap-3.min.css" ]
+            #- [ css, "@FCom_Core/css/bootstrap-3.3.5/css/boostrap.min.css" ]
             - [ css, "@FCom_Core/css/fcom.core.css" ]
             - [ css, "@FCom_Install/css/styles.css" ]
             - [ requireJs, jquery.validate, "@FCom_Install/js/jquery.validate.min", { deps: [ jquery ] }]

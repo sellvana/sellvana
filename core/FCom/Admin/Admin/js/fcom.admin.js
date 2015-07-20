@@ -45,12 +45,14 @@ define(fcomAdminDeps, function ($) {
      */
     FCom.Admin.Accordion = function (containerId, options) {
         var $container = $('#' + containerId);
-        $container.find('.accordion-toggle').each(function (i, headingEl) {
-            $(headingEl).attr('href', '#' + containerId + '-group' + i)
-                .attr('data-toggle', 'collapse').attr('data-parent', '#' + containerId);
-        });
         $container.find('.accordion-body').each(function (i, bodyEl) {
-            $(bodyEl).attr('id', containerId + '-group' + i).addClass('collapse');
+            var $bodyEl = $(bodyEl), $headingEl = $bodyEl.siblings('.panel-heading').find('a');
+            $bodyEl.addClass('collapse');
+            $headingEl.attr('data-parent', '#' + containerId);
+            if (!$bodyEl.attr('id')) {
+                $bodyEl.attr('id', containerId + '-group' + i);
+                $headingEl.attr('href', '#' + containerId + '-group' + i);
+            }
         });
     };
 

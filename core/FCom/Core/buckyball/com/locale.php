@@ -345,6 +345,7 @@ class BLocale extends BClass
 
             case 'raw':
                 $result = $languages;
+                break;
 
             default:
                 throw new BException('Invalid label type');
@@ -629,6 +630,7 @@ class BLocale extends BClass
 
             case 'raw':
                 $result = $countries;
+                break;
 
             default:
                 throw new BException('Invalid label type');
@@ -743,6 +745,7 @@ class BLocale extends BClass
 
             case 'raw':
                 $result = $regions;
+                break;
 
             default:
                 throw new BException('Invalid label type');
@@ -759,7 +762,7 @@ class BLocale extends BClass
         $regionName = strtolower($regionName);
         return isset($regions[$regionName]) ? $regions[$regionName] : null;
     }
-    
+
     public function postcodeRequired($country = null)
     {
         static $requiredFor = [

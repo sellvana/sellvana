@@ -63,7 +63,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         if (!parent::onBeforeSave()) return false;
 
-        if (!$this->unique_id) {
+        if (!$this->get('unique_id')) {
             $this->set('unique_id', $this->FCom_Core_Model_Seq->getNextSeqId('order'));
         }
 
@@ -265,11 +265,11 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $this->_cart = $cart;
         $this
             ->_importBasicFieldsFromCart()
+            ->_importTotalsDataFromCart()
             ->save() // create unique id
 
             ->_importAddressDataFromCart()
             ->_importItemsDataFromCart()
-            ->_importTotalsDataFromCart()
             ->_importShippingDataFromCart()
             ->_importPaymentDataFromCart()
             ->_importDiscountDataFromCart()
@@ -289,6 +289,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             'customer_email' => $cart->get('customer_email'),
             'item_qty' => $cart->get('item_qty'),
             'store_currency_code' => $cart->get('store_currency_code'),
+            'same_address' => $cart->get('same_address'),
         ]);
         return $this;
     }
@@ -368,8 +369,8 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             'tax_amount' => $cart->get('tax_amount'),
             'discount_amount' => $cart->get('discount_amount'),
             'grand_total' => $cart->get('grand_total'),
-            'amount_paid' => 0,
-            'amount_due' => $cart->get('grand_total'),
+            'amount_paid' => $cart->get('amount_paid'),
+            'amount_due' => $cart->get('amount_due'),
         ]);
 
         $this->setData('totals', $cart->getData('totals'));
@@ -541,6 +542,17 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
         $this->state()->calcAllStates();
         $this->saveAllDetails();
+    }
+
+    public function generateToken()
+    {
+        $this->set(['token' => $this->BUtil->randomString(20), 'token_at' => $this->BDb->now()]);
+        return $this;
+    }
+
+    public function accountExistsForGuestEmail()
+    {
+        return $this->Sellvana_Customer_Model_Customer->load($this->get('customer_email'), 'email');
     }
 
     public function __destruct()

@@ -66,7 +66,7 @@ catalog_product_form_tabs:
     - view: settings
         do:
             - [ addTabGroup, catalog, { label: Catalog, pos: 20 } ]
-            - [ addTab, Sellvana_Catalog, { label: Catalog, group: catalog, async: true } ]
+            - [ addTab, Sellvana_Catalog, { label: Catalog, group: catalog, async: true, permission: settings/Sellvana_Catalog } ]
 
 /header_search:
     - { hook: main, views: 'header-search/FCom_Products' }

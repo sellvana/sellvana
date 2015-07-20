@@ -27,6 +27,10 @@ customer_account_sidebar:
     - { hook: main, views: orders/view }
     - { include: customer_account_sidebar }
 
+/guest/create_account:
+    - { include: base }
+    - { hook: main, views: guest/create-account }
+
 /guest/find_order:
     - { include: base }
     - { hook: main, views: guest/find-order }
