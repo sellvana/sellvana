@@ -848,4 +848,14 @@ class Sellvana_Catalog_Migrate extends BClass
 
     }
 
+    public function upgrade__0_5_3_0__0_5_4_0()
+    {
+        $tSku = $this->Sellvana_Catalog_Model_InventorySku->table();
+        $this->BDb->ddlTableDef($tSku, [
+            BDb::COLUMNS => [
+                'hs_tariff_number' => 'varchar(20) default null',
+                'origin_country' => 'char(2) default null',
+            ],
+        ]);
+    }
 }

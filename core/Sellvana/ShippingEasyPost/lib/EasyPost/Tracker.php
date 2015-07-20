@@ -4,7 +4,7 @@ namespace EasyPost;
 
 defined('BUCKYBALL_ROOT_DIR') || die();
 
-class Rate extends Resource
+class Tracker extends Resource
 {
     public static function retrieve($id, $apiKey = null)
     {
@@ -23,17 +23,17 @@ class Rate extends Resource
 
     public static function create($params = null, $apiKey = null)
     {
-        if (!isset($params['rate']) || !is_array($params['rate'])) {
+        if (!is_array($params)) {
+          $clone = $params;
+          unset($params);
+          $params['tracker']['tracking_code'] = $clone;
+        } else if (!isset($params['tracker']) || !is_array($params['tracker'])) {
             $clone = $params;
             unset($params);
-            $params['rate'] = $clone;
-        }
-        if (isset($params['rate']['id']) && strpos($params['rate']['id'], "shp") !== -1) {
-            $clone = $params;
-            unset($params);
-            $params['rate']['shipment'] = $clone['rate'];
+            $params['tracker'] = $clone;
         }
 
         return self::_create(get_class(), $params, $apiKey);
     }
 }
+

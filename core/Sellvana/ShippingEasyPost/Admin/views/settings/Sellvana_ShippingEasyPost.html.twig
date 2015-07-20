@@ -1,0 +1,17 @@
+{% set c = THIS.get('model') %}
+{% set services = APP.instance('Sellvana_ShippingEasyPost_ShippingMethod').getServices() %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<h2>{{ "EasyPost Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-Sellvana_ShippingEasyPost'}) }}
+    {% set fieldData = { model: c, settings_module: 'Sellvana_ShippingEasyPost' } %}
+
+    {{ forms.accordion_panel_start({label:'EasyPost API'|_, id:'settings-Sellvana_ShippingEasyPost-group0', in:1}) }}
+        {{ forms.select(fieldData, {field:'mode', label:'Mode'|_, options:{test:'Test', prod:'Production'} }) }}
+        {{ forms.input(fieldData, {field:'test_access_key', label:'Test Access Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'access_key', label:'Production Access Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'max_package_weight', label:'Max Package Weight'|_ }) }}
+        {{ forms.input(fieldData, {field:'package_size', label:'Package Size (LxWxH)'|_ }) }}
+        {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:true, options:services}) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

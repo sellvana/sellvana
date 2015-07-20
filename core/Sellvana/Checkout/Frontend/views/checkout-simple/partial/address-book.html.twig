@@ -1,0 +1,18 @@
+{% set cart = APP.instance('Sellvana_Sales_Model_Cart').sessionCart() %}
+{% set type = THIS.get('address_type') %}
+{% set cartAddress = cart.addressAsArray(type) %}
+
+<div class="f-address-book">
+{% for address in THIS.get('addresses') %}
+    {% if (SESSION.get(type ~ '_address_id')) %}
+        {% set isSelected = (address.get('id') == SESSION.get(type ~ '_address_id')) %}
+    {% else %}
+        {% set isSelected = (address.get('id') == THIS.get('customer').get('default_' ~ type ~ '_id')) %}
+    {% endif %}
+    <div class="f-address-list-item{% if isSelected %} selected{% endif %}">
+        <label for="{{ type }}_address_{{ address.get('id') }}">
+            <a href="{{ APP.href('checkout/changeAddress') }}?type={{ type }}&id={{ address.get('id') }}">{{ APP.instance('Sellvana_Customer_Model_Address').as_html(address) | raw }}</a>
+        </label>
+    </div>
+{% endfor %}
+</div>

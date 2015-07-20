@@ -648,14 +648,16 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $defBilling = $customer->getDefaultBillingAddress();
         if ($defBilling) {
             $this->importAddressFromObject($defBilling, 'billing');
+            $this->BSession->set('billing_address_id', $defBilling->get('id'));
         }
         $defShipping = $customer->getDefaultShippingAddress();
         if ($defShipping) {
             $this->importAddressFromObject($defShipping, 'shipping');
+            $this->BSession->set('shipping_address_id', $defShipping->get('id'));
         }
 
         $this->set([
-            'same_address' => $defBilling && $defShipping && $defBilling->id() == $defShipping->id(),
+            'same_address' => (int)($defBilling && $defShipping && $defBilling->id() == $defShipping->id()),
             'recalc_shipping_rates' => 1,
         ]);
 
@@ -718,9 +720,17 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$ignoreInvalid && empty($methods[$method])) {
             throw new BException('Invalid shipping method: '. $method);
         }
+
         if (!empty($methods[$method])) {
             $services = $methods[$method]->getServices();
-            if (null !== $service && empty($services[$service])) {
+
+            $serviceCheckNeeded = true;
+            $this->BEvents->fire('Sellvana_Sales_Model_Cart::serviceCheckNeeded', [
+                'service_check_needed' => &$serviceCheckNeeded,
+                'shipping_method' => $method
+            ]);
+
+            if ($serviceCheckNeeded && null !== $service && empty($services[$service])) {
                 throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
             }
         } else {
@@ -849,7 +859,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $allServices = $method->getServices();
             $services = [];
             foreach ($servicesArr as $serviceCode => $serviceRate) {
-                $serviceTitle = $allServices[$serviceCode];
+                $serviceTitle = (isset($allServices[$serviceCode])) ? $allServices[$serviceCode] : $serviceCode;
                 $services[$serviceCode] = [
                     'value' => $methodCode . ':' . $serviceCode,
                     'title' => $serviceTitle,
