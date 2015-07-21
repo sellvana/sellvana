@@ -113,7 +113,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $row->set($customRowData);
                 $row->set('data', null);
             }
-            $thumbUrl = $this->_getThumbUrl($row['id']);
+            $thumbUrl = $this->_getThumbUrl($row->id());
             $row->set('thumb_path', $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]));
         }
         unset($row);
@@ -701,6 +701,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     /**
      * @param $model Sellvana_Catalog_Model_Product
+     * @param $post []
      */
     public function processCategoriesPost($model, $post)
     {
