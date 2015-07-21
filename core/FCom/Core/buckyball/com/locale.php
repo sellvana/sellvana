@@ -1024,7 +1024,7 @@ class BLocale extends BClass
             foreach ($choices as $condition => $string) {
                 if ($condition === '#') {
                     if (!isset($params[$string])) {
-                        throw new BException('Parameter is not set: ' . $params[$string]);
+                        throw new BException('Parameter is not set: ' . $string);
                     }
                     if (!is_int($params[$string])) {
                         throw new BException('Invalid qualifier parameter: ' . $params[$string]);
@@ -1039,7 +1039,7 @@ class BLocale extends BClass
                     $defaultString = $string;
                     continue;
                 }
-                if (!preg_match('/^(\*|#)?([0-9]+)?(\.\.)?([0-9]+)?$/', $condition, $m) || ($m[2] === '' && $m[4] === '')) {
+                if (!preg_match('/^(\*)?([0-9]+)?(\.\.)?([0-9]+)?$/', $condition, $m) || ($m[2] === '' && $m[4] === '')) {
                     throw new BException('Invalid condition: ' . $condition);
                 }
                 $condValue = empty($m[1]) ? $value : ($value % 10); // if starts with star, modulo 10
