@@ -289,7 +289,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
     {
         $config = $this->BConfig->get($this->_configPath);
         $services = [];
-        if (!$config['access_key']) {
+        if (!isset($config['access_key']) || !$config['access_key']) {
             return false;
         }
 
