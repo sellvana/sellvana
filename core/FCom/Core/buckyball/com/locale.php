@@ -1016,7 +1016,92 @@ class BLocale extends BClass
             }
         }
 
+        if (is_array($tr) && !empty($tr['#'])) {
+            $choices = $tr;
+            $defaultString = '';
+            $tr = null;
+            $value = null;
+            foreach ($choices as $condition => $string) {
+                if ($condition === '#') {
+                    if (!isset($params[$string])) {
+                        throw new BException('Parameter is not set: ' . $params[$string]);
+                    }
+                    if (!is_int($params[$string])) {
+                        throw new BException('Invalid qualifier parameter: ' . $params[$string]);
+                    }
+                    $value = $params[$string];
+                    continue;
+                }
+                if (null === $value) {
+                    throw new BException('Condition parameter should be specified first');
+                }
+                if ($condition === '*') { // if star, this is default
+                    $defaultString = $string;
+                    continue;
+                }
+                if (!preg_match('/^(\*|#)?([0-9]+)?(\.\.)?([0-9]+)?$/', $condition, $m) || ($m[2] === '' && $m[4] === '')) {
+                    throw new BException('Invalid condition: ' . $condition);
+                }
+                $condValue = empty($m[1]) ? $value : ($value % 10); // if starts with star, modulo 10
+                $valid = true;
+                if (!empty($m[3])) { // range
+                    if ($m[2] !== '' && $condValue < (int)$m[2]) { // lower bound breached
+                        $valid = false;
+                    }
+                    if (isset($m[4]) && $condValue > (int)$m[4]) { // upper bound breached
+                        $valid = false;
+                    }
+                } elseif ($condValue !== (int)$m[2]) { // single number matches
+                    $valid = false;
+                }
+                if ($valid) {
+                    $tr = $string;
+                    break;
+                }
+            }
+            if (null === $tr) {
+                $tr = $defaultString;
+            }
+        }
+
         return $this->BUtil->sprintfn($tr, $params);
+    }
+
+    public function tr_choice($choices, $property, array $params)
+    {
+        if (!isset($params[$property])) {
+            throw new BException('Parameter is not set: ' . $property);
+        }
+        if (!is_int($params[$property])) {
+            throw new BException('Invalid qualifier parameter: ' . $params[$property]);
+        }
+        $value = (int)$params[$property];
+        $defaultString = '';
+        foreach ($choices as $condition => $string) {
+            if ($condition === '*') { // if star, this is default
+                $defaultString = $string;
+                continue;
+            }
+            if (!preg_match('/^(\*)?([0-9]+)?(\.\.)?([0-9]+)?$/', $condition, $m) || ($m[2] === '' && $m[4] === '')) {
+                throw new BException('Invalid condition: ' . $condition);
+            }
+            $condValue = empty($m[1]) ? $value : ($value % 10); // if starts with star, modulo 10
+            $valid = true;
+            if (!empty($m[3])) { // range
+                if ($m[2] !== '' && $condValue < (int)$m[2]) { // lower bound breached
+                    $valid = false;
+                }
+                if (isset($m[4]) && $condValue > (int)$m[4]) { // upper bound breached
+                    $valid = false;
+                }
+            } elseif ($condValue !== (int)$m[2]) { // single number matches
+                $valid = false;
+            }
+            if ($valid) {
+                return $this->_($string, $params);
+            }
+        }
+        return $this->_($defaultString, $params);
     }
 
     public function translations($sources)

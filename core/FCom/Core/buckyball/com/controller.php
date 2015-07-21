@@ -97,6 +97,7 @@ class BRequest extends BClass
      */
     public function setArea($area)
     {
+        //TODO: $this->_area = preg_replace('#^fcom_#', '', strtolower($area));
         $this->_area = $area;
         return $this;
     }
