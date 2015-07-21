@@ -108,8 +108,15 @@ class Sellvana_CatalogFields_Admin extends BClass
         /** @var Sellvana_CatalogFields_Model_ProductVarfield[] $prodVarfieldModels */
         $prodVarfieldModels = $prodVarfieldHlp->orm()->where('product_id', $pId)->find_many_assoc('field_id');
 
-        // retrieve product variant models
         $prodVariantHlp = $this->Sellvana_CatalogFields_Model_ProductVariant;
+
+        //delete variants in remove list
+        if (!empty($data['variants_remove'])) {
+            $variantRemoveIds = explode(',', $data['variants_remove']);
+            $prodVariantHlp->delete_many(['product_id' => $pId, 'id' => $variantRemoveIds]);
+        }
+
+        // retrieve product variant models
         $prodVariantModels = $prodVariantHlp->orm()->where('product_id', $pId)->find_many_assoc();
 
         // delete removed fields
@@ -117,7 +124,6 @@ class Sellvana_CatalogFields_Admin extends BClass
             $fieldIdsToDelete = array_diff(array_keys($prodVarfieldModels), array_keys($varFieldsData));
             if ($fieldIdsToDelete) {
                 $prodVarfieldHlp->delete_many(['product_id' => $pId, 'field_id' => $fieldIdsToDelete]);
-
                 foreach ($prodVarfieldModels as $fId => $m) {
                     if (in_array($fId, $fieldIdsToDelete)) {
                         unset($prodVarfieldModels[$fId]);

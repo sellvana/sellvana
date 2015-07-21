@@ -60,6 +60,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
             ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
             ->select(['f.field_code', 'f.field_name'])
+            ->where('product_id', $model->id)
             ->order_by_asc('vf.position')
             ->find_many_assoc('field_id');
         if ($varFields) {
@@ -128,6 +129,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
             ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
             ->select(['f.field_code', 'f.field_name'])
+            ->where('product_id', $model->id())
             ->order_by_asc('vf.position')
             ->find_many_assoc('field_id');
 
@@ -218,7 +220,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
 
         $config = [
             'config' => [
-                'id' => 'variant-grid',
+                'id' => 'variant-grid-' . $model->id(),
                 'caption' => 'Variable Field Grid',
                 'data_mode' => 'local',
                 'data' => $data,
