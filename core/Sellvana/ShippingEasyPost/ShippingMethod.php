@@ -289,6 +289,9 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
     {
         $config = $this->BConfig->get($this->_configPath);
         $services = [];
+        if (!$config['access_key']) {
+            return false;
+        }
 
         // Carrier API is available only in production mode, so we must always use production access key
         \EasyPost\EasyPost::setApiKey($config['access_key']);
