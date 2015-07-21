@@ -27,15 +27,17 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
         }
         if ($q !== '' && !is_null($q)) {
             $alias = $this->Sellvana_Catalog_Model_SearchAlias->fetchSearchAlias($q);
-            $targetUrl = $alias->get('target_url');
-            if ($alias->get('alias_type') === Sellvana_Catalog_Model_SearchAlias::TYPE_FULL && $targetUrl) {
-                if (!$this->BUtil->isUrlFull($targetUrl)) {
-                    $targetUrl = $this->BApp->href($targetUrl);
+            if ($alias) {
+                $targetUrl = $alias->get('target_url');
+                if ($alias->get('alias_type') === Sellvana_Catalog_Model_SearchAlias::TYPE_FULL && $targetUrl) {
+                    if (!$this->BUtil->isUrlFull($targetUrl)) {
+                        $targetUrl = $this->BApp->href($targetUrl);
+                    }
+                    $this->BResponse->redirect($targetUrl);
+                    return;
+                } else {
+                    $q = $alias->get('target_term');
                 }
-                $this->BResponse->redirect($targetUrl);
-                return;
-            } else {
-                $q = $alias->get('target_term');
             }
         }
 

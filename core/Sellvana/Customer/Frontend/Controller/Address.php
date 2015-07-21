@@ -199,7 +199,7 @@ class Sellvana_Customer_Frontend_Controller_Address extends FCom_Frontend_Contro
         );
     }
 
-    public function action_delete()
+    public function action_delete__POST()
     {
         $id = $this->BRequest->get('id');
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
