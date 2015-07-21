@@ -201,6 +201,12 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
 
     public function action_changeAddress()
     {
+        $token = $this->BRequest->get('token');
+        if (!$this->BSession->validateCsrfToken($token)) {
+            $this->message('Incorrect token', 'error');
+            $this->BResponse->redirect('checkout');
+            return;
+        }
         $type = $this->BRequest->get('type');
         $addressId = (int)$this->BRequest->get('id');
 
