@@ -9,16 +9,19 @@
     <div class="f-address-list">
     {% for address in THIS.get('addresses') %}
       <div class="f-address-list-item{% if address.get('id') == THIS.get('customer').get('default_shipping_id') or address.get('id') == THIS.get('customer').get('default_billing_id') %} well{% endif %}">
-        {% if address.get('id') == THIS.get('customer').get('default_shipping_id') %}
-            <strong>{{ "Default shipping address" | _ }}</strong>
-        {% endif %}
-        {% if address.get('id') == THIS.get('customer').get('default_shipping_id') or address.get('id') == THIS.get('customer').get('default_billing_id') %}<br/>{% endif %}
-        {% if address.get('id') == THIS.get('customer').get('default_billing_id') %}
-            <strong>{{ "Default billing address" | _ }}</strong>
-        {% endif %}
-        {{ APP.instance('Sellvana_Customer_Model_Address').as_html(address) | raw }}
-        <a href="{{ APP.href("customer/address/edit") }}?id={{ address.get('id') }}">{{ "Edit" | _ }}</a>
-        <a href="{{ APP.href("customer/address/delete") }}?id={{ address.get('id') }}">{{ "Remove" | _ }}</a>
+        <form action="{{ APP.href("customer/address/delete") }}?id={{ address.get('id') }}" method="post">
+          <input type="hidden" name="X-CSRF-TOKEN" value="{{SESSION.csrfToken()}}">
+          {% if address.get('id') == THIS.get('customer').get('default_shipping_id') %}
+              <strong>{{ "Default shipping address" | _ }}</strong>
+          {% endif %}
+          {% if address.get('id') == THIS.get('customer').get('default_shipping_id') or address.get('id') == THIS.get('customer').get('default_billing_id') %}<br/>{% endif %}
+          {% if address.get('id') == THIS.get('customer').get('default_billing_id') %}
+              <strong>{{ "Default billing address" | _ }}</strong>
+          {% endif %}
+          {{ APP.instance('Sellvana_Customer_Model_Address').as_html(address) | raw }}
+          <a href="{{ APP.href("customer/address/edit") }}?id={{ address.get('id') }}">{{ "Edit" | _ }}</a>
+          <button type="submit"><span>{{ "Remove" | _ }}</span></button>
+        </form>
       </div>
     {% endfor %}
     </div>

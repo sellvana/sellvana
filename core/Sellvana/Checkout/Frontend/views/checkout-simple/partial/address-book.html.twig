@@ -11,7 +11,7 @@
     {% endif %}
     <div class="f-address-list-item{% if isSelected %} selected{% endif %}">
         <label for="{{ type }}_address_{{ address.get('id') }}">
-            <a href="{{ APP.href('checkout/changeAddress') }}?type={{ type }}&id={{ address.get('id') }}">{{ APP.instance('Sellvana_Customer_Model_Address').as_html(address) | raw }}</a>
+            <a href="{{ APP.href('checkout/changeAddress') }}?type={{ type }}&id={{ address.get('id') }}&token={{ SESSION.csrfToken() }}">{{ APP.instance('Sellvana_Customer_Model_Address').as_html(address) | raw }}</a>
         </label>
     </div>
 {% endfor %}
