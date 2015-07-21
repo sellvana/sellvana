@@ -158,7 +158,8 @@
             });
         }
     };*/
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp',
+        'jquery.fileupload-ui', 'griddle.fcomMediaLib'], function () {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
         var file_error = [];
         $('#quick-add-images')
@@ -183,7 +184,7 @@
                                 addRows.push(obj);
 
                                 //check combine grid already had this image
-                                if (combineGrid && !_.findWhere(combineGrid.getRows(), { file_id: obj.id })) {
+                                if (combineGrid && !_.findWhere(combineGrid.getRows(), {file_id: obj.id})) {
                                     var combineRow = $.extend({}, obj, {
                                         _new: true,
                                         id: guid(),
@@ -215,7 +216,11 @@
                         }
 
                         if (success) {
-                            $.bootstrapGrowl("Successfully uploaded.", { type: 'success', align: 'center', width: 'auto' });
+                            $.bootstrapGrowl("Successfully uploaded.", {
+                                type: 'success',
+                                align: 'center',
+                                width: 'auto'
+                            });
                         }
                     }
                 })
