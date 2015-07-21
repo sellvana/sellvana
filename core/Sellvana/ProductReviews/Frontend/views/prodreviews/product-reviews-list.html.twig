@@ -1,5 +1,6 @@
 {% set reviews = THIS.get('reviews') %}
 {% set isAlreadyReviewed = THIS.get('isAlreadyReviewed') %}
+{% set thisUrl = app.request.uri %}
 
 {% if reviews.numReviews > 0 %}
     {% set isLoggedIn = APP.instance('Sellvana_Customer_Model_Customer').isLoggedIn() %}
@@ -8,34 +9,27 @@
     <div class="f-prod-review-avg clearfix">
         <h5>{{ "Avg. Customer Rating"|_ }} ({{ reviews.numReviews }} {{ "Reviews"|_ }}):</h5>
         <div class="glyphicon f-rating-stars f-lg-stars">
-            <span class="f-filled-stars" style="width:{{ (reviews.avgRating.rating/rate.max)*100 }}%;"></span>
+            <span class="f-filled-stars" style="width:{{ (reviews.avgRating/rate.max)*100 }}%;"></span>
             <span class="f-empty-stars"></span>
         </div>
-        <strong>{{ reviews.avgRating.rating }} / {{ rate.max }}</strong>
-        <div class="f-prod-review-attrs">
-            <dl class="dl-horizontal">
-                <dt>{{ "Value"|_ }}</dt>
-                <dd>
-                    <div class="glyphicon f-rating-stars f-xs-stars">
-                        <span class="f-filled-stars" style="width:{{ (reviews.avgRating.rating1/rate.max)*100 }}%;"></span>
-                        <span class="f-empty-stars"></span>
-                    </div>
-                    {{ reviews.avgRating.rating1 }}</dd>
-                <dt>{{ "Features"|_ }}</dt>
-                <dd>
-                    <div class="glyphicon f-rating-stars f-xs-stars">
-                        <span class="f-filled-stars" style="width:{{ (reviews.avgRating.rating2/rate.max)*100 }}%;"></span>
-                        <span class="f-empty-stars"></span>
-                    </div>
-                    {{ reviews.avgRating.rating2 }}</dd>
-                <dt>{{ "Quality"|_ }}</dt>
-                <dd>
-                    <div class="glyphicon f-rating-stars f-xs-stars">
-                        <span class="f-filled-stars" style="width:{{ (reviews.avgRating.rating3/rate.max)*100 }}%;"></span>
-                        <span class="f-empty-stars"></span>
-                    </div>
-                    {{ reviews.avgRating.rating3 }}</dd>
-            </dl>
+        <strong>{{ reviews.avgRating }} / {{ rate.max }}</strong>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group f-rating-filter">
+                {% for i, count in reviews.ratings %}
+                    <a class="list-group-item clearfix" href="{{ thisUrl }}?filter={{ i }}">
+                        <span class="pull-left">{{ '%s stars' | _(i) }}</span>
+                        <div class="pull-left">
+                            <div class="glyphicon f-rating-stars f-xs-stars">
+                                <span class="f-filled-stars" style="width:{{ (i/rate.max)*100 }}%;"></span>
+                                <span class="f-empty-stars"></span>
+                            </div>
+                        </div>
+                        <span class="badge">{{ count }}</span>
+                    </a>
+                {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -53,28 +47,6 @@
                         </div>
                         <strong>{{ review.get('rating') }} / {{ rate.max }}</strong>
                     </dd>
-                    <dt>{{ "Value"|_ }}</dt>
-                    <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                            <span class="f-filled-stars" style="width:{{ (review.get('rating1')/rate.max)*100 }}%;"></span>
-                            <span class="f-empty-stars"></span>
-                        </div>
-                        {{ review.get('rating1') }}</dd>
-                    <dt>{{ "Features"|_ }}</dt>
-                    <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                            <span class="f-filled-stars" style="width:{{ (review.get('rating2')/rate.max)*100 }}%;"></span>
-                            <span class="f-empty-stars"></span>
-                        </div>
-                        {{ review.get('rating2') }}</dd>
-                    <dt>{{ "Quality"|_ }}</dt>
-                    <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                            <span class="f-filled-stars" style="width:{{ (review.get('rating3')/rate.max)*100 }}%;"></span>
-                            <span class="f-empty-stars"></span>
-                        </div>
-                        {{ review.get('rating3') }}</dd>
-
                 </dl>
                 <div class="f-prod-review">
                     {{ review.get("text") }}
@@ -102,8 +74,8 @@
         </article>
     {% endfor %}
 
-    {% if (reviews.numReviews > 1) %}
-        <p><a href="#"><strong>{{ "Read all %s customer reviews"|_(reviews.numReviews) }} &rsaquo;</strong></a></p>
+    {% if (reviews.numReviews > 1 or REQUEST.get('filter')) %}
+        <p><a href="{{ APP.href(REQUEST.server('PATH_INFO')) }}"><strong>{{ "Read all %s customer reviews"|_(reviews.numReviews) }} &rsaquo;</strong></a></p>
     {% endif %}
     <script>
         require(['jquery', 'fcom.productreviews'], function ($){

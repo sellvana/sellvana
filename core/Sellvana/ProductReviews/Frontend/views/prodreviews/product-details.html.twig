@@ -1,7 +1,11 @@
 {% set isLoggedIn = APP.instance('Sellvana_Customer_Model_Customer').isLoggedIn() %}
 {% set userId = APP.instance('Sellvana_Customer_Model_Customer').sessionUserId() %}
 {% set prod = THIS.get('prod') %}
-{% set reviews = prod.reviews() %}
+{% if REQUEST.get('filter') %}
+    {% set reviews = prod.reviews(true, REQUEST.get('filter')) %}
+{% else %}
+    {% set reviews = prod.reviews() %}
+{% endif %}
 {% set rate = APP.instance('Sellvana_ProductReviews_Model_Review').config() %}
 {% set isAlreadyReviewed = prod.isAlreadyReviewed(userId) %}
 {#{% for review in reviews.items %}

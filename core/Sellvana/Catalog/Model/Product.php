@@ -841,56 +841,67 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * @param bool $incAvgRating
+     * @param bool|int $filterByRating
      * @return array
      */
-    public function reviews($incAvgRating = true)
+    public function reviews($incAvgRating = true, $filterByRating = false)
     {
+        $numReviews = 0;
+        $reviews = [];
+
         if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
+            $ratings = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select('pr.rating')->select_expr('COUNT(pr.id)', 'count')
+                ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1])
+                ->group_by('pr.rating')->find_many();
+
+            list($numReviews, $avgRating, $ratingByStars) = $this->getRatingStats($ratings, $incAvgRating);
+
             $reviews = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
                 ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
-                ->where(['pr.product_id' => $this->id(), 'approved' => 1])->order_by_expr('pr.create_at DESC')->find_many();
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1]);
 
-            if ($incAvgRating) {
-                $avgRating = $this->calcAverageRating($reviews);
+            if ((int)$filterByRating) {
+                $reviews->where('rating', (int)$filterByRating);
             }
-        } else {
-            $reviews = [];
+
+            $reviews = $reviews->order_by_expr('pr.create_at DESC')->find_many();
         }
+
         return [
             'items' => $reviews,
+            'ratings' => isset($ratingByStars) ? $ratingByStars : [],
             'avgRating' => isset($avgRating) ? $avgRating : [],
-            'numReviews' => count($reviews),
+            'numReviews' => $numReviews,
         ];
     }
 
     /**
-     * @param array $reviews
+     * @param array $ratings
+     * @param bool $incAvgRating
      * @return array
      */
-    public function calcAverageRating($reviews = [])
+    public function getRatingStats($ratings = [], $incAvgRating = true)
     {
-        $rs = [
-            'rating' => 0,
-            'rating1' => 0,
-            'rating2' => 0,
-            'rating3' => 0,
-        ];
-        if (!empty($reviews)) {
-            $numReviews = count($reviews);
-            foreach ($reviews as $review) {
-                $rs['rating'] += $review->rating;
-                $rs['rating1'] += $review->rating1;
-                $rs['rating2'] += $review->rating2;
-                $rs['rating3'] += $review->rating3;
-            }
-
-            $rs['rating'] = number_format($rs['rating'] / $numReviews, 2);
-            $rs['rating1'] = number_format($rs['rating1'] / $numReviews, 2);
-            $rs['rating2'] = number_format($rs['rating2'] / $numReviews, 2);
-            $rs['rating3'] = number_format($rs['rating3'] / $numReviews, 2);
+        $avgRating = false;
+        $numReviews = 0;
+        $reviewConfig = $this->Sellvana_ProductReviews_Model_Review->config();
+        $ratingByStars = [];
+        for ($i = $reviewConfig['min']; $i <= $reviewConfig['max']; $i += $reviewConfig['step']) {
+            $ratingByStars[$i] = 0;
         }
 
-        return $rs;
+        if (!empty($ratings)) {
+            foreach ($ratings as $review) {
+                $avgRating += $review->rating * $review->count;
+                $numReviews += $review->count;
+                $ratingByStars[$review->rating] = $review->count;
+            }
+
+            $avgRating = number_format($avgRating / $numReviews, 2);
+        }
+
+        return array($numReviews, $avgRating, $ratingByStars);
     }
 
     /**

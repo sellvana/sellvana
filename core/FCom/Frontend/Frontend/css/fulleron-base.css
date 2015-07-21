@@ -446,6 +446,9 @@ label.success {
 .f-prod-review-form .f-prod-avg-rating {
   margin-bottom:10px;
   }
+.f-prod-reviews .f-rating-filter .f-rating-stars {
+  margin-left: 15px;
+  }
 #f-prod-review-form-container {
   max-width: 500px;
   }
