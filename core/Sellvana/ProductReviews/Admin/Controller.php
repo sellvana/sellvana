@@ -169,6 +169,9 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             'title' => $this->_gridTitle,
             'actions' => []
         ]);
+        $actions = $args['page_view']->get('actions');
+        unset($actions['new']);
+        $args['page_view']->set('actions', $actions);
     }
 
     public function inputRatingHtml($name)
