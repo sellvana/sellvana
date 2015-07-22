@@ -7,9 +7,6 @@
  * @property int $product_id
  * @property int $customer_id
  * @property int $rating
- * @property int $rating1
- * @property int $rating2
- * @property int $rating3
  * @property int $approved
  * @property int $helpful
  * @property int $helpful_voices
@@ -49,9 +46,6 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
         /*array('helpful_voices', '@string', null, array('max' => 11)),
         array('rating', '@integer'),
-        array('rating1', '@integer'),
-        array('rating2', '@integer'),
-        array('rating3', '@integer'),
         array('approved', '@integer'),
         array('helpful', '@integer'),
         array('offensive', '@integer'),
@@ -82,9 +76,6 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
             $rating = $this->orm()->where('product_id', $pId)
                            ->where('approved', 1)
                            ->select('(avg(rating))', 'avg')
-                            #->select('(avg(rating1))', 'avg1')
-                            #->select('(avg(rating2))', 'avg2')
-                            #->select('(avg(rating3))', 'avg3')
                            ->select('(count(1))', 'num')
                            ->find_one();
 
@@ -97,10 +88,17 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function helpful($mark)
+    public function helpful($mark, $add = false)
     {
+        if ($mark === 0) {
+            $mark = -1;
+        }
         $this->add('helpful', $mark);
-        $this->add('helpful_voices');
+
+        if ($add) {
+            $this->add('helpful_voices');
+        }
+
         $this->save();
         return $this;
     }

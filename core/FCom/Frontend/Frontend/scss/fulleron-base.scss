@@ -405,6 +405,12 @@ label {
 			margin: 4px 0 10px;
 			font-size: .9em;
 		}
+		.verified {
+			display: block;
+			color: #c45500;
+			margin: -10px 0 10px;
+			font-size: 12px;
+		}
 		.f-prod-review-attrs {
 			dt {
 				display: none;
@@ -440,6 +446,17 @@ label {
 			margin: 0 0 20px 0;
 		}
 	}
+	.f-rating-filter {
+		.stars-amount {
+			width: 50px;
+			margin-right: 10px;
+		}
+		.progress {
+			width: 50%;
+			margin-bottom: 0;
+		}
+	}
+
 }
 #f-prod-review-form-container {
 	max-width: 500px;

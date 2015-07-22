@@ -7,6 +7,7 @@
  * @property Sellvana_ProductReviews_Model_Review $Sellvana_ProductReviews_Model_Review
  * @property Sellvana_ProductReviews_Model_ReviewFlag $Sellvana_ProductReviews_Model_ReviewFlag
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  */
 class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -72,7 +73,20 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
                 if (!$needApprove) {
                     $post['review']['approved'] = 1;
                 }
-                $review->set($post['review'])->save();
+                $review->set($post['review']);
+
+                if ($this->BModuleRegistry->isLoaded('Sellvana_Sales')) {
+                    $orders = $this->Sellvana_Sales_Model_Order->orm('o')
+                        ->join('Sellvana_Sales_Model_Order_Item', ['o.id', '=', 'oi.order_id'], 'oi')
+                        ->where('oi.product_id', $product->get('id'))
+                        ->where('o.state_overall', Sellvana_Sales_Model_Order_State_Overall::COMPLETE)->find_many();
+
+                    if(count($orders)) {
+                        $review->set('verified_purchase', 1);
+                    }
+                }
+
+                $review->save();
                 $review->notify();
             }
 
@@ -122,7 +136,7 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
                 $this->BResponse->json(['error' => 'Invalid id']);
                 return;
             }
-            $mark = -1;
+            $mark = 0;
             if ($post['review_helpful'] == 'yes') {
                 $mark = 1;
             }
@@ -134,11 +148,11 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
             /** @var Sellvana_ProductReviews_Model_ReviewFlag $record */
 
             if (!$record) {
-                $review->helpful($mark);
+                $review->helpful($mark, true);
                 $data = ['customer_id' => $customer->id, 'review_id' => $review->id, 'helpful' => $mark];
                 $this->Sellvana_ProductReviews_Model_ReviewFlag->create($data)->save();
             } elseif ($record->helpful != $mark) {
-                $review->helpful($mark);
+                $review->helpful($mark, false);
                 $record->set('helpful', $mark)->save();
             } else {
                 $this->BResponse->json(['error' => "You've already rated this review"]);
@@ -148,10 +162,9 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
         }
     }
 
-    public function action_offensive()
+    public function action_offensive__POST()
     {
-        //TODO: convert to POST
-        $rid = $this->BRequest->get('rid');
+        $rid = $this->BRequest->post('rid');
         if (empty($rid)) {
             $this->forward(false);
             return;

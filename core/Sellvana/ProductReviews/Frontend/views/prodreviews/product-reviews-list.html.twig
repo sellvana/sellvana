@@ -18,14 +18,13 @@
                 <div class="list-group f-rating-filter">
                 {% for i, count in reviews.ratings %}
                     <a class="list-group-item clearfix" href="{{ thisUrl }}?filter={{ i }}">
-                        <span class="pull-left">{{ '%s stars' | _(i) }}</span>
-                        <div class="pull-left">
-                            <div class="glyphicon f-rating-stars f-xs-stars">
-                                <span class="f-filled-stars" style="width:{{ (i/rate.max)*100 }}%;"></span>
-                                <span class="f-empty-stars"></span>
+                        <span class="pull-left stars-amount">{{ '%stars$s star(s)' | _({stars: i}) }}</span>
+                        <div class="pull-left progress">
+                            <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{ (count/reviews.numReviews)*100 }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ (count/reviews.numReviews)*100 }}%">
+                                <span class="sr-only">{{ (count/reviews.numReviews)*100 }}%</span>
                             </div>
                         </div>
-                        <span class="badge">{{ count }}</span>
+                        <span class="badge">{{ ((count/reviews.numReviews)*100)|round }}%</span>
                     </a>
                 {% endfor %}
                 </div>
@@ -35,8 +34,12 @@
 
     {% for review in reviews.items %}
         <article class="f-prod-review-post clearfix">
+            <small>{{ "%helpful$s of %total$s people found the following review helpful"|_({helpful: review.get('helpful'), total: review.get('helpful_voices')}) }}</small>
             <h5>{{ review.get('title') }}</h5>
             <span class="meta">{{ "by"|_ }} {{ review.get('firstname') }} {{ review.get('lastname') }} {{ "on"|_ }} {{ review.get('created_at')|date('F j, Y') }}</span>
+            {% if review.get('verified_purchase') %}
+                <span class="verified">{{ "Verified Purchase"|_ }}</span>
+            {% endif %}
             <div class="col-md-12 col-sm-12 f-prod-review-attrs">
                 <dl class="dl-horizontal">
                     <dt><strong>{{ "Overall"|_ }}</strong></dt>
@@ -63,11 +66,21 @@
                                 <input type="hidden" name="rid" value="{{ review.get('id') }}">
                                 {{ "Was this review helpful to you" | _ }}?
                                 <button class="btn btn-primary btn-xs" type="submit" name="review_helpful" value="yes"
-                                        onclick="FCom.Review.AddRating("{{ APP.href('prodreviews/helpful') }}", {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
-                                <span class="badge">{{ review.get('helpful') }}</span>
+                                        onclick="FCom.Review.AddRating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
+                                <button class="btn btn-primary btn-xs" type="submit" name="review_helpful" value="no"
+                                        onclick="FCom.Review.AddRating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'no');">{{ "No" | _ }}</button>
                             </form>
                         </div>
-                        <span id="block_review_helpful_done_{{ review.get('id') }}" style="color:green;display: block"></span>
+                        <div id="block_review_offensive_{{ review.get('id') }}">
+                            <form action="{{ APP.href('prodreviews/offensive') }}" method="post"  onsubmit="return false;">
+                                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                                <input type="hidden" name="pid" value="{{ prod.get('id') }}">
+                                <input type="hidden" name="rid" value="{{ review.get('id') }}">
+                                <button class="btn btn-primary btn-xs" type="submit" name="review_offensive" value="yes"
+                                        onclick="FCom.Review.ReportOffensive('{{ APP.href('prodreviews/offensive') }}', {{ review.get('id') }});">{{ "Report offensive" | _ }}</button>
+                            </form>
+                        </div>
+                        <span id="block_review_done_{{ review.get('id') }}" style="color:green;display: block"></span>
                     {% endif %}
                 </div>
             </div>
