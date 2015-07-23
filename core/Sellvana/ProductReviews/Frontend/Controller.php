@@ -13,6 +13,31 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
 {
     public $formId = 'product-review';
 
+    public function action_index()
+    {
+        $p = $this->BRequest->param('product');
+        if ($p === '' || is_null($p)) {
+            $this->forward(false);
+            return $this;
+        }
+        $product = $this->Sellvana_Catalog_Model_Product->load($p, 'url_key');
+        if (!$product) {
+            $this->forward(false);
+            return $this;
+        }
+        if ($product->isDisabled()) {
+            $this->forward(false);
+            return $this;
+        }
+
+        $this->layout('/prodreview/index');
+        $this->BApp->set('current_product', $product);
+        $this->view('prodreviews/product-details')->set([
+            'prod' => $product,
+            'type' => 'full'
+        ]);
+    }
+
     public function action_add()
     {
         $r = $this->BRequest->get();
