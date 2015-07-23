@@ -173,25 +173,20 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
 
             //set default billing / shipping from addressed grid
             $data = $args['data'];
-            if (isset($data['default_billing_id']) && !empty($data['default_billing_id'])) {
+            if (!empty($data['default_billing_id'])) {
                 $address = $hlp->load($data['default_billing_id']);
-                if ($address->id == $data['default_billing_id'] && $address->is_default_billing == 0) {
-                    /** @type Sellvana_Customer_Model_Address $address */
-                    if ($address->customer_id == $customer->id) {
-                        $hlp->update_many(['is_default_billing' => 0], ['customer_id' => $customer->id]);
-                        $address->set('is_default_billing', 1)->save();
-                    }
+                /** @type Sellvana_Customer_Model_Address $address */
+                if ($address->is_default_billing == 0 && $address->customer_id == $customer->id) {
+                    $hlp->update_many(['is_default_billing' => 0], ['customer_id' => $customer->id]);
+                    $address->set('is_default_billing', 1)->save();
                 }
-
             }
-            if (isset($data['default_shipping_id']) && !empty($data['default_shipping_id'])) {
+            if (!empty($data['default_shipping_id'])) {
                 $address = $hlp->load($data['default_shipping_id']);
-                if ($address->id == $data['default_shipping_id'] && $address->is_default_shipping == 0) {
-                    /** @type Sellvana_Customer_Model_Address $address */
-                    if ($address->customer_id == $customer->id) {
-                        $hlp->update_many(['is_default_shipping' => 0], ['customer_id' => $customer->id]);
-                        $address->set('is_default_shipping', 1)->save();
-                    }
+                /** @type Sellvana_Customer_Model_Address $address */
+                if ($address->is_default_shipping == 0 && $address->customer_id == $customer->id) {
+                    $hlp->update_many(['is_default_shipping' => 0], ['customer_id' => $customer->id]);
+                    $address->set('is_default_shipping', 1)->save();
                 }
             }
         }
