@@ -116,7 +116,7 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
 
                     // If country has no region data then return input field
                     if (isRegionEmpty) {
-                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value},  validationRules));
+                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules));
                     }
 
                     // If select has setCountry event then apply event onchange
