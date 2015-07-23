@@ -82,17 +82,14 @@
             $("#block_form_fields_data").val(JSON.stringify(res));
         });
 
-        /**
-         * Add form fields
-         */
-        window.addFormField = function(modal) {
+        function collectFields(modal) {
             var fields = formFieldsModalNode.find('select,input,textarea'),
-                form = formFieldsModalNode.find('form'),
-                addBtn = formFieldsModalNode.find('button.save'),
-                options = {},
-                addRows = {};
+                    form = formFieldsModalNode.find('form'),
+                    options = {},
+                    addRows = {};
 
             var mainFields = {
+                id: 1,
                 name: 1,
                 label: 1,
                 input_type: 1,
@@ -101,7 +98,7 @@
             };
 
             var rows = formFieldsGrid.getRows();
-            if($.isEmptyObject(addRows) == true) {
+            if ($.isEmptyObject(addRows) == true) {
                 addRows['id'] = 0;
             }
 
@@ -135,11 +132,31 @@
                     addRows['_new'] = true;
                     addRows['id'] = id + 1;
                 }
+            }
+            return addRows;
+        }
+        /**
+         * Add form fields
+         */
+        window.addFormField = function(modal) {
+            var addRows = collectFields(modal);
 
+            if (addRows.id && addRows.id !== 0) {
                 formFieldsGrid.addRows([addRows]);
                 modal.close();
             }
         };
+
+        window.updateFormField = function(modal) {
+            var updateRows = collectFields(modal);
+
+            if (updateRows.id && updateRows.id !== 0) {
+                formFieldsGrid.updateRows([updateRows]);
+                modal.close();
+            }
+        };
+
+
 
         var formColumns = [
             {
@@ -344,6 +361,10 @@
                     return React.createElement(formFieldsModalElement, {
                         key: k, column: column, value: that.props.row[column.name]})
                 });
+                if(this.props.row['id']) {
+                    var rowId = React.createElement('input', {key: 'row-id', value: this.props.row['id'], name: 'id', type: 'hidden'});
+                    nodes.unshift(rowId);
+                }
 
                 return (
                     React.createElement("div", {className: " field-element-wrapper"}, nodes)
@@ -493,7 +514,7 @@
                                     formFieldsModalNode = $(modal.getDOMNode());
                                     formFieldsModalNode.find('.modal-dialog').css('width', '900px');
                                 },
-                                onConfirm: window.saveFormField
+                                onConfirm: window.updateFormField
                             },
                             React.createElement('div', {
                                 className: 'f-grid-wrapper',
