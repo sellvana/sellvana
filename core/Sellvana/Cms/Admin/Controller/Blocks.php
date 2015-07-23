@@ -77,7 +77,13 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
             ['name' => 'required', 'label' => 'Required', 'width' => 150,],
             ['name' => 'position', 'label' => 'Position', 'width' => 200,],
             ['name' => 'options', 'label' => 'Options', 'width' => 200, 'hidden' => true],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'delete'], ['name' => 'edit']]]
+            ['type' => 'btn_group', 'buttons' => [['name' => 'delete'], [
+                'name'     => 'edit-field',
+                'title'    => 'Edit',
+                'type'     => 'button',
+                'cssClass' => 'btn-edit',
+                'icon'     => 'icon icon-pencil',
+                'callback' => 'showModalToEditFormField']]]
         ];
 
         $config['filters'] = [
