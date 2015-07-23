@@ -613,15 +613,18 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var column = _.findWhere(this.props.getConfig('columns'), {name: filter.field});
             var data = [];
 
+
             var filterValueArr = filter.val.split(',');
             var valName = [];
-            _.forEach(column.options, function(value, key) {
-                data.push({ id: key, text: value });
-                //add value label name
-                if (_.contains(filterValueArr, key)) {
-                    valName.push(value);
-                }
-            });
+            if (typeof column !== 'undefined' && !_.isEmpty(column.options)) {
+                _.forEach(column.options, function(value, key) {
+                    data.push({ id: key, text: value });
+                    //add value label name
+                    if (_.contains(filterValueArr, key)) {
+                        valName.push(value);
+                    }
+                });
+            }
             filter.valName = valName.length ? valName.join(', ') : '';
 
             return { filter: filter, filterData: data };

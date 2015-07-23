@@ -21,6 +21,7 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
         },
         getDefaultProps: function () {
             return {
+                'row': {},
                 'id': 'modal-form',
                 'columnMetadata': []
             }
@@ -34,18 +35,22 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
         render: function () {
             var that = this;
             var columns = this.props.columnMetadata;
+            var key = 1;
             var defaultValue = this.state.country == '' ? 'US' : this.state.country;
             var nodes = columns.map(function(column) {
                 if (column.addable && column.editable) {
                     if (column.editor == 'select') {
                         if (column.name == 'region') {
-                            return React.createElement(AddressModalElement, {column: column, defaultValue: defaultValue})
+                            return React.createElement(AddressModalElement, {column: column, value: that.props.row[column.name], value: defaultValue, key: column.name + (key++)})
                         }
-                        return React.createElement(AddressModalElement, {column: column, defaultValue: defaultValue, setCountryHandle: that.setCountry})
+                        return React.createElement(AddressModalElement, {column: column, value: that.props.row[column.name], value: defaultValue, setCountryHandle: that.setCountry, key: column.name + (key++)})
                     }
-                    return React.createElement(AddressModalElement, {column: column})
+                    return React.createElement(AddressModalElement, {column: column, value: that.props.row[column.name], key: column.name + (key++)})
                 }
             });
+
+            //add id
+            nodes.push(React.createElement("input", {type: "hidden", name: "id", id: "id", value: that.props.row.id}));
 
             return (
                 React.createElement("div", {className: "field-element-wrapper"}, nodes)
@@ -58,13 +63,13 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
         mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function() {
             return {
-                'defaultValue': '', //default value
+                'value': '', //default value
                 'column': {}, //column info and option
                 'setCountryHandle': null
             }
         },
         componentDidMount: function() {
-            //console.log(this.props.callback);
+            //
         },
         renderLabel: function(column) {
             var iconRequired =(typeof column.validation != 'undefined' && column.validation.hasOwnProperty('required')) ? '*' : '';
@@ -95,7 +100,7 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
                     var isRegionEmpty = false;
                     if (column.name == 'region') {
                         _.forEach(column.options, function(subOption, value) {
-                            if (that.props.defaultValue !== '' && value.slice(1) == that.props.defaultValue) {
+                            if (that.props.value !== '' && value.slice(1) == that.props.value) {
                                 _.forEach(subOption, function(text, value) {
                                     options.push(React.createElement("option", {value: value}, text));
                                 });
@@ -111,22 +116,22 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
 
                     // If country has no region data then return input field
                     if (isRegionEmpty) {
-                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules));
+                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value},  validationRules));
                     }
 
                     // If select has setCountry event then apply event onchange
                     if (typeof that.props.setCountryHandle != 'undefined') {
-                        return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.defaultValue, onChange: that.props.setCountryHandle},  validationRules), options);
+                        return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value, onChange: that.props.setCountryHandle},  validationRules), options);
                     }
 
-                    return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.defaultValue},  validationRules), options);
+                    return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value},  validationRules), options);
 
                     break;
                 case 'textarea':
-                    return React.createElement("textarea", React.__spread({name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: ''},  validationRules));
+                    return React.createElement("textarea", React.__spread({name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: that.props.value},  validationRules));
                     break;
                 default:
-                    return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules));
+                    return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value},  validationRules));
                     break;
             }
         },
@@ -146,48 +151,57 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
         }
     });
 
+    window.showModalToEditAddress = function(row) {
+        modalRender(row);
+    }
+
     window.showModalToAddAddress = function(grid) {
+        modalRender();
+    }
+
+    /**
+     * callback function for render modal to add / edit fieldset
+     * @param grid
+     * @param rows
+     */
+    function modalRender(row) {
         var modalContainerEle = document.getElementById('fcom_append_form');
         React.unmountComponentAtNode(modalContainerEle);
         React.renderComponent(
             React.createElement(Components.Modal, {
-                        id: "addAddressModal",
-                        show: true,
-                        title: 'Create Form',
-                        confirm: 'Save changes',
-                        cancel: 'Close',
-                        onLoad: function(modal) {
-                            formAddressModalNode = $(modal.getDOMNode());
-                            formAddressModalNode.find('.modal-dialog').css('width', '600px');
-                        },
-                        onConfirm: window.addCustomerAddress
+                    id: "addAddressModal",
+                    show: true,
+                    title: 'Create Form',
+                    confirm: 'Save changes',
+                    cancel: 'Close',
+                    onLoad: function(modal) {
+                        formAddressModalNode = $(modal.getDOMNode());
+                        formAddressModalNode.find('.modal-dialog').css('width', '600px');
                     },
-                    React.createElement('div', {className: 'f-grid-wrapper', id: formAddressGrid.getConfig('id')+'-wrap'})
+                    onConfirm: window.addCustomerAddress
+                },
+                React.createElement('form', {className: 'form form-horizontal validate-form', id: formAddressGrid.getConfig('id')+'-modal-form'})
             ), modalContainerEle);
-        var modalWrapEle = $('#{{ addressConfig.config.id }}-wrap');
-            modalWrapEle.append('<form id="{{ addressConfig.config.id }}-modal-form" class="form form-horizontal validate-form"></form>');
         var modalFormEle = document.getElementById('{{ addressConfig.config.id }}-modal-form');
         React.unmountComponentAtNode(modalFormEle);
         React.render(
-            React.createElement(AddressModalForm, {columnMetadata: formAddressGrid.props.columnMetadata, id: formAddressGrid.getConfig('id')}), modalFormEle
+            React.createElement(AddressModalForm, {columnMetadata: formAddressGrid.props.columnMetadata, id: formAddressGrid.getConfig('id'), row: row}), modalFormEle
         );
     }
 
     window.addCustomerAddress = function(modal) {
         var fields  = formAddressModalNode.find('select,input,textarea'),
-            form    = formAddressModalNode.find('form');
+            form    = formAddressModalNode.find('form'),
+            id      = form.find('#id').val(),
+            hash    = { oper: id ? 'edit' : 'add', id: id },
+            url     = formAddressGrid.getConfig('edit_url');
 
         var rows = formAddressGrid.getRows();
-        var id;
         if($.isEmptyObject(rows) == true) {
             id = 0;
         } else {
             id = rows.length + 1;
         }
-
-        // Define operation type and url
-        var hash = { oper: 'add', id: id },
-            url  = formAddressGrid.getConfig('edit_url');
 
         // Validate form
         if (form.valid()) { // If validation passes

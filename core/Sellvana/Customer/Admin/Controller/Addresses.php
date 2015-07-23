@@ -25,6 +25,7 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115, 'buttons' => [['name' => 'edit', 'callback' => 'showModalToEditAddress'], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'a.id', 'width' => 80, 'hidden' => true],
             ['name' => 'customer_id', 'label' => 'Customer ID', 'index' => 'a.customer_id', 'hidden' => true,
                 'form_hidden_label' => true, 'addable' => true, 'editable' => true,
@@ -65,9 +66,7 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
             ],
             ['name' => 'is_default_shipping', 'label' => 'Is Default Shipping', 'display' => 'eval',
                 'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'model[default_shipping_id]\' "+(rc.row["is_default_shipping"] == 1 ? checked=\'checked\' : \'\')+" />"'
-            ],
-            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
-                'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
+            ]
         ];
         $config['actions'] = [
             'new'    => ['caption' => 'Add New Address', 'modal' => true],
