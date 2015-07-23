@@ -88,6 +88,28 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
         $config['grid_before_create'] = 'customer_address_grid';
         return ['config' => $config];
     }
+    
+    public function getCustomerAddressesGridConfigForGriddle($customer) {
+        $config = $this->getCustomerAddressesGridConfig($customer);
+
+        unset($config['config']['actions']['new']);
+        $config['config']['actions']['add-address'] = [
+            'caption'  => 'Add New Address',
+            'type'     => 'button',
+            'id'       => 'add-address-from-grid',
+            'class'    => 'btn-primary',
+            'callback' => 'showModalToAddAddress'
+        ];
+
+        unset($config['config']['callbacks']);
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'addressGridRegister'
+        ];
+
+        unset($config['config']['grid_before_create']);
+        $config['config']['grid_before_create'] = 'addressGridRegister';
+        return $config;
+    }
 
     public function action_get_state__POST()
     {
