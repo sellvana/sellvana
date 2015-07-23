@@ -42,7 +42,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             }
         },
         render: function () {
-            console.log('config', this.props.config);
+            console.log('griddle.config-' + this.props.config.id, this.props.config);
             var config = this.props.config;
 
             //prepare props base on data mode
@@ -592,8 +592,9 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 var checked = _.contains(that.props.selectedColumns(), column);
                 var colInfo = _.findWhere(that.props.columnMetadata, {name: column});
 
-                if(colInfo.hidden){
-                    return null;
+                //not render options item element in case no LABEL
+                if (typeof colInfo == 'undefined' || colInfo.label == '') {
+                    return false;
                 }
 
                 return (
