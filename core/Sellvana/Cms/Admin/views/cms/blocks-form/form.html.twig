@@ -82,7 +82,7 @@
             $("#block_form_fields_data").val(JSON.stringify(res));
         });
 
-        function collectFields(modal) {
+        function collectFields() {
             var fields = formFieldsModalNode.find('select,input,textarea'),
                     form = formFieldsModalNode.find('form'),
                     options = {},
@@ -139,7 +139,7 @@
          * Add form fields
          */
         window.addFormField = function(modal) {
-            var addRows = collectFields(modal);
+            var addRows = collectFields();
 
             if (addRows.id && addRows.id !== 0) {
                 formFieldsGrid.addRows([addRows]);
@@ -148,7 +148,7 @@
         };
 
         window.updateFormField = function(modal) {
-            var updateRows = collectFields(modal);
+            var updateRows = collectFields();
 
             if (updateRows.id && updateRows.id !== 0) {
                 formFieldsGrid.updateRows([updateRows]);
