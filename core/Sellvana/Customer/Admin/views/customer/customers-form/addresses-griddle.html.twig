@@ -27,7 +27,7 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
             }
         },
         componentDidMount: function() {
-            // 
+            //
         },
         setCountry: function(e) {
             this.setState({country: e.target.value});
@@ -36,21 +36,23 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
             var that = this;
             var columns = this.props.columnMetadata;
             var key = 1;
-            var defaultValue = this.state.country == '' ? 'US' : this.state.country;
+            var country = that.state.country;
             var nodes = columns.map(function(column) {
                 if (column.addable && column.editable) {
                     if (column.editor == 'select') {
+                        var defaultCountryValue = _.isEmpty(that.props.row) ? (country != '' ? country : 'US') : (that.props.row[column.name] != 'US' ? that.props.row[column.name] : 'US');
                         if (column.name == 'region') {
-                            return React.createElement(AddressModalElement, {column: column, value: that.props.row[column.name], value: defaultValue, key: column.name + (key++)})
+                            var defaultRegionValue = defaultCountryValue != 'US' && _.isEmpty(that.props.row) ? '' : (defaultCountryValue != 'US' && that.props.row[column.name] == '' ? '' : defaultCountryValue);
+                            return React.createElement(AddressModalElement, {column: column, value: defaultRegionValue, key: column.name + (key++)})
                         }
-                        return React.createElement(AddressModalElement, {column: column, value: that.props.row[column.name], value: defaultValue, setCountryHandle: that.setCountry, key: column.name + (key++)})
+                        return React.createElement(AddressModalElement, {column: column, value: defaultCountryValue, setCountryHandle: that.setCountry, key: column.name + (key++)})
                     }
                     return React.createElement(AddressModalElement, {column: column, value: that.props.row[column.name], key: column.name + (key++)})
                 }
             });
 
             //add id
-            nodes.push(React.createElement("input", {type: "hidden", name: "id", id: "id", value: that.props.row.id}));
+            nodes.push(React.createElement("input", {type: "hidden", name: "id", id: "id", value: that.props.row.id, key: 'id' + (key++)}));
 
             return (
                 React.createElement("div", {className: "field-element-wrapper"}, nodes)
@@ -64,6 +66,7 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
         getDefaultProps: function() {
             return {
                 'value': '', //default value
+                'key': '',
                 'column': {}, //column info and option
                 'setCountryHandle': null
             }
@@ -74,8 +77,8 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
         renderLabel: function(column) {
             var iconRequired =(typeof column.validation != 'undefined' && column.validation.hasOwnProperty('required')) ? '*' : '';
             return (
-                React.createElement("div", {className: "control-label col-sm-3"}, 
-                    React.createElement("label", {htmlFor: column.name}, 
+                React.createElement("div", {className: "control-label col-sm-3"},
+                    React.createElement("label", {htmlFor: column.name},
                         column.label, iconRequired
                     )
                 )
@@ -116,22 +119,22 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
 
                     // If country has no region data then return input field
                     if (isRegionEmpty) {
-                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules));
+                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value, key: that.props.key},  validationRules));
                     }
 
                     // If select has setCountry event then apply event onchange
                     if (typeof that.props.setCountryHandle != 'undefined') {
-                        return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value, onChange: that.props.setCountryHandle},  validationRules), options);
+                        return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value, key: that.props.key, onChange: that.props.setCountryHandle},  validationRules), options);
                     }
 
-                    return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value},  validationRules), options);
+                    return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value, key: that.props.key},  validationRules), options);
 
                     break;
                 case 'textarea':
-                    return React.createElement("textarea", React.__spread({name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: that.props.value},  validationRules));
+                    return React.createElement("textarea", React.__spread({name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: that.props.value, key: that.props.key},  validationRules));
                     break;
                 default:
-                    return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value},  validationRules));
+                    return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: that.props.value, key: that.props.key},  validationRules));
                     break;
             }
         },
@@ -139,12 +142,12 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
             var that = this;
             var column = this.props.column;
 
-            if (typeof column.element_print != 'undefined') {
+            if (typeof column.element_print !== 'undefined') {
                 return this.renderNode(column);
             }
 
             return (
-                React.createElement("div", {className: 'form-group'}, 
+                React.createElement("div", {className: 'form-group'},
                     this.renderLabel(column), React.createElement("div", {className: "controls col-sm-8"}, this.renderNode(column))
                 )
             )
@@ -167,7 +170,7 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
     function modalRender(row) {
         var modalContainerEle = document.getElementById('fcom_append_form');
         React.unmountComponentAtNode(modalContainerEle);
-        React.renderComponent(
+        React.render(
             React.createElement(Components.Modal, {
                     id: "addAddressModal",
                     show: true,
@@ -196,13 +199,6 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
             hash    = { oper: id ? 'edit' : 'add', id: id },
             url     = formAddressGrid.getConfig('edit_url');
 
-        var rows = formAddressGrid.getRows();
-        if($.isEmptyObject(rows) == true) {
-            id = 0;
-        } else {
-            id = rows.length + 1;
-        }
-
         // Validate form
         if (form.valid()) { // If validation passes
             fields.each(function (i, field) {
@@ -211,7 +207,7 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
                 hash[key] = formAddressGrid.html2text(val);
             });
 
-            // Add 
+            // Add
             $.post(url, hash, function(data) {
                 formAddressGrid.refresh();
                 modal.close();
