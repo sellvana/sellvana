@@ -840,14 +840,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param bool|int $limit
      * @param bool $incAvgRating
      * @param bool|int $filterByRating
      * @return array
      */
-    public function reviews($incAvgRating = true, $filterByRating = false)
+    public function reviews($limit = false, $incAvgRating = true, $filterByRating = false)
     {
         $numReviews = 0;
-        $reviews = [];
+        $pageData = [];
 
         if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
             $ratings = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select('pr.rating')->select_expr('COUNT(pr.id)', 'count')
@@ -855,21 +856,33 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 ->where(['pr.product_id' => $this->id(), 'approved' => 1])
                 ->group_by('pr.rating')->find_many();
 
-            list($numReviews, $avgRating, $ratingByStars) = $this->getRatingStats($ratings, $incAvgRating);
+            $stats = $this->getRatingStats($ratings, $incAvgRating);
+            $numReviews = $stats['num_reviews'];
+            $avgRating = $stats['avg_rating'];
+            $ratingByStars = $stats['rating_by_stars'];
 
             $reviews = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
                 ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
-                ->where(['pr.product_id' => $this->id(), 'approved' => 1]);
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1])
+                ->order_by_expr('(pr.helpful / pr.helpful_voices) DESC');
 
             if ((int)$filterByRating) {
                 $reviews->where('rating', (int)$filterByRating);
             }
 
-            $reviews = $reviews->order_by_expr('pr.create_at DESC')->find_many();
+            if ((int)$limit) {
+                $reviews->limit($limit);
+            }
+
+            $reviews = $reviews->order_by_expr('pr.create_at DESC');
+
+            $pageData = $reviews->paginate($this->BRequest->get(), [
+                'ps' => 3,
+            ]);
         }
 
         return [
-            'items' => $reviews,
+            'items' => $pageData,
             'ratings' => isset($ratingByStars) ? $ratingByStars : [],
             'avgRating' => isset($avgRating) ? $avgRating : [],
             'numReviews' => $numReviews,
@@ -887,7 +900,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $numReviews = 0;
         $reviewConfig = $this->Sellvana_ProductReviews_Model_Review->config();
         $ratingByStars = [];
-        for ($i = $reviewConfig['min']; $i <= $reviewConfig['max']; $i += $reviewConfig['step']) {
+        for ($i = $reviewConfig['max']; $i >= $reviewConfig['min']; $i -= $reviewConfig['step']) {
             $ratingByStars[$i] = 0;
         }
 
@@ -898,10 +911,14 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $ratingByStars[$review->rating] = $review->count;
             }
 
-            $avgRating = number_format($avgRating / $numReviews, 2);
+            $avgRating = trim(number_format($avgRating / $numReviews, 2), '0.');
         }
 
-        return array($numReviews, $avgRating, $ratingByStars);
+        return [
+            'num_reviews' => $numReviews,
+            'avg_rating' => $avgRating,
+            'rating_by_stars' => $ratingByStars
+        ];
     }
 
     /**

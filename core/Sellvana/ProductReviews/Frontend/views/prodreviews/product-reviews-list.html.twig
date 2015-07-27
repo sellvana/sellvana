@@ -1,58 +1,68 @@
 {% set reviews = THIS.get('reviews') %}
 {% set isAlreadyReviewed = THIS.get('isAlreadyReviewed') %}
-{% set thisUrl = app.request.uri %}
+{% set thisUrl = APP.href('prodreviews/' ~ prod.get('url_key')) %}
+{% set state = reviews.items.state %}
 
 {% if reviews.numReviews > 0 %}
     {% set isLoggedIn = APP.instance('Sellvana_Customer_Model_Customer').isLoggedIn() %}
     {% set userId = THIS.get('userId') %}
     {% set rate = APP.instance('Sellvana_ProductReviews_Model_Review').config() %}
-    <div class="f-prod-review-avg clearfix">
-        <h5>{{ "Avg. Customer Rating"|_ }} ({{ reviews.numReviews }} {{ "Reviews"|_ }}):</h5>
+    <div class="f-prod-review-avg clearfix col-md-3">
         <div class="glyphicon f-rating-stars f-lg-stars">
             <span class="f-filled-stars" style="width:{{ (reviews.avgRating/rate.max)*100 }}%;"></span>
             <span class="f-empty-stars"></span>
         </div>
-        <strong>{{ reviews.avgRating }} / {{ rate.max }}</strong>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="list-group f-rating-filter">
-                {% for i, count in reviews.ratings %}
-                    <a class="list-group-item clearfix" href="{{ thisUrl }}?filter={{ i }}">
-                        <span class="pull-left stars-amount">{{ '%stars$s star(s)' | _({stars: i}) }}</span>
-                        <div class="pull-left progress">
-                            <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{ (count/reviews.numReviews)*100 }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ (count/reviews.numReviews)*100 }}%">
+        {% if type == 'short' %}
+            <a href="{{ thisUrl }}">{{ reviews.numReviews }}</a>
+        {% endif %}
+        <a href="{{ thisUrl }}" class="f-avg-out-of-max">{{ "%avg$s out of %max$s stars" | _({avg: reviews.avgRating, max: rate.max}) }}</a>
+        <div class="f-rating-filter-container">
+            <ul class="f-rating-filter">
+            {% for i, count in reviews.ratings %}
+                <li>
+                    <a class="clearfix" href="{{ thisUrl }}?filter={{ i }}">
+                        <span class="stars-amount">{{ '%stars$s star(s)' | _({stars: i}) }}</span>
+                        <span class="progress">
+                            <span class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{ (count/reviews.numReviews)*100 }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ (count/reviews.numReviews)*100 }}%">
                                 <span class="sr-only">{{ (count/reviews.numReviews)*100 }}%</span>
-                            </div>
-                        </div>
-                        <span class="badge">{{ ((count/reviews.numReviews)*100)|round }}%</span>
+                            </span>
+                        </span>
+                        <span>{{ ((count/reviews.numReviews)*100)|round }}%</span>
                     </a>
-                {% endfor %}
-                </div>
-            </div>
+                </li>
+            {% endfor %}
+            </ul>
+            {% if (reviews.numReviews > 3 and (REQUEST.get('filter')) or type == 'short') %}
+                <p><a href="{{ thisUrl }}">{{ "Read all %s customer reviews"|_(reviews.numReviews) }} &rsaquo;</a></p>
+            {% endif %}
         </div>
     </div>
+    {% if type == 'full' %}
+        <div class="f-prod-img col-md-1">
+            <img src="{{ prod.thumbUrl(80, 80) }}" />
+        </div>
+        <div class="f-prod col-md-4">
+            <a href="{{ prod.url() }}">{{ prod.name }}</a>
+            {{ THIS.view('catalog/product/price').set('product', prod) | raw }}
+        </div>
+    {% endif %}
 
-    {% for review in reviews.items %}
+    <h5 class="f-prod-reviews-title">{{ "Most Helpful Customer Reviews"|_ }}</h5>
+    {% for review in reviews.items.rows %}
         <article class="f-prod-review-post clearfix">
             <small>{{ "%helpful$s of %total$s people found the following review helpful"|_({helpful: review.get('helpful'), total: review.get('helpful_voices')}) }}</small>
+            <span class="glyphicon f-rating-stars f-xs-stars">
+                <span class="f-filled-stars" style="width:{{ (review.get('rating')/rate.max)*100 }}%;"></span>
+                <span class="f-empty-stars"></span>
+            </span>
             <h5>{{ review.get('title') }}</h5>
             <span class="meta">{{ "by"|_ }} {{ review.get('firstname') }} {{ review.get('lastname') }} {{ "on"|_ }} {{ review.get('created_at')|date('F j, Y') }}</span>
             {% if review.get('verified_purchase') %}
                 <span class="verified">{{ "Verified Purchase"|_ }}</span>
             {% endif %}
             <div class="col-md-12 col-sm-12 f-prod-review-attrs">
-                <dl class="dl-horizontal">
-                    <dt><strong>{{ "Overall"|_ }}</strong></dt>
-                    <dd>
-                        <div class="glyphicon f-rating-stars f-xs-stars">
-                            <span class="f-filled-stars" style="width:{{ (review.get('rating')/rate.max)*100 }}%;"></span>
-                            <span class="f-empty-stars"></span>
-                        </div>
-                        <strong>{{ review.get('rating') }} / {{ rate.max }}</strong>
-                    </dd>
-                </dl>
                 <div class="f-prod-review">
-                    {{ review.get("text") }}
+                    {{ review.get("text") | nl2br }}
                     {% if review.get('customer_id') == userId %}
                         <a data-toggle="modal" data-content="{{ review.get('id') }}" class="f-prod-review-edit" title="{{ 'Edit this review'|_ }}"
                            href="{{ APP.href('prodreviews/edit?rid=') ~ review.get('id') }}">
@@ -87,9 +97,19 @@
         </article>
     {% endfor %}
 
-    {% if (reviews.numReviews > 1 or REQUEST.get('filter')) %}
-        <p><a href="{{ APP.href(REQUEST.server('PATH_INFO')) }}"><strong>{{ "Read all %s customer reviews"|_(reviews.numReviews) }} &rsaquo;</strong></a></p>
+    {% if type == 'full' %}
+        {% if state.p > 1 %}
+            <a href="{{ thisUrl }}?p={{ state.p - 1 }}{% if REQUEST.get('filter') %}&filter={{ REQUEST.get('filter') }}{% endif %}">{{ "Previous page" | _ }}</a>
+        {% endif %}
+        {% if state.p < state.mp %}
+            <a href="{{ thisUrl }}?p={{ state.p + 1 }}{% if REQUEST.get('filter') %}&filter={{ REQUEST.get('filter') }}{% endif %}">{{ "Next page" | _ }}</a>
+        {% endif %}
     {% endif %}
+
+    {% if (reviews.numReviews > 3 and (REQUEST.get('filter')) or type == 'short') %}
+        <strong class="show-all"><a href="{{ thisUrl }}">{{ "Read all %s customer reviews"|_(reviews.numReviews) }} &rsaquo;</a></strong>
+    {% endif %}
+
     <script>
         require(['jquery', 'fcom.productreviews'], function ($){
             $('.f-prod-review-edit').click(function () {

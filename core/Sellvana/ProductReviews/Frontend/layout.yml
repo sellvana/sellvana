@@ -3,6 +3,10 @@ base:
         do:
             - [ requireJs, fcom.productreviews, "@Sellvana_ProductReviews/Frontend/js/fcom.productreviews" ]
 
+/prodreview/index:
+    - { include: base }
+    - { hook: main, views: prodreviews/product-details }
+
 /prodreview/form:
     - { include: base }
     - { hook: main, views: prodreviews/form }

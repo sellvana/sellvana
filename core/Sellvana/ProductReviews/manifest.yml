@@ -22,5 +22,6 @@ modules:
                 routing:
                     - [ /prodreviews, Sellvana_ProductReviews_Frontend_Controller.index ]
                     - [ /prodreviews/.action, Sellvana_ProductReviews_Frontend_Controller ]
+                    - [ "/prodreviews/:product", Sellvana_ProductReviews_Frontend_Controller.index ]
                 observe:
                     - [ "BLayout::hook:prodreviews-reviews", Sellvana_ProductReviews_Frontend.hookReviews ]
