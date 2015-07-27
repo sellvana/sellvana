@@ -9,11 +9,23 @@
 <script>
 require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function(React, _, $, Components) {
     var formAddressGrid, formAddressNode, formAddressModalNode;
+
+    /**
+     * Callback init function to register grid vars
+     *
+     * @param  {React grid element} grid
+     * @return mixed
+     */
     window.addressGridRegister = function(grid) {
         formAddressGrid = grid;
         formAddressNode = $(formAddressGrid.getDOMNode());
     }
 
+    /**
+     * Custom modal form for address gird
+     *
+     * @return React form element
+     */
     var AddressModalForm = React.createClass({
         displayName: "AddressModalForm",
         getInitialState: function(){
@@ -60,6 +72,11 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
         }
     });
 
+    /**
+     * Custom modal element for address gird
+     *
+     * @return React element for individual input
+     */
     var AddressModalElement = React.createClass({
         displayName: "AddressModalElement",
         mixins: [FCom.Mixin, FCom.FormMixin],
@@ -154,18 +171,29 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
         }
     });
 
+    /**
+     * Callback function to edit address item
+     * @param  {Object} row
+     * @return mixed
+     */
     window.showModalToEditAddress = function(row) {
         modalRender(row);
     }
 
-    window.showModalToAddAddress = function(grid) {
+    /**
+     * Callback function to add address item
+     *
+     * @return mixed
+     */
+    window.showModalToAddAddress = function() {
         modalRender();
     }
 
     /**
-     * callback function for render modal to add / edit fieldset
-     * @param grid
-     * @param rows
+     * Function for render modal to add / edit address
+     *
+     * @param {Object} rows
+     * @return React modal element
      */
     function modalRender(row) {
         var modalContainerEle = document.getElementById('fcom_append_form');
@@ -192,6 +220,12 @@ require(['react', 'underscore', 'jquery', 'fcom.components', 'unique'], function
         );
     }
 
+    /**
+     * Callback function for saving modal form
+     * @param React DOM Node modal
+     *
+     * @return mixed
+     */
     window.addCustomerAddress = function(modal) {
         var fields  = formAddressModalNode.find('select,input,textarea'),
             form    = formAddressModalNode.find('form'),
