@@ -176,15 +176,15 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
             if (!empty($data['default_billing_id'])) {
                 $address = $hlp->load($data['default_billing_id']);
                 /** @type Sellvana_Customer_Model_Address $address */
-                if ($address->customer_id == $customer->id) {
+                if ($address->is_default_billing == 0 && $address->customer_id == $customer->id) {
                     $hlp->update_many(['is_default_billing' => 0], ['customer_id' => $customer->id]);
                     $address->set('is_default_billing', 1)->save();
                 }
             }
             if (!empty($data['default_shipping_id'])) {
-                $address = $hlp->load($data['default_billing_id']);
+                $address = $hlp->load($data['default_shipping_id']);
                 /** @type Sellvana_Customer_Model_Address $address */
-                if ($address->customer_id == $customer->id) {
+                if ($address->is_default_shipping == 0 && $address->customer_id == $customer->id) {
                     $hlp->update_many(['is_default_shipping' => 0], ['customer_id' => $customer->id]);
                     $address->set('is_default_shipping', 1)->save();
                 }

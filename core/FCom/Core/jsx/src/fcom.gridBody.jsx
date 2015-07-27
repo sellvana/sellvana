@@ -43,7 +43,11 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
 
             switch (action) {
                 case 'edit':
-                    //console.log('render modal');
+                    // If button has custom editable
+                    if (typeof callback !== 'undefined' && typeof window[callback] === 'function') {
+                        return window[callback](row);
+                    }
+
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
