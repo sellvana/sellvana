@@ -150,15 +150,17 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             this.setState({filters: filters});
             this.keepShowDropDown(event.target);
         },
-        prepareFilter: function () {
+        prepareFilter: function (filter, isClear) {
             //add submit filter
             var filters = this.state.filters;
             var submitFilters = {};
             _.forEach(filters, function(f) {
-                submitFilters[f.field] = f;
-                if (!f.submit) {
+                if (isClear === true && !f.submit && filter.field == f.field) {
+                    submitFilters[f.field]     = f;
                     submitFilters[f.field].val = '';
                     $('#f-grid-filter-' + f.field).find('input').val('');
+                } else if (f.submit) {
+                    submitFilters[f.field] = f;
                 }
             });
             return submitFilters;
@@ -177,7 +179,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var dataMode = this.props.getConfig('data_mode');
             this.setStateFilter(field, 'submit', !isClear);
 
-            var submitAll = this.prepareFilter();
+            var submitAll = this.prepareFilter(filter, isClear);
             var submitFilters = {};
 
             for (item in submitAll) {
