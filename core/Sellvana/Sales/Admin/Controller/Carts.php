@@ -136,7 +136,15 @@ class Sellvana_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstra
             ['field' => 'status', 'type' => 'multiselect'],
         ];
         $config['orm'] = $config['orm']->where('customer_id', $customer->id);
+        $config['data_url'] = $config['data_url'] . '?customer_id='.$customer->id;
 
         return ['config' => $config];
+    }
+
+    public function gridOrmConfig($orm) {
+        parent::gridOrmConfig($orm);
+        if ($this->BRequest->get('customer_id')) {
+            $orm->where('customer_id', $this->BRequest->get('customer_id'));
+        }
     }
 }

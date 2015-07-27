@@ -13,6 +13,20 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
     protected $_recordName = 'Address';
     protected $_mainTableAlias = 'a';
 
+    public function gridConfig() {
+        $config = parent::gridConfig();
+
+        $config['filters'] = [
+            ['field' => 'country', 'type' => 'multiselect'],
+            ['field' => 'company', 'type' => 'text'],
+            ['field' => 'postcode', 'type' => 'text'],
+            ['field' => 'street1', 'type' => 'text'],
+            ['field' => 'email', 'type' => 'text']
+        ];
+
+        return $config;
+    }
+
     /**
      * config get all addresses of customer
      * @param $customer Sellvana_Customer_Model_Customer
@@ -77,17 +91,17 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
             ['field' => 'company', 'type' => 'text'],
             ['field' => 'postcode', 'type' => 'text'],
             ['field' => 'street1', 'type' => 'text'],
-            ['field' => 'email', 'type' => 'text'],
-            '_quick' => ['expr' => 'street1 like ? or company like ? or city like ? or country like ?', 'args' => ['%?%', '%?%', '%?%', '%?%']]
+            ['field' => 'email', 'type' => 'text']
         ];
 
         $config['orm'] = $this->Sellvana_Customer_Model_Address->orm($this->_mainTableAlias)
             ->select($this->_mainTableAlias . '.*')->where('customer_id', $customer->id);
+        $config['data_url'] = $config['data_url'] . '?customer_id='.$customer->id;
         $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress'];
         $config['grid_before_create'] = 'customer_address_grid';
         return ['config' => $config];
     }
-    
+
     public function getCustomerAddressesGridConfigForGriddle($customer) {
         $config = $this->getCustomerAddressesGridConfig($customer);
 
@@ -108,6 +122,13 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
         unset($config['config']['grid_before_create']);
         $config['config']['grid_before_create'] = 'addressGridRegister';
         return $config;
+    }
+
+    public function gridOrmConfig($orm) {
+        parent::gridOrmConfig($orm);
+        if ($this->BRequest->get('customer_id')) {
+            $orm->where('customer_id', $this->BRequest->get('customer_id'));
+        }
     }
 
     public function action_get_state__POST()
