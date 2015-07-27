@@ -235,6 +235,7 @@ class Sellvana_Sales_Main extends BClass
             'icon' => 'inbox',
             'view' => 'order/dashboard/orders-list',
             'async' => true,
+            'filter' => true,
         ]);
         $view->addWidget('orders-totals', [
             'title' => 'Order Totals',
