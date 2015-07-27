@@ -572,7 +572,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             list($field, $dir) = is_string($sort) ? explode(' ', $sort) + ['', ''] : $sort;
             $method = 'order_by_' . (strtolower($dir) == 'desc' ? 'desc' : 'asc');
 
-            $bus['result']['orm']->$method('sort_' . $field);
+            $bus['result']['orm']->$method($field);
         }
     }
 }
