@@ -133,7 +133,7 @@ class Sellvana_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstra
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'grand_total', 'type' => 'number-range'],
-            ['field' => 'status', 'type' => 'multiselect'],
+            ['field' => 'state_overall', 'type' => 'multiselect'],
         ];
         $config['orm'] = $config['orm']->where('customer_id', $customer->id);
         $config['data_url'] = $config['data_url'] . '?customer_id='.$customer->id;

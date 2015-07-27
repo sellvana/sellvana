@@ -16,6 +16,23 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
     public function gridConfig() {
         $config = parent::gridConfig();
 
+        $config['columns'] = [
+            ['name' => 'id', 'index' => 'a.id'],
+            ['name' => 'firstname', 'index' => 'a.firstname'],
+            ['name' => 'lastname', 'index' => 'a.lastname'],
+            ['name' => 'company', 'index' => 'a.company'],
+            ['name' => 'street1', 'index' => 'a.street1'],
+            ['name' => 'street2', 'index' => 'a.street2'],
+            ['name' => 'street3', 'index' => 'a.street3'],
+            ['name' => 'country', 'index' => 'a.country'],
+            ['name' => 'region', 'index' => 'a.region'],
+            ['name' => 'city', 'index' => 'a.city'],
+            ['name' => 'postcode', 'index' => 'a.postcode'],
+            ['name' => 'phone', 'index' => 'a.phone'],
+            ['name' => 'fax', 'index' => 'a.fax'],
+            ['name' => 'email', 'index' => 'a.email']
+        ];
+
         $config['filters'] = [
             ['field' => 'country', 'type' => 'multiselect'],
             ['field' => 'company', 'type' => 'text'],
