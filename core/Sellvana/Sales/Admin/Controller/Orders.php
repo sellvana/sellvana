@@ -132,6 +132,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
         $orm->left_outer_join('FCom_Admin_Model_User', 'o.admin_id = au.id', 'au')
             ->select_expr('CONCAT_WS(" ", au.firstname,au.lastname)', 'admin_name');
+
+        if ($this->BRequest->get('customer_id')) {
+            $orm->where('o.customer_id', $this->BRequest->get('customer_id'));
+        }
     }
 
     public function gridViewBefore($args)
@@ -348,6 +352,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         /** @var BORM $orm */
         $orm = $config['orm'];
         $orm->where('customer_id', $customer->id());
+        $config['data_url'] = $config['data_url'] . '?customer_id='.$customer->id;
         $this->gridOrmConfig($orm);
 
         return ['config' => $config];
