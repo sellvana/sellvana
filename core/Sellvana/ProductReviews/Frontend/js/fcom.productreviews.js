@@ -12,11 +12,30 @@ define(["jquery"], function ($) {
                 }
                 if (msg['error']) {
                     $('#block_review_helpful_' + rid).hide();
-                    $('#block_review_helpful_done_' + rid).css('color', 'red').html(msg['error']);
+                    $('#block_review_done_' + rid).css('color', 'red').html(msg['error']);
                     //$('#block_review_helpful_done_' + rid).html(msg['error']);
                 } else {
                     $('#block_review_helpful_' + rid).hide();
-                    $('#block_review_helpful_done_' + rid).html("Thank you for your feedback!");
+                    $('#block_review_done_' + rid).html("Thank you for your feedback!");
+                }
+            });
+    };
+    FCom.Review.ReportOffensive = function (url, rid) {
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: { rid: rid }
+        }).done(function (msg) {
+                if (msg['redirect']) {
+                    window.location.replace(msg['redirect']);
+                    return false;
+                }
+                if (msg['error']) {
+                    $('#block_review_offensive_' + rid).hide();
+                    $('#block_review_done_' + rid).css('color', 'red').html(msg['error']);
+                } else {
+                    $('#block_review_offensive_' + rid).hide();
+                    $('#block_review_done_' + rid).html("Thank you for your feedback!");
                 }
             });
     }

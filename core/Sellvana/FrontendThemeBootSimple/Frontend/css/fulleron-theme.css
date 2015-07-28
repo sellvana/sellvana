@@ -601,13 +601,6 @@ a.btn-link { text-transform:none; }
   .f-prod-reviews [class^='col-md'] {
     padding:0;
     }
-  .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dl {
-    margin:8px 0;
-    }
-  .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dt:first-of-type,
-  .f-prod-reviews .f-prod-review-post .f-prod-review-attrs dd:first-of-type {
-    display:block;
-    }
   .f-prod-listing-toolbar .row {
     margin:0;
     }
@@ -670,11 +663,6 @@ a.btn-link { text-transform:none; }
     }
   .f-site-footer dd {
     margin:3px 0;
-    }
-
-  /* Container: Product Rating & Reviews */
-  .f-prod-reviews .f-prod-review-post .f-prod-review-attrs {
-    border:1px solid #eee;
     }
 }
 

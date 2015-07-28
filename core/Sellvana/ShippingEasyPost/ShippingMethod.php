@@ -32,7 +32,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
 
         $data = $this->_applyDefaultPackageConfig($data);
 
-        if ($data['mode'] === self::MODE_TEST) {
+        if ($data['mode'] === self::MODE_TEST && !empty($data['test_access_key'])) {
             $data['access_key'] = $data['test_access_key'];
         }
 
@@ -290,7 +290,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         $config = $this->BConfig->get($this->_configPath);
         $services = [];
         if (empty($config['access_key'])) {
-            return false;
+            return [];
         }
 
         // Carrier API is available only in production mode, so we must always use production access key

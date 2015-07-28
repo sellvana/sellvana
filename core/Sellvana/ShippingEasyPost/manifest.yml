@@ -21,5 +21,5 @@ modules:
                     enabled: 1
                     label: EasyPost
                     max_package_weight: 150
-                    production_mode: 0
+                    mode: test
                     sort_order: 20
