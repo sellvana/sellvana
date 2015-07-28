@@ -425,8 +425,8 @@
                     first.addClass('single');
                 }
 
-                first.removeClass('left').addClass('right');
-                second.removeClass('right').addClass('left');
+                /*first.removeClass('left').addClass('right');
+                second.removeClass('right').addClass('left');*/
 
                 if (this.singleDatePicker) {
                     first.show();
