@@ -1051,7 +1051,7 @@ class BLocale extends BClass
                     if (isset($m[4]) && $condValue > (int)$m[4]) { // upper bound breached
                         $valid = false;
                     }
-                } elseif ($condValue !== (int)$m[2]) { // single number matches
+                } elseif ($condValue !== (int)$m[2]) { // single number doesn't match
                     $valid = false;
                 }
                 if ($valid) {
