@@ -359,8 +359,11 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         $cond = 'o.create_at ' . $filter['condition'];
         $orm = $this->Sellvana_Sales_Model_Order->orm('o')
             ->join('Sellvana_Customer_Model_Customer', ['o.customer_id', '=', 'c.id'], 'c')
-            ->where_raw($cond, $filter['params'])
             ->select(['o.*', 'c.firstname', 'c.lastname']);
+
+        if ($filter) {
+            $orm->where_raw($cond, $filter['params']);
+        }
 
         $result = $orm->find_many();
 
@@ -376,8 +379,11 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ->group_by('s.id')
             ->select_expr('COUNT(o.id)', 'order')
             ->where('s.entity_type', 'order')
-            ->where_raw($cond, $filter['params'])
             ->select(['s.id', 's.state_label']);
+
+        if ($filter) {
+            $orderTotal->where_raw($cond, $filter['params']);
+        }
 
         $result = $orderTotal->find_many();
         return $result;

@@ -54,6 +54,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
             }
         }
         $result['filter'] = (isset($persData['dashboard']['filter'])) ? $persData['dashboard']['filter']: [];
+        $this->_processDateFilter($result['filter']);
         if ($add && $persData) {
             $this->FCom_Admin_Model_User->personalize($persData);
         }
