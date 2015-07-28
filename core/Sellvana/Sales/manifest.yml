@@ -23,6 +23,7 @@ modules:
                     - [ /payments/?.action, Sellvana_Sales_Admin_Controller_Payments ]
                     - [ /orderstatus/?.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
                     - [ /orderstatecustom/?.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
+                    - [ /sales/report/byCustomerGroup/?.action, Sellvana_Sales_Admin_Controller_Report_CustomerGroup ]
                 observe:
                     - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]
