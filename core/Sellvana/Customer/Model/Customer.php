@@ -156,7 +156,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             'password_hash' => $this->BUtil->fullSaltedHash($password),
             'password_session_token' => $token,
         ]);
-        if ($this->id() === $this->sessionUserId() && !$this->isOnBackend()) {
+
+        if ($this->id() === $this->sessionUserId() && $this->BRequest->area() != 'FCom_Admin') {
             $this->BSession->set('admin_user_password_token', $token);
         }
         return $this;
@@ -171,10 +172,6 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $this->set(['token' => $this->BUtil->randomString(20), 'token_at' => $this->BDb->now()])->save();
         $this->BLayout->view('email/customer-password-recover')->set('customer', $this)->email();
         return $this;
-    }
-
-    protected function isOnBackend() {
-        return strpos($_SERVER['SERVER_NAME'],'admin') === false;
     }
 
     /**
