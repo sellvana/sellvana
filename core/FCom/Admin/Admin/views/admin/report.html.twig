@@ -1,0 +1,17 @@
+<div class="f-admin-main-view">
+    <div class="page-header f-admin-page-header">
+        <h1 class="f-page-title">
+            <i class="icon-table"></i>
+            {{ THIS.get('title') }}
+        </h1>
+
+        <div class="btn-group">
+            {{ THIS.getActionsHtml() | raw }}
+        </div>
+    </div>
+    <div class="f-admin-main">
+        {{ THIS.view('core/messages') | raw }}
+        {{ THIS.view('core/visualization') | raw }}
+        {{ THIS.view('core/griddle') | raw }}
+    </div>
+</div>

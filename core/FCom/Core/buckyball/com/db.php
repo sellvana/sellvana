@@ -1531,6 +1531,33 @@ class BORM extends ORMWrapper
     }
 
     /**
+     * Add a RAW JOIN source to the query
+     *
+     * @param $table
+     * @param $constraint
+     * @param $table_alias
+     * @param array $parameters
+     * @return $this
+     */
+    public function raw_join($table, $constraint, $table_alias, $parameters = array()) {
+        // Add table alias if present
+        if (!is_null($table_alias)) {
+            $table_alias = $this->_quote_identifier($table_alias);
+            $table .= " {$table_alias}";
+        }
+        $this->_values = array_merge($this->_values, $parameters);
+        // Build the constraint
+        if (is_array($constraint)) {
+            list($first_column, $operator, $second_column) = $constraint;
+            $first_column = $this->_quote_identifier($first_column);
+            $second_column = $this->_quote_identifier($second_column);
+            $constraint = "{$first_column} {$operator} {$second_column}";
+        }
+        $this->_join_sources[] = "{$table} ON {$constraint}";
+        return $this;
+    }
+
+    /**
      * @param $data
      * @param null $isNew
      * @return $this
