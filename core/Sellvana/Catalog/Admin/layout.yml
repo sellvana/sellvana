@@ -6,6 +6,7 @@ base:
             - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
             - [ addNav, catalog/inventory, { label: Inventory, href: /catalog/inventory } ]
             - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
+            - [ addNav, catalog/products_import_griddle, { label: Products Import Griddle, href: /catalog/products/import/import_griddle } ]
             - [ addNav, catalog/searchalias, { label: Search Terms, href: /catalog/searchalias } ]
     - view: admin/header
         do:
@@ -43,6 +44,11 @@ catalog_product_form_tabs:
     - { hook: main, views: catalog/products/import }
     - { view: admin/nav, do: [[ setNav, catalog/products_import ]] }
 
+/catalog/products/import-griddle:
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: catalog/products/import-griddle }
+    - { view: admin/nav, do: [[ setNav, catalog/products_import_griddle ]] }
 
 /catalog/categories:
     - { include: base }

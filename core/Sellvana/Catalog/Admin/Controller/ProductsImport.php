@@ -31,6 +31,10 @@ class Sellvana_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Contro
         $this->layout('/catalog/products/import');
     }
 
+    public function action_import_griddle() {
+        $this->layout('/catalog/products/import-griddle');
+    }
+
     public function action_config()
     {
         $view = $this->view('catalog/products/import/config')->set([
@@ -51,7 +55,6 @@ class Sellvana_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Contro
     {
         $this->Sellvana_Catalog_ProductsImport->run();
         $this->BResponse->redirect('catalog/products/import/status');
-        exit;
     }
 
     public function action_stop__POST()

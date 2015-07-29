@@ -1,6 +1,3 @@
-{% set m = THIS.get('model') %}
-{% set customerImportGridConfig = APP.instance('Sellvana_Customer_Admin_Controller_CustomersImport').customerImportGridConfig(m) %}
-
 {% set medialibConfig = {
     id: 'import_files',
     mode: 'link',
@@ -91,7 +88,6 @@
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'fcom.admin', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
             window.registerGridimport_files = function(grid) {
                 importFilesGrid = grid;
-                FCom.Admin.Accordion('import-accordion');
             }
 
             var importAccordionEle = $('#import-accordion');

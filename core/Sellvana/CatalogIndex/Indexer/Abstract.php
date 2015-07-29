@@ -111,8 +111,10 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
                 //->offset($start)
                 ->find_many();
             $this->indexProducts($products);
-            echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
+            if (!$this->BRequest->xhr()) {
+                echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
                 . ' - ' . (time() - $t) . "s\n";
+            }
             $t = time();
             //$start += static::$_maxChunkSize;
         } while (sizeof($products) == static::$_maxChunkSize);

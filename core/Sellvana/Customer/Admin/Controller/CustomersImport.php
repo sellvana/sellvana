@@ -26,16 +26,6 @@ class Sellvana_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Cont
         ]);
     }
 
-    public function customerImportGridConfig($customer) {
-
-        $config['config']['callbacks'] = [
-            'grid_before_create' => 'gridRegister' . $config['config']['id'],
-            'componentDidMount' => 'gridRegister' . $config['config']['id']
-        ];
-
-        return $config;
-    }
-
     public function action_index()
     {
         $this->layout('/customers/import');
