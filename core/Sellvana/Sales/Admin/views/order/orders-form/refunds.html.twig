@@ -6,4 +6,5 @@
     {{ forms.textarea({ id:'refund-items', name:'refund[items]', label:'Refund Items (SKU:QTY)'|_}) }}
 </div>
 
-{{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }}
+{# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
+{{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}

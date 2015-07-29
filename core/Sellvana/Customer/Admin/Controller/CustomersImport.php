@@ -26,9 +26,23 @@ class Sellvana_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Cont
         ]);
     }
 
+    public function customerImportGridConfig($customer) {
+
+        $config['config']['callbacks'] = [
+            'grid_before_create' => 'gridRegister' . $config['config']['id'],
+            'componentDidMount' => 'gridRegister' . $config['config']['id']
+        ];
+
+        return $config;
+    }
+
     public function action_index()
     {
         $this->layout('/customers/import');
+    }
+
+    public function action_import_griddle() {
+        $this->layout('/customers/import-griddle');
     }
 
     public function action_config()
@@ -47,7 +61,7 @@ class Sellvana_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Cont
         $this->BResponse->redirect('customers/import/status');
     }
 
-    public function action_start()
+    public function action_start__POST()
     {
         $this->Sellvana_Customer_Import->run();
         $this->BResponse->redirect('customers/import/status');

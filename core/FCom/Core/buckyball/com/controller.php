@@ -342,13 +342,14 @@ class BRequest extends BClass
     protected static $_webRootCache = [];
 
     /**
-    * Web root path for current application
-    *
-    * If request is /folder1/folder2/index.php, return /folder1/folder2/
-    *
-    * @param $parent if required a parent of current web root, specify depth
-    * @return string
-    */
+     * Web root path for current application
+     *
+     * If request is /folder1/folder2/index.php, return /folder1/folder2/
+     *
+     * @param int $parentDepth
+     * @return string
+     * @internal param if $parent required a parent of current web root, specify depth
+     */
     public function webRoot($parentDepth = 0)
     {
         if (isset(static::$_webRootCache[$parentDepth])) {
@@ -510,12 +511,11 @@ class BRequest extends BClass
     }
 
     /**
-    * Request raw POST text
-    *
-    * @param bool $json Receive request as JSON
-    * @param bool $asObject Return as object vs array
-    * @return object|array|string
-    */
+     * Request raw POST text
+     * @return array|object|string
+     * @internal param bool $json Receive request as JSON
+     * @internal param bool $asObject Return as object vs array
+     */
     public function rawPost()
     {
         $post = file_get_contents('php://input');
@@ -544,6 +544,9 @@ class BRequest extends BClass
         return null === $key ? $_REQUEST : (isset($_REQUEST[$key]) ? $_REQUEST[$key] : null);
     }
 
+    /**
+     * @return string
+     */
     public function getCookieDomain()
     {
         $confDomain = $this->BConfig->get('cookie/domain');
@@ -561,6 +564,9 @@ class BRequest extends BClass
         return $domain;
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getCookiePath()
     {
         $confPath = $this->BConfig->get('cookie/path');
@@ -571,6 +577,9 @@ class BRequest extends BClass
         return $path;
     }
 
+    /**
+     * @return string
+     */
     public function getCookieConfigJson()
     {
         $config = $this->BConfig->get('cookie');
@@ -623,6 +632,13 @@ class BRequest extends BClass
         return !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $default;
     }
 
+    /**
+     * @param string $source
+     * @param string $targetDir
+     * @param null $typesRegex
+     * @return array|void
+     * @throws BException
+     */
     public function receiveFiles($source, $targetDir, $typesRegex = null)
     {
         if (is_string($source)) {
@@ -688,6 +704,10 @@ class BRequest extends BClass
         return $result;
     }
 
+    /**
+     * @param bool|false $includeEmpty
+     * @return array
+     */
     public function getAvailableCsrfMethods($includeEmpty = false)
     {
         $methods = [
@@ -850,6 +870,10 @@ class BRequest extends BClass
 
     /**
      * Validate that URL is within boundaries of domain and webroot
+     *
+     * @param string $url
+     * @param boolean $checkPath
+     * @return bool
      */
     public function isUrlLocal($url, $checkPath = false)
     {
@@ -1047,6 +1071,9 @@ class BRequest extends BClass
         }
     }
 
+    /**
+     * @return bool
+     */
     public function modRewriteEnabled()
     {
         if (function_exists('apache_get_modules')) {
@@ -1058,6 +1085,10 @@ class BRequest extends BClass
         return $modRewrite;
     }
 
+    /**
+     * @param array $whitelist
+     * @return $this
+     */
     public function addRequestFieldsWhitelist($whitelist)
     {
         foreach ((array)$whitelist as $urlPath => $fieldPaths) {
@@ -1072,6 +1103,9 @@ class BRequest extends BClass
         return $this;
     }
 
+    /**
+     * @return $this|null
+     */
     public function stripRequestFieldsTags()
     {
         static $alreadyStripped;
@@ -1094,6 +1128,11 @@ class BRequest extends BClass
         return $this;
     }
 
+    /**
+     * @param $data
+     * @param $forUrlPath
+     * @param null $curPath
+     */
     public function stripTagsRecursive(&$data, $forUrlPath, $curPath = null)
     {
         $allowedTags = $this->getAllowedTags();
@@ -1128,6 +1167,9 @@ class BRequest extends BClass
         unset($v);
     }
 
+    /**
+     * @return string
+     */
     public function getAllowedTags()
     {
         $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup>'
@@ -1292,6 +1334,12 @@ class BResponse extends BClass
         return $this;
     }
 
+    /**
+     * @param $header
+     * @param bool|true $replace
+     * @param null $httpResponseCode
+     * @return $this
+     */
     public function header($header, $replace = true, $httpResponseCode = null)
     {
         if (headers_sent($file, $line)) {
@@ -1308,34 +1356,55 @@ class BResponse extends BClass
         return $this;
     }
 
+    /**
+     * @param $type
+     * @return $this
+     */
     public function setContentType($type)
     {
         $this->_contentType = $type;
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getContentType()
     {
         return $this->_contentType;
     }
 
+    /**
+     * @param $string
+     * @return $this
+     */
     public function setContentPrefix($string)
     {
         $this->_contentPrefix = $string;
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getContentPrefix()
     {
         return $this->_contentPrefix;
     }
 
+    /**
+     * @param $string
+     * @return $this
+     */
     public function setContentSuffix($string)
     {
         $this->_contentSuffix = $string;
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getContentSuffix()
     {
         return $this->_contentSuffix;
@@ -1358,6 +1427,10 @@ class BResponse extends BClass
         $this->setContentType('application/json')->set($response)->render();
     }
 
+    /**
+     * @param $fileName
+     * @return string
+     */
     public function fileContentType($fileName)
     {
         $type = 'application/octet-stream';
@@ -1570,6 +1643,9 @@ class BResponse extends BClass
         return $this;
     }
 
+    /**
+     * Redirect from http to https
+     */
     public function httpsRedirect()
     {
         $this->redirect(str_replace('http://', 'https://', $this->BRequest->currentUrl()));
@@ -1617,6 +1693,9 @@ class BResponse extends BClass
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function nocache()
     {
         $this->header([
@@ -1628,6 +1707,10 @@ class BResponse extends BClass
         return $this;
     }
 
+    /**
+     * @param bool|true $bypassBuffering
+     * @return $this
+     */
     public function startLongResponse($bypassBuffering = true)
     {
         // improve performance by not processing debug log
@@ -1656,6 +1739,11 @@ class BResponse extends BClass
         return $this;
     }
 
+    /**
+     * @param $html
+     * @param null $tags
+     * @return mixed|string
+     */
     public function safeHtml($html, $tags = null)
     {
         if (!$tags) {
@@ -1674,6 +1762,9 @@ class BResponse extends BClass
         return $html;
     }
 
+    /**
+     * @param null $lastMethod
+     */
     public function shutdown($lastMethod = null)
     {
         $this->BEvents->fire(__METHOD__, ['last_method' => $lastMethod]);
@@ -1748,11 +1839,14 @@ class BRouting extends BClass
     }
 
     /**
-    * Change route part (usually 1st)
-    *
-    * @param string $partValue
-    * @param mixed $options
-    */
+     * Change route part (usually 1st)
+     *
+     * @param $from
+     * @param $opt
+     * @return $this
+     * @internal param string $partValue
+     * @internal param mixed $options
+     */
     public function changeRoute($from, $opt)
     {
         if (!is_array($opt)) {
@@ -1764,6 +1858,10 @@ class BRouting extends BClass
         return $this;
     }
 
+    /**
+     * @param string $href
+     * @return string
+     */
     public function processHref($href)
     {
         $href = ltrim($href, '/');
@@ -1779,6 +1877,11 @@ class BRouting extends BClass
         return $href;
     }
 
+    /**
+     * @param $route
+     * @param array $args
+     * @return string
+     */
     public function processRoutePath($route, $args = [])
     {
         if (!empty($args['module_name'])) {
@@ -1832,6 +1935,11 @@ class BRouting extends BClass
         return $this;
     }
 
+    /**
+     * @param string $route
+     * @param null $callback
+     * @return $this
+     */
     public function removeRoute($route, $callback = null)
     {
         if (null === $callback) {
@@ -1956,6 +2064,10 @@ class BRouting extends BClass
         return $this->route($route, $callback, $args, $name, $multiple);
     }
 
+    /**
+     * @param null $requestRoute
+     * @return BRouteNode|null
+     */
     public function findRoute($requestRoute = null)
     {
         if (null === $requestRoute) {
@@ -2014,6 +2126,12 @@ class BRouting extends BClass
         return $this;
     }
 
+    /**
+     * @param $from
+     * @param $to
+     * @param array $args
+     * @return $this
+     */
     public function forward($from, $to, $args = [])
     {
         $args['target'] = $to;
@@ -2026,11 +2144,21 @@ class BRouting extends BClass
         return $this;
     }
 
+    /**
+     * @param array $args
+     * @return string
+     */
     protected function _forwardCallback($args)
     {
         return $this->processRoutePath($args['target'], $args);
     }
 
+    /**
+     * @param $from
+     * @param $to
+     * @param array $args
+     * @return $this
+     */
     public function redirect($from, $to, $args = [])
     {
         $args['target'] = $to;
@@ -2038,6 +2166,9 @@ class BRouting extends BClass
         return $this;
     }
 
+    /**
+     * @param $args
+     */
     public function redirectCallback($args)
     {
         $this->BResponse->redirect($args['target']);
@@ -2094,12 +2225,19 @@ class BRouting extends BClass
         }
     }
 
+    /**
+     * @param bool|true $flag
+     * @return $this
+     */
     public function stop($flag = true)
     {
         $this->_stop = $flag;
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isStopped()
     {
         return $this->_stop;
@@ -2200,6 +2338,10 @@ class BRouteNode extends BClass
         }
     }
 
+    /**
+     * @param $route
+     * @return bool
+     */
     public function match($route)
     {
         if (!preg_match($this->regex, $route, $match)) {
@@ -2240,12 +2382,13 @@ class BRouteNode extends BClass
     }
 
     /**
-    * Add an observer to the route node
-    *
-    * @param mixed $callback
-    * @param array $args
-    * @param boolean $multiple whether to allow multiple observers for the route
-    */
+     * Add an observer to the route node
+     *
+     * @param mixed $callback
+     * @param array $args
+     * @param boolean $multiple whether to allow multiple observers for the route
+     * @return $this
+     */
     public function observe($callback, $args = null, $multiple = true)
     {
         $observer = new BRouteObserver([
@@ -2275,6 +2418,10 @@ class BRouteNode extends BClass
         return null;
     }
 
+    /**
+     * @param $callback
+     * @return $this
+     */
     public function removeObserver($callback)
     {
         foreach ($this->_observers as $i => $o) {
@@ -2666,16 +2813,29 @@ class BActionController extends BClass
         $this->BResponse->output();
     }
 
+    /**
+     * @return string
+     */
     public function getAction()
     {
         return $this->_action;
     }
 
+    /**
+     * @return string
+     */
     public function getController()
     {
         return self::origClass();
     }
 
+    /**
+     * @param string $viewPrefix
+     * @param string $defaultView
+     * @param string $hookName
+     * @param null $baseLayout
+     * @return array|null|string
+     */
     public function viewProxy($viewPrefix, $defaultView = 'index', $hookName = 'main', $baseLayout = null)
     {
         $layout = $this->BLayout;

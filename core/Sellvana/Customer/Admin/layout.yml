@@ -4,12 +4,19 @@ base:
             - [ addNav, customer, { label: Customers, pos: 300, icon_class: icon-user } ]
             - [ addNav, customer/customers, { label: Customers, href: /customers, pos: 10 } ]
             - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index, pos: 40 } ]
+            - [ addNav, customer/import-griddle, { label: Import Customers Griddle, href: /customers/import/import_griddle, pos: 45 } ]
 
 /customers/import:
     - { include: base }
     - { include: form }
     - { hook: main, views: customer/import }
     - { view: admin/nav, do: [[ setNav, customer/import ]] }
+
+/customers/import-griddle:
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: customer/import-griddle }
+    - { view: admin/nav, do: [[ setNav, customer/import-griddle ]] }
 
 /settings:
     - view: settings

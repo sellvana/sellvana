@@ -14,7 +14,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                     "can_upload": false,
                     "filetype_regex": "",
                     "folder": ""
-                }
+                },
+                "showModal": true
             }
         },
         getModalConfig: function() {
@@ -85,37 +86,56 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
             }
             return null
         },
-        render: function() {
-            console.log('render fcom mediablib');
-            var modalConfig = this.getModalConfig();
-            var uploadConfig = this.props.uploadConfig;
-            var mediaGridId = this.props.mediaConfig.id;
-
-            /*console.log('modalConfig', modalConfig);
-            console.log('propsmodalConfig', this.props.modalConfig);
-            console.log('uploadConfig', this.props.uploadConfig);
-            console.log('mediaConfig', this.props.mediaConfig);*/
-
-            var mainGridElement = React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
-
+        getMainGridEle: function() {
+            return React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
+        },
+        renderModal: function(modalConfig) {
             return (
                 React.createElement(Components.Modal, React.__spread({},  modalConfig), 
                     React.createElement("div", {className: "row"}, 
                         React.createElement("div", {className: "tabbable"}, 
                             React.createElement("ul", {className: "nav nav-tabs prod-type f-horiz-nav-tabs"}, 
                                 React.createElement("li", {className: "active"}, 
-                                    React.createElement("a", {"data-toggle": "tab", href: '#' + mediaGridId + '-attach_library'}, "Library")
+                                    React.createElement("a", {"data-toggle": "tab", href: '#' + this.props.mediaConfig.id + '-attach_library'}, "Library")
                                 ), 
-                                uploadConfig.can_upload ? React.createElement("li", null, React.createElement("a", {"data-toggle": "tab", href: '#' + mediaGridId + '-media-upload'}, "Upload")) : null
+                                this.props.uploadConfig.can_upload ? React.createElement("li", null, React.createElement("a", {"data-toggle": "tab", href: '#' + this.props.mediaConfig.id + '-media-upload'}, "Upload")) : null
                             ), 
                             React.createElement("div", {className: "tab-content"}, 
-                                React.createElement("div", {className: "tab-pane active", id: mediaGridId + '-attach_library'}, mainGridElement), 
-                                uploadConfig.can_upload ? React.createElement("div", {className: "tab-pane", id: mediaGridId + '-media-upload'}, this.mediaUploadElement()) : null
+                                React.createElement("div", {className: "tab-pane active", id: this.props.mediaConfig.id + '-attach_library'}, this.getMainGridEle()), 
+                                this.props.uploadConfig.can_upload ? React.createElement("div", {className: "tab-pane", id: this.props.mediaConfig.id + '-media-upload'}, this.mediaUploadElement()) : null
                             )
                         )
                     )
                 )
             );
+        },
+        renderView: function() {
+            return (
+                React.createElement("div", {className: "tabbable"}, 
+                    React.createElement("ul", {className: "nav nav-tabs prod-type f-horiz-nav-tabs"}, 
+                        React.createElement("li", {className: "active"}, 
+                            React.createElement("a", {"data-toggle": "tab", href: '#' + this.props.mediaConfig.id + '-attach_library'}, "Library")
+                        ), 
+                        this.props.uploadConfig.can_upload ? React.createElement("li", null, React.createElement("a", {"data-toggle": "tab", href: '#' + this.props.mediaConfig.id + '-media-upload'}, "Upload")) : null
+                    ), 
+                    React.createElement("div", {className: "tab-content"}, 
+                        React.createElement("div", {className: "tab-pane active", id: this.props.mediaConfig.id + '-attach_library'}, this.getMainGridEle()), 
+                        this.props.uploadConfig.can_upload ? React.createElement("div", {className: "tab-pane", id: this.props.mediaConfig.id + '-media-upload'}, this.mediaUploadElement()) : null
+                    )
+                )
+            );
+        },
+        render: function() {
+            /*console.log('modalConfig', this.getModalConfig());
+            console.log('propsmodalConfig', this.props.modalConfig);
+            console.log('uploadConfig', this.props.uploadConfig);
+            console.log('mediaConfig', this.props.mediaConfig);*/
+            if (this.props.showModal === true) {
+                var modalConfig = this.getModalConfig();
+                return this.renderModal(modalConfig);
+            } else {
+                return this.renderView();
+            }
         }
     });
 

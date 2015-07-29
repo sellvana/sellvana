@@ -7,6 +7,7 @@
 {% set mediaLibAttachConfigProcessed = THIS.view('core/griddle').set('grid', mediaLibAttachConfig).getGridConfig() %}
 
 <div id="{{ config.id }}-media-modal-container"></div>
+<div id="{{ config.id }}-media-container"></div>
 
 <script type="text/javascript">
     /**
@@ -45,13 +46,20 @@
         var mediaConfig = {{ UTIL.toJSON(mediaLibAttachConfigProcessed) | raw }};
         var uploadConfig = {{ UTIL.toJSON(uploadConfig) | raw }};
         var modalConfig = getMediaModalConfig(mediaGridId);
+        var mainConfig = {{ UTIL.toJSON(config) | raw }};
 
-        var modalEle = document.getElementById(mediaGridId + '-media-modal-container');
+        if (typeof mainConfig.showModal !== 'undefined' && mainConfig.showModal === false) {
+            var containerEle = document.getElementById(mediaGridId + '-media-container');
+        } else {
+            var containerEle = document.getElementById(mediaGridId + '-media-modal-container');
+        }
+
         mediaLibComponent{{ config.id }} = React.render(React.createElement(FComMediaLib, {
             mediaConfig: mediaConfig,
             uploadConfig: uploadConfig,
-            modalConfig: modalConfig
-        }), modalEle);
+            modalConfig: modalConfig,
+            showModal: mainConfig.showModal
+        }), containerEle);
         mediaLibGrid{{ config.id }} = mediaLibComponent{{ config.id }}.getMainGridComponent();
 
         //re-scan image button
