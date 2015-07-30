@@ -1709,15 +1709,6 @@ class BORM extends ORMWrapper
     }
 
     /**
-     * @return $this
-     */
-    public function clear_group()
-    {
-        $this->_group_by = [];
-        return $this;
-    }
-
-    /**
      * Add an ORDER BY expression DESC clause
      * @param $expression
      * @return $this
