@@ -249,10 +249,6 @@ default_griddle:
     - { include: base }
     - { hook: main, views: admin/griddle }
 
-default_report:
-    - { include: base }
-    - { hook: main, views: admin/report }
-
 default_form:
     - { include: base }
     - { include: form }

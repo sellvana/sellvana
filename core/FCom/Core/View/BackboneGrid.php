@@ -638,7 +638,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $persFilters = !empty($persState['filters']) ? $persState['filters'] : [];
             $persState = $this->BUtil->arrayMask($persState, 's,sd,p,ps,q');
 
-            $this->_processGridFilters($config, $persFilters, $orm);
+            $this->processGridFilters($config, $persFilters, $orm);
 
             $config['state'] = $persState;
             $grid['request'] = (empty($grid['request']))? $persState: $grid['request'];
@@ -831,7 +831,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
 
         if (!empty($filters)) {
-            $this->_processGridFilters($config, $filters, $orm);
+            $this->processGridFilters($config, $filters, $orm);
         }
         if (null !== $method) {
             //$this->BEvents->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
@@ -959,7 +959,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
      * @param array $filters
      * @param BORM $orm
      */
-    protected function _processGridFilters(&$config, $filters, $orm)
+    public function processGridFilters(&$config, $filters, $orm)
     {
         $configFilterFields = [];
         if (!empty($config['filters'])) {

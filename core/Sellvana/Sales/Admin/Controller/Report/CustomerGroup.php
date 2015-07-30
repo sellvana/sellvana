@@ -38,9 +38,6 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerGroup extends FCom_Admin_Co
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
         ];
-        $config['visualizations'] = [
-            ['type' => 'pie', 'label_field' => 'group_title', 'value_field' => 'subtotal_aggr']
-        ];
 
         return $config;
     }
@@ -51,8 +48,18 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerGroup extends FCom_Admin_Co
     public function gridOrmConfig($orm)
     {
         parent::gridOrmConfig($orm);
+        $orm->join('Sellvana_Customer_Model_Customer', 'c.id = o.customer_id', 'c')
+            ->left_outer_join('Sellvana_CustomerGroups_Model_Group', 'cg.id = c.customer_group', 'cg')
+            ->select_expr('IFNULL(SUM(o.grand_total), 0)', 'grand_total_aggr');
+        $tmpOrm = clone $orm;
 
-        $tOrder = $this->Sellvana_Sales_Model_Order->table();
+        /** @var FCom_Core_View_BackboneGrid $view */
+        $view = $this->view($this->_gridViewName);
+        $config = $this->gridConfig();
+        $filters = $this->_getFilters();
+        $view->processGridFilters($config, $filters, $tmpOrm);
+        $total = $tmpOrm->find_one()->get('grand_total_aggr');
+
         $orm->join('Sellvana_Customer_Model_Customer', 'c.id = o.customer_id', 'c')
             ->left_outer_join('Sellvana_CustomerGroups_Model_Group', 'cg.id = c.customer_group', 'cg')
             ->select_expr('IFNULL(cg.title, "NO GROUP")', 'group_title')
@@ -64,10 +71,8 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerGroup extends FCom_Admin_Co
             ->select_expr('SUM(o.amount_paid)', 'amount_paid_aggr')
             ->select_expr('SUM(o.amount_due)', 'amount_due_aggr')
             ->select_expr('IFNULL(SUM(o.amount_refunded), 0)', 'amount_refunded_aggr')
-            ->select_expr('SUM(o.grand_total)', 'grand_total_aggr')
             ->select_expr('SUM(o.item_qty)', 'item_qty_aggr')
-            ->raw_join('INNER JOIN (SELECT SUM(grand_total) as `amount` FROM ' . $tOrder . ')', '1=1', 'total')
-            ->select_expr('ROUND(100 * SUM(o.grand_total) / `total`.`amount`, 2)', 'pc_of_sales')
+            ->select_expr("ROUND(100 * SUM(o.grand_total) / {$total}, 2)", 'pc_of_sales')
             ->group_by('cg.id');
     }
 }
