@@ -116,6 +116,9 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['field' => 'state_payment', 'type' => 'multiselect'],
             ['field' => 'state_delivery', 'type' => 'multiselect'],
             ['field' => 'state_custom', 'type' => 'multiselect'],
+
+            // ['field' => 'billing_name', 'type' => 'text'],
+            // ['field' => 'shipping_name', 'type' => 'text'],
         ];
 
         return $config;
@@ -129,6 +132,12 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         parent::gridOrmConfig($orm);
 
         $orm->select($this->_mainTableAlias . '.*');
+        #Todo: This query will remove after fix filter for some special columns
+        // $orm->raw_query('SELECT * FROM (SELECT *, CONCAT_WS(" ", billing_street1, billing_city) AS billing_address, CONCAT_WS(" ", billing_firstname, billing_lastname) AS billing_name, CONCAT_WS(" ", shipping_firstname, shipping_lastname) AS shipping_name, CONCAT_WS(" ", shipping_street1, shipping_city) AS shipping_address, COUNT(*) AS count FROM fcom_sales_order) AS '.$this->_mainTableAlias);
+        $orm->select_expr('CONCAT_WS(" ", o.billing_street1, o.billing_city)', 'billing_address')
+            ->select_expr('CONCAT_WS(" ", o.billing_firstname, o.billing_lastname)', 'billing_name')
+            ->select_expr('CONCAT_WS(" ", o.shipping_firstname, o.shipping_lastname)', 'shipping_name')
+            ->select_expr('CONCAT_WS(" ", o.shipping_street1, o.shipping_city)', 'shipping_address');
 
         $orm->left_outer_join('FCom_Admin_Model_User', 'o.admin_id = au.id', 'au')
             ->select_expr('CONCAT_WS(" ", au.firstname,au.lastname)', 'admin_name');
@@ -329,10 +338,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['type' => 'row_select'],
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70],
             ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
-            ['name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'ab.billing_name'],
-            ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'ab.billing_address'],
-            ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'as.shipping_name'],
-            ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'as.shipping_address'],
+            ['name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'o.billing_name'],
+            ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'o.billing_address'],
+            ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'o.shipping_name'],
+            ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'o.shipping_address'],
             ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
             ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
