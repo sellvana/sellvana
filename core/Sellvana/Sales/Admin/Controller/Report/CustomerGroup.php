@@ -12,8 +12,10 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerGroup extends FCom_Admin_Co
     protected $_recordName = 'Order';
     protected $_mainTableAlias = 'o';
     protected $_permission = 'sales/reports';
-    protected $_navPath = 'sales/reports';
-    protected $_gridHref = 'sales/report/byCustomerGroup';
+    protected $_navPath = 'reports/sales/customer_groups';
+    protected $_gridHref = 'sales/report/customer_groups';
+    protected $_gridTitle = 'Customer Groups';
+
 
     public function gridConfig()
     {

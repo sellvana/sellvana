@@ -9,8 +9,9 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
     protected $_modelClass = 'Sellvana_Sales_Model_Order_Item';
     protected $_mainTableAlias = 'oi';
     protected $_permission = 'sales/reports';
-    protected $_navPath = 'sales/reports';
-    protected $_gridHref = 'sales/report/productPerformance';
+    protected $_navPath = 'reports/sales/product_performance';
+    protected $_gridHref = 'sales/report/product_performance';
+    protected $_gridTitle = 'Product Performance';
 
     public function gridConfig()
     {
