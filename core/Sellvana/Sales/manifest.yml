@@ -25,6 +25,7 @@ modules:
                     - [ /orderstatecustom/?.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
                     - [ /sales/report/productPerformance/?.action, Sellvana_Sales_Admin_Controller_Report_ProductPerformance ]
                     - [ /sales/report/byCustomerGroup/?.action, Sellvana_Sales_Admin_Controller_Report_CustomerGroup ]
+                    - [ /sales/report/abandonedCarts/?.action, Sellvana_Sales_Admin_Controller_Report_AbandonedCarts ]
                 observe:
                     - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]
