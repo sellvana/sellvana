@@ -1698,6 +1698,26 @@ class BORM extends ORMWrapper
     }
 
     /**
+     * Add an unquoted expression to the list of columns to GROUP BY
+     *
+     * @param $expr
+     * @return $this
+     */
+    public function group_by_expr($expr) {
+        $this->_group_by[] = $expr;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clear_group()
+    {
+        $this->_group_by = [];
+        return $this;
+    }
+
+    /**
      * Add an ORDER BY expression DESC clause
      * @param $expression
      * @return $this
