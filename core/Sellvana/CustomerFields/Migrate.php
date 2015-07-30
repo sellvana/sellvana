@@ -79,4 +79,32 @@ class Sellvana_CustomerFields_Migrate extends BClass
         ]);
 
     }
+
+    public function upgrade__0_5_0_0__0_5_1_0()
+    {
+        $tField = $this->Sellvana_CustomerFields_Model_Field->table();
+
+        // update field type to have customer option
+        $this->BDb->ddlTableDef($tField, [
+            BDb::COLUMNS => [
+                'field_type' => "enum('customer', 'product') NOT NULL DEFAULT 'customer'",
+            ]
+        ]);
+
+        $modelsForUpdate = $this->Sellvana_CustomerFields_Model_Field->orm()->where('field_type', 'product')
+                                                                     ->find_many();
+        // update any old records to be customer filed type
+        if($modelsForUpdate){
+            foreach ($modelsForUpdate as $m) {
+                $m->set('field_type', 'customer')->save();
+            }
+        }
+
+        // remove product field_type
+        $this->BDb->ddlTableDef($tField, [
+            BDb::COLUMNS => [
+                'field_type' => "enum('customer') NOT NULL DEFAULT 'customer'",
+            ]
+        ]);
+    }
 }

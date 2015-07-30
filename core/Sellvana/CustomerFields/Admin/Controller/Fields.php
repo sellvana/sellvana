@@ -5,6 +5,7 @@
  *
  * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
  * @property Sellvana_CustomerFields_Model_FieldOption $Sellvana_CustomerFields_Model_FieldOption
+ * @property Sellvana_CustomerFields_Model_SetField $Sellvana_CustomerFields_Model_SetField
  */
 class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Controller_Abstract
 {
@@ -22,8 +23,8 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
                 'id' => 'fields',
                 'caption' => 'Fields',
                 'orm' => $orm,
-                'data_url' => $this->BApp->href('customerfields/fieldsets/field_grid_data'),
-                'edit_url' => $this->BApp->href('customerfields/fieldsets/field_grid_data'),
+                'data_url' => $this->BApp->href('customerfields/fields/field_grid_data'),
+                'edit_url' => $this->BApp->href('customerfields/fields/field_grid_data'),
                 'columns' => [
                     ['type' => 'row_select'],
                     ['type' => 'btn_group', 'buttons' => [
@@ -39,7 +40,7 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['type' => 'input', 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true,
-                            'unique' => $this->BApp->href('/catalogfields/fields/unique_field')]],
+                            'unique' => $this->BApp->href('/customerfields/fields/unique_field')]],
                     ['type' => 'input', 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'multirow_edit' => true, 'validation' => ['required' => true]],
                     ['type' => 'input', 'name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 100, 'editable' => true, 'editor' => 'text',
@@ -108,9 +109,9 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
             'config' => [
                 'id' => 'options-grid',
                 'caption' => 'Fields',
-                'dataUrl' => $this->BApp->href('catalogfields/fieldsets/field_option_grid_data?field_id='),
-                'data_url' => $this->BApp->href('catalogfields/fieldsets/field_grid_data'),
-                'edit_url' => $this->BApp->href('catalogfields/fieldsets/field_grid_data'),
+                'dataUrl' => $this->BApp->href('customerfields/fieldsets/field_option_grid_data?field_id='),
+                'data_url' => $this->BApp->href('customerfields/fieldsets/field_grid_data'),
+                'edit_url' => $this->BApp->href('customerfields/fieldsets/field_grid_data'),
                 'data' => [],
                 'data_mode' => 'local',
                 'columns' => [
@@ -150,12 +151,12 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
 
     public function action_fieldsets()
     {
-        $this->layout('/catalogfields/fieldsets');
+        $this->layout('/customerfields/fieldsets');
     }
 
     public function action_fields()
     {
-        $this->layout('/catalogfields/fields');
+        $this->layout('/customerfields/fields');
     }
 
     public function action_grid_data()
@@ -239,7 +240,7 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
         if (isset($data['field_ids'])) {
             $field_ids = $data['field_ids'];
         }
-        
+
         $model = $this->Sellvana_CustomerFields_Model_SetField;
         switch ($r->post('oper')) {
             case 'add':
