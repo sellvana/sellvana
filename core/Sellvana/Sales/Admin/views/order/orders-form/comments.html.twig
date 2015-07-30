@@ -1,4 +1,5 @@
 {% set m = THIS.get('model') %}
 {% set gridConfig = APP.instance('Sellvana_Sales_Admin_Controller_Orders').commentsGridConfig(m) %}
 
-{{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }}
+{# {{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }} #}
+{{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}

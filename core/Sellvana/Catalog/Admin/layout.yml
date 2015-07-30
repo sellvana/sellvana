@@ -40,9 +40,8 @@ catalog_product_form_tabs:
 /catalog/products/import:
     - { include: base }
     - { include: form }
-    - { hook: main, views: catalog/products/import }
+    - { hook: main, views: catalog/products/import-griddle }
     - { view: admin/nav, do: [[ setNav, catalog/products_import ]] }
-
 
 /catalog/categories:
     - { include: base }
