@@ -31,10 +31,6 @@ class Sellvana_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Cont
         $this->layout('/customers/import');
     }
 
-    public function action_import_griddle() {
-        $this->layout('/customers/import-griddle');
-    }
-
     public function action_config()
     {
         $view = $this->view('customer/import/config')->set([

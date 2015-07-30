@@ -1,0 +1,125 @@
+{% set medialibConfig = {
+    id: 'import_files',
+    mode: 'link',
+    showModal: false,
+    type: 'product-import',
+    title: 'Files',
+    folder: 'storage/import/products',
+    multiSelAllowed: true,
+    config: {actions: {delete: {caption : 'Remove'}}}
+} %}
+
+<div class="f-admin-main-view">
+    <div class="page-header f-admin-page-header">
+        <h1 class="f-page-title">
+            {{ "Upload and Import Products" |_ }}
+        </h1>
+    </div>
+
+    <div class="f-admin-main">
+        <div class="accordion accordion-blue panel-group" role="tablist" id="import-accordion" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="import-accordion-head0">
+                    <a role="button" data-toggle="collapse" class="accordion-toggle" data-parent="#import-accordion" aria-expanded="true" aria-controls="import-accordion-group0" href="#import-accordion-group0">{{ "Step 1: Upload or select file"|_ }}</a>
+                </div>
+                <div class="panel-collapse collapse in" role="tabpanel" id="import-accordion-group0" aria-labelledby="import-accordion-head0" aria-expanded="true">
+                    <div class="panel-body">
+                        <form class="form form-horizontal" method="post">
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    {# {{ THIS.view('core/medialib').set('config', {id: 'import_files', mode: 'link', type: 'customer-import' }) | raw }} #}
+                                    {{ THIS.view('core/medialib-griddle').set('config', medialibConfig) | raw }}
+                                </div>
+                            </div>
+                            <div class="form-actions form-actions-padding-sm">
+                                <div class="row">
+                                    <div class="col-md-12 col-md-offset-2">
+                                        <button class="btn st1 sz2 btn btn-primary" id="step1-next"type="button">{{ 'Select file and go to next step'|_ }}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- import config -->
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="import-accordion-head1">
+                    <a role="button" data-toggle="collapse" class="accordion-toggle" data-parent="#import-accordion" aria-expanded="true" aria-controls="import-accordion-group1" href="#import-accordion-group1">{{ "Step 2: Configure columns and other options"|_ }}</a>
+                </div>
+                <div class="panel-collapse collapse" role="tabpanel" id="import-accordion-group1" aria-labelledby="import-accordion-head1" aria-expanded="true">
+                    <div class="panel-body">
+                    </div>
+                </div>
+            </div>
+
+            <!-- import status -->
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="import-accordion-head2">
+                    <a role="button" data-toggle="collapse" class="accordion-toggle" data-parent="#import-accordion" aria-expanded="true" aria-controls="import-accordion-group2" href="#import-accordion-group2">{{ "Step 3: Proceed with Import"|_ }}</a>
+                </div>
+                <div class="panel-collapse collapse" role="tabpanel" id="import-accordion-group2" aria-labelledby="import-accordion-head2" aria-expanded="true">
+                    <div class="panel-body">
+                    </div>
+                </div>
+            </div>
+
+            <!-- import review -->
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="import-accordion-head3">
+                    <a role="button" data-toggle="collapse" class="accordion-toggle" data-parent="#import-accordion" aria-expanded="true" aria-controls="import-accordion-group3" href="#import-accordion-group3">{{ "Step 4: Review Import results"|_ }}</a>
+                </div>
+                <div class="panel-collapse collapse" role="tabpanel" id="import-accordion-group3" aria-labelledby="import-accordion-head3" aria-expanded="true">
+                    <div class="panel-body">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'fcom.admin', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+        window.registerGridimport_files = function(grid) {
+            importFilesGrid = grid;
+        }
+
+        var importAccordionEle = $('#import-accordion');
+        var importConfigEle = $('#import-accordion-group1');
+        var importStatusEle = $('#import-accordion-group2');
+
+        $('#step1-next').click(function(ev) {
+            //importFilesGrid is global object created in medialib.html.twig
+            var selectedRows = importFilesGrid.getSelectedRows();
+            if (!selectedRows.length) {
+                alert('Please select one file');
+                return;
+            }
+
+            var filename = selectedRows[0].file_name;
+            importConfigEle.prev().find('a').trigger('click');
+            importConfigEle.html('Please wait loading file configuration...');
+            $.getJSON('{{APP.href('catalog/products/import/config')}}?file='+encodeURIComponent(filename), function(data, status, xhr) { importConfigEle.html(data.html); }
+            );
+        });
+
+        importAccordionEle.on('click', '#step2-next', function(ev) {
+            importStatusEle.prev().find('a').trigger('click');
+            importStatusEle.html('Please wait starting import...');
+            $.post('{{APP.href('catalog/products/import/config')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
+                importStatusEle.html(data);
+            });
+        });
+
+        importAccordionEle.on('click', '#step3-start', function(ev) {
+            importStatusEle.load('{{APP.href('catalog/products/import/status')}}?start=true');
+        });
+
+        importAccordionEle.on('click', '#step3-stop', function(ev) {
+            $.post('{{APP.href('catalog/products/import/stop')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
+                importStatusEle.html(data);
+            });
+        });
+    });
+</script>
