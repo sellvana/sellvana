@@ -39,6 +39,7 @@ base:
     - view: admin/nav
         do:
             - [ addNav, dashboard, { label: Dashboard, href: /, pos: 10, icon_class: icon-dashboard } ]
+            - [ addNav, reports, { label: Reports, pos: 700, icon_class: icon-filter } ]
             - [ addNav, modules, { label: Modules, pos: 800, icon_class: icon-puzzle-piece } ]
             - [ addNav, modules/installed, { label: Manage Modules, href: /modules } ]
             - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog } ]

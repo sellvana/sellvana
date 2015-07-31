@@ -6,7 +6,10 @@ base:
             - [ addNav, sales/payments, { label: Payments, href: /payments } ]
             - [ addNav, sales/orderstatecustom, { label: Custom Order States, href: /orderstatecustom } ]
             - [ addNav, sales/carts, { label: Shopping Carts, href: /carts } ]
-            - [ addNav, sales/reports, { label: Reports, href: /sales/reports } ]
+            - [ addNav, reports/sales, { label: Sales, pos: 10 }]
+            - [ addNav, reports/sales/product_performance, { label: Product Performance, href: /sales/report/product_performance, pos: 10 }]
+            - [ addNav, reports/sales/customer_groups, { label: Sales by Customer Group, href: /sales/report/customer_groups, pos: 30 }]
+            - [ addNav, reports/sales/abandoned_carts, { label: Cart Abandonment, href: /sales/report/abandoned_carts, pos: 20 }]
 
 /settings:
     - view: settings

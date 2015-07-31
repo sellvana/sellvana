@@ -369,57 +369,37 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
     public function getOrderRecent()
     {
-        $dayRecent = ($this->BConfig->get('modules/Sellvana_Sales/recent_day')) ? $this->BConfig->get('modules/Sellvana_Sales/recent_day') : 7;
-        $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - $dayRecent * 86400);
-        $result = $this->Sellvana_Sales_Model_Order->orm('o')
+        $filter = $this->BApp->get('dashboard_date_filter');
+        $cond = 'o.create_at ' . $filter['condition'];
+        $orm = $this->Sellvana_Sales_Model_Order->orm('o')
             ->join('Sellvana_Customer_Model_Customer', ['o.customer_id', '=', 'c.id'], 'c')
-            ->where_gte('o.create_at', $recent)
-            ->select(['o.*',  'c.firstname', 'c.lastname'])->find_many();
+            ->select(['o.*', 'c.firstname', 'c.lastname']);
+
+        if ($filter) {
+            $orm->where_raw($cond, $filter['params']);
+        }
+
+        $result = $orm->find_many();
 
         return $result;
     }
 
-    public function getOrderTotal($filter)
+    public function getOrderTotal()
     {
-        /*
-        // TODO: redo the whole thing
-        $orderTotal = $this->Sellvana_Sales_Model_Order_CustomStatus->orm('s')
-            ->left_outer_join('Sellvana_Sales_Model_Order', ['o.status', '=', 's.name'], 'o')
+        $filter = $this->BApp->get('dashboard_date_filter');
+        $cond = 'o.create_at ' . $filter['condition'];
+        $orderTotal = $this->Sellvana_Sales_Model_StateCustom->orm('s')
+            ->left_outer_join('Sellvana_Sales_Model_Order', ['o.state_custom', '=', 's.state_code'], 'o')
             ->group_by('s.id')
             ->select_expr('COUNT(o.id)', 'order')
-            ->select(['s.id', 'name']);
-        $tmp = $result = $orderTotal->find_many();
-        $tmp = [];
-        switch ($filter['type']) {
-            case 'between':
-                $tmp = $orderTotal->where_gte('o.create_at', $filter['min'])->where_lte('o.create_at', $filter['max'])->find_many();
-                break;
-            case 'to':
-                $tmp = $orderTotal->where_lte('o.create_at', $filter['date'])->find_many();
-                break;
-            case 'from':
-                $tmp = $orderTotal->where_gte('o.create_at', $filter['date'])->find_many();
-                break;
-            case 'equal':
-                $tmp = $orderTotal->where_like('o.create_at', $filter['date'] . '%')->find_many();
-                break;
-            case 'not_in':
-                $tmp = $orderTotal->where_raw('o.create_at', 'NOT BETWEEN ? AND ?', $filter['min'], $filter['max'])->find_many();
-                break;
-            default:
-                break;
+            ->where('s.entity_type', 'order')
+            ->select(['s.id', 's.state_label']);
+
+        if ($filter) {
+            $orderTotal->where_raw($cond, $filter['params']);
         }
-        foreach ($result as $obj) {
-            $order = 0;
-            foreach ($tmp as $key) {
-                if ($obj->get('id') == $key->get('id')) {
-                    $order = $key->get('order');
-                }
-            }
-            $obj->set('order', $order);
-        }
-        */
-        $result = [];
+
+        $result = $orderTotal->find_many();
         return $result;
     }
 
