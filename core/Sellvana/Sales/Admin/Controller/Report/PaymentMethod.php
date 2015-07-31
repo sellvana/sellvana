@@ -1,9 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Class Sellvana_Sales_Admin_Controller_Report_CustomerGroup
+ * Class Sellvana_Sales_Admin_Controller_Report_PaymentMethod
  *
- * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Admin_Controller_Report_PaymentMethod extends FCom_Admin_Controller_Abstract_Report
 {
@@ -20,8 +20,16 @@ class Sellvana_Sales_Admin_Controller_Report_PaymentMethod extends FCom_Admin_Co
     public function gridConfig()
     {
         $config = parent::gridConfig();
+
+        $paymentMethods = $this->Sellvana_Sales_Main->getPaymentMethods();
+        $methodOptions = [];
+        /** @var Sellvana_Sales_Method_Payment_Abstract $method */
+        foreach ($paymentMethods as $code => $method) {
+            $methodOptions[$code] = $method->getName();
+        }
+
         $config['columns'] = [
-            ['name' => 'payment_method', 'index' => 'o.payment_method', 'label' => 'Payment Type', 'width' => 70],
+            ['name' => 'payment_method', 'index' => 'o.payment_method', 'label' => 'Payment Type', 'width' => 70, 'options' => $methodOptions],
             ['name' => 'order_count', 'index' => 'order_count', 'label' => '# of Orders'],
             ['name' => 'pc_orders', 'index' => 'pc_orders', 'label' => '% of Orders'],
             ['name' => 'total_amount', 'index' => 'total_amount', 'label' => 'Total $'],
