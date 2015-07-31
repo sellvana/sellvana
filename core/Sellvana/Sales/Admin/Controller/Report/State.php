@@ -10,8 +10,8 @@ class Sellvana_Sales_Admin_Controller_Report_State extends FCom_Admin_Controller
     protected $_recordName = 'Order';
     protected $_mainTableAlias = 'o';
     protected $_permission = 'sales/reports';
-    protected $_navPath = 'reports/sales/country';
-    protected $_gridHref = 'sales/report/country';
+    protected $_navPath = 'reports/sales/state';
+    protected $_gridHref = 'sales/report/state';
     protected $_gridTitle = 'States/Provinces';
 
 
