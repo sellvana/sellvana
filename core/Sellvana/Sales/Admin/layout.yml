@@ -10,6 +10,7 @@ base:
             - [ addNav, reports/sales/product_performance, { label: Product Performance, href: /sales/report/product_performance, pos: 10 }]
             - [ addNav, reports/sales/customer_groups, { label: Sales by Customer Group, href: /sales/report/customer_groups, pos: 30 }]
             - [ addNav, reports/sales/abandoned_carts, { label: Cart Abandonment, href: /sales/report/abandoned_carts, pos: 20 }]
+            - [ addNav, reports/sales/payment_method, { label: Sales by Payment Method, href: /sales/report/payment_method, pos: 60 }]
 
 /settings:
     - view: settings
