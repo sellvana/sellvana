@@ -27,6 +27,10 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         'unique_key' => ['role_name'],
     ];
 
+    protected static $_fieldOptions = [
+        'status' => ['all' => 'All', 'none' => "None"],
+    ];
+
     /**
      * @return array
      */

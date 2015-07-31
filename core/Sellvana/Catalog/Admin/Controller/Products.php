@@ -260,7 +260,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function productAttachmentsGridConfig($model)
     {
         $download_url = $this->BApp->href('/media/grid/download?folder=media/product/attachment&file=');
-        $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->order_by_expr('pa.position asc')
+        $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTACH)->order_by_expr('pa.position asc')
             ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name', 'a.file_size', 'pa.create_at', 'pa.update_at'])
             ->select('a.id', 'file_id')->find_many());
 
@@ -647,7 +647,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $this->processMediaPost($model, $data);
                 $this->processInventoryPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
-                $this->processPricesPost($model, $data);
+                $this->_processPricesPost($model, $data);
                 $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
                 $model->save();
             }
@@ -1117,7 +1117,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $this->Sellvana_Catalog_Model_Product->orm()->select('url_key')->iterate($callback);
     }
 
-    protected function processPricesPost($model, $data)
+    protected function _processPricesPost($model, $data)
     {
         if(empty($data['prices'])){
             return;
