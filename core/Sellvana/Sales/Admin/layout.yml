@@ -12,6 +12,7 @@ base:
             - [ addNav, reports/sales/abandoned_carts, { label: Cart Abandonment, href: /sales/report/abandoned_carts, pos: 20 }]
             - [ addNav, reports/sales/payment_method, { label: Sales by Payment Method, href: /sales/report/payment_method, pos: 60 }]
             - [ addNav, reports/sales/country, { label: Sales by Country, href: /sales/report/country, pos: 70 }]
+            - [ addNav, reports/sales/state, { label: Sales by State/Province, href: /sales/report/state, pos: 80 }]
 
 /settings:
     - view: settings
