@@ -29,7 +29,7 @@ class FCom_Dev_Translations extends BClass
         $keys = [];
         foreach ($files as $file) {
             $source = file_get_contents($file);
-            $source = $this->getTwigSource($file, $source);
+            $source = $this->_getTwigSource($file, $source);
             $tokens = token_get_all($source);
             $func = 0;
             $class = 0;
@@ -85,16 +85,16 @@ class FCom_Dev_Translations extends BClass
         $ext = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
         switch ($ext) {
             case 'php':
-                $this->saveToPHP($targetFile, $newTranslations);
+                $this->_saveToPHP($targetFile, $newTranslations);
                 break;
             case 'csv':
-                $this->saveToCSV($targetFile, $newTranslations);
+                $this->_saveToCSV($targetFile, $newTranslations);
                 break;
             case 'json':
-                $this->saveToJSON($targetFile, $newTranslations);
+                $this->_saveToJSON($targetFile, $newTranslations);
                 break;
             case 'po':
-                $this->saveToJSON($targetFile, $newTranslations);
+                $this->_saveToJSON($targetFile, $newTranslations);
                 break;
             default:
                 throw new Exception("Undefined format of translation targetFile. Possible formats are: json/csv/php");
@@ -102,7 +102,7 @@ class FCom_Dev_Translations extends BClass
 
     }
 
-    protected function saveToPHP($targetFile, $array)
+    protected function _saveToPHP($targetFile, $array)
     {
         $code = '';
         foreach ($array as $k => $v) {
@@ -115,13 +115,13 @@ class FCom_Dev_Translations extends BClass
         file_put_contents($targetFile, $code);
     }
 
-    protected function saveToJSON($targetFile, $array)
+    protected function _saveToJSON($targetFile, $array)
     {
         $json = json_encode($array);
         file_put_contents($targetFile, $json);
     }
 
-    protected function saveToCSV($targetFile, $array)
+    protected function _saveToCSV($targetFile, $array)
     {
         $handle = fopen($targetFile, "w");
         foreach ($array as $k => $v) {
@@ -131,7 +131,7 @@ class FCom_Dev_Translations extends BClass
         fclose($handle);
     }
 
-    protected function saveToPO($targetFile, $array)
+    protected function _saveToPO($targetFile, $array)
     {
         $handle = fopen($targetFile, "w");
         foreach ($array as $k => $v) {
@@ -146,9 +146,9 @@ class FCom_Dev_Translations extends BClass
      * @param string $source file content
      * @return Twig_Node_Module
      */
-    protected function getTwigSource($file, $source)
+    protected function _getTwigSource($file, $source)
     {
-        $this->initTwig();
+        $this->_initTwig();
         $info = pathinfo($file, PATHINFO_EXTENSION);
         if ($info == 'twig') {
             $stringTwig = $this->getTwigEnv();
@@ -163,26 +163,26 @@ class FCom_Dev_Translations extends BClass
         }
         return $source;
     }
-    protected static $twig;
-    protected function initTwig()
+    protected static $_twig;
+    protected function _initTwig()
     {
-        if (!static::$twig) {
+        if (!static::$_twig) {
             $this->BEvents->on("FCom_LibTwig_Main::init", __CLASS__ . "::setTwigEnv");
             $bDir = $this->BModuleRegistry->module("FCom_Core")->baseDir();
             echo $bDir;
             $this->FCom_LibTwig_Main->init($bDir);
             echo "after Initing twig event\n";
-            static::$twig = 1;
+            static::$_twig = 1;
         }
     }
 
     /**
      * @var Twig_Environment
      */
-    protected static $twigEnv;
+    protected static $_twigEnv;
     public function setTwigEnv($args)
     {
-        static::$twigEnv = $args['string_adapter'];
+        static::$_twigEnv = $args['string_adapter'];
     }
 
     /**
@@ -190,7 +190,7 @@ class FCom_Dev_Translations extends BClass
      */
     private function getTwigEnv()
     {
-        return static::$twigEnv;
+        return static::$_twigEnv;
     }
 
 }

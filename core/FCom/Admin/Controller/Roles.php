@@ -17,7 +17,6 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     protected        $_formTitleField = 'role_name';
     protected        $_formLayoutName = '/roles/form';
 
-    protected $statusOptions = ['all' => 'All', 'none' => "None"];
 
     public function gridConfig()
     {
@@ -51,7 +50,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
                     'name'               => 'status',
                     'label'              => "Status",
                     'overflow'           => true,
-                    'options'            => $this->statusOptions,
+                    'options'            => $this->FCom_Admin_Model_Role->fieldOptions('status'),
                     'width'              => 100,
                     'validation'         => ['required' => true],
                     'editable'           => 'inline',

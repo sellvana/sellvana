@@ -852,7 +852,7 @@ class BLocale extends BClass
                     case 'csv':
                         $fp = fopen($data, 'r');
                         while (($r = fgetcsv($fp, 2084))) {
-                            static::addTranslation($r, $module);
+                            static::_addTranslation($r, $module);
                         }
                         fclose($fp);
                         break;
@@ -862,7 +862,7 @@ class BLocale extends BClass
                         $translations = $this->BUtil->fromJson($content);
                         if (is_array($translations)) {
                             foreach ($translations as $word => $tr) {
-                                static::addTranslation([$word, $tr], $module);
+                                static::_addTranslation([$word, $tr], $module);
                             }
                         }
                         break;
@@ -870,7 +870,7 @@ class BLocale extends BClass
                     case 'php':
                         $translations = include $data;
                         foreach ($translations as $word => $tr) {
-                            static::addTranslation([$word, $tr], $module);
+                            static::_addTranslation([$word, $tr], $module);
                         }
                         break;
 
@@ -903,7 +903,7 @@ class BLocale extends BClass
             }
         } elseif (is_array($data)) {
             foreach ($data as $r) {
-                static::addTranslation($r, $module);
+                static::_addTranslation($r, $module);
             }
         }
     }
@@ -947,7 +947,7 @@ class BLocale extends BClass
         return $this;
     }
 
-    protected function addTranslation($r, $module = null)
+    protected function _addTranslation($r, $module = null)
     {
         if (empty($r[1])) {
             #BDebug::debug('Empty translation for "'.$r[0].'"');
