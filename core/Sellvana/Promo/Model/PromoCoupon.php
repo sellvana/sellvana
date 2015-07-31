@@ -48,7 +48,7 @@ class Sellvana_Promo_Model_PromoCoupon extends FCom_Core_Model_Abstract
         } else {
             $pattern = $params['pattern'];
         }
-        $codes = $this->prepareCodes($pattern, $paramsCount);
+        $codes = $this->_prepareCodes($pattern, $paramsCount);
 
         if (isset($promo)) {
             $count = $this->createCouponCodes($codes, $promo->id());
@@ -64,7 +64,7 @@ class Sellvana_Promo_Model_PromoCoupon extends FCom_Core_Model_Abstract
      * @param $paramsCount
      * @return array
      */
-    protected function prepareCodes($pattern, $paramsCount)
+    protected function _prepareCodes($pattern, $paramsCount)
     {
         $done = false;
         $count = $paramsCount;
@@ -78,7 +78,7 @@ class Sellvana_Promo_Model_PromoCoupon extends FCom_Core_Model_Abstract
                     $codes[$code] = 1;
                 }
             }
-            $codes = $this->filterOutExistingCodes($codes); // codes now has just valid (unique) codes in it.
+            $codes = $this->_filterOutExistingCodes($codes); // codes now has just valid (unique) codes in it.
             $done = (count($codes) == $paramsCount); // if number of codes is equal to requested number of codes, we're done
             if ($limit-- == 0) { // if limit has reached 0, give up
                 break;
@@ -101,7 +101,7 @@ class Sellvana_Promo_Model_PromoCoupon extends FCom_Core_Model_Abstract
      * Check if any of the supplied codes already exists and if so remove it from results
      * @param $codes
      */
-    protected function filterOutExistingCodes($codes)
+    protected function _filterOutExistingCodes($codes)
     {
         $sql = "SELECT `code` FROM " . static::table() . " WHERE `code` IN "; // check if codes exist already
         $place_holders = implode(',', array_fill(0, count($codes), '?'));
@@ -150,7 +150,7 @@ class Sellvana_Promo_Model_PromoCoupon extends FCom_Core_Model_Abstract
             $paramsCount++;
         }
 
-        $codes = $this->filterOutExistingCodes($codes); // do not allow duplicate codes?
+        $codes = $this->_filterOutExistingCodes($codes); // do not allow duplicate codes?
 
         if (null != $promoId) {
             $count = $this->createCouponCodes($codes, $promoId);

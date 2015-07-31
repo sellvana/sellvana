@@ -60,7 +60,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
             $result['error']['message'] = 'There has been an issue with your transaction';
         }
         $result['response'] = $response;
-        $this->clear();
+        $this->_clear();
         $transaction->setData('result', $result)->save();
 
         $this->Sellvana_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [
@@ -114,7 +114,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
     {
         $data = $this->_details;
         if (!empty($data) && isset($data['cc_num'])) {
-            $data['last_four'] = $this->lastFour();
+            $data['last_four'] = $this->_lastFour();
             unset($data['cc_num']);
         }
         return $data;
@@ -125,7 +125,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         return $this->getDataToSave();
     }
 
-    protected function lastFour()
+    protected function _lastFour()
     {
         $lastFour = $this->get('last_four');
         $ccNum    = $this->get('cc_num');
@@ -134,9 +134,9 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
         }
         return $this->get('last_four');
     }
-    protected function clear()
+    protected function _clear()
     {
-        $this->lastFour();
+        $this->_lastFour();
         unset($this->_details['cc_num']);
     }
 }

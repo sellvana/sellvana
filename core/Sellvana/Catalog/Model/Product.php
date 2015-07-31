@@ -1436,20 +1436,20 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getThumbPath($productId)
     {
-        return $this->getProductImage($productId, 'thumb');
+        return $this->_getProductImage($productId, 'thumb');
     }
 
     public function getRolloverPath($productId)
     {
-        return $this->getProductImage($productId, 'rollover');
+        return $this->_getProductImage($productId, 'rollover');
     }
 
     public function getDefaultImagePath($productId)
     {
-        return $this->getProductImage($productId, 'default');
+        return $this->_getProductImage($productId, 'default');
     }
 
-    protected function getProductImage($productId, $imgType = 'default')
+    protected function _getProductImage($productId, $imgType = 'default')
     {
         $thumbUrl     = null;
         $productMediaOrm = $this->Sellvana_Catalog_Model_ProductMedia

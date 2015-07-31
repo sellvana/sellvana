@@ -51,7 +51,6 @@ class Sellvana_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Contro
     {
         $this->Sellvana_Catalog_ProductsImport->run();
         $this->BResponse->redirect('catalog/products/import/status');
-        exit;
     }
 
     public function action_stop__POST()

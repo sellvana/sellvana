@@ -10,8 +10,8 @@
  */
 class Sellvana_SampleData_Admin extends BClass
 {
-    protected static $defaultProductDataFile = 'products.csv';
-    protected static $defaultDataPath = 'data';
+    protected static $_defaultProductDataFile = 'products.csv';
+    protected static $_defaultDataPath = 'data';
 
     public function bootstrap()
     {
@@ -35,12 +35,12 @@ class Sellvana_SampleData_Admin extends BClass
 
         $file = $config->get('modules/Sellvana_SampleData/sample_file');
         if (!$file) {
-            $file = static::$defaultProductDataFile;
+            $file = static::$_defaultProductDataFile;
         }
 
         $path = $config->get('modules/Sellvana_SampleData/sample_path');
         if (!$path) {
-            $path = static::$defaultDataPath;
+            $path = static::$_defaultDataPath;
         }
         $path = $basePath . DIRECTORY_SEPARATOR . $path;
 

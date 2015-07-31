@@ -61,8 +61,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     ];
 
     protected static $_sessionUser;
-    protected $defaultShipping = null;
-    protected $defaultBilling = null;
+    protected $_defaultShipping = null;
+    protected $_defaultBilling = null;
 
     private static $lastImportedCustomer = 0;
 
@@ -156,7 +156,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             'password_hash' => $this->BUtil->fullSaltedHash($password),
             'password_session_token' => $token,
         ]);
-        if ($this->id() === $this->sessionUserId()) {
+
+        if ($this->id() === $this->sessionUserId() && $this->BRequest->area() != 'FCom_Admin') {
             $this->BSession->set('admin_user_password_token', $token);
         }
         return $this;

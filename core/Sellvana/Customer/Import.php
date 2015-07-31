@@ -2,7 +2,7 @@
 
 class Sellvana_Customer_Import extends BImport
 {
-    protected $fields = [
+    protected $_fields = [
             'customer.firstname' => ['pattern' => 'first.*name'],
             'customer.lastname' => ['pattern' => 'last.*name'],
             'customer.email' => ['pattern' => 'e[ -]?mail'],
@@ -22,9 +22,9 @@ class Sellvana_Customer_Import extends BImport
             'address.fax' => ['pattern' => 'fax'],
         ];
 
-    protected $dir = 'customers';
-    protected $model = 'Sellvana_Customer_Model_Customer';
+    protected $_dir = 'customers';
+    protected $_model = 'Sellvana_Customer_Model_Customer';
 
-    protected $allowedFileTypes = ['txt', 'csv'];
+    protected $_allowedFileTypes = ['txt', 'csv'];
 
 }

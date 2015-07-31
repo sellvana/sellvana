@@ -5,7 +5,7 @@
  */
 class Sellvana_Catalog_ProductsImport extends BImport
 {
-    protected $fields = [
+    protected $_fields = [
         'product.product_sku' => ['pattern' => 'sku'],
         'product.product_name' => ['pattern' => 'product.*name|name'],
         'product.short_description' => ['pattern' => 'short.*description'],
@@ -33,10 +33,10 @@ class Sellvana_Catalog_ProductsImport extends BImport
         'product.update_at' => ['updated']
     ];
 
-    protected $dir = 'products';
-    protected $model = 'Sellvana_Catalog_Model_Product';
+    protected $_dir = 'products';
+    protected $_model = 'Sellvana_Catalog_Model_Product';
 
-    protected $allowedFileTypes = ['txt', 'csv'];
+    protected $_allowedFileTypes = ['txt', 'csv'];
 
     public function updateFieldsDueToInfo($info = null)
     {

@@ -14,7 +14,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                     "can_upload": false,
                     "filetype_regex": "",
                     "folder": ""
-                }
+                },
+                "showModal": true
             }
         },
         getModalConfig: function() {
@@ -85,37 +86,56 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
             }
             return null
         },
-        render: function() {
-            console.log('render fcom mediablib');
-            var modalConfig = this.getModalConfig();
-            var uploadConfig = this.props.uploadConfig;
-            var mediaGridId = this.props.mediaConfig.id;
-
-            /*console.log('modalConfig', modalConfig);
-            console.log('propsmodalConfig', this.props.modalConfig);
-            console.log('uploadConfig', this.props.uploadConfig);
-            console.log('mediaConfig', this.props.mediaConfig);*/
-
-            var mainGridElement = React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
-
+        getMainGridEle: function() {
+            return React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
+        },
+        renderModal: function(modalConfig) {
             return (
                 <Components.Modal {...modalConfig}>
                     <div className="row">
                         <div className="tabbable">
                             <ul className="nav nav-tabs prod-type f-horiz-nav-tabs">
                                 <li className="active">
-                                    <a data-toggle="tab" href={'#' + mediaGridId + '-attach_library'}>Library</a>
+                                    <a data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-attach_library'}>Library</a>
                                 </li>
-                                {uploadConfig.can_upload ? <li><a data-toggle="tab" href={'#' + mediaGridId + '-media-upload'}>Upload</a></li> : null}
+                                {this.props.uploadConfig.can_upload ? <li><a data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-media-upload'}>Upload</a></li> : null}
                             </ul>
                             <div className="tab-content">
-                                <div className="tab-pane active" id={mediaGridId + '-attach_library'}>{mainGridElement}</div>
-                                {uploadConfig.can_upload ? <div className="tab-pane" id={mediaGridId + '-media-upload'}>{this.mediaUploadElement()}</div> : null}
+                                <div className="tab-pane active" id={this.props.mediaConfig.id + '-attach_library'}>{this.getMainGridEle()}</div>
+                                {this.props.uploadConfig.can_upload ? <div className="tab-pane" id={this.props.mediaConfig.id + '-media-upload'}>{this.mediaUploadElement()}</div> : null}
                             </div>
                         </div>
                     </div>
                 </Components.Modal>
             );
+        },
+        renderView: function() {
+            return (
+                <div className="tabbable">
+                    <ul className="nav nav-tabs prod-type f-horiz-nav-tabs">
+                        <li className="active">
+                            <a data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-attach_library'}>Library</a>
+                        </li>
+                        {this.props.uploadConfig.can_upload ? <li><a data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-media-upload'}>Upload</a></li> : null}
+                    </ul>
+                    <div className="tab-content">
+                        <div className="tab-pane active" id={this.props.mediaConfig.id + '-attach_library'}>{this.getMainGridEle()}</div>
+                        {this.props.uploadConfig.can_upload ? <div className="tab-pane" id={this.props.mediaConfig.id + '-media-upload'}>{this.mediaUploadElement()}</div> : null}
+                    </div>
+                </div>
+            );
+        },
+        render: function() {
+            /*console.log('modalConfig', this.getModalConfig());
+            console.log('propsmodalConfig', this.props.modalConfig);
+            console.log('uploadConfig', this.props.uploadConfig);
+            console.log('mediaConfig', this.props.mediaConfig);*/
+            if (this.props.showModal === true) {
+                var modalConfig = this.getModalConfig();
+                return this.renderModal(modalConfig);
+            } else {
+                return this.renderView();
+            }
         }
     });
 

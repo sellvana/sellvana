@@ -8,7 +8,7 @@ base:
 /customers/import:
     - { include: base }
     - { include: form }
-    - { hook: main, views: customer/import }
+    - { hook: main, views: customer/import-griddle }
     - { view: admin/nav, do: [[ setNav, customer/import ]] }
 
 /settings:

@@ -86,7 +86,7 @@ class Sellvana_MultiLanguage_Main extends BClass
         $model = $args['result'];
         $id      = $model->id();
 
-        $localized = $this->getTranslations($id, $entityType, $lang);
+        $localized = $this->_getTranslations($id, $entityType, $lang);
 
         foreach ($localized as $locale) {
             /* @var Sellvana_MultiLanguage_Model_Translation $locale */
@@ -123,7 +123,7 @@ class Sellvana_MultiLanguage_Main extends BClass
             return false;
         }
         // todo, filter by actual fields selected in model
-        $localized = $this->getTranslations($modelIds, $entityType, $lang);
+        $localized = $this->_getTranslations($modelIds, $entityType, $lang);
         // localized fields for current product ids and language
 
         foreach ($localized as $locale) {
@@ -145,7 +145,7 @@ class Sellvana_MultiLanguage_Main extends BClass
      * @param array            $fields
      * @return array
      */
-    protected function getTranslations($id, $entityId, $lang, $fields = [])
+    protected function _getTranslations($id, $entityId, $lang, $fields = [])
     {
         /* @var $orm BORM */
         $orm = $this->Sellvana_MultiLanguage_Model_Translation

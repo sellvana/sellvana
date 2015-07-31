@@ -47,7 +47,7 @@ class Sellvana_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Cont
         $this->BResponse->redirect('customers/import/status');
     }
 
-    public function action_start()
+    public function action_start__POST()
     {
         $this->Sellvana_Customer_Import->run();
         $this->BResponse->redirect('customers/import/status');

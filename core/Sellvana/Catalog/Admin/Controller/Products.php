@@ -260,11 +260,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function productAttachmentsGridConfig($model)
     {
         $download_url = $this->BApp->href('/media/grid/download?folder=media/product/attachment&file=');
-        $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->order_by_expr('pa.position asc')
+        $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTACH)->order_by_expr('pa.position asc')
             ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name', 'a.file_size', 'pa.create_at', 'pa.update_at'])
             ->select('a.id', 'file_id')->find_many());
 
-        return [
+        $config = [
             'config' => [
                 'id' => 'product_attachments',
                 'caption' => 'Product Attachments',
@@ -288,7 +288,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
                 ],
                 'actions' => [
-                    'add' => ['caption' => 'Add attachments'],
+                    // 'add' => ['caption' => 'Add attachments'],
                     'delete' => ['caption' => 'Remove']
                 ],
                 'grid_before_create' => 'attachmentGridRegister',
@@ -299,16 +299,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 ]
             ]
         ];
-    }
 
-    /**
-     * todo: this method will be remove after test
-     * @param $model Sellvana_Catalog_Model_Product
-     * @return array
-     */
-    public function productAttachmentsGridConfigForGriddle($model) {
-        $config = $this->productAttachmentsGridConfig($model);
-        unset($config['config']['actions']['add']);
         $config['config']['actions'] += [
             'add-attachment' => [
                 'caption'  => 'Add attachments',
@@ -396,7 +387,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 ],
                 'actions' => [
                     'refresh' => true,
-                    'add' => ['caption' => 'Add images'],
+                    // 'add' => ['caption' => 'Add images'],
                     'quick_add' => [
                         'html' => '<span class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
                                      <i class="icon-plus icon-white"></i>
@@ -419,19 +410,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ]
         ];
 
-        return $config;
-    }
-
-    /**
-     * //todo: remove after finish griddle
-     * temporary function to build griddle, will be removed after test
-     * @param $model
-     * @return array
-     */
-    public function productImagesGridConfigForGriddle($model)
-    {
-        $config = $this->productImagesGridConfig($model);
-        unset($config['config']['actions']['add']);
         $config['config']['actions'] += [
             'add-images' => [
                 'caption'  => 'Add images',
@@ -669,7 +647,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $this->processMediaPost($model, $data);
                 $this->processInventoryPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
-                $this->processPricesPost($model, $data);
+                $this->_processPricesPost($model, $data);
                 $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
                 $model->save();
             }
@@ -1139,7 +1117,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $this->Sellvana_Catalog_Model_Product->orm()->select('url_key')->iterate($callback);
     }
 
-    protected function processPricesPost($model, $data)
+    protected function _processPricesPost($model, $data)
     {
         if(empty($data['prices'])){
             return;

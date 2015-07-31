@@ -11,8 +11,9 @@ class Sellvana_Sales_Admin_Controller_Report_AbandonedCarts extends FCom_Admin_C
     protected $_recordName = 'Cart';
     protected $_mainTableAlias = 'c';
     protected $_permission = 'sales/reports';
-    protected $_navPath = 'sales/reports';
-    protected $_gridHref = 'sales/report/abandonedCarts';
+    protected $_navPath = 'reports/sales/abandoned_carts';
+    protected $_gridHref = 'sales/report/abandoned_carts';
+    protected $_gridTitle = 'Abandoned Carts';
 
     public function gridConfig()
     {
