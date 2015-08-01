@@ -375,12 +375,16 @@ class FCom_Core_ImportExport extends BClass
                 }
 
                 if (!$this->_isArrayAssoc($data)) {
+                    if (sizeof($this->_currentFields) !== sizeof($data)) {
+                        $this->BDebug->warning('Invalid data: ' . print_r($this->_currentFields, 1) . ' | ' . print_r($data, 1));
+                    }
                     $data = array_combine($this->_currentFields, $data);
                 }
 
                 $id = '';
 
                 if (!empty($this->_currentConfig['unique_key'])) {
+                    //TODO: add checking for existance of data for unique_key and proper handle it
                     foreach ((array)$this->_currentConfig['unique_key'] as $key) {
                         $id .= $data[$key] . '/';
                     }
@@ -464,7 +468,9 @@ class FCom_Core_ImportExport extends BClass
 
         foreach ($batchData as $id => $data) {
             if(!isset($data[$this->_currentModelIdField])){
-                $this->BDebug->warning($this->BLocale->_("%s Invalid data: %s", [$this->BDb->now(), print_r($data, 1)]));
+                $this->BDebug->warning($this->BLocale->_("%s Invalid data: %s: %s", [$this->BDb->now(), $id, print_r($data, 1)]));
+                //TODO: better handling and reporting of invalid data
+                continue;
             }
             $ieData = [
                 'site_id'   => $this->_importId,

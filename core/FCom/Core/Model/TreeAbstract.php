@@ -313,7 +313,9 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      */
     public function unregister($save = false)
     {
-        $this->parent()->add('num_children', -1);
+        if ($this->parent()) {
+            $this->parent()->add('num_children', -1);
+        }
         $numDesc = 1 + $this->get('num_descendants');
         foreach ($this->ascendants() as $c) {
             $c->add('num_descendants', - $numDesc);

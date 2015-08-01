@@ -103,14 +103,14 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     if ($node->validateNodeName($r->post('title'), true)) {
                         $child = $node->createChild($r->post('title'));
                         $node->cacheSaveDirty();
-                        $result['id'] = $child->id;
+                        $result['id'] = $child->id();
                     } else {
                         $result = ['status' => 0, 'message' => $this->_("Can't create node duplicate name node.")];
                     }
                     break;
 
                 case 'rename_node':
-                    if ($node->id < 2) {
+                    if ($node->id() < 2) {
                         throw new BException($this->_("Can't rename root"));
                     }
                     if ($node->validateNodeName($r->post('title'))) {
@@ -123,10 +123,10 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     break;
 
                 case 'move_node':
-                    if ($node->id < 2) {
+                    if ($node->id() < 2) {
                         throw new BException("Can't move root");
                     }
-                    if ($r->post('ref') != $node->parent()->id) {
+                    if (!$node->parent() || $r->post('ref') != $node->parent()->id()) {
                         $node->move($r->post('ref'));
                     }
                     if ($r->post('position') !== null) {
@@ -136,7 +136,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     break;
 
                 case 'remove_node':
-                    if ($node->id < 2) {
+                    if ($node->id() < 2) {
                         throw new BException("Can't remove root");
                     }
                     $node->delete();
