@@ -13,6 +13,9 @@ base:
             - [ addNav, reports/sales/payment_method, { label: Sales by Payment Method, href: /sales/report/payment_method, pos: 60 }]
             - [ addNav, reports/sales/country, { label: Sales by Country, href: /sales/report/country, pos: 70 }]
             - [ addNav, reports/sales/state, { label: Sales by State/Province, href: /sales/report/state, pos: 80 }]
+            - [ addNav, reports/sales/hour, { label: Sales by Hour of the Day, href: /sales/report/hour, pos: 90 }]
+            - [ addNav, reports/sales/day, { label: Sales by Day of Week, href: /sales/report/day, pos: 100 }]
+            - [ addNav, reports/sales/shipping_method, { label: Shipping Methods, href: /sales/report/shipping_method, pos: 140 }]
 
 /settings:
     - view: settings

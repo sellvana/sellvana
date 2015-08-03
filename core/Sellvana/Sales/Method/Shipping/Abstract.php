@@ -77,7 +77,7 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         }
         $services = [];
         foreach ($enabled as $svc) {
-            $services[$svc] = $allServices[$svc];
+            $services[$svc] = (!empty($allServices[$svc])) ? $allServices[$svc] : $svc;
         }
         return $services;
     }
