@@ -56,7 +56,11 @@ class Sellvana_Sales_Admin_Controller_Report_Hour extends FCom_Admin_Controller_
         $view->processGridFilters($config, $filters, $tmpOrm);
         $total = $tmpOrm->find_one()->get('total_amount');
 
-        $orm->select_expr('HOUR(create_at)', 'hour')
+        $offset = $this->BLocale->tzOffset() / 3600;
+        if ($offset < 0) {
+            $offset += 24 * 3600;
+        }
+        $orm->select_expr('MOD(HOUR(create_at) + ' . $offset . ', 24)', 'hour')
             ->select_expr('COUNT(o.id)', 'order_count')
             ->select_expr('IFNULL(SUM(o.item_qty), 0)', 'total_item_qty')
             ->select_expr('IFNULL(SUM(o.subtotal), 0)', 'total_subtotal')
@@ -67,6 +71,6 @@ class Sellvana_Sales_Admin_Controller_Report_Hour extends FCom_Admin_Controller_
             ->select_expr('IFNULL(SUM(o.amount_refunded), 0)', 'total_refunded')
             ->select_expr("IFNULL(ROUND(100 * SUM(o.grand_total) / {$total}, 2), 0)", 'pc_total_amount')
             ->group_by_expr('HOUR(create_at)')
-            ->order_by_expr('HOUR(create_at) ASC');
+            ->order_by_expr('MOD(HOUR(create_at) + ' . $offset . ', 24) ASC');
     }
 }
