@@ -10,8 +10,8 @@ class Sellvana_Sales_Admin_Controller_Report_Day extends FCom_Admin_Controller_A
     protected $_recordName = 'Order';
     protected $_mainTableAlias = 'o';
     protected $_permission = 'sales/reports';
-    protected $_navPath = 'reports/sales/hour';
-    protected $_gridHref = 'sales/report/hour';
+    protected $_navPath = 'reports/sales/day';
+    protected $_gridHref = 'sales/report/day';
     protected $_gridTitle = 'Day of the Week';
 
 
