@@ -30,6 +30,7 @@ modules:
                     - [ /sales/report/country/?.action, Sellvana_Sales_Admin_Controller_Report_Country ]
                     - [ /sales/report/state/?.action, Sellvana_Sales_Admin_Controller_Report_State ]
                     - [ /sales/report/hour/?.action, Sellvana_Sales_Admin_Controller_Report_Hour ]
+                    - [ /sales/report/day/?.action, Sellvana_Sales_Admin_Controller_Report_Day ]
                 observe:
                     - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]
