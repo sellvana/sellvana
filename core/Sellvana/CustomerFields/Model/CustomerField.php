@@ -18,33 +18,23 @@
  * @property string $test2
  *
  * DI
- * @property Sellvana_CustomerFields_Model_Field $SellvanaCustomerFields_Model_Field
+ * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
  */
 class Sellvana_CustomerFields_Model_CustomerField extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
-    protected static $_table = 'fcom_customer_custom';
+    protected static $_table = 'fcom_customer_field_data';
     protected static $_importExportProfile = [
         'skip' => [],
         'related' => [
-            'product_id' => 'Sellvana_Catalog_Model_Product.id',
+            'customer_id' => 'Sellvana_Catalog_Model_Product.id',
         ],
         'unique_id' => ['product_id'],
     ];
 
-    public function productFields($p, $r = [])
+    public function customerFields($p, $r = [])
     {
         $where = [];
-        if ($p->get('_fieldset_ids') || !empty($r['add_fieldset_ids'])) {
-            $addSetIds = $this->BUtil->arrayCleanInt($p->get('_fieldset_ids'));
-            if (!empty($r['add_fieldset_ids'])) {
-                //$addSetIds += $this->BUtil->arrayCleanInt($r['add_fieldset_ids']);
-                $addSetIds = array_merge($addSetIds, $this->BUtil->arrayCleanInt($r['add_fieldset_ids']));
-            }
-            $where['OR'][] = "f.id IN (SELECT field_id FROM " . $this->Sellvana_CustomerFields_Model_SetField->table()
-                . " WHERE set_id IN (" . join(',', $addSetIds) . "))";
-                $p->set('_fieldset_ids', join(',', array_unique($addSetIds)));
-        }
 
         if ($p->get('_add_field_ids') || !empty($r['add_field_ids'])) {
             $addFieldIds = $this->BUtil->arrayCleanInt($p->get('_add_field_ids'));
@@ -79,7 +69,6 @@ class Sellvana_CustomerFields_Model_CustomerField extends FCom_Core_Model_Abstra
         } else {
             $fields = $this->Sellvana_CustomerFields_Model_Field->orm('f')
                     ->select("f.*")
-                    ->left_outer_join($this->Sellvana_CustomerFields_Model_SetField->table(), 'f.id = sf.field_id', 'sf') //todo: implement override left_outer_join to IDE understand BORM::where
                     ->where($where, null)
                     ->order_by_asc('sf.position')
                     ->find_many_assoc();
@@ -90,8 +79,8 @@ class Sellvana_CustomerFields_Model_CustomerField extends FCom_Core_Model_Abstra
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->get('product_id')) return false;
-        if (!$this->id() && ($exists = $this->load($this->get('product_id'), 'product_id'))) {
+        if (!$this->get('customer_id')) return false;
+        if (!$this->id() && ($exists = $this->load($this->get('customer_id'), 'customer_id'))) {
             return false;
         }
 

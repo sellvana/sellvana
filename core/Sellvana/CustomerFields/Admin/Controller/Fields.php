@@ -5,7 +5,6 @@
  *
  * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
  * @property Sellvana_CustomerFields_Model_FieldOption $Sellvana_CustomerFields_Model_FieldOption
- * @property Sellvana_CustomerFields_Model_SetField $Sellvana_CustomerFields_Model_SetField
  */
 class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Controller_Abstract
 {
@@ -109,9 +108,9 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
             'config' => [
                 'id' => 'options-grid',
                 'caption' => 'Fields',
-                'dataUrl' => $this->BApp->href('customerfields/fieldsets/field_option_grid_data?field_id='),
-                'data_url' => $this->BApp->href('customerfields/fieldsets/field_grid_data'),
-                'edit_url' => $this->BApp->href('customerfields/fieldsets/field_grid_data'),
+                'dataUrl' => $this->BApp->href('customerfields/fields/field_option_grid_data?field_id='),
+                'data_url' => $this->BApp->href('customerfields/fields/field_grid_data'),
+                'edit_url' => $this->BApp->href('customerfields/fields/field_grid_data'),
                 'data' => [],
                 'data_mode' => 'local',
                 'columns' => [
@@ -149,11 +148,6 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
         return $config;
     }
 
-    public function action_fieldsets()
-    {
-        $this->layout('/customerfields/fieldsets');
-    }
-
     public function action_fields()
     {
         $this->layout('/customerfields/fields');
@@ -164,32 +158,6 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
         $view = $this->view('core/backbonegrid');
         $view->set('grid', $this->fieldSetsGridConfig());
         $data = $view->generateOutputData();
-        $this->BResponse->json([
-            ['c' => $data['state']['c']],
-            $this->BDb->many_as_array($data['rows']),
-        ]);
-    }
-
-    public function action_fieldset_modal_selected_grid_data()
-    {
-        $orm = $this->Sellvana_CustomerFields_Model_SetField->orm('sf')
-            ->join('Sellvana_CustomerFields_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
-            ->select(['f.id', 'f.field_name', 'f.field_code', 'sf.position'])
-            ->where('sf.set_id', $this->BRequest->get('set_id'));
-        //TODO check when rows count is over 10.(processORM paginate)
-        $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
-        $this->BResponse->json([
-            ['c' => $data['state']['c']],
-            $this->BDb->many_as_array($data['rows']),
-        ]);
-    }
-
-    public function action_fieldset_modal_add_grid_data()
-    {
-        /** @var FCom_Core_View_BackboneGrid $view */
-        $view = $this->view('core/backbonegrid');
-        $orm = $this->Sellvana_CustomerFields_Model_Field->orm()->select('*');
-        $data = $view->processORM($orm, __METHOD__);
         $this->BResponse->json([
             ['c' => $data['state']['c']],
             $this->BDb->many_as_array($data['rows']),
@@ -230,73 +198,6 @@ class Sellvana_CustomerFields_Admin_Controller_Fields extends FCom_Admin_Control
                 'options' => $options
             ]
         );
-    }
-
-    public function action_grid_data__POST()
-    {
-        $r = $this->BRequest;
-        $data = $r->post();
-        $field_ids = '';
-        if (isset($data['field_ids'])) {
-            $field_ids = $data['field_ids'];
-        }
-
-        $model = $this->Sellvana_CustomerFields_Model_SetField;
-        switch ($r->post('oper')) {
-            case 'add':
-                unset($data['id'], $data['oper'], $data['field_ids']);
-                $set = $this->Sellvana_CustomerFields_Model_Set->create($data)->save();
-                $result = $set->as_array();
-                $num_fields = 0;
-                if ($field_ids !== '') {
-                    $arr = explode(',', $field_ids);
-                    $num_fields = count($arr);
-                    foreach ($arr as $i => $fId) {
-                        $model->create(['set_id' => $result['id'], 'field_id' => $fId, 'position' => $i])->save();
-                    }
-                }
-                $result['num_fields'] = $num_fields;
-                $this->BResponse->json($result);
-                break;
-            case 'edit':
-                $model->delete_many(['set_id' => $data['id']]);
-                $num_fields = 0;
-                if ($field_ids !== '') {
-                    $arr = explode(',', $field_ids);
-                    $num_fields = count($arr);
-                    foreach ($arr as $i => $fId) {
-                        if (!$model->loadWhere(['set_id' => (int)$data['id'], 'field_id' => (int)$fId])) {
-                            $model->create(['set_id' => $data['id'], 'field_id' => $fId, 'position' => $i])->save();
-                        }
-                    }
-                }
-                $set = $this->Sellvana_CustomerFields_Model_Set->load($data['id']);
-                unset($data['id'], $data['oper'], $data['field_ids']);
-                $set->set($data)->save();
-                $result = $set->as_array();
-                $result['num_fields'] = $num_fields;
-                $this->BResponse->json($result);
-                break;
-            default:
-                $this->_processGridDataPost('Sellvana_CustomerFields_Model_Set');
-                break;
-        }
-
-    }
-
-    public function action_fieldset_modal_selected_grid_data__POST()
-    {
-        //$this->_processPost('Sellvana_CustomerFields_Model_SetField', array('set_id'=>$this->BRequest->get('set_id')));
-        //print_r($this->BRequest->request()); exit;
-        $p = $this->BRequest->post();
-        $model = $this->Sellvana_CustomerFields_Model_SetField;
-        $model->delete_many(['set_id' => (int)$p['set_id']]);
-        if ($p['field_ids'] !== '') {
-            foreach (explode(',', $p['field_ids']) as $i => $fId) {
-                $model->create(['set_id' => $p['set_id'], 'field_id' => $fId, 'position' => $i])->save();
-            }
-        }
-        $this->BResponse->json(['success' => true]);
     }
 
     public function action_field_grid_data__POST()

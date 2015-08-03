@@ -106,5 +106,15 @@ class Sellvana_CustomerFields_Migrate extends BClass
                 'field_type' => "enum('customer') NOT NULL DEFAULT 'customer'",
             ]
         ]);
+
+        $tCustomerField = $this->Sellvana_CustomerFields_Model_CustomerField->table();
+        $this->BDb->run(sprintf('RENAME TABLE `%s` TO `%s`', $this->BDb->t('fcom_customer_custom'), $tCustomerField));
+        $this->BDb->ddlTableDef($tCustomerField, [
+            BDb::COLUMNS     => [
+                '_fieldset_ids'   => 'DROP',
+                '_add_field_ids'  => 'DROP',
+                '_hide_field_ids' => 'DROP',
+            ],
+        ]);
     }
 }
