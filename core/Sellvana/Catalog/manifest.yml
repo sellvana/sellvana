@@ -17,6 +17,8 @@ modules:
                     allowed_locales: [ en_US ]
                     weight_unit: lb
                     length_unit: in
+                    enable_rollover: true
+                    rollover_effect: fade
 
         areas:
             FCom_Admin:

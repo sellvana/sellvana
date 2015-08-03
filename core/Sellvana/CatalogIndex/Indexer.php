@@ -164,7 +164,7 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
         $tTerm = $this->Sellvana_CatalogIndex_Model_Term->table();
         $tDocTerm = $this->Sellvana_CatalogIndex_Model_DocTerm->table();
 /*
-//TODO: figure out why this doesn't work??
+//TODO: figure out why this doesn't work?? tried raw direct SQL queries as well (5.6.24)
         $this->BDb->run("
 DELETE FROM {$tFieldValue} WHERE id NOT IN (SELECT value_id FROM {$tDocValue});
 DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
