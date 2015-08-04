@@ -25,12 +25,6 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
             $methodOptions[$code] = $method->getName();
         }
 
-        $periodTypes = [
-            'day' => 'Day',
-            'week' => 'Week',
-            'month' => 'Month',
-            'year' => 'Year'
-        ];
         $config['columns'] = [
             ['name' => 'period', 'index' => 'period', 'label' => 'Period', 'width' => 70],
             ['name' => 'shipping_method', 'index' => 'o.shipping_method', 'label' => 'Shipping Carrier', 'options' => $methodOptions],
@@ -39,7 +33,7 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
             ['name' => 'qty_sold', 'index' => 'qty_sold', 'label' => '# of Items'],
             ['name' => 'total_shipping_amount', 'index' => 'total_shipping_amount', 'label' => 'Shipping $ Collected'],
 
-            ['name' => 'period_type', 'label' => 'Period', 'options' => $periodTypes, 'hidden' => true],
+            ['name' => 'period_type', 'label' => 'Period', 'options' => $this->_periodTypes, 'hidden' => true],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'o.create_at', 'hidden' => true],
         ];
         $config['filters'] = [
@@ -62,33 +56,5 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
             ->select_expr('SUM(o.shipping_price - o.shipping_discount)', 'total_shipping_amount')
             ->group_by('o.shipping_method')
             ->group_by('o.shipping_service');
-    }
-
-    /**
-     * @param array $filter
-     * @param string $val
-     * @param BORM $orm
-     */
-    public function periodTypeCallback($filter, $val, $orm)
-    {
-        $field = 'o.create_at';
-        switch ($val) {
-            case 'year':
-                $expr = "YEAR({$field})";
-                break;
-            case 'month':
-                $expr = "DATE_FORMAT({$field}, '%Y-%m')";
-                break;
-            case 'week':
-                $expr = "YEARWEEK({$field})";
-                break;
-            case 'day':
-            default:
-                $expr = "DATE_FORMAT({$field}, '%Y-%m-%d')";
-                break;
-        }
-
-        $orm->group_by_expr($expr);
-        $orm->select_expr($expr, 'period');
     }
 }
