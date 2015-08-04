@@ -70,6 +70,38 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
 
     protected static $_fieldsCache = [];
 
+    /**
+     * @param      $type
+     * @param bool $keysOnly
+     * @return array
+     */
+    public function fieldsInfo($type, $keysOnly = false)
+    {
+        if (empty(static::$_fieldsCache[$type])) {
+            $class  = static::$_fieldTypes[$type]['class'];
+            $fields = $this->BDb->ddlFieldInfo($class::table());
+            unset($fields['id'], $fields['product_id']);
+            static::$_fieldsCache[$type] = $fields;
+        }
+
+        return $keysOnly? array_keys(static::$_fieldsCache[$type]): static::$_fieldsCache[$type];
+    }
+
+    /**
+     * @return array
+     */
+    public function getListAssoc()
+    {
+        $result = [];
+        $cfList = $this->orm()->find_many();
+        /** @var self $cffield */
+        foreach ($cfList as $cffield) {
+            $result[$cffield->field_code] = $cffield;
+        }
+
+        return $result;
+    }
+
     public function tableName() {
         if (empty(static::$_fieldTypes[$this->field_type])) {
             return null;

@@ -3,10 +3,17 @@ modules:
         version: 0.5.1.0
         channel: alpha
         require: { module: { Sellvana_Customer: 0.5.0.0 } }
+        auto_use: [ bootstrap ]
+        observe:
+            - [ "Sellvana_Customer_Model_Customer::orm", Sellvana_CatalogFields_Main.onCustomerOrm ]
+            - [ "Sellvana_Customer_Model_Customer::onAfterSave", Sellvana_CatalogFields_Main.onCustomerAfterSave ]
+            - [ "Sellvana_Customer_Model_Customer::import:row", Sellvana_CatalogFields_Main.onCustomerImportRow ]
+            - [ "Sellvana_Customer_Model_Customer::import:after_loop", Sellvana_CatalogFields_Main.onCustomerImportAfterLoop ]
 
         areas:
             FCom_Admin:
                 auto_use: [ layout, views ]
                 routing:
-                    - [ /customerfields/.action, Sellvana_CustomerFields_Admin_Controller_Fields ]
                     - [ /customerfields/fields/.action, Sellvana_CustomerFields_Admin_Controller_Fields ]
+                    - [ /customerfields/customers/.action, Sellvana_CustomerFields_Admin_Controller_Customers ]
+                    - [ /customerfields/.action, Sellvana_CustomerFields_Admin_Controller_Fields ]
