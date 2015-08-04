@@ -3,10 +3,26 @@
 {% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
 {% set variantConfig = ctrl.variantGridConfig(model) %}
 
+{% set loadCustomerGroups = MODULES.isLoaded('Sellvana_CustomerGroups') %}
+{% if loadCustomerGroups %}
+    {% set customerGroups = APP.instance('Sellvana_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+
+{% set loadSites = MODULES.isLoaded('Sellvana_MultiSite') %}
+{% if loadSites %}
+    {% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
+{% endif %}
+
+{% set loadCurrency = MODULES.isLoaded('Sellvana_MultiCurrency') %}
+{% if loadCurrency %}
+    {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').getAvailableCurrencies() %}
+{% endif %}
+{% set priceHelper = APP.instance('Sellvana_Catalog_Model_ProductPrice') %}
+
 <script type="text/javascript">
-    var variantGrid, variantFieldGrid, variantImages, variantFields; //todo: move this to inside scope
-    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'jquery-ui', 'jquery.validate', 'unique'],
-            function ($, _, React, FComGriddleComponent, Components) {
+    var variantGrid, variantFieldGrid, variantImages, variantFields, variantModalNode; //todo: move this to inside scope
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'fcom.catalog.variant.price', 'fcom.locale', 'daterangepicker', 'select2', 'jquery-ui', 'jquery.validate', 'unique'],
+            function ($, _, React, FComGriddleComponent, Components, Price, Locale) {
 
         /**
          * object contains property and method to hand variant images
@@ -673,7 +689,191 @@
             }
         };
 
+        window.showModalToEditVariantPrice = function(row) {
+            var variantPrices = [];
+            $.ajax({
+                url: '{{APP.href('catalogfields/products/prices')}}?id=' + {{ REQUEST.get('id') }} + '&variant_id=' + row.id,
+                type: 'GET',
+                dataType: 'json',
+                async: false,
+                success: function(data) {
+                    variantPrices = data;
+                }
+            });
+
+            function validatePrices() {
+                var valid = true;
+                $(variantModalNode).find('select.priceUnique').each(function (el) {
+                    if (!$(this).valid()) {
+                        valid = false;
+                    }
+                });
+                return valid;
+            }
+
+            var options = {
+                id: variantGrid.getConfig('id'),
+                title: Locale._('Variant Prices'),
+                prices: variantPrices,
+                price_types: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
+                editable_prices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
+                customer_groups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
+                sites: {{ sites ? UTIL.toJson(sites) | raw: 'null' }},
+                currencies: {{ currencies ? UTIL.toJson(currencies) | raw: 'null' }},
+                product_id: '{{ model.id() }}',
+                validatePrices: validatePrices,
+                priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options'))|raw }},
+                operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options'))|raw }},
+                sale_date_separator: ' / ',
+                show_customers: {{ loadCustomerGroups ? 'true' : 'false' }},
+                show_sites: {{ loadSites ? 'true' : 'false' }},
+                show_currency: {{ loadCurrency ? 'true' : 'false' }}
+            };
+
+            var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "editVariantPriceModal",
+                        show: true,
+                        title: 'Edit Variant Prices',
+                        confirm: 'Save changes',
+                        cancel: 'Close',
+                        onLoad: function(modal) {
+                            variantModalNode = $(modal.getDOMNode());
+                            variantModalNode.find('.modal-dialog').css('width', '1200px');
+                        },
+                        onConfirm: window.saveVariantPriceModal
+                    },
+                    React.createElement('fieldset', { name: 'variant-price' }, 
+                        React.createElement('div', {className: 'f-section'}, 
+                            React.createElement('div', {id: 'variant_price_list'}, 
+                                React.createElement('form', {id: 'catalog-variant-prices-form',className: 'form form-horizontal validate-form'}, 
+                                    React.createElement(Price, { id: 'variant', options: options })
+                            )))
+                    )), modalContainerEle);
+
+            function validateBaseField(value, element) {
+                var valid = false;
+                if(typeof element !== 'undefined') {
+                    var $parent = $(element).parents('.price-item');
+                    var $curFields = $parent.find('.customer-group, .site, .currency');
+                    var currHash = value;
+                    var matchingHashes = {};
+                    var siteId = '*', currCode = '*', groupId = '*';
+                    $curFields.each(function () {
+                        var $el = $(this);
+                        var val = $el.val();
+
+                        if($el.hasClass('site')) {
+                            siteId = val;
+                        } else if($el.hasClass('currency')) {
+                            currCode = val;
+                        } else if($el.hasClass('customer-group')) {
+                            groupId = val;
+                        }
+                    });
+
+                    matchingHashes[value + '***'] = 1;
+
+                    matchingHashes[value + groupId +'**'] = 1;
+                    matchingHashes[value + '*' + siteId + '*'] = 1;
+                    matchingHashes[value + '**' + currCode] = 1;
+                    matchingHashes[value + groupId + '*' + currCode] = 1;
+                    matchingHashes[value + '*' + siteId + currCode] = 1;
+                    matchingHashes[value + groupId + siteId + '*'] = 1;
+
+                    matchingHashes[currHash] = 1;
+
+
+                    var $items = $('.price-item');
+                    $items.each(function () {
+                        if(valid) {
+                            // valid price already found, return
+                            return;
+                        }
+
+                        var $item = $(this);
+                        if($item[0] === $parent[0]) {
+                            // same as validated element, return
+                            return;
+                        }
+                        var $priceType = $item.find('.price-type');
+                        if($priceType.length == 0) {
+                            // no price type return
+                            return;
+                        }
+                        var itemHash = $priceType.val();
+
+                        var $itemFields = $item.find('.customer-group, .site, .currency');
+                        var siteId = '*', currCode = '*', groupId = '*', defaultHash = '';
+                        $itemFields.each(function () {
+                            var $el = $(this);
+                            if ($el.hasClass('site')) {
+                                siteId = $el.val();
+                            } else if ($el.hasClass('currency')) {
+                                currCode = $el.val();
+                            } else if ($el.hasClass('customer-group')) {
+                                groupId = $el.val();
+                            }
+                        });
+                        itemHash += groupId + siteId + currCode;
+                        valid = (matchingHashes[itemHash] == 1);
+                    });
+                }
+                return valid;
+            }
+
+            /*
+             *custom validation function for checking duplicated input
+             */
+            function priceUnique(value, elem) {
+                var form = $(elem).parents('#catalog-variant-prices-form');
+                var valid = true;
+                if (typeof elem !== 'undefined') {
+                    var parent = $(elem).parents('.price-item');
+                    var curFields = parent.find('input.priceUnique, select.priceUnique');
+                    var currHash = '';
+                    curFields.each(function () {
+                        currHash += $(this).val();
+                    });
+
+                    var items = form.find('.price-item');
+                    items.each(function () {
+                        if (!valid) {
+                            return;
+                        }
+
+                        var $item = $(this);
+                        if (this === parent[0]) {
+                            return;
+                        }
+                        var fields = $item.find('input.priceUnique, select.priceUnique');
+                        var checkHash = '';
+                        fields.each(function (idx) {
+                            checkHash += $(this).val();
+                        });
+                        valid = currHash != checkHash;
+                    });
+                    return valid;
+                }
+            }
+            
+            $.validator.addMethod('priceUnique', priceUnique, '{{"Same price already exists."|_}}');
+            $.validator.addMethod('base_field', validateBaseField, '{{"No matching base price"|_}}');
+
+            $.validator.addClassRules("priceUnique", {
+                priceUnique: true
+            });
+            $.validator.addClassRules("base_field", {
+                base_field: true
+            });
+        }
     });
+
+    window.saveVariantPriceModal = function(modal) {
+        
+    }
 
     /**
      * toggle Add New Variant button

@@ -10,6 +10,7 @@
  * @property Sellvana_CatalogFields_Model_Set $Sellvana_CatalogFields_Model_Set
  * @property Sellvana_CatalogFields_Model_SetField $Sellvana_CatalogFields_Model_SetField
  * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property FCom_Core_Main $FCom_Core_Main
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
@@ -120,6 +121,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 30]);
         $columns = [
             ['type' => 'row_select'],
+            ['type' => 'btn_group',  'buttons' => [['name' => 'delete'], ['name' => 'edit', 'callback' => 'showModalToEditVariantPrice']]],
             ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
         ];
 
@@ -178,7 +180,6 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
         $columns[] = ['name' => 'field_values',  'hidden' => true, 'default' => ''];
         $columns[] = ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl];
-        $columns[] = ['type' => 'btn_group',  'buttons' => [['name' => 'delete']] ];
 
         $data = [];
 
@@ -332,6 +333,14 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         }
 
         $this->BResponse->json(['id' => $set->id(), 'set_name' => $set->set_name, 'fields' => ($fields)]);
+    }
+
+    public function action_prices() {
+        $r = $this->BRequest;
+        $variantId = $r->get('variant_id');
+        $p = $this->Sellvana_Catalog_Model_Product->load($r->get('id'));
+        $prices = $this->Sellvana_Catalog_Model_ProductPrice->getProductPrices($p, $variantId);
+        $this->BResponse->json($prices);
     }
 
     public function action_get_field()
