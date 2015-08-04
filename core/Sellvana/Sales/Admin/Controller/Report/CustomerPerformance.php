@@ -71,20 +71,14 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerPerformance extends FCom_Ad
             ->raw_join("LEFT JOIN (
                 SELECT sub_c.id as `lft_customer_id`, IFNULL(SUM(sub_o.grand_total), 0) as `lifetime_sales`, IFNULL(SUM(sub_o.item_qty), 0) as `lifetime_item_qty`,
                     IFNULL(AVG(sub_o.grand_total), 0) as `lifetime_avg_amount`, IFNULL(SUM(sub_o.amount_refunded), 0) as `lifetime_refund_amount`,
-                    COUNT(sub_o.id) as `lifetime_order_count`, DATEDIFF(NOW(), MAX(sub_o.create_at)) as `days_since_last_order`
+                    COUNT(sub_o.id) as `lifetime_order_count`, DATEDIFF(NOW(), MAX(sub_o.create_at)) as `days_since_last_order`,
+                    COUNT(IF(sub_o.amount_refunded > 0, 1, NULL)) as `lifetime_refund_qty`
                 FROM {$tCustomer} `sub_c`
                 LEFT JOIN {$tOrder} `sub_o` ON (sub_o.customer_id = sub_c.id)
                 GROUP BY sub_c.id
             )", 'lft.lft_customer_id = c.id', 'lft')
-            ->raw_join("LEFT JOIN (
-                SELECT customer_id, COUNT(id) as `lifetime_refund_qty`
-                FROM {$tOrder}
-                WHERE amount_refunded > 0
-                GROUP BY customer_id
-            )", "lft_refund.customer_id = c.id", 'lft_refund')
             ->select('lft.*')
             ->select('cg.title')
-            ->select_expr('IFNULL(lft_refund.lifetime_refund_qty, 0)', 'lifetime_refund_qty')
             ->select_expr('COUNT(IF(o.amount_refunded > 0, 1, NULL))', 'period_refund_qty')
             ->group_by('c.id');
     }
