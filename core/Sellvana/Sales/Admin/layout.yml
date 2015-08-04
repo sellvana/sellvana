@@ -17,6 +17,7 @@ base:
             - [ addNav, reports/sales/day, { label: Sales by Day of Week, href: /sales/report/day, pos: 100 }]
             - [ addNav, reports/sales/shipping_method, { label: Shipping Methods, href: /sales/report/shipping_method, pos: 150 }]
             - [ addNav, reports/sales/customer_performance, { label: Customer Performance, href: /sales/report/customer_performance, pos: 170 }]
+            - [ addNav, reports/sales/product_history, { label: Product History, href: /sales/report/product_history, pos: 210 }]
 
 /settings:
     - view: settings
