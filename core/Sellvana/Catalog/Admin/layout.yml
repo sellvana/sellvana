@@ -9,6 +9,7 @@ base:
             - [ addNav, catalog/searchalias, { label: Search Terms, href: /catalog/searchalias } ]
             - [ addNav, reports/catalog, { label: Products and Inventory, pos: 30 }]
             - [ addNav, reports/catalog/search_terms, { label: Search Terms, href: /catalog/report/search_terms, pos: 30 }]
+            - [ addNav, reports/catalog/product_orders_history, { label: Product Orders History, href: /catalog/report/product_orders_history, pos: 70 }]
     - view: admin/header
         do:
             - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
