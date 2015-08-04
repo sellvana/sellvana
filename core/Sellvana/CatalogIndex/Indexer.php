@@ -163,10 +163,16 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
         $tDocValue = $this->Sellvana_CatalogIndex_Model_DocValue->table();
         $tTerm = $this->Sellvana_CatalogIndex_Model_Term->table();
         $tDocTerm = $this->Sellvana_CatalogIndex_Model_DocTerm->table();
-
+/*
+//TODO: figure out why this doesn't work?? tried raw direct SQL queries as well (5.6.24)
         $this->BDb->run("
 DELETE FROM {$tFieldValue} WHERE id NOT IN (SELECT value_id FROM {$tDocValue});
 DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
+        ");
+*/
+        $this->BDb->run("
+DELETE FROM {$tFieldValue} WHERE NOT EXISTS (SELECT dv.value_id FROM {$tDocValue} dv WHERE dv.value_id={$tFieldValue}.id);
+DELETE FROM {$tTerm} WHERE NOT EXISTS (SELECT dt.term_id FROM {$tDocTerm} dt where dt.term_id={$tTerm}.id);
         ");
     }
 
@@ -245,9 +251,9 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $bus['filter']['fields'][$fName]['values'] = [];
             $bus['filter']['fields'][$fName]['value_ids'] = [];
             // take category filter from options if available
-            if (!empty($bus['request']['params']['options']['category']) && $field['field_type'] == 'category') {
+            if (!empty($bus['request']['options']['category']) && $field['field_type'] == 'category') {
                 /** @var Sellvana_Catalog_Model_Category $category */
-                $category = $bus['request']['params']['options']['category'];
+                $category = $bus['request']['options']['category'];
                 $bus['request']['filters'][$fName] = $category->get('url_path');
             }
         }

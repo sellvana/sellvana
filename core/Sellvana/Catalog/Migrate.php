@@ -858,4 +858,12 @@ class Sellvana_Catalog_Migrate extends BClass
             ],
         ]);
     }
+/*
+//TODO: abstract root folder to @media/ etc
+    public function upgrade__0_5_4_0__0_5_5_0()
+    {
+        $tProductMedia = $this->Sellvana_Catalog_Model_ProductMedia->table();
+        $this->BDb->run("UPDATE {$tProductMedia} set folder=REPLACE(folder, 'media/', '@media/')");
+    }
+*/
 }

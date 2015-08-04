@@ -11,6 +11,7 @@
  * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
  */
 
 class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Controller_Abstract
@@ -81,6 +82,7 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
             $layout->view('catalog/product/pager')->set(['query' => $q, 'filters' => $filter]);
         }
 
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($productsData['rows']);
         $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($productsData['rows']);
         $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($productsData['rows']);
 
