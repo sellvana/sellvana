@@ -175,7 +175,7 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
             return $results;
         });
 
-        $base_product_fields = $this->searchTableFields($this->Sellvana_Catalog_Model_Product->table(), $term);
+        $base_product_fields = $this->_searchTableFields($this->Sellvana_Catalog_Model_Product->table(), $term);
         $baseExclude         = ['id', 'images_data', 'data_serialized'];
         if (!empty($base_product_fields)) {
             foreach ($base_product_fields as $field => $fieldData) {
@@ -187,7 +187,7 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
 
         }
 
-        $stock_product_fields = $this->searchTableFields($this->Sellvana_Catalog_Model_InventorySku->table(), $term);
+        $stock_product_fields = $this->_searchTableFields($this->Sellvana_Catalog_Model_InventorySku->table(), $term);
         $stockExclude         = ['id', 'inventory_sku', 'bin_id', 'data_serialized', 'manage_inventory'];
         if (!empty($stock_product_fields)) {
             foreach ($stock_product_fields as $field => $fieldData) {
@@ -418,14 +418,14 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
      * @param string $term
      * @return BModel[]
      */
-    protected function searchTableFields($tableName, $term)
+    protected function _searchTableFields($tableName, $term)
     {
         $sql = "SHOW FIELDS FROM `{$tableName}`";
         if ($term != '*') {
             $term = "%{$term}%";
             $sql .= "WHERE Field LIKE ?";
         }
-        $res = BORM::i()->raw_query($sql, [$term])->find_many_assoc('Field');
+        $res = $this->BORM->raw_query($sql, [$term])->find_many_assoc('Field');
 
         return $res;
     }

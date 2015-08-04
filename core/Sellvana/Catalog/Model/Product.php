@@ -109,6 +109,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected $_priceModels;
 
+    protected $_images;
+
     protected static $_urlPrefix;
 
     public function validateDupSku($data, $args)
@@ -194,16 +196,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //if ($thumbUrl) {
         //    return $url . $media . '/' . $thumbUrl;
         //}
-        $productId    = $this->id();
         switch ($imgType) {
             case 'thumb':
-                $thumbUrl = $this->getThumbPath($productId);
+                $thumbUrl = $this->getThumbPath();
                 break;
             case 'rollover':
-                $thumbUrl = $this->getRolloverPath($productId);
+                $thumbUrl = $this->getRolloverPath();
                 break;
             default :
-                $thumbUrl = $this->getDefaultImagePath($productId);
+                $thumbUrl = $this->getDefaultImagePath();
                 break;
         }
 
@@ -264,14 +265,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //}
 
         return true;
-    }
-
-    public function onAfterLoad()
-    {
-        parent::onAfterLoad();
-        $thumbPath = $this->FCom_Core_Main->resizeUrl($this->imageUrl(), ['s' => 48]);
-        $this->set('thumb_path', $thumbPath);
-
     }
 
     public function onAfterSave()
@@ -1430,53 +1423,37 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         unset($this->_priceModels);
     }
 
-    /**
-     * @param $productId
-     * @return mixed|null|string
-     */
-    public function getThumbPath($productId)
+    public function setProductImages($images)
     {
-        return $this->getProductImage($productId, 'thumb');
-    }
-
-    public function getRolloverPath($productId)
-    {
-        return $this->getProductImage($productId, 'rollover');
-    }
-
-    public function getDefaultImagePath($productId)
-    {
-        return $this->getProductImage($productId, 'default');
-    }
-
-    protected function getProductImage($productId, $imgType = 'default')
-    {
-        $thumbUrl     = null;
-        $productMediaOrm = $this->Sellvana_Catalog_Model_ProductMedia
-            ->orm("fpm")
-            ->join($this->FCom_Core_Model_MediaLibrary->table(), "fpm.file_id=fml.id", "fml")
-            ->where(["fpm.media_type" => "I", "fpm.product_id" => $productId]);
-
-        switch ($imgType) {
-            case 'thumb':
-                $productMediaOrm->where("fpm.is_thumb", 1);
-                break;
-            case 'rollover':
-                $productMediaOrm->where("fpm.is_rollover", 1);
-                break;
-            default :
-                $productMediaOrm->where("fpm.is_default", 1);
-                break;
+        if (empty($this->_images)) {
+            $this->_images = $images;
+        } else {
+            $this->_images = array_merge($this->_images, $images);
         }
+        return $this;
+    }
 
-        $productMedia = $productMediaOrm->find_one();
-        if ($productMedia) {
-            $thumbUrl = ($productMedia->get('subfolder') != null)
-                ? $productMedia->get('folder') . '/' . $productMedia->get('subfolder') . '/' . $productMedia->get('file_name')
-                : $productMedia->get('folder') . '/' . $productMedia->get('file_name');
-            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
+    public function getThumbPath()
+    {
+        if (!isset($this->_images['thumb'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['thumb']*/);
         }
+        return $this->_images['thumb'];
+    }
 
-        return $thumbUrl;
+    public function getRolloverPath()
+    {
+        if (!isset($this->_images['rollover'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['rollover']*/);
+        }
+        return $this->_images['rollover'];
+    }
+
+    public function getDefaultImagePath()
+    {
+        if (!isset($this->_images['default'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['default']*/);
+        }
+        return $this->_images['default'];
     }
 }

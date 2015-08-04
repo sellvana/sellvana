@@ -677,10 +677,15 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
      */
     public function getPageRowsData()
     {
-
         $grid = $this->get('grid');
         $state = isset($grid['result']['state']) ? $grid['result']['state'] : [];
         $rows = isset($grid['result']['rows']) ? $grid['result']['rows'] : [];
+
+        if (!empty($grid['config']['page_models_callback'])) {
+            $callback = $this->BUtil->extCallback($grid['config']['page_models_callback']);
+            call_user_func($callback, $rows);
+        }
+
         //var_dump($state);
         $gridId = $grid['config']['id'];
 //        $persState = !empty($grid['config']['state']) ? $grid['config']['state'] : array(); // overridden right after this section

@@ -458,7 +458,10 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             });
 
 
-            filterContainer.find(".datepicker").datetimepicker({ pickTime: false });
+            filterContainer.find(".datepicker").datetimepicker({ pickTime: false }).on('changeDate', function(ev) {
+                filter.val = ev.date.toLocaleFormat("%Y-%m-%d");
+                that.setState({filter: filter});
+            });
 
             $('.daterangepicker').on('click', function (ev) {
                     ev.stopPropagation();

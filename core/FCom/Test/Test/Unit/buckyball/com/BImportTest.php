@@ -186,7 +186,7 @@ class BImportTest extends FCom_Test_Model_TestCase
 
 class BImportDouble extends BImport
 {
-    protected $fields = [
+    protected $_fields = [
         'field1' => ['pattern' => 'f1'],
         'field2' => ['pattern' => 'f2'],
         'field3' => ['pattern' => 'f3'],
@@ -199,7 +199,7 @@ class BImportDouble extends BImport
             if (!is_string($pattern) || strlen($pattern) < 2) {
                 continue;
             }
-            $this->fields[$field]['pattern'] = $pattern;
+            $this->_fields[$field]['pattern'] = $pattern;
         }
     }
 
@@ -213,22 +213,22 @@ class BImportDouble extends BImport
 
     public function getDir()
     {
-        return $this->dir;
+        return $this->_dir;
     }
 
     public function getFields()
     {
-        return $this->fields;
+        return $this->_fields;
     }
 
     public function getModel()
     {
-        return $this->model;
+        return $this->_model;
     }
 
     public function setModel($model)
     {
-        $this->model = $model;
+        $this->_model = $model;
         return $this;
     }
 }

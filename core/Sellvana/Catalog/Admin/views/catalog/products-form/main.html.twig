@@ -25,6 +25,10 @@
 
         {{ forms.boolean(fieldData, {field:'is_hidden', label:'Hide Product'|_}) }}
 
+        {{ forms.boolean(fieldData, {field:'is_featured', label:'Featured'|_}) }}
+
+        {{ forms.boolean(fieldData, {field:'is_popular', label:'Popular'|_}) }}
+
         <input type='hidden' id='name_lang_fields' name='name_lang_fields'/>
         <input type='hidden' id='short_desc_lang_fields' name='short_desc_lang_fields'/>
         <input type='hidden' id='desc_lang_fields' name='desc_lang_fields'/>

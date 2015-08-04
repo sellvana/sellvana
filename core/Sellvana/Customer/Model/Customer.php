@@ -61,8 +61,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     ];
 
     protected static $_sessionUser;
-    protected $defaultShipping = null;
-    protected $defaultBilling = null;
+    protected $_defaultShipping = null;
+    protected $_defaultBilling = null;
 
     private static $lastImportedCustomer = 0;
 

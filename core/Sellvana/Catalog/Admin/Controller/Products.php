@@ -71,29 +71,25 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['field' => 'update_at', 'type' => 'date-range'],
             '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
         ];
-        $config['page_rows_data_callback'] = [$this, 'afterInitialData'];
+        $config['page_models_callback'] = [$this, 'onPageModelsCallback'];
         return $config;
     }
 
     /**
-     * @param $rows
+     * @param Sellvana_Catalog_Model_Product[] $rows
      * @return mixed
      */
-    public function afterInitialData($rows)
+    public function onPageModelsCallback($rows)
     {
         $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
-        foreach ($rows as & $row) {
-            $thumbUrl = $this->_getThumbUrl($row['id']);
-            $row['thumb_path'] = $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]);
+
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($rows);
+
+        foreach ($rows as $row) {
+            $row->set('thumb_path', $hlp->resizeUrl($mediaUrl . '/' . $row->getThumbPath(), ['s' => 68]));
         }
         return $rows;
-    }
-
-    protected function _getThumbUrl($productId)
-    {
-        $thumbUrl     = $this->Sellvana_Catalog_Model_Product->getThumbPath($productId)?:'image-not-found.png';
-        return $thumbUrl;
     }
 
     /**
@@ -106,6 +102,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $hlp = $this->FCom_Core_Main;
 
         $data = parent::gridDataAfter($data);
+
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($data['rows']);
+
         foreach ($data['rows'] as $row) {
             /** @var Sellvana_Catalog_Model_Product $row */
             $customRowData = $row->getData();
@@ -113,8 +112,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $row->set($customRowData);
                 $row->set('data', null);
             }
-            $thumbUrl = $this->_getThumbUrl($row->id());
-            $row->set('thumb_path', $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]));
+            $row->set('thumb_path', $hlp->resizeUrl($mediaUrl . '/' . $row->getThumbPath(), ['s' => 68]));
         }
         unset($row);
         return $data;
@@ -260,7 +258,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function productAttachmentsGridConfig($model)
     {
         $download_url = $this->BApp->href('/media/grid/download?folder=media/product/attachment&file=');
-        $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->order_by_expr('pa.position asc')
+        $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTACH)->order_by_expr('pa.position asc')
             ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name', 'a.file_size', 'pa.create_at', 'pa.update_at'])
             ->select('a.id', 'file_id')->find_many());
 
@@ -647,7 +645,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $this->processMediaPost($model, $data);
                 $this->processInventoryPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
-                $this->processPricesPost($model, $data);
+                $this->_processPricesPost($model, $data);
                 $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
                 $model->save();
             }
@@ -1117,7 +1115,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $this->Sellvana_Catalog_Model_Product->orm()->select('url_key')->iterate($callback);
     }
 
-    protected function processPricesPost($model, $data)
+    protected function _processPricesPost($model, $data)
     {
         if(empty($data['prices'])){
             return;

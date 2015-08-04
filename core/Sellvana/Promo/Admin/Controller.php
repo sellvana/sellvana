@@ -99,7 +99,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             // todo initiate promo with status 'incomplete'
             $args['view']->numCodes = 0;
         } else {
-            $m->set('numCodes', $this->getPromoCouponCodesCount($m->id()));
+            $m->set('numCodes', $this->_getPromoCouponCodesCount($m->id()));
             if ($m->get('coupon_type') == 1) {
                 // load coupon code for view display
                 $coupon = $this->Sellvana_Promo_Model_PromoCoupon->load($m->id(), 'promo_id');
@@ -160,8 +160,8 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
-        $this->processCoupons($args['model']);
-        $this->processFrontendDisplay($args['model']);
+        $this->_processCoupons($args['model']);
+        $this->_processFrontendDisplay($args['model']);
         #$this->processGroupsPost($args['model'], $_POST);
         #$this->processMediaPost($args['model'], $_POST);
     }
@@ -184,7 +184,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 return;
             }
         }
-        $view = $this->couponGridView();
+        $view = $this->_couponGridView();
         $grid = $view->get('grid');
         $mainTableAlias = 'pc';
 
@@ -228,7 +228,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     /**
      * @return FCom_Core_View_BackboneGrid
      */
-    protected function couponGridView()
+    protected function _couponGridView()
     {
         $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
         $config = [
@@ -269,7 +269,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         //    $this->BResponse->status(400, $html, false);
         //} else {
             $status = "success";
-            $html = $this->couponGridView()->render();
+            $html = $this->_couponGridView()->render();
         //}
         $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
@@ -400,7 +400,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         return $this->Sellvana_Promo_Model_PromoCoupon->origClass() . '_grid';
     }
 
-    protected function getPromoCouponCodesCount($id)
+    protected function _getPromoCouponCodesCount($id)
     {
         $couponOrm = $this->Sellvana_Promo_Model_PromoCoupon->orm('pc');
         $couponOrm->where('promo_id', $id);
@@ -411,7 +411,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
      * @param Sellvana_Promo_Model_Promo $model
      * @return $this|bool
      */
-    protected function processCoupons($model)
+    protected function _processCoupons($model)
     {
         $this->_processSingleCoupon($model);
         $this->_processMultiCoupons($model);
@@ -421,7 +421,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
      * @param Sellvana_Promo_Model_Promo $model
      * @throws BException
      */
-    protected function processFrontendDisplay($model)
+    protected function _processFrontendDisplay($model)
     {
         $data = $this->BRequest->post('display');
         if(!$data) {
@@ -617,7 +617,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 'id' => 'promo_attachments',
                 'caption' => 'Promotion Attachments',
                 'datatype' => 'local',
-                'data' => $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->select('a.id')->select('a.file_name')->find_many()),
+                'data' => $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTACH)->select('a.id')->select('a.file_name')->find_many()),
                 'colModel' => [
                     ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],

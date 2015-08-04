@@ -3,12 +3,12 @@
 class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
 {
     const AUTHORIZENET_LOG_FILE = "authorize.net.log";
-    protected $response_vars = [];
+    protected $_responseVars = [];
 
     /**
      * @var AuthorizeNetAIM
      */
-    protected $api;
+    protected $_api;
 
     /**
      * @param Sellvana_Sales_Model_Order_Payment_Transaction $transaction
@@ -18,7 +18,7 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
     public function sale($transaction, $paymentMethod)
     {
         $api           = $this->getApi();
-        $this->setSaleDetails($transaction, $paymentMethod, $api);
+        $this->_setSaleDetails($transaction, $paymentMethod, $api);
         $response      = $api->authorizeAndCapture();
         return $this->responseAsArray($response);
     }
@@ -31,7 +31,7 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
     public function authorize($transaction, $paymentMethod)
     {
         $api = $this->getApi();
-        $this->setSaleDetails($transaction, $paymentMethod, $api);
+        $this->_setSaleDetails($transaction, $paymentMethod, $api);
 
         $response = $api->authorizeOnly();
         return $this->responseAsArray($response);
@@ -90,7 +90,7 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
      * @param Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim $paymentMethod
      * @param AuthorizeNetAIM $api
      */
-    protected function setSaleDetails($transaction, $paymentMethod, $api)
+    protected function _setSaleDetails($transaction, $paymentMethod, $api)
     {
         $payment = $transaction->payment();
         $order = $payment->order();
@@ -148,7 +148,7 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
      */
     public function getApi()
     {
-        if (null == $this->api) {
+        if (null == $this->_api) {
             $conf = $this->getConfig();
             if (!$data = $conf->get('aim')) {
                 throw new BException("Invalid Authorize.net settings.");
@@ -171,14 +171,14 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
                 define('AUTHORIZENET_LOG_FILE', static::AUTHORIZENET_LOG_FILE);
             }
             $this->BClassAutoload->addPath(__DIR__ . '/lib');
-            $this->api = new AuthorizeNetAIM();
+            $this->_api = new AuthorizeNetAIM();
 /* API is missing currency code !!!!
             if($data->get('currency')){
                 $this->api->currency_code = $data->get('currency');
             }
 */
         }
-        return $this->api;
+        return $this->_api;
     }
 
     /**
@@ -196,7 +196,7 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
     public function responseAsArray($response)
     {
         $result = [];
-        foreach ($this->getResponseVariables($response) as $name) {
+        foreach ($this->_getResponseVariables($response) as $name) {
             if (!empty($response-> {$name})) {
                 $result[$name] = $response-> {$name};
             }
@@ -212,16 +212,16 @@ class Sellvana_PaymentAuthorizeNet_AimApi extends BClass
      * @param AuthorizeNetAIM_Response $response
      * @return array
      */
-    protected function getResponseVariables($response)
+    protected function _getResponseVariables($response)
     {
-        if (empty($this->response_vars)) {
+        if (empty($this->_responseVars)) {
             $vars = get_object_vars($response);
             if ($vars) {
                 foreach (array_keys($vars) as $k) {
-                    $this->response_vars[] = $k;
+                    $this->_responseVars[] = $k;
                 }
             }
         }
-        return $this->response_vars;
+        return $this->_responseVars;
     }
 }

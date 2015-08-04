@@ -161,7 +161,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     public function action_index()
     {
         $model['export_config'] = $this->getExportConfig();
-        $model[ 'import_config' ] = $this->getImportConfig();
+        $model[ 'import_config' ] = $this->_getImportConfig();
 
         $this->layout();
 
@@ -184,9 +184,16 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
         $this->processFormTabs($view, $model);
     }
+
+//    public function action_test()
+//    {
+//        $this->BResponse->startLongResponse();
+//        $file = $this->BApp->storageRandomDir() . '/export/export.json';
+//        $this->FCom_Core_ImportExport->importFile($file);
+//    }
+
     public function action_import__POST()
     {
-
         if (empty($_FILES) || !isset($_FILES['upload'])) {
             $this->BResponse->json(['msg' => "Nothing found"]);
             return;
@@ -268,7 +275,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         //}
     }
 
-    protected function getImportConfig()
+    protected function _getImportConfig()
     {
         $config = array(
             'max_import_file_size' => $this->_getMaxUploadSize()

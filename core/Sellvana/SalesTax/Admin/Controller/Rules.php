@@ -84,21 +84,21 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
         $data = $args['data'];
 
         if($data['match_all_customer_classes'] == 1) {
-            $this->resetRuleCustomerClasses($model);
+            $this->_resetRuleCustomerClasses($model);
         } else if(!empty($data['customer_classes'])) {
-            $this->setRuleCustomerClasses($model, $data['customer_classes']);
+            $this->_setRuleCustomerClasses($model, $data['customer_classes']);
         }
 
         if($data['match_all_product_classes'] == 1) {
-            $this->resetRuleProductClasses($model);
+            $this->_resetRuleProductClasses($model);
         } else if(!empty($data['product_classes'])) {
-            $this->setRuleProductClasses($model, $data['product_classes']);
+            $this->_setRuleProductClasses($model, $data['product_classes']);
         }
 
         if($data['match_all_zones'] == 1) {
-            $this->resetRuleZones($model);
+            $this->_resetRuleZones($model);
         } else if(!empty($data['zones'])) {
-            $this->setRuleZones($model, $data['zones']);
+            $this->_setRuleZones($model, $data['zones']);
         }
 
     }
@@ -124,7 +124,7 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
     /**
      * @param $rule Sellvana_SalesTax_Model_Rule
      */
-    protected function resetRuleCustomerClasses($rule)
+    protected function _resetRuleCustomerClasses($rule)
     {
         $currentCustomerRules = $this->Sellvana_SalesTax_Model_RuleCustomerClass
             ->orm()->where('rule_id', $rule->id())->find_many();
@@ -139,7 +139,7 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
     /**
      * @param $rule Sellvana_SalesTax_Model_Rule
      */
-    protected function resetRuleProductClasses($rule)
+    protected function _resetRuleProductClasses($rule)
     {
         $currentProductRules = $this->Sellvana_SalesTax_Model_RuleProductClass
             ->orm()->where('rule_id', $rule->id())->find_many();
@@ -154,7 +154,7 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
     /**
      * @param $rule Sellvana_SalesTax_Model_Rule
      */
-    protected function resetRuleZones($rule)
+    protected function _resetRuleZones($rule)
     {
         $currentZoneRules = $this->Sellvana_SalesTax_Model_RuleZone->orm()->where('rule_id', $rule->id())->find_many();
         if ($currentZoneRules) {
@@ -169,7 +169,7 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
      * @param $rule Sellvana_SalesTax_Model_Rule
      * @param $customer_classes array
      */
-    protected function setRuleCustomerClasses($rule, $customer_classes)
+    protected function _setRuleCustomerClasses($rule, $customer_classes)
     {
         $currentCustomerRules = $this->Sellvana_SalesTax_Model_RuleCustomerClass
             ->orm()->where('rule_id', $rule->id())->find_many_assoc('customer_class_id');
@@ -195,7 +195,7 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
      * @param $rule Sellvana_SalesTax_Model_Rule
      * @param $product_classes array
      */
-    protected function setRuleProductClasses($rule, $product_classes)
+    protected function _setRuleProductClasses($rule, $product_classes)
     {
         $currentProductRules = $this->Sellvana_SalesTax_Model_RuleProductClass
             ->orm()->where('rule_id', $rule->id())->find_many_assoc('product_class_id');
@@ -221,7 +221,7 @@ class Sellvana_SalesTax_Admin_Controller_Rules extends FCom_Admin_Controller_Abs
      * @param $rule Sellvana_SalesTax_Model_Rule
      * @param $zones array
      */
-    protected function setRuleZones($rule, $zones)
+    protected function _setRuleZones($rule, $zones)
     {
         $currentZoneRules = $this->Sellvana_SalesTax_Model_RuleZone
             ->orm()->where('rule_id', $rule->id())->find_many_assoc('zone_id');
