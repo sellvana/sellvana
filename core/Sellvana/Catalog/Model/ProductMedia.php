@@ -73,6 +73,10 @@ class Sellvana_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
      */
     public function collectProductsImages(array $products, $imgTypes = ['thumb', 'rollover', 'default'], $params = null)
     {
+        if (!count($products)) {
+            return $this;
+        }
+
         $pIds = [];
         foreach ($products as $p) {
             $pIds[] = $p->id();
