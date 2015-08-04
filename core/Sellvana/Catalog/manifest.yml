@@ -35,6 +35,8 @@ modules:
                     - [ /catalog/searchalias/.action, Sellvana_Catalog_Admin_Controller_SearchAlias ]
 
                     - [ "/catalog/inventory/?.action", Sellvana_Catalog_Admin_Controller_Inventory ]
+
+                    - [ /catalog/report/search_terms/?.action, Sellvana_Catalog_Admin_Controller_Report_SearchTerms ]
                 observe:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, Sellvana_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, Sellvana_Catalog_Admin_Controller_Products.onGenerateSiteMap ]
