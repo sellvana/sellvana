@@ -3,7 +3,7 @@
 /**
  * Class Sellvana_Customer_Admin_Controller_Report_ProductHistory
  *
- * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
+ * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  */
 class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admin_Controller_Abstract_Report
 {
@@ -18,10 +18,15 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
     public function gridConfig()
     {
         $config = parent::gridConfig();
+        $customers = $this->Sellvana_Customer_Model_Customer->orm('c')->find_many();
+        $customersOptions = [];
+        foreach ($customers as $customer) {
+            $customersOptions[$customer->get('id')] = $customer->get('firstname') . ' ' . $customer->get('lastname');
+        }
 
         $config['columns'] = [
             ['name' => 'order_date', 'index' => 'o.create_at', 'label' => 'Order Date'],
-            ['name' => 'customer_name', 'index' => 'customer_name', 'label' => 'Customer'],
+            ['name' => 'customer_id', 'index' => 'customer_id', 'label' => 'Customer', 'options' => $customersOptions],
             ['name' => 'unique_id', 'index' => 'o.unique_id', 'label' => 'Order #'],
             ['name' => 'product_sku', 'index' => 'oi.product_sku', 'label' => 'Sku'],
             ['name' => 'product_name', 'index' => 'oi.product_name', 'label' => 'Product Name'],
@@ -33,7 +38,7 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
         ];
         $config['filters'] = [
             ['field' => 'order_date', 'type' => 'date-range'],
-            ['field' => 'customer_name', 'type' => 'text'],
+            ['field' => 'customer_id', 'type' => 'multiselect'],
         ];
 
         return $config;
@@ -45,16 +50,11 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
     public function gridOrmConfig($orm)
     {
         parent::gridOrmConfig($orm);
-        $tOrder = $this->Sellvana_Sales_Model_Order->table();
 
         $orm->join('Sellvana_Sales_Model_Order', 'oi.order_id = o.id', 'o')
-            ->raw_join("INNER JOIN (
-                SELECT customer_id, CONCAT(billing_firstname, ' ', billing_lastname) as `customer_name`
-                FROM {$tOrder}
-            )", 'oc.customer_id = o.customer_id', 'oc')
-            ->select('oc.customer_name', 'customer_name')
-            ->select(['unique_id' => 'o.unique_id', 'order_date' => 'o.create_at'])
+            ->select(['unique_id' => 'o.unique_id', 'order_date' => 'o.create_at', 'customer_id' => 'o.customer_id'])
             ->select_expr('IFNULL(o.amount_refunded, 0)', 'amount_refunded')
+            ->where_not_null('o.customer_id')
             ->group_by('oi.id');
     }
 }
