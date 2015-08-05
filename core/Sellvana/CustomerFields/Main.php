@@ -44,7 +44,7 @@ class Sellvana_CustomerFields_Main extends BClass
         $orm = $args['orm'];
         $tC = $orm->table_alias();
         $orm->select($tC . '.*')
-            ->left_outer_join('Sellvana_CustomerFields_Model_CustomerField', ['pcf.product_id', '=', $tC . '.id'], 'pcf');
+            ->left_outer_join('Sellvana_CustomerFields_Model_CustomerField', ['ccf.customer_id', '=', $tC . '.id'], 'ccf');
         $fields = $this->Sellvana_CustomerFields_Model_Field->fieldsInfo('customer', true);
         $orm->select($fields);
     }
@@ -76,7 +76,6 @@ class Sellvana_CustomerFields_Main extends BClass
     }
 
     /**
-     * @param $args
      * @return mixed|string
      */
     public function hookCustomFieldFilters()

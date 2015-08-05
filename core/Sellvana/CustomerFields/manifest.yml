@@ -5,10 +5,10 @@ modules:
         require: { module: { Sellvana_Customer: 0.5.0.0 } }
         auto_use: [ bootstrap ]
         observe:
-            - [ "Sellvana_Customer_Model_Customer::orm", Sellvana_CatalogFields_Main.onCustomerOrm ]
-            - [ "Sellvana_Customer_Model_Customer::onAfterSave", Sellvana_CatalogFields_Main.onCustomerAfterSave ]
-            - [ "Sellvana_Customer_Model_Customer::import:row", Sellvana_CatalogFields_Main.onCustomerImportRow ]
-            - [ "Sellvana_Customer_Model_Customer::import:after_loop", Sellvana_CatalogFields_Main.onCustomerImportAfterLoop ]
+            - [ "Sellvana_Customer_Model_Customer::orm", Sellvana_CustomerFields_Main.onCustomerOrm ]
+            - [ "Sellvana_Customer_Model_Customer::onAfterSave", Sellvana_CustomerFields_Main.onCustomerAfterSave ]
+            - [ "Sellvana_Customer_Model_Customer::import:row", Sellvana_CustomerFields_Main.onCustomerImportRow ]
+            - [ "Sellvana_Customer_Model_Customer::import:after_loop", Sellvana_CustomerFields_Main.onCustomerImportAfterLoop ]
 
         areas:
             FCom_Admin:
@@ -17,3 +17,11 @@ modules:
                     - [ /customerfields/fields/.action, Sellvana_CustomerFields_Admin_Controller_Fields ]
                     - [ /customerfields/customers/.action, Sellvana_CustomerFields_Admin_Controller_Customers ]
                     - [ /customerfields/.action, Sellvana_CustomerFields_Admin_Controller_Fields ]
+                observe:
+                    - [ "Sellvana_Customer_Admin_Controller_Customers::gridColumns", Sellvana_CustomerFields_Admin.onCustomerGridColumns ]
+                    - [ "Sellvana_Customer_Admin_Controller_Customers::formViewBefore", Sellvana_CustomerFields_Admin.onCustomerFormViewBefore ]
+                    - [ "Sellvana_Customer_Admin_Controller_Customers::formPostAfter:afterValidate", Sellvana_CustomerFields_Admin.onCustomerFormPostAfterValidate ]
+                security:
+                    request_fields_whitelist:
+                        /catalog/products/form:
+                            POST/custom_fields: "+"

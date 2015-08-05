@@ -4,11 +4,13 @@
  * Class Sellvana_CatalogFields_Frontend
  *
  * Uses:
- * @property Sellvana_Sales_Model_Cart                  $Sellvana_Sales_Model_Cart
+ *
+ *@property Sellvana_Sales_Model_Cart                  $Sellvana_Sales_Model_Cart
  * @property Sellvana_CatalogFields_Model_ProductVariant  $Sellvana_CatalogFields_Model_ProductVariant
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
  * @property Sellvana_Catalog_Model_InventorySku        $Sellvana_Catalog_Model_InventorySku
- */
+ * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
+*/
 class Sellvana_CatalogFields_Frontend extends BClass
 {
     /**
@@ -127,6 +129,7 @@ class Sellvana_CatalogFields_Frontend extends BClass
     }
 
     /**
+     * @param Sellvana_Catalog_Model_Product $product
      * @return array
      */
     public function customFieldsShowOnFrontend(Sellvana_Catalog_Model_Product $product)
