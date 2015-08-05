@@ -6,6 +6,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         'day' => 'Day',
         'week' => 'Week',
         'month' => 'Month',
+        'quarter' => 'Quarter',
         'year' => 'Year'
     ];
 
@@ -28,11 +29,14 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
             case 'year':
                 $expr = "YEAR({$field})";
                 break;
+            case 'quarter':
+                $expr = "CONCAT(YEAR({$field}), '-', QUARTER({$field}))";
+                break;
             case 'month':
                 $expr = "DATE_FORMAT({$field}, '%Y-%m')";
                 break;
             case 'week':
-                $expr = "YEARWEEK({$field})";
+                $expr = "DATE_FORMAT({$field}, '%Y-%u')";
                 break;
             case 'day':
             default:
