@@ -16,12 +16,6 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $periodTypes = [
-            'day' => 'Day',
-            'week' => 'Week',
-            'month' => 'Month',
-            'year' => 'Year'
-        ];
         $config['columns'] = [
             ['name' => 'period', 'index' => 'period', 'label' => 'Period', 'width' => 70],
             ['name' => 'product_sku', 'index' => 'product_sku', 'label' => 'Inventory SKU', 'width' => 70],
@@ -29,7 +23,7 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
             ['name' => 'qty_sold', 'index' => 'qty_sold', 'label' => 'Qty Sold'],
             ['name' => 'row_total_amount', 'index' => 'row_total_amount', 'label' => 'Total After Discounts'],
 
-            ['name' => 'period_type', 'label' => 'Period', 'options' => $periodTypes, 'hidden' => true],
+            ['name' => 'period_type', 'label' => 'Period', 'options' => $this->_periodTypes, 'hidden' => true],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'o.create_at', 'hidden' => true],
         ];
         $config['filters'] = [
@@ -51,33 +45,5 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
             ->select_expr('SUM(oi.qty_ordered)', 'qty_sold')
             ->select_expr('SUM(oi.row_total - oi.row_discount)', 'row_total_amount')
             ->group_by('oi.product_id');
-    }
-
-    /**
-     * @param array $filter
-     * @param string $val
-     * @param BORM $orm
-     */
-    public function periodTypeCallback($filter, $val, $orm)
-    {
-        $field = 'o.create_at';
-        switch ($val) {
-            case 'year':
-                $expr = "YEAR({$field})";
-                break;
-            case 'month':
-                $expr = "DATE_FORMAT({$field}, '%Y-%m')";
-                break;
-            case 'week':
-                $expr = "YEARWEEK({$field})";
-                break;
-            case 'day':
-            default:
-                $expr = "DATE_FORMAT({$field}, '%Y-%m-%d')";
-                break;
-        }
-
-        $orm->group_by_expr($expr);
-        $orm->select_expr($expr, 'period');
     }
 }

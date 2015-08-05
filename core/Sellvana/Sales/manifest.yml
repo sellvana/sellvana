@@ -32,6 +32,8 @@ modules:
                     - [ /sales/report/hour/?.action, Sellvana_Sales_Admin_Controller_Report_Hour ]
                     - [ /sales/report/day/?.action, Sellvana_Sales_Admin_Controller_Report_Day ]
                     - [ /sales/report/shipping_method/?.action, Sellvana_Sales_Admin_Controller_Report_ShippingMethod ]
+                    - [ /sales/report/customer_performance/?.action, Sellvana_Sales_Admin_Controller_Report_CustomerPerformance ]
+                    - [ /sales/report/product_history/?.action, Sellvana_Sales_Admin_Controller_Report_ProductHistory ]
                 observe:
                     - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]
