@@ -20,6 +20,7 @@ modules:
                     - [ /addresses/.action, Sellvana_Customer_Admin_Controller_Addresses ]
 
                     - [ /customer/report/country/?.action, Sellvana_Customer_Admin_Controller_Report_Country ]
+                    - [ /customer/report/product_history/?.action, Sellvana_Customer_Admin_Controller_Report_ProductHistory ]
                 observe:
                     - [ "BActionController::onBeforeDispatch", Sellvana_Customer_Admin.onControllerBeforeDispatch ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Customer_Admin.onGetDashboardWidgets ]

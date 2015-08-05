@@ -7,6 +7,7 @@ base:
 
             - [ addNav, reports/customer, { label: Customers, pos: 40 }]
             - [ addNav, reports/customer/country, { label: Users by Country, href: /customer/report/country, pos: 20 }]
+            - [ addNav, reports/customer/product_history, { label: Customer Product History, href: /customer/report/product_history, pos: 30 }]
 
 /customers/import:
     - { include: base }
