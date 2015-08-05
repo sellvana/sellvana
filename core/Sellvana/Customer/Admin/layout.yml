@@ -11,6 +11,10 @@ base:
     - { hook: main, views: customer/import }
     - { view: admin/nav, do: [[ setNav, customer/import ]] }
 
+/customers/form:
+    - { include: default_form }
+    - { include: customer_form_tabs }
+
 /settings:
     - view: settings
         do:

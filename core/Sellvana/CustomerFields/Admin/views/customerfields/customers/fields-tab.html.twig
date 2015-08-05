@@ -1,4 +1,3 @@
-{% set fieldSetModel = APP.instance('Sellvana_CustomerFields_Model_Set') %}
 {% set ctrl = APP.instance('Sellvana_CustomerFields_Admin_Controller_Customers') %}
 
 <div id="cust-new-field-modal">
@@ -121,12 +120,25 @@
     </div>
 </div>
 
-{# CONFLICT START #}
+
+<div class="well">
+    <div class="row">
+        <input type="hidden" id="custom_fields" name="custom_fields"/>
+        <div class="col-sm-6" id="field">
+            <select id="sel_fields" class="select2 form-control" style="width:150px;"
+                    placeholder='{{ 'Choose field...'|_ }}'>
+                {{ UTIL.optionsHtml(APP.instance('Sellvana_CustomerFields_Model_Field').as_values('field_name')) | raw }}
+            </select>
+            <button class="btn btn-primary btn-sm" type="button" id="btn_add_field">{{ 'Add a Field'|_ }}</button>
+            <button class="btn btn-sm" type="button" id="btn_new_field">{{ 'New Field'|_ }}</button>
+        </div>
+    </div>
+</div>
 
 <hr/>
 <div id="fields_list"></div>
 
-        <script type="template" id="field-template">
+    <script type="template" id="field-template">
         <div class="row">
             <div class="col-md-9 col-lg-push-3">
                 <label class="col-md-2 control-label dd-handle control-handle" for="cust-review-text">
@@ -221,38 +233,37 @@
             </div>
         </div>
         <% } %>
-        </script>
+    </script>
 
-        <script type="template" id="lang-field-template">
-            <div class="col-md-3 control-label">
-                <span class="badge badge-default"><%- rc.lang_code %></span>
-            </div>
-            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
-                <% switch(rc.admin_input_type) {
-                    case 'text':
-                        print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
-                        break;
-                    case 'textarea':
-                        print('<textarea  id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
-                        break;
-                    case 'wysiwyg':
-                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
-                        break;
-                } %>
-            </div>
-            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
-                <button class="btn btn-danger btn-xs field-remove" style="margin-top: 5px;">
-                    <i class="icon-remove"></i>
-                </button>
-            </div>
-        </script>
-</div>
-
+    <script type="template" id="lang-field-template">
+        <div class="col-md-3 control-label">
+            <span class="badge badge-default"><%- rc.lang_code %></span>
+        </div>
+        <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
+            <% switch(rc.admin_input_type) {
+                case 'text':
+                    print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
+                    break;
+                case 'textarea':
+                    print('<textarea  id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
+                    break;
+                case 'wysiwyg':
+                    print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
+                    break;
+            } %>
+        </div>
+        <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
+            <button class="btn btn-danger btn-xs field-remove" style="margin-top: 5px;">
+                <i class="icon-remove"></i>
+            </button>
+        </div>
+    </script>
 
 <script>
 $('#fcom_append_form').append('<form id="cust-new-field-form1" class="form form-horizontal validate-form"/>');
-var html = $("#cust-new-field-modal").html();
-$("#cust-new-field-modal").remove();
+var $custModal = $("#cust-new-field-modal");
+var html = $custModal.html();
+$custModal.remove();
 $('#cust-new-field-form1').append(html);
 
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {

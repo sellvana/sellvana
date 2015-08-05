@@ -2,7 +2,6 @@ base:
     - view: head
         do:
             - [ requireJs, fcom.customerfields, "@Sellvana_CustomerFields/Admin/js/fcom.customerfields" ]
-
     - view: admin/nav
         do:
             - [ addNav, customer/fields, { label: Customer Fields, href: /customerfields/fields } ]
