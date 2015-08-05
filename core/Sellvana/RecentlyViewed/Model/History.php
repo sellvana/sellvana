@@ -6,6 +6,7 @@
  * DI
  * @property Sellvana_Customer_Model_Customer Sellvana_Customer_Model_Customer
  * @property Sellvana_Catalog_Model_Product Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
  */
 class Sellvana_RecentlyViewed_Model_History extends FCom_Core_Model_Abstract
 {
@@ -59,7 +60,8 @@ class Sellvana_RecentlyViewed_Model_History extends FCom_Core_Model_Abstract
             $orm->where('h.customer_id', $custId);
         }
 
-        $result = $orm->find_many();
-        return $result;
+        $products = $orm->find_many();
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
+        return $products;
     }
 }
