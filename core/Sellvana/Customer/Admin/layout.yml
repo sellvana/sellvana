@@ -5,6 +5,9 @@ base:
             - [ addNav, customer/customers, { label: Customers, href: /customers, pos: 10 } ]
             - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index, pos: 40 } ]
 
+            - [ addNav, reports/customer, { label: Customers, pos: 40 }]
+            - [ addNav, reports/customer/country, { label: Users by Country, href: /customer/report/country, pos: 20 }]
+
 /customers/import:
     - { include: base }
     - { include: form }

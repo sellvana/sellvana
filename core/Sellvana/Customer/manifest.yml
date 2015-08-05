@@ -18,6 +18,8 @@ modules:
                     - [ /customers/.action, Sellvana_Customer_Admin_Controller_Customers ]
                     - [ /customers/import/.action, Sellvana_Customer_Admin_Controller_CustomersImport ]
                     - [ /addresses/.action, Sellvana_Customer_Admin_Controller_Addresses ]
+
+                    - [ /customer/report/country/?.action, Sellvana_Customer_Admin_Controller_Report_Country ]
                 observe:
                     - [ "BActionController::onBeforeDispatch", Sellvana_Customer_Admin.onControllerBeforeDispatch ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Customer_Admin.onGetDashboardWidgets ]
