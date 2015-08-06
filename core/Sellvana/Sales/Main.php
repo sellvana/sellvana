@@ -253,6 +253,14 @@ class Sellvana_Sales_Main extends BClass
             'async' => true,
             'filter' => true
         ]);
+        $view->addWidget('top-products', [
+            'title' => 'Top Products',
+            'icon' => 'inbox',
+            'cols' => 4,
+            'view' => 'order/dashboard/top-products',
+            'async' => true,
+            'filter' => true
+        ]);
     }
 
     public function workflowAction($actionName, $args = [])

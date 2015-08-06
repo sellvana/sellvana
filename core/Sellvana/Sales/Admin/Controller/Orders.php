@@ -420,6 +420,25 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         return number_format($result, 2);
     }
 
+    public function getTopProducts()
+    {
+        $items = $this->Sellvana_Sales_Model_Order->orm('o')
+            ->join('Sellvana_Sales_Model_Order_Item', 'oi.order_id = o.id', 'oi')
+            ->join('Sellvana_Catalog_Model_Product', 'p.id = oi.product_id', 'p')
+            ->select_expr('SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2))))', 'profit_fixed');
+        $this->_processFilters($items);
+        $totals = clone $items;
+        $total_profit = $totals->find_one()->get('profit_fixed');
+        $items->select('p.*')
+            ->select_expr('SUM(oi.row_total)', 'revenue')
+            ->select_expr('SUM(oi.qty_ordered)', 'qty')
+            ->select_expr("ROUND(SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2)))) * 100 / {$total_profit}, 2)", 'profit_pc')
+            ->group_by('oi.product_id');
+
+        $result = $items->find_many();
+        return $result;
+    }
+
     public function action_validate_order_number__POST()
     {
         $r = $this->BRequest->post('config');
