@@ -690,20 +690,9 @@
         };
 
         window.showModalToEditVariantPrice = function(row) {
-            var variantPrices = [];
-            $.ajax({
-                url: '{{APP.href('catalogfields/products/prices')}}?id=' + {{ REQUEST.get('id') }} + '&variant_id=' + row.id,
-                type: 'GET',
-                dataType: 'json',
-                async: false,
-                success: function(data) {
-                    variantPrices = data;
-                }
-            });
-
             function validatePrices() {
                 var valid = true;
-                $(variantModalNode).find('select.priceUnique').each(function (el) {
+                $('#catalog-variant-prices-form').find('select.priceUnique').each(function (el) {
                     if (!$(this).valid()) {
                         valid = false;
                     }
@@ -714,13 +703,14 @@
             var options = {
                 id: variantGrid.getConfig('id'),
                 title: Locale._('Variant Prices'),
-                prices: variantPrices,
+                source: '{{APP.href('catalogfields/products/prices')}}?id=' + {{ REQUEST.get('id') }} + '&variant_id=' + row.id,
                 price_types: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
                 editable_prices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
                 customer_groups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
                 sites: {{ sites ? UTIL.toJson(sites) | raw: 'null' }},
                 currencies: {{ currencies ? UTIL.toJson(currencies) | raw: 'null' }},
                 product_id: '{{ model.id() }}',
+                variant_id: row.id,
                 validatePrices: validatePrices,
                 priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options'))|raw }},
                 operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options'))|raw }},
@@ -741,22 +731,18 @@
                         cancel: 'Close',
                         onLoad: function(modal) {
                             variantModalNode = $(modal.getDOMNode());
-                            variantModalNode.find('.modal-dialog').css('width', '1200px');
+                            variantModalNode.find('.modal-dialog').css('width', '1280px');
                         },
                         onConfirm: window.saveVariantPriceModal
                     },
-                    React.createElement('fieldset', { name: 'variant-price' }, 
-                        React.createElement('div', {className: 'f-section'}, 
-                            React.createElement('div', {id: 'variant_price_list'}, 
-                                React.createElement('form', {id: 'catalog-variant-prices-form',className: 'form form-horizontal validate-form'}, 
-                                    React.createElement(Price, { id: 'variant', options: options })
-                            )))
-                    )), modalContainerEle);
+                    React.createElement('form', {id: 'catalog-variant-prices-form',className: 'form form-horizontal validate-form'}, 
+                            React.createElement(Price, { id: 'variant', options: options }
+            ))), modalContainerEle);
 
             function validateBaseField(value, element) {
                 var valid = false;
                 if(typeof element !== 'undefined') {
-                    var $parent = $(element).parents('.price-item');
+                    var $parent = $(element).parents('.variant-price-item');
                     var $curFields = $parent.find('.customer-group, .site, .currency');
                     var currHash = value;
                     var matchingHashes = {};
@@ -786,7 +772,7 @@
                     matchingHashes[currHash] = 1;
 
 
-                    var $items = $('.price-item');
+                    var $items = $('.variant-price-item');
                     $items.each(function () {
                         if(valid) {
                             // valid price already found, return
@@ -831,14 +817,14 @@
                 var form = $(elem).parents('#catalog-variant-prices-form');
                 var valid = true;
                 if (typeof elem !== 'undefined') {
-                    var parent = $(elem).parents('.price-item');
+                    var parent = $(elem).parents('.variant-price-item');
                     var curFields = parent.find('input.priceUnique, select.priceUnique');
                     var currHash = '';
                     curFields.each(function () {
                         currHash += $(this).val();
                     });
 
-                    var items = form.find('.price-item');
+                    var items = form.find('.variant-price-item');
                     items.each(function () {
                         if (!valid) {
                             return;
@@ -872,7 +858,20 @@
     });
 
     window.saveVariantPriceModal = function(modal) {
-        
+        var fields  = variantModalNode.find('select, input, textarea'),
+            form    = variantModalNode.find('form'),
+            url     = '{{ APP.href("catalog/products/save_variant_prices") }}?id='+{{ REQUEST.get('id') }};
+
+        if (form.valid()) { // If validation passes
+            // Add
+            $.post(url, form.serialize(), function(r) {
+                if (r.success == 1) {
+                    modal.close();
+                } else {
+                    alert('Error while saving data, please try again !');
+                }
+            });
+        }
     }
 
     /**

@@ -1155,6 +1155,14 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     }
 
+    public function action_save_variant_prices__POST() {
+        $r          = $this->BRequest;
+        $pricesData = $r->request();
+        $model      = $this->Sellvana_Catalog_Model_Product->load($r->get('id'));
+        $this->_processPricesPost($model, $pricesData);
+        $this->BResponse->json(['success' => 1]);
+    }
+
     /**
      * Fetch list of products to use in conditions
      */
