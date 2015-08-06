@@ -452,6 +452,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'unique_hash' => $hash,
                 'auto_added' => !empty($params['auto_added']) ? $params['auto_added'] : 0,
                 'parent_item_id' => !empty($params['parent_item_id']) ? $params['parent_item_id'] : null,
+                'cost' => !empty($params['cost']) ? $params['cost'] : null,
             ];
             if ($skuModel) {
                 $itemData = array_merge($itemData, [
@@ -459,7 +460,6 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
                     'pack_separate' => $skuModel->get('pack_separate'),
                     'shipping_weight' => $skuModel->get('shipping_weight') ?: $product->get('ship_weight'),
                     'shipping_size' => $skuModel->get('shipping_size'),
-                    'cost' => $skuModel->get('unit_cost'),
                 ]);
             }
             $item = $this->Sellvana_Sales_Model_Cart_Item->create($itemData);
