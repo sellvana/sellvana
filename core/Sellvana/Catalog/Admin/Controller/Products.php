@@ -85,6 +85,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function onPageModelsCallback($rows)
     {
+        if (empty($rows)) {
+            return false;
+        }
+
         $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
 
