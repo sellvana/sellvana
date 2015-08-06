@@ -120,7 +120,6 @@
     </div>
 </div>
 
-
 <div class="well">
     <div class="row">
         <input type="hidden" id="custom_fields" name="custom_fields"/>
@@ -136,7 +135,11 @@
 </div>
 
 <hr/>
-<div id="fields_list"></div>
+<div id="fields_list">
+    <div class="box-content">
+        <!-- content here -->
+    </div>
+</div>
 
     <script type="template" id="field-template">
         <div class="row">
@@ -260,13 +263,15 @@
     </script>
 
 <script>
-$('#fcom_append_form').append('<form id="cust-new-field-form1" class="form form-horizontal validate-form"/>');
+    console.log(262);
+    $('#fcom_append_form').append('<form id="cust-new-field-form1" class="form form-horizontal validate-form"></form>');
 var $custModal = $("#cust-new-field-modal");
 var html = $custModal.html();
 $custModal.remove();
 $('#cust-new-field-form1').append(html);
 
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
+    _.templateSettings.variable = 'rc';
     var setValidateForm = function(selector) {
         if (selector == null) {
           selector = $(".validate-form");
@@ -292,15 +297,17 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
           });
         }
     };
-    var currentSet = null;
     var initialData = {{ ctrl.getInitialData(model) | raw }};
 
     function refresh_selects()
     {
-        $('#sel_sets').val('');
-        $('#sel_fields').val('');
-        $('#sel_sets').select2();
-        $('#sel_fields').select2();
+        var $selSets = $('#sel_sets');
+        var $selFields = $('#sel_fields');
+
+        $selSets.val('');
+        $selFields.val('');
+        $selSets.select2();
+        $selFields.select2();
     }
 
     function remove_options(set)
@@ -345,6 +352,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
              .append($("<option></option>")
              .attr("value",field.get('id'))
              .text(field.get('field_name')));
+
         refresh_selects();
     }
 
@@ -354,12 +362,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         newField.url = '{{ APP.href('/customerfields/customers/get_field?id=') | raw }}'+fieldId;
         newField.fetch({
             success: function() {
-                var set = setCollection.at(0);
-                set.fields.add(newField);
+                setCollection.add(newField);
                 remove_option(newField);
             }
         });
     });
+
     var _mainForm = $('#cust-customers-form');
 
     $(_mainForm).submit(function(ev) {
@@ -399,9 +407,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             remote: "This field code is already taken place"
         }
     });
+
     $('#btn_new_field').click(function() {
-        $('#cust-new-field-form').find('input').val('');
-        $('#cust-new-field-form').find('select').each(function(index) {
+        var $custNewFieldForm = $('#cust-new-field-form');
+        $custNewFieldForm.find('input').val('');
+        $custNewFieldForm.find('select').each(function(index) {
             $(this).find('option').removeAttr('selected');
             $(this).find('option:first').attr('selected','selected');
         });
@@ -414,22 +424,22 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             return;
 
         var hash = {};
-        $('#cust-new-field-form .form-control').each(function(index) {
+        $('#cust-new-field-form').find('.form-control').each(function(index) {
             hash[$(this).attr('id')] = $(this).val();
         });
         hash.oper = 'add';
         $.post('{{ APP.href('/customerfields/fieldsets/field_grid_data') | raw }}', hash, function(res) {
             var field = new CustomField.Models.Field(res);
             var flag = false;
-            setCollection.each(function(set) {
-                if (set.get('collapsed') === false) {
-                    set.fields.add(field);
-                    flag = true;
-                }
-            });
-
-            if (!flag)
-                add_option(field);
+//            setCollection.each(function(set) {
+//                if (set.get('collapsed') === false) {
+//                    set.fields.add(field);
+//                    flag = true;
+//                }
+//            });
+//
+//            if (!flag)
+            add_option(field);
             $('#btn-newfield-close').trigger('click');
             //setCollection.trigger('change');
         });
@@ -583,6 +593,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     break;
                 case 'textarea':
                     hash['change textarea'] = '_changeVal';
+                    break;
                 case 'text':
                     hash['change input[type="text"]'] = '_changeVal';
             }
@@ -716,31 +727,52 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     CustomField.Views.MainView = Backbone.View.extend({
         el: '#fields_list',
         initialize: function() {
-            this.collection.on('add', this._addSetView, this);
+            this.collection.on('add', this._addFieldView, this);
         },
-        _addSetView: function(set) {
-            var setView = new  CustomField.Views.FieldSetView({model: set});
-            this.$el.append(setView.render().el);
+        _addFieldView: function(field) {
+//            var setView = new  CustomField.Views.FieldSetView({model: set});
+            console.log(field);
+            var fieldView = new CustomField.Views.FieldView({model: field});
+            this.$el.find('div.box-content').append(fieldView.render().el);
+
+            switch (field.get('admin_input_type')) {
+                case 'multiselect':
+                case 'select':
+                    this.$el.find('select:last').val(field.get('value'));
+                    this.$el.find('select:last').select2();
+                    break;
+                case 'boolean':
+                    field.switch = true;
+                    fieldView.$el.find('.switch-cbx:last').wrap("<div class='make-switch switch' data-off-label='&lt;i class=\"icon-remove\"&gt;&lt;/i&gt;' data-on-label='&lt;i class=\"icon-ok\"&gt;&lt;/i&gt;' data-on='primary'>").parent().bootstrapSwitch();
+
+                    break;
+                case 'wysiwyg':
+                    field.wysiwyg = true;
+                    adminForm.wysiwygInit();
+                    var p = fieldView.$el.find('textarea:first').parent();
+                    p.append('<textarea name="' + guid() + '" ' + (field.get('required') === '1' ? 'data-rule-required="true"' : '') + ' style="display:none;">' + fieldView.$el.find('textarea:first').val() + '</textarea>');
+                    break;
+            }
+//            this.$el.append(setView.render().el);
         },
         render: function() {
-            this.$el.html('');
-            this.collection.each(this._addSetView, this);
+            this.$el.find('div.box-content').html('');
+            this.collection.each(this._addFieldView, this);
             adminForm.wysiwygInit();
             adminForm.createSwitchButton();
         }
     });
 
-    var setModel = null;
+    var setCollection = new CustomField.Collections.FieldCollection();
     if (initialData !== -1) {
-        for(var i in initialData) {
-            var set = initialData[i];
+        for (var i in initialData) {
+            var fSet = initialData[i];
             //var fields = _.clone(set.fields);
             //delete set.fields;
-            var setModel = new CustomField.Models.FieldSet(set);
+            var setModel = new CustomField.Models.Field(fSet);
             //setModel.fields.set(fields);
             setCollection.add(setModel);
             remove_options(setModel);
-
         }
         $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
     }
@@ -749,8 +781,33 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     var mainView = new CustomField.Views.MainView({collection: setCollection});
     mainView.render();
+//    if (setCollection.length === 0) {
+//        $('#td_fields').css('display', 'none');
+//        $('#field').hide();
+//        $('#btn_add_field').css('display', 'none');
+//    }
+    setCollection.on('add remove change', function (ev, data) {
+        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
 
-    $( ".prod-fieldset .box-content" ).sortable({
+//        if (setCollection.length === 0) {
+//            $('#td_fields').css('display', 'none');
+//            $('#field').hide();
+//            $('#btn_add_field').css('display', 'none');
+//        } else {
+//            $('#td_fields').css('display', 'block');
+//            $('#field').show();
+//            $('#btn_add_field').css('display', 'inline-block');
+//        }
+
+        $(".prod-fieldset .box-content").sortable({
+            revert: true,
+            axis: 'y',
+            connectWith: ".prod-fieldset .box-content",
+            handle: '.control-handle'
+        });
+    });
+
+    $(".prod-fieldset .box-content").sortable({
         revert: true,
         axis: 'y',
         connectWith: ".prod-fieldset .box-content",

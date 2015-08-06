@@ -333,7 +333,8 @@ CONFLICT END #}
 
 
 <script>
-$('#fcom_append_form').append('<form id="prod-new-field-form1" class="form form-horizontal validate-form"/>');
+    console.log(336);
+    $('#fcom_append_form').append('<form id="prod-new-field-form1" class="form form-horizontal validate-form"/>');
 var html = $("#prod-new-field-modal").html();
 $("#prod-new-field-modal").remove();
 $('#prod-new-field-form1').append(html);
@@ -664,6 +665,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     CustomField.Collections.FieldSetCollection = Backbone.Collection.extend({
         model: CustomField.Models.FieldSet
     });
+
     CustomField.Views.LangFieldView = Backbone.View.extend({
         className: 'row',
         attributes: {
@@ -679,7 +681,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.model.set('value', val);
         },
         _remove: function() {
-            var confirm = window.confirm("Do you want to really remove?");
+            var confirm = window.confirm("{{ "Do you want to really remove?"|_ }}");
             if (confirm) {
                 this.parentSet.langFields.remove(this.model);
                 this.undelegateEvents();
@@ -702,6 +704,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             return this;
         }
     });
+
     CustomField.Views.FieldView = Backbone.View.extend({
         className: 'form-group',
         attributes: function() {
@@ -723,6 +726,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     break;
                 case 'textarea':
                     hash['change textarea'] = '_changeVal';
+                    break;
                 case 'text':
                     hash['change input[type="text"]'] = '_changeVal';
             }
@@ -757,7 +761,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _updateLangTag: function() {
             var langs = _.difference(CustomField.Langs, this.model.get('avail_langs'));
-            var html = 'Set Locale...'
+            var html = 'Set Locale...';
             if(langs.length>0) {
                 html = langs.join(',');
             }
@@ -873,7 +877,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             'click button.btn-remove': '_removeSelf'
         },
         _removeSelf: function() {
-            var confirm = window.confirm("Do you want to really remove?");
+            var confirm = window.confirm("{{ "Do you want to really remove?"|_ }}");
             if (confirm) {
                 add_options(this.model);
                 setCollection.remove(this.model);
@@ -957,17 +961,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     });
 
     var setCollection = new CustomField.Collections.FieldSetCollection();
-    var setModel = null;
     if (initialData !== -1) {
         for(var i in initialData) {
-            var set = initialData[i];
+            var fSet = initialData[i];
             //var fields = _.clone(set.fields);
             //delete set.fields;
-            var setModel = new CustomField.Models.FieldSet(set);
+            var setModel = new CustomField.Models.FieldSet(fSet);
             //setModel.fields.set(fields);
             setCollection.add(setModel);
             remove_options(setModel);
-
         }
         $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
     }
