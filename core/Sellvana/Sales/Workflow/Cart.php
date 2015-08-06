@@ -178,6 +178,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 'product_id' => $p->id(),
                 'product_sku' => $p->get('product_sku'),
                 'inventory_sku' => $p->get('inventory_sku'),
+                'cost' => ($p->getPriceModelByType('cost')) ? $p->getPriceModelByType('cost')->getPrice() : null,
                 #'manage_inventory' => $p->get('manage_inventory'),
             ];
 

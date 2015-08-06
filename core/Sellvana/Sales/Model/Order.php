@@ -335,6 +335,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
                 'shipping_size' => $item->get('shipping_size'),
                 'shipping_weight' => $item->get('shipping_weight'),
                 'data_serialized' => $item->get('data_serialized'),
+                'cost' => $item->get('cost'),
             ])->save();
 
             if ($orderItem->get('qty_backordered') == $orderItem->get('qty_ordered')) {
