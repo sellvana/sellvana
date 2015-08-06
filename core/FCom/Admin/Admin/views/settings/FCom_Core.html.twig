@@ -45,6 +45,7 @@
         {{ forms.input(fieldData,   { field:'dbname', label:'Database'|_ }) }}
         {{ forms.input(fieldData,   { field:'username', label:'Username'|_ }) }}
         {{ forms.input(fieldData,   { field:'password', label:'Password'|_, value:c.get('db/password')?'*****':'', type:'password', placeholder:'*****' }) }}
+        {{ forms.input(fieldData,   { field:'table_prefix', label:'Table Prefix'|_ }) }}
         {{ forms.boolean(fieldData, { field:'logging', label:'Enable Logging'|_ }) }}
         {{ forms.boolean(fieldData, { field:'implicit_migration', label:'Implicit Migration'|_ }) }}
     {{ forms.accordion_panel_end }}
