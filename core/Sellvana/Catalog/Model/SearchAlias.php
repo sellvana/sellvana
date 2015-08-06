@@ -19,19 +19,21 @@ class Sellvana_Catalog_Model_SearchAlias extends FCom_Core_Model_Abstract
 
     public function fetchSearchAlias($query)
     {
+        /*
         $sData =& $this->BSession->dataToUpdate();
         if (!empty($sData['search_alias'][$query])) {
             return $sData['search_alias'][$query];
         }
+        */
         //TODO: implement 'W'ord aliases
-        $data = ['alias_type' => 'F', 'alias_term' => $query];
+        $data = ['alias_type' => 'F', 'alias_term' => (string)$query];
         $record = $this->loadWhere($data);
         if (!$record) {
-            $sData['search_alias'][$query] = $query;
-            return [];
+            //$sData['search_alias'][$query] = $query;
+            return false;
         }
         $record->add('num_hits')->save();
-        $sData['search_alias'][$query] = $record->get('target_term');
+        //$sData['search_alias'][$query] = $record->get('target_term');
         return $record;
     }
 }

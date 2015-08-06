@@ -62,6 +62,17 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'vendor_disc' => 'Supplier Discontinued',
             'mfr_disc' => 'MFR Discontinued',
         ],
+        'rollover_effects' => [
+            'fade' => 'Fade',
+            'clip' => 'Clip',
+            'blind' => 'Blinds',
+            'drop' => 'Drop',
+            'fold' => 'Fold',
+            'highlight' => 'Highlight',
+            'puff' => 'Puff',
+            'pulsate' => 'Pulsate',
+            'slide' => 'Slide'
+        ],
     ];
 
     protected static $_validationRules = [
@@ -97,6 +108,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     protected $_dataImport = [];
 
     protected $_priceModels;
+
+    protected $_images;
 
     protected static $_urlPrefix;
 
@@ -172,14 +185,30 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->BApp->frontendHref($prefix . ($category ? $category->get('url_path') . '/' : '') . $this->get('url_key'));
     }
 
-    public function imageUrl($full = false)
+    public function imageUrl($full = false, $imgType = 'default')
     {
         static $default;
 
         $media = $this->BConfig->get('web/media_dir');# ? $this->BConfig->get('web/media_dir') : 'media/';
-        $url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();
-        $thumbUrl = $this->get('thumb_url');
-        if ($thumbUrl) {
+        //$url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();// what is the point in this? Image resources are always in same path
+        $url = '';
+        //$thumbUrl = $this->get('thumb_url');
+        //if ($thumbUrl) {
+        //    return $url . $media . '/' . $thumbUrl;
+        //}
+        switch ($imgType) {
+            case 'thumb':
+                $thumbUrl = $this->getThumbPath();
+                break;
+            case 'rollover':
+                $thumbUrl = $this->getRolloverPath();
+                break;
+            default :
+                $thumbUrl = $this->getDefaultImagePath();
+                break;
+        }
+
+        if($thumbUrl){
             return $url . $media . '/' . $thumbUrl;
         }
 
@@ -196,9 +225,19 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $default;
     }
 
+    public function defaultImgUrl($w, $h = null, $full = false)
+    {
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'default'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+    }
+
     public function thumbUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'thumb'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+    }
+
+    public function rolloverUrl($w, $h = null, $full = false)
+    {
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'rollover'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
     }
 
     public function onBeforeSave()
@@ -226,14 +265,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //}
 
         return true;
-    }
-
-    public function onAfterLoad()
-    {
-        parent::onAfterLoad();
-        $thumbPath = $this->FCom_Core_Main->resizeUrl($this->imageUrl(), ['s' => 48]);
-        $this->set('thumb_path', $thumbPath);
-
     }
 
     public function onAfterSave()
@@ -438,7 +469,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * @param $type
-     * @return ORM
+     * @return BORM
      */
     public function mediaORM($type)
     {
@@ -457,6 +488,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function media($type)
     {
         return $this->mediaORM($type)->find_many_assoc();
+    }
+
+    public function gallery()
+    {
+        return $this->mediaORM('I')->where(["pa.in_gallery" => 1])->order_by_desc('is_default')->find_many_assoc();
     }
 
     /**
@@ -797,57 +833,85 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param bool|int $limit
      * @param bool $incAvgRating
+     * @param bool|int $filterByRating
      * @return array
      */
-    public function reviews($incAvgRating = true)
+    public function reviews($limit = false, $incAvgRating = true, $filterByRating = false)
     {
+        $numReviews = 0;
+        $pageData = [];
+
         if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
+            $ratings = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select('pr.rating')->select_expr('COUNT(pr.id)', 'count')
+                ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1])
+                ->group_by('pr.rating')->find_many();
+
+            $stats = $this->getRatingStats($ratings, $incAvgRating);
+            $numReviews = $stats['num_reviews'];
+            $avgRating = $stats['avg_rating'];
+            $ratingByStars = $stats['rating_by_stars'];
+
             $reviews = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
                 ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
-                ->where(['pr.product_id' => $this->id(), 'approved' => 1])->order_by_expr('pr.create_at DESC')->find_many();
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1])
+                ->order_by_expr('(pr.helpful / pr.helpful_voices) DESC');
 
-            if ($incAvgRating) {
-                $avgRating = $this->calcAverageRating($reviews);
+            if ((int)$filterByRating) {
+                $reviews->where('rating', (int)$filterByRating);
             }
-        } else {
-            $reviews = [];
+
+            if ((int)$limit) {
+                $reviews->limit($limit);
+            }
+
+            $reviews = $reviews->order_by_expr('pr.create_at DESC');
+
+            $pageData = $reviews->paginate($this->BRequest->get(), [
+                'ps' => 3,
+            ]);
         }
+
         return [
-            'items' => $reviews,
+            'items' => $pageData,
+            'ratings' => isset($ratingByStars) ? $ratingByStars : [],
             'avgRating' => isset($avgRating) ? $avgRating : [],
-            'numReviews' => count($reviews),
+            'numReviews' => $numReviews,
         ];
     }
 
     /**
-     * @param array $reviews
+     * @param array $ratings
+     * @param bool $incAvgRating
      * @return array
      */
-    public function calcAverageRating($reviews = [])
+    public function getRatingStats($ratings = [], $incAvgRating = true)
     {
-        $rs = [
-            'rating' => 0,
-            'rating1' => 0,
-            'rating2' => 0,
-            'rating3' => 0,
-        ];
-        if (!empty($reviews)) {
-            $numReviews = count($reviews);
-            foreach ($reviews as $review) {
-                $rs['rating'] += $review->rating;
-                $rs['rating1'] += $review->rating1;
-                $rs['rating2'] += $review->rating2;
-                $rs['rating3'] += $review->rating3;
-            }
-
-            $rs['rating'] = number_format($rs['rating'] / $numReviews, 2);
-            $rs['rating1'] = number_format($rs['rating1'] / $numReviews, 2);
-            $rs['rating2'] = number_format($rs['rating2'] / $numReviews, 2);
-            $rs['rating3'] = number_format($rs['rating3'] / $numReviews, 2);
+        $avgRating = false;
+        $numReviews = 0;
+        $reviewConfig = $this->Sellvana_ProductReviews_Model_Review->config();
+        $ratingByStars = [];
+        for ($i = $reviewConfig['max']; $i >= $reviewConfig['min']; $i -= $reviewConfig['step']) {
+            $ratingByStars[$i] = 0;
         }
 
-        return $rs;
+        if (!empty($ratings)) {
+            foreach ($ratings as $review) {
+                $avgRating += $review->rating * $review->count;
+                $numReviews += $review->count;
+                $ratingByStars[$review->rating] = $review->count;
+            }
+
+            $avgRating = trim(number_format($avgRating / $numReviews, 2), '0.');
+        }
+
+        return [
+            'num_reviews' => $numReviews,
+            'avg_rating' => $avgRating,
+            'rating_by_stars' => $ratingByStars
+        ];
     }
 
     /**
@@ -1052,6 +1116,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             "NOT_BACK_ORDERS"         => $this->BLocale->_("No Back Orders"),
             "ALLOW_QUANTITY_BELOW" => $this->BLocale->_("Allow Quantity Below 0")
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRolloverEffects()
+    {
+        // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
+        return $this->fieldOptions('rollover_effects');
     }
 
     /**
@@ -1348,5 +1421,39 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         parent::__destruct();
         unset($this->_priceModels);
+    }
+
+    public function setProductImages($images)
+    {
+        if (empty($this->_images)) {
+            $this->_images = $images;
+        } else {
+            $this->_images = array_merge($this->_images, $images);
+        }
+        return $this;
+    }
+
+    public function getThumbPath()
+    {
+        if (!isset($this->_images['thumb'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['thumb']*/);
+        }
+        return $this->_images['thumb'];
+    }
+
+    public function getRolloverPath()
+    {
+        if (!isset($this->_images['rollover'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['rollover']*/);
+        }
+        return $this->_images['rollover'];
+    }
+
+    public function getDefaultImagePath()
+    {
+        if (!isset($this->_images['default'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['default']*/);
+        }
+        return $this->_images['default'];
     }
 }

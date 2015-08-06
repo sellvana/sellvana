@@ -18,7 +18,7 @@ foreach ($modules as $modName => $mod) {
     $targetFile = $mod->root_dir . '/i18n';
     if (!file_exists($targetFile)) {
 //        mkdir($targetFile);
-        BUtil::ensureDir($targetFile);
+        $mod->BUtil->ensureDir($targetFile);
     }
     $targetFile .= '/en.php';
     if (!file_exists($targetFile)) {

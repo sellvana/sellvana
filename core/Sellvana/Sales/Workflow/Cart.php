@@ -36,7 +36,9 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
             $cart->set([
                 'customer_id' => $customer->id(),
                 'customer_email' => $customer->get('email'),
-            ])->importAddressesFromCustomer($customer)->calculateTotals();
+            ]);
+            $cart->importAddressesFromCustomer($customer);
+            $cart->calculateTotals();
         }
 
         $cart->save();
@@ -147,13 +149,20 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 $ids[] = $item['id'];
             } elseif ($reqItem instanceof Sellvana_Catalog_Model_Product) {
                 $item = ['id' => $reqItem->getId(), 'qty' => 1, 'product' => $reqItem];
+            } else {
+                $this->BDebug->log('Invalid reqItem: ' . print_r($reqItem, 1));
+                continue;
             }
             $itemsData[] = $item;
         }
 
         // retrieve product records
         /** @var Sellvana_Catalog_Model_Product[] $products */
-        $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $ids)->find_many_assoc();
+        if ($ids) {
+            $products = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $ids)->find_many_assoc();
+        } else {
+            $products = [];
+        }
         foreach ($itemsData as $i => &$item) {
             if (!empty($item['error'])) {
                 continue;
@@ -169,6 +178,7 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 'product_id' => $p->id(),
                 'product_sku' => $p->get('product_sku'),
                 'inventory_sku' => $p->get('inventory_sku'),
+                'cost' => ($p->getPriceModelByType('cost')) ? $p->getPriceModelByType('cost')->getPrice() : null,
                 #'manage_inventory' => $p->get('manage_inventory'),
             ];
 

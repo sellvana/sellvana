@@ -2,3 +2,12 @@ modules:
     Sellvana_CustomerSegments:
         version: 0.5.0.0
         channel: alpha
+        require: { module: { Sellvana_Customer: 0.5.0.0 } }
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout, bootstrap ]
+                routing:
+                    - [ /customer-segments/?.action, Sellvana_CustomerSegments_Admin_Controller_Segments ]
+        observe:
+            - [ "Sellvana_Customer_Model_Customer::onBeforeSave", "Sellvana_CustomerSegments_Main::onCustomerBeforeSave" ]

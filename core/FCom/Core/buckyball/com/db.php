@@ -1207,11 +1207,12 @@ class BORM extends ORMWrapper
     }
 
     /**
-    * Return select sql statement built from the ORM object
-    * Extended with argument for options skipping of values calculation
-    *
-    * @return string
-    */
+     * Return select sql statement built from the ORM object
+     * Extended with argument for options skipping of values calculation
+     *
+     * @param bool $calculate_values
+     * @return string
+     */
     public function as_sql($calculate_values = true)
     {
         return $this->_build_select($calculate_values);
@@ -1530,6 +1531,33 @@ class BORM extends ORMWrapper
     }
 
     /**
+     * Add a RAW JOIN source to the query
+     *
+     * @param $table
+     * @param $constraint
+     * @param $table_alias
+     * @param array $parameters
+     * @return $this
+     */
+    public function raw_join($table, $constraint, $table_alias, $parameters = array()) {
+        // Add table alias if present
+        if (!is_null($table_alias)) {
+            $table_alias = $this->_quote_identifier($table_alias);
+            $table .= " {$table_alias}";
+        }
+        $this->_values = array_merge($this->_values, $parameters);
+        // Build the constraint
+        if (is_array($constraint)) {
+            list($first_column, $operator, $second_column) = $constraint;
+            $first_column = $this->_quote_identifier($first_column);
+            $second_column = $this->_quote_identifier($second_column);
+            $constraint = "{$first_column} {$operator} {$second_column}";
+        }
+        $this->_join_sources[] = "{$table} ON {$constraint}";
+        return $this;
+    }
+
+    /**
      * @param $data
      * @param null $isNew
      * @return $this
@@ -1667,6 +1695,17 @@ class BORM extends ORMWrapper
     {
         BDb::connect($this->_writeConnectionName);
         return parent::delete();
+    }
+
+    /**
+     * Add an unquoted expression to the list of columns to GROUP BY
+     *
+     * @param $expr
+     * @return $this
+     */
+    public function group_by_expr($expr) {
+        $this->_group_by[] = $expr;
+        return $this;
     }
 
     /**
@@ -1863,7 +1902,10 @@ class BORM extends ORMWrapper
 
         $values = [];
         foreach ($this->_where_conditions as $condition) {
-            $values[] = $condition[static::WHERE_VALUES][0];
+            // WHERE condition doesn't always have a value (e.g. WHERE x IS NULL)
+            if (!empty($condition[static::WHERE_VALUES][0])) {
+                $values[] = $condition[static::WHERE_VALUES][0];
+            }
         }
 
         return $values;

@@ -21,7 +21,7 @@
 
 {% set prod = THIS.get('product') %}
 {% set inventory = prod.getInventoryModel() %}
-{% set images = prod.media('I') %}
+{% set images = prod.gallery() %}
 {% set cat = THIS.get('category') %}
 {% set customFields = prod.getData('custom_fields') %}
 
@@ -144,7 +144,7 @@
                 {% endif %}
             </section>
 
-            {{ THIS.view('prodreviews/product-details').set('prod', prod) | raw }}
+            {{ THIS.view('prodreviews/product-details').set('prod', prod).set('type', 'short') | raw }}
 
         </div>
     </div><!-- /.f-prod-info -->

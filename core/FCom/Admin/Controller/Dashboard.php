@@ -54,6 +54,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
             }
         }
         $result['filter'] = (isset($persData['dashboard']['filter'])) ? $persData['dashboard']['filter']: [];
+        $this->_processDateFilter($result['filter']);
         if ($add && $persData) {
             $this->FCom_Admin_Model_User->personalize($persData);
         }
@@ -88,6 +89,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                         break;
                 }
             }
+            $this->_processDateFilter($p);
             $widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
             $result = [];
             $this->FCom_Admin_Model_User->personalize($persData);
@@ -107,6 +109,85 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
         }
 
         $this->BResponse->json($result);
+    }
+
+    /**
+     * @param array $filter
+     */
+    protected function _processDateFilter($filter)
+    {
+        $dayRecent = ($this->BConfig->get('modules/Sellvana_Sales/recent_day')) ? $this->BConfig->get('modules/Sellvana_Sales/recent_day') : 7;
+        $params = [];
+        if (strpos($filter['date'], '~') !== FALSE) {
+            $range = explode('~', $filter['date']);
+            $filter['date'] = array(
+                'min' => $range[0],
+                'max' => $range[1]
+            );
+        }
+        switch ($filter['type']) {
+            case 'equal':
+                $from = $filter['date'];
+                if ($filter['date'] == 'today') {
+                    $from = date('Y-m-d');
+                    $cond = '> ?';
+                    $params[] = $from;
+                } else {
+                    $from = strtotime($from);
+                    $to = $from + 24 * 60 * 60 - 1;
+                    $cond = 'BETWEEN ? AND ?';
+                    $params[] = $from;
+                    $params[] = $to;
+                }
+                break;
+            case 'from':
+                $cond = '> ?';
+                $params[] = $filter['date'];
+                break;
+            case 'to':
+                $cond = '< ?';
+                $params[] = strtotime($filter['date']) + 24 * 60 * 60;
+                break;
+            case 'between':
+                switch ($filter['date']) {
+                    case 'last-month':
+                        $cond = '> DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+                        break;
+                    case 'last-week':
+                        $cond = '> DATE_SUB(NOW(), INTERVAL 7 DAY)';
+                        break;
+                    default:
+                        if (!empty($filter['date']['min']) && !empty($filter['date']['max'])) {
+                            $cond = 'BETWEEN ? AND ?';
+                            $params[] = $filter['date']['min'];
+                            $params[] = $filter['date']['max'];
+                        } else {
+                            $cond = '> DATE_SUB(NOW(), ? DAY)';
+                            $params[] = $dayRecent;
+                        }
+                }
+                break;
+            case 'not-in':
+                if (!empty($filter['date']['min']) && !empty($filter['date']['max'])) {
+                    $cond = 'NOT BETWEEN ? AND ?';
+                    $params[] = $filter['date']['min'];
+                    $params[] = $filter['date']['max'];
+                } else {
+                    $cond = '> DATE_SUB(NOW(), ? DAY)';
+                    $params[] = $dayRecent;
+                }
+                break;
+            case 'default':
+                $cond = '> 0';
+                break;
+            default:
+                $cond = '> DATE_SUB(NOW(), ? DAY)';
+                $params[] = $dayRecent;
+        }
+        $this->BApp->set('dashboard_date_filter', array(
+            'condition' => $cond,
+            'params' => $params
+        ));
     }
 
     /**

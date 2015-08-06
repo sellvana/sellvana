@@ -5,7 +5,8 @@
 
 <script type="text/javascript">
     var variantGrid, variantFieldGrid, variantImages, variantFields; //todo: move this to inside scope
-    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'jquery-ui', 'jquery.validate', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'jquery-ui', 'jquery.validate', 'unique'],
+            function ($, _, React, FComGriddleComponent, Components) {
 
         /**
          * object contains property and method to hand variant images
@@ -109,7 +110,7 @@
              */
             processImagesForRow: function (id) {
                 //console.log('processImagesForRow');
-                if (variantGrid && this.images.length) {
+                if (variantGrid) {
                     var selectClass = this.selectClass;
                     var listClass = this.listClass;
                     var inputClass = this.inputClass;
@@ -212,7 +213,7 @@
             listId: '#variants-tab-field',
             //input class in each row
             inputClass: '.select-value-field',
-            customFields: [],
+            customFields: [], //custom fields already attached to this product
             combinations: {},
             init: function () {
                 if (variantFieldGrid) {
@@ -288,7 +289,7 @@
              * populate data to top field section and handle events
              */
             processTopFieldSection: function () {
-                if (variantGrid && this.customFields.length) {
+                if (variantGrid) {
                     var select = variantFields.select;
                     var list = variantFields.list;
 
@@ -343,13 +344,17 @@
 
                     });
 
-                    $(this.btnRemoveFieldClass).on('click', function() {
-                        if (confirm('Are you sure to delete this?')) {
+                    $(this.listId).on('click', this.btnRemoveFieldClass, function() {
+                        //todo: use modal to display more details message
+                        if (confirm('Deleting this field will remove all associated variants of this product. Are you sure you want to delete?')) {
                             var fieldCode = $(this).attr('data-code');
 
                             //re-display in select
                             variantFields.select.find('option[value=' + $(this).attr('data-id') + ']').removeClass('hide');
                             variantFields.resetSelect();
+
+                            //remove from list
+                            $(this).parents('li.dd-item').remove();
 
                             //remove in custom fields
                             variantFields.customFields = _.reject(variantFields.customFields, function (f) {
@@ -359,16 +364,29 @@
                             //remove from grid column
                             variantFields.deleteGridColumn({ field_code: fieldCode });
 
+                            //remove rows from grid
+                            /*var deleteCombinations = [];
+                            _.forEach(variantFields.combinations, function(comb, key) {
+                                comb['id'] = key;
+                                deleteCombinations.push(comb);
+                            });
+                            variantGrid.removeRows(deleteCombinations);*/
+
                             //remove from combinations
                             if (!_.isEmpty(variantFields.combinations)) {
                                 _.forEach(variantFields.combinations, function (comb, key) {
                                     delete comb[fieldCode];
                                     variantFields.combinations[key] = comb;
                                 });
+
+                                //run the validation again
+                                variantFields.validateVariant();
                             }
 
-                            //remove from list
-                            $(this).parents('li.dd-item').remove();
+                            //if empty custom fields, remove all rows
+                            if (!variantFields.customFields.length) {
+                                variantGrid.removeRows(variantGrid.getRows());
+                            }
                         }
                     });
 
@@ -537,7 +555,7 @@
 
                         variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
                     }
-
+                    toggleAddNewVariantsButton();
                 }
             },
             /**
@@ -560,6 +578,8 @@
                     } else {
                         console.log('DEBUG: cannot find column name ', field.field_code);
                     }
+
+                    toggleAddNewVariantsButton();
                 }
             },
             /**
@@ -590,7 +610,9 @@
          */
         window.variantFieldGriddleRegister = function(grid, triggerName) {
             variantFieldGrid = grid;
-            variantFields.init();
+            if (triggerName == 'componentDidMount') {
+                variantFields.init();
+            }
         };
 
         /**
@@ -615,6 +637,7 @@
 
             if (triggerName == 'componentDidMount') {
                 variantFields.processTopFieldSection();
+                toggleAddNewVariantsButton();
 
                 $(grid.getDOMNode()).on('change', 'tr', function(e) {
                     //console.log('on-change', this);
@@ -635,17 +658,31 @@
                         variantFields.combinations[row.id] = obj;
                     });
                 }).on('removedRows.griddle', function(e, rows) { //remove combination when remove rows
+                    var deleteInputEle = $('#variants_remove');
+                    var currentDeleteIds = deleteInputEle.val() ? deleteInputEle.val().split(',') : [];
                     _.forEach(rows, function(row) {
+                        currentDeleteIds.push(row.id);
                         if (typeof (variantFields.combinations[row.id]) != 'undefined') {
                             delete variantFields.combinations[row.id];
                         }
                     });
+
+                    deleteInputEle.val(_.uniq(currentDeleteIds).join(','));
                 })
                 ;
             }
         };
 
     });
+
+    /**
+     * toggle Add New Variant button
+     * todo: need to add to FComSettings or better components
+     */
+    function toggleAddNewVariantsButton() {
+        var newVariantButton = $(variantGrid.getDOMNode()).find('.btn.grid-new');
+        newVariantButton.prop('disabled', !(variantFields.customFields.length > 0));
+    }
 
     /**
      * custom validation function for checking duplicated input
@@ -665,7 +702,8 @@
                 if (rowEle.attr('id') != id) {
                     var flag = false;
                     rowEle.find('input.select-value-field').each(function() {
-                        if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined' && $(this).val() != comb[$(this).attr('name')]) {
+                        if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined'
+                                && $(this).val() != comb[$(this).attr('name')]) {
                             flag = true; // at least one field is different
                         }
                     });
@@ -763,4 +801,5 @@
 </div>
 
 <input type='hidden' id='vfield_ids' name='vfields' />
+<input type='hidden' id='variants_remove' name='variants_remove' />
 <input type='hidden' id='variants' name='variants' />

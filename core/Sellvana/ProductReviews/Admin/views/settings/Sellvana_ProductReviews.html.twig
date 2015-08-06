@@ -4,6 +4,6 @@
 <h2>{{ "Product Reviews Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-Sellvana_ProductReviews'}) }}
      {{ forms.accordion_panel_start({label:'General Settings'|_, id:'settings-Sellvana_ProductReviews-group0', in:1}) }}
-        {{ forms.boolean(fieldData, {field:'need_approve', label:'Custom Order Status On Payment'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'need_approve', label:'Approve needed'|_ }) }}
      {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

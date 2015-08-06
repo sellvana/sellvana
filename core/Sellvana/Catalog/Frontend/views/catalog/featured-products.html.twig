@@ -1,13 +1,17 @@
-{% set featured = APP.instance('Sellvana_Catalog_Frontend').getFeaturedProducts(THIS.get('cnt')) %}
+{% set cnt = THIS.get('cnt') ?: 6 %}
+{% set featured = APP.instance('Sellvana_Catalog_Frontend').getFeaturedProducts(cnt) %}
 
 {% if featured %}
-    <div class="f-widget f-widget-featured-prods">
+    <div class="f-widget f-widget-featured-prods f-prod-listing f-prod-listing-grid">
         <header class="f-widget-header">
             <strong class="f-widget-title">{{ 'Featured Products'|_ }}</strong>
         </header>
-
         <div class="f-widget-content">
             {{ THIS.view('catalog/product/grid-tiles').set({
+                lg_columns: cnt,
+                md_columns: cnt,
+                sm_columns: 4,
+                xs_columns: 2,
                 products: featured,
                 simple_view: true,
                 list_name: 'Featured Products',

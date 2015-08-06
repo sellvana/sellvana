@@ -827,4 +827,43 @@ class Sellvana_Catalog_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_5_2_0__0_5_3_0()
+    {
+        $tProductMedia = $this->Sellvana_Catalog_Model_ProductMedia->table();
+        $this->BDb->ddlTableDef($tProductMedia, [
+            BDb::COLUMNS => [
+                'main_thumb' => 'RENAME is_thumb BOOL DEFAULT 0',
+                'is_default' => 'BOOL DEFAULT 0',
+                'is_rollover' => 'BOOL DEFAULT 0',
+                'in_gallery' => 'BOOL DEFAULT 1',
+            ]
+        ]);
+
+        $productMedia = $this->Sellvana_Catalog_Model_ProductMedia->orm()->where("is_thumb", 1)->find_many();
+        /** @var Sellvana_Catalog_Model_ProductMedia $pm */
+        foreach ($productMedia as $pm) {
+            $pm->set(['is_default' => 1, 'is_rollover' => 1])->save();
+        }
+
+    }
+
+    public function upgrade__0_5_3_0__0_5_4_0()
+    {
+        $tSku = $this->Sellvana_Catalog_Model_InventorySku->table();
+        $this->BDb->ddlTableDef($tSku, [
+            BDb::COLUMNS => [
+                'hs_tariff_number' => 'varchar(20) default null',
+                'origin_country' => 'char(2) default null',
+            ],
+        ]);
+    }
+/*
+//TODO: abstract root folder to @media/ etc
+    public function upgrade__0_5_4_0__0_5_5_0()
+    {
+        $tProductMedia = $this->Sellvana_Catalog_Model_ProductMedia->table();
+        $this->BDb->run("UPDATE {$tProductMedia} set folder=REPLACE(folder, 'media/', '@media/')");
+    }
+*/
 }

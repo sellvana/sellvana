@@ -2,9 +2,24 @@ modules:
     Sellvana_ShippingEasyPost:
         version: 0.5.0.0
         channel: alpha
-        require: { module: { FCom_Core: 0.1.0 } }
-        #autoload: lib
+        require: { module: { FCom_Core: 0.1.0, Sellvana_Sales: 0.5.4.0 } }
+        autoload: lib
+
+        auto_use: [ bootstrap ]
+
+        observe:
+            - [ Sellvana_Sales_Model_Cart::serviceCheckNeeded, Sellvana_ShippingEasyPost_Main.serviceCheckNeeded ]
+            - [ Sellvana_Sales_Model_Order_Shipment_State_Overall::changeState, Sellvana_ShippingEasyPost_Main.onShipmentStateChange ]
 
         areas:
             FCom_Admin:
                 auto_use: [ layout, views, bootstrap ]
+
+        default_config:
+            modules:
+                Sellvana_ShippingEasyPost:
+                    enabled: 1
+                    label: EasyPost
+                    max_package_weight: 150
+                    mode: test
+                    sort_order: 20

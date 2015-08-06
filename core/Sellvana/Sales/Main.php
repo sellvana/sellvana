@@ -28,7 +28,7 @@ class Sellvana_Sales_Main extends BClass
             'settings/Sellvana_SalesPaymentMethods' => $locale->_('Sales Payment Methods Settings'),
         ]);
 
-        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal'] as $total) {
+        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal', 'AmountDue'] as $total) {
             $this->Sellvana_Sales_Model_Cart->registerTotalRowHandler('Sellvana_Sales_Model_Cart_Total_' . $total);
         }
 
@@ -235,12 +235,37 @@ class Sellvana_Sales_Main extends BClass
             'icon' => 'inbox',
             'view' => 'order/dashboard/orders-list',
             'async' => true,
+            'filter' => true,
         ]);
         $view->addWidget('orders-totals', [
             'title' => 'Order Totals',
             'icon' => 'inbox',
             'view' => 'order/dashboard/orders-totals',
             'cols' => 4,
+            'async' => true,
+            'filter' => true
+        ]);
+        $view->addWidget('avg-order-value', [
+            'title' => 'Average Order Value',
+            'icon' => 'inbox',
+            'cols' => 2,
+            'view' => 'order/dashboard/avg-order-value',
+            'async' => true,
+            'filter' => true
+        ]);
+        $view->addWidget('top-products', [
+            'title' => 'Top Products',
+            'icon' => 'inbox',
+            'cols' => 4,
+            'view' => 'order/dashboard/top-products',
+            'async' => true,
+            'filter' => true
+        ]);
+        $view->addWidget('top-products-chart', [
+            'title' => 'Top Products (Chart)',
+            'icon' => 'inbox',
+            'cols' => 4,
+            'view' => 'order/dashboard/top-products-chart',
             'async' => true,
             'filter' => true
         ]);

@@ -5,8 +5,9 @@
  *
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  */
-class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
+abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements Sellvana_CatalogIndex_Indexer_Interface
 {
 
     protected static $_maxChunkSize = 100;
@@ -33,6 +34,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
                 $this->indexProducts($chunk);
                 echo 'DONE CHUNK ' . $i . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true) . "\n";
             }
+            $this->indexGC();
             return;
         }
 
@@ -111,8 +113,10 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
                 //->offset($start)
                 ->find_many();
             $this->indexProducts($products);
-            echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
+            if (!$this->BRequest->xhr()) {
+                echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
                 . ' - ' . (time() - $t) . "s\n";
+            }
             $t = time();
             //$start += static::$_maxChunkSize;
         } while (sizeof($products) == static::$_maxChunkSize);
@@ -203,7 +207,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
         return preg_split('#[ \t\n\r]#', $string, null, PREG_SPLIT_NO_EMPTY);
     }
 
-    protected function _buildBus()
+    protected function _buildBus(array $params)
     {
         $bus = [
             'request' => [

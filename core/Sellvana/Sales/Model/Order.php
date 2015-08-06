@@ -335,6 +335,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
                 'shipping_size' => $item->get('shipping_size'),
                 'shipping_weight' => $item->get('shipping_weight'),
                 'data_serialized' => $item->get('data_serialized'),
+                'cost' => $item->get('cost'),
             ])->save();
 
             if ($orderItem->get('qty_backordered') == $orderItem->get('qty_ordered')) {
@@ -369,8 +370,8 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
             'tax_amount' => $cart->get('tax_amount'),
             'discount_amount' => $cart->get('discount_amount'),
             'grand_total' => $cart->get('grand_total'),
-            'amount_paid' => 0,
-            'amount_due' => $cart->get('grand_total'),
+            'amount_paid' => $cart->get('amount_paid'),
+            'amount_due' => $cart->get('amount_due'),
         ]);
 
         $this->setData('totals', $cart->getData('totals'));
@@ -385,12 +386,13 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         $service = $cart->get('shipping_service');
         $methods = $this->Sellvana_Sales_Main->getShippingMethods();
         $services = $methods[$method]->getServices();
+        $serviceTitle = isset($services[$service]) ? $services[$service] : $service;
 
         $this->set([
             'shipping_price' => $cart->get('shipping_price'),
             'shipping_method' => $method,
             'shipping_service' => $service,
-            'shipping_service_title' => $methods[$method]->getDescription() . ' - ' . $services[$service]
+            'shipping_service_title' => $methods[$method]->getDescription() . ' - ' . $serviceTitle
         ]);
 
         return $this;

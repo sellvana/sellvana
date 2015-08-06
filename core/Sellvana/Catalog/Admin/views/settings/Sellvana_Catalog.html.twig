@@ -3,6 +3,7 @@
 {% set fieldValidate = fieldData|merge({  attr: 'data-rule-number="true"', input_class: 'input-stock' }) %}
 {% set prod = APP.instance('Sellvana_Catalog_Model_Product') %}
 {% set backOrders = prod.backOrders() %}
+{% set rolloverEffects = prod.getRolloverEffects() %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 <h2>{{ "Catalog Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-Sellvana_Catalog'}) }}
@@ -16,5 +17,11 @@
     {{ forms.accordion_panel_end }}
     {{ forms.accordion_panel_start({label:'Web'|_, id:'settings-Sellvana_Catalog-group1'}) }}
         {{ forms.input(fieldData, {field:'url_prefix', label:'URL Prefix'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'enable_rollover', label:'Enable Rollover Effect'|_ }) }}
+        {{ forms.select(fieldData, {field:'rollover_effect', label:'Rollover Effect'|_, options: rolloverEffects }) }}
+    {{ forms.accordion_panel_end }}
+    {{ forms.accordion_panel_start({label:'Units'|_, id:'settings-Sellvana_Catalog-group2'}) }}
+        {{ forms.select(fieldData, {field:'weight_unit', label:'Default Weight Unit'|_, options: {lb: 'Pound (lb)', kg: 'Kilogram (kg)'} }) }}
+        {{ forms.select(fieldData, {field:'length_unit', label:'Default Length Unit'|_, options: {in: 'Inch (in)', cm: 'Centimetre (cm)'} }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

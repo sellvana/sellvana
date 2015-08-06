@@ -71,7 +71,9 @@ class FCom_AutoTranslate_Main extends BClass
                 }
                 $translated = htmlspecialchars_decode($result[$string1], ENT_QUOTES);
                 $translated = preg_replace('#<t v="([^"]+)"/>#', '$1', $translated);
-                #$translated = preg_replace_callback('#<t v="([^"]+)"/>#', function($a) { return htmlspecialchars_decode($a[1]); }, $translated);
+                // $translated = preg_replace_callback('#<t v="([^"]+)"/>#', function($a) {
+                //     return htmlspecialchars_decode($a[1]);
+                // }, $translated);
                 $this->_requestCache[$string] = $translated;
             }
         }
@@ -114,16 +116,19 @@ class FCom_AutoTranslate_Main extends BClass
         foreach ((array)$query as $q) {
             $requestUrl .= '&q=' . urlencode($q);
         }
-        $response = $this->BUtil->remoteHttp('GET', $requestUrl, [], ['referer: http://www.sellvana.com/'], ['curl' => true]);
+        $response = $this->BUtil->remoteHttp('GET', $requestUrl, [], ['referer: ' . $this->BRequest->currentUrl()],
+            ['curl' => true]);
         $status = $this->BUtil->lastRemoteHttpInfo();
         #var_dump($this->BUtil->remoteHttp('GET', 'http://ipinfo.io'));
         if ($status['headers']['http']['code'] != 200) {
-            $this->BDebug->notice('Google Translate API error (1): ' . $requestUrl . "\n" . print_r($response, 1) . "\n" . print_r($status, 1));
+            $this->BDebug->notice('Google Translate API error (1): ' . $requestUrl . "\n" . print_r($response, 1) . "\n"
+                                  . print_r($status, 1));
             return false;
         }
         $apiResult = $this->BUtil->fromJson($response);
         if (empty($apiResult['data']['translations'])) {
-            $this->BDebug->notice('Google Translate API error (2): ' . $requestUrl . "\n" . print_r($response, 1) . "\n" . print_r($status, 1));
+            $this->BDebug->notice('Google Translate API error (2): ' . $requestUrl . "\n" . print_r($response, 1) . "\n"
+                                  . print_r($status, 1));
             return false;
         }
         $translations = $apiResult['data']['translations'];

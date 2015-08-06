@@ -25,7 +25,9 @@ class Sellvana_Catalog_Frontend extends BClass
         if (!$cnt) {
             $cnt = 6;
         }
-        return $this->Sellvana_Catalog_Model_Product->orm()->where('is_featured', 1)->limit($cnt)->find_many();
+        $products = $this->Sellvana_Catalog_Model_Product->orm()->where('is_featured', 1)->limit($cnt)->find_many();
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
+        return $products;
     }
 
     public function getPopularProducts($cnt = null)
@@ -33,7 +35,19 @@ class Sellvana_Catalog_Frontend extends BClass
         if (!$cnt) {
             $cnt = 6;
         }
-        return $this->Sellvana_Catalog_Model_Product->orm()->where('is_popular', 1)->limit($cnt)->find_many();
+        $products = $this->Sellvana_Catalog_Model_Product->orm()->where('is_popular', 1)->limit($cnt)->find_many();
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
+        return $products;
+    }
+
+    public function getCustomFlagProducts($field, $cnt = null)
+    {
+        if (!$cnt) {
+            $cnt = 6;
+        }
+        $products = $this->Sellvana_Catalog_Model_Product->orm()->where($field, 1)->limit($cnt)->find_many();
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
+        return $products;
     }
 
     public function onSitemapsIndexXmlBefore($args)

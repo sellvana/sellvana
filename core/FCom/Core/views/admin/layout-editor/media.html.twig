@@ -4,29 +4,42 @@
     {{ forms.input({label: "Width"|_, name: "#{context.prefix}[widgets][#{widget.id}][width]", value: widget.width|default('640'), field: "width-#{widget.id}"}) }}
     {{ forms.input({label: "Height"|_, name: "#{context.prefix}[widgets][#{widget.id}][height]", value: widget.height|default('320'), field: "height-#{widget.id}"}) }}
     {{ forms.hidden({name: "#{context.prefix}[widgets][#{widget.id}][src]", value: widget.src, field: "src-#{widget.id}"}) }}
-    <div id="lib-images-{{ widget.id }}"></div>
-    {% set type = 'images' %}
-    {% set medialibConfig = {
-    id: 'all_' ~ type,
-        mode: 'images',
-        type: 'images',
-        title: 'Images',
-        folder: 'media/product/images',
-        config: {actions: {delete: {caption : 'Remove'}}}
-    } %}
+    <div id="lib-images-{{ widget.id }}">
+        {% set type = 'images' %}
+        {% set medialibConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({'id': 'all_' ~ type}) %}
+        <!-- Att -->
+        <button type="button" class='btn btn-primary' id='{{ medialibConfig.id }}-media-modal-toggle'>{{ "Select Image"|_ }}</button>
+        <div id="{{ medialibConfig.config.id }}-media-modal" class="fade modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">{{ "Choose Image"|_ }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        {{ LAYOUT.view('core/griddle').set('grid', medialibConfig) | raw }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    {% set imageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({id: 'insert_media_main_grid' ~ widget.id}) %}
-
-    {% set attachmentsConfig = {
-        type: type,
-        targetType: 'images',
-        elementContainer: '#lib-images-' ~ widget.id,
-        medialibConfig: medialibConfig,
-        gridConfig: imageConfig
-    } %}
-    <!-- Att -->
-    {{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}
-    <!-- Att end -->
-
+        <script type="text/javascript">
+            require(['jquery'], function ($) {
+                var mediaModal = $('#{{ medialibConfig.config.id }}-media-modal');
+                if (mediaModal) {
+                    $('#{{ medialibConfig.config.id }}-media-modal-toggle').on('click', function () {
+                        mediaModal.modal('show');
+                    });
+                }
+            });
+        </script>
+        <!-- Att end -->
+    </div>
     {{ layout.widget_custom_params(widget, library, context) }}
 {% endmacro %}

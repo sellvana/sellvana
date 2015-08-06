@@ -97,6 +97,7 @@ class BRequest extends BClass
      */
     public function setArea($area)
     {
+        //TODO: $this->_area = preg_replace('#^fcom_#', '', strtolower($area));
         $this->_area = $area;
         return $this;
     }
@@ -341,13 +342,13 @@ class BRequest extends BClass
     protected static $_webRootCache = [];
 
     /**
-    * Web root path for current application
-    *
-    * If request is /folder1/folder2/index.php, return /folder1/folder2/
-    *
-    * @param $parent if required a parent of current web root, specify depth
-    * @return string
-    */
+     * Web root path for current application
+     *
+     * If request is /folder1/folder2/index.php, return /folder1/folder2/
+     *
+     * @param $parent if required a parent of current web root, specify depth
+     * @return string
+     */
     public function webRoot($parentDepth = 0)
     {
         if (isset(static::$_webRootCache[$parentDepth])) {
@@ -509,12 +510,12 @@ class BRequest extends BClass
     }
 
     /**
-    * Request raw POST text
-    *
-    * @param bool $json Receive request as JSON
-    * @param bool $asObject Return as object vs array
-    * @return object|array|string
-    */
+     * Request raw POST text
+     *
+     * @param bool $json Receive request as JSON
+     * @param bool $asObject Return as object vs array
+     * @return object|array|string
+     */
     public function rawPost()
     {
         $post = file_get_contents('php://input');
@@ -1093,6 +1094,11 @@ class BRequest extends BClass
         return $this;
     }
 
+    /**
+     * @param $data
+     * @param $forUrlPath
+     * @param null $curPath
+     */
     public function stripTagsRecursive(&$data, $forUrlPath, $curPath = null)
     {
         $allowedTags = $this->getAllowedTags();
@@ -1518,12 +1524,6 @@ class BResponse extends BClass
         $this->output();
     }
 
-    /**
-    * Redirect browser to another URL
-    *
-    * @param string $url URL to redirect
-    * @param int $status Default 302 (temporary), another possible value 301 (permanent)
-    */
     public function redirect($url, $status = 302)
     {
         $this->BSession->close();
@@ -1747,11 +1747,11 @@ class BRouting extends BClass
     }
 
     /**
-    * Change route part (usually 1st)
-    *
-    * @param string $partValue
-    * @param mixed $options
-    */
+     * Change route part (usually 1st)
+     *
+     * @param string $partValue
+     * @param mixed $options
+     */
     public function changeRoute($from, $opt)
     {
         if (!is_array($opt)) {
@@ -2030,6 +2030,12 @@ class BRouting extends BClass
         return $this->processRoutePath($args['target'], $args);
     }
 
+    /**
+     * @param $from
+     * @param $to
+     * @param array $args
+     * @return $this
+     */
     public function redirect($from, $to, $args = [])
     {
         $args['target'] = $to;
@@ -2239,12 +2245,12 @@ class BRouteNode extends BClass
     }
 
     /**
-    * Add an observer to the route node
-    *
-    * @param mixed $callback
-    * @param array $args
-    * @param boolean $multiple whether to allow multiple observers for the route
-    */
+     * Add an observer to the route node
+     *
+     * @param mixed $callback
+     * @param array $args
+     * @param boolean $multiple whether to allow multiple observers for the route
+     */
     public function observe($callback, $args = null, $multiple = true)
     {
         $observer = new BRouteObserver([

@@ -56,10 +56,7 @@ class Sellvana_Cms_Frontend_View_FormFields extends FCom_Core_View_Abstract
      */
     public function getFormMethod()
     {
-        $method = "get";
-        if($this->_hasUpload || $this->_bigInput){
-            $method = 'post';
-        }
+        $method = "post";
         return $method;
     }
 

@@ -992,12 +992,19 @@ if ($args['name']==="Sellvana_Referrals") {
         $area = $this->BRequest->area();
         $areaDir = str_replace('FCom_', '', $area);
         if (isset($auto['all']) || isset($auto['bootstrap'])) { // TODO: check for is_callable() ?
+            if (!isset($this->bootstrap)) {
+                $this->bootstrap = [];
+            }
+            /*
+            if (method_exists($this->name, 'bootstrap')) {
+                $this->bootstrap[] = ['callback' => $this->name . '::bootstrap'];
+            }
+            */
+            if (method_exists($this->name . '_Main', 'bootstrap')) {
+                $this->bootstrap[] = ['callback' => $this->name . '_Main::bootstrap'];
+            }
             if (method_exists($this->name . '_' . $areaDir, 'bootstrap')) {
-                $this->bootstrap = ['callback' => $this->name . '_' . $areaDir . '::bootstrap'];
-            } elseif (method_exists($this->name . '_Main', 'bootstrap')) {
-                $this->bootstrap = ['callback' => $this->name . '_Main::bootstrap'];
-            } elseif (method_exists($this->name, 'bootstrap')) {
-                $this->bootstrap = ['callback' => $this->name . '::bootstrap'];
+                $this->bootstrap[] = ['callback' => $this->name . '_' . $areaDir . '::bootstrap'];
             }
         }
         $this->BLayout->addModuleViewsDirsAndLayouts($this, $area);
@@ -1320,17 +1327,22 @@ if (!isset($o[0]) || !isset($o[1])) {
         $this->BEvents->fire('BModule::bootstrap:before', ['module' => $this]);
 
         if (!empty($this->bootstrap)) {
-            if (!empty($this->bootstrap['file'])) {
-                $includeFile = $this->BUtil->normalizePath($this->root_dir . '/' . $this->bootstrap['file']);
-                BDebug::debug('MODULE.BOOTSTRAP ' . $includeFile);
-                require_once ($includeFile);
+            if (empty($this->bootstrap[0])) {
+                $this->bootstrap = [$this->bootstrap];
             }
-            if (!empty($this->bootstrap['callback'])) {
-                $start = BDebug::debug($this->BLocale->_('Start bootstrap for %s', [$this->name]));
-                $this->BUtil->call($this->bootstrap['callback']);
-                #$mod->run_status = BModule::LOADED;
-                BDebug::profile($start);
-                BDebug::debug($this->BLocale->_('End bootstrap for %s', [$this->name]));
+            foreach ($this->bootstrap as $bootstrap) {
+                if (!empty($bootstrap['file'])) {
+                    $includeFile = $this->BUtil->normalizePath($this->root_dir . '/' . $bootstrap['file']);
+                    BDebug::debug('MODULE.BOOTSTRAP ' . $includeFile);
+                    require_once($includeFile);
+                }
+                if (!empty($bootstrap['callback'])) {
+                    $start = BDebug::debug($this->BLocale->_('Start bootstrap for %s', [$this->name]));
+                    $this->BUtil->call($bootstrap['callback']);
+                    #$mod->run_status = BModule::LOADED;
+                    BDebug::profile($start);
+                    BDebug::debug($this->BLocale->_('End bootstrap for %s', [$this->name]));
+                }
             }
         }
 

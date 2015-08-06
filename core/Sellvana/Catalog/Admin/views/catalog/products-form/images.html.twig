@@ -1,5 +1,5 @@
 {% set m = THIS.get('model') %}
-{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfigForGriddle(m) %}
+{% set prodImagesConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 
 {% set type = 'images' %}
 {% set targetType = 'product' %}
@@ -89,6 +89,7 @@
                     file_size: row.file_size,
                     label: row.label,
                     position: row.position,
+                    in_gallery: row.in_galery,
                     subfolder: row.subfolder,
                     id: guid()
                 });
@@ -157,7 +158,8 @@
             });
         }
     };*/
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp',
+        'jquery.fileupload-ui', 'griddle.fcomMediaLib'], function () {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
         var file_error = [];
         $('#quick-add-images')
@@ -182,7 +184,7 @@
                                 addRows.push(obj);
 
                                 //check combine grid already had this image
-                                if (combineGrid && !_.findWhere(combineGrid.getRows(), { file_id: obj.id })) {
+                                if (combineGrid && !_.findWhere(combineGrid.getRows(), {file_id: obj.id})) {
                                     var combineRow = $.extend({}, obj, {
                                         _new: true,
                                         id: guid(),
@@ -191,6 +193,7 @@
                                         create_at: current,
                                         //temporary value before implement edit inline
                                         position: 0,
+                                        in_gallery: 1,
                                         label: FCom.Mixin.removeSpecialChars(obj.file_name)
                                     });
                                     combineAddRows.push(combineRow);
@@ -213,7 +216,11 @@
                         }
 
                         if (success) {
-                            $.bootstrapGrowl("Successfully uploaded.", { type: 'success', align: 'center', width: 'auto' });
+                            $.bootstrapGrowl("Successfully uploaded.", {
+                                type: 'success',
+                                align: 'center',
+                                width: 'auto'
+                            });
                         }
                     }
                 })

@@ -1233,7 +1233,7 @@ class BUtil extends BClass
             $respHeaders = isset($http_response_header) ? $http_response_header : [];
         }
         foreach ($respHeaders as $i => $line) {
-            if ($i) {
+            if ($i && strpos($line, ':')) {
                 $arr = explode(':', $line, 2);
                 static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {
@@ -2959,6 +2959,7 @@ class BDebug extends BClass
     {
         $this->BUtil->ensureDir($dir);
         static::$_logDir = $dir;
+        return $this;
     }
 
     /**
@@ -2969,12 +2970,16 @@ class BDebug extends BClass
     public function log($msg, $file = 'debug.log', $backtrace = false)
     {
         $file = static::$_logDir . '/' . $file;
+        if (!is_scalar($msg)) {
+            $msg = print_r($msg, 1);
+        }
         error_log($msg . "\n", 3, $file);
         if ($backtrace) {
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             error_log(ob_get_clean(), 3, $file);
         }
+        return $this;
     }
 
     /**
@@ -2982,7 +2987,8 @@ class BDebug extends BClass
      */
     public function logException($e)
     {
-        static::log(print_r($e, 1), 'exceptions.log');
+        $this->log(print_r($e, 1), 'exceptions.log');
+        return $this;
     }
 
     /**

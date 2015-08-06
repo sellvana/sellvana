@@ -7,6 +7,7 @@
 {% set mediaLibAttachConfigProcessed = THIS.view('core/griddle').set('grid', mediaLibAttachConfig).getGridConfig() %}
 
 <div id="{{ config.id }}-media-modal-container"></div>
+<div id="{{ config.id }}-media-container"></div>
 
 <script type="text/javascript">
     /**
@@ -45,25 +46,43 @@
         var mediaConfig = {{ UTIL.toJSON(mediaLibAttachConfigProcessed) | raw }};
         var uploadConfig = {{ UTIL.toJSON(uploadConfig) | raw }};
         var modalConfig = getMediaModalConfig(mediaGridId);
+        var mainConfig = {{ UTIL.toJSON(config) | raw }};
 
-        var modalEle = document.getElementById(mediaGridId + '-media-modal-container');
-        mediaLibComponent{{ config.id }} = React.render(React.createElement(FComMediaLib, { mediaConfig: mediaConfig, uploadConfig: uploadConfig, modalConfig: modalConfig}), modalEle);
+        if (typeof mainConfig.showModal !== 'undefined' && mainConfig.showModal === false) {
+            var containerEle = document.getElementById(mediaGridId + '-media-container');
+        } else {
+            var containerEle = document.getElementById(mediaGridId + '-media-modal-container');
+        }
+
+        mediaLibComponent{{ config.id }} = React.render(React.createElement(FComMediaLib, {
+            mediaConfig: mediaConfig,
+            uploadConfig: uploadConfig,
+            modalConfig: modalConfig,
+            showModal: mainConfig.showModal
+        }), containerEle);
         mediaLibGrid{{ config.id }} = mediaLibComponent{{ config.id }}.getMainGridComponent();
 
         //re-scan image button
-        $(mediaLibComponent{{ config.id }}.getDOMNode()).find('.btn-rescan-images').on('click', function() {
-            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}', { do: 'rescan'}, function (response) {
-                if (response.status == 'success') {
-                    $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
-                    mediaLibGrid{{ config.id }}.refresh();
-                } else {
-                    $.bootstrapGrowl("Error:<br>" + response.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-                }
-            });
+        $(mediaLibComponent{{ config.id }}.getDOMNode()).find('.btn-rescan-images').on('click', function () {
+            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}',
+                    {do: 'rescan'}, function (response) {
+                        if (response.status == 'success') {
+                            $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});
+                            mediaLibGrid{{ config.id }}.refresh();
+                        } else {
+                            $.bootstrapGrowl("Error:<br>" + response.message, {
+                                type: 'danger',
+                                align: 'center',
+                                width: 'auto',
+                                delay: 5000
+                            });
+                        }
+                    });
         });
     });
 
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp',
+        'jquery.fileupload-ui', 'griddle.fcomMediaLib'], function () {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
         $('#{{config.id}}-media-upload').fileupload({
             url: uploadUrl,
@@ -73,7 +92,7 @@
             {% elseif uploadConfig.filetype_regex %}
             , acceptFileTypes: {{ uploadConfig.filetype_regex }}
             {% endif %}
-        }).bind('fileuploadalways', function(e, data) {
+        }).bind('fileuploadalways', function (e, data) {
             //console.log('DEBUG: fileuploadalways.data', data);
 
             var mediaGrid = mediaLibGrid{{ config.id }};
@@ -81,7 +100,7 @@
             if (mediaGrid) {
                 //push data to media grid after upload
                 if ($.isArray(data.result.files)) {
-                    var rows = [], selectedRows =[];
+                    var rows = [], selectedRows = [];
                     data.result.files.forEach(function (obj) {
                         {% if config.multiSelAllowed %}
                         selectedRows.push(obj);
@@ -89,8 +108,8 @@
 
                         rows.push(obj);
 
-                        $('td.name span').each(function(i) {
-                            if($(this).html() === obj.file_name) {
+                        $('td.name span').each(function (i) {
+                            if ($(this).html() === obj.file_name) {
                                 $(this).parents('tr:first').remove();
                             }
                         });

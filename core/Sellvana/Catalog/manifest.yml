@@ -1,6 +1,6 @@
 modules:
     Sellvana_Catalog:
-        version: 0.5.2.0
+        version: 0.5.4.0
         channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
@@ -12,7 +12,13 @@ modules:
             - [ "FCom_Core_LayoutEditor::fetchLibrary", "Sellvana_Catalog_Main.onLayoutEditorFetchLibrary" ]
 
         default_config:
-            modules/Sellvana_Catalog/allowed_locales: [ en_US ]
+            modules:
+                Sellvana_Catalog:
+                    allowed_locales: [ en_US ]
+                    weight_unit: lb
+                    length_unit: in
+                    enable_rollover: true
+                    rollover_effect: fade
 
         areas:
             FCom_Admin:
@@ -29,6 +35,9 @@ modules:
                     - [ /catalog/searchalias/.action, Sellvana_Catalog_Admin_Controller_SearchAlias ]
 
                     - [ "/catalog/inventory/?.action", Sellvana_Catalog_Admin_Controller_Inventory ]
+
+                    - [ /catalog/report/search_terms/?.action, Sellvana_Catalog_Admin_Controller_Report_SearchTerms ]
+                    - [ /catalog/report/product_orders_history/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory ]
                 observe:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, Sellvana_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, Sellvana_Catalog_Admin_Controller_Products.onGenerateSiteMap ]

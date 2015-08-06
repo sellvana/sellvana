@@ -30,14 +30,14 @@
 
 class BImport extends BClass
 {
-    protected $fields = [];
-    protected $dir = 'shared';
-    protected $model = '';
+    protected $_fields = [];
+    protected $_dir = 'shared';
+    protected $_model = '';
 
     public function getFieldData()
     {
-        $this->BEvents->fire(__METHOD__, ['fields' => &$this->fields]);
-        return $this->fields;
+        $this->BEvents->fire(__METHOD__, ['fields' => &$this->_fields]);
+        return $this->_fields;
     }
 
     public function getFieldOptions()
@@ -51,7 +51,7 @@ class BImport extends BClass
 
     public function getImportDir()
     {
-        return $this->FCom_Core_Main->dir('storage/' . $this->BConfig->get('core/storage_random_dir') . '/import/' . $this->dir);
+        return $this->FCom_Core_Main->dir('storage/' . $this->BConfig->get('core/storage_random_dir') . '/import/' . $this->_dir);
         //return $this->FCom_Core_Main->dir('storage/import/' . $this->dir);
     }
 
@@ -122,7 +122,7 @@ class BImport extends BClass
      */
     public function config($config = null, $update = false)
     {
-        $dir = $this->FCom_Core_Main->dir('storage/run/' . $this->dir);
+        $dir = $this->FCom_Core_Main->dir('storage/run/' . $this->_dir);
         $this->BUtil->ensureDir($dir);
         $file = $this->BSession->sessionId() . '.json';
         $filename = $dir . '/' . $file;
@@ -163,11 +163,11 @@ class BImport extends BClass
 
         $timer = microtime(true);
 
-        if (empty($this->model)) {
+        if (empty($this->_model)) {
             throw new BException("Model is required");
         }
 
-        $modelClass = $this->model;
+        $modelClass = $this->_model;
         $model = $modelClass::i();
 
         if (!method_exists($model, 'import')) {

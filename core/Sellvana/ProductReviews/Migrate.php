@@ -142,4 +142,18 @@ class Sellvana_ProductReviews_Migrate extends BClass
             ])->save();
         }
     }
+
+
+    public function upgrade__0_5_0_0__0_5_1_0()
+    {
+        $table = $this->Sellvana_ProductReviews_Model_Review->table();
+        $this->BDb->ddlTableDef($table, [
+            BDb::COLUMNS => [
+                'rating1'           => BDb::DROP,
+                'rating2'           => BDb::DROP,
+                'rating3'           => BDb::DROP,
+                'verified_purchase' => 'tinyint(1) unsigned not null after rating'
+            ],
+        ]);
+    }
 }

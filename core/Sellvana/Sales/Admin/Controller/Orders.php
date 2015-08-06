@@ -116,6 +116,9 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['field' => 'state_payment', 'type' => 'multiselect'],
             ['field' => 'state_delivery', 'type' => 'multiselect'],
             ['field' => 'state_custom', 'type' => 'multiselect'],
+
+            // ['field' => 'billing_name', 'type' => 'text'],
+            // ['field' => 'shipping_name', 'type' => 'text'],
         ];
 
         return $config;
@@ -129,9 +132,19 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         parent::gridOrmConfig($orm);
 
         $orm->select($this->_mainTableAlias . '.*');
+        #Todo: This query will remove after fix filter for some special columns
+        // $orm->raw_query('SELECT * FROM (SELECT *, CONCAT_WS(" ", billing_street1, billing_city) AS billing_address, CONCAT_WS(" ", billing_firstname, billing_lastname) AS billing_name, CONCAT_WS(" ", shipping_firstname, shipping_lastname) AS shipping_name, CONCAT_WS(" ", shipping_street1, shipping_city) AS shipping_address, COUNT(*) AS count FROM fcom_sales_order) AS '.$this->_mainTableAlias);
+        $orm->select_expr('CONCAT_WS(" ", o.billing_street1, o.billing_city)', 'billing_address')
+            ->select_expr('CONCAT_WS(" ", o.billing_firstname, o.billing_lastname)', 'billing_name')
+            ->select_expr('CONCAT_WS(" ", o.shipping_firstname, o.shipping_lastname)', 'shipping_name')
+            ->select_expr('CONCAT_WS(" ", o.shipping_street1, o.shipping_city)', 'shipping_address');
 
         $orm->left_outer_join('FCom_Admin_Model_User', 'o.admin_id = au.id', 'au')
             ->select_expr('CONCAT_WS(" ", au.firstname,au.lastname)', 'admin_name');
+
+        if ($this->BRequest->get('customer_id')) {
+            $orm->where('o.customer_id', $this->BRequest->get('customer_id'));
+        }
     }
 
     public function gridViewBefore($args)
@@ -325,10 +338,10 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ['type' => 'row_select'],
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70],
             ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
-            ['name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'ab.billing_name'],
-            ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'ab.billing_address'],
-            ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'as.shipping_name'],
-            ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'as.shipping_address'],
+            ['name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'o.billing_name'],
+            ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'o.billing_address'],
+            ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'o.shipping_name'],
+            ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'o.shipping_address'],
             ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
             ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
@@ -340,72 +353,92 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
-            ['field' => 'billing_name', 'type' => 'text'],
-            ['field' => 'shipping_name', 'type' => 'text'],
+            // ['field' => 'billing_name', 'type' => 'text'],
+            // ['field' => 'shipping_name', 'type' => 'text'],
             ['field' => 'grand_total', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
         /** @var BORM $orm */
         $orm = $config['orm'];
         $orm->where('customer_id', $customer->id());
+        $config['data_url'] = $config['data_url'] . '?customer_id='.$customer->id;
         $this->gridOrmConfig($orm);
 
         return ['config' => $config];
     }
 
+    /**
+     * @param ORM $orm
+     * @param string $field
+     */
+    protected function _processFilters($orm, $field = 'o.create_at')
+    {
+        $filter = $this->BApp->get('dashboard_date_filter');
+        $cond = $field . ' ' . $filter['condition'];
+
+        if ($filter) {
+            $orm->where_raw($cond, $filter['params']);
+        }
+    }
+
     public function getOrderRecent()
     {
-        $dayRecent = ($this->BConfig->get('modules/Sellvana_Sales/recent_day')) ? $this->BConfig->get('modules/Sellvana_Sales/recent_day') : 7;
-        $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - $dayRecent * 86400);
-        $result = $this->Sellvana_Sales_Model_Order->orm('o')
+        $orm = $this->Sellvana_Sales_Model_Order->orm('o')
             ->join('Sellvana_Customer_Model_Customer', ['o.customer_id', '=', 'c.id'], 'c')
-            ->where_gte('o.create_at', $recent)
-            ->select(['o.*',  'c.firstname', 'c.lastname'])->find_many();
+            ->select(['o.*', 'c.firstname', 'c.lastname']);
+
+        $this->_processFilters($orm);
+
+        $result = $orm->find_many();
 
         return $result;
     }
 
-    public function getOrderTotal($filter)
+    public function getOrderTotal()
     {
-        /*
-        // TODO: redo the whole thing
-        $orderTotal = $this->Sellvana_Sales_Model_Order_CustomStatus->orm('s')
-            ->left_outer_join('Sellvana_Sales_Model_Order', ['o.status', '=', 's.name'], 'o')
+        $orderTotal = $this->Sellvana_Sales_Model_StateCustom->orm('s')
+            ->left_outer_join('Sellvana_Sales_Model_Order', ['o.state_custom', '=', 's.state_code'], 'o')
             ->group_by('s.id')
             ->select_expr('COUNT(o.id)', 'order')
-            ->select(['s.id', 'name']);
-        $tmp = $result = $orderTotal->find_many();
-        $tmp = [];
-        switch ($filter['type']) {
-            case 'between':
-                $tmp = $orderTotal->where_gte('o.create_at', $filter['min'])->where_lte('o.create_at', $filter['max'])->find_many();
-                break;
-            case 'to':
-                $tmp = $orderTotal->where_lte('o.create_at', $filter['date'])->find_many();
-                break;
-            case 'from':
-                $tmp = $orderTotal->where_gte('o.create_at', $filter['date'])->find_many();
-                break;
-            case 'equal':
-                $tmp = $orderTotal->where_like('o.create_at', $filter['date'] . '%')->find_many();
-                break;
-            case 'not_in':
-                $tmp = $orderTotal->where_raw('o.create_at', 'NOT BETWEEN ? AND ?', $filter['min'], $filter['max'])->find_many();
-                break;
-            default:
-                break;
-        }
-        foreach ($result as $obj) {
-            $order = 0;
-            foreach ($tmp as $key) {
-                if ($obj->get('id') == $key->get('id')) {
-                    $order = $key->get('order');
-                }
-            }
-            $obj->set('order', $order);
-        }
-        */
-        $result = [];
+            ->where('s.entity_type', 'order')
+            ->select(['s.id', 's.state_label']);
+
+        $this->_processFilters($orderTotal);
+
+        $result = $orderTotal->find_many();
+        return $result;
+    }
+
+    public function getAvgOrderTotal()
+    {
+        $orderTotal = $this->Sellvana_Sales_Model_Order->orm('o')
+            ->select_expr('AVG(o.grand_total)', 'avg_total');
+
+        $this->_processFilters($orderTotal);
+
+        $result = (float)$orderTotal->find_one()->get('avg_total');
+        return number_format($result, 2);
+    }
+
+    public function getTopProducts()
+    {
+        $items = $this->Sellvana_Sales_Model_Order->orm('o')
+            ->join('Sellvana_Sales_Model_Order_Item', 'oi.order_id = o.id', 'oi')
+            ->join('Sellvana_Catalog_Model_Product', 'p.id = oi.product_id', 'p')
+            ->select_expr('SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2))))', 'profit_fixed');
+        $this->_processFilters($items);
+        $totals = clone $items;
+        $total_profit = $totals->find_one()->get('profit_fixed');
+        $profitExpr = "ROUND(SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2)))) * 100 / {$total_profit}, 2)";
+        $items->select('p.*')
+            ->select_expr('SUM(oi.row_total)', 'revenue')
+            ->select_expr('SUM(oi.qty_ordered)', 'qty')
+            ->select_expr($profitExpr, 'profit_pc')
+            ->group_by('oi.product_id')
+            ->order_by_expr($profitExpr . ' DESC')
+            ->limit(5);
+
+        $result = $items->find_many();
         return $result;
     }
 

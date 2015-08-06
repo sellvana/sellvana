@@ -17,10 +17,10 @@
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
- * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_CatalogFields_Model_ProductVariantField $Sellvana_CatalogFields_Model_ProductVariantField
  */
 class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstract
 {
@@ -146,7 +146,7 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
     /**
      * @param Sellvana_Catalog_Model_Product $product
      * @param array $fieldValues
-     * @return BModel
+     * @return self[]
      * @throws BException
      */
     public function findByProductFieldValues($product, $fieldValues)
