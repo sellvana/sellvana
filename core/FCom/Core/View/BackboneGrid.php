@@ -6,6 +6,7 @@
  * @property array $grid
  *
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * todo: rename class FCom_Core_View_BackboneGrid
  */
 class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 {
@@ -615,7 +616,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $params = ["p", "ps", "s", "sd"/*,"q"*/];
 
             foreach ($params as $p) {
-                $persState[$p] = isset($persState[$p]) ? $persState[$p]
+                $persState[$p] = (isset($persState[$p])  && $persState[$p] != null) ? $persState[$p]
                     : ((isset($config['state']) && isset($config['state'][$p])) ? $config['state'][$p] : null);
             }
 
@@ -640,7 +641,14 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
             $this->processGridFilters($config, $persFilters, $orm);
 
-            $config['state'] = $persState;
+            //apply state from config[state] in case personalize[state] null
+            $params = ["p", "ps", "s", "sd"/*,"q"*/];
+            foreach ($params as $p) {
+                $persState[$p] = (isset($persState[$p]) && $persState[$p] != null) ? $persState[$p]
+                    :  ((isset($config['state']) && isset($config['state'][$p])) ? $config['state'][$p] : null);
+            }
+
+            $grid['result']['state'] = $persState;
             $grid['request'] = (empty($grid['request']))? $persState: $grid['request'];
             try {
                 $grid['result'] = $orm->paginate($grid['request'], [
