@@ -3,7 +3,6 @@
 /**
  * Class FCom_Core_Migrate
  *
- * @property FCom_Core_ImportExport $FCom_Core_ImportExport
  * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
  * @property FCom_Core_Model_ImportExport_Model $FCom_Core_Model_ImportExport_Model
  * @property FCom_Core_Model_ImportExport_Site $FCom_Core_Model_ImportExport_Site
@@ -47,7 +46,7 @@ class FCom_Core_Migrate extends BClass
         ]);
         $this->BConfig->set('cookie/session_check_ip', 1, false, true);
         $this->BConfig->writeConfigFiles();
-        $this->BDb->ddlTableDef($this->FCom_Core_ImportExport->table(), [
+        $this->BDb->ddlTableDef($this->FCom_Core_Model_ImportExport_Id->table(), [
             BDb::COLUMNS => [
                 'id'        => 'int(11)',
                 'store_id'  => 'char(32)',
@@ -57,6 +56,7 @@ class FCom_Core_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
+            BDb::PRIMARY => '(id)',
         ]);
 
         $this->BDb->run("DROP TABLE IF EXISTS fcom_import_info");
@@ -160,7 +160,7 @@ class FCom_Core_Migrate extends BClass
     public function upgrade__0_1_3__0_1_4()
     {
         //Source, model, import id, local id
-        $this->BDb->ddlTableDef($this->FCom_Core_ImportExport->table(), [
+        $this->BDb->ddlTableDef($this->FCom_Core_Model_ImportExport_Id->table(), [
             BDb::COLUMNS => [
                 'id'        => 'int(11)',
                 'store_id'  => 'char(32)',

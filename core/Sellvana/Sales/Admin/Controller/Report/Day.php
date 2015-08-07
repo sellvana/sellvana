@@ -74,7 +74,6 @@ class Sellvana_Sales_Admin_Controller_Report_Day extends FCom_Admin_Controller_A
             ->select_expr("IFNULL(ROUND(100 * SUM(o.item_qty) / {$totals->get('total_item_qty')}, 2), 0)", 'pc_total_item_qty')
             ->select_expr("IFNULL(ROUND(100 * SUM(o.grand_total) / {$totals->get('total_amount')}, 2), 0)", 'pc_total_amount')
             ->select_expr("IFNULL(ROUND(100 * COUNT(o.id) / {$totals->get('order_count')}, 2), 0)", 'pc_orders')
-            ->group_by_expr($expr)
-            ->order_by_expr($expr);
+            ->group_by_expr($expr);
     }
 }
