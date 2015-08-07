@@ -121,7 +121,13 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 30]);
         $columns = [
             ['type' => 'row_select'],
-            ['type' => 'btn_group',  'buttons' => [['name' => 'delete'], ['name' => 'edit', 'callback' => 'showModalToEditVariantPrice']]],
+            [
+                'type' => 'btn_group',  
+                'buttons' => [
+                    ['name' => 'delete'], 
+                    ['name' => 'edit', 'callback' => 'showModalToEditVariantPrice', 'isNew' => ['visibility' => 'hidden']]
+                ]
+            ],
             ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
         ];
 

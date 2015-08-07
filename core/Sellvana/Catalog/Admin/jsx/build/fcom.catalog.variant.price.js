@@ -85,7 +85,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             this.editable = this.checkEditable(price);
             var priceTypes =
                 React.createElement("span", {key: "price_type_wrapper"}, 
-                    React.createElement("select", {key: "price_type", className: "form-control price-type" + (this.editable || this.props.theBase ? " priceUnique": ''), name: this.getFieldName(price, 'price_type'), disabled: !this.editable, defaultValue: price.price_type, ref: "price_type"}, 
+                    React.createElement("select", {key: "price_type", className: "form-control price-type " + (this.editable || this.props.theBase ? this.props.id + "PriceUnique": ''), name: this.getFieldName(price, 'price_type'), disabled: !this.editable, defaultValue: price.price_type, ref: "price_type"}, 
                             _.map(this.props.price_types, function (pt, pk) {
                                 return React.createElement("option", {key: pk, value: pk, disabled: pk == 'promo' ? 'disabled' : null}, pt);
                             })
@@ -95,7 +95,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
 
             var qty = React.createElement("input", {key: "qty_hidden", type: "hidden", name: this.getFieldName(price, "qty"), defaultValue: price.qty});
             if (price.price_type === 'tier') {
-                qty = React.createElement("label", {key: "qty_label"}, Locale._("Qty"), React.createElement("div", {style: {display: "inline-block", width:"30%", margin:"0 0 0 5px"}}, React.createElement("input", {key: "qty", type: "number", step: "1", className: "form-control priceUnique", name: this.getFieldName(price, "qty"), placeholder: Locale._("Qty"), defaultValue: price.qty, onChange: this.props.validate, size: "2", readOnly: this.editable ? null : 'readonly'})));
+                qty = React.createElement("label", {key: "qty_label"}, Locale._("Qty"), React.createElement("div", {style: {display: "inline-block", width:"30%", margin:"0 0 0 5px"}}, React.createElement("input", {key: "qty", type: "number", step: "1", className: "form-control "+this.props.id+"PriceUnique", name: this.getFieldName(price, "qty"), placeholder: Locale._("Qty"), defaultValue: price.qty, onChange: this.props.validate, size: "2", readOnly: this.editable ? null : 'readonly'})));
             }
 
             var dateRange = React.createElement("span", {key: "sale_period"});
@@ -108,7 +108,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
                         dates += price.valid_to;
                     }
                 }
-                dateRange = React.createElement("input", {ref: "sale_period", key: "sale_period", type: "text", className: "form-control priceUnique", name: this.getFieldName(price, "sale_period"), placeholder: Locale._("Select sale dates"), defaultValue: dates, readOnly: this.editable ? null : 'readonly'});
+                dateRange = React.createElement("input", {ref: "sale_period", key: "sale_period", type: "text", className: "form-control "+this.props.id+"PriceUnique", name: this.getFieldName(price, "sale_period"), placeholder: Locale._("Select sale dates"), defaultValue: dates, readOnly: this.editable ? null : 'readonly'});
             }
 
             var operation = null, baseField = null;
@@ -137,7 +137,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             if(this.props.show_customers) {
                 groups =
                     React.createElement("span", {key: "cuatomer_groups"}, 
-                        React.createElement("select", {name: this.getFieldName(price, "customer_group_id"), disabled: this.editable? null: true, onChange: this.updatePrice, defaultValue: price.customer_group_id, "data-type": "customer_group_id", className: "form-control customer-group" + (this.editable ? " priceUnique" : '')}, 
+                        React.createElement("select", {name: this.getFieldName(price, "customer_group_id"), disabled: this.editable? null: true, onChange: this.updatePrice, defaultValue: price.customer_group_id, "data-type": "customer_group_id", className: "form-control customer-group " + (this.editable ? this.props.id + "PriceUnique" : '')}, 
                             React.createElement("option", {value: "*"}, Locale._("Default")), 
                             _.map(this.props.customer_groups, function (val, key) {
                                 return React.createElement("option", {key: key, value: key}, val);
@@ -149,7 +149,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             if(this.props.show_sites) {
                 sites =
                     React.createElement("span", {key: "sites"}, 
-                        React.createElement("select", {name: this.getFieldName(price, "site_id"), disabled: this.editable? null: true, defaultValue: price.site_id, onChange: this.updatePrice, "data-type": "site_id", className: "form-control site" + (this.editable ? " priceUnique": '')}, 
+                        React.createElement("select", {name: this.getFieldName(price, "site_id"), disabled: this.editable? null: true, defaultValue: price.site_id, onChange: this.updatePrice, "data-type": "site_id", className: "form-control site " + (this.editable ? this.props.id + "PriceUnique": '')}, 
                             React.createElement("option", {value: "*"}, Locale._("Default")), 
                             _.map(this.props.sites, function (val, key) {
                                 return React.createElement("option", {key: key, value: key}, val);
@@ -161,7 +161,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             if(this.props.show_currency) {
                 currencies =
                     React.createElement("span", null, 
-                        React.createElement("select", {name: this.getFieldName(price, "currency_code"), disabled: this.editable? null: true, defaultValue: price.currency_code, onChange: this.props.updatePrice, "data-type": "currency_code", className: "form-control currency" + (this.editable? " priceUnique": '')}, 
+                        React.createElement("select", {name: this.getFieldName(price, "currency_code"), disabled: this.editable? null: true, defaultValue: price.currency_code, onChange: this.props.updatePrice, "data-type": "currency_code", className: "form-control currency " + (this.editable? this.props.id + "PriceUnique": '')}, 
                             React.createElement("option", {value: "*"}, Locale._("Default")), 
                             _.map(this.props.currencies, function (val, key) {
                                 return React.createElement("option", {key: key, value: key}, val);
@@ -173,9 +173,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
 
             return (
                 React.createElement("tr", {className: this.props.id + "-price-item"}, 
-                    this.props.variant_id ? React.createElement("input", {type: "hidden", defaultValue: this.props.variant_id, name: this.getFieldName(price, "variant_id")}) : null, 
                     React.createElement("td", null, 
                         this.editable ? React.createElement("a", {href: "javascript:void(0)", className: "btn-remove", "data-id": price.id, id: "remove_price_btn_" + price.id, onClick: this.props.deletePrice}, " ", React.createElement("span", {className: "icon-remove-sign"})) : null, 
+                        this.props.variant_id ? React.createElement("input", {type: "hidden", defaultValue: this.props.variant_id, name: this.getFieldName(price, "variant_id")}) : null, 
                          price.product_id && price.product_id !== "*" ? React.createElement("input", {type: "hidden", name: this.getFieldName(price, "product_id"), defaultValue: price.product_id}) : null
                     ), 
                      this.props.show_customers ? React.createElement("td", null, groups): null, 

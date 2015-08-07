@@ -690,9 +690,9 @@
         };
 
         window.showModalToEditVariantPrice = function(row) {
-            function validatePrices() {
+            function validateVariantPrices() {
                 var valid = true;
-                $('#catalog-variant-prices-form').find('select.priceUnique').each(function (el) {
+                $('#catalog-variant-prices-form').find('select.variantPriceUnique').each(function (el) {
                     if (!$(this).valid()) {
                         valid = false;
                     }
@@ -711,7 +711,7 @@
                 currencies: {{ currencies ? UTIL.toJson(currencies) | raw: 'null' }},
                 product_id: '{{ model.id() }}',
                 variant_id: row.id,
-                validatePrices: validatePrices,
+                validatePrices: validateVariantPrices,
                 priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options'))|raw }},
                 operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options'))|raw }},
                 sale_date_separator: ' / ',
@@ -735,11 +735,12 @@
                         },
                         onConfirm: window.saveVariantPriceModal
                     },
-                    React.createElement('form', {id: 'catalog-variant-prices-form',className: 'form form-horizontal validate-form'}, 
+                    React.createElement('form', {id: 'catalog-variant-prices-form', className: 'form form-horizontal validate-form', noValidate: "novalidate"}, 
                             React.createElement(Price, { id: 'variant', options: options }
             ))), modalContainerEle);
 
-            function validateBaseField(value, element) {
+            function validateVariantBaseField(value, element) {
+                console.log('variant.validateVariantBaseField.element', element);
                 var valid = false;
                 if(typeof element !== 'undefined') {
                     var $parent = $(element).parents('.variant-price-item');
@@ -813,12 +814,12 @@
             /*
              *custom validation function for checking duplicated input
              */
-            function priceUnique(value, elem) {
+            function variantPriceUnique(value, elem) {
                 var form = $(elem).parents('#catalog-variant-prices-form');
                 var valid = true;
                 if (typeof elem !== 'undefined') {
                     var parent = $(elem).parents('.variant-price-item');
-                    var curFields = parent.find('input.priceUnique, select.priceUnique');
+                    var curFields = parent.find('input.variantPriceUnique, select.variantPriceUnique');
                     var currHash = '';
                     curFields.each(function () {
                         currHash += $(this).val();
@@ -834,7 +835,7 @@
                         if (this === parent[0]) {
                             return;
                         }
-                        var fields = $item.find('input.priceUnique, select.priceUnique');
+                        var fields = $item.find('input.variantPriceUnique, select.variantPriceUnique');
                         var checkHash = '';
                         fields.each(function (idx) {
                             checkHash += $(this).val();
@@ -845,11 +846,11 @@
                 }
             }
             
-            $.validator.addMethod('priceUnique', priceUnique, '{{"Same price already exists."|_}}');
-            $.validator.addMethod('base_field', validateBaseField, '{{"No matching base price"|_}}');
+            $.validator.addMethod('variantPriceUnique', variantPriceUnique, '{{"Same price already exists."|_}}');
+            $.validator.addMethod('variantBaseField', validateVariantBaseField, '{{"No matching base price"|_}}');
 
-            $.validator.addClassRules("priceUnique", {
-                priceUnique: true
+            $.validator.addClassRules("variantPriceUnique", {
+                variantPriceUnique: true
             });
             $.validator.addClassRules("base_field", {
                 base_field: true
@@ -858,6 +859,7 @@
     });
 
     window.saveVariantPriceModal = function(modal) {
+        
         var fields  = variantModalNode.find('select, input, textarea'),
             form    = variantModalNode.find('form'),
             url     = '{{ APP.href("catalog/products/save_variant_prices") }}?id='+{{ REQUEST.get('id') }};

@@ -85,7 +85,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             this.editable = this.checkEditable(price);
             var priceTypes =
                 <span key="price_type_wrapper">
-                    <select key="price_type" className={"form-control price-type" + (this.editable || this.props.theBase ? " priceUnique": '')} name={this.getFieldName(price, 'price_type')} disabled={!this.editable} defaultValue={price.price_type} ref="price_type">
+                    <select key="price_type" className={"form-control price-type " + (this.editable || this.props.theBase ? this.props.id + "PriceUnique": '')} name={this.getFieldName(price, 'price_type')} disabled={!this.editable} defaultValue={price.price_type} ref="price_type">
                             {_.map(this.props.price_types, function (pt, pk) {
                                 return <option key={pk} value={pk} disabled={pk == 'promo' ? 'disabled' : null}>{pt}</option>;
                             })}
@@ -95,7 +95,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
 
             var qty = <input key="qty_hidden" type="hidden" name={this.getFieldName(price, "qty")} defaultValue={price.qty}/>;
             if (price.price_type === 'tier') {
-                qty = <label key="qty_label">{Locale._("Qty")}<div style={{display: "inline-block", width:"30%", margin:"0 0 0 5px"}}><input key="qty" type="number" step="1" className="form-control priceUnique" name={this.getFieldName(price, "qty")} placeholder={Locale._("Qty")} defaultValue={price.qty} onChange={this.props.validate} size="2" readOnly={this.editable ? null : 'readonly'}/></div></label>;
+                qty = <label key="qty_label">{Locale._("Qty")}<div style={{display: "inline-block", width:"30%", margin:"0 0 0 5px"}}><input key="qty" type="number" step="1" className={"form-control "+this.props.id+"PriceUnique"} name={this.getFieldName(price, "qty")} placeholder={Locale._("Qty")} defaultValue={price.qty} onChange={this.props.validate} size="2" readOnly={this.editable ? null : 'readonly'}/></div></label>;
             }
 
             var dateRange = <span key="sale_period"/>;
@@ -108,7 +108,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
                         dates += price.valid_to;
                     }
                 }
-                dateRange = <input ref="sale_period" key="sale_period" type="text" className="form-control priceUnique" name={this.getFieldName(price, "sale_period")} placeholder={Locale._("Select sale dates")} defaultValue={dates} readOnly={this.editable ? null : 'readonly'}/>;
+                dateRange = <input ref="sale_period" key="sale_period" type="text" className={"form-control "+this.props.id+"PriceUnique"} name={this.getFieldName(price, "sale_period")} placeholder={Locale._("Select sale dates")} defaultValue={dates} readOnly={this.editable ? null : 'readonly'}/>;
             }
 
             var operation = null, baseField = null;
@@ -137,7 +137,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             if(this.props.show_customers) {
                 groups =
                     <span key="cuatomer_groups">
-                        <select name={this.getFieldName(price, "customer_group_id")} disabled={this.editable? null: true} onChange={this.updatePrice} defaultValue={price.customer_group_id} data-type="customer_group_id" className={"form-control customer-group" + (this.editable ? " priceUnique" : '')}>
+                        <select name={this.getFieldName(price, "customer_group_id")} disabled={this.editable? null: true} onChange={this.updatePrice} defaultValue={price.customer_group_id} data-type="customer_group_id" className={"form-control customer-group " + (this.editable ? this.props.id + "PriceUnique" : '')}>
                             <option value="*">{Locale._("Default")}</option>
                             {_.map(this.props.customer_groups, function (val, key) {
                                 return <option key={key} value={key}>{val}</option>;
@@ -149,7 +149,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             if(this.props.show_sites) {
                 sites =
                     <span key="sites">
-                        <select name={this.getFieldName(price, "site_id")} disabled={this.editable? null: true} defaultValue={price.site_id} onChange={this.updatePrice} data-type="site_id" className={"form-control site" + (this.editable ? " priceUnique": '')}>
+                        <select name={this.getFieldName(price, "site_id")} disabled={this.editable? null: true} defaultValue={price.site_id} onChange={this.updatePrice} data-type="site_id" className={"form-control site " + (this.editable ? this.props.id + "PriceUnique": '')}>
                             <option value="*">{Locale._("Default")}</option>
                             {_.map(this.props.sites, function (val, key) {
                                 return <option key={key} value={key}>{val}</option>;
@@ -161,7 +161,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             if(this.props.show_currency) {
                 currencies =
                     <span>
-                        <select name={this.getFieldName(price, "currency_code")} disabled={this.editable? null: true} defaultValue={price.currency_code} onChange={this.props.updatePrice} data-type="currency_code" className={"form-control currency" + (this.editable? " priceUnique": '')}>
+                        <select name={this.getFieldName(price, "currency_code")} disabled={this.editable? null: true} defaultValue={price.currency_code} onChange={this.props.updatePrice} data-type="currency_code" className={"form-control currency " + (this.editable? this.props.id + "PriceUnique": '')}>
                             <option value="*">{Locale._("Default")}</option>
                             {_.map(this.props.currencies, function (val, key) {
                                 return <option key={key} value={key}>{val}</option>;
@@ -173,9 +173,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
 
             return (
                 <tr className={this.props.id + "-price-item"}>
-                    {this.props.variant_id ? <input type="hidden" defaultValue={this.props.variant_id} name={this.getFieldName(price, "variant_id")} /> : null}
                     <td>
                         {this.editable ? <a href="javascript:void(0)" className="btn-remove" data-id={price.id} id={"remove_price_btn_" + price.id} onClick={this.props.deletePrice}> <span className="icon-remove-sign"></span></a> : null}
+                        {this.props.variant_id ? <input type="hidden" defaultValue={this.props.variant_id} name={this.getFieldName(price, "variant_id")} /> : null}
                         { price.product_id && price.product_id !== "*" ? <input type="hidden" name={this.getFieldName(price, "product_id")} defaultValue={price.product_id}/> : null }
                     </td>
                     { this.props.show_customers ? <td>{groups}</td>: null }
