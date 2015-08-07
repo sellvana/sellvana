@@ -690,6 +690,11 @@
         };
 
         window.showModalToEditVariantPrice = function(row) {
+            if (row.id.match(/\-/g)) {
+                alert('Please save variant before edit it\'s prices');
+                return false;
+            }
+            
             function validateVariantPrices() {
                 var valid = true;
                 $('#catalog-variant-prices-form').find('select.variantPriceUnique').each(function (el) {
@@ -859,7 +864,7 @@
     });
 
     window.saveVariantPriceModal = function(modal) {
-        
+
         var fields  = variantModalNode.find('select, input, textarea'),
             form    = variantModalNode.find('form'),
             url     = '{{ APP.href("catalog/products/save_variant_prices") }}?id='+{{ REQUEST.get('id') }};

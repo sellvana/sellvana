@@ -72,7 +72,7 @@ define(['underscore', 'react'], function (_, React) {
                                 //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
                                     React.createElement("button", {className: "btn btn-link " + btn.cssClass, key: index, title: btn.title ? btn.title : "", type: "button", 
-                                        "data-action": btn.name, "data-row": row.id, style: btn.isNew && row.id.match(/\-/g) ? btn.isNew : null, onClick: that.props.doRowAction.bind(null, btn.callback)}, 
+                                        "data-action": btn.name, "data-row": row.id, onClick: that.props.doRowAction.bind(null, btn.callback)}, 
                                         React.createElement("i", {className: btn.icon, "data-action": btn.name, "data-row": row.id}), 
                                         btn.caption
                                     )
