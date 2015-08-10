@@ -40,6 +40,16 @@ class Sellvana_Catalog_Frontend extends BClass
         return $products;
     }
 
+    public function getCustomFlagProducts($field, $cnt = null)
+    {
+        if (!$cnt) {
+            $cnt = 6;
+        }
+        $products = $this->Sellvana_Catalog_Model_Product->orm()->where($field, 1)->limit($cnt)->find_many();
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
+        return $products;
+    }
+
     public function onSitemapsIndexXmlBefore($args)
     {
         $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size');

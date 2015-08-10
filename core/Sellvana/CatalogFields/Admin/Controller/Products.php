@@ -10,6 +10,7 @@
  * @property Sellvana_CatalogFields_Model_Set $Sellvana_CatalogFields_Model_Set
  * @property Sellvana_CatalogFields_Model_SetField $Sellvana_CatalogFields_Model_SetField
  * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property FCom_Core_Main $FCom_Core_Main
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
@@ -101,7 +102,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                 'actions' => [
                    'delete' => ['caption' => 'Remove']
                 ],
-                'grid_before_create' => 'variantFieldGridRegister',
+                'grid_before_create' => 'variantFieldGriddleRegister',
                 'callbacks' => [
                     'componentDidMount' => 'variantFieldGriddleRegister'
                 ]
@@ -120,6 +121,13 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 30]);
         $columns = [
             ['type' => 'row_select'],
+            [
+                'type' => 'btn_group',  
+                'buttons' => [
+                    ['name' => 'delete'], 
+                    ['name' => 'edit', 'callback' => 'showModalToEditVariantPrice', 'isNew' => ['visibility' => 'hidden']]
+                ]
+            ],
             ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
         ];
 
@@ -164,21 +172,16 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
 #var_dump($columns); exit;
         }
         $image = $this->variantImageGrid($model);
-        $columns[] = ['type' => 'input', 'name' => 'product_sku', 'label' => 'Variant SKU', 'width' => 150, 'editable' => 'inline',
-            'addable' => true, 'default' => ''];
-        $columns[] = ['type' => 'input', 'name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 150, 'editable' => 'inline',
-            'addable' => true, 'default' => ''];
-        $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline',
-                        'addable' => true, 'validation' => ['number' => true], 'default' => ''];
-        $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline',
-                        'addable' => true, 'validation' => ['number' => true], 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'product_sku', 'label' => 'Variant SKU', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => ''];
         $columns[] = ['name' => 'image', 'label' => 'IMAGES', 'width' => 250, 'display' => 'eval',
             'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["variant_file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
         $columns[] = ['name' => 'variant_file_id',  'hidden' => true];
         $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
         $columns[] = ['name' => 'field_values',  'hidden' => true, 'default' => ''];
         $columns[] = ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl];
-        $columns[] = ['type' => 'btn_group',  'buttons' => [['name' => 'delete']] ];
 
         $data = [];
 
@@ -232,7 +235,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                     'new' => ['caption' => 'New Variant'],
                     'delete' => ['caption' => 'Remove']
                 ],
-                'grid_before_create' => 'variantGridRegister',
+                'grid_before_create' => 'variantGriddleRegister',
                 'callbacks' => [
                     'componentDidMount' => 'variantGriddleRegister',
                     'componentDidUpdate' => 'variantGriddleRegister'
@@ -332,6 +335,14 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         }
 
         $this->BResponse->json(['id' => $set->id(), 'set_name' => $set->set_name, 'fields' => ($fields)]);
+    }
+
+    public function action_prices() {
+        $r = $this->BRequest;
+        $variantId = $r->get('variant_id');
+        $p = $this->Sellvana_Catalog_Model_Product->load($r->get('id'));
+        $prices = $this->Sellvana_Catalog_Model_ProductPrice->getProductPrices($p, $variantId);
+        $this->BResponse->json($prices);
     }
 
     public function action_get_field()
