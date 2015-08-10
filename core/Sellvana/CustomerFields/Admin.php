@@ -47,14 +47,15 @@ class Sellvana_CustomerFields_Admin extends BClass
         $view->set('model', $c)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
-    public function onCustomerFormPostAfterValidate($args)
+    public function onCustomerFormPostAfter($args)
     {
         /** @var Sellvana_Customer_Model_Customer $model */
         $model = $args['model'];
-        $data = $args['data'];
+        $customFields = $this->BRequest->post('custom_fields');
 
-        if (!empty($data['custom_fields'])) {
-            $model->setData('custom_fields', $data['custom_fields']);
+        if (!empty($customFields)) {
+            $customFields = $this->BUtil->fromJson($customFields);
+            $model->setData('custom_fields', $customFields);
         }
     }
 }
