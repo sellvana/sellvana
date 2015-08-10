@@ -29,8 +29,10 @@ class Sellvana_ShopperFields_Admin extends BClass
     public function frontendFieldGrid(Sellvana_Catalog_Model_Product $model)
     {
         $data = $model->getData('frontend_fields');
-        if (!isset($data))
+        if (!isset($data)) {
             $data = [];
+        }
+
         $config = [
             'config' => [
                 'id' => 'frontend-field-grid',
@@ -41,7 +43,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['name' => 'name', 'label' => 'Field Name', 'width' => 200, 'editable' => 'inline',
-                        'addable' => true, 'type' => 'input' , 'validation' => ['required' => true]],
+                        'addable' => true, 'type' => 'input', 'validation' => ['required' => true]],
                     ['name' => 'label', 'label' => 'Field Label', 'width' => 200, 'editable' => 'inline',
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true]],
                     ['name' => 'input_type', 'label' => 'Field Type', 'width' => 200, 'editable' => 'inline','editor' => 'select',
@@ -54,7 +56,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                         'addable' => true, 'validation' => ['required' => true]],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 200, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true]],
-                    ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
+                    ['type' => 'btn_group', 'buttons' => [['name' => 'edit-custom', 'callback' => 'showModalToEditShopperField', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "], ['name' => 'delete']]]
                 ],
                 'filters' => [
                     ['field' => 'name', 'type' => 'text'],

@@ -690,9 +690,9 @@
         };
 
         window.showModalToEditVariantPrice = function(row) {
-            if (row.id.match(/\-/g)) {
+            if (isNaN(row.id)) {
                 alert('Please save variant before edit it\'s prices');
-                return false;
+                return;
             }
             
             function validateVariantPrices() {

@@ -125,7 +125,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                 'type' => 'btn_group',  
                 'buttons' => [
                     ['name' => 'delete'], 
-                    ['name' => 'edit', 'callback' => 'showModalToEditVariantPrice', 'isNew' => ['visibility' => 'hidden']]
+                    ['name' => 'edit-custom', 'callback' => 'showModalToEditVariantPrice', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "]
                 ]
             ],
             ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
