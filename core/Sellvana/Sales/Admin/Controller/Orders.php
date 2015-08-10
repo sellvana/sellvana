@@ -432,7 +432,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ->select_expr('SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2))))', 'profit_fixed');
         $this->_processFilters($items);
         $totals = clone $items;
-        $total_profit = $totals->find_one()->get('profit_fixed');
+        $total_profit = $totals->find_one()->get('profit_fixed') ?: 0;
         $profitExpr = "ROUND(SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2)))) * 100 / {$total_profit}, 2)";
         $items->select('p.*')
             ->select_expr('SUM(oi.row_total)', 'revenue')
