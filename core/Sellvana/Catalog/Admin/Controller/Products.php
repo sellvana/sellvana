@@ -71,6 +71,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['field' => 'update_at', 'type' => 'date-range'],
             '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
         ];
+        $config['state'] = [
+            's' => 'product_name',
+            'sd' => 'asc'
+        ];
         $config['page_models_callback'] = [$this, 'onPageModelsCallback'];
         return $config;
     }
@@ -81,6 +85,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function onPageModelsCallback($rows)
     {
+        if (empty($rows)) {
+            return false;
+        }
+
         $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         $hlp = $this->FCom_Core_Main;
 
@@ -1153,6 +1161,14 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         }
 
+    }
+
+    public function action_save_variant_prices__POST() {
+        $r          = $this->BRequest;
+        $pricesData = $r->request();
+        $model      = $this->Sellvana_Catalog_Model_Product->load($r->get('id'));
+        $this->_processPricesPost($model, $pricesData);
+        $this->BResponse->json(['success' => 1]);
     }
 
     /**

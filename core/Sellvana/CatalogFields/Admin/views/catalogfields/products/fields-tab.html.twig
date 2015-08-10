@@ -9,14 +9,14 @@
 
                 <div class="modal-header">
                     <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
-                    <h4 class="modal-title" id="myModalLabel">Create Form</h4>
+                    <h4 class="modal-title" id="myModalLabel">{{ 'Create Form'|_ }}</h4>
                 </div>
 
                 <div class="modal-body">
 
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="field_code">Field Code</label>
+                            <label for="field_code">{{ 'Field Code'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
@@ -24,7 +24,7 @@
                     </div>
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="field_name">Field Name</label>
+                            <label for="field_name">{{ 'Field Name'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
@@ -32,7 +32,7 @@
                     </div>
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="frontend_label">Frontend Label</label>
+                            <label for="frontend_label">{{ 'Frontend Label'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
@@ -40,7 +40,7 @@
                     </div>
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="frontend_show">Show on frontend</label>
+                            <label for="frontend_show">{{ 'Show on frontend'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
@@ -51,7 +51,7 @@
                     </div>
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="sort_order">Sort order</label>
+                            <label for="sort_order">{{ 'Sort order'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
@@ -59,7 +59,7 @@
                     </div>
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="table_field_type">DB Type</label>
+                            <label for="table_field_type">{{ 'DB Type'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
@@ -69,7 +69,7 @@
                     </div>
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="admin_input_type">Input Type</label>
+                            <label for="admin_input_type">{{ 'Input Type'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
@@ -79,7 +79,7 @@
                     </div>
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="system">System field</label>
+                            <label for="system">{{ 'System field'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <select name="system" id="system" class="form-control" data-rule-required="true">
@@ -90,7 +90,7 @@
                     </div>
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="required">Multi Language</label>
+                            <label for="required">{{ 'Multi Language'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <select name="multilanguage" id="multilanguage" class="form-control" data-rule-required="true">
@@ -101,7 +101,7 @@
                     </div>
                     <div class="form-group">
                         <div class="control-label col-sm-3">
-                            <label for="required">Required</label>
+                            <label for="required">{{ 'Required'|_ }}</label>
                         </div>
                         <div class="controls col-sm-8">
                             <select name="required" id="required" class="form-control" data-rule-required="true">
@@ -127,13 +127,13 @@
   <div class="row">
     <input type="hidden" id="custom_fields" name="custom_fields"/>
     <div class="col-sm-6">
-      <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='{{ 'Choose fieldset...'|_ }}'>
+      <select id="sel_sets" class="select2 form-control" style="width:150px;">
         {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
       </select>
       <button class="btn btn-primary btn-sm" id="btn_add_set" type="button">{{ 'Add a Field Set'|_ }}</button>
     </div>
     <div class="col-sm-6" id="field">
-      <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='{{ 'Choose field...'|_ }}'>
+      <select id="sel_fields" class="select2 form-control" style="width:150px;">
         {{ UTIL.optionsHtml(APP.instance('Sellvana_CatalogFields_Model_Field').as_values('field_name')) | raw }}
       </select>
       <button class="btn btn-primary btn-sm" type="button" id="btn_add_field">{{ 'Add a Field'|_ }}</button>
