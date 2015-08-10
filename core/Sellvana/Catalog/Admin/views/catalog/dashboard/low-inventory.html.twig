@@ -1,0 +1,26 @@
+{% set products = APP.instance('Sellvana_Catalog_Admin_Controller_Inventory').getLowStockProducts() %}
+
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "SKU"|_ }}</th>
+            <th>{{ "Name"|_ }}</th>
+            <th>{{ "Qty"|_ }}</th>
+        </tr>
+        </thead>
+        {% if products is empty %}
+            <tr>
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+        {% else %}
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.get('inventory_sku') }}</td>
+                    <td>{{ product.get('title') }}</td>
+                    <td>{{ product.get('qty_in_stock') }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>
