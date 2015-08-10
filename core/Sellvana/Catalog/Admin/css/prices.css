@@ -1,4 +1,11 @@
-.product-prices-table select {
+.product-prices-table select, .variant-prices-table select {
     width: auto;
     float: left;
+}
+
+product-prices-table label.error, .variant-prices-table label.error {
+	display: inline-table;
+}
+.variant-prices-table label.error {
+	font-size: 11px;
 }
