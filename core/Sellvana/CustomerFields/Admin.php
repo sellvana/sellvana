@@ -54,7 +54,7 @@ class Sellvana_CustomerFields_Admin extends BClass
         $customFields = $this->BRequest->post('custom_fields');
 
         if (!empty($customFields)) {
-            $customFields = $this->BUtil->fromJson($customFields);
+            //$customFields = $this->BUtil->fromJson($customFields);
             $model->setData('custom_fields', $customFields);
         }
     }

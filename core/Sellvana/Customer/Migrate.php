@@ -258,4 +258,14 @@ class Sellvana_Customer_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_5_0_0__0_5_1_0()
+    {
+        $table = $this->Sellvana_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($table, [
+            BDb::COLUMNS => [
+                'data_serialized' => "mediumtext",
+            ],
+        ]);
+    }
 }
