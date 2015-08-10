@@ -285,11 +285,15 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
 
     public function getCustomerRecent()
     {
-        $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - 7 * 86400);
+        $limit = $this->BConfig->get('modules/Sellvana_Customer/recent_day');
         $result = $this->Sellvana_Customer_Model_Customer->orm()
-            ->where_gte('create_at', $recent)
-            ->select(['id' , 'email', 'firstname', 'lastname', 'create_at', 'status'])->find_many();
-        return $result;
+            ->select(['id' , 'email', 'firstname', 'lastname', 'create_at', 'status'])
+            ->order_by_desc('create_at');
+        if ($limit) {
+            $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - $limit * 86400);
+            $result->where_gte('create_at', $recent);
+        }
+        return $result->find_many();
     }
 
     public function onHeaderSearch($args)
