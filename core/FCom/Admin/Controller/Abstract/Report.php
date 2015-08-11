@@ -10,6 +10,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         'year' => 'Year'
     ];
 
+    protected $_selectModels = [];
+
     /**
      * @return BView|FCom_Core_View_BackboneGrid
      */
@@ -105,5 +107,20 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         }
 
         return [];
+    }
+
+    /**
+     * @param BORM $orm
+     */
+    protected function _selectAllFields($orm)
+    {
+        /** @var FCom_Core_Model_Abstract $model */
+        foreach ($this->_selectModels as $alias => $model) {
+            $table = $model->table();
+            $fields = BDb::ddlFieldInfo($table);
+            foreach ($fields as $field) {
+                $orm->select($alias . '.' . $field->orm->get('Field'), $alias . '_' . $field->orm->get('Field'));
+            }
+        }
     }
 }
