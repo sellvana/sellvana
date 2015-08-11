@@ -26,15 +26,15 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
         }
 
         $config['columns'] = [
-            ['name' => 'period', 'index' => 'period', 'label' => 'Period', 'width' => 70],
-            ['name' => 'shipping_method', 'index' => 'o.shipping_method', 'label' => 'Shipping Carrier', 'options' => $methodOptions],
-            ['name' => 'shipping_service', 'index' => 'o.shipping_service', 'label' => 'Shipping Method'],
-            ['name' => 'order_count', 'index' => 'order_count', 'label' => '# of Orders'],
-            ['name' => 'qty_sold', 'index' => 'qty_sold', 'label' => '# of Items'],
-            ['name' => 'total_shipping_amount', 'index' => 'total_shipping_amount', 'label' => 'Shipping $ Collected'],
+            ['name' => 'period', 'index' => 'period', 'width' => 70],
+            ['name' => 'shipping_method', 'index' => 'o.shipping_method', 'options' => $methodOptions],
+            ['name' => 'shipping_service', 'index' => 'o.shipping_service'],
+            ['name' => 'order_count', 'index' => 'order_count'],
+            ['name' => 'qty_sold', 'index' => 'qty_sold'],
+            ['name' => 'total_shipping_amount', 'index' => 'total_shipping_amount'],
 
-            ['name' => 'period_type', 'label' => 'Period', 'options' => $this->_periodTypes, 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -42,6 +42,23 @@ class Sellvana_Sales_Admin_Controller_Report_ShippingMethod extends FCom_Admin_C
         ];
 
         return $config;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'period' => 'Period',
+            'shipping_method' => 'Shipping Carrier',
+            'shipping_service' => 'Shipping Method',
+            'order_count' => '# of Orders',
+            'qty_sold' => '# of Items',
+            'total_shipping_amount' => 'Shipping $ Collected',
+            'period_type' => 'Period',
+            'create_at' => 'Created',
+        ];
     }
 
     /**

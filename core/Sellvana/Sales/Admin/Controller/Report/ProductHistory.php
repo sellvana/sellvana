@@ -18,21 +18,21 @@ class Sellvana_Sales_Admin_Controller_Report_ProductHistory extends FCom_Admin_C
         $config = parent::gridConfig();
 
         $config['columns'] = [
-            ['name' => 'period', 'index' => 'period', 'label' => 'Period', 'width' => 70],
-            ['name' => 'product_sku', 'index' => 'product_sku', 'label' => 'Product SKU'],
-            ['name' => 'product_name', 'index' => 'product_name', 'label' => 'Product Name'],
-            ['name' => 'qty_sold', 'index' => 'qty_sold', 'label' => 'Qty'],
-            ['name' => 'period_subtotal', 'index' => 'period_subtotal', 'label' => '$Subtotal'],
-            ['name' => 'period_discount', 'index' => 'period_discount', 'label' => '$Discount'],
-            ['name' => 'period_total', 'index' => 'period_total', 'label' => '$Total'],
-            ['name' => 'period_received', 'index' => 'period_received', 'label' => '$Received'],
-            ['name' => 'period_refunded', 'index' => 'period_refunded', 'label' => '$Refunded'],
-            ['name' => 'avg_price', 'index' => 'avg_price', 'label' => 'Avg Sell Price'],
-            ['name' => 'max_price', 'index' => 'max_price', 'label' => 'Max Sell Price'],
-            ['name' => 'min_price', 'index' => 'min_price', 'label' => 'Min Sell Price'],
+            ['name' => 'period', 'index' => 'period', 'width' => 70],
+            ['name' => 'product_sku', 'index' => 'product_sku'],
+            ['name' => 'product_name', 'index' => 'product_name'],
+            ['name' => 'qty_sold', 'index' => 'qty_sold'],
+            ['name' => 'period_subtotal', 'index' => 'period_subtotal'],
+            ['name' => 'period_discount', 'index' => 'period_discount'],
+            ['name' => 'period_total', 'index' => 'period_total'],
+            ['name' => 'period_received', 'index' => 'period_received'],
+            ['name' => 'period_refunded', 'index' => 'period_refunded'],
+            ['name' => 'avg_price', 'index' => 'avg_price'],
+            ['name' => 'max_price', 'index' => 'max_price'],
+            ['name' => 'min_price', 'index' => 'min_price'],
 
-            ['name' => 'period_type', 'label' => 'Period', 'options' => $this->_periodTypes, 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -40,6 +40,29 @@ class Sellvana_Sales_Admin_Controller_Report_ProductHistory extends FCom_Admin_C
         ];
 
         return $config;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'period' => 'Period',
+            'product_sku' => 'Product SKU',
+            'product_name' => 'Product Name',
+            'qty_sold' => 'Qty',
+            'period_subtotal' => '$Subtotal',
+            'period_discount' => '$Discount',
+            'period_total' => '$Total',
+            'period_received' => '$Received',
+            'period_refunded' => '$Refunded',
+            'avg_price' => 'Avg Sell Price',
+            'max_price' => 'Max Sell Price',
+            'min_price' => 'Min Sell Price',
+            'period_type' => 'Period',
+            'create_at' => 'Created',
+        ];
     }
 
     /**

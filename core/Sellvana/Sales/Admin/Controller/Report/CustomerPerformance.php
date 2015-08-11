@@ -21,24 +21,24 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerPerformance extends FCom_Ad
         $config = parent::gridConfig();
 
         $config['columns'] = [
-            ['name' => 'id', 'index' => 'c.id', 'label' => 'Customer Id'],
-            ['name' => 'customer_name', 'index' => 'customer_name', 'label' => 'Customer Name'],
-            ['name' => 'email', 'index' => 'c.email', 'label' => 'Customer Email'],
-            ['name' => 'title', 'index' => 'cg.title', 'label' => 'Customer Group'],
-            ['name' => 'lifetime_sales', 'index' => 'lft.lifetime_sales', 'label' => 'Lifetime Sales'],
-            ['name' => 'lifetime_order_count', 'index' => 'lft.lifetime_order_count', 'label' => 'Lifetime Number of Orders'],
-            ['name' => 'lifetime_avg_amount', 'index' => 'lft.lifetime_avg_amount', 'label' => 'Lifetime Avg Order Value'],
-            ['name' => 'lifetime_item_qty', 'index' => 'lft.lifetime_item_qty', 'label' => 'Lifetime # of units purchased'],
-            ['name' => 'lifetime_refund_qty', 'index' => 'lft.lifetime_refund_qty', 'label' => 'Lifetime # of Refunds'],
-            ['name' => 'lifetime_refund_amount', 'index' => 'lft.lifetime_refund_amount', 'label' => 'Lifetime $Refunds'],
-            ['name' => 'create_at', 'index' => 'c.create_at', 'label' => 'Date Created'],
-            ['name' => 'days_since_last_order', 'index' => 'days_since_last_order', 'label' => 'Days since last order'],
-            ['name' => 'period_sales', 'index' => 'period_sales', 'label' => '$Total during specified Period'],
-            ['name' => 'period_order_count', 'index' => 'period_order_count', 'label' => 'Total Orders During Specified Period'],
-            ['name' => 'period_item_qty', 'index' => 'period_item_qty', 'label' => '# of Items During Specified Period'],
-            ['name' => 'period_avg_amount', 'index' => 'period_avg_amount', 'label' => 'AOV During Period'],
-            ['name' => 'period_refund_qty', 'index' => 'period_refund_qty', 'label' => '# Refunds During Period'],
-            ['name' => 'period_refund_amount', 'index' => 'period_refund_amount', 'label' => '$Refunds During Period'],
+            ['name' => 'id', 'index' => 'c.id'],
+            ['name' => 'customer_name', 'index' => 'customer_name'],
+            ['name' => 'email', 'index' => 'c.email'],
+            ['name' => 'title', 'index' => 'cg.title'],
+            ['name' => 'lifetime_sales', 'index' => 'lft.lifetime_sales'],
+            ['name' => 'lifetime_order_count', 'index' => 'lft.lifetime_order_count'],
+            ['name' => 'lifetime_avg_amount', 'index' => 'lft.lifetime_avg_amount'],
+            ['name' => 'lifetime_item_qty', 'index' => 'lft.lifetime_item_qty'],
+            ['name' => 'lifetime_refund_qty', 'index' => 'lft.lifetime_refund_qty'],
+            ['name' => 'lifetime_refund_amount', 'index' => 'lft.lifetime_refund_amount'],
+            ['name' => 'create_at', 'index' => 'c.create_at'],
+            ['name' => 'days_since_last_order', 'index' => 'days_since_last_order'],
+            ['name' => 'period_sales', 'index' => 'period_sales'],
+            ['name' => 'period_order_count', 'index' => 'period_order_count'],
+            ['name' => 'period_item_qty', 'index' => 'period_item_qty'],
+            ['name' => 'period_avg_amount', 'index' => 'period_avg_amount'],
+            ['name' => 'period_refund_qty', 'index' => 'period_refund_qty'],
+            ['name' => 'period_refund_amount', 'index' => 'period_refund_amount'],
 
             ['name' => 'order_create_at', 'label' => 'Created', 'index' => 'o.create_at', 'hidden' => true],
         ];
@@ -47,6 +47,34 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerPerformance extends FCom_Ad
         ];
 
         return $config;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'id' => 'Customer Id',
+            'customer_name' => 'Customer Name',
+            'email' => 'Customer Email',
+            'title' => 'Customer Group',
+            'lifetime_sales' => 'Lifetime Sales',
+            'lifetime_order_count' => 'Lifetime Number of Orders',
+            'lifetime_avg_amount' => 'Lifetime Avg Order Value',
+            'lifetime_item_qty' => 'Lifetime # of units purchased',
+            'lifetime_refund_qty' => 'Lifetime # of Refunds',
+            'lifetime_refund_amount' => 'Lifetime $Refunds',
+            'create_at' => 'Date Created',
+            'days_since_last_order' => 'Days since last order',
+            'period_sales' => '$Total during specified Period',
+            'period_order_count' => 'Total Orders During Specified Period',
+            'period_item_qty' => '# of Items During Specified Period',
+            'period_avg_amount' => 'AOV During Period',
+            'period_refund_qty' => '# Refunds During Period',
+            'period_refund_amount' => '$Refunds During Period',
+            'order_create_at' => 'Created',
+        ];
     }
 
     /**

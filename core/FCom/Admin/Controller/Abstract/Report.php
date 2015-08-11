@@ -10,6 +10,36 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         'year' => 'Year'
     ];
 
+    /**
+     * @return BView|FCom_Core_View_BackboneGrid
+     */
+    public function gridView()
+    {
+        $view = parent::gridView();
+        $grid = $view->get('grid');
+        $config = $grid['config'];
+
+        $labels = $this->_getFieldLabels();
+        $this->BEvents->fire(static::$_origClass . '::fieldLabels', ['data' => &$labels]);
+
+        foreach ($config['columns'] as &$column) {
+            if (!empty($column['name']) && !empty($labels[$column['name']])) {
+                $column['label'] = $labels[$column['name']];
+            }
+        }
+
+        $view->set('grid', ['config' => $config]);
+        return $view;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [];
+    }
+
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);

@@ -29,20 +29,37 @@ class Sellvana_Sales_Admin_Controller_Report_PaymentMethod extends FCom_Admin_Co
         }
 
         $config['columns'] = [
-            ['name' => 'payment_method', 'index' => 'o.payment_method', 'label' => 'Payment Type', 'width' => 70, 'options' => $methodOptions],
-            ['name' => 'order_count', 'index' => 'order_count', 'label' => '# of Orders'],
-            ['name' => 'pc_orders', 'index' => 'pc_orders', 'label' => '% of Orders'],
-            ['name' => 'total_amount', 'index' => 'total_amount', 'label' => 'Total $'],
-            ['name' => 'pc_total_amount', 'index' => 'pc_total_amount', 'label' => '% of $ Total'],
-            ['name' => 'received', 'index' => 'received', 'label' => '$ Received'],
-            ['name' => 'pc_received', 'index' => 'pc_received', 'label' => '% of $ Received'],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Created', 'hidden' => true],
+            ['name' => 'payment_method', 'index' => 'o.payment_method', 'width' => 70, 'options' => $methodOptions],
+            ['name' => 'order_count', 'index' => 'order_count'],
+            ['name' => 'pc_orders', 'index' => 'pc_orders'],
+            ['name' => 'total_amount', 'index' => 'total_amount'],
+            ['name' => 'pc_total_amount', 'index' => 'pc_total_amount'],
+            ['name' => 'received', 'index' => 'received'],
+            ['name' => 'pc_received', 'index' => 'pc_received'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
         ];
 
         return $config;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'payment_method' => 'Payment Type',
+            'order_count' => '# of Orders',
+            'pc_orders' => '% of Orders',
+            'total_amount' => 'Total $',
+            'pc_total_amount' => '% of $ Total',
+            'received' => '$ Received',
+            'pc_received' => '% of $ Received',
+            'create_at' => 'Created',
+        ];
     }
 
     /**
