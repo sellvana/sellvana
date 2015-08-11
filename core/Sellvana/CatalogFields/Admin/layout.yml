@@ -12,7 +12,7 @@ catalog_product_form_tabs:
     - view: admin/form
         do:
             - [ addTab, fields, { label: Additional Info, pos: 82, view: catalogfields/products/fields-tab, async: true } ]
-            - [ addTab, variants, { label: Variants, pos: 84, view: catalogfields/products/variants-tab, async: true } ]
+            - [ addTab, variants, { label: Variants, pos: 84, view: catalogfields/products/variants-tab } ]
             #- [ addTab, variants-backbone, { label: Variants (Backbone), pos: 84, view: catalogfields/products/variants-tab-backbone, async: true } ]
 
 /catalogfields/fieldsets:

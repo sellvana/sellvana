@@ -626,7 +626,7 @@
          */
         window.variantFieldGriddleRegister = function(grid, triggerName) {
             variantFieldGrid = grid;
-            if (triggerName == 'componentDidMount') {
+            if (triggerName === 'componentDidMount') {
                 variantFields.init();
             }
         };
@@ -638,7 +638,7 @@
          */
         window.variantGriddleRegister = function(grid, triggerName) {
             variantGrid = grid;
-            if (triggerName == 'componentDidMount') {
+            if (triggerName === 'componentDidMount') {
                 variantImages.init();
             }
 
@@ -651,7 +651,7 @@
                 });
             }
 
-            if (triggerName == 'componentDidMount') {
+            if (triggerName === 'componentDidMount') {
                 variantFields.processTopFieldSection();
                 toggleAddNewVariantsButton();
 
@@ -861,127 +861,127 @@
                 base_field: true
             });
         }
-    });
 
-    window.saveVariantPriceModal = function(modal) {
+        window.saveVariantPriceModal = function(modal) {
 
-        var fields  = variantModalNode.find('select, input, textarea'),
-            form    = variantModalNode.find('form'),
-            url     = '{{ APP.href("catalog/products/save_variant_prices") }}?id='+{{ REQUEST.get('id') }};
+            var fields  = variantModalNode.find('select, input, textarea'),
+                form    = variantModalNode.find('form'),
+                url     = '{{ APP.href("catalog/products/save_variant_prices") }}?id='+{{ REQUEST.get('id') }};
 
-        if (form.valid()) { // If validation passes
-            // Add
-            $.post(url, form.serialize(), function(r) {
-                if (r.success == 1) {
-                    modal.close();
-                } else {
-                    alert('Error while saving data, please try again !');
-                }
-            });
-        }
-    }
-
-    /**
-     * toggle Add New Variant button
-     * todo: need to add to FComSettings or better components
-     */
-    function toggleAddNewVariantsButton() {
-        var newVariantButton = $(variantGrid.getDOMNode()).find('.btn.grid-new');
-        newVariantButton.prop('disabled', !(variantFields.customFields.length > 0));
-    }
-
-    /**
-     * custom validation function for checking duplicated input
-     * @param value
-     * @param elem
-     * @param params
-     * @returns {boolean}
-     */
-    function variantUnique(value, elem, params) {
-        //console.log('begin validation unique in ele: ', elem);
-        var valid = true;
-        var rowEle = $(elem).parents('tr');
-        //console.log('row ele', rowEle);
-
-        if (!_.isEmpty(variantFields.combinations)) {
-            _.forEach(variantFields.combinations, function(comb, id) {
-                if (rowEle.attr('id') != id) {
-                    var flag = false;
-                    rowEle.find('input.select-value-field').each(function() {
-                        if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined'
-                                && $(this).val() != comb[$(this).attr('name')]) {
-                            flag = true; // at least one field is different
-                        }
-                    });
-                    if (!flag) {
-                        valid = false;
+            if (form.valid()) { // If validation passes
+                // Add
+                $.post(url, form.serialize(), function(r) {
+                    if (r.success == 1) {
+                        modal.close();
+                    } else {
+                        alert('Error while saving data, please try again !');
                     }
-                }
-            });
+                });
+            }
         }
 
-        //console.log('valid', valid);
-        return valid;
-    }
-
-    //add custom validate to jquery validator
-    $.validator.addMethod('variantUnique', variantUnique , 'Same variant is already taken place.');
-    $.validator.addClassRules("variantUnique", {
-        variantUnique: true
-    });
-
-    $('form').submit(function (ev) {
-
-        var variantPostFields = [], variantPostData = [];
-
-        if (!variantFields.validateVariant()) {
-            return false;
+        /**
+         * toggle Add New Variant button
+         * todo: need to add to FComSettings or better components
+         */
+        function toggleAddNewVariantsButton() {
+            var newVariantButton = $(variantGrid.getDOMNode()).find('.btn.grid-new');
+            newVariantButton.prop('disabled', !(variantFields.customFields.length > 0));
         }
 
-        variantFields.customFields.forEach(function (obj) {
-            variantPostFields.push({
-                id: obj.id,
-                field_code: obj.field_code,
-                name: obj.name
-            });
-        });
+        /**
+         * custom validation function for checking duplicated input
+         * @param value
+         * @param elem
+         * @param params
+         * @returns {boolean}
+         */
+        function variantUnique(value, elem, params) {
+            //console.log('begin validation unique in ele: ', elem);
+            var valid = true;
+            var rowEle = $(elem).parents('tr');
+            //console.log('row ele', rowEle);
 
-        //set object data to submit
-        _.forEach(variantGrid.getChildComponent('rows'), function (comp) {
-            var newObj = _.clone(comp.props.row);
-            //remove list images
-            delete newObj.list_image;
-
-            if (typeof variantFields.combinations[newObj.id] != 'undefined' && variantFields.combinations[newObj.id] != null) {
-                newObj.field_values = variantFields.combinations[newObj.id];
-                /*_.forEach(variantFields.combinations[newObj.id], function(value, key) {
-                    newObj[key] = value;
-                })*/
-            } else { //after validate, this case will never be happened
-                newObj = {};
-                variantFields.customFields.each(function(field) {
-                    newObj[field.field_code] = '';
+            if (!_.isEmpty(variantFields.combinations)) {
+                _.forEach(variantFields.combinations, function(comb, id) {
+                    if (rowEle.attr('id') != id) {
+                        var flag = false;
+                        rowEle.find('input.select-value-field').each(function() {
+                            if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined'
+                                    && $(this).val() != comb[$(this).attr('name')]) {
+                                flag = true; // at least one field is different
+                            }
+                        });
+                        if (!flag) {
+                            valid = false;
+                        }
+                    }
                 });
             }
 
-            //images
-            newObj.variant_file_id = $(comp.getDOMNode()).find(variantImages.inputClass).val();
+            //console.log('valid', valid);
+            return valid;
+        }
 
-            //todo: find better way for this
-            newObj.product_sku = newObj.product_sku || '';
-            newObj.inventory_sku = newObj.inventory_sku || '';
-            newObj.variant_price = newObj.variant_price || '';
-            newObj.variant_qty = newObj.variant_qty || '';
-
-            //console.log('newObj', newObj);
-            variantPostData.push(newObj);
+        //add custom validate to jquery validator
+        $.validator.addMethod('variantUnique', variantUnique , 'Same variant is already taken place.');
+        $.validator.addClassRules("variantUnique", {
+            variantUnique: true
         });
 
-        $('#vfield_ids').val(JSON.stringify(variantPostFields));
-        $('#variants').val(JSON.stringify(variantPostData));
+        $('form').submit(function (ev) {
 
-        //return false;
-        return true;
+            var variantPostFields = [], variantPostData = [];
+
+            if (!variantFields.validateVariant()) {
+                return false;
+            }
+
+            variantFields.customFields.forEach(function (obj) {
+                variantPostFields.push({
+                    id: obj.id,
+                    field_code: obj.field_code,
+                    name: obj.name
+                });
+            });
+
+            //set object data to submit
+            _.forEach(variantGrid.getChildComponent('rows'), function (comp) {
+                var newObj = _.clone(comp.props.row);
+                //remove list images
+                delete newObj.list_image;
+
+                if (typeof variantFields.combinations[newObj.id] != 'undefined' && variantFields.combinations[newObj.id] != null) {
+                    newObj.field_values = variantFields.combinations[newObj.id];
+                    /*_.forEach(variantFields.combinations[newObj.id], function(value, key) {
+                        newObj[key] = value;
+                    })*/
+                } else { //after validate, this case will never be happened
+                    newObj = {};
+                    variantFields.customFields.each(function(field) {
+                        newObj[field.field_code] = '';
+                    });
+                }
+
+                //images
+                newObj.variant_file_id = $(comp.getDOMNode()).find(variantImages.inputClass).val();
+
+                //todo: find better way for this
+                newObj.product_sku = newObj.product_sku || '';
+                newObj.inventory_sku = newObj.inventory_sku || '';
+                newObj.variant_price = newObj.variant_price || '';
+                newObj.variant_qty = newObj.variant_qty || '';
+
+                //console.log('newObj', newObj);
+                variantPostData.push(newObj);
+            });
+
+            $('#vfield_ids').val(JSON.stringify(variantPostFields));
+            $('#variants').val(JSON.stringify(variantPostData));
+
+            //return false;
+            return true;
+        });
     });
 </script>
 
