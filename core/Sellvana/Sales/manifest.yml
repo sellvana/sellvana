@@ -2,7 +2,7 @@ modules:
     Sellvana_Sales:
         version: 0.5.4.0
         channel: alpha
-        require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0, FCom_LibJsFlot: 0.1.0 } }
         description: "Fundamental Sales functionality"
         auto_use: [ bootstrap ]
 
