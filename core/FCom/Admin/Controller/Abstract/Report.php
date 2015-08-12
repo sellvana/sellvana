@@ -10,6 +10,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         'year' => 'Year'
     ];
 
+    protected $_systemFields = [];
+    protected $_visibleFields = [];
     protected $_selectModels = [];
 
     /**
@@ -107,6 +109,32 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         }
 
         return [];
+    }
+
+    /**
+     * @return array
+     */
+    protected function _addAllColumns()
+    {
+        $columns = [];
+        /** @var FCom_Core_Model_Abstract $model */
+        foreach ($this->_selectModels as $alias => $model) {
+            $table = $model->table();
+            $fields = BDb::ddlFieldInfo($table);
+            foreach ($fields as $field) {
+                $fieldId = $field->orm->get('Field');
+                $fieldName = $alias . '_' . $fieldId;
+                if (!in_array($fieldName, $this->_systemFields)) {
+                    $columns[] = [
+                        'name' => $fieldName,
+                        'index' => $alias . '.' . $fieldId,
+                        'hidden' => (!in_array($fieldName, $this->_visibleFields))
+                    ];
+                }
+            }
+        }
+
+        return $columns;
     }
 
     /**
