@@ -21,27 +21,48 @@ class Sellvana_Sales_Admin_Controller_Report_CustomerGroup extends FCom_Admin_Co
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['name' => 'group_id', 'index' => 'group_id', 'label' => 'Customer Group ID', 'width' => 70],
-            ['name' => 'group_title', 'index' => 'group_title', 'label' => 'Customer Group', 'width' => 100],
+            ['name' => 'group_id', 'index' => 'group_id', 'width' => 70],
+            ['name' => 'group_title', 'index' => 'group_title', 'width' => 100],
 
-            ['name' => 'subtotal_aggr', 'index' => 'subtotal_aggr', 'label' => 'Subtotal', 'width' => 70],
-            ['name' => 'tax_amount_aggr', 'index' => 'tax_amount_aggr', 'label' => 'Tax'],
-            ['name' => 'shipping_price_aggr', 'index' => 'shipping_price_aggr', 'label' => 'Shipping'],
-            ['name' => 'discount_amount_aggr', 'label' => 'Discounts', 'index' => 'discount_amount_aggr'],
-            ['name' => 'grand_total_aggr', 'label' => 'Total', 'index' => 'grand_total_aggr'],
+            ['name' => 'subtotal_aggr', 'index' => 'subtotal_aggr'],
+            ['name' => 'tax_amount_aggr', 'index' => 'tax_amount_aggr'],
+            ['name' => 'shipping_price_aggr', 'index' => 'shipping_price_aggr'],
+            ['name' => 'discount_amount_aggr', 'index' => 'discount_amount_aggr'],
+            ['name' => 'grand_total_aggr', 'index' => 'grand_total_aggr'],
 
-            ['name' => 'amount_paid_aggr', 'label' => 'Received', 'index' => 'amount_paid_aggr'],
-            ['name' => 'amount_refunded_aggr', 'label' => 'Refunded', 'index' => 'amount_refunded_aggr'],
+            ['name' => 'amount_paid_aggr', 'index' => 'amount_paid_aggr'],
+            ['name' => 'amount_refunded_aggr', 'index' => 'amount_refunded_aggr'],
 
-            ['name' => 'item_qty_aggr', 'label' => '# of Units Sold', 'index' => 'item_qty_aggr'],
-            ['name' => 'pc_of_sales', 'label' => '% of sales', 'index' => 'pc_of_sales'],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'item_qty_aggr', 'index' => 'item_qty_aggr'],
+            ['name' => 'pc_of_sales', 'index' => 'pc_of_sales'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
         ];
 
         return $config;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'group_id' => 'Customer Group ID',
+            'group_title' => 'Customer Group',
+            'subtotal_aggr' => 'Subtotal',
+            'tax_amount_aggr' => 'Tax',
+            'shipping_price_aggr' => 'Shipping',
+            'discount_amount_aggr' => 'Discounts',
+            'grand_total_aggr' => 'Total',
+            'amount_paid_aggr' => 'Received',
+            'amount_refunded_aggr' => 'Refunded',
+            'item_qty_aggr' => '# of Units Sold',
+            'pc_of_sales' => '% of sales',
+            'create_at' => 'Created',
+        ];
     }
 
     /**

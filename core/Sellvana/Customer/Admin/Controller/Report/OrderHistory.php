@@ -25,16 +25,16 @@ class Sellvana_Customer_Admin_Controller_Report_OrderHistory extends FCom_Admin_
         }
 
         $config['columns'] = [
-            ['name' => 'period', 'index' => 'period', 'label' => 'Period', 'width' => 70],
-            ['name' => 'customer_id', 'index' => 'customer_id', 'label' => 'Customer', 'options' => $customersOptions],
-            ['name' => 'order_count', 'index' => 'order_count', 'label' => '# of Orders'],
-            ['name' => 'item_count', 'index' => 'item_count', 'label' => '# of Items'],
-            ['name' => 'total_amount', 'index' => 'total_amount', 'label' => 'Total Sales'],
-            ['name' => 'total_received', 'index' => 'total_received', 'label' => 'Total $Received'],
-            ['name' => 'total_refunded', 'index' => 'total_refunded', 'label' => 'Total $Refunded'],
+            ['name' => 'period', 'index' => 'period', 'width' => 70],
+            ['name' => 'customer_id', 'index' => 'customer_id', 'options' => $customersOptions],
+            ['name' => 'order_count', 'index' => 'order_count'],
+            ['name' => 'item_count', 'index' => 'item_count'],
+            ['name' => 'total_amount', 'index' => 'total_amount'],
+            ['name' => 'total_received', 'index' => 'total_received'],
+            ['name' => 'total_refunded', 'index' => 'total_refunded'],
 
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'o.create_at', 'hidden' => true],
-            ['name' => 'period_type', 'label' => 'Period', 'options' => $this->_periodTypes, 'hidden' => true],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -43,6 +43,24 @@ class Sellvana_Customer_Admin_Controller_Report_OrderHistory extends FCom_Admin_
         ];
 
         return $config;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'period' => 'Period',
+            'customer_id' => 'Customer',
+            'order_count' => '# of Orders',
+            'item_count' => '# of Items',
+            'total_amount' => 'Total Sales',
+            'total_received' => 'Total $Received',
+            'total_refunded' => 'Total $Refunded',
+            'create_at' => 'Created',
+            'period_type' => 'Period',
+        ];
     }
 
     /**
