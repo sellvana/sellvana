@@ -63,7 +63,7 @@ class Sellvana_Customer_Admin_Controller_Report_Country extends FCom_Admin_Contr
     {
         parent::gridOrmConfig($orm);
 
-        $orm->left_outer_join('Sellvana_Customer_Model_Address', 'ca.customer_id = c.id AND c.default_billing_id = ca.id', 'ca')
+        $orm->left_outer_join('Sellvana_Customer_Model_Address', 'ca.customer_id = c.id AND c.default_shipping_id = ca.id', 'ca')
             ->left_outer_join('Sellvana_Sales_Model_Order', 'o.customer_id = c.id', 'o')
             ->select_expr('COUNT(DISTINCT c.id)', 'customer_count')
             ->select_expr('COUNT(DISTINCT o.customer_id)', 'customer_with_order_count')
