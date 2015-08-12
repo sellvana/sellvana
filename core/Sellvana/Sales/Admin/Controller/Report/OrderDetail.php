@@ -33,6 +33,7 @@ class Sellvana_Sales_Admin_Controller_Report_OrderDetail extends FCom_Admin_Cont
 
         $config['columns'] = [
             ['name' => 'create_at', 'index' => 'o.create_at'],
+            ['name' => 'inventory_sku', 'index' => 'inventory_sku'],
         ];
 
         $config['columns'] = array_merge($config['columns'], $this->_addAllColumns());
@@ -51,6 +52,7 @@ class Sellvana_Sales_Admin_Controller_Report_OrderDetail extends FCom_Admin_Cont
     {
         return [
             'create_at' => 'Order Created at',
+            'inventory_sku' => 'Products',
             'o_customer_email' => 'Email',
             'o_item_qty' => 'Item Qty',
             'o_subtotal' => 'Subtotal',
