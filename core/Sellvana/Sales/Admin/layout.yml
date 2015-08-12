@@ -16,6 +16,7 @@ base:
             - [ addNav, reports/sales/hour, { label: Sales by Hour of the Day, href: /sales/report/hour, pos: 90 }]
             - [ addNav, reports/sales/day, { label: Sales by Day of Week, href: /sales/report/day, pos: 100 }]
             - [ addNav, reports/sales/order_detail, { label: Sales Order Detail Report, href: /sales/report/order_detail, pos: 110 }]
+            - [ addNav, reports/sales/order_item_detail, { label: Sales Item Detail Report, href: /sales/report/order_item_detail, pos: 120 }]
             - [ addNav, reports/sales/shipping_method, { label: Shipping Methods, href: /sales/report/shipping_method, pos: 150 }]
             - [ addNav, reports/sales/customer_performance, { label: Customer Performance, href: /sales/report/customer_performance, pos: 170 }]
             - [ addNav, reports/sales/product_history, { label: Product History, href: /sales/report/product_history, pos: 210 }]
