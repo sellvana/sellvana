@@ -1142,9 +1142,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         // Process variant prices
         if (!empty($data['variantPrice'])) {
             $variantPrices = $data['variantPrice'];
-            foreach ($variantPrices['prices'] as $vId => $data) {
-                parse_str($data, $prices);
-                $this->_savePrices($model, $prices['variantPrice']);
+            if (!empty($variantPrices['prices'])) {
+                foreach ($variantPrices['prices'] as $vId => $data) {
+                    parse_str($data, $prices);
+                    $this->_savePrices($model, $prices['variantPrice']);
+                }
             }
 
             // Process delete variant prices
