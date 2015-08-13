@@ -221,6 +221,14 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             }
         }
 
+        // Get prices for each variant
+        if (!empty($data)) {
+            $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+            foreach ($data as $key => $variant) {
+                $data[$key]['prices'] = $priceHlp->getProductPrices($model, $variant['id']);
+            }
+        }
+
         $config = [
             'config' => [
                 'id' => 'variant-grid-' . $model->id(),

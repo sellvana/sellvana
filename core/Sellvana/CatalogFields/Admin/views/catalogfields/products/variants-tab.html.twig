@@ -792,16 +792,46 @@
             return true;
         });
     });
-
+    
+    var currentPrices, oldPrices, deletedPrices = [], variantId;
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'fcom.catalog.variant.price', 'fcom.locale', 'daterangepicker'],
         function ($, _, React, FComGriddleComponent, Components, Price, Locale) {
 
+        /**
+         * Get prices for specific variant
+         * @param  {int} id 
+         * @return {Object}
+         */
+        function getVariantPrices(id) {
+            var variants = variantGrid.getConfig('data').data;
+            var prices;
+            _.each(variants, function(variant) {
+                if (variant.id === id) {
+                    prices = variant.prices;
+                }
+            });
+            return prices;
+        }
+
+        /**
+         * Show edit variant prices modal callback
+         * @param  {Object} row 
+         * @return {mixed}
+         */
         window.showModalToEditVariantPrice = function(row) {
             if (isNaN(row.id)) {
                 alert('Please save variant before edit it\'s prices');
                 return;
             }
+
+            variantId     = row.id;
+            currentPrices = getVariantPrices(row.id);
+            oldPrices     = _.clone(currentPrices);
             
+            /**
+             * Validate unique price
+             * @return mixed
+             */
             function validateVariantPrices() {
                 var valid = true;
                 $('#catalog-variant-prices-form').find('select.variantPriceUnique').each(function (el) {
@@ -815,7 +845,10 @@
             var options = {
                 id: variantGrid.getConfig('id'),
                 title: Locale._('Variant Prices'),
-                source: '{{APP.href('catalogfields/products/prices')}}?id=' + {{ REQUEST.get('id') }} + '&variant_id=' + row.id,
+                data_mode: 'local',
+                prices: getVariantPrices(row.id),
+                deleted: deletedPrices,
+                // source: '{{APP.href('catalogfields/products/prices')}}?id=' + {{ REQUEST.get('id') }} + '&variant_id=' + row.id,
                 price_types: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
                 editable_prices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
                 customer_groups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
@@ -851,6 +884,9 @@
                             React.createElement(Price, { id: 'variant', options: options }
             ))), modalContainerEle);
 
+            /**
+             * Custom validate function for checking base field
+             */
             function validateVariantBaseField(value, element) {
                 console.log('variant.validateVariantBaseField.element', element);
                 var valid = false;
@@ -969,21 +1005,50 @@
             });
         }
 
+        /**
+         * Save variant prices callback
+         * @param  {Object} modal
+         * @return {mixed}
+         */
         window.saveVariantPriceModal = function(modal) {
+            var form        = variantModalNode.find('form#catalog-variant-prices-form'),
+                priceItems  = form.find('.variant-price-item')
+                deletedIds  = []
+                container   = $('#tab-variants')
+                inputName   = "variantPrice[prices]["+variantId+"]";
 
-            var fields  = variantModalNode.find('select, input, textarea'),
-                form    = variantModalNode.find('form'),
-                url     = '{{ APP.href("catalog/products/save_variant_prices") }}?id='+{{ REQUEST.get('id') }};
-
-            if (form.valid()) { // If validation passes
-                // Add
-                $.post(url, form.serialize(), function(r) {
-                    if (r.success == 1) {
-                        modal.close();
-                    } else {
-                        alert('Error while saving data, please try again !');
+            // Set new value for new price
+            if (currentPrices.length > oldPrices.length) {
+                _.each(currentPrices, function(currentPrice) {
+                    if (isNaN(currentPrice.id)) {
+                        var tr = form.find('tr[data-id="'+currentPrice.id+'"]');
+                        if (tr.length) {
+                            _.each(currentPrice, function(item, index) {
+                                if ($.inArray(index, ['operation', 'qty']) !== -1) {
+                                    currentPrice[index] = tr.find('[name="variantPrice['+currentPrice.id+']['+index+']"]').val();
+                                }
+                            });
+                        }
                     }
                 });
+            }
+
+            if (form.valid()) { // If validation passes
+                var deletedIds = [];
+                _.each(deletedPrices, function(price, i) {
+                    deletedIds.push(i);
+                });
+
+                if (deletedIds.length) {
+                    $('#variant_prices_deleted').val(JSON.stringify(deletedIds));
+                }
+                
+                if (container.find('#variant_prices_'+variantId).length) {
+                    container.find('#variant_prices_'+variantId).val(form.serialize());
+                } else {
+                    container.append('<input id="variant_prices_'+variantId+'" type="hidden" name="'+inputName+'" value="'+form.serialize()+'">');
+                }
+                modal.close();
             }
         }
     });
@@ -1013,3 +1078,4 @@
 <input type='hidden' id='vfield_ids' name='vfields' />
 <input type='hidden' id='variants_remove' name='variants_remove' />
 <input type='hidden' id='variants' name='variants' />
+<input type="hidden" id="variant_prices_deleted" name="variantPrice[delete]">

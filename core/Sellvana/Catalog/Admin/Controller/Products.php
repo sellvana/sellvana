@@ -648,11 +648,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             $this->deleteRelatedInfo($model);
         } else {
             if (empty($args['validate_failed'])) {
-                $this->processCategoriesPost($model, $data);
-                $this->processLinkedProductsPost($model, $data);
-                $this->processMediaPost($model, $data);
-                $this->processInventoryPost($model, $data);
-                $this->processSystemLangFieldsPost($model, $data);
+                $this->_processCategoriesPost($model, $data);
+                $this->_processLinkedProductsPost($model, $data);
+                $this->_processMediaPost($model, $data);
+                $this->_processInventoryPost($model, $data);
+                $this->_processSystemLangFieldsPost($model, $data);
                 $this->_processPricesPost($model, $data);
                 $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
                 $model->save();
@@ -687,7 +687,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @param $model Sellvana_Catalog_Model_Product
      * @param $post []
      */
-    public function processCategoriesPost($model, $post)
+    protected function _processCategoriesPost($model, $post)
     {
         $categories = [];
         foreach ($post as $key => $value) {
@@ -718,7 +718,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @return $this
      * @throws BException
      */
-    public function processLinkedProductsPost($model, $data)
+    protected function _processLinkedProductsPost($model, $data)
     {
         //echo "<pre>"; print_r($data); echo "</pre>";die;
         $hlp = $this->Sellvana_Catalog_Model_ProductLink;
@@ -765,7 +765,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @return $this
      * @throws BException
      */
-    public function processMediaPost($model, $data)
+    protected function _processMediaPost($model, $data)
     {
         $hlp = $this->Sellvana_Catalog_Model_ProductMedia;
         foreach (['A' => 'attachments', 'I' => 'images'] as $type => $typeName) {
@@ -863,7 +863,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @param array $data
      * @throws BException
      */
-    public function processInventoryPost($model, $data)
+    protected function _processInventoryPost($model, $data)
     {
         // update product inventory sku if needed
         if (!empty($data['inventory']['inventory_sku'])) {
@@ -889,7 +889,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @param Sellvana_Catalog_Model_Product $model
      * @param $data
      */
-    public function processSystemLangFieldsPost($model, $data)
+    protected function _processSystemLangFieldsPost($model, $data)
     {
         $model->setData('name_lang_fields', $data['name_lang_fields']);
         $model->setData('short_desc_lang_fields', $data['short_desc_lang_fields']);
@@ -1125,50 +1125,65 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     protected function _processPricesPost($model, $data)
     {
-        if(empty($data['prices'])){
+        if(empty($data['prices']) && empty($data['variantPrice'])){
             return;
         }
 
+        // Process product prices
         if (!empty($data['prices']['productPrice'])) {
-            foreach ($data['prices']['productPrice'] as $id => $priceData) {
-                foreach ($priceData as $field => $pf) {
-                    if (in_array($field, ['customer_group_id', 'site_id']) && !is_numeric($pf)) {
-                        $priceData[$field] = null;
-                    }
-
-                    if($field == 'currency_code' && $pf == '*'){
-                        $priceData[$field] = null;
-                    }
-                }
-
-                $priceData['product_id'] = $model->id();
-                if (is_numeric($id)) {
-                    $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
-                } else {
-                    $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
-                }
-                $price->set($priceData)->save();
-            }
+            $this->_savePrices($model, $data['prices']['productPrice']);
+        }
+        
+        // Process delete product prices
+        if (!empty($data['prices']['delete'])) {
+            $this->_deletePrices($data['prices']['delete']);
         }
 
-        if(!empty($data['prices']['delete'])){
-            foreach ($data['prices']['delete'] as $delPrice) {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($delPrice);
-                if($price){
-                    $price->delete();
-                }
+        // Process variant prices
+        if (!empty($data['variantPrice'])) {
+            $variantPrices = $data['variantPrice'];
+            foreach ($variantPrices['prices'] as $vId => $data) {
+                parse_str($data, $prices);
+                $this->_savePrices($model, $prices['variantPrice']);
             }
 
+            // Process delete variant prices
+            if (!empty($variantPrices['delete'])) {
+                $deletedPrices = $this->BUtil->fromJson($variantPrices['delete']);
+                $this->_deletePrices($deletedPrices);
+            }
         }
-
     }
 
-    public function action_save_variant_prices__POST() {
-        $r          = $this->BRequest;
-        $pricesData = $r->request();
-        $model      = $this->Sellvana_Catalog_Model_Product->load($r->get('id'));
-        $this->_processPricesPost($model, $pricesData);
-        $this->BResponse->json(['success' => 1]);
+    protected function _deletePrices($delPrices) {
+        foreach ($delPrices as $delPrice) {
+            $price = $this->Sellvana_Catalog_Model_ProductPrice->load($delPrice);
+            if($price){
+                $price->delete();
+            }
+        }
+    }
+
+    protected function _savePrices($model, $pricesData) {
+        foreach ($pricesData as $id => $priceData) {
+            foreach ($priceData as $field => $pf) {
+                if (in_array($field, ['customer_group_id', 'site_id']) && !is_numeric($pf)) {
+                    $priceData[$field] = null;
+                }
+
+                if($field == 'currency_code' && $pf == '*'){
+                    $priceData[$field] = null;
+                }
+            }
+
+            $priceData['product_id'] = $model->id();
+            if (is_numeric($id)) {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
+            } else {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
+            }
+            $price->set($priceData)->save();
+        }
     }
 
     /**
