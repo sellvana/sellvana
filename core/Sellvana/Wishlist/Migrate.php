@@ -123,4 +123,15 @@ class Sellvana_Wishlist_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $tWishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->table();
+        $this->BDb->ddlTableDef($tWishlistItem, [
+            BDb::COLUMNS => [
+                'create_at' => 'datetime not null',
+                'comment' => 'text',
+            ],
+        ]);
+    }
 }
