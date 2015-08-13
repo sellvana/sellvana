@@ -59,7 +59,7 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
         $id = $r->get('id');
         $field = $this->Sellvana_CustomerFields_Model_Field->load($id);
         $options = $this->Sellvana_CustomerFields_Model_FieldOption->getListAssocById($field->id());
-        $this->BResponse->json(['id' => $field->id(), 'field_name' => $field->field_name,
+        $this->BResponse->json(['id' => $field->id(), 'field_name' => $field->field_name, 'field_code' => $field->field_code,
             'admin_input_type' => $field->admin_input_type, 'multilang' => $field->multilanguage,
             'options' => $options, 'required' => $field->required]);
     }

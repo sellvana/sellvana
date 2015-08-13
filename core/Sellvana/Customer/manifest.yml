@@ -1,6 +1,6 @@
 modules:
     Sellvana_Customer:
-        version: 0.5.0.0
+        version: 0.5.1.0
         channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.0 } }
         translations: { en: en.php }

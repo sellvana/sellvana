@@ -604,7 +604,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.model.langFields.on('remove', this._removeLangView, this);
         },
         _refresh: function() {
-            this.model.url = '{{ APP.href('/customerfields/products/get_field?id=') | raw }}'+this.model.get('id');
+            this.model.url = '{{ APP.href('/customerfields/customers/get_field?id=') | raw }}'+this.model.get('id');
             var self = this;
             this.model.fetch({
                 success: function() {
