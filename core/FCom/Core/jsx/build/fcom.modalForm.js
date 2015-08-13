@@ -37,13 +37,13 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
             var gridId = this.props.id;
             //console.log('row', this.props.row);
 
-            var nodes = this.props.columnMetadata.map(function(column) {
+            var nodes = this.props.columnMetadata.map(function(column, index) {
                 if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
-                return React.createElement(Components.ModalElement, {column: column, value: that.props.row[column.name]})
+                return React.createElement(Components.ModalElement, {column: column, value: that.props.row[column.name], key: index})
             });
 
             //add id
-            nodes.push(React.createElement("input", {type: "hidden", name: "id", id: "id", value: this.props.row.id}));
+            nodes.push(React.createElement("input", {type: "hidden", name: "id", id: "id", value: this.props.row.id, key: nodes.length++}));
 
             return (
                 React.createElement("form", {className: "form form-horizontal validate-form", id: gridId + '-modal-form'}, 

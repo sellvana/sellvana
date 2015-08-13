@@ -19,7 +19,7 @@ define(['underscore', 'react'], function (_, React) {
                 "doRowAction": null,
                 "addSelectedRows": null,
                 "getSelectedRows": null
-            }
+            };
         },
         selectRow: function(event) {
             if (event.target.checked) {
@@ -116,29 +116,29 @@ define(['underscore', 'react'], function (_, React) {
                             switch (col.editor) {
                                 case 'checkbox': //todo: need test again
                                 case 'radio':
-                                    node = React.createElement("input", React.__spread({type: "checkbox"},  inlineProps,  validationRules));
+                                    node = React.createElement("input", React.__spread({key: col.name, type: "checkbox"},  inlineProps,  validationRules));
                                     break;
                                 case 'textarea':  //todo: need test again
-                                    node = React.createElement("textarea", React.__spread({},  inlineProps,  validationRules, {rows: "4"}), row[col.name]);
+                                    node = React.createElement("textarea", React.__spread({key: col.name},  inlineProps,  validationRules, {rows: "4"}), row[col.name]);
                                     break;
                                 case 'select':
                                     var selectOptions = [];
                                     if (_.isArray(col.options)) {
-                                        selectOptions = col.options.map(function(opt) {
-                                            return React.createElement("option", {value: opt.value});
+                                        selectOptions = col.options.map(function(opt, index) {
+                                            return React.createElement("option", {key: index, value: opt.value});
                                         });
                                     } else {
                                         for(var key in col.options) {
-                                            selectOptions.push(React.createElement("option", {value: key}, col.options[key]));
+                                            selectOptions.push(React.createElement("option", {key: key, value: key}, col.options[key]));
                                         }
                                     }
                                     
                                     node = (
-                                        React.createElement("select", React.__spread({defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange}), selectOptions)
+                                        React.createElement("select", React.__spread({key: col.name, defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange}), selectOptions)
                                     );
                                     break;
                                 default:
-                                    node = React.createElement("input", React.__spread({type: "text"},  inlineProps,  validationRules, {defaultValue: defaultValue, onChange: that.handleChange}));
+                                    node = React.createElement("input", React.__spread({key: col.name, type: "text"},  inlineProps,  validationRules, {defaultValue: defaultValue, onChange: that.handleChange}));
                                     break;
                             }
                             /*var inlineColValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";

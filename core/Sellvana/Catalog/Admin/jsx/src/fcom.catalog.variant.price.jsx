@@ -1,7 +1,7 @@
 /**
  * Created by pp on 02-26-2015.
  */
-define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'daterangepicker'], function ($, _, React, Locale) {
+define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'jquery.validate', 'daterangepicker'], function ($, _, React, Components, Locale) {
     var PriceItem = React.createClass({
         editable: true,
         componentDidMount: function() {
@@ -58,7 +58,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             return editable;
         },
         getFieldName: function(obj, field) {
-            return "prices[productPrice][" + obj.id + "][" + field + "]";
+            return this.props.id + "Price[" + obj.id + "][" + field + "]";
         },
         updatePrice: function(e) {
             var $el = $(e.target);
@@ -172,7 +172,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             }
 
             return (
-                <tr className={this.props.id + "-price-item"}>
+                <tr className={this.props.id + "-price-item"} data-id={price.id}>
                     <td>
                         {this.editable ? <a href="javascript:void(0)" className="btn-remove" data-id={price.id} id={"remove_price_btn_" + price.id} onClick={this.props.deletePrice}> <span className="icon-remove-sign"></span></a> : null}
                         {this.props.variant_id ? <input type="hidden" defaultValue={this.props.variant_id} name={this.getFieldName(price, "variant_id")} /> : null}
@@ -321,6 +321,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
 
     var VariantPrice = React.createClass({
         displayName: "FComVariantPrice",
+        mixins: [FCom.Mixin],
         newIdx: 0,
         getInitialState: function() {
             return {
@@ -367,9 +368,10 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
                     this.props.options.prices.push(newPrice);
                     this.setState({ options: this.props.options });
                 }
-            } else {
-                // Todo: If prices has data
             }
+        },
+        isLocalMode: function() {
+            return 'data_mode' in this.props.options && this.props.options.data_mode === 'local';
         },
         /**
          * Apply filter
@@ -394,7 +396,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
             $(e.target).val("-1");
 
             var newPrice = {
-                id: 'new_' + (this.newIdx++),
+                id: guid(),
                 product_id: this.props.options.product_id,
                 price_type: type,
                 customer_group_id: this.props.options.filter_customer_group_value || null,
@@ -403,6 +405,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
                 amount: null,
                 qty: 1
             };
+
             if(!this.props.options.prices) {
                 this.props.options.prices = [];
             }
@@ -421,6 +424,14 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
                 this.props.options.deleted = {};
             }
             this.props.options.deleted[id] = true;
+            if (this.isLocalMode()) {
+                var prices = this.props.options.prices;
+                _.each(prices, function(price, index) {
+                    if (price.id == id) {
+                        this.props.options.prices.splice(index, 1);
+                    }
+                }.bind(this));
+            }
             this.setState({ options: this.props.options });
         },
         /**
@@ -616,7 +627,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'jquery.validate', 'date
         render: function() {
             this.calculateDynamicPrice(this.props.options);
             return (
-                <PricesApp {...this.props.options} id={this.props.id} addNewPrice={this.addNewPrice} updatePriceType={this.updatePriceType} updatePriceField={this.updatePriceField} updateOperation={this.updateOperation} applyFilter={this.applyFilter} deletePrice={this.deletePrice} />
+                <PricesApp {...this.props.options} id={this.props.id} isLocal={this.isLocalMode} addNewPrice={this.addNewPrice} updatePriceType={this.updatePriceType} updatePriceField={this.updatePriceField} updateOperation={this.updateOperation} applyFilter={this.applyFilter} deletePrice={this.deletePrice} />
             );
         }
     });

@@ -70,6 +70,18 @@ class Sellvana_CatalogFields_Admin extends BClass
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
+    protected function _saveProductCustom($p, $data = []) {
+        $pc = $this->Sellvana_CatalogFields_Model_ProductField->load($p->id, 'product_id');
+        if (!$pc) {
+            $pc = $this->Sellvana_CatalogFields_Model_ProductField->create();
+        }
+        $pc->set('product_id', $p->id);
+        if (empty($data) || $data === '[]') {
+            $data = null;
+        }
+        $pc->set('_data_serialized', $data)->save();
+    }
+
     public function onProductFormPostAfterValidate($args)
     {
         /** @var Sellvana_Catalog_Model_Product $model */
@@ -77,7 +89,9 @@ class Sellvana_CatalogFields_Admin extends BClass
         $data = $args['data'];
 
         if (!empty($data['custom_fields'])) {
-            $model->setData('custom_fields', $data['custom_fields']);
+            // Save custom fields on fcom_product_custom
+            $this->_saveProductCustom($model, $data['custom_fields']);
+            // $model->setData('custom_fields', $data['custom_fields']);
         }
 
         if (empty($data['vfields']) && empty($data['variants'])) {

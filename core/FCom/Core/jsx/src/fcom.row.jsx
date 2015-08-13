@@ -19,7 +19,7 @@ define(['underscore', 'react'], function (_, React) {
                 "doRowAction": null,
                 "addSelectedRows": null,
                 "getSelectedRows": null
-            }
+            };
         },
         selectRow: function(event) {
             if (event.target.checked) {
@@ -116,29 +116,29 @@ define(['underscore', 'react'], function (_, React) {
                             switch (col.editor) {
                                 case 'checkbox': //todo: need test again
                                 case 'radio':
-                                    node = <input type="checkbox" {...inlineProps} {...validationRules} />;
+                                    node = <input key={col.name} type="checkbox" {...inlineProps} {...validationRules} />;
                                     break;
                                 case 'textarea':  //todo: need test again
-                                    node = <textarea {...inlineProps} {...validationRules} rows="4">{row[col.name]}</textarea>;
+                                    node = <textarea key={col.name} {...inlineProps} {...validationRules} rows="4">{row[col.name]}</textarea>;
                                     break;
                                 case 'select':
                                     var selectOptions = [];
                                     if (_.isArray(col.options)) {
-                                        selectOptions = col.options.map(function(opt) {
-                                            return <option value={opt.value}></option>;
+                                        selectOptions = col.options.map(function(opt, index) {
+                                            return <option key={index} value={opt.value}></option>;
                                         });
                                     } else {
                                         for(var key in col.options) {
-                                            selectOptions.push(<option value={key}>{col.options[key]}</option>);
+                                            selectOptions.push(<option key={key} value={key}>{col.options[key]}</option>);
                                         }
                                     }
                                     
                                     node = (
-                                        <select defaultValue={defaultValue} {...inlineProps} {...validationRules} onChange={that.handleChange}>{selectOptions}</select>
+                                        <select key={col.name} defaultValue={defaultValue} {...inlineProps} {...validationRules} onChange={that.handleChange}>{selectOptions}</select>
                                     );
                                     break;
                                 default:
-                                    node = <input type="text" {...inlineProps} {...validationRules} defaultValue={defaultValue} onChange={that.handleChange} />;
+                                    node = <input key={col.name} type="text" {...inlineProps} {...validationRules} defaultValue={defaultValue} onChange={that.handleChange} />;
                                     break;
                             }
                             /*var inlineColValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";

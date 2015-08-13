@@ -56,7 +56,7 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
         unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
-            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115, 'buttons' => [['name' => 'edit', 'callback' => 'showModalToEditAddress'], ['name' => 'delete']]],
+            ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115, 'buttons' => [['name' => 'edit-custom', 'callback' => 'showModalToEditAddress', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "], ['name' => 'delete']]],
             ['name' => 'id', 'label' => 'ID', 'index' => 'a.id', 'width' => 80, 'hidden' => true],
             ['name' => 'customer_id', 'label' => 'Customer ID', 'index' => 'a.customer_id', 'hidden' => true,
                 'form_hidden_label' => true, 'addable' => true, 'editable' => true,

@@ -404,7 +404,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
             var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
             if (typeof(column['form_hidden_label']) === 'undefined' || !column['form_hidden_label']) {
                 label = (
-                    React.createElement("div", {className: "control-label col-sm-3"}, 
+                    React.createElement("div", {className: "control-label col-sm-3", key: this.props.key}, 
                         React.createElement("label", {htmlFor: column.name}, 
                             column.label, " ", iconRequired
                         )
@@ -419,28 +419,28 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
                     input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
                 }
                 input += '<div class="controls col-sm-8">' + column['element_print'] + '</div>';
-                return React.createElement("div", {className: "form-group element_print", dangerouslySetInnerHTML: {__html: input}})
+                return React.createElement("div", {key: this.props.key, className: "form-group element_print", dangerouslySetInnerHTML: {__html: input}})
             } else {
                 switch (column.editor) {
                     case 'select':
                         var options = [];
                         _.forEach(column.options, function(text, value) {
-                            options.push(React.createElement("option", {value: value}, text));
+                            options.push(React.createElement("option", {value: value, key: value}, text));
                         });
-                        input = React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: this.props.value},  validationRules), options);
+                        input = React.createElement("select", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control", defaultValue: this.props.value},  validationRules), options);
                         break;
                     case 'textarea':
-                        input = React.createElement("textarea", React.__spread({name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: this.props.value},  validationRules));
+                        input = React.createElement("textarea", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: this.props.value},  validationRules));
                         break;
                     default:
-                        input = React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: this.props.value},  validationRules));
+                        input = React.createElement("input", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control", defaultValue: this.props.value},  validationRules));
                         break;
                 }
             }
 
             var removeFieldButton = '';
             if (this.props.removeFieldDisplay) {
-                removeFieldButton = (React.createElement("button", {className: "btn box-remove btn-xs btn-link btn-remove remove-field icon-remove", type: "button", onClick: this.props.removeFieldHandle, "data-field": column.name}));
+                removeFieldButton = (React.createElement("button", {key: this.props.key, className: "btn box-remove btn-xs btn-link btn-remove remove-field icon-remove", type: "button", onClick: this.props.removeFieldHandle, "data-field": column.name}));
             }
 
             return (

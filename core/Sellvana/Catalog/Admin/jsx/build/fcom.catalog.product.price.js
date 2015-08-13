@@ -289,8 +289,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                defaultValue: price['amount'], readOnly: this.editable || this.props.theBase ? null: 'readonly'})
                     ), 
                     React.createElement("td", null, 
-                         operation ? {operation:operation} : null, 
-                         baseField ? {baseField:baseField} : null
+                         operation ? {operation} : null, 
+                         baseField ? {baseField} : null
                     ), 
                     React.createElement("td", null, 
                         [qty, dateRange]
