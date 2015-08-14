@@ -10,6 +10,40 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         'year' => 'Year'
     ];
 
+    protected $_systemFields = [];
+    protected $_visibleFields = [];
+    protected $_selectModels = [];
+
+    /**
+     * @return BView|FCom_Core_View_BackboneGrid
+     */
+    public function gridView()
+    {
+        $view = parent::gridView();
+        $grid = $view->get('grid');
+        $config = $grid['config'];
+
+        $labels = $this->_getFieldLabels();
+        $this->BEvents->fire(static::$_origClass . '::fieldLabels', ['data' => &$labels]);
+
+        foreach ($config['columns'] as &$column) {
+            if (!empty($column['name']) && !empty($labels[$column['name']])) {
+                $column['label'] = $labels[$column['name']];
+            }
+        }
+
+        $view->set('grid', ['config' => $config]);
+        return $view;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [];
+    }
+
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
@@ -75,5 +109,46 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         }
 
         return [];
+    }
+
+    /**
+     * @return array
+     */
+    protected function _addAllColumns()
+    {
+        $columns = [];
+        /** @var FCom_Core_Model_Abstract $model */
+        foreach ($this->_selectModels as $alias => $model) {
+            $table = $model->table();
+            $fields = BDb::ddlFieldInfo($table);
+            foreach ($fields as $field) {
+                $fieldId = $field->orm->get('Field');
+                $fieldName = $alias . '_' . $fieldId;
+                if (!in_array($fieldName, $this->_systemFields)) {
+                    $columns[] = [
+                        'name' => $fieldName,
+                        'index' => $alias . '.' . $fieldId,
+                        'hidden' => (!in_array($fieldName, $this->_visibleFields))
+                    ];
+                }
+            }
+        }
+
+        return $columns;
+    }
+
+    /**
+     * @param BORM $orm
+     */
+    protected function _selectAllFields($orm)
+    {
+        /** @var FCom_Core_Model_Abstract $model */
+        foreach ($this->_selectModels as $alias => $model) {
+            $table = $model->table();
+            $fields = BDb::ddlFieldInfo($table);
+            foreach ($fields as $field) {
+                $orm->select($alias . '.' . $field->orm->get('Field'), $alias . '_' . $field->orm->get('Field'));
+            }
+        }
     }
 }

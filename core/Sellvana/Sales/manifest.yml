@@ -2,7 +2,7 @@ modules:
     Sellvana_Sales:
         version: 0.5.4.0
         channel: alpha
-        require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0, FCom_LibJsFlot: 0.1.0 } }
         description: "Fundamental Sales functionality"
         auto_use: [ bootstrap ]
 
@@ -31,6 +31,8 @@ modules:
                     - [ /sales/report/state/?.action, Sellvana_Sales_Admin_Controller_Report_State ]
                     - [ /sales/report/hour/?.action, Sellvana_Sales_Admin_Controller_Report_Hour ]
                     - [ /sales/report/day/?.action, Sellvana_Sales_Admin_Controller_Report_Day ]
+                    - [ /sales/report/order_detail/?.action, Sellvana_Sales_Admin_Controller_Report_OrderDetail ]
+                    - [ /sales/report/order_item_detail/?.action, Sellvana_Sales_Admin_Controller_Report_OrderItemDetail ]
                     - [ /sales/report/shipping_method/?.action, Sellvana_Sales_Admin_Controller_Report_ShippingMethod ]
                     - [ /sales/report/customer_performance/?.action, Sellvana_Sales_Admin_Controller_Report_CustomerPerformance ]
                     - [ /sales/report/product_history/?.action, Sellvana_Sales_Admin_Controller_Report_ProductHistory ]

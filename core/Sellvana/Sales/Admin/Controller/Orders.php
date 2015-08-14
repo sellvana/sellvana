@@ -383,11 +383,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
     public function getOrderRecent()
     {
+        $limit = $this->BConfig->get('modules/Sellvana_Sales/recent_day');
         $orm = $this->Sellvana_Sales_Model_Order->orm('o')
             ->join('Sellvana_Customer_Model_Customer', ['o.customer_id', '=', 'c.id'], 'c')
-            ->select(['o.*', 'c.firstname', 'c.lastname']);
-
-        $this->_processFilters($orm);
+            ->select(['o.*', 'c.firstname', 'c.lastname'])
+            ->order_by_desc('o.create_at');
+        if ($limit) {
+            $orm->where_raw("DATE_ADD(o.create_at, INTERVAL {$limit} DAY) > NOW()");
+        }
 
         $result = $orm->find_many();
 
@@ -422,21 +425,24 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
     public function getTopProducts()
     {
+        $limit = $this->BConfig->get('modules/Sellvana_Sales/top_products');
         $items = $this->Sellvana_Sales_Model_Order->orm('o')
             ->join('Sellvana_Sales_Model_Order_Item', 'oi.order_id = o.id', 'oi')
             ->join('Sellvana_Catalog_Model_Product', 'p.id = oi.product_id', 'p')
             ->select_expr('SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2))))', 'profit_fixed');
         $this->_processFilters($items);
         $totals = clone $items;
-        $total_profit = $totals->find_one()->get('profit_fixed');
+        $total_profit = $totals->find_one()->get('profit_fixed') ?: 0;
         $profitExpr = "ROUND(SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2)))) * 100 / {$total_profit}, 2)";
         $items->select('p.*')
             ->select_expr('SUM(oi.row_total)', 'revenue')
             ->select_expr('SUM(oi.qty_ordered)', 'qty')
             ->select_expr($profitExpr, 'profit_pc')
             ->group_by('oi.product_id')
-            ->order_by_expr($profitExpr . ' DESC')
-            ->limit(5);
+            ->order_by_expr($profitExpr . ' DESC');
+        if ($limit) {
+            $items->limit($limit);
+        }
 
         $result = $items->find_many();
         return $result;

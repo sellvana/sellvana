@@ -17,14 +17,14 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['name' => 'period', 'index' => 'period', 'label' => 'Period', 'width' => 70],
-            ['name' => 'product_sku', 'index' => 'product_sku', 'label' => 'Inventory SKU', 'width' => 70],
-            ['name' => 'product_name', 'index' => 'product_name', 'label' => 'Inventory SKU Name'],
-            ['name' => 'qty_sold', 'index' => 'qty_sold', 'label' => 'Qty Sold'],
-            ['name' => 'row_total_amount', 'index' => 'row_total_amount', 'label' => 'Total After Discounts'],
+            ['name' => 'period', 'index' => 'period', 'width' => 70],
+            ['name' => 'product_sku', 'index' => 'product_sku', 'width' => 70],
+            ['name' => 'product_name', 'index' => 'product_name'],
+            ['name' => 'qty_sold', 'index' => 'qty_sold'],
+            ['name' => 'row_total_amount', 'index' => 'row_total_amount'],
 
-            ['name' => 'period_type', 'label' => 'Period', 'options' => $this->_periodTypes, 'hidden' => true],
-            ['name' => 'create_at', 'label' => 'Created', 'index' => 'o.create_at', 'hidden' => true],
+            ['name' => 'period_type', 'options' => $this->_periodTypes, 'hidden' => true],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -32,6 +32,23 @@ class Sellvana_Sales_Admin_Controller_Report_ProductPerformance extends FCom_Adm
         ];
 
         return $config;
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'period' => 'Period',
+            'product_sku' => 'Inventory SKU',
+            'product_name' => 'Inventory SKU Name',
+            'qty_sold' => 'Qty Sold',
+            'row_total_amount' => 'Total After Discounts',
+            'period_type' => 'Period',
+            'create_at' => 'Created',
+        ];
     }
 
     /**

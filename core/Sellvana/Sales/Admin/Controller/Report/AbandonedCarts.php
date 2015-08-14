@@ -19,22 +19,41 @@ class Sellvana_Sales_Admin_Controller_Report_AbandonedCarts extends FCom_Admin_C
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['name' => 'id', 'index' => 'c.id', 'label' => 'Cart ID', 'width' => 70],
-            ['name' => 'customer_name', 'index' => 'customer_name', 'label' => 'Customer Name'],
-            ['name' => 'customer_email', 'index' => 'customer_email', 'label' => 'Customer Email'],
-            ['name' => 'skus', 'index' => 'skus', 'label' => 'Inventory SKUs'],
-            ['name' => 'item_qty', 'index' => 'c.item_qty', 'label' => 'Total Qty in Cart'],
-            ['name' => 'subtotal', 'index' => 'c.subtotal', 'label' => 'Subtotal'],
-            ['name' => 'coupon_code', 'index' => 'c.coupon_code', 'label' => 'Applied Coupons'],
-            ['name' => 'last_page', 'index' => 'last_page', 'label' => 'Last Page Visited'],
-            ['name' => 'create_at', 'index' => 'c.create_at', 'label' => 'Date Created'],
-            ['name' => 'update_at', 'index' => 'c.update_at', 'label' => 'Last Updated Date'],
+            ['name' => 'id', 'index' => 'c.id', 'width' => 70],
+            ['name' => 'customer_name', 'index' => 'customer_name'],
+            ['name' => 'customer_email', 'index' => 'customer_email'],
+            ['name' => 'skus', 'index' => 'skus'],
+            ['name' => 'item_qty', 'index' => 'c.item_qty'],
+            ['name' => 'subtotal', 'index' => 'c.subtotal'],
+            ['name' => 'coupon_code', 'index' => 'c.coupon_code'],
+            ['name' => 'last_page', 'index' => 'last_page'],
+            ['name' => 'create_at', 'index' => 'c.create_at'],
+            ['name' => 'update_at', 'index' => 'c.update_at'],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
         ];
 
         return $config;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'id' => 'Cart ID',
+            'customer_name' => 'Customer Name',
+            'customer_email' => 'Customer Email',
+            'skus' => 'Inventory SKUs',
+            'item_qty' => 'Total Qty in Cart',
+            'subtotal' => 'Subtotal',
+            'coupon_code' => 'Applied Coupons',
+            'last_page' => 'Last Page Visited',
+            'create_at' => 'Date Created',
+            'update_at' => 'Last Updated Date',
+        ];
     }
 
     /**

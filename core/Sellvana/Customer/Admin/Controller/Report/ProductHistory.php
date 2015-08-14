@@ -25,16 +25,16 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
         }
 
         $config['columns'] = [
-            ['name' => 'order_date', 'index' => 'o.create_at', 'label' => 'Order Date'],
-            ['name' => 'customer_id', 'index' => 'customer_id', 'label' => 'Customer', 'options' => $customersOptions],
-            ['name' => 'unique_id', 'index' => 'o.unique_id', 'label' => 'Order #'],
-            ['name' => 'product_sku', 'index' => 'oi.product_sku', 'label' => 'Sku'],
-            ['name' => 'product_name', 'index' => 'oi.product_name', 'label' => 'Product Name'],
-            ['name' => 'qty_ordered', 'index' => 'oi.qty_ordered', 'label' => 'Qty ordered'],
-            ['name' => 'price', 'index' => 'oi.price', 'label' => 'Price'],
-            ['name' => 'row_total', 'index' => 'oi.row_total', 'label' => 'Row total'],
-            ['name' => 'qty_refunded', 'index' => 'oi.qty_refunded', 'label' => 'Refunded Qty'],
-            ['name' => 'amount_refunded', 'index' => 'o.amount_refunded', 'label' => 'Refunded Amt'],
+            ['name' => 'order_date', 'index' => 'o.create_at'],
+            ['name' => 'customer_id', 'index' => 'customer_id', 'options' => $customersOptions],
+            ['name' => 'unique_id', 'index' => 'o.unique_id'],
+            ['name' => 'product_sku', 'index' => 'oi.product_sku'],
+            ['name' => 'product_name', 'index' => 'oi.product_name'],
+            ['name' => 'qty_ordered', 'index' => 'oi.qty_ordered'],
+            ['name' => 'price', 'index' => 'oi.price'],
+            ['name' => 'row_total', 'index' => 'oi.row_total'],
+            ['name' => 'qty_refunded', 'index' => 'oi.qty_refunded'],
+            ['name' => 'amount_refunded', 'index' => 'o.amount_refunded'],
         ];
         $config['filters'] = [
             ['field' => 'order_date', 'type' => 'date-range'],
@@ -42,6 +42,25 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
         ];
 
         return $config;
+    }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'order_date' => 'Order Date',
+            'customer_id' => 'Customer',
+            'unique_id' => 'Order #',
+            'product_sku' => 'Sku',
+            'product_name' => 'Product Name',
+            'qty_ordered' => 'Qty ordered',
+            'price' => 'Price',
+            'row_total' => 'Row total',
+            'qty_refunded' => 'Refunded Qty',
+            'amount_refunded' => 'Refunded Amt',
+        ];
     }
 
     /**
