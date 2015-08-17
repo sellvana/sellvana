@@ -74,15 +74,15 @@
     });*/
 </script>
 <script>
-    require(['react', 'underscore', 'jquery', 'fcom.components'], function(React, _, $, Components) {
+    require(['react', 'underscore', 'jquery', 'griddle.fcomModalForm', 'fcom.components'], function(React, _, $, FComModalForm, Components) {
         var inputName = 'input[data-col="name"]';
         var inputOption = 'input[data-col="options"]';
         var selectFieldType = 'select[data-col="input_type"]';
 
-        var shopperGrid, shopperNode;
+        var shopperGrid, shopperNode, shopperModalNode;
         /**
          * Main grid register callback
-         * @param  {Object} grid 
+         * @param  {Object} grid
          * @return mixed
          */
         window.fieldsGridRegister = function(grid) {
@@ -102,6 +102,64 @@
          */
         window.addBlankRows = function(grid) {
             shopperGrid.addRows([{id : guid()}]);
+        }
+
+        /**
+         * Modal for editing shopper field item
+         * @param  {Object} row
+         * @return React modal form
+         */
+        window.showModalToEditShopperField = function(row) {
+            // var modalContainerEle = document.getElementById(shopperGrid.getConfig('id') +'-modal');
+            var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "editShopperFieldsModal",
+                        show: true,
+                        title: 'Edit Form',
+                        confirm: 'Save changes',
+                        cancel: 'Close',
+                        onLoad: function(modal) {
+                            shopperModalNode = $(modal.getDOMNode());
+                            shopperModalNode.find('.modal-dialog').css('width', '900px');
+                        },
+                        onConfirm: window.saveShopperModal
+                    },
+                    React.createElement(FComModalForm, {columnMetadata: shopperGrid.props.columnMetadata, id: shopperGrid.getConfig('id'), row: row, id: shopperGrid.getConfig('id')})
+                    ), modalContainerEle);
+        }
+
+        /**
+         * Callback function for update field
+         * @return mixed
+         */
+        window.saveShopperModal = function(modal) {
+            var fields  = shopperModalNode.find('select, input, textarea, select'),
+                form    = shopperModalNode.find('form'),
+                id      = form.find('#id').val(),
+                hash    = { oper: id ? 'edit' : 'add', id: id },
+                url     = shopperGrid.getConfig('data_url');
+
+            fields.each(function() {
+                var key = $(this).attr('id');
+                var val = $(this).val();
+                var name = $(this).attr('name');
+                hash[key] = shopperGrid.html2text(val);
+                if (name === 'input_type') {
+                    if (val !== 'select') {
+                        $('#' + shopperGrid.getConfig('id') + '-options-' + id).prop('disabled', true);
+                    } else {
+                        $('#' + shopperGrid.getConfig('id') + '-options-' + id).prop('disabled', false);
+                    }
+                }
+                $('#' + shopperGrid.getConfig('id') + '-' + name + '-' + id).val(shopperGrid.html2text(val));
+            });
+
+            if (form.valid()) {
+                shopperGrid.updateRows([hash]);
+                modal.close();
+            }
         }
 
         /*
@@ -127,7 +185,7 @@
          * Update validation class for all rows
          * @return mixed
          */
-        function updateValidation() {  
+        function updateValidation() {
             shopperNode.find(inputName).addClass('unique');
             shopperNode.find(inputOption).addClass('requiredOptions');
             var rows = shopperGrid.getRows();

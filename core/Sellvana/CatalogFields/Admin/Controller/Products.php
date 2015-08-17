@@ -125,7 +125,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                 'type' => 'btn_group',  
                 'buttons' => [
                     ['name' => 'delete'], 
-                    ['name' => 'edit', 'callback' => 'showModalToEditVariantPrice', 'isNew' => ['visibility' => 'hidden']]
+                    ['name' => 'edit-custom', 'callback' => 'showModalToEditVariantPrice', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "]
                 ]
             ],
             ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
@@ -221,6 +221,14 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             }
         }
 
+        // Get prices for each variant
+        if (!empty($data)) {
+            $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+            foreach ($data as $key => $variant) {
+                $data[$key]['prices'] = $priceHlp->getProductPrices($model, $variant['id']);
+            }
+        }
+
         $config = [
             'config' => [
                 'id' => 'variant-grid-' . $model->id(),
@@ -301,7 +309,9 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
 
     public function getInitialData($model)
     {
-        $customFields = $model->getData('custom_fields');
+        // $customFields = $model->getData('custom_fields');
+        $pc = $this->Sellvana_CatalogFields_Model_ProductField->load($model->id, 'product_id');
+        $customFields = $pc->get('_data_serialized');
         return !isset($customFields) ? -1 : $customFields;
     }
     public function fieldsetAry()
