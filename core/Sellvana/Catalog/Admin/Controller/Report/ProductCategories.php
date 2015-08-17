@@ -2,9 +2,6 @@
 
 /**
  * Class Sellvana_Catalog_Admin_Controller_Report_ProductCategories
- *
- * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
  */
 class Sellvana_Catalog_Admin_Controller_Report_ProductCategories extends FCom_Admin_Controller_Abstract_Report
 {
@@ -12,8 +9,8 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductCategories extends FCom_Ad
     protected $_modelClass = 'Sellvana_Catalog_Model_Product';
     protected $_mainTableAlias = 'p';
     protected $_permission = 'catalog/reports';
-    protected $_navPath = 'reports/integrity/product_images';
-    protected $_gridHref = 'integrity/report/product_images';
+    protected $_navPath = 'reports/integrity/product_categories';
+    protected $_gridHref = 'integrity/report/product_categories';
     protected $_gridTitle = 'Products Without Categories';
 
     public function gridConfig()
