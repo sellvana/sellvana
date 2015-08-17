@@ -12,7 +12,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
 
     protected $_systemFields = [];
     protected $_visibleFields = [];
-    protected $_selectModels = [];
+    protected $_selectTables = [];
 
     /**
      * @return BView|FCom_Core_View_BackboneGrid
@@ -26,6 +26,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         $labels = $this->_getFieldLabels();
         $this->BEvents->fire(static::$_origClass . '::fieldLabels', ['data' => &$labels]);
 
+        $this->_selectAllFields($config['orm']);
         foreach ($config['columns'] as &$column) {
             if (!empty($column['name']) && !empty($labels[$column['name']])) {
                 $column['label'] = $labels[$column['name']];
@@ -35,6 +36,18 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         $view->set('grid', ['config' => $config]);
         return $view;
     }
+
+    /**
+     * return config to build grid
+     * @return array
+     */
+    public function gridConfig()
+    {
+        $config = parent::gridConfig();
+        $config['columns'] = array_merge($config['columns'], $this->_addAllColumns());
+        return $config;
+    }
+
 
     /**
      * @return array
@@ -55,6 +68,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
      * @param array $filter
      * @param string $val
      * @param BORM $orm
+     *
+     * @return bool
      */
     public function periodTypeCallback($filter, $val, $orm)
     {
@@ -80,6 +95,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
 
         $orm->group_by_expr($expr);
         $orm->select_expr($expr, 'period');
+
+        return true;
     }
 
     /**
@@ -117,9 +134,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
     protected function _addAllColumns()
     {
         $columns = [];
-        /** @var FCom_Core_Model_Abstract $model */
-        foreach ($this->_selectModels as $alias => $model) {
-            $table = $model->table();
+        /** @var FCom_Core_Model_Abstract $table */
+        foreach ($this->_selectTables as $alias => $table) {
             $fields = BDb::ddlFieldInfo($table);
             foreach ($fields as $field) {
                 $fieldId = $field->orm->get('Field');
@@ -142,9 +158,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
      */
     protected function _selectAllFields($orm)
     {
-        /** @var FCom_Core_Model_Abstract $model */
-        foreach ($this->_selectModels as $alias => $model) {
-            $table = $model->table();
+        /** @var FCom_Core_Model_Abstract $table */
+        foreach ($this->_selectTables as $alias => $table) {
             $fields = BDb::ddlFieldInfo($table);
             foreach ($fields as $field) {
                 $orm->select($alias . '.' . $field->orm->get('Field'), $alias . '_' . $field->orm->get('Field'));

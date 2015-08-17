@@ -29,9 +29,9 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
     public function __construct()
     {
         parent::__construct();
-        $this->_selectModels['oi'] = $this->Sellvana_Sales_Model_Order_Item;
-        $this->_selectModels['o'] = $this->Sellvana_Sales_Model_Order;
-        $this->_selectModels['c'] = $this->Sellvana_Customer_Model_Customer;
+        $this->_selectTables['oi'] = $this->Sellvana_Sales_Model_Order_Item->table();
+        $this->_selectTables['o'] = $this->Sellvana_Sales_Model_Order->table();
+        $this->_selectTables['c'] = $this->Sellvana_Customer_Model_Customer->table();
     }
 
 
@@ -39,11 +39,7 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
     {
         $config = parent::gridConfig();
 
-        $config['columns'] = [
-            ['name' => 'create_at', 'index' => 'o.create_at'],
-        ];
-
-        $config['columns'] = array_merge($config['columns'], $this->_addAllColumns());
+        $config['columns'][] = ['name' => 'create_at', 'index' => 'o.create_at'];
 
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -163,7 +159,5 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
             ->join('Sellvana_Customer_Model_Customer', 'c.id = o.customer_id', 'c')
             ->left_outer_join('Sellvana_CustomerGroups_Model_Group', 'cg.id = c.customer_group', 'cg')
             ->group_by('oi.id');
-
-        $this->_selectAllFields($orm);
     }
 }
