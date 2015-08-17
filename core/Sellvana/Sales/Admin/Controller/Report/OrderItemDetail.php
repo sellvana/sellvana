@@ -29,9 +29,9 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
     public function __construct()
     {
         parent::__construct();
-        $this->_selectModels['oi'] = $this->Sellvana_Sales_Model_Order_Item->table();
-        $this->_selectModels['o'] = $this->Sellvana_Sales_Model_Order->table();
-        $this->_selectModels['c'] = $this->Sellvana_Customer_Model_Customer->table();
+        $this->_selectTables['oi'] = $this->Sellvana_Sales_Model_Order_Item->table();
+        $this->_selectTables['o'] = $this->Sellvana_Sales_Model_Order->table();
+        $this->_selectTables['c'] = $this->Sellvana_Customer_Model_Customer->table();
     }
 
 

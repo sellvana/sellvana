@@ -26,8 +26,8 @@ class Sellvana_Sales_Admin_Controller_Report_OrderDetail extends FCom_Admin_Cont
 
     public function gridConfig()
     {
-        $this->_selectModels['o'] = $this->Sellvana_Sales_Model_Order->table();
-        $this->_selectModels['c'] = $this->Sellvana_Customer_Model_Customer->table();
+        $this->_selectTables['o'] = $this->Sellvana_Sales_Model_Order->table();
+        $this->_selectTables['c'] = $this->Sellvana_Customer_Model_Customer->table();
 
         $config = parent::gridConfig();
 

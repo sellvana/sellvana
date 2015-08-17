@@ -12,7 +12,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
 
     protected $_systemFields = [];
     protected $_visibleFields = [];
-    protected $_selectModels = [];
+    protected $_selectTables = [];
 
     /**
      * @return BView|FCom_Core_View_BackboneGrid
@@ -135,7 +135,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
     {
         $columns = [];
         /** @var FCom_Core_Model_Abstract $table */
-        foreach ($this->_selectModels as $alias => $table) {
+        foreach ($this->_selectTables as $alias => $table) {
             $fields = BDb::ddlFieldInfo($table);
             foreach ($fields as $field) {
                 $fieldId = $field->orm->get('Field');
@@ -159,7 +159,7 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
     protected function _selectAllFields($orm)
     {
         /** @var FCom_Core_Model_Abstract $table */
-        foreach ($this->_selectModels as $alias => $table) {
+        foreach ($this->_selectTables as $alias => $table) {
             $fields = BDb::ddlFieldInfo($table);
             foreach ($fields as $field) {
                 $orm->select($alias . '.' . $field->orm->get('Field'), $alias . '_' . $field->orm->get('Field'));
