@@ -1903,10 +1903,7 @@ class BORM extends ORMWrapper
         $values = [];
         foreach ($this->_where_conditions as $condition) {
             // WHERE condition doesn't always have a value (e.g. WHERE x IS NULL)
-            if (!empty($condition[static::WHERE_VALUES][0])
-                || $condition[static::WHERE_VALUES][0] === 0
-                || $condition[static::WHERE_VALUES][0] === '0'
-            ) {
+            if (isset($condition[static::WHERE_VALUES][0])) {
                 $values[] = $condition[static::WHERE_VALUES][0];
             }
         }
