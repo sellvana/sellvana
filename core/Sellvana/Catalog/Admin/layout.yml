@@ -13,6 +13,7 @@ base:
             - [ addNav, reports/catalog/low_inventory, { label: Low Inventory Report, href: /catalog/report/low_inventory, pos: 90 }]
             - [ addNav, reports/integrity, { label: Data Integrity, pos: 50 }]
             - [ addNav, reports/integrity/product_images, { label: Products with no images, href: /integrity/report/product_images, pos: 10 }]
+            - [ addNav, reports/integrity/product_categories, { label: Products without a category, href: /integrity/report/product_categories, pos: 20 }]
     - view: admin/header
         do:
             - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]

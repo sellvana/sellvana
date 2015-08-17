@@ -41,6 +41,7 @@ modules:
                     - [ /catalog/report/low_inventory/?.action, Sellvana_Catalog_Admin_Controller_Report_LowInventory ]
 
                     - [ /integrity/report/product_images/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductImages ]
+                    - [ /integrity/report/product_categories/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductCategories ]
                 observe:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, Sellvana_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, Sellvana_Catalog_Admin_Controller_Products.onGenerateSiteMap ]
