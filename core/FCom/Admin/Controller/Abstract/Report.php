@@ -55,6 +55,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
      * @param array $filter
      * @param string $val
      * @param BORM $orm
+     *
+     * @return bool
      */
     public function periodTypeCallback($filter, $val, $orm)
     {
@@ -80,6 +82,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
 
         $orm->group_by_expr($expr);
         $orm->select_expr($expr, 'period');
+
+        return true;
     }
 
     /**
