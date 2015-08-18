@@ -1,2 +1,7 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, reports/catalog/wishlist_items, { label: Products on Wishlists, href: /catalog/report/wishlist_items, pos: 60 }]
+
 /settings:
     - { view: settings, do: [[ addTab, Sellvana_Wishlist, { label: Wishlist, group: customers, async: true, permission: settings/Sellvana_Wishlist } ]] }

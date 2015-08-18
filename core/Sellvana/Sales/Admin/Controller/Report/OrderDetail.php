@@ -26,17 +26,13 @@ class Sellvana_Sales_Admin_Controller_Report_OrderDetail extends FCom_Admin_Cont
 
     public function gridConfig()
     {
-        $this->_selectModels['o'] = $this->Sellvana_Sales_Model_Order;
-        $this->_selectModels['c'] = $this->Sellvana_Customer_Model_Customer;
+        $this->_selectTables['o'] = $this->Sellvana_Sales_Model_Order->table();
+        $this->_selectTables['c'] = $this->Sellvana_Customer_Model_Customer->table();
 
         $config = parent::gridConfig();
 
-        $config['columns'] = [
-            ['name' => 'create_at', 'index' => 'o.create_at'],
-            ['name' => 'inventory_sku', 'index' => 'inventory_sku'],
-        ];
-
-        $config['columns'] = array_merge($config['columns'], $this->_addAllColumns());
+        $config['columns'][] = ['name' => 'create_at', 'index' => 'o.create_at'];
+        $config['columns'][] = ['name' => 'inventory_sku', 'index' => 'inventory_sku'];
 
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -130,7 +126,5 @@ class Sellvana_Sales_Admin_Controller_Report_OrderDetail extends FCom_Admin_Cont
             ->join('Sellvana_Sales_Model_Order_Item', 'oi.order_id = o.id', 'oi')
             ->select_expr('GROUP_CONCAT(oi.product_sku SEPARATOR ", ")', 'inventory_sku')
             ->group_by('o.id');
-
-        $this->_selectAllFields($orm);
     }
 }
