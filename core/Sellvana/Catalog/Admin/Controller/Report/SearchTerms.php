@@ -10,7 +10,7 @@ class Sellvana_Catalog_Admin_Controller_Report_SearchTerms extends FCom_Admin_Co
     protected $_mainTableAlias = 'sh';
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/catalog/search_terms';
-    protected $_gridHref = 'catalog/report/search_terms';
+    protected $_gridHref = 'catalog/report/inventory/search_terms';
     protected $_gridTitle = 'Search Terms';
 
     public function gridConfig()

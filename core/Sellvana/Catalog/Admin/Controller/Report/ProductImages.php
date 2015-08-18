@@ -13,7 +13,7 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductImages extends FCom_Admin_
     protected $_mainTableAlias = 'p';
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/integrity/product_images';
-    protected $_gridHref = 'integrity/report/product_images';
+    protected $_gridHref = 'catalog/report/integrity/product_images';
     protected $_gridTitle = 'Products Without Images';
 
     public function gridConfig()
