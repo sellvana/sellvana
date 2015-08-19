@@ -11,7 +11,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
                     self.props.updatePriceType(id, priceType);
                     self.props.validate();
                 });
-                if(this.props.data.price_type === 'sale'){
+                if(this.props.data.price_type === 'sale') {
                     this.initDateInput();
                 }
             }
@@ -63,7 +63,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
         },
         updateOperation: function(e) {
             var operation = e.target.value;
-            var id = this.props.data.id;
+            var id        = this.props.data.id;
             var baseField = null;
             if (this.refs.base_fields) {
                 baseField = $(this.refs.base_fields.getDOMNode()).val();
@@ -73,7 +73,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
         },
         updatePriceType: function(e) {
             var priceType = e.target.value;
-            var id = this.props.data.id;
+            var id        = this.props.data.id;
             this.props.updatePriceType(id, priceType);
             this.props.validate();
         },
@@ -114,12 +114,12 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
                     return price.operation == item.value;
                 });
                 operation =
-                        <select key="operation" data-type='operation' name={this.getFieldName(price, 'operation')} defaultValue={price.operation}
-                            ref="operation" className="form-control" disabled={price.price_type == 'promo'} onChange={this.updateOperation}>
-                            {this.props.operationOptions.map(function (o) {
-                                return <option value={o.value} key={o.value}>{o.label}</option>;
-                            })}
-                        </select>;
+                    <select key="operation" data-type='operation' name={this.getFieldName(price, 'operation')} defaultValue={price.operation}
+                        ref="operation" className="form-control" disabled={price.price_type == 'promo'} onChange={this.updateOperation}>
+                        {this.props.operationOptions.map(function (o) {
+                            return <option value={o.value} key={o.value}>{o.label}</option>;
+                        })}
+                    </select>;
                 if(price.operation && price.operation !== "=$") {
                     baseField =
                         <select ref="base_fields" data-type='base_field' key="base_field" name={this.getFieldName(price, 'base_field')} defaultValue={price.base_field} className="base_field form-control" onChange={this.updateOperation} disabled={this.editable || this.props.theBase ? null: true}>
@@ -221,9 +221,9 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
             return show;
         },
         render: function() {
-            var self = this;
-            var childProps = _.omit(this.props, ['prices', 'deleted','validatePrices', 'title']);
-            var baseFound = false;
+            var self         = this;
+            var childProps   = _.omit(this.props, ['prices', 'deleted','validatePrices', 'title']);
+            var baseFound    = false;
             var priceOptions = {};
             _.each(this.props.price_types, function (op, k) {
                 if(k !== 'promo') {
@@ -490,10 +490,10 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
          * @return {Object}
          */
         findBasePrice: function(price, prices) {
-            var base_field = price.base_field;
+            var base_field        = price.base_field;
             var customer_group_id = price.customer_group_id;
-            var currency_code = price.currency_code;
-            var site_id = price.site_id;
+            var currency_code     = price.currency_code;
+            var site_id           = price.site_id;
 
             var possiblePrices = _.filter(prices, function (p) {
                 return p.price_type == base_field;
@@ -576,7 +576,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
                     collectPrice(basePrice, prices);
                 }
                 var result;
-                var value = parseFloat(basePrice.calc_amount || basePrice.amount);
+                var value  = parseFloat(basePrice.calc_amount || basePrice.amount);
                 var value2 = parseFloat(price.amount);
                 switch (operation) {
                     case '*$':
@@ -604,7 +604,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
             }
         },
         calculateDynamicPrice: function(options) {
-            var self = this;
+            var self   = this;
             var prices = options.prices;
             _.each(prices, function (price) {
                 price.calc_amount = null;

@@ -263,7 +263,7 @@
         }
     });
 
-    require(['react', 'underscore', 'jquery', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'fcom.catalog.price', 'fcom.locale'], function(React, _, $, FComGriddleComponent, FComModalForm, Components, Price, Locale) {
+    require(['react', 'underscore', 'jquery', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'fcom.catalog.price', 'fcom.locale', 'fcom.catalog.components'], function(React, _, $, FComGriddleComponent, FComModalForm, Components, Price, Locale) {
 
         /**
          * Add new option row
@@ -285,6 +285,11 @@
             }
         }
 
+        /**
+         * Toggle tabs when edit trigger
+         * @param  {string} label 
+         * @return {mixed}
+         */
         window.toggleTab = function(label) {
             shopperModalNode.find('#btn'+capitalizeFirstLetter(label)+'Tab').click();
             shopperModalNode.find('#btnShopperTab').click();
@@ -300,7 +305,7 @@
 
         var PriceTabs = React.createClass({
             displayName: "PriceTabs",
-            mixins: [FCom.Mixin],
+            mixins: [FCom.Mixin, FCom.PriceMixin],
             getInitialState: function() {
                 return {
                     options: []
@@ -346,7 +351,6 @@
             render: function() {
                 var optionLabelIndex = optionDataIndex = 0;
                 var options = _.isEmpty(this.state.options) ? this.props.row.options.split(',') : this.state.options;
-                // var renderNodes = _.after(options.length, render);
 
                 return React.createElement("div", { className: "tabbable" },
                     React.createElement("ul", { className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
@@ -372,7 +376,7 @@
                                     return React.createElement('li', { className: className, role: 'presentation', key: option, id: option + '-tab' }, 
                                             React.createElement('a', { id: 'btn'+capitalizeFirstLetter(option)+'Tab', href: '#'+option, 'aria-controls': option, role: 'tab', 'data-toggle': 'tab' }, capitalizeFirstLetter(option))
                                         );
-                                })
+                                }.bind(this))
                             ),
                             React.createElement("div", { id: shopperGrid.getConfig('id') + '-data-tabs', className: "tab-content" }, 
                                 _(options).map(function(option, index) {
@@ -387,7 +391,7 @@
                                     if (shopperPrices[option] && shopperPrices[option].length) {
                                         prices = JSON.parse(shopperPrices[option]);
                                     }
-                                    // console.log('prices', prices);
+
                                     /**
                                      * Validate unique price
                                      * @return mixed
@@ -414,6 +418,7 @@
                                         sites: {{ sites ? UTIL.toJson(sites) | raw: 'null' }},
                                         currencies: {{ currencies ? UTIL.toJson(currencies) | raw: 'null' }},
                                         validatePrices: validatePrices,
+                                        product_id: '{{ model.id() }}',
                                         priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
                                         operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
                                         show_customers: {{ loadCustomerGroups ? 'true' : 'false' }},
@@ -424,130 +429,22 @@
                                     var node = React.createElement('div', { role: 'tabpanel', className: 'tab-pane fade ' + className, id: option , key: option}, 
                                             React.createElement(Price, { id: option, options: priceOptions })
                                         );
-                                    /**
-                                     * Custom validate function for checking base field
-                                     */
-                                    function validateBaseField(value, element) {
-                                        var valid = false;
-                                        if(typeof element !== 'undefined') {
-                                            var $parent = $(element).parents('.'+option+'-price-item');
-                                            var $curFields = $parent.find('.customer-group, .site, .currency');
-                                            var currHash = value;
-                                            var matchingHashes = {};
-                                            var siteId = '*', currCode = '*', groupId = '*';
-                                            $curFields.each(function () {
-                                                var $el = $(this);
-                                                var val = $el.val();
-
-                                                if($el.hasClass('site')) {
-                                                    siteId = val;
-                                                } else if($el.hasClass('currency')) {
-                                                    currCode = val;
-                                                } else if($el.hasClass('customer-group')) {
-                                                    groupId = val;
-                                                }
-                                            });
-
-                                            matchingHashes[value + '***'] = 1;
-
-                                            matchingHashes[value + groupId +'**'] = 1;
-                                            matchingHashes[value + '*' + siteId + '*'] = 1;
-                                            matchingHashes[value + '**' + currCode] = 1;
-                                            matchingHashes[value + groupId + '*' + currCode] = 1;
-                                            matchingHashes[value + '*' + siteId + currCode] = 1;
-                                            matchingHashes[value + groupId + siteId + '*'] = 1;
-
-                                            matchingHashes[currHash] = 1;
-
-
-                                            var $items = $('.'+option+'-price-item');
-                                            $items.each(function () {
-                                                if(valid) {
-                                                    // valid price already found, return
-                                                    return;
-                                                }
-
-                                                var $item = $(this);
-                                                if($item[0] === $parent[0]) {
-                                                    // same as validated element, return
-                                                    return;
-                                                }
-                                                var $priceType = $item.find('.price-type');
-                                                if($priceType.length == 0) {
-                                                    // no price type return
-                                                    return;
-                                                }
-                                                var itemHash = $priceType.val();
-
-                                                var $itemFields = $item.find('.customer-group, .site, .currency');
-                                                var siteId = '*', currCode = '*', groupId = '*', defaultHash = '';
-                                                $itemFields.each(function () {
-                                                    var $el = $(this);
-                                                    if ($el.hasClass('site')) {
-                                                        siteId = $el.val();
-                                                    } else if ($el.hasClass('currency')) {
-                                                        currCode = $el.val();
-                                                    } else if ($el.hasClass('customer-group')) {
-                                                        groupId = $el.val();
-                                                    }
-                                                });
-                                                itemHash += groupId + siteId + currCode;
-                                                valid = (matchingHashes[itemHash] == 1);
-                                            });
-                                        }
-                                        return valid;
-                                    }
-
-                                    /*
-                                     *custom validation function for checking duplicated input
-                                     */
-                                    function priceUnique(value, elem) {
-                                        var form = $(elem).parents('#{{ frontendFieldGrid.config.id }}_options_form');
-                                        var valid = true;
-                                        if (typeof elem !== 'undefined') {
-                                            var parent = $(elem).parents('.'+option+'-price-item');
-                                            var curFields = parent.find('input.'+option+'PriceUnique, select.'+option+'PriceUnique');
-                                            var currHash = '';
-                                            curFields.each(function () {
-                                                currHash += $(this).val();
-                                            });
-
-                                            var items = form.find('.'+option+'-price-item');
-                                            items.each(function () {
-                                                if (!valid) {
-                                                    return;
-                                                }
-
-                                                var $item = $(this);
-                                                if (this === parent[0]) {
-                                                    return;
-                                                }
-                                                var fields = $item.find('input.'+option+'PriceUnique, select.'+option+'PriceUnique');
-                                                var checkHash = '';
-                                                fields.each(function (idx) {
-                                                    checkHash += $(this).val();
-                                                });
-                                                valid = currHash != checkHash;
-                                            });
-                                            return valid;
-                                        }
-                                    }
 
                                     var validateUniqueMethod = option+'PriceUnique',
                                         validateBaseMethod = option+'BaseField',
                                         validateUniqueRule = {};
 
                                     validateUniqueRule[validateUniqueMethod] = true;
-                                    $.validator.addMethod(validateUniqueMethod, priceUnique, '{{"Price already exists."|_}}');
+                                    $.validator.addMethod(validateUniqueMethod, this.validateUniquePrice(option), '{{"Price already exists."|_}}');
                                     $.validator.addClassRules(validateUniqueMethod, validateUniqueRule);
 
-                                    $.validator.addMethod(validateBaseMethod, validateBaseField, '{{"No matching base price"|_}}');
+                                    $.validator.addMethod(validateBaseMethod, this.validateBasePrice(option), '{{"No matching base price"|_}}');
                                     $.validator.addClassRules("base_field", {
                                         base_field: true
                                     });
 
                                     return node;
-                                })
+                                }.bind(this))
                             )
                         )
                     )
@@ -589,7 +486,10 @@
                     React.createElement("div", { className: "row f-grid-wrapper" }, 
                         React.createElement("form", {id:'{{ frontendFieldGrid.config.id }}_options_form'},
                             React.createElement(PriceTabs, { row: row })
-                    ))), modalContainerEle);
+                        )
+                    )
+                ), modalContainerEle
+            );
 
             // Register options grid
             var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};

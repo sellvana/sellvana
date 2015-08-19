@@ -9,7 +9,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
     FCom.Mixin = {
         text2html: function (val) {
             var text = $.parseHTML(val);
-            return (text != null) ? text[0].data: null;
+            return (text !== null) ? text[0].data: null;
         },
         html2text: function (val) {
             return $('<div/>').text(val).html();
