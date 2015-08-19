@@ -145,6 +145,27 @@ define(['underscore', 'react'], function (_, React) {
                             node = (<input type="text" data-col={col.name} onChange={that.handleChange} defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + row.id + "][" + col.name + "]"} />);*/
                         }
                         break;
+                    case 'link':
+                        var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+                        var count = 0;
+                        if (defaultValue) {
+                            count = defaultValue.split(',').length;
+                        }
+                        var value = count + ' ' + col.value;
+                        
+                        var inlineProps = {
+                            href: col.href ? col.href : 'javascript:void(0)',
+                            id: id + '-' + col.name + '-' + row.id,
+                            name: id + '[' + row.id + '][' + col.name + ']',
+                            className: (col.cssClass ? col.cssClass : ''),
+                            style: (col.style ? col.style : ''),
+                            "data-col": col.name,
+                            'data-action': col.name,
+                            'data-row': row.id,
+                            defaultValue: defaultValue
+                        };
+                        node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{value}</a>;
+                        break;
                     default:
                         if (col.display == 'eval') {
                             //use rc for compatibility old backbone grid

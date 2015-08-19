@@ -52,8 +52,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ],
                     ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select',
                         'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => 'Yes', 0 => 'No'], 'default' => 1],
-                    ['type' => 'input', 'name' => 'options', 'label' => 'Options', 'width' => 200, 'editable' => 'inline', 'cssClass' => '', 
-                        'addable' => true, 'validation' => ['required' => true]],
+                    ['type' => 'link', 'name' => 'options', 'label' => 'Options', 'width' => 200, 'value' => 'text', 'style' => ['fontSize' => '12px', 'lineHeight' => '32px', 'display' => 'block', 'textAlign' => 'center'], 'value' => 'Options', 'addable' => true, 'action' => 'showModalToEditShopperField'],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 200, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true]],
                     ['type' => 'btn_group', 'buttons' => [['name' => 'edit-custom', 'callback' => 'showModalToEditShopperField', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "], ['name' => 'delete']]]
