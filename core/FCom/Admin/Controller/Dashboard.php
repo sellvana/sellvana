@@ -34,7 +34,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
         }
 
         $result['filter'] = (isset($persData['dashboard']['filter'])) ? $persData['dashboard']['filter']: [];
-        if ($result['filter']['range'] == 'range') {
+        if (!empty($result['filter']['range']) && $result['filter']['range'] == 'range') {
             $result['filter'] = $this->_calculateDate($result['filter']);
         }
         $this->_processDateFilter($result['filter']);
