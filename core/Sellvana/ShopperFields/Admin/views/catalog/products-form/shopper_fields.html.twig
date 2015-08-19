@@ -263,7 +263,7 @@
         }
     });
 
-    require(['react', 'underscore', 'jquery', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'griddle.fcomPrice', 'fcom.locale'], function(React, _, $, FComGriddleComponent, FComModalForm, Components, Price, Locale) {
+    require(['react', 'underscore', 'jquery', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'fcom.catalog.price', 'fcom.locale'], function(React, _, $, FComGriddleComponent, FComModalForm, Components, Price, Locale) {
 
         /**
          * Add new option row
@@ -313,7 +313,7 @@
                     removedOption: ''
                 }
             },
-            getOption: function() {
+            getAddedOption: function() {
                 return this.props.addedOption;
             },
             componentDidMount: function() {
@@ -325,7 +325,7 @@
 
                 // Global event system for remove row action on option grid
                 $(OPTS).on('remove', function(e, options, removedRow) {
-                    this.props.removedRow = removedRow;
+                    this.props.removedRow = removedRow.label;
                     this.setState({ options: options });
                 }.bind(this));
             },
@@ -334,13 +334,14 @@
                     toggleTab(this.props.addedOption);
                     this.props.addedOption = '';
                 }
+
+                if (this.props.removedOption !== '') {
+                    // 
+                }
             },
             componentWillUnmount: function () {
                 $(OPTS).off('add');
                 $(OPTS).off('remove');
-            },
-            renderView: function() {
-
             },
             render: function() {
                 var optionLabelIndex = optionDataIndex = 0;
@@ -349,14 +350,17 @@
 
                 return React.createElement("div", { className: "tabbable" },
                     React.createElement("ul", { className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
-                        React.createElement('li', { className: '', role: 'presentation' }, 
-                            React.createElement('a', { id: 'btnShopperTab', href: '#shopper-tab', 'aria-controls': 'shopper-tab', role: 'tab', 'data-toggle': 'tab' }, 'Price rule')
-                        ),
                         React.createElement('li', { className: 'active', role: 'presentation' }, 
                             React.createElement('a', { id: 'btnOptionsTab',href: '#options-tab', 'aria-controls': 'options-tab', role: 'tab', 'data-toggle': 'tab' }, 'Options')
+                        ),
+                        React.createElement('li', { className: '', role: 'presentation' }, 
+                            React.createElement('a', { id: 'btnShopperTab', href: '#shopper-tab', 'aria-controls': 'shopper-tab', role: 'tab', 'data-toggle': 'tab' }, 'Price rule')
                         )
                     ),
                     React.createElement("div", { className: "tab-content" }, 
+                        React.createElement("div", { className: "tab-pane fade in active", id: 'options-tab', role: 'tabpanel' }, 
+                            React.createElement("div", {id:'{{ frontendFieldGrid.config.id }}_options_grid'})
+                        ),
                         React.createElement("div", { className: "tab-pane fade", id: 'shopper-tab', role: 'tabpanel' },
                             React.createElement("ul", { id: shopperGrid.getConfig('id') + '-tabs', className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
                                 _(options).map(function(option) {
@@ -398,7 +402,7 @@
                                         return valid;
                                     }
 
-                                    var optionsPrice = {
+                                    var priceOptions = {
                                         id: 'shopper',
                                         title: Locale._(capitalizeFirstLetter(option) + ' Prices'),
                                         data_mode: 'local',
@@ -418,7 +422,7 @@
                                     };
 
                                     var node = React.createElement('div', { role: 'tabpanel', className: 'tab-pane fade ' + className, id: option , key: option}, 
-                                            React.createElement(Price, { id: option, options: optionsPrice })
+                                            React.createElement(Price, { id: option, options: priceOptions })
                                         );
                                     /**
                                      * Custom validate function for checking base field
@@ -545,9 +549,6 @@
                                     return node;
                                 })
                             )
-                        ),
-                        React.createElement("div", { className: "tab-pane fade in active", id: 'options-tab', role: 'tabpanel' }, 
-                            React.createElement("div", {id:'{{ frontendFieldGrid.config.id }}_options_grid'})
                         )
                     )
                 );

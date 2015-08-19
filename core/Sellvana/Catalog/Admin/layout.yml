@@ -43,7 +43,7 @@ catalog_product_form_tabs:
         do:
             - [ css, "@Sellvana_Catalog/Admin/css/prices.css" ]
             - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.product.price, { deps: [ jquery, react ] } ]
-            - [ requireJs, fcom.catalog.variant.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.variant.price, { deps: [ jquery, react ] } ]
+            - [ requireJs, fcom.catalog.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.price, { deps : [ react ]} ]
 #            - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/src/fcom.catalog.product.price, [jquery, react]]
 
 /catalog/products/import:

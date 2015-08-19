@@ -60,7 +60,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
         getInputId: function () {
             var field = this.props.field;
             if (this.props.id) {
-                return this.props.id
+                return this.props.id;
             }
             if (!field) {
                 return '';
