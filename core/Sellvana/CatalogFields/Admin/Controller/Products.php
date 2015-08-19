@@ -335,7 +335,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $set = $this->Sellvana_CatalogFields_Model_Set->load($id);
         $fields = $this->BDb->many_as_array($this->Sellvana_CatalogFields_Model_SetField->orm('sf')
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
-            ->select(['f.id', 'f.field_name', 'f.admin_input_type'])
+            ->select(['f.id', 'f.field_code', 'f.field_name', 'f.admin_input_type'])
             ->where('sf.set_id', $id)->find_many()
         );
         foreach ($fields as &$field) {
@@ -361,9 +361,9 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $id = $r->get('id');
         $field = $this->Sellvana_CatalogFields_Model_Field->load($id);
         $options = $this->Sellvana_CatalogFields_Model_FieldOption->getListAssocById($field->id());
-        $this->BResponse->json(['id' => $field->id(), 'field_name' => $field->field_name,
-            'admin_input_type' => $field->admin_input_type, 'multilang' => $field->multilanguage,
-            'options' => $options, 'required' => $field->required]);
+        $this->BResponse->json(['id' => $field->id(), 'field_code' => $field->field_code,
+            'field_name' => $field->field_name, 'admin_input_type' => $field->admin_input_type,
+            'multilang' => $field->multilanguage, 'options' => $options, 'required' => $field->required]);
     }
 
     public function action_save__POST()
