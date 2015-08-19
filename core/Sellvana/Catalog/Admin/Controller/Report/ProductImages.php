@@ -30,6 +30,8 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductImages extends FCom_Admin_
             ['field' => 'image_count', 'type' => 'number-range', 'callback' => 'filterByImageCount', 'op' => 'equal', 'val' => '0'],
         ];
 
+        $config = $this->_addProductCustomFields($config);
+
         return $config;
     }
 
@@ -38,11 +40,15 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductImages extends FCom_Admin_
      */
     protected function _getFieldLabels()
     {
-        return [
+        $labels = [
             'product_sku' => 'SKU',
             'product_name' => 'Name',
             'image_count' => 'Image Count',
         ];
+
+        $labels = array_merge($labels, $this->_getProductCustomFieldLabels());
+
+        return $labels;
     }
 
     /**

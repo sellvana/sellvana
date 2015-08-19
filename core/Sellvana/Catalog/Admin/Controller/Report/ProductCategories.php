@@ -21,6 +21,8 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductCategories extends FCom_Ad
             ['name' => 'product_name', 'index' => 'p.product_name'],
         ];
 
+        $config = $this->_addProductCustomFields($config);
+
         return $config;
     }
 
@@ -29,10 +31,14 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductCategories extends FCom_Ad
      */
     protected function _getFieldLabels()
     {
-        return [
+        $labels = [
             'product_sku' => 'SKU',
             'product_name' => 'Name',
         ];
+
+        $labels = array_merge($labels, $this->_getProductCustomFieldLabels());
+
+        return $labels;
     }
 
     /**
