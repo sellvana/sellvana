@@ -79,6 +79,18 @@ class Sellvana_CatalogFields_Admin extends BClass
         if (empty($data) || $data === '[]') {
             $data = null;
         }
+        $fields = $this->BUtil->fromJson($data);
+        if(is_array($fields) && !empty($fields[0]['fields'])) {
+            foreach ($fields[0]['fields'] as $field) {
+                if (!in_array($field['field_code'], ['id', 'product_id'])) {
+                    $value = $field['value'];
+                    if (!empty($field['options'])) {
+                        $value = $field['options'][$field['value']];
+                    }
+                    $pc->set($field['field_code'], $value);
+                }
+            }
+        }
         $pc->set('_data_serialized', $data)->save();
     }
 
