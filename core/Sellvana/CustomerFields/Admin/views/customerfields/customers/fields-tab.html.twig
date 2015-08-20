@@ -314,9 +314,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     {
         $("#sel_sets option[value='"+set.get('id')+"']").remove();
         var fields = set.fields;
-        fields.each(function(f) {
-            $("#sel_fields option[value='"+f.get('id')+"']").remove();
-        });
+        if (fields && typeof(fields.each) == 'function') {
+            fields.each(function (f) {
+                $("#sel_fields option[value='" + f.get('id') + "']").remove();
+            });
+        }
         refresh_selects();
     }
 
@@ -372,7 +374,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     $(_mainForm).submit(function(ev) {
 
-        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
+        var newVal = JSON.stringify(setCollection.toJSON());
+        console.log(newVal);
+        $('#custom_fields').val(newVal);
 
         if(!$(this).valid()) {
             CustomField.checkingForm = true;
@@ -675,10 +679,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.model.set('value', val);
         },
         _remove: function() {
-            var confirm = window.confirm("Do you want to really remove?");
+            var confirm = window.confirm("{{ "Do you want to really remove?"|_ }}");
             if (confirm) {
+                console.log(684);
                 add_option(this.model);
-                this.parentSet.fields.remove(this.model);
+                if (this.options.parentSet) {
+                    console.log("removing");
+                    this.options.parentSet.remove(this.model);
+                }
                 this.undelegateEvents();
                 this.$el.removeData().unbind();
                 this.remove();
@@ -732,7 +740,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         _addFieldView: function(field) {
 //            var setView = new  CustomField.Views.FieldSetView({model: set});
             console.log(field);
-            var fieldView = new CustomField.Views.FieldView({model: field});
+            var fieldView = new CustomField.Views.FieldView({model: field, parentSet: setCollection});
             this.$el.find('div.box-content').append(fieldView.render().el);
 
             switch (field.get('admin_input_type')) {
@@ -769,10 +777,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             var fSet = initialData[i];
             //var fields = _.clone(set.fields);
             //delete set.fields;
-            var setModel = new CustomField.Models.Field(fSet);
+            var field = new CustomField.Models.Field(fSet);
             //setModel.fields.set(fields);
-            setCollection.add(setModel);
-            remove_options(setModel);
+            setCollection.add(field);
+            remove_option(field);
         }
         $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
     }
@@ -787,7 +795,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 //        $('#btn_add_field').css('display', 'none');
 //    }
     setCollection.on('add remove change', function (ev, data) {
-        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
+        var newVal = JSON.stringify(setCollection.toJSON());
+        console.log(newVal);
+        $('#custom_fields').val(newVal);
 
 //        if (setCollection.length === 0) {
 //            $('#td_fields').css('display', 'none');
