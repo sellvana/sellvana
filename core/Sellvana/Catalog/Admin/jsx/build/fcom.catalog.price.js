@@ -234,7 +234,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
             var colspan = 4 + (this.props.show_customers ? 1 : 0) + (this.props.show_sites ? 1 : 0) + (this.props.show_currency ? 1 : 0);
             return (
                 React.createElement("div", {id: this.props.id + "-prices"}, 
-                    React.createElement("h4", null, this.props.title), 
+                    React.createElement("h4", null, this.props.title.replace(/\-/g, ' ')), 
                     React.createElement("table", {className: "table table-striped "+this.props.id+"-prices-table"}, 
                         React.createElement("thead", null, 
                         React.createElement("tr", {className: "table-title"}, 
@@ -300,7 +300,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
                             React.createElement("tr", {className: "table-actions", style: {backgroundColor: "#ccc"}}, 
                                 React.createElement("td", null), 
                                 React.createElement("td", null, 
-                                    React.createElement("select", {id: "price-types", className: "form-control", ref: "price-types", onChange: this.props.addNewPrice}, 
+                                    React.createElement("select", {id: "price-types-" + this.props.id, "data-id": this.props.id, className: "form-control", ref: "price-types", onChange: this.props.addNewPrice.bind(null, 'addPriceTypeCallback')}, 
                                     React.createElement("option", {value: "-1"}, Locale._("Add Price ...")), 
                                     _.map(priceOptions, function (pt, pk) {
                                         return React.createElement("option", {key: pk, value: pk, disabled: pk == 'promo' ? 'disabled' : null}, pt);
@@ -338,27 +338,34 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
                 }
             };
         },
+        addBlankPrice: function() {
+            this.props.options.prices = [];
+            var newPrice = {
+                id: guid(),
+                product_id: this.props.options.product_id,
+                price_type: 'base',
+                customer_group_id: null,
+                site_id: null,
+                currency_code: null,
+                amount: null,
+                qty: 1
+            };
+            this.props.options.prices.push(newPrice);
+            this.setState({ options: this.props.options });
+        },
+        componentDidUpdate: function() {
+            if (typeof this.props.options.prices === 'undefined' || this.props.options.prices.length === 0) {
+                this.addBlankPrice();
+            }
+        },
         /**
          * Init prices data
          * 
          * @return mixed
          */
         componentDidMount: function() {
-            var self = this;
             if (typeof this.props.options.prices === 'undefined' || this.props.options.prices.length === 0) {
-                this.props.options.prices = [];
-                var newPrice = {
-                    id: guid(),
-                    product_id: this.props.options.product_id,
-                    price_type: 'base',
-                    customer_group_id: null,
-                    site_id: null,
-                    currency_code: null,
-                    amount: null,
-                    qty: 1
-                };
-                this.props.options.prices.push(newPrice);
-                this.setState({ options: this.props.options });
+                this.addBlankPrice();
             }
         },
         isLocalMode: function() {
@@ -382,8 +389,9 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
          * @param {Object} e
          * @return mixed
          */
-        addNewPrice: function(e) {
+        addNewPrice: function(callback, e) {
             var type = $(e.target).val();
+            var option = $(e.target).data('id');
             $(e.target).val("-1");
 
             var newPrice = {
@@ -402,6 +410,9 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
             }
             this.props.options.prices.push(newPrice);
             this.setState({ options: this.props.options });
+            if (typeof window[callback] === 'function') {
+                return window[callback](this.props.options.prices, option);
+            }
         },
         /**
          * Delete one price
