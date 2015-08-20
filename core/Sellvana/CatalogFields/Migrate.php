@@ -3,8 +3,8 @@
 /**
  * Class Sellvana_CatalogFields_Migrate
  *
- * @property FCom_Core_Model_MediaLibrary               $FCom_Core_Model_MediaLibrary
- * @property Sellvana_Catalog_Model_Product                 $Sellvana_Catalog_Model_Product
+ * @property FCom_Core_Model_MediaLibrary                     $FCom_Core_Model_MediaLibrary
+ * @property Sellvana_Catalog_Model_Product                   $Sellvana_Catalog_Model_Product
  * @property Sellvana_CatalogFields_Model_Field               $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_CatalogFields_Model_FieldOption         $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_Set                 $Sellvana_CatalogFields_Model_Set
@@ -14,7 +14,9 @@
  * @property Sellvana_CatalogFields_Model_ProductVarfield     $Sellvana_CatalogFields_Model_ProductVarfield
  * @property Sellvana_CatalogFields_Model_ProductVariantField $Sellvana_CatalogFields_Model_ProductVariantField
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
- * @property Sellvana_Catalog_Model_ProductPrice            $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_Catalog_Model_ProductPrice              $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_CatalogFields_Model_ProductFieldSet     $Sellvana_CatalogFields_Model_ProductFieldSet
  */
 class Sellvana_CatalogFields_Migrate extends BClass
 {
@@ -496,5 +498,128 @@ class Sellvana_CatalogFields_Migrate extends BClass
                 'update_at' => 'datetime default null',
             ],
         ]);
+    }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $tField = $this->Sellvana_CatalogFields_Model_Field->table();
+        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
+        $tProductField = $this->Sellvana_CatalogFields_Model_ProductFieldData->table();
+        $tProductFieldSet = $this->Sellvana_CatalogFields_Model_ProductFieldSet->table();
+        $tFieldOption = $this->Sellvana_CatalogFields_Model_FieldOption->table();
+        $tSet = $this->Sellvana_CatalogFields_Model_Set->table();
+
+        $this->BDb->ddlTableDef($tProductField, [
+            BDb::COLUMNS => [
+                'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
+                'product_id' => "int(10) UNSIGNED NOT NULL",
+                'set_id' => "int(10) UNSIGNED DEFAULT NULL",
+                'field_id' => "int(10) UNSIGNED NOT NULL",
+                'value_id' => "int(10) UNSIGNED",
+                'value_int' => "int",
+                'value_dec' => "decimal(12,2)",
+                'value_var' => "varchar(255)",
+                'value_text' => "text",
+                'value_date' => "datetime",
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'product' => ['product_id', $tProduct],
+                'set' => ['set_id', $tSet],
+                'field' => ['field_id', $tField],
+                'value' => ['value_id', $tFieldOption],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tProductFieldSet, [
+            BDb::COLUMNS => [
+                'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
+                'product_id' => "int(10) UNSIGNED NOT NULL",
+                'set_id' => "int(10) UNSIGNED NOT NULL",
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_product_id_set_id' => 'UNIQUE (product_id, set_id)',
+            ],
+            BDb::CONSTRAINTS => [
+                'product' => ['product_id', $tProduct],
+                'set' => ['set_id', $tSet],
+            ],
+        ]);
+
+        $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
+        $fieldsAssoc = [];
+        foreach ($fields as $field) {
+            $fieldsAssoc[$field->get('field_code')] = $field;
+        }
+
+        $options = $this->Sellvana_CatalogFields_Model_FieldOption->orm('fo')->find_many();
+        $optionsAssoc = [];
+        foreach ($options as $option) {
+            if (empty($optionsAssoc[$option->get('field_id')])) {
+                $optionsAssoc[$option->get('field_id')] = [];
+            }
+
+            $optionsAssoc[$option->get('field_id')][$option->get('label')] = $option->get('id');
+        }
+
+        $oldData = $this->Sellvana_CatalogFields_Model_ProductField->orm('pf')->find_many();
+        foreach ($oldData as $row) {
+            $productId = $row->get('product_id');
+
+            if ($json = $row->get('_data_serialized')) {
+                $data = $this->BUtil->fromJson($json);
+                foreach ($data as $fieldSet) {
+                    $setId = $fieldSet['id'];
+                    $this->Sellvana_CatalogFields_Model_ProductFieldSet->create([
+                        'product_id' => $productId,
+                        'set_id' => $setId,
+                    ])->save();
+                }
+            }
+
+            foreach ($fieldsAssoc as $fieldCode => $field) {
+                $value = $row->get($fieldCode);
+                $fieldInputType = $field->get('admin_input_type');
+                if (is_null($value)) {
+                    continue;
+                }
+
+                preg_match('/[a-zA-Z]+/', $field->get('table_field_type'), $fieldDbType);
+                $valueColumn = 'value_var';
+                if (count($fieldDbType)) {
+                    switch ($fieldDbType[0]) {
+                        case 'int':
+                            $valueColumn = 'value_int';
+                            break;
+                        case 'text':
+                            $valueColumn = 'value_text';
+                            break;
+                        case 'decimal':
+                            $valueColumn = 'value_dec';
+                            break;
+                        case 'datetime':
+                            $valueColumn = 'value_date';
+                            break;
+                        default:
+                            $valueColumn = 'value_var';
+                            break;
+                    }
+                }
+
+                if ($fieldInputType == 'select') {
+                    if (!empty($optionsAssoc[$field->get('id')][$value])) {
+                        $value = $optionsAssoc[$field->get('id')][$value];
+                        $valueColumn = 'value_id';
+                    }
+                }
+
+                $this->Sellvana_CatalogFields_Model_ProductFieldData->create([
+                    'product_id' => $productId,
+                    'field_id' => $field->get('id'),
+                    $valueColumn => $value
+                ])->save();
+            }
+        }
     }
 }
