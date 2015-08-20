@@ -10,7 +10,7 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory extends FCom
     protected $_mainTableAlias = 'oi';
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/catalog/product_orders_history';
-    protected $_gridHref = 'catalog/report/product_orders_history';
+    protected $_gridHref = 'catalog/report/inventory/product_orders_history';
     protected $_gridTitle = 'Product Orders History';
 
     public function gridConfig()

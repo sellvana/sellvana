@@ -26,17 +26,12 @@ class Sellvana_Sales_Admin_Controller_Report_OrderItemDetail extends FCom_Admin_
     ];
     protected $_visibleFields = ['o_unique_id', 'o_grand_total', 'o_customer_email', 'o_billing_firstname', 'o_billing_lastname', 'oi_product_sku', 'oi_product_name', 'oi_price', 'oi_qty_ordered', 'oi_row_total'];
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->_selectTables['oi'] = $this->Sellvana_Sales_Model_Order_Item->table();
-        $this->_selectTables['o'] = $this->Sellvana_Sales_Model_Order->table();
-        $this->_selectTables['c'] = $this->Sellvana_Customer_Model_Customer->table();
-    }
-
-
     public function gridConfig()
     {
+        $this->_selectModels['oi'] = $this->Sellvana_Sales_Model_Order_Item;
+        $this->_selectModels['o'] = $this->Sellvana_Sales_Model_Order;
+        $this->_selectModels['c'] = $this->Sellvana_Customer_Model_Customer;
+
         $config = parent::gridConfig();
 
         $config['columns'][] = ['name' => 'create_at', 'index' => 'o.create_at'];

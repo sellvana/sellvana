@@ -12,7 +12,7 @@ class Sellvana_Catalog_Admin_Controller_Report_CategoryProducts extends FCom_Adm
     protected $_mainTableAlias = 'c';
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/integrity/category_products';
-    protected $_gridHref = 'integrity/report/category_products';
+    protected $_gridHref = 'catalog/report/integrity/category_products';
     protected $_gridTitle = 'Categories Without Products';
 
     public function gridConfig()

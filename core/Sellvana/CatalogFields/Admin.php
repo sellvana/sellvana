@@ -70,14 +70,54 @@ class Sellvana_CatalogFields_Admin extends BClass
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
-    protected function _saveProductCustom($p, $data = []) {
+    protected function _saveProductCustom($p, $data = [])
+    {
         $pc = $this->Sellvana_CatalogFields_Model_ProductField->load($p->id, 'product_id');
         if (!$pc) {
-            $pc = $this->Sellvana_CatalogFields_Model_ProductField->create();
+            $pc = $this->Sellvana_CatalogFields_Model_ProductField->create(['product_id' => $p->id()]);
         }
-        $pc->set('product_id', $p->id);
         if (empty($data) || $data === '[]') {
             $data = null;
+        }
+        $fieldSets = $this->BUtil->fromJson($data);
+
+        if (is_array($fieldSets) && count($fieldSets)) {
+
+            $fieldNames = [];
+            foreach ($fieldSets as $fieldSet) {
+                if (!empty($fieldSet['fields'])) {
+                    foreach ($fieldSet['fields'] as $field) {
+                        $fieldNames[] = $field['field_name'];
+                    }
+                }
+            }
+            $fields = $this->Sellvana_CatalogFields_Model_Field->orm()->where_in('field_name', $fieldNames)
+                ->find_many_assoc('field_name');
+
+            foreach ($fieldSets as $fieldSet) {
+                if (!empty($fieldSet['fields'])) {
+                    foreach ($fieldSet['fields'] as $field) {
+
+                        if (empty($fields[$field['field_name']])) {
+                            continue;
+                        }
+                        $field['field_code'] = $fields[$field['field_name']]->get('field_code');
+                        $field['column_type'] = $fields[$field['field_name']]->get('table_field_type');
+
+                        if (!in_array($field['field_code'], ['id', 'product_id']) && $field['column_type'] !== 'serialized') {
+                            $value = $field['value'];
+                            if (!empty($field['options'])) {
+                                if (!empty($field['options'][$field['value']])) {
+                                    $value = $field['options'][$field['value']];
+                                } else {
+                                    $value = null;
+                                }
+                            }
+                            $pc->set($field['field_code'], $value);
+                        }
+                    }
+                }
+            }
         }
         $pc->set('_data_serialized', $data)->save();
     }

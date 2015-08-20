@@ -331,7 +331,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                         $('#dashboard-widget__' + widget.key + ' .widget-contents').html(widget.html);
                     }
                 });
-                if (Object.keys(response.filter).length !== 0) {
+                /*if (Object.keys(response.filter).length !== 0) {
                     switch (response.filter.date) {
                         case 'last-month':
                             $('button[data-date="month"]').click();
@@ -354,7 +354,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                     }
                 } else {
                     $('button[data-date="all"]').click();
-                }
+                }*/
             });
         }
 
