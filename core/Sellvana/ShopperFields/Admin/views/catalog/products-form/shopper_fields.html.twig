@@ -191,6 +191,7 @@
             var rows = shopperGrid.getRows();
             _.each(rows, function(row) {
                 if (row.input_type != 'select') {
+                    // shopperNode.find('tr#' + row.id).find(inputOption).prop('disabled', true);
                     shopperNode.find('tr#' + row.id).find(inputOption).prop('disabled', true);
                 }
             });
@@ -275,29 +276,23 @@
         }
 
         window.editShopperOption = function(editedRow) {
-            var form = shopperModalNode.find('#frontend-field-grid_options_form');
-            if (isNaN(editedRow.id) && form.valid() && $.inArray(editedRow.label, shopperOptions) === -1) {
-                if (typeof shopperOptions[fieldId] === 'undefined') {
-                    shopperOptions[fieldId] = [];
-                }
-                shopperOptions[fieldId].push(toggleSpace(editedRow.label));
-                $(OPTS).trigger('add', [shopperOptions, editedRow]);
-            } else {
-                toggleTab(editedRow.label);
-            }
+            // 
         }
 
         window.addPrices = function() {
-            var options = optionsModalGrid.getRows().map(function(row) {
-                if ($.inArray(row.label, shopperOptions) === -1) {
-                    if (typeof shopperOptions[fieldId] === 'undefined') {
-                        shopperOptions[fieldId] = [];
+            var form = shopperModalNode.find('#frontend-field-grid_options_form');
+            if (form.valid()) {
+                var options = optionsModalGrid.getRows().map(function(row) {
+                    if ($.inArray(row.label, shopperOptions) === -1) {
+                        if (typeof shopperOptions[fieldId] === 'undefined') {
+                            shopperOptions[fieldId] = [];
+                        }
+                        shopperOptions[fieldId].push(toggleSpace(row.label));
                     }
-                    shopperOptions[fieldId].push(toggleSpace(row.label));
-                }
-                return toggleSpace(row.label);
-            });
-            $(OPTS).trigger('add', [options]);
+                    return toggleSpace(row.label);
+                });
+                $(OPTS).trigger('add', [options]);
+            }
         }
 
         window.addPriceTypeCallback = function(prices, option) {

@@ -97,7 +97,11 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 300, 'editable' => 'inline',
                         'sortable' => false, 'validation' => ['required' => true]],
-                    ['type' => 'btn_group', 'buttons' => [['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "], ['name' => 'delete']]]
+                    ['type' => 'btn_group', 'buttons' => [
+                            // ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "], 
+                            ['name' => 'delete']
+                        ]
+                    ]
                 ],
                 'filters' => [
                     '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
