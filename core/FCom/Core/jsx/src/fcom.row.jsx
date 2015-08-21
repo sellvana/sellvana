@@ -151,7 +151,7 @@ define(['underscore', 'react'], function (_, React) {
                         if (defaultValue) {
                             count = defaultValue.split(',').length;
                         }
-                        var value = count + ' ' + col.value;
+                        var value = count + ' ' + col.value + (count <= 1 ? '' : 's');
                         
                         var inlineProps = {
                             href: col.href ? col.href : 'javascript:void(0)',
@@ -162,8 +162,10 @@ define(['underscore', 'react'], function (_, React) {
                             "data-col": col.name,
                             'data-action': col.name,
                             'data-row': row.id,
+                            'data-length': count,
                             defaultValue: defaultValue
                         };
+
                         node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{value}</a>;
                         break;
                     default:
