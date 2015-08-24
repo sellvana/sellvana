@@ -117,4 +117,17 @@ class Sellvana_CustomerFields_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_5_1_0__0_5_1_1()
+    {
+        $tField = $this->Sellvana_CustomerFields_Model_Field->table();
+
+        // update field type to have customer option
+        $this->BDb->ddlTableDef($tField, [
+            BDb::COLUMNS => [
+                'register_form' => "BOOLEAN DEFAULT 0",
+                'account_edit' => "BOOLEAN DEFAULT 0",
+            ]
+        ]);
+    }
 }

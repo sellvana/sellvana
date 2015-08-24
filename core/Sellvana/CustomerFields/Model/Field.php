@@ -53,6 +53,14 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
             '1' => 'Yes',
             '0' => 'No'
         ],
+        'account_edit' => [
+            '1' => 'Yes',
+            '0' => 'No'
+        ],
+        'register_form' => [
+            '1' => 'Yes',
+            '0' => 'No'
+        ],
     ];
 
     protected static $_fieldTypes = [
