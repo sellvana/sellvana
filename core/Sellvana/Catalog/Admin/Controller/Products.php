@@ -654,7 +654,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $this->_processInventoryPost($model, $data);
                 $this->_processSystemLangFieldsPost($model, $data);
                 $this->_processPricesPost($model, $data);
-                $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
+                $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => &$data]);
+                $this->_processVariantPricesPost($model, $data);
                 $model->save();
             }
         }
@@ -1123,9 +1124,15 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $this->Sellvana_Catalog_Model_Product->orm()->select('url_key')->iterate($callback);
     }
 
+    /**
+     * Save product prices
+     * @param  [object] $model
+     * @param  [array] $data
+     * @return mixed
+     */
     protected function _processPricesPost($model, $data)
     {
-        if(empty($data['prices']) && empty($data['variantPrice'])){
+        if(empty($data['prices'])){
             return;
         }
 
@@ -1137,6 +1144,18 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         // Process delete product prices
         if (!empty($data['prices']['delete'])) {
             $this->_deletePrices($data['prices']['delete']);
+        }
+    }
+
+    /**
+     * Save product variants prices
+     * @param  [object] $model
+     * @param  [array] $data
+     * @return mixed
+     */
+    protected function _processVariantPricesPost($model, $data) {
+        if (empty($data['variantPrice'])) {
+            return;
         }
 
         // Process variant prices
@@ -1193,7 +1212,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function action_skus()
     {
-
         $r       = $this->BRequest;
         $page    = $r->get('page')?: 1;
         $skuTerm = $r->get('q');

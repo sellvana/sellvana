@@ -126,7 +126,7 @@ class Sellvana_CatalogFields_Admin extends BClass
     {
         /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
-        $data = $args['data'];
+        $data = &$args['data'];
 
         if (!empty($data['custom_fields'])) {
             // Save custom fields on fcom_product_custom
@@ -285,7 +285,8 @@ class Sellvana_CatalogFields_Admin extends BClass
                 if (!empty($matchedVariants[$i])) {
                     $m = $prodVariantModels[$matchedVariants[$i]];
                 } else {
-                    $m = $prodVariantHlp->create(['product_id' => $pId]);
+                    $tmpId  = $vd['id'];
+                    $m      = $prodVariantHlp->create(['product_id' => $pId]);
                 }
                 if (!empty($vd['inventory_sku']) && $vd['variant_qty'] !== '') {
                     if (empty($invModels[$vd['inventory_sku']])) {
@@ -304,6 +305,11 @@ class Sellvana_CatalogFields_Admin extends BClass
                     'variant_price' => $vd['variant_price'] !== '' ? $vd['variant_price'] : null,
                     'manage_inventory' => $vd['variant_qty'] !== '' ? 1 : 0,
                 ])->save();
+
+                if ($m->isNewRecord() && !empty($data['variantPrice'])) {
+                    $this->_setVariantId($m, $tmpId, $data['variantPrice']);
+                }
+
                 if (empty($matchedVariants[$i])) {
 
                     foreach ($vd['field_values'] as $f => $fv) {
@@ -377,6 +383,26 @@ class Sellvana_CatalogFields_Admin extends BClass
             // delete unused variant images
             if ($fileIdsToDelete) {
                 $prodVariantImageHlp->delete_many(['product_id' => $pId, 'id' => $fileIdsToDelete]);
+            }
+        }
+    }
+
+    /**
+     * Update variant_id for each price of each new variant after saved ( Only has prices data )
+     * @param [object] $variantModel
+     * @param [string] $tmpId
+     * @param [array] &$variantsPrices
+     */
+    protected function _setVariantId($variantModel, $tmpId, &$variantsPrices) {
+        if (!empty($variantsPrices['prices'])) {
+            foreach ($variantsPrices['prices'] as $vId => $data) {
+                parse_str($data, $prices);
+                foreach ($prices['variantPrice'] as $id => $price) {
+                    if ($price['variant_id'] == $tmpId) {
+                        $prices['variantPrice'][$id]['variant_id'] = $variantModel->id();
+                    }
+                }
+                $variantsPrices['prices'][$vId] = http_build_query($prices);
             }
         }
     }
