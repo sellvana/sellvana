@@ -1,6 +1,6 @@
 modules:
     Sellvana_CatalogFields:
-        version: 0.5.2.0
+        version: 0.5.3.0
         channel: alpha
         require: { module: { Sellvana_Catalog: 0.2.1 } }
         translations: { en: en.php }
@@ -9,6 +9,7 @@ modules:
         auto_use: [ bootstrap ]
         observe:
             - [ "Sellvana_Catalog_Model_Product::orm", Sellvana_CatalogFields_Main.onProductOrm ]
+            - [ "Sellvana_Catalog_Model_Product::onAfterLoad", Sellvana_CatalogFields_Main.onProductAfterLoad ]
             - [ "Sellvana_Catalog_Model_Product::onAfterSave", Sellvana_CatalogFields_Main.onProductAfterSave ]
             - [ "Sellvana_CatalogFields_Model_ProductVariant::find_one:after", Sellvana_CatalogFields_Main.onProductVariantFindAfter ]
             - [ "Sellvana_CatalogFields_Model_ProductVariant::find_many:after", Sellvana_CatalogFields_Main.onProductVariantFindAfter ]

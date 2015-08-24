@@ -622,4 +622,17 @@ class Sellvana_CatalogFields_Migrate extends BClass
             }
         }
     }
+
+    public function upgrade__0_5_2_0__0_5_3_0()
+    {
+        $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
+        foreach ($fields as $field) {
+            $fieldDbType = [];
+            preg_match('/[a-zA-Z]+/', $field->get('table_field_type'), $fieldDbType);
+            if (count($fieldDbType)) {
+                $field->set('table_field_type', $fieldDbType[0])->save();
+            }
+        }
+
+    }
 }

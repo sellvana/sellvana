@@ -12,6 +12,8 @@
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
+ * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_CatalogFields_Model_ProductFieldSet     $Sellvana_CatalogFields_Model_ProductFieldSet
  */
 class Sellvana_CatalogFields_Admin extends BClass
 {
@@ -72,16 +74,12 @@ class Sellvana_CatalogFields_Admin extends BClass
 
     protected function _saveProductCustom($p, $data = [])
     {
-        $pc = $this->Sellvana_CatalogFields_Model_ProductField->load($p->id, 'product_id');
-        if (!$pc) {
-            $pc = $this->Sellvana_CatalogFields_Model_ProductField->create(['product_id' => $p->id()]);
-        }
-        if (empty($data) || $data === '[]') {
-            $data = null;
-        }
         $fieldSets = $this->BUtil->fromJson($data);
 
         if (is_array($fieldSets) && count($fieldSets)) {
+            $fieldsetData = $this->Sellvana_CatalogFields_Model_ProductFieldSet->orm('ps')
+                ->where_equal('product_id', $p->id)
+                ->find_many_assoc('set_id');
 
             $fieldNames = [];
             foreach ($fieldSets as $fieldSet) {
@@ -91,35 +89,64 @@ class Sellvana_CatalogFields_Admin extends BClass
                     }
                 }
             }
+
+            /** @var Sellvana_CatalogFields_Model_Field[] $fields */
             $fields = $this->Sellvana_CatalogFields_Model_Field->orm()->where_in('field_name', $fieldNames)
                 ->find_many_assoc('field_name');
 
             foreach ($fieldSets as $fieldSet) {
                 if (!empty($fieldSet['fields'])) {
-                    foreach ($fieldSet['fields'] as $field) {
+                    if ($fieldSetId = $fieldSet['id']) {
+                        if (empty($fieldsetData[$fieldSetId])) {
+                            $fs = $this->Sellvana_CatalogFields_Model_ProductFieldSet->create(['product_id' => $p->id]);
+                        } else {
+                            $fs = $fieldsetData[$fieldSetId];
+                        }
+                        $fs->set('set_id', $fieldSetId)->save();
+                    }
 
-                        if (empty($fields[$field['field_name']])) {
+                    $fieldData = $this->Sellvana_CatalogFields_Model_ProductFieldData->orm('pf')
+                        ->where_equal('product_id', $p->id)
+                        ->where_raw('(set_id = ? OR ISNULL(set_id))', [$fieldSetId])
+                        ->find_many_assoc('field_id');
+
+                    foreach ($fieldSet['fields'] as $field) {
+                        $fieldName = $field['field_name'];
+                        $fieldId = $field['id'];
+                        if (empty($fields[$fieldName])) {
                             continue;
                         }
-                        $field['field_code'] = $fields[$field['field_name']]->get('field_code');
-                        $field['column_type'] = $fields[$field['field_name']]->get('table_field_type');
 
-                        if (!in_array($field['field_code'], ['id', 'product_id']) && $field['column_type'] !== 'serialized') {
-                            $value = $field['value'];
-                            if (!empty($field['options'])) {
-                                if (!empty($field['options'][$field['value']])) {
-                                    $value = $field['options'][$field['value']];
-                                } else {
-                                    $value = null;
-                                }
-                            }
-                            $pc->set($field['field_code'], $value);
+                        if (empty($fieldData[$fieldId])) {
+                            $fs = $this->Sellvana_CatalogFields_Model_ProductFieldData->create([
+                                'product_id' => $p->id,
+                            ]);
+                        } else {
+                            $fs = $fieldData[$fieldId];
                         }
+
+                        if ($fieldSetId) {
+                            $fs->set('set_id', $fieldSetId);
+                        }
+
+                        $fieldType = $fields[$fieldName]->get('table_field_type');
+                        $column = $fields[$fieldName]->fieldOptions('table_field_columns', $fieldType);
+
+                        $value = $field['value'];
+                        if (!empty($field['options'])) {
+                            if (!empty($field['options'][$field['value']])) {
+                                $value = $field['options'][$field['value']];
+                                $column = 'value_id';
+                            } else {
+                                $value = null;
+                            }
+                        }
+                        $fs->set($column, $value);
+                        $fs->save();
                     }
                 }
             }
         }
-        $pc->set('_data_serialized', $data)->save();
     }
 
     public function onProductFormPostAfterValidate($args)

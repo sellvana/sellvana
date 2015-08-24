@@ -8,6 +8,7 @@
  * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  */
 class Sellvana_CatalogFields_Main extends BClass
 {
@@ -285,6 +286,14 @@ class Sellvana_CatalogFields_Main extends BClass
         }
          *
          */
+    }
+
+    public function onProductAfterLoad($args)
+    {
+        $fieldsData = $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductFieldsData([$args['model']]);
+        if (!empty($fieldsData[$args['model']->get('id')])) {
+            $args['model']->set('custom_fields', $fieldsData[$args['model']->get('id')]);
+        }
     }
 }
 
