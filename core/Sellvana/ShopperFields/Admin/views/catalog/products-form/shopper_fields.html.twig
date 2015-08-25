@@ -360,7 +360,7 @@
          * @return {mixed}
          */
         window.editShopperOptionLabelCallback = function(e) {
-            if (!currentShopper.option_serialized[e.target.value]) {
+            if (currentShopper.option_serialized && !currentShopper.option_serialized[e.target.value]) {
                 shopperModalNode.find('.modal-footer button.btn-primary').addClass('disabled');
             } else {
                 shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
@@ -386,7 +386,7 @@
             }
 
             if (currentShopper.option_serialized === '' || typeof currentShopper.option_serialized === 'undefined') {
-                currentShopper.option_serialized = [];
+                currentShopper.option_serialized = {};
             }
 
             if (typeof currentShopper.option_serialized[option] === 'undefined') {
@@ -702,6 +702,65 @@
             React.render(
                 React.createElement(FComGriddleComponent, { config: optionsConfigCompiled }
             ), attachGridContainerEle);
+            // Position unique validation
+            function validateUniquePosition (value, elem) {
+                var valid = true;
+                if (typeof elem !== 'undefined') {
+                    var $parent = $(elem).parents('tr');
+
+                    var $items = optionsModalNode.find('tr');
+                    $items.each(function() {
+                        if (!valid) {
+                            return;
+                        }
+
+                        var $item = $(this);
+                        if (this === $parent[0]) {
+                            return;
+                        }
+
+                        valid = value !== $item.find('input[data-col="position"]').val();
+                        if (!valid) {
+                            $parent.parents('tbody').find('.btn-edit').addClass('disabled');
+                        } else $parent.parents('tbody').find('.btn-edit').removeClass('disabled');
+                    });
+                    return valid;
+                }
+            }
+            $.validator.addMethod('validateUniquePosition', validateUniquePosition, '{{"Position already exists."|_}}');
+            $.validator.addClassRules('optionPositionUnique', {
+                validateUniquePosition: true
+            });
+
+            // Option unique validation
+            function validateUniqueOption (value, elem) {
+                var valid = true;
+                if (typeof elem !== 'undefined') {
+                    var $parent = $(elem).parents('tr');
+
+                    var $items = optionsModalNode.find('tr');
+                    $items.each(function() {
+                        if (!valid) {
+                            return;
+                        }
+
+                        var $item = $(this);
+                        if (this === $parent[0]) {
+                            return;
+                        }
+
+                        valid = value !== $item.find('input[data-col="label"]').val();
+                        if (!valid) {
+                            $parent.parents('tbody').find('.btn-edit').addClass('disabled');
+                        } else $parent.parents('tbody').find('.btn-edit').removeClass('disabled');
+                    });
+                    return valid;
+                }
+            }
+            $.validator.addMethod('validateUniqueOption', validateUniqueOption, '{{"Position already exists."|_}}');
+            $.validator.addClassRules('optionLabelUnique', {
+                validateUniqueOption: true
+            });
         }
 
         /**
@@ -725,6 +784,16 @@
                         prices      = [];
 
                     optionSaveStr += optionLabel + ',';
+
+                    if (!currentShopper.option_serialized) {
+                        currentShopper.option_serialized = {};
+                    }
+
+                    if (!currentShopper.option_serialized[row.label]) {
+                        currentShopper.option_serialized[row.label] = {};
+                    }
+                    currentShopper.option_serialized[row.label].sku = row.sku;
+                    currentShopper.option_serialized[row.label].position = row.position;
 
                     data[optionLabel]['sku']      = row.sku; 
                     data[optionLabel]['position'] = row.position;
