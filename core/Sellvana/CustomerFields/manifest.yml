@@ -25,3 +25,7 @@ modules:
                     request_fields_whitelist:
                         /catalog/products/form:
                             POST/custom_fields: "+"
+            FCom_Frontend:
+                observe:
+                    - [ "BLayout::hook:customer-edit-form", Sellvana_CustomerFields_Frontend.hookEdit ]
+                    - [ "BLayout::hook:customer-register-form", Sellvana_CustomerFields_Frontend.hookRegister ]
