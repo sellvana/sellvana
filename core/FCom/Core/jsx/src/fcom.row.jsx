@@ -32,7 +32,7 @@ define(['underscore', 'react'], function (_, React) {
             var col = event.target.getAttribute('data-col');
             this.props.row[col] = event.target.value;
             if (typeof window[callback] === 'function') {
-                return window[callback](event.target);
+                return window[callback](event);
             }
         },
         render: function () {

@@ -159,14 +159,19 @@
 
                 var data = _.pick(row, 'id', 'name', 'label', 'input_type', 'required', 'options', 'position');
                 if (row.input_type === 'select') { // Only save prices when field is select
-                    var $priceEles = $('input[data-shopper-id="'+row.id+'"]');
-                    if ($priceEles.length) {
-                        $priceEles.each(function(index, priceEle) {
-                            optionSerialized = $(priceEle).val();
-                        });
+                    var $priceEle = $('input[data-shopper-id="'+row.id+'"]');
+                    if ($priceEle.length) { // If price modal is saved changed
+                        optionSerialized = $priceEle.val();
                     } else {
-                        if ('option_serialized' in row && row.option_serialized.length) {
+                        if (typeof row.option_serialized === 'string' && row.option_serialized.length) { // 
                             optionSerialized = row.option_serialized;
+                        } else { // If added prices but not saved changed then remove
+                            _(row.option_serialized).each(function(optionPrice, index) {
+                                if (isNaN(optionPrice.prices[0].id)) {
+                                    delete row.option_serialized[index];
+                                }
+                            });
+                            optionSerialized = JSON.stringify(row.option_serialized);
                         }
                     }
                     data['option_serialized'] = optionSerialized;
@@ -191,6 +196,7 @@
                     shopperNode.find('tr#' + row.id).find(inputOption)[0].innerText = '';
                 }
             });
+
             /**
              * Disable options upon field type is not dropdown
              */
@@ -278,29 +284,33 @@
          * @param  {Object} editedRow 
          * @return {mixed}
          */
-        window.editShopperOption = function(editedRow) {
-            var options = currentShopper.options ? currentShopper.options.split(',') : [];
-            var newOptions = _(options).map(function(option, index) {
-                if (++index == editedRow.id) {
-                    var regex = new RegExp(option, 'g');
-                    var optionsStr = currentShopper.options.replace(regex, editedRow.label);
-                    currentShopper.options = optionsStr;
+        window.editShopperOption = function(editedRow, e) {
+            var form = shopperModalNode.find('#frontend-field-grid_options_form');
+            if (form.valid()) {
+                var options = currentShopper.options ? parseOptions(currentShopper.options) : [];
+                var newOptions = _(options).map(function(option, index) {
+                    if (++index == editedRow.id) {
+                        var regex = new RegExp(option, 'g');
+                        var optionsStr = currentShopper.options.replace(regex, editedRow.label);
+                        currentShopper.options = optionsStr;
 
-                    _(currentShopper.option_serialized).each(function(item, index) {
-                        if (index == option) {
-                            item.sku = editedRow.sku;
-                            item.position = editedRow.position;
-                            currentShopper.option_serialized[editedRow.label] = item;
-                            delete currentShopper.option_serialized[option];
-                        }
-                    });
+                        _(currentShopper.option_serialized).each(function(item, index) {
+                            if (index == option) {
+                                item.sku = editedRow.sku;
+                                item.position = editedRow.position;
+                                currentShopper.option_serialized[editedRow.label] = item;
+                                delete currentShopper.option_serialized[option];
+                            }
+                        });
 
-                    return toggleSpace(editedRow.label);
-                } else return option;
-            });
-            // Update shopper grid data
-            shopperGrid.updateRows([currentShopper]);
-            $(OPTS).trigger('edit', [newOptions, editedRow]);
+                        return toggleSpace(editedRow.label);
+                    } else return option;
+                });
+                
+                shopperGrid.updateRows([currentShopper]); // Update shopper grid data
+                $(OPTS).trigger('edit', [newOptions, editedRow]); // Subcribe global event for re-rendering react component
+                $(e.target).parent().addClass('disabled'); // Disable save button
+            }
         }
 
         /**
@@ -321,15 +331,23 @@
                     }
                     return toggleSpace(row.label);
                 });
-                $(OPTS).trigger('add', [options]);
+
+                $(OPTS).trigger('add', [options]); // Subcribe global event for re-rendering react component
             }
         }
 
-        window.editShopperOptionLabelCallback = window.editShopperOptionPositionCallback = window.editShopperOptionSkuCallback = function(target) {
-            if (target.value != target.getAttribute('data-tmp-value')) {
+        /**
+         * Callback functions onchange on option input attribute
+         * @param  {Object} e 
+         * @return {mixed}
+         */
+        window.editShopperOptionLabelCallback = window.editShopperOptionPositionCallback = window.editShopperOptionSkuCallback = function(e) {
+            if (e.target.value != e.target.getAttribute('data-tmp-value')) {
                 optionsModalNode.find('#add-prices').prop('disabled', true);
+                $(e.target).parents('tr').find('.btn-edit').removeClass('disabled');
             } else {
                 optionsModalNode.find('#add-prices').prop('disabled', false);
+                $(e.target).parents('tr').find('.btn-edit').addClass('disabled');
             }
         }
 
@@ -351,7 +369,7 @@
                 shopperOptions[fieldId].push(toggleSpace(option));
             }
 
-            if (typeof currentShopper.option_serialized === 'undefined') {
+            if (currentShopper.option_serialized === '' || typeof currentShopper.option_serialized === 'undefined') {
                 currentShopper.option_serialized = [];
             }
 
@@ -393,7 +411,10 @@
          * @return {Array}
          */
         function parseOptions(options) {
-            return options.split(',');
+            if (typeof options === 'string' && options.length) {
+                return options.split(',');
+            }
+            return [];
         }
 
         /**
@@ -413,7 +434,9 @@
          */
         function mergeOptions(curOptions, addedOptions) {
             _(addedOptions).map(function(addedOption) {
-                return curOptions += ',' + addedOption;
+                if (curOptions.indexOf(addedOption) === -1) {
+                    return curOptions += ',' + addedOption;
+                }
             });
 
             return curOptions;
@@ -608,10 +631,12 @@
 
             if ('option_serialized' in row) {
                 if (currentShopper.option_serialized && typeof currentShopper.option_serialized === 'string') {
-                    currentShopper.option_serialized = JSON.parse(currentShopper.option_serialized);
+                    currentShopper.option_serialized = currentShopper.option_serialized ? JSON.parse(currentShopper.option_serialized) : [];
                 }
-                
                 options = row.options ? (_.isEmpty(shopperOptions[fieldId]) ? parseOptions(row.options) : parseOptions(mergeOptions(row.options, shopperOptions[fieldId]))) : (shopperOptions[fieldId] ? shopperOptions[fieldId] : []);
+
+                // Preventive case if has duplicate options
+                options = _.unique(options);
             }
 
             var modalContainerEle = document.getElementById('fcom_append_form');

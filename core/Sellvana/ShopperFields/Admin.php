@@ -99,7 +99,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ['type' => 'input', 'name' => 'sku', 'label' => 'Sku', 'width' => 150, 'editable' => 'inline', 'sortable' => false, 'callback' => 'editShopperOptionSkuCallback'],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionPositionCallback'],
                     ['type' => 'btn_group', 'buttons' => [
-                            ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-save "], 
+                            ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit disabled ", "icon" => " icon-save", 'attrs' => ['data-toggle' => 'tooltip', 'title' => 'Save New Option', 'data-placement' => 'top']], 
                             ['name' => 'delete']
                         ]
                     ]
