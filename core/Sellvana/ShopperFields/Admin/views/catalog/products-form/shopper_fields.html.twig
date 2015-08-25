@@ -287,36 +287,54 @@
         window.editShopperOption = function(editedRow, e) {
             var form = shopperModalNode.find('#frontend-field-grid_options_form');
             if (form.valid()) {
-                var options = currentShopper.options ? parseOptions(currentShopper.options) : [];
-                var newOptions = _(options).map(function(option, index) {
-                    if (++index == editedRow.id) {
-                        var regex = new RegExp(option, 'g');
-                        var optionsStr = currentShopper.options.replace(regex, editedRow.label);
-                        currentShopper.options = optionsStr;
+                if (!isNaN(editedRow.id)) {
+                    var options = currentShopper.options ? parseOptions(currentShopper.options) : [];
+                    if (options.length) {
+                        options = _(options).map(function(option, index) {
+                            if (++index == editedRow.id && editedRow.label != option) {
+                                var regex = new RegExp(option, 'g');
+                                var optionsStr = currentShopper.options.replace(regex, editedRow.label);
+                                currentShopper.options = optionsStr;
 
-                        _(currentShopper.option_serialized).each(function(item, index) {
-                            if (index == option) {
-                                item.sku = editedRow.sku;
-                                item.position = editedRow.position;
-                                currentShopper.option_serialized[editedRow.label] = item;
-                                delete currentShopper.option_serialized[option];
-                            }
+                                _(currentShopper.option_serialized).each(function(item, index) {
+                                    if (index == option) {
+                                        item.sku = editedRow.sku;
+                                        item.position = editedRow.position;
+                                        currentShopper.option_serialized[editedRow.label] = item;
+                                        delete currentShopper.option_serialized[option];
+                                    }
+                                });
+
+                                return toggleSpace(editedRow.label);
+                            } else return option;
                         });
+                    }
+                } else {
+                    var availableOptions = optionsModalGrid.getRows();
+                    if (typeof shopperOptions[fieldId] === 'undefined') {
+                        shopperOptions[fieldId] = [];
+                    }
 
-                        return toggleSpace(editedRow.label);
-                    } else return option;
-                });
-                
+                    if (availableOptions.length) {
+                        options = _(availableOptions).map(function(option) {
+                            return toggleSpace(option.label);
+                        });
+                        shopperOptions[fieldId] = options;
+                    } else if (!shopperOptions[fieldId][editedRow.label]) {
+                        shopperOptions[fieldId].push(toggleSpace(editedRow.label));
+                        options = shopperOptions[fieldId];
+                    }
+                }
+
                 shopperGrid.updateRows([currentShopper]); // Update shopper grid data
-                $(OPTS).trigger('edit', [newOptions, editedRow]); // Subcribe global event for re-rendering react component
-                $(e.target).parent().addClass('disabled'); // Disable save button
+                $(OPTS).trigger('edit', [options, editedRow]); // Subcribe global event for re-rendering react component
             }
         }
 
         /**
          * Add all new prices on options grid
          */
-        window.addPrices = function() {
+        /*window.addPrices = function() {
             var form = shopperModalNode.find('#frontend-field-grid_options_form');
             if (form.valid()) {
                 var options = optionsModalGrid.getRows().map(function(row) {
@@ -334,20 +352,18 @@
 
                 $(OPTS).trigger('add', [options]); // Subcribe global event for re-rendering react component
             }
-        }
+        }*/
 
         /**
          * Callback functions onchange on option input attribute
          * @param  {Object} e 
          * @return {mixed}
          */
-        window.editShopperOptionLabelCallback = window.editShopperOptionPositionCallback = window.editShopperOptionSkuCallback = function(e) {
-            if (e.target.value != e.target.getAttribute('data-tmp-value')) {
-                optionsModalNode.find('#add-prices').prop('disabled', true);
-                $(e.target).parents('tr').find('.btn-edit').removeClass('disabled');
+        window.editShopperOptionLabelCallback = function(e) {
+            if (!currentShopper.option_serialized[e.target.value]) {
+                shopperModalNode.find('.modal-footer button.btn-primary').addClass('disabled');
             } else {
-                optionsModalNode.find('#add-prices').prop('disabled', false);
-                $(e.target).parents('tr').find('.btn-edit').addClass('disabled');
+                shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
             }
         }
 
@@ -486,7 +502,8 @@
                 }
 
                 if (this.props.editedOption !== '') {
-                    optionsModalNode.find('#add-prices').prop('disabled', false);
+                    toggleTab(this.props.editedOption);
+                    shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
                     this.props.editedOption = '';
                 }
 
@@ -591,6 +608,7 @@
                                             React.createElement(Price, { id: option, options: priceOptions })
                                         );
 
+                                    
                                     var validateUniqueMethod = option+'PriceUnique',
                                         validateBaseMethod = option+'BaseField',
                                         validateUniqueRule = {};
@@ -627,17 +645,15 @@
             currentShopper = row;
             optionId       = row.id;
             fieldId        = toggleSpace(row.name);
-            var options    = [];
 
-            if ('option_serialized' in row) {
-                if (currentShopper.option_serialized && typeof currentShopper.option_serialized === 'string') {
-                    currentShopper.option_serialized = currentShopper.option_serialized ? JSON.parse(currentShopper.option_serialized) : [];
-                }
-                options = row.options ? (_.isEmpty(shopperOptions[fieldId]) ? parseOptions(row.options) : parseOptions(mergeOptions(row.options, shopperOptions[fieldId]))) : (shopperOptions[fieldId] ? shopperOptions[fieldId] : []);
-
-                // Preventive case if has duplicate options
-                options = _.unique(options);
+            if (currentShopper.option_serialized && typeof currentShopper.option_serialized === 'string') {
+                currentShopper.option_serialized = currentShopper.option_serialized ? JSON.parse(currentShopper.option_serialized) : [];
             }
+
+            var options = row.options ? (_.isEmpty(shopperOptions[fieldId]) ? parseOptions(row.options) : parseOptions(mergeOptions(row.options, shopperOptions[fieldId]))) : (shopperOptions[fieldId] ? shopperOptions[fieldId] : []);
+
+            // Preventive case if has duplicate options
+            options = _.unique(options);
 
             var modalContainerEle = document.getElementById('fcom_append_form');
             React.unmountComponentAtNode(modalContainerEle);
@@ -676,8 +692,8 @@
                     return {
                         id: ++i,
                         label: option,
-                        sku: optionSerialized[option] && optionSerialized[option].sku ? optionSerialized[option].sku : option,
-                        position: optionSerialized[option] && optionSerialized[option].position ? optionSerialized[option].position : i
+                        sku: (optionSerialized && optionSerialized[option] && optionSerialized[option].sku) ? optionSerialized[option].sku : option,
+                        position: (optionSerialized && optionSerialized[option] && optionSerialized[option].position) ? optionSerialized[option].position : i
                     };
                 });
                 optionsConfigCompiled.data.data = options;
@@ -694,14 +710,13 @@
          */
         window.saveShopperModal = function(modal) {
             var form            = shopperModalNode.find('#frontend-field-grid_options_form'),
-                options         = optionsModalGrid.getRows(),
+                rows            = optionsModalGrid.getRows(),
                 optionSaveStr   = '',
                 data            = {};
 
             if (form.valid()) { // Passes validation
-                // Process prices grid
-                _.each(options, function(option) {
-                    var optionLabel = toggleSpace(option.label)
+                _(rows).each(function(row, index) {
+                    var optionLabel = toggleSpace(row.label)
                     if (typeof data[optionLabel] === 'undefined') {
                         data[optionLabel] = {};
                     }
@@ -711,8 +726,8 @@
 
                     optionSaveStr += optionLabel + ',';
 
-                    data[optionLabel]['sku']      = option.sku; 
-                    data[optionLabel]['position'] = option.position;
+                    data[optionLabel]['sku']      = row.sku; 
+                    data[optionLabel]['position'] = row.position;
                     $trItems.each(function(i, item) {
                         var price           = {};
                         price['id']         = ++i;

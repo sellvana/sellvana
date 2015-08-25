@@ -110,8 +110,7 @@ define(['underscore', 'react'], function (_, React) {
                                 id: id + '-' + col.name + '-' + row.id,
                                 name: id + '[' + row.id + '][' + col.name + ']',
                                 className: (col.cssClass ? col.cssClass : '') + ' form-control',
-                                "data-col": col.name,
-                                "data-tmp-value": defaultValue ? defaultValue : row.id
+                                "data-col": col.name
                             };
 
                             if (typeof row[col.name + '_disabled'] !== 'undefined' && row[col.name + '_disabled'] == true) {

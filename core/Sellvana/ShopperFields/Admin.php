@@ -95,11 +95,11 @@ class Sellvana_ShopperFields_Admin extends BClass
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback'],
-                    ['type' => 'input', 'name' => 'sku', 'label' => 'Sku', 'width' => 150, 'editable' => 'inline', 'sortable' => false, 'callback' => 'editShopperOptionSkuCallback'],
-                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionPositionCallback'],
+                    ['type' => 'input', 'name' => 'label', 'label' => 'Option', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
+                    ['type' => 'input', 'name' => 'sku', 'label' => 'Sku', 'width' => 150, 'editable' => 'inline', 'sortable' => false],
+                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'cssClass' => 'optionPositionUnique '],
                     ['type' => 'btn_group', 'buttons' => [
-                            ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit disabled ", "icon" => " icon-save", 'attrs' => ['data-toggle' => 'tooltip', 'title' => 'Save New Option', 'data-placement' => 'top']], 
+                            ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-save", 'attrs' => ['data-toggle' => 'tooltip', 'title' => 'Save New Option', 'data-placement' => 'top']], 
                             ['name' => 'delete']
                         ]
                     ]
@@ -115,14 +115,14 @@ class Sellvana_ShopperFields_Admin extends BClass
                         'id'       => 'add-new-field-option',
                         'class'    => 'btn-primary',
                         'callback' => 'insertNewFieldOption'
-                    ],
+                    ],/*
                     'add-prices' => [
                         'caption'  => 'Add Prices',
                         'type'     => 'button',
                         'id'       => 'add-prices',
                         'class'    => 'btn-info',
                         'callback' => 'addPrices'
-                    ],
+                    ],*/
                     'delete' => ['caption' => 'Remove']
                 ],
                 'callbacks' => [
