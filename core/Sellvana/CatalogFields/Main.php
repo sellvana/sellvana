@@ -290,10 +290,7 @@ class Sellvana_CatalogFields_Main extends BClass
 
     public function onProductAfterLoad($args)
     {
-        $fieldsData = $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductFieldsData([$args['model']]);
-        if (!empty($fieldsData[$args['model']->get('id')])) {
-            $args['model']->set('custom_fields', $fieldsData[$args['model']->get('id')]);
-        }
+        $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductFieldsData([$args['model']]);
     }
 }
 

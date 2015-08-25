@@ -41,16 +41,6 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
             'datetime'      => 'Date/Time',
             '_serialized'   => 'Serialized',
         ],
-        'table_field_columns'  => [
-            'varchar'       => 'value_var',
-            'text'          => 'value_text',
-            'int'           => 'value_int',
-            'tinyint'       => 'value_int',
-            'decimal'       => 'value_dec',
-            'date'          => 'value_date',
-            'datetime'      => 'value_date',
-            '_serialized'   => 'value_text',
-        ],
         'admin_input_type' => [
             'text'        => 'Text Line',
             'textarea'    => 'Text Area',
@@ -63,6 +53,17 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
             '1' => 'Yes',
             '0' => 'No'
         ],
+    ];
+
+    protected static $_fieldTypeColumns = [
+        'varchar'       => 'value_var',
+        'text'          => 'value_text',
+        'int'           => 'value_int',
+        'tinyint'       => 'value_int',
+        'decimal'       => 'value_dec',
+        'date'          => 'value_date',
+        'datetime'      => 'value_date',
+        '_serialized'   => 'value_text',
     ];
 
     protected static $_fieldTypes = [
@@ -173,5 +174,18 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
     {
         $field = $this->load($code, 'field_code');
         return $field->get('frontend_label');
+    }
+
+    /**
+     * @param string $type
+     * @return bool|string
+     */
+    public function getTableColumn($type)
+    {
+        if (!empty(static::$_fieldTypeColumns[$type])) {
+            return static::$_fieldTypeColumns[$type];
+        } else {
+            return false;
+        }
     }
 }

@@ -77,8 +77,9 @@ class Sellvana_CatalogFields_Admin extends BClass
         $fieldSets = $this->BUtil->fromJson($data);
 
         if (is_array($fieldSets) && count($fieldSets)) {
+            $productId = $p->id();
             $fieldsetData = $this->Sellvana_CatalogFields_Model_ProductFieldSet->orm('ps')
-                ->where_equal('product_id', $p->id)
+                ->where_equal('product_id', $productId)
                 ->find_many_assoc('set_id');
 
             $fieldNames = [];
@@ -98,7 +99,7 @@ class Sellvana_CatalogFields_Admin extends BClass
                 if (!empty($fieldSet['fields'])) {
                     if ($fieldSetId = $fieldSet['id']) {
                         if (empty($fieldsetData[$fieldSetId])) {
-                            $fs = $this->Sellvana_CatalogFields_Model_ProductFieldSet->create(['product_id' => $p->id]);
+                            $fs = $this->Sellvana_CatalogFields_Model_ProductFieldSet->create(['product_id' => $productId]);
                         } else {
                             $fs = $fieldsetData[$fieldSetId];
                         }
@@ -106,7 +107,7 @@ class Sellvana_CatalogFields_Admin extends BClass
                     }
 
                     $fieldData = $this->Sellvana_CatalogFields_Model_ProductFieldData->orm('pf')
-                        ->where_equal('product_id', $p->id)
+                        ->where_equal('product_id', $productId)
                         ->where_raw('(set_id = ? OR ISNULL(set_id))', [$fieldSetId])
                         ->find_many_assoc('field_id');
 
@@ -119,7 +120,8 @@ class Sellvana_CatalogFields_Admin extends BClass
 
                         if (empty($fieldData[$fieldId])) {
                             $fs = $this->Sellvana_CatalogFields_Model_ProductFieldData->create([
-                                'product_id' => $p->id,
+                                'product_id' => $productId,
+                                'field_id' => $fieldId,
                             ]);
                         } else {
                             $fs = $fieldData[$fieldId];
@@ -130,18 +132,18 @@ class Sellvana_CatalogFields_Admin extends BClass
                         }
 
                         $fieldType = $fields[$fieldName]->get('table_field_type');
-                        $column = $fields[$fieldName]->fieldOptions('table_field_columns', $fieldType);
+                        $column = $fields[$fieldName]->getTableColumn($fieldType);
 
                         $value = $field['value'];
                         if (!empty($field['options'])) {
-                            if (!empty($field['options'][$field['value']])) {
-                                $value = $field['options'][$field['value']];
-                                $column = 'value_id';
-                            } else {
+                            if (empty($field['options'][$field['value']])) {
                                 $value = null;
+                            } else {
+                                $column = 'value_id';
                             }
                         }
                         $fs->set($column, $value);
+                        $fs->set('position', $field['position']);
                         $fs->save();
                     }
                 }

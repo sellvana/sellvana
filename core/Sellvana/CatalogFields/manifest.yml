@@ -1,6 +1,6 @@
 modules:
     Sellvana_CatalogFields:
-        version: 0.5.3.0
+        version: 0.5.4.0
         channel: alpha
         require: { module: { Sellvana_Catalog: 0.2.1 } }
         translations: { en: en.php }

@@ -68,15 +68,41 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
 
         $data = $orm->find_many();
 
-        $position = 0;
         foreach ($data as $row) {
-            if (empty($fieldsData[$row->get('product_id')])) {
-                $fieldsData[$row->get('product_id')] = [];
+            $productId = $row->get('product_id');
+            if (empty($fieldsData[$productId])) {
+                $fieldsData[$productId] = [];
             }
 
             $fieldSetId = !is_null($row->get('set_id')) ? $row->get('set_id') : '';
-            if (empty($fieldsData[$row->get('product_id')][$fieldSetId])) {
-                $fieldsData[$row->get('product_id')][$fieldSetId] = [
+
+            $inputType = $row->get('admin_input_type');
+            if ($inputType == 'select') {
+                $column = 'value_id';
+            } else {
+                $column = $this->Sellvana_CatalogFields_Model_Field->getTableColumn($row->get('table_field_type'));
+            }
+            $value = $row->get($column);
+
+            $fieldId = $row->get('field_id');
+            $field = [
+                'id' => $fieldId,
+                'field_code' => $row->get('field_code'),
+                'field_name' => $row->get('field_name'),
+                'admin_input_type' => $inputType,
+                'value' => $value,
+                'position' => $row->get('position'),
+            ];
+
+            if ($inputType == 'select' && !empty($options[$fieldId])) {
+                $field['options'] = $options[$fieldId];
+            } elseif ($inputType == 'select') {
+                // hide the field if we don't have any option for it
+                continue;
+            }
+
+            if (empty($fieldsData[$productId][$fieldSetId])) {
+                $fieldsData[$productId][$fieldSetId] = [
                     'collapsed' => 'false',
                     'id' => $fieldSetId,
                     'set_name' => ($row->get('set_name')) ?: '',
@@ -84,27 +110,24 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 ];
             }
 
-            $column = $this->Sellvana_CatalogFields_Model_Field->fieldOptions('table_field_columns', $row->get('table_field_type'));
-            $value = $row->get($column);
-            $field = [
-                'id' => $row->get('field_id'),
-                'field_code' => $row->get('field_code'),
-                'field_name' => $row->get('field_name'),
-                'admin_input_type' => $row->get('admin_input_type'),
-                'value' => $value,
-                'position' => $position++,
-            ];
+            $fieldsData[$productId][$fieldSetId]['fields'][] = $field;
 
-            if ($row->get('admin_input_type') == 'select' && !empty($options[$row->get('field_id')])) {
-                $field['options'] = $options[$row->get('field_id')];
-            } elseif ($row->get('admin_input_type') == 'select') {
-                // hide the field if we don't have any option for it
-                continue;
-            }
-
-            $fieldsData[$row->get('product_id')][$fieldSetId]['fields'][] = $field;
         }
 
-        return $fieldsData;
+        foreach ($products as $product) {
+            $product->set('custom_fields', $fieldsData[$product->get('id')]);
+
+            foreach ($fieldsData[$product->get('id')] as $fieldSetId => $fieldSet) {
+                foreach ($fieldSet['fields'] as $field) {
+                    $value = $field['value'];
+                    $fieldId = $field['id'];
+                    if (!empty($options[$fieldId])) {
+                        $value = $options[$fieldId][$value];
+                    }
+
+                    $product->set($field['field_code'], $value);
+                }
+            }
+        }
     }
 }
