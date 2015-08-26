@@ -138,7 +138,7 @@ define(['underscore', 'react'], function (_, React) {
                                     }
                                     
                                     node = (
-                                        <select key={col.name} defaultValue={defaultValue} {...inlineProps} {...validationRules} onChange={that.handleChange}>{selectOptions}</select>
+                                        <select key={col.name} defaultValue={defaultValue} {...inlineProps} {...validationRules} onChange={that.handleChange.bind(null, col.callback)}>{selectOptions}</select>
                                     );
                                     break;
                                 default:
