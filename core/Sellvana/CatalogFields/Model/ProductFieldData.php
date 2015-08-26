@@ -115,6 +115,10 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
         }
 
         foreach ($products as $product) {
+            if (empty($fieldsData[$product->get('id')])) {
+                continue;
+            }
+
             $product->set('custom_fields', $fieldsData[$product->get('id')]);
 
             foreach ($fieldsData[$product->get('id')] as $fieldSetId => $fieldSet) {

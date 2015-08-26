@@ -219,7 +219,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             ],
             'config' => $this->BConfig->get('modules/Sellvana_CatalogIndex'),
             'result' => [
-                'orm' => $this->Sellvana_Catalog_Model_Product->orm('p')
+                'orm' => $this->Sellvana_Catalog_Model_Product->orm('p', 'catalog_products')
                     ->join('Sellvana_CatalogIndex_Model_Doc', ['d.id', '=', 'p.id'], 'd'),
                 'facets' => [],
             ],

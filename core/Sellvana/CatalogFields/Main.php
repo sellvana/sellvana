@@ -33,23 +33,6 @@ class Sellvana_CatalogFields_Main extends BClass
     }
 
     /**
-     * @param $args
-     */
-    public function onProductOrm($args)
-    {
-        if ($this->_disabled) {
-            return;
-        }
-        $tP = $args['orm']->table_alias();
-        $args['orm']
-            ->select($tP . '.*')
-            ->left_outer_join('Sellvana_CatalogFields_Model_ProductField', ['pcf.product_id', '=', $tP . '.id'], 'pcf')
-        ;
-        $fields = $this->Sellvana_CatalogFields_Model_Field->fieldsInfo('product', true);
-        $args['orm']->select($fields);
-    }
-
-    /**
      * @param array $args
      */
     public function onProductVariantFindAfter($args)
@@ -291,6 +274,15 @@ class Sellvana_CatalogFields_Main extends BClass
     public function onProductAfterLoad($args)
     {
         $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductFieldsData([$args['model']]);
+    }
+
+    public function onFindManyAfter($args)
+    {
+        /** @var BORM $orm */
+        $orm = $args['orm'];
+        if ($orm->get('_context') == 'catalog_products') {
+            $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductFieldsData($args['result']);
+        }
     }
 }
 

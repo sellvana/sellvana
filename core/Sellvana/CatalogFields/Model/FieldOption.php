@@ -22,7 +22,7 @@ class Sellvana_CatalogFields_Model_FieldOption extends FCom_Core_Model_Abstract
         /** @var Sellvana_CatalogFields_Model_FieldOption[] $options */
         $options = $this->orm()->where("field_id", $fieldId)->find_many();
         foreach ($options as $o) {
-            $result[$o->label] = $o->label;
+            $result[$o->id] = $o->label;
         }
         return $result;
     }
