@@ -793,7 +793,7 @@
         });
     });
     
-    var currentPrices, oldPrices, deletedPrices = [], variantId;
+    var currentRow, currentPrices, oldPrices, deletedPrices = [], variantId;
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'fcom.catalog.price', 'fcom.locale', 'fcom.catalog.components', 'daterangepicker'],
         function ($, _, React, FComGriddleComponent, Components, Price, Locale) {
 
@@ -875,6 +875,7 @@
          * @return {mixed}
          */
         window.showModalToEditVariantPrice = function(row) {
+            currentRow    = row;
             variantId     = row.id;
             currentPrices = isNaN(row.id) ? [] : getVariantPrices(row.id);
             oldPrices     = _.clone(currentPrices);
@@ -929,6 +930,11 @@
                 });
             }
 
+            var basePrice = _.findWhere(currentPrices, { price_type: 'base' });
+            if (!_.isEmpty(basePrice)) {
+                currentRow.variant_price = basePrice.amount ? basePrice.amount : 0;
+            }
+
             if (form.valid()) { // If validation passes
                 var deletedIds = [];
                 _.each(deletedPrices, function(price, i) {
@@ -944,10 +950,23 @@
                 } else {
                     container.append('<input id="variant_prices_'+variantId+'" type="hidden" name="'+inputName+'" value="'+form.serialize()+'">');
                 }
+
+                variantGrid.updateRows([currentRow]);
+                updateVariantGridRowAttrs(currentRow);
                 modal.close();
             }
         }
     });
+
+    function updateVariantGridRowAttrs(row) {
+        // Just update base price amount to variant price on variant grid
+        var $rows = $(variantGrid.getDOMNode()).find('tr');
+        $rows.each(function() {
+            if ($(this).attr('id') == row.id) {
+                $(this).find('input[data-col="variant_price"]').val(row.variant_price);
+            }
+        });
+    }
 </script>
 
 <div class="well clearfix">

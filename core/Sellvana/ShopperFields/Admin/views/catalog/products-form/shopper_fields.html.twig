@@ -151,13 +151,14 @@
             var rows = shopperGrid.getRows();
 
             var res = [];
-            _(rows).each(function(row) {
+            _(rows).each(function(row, index) {
                 var optionSerialized = '';
                 if (row.position == 0) {
                     row.position = 0;
                 }
 
                 var data = _.pick(row, 'id', 'name', 'label', 'input_type', 'required', 'options', 'position');
+                data['id'] = ++index;
                 if (row.input_type === 'select') { // Only save prices when field is select
                     var $priceEle = $('input[data-shopper-id="'+row.id+'"]');
                     if ($priceEle.length) { // If price modal is saved changed
@@ -626,6 +627,7 @@
                                         data_mode: 'local',
                                         prices: prices,
                                         deleted: deletedPrices,
+                                        option: option,
                                         add_price_type_callback: 'shopperPriceTypeCallback',
                                         price_types: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
                                         editable_prices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
