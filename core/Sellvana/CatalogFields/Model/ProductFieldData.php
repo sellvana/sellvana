@@ -32,9 +32,15 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
         // transform collection into array of ids so that we'd be able to use it as filter further
         $fieldsData = $productIds = [];
         foreach ($products as $product) {
-            $productIds[] = $product->get('id');
+            $pId = $product->id();
+            if ($pId) {
+                $productIds[] = $pId;
+            }
         }
-
+        if (!$productIds) {
+            return $this;
+        }
+        
         $orm = $this->Sellvana_CatalogFields_Model_Field->orm('f');
         if (count($fieldNames)) {
             $orm->where_in('field_code', $fieldNames);
@@ -43,7 +49,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
         $fields = $orm->find_many();
         $fieldIds = [];
         foreach ($fields as $field) {
-            $fieldIds[] = $field->get('id');
+            $fieldIds[] = $field->id();
         }
 
         // get all values for the relevant fields and store it for multiple uses
@@ -57,7 +63,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 $options[$val->get('field_id')] = [];
             }
 
-            $options[$val->get('field_id')][$val->get('id')] = $val->get('label');
+            $options[$val->get('field_id')][$val->id()] = $val->get('label');
         }
 
         $orm->join(self::$_origClass, 'pf.field_id = f.id', 'pf')
@@ -115,13 +121,13 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
         }
 
         foreach ($products as $product) {
-            if (empty($fieldsData[$product->get('id')])) {
+            if (empty($fieldsData[$product->id()])) {
                 continue;
             }
 
-            $product->set('custom_fields', $fieldsData[$product->get('id')]);
+            $product->set('custom_fields', $fieldsData[$product->id()]);
 
-            foreach ($fieldsData[$product->get('id')] as $fieldSetId => $fieldSet) {
+            foreach ($fieldsData[$product->id()] as $fieldSetId => $fieldSet) {
                 foreach ($fieldSet['fields'] as $field) {
                     $value = $field['value'];
                     $fieldId = $field['id'];
@@ -133,5 +139,6 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 }
             }
         }
+        return $this;
     }
 }

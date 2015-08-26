@@ -500,12 +500,11 @@ class Sellvana_CatalogFields_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_5_1_0__0_5_2_0()
+    public function upgrade__0_5_1_0__0_5_5_0()
     {
         $tField = $this->Sellvana_CatalogFields_Model_Field->table();
         $tProduct = $this->Sellvana_Catalog_Model_Product->table();
         $tProductField = $this->Sellvana_CatalogFields_Model_ProductFieldData->table();
-        $tProductFieldSet = $this->Sellvana_CatalogFields_Model_ProductFieldSet->table();
         $tFieldOption = $this->Sellvana_CatalogFields_Model_FieldOption->table();
         $tSet = $this->Sellvana_CatalogFields_Model_Set->table();
 
@@ -531,22 +530,6 @@ class Sellvana_CatalogFields_Migrate extends BClass
             ],
         ]);
 
-        $this->BDb->ddlTableDef($tProductFieldSet, [
-            BDb::COLUMNS => [
-                'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
-                'product_id' => "int(10) UNSIGNED NOT NULL",
-                'set_id' => "int(10) UNSIGNED NOT NULL",
-            ],
-            BDb::PRIMARY => '(id)',
-            BDb::KEYS => [
-                'UNQ_product_id_set_id' => 'UNIQUE (product_id, set_id)',
-            ],
-            BDb::CONSTRAINTS => [
-                'product' => ['product_id', $tProduct],
-                'set' => ['set_id', $tSet],
-            ],
-        ]);
-
         $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
         $fieldsAssoc = [];
         foreach ($fields as $field) {
@@ -566,17 +549,6 @@ class Sellvana_CatalogFields_Migrate extends BClass
         $oldData = $this->Sellvana_CatalogFields_Model_ProductField->orm('pf')->find_many();
         foreach ($oldData as $row) {
             $productId = $row->get('product_id');
-
-            if ($json = $row->get('_data_serialized')) {
-                $data = $this->BUtil->fromJson($json);
-                foreach ($data as $fieldSet) {
-                    $setId = $fieldSet['id'];
-                    $this->Sellvana_CatalogFields_Model_ProductFieldSet->create([
-                        'product_id' => $productId,
-                        'set_id' => $setId,
-                    ])->save();
-                }
-            }
 
             foreach ($fieldsAssoc as $fieldCode => $field) {
                 $value = $row->get($fieldCode);
@@ -621,10 +593,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
                 ])->save();
             }
         }
-    }
 
-    public function upgrade__0_5_2_0__0_5_3_0()
-    {
         $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
         foreach ($fields as $field) {
             $fieldDbType = [];
@@ -633,17 +602,8 @@ class Sellvana_CatalogFields_Migrate extends BClass
                 $field->set('table_field_type', $fieldDbType[0])->save();
             }
         }
-    }
 
-    public function upgrade__0_5_3_0__0_5_4_0()
-    {
         $tProductField = $this->Sellvana_CatalogFields_Model_ProductFieldData->table();
         $this->BDb->ddlTableDef($tProductField, [BDb::COLUMNS => ['position' => "tinyint(3) NOT NULL DEFAULT '0' after `field_id`"]]);
-    }
-
-    public function upgrade__0_5_4_0__0_5_5_0()
-    {
-        $tProductFieldSet = $this->Sellvana_CatalogFields_Model_ProductFieldSet->table();
-        $this->BDb->ddlDropTable($tProductFieldSet);
     }
 }
