@@ -875,13 +875,8 @@
          * @return {mixed}
          */
         window.showModalToEditVariantPrice = function(row) {
-            if (isNaN(row.id)) {
-                alert('Please save variant before edit it\'s prices');
-                return;
-            }
-
             variantId     = row.id;
-            currentPrices = getVariantPrices(row.id);
+            currentPrices = isNaN(row.id) ? [] : getVariantPrices(row.id);
             oldPrices     = _.clone(currentPrices);
 
             var modalContainerEle = document.getElementById('fcom_append_form');

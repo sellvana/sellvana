@@ -28,9 +28,12 @@ define(['underscore', 'react'], function (_, React) {
                 this.props.removeSelectedRows([this.props.row]);
             }
         },
-        handleChange: function(event) {
+        handleChange: function(callback, event) {
             var col = event.target.getAttribute('data-col');
             this.props.row[col] = event.target.value;
+            if (typeof window[callback] === 'function') {
+                return window[callback](event);
+            }
         },
         render: function () {
             var that = this;
@@ -72,7 +75,7 @@ define(['underscore', 'react'], function (_, React) {
                                 //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
                                     <button className={"btn btn-link " + btn.cssClass} key={index} title={btn.title ? btn.title : ""} type="button"
-                                        data-action={btn.name} data-row={row.id} onClick={that.props.doRowAction.bind(null, btn.callback)}>
+                                        data-action={btn.name} data-row={row.id} {...btn.attrs} onClick={that.props.doRowAction.bind(null, btn.callback)}>
                                         <i className={btn.icon} data-action={btn.name} data-row={row.id}></i>
                                         {btn.caption}
                                     </button>
@@ -100,14 +103,15 @@ define(['underscore', 'react'], function (_, React) {
                         } else { //inline mode
 
                             var validationRules = that.validationRules(col.validation);
+
+                            var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+
                             var inlineProps = {
                                 id: id + '-' + col.name + '-' + row.id,
                                 name: id + '[' + row.id + '][' + col.name + ']',
                                 className: (col.cssClass ? col.cssClass : '') + ' form-control',
                                 "data-col": col.name
                             };
-
-                            var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
 
                             if (typeof row[col.name + '_disabled'] !== 'undefined' && row[col.name + '_disabled'] == true) {
                                 inlineProps.disabled = 'disabled';
@@ -138,7 +142,7 @@ define(['underscore', 'react'], function (_, React) {
                                     );
                                     break;
                                 default:
-                                    node = <input key={col.name} type="text" {...inlineProps} {...validationRules} defaultValue={defaultValue} onChange={that.handleChange} />;
+                                    node = <input key={col.name} type="text" {...inlineProps} {...col.attrs} {...validationRules} defaultValue={defaultValue} onChange={that.handleChange.bind(null, col.callback)} />;
                                     break;
                             }
                             /*var inlineColValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";

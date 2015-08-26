@@ -300,7 +300,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
                             <tr className="table-actions" style={{backgroundColor: "#ccc"}}>
                                 <td></td>
                                 <td>
-                                    <select id={"price-types-" + this.props.id} data-id={this.props.id} className="form-control" ref="price-types" onChange={this.props.addNewPrice.bind(null, 'addPriceTypeCallback')}>
+                                    <select id={"price-types-" + this.props.id} data-id={this.props.id} className="form-control" ref="price-types" onChange={this.props.addNewPrice.bind(null, this.props.add_price_type_callback)}>
                                     <option value="-1">{Locale._("Add Price ...")}</option>
                                     {_.map(priceOptions, function (pt, pk) {
                                         return <option key={pk} value={pk} disabled={pk == 'promo' ? 'disabled' : null}>{pt}</option>;
