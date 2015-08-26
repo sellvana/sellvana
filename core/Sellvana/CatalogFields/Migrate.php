@@ -640,4 +640,10 @@ class Sellvana_CatalogFields_Migrate extends BClass
         $tProductField = $this->Sellvana_CatalogFields_Model_ProductFieldData->table();
         $this->BDb->ddlTableDef($tProductField, [BDb::COLUMNS => ['position' => "tinyint(3) NOT NULL DEFAULT '0' after `field_id`"]]);
     }
+
+    public function upgrade__0_5_4_0__0_5_5_0()
+    {
+        $tProductFieldSet = $this->Sellvana_CatalogFields_Model_ProductFieldSet->table();
+        $this->BDb->ddlDropTable($tProductFieldSet);
+    }
 }
