@@ -1175,18 +1175,21 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * @param bool $useDefault
      * @return Sellvana_Catalog_Model_ProductPrice
      */
-    public function getPriceModelByType($type, $context = null, $useDefault = true)
+    public function getPriceModelByType($type, $context = [], $useDefault = true)
     {
         if (!isset($this->_priceModels)) {
-            $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices([$this], true);
+            $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices([$this]);
         }
-        if (false === $this->_priceModels || empty($this->_priceModels[0][$type])) {
+
+        $variantId = !empty($context['variant_id']) ? $context['variant_id'] : 0;
+
+        if (false === $this->_priceModels || empty($this->_priceModels[$variantId][$type])) {
             return null;
         }
 
-        $prices = $this->_priceModels[0][$type];
+        $prices = $this->_priceModels[$variantId][$type];
 
-        if (!$context) {
+        if (!isset($context['site_id']) && !isset($context['customer_group_id']) && !isset($context['currency_code'])) {
             return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
         }
 
@@ -1209,17 +1212,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             }
         }
 
-        if (true === $context) {
-            $context = [
-                'site_id' => true,
-                'customer_group_id' => true,
-                'currency_code' => true,
-            ];
+        if (!empty($context['default'])) {
+            $context['site_id'] = '*';
+            $context['customer_group_id'] = '*';
+            $context['currency_code'] = '*';
         }
 
-        $s = !empty($context['site_id']) ? (true !== $context['site_id'] ? $context['site_id'] : $siteId) : '*';
-        $g = !empty($context['customer_group_id']) ? (true !== $context['customer_group_id'] ? $context['customer_group_id'] : $customerGroupId) : '*';
-        $c = !empty($context['currency_code']) ? (true !== $context['currency_code'] ? $context['currency_code'] : $currencyCode) : '*';
+        $s = !empty($context['site_id']) ? $context['site_id'] : $siteId;
+        $g = !empty($context['customer_group_id']) ? $context['customer_group_id'] : $customerGroupId;
+        $c = !empty($context['currency_code']) ? $context['currency_code'] : $currencyCode;
 
         if (isset($prices["{$s}:{$g}:{$c}"])) {
             return $prices["{$s}:{$g}:{$c}"];
@@ -1253,12 +1254,10 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      *
      * @param boolean|array $context
      * @return mixed
-     *
-     * @todo assume $context true when null, or when components null - same for ProductPrice::getPrice()
      */
-    public function getCatalogPrice($context = true)
+    public function getCatalogPrice($context = [])
     {
-        if (is_array($context) && !empty($context['currency_code']) && $context['currency_code'] !== true) {
+        if (!empty($context['currency_code']) && $context['currency_code'] !== '*') {
             $currency = $context['currency_code'];
         } else {
             $currency = null;
@@ -1291,7 +1290,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
          * - pos: 0,1,2,3
          */
         $prices = [];
-        $context = true;
+        $context = [];
 
         $basePriceModel = $this->getPriceModelByType('base', $context);
         $mapPriceModel = $this->getPriceModelByType('map', $context);
@@ -1345,7 +1344,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $prices;
     }
 
-    public function getAllTierPrices($context = true)
+    public function getAllTierPrices($context = [])
     {
         return $this->getPriceModelByType('tier', $context);
     }
@@ -1357,7 +1356,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * @param array|boolean $context
      * @return null|float
      */
-    public function getTierPrice($qty, $context = true)
+    public function getTierPrice($qty, $context = [])
     {
         /** @var Sellvana_Catalog_Model_ProductPrice[] $tierPrices */
         $tierPrices = $this->getPriceModelByType('tier', $context);

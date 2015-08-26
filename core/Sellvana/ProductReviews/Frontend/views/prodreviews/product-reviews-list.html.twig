@@ -99,7 +99,7 @@
                                 <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
                                 <input type="hidden" name="pid" value="{{ prod.get('id') }}">
                                 <input type="hidden" name="rid" value="{{ review.get('id') }}">
-                                <button class="btn btn-primary btn-xs" type="submit" name="review_offensive" value="yes"
+                                <button class="btn btn-link btn-xs" type="submit" name="review_offensive" value="yes"
                                         onclick="FCom.Review.ReportOffensive('{{ APP.href('prodreviews/offensive') }}', {{ review.get('id') }});">{{ "Report offensive" | _ }}</button>
                             </form>
                         </div>
