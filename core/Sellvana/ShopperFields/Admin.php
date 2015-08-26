@@ -97,7 +97,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['type' => 'input', 'name' => 'label', 'label' => 'Option', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
                     ['type' => 'input', 'name' => 'sku', 'label' => 'Sku', 'width' => 150, 'editable' => 'inline', 'sortable' => false],
-                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'cssClass' => 'optionPositionUnique '],
+                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'cssClass' => 'optionPositionUnique ', 'callback' => 'editShopperOptionPositionCallback'],
                     ['type' => 'btn_group', 'buttons' => [
                             ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit ", 'textValue' => 'Edit Price', "icon" => " icon-dollar", 'attrs' => ['data-toggle' => 'tooltip', 'title' => 'Update Prices', 'data-placement' => 'top']], 
                             ['name' => 'delete']

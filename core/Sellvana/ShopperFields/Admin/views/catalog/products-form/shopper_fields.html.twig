@@ -252,6 +252,96 @@
     });
 
     require(['react', 'underscore', 'jquery', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'fcom.catalog.price', 'fcom.locale', 'fcom.catalog.components'], function(React, _, $, FComGriddleComponent, FComModalForm, Components, Price, Locale) {
+        /**
+         * Toggle tabs when edit trigger
+         * @param  {string} label 
+         * @return {mixed}
+         */
+        function toggleTab(label) {
+            shopperModalNode.find('#btn'+capitalizeFirstLetter(toggleSpace(label))+'Tab').click();
+            shopperModalNode.find('#btnShopperTab').click();
+        }
+
+        /**
+         * Toggle action buttons if valid false
+         * @param  {Boolean} valid 
+         * @return {mixed}
+         */
+        function toggleActionButton(valid) {
+            if (!valid) {
+                shopperModalNode.find('tbody .btn-edit').addClass('disabled');
+                shopperModalNode.find('.modal-footer button.btn-primary').addClass('disabled');
+            } else {
+                shopperModalNode.find('tbody .btn-edit').removeClass('disabled');
+                shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
+            }
+        }
+
+        /**
+         * Convert space chars to hyphen or on the contrary
+         * @param  {string}  string
+         * @param  {Boolean} isRevert
+         * @return {string}
+         */
+        function toggleSpace(string, isRevert) {
+            string = $.trim(string);
+            if (isRevert) {
+                return string.replace(/\-/g, ' ');
+            } else {
+                return string.replace(/\s/g, '-');
+            }
+        }
+
+        /**
+         * Parse options string to array
+         * @param  {string} options 
+         * @return {Array}
+         */
+        function parseOptions(options) {
+            if (typeof options === 'string' && options.length) {
+                return options.split(',');
+            }
+            return [];
+        }
+
+        /**
+         * Capitalize first letter
+         * @param  {string} string 
+         * @return {string}
+         */
+        function capitalizeFirstLetter(string) {
+            return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        /**
+         * Merge options of current row to global added options of specify row's options
+         * @param  {string} curOptions
+         * @param  {Object} addedOptions
+         * @return {string}
+         */
+        function mergeOptions(curOptions, addedOptions) {
+            _(addedOptions).map(function(addedOption) {
+                if (curOptions.indexOf(addedOption) === -1) {
+                    return curOptions += ',' + addedOption;
+                }
+            });
+
+            return curOptions;
+        }
+
+        /**
+         * Validate unique option attributes
+         * @return boolean
+         */
+        var validateAttrs = function() {
+            var valid = true;
+            shopperModalNode.find('input[data-col="label"], input[data-col="position"]').each(function (el) {
+                if (!$(this).valid()) {
+                    valid = false;
+                }
+            });
+            return valid;
+        }
 
         /**
          * Options grid register
@@ -355,7 +445,7 @@
         }*/
 
         /**
-         * Callback functions onchange on option input attribute
+         * Callback functions onchange option name
          * @param  {Object} e 
          * @return {mixed}
          */
@@ -365,6 +455,16 @@
             } else {
                 shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
             }
+            validateAttrs();
+        }
+
+        /**
+         * Callback functions onchange option position
+         * @param  {Object} e 
+         * @return {mixed}
+         */
+        window.editShopperOptionPositionCallback = function(e) {
+            validateAttrs();
         }
 
         /**
@@ -394,68 +494,6 @@
             }
 
             currentShopper.option_serialized[option].prices = prices;
-        }
-
-        /**
-         * Toggle tabs when edit trigger
-         * @param  {string} label 
-         * @return {mixed}
-         */
-        window.toggleTab = function(label) {
-            shopperModalNode.find('#btn'+capitalizeFirstLetter(toggleSpace(label))+'Tab').click();
-            shopperModalNode.find('#btnShopperTab').click();
-        }
-
-        /**
-         * Convert space chars to hyphen or on the contrary
-         * @param  {string}  string
-         * @param  {Boolean} isRevert
-         * @return {string}
-         */
-        function toggleSpace(string, isRevert) {
-            string = $.trim(string);
-            if (isRevert) {
-                return string.replace(/\-/g, ' ');
-            } else {
-                return string.replace(/\s/g, '-');
-            }
-        }
-
-        /**
-         * Parse options string to array
-         * @param  {string} options 
-         * @return {Array}
-         */
-        function parseOptions(options) {
-            if (typeof options === 'string' && options.length) {
-                return options.split(',');
-            }
-            return [];
-        }
-
-        /**
-         * Capitalize first letter
-         * @param  {string} string 
-         * @return {string}
-         */
-        function capitalizeFirstLetter(string) {
-            return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1);
-        }
-
-        /**
-         * Merge options of current row to global added options of specify row's options
-         * @param  {string} curOptions
-         * @param  {Object} addedOptions
-         * @return {string}
-         */
-        function mergeOptions(curOptions, addedOptions) {
-            _(addedOptions).map(function(addedOption) {
-                if (curOptions.indexOf(addedOption) === -1) {
-                    return curOptions += ',' + addedOption;
-                }
-            });
-
-            return curOptions;
         }
 
         /**
@@ -702,6 +740,7 @@
             React.render(
                 React.createElement(FComGriddleComponent, { config: optionsConfigCompiled }
             ), attachGridContainerEle);
+
             // Position unique validation
             function validateUniquePosition (value, elem) {
                 var valid = true;
@@ -720,9 +759,7 @@
                         }
 
                         valid = value !== $item.find('input[data-col="position"]').val();
-                        if (!valid) {
-                            $parent.parents('tbody').find('.btn-edit').addClass('disabled');
-                        } else $parent.parents('tbody').find('.btn-edit').removeClass('disabled');
+                        toggleActionButton(valid);
                     });
                     return valid;
                 }
@@ -750,14 +787,12 @@
                         }
 
                         valid = value !== $item.find('input[data-col="label"]').val();
-                        if (!valid) {
-                            $parent.parents('tbody').find('.btn-edit').addClass('disabled');
-                        } else $parent.parents('tbody').find('.btn-edit').removeClass('disabled');
+                        toggleActionButton(valid);
                     });
                     return valid;
                 }
             }
-            $.validator.addMethod('validateUniqueOption', validateUniqueOption, '{{"Position already exists."|_}}');
+            $.validator.addMethod('validateUniqueOption', validateUniqueOption, '{{"Option already exists."|_}}');
             $.validator.addClassRules('optionLabelUnique', {
                 validateUniqueOption: true
             });
