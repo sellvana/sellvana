@@ -1,9 +1,7 @@
 {% set fieldSetModel = APP.instance('Sellvana_CatalogFields_Model_Set') %}
 {% set ctrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products') %}
-
-<div id="prod-new-field-modal">
-    <a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
-    <div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
+<form id="prod-new-field-form" class="form form-horizontal validate-form">
+    <div id="prod-new-field-modal" class="modal fade in" tabindex='-1'>
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -119,8 +117,7 @@
             </div>
         </div>
     </div>
-</div>
-
+</form>
 {# CONFLICT START #}
 
 <div class="well">
@@ -333,11 +330,6 @@ CONFLICT END #}
 
 
 <script>
-$('#fcom_append_form').append('<form id="prod-new-field-form1" class="form form-horizontal validate-form"/>');
-var html = $("#prod-new-field-modal").html();
-$("#prod-new-field-modal").remove();
-$('#prod-new-field-form1').append(html);
-
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
     var setValidateForm = function(selector) {
         if (selector == null) {
@@ -520,7 +512,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
 
-    var _appendForm = $('#prod-new-field-form1');
+    var _appendForm = $('#prod-new-field-form');
     setValidateForm($(_appendForm));
     $('#field_code').rules("add", {
         onfocusout: false,
@@ -529,7 +521,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             url: '{{ APP.href('/catalogfields/fields/unique_field') | raw }}',
             type: 'post',
              data: {
-                name: 'field_code'
+                _name: 'field_code'
             },
             dataFilter: function (responseString) {
                 var response = jQuery.parseJSON(responseString);
@@ -542,12 +534,13 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
     $('#btn_new_field').click(function() {
-        $('#prod-new-field-form').find('input').val('');
-        $('#prod-new-field-form').find('select').each(function(index) {
+        $('#prod-new-field-modal').find('input').val('');
+        $('#prod-new-field-modal').find('select').each(function(index) {
             $(this).find('option').removeAttr('selected');
             $(this).find('option:first').attr('selected','selected');
         })
-        $('#btn_show_modal').trigger('click');
+
+        $('#prod-new-field-modal').modal('show');
 
     });
 

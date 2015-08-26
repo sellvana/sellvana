@@ -354,7 +354,6 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
             this.setState({ options: this.props.options });
         },
         componentDidUpdate: function() {
-            console.log(this.props.options);
             if (typeof this.props.options.prices === 'undefined' || this.props.options.prices.length === 0) {
                 this.addBlankPrice();
             }
@@ -365,7 +364,6 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
          * @return mixed
          */
         componentDidMount: function() {
-            console.log(this.props.options);
             if (typeof this.props.options.prices === 'undefined' || this.props.options.prices.length === 0) {
                 this.addBlankPrice();
 
@@ -416,7 +414,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
             }
             this.props.options.prices.push(newPrice);
             this.setState({ options: this.props.options });
-            if (typeof window[callback] === 'function') {console.log();
+            if (typeof window[callback] === 'function') {
                 window[callback](this.props.options.prices, option);
             }
         },
@@ -440,7 +438,6 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
                     }
                 }.bind(this));
             }
-            console.log(this.props.options);
             this.setState({ options: this.props.options });
         },
         /**
