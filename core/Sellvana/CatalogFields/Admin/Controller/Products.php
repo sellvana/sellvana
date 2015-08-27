@@ -309,6 +309,8 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
 
     public function getInitialData($model)
     {
+        return $this->BUtil->toJson($model->get('custom_fields'));
+
         // $customFields = $model->getData('custom_fields');
         $pc = $this->Sellvana_CatalogFields_Model_ProductField->load($model->id(), 'product_id');
         if (!$pc) {

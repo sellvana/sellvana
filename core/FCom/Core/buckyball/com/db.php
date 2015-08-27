@@ -1336,7 +1336,7 @@ class BORM extends ORMWrapper
         $class = $this->_origClass();
         BEvents::i()->fire($class . '::find_many:orm', ['orm' => $this, 'class' => $class]);
         $result = parent::find_many();
-        BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'class' => $class]);
+        BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'orm' => $this, 'class' => $class]);
         return $result;
     }
 
@@ -2396,9 +2396,10 @@ class BModel extends Model
     * Use XXX::i()->orm($alias) instead
     *
     * @param string|null $class_name optional
+    * @param string|null $context
     * @return BORM
     */
-    public static function factory($class_name = null)
+    public static function factory($class_name = null, $context = null)
     {
         if (null === $class_name) { // ADDED
             $class_name = get_called_class();
@@ -2414,6 +2415,7 @@ class BModel extends Model
             static::$_readConnectionName ? static::$_readConnectionName : static::$_connectionName,
             static::$_writeConnectionName ? static::$_writeConnectionName : static::$_connectionName
         );
+        $orm->set('_context', $context); // ADDED
         $orm->table_alias('_main');
         return $orm;
     }
@@ -2422,11 +2424,12 @@ class BModel extends Model
     * Alias for self::factory() with shortcut for table alias
     *
     * @param string $alias table alias
+    * @param string $context
     * @return BORM
     */
-    public static function orm($alias = null)
+    public static function orm($alias = null, $context = null)
     {
-        $orm = static::factory();
+        $orm = static::factory(null, $context);
         static::_findOrm($orm);
         if ($alias) {
             $orm->table_alias($alias);

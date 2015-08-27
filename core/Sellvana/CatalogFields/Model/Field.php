@@ -31,12 +31,12 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
         'field_type'       => [
             'product' => 'Products',
         ],
-        'table_field_type' => [
-            'varchar(255)'  => 'Short Text',
+        'table_field_type'  => [
+            'varchar'       => 'Short Text',
             'text'          => 'Long Text',
-            'int(11)'       => 'Integer',
-            'tinyint(3)'    => 'Tiny Int',
-            'decimal(12,2)' => 'Decimal',
+            'int'           => 'Integer',
+            'tinyint'       => 'Tiny Int',
+            'decimal'       => 'Decimal',
             'date'          => 'Date',
             'datetime'      => 'Date/Time',
             '_serialized'   => 'Serialized',
@@ -55,6 +55,17 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
         ],
     ];
 
+    protected static $_fieldTypeColumns = [
+        'varchar'       => 'value_var',
+        'text'          => 'value_text',
+        'int'           => 'value_int',
+        'tinyint'       => 'value_int',
+        'decimal'       => 'value_dec',
+        'date'          => 'value_date',
+        'datetime'      => 'value_date',
+        '_serialized'   => 'value_text',
+    ];
+
     protected static $_fieldTypes = [
         'product' => [
             'class' => 'Sellvana_CatalogFields_Model_ProductField',
@@ -66,15 +77,6 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
     protected $_oldTableFieldType;
 
     protected static $_fieldsCache = [];
-
-    public function tableName()
-    {
-        if (empty(static::$_fieldTypes[$this->field_type])) {
-            return null;
-        }
-        $class = static::$_fieldTypes[$this->field_type]['class'];
-        return $class::table();
-    }
 
     /**
      * @param $type
@@ -129,50 +131,6 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function onAfterSave()
-    {
-        $fTable = $this->tableName();
-        $fCode = preg_replace('#([^0-9A-Za-z_])#', '', $this->field_code);
-        $fType = preg_replace('#([^0-9a-z\(\),])#', '', strtolower($this->table_field_type));
-        $field = $this->BDb->ddlFieldInfo($fTable, $this->field_code);
-        $columnsUpdate = [];
-
-        if ($fType === '_serialized') {
-            if ($field) {
-                $columnsUpdate[$fCode] = 'DROP';
-            } elseif ($this->_oldTableFieldCode !== $fCode) {
-                //TODO: rename key name in all records??
-            }
-        } else {
-            if (!$field) {
-                $columnsUpdate[$fCode] = $fType;
-            } elseif ($this->_oldTableFieldCode !== $fCode) {
-                $columnsUpdate[$this->_oldTableFieldCode] = "RENAME {$fCode} {$fType}";
-            }
-        }
-        if ($columnsUpdate) {
-            $this->BDb->ddlTableDef($fTable, [BDb::COLUMNS => $columnsUpdate]);
-        }
-
-        $this->_oldTableFieldCode = $this->field_code;
-        $this->_oldTableFieldType = $this->table_field_type;
-        //fix field code name
-        if ($this->field_code != $fCode) {
-            $this->field_code = $fCode;
-            $this->save();
-        }
-
-        parent::onAfterSave();
-    }
-
-    public function onAfterDelete()
-    {
-        parent::onAfterDelete();
-        if ($this->table_field_type !== '_serialized') {
-            $this->BDb->ddlTableDef($this->tableName(), [BDb::COLUMNS => [$this->field_code => BDb::DROP]]);
-        }
-    }
-
     /**
      * @return array
      */
@@ -216,5 +174,18 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
     {
         $field = $this->load($code, 'field_code');
         return $field->get('frontend_label');
+    }
+
+    /**
+     * @param string $type
+     * @return bool|string
+     */
+    public function getTableColumn($type)
+    {
+        if (!empty(static::$_fieldTypeColumns[$type])) {
+            return static::$_fieldTypeColumns[$type];
+        } else {
+            return false;
+        }
     }
 }
