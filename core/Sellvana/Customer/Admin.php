@@ -31,8 +31,9 @@ class Sellvana_Customer_Admin extends BClass
         $view->addWidget('customers-list', [
             'title' => 'Recent Customers',
             'icon' => 'group',
-            'view' => 'customer/dashboard/customers-list',
+            'view' => 'dashboard/customers-list',
             'async' => true,
+            'permission' => 'customers/manage'
         ]);
     }
 

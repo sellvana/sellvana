@@ -13,6 +13,14 @@ class FCom_Admin_View_Dashboard extends FCom_Admin_View_Abstract
      */
     public function addWidget($widgetKey, $widget)
     {
+        if (array_key_exists('permission', $widget)) {
+            $user = $this->FCom_Admin_Model_User->sessionUser();
+
+            if (!$user || !$user->getPermission($widget['permission'])) {
+                return $this;
+            }
+        }
+
         $widgets = (array)$this->get('widgets');
         $widget['key'] = $widgetKey;
         if (empty($widget['cols'])) {
