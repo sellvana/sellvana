@@ -1225,4 +1225,25 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         $this->BResponse->json($result);
     }
+
+    public function getLatestNewProducts(){
+        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/latest_new_limit');
+        if (!$limit) {
+            $limit = 25;
+        }
+        $products = $this->Sellvana_Catalog_Model_Product->orm('p')
+            ->join('Sellvana_Catalog_Model_CategoryProduct', ['p.id', '=', 'cp.product_id'], 'cp')
+            ->join('Sellvana_Catalog_Model_Category', ['c.id', '=', 'cp.category_id'], 'c')
+            ->select([
+                'p.product_sku',
+                'p.product_name',
+                'p.create_at'
+            ])
+            ->select_expr('GROUP_CONCAT(c.node_name SEPARATOR "\n ")', 'categories')
+            ->group_by('p.id')
+            ->order_by_desc('p.create_at')
+            ->limit($limit);
+
+        return $products->find_many();
+    }
 }

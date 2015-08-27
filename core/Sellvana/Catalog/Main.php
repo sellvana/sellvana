@@ -88,7 +88,15 @@ class Sellvana_Catalog_Main extends BClass
         $view->addWidget('low-inventory', [
             'title' => 'Low Inventory Products',
             'icon' => 'inbox',
-            'view' => 'catalog/dashboard/low-inventory',
+            'view' => 'dashboard/low-inventory',
+            'cols' => 4,
+            'async' => true,
+            'filter' => false,
+        ]);
+        $view->addWidget('latest-new', [
+            'title' => 'Latest New Products',
+            'icon' => 'inbox',
+            'view' => 'dashboard/latest-new',
             'cols' => 4,
             'async' => true,
             'filter' => false,
