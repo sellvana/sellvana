@@ -237,6 +237,7 @@ class Sellvana_Sales_Main extends BClass
             'view' => 'dashboard/orders-list',
             'async' => true,
             'filter' => false,
+            'permission' => 'sales/orders'
         ]);
         $view->addWidget('orders-totals', [
             'title' => 'Order Totals',
@@ -244,7 +245,8 @@ class Sellvana_Sales_Main extends BClass
             'view' => 'dashboard/orders-totals',
             'cols' => 4,
             'async' => true,
-            'filter' => true
+            'filter' => true,
+            'permission' => 'sales/orders'
         ]);
         $view->addWidget('avg-order-value', [
             'title' => 'Average Order Value',
@@ -252,7 +254,8 @@ class Sellvana_Sales_Main extends BClass
             'cols' => 2,
             'view' => 'dashboard/avg-order-value',
             'async' => true,
-            'filter' => true
+            'filter' => true,
+            'permission' => 'sales/orders'
         ]);
         $view->addWidget('top-products', [
             'title' => 'Top Products',
@@ -260,7 +263,8 @@ class Sellvana_Sales_Main extends BClass
             'cols' => 4,
             'view' => 'dashboard/top-products',
             'async' => true,
-            'filter' => true
+            'filter' => true,
+            'permission' => 'sales/orders'
         ]);
         $view->addWidget('top-products-chart', [
             'title' => 'Top Products (Chart)',
@@ -268,7 +272,8 @@ class Sellvana_Sales_Main extends BClass
             'cols' => 4,
             'view' => 'dashboard/top-products-chart',
             'async' => true,
-            'filter' => true
+            'filter' => true,
+            'permission' => 'sales/orders'
         ]);
     }
 

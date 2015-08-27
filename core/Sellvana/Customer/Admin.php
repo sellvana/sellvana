@@ -33,6 +33,7 @@ class Sellvana_Customer_Admin extends BClass
             'icon' => 'group',
             'view' => 'dashboard/customers-list',
             'async' => true,
+            'permission' => 'customers/manage'
         ]);
     }
 
