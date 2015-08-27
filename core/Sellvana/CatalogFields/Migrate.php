@@ -16,7 +16,6 @@
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_ProductPrice              $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
- * @property Sellvana_CatalogFields_Model_ProductFieldSet     $Sellvana_CatalogFields_Model_ProductFieldSet
  */
 class Sellvana_CatalogFields_Migrate extends BClass
 {

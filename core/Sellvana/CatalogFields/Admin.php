@@ -13,7 +13,6 @@
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
- * @property Sellvana_CatalogFields_Model_ProductFieldSet     $Sellvana_CatalogFields_Model_ProductFieldSet
  */
 class Sellvana_CatalogFields_Admin extends BClass
 {
@@ -78,10 +77,6 @@ class Sellvana_CatalogFields_Admin extends BClass
 
         if (is_array($fieldSets) && count($fieldSets)) {
             $productId = $p->id();
-            $fieldsetData = $this->Sellvana_CatalogFields_Model_ProductFieldSet->orm('ps')
-                ->where_equal('product_id', $productId)
-                ->find_many_assoc('set_id');
-
             $fieldNames = [];
             foreach ($fieldSets as $fieldSet) {
                 if (!empty($fieldSet['fields'])) {
@@ -97,14 +92,7 @@ class Sellvana_CatalogFields_Admin extends BClass
 
             foreach ($fieldSets as $fieldSet) {
                 if (!empty($fieldSet['fields'])) {
-                    if ($fieldSetId = $fieldSet['id']) {
-                        if (empty($fieldsetData[$fieldSetId])) {
-                            $fs = $this->Sellvana_CatalogFields_Model_ProductFieldSet->create(['product_id' => $productId]);
-                        } else {
-                            $fs = $fieldsetData[$fieldSetId];
-                        }
-                        $fs->set('set_id', $fieldSetId)->save();
-                    }
+                    $fieldSetId = $fieldSet['id'];
 
                     $fieldData = $this->Sellvana_CatalogFields_Model_ProductFieldData->orm('pf')
                         ->where_equal('product_id', $productId)
