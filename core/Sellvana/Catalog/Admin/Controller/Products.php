@@ -1246,4 +1246,28 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         return $products->find_many();
     }
+
+    public function getProductsWithoutImages(){
+        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/products_without_images_limit');
+        if (!$limit) {
+            $limit = 25;
+        }
+
+        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
+        $tMedia = $this->Sellvana_Catalog_Model_ProductMedia->table();
+
+        $products = $this->Sellvana_Catalog_Model_Product->orm('p')
+            ->raw_join("INNER JOIN (
+                SELECT `sub_p`.`id`, IFNULL(COUNT(sub_m.id), 0) as `image_count`
+                FROM {$tProduct} sub_p
+                LEFT JOIN {$tMedia} sub_m ON (sub_m.product_id = sub_p.id)
+                GROUP BY `sub_p`.`id`
+                )", 'm.id = p.id', 'm')
+            ->group_by('p.id')
+            ->where_equal('m.image_count', 0)
+            ->order_by_asc('p.update_at')
+            ->limit($limit);
+
+        return $products->find_many();
+    }
 }

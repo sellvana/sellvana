@@ -26,5 +26,6 @@
     {{ forms.accordion_panel_end }}
     {{ forms.accordion_panel_start({label:'Dashboard'|_, id:'settings-Sellvana_Catalog-group3'}) }}
         {{ forms.input(fieldData, {field:'latest_new_limit', label:'Latest New Products Limit'|_ }) }}
+        {{ forms.input(fieldData, {field:'products_without_images_limit', label:'Products With No Images Limit'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

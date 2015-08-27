@@ -103,5 +103,14 @@ class Sellvana_Catalog_Main extends BClass
             'filter' => false,
             'permission' => 'catalog/products'
         ]);
+        $view->addWidget('without-images', [
+            'title' => 'Products With No Images',
+            'icon' => 'inbox',
+            'view' => 'dashboard/without-images',
+            'cols' => 3,
+            'async' => true,
+            'filter' => false,
+            'permission' => 'catalog/products'
+        ]);
     }
 }

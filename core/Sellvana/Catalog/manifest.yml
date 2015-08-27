@@ -20,6 +20,7 @@ modules:
                     enable_rollover: true
                     rollover_effect: fade
                     latest_new_limit: 25
+                    products_without_images_limit: 25
 
         areas:
             FCom_Admin:
