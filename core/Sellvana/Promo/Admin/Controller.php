@@ -5,8 +5,6 @@
  *
  * @property Sellvana_Promo_Model_Promo       $Sellvana_Promo_Model_Promo
  * @property Sellvana_Promo_Model_PromoMedia  $Sellvana_Promo_Model_PromoMedia
- * @property Sellvana_Promo_Model_Product     $Sellvana_Promo_Model_Product
- * @property Sellvana_Promo_Model_Group       $Sellvana_Promo_Model_Group
  * @property Sellvana_Catalog_Model_Category  $Sellvana_Catalog_Model_Category
  * @property Sellvana_Catalog_Model_Product   $Sellvana_Catalog_Model_Product
  * @property FCom_Admin_View_Grid         $FCom_Admin_View_Grid

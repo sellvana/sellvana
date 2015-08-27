@@ -10,17 +10,18 @@
  * @property string $table_field_type
  * @property string $admin_input_type
  * @property string $frontend_label
- * @property int $frontend_show
+ * @property int    $frontend_show
  * @property string $config_json
- * @property int $sort_order
+ * @property int    $sort_order
  * @property string $facet_select (No|Exclusive|Inclusive)
- * @property int $system
- * @property int $multilanguage
+ * @property int    $system
+ * @property int    $multilanguage
  * @property string $validation
- * @property int $required
+ * @property int    $required
  *
  * DI
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property Sellvana_CustomerFields_Model_FieldOption $Sellvana_CustomerFields_Model_FieldOption
  */
 class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
 {
@@ -230,6 +231,16 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
         }
 
         return $res;
+    }
+
+    public function getOptions()
+    {
+        $options = [];
+        $input   = $this->get('admin_input_type');
+        if($input == 'select' || $input == 'multiselect'){
+            $options = $this->Sellvana_CustomerFields_Model_FieldOption->getListAssocById($this->id());
+        }
+        return $options;
     }
 
     /**
