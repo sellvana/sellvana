@@ -21,6 +21,7 @@ modules:
                     rollover_effect: fade
                     latest_new_limit: 25
                     products_without_images_limit: 25
+                    searches_recent_terms_limit: 25
 
         areas:
             FCom_Admin:

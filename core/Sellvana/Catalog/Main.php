@@ -112,5 +112,14 @@ class Sellvana_Catalog_Main extends BClass
             'filter' => false,
             'permission' => 'catalog/products'
         ]);
+        $view->addWidget('searches-recent-terms', [
+            'title' => 'Searches - recent terms (internal)',
+            'icon' => 'inbox',
+            'view' => 'dashboard/searches-recent-terms',
+            'cols' => 3,
+            'async' => true,
+            'filter' => false,
+            'permission' => 'catalog/products'
+        ]);
     }
 }

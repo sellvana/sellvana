@@ -1275,4 +1275,18 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         return $products->find_many();
     }
+
+    public function getSearchesRecentTerms() {
+        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/searches_recent_terms_limit');
+        if (!$limit) {
+            $limit = 25;
+        }
+
+        $terms = $this->Sellvana_Catalog_Model_SearchHistory->orm('sh')
+            ->select(['sh.query'])
+            ->order_by_desc('sh.last_at')
+            ->limit($limit);
+
+        return $terms->find_many();
+    }
 }
