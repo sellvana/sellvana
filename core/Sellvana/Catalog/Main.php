@@ -92,6 +92,7 @@ class Sellvana_Catalog_Main extends BClass
             'cols' => 4,
             'async' => true,
             'filter' => false,
+            'permission' => 'catalog/inventory'
         ]);
         $view->addWidget('latest-new', [
             'title' => 'Latest New Products',
