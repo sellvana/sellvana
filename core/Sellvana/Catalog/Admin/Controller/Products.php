@@ -14,6 +14,7 @@
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
  */
 class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -1264,6 +1265,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 GROUP BY `sub_p`.`id`
                 )", 'm.id = p.id', 'm')
             ->group_by('p.id')
+            ->select([
+                'p.product_sku',
+                'p.product_name'
+            ])
             ->where_equal('m.image_count', 0)
             ->order_by_asc('p.update_at')
             ->limit($limit);
