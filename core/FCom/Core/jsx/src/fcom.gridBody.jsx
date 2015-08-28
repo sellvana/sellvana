@@ -17,7 +17,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 "originalData": [],
                 "columnMetadata": [],
                 "className": ""
-            }
+            };
         },
         doRowAction: function(callback, event) {
             // Remove focus for prevent re-render modal when keypress

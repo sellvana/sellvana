@@ -1133,14 +1133,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     protected function _processPricesPost($model, $data)
     {
-        if(empty($data['prices'])){
+        if(empty($data['productPrice'])){
             return;
         }
-
-        // Process product prices
-        if (!empty($data['prices']['productPrice'])) {
-            $this->_savePrices($model, $data['prices']['productPrice']);
-        }
+        
+        $this->_savePrices($model, $data['productPrice']);
         
         // Process delete product prices
         if (!empty($data['prices']['delete'])) {
