@@ -88,10 +88,38 @@ class Sellvana_Catalog_Main extends BClass
         $view->addWidget('low-inventory', [
             'title' => 'Low Inventory Products',
             'icon' => 'inbox',
-            'view' => 'catalog/dashboard/low-inventory',
+            'view' => 'dashboard/low-inventory',
             'cols' => 4,
             'async' => true,
             'filter' => false,
+            'permission' => 'catalog/inventory'
+        ]);
+        $view->addWidget('latest-new', [
+            'title' => 'Latest New Products',
+            'icon' => 'inbox',
+            'view' => 'dashboard/latest-new',
+            'cols' => 4,
+            'async' => true,
+            'filter' => false,
+            'permission' => 'catalog/products'
+        ]);
+        $view->addWidget('without-images', [
+            'title' => 'Products With No Images',
+            'icon' => 'inbox',
+            'view' => 'dashboard/without-images',
+            'cols' => 3,
+            'async' => true,
+            'filter' => false,
+            'permission' => 'catalog/products'
+        ]);
+        $view->addWidget('searches-recent-terms', [
+            'title' => 'Searches - recent terms (internal)',
+            'icon' => 'inbox',
+            'view' => 'dashboard/searches-recent-terms',
+            'cols' => 3,
+            'async' => true,
+            'filter' => false,
+            'permission' => 'catalog/products'
         ]);
     }
 }

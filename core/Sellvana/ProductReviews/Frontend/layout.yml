@@ -1,6 +1,7 @@
 base:
     - view: head
         do:
+            - [ scss, "@Sellvana_ProductReviews/Frontend/scss/fcom.productreviews.scss" ]
             - [ requireJs, fcom.productreviews, "@Sellvana_ProductReviews/Frontend/js/fcom.productreviews" ]
 
 /prodreview/index:

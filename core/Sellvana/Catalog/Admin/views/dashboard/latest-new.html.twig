@@ -1,0 +1,28 @@
+{% set products = APP.instance('Sellvana_Catalog_Admin_Controller_Products').getLatestNewProducts() %}
+
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "SKU"|_ }}</th>
+            <th>{{ "Name"|_ }}</th>
+            <th>{{ "Date added"|_ }}</th>
+            <th>{{ "Category"|_ }}</th>
+        </tr>
+        </thead>
+        {% if products is empty %}
+            <tr>
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+        {% else %}
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.get('product_sku') }}</td>
+                    <td>{{ product.get('product_name') }}</td>
+                    <td>{{ product.get('create_at') }}</td>
+                    <td>{{ product.get('categories')|nl2br }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>
