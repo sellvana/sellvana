@@ -33,7 +33,7 @@ class Sellvana_ProductReviews_Frontend_Controller extends FCom_Frontend_Controll
         $this->layout('/prodreview/index');
         $this->BApp->set('current_product', $product);
         $this->view('prodreviews/product-details')->set([
-            'prod' => $product,
+            'product' => $product,
             'type' => 'full'
         ]);
     }

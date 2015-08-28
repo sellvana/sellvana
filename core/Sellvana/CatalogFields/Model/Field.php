@@ -21,6 +21,7 @@
  *
  * DI
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  */
 class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
 {
@@ -28,42 +29,35 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_field';
 
     protected static $_fieldOptions = [
-        'field_type'       => [
-            'product' => 'Products',
+        'field_type'      => [
+            'product'     => 'Products',
         ],
-        'table_field_type'  => [
-            'varchar'       => 'Short Text',
-            'text'          => 'Long Text',
-            'int'           => 'Integer',
-            'tinyint'       => 'Tiny Int',
-            'decimal'       => 'Decimal',
-            'date'          => 'Date',
-            'datetime'      => 'Date/Time',
-            '_serialized'   => 'Serialized',
+        'table_field_type' => [
+            'options'      => 'Options',
+            'varchar'      => 'Short Text',
+            'text'         => 'Long Text',
+            'int'          => 'Integer',
+            'decimal'      => 'Decimal',
+            'date'         => 'Date',
+            'datetime'     => 'Date/Time',
+            'serialized'   => 'Serialized',
         ],
         'admin_input_type' => [
-            'text'        => 'Text Line',
-            'textarea'    => 'Text Area',
-            'select'      => 'Drop down',
-            'multiselect' => 'Multiple Select',
-            'boolean'     => 'Yes/No',
-            'wysiwyg'     => 'WYSIWYG editor'
+            'text'         => 'Text Line',
+            'textarea'     => 'Text Area',
+            'select'       => 'Drop down',
+            'multiselect'  => 'Multiple Select',
+            'boolean'      => 'Yes/No',
+            'wysiwyg'      => 'WYSIWYG editor'
         ],
         'frontend_show'    => [
-            '1' => 'Yes',
-            '0' => 'No'
+            '1'            => 'Yes',
+            '0'            => 'No'
         ],
     ];
 
-    protected static $_fieldTypeColumns = [
-        'varchar'       => 'value_var',
-        'text'          => 'value_text',
-        'int'           => 'value_int',
-        'tinyint'       => 'value_int',
-        'decimal'       => 'value_dec',
-        'date'          => 'value_date',
-        'datetime'      => 'value_date',
-        '_serialized'   => 'value_text',
+    protected static $_fieldDefaults = [
+        'field_type' => 'product',
     ];
 
     protected static $_fieldTypes = [
@@ -76,35 +70,50 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
     protected $_oldTableFieldCode;
     protected $_oldTableFieldType;
 
-    protected static $_fieldsCache = [];
+    protected static $_fieldsCache;
 
     /**
-     * @param $type
-     * @param bool $keysOnly
-     * @return array
+     * @return Sellvana_CatalogFields_Model_Field[]
      */
-    public function fieldsInfo($type, $keysOnly = false)
+    public function getAllFields()
     {
-        if (empty(static::$_fieldsCache[$type])) {
-            $class = static::$_fieldTypes[$type]['class'];
-            $fields = $this->BDb->ddlFieldInfo($class::table());
-            unset($fields['id'], $fields['product_id']);
-            static::$_fieldsCache[$type] = $fields;
+        if (null === static::$_fieldsCache) {
+            static::$_fieldsCache = $this->orm('f')->order_by_asc('field_name')->find_many_assoc('field_code');
         }
-        return $keysOnly ? array_keys(static::$_fieldsCache[$type]) : static::$_fieldsCache[$type];
+        return static::$_fieldsCache;
     }
 
-    public function onAfterLoad()
+    /**
+     * @param string $key
+     * @param string $prop
+     * @return static|null
+     */
+    public function getField($key, $prop = 'field_code')
     {
-        parent::onAfterLoad();
-        $this->_oldTableFieldCode = $this->field_code;
-        $this->_oldTableFieldType = $this->table_field_type;
+        $fields = $this->getAllFields();
+        if (!$key) {
+            return null;
+        }
+        if ($prop === 'field_code') {
+            return !empty($fields[$key]) ? $fields[$key] : null;
+        }
+        /** @var static $field */
+        foreach ($fields as $field) {
+            if ($field->get($prop) === $key) {
+                return $field;
+            }
+        }
+        return null;
+    }
+
+    public function getFieldOptions($full = false)
+    {
+        return $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($this, $full);
     }
 
     /**
      * @param array $data
      * @return Sellvana_CatalogFields_Model_Field
-     * @throws BException
      */
     public function addField($data)
     {
@@ -114,42 +123,8 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
         } else {
             $field->set($data)->save();
         }
+        static::$_fieldsCache[$field->get('field_code')] = $field;
         return $field;
-    }
-
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) return false;
-
-        if (!$this->field_type) $this->field_type = 'product';
-
-        if ($this->_oldTableFieldCode !== $this->field_code &&
-            $this->field_type === '_serialized' && !empty($this->_oldTableFieldCode)
-        ) {
-            $this->field_code = $this->_oldTableFieldCode; // TODO: disallow code change in UI
-        }
-        return true;
-    }
-
-    /**
-     * @return array
-     */
-    public function products()
-    {
-        return $this->Sellvana_Catalog_Model_Product->orm('p')->where_not_null($this->field_code)->find_many();
-    }
-
-    /**
-     * @return array
-     */
-    public function getListAssoc()
-    {
-        $result = [];
-        $cfList = $this->orm()->find_many();
-        foreach ($cfList as $cffield) {
-            $result[$cffield->field_code] = $cffield;
-        }
-        return $result;
     }
 
     /**
@@ -157,35 +132,27 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
      */
     public function getDropdowns()
     {
-        $fields = $this->BDb->many_as_array($this->orm()->where('admin_input_type', 'select')->find_many());
-        $res = [];
+        $fields = $this->getAllFields();
+        $result = [];
         foreach ($fields as $field) {
-            $res[$field['id']] = ['text' => $field['field_name'], 'data-code' => $field['field_code'], 'data-frontend-label' => $field['frontend_label']];
+            if ($field->get('admin_input_type') === 'select') {
+                $result[$field->id()] = [
+                    'text' => $field->get('field_name'),
+                    'data-code' => $field->get('field_code'),
+                    'data-frontend-label' => $field->get('frontend_label')
+                ];
+            }
         }
-        return $res;
+        return $result;
     }
 
     /**
      * @param $code
      * @return mixed
-     * @throws BException
      */
     public function getFrontendLabel($code)
     {
-        $field = $this->load($code, 'field_code');
-        return $field->get('frontend_label');
-    }
-
-    /**
-     * @param string $type
-     * @return bool|string
-     */
-    public function getTableColumn($type)
-    {
-        if (!empty(static::$_fieldTypeColumns[$type])) {
-            return static::$_fieldTypeColumns[$type];
-        } else {
-            return false;
-        }
+        $field = $this->getField($code);
+        return $field ? $field->get('frontend_label') : null;
     }
 }

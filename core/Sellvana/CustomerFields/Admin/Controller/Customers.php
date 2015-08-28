@@ -293,6 +293,7 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
         $customFields = $model->getData('custom_fields');
         return !isset($customFields) ? -1 : $customFields;
     }
+
     public function fieldsetAry()
     {
         $sets = $this->BDb->many_as_array($this->Sellvana_CustomerFields_Model_Set->orm('s')->select('s.*')->find_many());

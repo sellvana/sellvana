@@ -6,6 +6,8 @@
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
+ * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
+ * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  */
 abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements Sellvana_CatalogIndex_Indexer_Interface
 {
@@ -134,8 +136,8 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 //        }
 
         foreach ($fields as $fName => $field) {
-            $source = $field->source_callback ? $field->source_callback : $fName;
-            switch ($field->source_type) {
+            $source = $field->get('source_callback') ?: $fName;
+            switch ($field->get('source_type')) {
                 case 'field':
                     foreach ($products as $p) {
                         static::$_indexData[$p->id()][$fName] = $p->get($source);
@@ -143,7 +145,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
                     break;
                 case 'method':
                     foreach ($products as $p) {
-                        static::$_indexData[$p->id()][$fName] = $p->$source($field);
+                        static::$_indexData[$p->id()][$fName] = $p->{$source}($field);
                     }
                     break;
                 case 'callback':
@@ -161,7 +163,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
     protected function _indexFetchVariantsData($products)
     {
         if (!$this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
-            return;
+            return; // should be always loaded, as it's dep
         }
         $pIds = [];
         foreach ($products as $p) {

@@ -1494,8 +1494,11 @@ class BORM extends ORMWrapper
      * @param null $table_alias
      * @return $this
      */
-    protected function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
-        if (!isset(self::$_classTableMap[$table])) {
+    protected function _add_join_source($join_operator, $table, $constraint, $table_alias = null)
+    {
+        if ($table instanceof BModel) {
+            self::$_classTableMap[$table] = $table->table();
+        } elseif (!isset(self::$_classTableMap[$table])) {
             if (class_exists($table) && is_subclass_of($table, 'BModel')) {
                 $class = BClassRegistry::className($table);
                 self::$_classTableMap[$table] = $class::table();

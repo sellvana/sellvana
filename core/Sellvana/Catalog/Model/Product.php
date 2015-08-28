@@ -1171,7 +1171,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * @param string $type
-     * @param array|boolean $context
+     * @param array $context
      * @param bool $useDefault
      * @return Sellvana_Catalog_Model_ProductPrice
      */
@@ -1252,7 +1252,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     /**
      * Get final price of product in catalog
      *
-     * @param boolean|array $context
+     * @param array $context
      * @return mixed
      */
     public function getCatalogPrice($context = [])

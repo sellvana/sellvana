@@ -1,6 +1,6 @@
 {% set isLoggedIn = APP.instance('Sellvana_Customer_Model_Customer').isLoggedIn() %}
 {% set userId = APP.instance('Sellvana_Customer_Model_Customer').sessionUserId() %}
-{% set prod = THIS.get('prod') %}
+{% set prod = THIS.get('product') %}
 {% set type = THIS.get('type') %}
 {% if type == 'full' and REQUEST.get('filter') %}
     {% set reviews = prod.reviews(false, true, REQUEST.get('filter')) %}
