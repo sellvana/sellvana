@@ -74,7 +74,7 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
     }
 
     public function getLatestNewsletterSubscriptions(){
-        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/latest_new_limit');
+        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Email/latest_new_limit');
         if (!$limit) {
             $limit = 25;
         }
