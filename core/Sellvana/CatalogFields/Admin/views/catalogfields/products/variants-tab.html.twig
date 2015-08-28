@@ -934,7 +934,7 @@
                 });
             }
 
-            var basePrice = _.findWhere(currentPrices, { price_type: 'base' });
+            var basePrice = _.findWhere(currentPrices[currentRow.id], { price_type: 'base' });
             if (!_.isEmpty(basePrice)) {
                 currentRow.variant_price = basePrice.amount ? basePrice.amount : 0;
             }
