@@ -823,5 +823,63 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
 
         return ['config' => $config];
     }
+
+    /**
+     * @return $this|ORM
+     */
+    protected function _getLateOrdersPrepare()
+    {
+        $state = $this->Sellvana_Sales_Model_Order_State_Overall->origClass();
+
+        $ignoreStateList = [
+//            $state::PENDING,
+//            $state::PLACED,
+//            $state::REVIEW,
+//            $state::FRAUD,
+//            $state::LEGIT,
+//            $state::PROCESSING,
+//            $state::BACKORDERED,
+            $state::COMPLETE,
+//            $state::CANCEL_REQUESTED,
+            $state::CANCELED,
+            $state::ARCHIVED
+        ];
+
+        $limit = $this->BConfig->get('modules/Sellvana_Sales/orders_late_day');
+
+        $orders = $this->Sellvana_Sales_Model_Order->orm('o')
+            ->select([
+                'o.unique_id',
+                'o.create_at',
+                'o.update_at'
+            ])
+            ->where_not_in('o.state_overall', $ignoreStateList);
+
+        if ($limit) {
+            $orders->where_raw("DATE_ADD(o.update_at, INTERVAL {$limit} DAY) < NOW()");
+        }
+
+        return $orders;
+    }
+
+    public function getLateOrders()
+    {
+        $limit = $this->BConfig->get('modules/Sellvana_Sales/orders_late_limit');
+        if (!$limit) {
+            $limit = 25;
+        }
+
+        $orders = $this->_getLateOrdersPrepare();
+        $orders->limit($limit);
+
+        return $orders->find_many();
+    }
+
+    public function getLateOrdersCount()
+    {
+        $orders = $this->_getLateOrdersPrepare();
+
+        return $orders->count();
+    }
 }
 

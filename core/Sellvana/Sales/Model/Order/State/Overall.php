@@ -14,6 +14,8 @@ class Sellvana_Sales_Model_Order_State_Overall extends Sellvana_Sales_Model_Orde
         CANCELED = 'canceled',
         ARCHIVED = 'archived';
 
+    protected static $_origClass = __CLASS__;
+
     protected $_valueLabels = [
         self::PENDING => 'Pending',
         self::PLACED => 'Placed',
