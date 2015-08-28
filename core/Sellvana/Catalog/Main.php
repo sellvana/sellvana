@@ -121,5 +121,14 @@ class Sellvana_Catalog_Main extends BClass
             'filter' => false,
             'permission' => 'catalog/products'
         ]);
+        $view->addWidget('searches-top-terms', [
+            'title' => 'Searches - top terms (internal)',
+            'icon' => 'inbox',
+            'view' => 'dashboard/searches-top-terms',
+            'cols' => 3,
+            'async' => true,
+            'filter' => true,
+            'permission' => 'catalog/products'
+        ]);
     }
 }

@@ -866,4 +866,24 @@ class Sellvana_Catalog_Migrate extends BClass
         $this->BDb->run("UPDATE {$tProductMedia} set folder=REPLACE(folder, 'media/', '@media/')");
     }
 */
+    public function upgrade__0_5_4_0__0_5_5_0()
+    {
+        $tSearchHistory = $this->Sellvana_Catalog_Model_SearchHistory->table();
+        $tSearchHistoryLog = $this->Sellvana_Catalog_Model_SearchHistoryLog->table();
+
+        $this->BDb->ddlTableDef($tSearchHistoryLog, [
+            BDb::COLUMNS => [
+                'id' => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                'query_id' => 'int(10) UNSIGNED NOT NULL',
+                'create_at' => 'datetime NOT NULL'
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'query_id'     => '(query_id)',
+            ],
+            BDb::CONSTRAINTS => [
+                'query' => ['query_id', $tSearchHistory],
+            ],
+        ]);
+    }
 }

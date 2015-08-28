@@ -1,6 +1,6 @@
 modules:
     Sellvana_Catalog:
-        version: 0.5.4.0
+        version: 0.5.5.0
         channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
@@ -22,6 +22,7 @@ modules:
                     latest_new_limit: 25
                     products_without_images_limit: 25
                     searches_recent_terms_limit: 25
+                    searches_recent_top_limit: 25
 
         areas:
             FCom_Admin:
