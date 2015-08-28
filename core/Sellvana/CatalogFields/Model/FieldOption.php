@@ -29,9 +29,12 @@ class Sellvana_CatalogFields_Model_FieldOption extends FCom_Core_Model_Abstract
 
     /**
      * @param int|string|Sellvana_CatalogFields_Model_Field $field
+     * @param bool $full
+     * @param string $idField
+     * @param string $labelField
      * @return Sellvana_CatalogFields_Model_FieldOption[]|null
      */
-    public function getFieldOptions($field, $full = false)
+    public function getFieldOptions($field, $full = false, $idField = 'id', $labelField = 'label')
     {
         if (is_object($field)) {
             $fieldId = $field->id();
@@ -51,7 +54,7 @@ class Sellvana_CatalogFields_Model_FieldOption extends FCom_Core_Model_Abstract
         if ($full) {
             return static::$_optionsCache[$fieldId];
         } else {
-            return $this->BUtil->arrayToOptions(static::$_optionsCache[$fieldId], 'label', 'id');
+            return $this->BUtil->arrayToOptions(static::$_optionsCache[$fieldId], $labelField, $idField);
         }
     }
 

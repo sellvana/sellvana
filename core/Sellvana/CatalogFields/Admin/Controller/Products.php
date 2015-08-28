@@ -360,7 +360,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $r = $this->BRequest;
         $id = $r->get('id');
         $field = $this->Sellvana_CatalogFields_Model_Field->load($id);
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field->id());
+        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field->id(), false, 'label');
         $this->BResponse->json(['id' => $field->id(), 'field_code' => $field->field_code,
             'field_name' => $field->field_name, 'admin_input_type' => $field->admin_input_type,
             'multilang' => $field->multilanguage, 'options' => $options, 'required' => $field->required]);

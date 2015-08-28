@@ -166,6 +166,13 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 $value = $row->get($column);
                 $fieldId = $row->get('field_id');
 
+                if ($row->get('table_field_type') === 'options') {
+                    $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($fieldId);
+                    if (!empty($options[$value])) {
+                        $value = $options[$value];
+                    }
+                }
+
                 $field = [
                     'id' => $fieldId,
                     'field_code' => $row->get('field_code'),
@@ -176,7 +183,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 ];
 
                 if ($row->get('table_field_type') === 'options') {
-                    $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($fieldId);
+                    $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($fieldId, false, 'label');
                 }
 
                 $fieldsData[$productId][$setId]['fields'][] = $field;

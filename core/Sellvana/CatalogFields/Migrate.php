@@ -648,4 +648,17 @@ class Sellvana_CatalogFields_Migrate extends BClass
             $row->set(['value_var' => null, 'value_id' => $valueId])->save();
         });
     }
+
+    public function upgrade__0_5_6_0__0_5_7_0()
+    {
+        $fHlp = $this->Sellvana_CatalogFields_Model_Field;
+        $fields = $fHlp->orm('f')
+            ->where_in('admin_input_type', ['select', 'multiselect'])
+            ->where_not_equal('table_field_type', 'options')
+            ->find_many();
+
+        foreach ($fields as $field) {
+            $field->set('table_field_type', 'options')->save();
+        }
+    }
 }

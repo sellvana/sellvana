@@ -108,7 +108,7 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
 
     public function getFieldOptions($full = false)
     {
-        return $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($this, $full);
+        return $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($this, $full, 'label');
     }
 
     /**
