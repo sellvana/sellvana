@@ -1306,7 +1306,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     }
 
     public function getSearchesTopTerms() {
-        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/searches_recent_terms_limit');
+        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/searches_top_terms_limit');
         if (!$limit) {
             $limit = 25;
         }
