@@ -109,7 +109,7 @@
         shopperOptions = [],
         currentShopper,
         shopperPrices = [],
-        OPTS = {};
+        OPTS = {}; // Global objec event to connect two components fcom.griddle and fcom.catalog.product.price grid
 
     require(['react', 'underscore', 'jquery', 'fcom.components'], function(React, _, $, Components) {
 
@@ -151,13 +151,14 @@
             var rows = shopperGrid.getRows();
 
             var res = [];
-            _(rows).each(function(row) {
+            _(rows).each(function(row, index) {
                 var optionSerialized = '';
                 if (row.position == 0) {
                     row.position = 0;
                 }
 
                 var data = _.pick(row, 'id', 'name', 'label', 'input_type', 'required', 'options', 'position');
+                data['id'] = ++index;
                 if (row.input_type === 'select') { // Only save prices when field is select
                     var $priceEle = $('input[data-shopper-id="'+row.id+'"]');
                     if ($priceEle.length) { // If price modal is saved changed
@@ -251,7 +252,7 @@
         }
     });
 
-    require(['react', 'underscore', 'jquery', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'fcom.catalog.price', 'fcom.locale', 'fcom.catalog.components'], function(React, _, $, FComGriddleComponent, FComModalForm, Components, Price, Locale) {
+    require(['react', 'underscore', 'jquery', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'fcom.catalog.product.price', 'fcom.locale', 'fcom.catalog.components'], function(React, _, $, FComGriddleComponent, FComModalForm, Components, Price, Locale) {
         /**
          * Toggle tabs when edit trigger
          * @param  {string} label 
@@ -621,25 +622,24 @@
                                     }
 
                                     var priceOptions = {
-                                        id: 'shopper',
                                         title: Locale._(capitalizeFirstLetter(option) + ' Prices'),
-                                        data_mode: 'local',
                                         prices: prices,
                                         deleted: deletedPrices,
-                                        add_price_type_callback: 'shopperPriceTypeCallback',
-                                        price_types: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
-                                        editable_prices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
-                                        customer_groups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
-                                        sites: {{ sites ? UTIL.toJson(sites) | raw: 'null' }},
-                                        currencies: {{ currencies ? UTIL.toJson(currencies) | raw: 'null' }},
-                                        product_id: '{{ model.id() }}',
-                                        field_id: toggleSpace(this.props.row.name),
+                                        option: option,
+                                        addPriceTypeCallback: 'shopperPriceTypeCallback',
+                                        priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
+                                        editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
+                                        customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
+                                        sites: {{ sites ? UTIL.toJson(sites) | raw : 'null' }},
+                                        currencies: {{ currencies ? UTIL.toJson(currencies) | raw : 'null' }},
+                                        productId: '{{ model.id() }}',
+                                        fieldId: toggleSpace(this.props.row.name),
                                         validatePrices: validatePrices,
                                         priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
                                         operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
-                                        show_customers: {{ loadCustomerGroups ? 'true' : 'false' }},
-                                        show_sites: {{ loadSites ? 'true' : 'false' }},
-                                        show_currency: {{ loadCurrency ? 'true' : 'false' }}
+                                        showCustomers: {{ loadCustomerGroups ? 'true' : 'false' }},
+                                        showSites: {{ loadSites ? 'true' : 'false' }},
+                                        showCurrency: {{ loadCurrency ? 'true' : 'false' }}
                                     };
 
                                     var node = React.createElement('div', { role: 'tabpanel', className: 'tab-pane fade ' + className, id: option , key: option}, 
@@ -649,16 +649,16 @@
                                     
                                     var validateUniqueMethod = option+'PriceUnique',
                                         validateBaseMethod = option+'BaseField',
-                                        validateUniqueRule = {};
+                                        validateUniqueRule = {},
+                                        validateBaseRule = {};
 
                                     validateUniqueRule[validateUniqueMethod] = true;
                                     $.validator.addMethod(validateUniqueMethod, this.validateUniquePrice(option), '{{"Price already exists."|_}}');
                                     $.validator.addClassRules(validateUniqueMethod, validateUniqueRule);
 
+                                    validateBaseRule[validateBaseMethod] = true;
                                     $.validator.addMethod(validateBaseMethod, this.validateBasePrice(option), '{{"No matching base price"|_}}');
-                                    $.validator.addClassRules("base_field", {
-                                        base_field: true
-                                    });
+                                    $.validator.addClassRules(option+"_base_field", validateBaseRule);
 
                                     return node;
                                 }.bind(this))
@@ -747,18 +747,18 @@
                 if (typeof elem !== 'undefined') {
                     var $parent = $(elem).parents('tr');
 
-                    var $items = optionsModalNode.find('tr');
-                    $items.each(function() {
+                    var items = optionsModalNode.find('tr');
+                    items.each(function() {
                         if (!valid) {
                             return;
                         }
 
-                        var $item = $(this);
+                        var item = $(this);
                         if (this === $parent[0]) {
                             return;
                         }
 
-                        valid = value !== $item.find('input[data-col="position"]').val();
+                        valid = value !== item.find('input[data-col="position"]').val();
                         toggleActionButton(valid);
                     });
                     return valid;
@@ -775,18 +775,18 @@
                 if (typeof elem !== 'undefined') {
                     var $parent = $(elem).parents('tr');
 
-                    var $items = optionsModalNode.find('tr');
-                    $items.each(function() {
+                    var items = optionsModalNode.find('tr');
+                    items.each(function() {
                         if (!valid) {
                             return;
                         }
 
-                        var $item = $(this);
+                        var item = $(this);
                         if (this === $parent[0]) {
                             return;
                         }
 
-                        valid = value !== $item.find('input[data-col="label"]').val();
+                        valid = value !== item.find('input[data-col="label"]').val();
                         toggleActionButton(valid);
                     });
                     return valid;

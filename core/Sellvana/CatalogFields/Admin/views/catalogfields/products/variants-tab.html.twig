@@ -793,8 +793,8 @@
         });
     });
     
-    var currentPrices, oldPrices, deletedPrices = [], variantId;
-    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'fcom.catalog.price', 'fcom.locale', 'fcom.catalog.components', 'daterangepicker'],
+    var currentRow, currentPrices = {}, oldPrices, deletedPrices = [], variantId;
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'fcom.catalog.product.price', 'fcom.locale', 'fcom.catalog.components', 'daterangepicker'],
         function ($, _, React, FComGriddleComponent, Components, Price, Locale) {
 
         /**
@@ -832,37 +832,35 @@
                 }
 
                 var options = {
-                    id: variantGrid.getConfig('id'),
                     title: Locale._('Variant Prices'),
-                    data_mode: 'local',
-                    prices: getVariantPrices(this.props.row.id),
+                    prices: this.props.prices,
                     deleted: deletedPrices,
-                    price_types: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
-                    editable_prices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
-                    customer_groups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
+                    priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
+                    editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
+                    customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
                     sites: {{ sites ? UTIL.toJson(sites) | raw: 'null' }},
                     currencies: {{ currencies ? UTIL.toJson(currencies) | raw: 'null' }},
-                    product_id: '{{ model.id() }}',
-                    variant_id: this.props.row.id,
+                    productId: '{{ model.id() }}',
+                    variantId: this.props.id,
                     validatePrices: validateVariantPrices,
-                    priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options'))|raw }},
-                    operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options'))|raw }},
-                    sale_date_separator: ' / ',
-                    show_customers: {{ loadCustomerGroups ? 'true' : 'false' }},
-                    show_sites: {{ loadSites ? 'true' : 'false' }},
-                    show_currency: {{ loadCurrency ? 'true' : 'false' }}
+                    priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
+                    operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
+                    saleDateSeparator: ' / ',
+                    showCustomers: {{ loadCustomerGroups ? 'true' : 'false' }},
+                    showSites: {{ loadSites ? 'true' : 'false' }},
+                    showCurrency: {{ loadCurrency ? 'true' : 'false' }}
                 };
 
                 var node = React.createElement(Price, { id: 'variant', options: options });
             
                 $.validator.addMethod('variantPriceUnique', this.validateUniquePrice('variant'), '{{"Same price already exists."|_}}');
-                $.validator.addMethod('variantBaseField', this.validateBasePrice('variant'), '{{"No matching base price"|_}}');
-
                 $.validator.addClassRules("variantPriceUnique", {
                     variantPriceUnique: true
                 });
-                $.validator.addClassRules("base_field", {
-                    base_field: true
+
+                $.validator.addMethod('variantBaseField', this.validateBasePrice('variant'), '{{"No matching base price"|_}}');
+                $.validator.addClassRules("variant_base_field", {
+                    variantBaseField: true
                 });
 
                 return node;
@@ -875,9 +873,16 @@
          * @return {mixed}
          */
         window.showModalToEditVariantPrice = function(row) {
-            variantId     = row.id;
-            currentPrices = isNaN(row.id) ? [] : getVariantPrices(row.id);
-            oldPrices     = _.clone(currentPrices);
+            currentRow = row;
+            variantId  = row.id;
+            var prices = isNaN(row.id) ? [] : getVariantPrices(row.id);
+
+            if (!currentPrices[row.id]) {
+                currentPrices[row.id] = []
+            }
+
+            currentPrices[row.id] = currentPrices[row.id] ? prices.length ? prices : currentPrices[row.id] : prices.length ? prices : [];
+            oldPrices  = _.clone(currentPrices);
 
             var modalContainerEle = document.getElementById('fcom_append_form');
             React.unmountComponentAtNode(modalContainerEle);
@@ -895,7 +900,7 @@
                         onConfirm: window.saveVariantPriceModal
                     },
                     React.createElement('form', {id: 'catalog-variant-prices-form', className: 'form form-horizontal validate-form', noValidate: "novalidate"}, 
-                        React.createElement(PriceGrid, { row: row })
+                        React.createElement(PriceGrid, { id: row.id, prices: currentPrices[row.id] })
                     )
                 ), modalContainerEle
             );
@@ -929,14 +934,14 @@
                 });
             }
 
-            if (form.valid()) { // If validation passes
-                var deletedIds = [];
-                _.each(deletedPrices, function(price, i) {
-                    deletedIds.push(i);
-                });
+            var basePrice = _.findWhere(currentPrices[currentRow.id], { price_type: 'base' });
+            if (!_.isEmpty(basePrice)) {
+                currentRow.variant_price = basePrice.amount ? basePrice.amount : 0;
+            }
 
-                if (deletedIds.length) {
-                    $('#variant_prices_deleted').val(JSON.stringify(deletedIds));
+            if (form.valid()) { // If validation passes
+                if (deletedPrices.length) {
+                    $('#variant_prices_deleted').val(JSON.stringify(deletedPrices));
                 }
                 
                 if (container.find('#variant_prices_'+variantId).length) {
@@ -944,10 +949,23 @@
                 } else {
                     container.append('<input id="variant_prices_'+variantId+'" type="hidden" name="'+inputName+'" value="'+form.serialize()+'">');
                 }
+
+                variantGrid.updateRows([currentRow]);
+                updateVariantGridRowAttrs(currentRow);
                 modal.close();
             }
         }
     });
+
+    function updateVariantGridRowAttrs(row) {
+        // Just update base price amount to variant price on variant grid
+        var $rows = $(variantGrid.getDOMNode()).find('tr');
+        $rows.each(function() {
+            if ($(this).attr('id') == row.id) {
+                $(this).find('input[data-col="variant_price"]').val(row.variant_price);
+            }
+        });
+    }
 </script>
 
 <div class="well clearfix">

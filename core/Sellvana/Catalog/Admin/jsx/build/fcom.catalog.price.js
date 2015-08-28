@@ -279,7 +279,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
                         ), 
                         React.createElement("tbody", null, 
                             _.map(this.props.prices, function (price) {
-                                if (self.props.deleted && self.props.deleted[price.id]) {
+                                if (self.props.deleted && self.props.deleted[price.id] && !self.props.isLocal()) {
                                     return React.createElement("input", {key: 'delete-' + price.id, type: "hidden", name: "prices[delete][]", value: price.id});
                                 }
 
@@ -366,6 +366,10 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
         componentDidMount: function() {
             if (typeof this.props.options.prices === 'undefined' || this.props.options.prices.length === 0) {
                 this.addBlankPrice();
+
+                if (typeof window[this.props.options.add_price_type_callback] === 'function') {
+                    window[this.props.options.add_price_type_callback](this.props.options.prices, this.props.options.option);
+                }
             }
         },
         isLocalMode: function() {
@@ -411,7 +415,7 @@ define(['jquery', 'underscore', 'react', 'fcom.components', 'fcom.locale', 'date
             this.props.options.prices.push(newPrice);
             this.setState({ options: this.props.options });
             if (typeof window[callback] === 'function') {
-                return window[callback](this.props.options.prices, option);
+                window[callback](this.props.options.prices, option);
             }
         },
         /**
