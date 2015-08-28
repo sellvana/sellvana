@@ -70,11 +70,18 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             ->left_outer_join('Sellvana_CatalogFields_Model_FieldOption', 'fo.field_id = pf.field_id AND fo.id = pf.value_id', 'fo')
             ->left_outer_join('Sellvana_CatalogFields_Model_Set', 'fs.id = pf.set_id AND fs.set_type = "product"', 'fs')
             ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.table_field_type', 'fs.set_name'])
-            ->where_in('pf.product_id', $productIds);
+            ->where_in('pf.product_id', $productIds)
+            ->order_by_asc('pf.site_id')
+            ->order_by_asc('pf.locale');
 
         $data = $orm->find_many();
 
+        $locale = $this->BLocale->getCurrentLocale();
         foreach ($data as $row) {
+            if (!is_null($row->get('locale')) && $row->get('locale') != $locale) {
+                continue;
+            }
+
             $productId = $row->get('product_id');
             if (empty($fieldsData[$productId])) {
                 $fieldsData[$productId] = [];
@@ -116,7 +123,19 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 ];
             }
 
-            $fieldsData[$productId][$fieldSetId]['fields'][] = $field;
+            if (empty($fieldsData[$productId][$fieldSetId]['fields'][$fieldId])) {
+                $fieldsData[$productId][$fieldSetId]['fields'][$fieldId] = [];
+            }
+
+            if ($row->get('locale')) {
+                $key = 'locale';
+            } elseif ($row->get('site_id')) {
+                $key = 'site';
+            } else {
+                $key = 'default';
+            }
+
+            $fieldsData[$productId][$fieldSetId]['fields'][$fieldId][$key] = $field;
 
         }
 
@@ -129,15 +148,18 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
 
             foreach ($fieldsData[$product->id()] as $fieldSetId => $fieldSet) {
                 foreach ($fieldSet['fields'] as $field) {
-                    $value = $field['value'];
-                    $fieldId = $field['id'];
-                    if (!empty($options[$fieldId])) {
-                        $value = $options[$fieldId][$value];
+                    foreach ($field as $fieldId => $fieldValue) {
+                        $value = $fieldValue['value'];
+                        if (!empty($options[$fieldId])) {
+                            $value = $options[$fieldId][$value];
+                        }
+
+                        $product->set($fieldValue['field_code'], $value);
                     }
 
-                    $product->set($field['field_code'], $value);
                 }
             }
+            //var_dump($product);
         }
         return $this;
     }
