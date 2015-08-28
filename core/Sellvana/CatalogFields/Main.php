@@ -8,6 +8,7 @@
  * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  */
 class Sellvana_CatalogFields_Main extends BClass
 {
@@ -29,23 +30,6 @@ class Sellvana_CatalogFields_Main extends BClass
     {
         $this->_disabled = $flag;
         return $this;
-    }
-
-    /**
-     * @param $args
-     */
-    public function onProductOrm($args)
-    {
-        if ($this->_disabled) {
-            return;
-        }
-        $tP = $args['orm']->table_alias();
-        $args['orm']
-            ->select($tP . '.*')
-            ->left_outer_join('Sellvana_CatalogFields_Model_ProductField', ['pcf.product_id', '=', $tP . '.id'], 'pcf')
-        ;
-        $fields = $this->Sellvana_CatalogFields_Model_Field->fieldsInfo('product', true);
-        $args['orm']->select($fields);
     }
 
     /**
@@ -76,28 +60,13 @@ class Sellvana_CatalogFields_Main extends BClass
      */
     public function onProductAfterSave($args)
     {
-        $p = $args['model'];
-        $data = $p->as_array();
-        $fields = $this->Sellvana_CatalogFields_Model_Field->fieldsInfo('product', true);
-        if (array_intersect($fields, array_keys($data))) {
-            $custom = $this->Sellvana_CatalogFields_Model_ProductField->load($p->id, 'product_id');
-            if (!$custom) {
-                $custom = $this->Sellvana_CatalogFields_Model_ProductField->create();
-            }
-            $dataCustomKeys = array_intersect($fields, array_keys($data));
-            $dataCustom = [];
-            foreach ($dataCustomKeys as $key) {
-                $dataCustom[$key] = $data[$key];
-            }
-            //print_r($dataCustom);exit;
-            $custom->set($dataCustom)->set('product_id', $p->id())->save();
-        }
-        // not deleting to preserve meta info about fields
+        $this->Sellvana_CatalogFields_Model_ProductFieldData->saveProductsFieldData([$args['model']]);
     }
 
     /**
      * @param $args
      * @return mixed|string
+     * @todo refactor to use layout
      */
     public function hookCustomFieldFilters($args)
     {
@@ -194,7 +163,7 @@ class Sellvana_CatalogFields_Main extends BClass
             return;
         }
         //find intersection of custom fields with data fields
-        $cfFields = $this->Sellvana_CatalogFields_Model_Field->getListAssoc();
+        $cfFields = $this->Sellvana_CatalogFields_Model_Field->getAllFields();
         $cfKeys = array_keys($cfFields);
         $dataKeys = array_keys($data);
         $cfIntersection = array_intersect($cfKeys, $dataKeys);
@@ -266,7 +235,7 @@ class Sellvana_CatalogFields_Main extends BClass
     {
         //$info = $args['info'];
         $object = $args['object'];
-        $cfFields = $this->Sellvana_CatalogFields_Model_Field->getListAssoc();
+        $cfFields = $this->Sellvana_CatalogFields_Model_Field->getAllFields();
         $cfKeys = array_keys($cfFields);
         //$dataKeys = $info['first_row'];
         //$cfIntersection = array_intersect($cfKeys, $dataKeys);
@@ -285,6 +254,20 @@ class Sellvana_CatalogFields_Main extends BClass
         }
          *
          */
+    }
+
+    public function onProductAfterLoad($args)
+    {
+        $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductsFieldData([$args['model']]);
+    }
+
+    public function onFindManyAfter($args)
+    {
+        /** @var BORM $orm */
+        $orm = $args['orm'];
+        if ($orm->get('_context') == 'catalog_products') {
+            $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductsFieldData($args['result']);
+        }
     }
 }
 

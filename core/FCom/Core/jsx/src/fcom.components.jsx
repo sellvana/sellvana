@@ -9,7 +9,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
     FCom.Mixin = {
         text2html: function (val) {
             var text = $.parseHTML(val);
-            return (text != null) ? text[0].data: null;
+            return (text !== null) ? text[0].data: null;
         },
         html2text: function (val) {
             return $('<div/>').text(val).html();
@@ -60,7 +60,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
         getInputId: function () {
             var field = this.props.field;
             if (this.props.id) {
-                return this.props.id
+                return this.props.id;
             }
             if (!field) {
                 return '';
@@ -404,7 +404,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
             var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
             if (typeof(column['form_hidden_label']) === 'undefined' || !column['form_hidden_label']) {
                 label = (
-                    <div className="control-label col-sm-3">
+                    <div className="control-label col-sm-3" key={this.props.key}>
                         <label htmlFor={column.name}>
                             {column.label} {iconRequired}
                         </label>
@@ -419,28 +419,28 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
                     input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
                 }
                 input += '<div class="controls col-sm-8">' + column['element_print'] + '</div>';
-                return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
+                return <div key={this.props.key} className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
             } else {
                 switch (column.editor) {
                     case 'select':
                         var options = [];
                         _.forEach(column.options, function(text, value) {
-                            options.push(<option value={value}>{text}</option>);
+                            options.push(<option value={value} key={value}>{text}</option>);
                         });
-                        input = <select name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules}>{options}</select>;
+                        input = <select key={this.props.key} name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules}>{options}</select>;
                         break;
                     case 'textarea':
-                        input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={this.props.value} {...validationRules} />;
+                        input = <textarea key={this.props.key} name={column.name} id={column.name} className="form-control" rows="5" defaultValue={this.props.value} {...validationRules} />;
                         break;
                     default:
-                        input = <input name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules} />;
+                        input = <input key={this.props.key} name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules} />;
                         break;
                 }
             }
 
             var removeFieldButton = '';
             if (this.props.removeFieldDisplay) {
-                removeFieldButton = (<button className="btn box-remove btn-xs btn-link btn-remove remove-field icon-remove" type="button" onClick={this.props.removeFieldHandle} data-field={column.name}></button>);
+                removeFieldButton = (<button key={this.props.key} className="btn box-remove btn-xs btn-link btn-remove remove-field icon-remove" type="button" onClick={this.props.removeFieldHandle} data-field={column.name}></button>);
             }
 
             return (

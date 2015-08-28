@@ -538,7 +538,7 @@
 
         window.showModalToAddFormField = function(grid) {
             formFieldsGrid = grid;
-            var modalContainerEle = document.getElementById('{{ grid.config.id }}-modal');
+            var modalContainerEle = document.getElementById('fcom_append_form');
             React.unmountComponentAtNode(modalContainerEle);
             React.render(
                 React.createElement(Components.Modal, {

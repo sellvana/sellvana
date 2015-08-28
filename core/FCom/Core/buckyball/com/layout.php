@@ -622,6 +622,15 @@ class BLayout extends BClass
         return $this->hook($hookName, $view, $args, $params);
     }
 
+    public function hookViewsRegex($hookName, $viewsRegex, $args = [], $params = [])
+    {
+        $views = $this->findViewsRegex($viewsRegex);
+        foreach ($views as $viewName => $view) {
+            $this->hookView($hookName, $viewName, $args, $params);
+        }
+        return $this;
+    }
+
     public function hookText($hookName, $text)
     {
         return $this->hook($hookName, function() use ($text) { return $text; });
@@ -927,7 +936,11 @@ class BLayout extends BClass
         }
         if (!empty($d['views'])) {
             foreach ((array)$d['views'] as $v) {
-                $this->hookView($d['name'], $v, $args, $params);
+                if ($v[0] === '^') {
+                    $this->hookViewsRegex($d['name'], '#' . $v . '#', $args, $params);
+                } else {
+                    $this->hookView($d['name'], $v, $args, $params);
+                }
             }
             if (!empty($d['use_meta'])) {
                 $this->view($v)->useMetaData();

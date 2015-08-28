@@ -15,15 +15,15 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
     /**
      * @var string
      */
-    protected $api_host = 'https://secure.mollie.nl';
+    protected $_apiHost = 'https://secure.mollie.nl';
     /**
      * @var int
      */
-    protected $api_port = 443;
+    protected $_apiPort = 443;
     /**
      * @var BData
      */
-    protected $config;
+    protected $_config;
 
     /**
      * @var string
@@ -52,7 +52,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
         $reportUrl   = $this->BApp->href("ideal/report");
 
         try {
-            $this->createPayment($bankId, $amount, $description, $returnUrl, $reportUrl);
+            $this->_createPayment($bankId, $amount, $description, $returnUrl, $reportUrl);
             $bankUrl = $this->get('bank_url');
             if ($bankUrl) {
                 $this->BSession->set('redirect_url', $bankUrl);
@@ -100,7 +100,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      */
     public function getCheckoutFormView()
     {
-        $banks = $this->getBanks();
+        $banks = $this->_getBanks();
         return $this->BLayout->view('ideal/form')
                ->set('banks', $banks)
                ->set('key', 'ideal');
@@ -114,10 +114,10 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      */
     public function config()
     {
-        if (!$this->config) {
-            $this->config = BData::i(true, [$this->BConfig->get('modules/Sellvana_PaymentIdeal')]);
+        if (!$this->_config) {
+            $this->_config = BData::i(true, [$this->BConfig->get('modules/Sellvana_PaymentIdeal')]);
         }
-        return $this->config;
+        return $this->_config;
     }
 
 // API methods
@@ -126,7 +126,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      * @return array
      * @throws Exception
      */
-    protected function getBanks()
+    protected function _getBanks()
     {
         $banks_array     = [];
         $query_variables = [
@@ -146,8 +146,8 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
         if (!empty($banks_xml)) {
             $banks_object = static::_XMLtoObject($banks_xml);
 
-            if (!$banks_object || $this->getResponseError($banks_object)) {
-                $errors = $this->getResponseError($banks_object);
+            if (!$banks_object || $this->_getResponseError($banks_object)) {
+                $errors = $this->_getResponseError($banks_object);
                 throw new Exception(sprintf("Could not get bank list. %s, %s", $errors['error_code'], $errors['error_message']));
             }
 
@@ -167,13 +167,13 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      * @return bool
      * @throws Exception
      */
-    protected function createPayment($bankId, $amount, $description, $returnUrl, $reportUrl)
+    protected function _createPayment($bankId, $amount, $description, $returnUrl, $reportUrl)
     {
-        if (!$this->setBankId($bankId)) {
+        if (!$this->_setBankId($bankId)) {
             throw new Exception($this->BLocale->_("Bank id: %s is not valid.", [$bankId]));
         }
 
-        if (!$this->setDescription($description)) {
+        if (!$this->_setDescription($description)) {
             throw new Exception($this->BLocale->_("Provided description \"%s\" cannot be used.", [$description]));
         }
 
@@ -210,8 +210,8 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
 
         $create_object = static::_XMLtoObject($create_xml);
 
-        if ($this->getResponseError($create_object)) {
-            $errors = $this->getResponseError($create_object);
+        if ($this->_getResponseError($create_object)) {
+            $errors = $this->_getResponseError($create_object);
             throw new Exception(sprintf("Could not perform payment. %s, %s", $errors['error_code'], $errors['error_message']));
         }
 
@@ -250,8 +250,8 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
 
         $check_object = static::_XMLtoObject($check_xml);
 
-        if ($this->getResponseError($check_object)) {
-            $errors = $this->getResponseError($check_object);
+        if ($this->_getResponseError($check_object)) {
+            $errors = $this->_getResponseError($check_object);
             throw new Exception(sprintf("Could not check payment. %s, %s", $errors['error_code'], $errors['error_message']));
         }
 
@@ -272,7 +272,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      */
     public function createPaymentLink($description, $amount)
     {
-        if (!$this->setDescription($description) || !$this->setAmount($amount)) {
+        if (!$this->_setDescription($description) || !$this->setAmount($amount)) {
             throw new Exception("Invalid description or amount");
         }
 
@@ -291,8 +291,8 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
 
         $create_object = static::_XMLtoObject($create_xml);
 
-        if ($this->getResponseError($create_object)) {
-            $errors = $this->getResponseError($create_object);
+        if ($this->_getResponseError($create_object)) {
+            $errors = $this->_getResponseError($create_object);
             throw new Exception(sprintf("Could not create payment link. %s, %s", $errors['error_code'], $errors['error_message']));
         }
 
@@ -317,7 +317,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      * @param $bank_id
      * @return bool
      */
-    protected function setBankId($bank_id)
+    protected function _setBankId($bank_id)
     {
         if (!is_numeric($bank_id) || (!$this->config()->get('test') && $bank_id == static::IDEAL_TEST_BANK_ID)) {
             return false;
@@ -330,7 +330,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      * @param $description
      * @return mixed
      */
-    protected function setDescription($description)
+    protected function _setDescription($description)
     {
         $description = substr($description, 0, 29);
 
@@ -362,7 +362,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      */
     protected function _sendRequest($path, $query)
     {
-        $url      = rtrim($this->api_host, '/') . "{$path}";
+        $url      = rtrim($this->_apiHost, '/') . "{$path}";
         $response = $this->BUtil->remoteHttp('GET', $url, $query);
         if (!$response) {
             $info       = $this->BUtil->lastRemoteHttpInfo();
@@ -389,7 +389,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
             $errors     = libxml_get_errors();
             $debugError = '';
             foreach ($errors as $error) {
-                $debugError .= $this->displayXmlError($error);
+                $debugError .= $this->_displayXmlError($error);
             }
             $this->BDebug->log($debugError, static::IDEAL_LOG);
             $this->BDebug->log($xml, static::IDEAL_LOG);
@@ -405,7 +405,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      * @param SimpleXMLElement $xml
      * @return array|bool
      */
-    protected function getResponseError($xml)
+    protected function _getResponseError($xml)
     {
         if (empty($xml)) {
             return [
@@ -440,7 +440,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
      * @param libXMLError $error
      * @return string
      */
-    protected function displayXmlError($error)
+    protected function _displayXmlError($error)
     {
         $return = "XML, ";
         switch ($error->level) {

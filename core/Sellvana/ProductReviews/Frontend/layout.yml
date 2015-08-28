@@ -1,7 +1,16 @@
 base:
     - view: head
         do:
+            - [ scss, "@Sellvana_ProductReviews/Frontend/scss/fcom.productreviews.scss" ]
             - [ requireJs, fcom.productreviews, "@Sellvana_ProductReviews/Frontend/js/fcom.productreviews" ]
+
+/catalog/product:
+    - { hook: "catalog/product/details:after_content", prodreviews/product-details }
+    - { view: prodreviews/product-details, set: { type: short } }
+
+/prodreview/index:
+    - { include: base }
+    - { hook: main, views: prodreviews/product-details }
 
 /prodreview/form:
     - { include: base }

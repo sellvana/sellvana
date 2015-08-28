@@ -5,8 +5,11 @@
  *
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
+ * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
+ * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  */
-class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
+abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements Sellvana_CatalogIndex_Indexer_Interface
 {
 
     protected static $_maxChunkSize = 100;
@@ -33,6 +36,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
                 $this->indexProducts($chunk);
                 echo 'DONE CHUNK ' . $i . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true) . "\n";
             }
+            $this->indexGC();
             return;
         }
 
@@ -111,8 +115,10 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
                 //->offset($start)
                 ->find_many();
             $this->indexProducts($products);
-            echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
+            if (!$this->BRequest->xhr()) {
+                echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
                 . ' - ' . (time() - $t) . "s\n";
+            }
             $t = time();
             //$start += static::$_maxChunkSize;
         } while (sizeof($products) == static::$_maxChunkSize);
@@ -130,8 +136,8 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
 //        }
 
         foreach ($fields as $fName => $field) {
-            $source = $field->source_callback ? $field->source_callback : $fName;
-            switch ($field->source_type) {
+            $source = $field->get('source_callback') ?: $fName;
+            switch ($field->get('source_type')) {
                 case 'field':
                     foreach ($products as $p) {
                         static::$_indexData[$p->id()][$fName] = $p->get($source);
@@ -139,7 +145,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
                     break;
                 case 'method':
                     foreach ($products as $p) {
-                        static::$_indexData[$p->id()][$fName] = $p->$source($field);
+                        static::$_indexData[$p->id()][$fName] = $p->{$source}($field);
                     }
                     break;
                 case 'callback':
@@ -157,7 +163,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
     protected function _indexFetchVariantsData($products)
     {
         if (!$this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
-            return;
+            return; // should be always loaded, as it's dep
         }
         $pIds = [];
         foreach ($products as $p) {
@@ -203,7 +209,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
         return preg_split('#[ \t\n\r]#', $string, null, PREG_SPLIT_NO_EMPTY);
     }
 
-    protected function _buildBus()
+    protected function _buildBus(array $params)
     {
         $bus = [
             'request' => [
@@ -215,7 +221,7 @@ class Sellvana_CatalogIndex_Indexer_Abstract extends BClass
             ],
             'config' => $this->BConfig->get('modules/Sellvana_CatalogIndex'),
             'result' => [
-                'orm' => $this->Sellvana_Catalog_Model_Product->orm('p')
+                'orm' => $this->Sellvana_Catalog_Model_Product->orm('p', 'catalog_products')
                     ->join('Sellvana_CatalogIndex_Model_Doc', ['d.id', '=', 'p.id'], 'd'),
                 'facets' => [],
             ],

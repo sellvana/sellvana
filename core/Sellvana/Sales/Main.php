@@ -28,7 +28,7 @@ class Sellvana_Sales_Main extends BClass
             'settings/Sellvana_SalesPaymentMethods' => $locale->_('Sales Payment Methods Settings'),
         ]);
 
-        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal'] as $total) {
+        foreach (['Subtotal', 'Shipping', 'Tax', 'Discount', 'GrandTotal', 'AmountDue'] as $total) {
             $this->Sellvana_Sales_Model_Cart->registerTotalRowHandler('Sellvana_Sales_Model_Cart_Total_' . $total);
         }
 
@@ -229,20 +229,51 @@ class Sellvana_Sales_Main extends BClass
      */
     public function onGetDashboardWidgets($args)
     {
+        /** @var FCom_Admin_View_Dashboard $view */
         $view = $args['view'];
         $view->addWidget('orders-list', [
             'title' => 'Recent Orders',
             'icon' => 'inbox',
-            'view' => 'order/dashboard/orders-list',
+            'view' => 'dashboard/orders-list',
             'async' => true,
+            'filter' => false,
+            'permission' => 'sales/orders'
         ]);
         $view->addWidget('orders-totals', [
             'title' => 'Order Totals',
             'icon' => 'inbox',
-            'view' => 'order/dashboard/orders-totals',
+            'view' => 'dashboard/orders-totals',
             'cols' => 4,
             'async' => true,
-            'filter' => true
+            'filter' => true,
+            'permission' => 'sales/orders'
+        ]);
+        $view->addWidget('avg-order-value', [
+            'title' => 'Average Order Value',
+            'icon' => 'inbox',
+            'cols' => 2,
+            'view' => 'dashboard/avg-order-value',
+            'async' => true,
+            'filter' => true,
+            'permission' => 'sales/orders'
+        ]);
+        $view->addWidget('top-products', [
+            'title' => 'Top Products',
+            'icon' => 'inbox',
+            'cols' => 4,
+            'view' => 'dashboard/top-products',
+            'async' => true,
+            'filter' => true,
+            'permission' => 'sales/orders'
+        ]);
+        $view->addWidget('top-products-chart', [
+            'title' => 'Top Products (Chart)',
+            'icon' => 'inbox',
+            'cols' => 4,
+            'view' => 'dashboard/top-products-chart',
+            'async' => true,
+            'filter' => true,
+            'permission' => 'sales/orders'
         ]);
     }
 

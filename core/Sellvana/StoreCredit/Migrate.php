@@ -10,7 +10,7 @@
  */
 class Sellvana_StoreCredit_Migrate extends BClass
 {
-    public function install__0_5_0_0()
+    public function install__0_5_1_0()
     {
         $tBalance = $this->Sellvana_StoreCredit_Model_Balance->table();
         $tTransaction = $this->Sellvana_StoreCredit_Model_Transaction->table();
@@ -36,7 +36,7 @@ class Sellvana_StoreCredit_Migrate extends BClass
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'balance_id' => 'int unsigned not null',
-                'order_id' => 'int unsigned not null',
+                'order_id' => 'int unsigned default null',
                 'event' => 'varchar(20) not null',
                 'amount' => 'decimal(12,2) not null',
                 'create_at' => 'datetime not null',
@@ -46,7 +46,22 @@ class Sellvana_StoreCredit_Migrate extends BClass
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
                 'balance' => ['balance_id', $tBalance],
-                'order' => ['order_id', $tOrder],
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_0_0__0_5_1_0()
+    {
+        $tTransaction = $this->Sellvana_StoreCredit_Model_Transaction->table();
+        $tOrder = $this->Sellvana_Sales_Model_Order->table();
+
+        $this->BDb->ddlTableDef($tTransaction, [
+            BDb::COLUMNS => [
+                'order_id' => 'int unsigned default null',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
     }

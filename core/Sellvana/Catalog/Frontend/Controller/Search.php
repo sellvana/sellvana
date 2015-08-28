@@ -11,6 +11,7 @@
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
  */
 
 class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
@@ -27,15 +28,17 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
         }
         if ($q !== '' && !is_null($q)) {
             $alias = $this->Sellvana_Catalog_Model_SearchAlias->fetchSearchAlias($q);
-            $targetUrl = $alias->get('target_url');
-            if ($alias->get('alias_type') === Sellvana_Catalog_Model_SearchAlias::TYPE_FULL && $targetUrl) {
-                if (!$this->BUtil->isUrlFull($targetUrl)) {
-                    $targetUrl = $this->BApp->href($targetUrl);
+            if ($alias) {
+                $targetUrl = $alias->get('target_url');
+                if ($alias->get('alias_type') === Sellvana_Catalog_Model_SearchAlias::TYPE_FULL && $targetUrl) {
+                    if (!$this->BUtil->isUrlFull($targetUrl)) {
+                        $targetUrl = $this->BApp->href($targetUrl);
+                    }
+                    $this->BResponse->redirect($targetUrl);
+                    return;
+                } else {
+                    $q = $alias->get('target_term');
                 }
-                $this->BResponse->redirect($targetUrl);
-                return;
-            } else {
-                $q = $alias->get('target_term');
             }
         }
 
@@ -63,6 +66,7 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
 
         $this->Sellvana_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
 
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($productsData['rows']);
         $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($productsData['rows']);
         $this->Sellvana_Catalog_Model_InventorySku->collectInventoryForProducts($productsData['rows']);
 

@@ -61,8 +61,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     ];
 
     protected static $_sessionUser;
-    protected $defaultShipping = null;
-    protected $defaultBilling = null;
+    protected $_defaultShipping = null;
+    protected $_defaultBilling = null;
 
     private static $lastImportedCustomer = 0;
 
@@ -156,7 +156,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             'password_hash' => $this->BUtil->fullSaltedHash($password),
             'password_session_token' => $token,
         ]);
-        if ($this->id() === $this->sessionUserId()) {
+
+        if ($this->id() === $this->sessionUserId() && $this->BRequest->area() != 'FCom_Admin') {
             $this->BSession->set('admin_user_password_token', $token);
         }
         return $this;
@@ -553,7 +554,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_billing || $this->default_billing_id === $addr->id()) {
+            if ($this->default_billing_id === $addr->id()) {
                 return $addr;
             }
         }
@@ -561,13 +562,13 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return nul|Sellvana_Customer_Model_Address
+     * @return null|Sellvana_Customer_Model_Address
      */
     public function getDefaultShippingAddress()
     {
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_shipping || $this->default_shipping_id === $addr->id()) {
+            if ($this->default_shipping_id === $addr->id()) {
                 return $addr;
             }
         }

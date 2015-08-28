@@ -3,9 +3,26 @@
 {% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
 {% set variantConfig = ctrl.variantGridConfig(model) %}
 
+{% set loadCustomerGroups = MODULES.isLoaded('Sellvana_CustomerGroups') %}
+{% if loadCustomerGroups %}
+    {% set customerGroups = APP.instance('Sellvana_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+
+{% set loadSites = MODULES.isLoaded('Sellvana_MultiSite') %}
+{% if loadSites %}
+    {% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
+{% endif %}
+
+{% set loadCurrency = MODULES.isLoaded('Sellvana_MultiCurrency') %}
+{% if loadCurrency %}
+    {% set currencies = APP.instance('Sellvana_MultiCurrency_Main').getAvailableCurrencies() %}
+{% endif %}
+{% set priceHelper = APP.instance('Sellvana_Catalog_Model_ProductPrice') %}
+
 <script type="text/javascript">
-    var variantGrid, variantFieldGrid, variantImages, variantFields; //todo: move this to inside scope
-    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'jquery-ui', 'jquery.validate', 'unique'], function ($, _, React, FComGriddleComponent, Components) {
+    var variantGrid, variantFieldGrid, variantImages, variantFields, variantModalNode; //todo: move this to inside scope
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'select2', 'jquery-ui', 'unique'],
+            function ($, _, React, FComGriddleComponent, Components) {
 
         /**
          * object contains property and method to hand variant images
@@ -109,7 +126,7 @@
              */
             processImagesForRow: function (id) {
                 //console.log('processImagesForRow');
-                if (variantGrid && this.images.length) {
+                if (variantGrid) {
                     var selectClass = this.selectClass;
                     var listClass = this.listClass;
                     var inputClass = this.inputClass;
@@ -212,7 +229,7 @@
             listId: '#variants-tab-field',
             //input class in each row
             inputClass: '.select-value-field',
-            customFields: [],
+            customFields: [], //custom fields already attached to this product
             combinations: {},
             init: function () {
                 if (variantFieldGrid) {
@@ -288,7 +305,7 @@
              * populate data to top field section and handle events
              */
             processTopFieldSection: function () {
-                if (variantGrid && this.customFields.length) {
+                if (variantGrid) {
                     var select = variantFields.select;
                     var list = variantFields.list;
 
@@ -343,13 +360,17 @@
 
                     });
 
-                    $(this.btnRemoveFieldClass).on('click', function() {
-                        if (confirm('Are you sure to delete this?')) {
+                    $(this.listId).on('click', this.btnRemoveFieldClass, function() {
+                        //todo: use modal to display more details message
+                        if (confirm('Deleting this field will remove all associated variants of this product. Are you sure you want to delete?')) {
                             var fieldCode = $(this).attr('data-code');
 
                             //re-display in select
                             variantFields.select.find('option[value=' + $(this).attr('data-id') + ']').removeClass('hide');
                             variantFields.resetSelect();
+
+                            //remove from list
+                            $(this).parents('li.dd-item').remove();
 
                             //remove in custom fields
                             variantFields.customFields = _.reject(variantFields.customFields, function (f) {
@@ -359,16 +380,29 @@
                             //remove from grid column
                             variantFields.deleteGridColumn({ field_code: fieldCode });
 
+                            //remove rows from grid
+                            /*var deleteCombinations = [];
+                            _.forEach(variantFields.combinations, function(comb, key) {
+                                comb['id'] = key;
+                                deleteCombinations.push(comb);
+                            });
+                            variantGrid.removeRows(deleteCombinations);*/
+
                             //remove from combinations
                             if (!_.isEmpty(variantFields.combinations)) {
                                 _.forEach(variantFields.combinations, function (comb, key) {
                                     delete comb[fieldCode];
                                     variantFields.combinations[key] = comb;
                                 });
+
+                                //run the validation again
+                                variantFields.validateVariant();
                             }
 
-                            //remove from list
-                            $(this).parents('li.dd-item').remove();
+                            //if empty custom fields, remove all rows
+                            if (!variantFields.customFields.length) {
+                                variantGrid.removeRows(variantGrid.getRows());
+                            }
                         }
                     });
 
@@ -537,7 +571,7 @@
 
                         variantGrid.setState({ initColumns: columns, filteredColumns: filteredColumns });
                     }
-
+                    toggleAddNewVariantsButton();
                 }
             },
             /**
@@ -560,6 +594,8 @@
                     } else {
                         console.log('DEBUG: cannot find column name ', field.field_code);
                     }
+
+                    toggleAddNewVariantsButton();
                 }
             },
             /**
@@ -590,7 +626,9 @@
          */
         window.variantFieldGriddleRegister = function(grid, triggerName) {
             variantFieldGrid = grid;
-            variantFields.init();
+            if (triggerName === 'componentDidMount') {
+                variantFields.init();
+            }
         };
 
         /**
@@ -600,7 +638,7 @@
          */
         window.variantGriddleRegister = function(grid, triggerName) {
             variantGrid = grid;
-            if (triggerName == 'componentDidMount') {
+            if (triggerName === 'componentDidMount') {
                 variantImages.init();
             }
 
@@ -613,8 +651,9 @@
                 });
             }
 
-            if (triggerName == 'componentDidMount') {
+            if (triggerName === 'componentDidMount') {
                 variantFields.processTopFieldSection();
+                toggleAddNewVariantsButton();
 
                 $(grid.getDOMNode()).on('change', 'tr', function(e) {
                     //console.log('on-change', this);
@@ -635,110 +674,298 @@
                         variantFields.combinations[row.id] = obj;
                     });
                 }).on('removedRows.griddle', function(e, rows) { //remove combination when remove rows
+                    var deleteInputEle = $('#variants_remove');
+                    var currentDeleteIds = deleteInputEle.val() ? deleteInputEle.val().split(',') : [];
                     _.forEach(rows, function(row) {
+                        currentDeleteIds.push(row.id);
                         if (typeof (variantFields.combinations[row.id]) != 'undefined') {
                             delete variantFields.combinations[row.id];
                         }
                     });
+
+                    deleteInputEle.val(_.uniq(currentDeleteIds).join(','));
                 })
                 ;
             }
         };
 
-    });
+        /**
+         * toggle Add New Variant button
+         * todo: need to add to FComSettings or better components
+         */
+        function toggleAddNewVariantsButton() {
+            var newVariantButton = $(variantGrid.getDOMNode()).find('.btn.grid-new');
+            newVariantButton.prop('disabled', !(variantFields.customFields.length > 0));
+        }
 
-    /**
-     * custom validation function for checking duplicated input
-     * @param value
-     * @param elem
-     * @param params
-     * @returns {boolean}
-     */
-    function variantUnique(value, elem, params) {
-        //console.log('begin validation unique in ele: ', elem);
-        var valid = true;
-        var rowEle = $(elem).parents('tr');
-        //console.log('row ele', rowEle);
+        /**
+         * custom validation function for checking duplicated input
+         * @param value
+         * @param elem
+         * @param params
+         * @returns {boolean}
+         */
+        function variantUnique(value, elem, params) {
+            //console.log('begin validation unique in ele: ', elem);
+            var valid = true;
+            var rowEle = $(elem).parents('tr');
+            //console.log('row ele', rowEle);
 
-        if (!_.isEmpty(variantFields.combinations)) {
-            _.forEach(variantFields.combinations, function(comb, id) {
-                if (rowEle.attr('id') != id) {
-                    var flag = false;
-                    rowEle.find('input.select-value-field').each(function() {
-                        if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined' && $(this).val() != comb[$(this).attr('name')]) {
-                            flag = true; // at least one field is different
+            if (!_.isEmpty(variantFields.combinations)) {
+                _.forEach(variantFields.combinations, function(comb, id) {
+                    if (rowEle.attr('id') != id) {
+                        var flag = false;
+                        rowEle.find('input.select-value-field').each(function() {
+                            if (typeof comb != 'undefined' && typeof comb[$(this).attr('name')] != 'undefined'
+                                    && $(this).val() != comb[$(this).attr('name')]) {
+                                flag = true; // at least one field is different
+                            }
+                        });
+                        if (!flag) {
+                            valid = false;
                         }
-                    });
-                    if (!flag) {
-                        valid = false;
                     }
-                }
-            });
-        }
-
-        //console.log('valid', valid);
-        return valid;
-    }
-
-    //add custom validate to jquery validator
-    $.validator.addMethod('variantUnique', variantUnique , 'Same variant is already taken place.');
-    $.validator.addClassRules("variantUnique", {
-        variantUnique: true
-    });
-
-    $('form').submit(function (ev) {
-
-        var variantPostFields = [], variantPostData = [];
-
-        if (!variantFields.validateVariant()) {
-            return false;
-        }
-
-        variantFields.customFields.forEach(function (obj) {
-            variantPostFields.push({
-                id: obj.id,
-                field_code: obj.field_code,
-                name: obj.name
-            });
-        });
-
-        //set object data to submit
-        _.forEach(variantGrid.getChildComponent('rows'), function (comp) {
-            var newObj = _.clone(comp.props.row);
-            //remove list images
-            delete newObj.list_image;
-
-            if (typeof variantFields.combinations[newObj.id] != 'undefined' && variantFields.combinations[newObj.id] != null) {
-                newObj.field_values = variantFields.combinations[newObj.id];
-                /*_.forEach(variantFields.combinations[newObj.id], function(value, key) {
-                    newObj[key] = value;
-                })*/
-            } else { //after validate, this case will never be happened
-                newObj = {};
-                variantFields.customFields.each(function(field) {
-                    newObj[field.field_code] = '';
                 });
             }
 
-            //images
-            newObj.variant_file_id = $(comp.getDOMNode()).find(variantImages.inputClass).val();
+            //console.log('valid', valid);
+            return valid;
+        }
 
-            //todo: find better way for this
-            newObj.product_sku = newObj.product_sku || '';
-            newObj.inventory_sku = newObj.inventory_sku || '';
-            newObj.variant_price = newObj.variant_price || '';
-            newObj.variant_qty = newObj.variant_qty || '';
-
-            //console.log('newObj', newObj);
-            variantPostData.push(newObj);
+        //add custom validate to jquery validator
+        $.validator.addMethod('variantUnique', variantUnique , 'Same variant is already taken place.');
+        $.validator.addClassRules("variantUnique", {
+            variantUnique: true
         });
 
-        $('#vfield_ids').val(JSON.stringify(variantPostFields));
-        $('#variants').val(JSON.stringify(variantPostData));
+        $('form').submit(function (ev) {
 
-        //return false;
-        return true;
+            var variantPostFields = [], variantPostData = [];
+
+            if (!variantFields.validateVariant()) {
+                return false;
+            }
+
+            variantFields.customFields.forEach(function (obj) {
+                variantPostFields.push({
+                    id: obj.id,
+                    field_code: obj.field_code,
+                    name: obj.name
+                });
+            });
+
+            //set object data to submit
+            _.forEach(variantGrid.getChildComponent('rows'), function (comp) {
+                var newObj = _.clone(comp.props.row);
+                //remove list images
+                delete newObj.list_image;
+
+                if (typeof variantFields.combinations[newObj.id] != 'undefined' && variantFields.combinations[newObj.id] != null) {
+                    newObj.field_values = variantFields.combinations[newObj.id];
+                    /*_.forEach(variantFields.combinations[newObj.id], function(value, key) {
+                        newObj[key] = value;
+                    })*/
+                } else { //after validate, this case will never be happened
+                    newObj = {};
+                    variantFields.customFields.each(function(field) {
+                        newObj[field.field_code] = '';
+                    });
+                }
+
+                //images
+                newObj.variant_file_id = $(comp.getDOMNode()).find(variantImages.inputClass).val();
+
+                //todo: find better way for this
+                newObj.product_sku = newObj.product_sku || '';
+                newObj.inventory_sku = newObj.inventory_sku || '';
+                newObj.variant_price = newObj.variant_price || '';
+                newObj.variant_qty = newObj.variant_qty || '';
+
+                //console.log('newObj', newObj);
+                variantPostData.push(newObj);
+            });
+
+            $('#vfield_ids').val(JSON.stringify(variantPostFields));
+            $('#variants').val(JSON.stringify(variantPostData));
+
+            //return false;
+            return true;
+        });
     });
+    
+    var currentRow, currentPrices = {}, oldPrices, deletedPrices = [], variantId;
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'fcom.catalog.product.price', 'fcom.locale', 'fcom.catalog.components', 'daterangepicker'],
+        function ($, _, React, FComGriddleComponent, Components, Price, Locale) {
+
+        /**
+         * Get prices for specific variant
+         * @param  {int} id 
+         * @return {Object}
+         */
+        function getVariantPrices(id) {
+            var variants = variantGrid.getConfig('data').data;
+            var prices;
+            _.each(variants, function(variant) {
+                if (variant.id === id) {
+                    prices = variant.prices;
+                }
+            });
+            return prices;
+        }
+
+        var PriceGrid = React.createClass({
+            displayName: "PriceGrid",
+            mixins: [FCom.Mixin, FCom.PriceMixin],
+            render: function() {
+                /**
+                 * Validate unique price
+                 * @return mixed
+                 */
+                function validateVariantPrices() {
+                    var valid = true;
+                    $('#catalog-variant-prices-form').find('select.variantPriceUnique').each(function (el) {
+                        if (!$(this).valid()) {
+                            valid = false;
+                        }
+                    });
+                    return valid;
+                }
+
+                var options = {
+                    title: Locale._('Variant Prices'),
+                    prices: this.props.prices,
+                    deleted: deletedPrices,
+                    priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
+                    editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
+                    customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
+                    sites: {{ sites ? UTIL.toJson(sites) | raw: 'null' }},
+                    currencies: {{ currencies ? UTIL.toJson(currencies) | raw: 'null' }},
+                    productId: '{{ model.id() }}',
+                    variantId: this.props.id,
+                    validatePrices: validateVariantPrices,
+                    priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
+                    operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
+                    saleDateSeparator: ' / ',
+                    showCustomers: {{ loadCustomerGroups ? 'true' : 'false' }},
+                    showSites: {{ loadSites ? 'true' : 'false' }},
+                    showCurrency: {{ loadCurrency ? 'true' : 'false' }}
+                };
+
+                var node = React.createElement(Price, { id: 'variant', options: options });
+            
+                $.validator.addMethod('variantPriceUnique', this.validateUniquePrice('variant'), '{{"Same price already exists."|_}}');
+                $.validator.addClassRules("variantPriceUnique", {
+                    variantPriceUnique: true
+                });
+
+                $.validator.addMethod('variantBaseField', this.validateBasePrice('variant'), '{{"No matching base price"|_}}');
+                $.validator.addClassRules("variant_base_field", {
+                    variantBaseField: true
+                });
+
+                return node;
+            }
+        });
+
+        /**
+         * Show edit variant prices modal callback
+         * @param  {Object} row 
+         * @return {mixed}
+         */
+        window.showModalToEditVariantPrice = function(row) {
+            currentRow = row;
+            variantId  = row.id;
+            var prices = isNaN(row.id) ? [] : getVariantPrices(row.id);
+
+            if (!currentPrices[row.id]) {
+                currentPrices[row.id] = []
+            }
+
+            currentPrices[row.id] = currentPrices[row.id] ? prices.length ? prices : currentPrices[row.id] : prices.length ? prices : [];
+            oldPrices  = _.clone(currentPrices);
+
+            var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "editVariantPriceModal",
+                        show: true,
+                        title: 'Edit Variant Prices',
+                        confirm: 'Save changes',
+                        cancel: 'Close',
+                        onLoad: function(modal) {
+                            variantModalNode = $(modal.getDOMNode());
+                            variantModalNode.find('.modal-dialog').css('width', '1280px');
+                        },
+                        onConfirm: window.saveVariantPriceModal
+                    },
+                    React.createElement('form', {id: 'catalog-variant-prices-form', className: 'form form-horizontal validate-form', noValidate: "novalidate"}, 
+                        React.createElement(PriceGrid, { id: row.id, prices: currentPrices[row.id] })
+                    )
+                ), modalContainerEle
+            );
+        }
+
+        /**
+         * Save variant prices callback
+         * @param  {Object} modal
+         * @return {mixed}
+         */
+        window.saveVariantPriceModal = function(modal) {
+            var form        = variantModalNode.find('form#catalog-variant-prices-form'),
+                priceItems  = form.find('.variant-price-item'),
+                deletedIds  = [],
+                container   = $('#tab-variants'),
+                inputName   = "variantPrice[prices]["+variantId+"]";
+
+            // Set new value for new price
+            if (currentPrices.length > oldPrices.length) {
+                _.each(currentPrices, function(currentPrice) {
+                    if (isNaN(currentPrice.id)) {
+                        var tr = form.find('tr[data-id="'+currentPrice.id+'"]');
+                        if (tr.length) {
+                            _.each(currentPrice, function(item, index) {
+                                if ($.inArray(index, ['operation', 'qty']) !== -1) {
+                                    currentPrice[index] = tr.find('[name="variantPrice['+currentPrice.id+']['+index+']"]').val();
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+            var basePrice = _.findWhere(currentPrices[currentRow.id], { price_type: 'base' });
+            if (!_.isEmpty(basePrice)) {
+                currentRow.variant_price = basePrice.amount ? basePrice.amount : 0;
+            }
+
+            if (form.valid()) { // If validation passes
+                if (deletedPrices.length) {
+                    $('#variant_prices_deleted').val(JSON.stringify(deletedPrices));
+                }
+                
+                if (container.find('#variant_prices_'+variantId).length) {
+                    container.find('#variant_prices_'+variantId).val(form.serialize());
+                } else {
+                    container.append('<input id="variant_prices_'+variantId+'" type="hidden" name="'+inputName+'" value="'+form.serialize()+'">');
+                }
+
+                variantGrid.updateRows([currentRow]);
+                updateVariantGridRowAttrs(currentRow);
+                modal.close();
+            }
+        }
+    });
+
+    function updateVariantGridRowAttrs(row) {
+        // Just update base price amount to variant price on variant grid
+        var $rows = $(variantGrid.getDOMNode()).find('tr');
+        $rows.each(function() {
+            if ($(this).attr('id') == row.id) {
+                $(this).find('input[data-col="variant_price"]').val(row.variant_price);
+            }
+        });
+    }
 </script>
 
 <div class="well clearfix">
@@ -763,4 +990,6 @@
 </div>
 
 <input type='hidden' id='vfield_ids' name='vfields' />
+<input type='hidden' id='variants_remove' name='variants_remove' />
 <input type='hidden' id='variants' name='variants' />
+<input type="hidden" id="variant_prices_deleted" name="variantPrice[delete]">

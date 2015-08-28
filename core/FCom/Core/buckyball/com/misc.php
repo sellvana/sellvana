@@ -283,7 +283,7 @@ class BUtil extends BClass
      * @param array|string $mapFields
      * @return array
      */
-    public function arraySeqToMap($array, $idField, $mapFields = null)
+    public function arraySeqToMap($array, $idField = 'id', $mapFields = null)
     {
         $map = [];
         foreach ($array as $k => $row) {
@@ -291,6 +291,8 @@ class BUtil extends BClass
                 $outRow = $this->BUtil->arrayMask($row, $mapFields);
             } elseif (is_string($mapFields)) {
                 $outRow = !empty($row[$mapFields]) ? $row[$mapFields] : null;
+            } else {
+                $outRow = !empty($row[$idField]) ? $row[$idField] : null;
             }
             if (!is_numeric($k)) {
                 $map[$k] = $outRow;
@@ -732,9 +734,11 @@ class BUtil extends BClass
         $isObject = is_object(current($source));
         foreach ($source as $k => $item) {
             if ($isObject) {
-                $key = null === $keyField ? $k : $item->$keyField;
-                $label = $labelField[0] === '.' ? $item-> {substr($labelField, 1)}() : $item->labelField;
-                $options[$key] = $label;
+                $key = null === $keyField ? $k : $item->get($keyField);
+                $label = $labelField[0] === '.' ? $item->{substr($labelField, 1)}() : $item->get($labelField);
+                if (null !== $label) {
+                    $options[$key] = $label;
+                }
             } else {
                 $key = null === $keyField ? $k : $item[$keyField];
                 $options[$key] = $item[$labelField];
@@ -1035,7 +1039,7 @@ class BUtil extends BClass
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
         $timeout = !empty($options['timeout']) ? $options['timeout'] : 5;
         $userAgent = !empty($options['useragent']) ? $options['useragent'] : 'Mozilla/5.0';
-        $useCurl = isset($options['curl']) ? $options['curl'] : false;
+        $useCurl = isset($options['curl']) ? $options['curl'] : true;
         if (preg_match('#^//#', $url)) {
             $url = 'http:' . $url;
         }
@@ -1145,9 +1149,10 @@ class BUtil extends BClass
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
+#var_dump(__METHOD__, $rawResponse);
             list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2);
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
-#echo "<xmp>"; var_dump($rawResponse, static::$_lastRemoteHttpInfo); echo "</xmp>";
+#var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt);
             $respHeaders = explode("\r\n", $headers);
             if (curl_errno($ch) != 0) {
                 static::$_lastRemoteHttpInfo['errno'] = curl_errno($ch);
@@ -1156,7 +1161,7 @@ class BUtil extends BClass
             curl_close($ch);
         } else {
             $streamOptions = ['http' => [
-                'protocol_version' => '1.1',
+                'protocol_version' => '1.0',
                 'method' => $method,
                 'timeout' => $timeout,
                 'header' => [
@@ -1233,7 +1238,7 @@ class BUtil extends BClass
             $respHeaders = isset($http_response_header) ? $http_response_header : [];
         }
         foreach ($respHeaders as $i => $line) {
-            if ($i) {
+            if ($i && strpos($line, ':')) {
                 $arr = explode(':', $line, 2);
                 static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {
@@ -2959,6 +2964,7 @@ class BDebug extends BClass
     {
         $this->BUtil->ensureDir($dir);
         static::$_logDir = $dir;
+        return $this;
     }
 
     /**
@@ -2969,12 +2975,16 @@ class BDebug extends BClass
     public function log($msg, $file = 'debug.log', $backtrace = false)
     {
         $file = static::$_logDir . '/' . $file;
+        if (!is_scalar($msg)) {
+            $msg = print_r($msg, 1);
+        }
         error_log($msg . "\n", 3, $file);
         if ($backtrace) {
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             error_log(ob_get_clean(), 3, $file);
         }
+        return $this;
     }
 
     /**
@@ -2982,7 +2992,8 @@ class BDebug extends BClass
      */
     public function logException($e)
     {
-        static::log(print_r($e, 1), 'exceptions.log');
+        $this->log(print_r($e, 1), 'exceptions.log');
+        return $this;
     }
 
     /**

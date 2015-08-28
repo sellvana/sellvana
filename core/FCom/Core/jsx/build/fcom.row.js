@@ -19,7 +19,7 @@ define(['underscore', 'react'], function (_, React) {
                 "doRowAction": null,
                 "addSelectedRows": null,
                 "getSelectedRows": null
-            }
+            };
         },
         selectRow: function(event) {
             if (event.target.checked) {
@@ -28,9 +28,12 @@ define(['underscore', 'react'], function (_, React) {
                 this.props.removeSelectedRows([this.props.row]);
             }
         },
-        handleChange: function(event) {
+        handleChange: function(callback, event) {
             var col = event.target.getAttribute('data-col');
             this.props.row[col] = event.target.value;
+            if (typeof window[callback] === 'function') {
+                return window[callback](event);
+            }
         },
         render: function () {
             var that = this;
@@ -71,8 +74,8 @@ define(['underscore', 'react'], function (_, React) {
                             } else {
                                 //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
-                                    React.createElement("button", {className: "btn btn-link " + btn.cssClass, key: index, title: btn.title ? btn.title : "", type: "button", 
-                                        "data-action": btn.name, "data-row": row.id, onClick: that.props.doRowAction.bind(null, btn.callback)}, 
+                                    React.createElement("button", React.__spread({className: "btn btn-link " + btn.cssClass, key: index, title: btn.title ? btn.title : "", type: "button", 
+                                        "data-action": btn.name, "data-row": row.id},  btn.attrs, {onClick: that.props.doRowAction.bind(null, btn.callback)}), 
                                         React.createElement("i", {className: btn.icon, "data-action": btn.name, "data-row": row.id}), 
                                         btn.caption
                                     )
@@ -100,14 +103,15 @@ define(['underscore', 'react'], function (_, React) {
                         } else { //inline mode
 
                             var validationRules = that.validationRules(col.validation);
+
+                            var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+
                             var inlineProps = {
                                 id: id + '-' + col.name + '-' + row.id,
                                 name: id + '[' + row.id + '][' + col.name + ']',
                                 className: (col.cssClass ? col.cssClass : '') + ' form-control',
                                 "data-col": col.name
                             };
-
-                            var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
 
                             if (typeof row[col.name + '_disabled'] !== 'undefined' && row[col.name + '_disabled'] == true) {
                                 inlineProps.disabled = 'disabled';
@@ -116,34 +120,57 @@ define(['underscore', 'react'], function (_, React) {
                             switch (col.editor) {
                                 case 'checkbox': //todo: need test again
                                 case 'radio':
-                                    node = React.createElement("input", React.__spread({type: "checkbox"},  inlineProps,  validationRules));
+                                    node = React.createElement("input", React.__spread({key: col.name, type: "checkbox"},  inlineProps,  validationRules));
                                     break;
                                 case 'textarea':  //todo: need test again
-                                    node = React.createElement("textarea", React.__spread({},  inlineProps,  validationRules, {rows: "4"}), row[col.name]);
+                                    node = React.createElement("textarea", React.__spread({key: col.name},  inlineProps,  validationRules, {rows: "4"}), row[col.name]);
                                     break;
                                 case 'select':
                                     var selectOptions = [];
                                     if (_.isArray(col.options)) {
-                                        selectOptions = col.options.map(function(opt) {
-                                            return React.createElement("option", {value: opt.value});
+                                        selectOptions = col.options.map(function(opt, index) {
+                                            return React.createElement("option", {key: index, value: opt.value});
                                         });
                                     } else {
                                         for(var key in col.options) {
-                                            selectOptions.push(React.createElement("option", {value: key}, col.options[key]));
+                                            selectOptions.push(React.createElement("option", {key: key, value: key}, col.options[key]));
                                         }
                                     }
                                     
                                     node = (
-                                        React.createElement("select", React.__spread({defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange}), selectOptions)
+                                        React.createElement("select", React.__spread({key: col.name, defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange.bind(null, col.callback)}), selectOptions)
                                     );
                                     break;
                                 default:
-                                    node = React.createElement("input", React.__spread({type: "text"},  inlineProps,  validationRules, {defaultValue: defaultValue, onChange: that.handleChange}));
+                                    node = React.createElement("input", React.__spread({key: col.name, type: "text"},  inlineProps,  col.attrs,  validationRules, {defaultValue: defaultValue, onChange: that.handleChange.bind(null, col.callback)}));
                                     break;
                             }
                             /*var inlineColValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
                             node = (<input type="text" data-col={col.name} onChange={that.handleChange} defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + row.id + "][" + col.name + "]"} />);*/
                         }
+                        break;
+                    case 'link':
+                        var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+                        var count = 0;
+                        if (defaultValue) {
+                            count = defaultValue.split(',').length;
+                        }
+                        var value = count + ' ' + col.value + (count <= 1 ? '' : 's');
+                        
+                        var inlineProps = {
+                            href: col.href ? col.href : 'javascript:void(0)',
+                            id: id + '-' + col.name + '-' + row.id,
+                            name: id + '[' + row.id + '][' + col.name + ']',
+                            className: (col.cssClass ? col.cssClass : ''),
+                            style: (col.style ? col.style : ''),
+                            "data-col": col.name,
+                            'data-action': col.name,
+                            'data-row': row.id,
+                            'data-length': count,
+                            defaultValue: defaultValue
+                        };
+
+                        node = React.createElement("a", React.__spread({key: col.name},  inlineProps, {onClick: col.action ? that.props.doRowAction.bind(null, col.action) : null}), value);
                         break;
                     default:
                         if (col.display == 'eval') {

@@ -109,6 +109,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected $_priceModels;
 
+    protected $_images;
+
     protected static $_urlPrefix;
 
     public function validateDupSku($data, $args)
@@ -194,16 +196,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //if ($thumbUrl) {
         //    return $url . $media . '/' . $thumbUrl;
         //}
-        $productId    = $this->id();
         switch ($imgType) {
             case 'thumb':
-                $thumbUrl = $this->getThumbPath($productId);
+                $thumbUrl = $this->getThumbPath();
                 break;
             case 'rollover':
-                $thumbUrl = $this->getRolloverPath($productId);
+                $thumbUrl = $this->getRolloverPath();
                 break;
             default :
-                $thumbUrl = $this->getDefaultImagePath($productId);
+                $thumbUrl = $this->getDefaultImagePath();
                 break;
         }
 
@@ -264,14 +265,6 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //}
 
         return true;
-    }
-
-    public function onAfterLoad()
-    {
-        parent::onAfterLoad();
-        $thumbPath = $this->FCom_Core_Main->resizeUrl($this->imageUrl(), ['s' => 48]);
-        $this->set('thumb_path', $thumbPath);
-
     }
 
     public function onAfterSave()
@@ -840,57 +833,85 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param bool|int $limit
      * @param bool $incAvgRating
+     * @param bool|int $filterByRating
      * @return array
      */
-    public function reviews($incAvgRating = true)
+    public function reviews($limit = false, $incAvgRating = true, $filterByRating = false)
     {
+        $numReviews = 0;
+        $pageData = [];
+
         if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
+            $ratings = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select('pr.rating')->select_expr('COUNT(pr.id)', 'count')
+                ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1])
+                ->group_by('pr.rating')->find_many();
+
+            $stats = $this->getRatingStats($ratings, $incAvgRating);
+            $numReviews = $stats['num_reviews'];
+            $avgRating = $stats['avg_rating'];
+            $ratingByStars = $stats['rating_by_stars'];
+
             $reviews = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
                 ->join('Sellvana_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
-                ->where(['pr.product_id' => $this->id(), 'approved' => 1])->order_by_expr('pr.create_at DESC')->find_many();
+                ->where(['pr.product_id' => $this->id(), 'approved' => 1])
+                ->order_by_expr('(pr.helpful / pr.helpful_voices) DESC');
 
-            if ($incAvgRating) {
-                $avgRating = $this->calcAverageRating($reviews);
+            if ((int)$filterByRating) {
+                $reviews->where('rating', (int)$filterByRating);
             }
-        } else {
-            $reviews = [];
+
+            if ((int)$limit) {
+                $reviews->limit($limit);
+            }
+
+            $reviews = $reviews->order_by_expr('pr.create_at DESC');
+
+            $pageData = $reviews->paginate($this->BRequest->get(), [
+                'ps' => 3,
+            ]);
         }
+
         return [
-            'items' => $reviews,
+            'items' => $pageData,
+            'ratings' => isset($ratingByStars) ? $ratingByStars : [],
             'avgRating' => isset($avgRating) ? $avgRating : [],
-            'numReviews' => count($reviews),
+            'numReviews' => $numReviews,
         ];
     }
 
     /**
-     * @param array $reviews
+     * @param array $ratings
+     * @param bool $incAvgRating
      * @return array
      */
-    public function calcAverageRating($reviews = [])
+    public function getRatingStats($ratings = [], $incAvgRating = true)
     {
-        $rs = [
-            'rating' => 0,
-            'rating1' => 0,
-            'rating2' => 0,
-            'rating3' => 0,
-        ];
-        if (!empty($reviews)) {
-            $numReviews = count($reviews);
-            foreach ($reviews as $review) {
-                $rs['rating'] += $review->rating;
-                $rs['rating1'] += $review->rating1;
-                $rs['rating2'] += $review->rating2;
-                $rs['rating3'] += $review->rating3;
-            }
-
-            $rs['rating'] = number_format($rs['rating'] / $numReviews, 2);
-            $rs['rating1'] = number_format($rs['rating1'] / $numReviews, 2);
-            $rs['rating2'] = number_format($rs['rating2'] / $numReviews, 2);
-            $rs['rating3'] = number_format($rs['rating3'] / $numReviews, 2);
+        $avgRating = false;
+        $numReviews = 0;
+        $reviewConfig = $this->Sellvana_ProductReviews_Model_Review->config();
+        $ratingByStars = [];
+        for ($i = $reviewConfig['max']; $i >= $reviewConfig['min']; $i -= $reviewConfig['step']) {
+            $ratingByStars[$i] = 0;
         }
 
-        return $rs;
+        if (!empty($ratings)) {
+            foreach ($ratings as $review) {
+                $avgRating += $review->rating * $review->count;
+                $numReviews += $review->count;
+                $ratingByStars[$review->rating] = $review->count;
+            }
+
+            $avgRating = trim(number_format($avgRating / $numReviews, 2), '0.');
+        }
+
+        return [
+            'num_reviews' => $numReviews,
+            'avg_rating' => $avgRating,
+            'rating_by_stars' => $ratingByStars
+        ];
     }
 
     /**
@@ -1150,22 +1171,25 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * @param string $type
-     * @param array|boolean $context
+     * @param array $context
      * @param bool $useDefault
      * @return Sellvana_Catalog_Model_ProductPrice
      */
-    public function getPriceModelByType($type, $context = null, $useDefault = true)
+    public function getPriceModelByType($type, $context = [], $useDefault = true)
     {
         if (!isset($this->_priceModels)) {
-            $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices([$this], true);
+            $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices([$this]);
         }
-        if (false === $this->_priceModels || empty($this->_priceModels[0][$type])) {
+
+        $variantId = !empty($context['variant_id']) ? $context['variant_id'] : 0;
+
+        if (false === $this->_priceModels || empty($this->_priceModels[$variantId][$type])) {
             return null;
         }
 
-        $prices = $this->_priceModels[0][$type];
+        $prices = $this->_priceModels[$variantId][$type];
 
-        if (!$context) {
+        if (!isset($context['site_id']) && !isset($context['customer_group_id']) && !isset($context['currency_code'])) {
             return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
         }
 
@@ -1188,17 +1212,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             }
         }
 
-        if (true === $context) {
-            $context = [
-                'site_id' => true,
-                'customer_group_id' => true,
-                'currency_code' => true,
-            ];
+        if (!empty($context['default'])) {
+            $context['site_id'] = '*';
+            $context['customer_group_id'] = '*';
+            $context['currency_code'] = '*';
         }
 
-        $s = !empty($context['site_id']) ? (true !== $context['site_id'] ? $context['site_id'] : $siteId) : '*';
-        $g = !empty($context['customer_group_id']) ? (true !== $context['customer_group_id'] ? $context['customer_group_id'] : $customerGroupId) : '*';
-        $c = !empty($context['currency_code']) ? (true !== $context['currency_code'] ? $context['currency_code'] : $currencyCode) : '*';
+        $s = !empty($context['site_id']) ? $context['site_id'] : $siteId;
+        $g = !empty($context['customer_group_id']) ? $context['customer_group_id'] : $customerGroupId;
+        $c = !empty($context['currency_code']) ? $context['currency_code'] : $currencyCode;
 
         if (isset($prices["{$s}:{$g}:{$c}"])) {
             return $prices["{$s}:{$g}:{$c}"];
@@ -1230,14 +1252,12 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
     /**
      * Get final price of product in catalog
      *
-     * @param boolean|array $context
+     * @param array $context
      * @return mixed
-     *
-     * @todo assume $context true when null, or when components null - same for ProductPrice::getPrice()
      */
-    public function getCatalogPrice($context = true)
+    public function getCatalogPrice($context = [])
     {
-        if (is_array($context) && !empty($context['currency_code']) && $context['currency_code'] !== true) {
+        if (!empty($context['currency_code']) && $context['currency_code'] !== '*') {
             $currency = $context['currency_code'];
         } else {
             $currency = null;
@@ -1270,7 +1290,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
          * - pos: 0,1,2,3
          */
         $prices = [];
-        $context = true;
+        $context = [];
 
         $basePriceModel = $this->getPriceModelByType('base', $context);
         $mapPriceModel = $this->getPriceModelByType('map', $context);
@@ -1324,7 +1344,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $prices;
     }
 
-    public function getAllTierPrices($context = true)
+    public function getAllTierPrices($context = [])
     {
         return $this->getPriceModelByType('tier', $context);
     }
@@ -1336,7 +1356,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * @param array|boolean $context
      * @return null|float
      */
-    public function getTierPrice($qty, $context = true)
+    public function getTierPrice($qty, $context = [])
     {
         /** @var Sellvana_Catalog_Model_ProductPrice[] $tierPrices */
         $tierPrices = $this->getPriceModelByType('tier', $context);
@@ -1402,53 +1422,37 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         unset($this->_priceModels);
     }
 
-    /**
-     * @param $productId
-     * @return mixed|null|string
-     */
-    public function getThumbPath($productId)
+    public function setProductImages($images)
     {
-        return $this->getProductImage($productId, 'thumb');
-    }
-
-    public function getRolloverPath($productId)
-    {
-        return $this->getProductImage($productId, 'rollover');
-    }
-
-    public function getDefaultImagePath($productId)
-    {
-        return $this->getProductImage($productId, 'default');
-    }
-
-    protected function getProductImage($productId, $imgType = 'default')
-    {
-        $thumbUrl     = null;
-        $productMediaOrm = $this->Sellvana_Catalog_Model_ProductMedia
-            ->orm("fpm")
-            ->join($this->FCom_Core_Model_MediaLibrary->table(), "fpm.file_id=fml.id", "fml")
-            ->where(["fpm.media_type" => "I", "fpm.product_id" => $productId]);
-
-        switch ($imgType) {
-            case 'thumb':
-                $productMediaOrm->where("fpm.is_thumb", 1);
-                break;
-            case 'rollover':
-                $productMediaOrm->where("fpm.is_rollover", 1);
-                break;
-            default :
-                $productMediaOrm->where("fpm.is_default", 1);
-                break;
+        if (empty($this->_images)) {
+            $this->_images = $images;
+        } else {
+            $this->_images = array_merge($this->_images, $images);
         }
+        return $this;
+    }
 
-        $productMedia = $productMediaOrm->find_one();
-        if ($productMedia) {
-            $thumbUrl = ($productMedia->get('subfolder') != null)
-                ? $productMedia->get('folder') . '/' . $productMedia->get('subfolder') . '/' . $productMedia->get('file_name')
-                : $productMedia->get('folder') . '/' . $productMedia->get('file_name');
-            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
+    public function getThumbPath()
+    {
+        if (!isset($this->_images['thumb'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['thumb']*/);
         }
+        return $this->_images['thumb'];
+    }
 
-        return $thumbUrl;
+    public function getRolloverPath()
+    {
+        if (!isset($this->_images['rollover'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['rollover']*/);
+        }
+        return $this->_images['rollover'];
+    }
+
+    public function getDefaultImagePath()
+    {
+        if (!isset($this->_images['default'])) {
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['default']*/);
+        }
+        return $this->_images['default'];
     }
 }

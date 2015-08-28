@@ -1,15 +1,23 @@
 modules:
     Sellvana_StoreCredit:
-        version: 0.5.0.0
+        version: 0.5.1.0
         channel: alpha
+        require: { module: { Sellvana_Sales: 0.5.0.0 } }
+
+        auto_use: [ bootstrap ]
 
         areas:
             FCom_Admin:
-                auto_use: [ views ]
+                auto_use: [ layout, views ]
+                observe:
+                    - [ Sellvana_Customer_Admin_Controller_Customers::formPostAfter, Sellvana_StoreCredit_Admin.onCustomersFormPostAfter ]
                 routing:
                     - [ /storecredit/balances/.action, Sellvana_StoreCredit_Admin_Controller_Balances ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]
                 routing:
-                    - [ /storecredit/account/.action, Sellvana_StoreCredit_Frontend_Controller_Account ]
+                    - [ /storecredit/account/?.action, Sellvana_StoreCredit_Frontend_Controller_Account ]
+
+        observe:
+            - [ "Sellvana_Sales_Model_Cart_Total_AmountDue::calculate", Sellvana_StoreCredit_Model_Total_Cart.onAmountDueCalculate ]

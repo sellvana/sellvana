@@ -1,5 +1,5 @@
 base:
     - view: head
         do:
-            - [ css, "@Sellvana_FrontendThemeBootSimple/Frontend/css/fulleron-theme.css" ]
+            - [ scss, "@Sellvana_FrontendThemeBootSimple/Frontend/scss/fulleron-theme.scss" ]
 

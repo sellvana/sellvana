@@ -20,4 +20,13 @@
         {{ forms.boolean(fieldData, {field:'enable_rollover', label:'Enable Rollover Effect'|_ }) }}
         {{ forms.select(fieldData, {field:'rollover_effect', label:'Rollover Effect'|_, options: rolloverEffects }) }}
     {{ forms.accordion_panel_end }}
+    {{ forms.accordion_panel_start({label:'Units'|_, id:'settings-Sellvana_Catalog-group2'}) }}
+        {{ forms.select(fieldData, {field:'weight_unit', label:'Default Weight Unit'|_, options: {lb: 'Pound (lb)', kg: 'Kilogram (kg)'} }) }}
+        {{ forms.select(fieldData, {field:'length_unit', label:'Default Length Unit'|_, options: {in: 'Inch (in)', cm: 'Centimetre (cm)'} }) }}
+    {{ forms.accordion_panel_end }}
+    {{ forms.accordion_panel_start({label:'Dashboard'|_, id:'settings-Sellvana_Catalog-group3'}) }}
+        {{ forms.input(fieldData, {field:'latest_new_limit', label:'Latest New Products Limit'|_ }) }}
+        {{ forms.input(fieldData, {field:'products_without_images_limit', label:'Products With No Images Limit'|_ }) }}
+        {{ forms.input(fieldData, {field:'searches_recent_terms_limit', label:'Searches - Recent Terms (internal)'|_ }) }}
+    {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

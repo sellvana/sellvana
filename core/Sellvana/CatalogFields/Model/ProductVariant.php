@@ -17,10 +17,10 @@
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
- * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_CatalogFields_Model_ProductVariantField $Sellvana_CatalogFields_Model_ProductVariantField
  */
 class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstract
 {
@@ -79,6 +79,7 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
 
         $variants = [];
         $fieldValues = [];
+        /** @var Sellvana_CatalogFields_Model_ProductVariant $m */
         foreach ($varModels as $m) {
             $vr = $m->as_array();
             unset($vr['data_serialized']);
@@ -87,7 +88,7 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
             $vr['product_sku'] = ($vr['product_sku'] === '') ? $product->get('product_sku') : $vr['product_sku'];
             $vr['inventory_sku'] = ($vr['inventory_sku'] === '') ? $product->get('inventory_sku') : $vr['inventory_sku'];
             $price = ($vr['variant_price'] > 0) ? $vr['variant_price'] : $product->get('base_price');
-            $vr['variant_price'] = $this->BLocale->currency($price);
+            $vr['variant_price'] = $this->BLocale->currency($m->getCatalogPrice($product));
             $vr['variant_qty'] = !empty($invModels[$vr['inventory_sku']]) ? $invModels[$vr['inventory_sku']]->get('qty_in_stock') : 0;
             $vrKeyArr = [];
             foreach ($fields as $f) {
@@ -146,7 +147,7 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
     /**
      * @param Sellvana_Catalog_Model_Product $product
      * @param array $fieldValues
-     * @return BModel
+     * @return self[]
      * @throws BException
      */
     public function findByProductFieldValues($product, $fieldValues)
@@ -170,22 +171,14 @@ class Sellvana_CatalogFields_Model_ProductVariant extends FCom_Core_Model_Abstra
         return $this->load($product, 'product_id');
     }
 
-    public function onAfterLoad()
+    public function getCatalogPrice(Sellvana_Catalog_Model_Product $product, $context = [])
     {
-        $priceModel = $this->Sellvana_Catalog_Model_ProductPrice->getVariantPriceModel($this->id());
-        if($priceModel){
-            $this->set('variant_price', $priceModel->getPrice());
+        $context['variant_id'] = $this->id();
+        $price = $product->getCatalogPrice($context);
+        if (!$price) {
+            unset($context['variant_id']);
+            $price = $product->getCatalogPrice($context);
         }
-        parent::onAfterLoad();
+        return $price;
     }
-
-    public function onAfterSave()
-    {
-        $price = $this->get('variant_price');
-        if($price){
-            $this->Sellvana_Catalog_Model_ProductPrice->saveVariantPriceModel($price, $this->id(), $this->get('product_id'));
-        }
-        return parent::onAfterSave();
-    }
-
 }

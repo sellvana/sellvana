@@ -5,4 +5,5 @@
 
 {% set m = THIS.get('model') %}
 {% set hlp = APP.instance('Sellvana_Wishlist_Admin_Controller') %}
-{{ THIS.view('core/backbonegrid').set('grid', hlp.customerWishlistGridConfig(m)) | raw }}
+{# {{ THIS.view('core/backbonegrid').set('grid', hlp.customerWishlistGridConfig(m)) | raw }} #}
+{{ THIS.view('core/griddle').set('grid', hlp.customerWishlistGridConfig(m)) | raw }}

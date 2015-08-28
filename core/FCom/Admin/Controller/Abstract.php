@@ -267,6 +267,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         if ($outTabs) {
             $layout = $this->BLayout;
             $tabs = $view->tabs;
+            $this->BLayout->applyLayout('settings-tabs');
             foreach ($tabs as $k => $tab) {
                 if ($outTabs !== 'ALL' && !in_array($k, $outTabs)) {
                     continue;

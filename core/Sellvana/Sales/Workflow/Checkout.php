@@ -58,30 +58,22 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
             if ($recalc) {
                 $cart->set('recalc_shipping_rates', 1);
             }
+            if (isset($args['post']['address_id'])) {
+                $this->BSession->set('shipping_address_id', $args['post']['address_id']);
+            }
         }
     }
 
     public function action_customerUpdatesBillingAddress($args)
     {
         $cart = $args['cart'];
-        $recalc = false;
-        $same = !empty($args['post']['same_address']);
+        $same = (int)!empty($args['post']['same_address']);
         $cart->set('same_address', $same);
-        if (!$same) {
-            foreach ($args['post']['billing'] as $k => $v) {
-                $cart->set('billing_' . $k, $v);
-                /*
-                if ($same && $cart->get('shipping_' . $k) !== $v) {
-                    $cart->set('shipping_' . $k, $v);
-                    $recalc = true;
-                }
-                */
-            }
-            /*
-            if ($recalc) {
-                $cart->set('recalc_shipping_rates', 1);
-            }
-            */
+        foreach ($args['post']['billing'] as $k => $v) {
+            $cart->set('billing_' . $k, $v);
+        }
+        if (isset($args['post']['address_id'])) {
+            $this->BSession->set('billing_address_id', $args['post']['address_id']);
         }
     }
 
@@ -118,7 +110,6 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
         $cart = $this->_getCart($args);
 
         $cart->calculateTotals()->saveAllDetails();
-
         /** @var Sellvana_Sales_Model_Order[] $oldOrdersFromCart */
         $oldOrdersFromCart = $this->Sellvana_Sales_Model_Order->orm()->where('cart_id', $cart->id())->find_many();
         if ($oldOrdersFromCart) {

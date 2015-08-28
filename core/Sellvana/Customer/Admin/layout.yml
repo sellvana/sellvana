@@ -5,10 +5,15 @@ base:
             - [ addNav, customer/customers, { label: Customers, href: /customers, pos: 10 } ]
             - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index, pos: 40 } ]
 
+            - [ addNav, reports/customer, { label: Customers, pos: 40 }]
+            - [ addNav, reports/customer/country, { label: Users by Country, href: /customer/report/country, pos: 20 }]
+            - [ addNav, reports/customer/product_history, { label: Customer Product History, href: /customer/report/product_history, pos: 30 }]
+            - [ addNav, reports/customer/order_history, { label: Customer Order History, href: /customer/report/order_history, pos: 40 }]
+
 /customers/import:
     - { include: base }
     - { include: form }
-    - { hook: main, views: customer/import }
+    - { hook: main, views: customer/import-griddle }
     - { view: admin/nav, do: [[ setNav, customer/import ]] }
 
 /customers/form:

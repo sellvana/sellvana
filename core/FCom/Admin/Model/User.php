@@ -496,7 +496,8 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             $roles = $this->FCom_Admin_Model_Role->orm()->where_in('id', $roleIds)->find_many();
             $perms = [];
             foreach ($roles as $role) {
-                $perms = array_merge($perms, $role->get('permissions'));
+                $permissions = array_flip(explode("\n", $role->get('permissions_data')));
+                $perms = array_merge($perms, $permissions);
             }
             $this->set('permissions', $perms);
         }
@@ -504,7 +505,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             $paths = explode(',', $paths);
         }
         foreach ($paths as $p) {
-            if (!empty($perms[$p])) {
+            if (array_key_exists($p, $perms)) {
                 return true;
             }
         }

@@ -57,6 +57,7 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
             'role' => !empty($data['role']) ? $data['role'] : null,
         ]);
         $response = $this->BUtil->remoteHttp('GET', $url);
+#var_dump($url, $response, $this->BUtil->lastRemoteHttpInfo()); exit;
         $result = $this->BUtil->fromJson($response);
         if (!empty($result['site_key'])) {
             $this->BConfig->set('modules/Sellvana_MarketClient/site_key', $result['site_key'], false, true);

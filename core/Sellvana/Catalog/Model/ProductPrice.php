@@ -121,7 +121,7 @@ class Sellvana_Catalog_Model_ProductPrice
      * @return Sellvana_Catalog_Model_ProductPrice[]
      * @throws BException
      */
-    public function getProductPrices($product, $qty = null, $customer_group_id = null, $site_id = null,
+    public function getProductPrices($product, $variant_id = null, $qty = null, $customer_group_id = null, $site_id = null,
         $currency_code = null, $date = null)
     {
         $orm = $this->orm('tp')
@@ -133,6 +133,10 @@ class Sellvana_Catalog_Model_ProductPrice
                     ['(? BETWEEN valid_from AND valid_to)', $date]
                 ]
             ]);
+        }
+
+        if (!empty($variant_id)) {
+            $orm->where('variant_id', $variant_id);
         }
         if (!empty($qty)) {
             $orm->where([['qty <= ?', $qty]]); // tier prices up to provided qty
@@ -270,7 +274,12 @@ class Sellvana_Catalog_Model_ProductPrice
         parent::onAfterLoad();
     }
 
-    public function collectProductsPrices($products, $context = null)
+    /**
+     * @param Sellvana_Catalog_Model_Product[] $products
+     * @param array $context
+     * @return $this
+     */
+    public function collectProductsPrices($products, $context = [])
     {
         if (!$products) {
             return $this;
@@ -323,7 +332,7 @@ class Sellvana_Catalog_Model_ProductPrice
             ]]);
         }
 
-        if (empty($context['variants'])) {
+        if (!empty($context['no_variants'])) {
             $orm->where_null('variant_id');
         }
 

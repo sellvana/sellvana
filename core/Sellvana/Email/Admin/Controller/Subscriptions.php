@@ -72,4 +72,21 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
         }
         $this->BResponse->json($result);
     }
+
+    public function getLatestNewsletterSubscriptions()
+    {
+        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/latest_new_limit');
+        if (!$limit) {
+            $limit = 25;
+        }
+        $emails = $this->Sellvana_Email_Model_Pref->orm('p')
+            ->select([
+                'p.email'
+            ])
+            ->where('p.sub_newsletter', '1')
+            ->order_by_desc('p.create_at')
+            ->limit($limit);
+
+        return $emails->find_many();
+    }
 }

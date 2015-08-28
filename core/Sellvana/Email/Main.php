@@ -71,4 +71,18 @@ class Sellvana_Email_Main extends BClass
         }
         return false;
     }
+
+    public function onGetDashboardWidgets($args)
+    {
+        $view = $args['view'];
+        $view->addWidget('latest-newsletter', [
+            'title' => 'Latest Newsletter Subscriptions',
+            'icon' => 'inbox',
+            'view' => 'dashboard/latest-newsletter',
+            'cols' => 2,
+            'async' => true,
+            'filter' => false,
+            'permission' => 'subscriptions'
+        ]);
+    }
 }

@@ -1,8 +1,8 @@
 modules:
     Sellvana_Sales:
-        version: 0.5.1.0
+        version: 0.5.4.0
         channel: alpha
-        require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0, FCom_LibJsFlot: 0.1.0 } }
         description: "Fundamental Sales functionality"
         auto_use: [ bootstrap ]
 
@@ -23,6 +23,19 @@ modules:
                     - [ /payments/?.action, Sellvana_Sales_Admin_Controller_Payments ]
                     - [ /orderstatus/?.action, Sellvana_Sales_Admin_Controller_OrderStatus ]
                     - [ /orderstatecustom/?.action, Sellvana_Sales_Admin_Controller_OrderStateCustom ]
+                    - [ /sales/report/product_performance/?.action, Sellvana_Sales_Admin_Controller_Report_ProductPerformance ]
+                    - [ /sales/report/customer_groups/?.action, Sellvana_Sales_Admin_Controller_Report_CustomerGroup ]
+                    - [ /sales/report/abandoned_carts/?.action, Sellvana_Sales_Admin_Controller_Report_AbandonedCarts ]
+                    - [ /sales/report/payment_method/?.action, Sellvana_Sales_Admin_Controller_Report_PaymentMethod ]
+                    - [ /sales/report/country/?.action, Sellvana_Sales_Admin_Controller_Report_Country ]
+                    - [ /sales/report/state/?.action, Sellvana_Sales_Admin_Controller_Report_State ]
+                    - [ /sales/report/hour/?.action, Sellvana_Sales_Admin_Controller_Report_Hour ]
+                    - [ /sales/report/day/?.action, Sellvana_Sales_Admin_Controller_Report_Day ]
+                    - [ /sales/report/order_detail/?.action, Sellvana_Sales_Admin_Controller_Report_OrderDetail ]
+                    - [ /sales/report/order_item_detail/?.action, Sellvana_Sales_Admin_Controller_Report_OrderItemDetail ]
+                    - [ /sales/report/shipping_method/?.action, Sellvana_Sales_Admin_Controller_Report_ShippingMethod ]
+                    - [ /sales/report/customer_performance/?.action, Sellvana_Sales_Admin_Controller_Report_CustomerPerformance ]
+                    - [ /sales/report/product_history/?.action, Sellvana_Sales_Admin_Controller_Report_ProductHistory ]
                 observe:
                     - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]

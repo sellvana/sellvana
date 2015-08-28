@@ -26,6 +26,7 @@ class Sellvana_MultiVendor_Admin extends BClass
         }
         $product = $args['model'];
 
+
         $hlp = $this->Sellvana_MultiVendor_Model_VendorProduct;
         $vp = $hlp->load($product->id(), 'product_id');
         if ($vp) {
@@ -35,8 +36,8 @@ class Sellvana_MultiVendor_Admin extends BClass
                 $vp->delete();
             }
         } elseif (!empty($vpData['vendor_id'])) {
-            $vp['product_id'] = $product->id();
-            $hlp->create($vp)->save();
+            $vpData['product_id'] = $product->id();
+            $hlp->create($vpData)->save();
         }
     }
 }

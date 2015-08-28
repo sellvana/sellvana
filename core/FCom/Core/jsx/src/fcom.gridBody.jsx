@@ -17,9 +17,12 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 "originalData": [],
                 "columnMetadata": [],
                 "className": ""
-            }
+            };
         },
         doRowAction: function(callback, event) {
+            // Remove focus for prevent re-render modal when keypress
+            event.currentTarget.blur();
+            
             /*if (this.props.getConfig('data_mode') == 'local') {
                 return this.doRowLocalAction(event);
             }*/
@@ -43,7 +46,6 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
 
             switch (action) {
                 case 'edit':
-                    //console.log('render modal');
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
@@ -77,7 +79,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     break;
                 default:
                     if (typeof window[callback] === 'function') {
-                        return window[callback](row);
+                        return window[callback](row, event);
                     } else {
                         console.log('Do row custom action');
                     }

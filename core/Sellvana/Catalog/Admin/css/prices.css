@@ -1,4 +1,32 @@
-.product-prices-table select {
+table[class$='-prices-table'] select {
     width: auto;
     float: left;
 }
+
+table[class$='-prices-table'] label.error {
+	display: inline-table;
+	font-size: 11px;
+}
+
+/* 
+#frontend-field-grid-tabs {
+	float: left;
+	width: 120px;
+}
+
+#frontend-field-grid-tabs li {
+	width: 100%;
+}
+
+#frontend-field-grid-tabs li a {
+	width: 100%;
+}
+
+#frontend-field-grid-tabs li.active a {
+	border: 0;
+}
+
+#frontend-field-grid-data-tabs .tab-pane {
+	float: left;
+	width: 85%;
+} */
