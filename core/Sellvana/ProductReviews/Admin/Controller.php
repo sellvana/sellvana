@@ -234,4 +234,30 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
         return ['config' => $config];
 
     }
+
+    /**
+     * Get short data of latest new product reviews
+     * @return array
+     */
+    public function getLatestProductReviews()
+    {
+        $limit = $this->BConfig->get('modules/Sellvana_ProductReviews/latest-product-reviews-limit');
+        if (!$limit) {
+            $limit = 25;
+        }
+
+        $reviews = $this->Sellvana_ProductReviews_Model_Review->orm('pr')
+            ->join('Sellvana_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
+            ->left_outer_join('Sellvana_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
+            ->select([
+                'c.firstname',
+                'c.lastname',
+                'p.product_name',
+                'pr.rating'
+            ])
+            ->order_by_desc('pr.create_at')
+            ->limit($limit);
+
+        return $reviews->find_many();
+    }
 }

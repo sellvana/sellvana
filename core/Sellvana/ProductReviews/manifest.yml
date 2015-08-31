@@ -7,6 +7,10 @@ modules:
         description: "Product reviews by customers"
 
         auto_use: [ bootstrap, layout, views ]
+
+        default_config:
+            modules/Sellvana_ProductReviews/latest-product-reviews-limit: 25
+
         views:
             - [ prodreviews/grid, { view_class: FCom_Core_View_BackboneGrid } ]
 
@@ -17,6 +21,7 @@ modules:
                     - [ /prodreviews/.action, Sellvana_ProductReviews_Admin_Controller ]
                 observe:
                     - [ "BLayout::hook:catalog/products/tab/main", Sellvana_ProductReviews_Admin.hookProductTab ]
+                    - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_ProductReviews_Admin.onGetDashboardWidgets ]
 
             FCom_Frontend:
                 routing:
