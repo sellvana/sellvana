@@ -15,6 +15,7 @@
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
+ * @property Sellvana_Catalog_Model_SearchHistoryLog $Sellvana_Catalog_Model_SearchHistoryLog
  */
 class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -1304,6 +1305,39 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ->select(['sh.query'])
             ->order_by_desc('sh.last_at')
             ->limit($limit);
+
+        return $terms->find_many();
+    }
+
+    /**
+     * @param ORM $orm
+     * @param string $field
+     */
+    protected function _processFilters($orm, $field = 'p.create_at')
+    {
+        $filter = $this->BApp->get('dashboard_date_filter');
+        $cond = $field . ' ' . $filter['condition'];
+
+        if ($filter) {
+            $orm->where_raw($cond, $filter['params']);
+        }
+    }
+
+    public function getSearchesTopTerms() {
+        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/searches_top_terms_limit');
+        if (!$limit) {
+            $limit = 25;
+        }
+
+        $terms = $this->Sellvana_Catalog_Model_SearchHistoryLog->orm('shl')
+            ->inner_join('Sellvana_Catalog_Model_SearchHistory', ['shl.query_id', '=', 'sh.id'], 'sh')
+            ->select(['sh.query'])
+            ->select_expr('COUNT(sh.id)', 'qty')
+            ->group_by('shl.query_id')
+            ->order_by_desc('qty')
+            ->limit($limit);
+
+        $this->_processFilters($terms, 'shl.create_at');
 
         return $terms->find_many();
     }
