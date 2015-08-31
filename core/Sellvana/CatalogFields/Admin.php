@@ -60,7 +60,7 @@ class Sellvana_CatalogFields_Admin extends BClass
         $fieldsOptions = [];
         $fields = $this->Sellvana_CatalogFields_Model_ProductField->productFields($p);
         if ($fields) {
-            $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
+            $fieldIds = $this->BUtil->arrayToOptions($fields, '.id');
             $fieldOptionsAll = $this->Sellvana_CatalogFields_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
                 ->order_by_asc('field_id')->order_by_asc('label')->find_many();
             foreach ($fieldOptionsAll as $option) {
@@ -71,68 +71,41 @@ class Sellvana_CatalogFields_Admin extends BClass
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
-    protected function _saveProductCustom($p, $data = [])
+    protected function _saveProductCustom(Sellvana_Catalog_Model_Product $p, $fieldSets = [])
     {
-        $fieldSets = $this->BUtil->fromJson($data);
+        if (!$fieldSets || !is_array($fieldSets)) {
+            return;
+        }
 
-        if (is_array($fieldSets) && count($fieldSets)) {
-            $productId = $p->id();
-            $fieldNames = [];
-            foreach ($fieldSets as $fieldSet) {
-                if (!empty($fieldSet['fields'])) {
-                    foreach ($fieldSet['fields'] as $field) {
-                        $fieldNames[] = $field['field_name'];
-                    }
-                }
+        foreach ($fieldSets as $set) {
+            if (empty($set['fields'])) {
+                continue;
             }
+            foreach ($set['fields'] as $field) {
+#var_dump($field);
+                $p->set($field['field_code'], $field['value']);
+            }
+        }
+        $pfdHlp = $this->Sellvana_CatalogFields_Model_ProductFieldData;
+        $pfdHlp->saveProductsFieldData([$p]);
 
-            /** @var Sellvana_CatalogFields_Model_Field[] $fields */
-            $fields = $this->Sellvana_CatalogFields_Model_Field->orm()->where_in('field_name', $fieldNames)
-                ->find_many_assoc('field_name');
-
-            foreach ($fieldSets as $fieldSet) {
-                if (!empty($fieldSet['fields'])) {
-                    $fieldSetId = $fieldSet['id'];
-
-                    $fieldData = $this->Sellvana_CatalogFields_Model_ProductFieldData->orm('pf')
-                        ->where_equal('product_id', $productId)
-                        ->where_raw('(set_id = ? OR ISNULL(set_id))', [$fieldSetId])
-                        ->find_many_assoc('field_id');
-
-                    foreach ($fieldSet['fields'] as $field) {
-                        $fieldName = $field['field_name'];
-                        $fieldId = $field['id'];
-                        if (empty($fields[$fieldName])) {
+        $fieldsDataArr = $pfdHlp->fetchProductsFieldData([$p->id()]);
+        if (!empty($fieldsDataArr[$p->id()])) {
+            $fieldsData = $fieldsDataArr[$p->id()];
+            foreach ($fieldSets as $set) {
+                if (empty($set['fields'])) {
+                    continue;
+                }
+                foreach ($set['fields'] as $field) {
+                    /** @var Sellvana_CatalogFields_Model_ProductFieldData $row */
+                    foreach ($fieldsData as $row) {
+                        if ($row->get('field_id') != $field['id']) {
                             continue;
                         }
-
-                        if (empty($fieldData[$fieldId])) {
-                            $fs = $this->Sellvana_CatalogFields_Model_ProductFieldData->create([
-                                'product_id' => $productId,
-                                'field_id' => $fieldId,
-                            ]);
-                        } else {
-                            $fs = $fieldData[$fieldId];
-                        }
-
-                        if ($fieldSetId) {
-                            $fs->set('set_id', $fieldSetId);
-                        }
-
-                        $fieldType = $fields[$fieldName]->get('table_field_type');
-                        $column = $fields[$fieldName]->getTableColumn($fieldType);
-
-                        $value = $field['value'];
-                        if (!empty($field['options'])) {
-                            if (empty($field['options'][$field['value']])) {
-                                $value = null;
-                            } else {
-                                $column = 'value_id';
-                            }
-                        }
-                        $fs->set($column, $value);
-                        $fs->set('position', $field['position']);
-                        $fs->save();
+                        $row->set([
+                            'set_id' => $set['id'] ?: null,
+                            'position' => $field['position'],
+                        ])->save();
                     }
                 }
             }
@@ -147,7 +120,7 @@ class Sellvana_CatalogFields_Admin extends BClass
 
         if (!empty($data['custom_fields'])) {
             // Save custom fields on fcom_product_custom
-            $this->_saveProductCustom($model, $data['custom_fields']);
+            $this->_saveProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
             // $model->setData('custom_fields', $data['custom_fields']);
         }
 

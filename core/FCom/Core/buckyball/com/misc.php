@@ -283,7 +283,7 @@ class BUtil extends BClass
      * @param array|string $mapFields
      * @return array
      */
-    public function arraySeqToMap($array, $idField, $mapFields = null)
+    public function arraySeqToMap($array, $idField = 'id', $mapFields = null)
     {
         $map = [];
         foreach ($array as $k => $row) {
@@ -291,6 +291,8 @@ class BUtil extends BClass
                 $outRow = $this->BUtil->arrayMask($row, $mapFields);
             } elseif (is_string($mapFields)) {
                 $outRow = !empty($row[$mapFields]) ? $row[$mapFields] : null;
+            } else {
+                $outRow = !empty($row[$idField]) ? $row[$idField] : null;
             }
             if (!is_numeric($k)) {
                 $map[$k] = $outRow;
@@ -732,9 +734,11 @@ class BUtil extends BClass
         $isObject = is_object(current($source));
         foreach ($source as $k => $item) {
             if ($isObject) {
-                $key = null === $keyField ? $k : $item->$keyField;
-                $label = $labelField[0] === '.' ? $item-> {substr($labelField, 1)}() : $item->labelField;
-                $options[$key] = $label;
+                $key = null === $keyField ? $k : $item->get($keyField);
+                $label = $labelField[0] === '.' ? $item->{substr($labelField, 1)}() : $item->get($labelField);
+                if (null !== $label) {
+                    $options[$key] = $label;
+                }
             } else {
                 $key = null === $keyField ? $k : $item[$keyField];
                 $options[$key] = $item[$labelField];

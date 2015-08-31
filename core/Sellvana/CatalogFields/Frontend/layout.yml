@@ -1,0 +1,2 @@
+/catalog/product:
+    - { hook: "catalog/product/details:after_description", views: catalog/product/custom-fields }

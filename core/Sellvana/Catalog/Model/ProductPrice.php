@@ -274,6 +274,11 @@ class Sellvana_Catalog_Model_ProductPrice
         parent::onAfterLoad();
     }
 
+    /**
+     * @param Sellvana_Catalog_Model_Product[] $products
+     * @param array $context
+     * @return $this
+     */
     public function collectProductsPrices($products, $context = [])
     {
         if (!$products) {

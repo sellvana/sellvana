@@ -605,4 +605,60 @@ class Sellvana_CatalogFields_Migrate extends BClass
         $tProductField = $this->Sellvana_CatalogFields_Model_ProductFieldData->table();
         $this->BDb->ddlTableDef($tProductField, [BDb::COLUMNS => ['position' => "tinyint(3) NOT NULL DEFAULT '0' after `field_id`"]]);
     }
+
+    public function upgrade__0_5_5_0__0_5_6_0()
+    {
+        $fHlp = $this->Sellvana_CatalogFields_Model_Field;
+
+        if (($field = $fHlp->getField('size'))) {
+            $field->set('table_field_type', 'options')->save();
+        }
+        if (($field = $fHlp->getField('color'))) {
+            $field->set('table_field_type', 'options')->save();
+        }
+
+        $foHlp = $this->Sellvana_CatalogFields_Model_FieldOption;
+
+        $options = $foHlp->preloadAllFieldsOptions()->getAllFieldsOptions();
+        $optionsByLabel = [];
+        foreach ($options as $fieldId => $fieldOptions) {
+            foreach ($fieldOptions as $optionId => $option) {
+                $optionsByLabel[$fieldId][strtolower($option->get('label'))] = $option->id();
+            }
+        }
+
+        $orm = $this->Sellvana_CatalogFields_Model_ProductFieldData->orm('pfd')
+            ->join($fHlp->table(), ['f.id', '=', 'pfd.field_id'], 'f')
+            ->where('f.table_field_type', 'options')
+            ->select('pfd.*');
+
+        $orm->iterate(function($row) use (&$optionsByLabel, $fHlp, $foHlp) {
+            $fId = $row->get('field_id');
+            $label = $row->get('value_var');
+            $valueLower = strtolower($label);
+            if (!$valueLower) {
+                return;
+            }
+            if (!empty($optionsByLabel[$fId][$valueLower])) {
+                $valueId = $optionsByLabel[$fId][$valueLower];
+            } else {
+                $valueId = $foHlp->create(['field_id' => $fId, 'label' => $label])->save()->id();
+                $optionsByLabel[$fId][$valueLower] = $valueId;
+            }
+            $row->set(['value_var' => null, 'value_id' => $valueId])->save();
+        });
+    }
+
+    public function upgrade__0_5_6_0__0_5_7_0()
+    {
+        $fHlp = $this->Sellvana_CatalogFields_Model_Field;
+        $fields = $fHlp->orm('f')
+            ->where_in('admin_input_type', ['select', 'multiselect'])
+            ->where_not_equal('table_field_type', 'options')
+            ->find_many();
+
+        foreach ($fields as $field) {
+            $field->set('table_field_type', 'options')->save();
+        }
+    }
 }

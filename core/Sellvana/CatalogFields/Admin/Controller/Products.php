@@ -3,7 +3,7 @@
 /**
  * Class Sellvana_CatalogFields_Admin_Controller_Products
  *
- * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
+ * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
@@ -309,16 +309,11 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
 
     public function getInitialData($model)
     {
-        return $this->BUtil->toJson($model->get('custom_fields'));
-
-        // $customFields = $model->getData('custom_fields');
-        $pc = $this->Sellvana_CatalogFields_Model_ProductField->load($model->id(), 'product_id');
-        if (!$pc) {
-            return -1;
-        }
-        $customFields = $pc->get('_data_serialized');
-        return !isset($customFields) ? -1 : $customFields;
+        $pId = $model->id();
+        $data = $this->Sellvana_CatalogFields_Model_ProductFieldData->getProductFieldSetData([$pId]);
+        return $this->BUtil->toJson($data[$pId]);
     }
+
     public function fieldsetAry()
     {
         $sets = $this->BDb->many_as_array($this->Sellvana_CatalogFields_Model_Set->orm('s')->select('s.*')->find_many());
@@ -345,7 +340,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         );
         foreach ($fields as &$field) {
             if ($field['admin_input_type'] === 'select' ||  $field['admin_input_type'] === 'multiselect') {
-                $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getListAssocById($field['id']);
+                $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field['id']);
             }
         }
 
@@ -365,7 +360,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $r = $this->BRequest;
         $id = $r->get('id');
         $field = $this->Sellvana_CatalogFields_Model_Field->load($id);
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getListAssocById($field->id());
+        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field->id(), false, 'label');
         $this->BResponse->json(['id' => $field->id(), 'field_code' => $field->field_code,
             'field_name' => $field->field_name, 'admin_input_type' => $field->admin_input_type,
             'multilang' => $field->multilanguage, 'options' => $options, 'required' => $field->required]);
@@ -406,7 +401,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                     'name' => $field->field_name,
                     'label' => $field->frontend_label,
                     'input_type' => $field->admin_input_type,
-                    'options' => join(',', array_keys($optionsHlp->getListAssocById($id))),
+                    'options' => join(',', array_keys($optionsHlp->getFieldOptions($id))),
                     'required' => $field->required,
                     'field_code' => $field->field_code,
                     'position' => ''
