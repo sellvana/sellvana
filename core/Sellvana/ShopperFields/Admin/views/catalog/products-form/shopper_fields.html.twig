@@ -626,6 +626,7 @@
                                         prices: prices,
                                         deleted: deletedPrices,
                                         option: option,
+                                        dataMode: 'local',
                                         addPriceTypeCallback: 'shopperPriceTypeCallback',
                                         priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
                                         editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
@@ -648,9 +649,9 @@
 
                                     
                                     var validateUniqueMethod = option+'PriceUnique',
-                                        validateBaseMethod = option+'BaseField',
-                                        validateUniqueRule = {},
-                                        validateBaseRule = {};
+                                        validateBaseMethod   = option+'BaseField',
+                                        validateUniqueRule   = {},
+                                        validateBaseRule     = {};
 
                                     validateUniqueRule[validateUniqueMethod] = true;
                                     $.validator.addMethod(validateUniqueMethod, this.validateUniquePrice(option), '{{"Price already exists."|_}}');
@@ -658,7 +659,7 @@
 
                                     validateBaseRule[validateBaseMethod] = true;
                                     $.validator.addMethod(validateBaseMethod, this.validateBasePrice(option), '{{"No matching base price"|_}}');
-                                    $.validator.addClassRules(option+"_base_field", validateBaseRule);
+                                    $.validator.addClassRules(option+"BaseField", validateBaseRule);
 
                                     return node;
                                 }.bind(this))
