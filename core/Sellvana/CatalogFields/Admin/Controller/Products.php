@@ -340,7 +340,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         );
         foreach ($fields as &$field) {
             if ($field['admin_input_type'] === 'select' ||  $field['admin_input_type'] === 'multiselect') {
-                $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field['id']);
+                $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field['id'], false, 'label');
             }
         }
 
