@@ -138,7 +138,7 @@ define(['underscore', 'react'], function (_, React) {
                                     }
                                     
                                     node = (
-                                        React.createElement("select", React.__spread({key: col.name, defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange}), selectOptions)
+                                        React.createElement("select", React.__spread({key: col.name, defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange.bind(null, col.callback)}), selectOptions)
                                     );
                                     break;
                                 default:

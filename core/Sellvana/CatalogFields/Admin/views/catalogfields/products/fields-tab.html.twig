@@ -1,126 +1,121 @@
 {% set fieldSetModel = APP.instance('Sellvana_CatalogFields_Model_Set') %}
 {% set ctrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products') %}
+<div id="prod-new-field-modal" class="modal fade in" tabindex='-1'>
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-<div id="prod-new-field-modal">
-    <a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
-    <div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
-        <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                <h4 class="modal-title" id="myModalLabel">{{ 'Create Form'|_ }}</h4>
+            </div>
 
-                <div class="modal-header">
-                    <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
-                    <h4 class="modal-title" id="myModalLabel">{{ 'Create Form'|_ }}</h4>
-                </div>
+            <div class="modal-body">
 
-                <div class="modal-body">
-
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="field_code">{{ 'Field Code'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
-                        </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="field_code">{{ 'Field Code'|_ }}</label>
                     </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="field_name">{{ 'Field Name'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="frontend_label">{{ 'Frontend Label'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="frontend_show">{{ 'Show on frontend'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="sort_order">{{ 'Sort order'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="table_field_type">{{ 'DB Type'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
-                                {{ UTIL.optionsHtml(APP.instance('Sellvana_CatalogFields_Model_Field').fieldOptions('table_field_type')) | raw }}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="admin_input_type">{{ 'Input Type'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
-                                {{ UTIL.optionsHtml(APP.instance('Sellvana_CatalogFields_Model_Field').fieldOptions('admin_input_type')) | raw }}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="system">{{ 'System field'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="system" id="system" class="form-control" data-rule-required="true">
-                                <option value="0">No</option>
-                                <option value="1">Yes</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="required">{{ 'Multi Language'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="multilanguage" id="multilanguage" class="form-control" data-rule-required="true">
-                                <option value="0">No</option>
-                                <option value="1">Yes</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="control-label col-sm-3">
-                            <label for="required">{{ 'Required'|_ }}</label>
-                        </div>
-                        <div class="controls col-sm-8">
-                            <select name="required" id="required" class="form-control" data-rule-required="true">
-                                <option value="0">No</option>
-                                <option value="1">Yes</option>
-                            </select>
-                        </div>
+                    <div class="controls col-sm-8">
+                        <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
                     </div>
                 </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">{{ 'Close'|_ }}</button>
-                    <button class="btn btn-primary save" type="button" id="btn-newfield-save">{{ 'Save changes'|_ }}</button>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="field_name">{{ 'Field Name'|_ }}</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
+                    </div>
                 </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="frontend_label">{{ 'Frontend Label'|_ }}</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="frontend_show">{{ 'Show on frontend'|_ }}</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="sort_order">{{ 'Sort order'|_ }}</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="table_field_type">{{ 'DB Type'|_ }}</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
+                            {{ UTIL.optionsHtml(APP.instance('Sellvana_CatalogFields_Model_Field').fieldOptions('table_field_type')) | raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="admin_input_type">{{ 'Input Type'|_ }}</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
+                            {{ UTIL.optionsHtml(APP.instance('Sellvana_CatalogFields_Model_Field').fieldOptions('admin_input_type')) | raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="system">{{ 'System field'|_ }}</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="system" id="system" class="form-control" data-rule-required="true">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="required">{{ 'Multi Language'|_ }}</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="multilanguage" id="multilanguage" class="form-control" data-rule-required="true">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="control-label col-sm-3">
+                        <label for="required">{{ 'Required'|_ }}</label>
+                    </div>
+                    <div class="controls col-sm-8">
+                        <select name="required" id="required" class="form-control" data-rule-required="true">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">{{ 'Close'|_ }}</button>
+                <button class="btn btn-primary save" type="button" id="btn-newfield-save">{{ 'Save changes'|_ }}</button>
             </div>
         </div>
     </div>
 </div>
-
 {# CONFLICT START #}
 
 <div class="well">
@@ -219,32 +214,35 @@ CONFLICT END #}
                 <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
                     <% switch(rc.admin_input_type) {
                     case 'text':
-                    print('<input '+(rc.required === '1' ? 'data-rule-required="true"' : '') +'name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
+                        print('<input '+(rc.required === '1' ? 'data-rule-required="true"' : '') +'name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
 
-                    break;
+                        break;
                     case 'textarea':
-                    print('<textarea '+(rc.required === '1' ? 'data-rule-required="true"' : '') +' name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
+                        print('<textarea '+(rc.required === '1' ? 'data-rule-required="true"' : '') +' name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
 
-                    break;
+                        break;
                     case 'wysiwyg':
-                    print('<textarea name="'+guid()+'" id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
+                        print('<textarea name="'+guid()+'" id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
 
-                    break;
+                        break;
                     case 'select':
                     case 'multiselect':
-                    print('<select '+(rc.required === '1' ? 'data-rule-required="true"' : '') +(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
-                    print("<option value=''>&nbsp;</option>");
-                    vals = rc.value.split(',');
-                    for(key in rc.options) {
-                    print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
-                    }
-                    print('</select>');
+                        print('<select '+(rc.required === '1' ? 'data-rule-required="true"' : '') +(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
+                        print("<option value=''>&nbsp;</option>");
+                        if (rc.value && rc.value.length) {
+                            vals = rc.value.split(',');
+                        } else vals = [];
 
-                    break;
+                        for(key in rc.options) {
+                            print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
+                        }
+                        print('</select>');
+
+                        break;
                     case 'boolean':
-                    print('<input type="hidden" name="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
+                        print('<input type="hidden" name="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
 
-                    break;
+                        break;
                     } %>
                 </div>
                 <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
@@ -333,11 +331,8 @@ CONFLICT END #}
 
 
 <script>
-$('#fcom_append_form').append('<form id="prod-new-field-form1" class="form form-horizontal validate-form"/>');
-var html = $("#prod-new-field-modal").html();
-$("#prod-new-field-modal").remove();
-$('#prod-new-field-form1').append(html);
-
+$('#fcom_additional_info_field_form').append('<form id="prod-new-field-form" class="form form-horizontal validate-form"></form>');
+$('#prod-new-field-modal').appendTo('#prod-new-field-form');
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
     var setValidateForm = function(selector) {
         if (selector == null) {
@@ -430,9 +425,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 remove_options(newSet);
             }
         });
-
-
-
     });
 
     $('#btn_add_field').click(function() {
@@ -473,7 +465,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                         langField.view.$el.find('textarea').val(val);//for validation show only
                     }
                     if (field.get('required') === '1' && langField.get('value') === '')
-                            invalid++;
+                        invalid++;
                 });
 
                 if (field.get('required') === '1') {
@@ -521,16 +513,16 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
 
-    var _appendForm = $('#prod-new-field-form1');
+    var _appendForm = $('#prod-new-field-form');
     setValidateForm($(_appendForm));
-    $('#field_code').rules("add", {
+    _appendForm.find('#field_code').rules("add", {
         onfocusout: false,
         onkeyup: false,
         remote: {
             url: '{{ APP.href('/catalogfields/fields/unique_field') | raw }}',
             type: 'post',
              data: {
-                name: 'field_code'
+                _name: 'field_code'
             },
             dataFilter: function (responseString) {
                 var response = jQuery.parseJSON(responseString);
@@ -543,12 +535,13 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
     $('#btn_new_field').click(function() {
-        $('#prod-new-field-form').find('input').val('');
-        $('#prod-new-field-form').find('select').each(function(index) {
+        $('#prod-new-field-modal').find('input').val('');
+        $('#prod-new-field-modal').find('select').each(function(index) {
             $(this).find('option').removeAttr('selected');
             $(this).find('option:first').attr('selected','selected');
         })
-        $('#btn_show_modal').trigger('click');
+
+        $('#prod-new-field-modal').modal('show');
 
     });
 
