@@ -835,6 +835,7 @@
                     title: Locale._('Variant Prices'),
                     prices: this.props.prices,
                     deleted: deletedPrices,
+                    dataMode: 'local',
                     priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
                     editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
                     customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
@@ -859,7 +860,7 @@
                 });
 
                 $.validator.addMethod('variantBaseField', this.validateBasePrice('variant'), '{{"No matching base price"|_}}');
-                $.validator.addClassRules("variant_base_field", {
+                $.validator.addClassRules("variantBaseField", {
                     variantBaseField: true
                 });
 
