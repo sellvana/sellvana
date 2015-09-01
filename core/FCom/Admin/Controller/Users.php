@@ -108,7 +108,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 80, 'hidden' => true],
             ['name' => 'username', 'label' => 'Username', 'index' => 'au.username', 'width' => 200],
             ['name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 200],
-            ['name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 200, 'editable' => true,
+            ['name' => 'user_status', 'label' => 'Status', 'index' => 'au.status', 'width' => 200, 'editable' => true,
                 'multirow_edit' => true, 'editor' => 'select',
                 'options' => $this->FCom_Admin_Model_User->fieldOptions('status')]
         ];
@@ -126,7 +126,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['config']['filters'] = [
             ['field' => 'username', 'type' => 'text'],
             ['field' => 'email', 'type' => 'text'],
-            ['field' => 'status', 'type' => 'multiselect']
+            ['field' => 'user_status', 'type' => 'multiselect']
         ];
         $config['config']['data_mode'] = 'local';
         $config['config']['grid_before_create'] = 'rolesGridRegister';
