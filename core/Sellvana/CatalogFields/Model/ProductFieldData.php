@@ -54,9 +54,20 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
         if (!$pIds) {
             return $this;
         }
-        /** @var Sellvana_CatalogFields_Model_ProductFieldData[][] $fieldsData */
-        $fieldsData = $this->orm('pfd')->where_in('product_id', $pIds)
-            ->find_many_assoc(['product_id', 'field_id']);
+        /** @var Sellvana_CatalogFields_Model_ProductFieldData[][][] $fieldsData */
+        $rawFieldsData = $this->orm('pfd')->where_in('product_id', $pIds)->find_many();
+        $fieldsData = [];
+        foreach ($rawFieldsData as $rawData) {
+            if (empty($fieldsData[$rawData->get('product_id')])) {
+                $fieldsData[$rawData->get('product_id')] = [];
+            }
+
+            if (empty($fieldsData[$rawData->get('product_id')][$rawData->get('field_id')])) {
+                $fieldsData[$rawData->get('product_id')][$rawData->get('field_id')] = [];
+            }
+
+            array_push($fieldsData[$rawData->get('product_id')][$rawData->get('field_id')], $rawData);
+        }
 
         $options = $this->Sellvana_CatalogFields_Model_FieldOption->preloadAllFieldsOptions()->getAllFieldsOptions();
         $optionsByLabel = [];
@@ -74,50 +85,72 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 if (empty($fields[$fieldCode])) {
                     continue;
                 }
+
                 $field = $fields[$fieldCode];
                 $fId = $field->id();
                 $fieldType = $field->get('table_field_type');
-                if (null !== $product->get($fieldCode)) { // if this product has this field data
-                    if (!empty($fieldsData[$pId][$fId])) { // if this field data record already exists
-                        $fData = $fieldsData[$pId][$fId];
-                    } else { // if this is a new entry
-                        $fData = $this->create([
-                            'product_id' => $pId,
-                            'field_id' => $fId,
-                        ]);
-                    }
-                    if ($fieldType === 'options') {
-                        $valueLower = strtolower($value);
-                        if (!empty($optionsByLabel[$fId][$valueLower])) { // option exists?
-                            $value = $optionsByLabel[$fId][$valueLower];
-                        } else {                                   // option doesn't exist
-                            if (static::$_autoCreateOptions) { // allow option auto-creation?
-                                $optionId = $this->Sellvana_CatalogFields_Model_FieldOption->create([
-                                    'field_id' => $fId,
-                                    'label' => $value,
-                                ])->save()->id();
-                                $value = $optionId;
-                                $optionsByLabel[$fId][$valueLower] = $optionId;
-                            } else { // don't auto-create
-                                $value = null;
+                $tableColumn = static::$_fieldTypeColumns[$fieldType];
+
+                if ($fieldType === 'options') {
+                    $value = explode(',', $value);
+                }
+                elseif (!is_array($value)) {
+                    $value = [$value];
+                }
+
+                foreach ($value as $singleValue) {
+                    if (null !== $product->get($fieldCode)) { // if this product has this field data
+                        if (!empty($fieldsData[$pId][$fId])) { // if this field data record already exists
+                            $fData = array_shift($fieldsData[$pId][$fId]);
+                        } else { // if this is a new entry
+                            $fData = $this->create([
+                                'product_id' => $pId,
+                                'field_id' => $fId,
+                            ]);
+                        }
+                        if ($fieldType === 'options') {
+                            $valueLower = strtolower($singleValue);
+                            if (!empty($optionsByLabel[$fId][$valueLower])) { // option exists?
+                                $singleValue = $optionsByLabel[$fId][$valueLower];
+                            } else {                                   // option doesn't exist
+                                if (static::$_autoCreateOptions) { // allow option auto-creation?
+                                    $optionId = $this->Sellvana_CatalogFields_Model_FieldOption->create([
+                                        'field_id' => $fId,
+                                        'label' => $singleValue,
+                                    ])->save()->id();
+                                    $singleValue = $optionId;
+                                    $optionsByLabel[$fId][$valueLower] = $optionId;
+                                } else { // don't auto-create
+                                    $singleValue = null;
+                                }
+                            }
+                        }
+                        if ($fieldType === 'serialized') {
+                            $product->setData("field_data/{$fieldCode}", $singleValue);
+                            $saveProduct = true;
+                        } else {
+                            $fData->set($tableColumn, $singleValue);
+                            $fData->save();
+                        }
+                    } else { // this product doesn't have data for this field
+                        if (!empty($fieldsData[$pId][$fId])) { // there's old data
+                            foreach ($fieldsData[$pId][$fId] as $wrongData) {
+                                $wrongData->set($tableColumn, null); // delete old data record for this product/field
                             }
                         }
                     }
-                    if ($fieldType === 'serialized') {
-                        $product->setData("field_data/{$fieldCode}", $value);
-                        $saveProduct = true;
-                    } else {
-                        $tableColumn = static::$_fieldTypeColumns[$fieldType];
-                        $fData->set($tableColumn, $value);
-                        $fData->save();
-                    }
-                } else { // this product doesn't have data for this field
-                    if (!empty($fieldsData[$pId][$fId])) { // there's old data
-                        $tableColumn = static::$_fieldTypeColumns[$fieldType];
-                        $fieldsData[$pId][$fId]->set($tableColumn, null); // delete old data record for this product/field
+                }
+            }
+
+            // cleaning up deleted values
+            foreach ($fieldsData as $prodData) {
+                foreach ($prodData as $fieldData) {
+                    foreach ($fieldData as $valueData) {
+                        $valueData->delete();
                     }
                 }
             }
+
             if ($saveProduct) {
                 $product->save();
             }
@@ -186,7 +219,20 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                     $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($fieldId, false, 'label');
                 }
 
-                $fieldsData[$productId][$setId]['fields'][] = $field;
+                $found = false;
+                if ($field['admin_input_type'] == 'multiselect') {
+                    foreach ($fieldsData[$productId][$setId]['fields'] as &$oldField) {
+                        if ($oldField['field_code'] == $field['field_code']) {
+                            $oldField['value'] .= ',' . $field['value'];
+                            $found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$found) {
+                    $fieldsData[$productId][$setId]['fields'][] = $field;
+                }
             }
         }
 
@@ -219,6 +265,9 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                     $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($row->get('field_id'));
                     if (!empty($options[$value])) {
                         $value = $options[$value];
+                    }
+                    if ($oldValue = $product->get($row->get('field_code'))) {
+                        $value = $oldValue . ',' . $value;
                     }
                 }
                 $product->set($row->get('field_code'), $value);
