@@ -1,0 +1,24 @@
+{% set terms = APP.instance('Sellvana_Catalog_Admin_Controller_Products').getSearchesTopTerms() %}
+
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "Term"|_ }}</th>
+            <th>{{ "Count"|_ }}</th>
+        </tr>
+        </thead>
+        {% if terms is empty %}
+            <tr>
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+        {% else %}
+            {% for term in terms %}
+                <tr>
+                    <td>{{ term.get('query') }}</td>
+                    <td>{{ term.get('qty') }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>
