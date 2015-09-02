@@ -102,6 +102,11 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                     if (null !== $product->get($fieldCode)) { // if this product has this field data
                         if (!empty($fieldsData[$pId][$fId])) { // if this field data record already exists
                             $fData = array_shift($fieldsData[$pId][$fId]);
+                            if (!empty($pData['_custom_fields_remove']) && in_array($fId, $pData['_custom_fields_remove'])) {
+                                $fData->delete();
+                                $product->set($fieldCode, null);
+                                continue;
+                            }
                         } else { // if this is a new entry
                             $fData = $this->create([
                                 'product_id' => $pId,

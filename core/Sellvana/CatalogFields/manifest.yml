@@ -29,6 +29,7 @@ modules:
                 observe:
                     - [ "Sellvana_Catalog_Admin_Controller_Products::gridColumns", Sellvana_CatalogFields_Admin.onProductGridColumns ]
                     - [ "Sellvana_Catalog_Admin_Controller_Products::formViewBefore", Sellvana_CatalogFields_Admin.onProductsFormViewBefore ]
+                    - [ "Sellvana_Catalog_Admin_Controller_Products::formPostBefore", Sellvana_CatalogFields_Admin.onProductFormPostBefore ]
                     - [ "Sellvana_Catalog_Admin_Controller_Products::formPostAfter:afterValidate", Sellvana_CatalogFields_Admin.onProductFormPostAfterValidate ]
                 security:
                     request_fields_whitelist:
