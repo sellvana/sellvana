@@ -16,6 +16,7 @@
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_ProductPrice              $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_MultiSite_Model_Site                    $Sellvana_MultiSite_Model_Site
  */
 class Sellvana_CatalogFields_Migrate extends BClass
 {
@@ -660,5 +661,20 @@ class Sellvana_CatalogFields_Migrate extends BClass
         foreach ($fields as $field) {
             $field->set('table_field_type', 'options')->save();
         }
+    }
+
+    public function upgrade__0_5_7_0__0_5_8_0()
+    {
+        $tProductField = $this->Sellvana_CatalogFields_Model_ProductFieldData->table();
+        $tSite = $this->Sellvana_MultiSite_Model_Site->table();
+        $this->BDb->ddlTableDef($tProductField, [
+            BDb::COLUMNS => [
+                'locale' => "varchar(10) DEFAULT NULL after `position`",
+                'site_id' => "int(10) UNSIGNED DEFAULT NULL after `position`",
+            ],
+            BDb::CONSTRAINTS => [
+                'site' => ['site_id', $tSite],
+            ]
+        ]);
     }
 }
