@@ -1,5 +1,5 @@
 {% set prod = THIS.get('product') %}
-{% set customFields = APP.instance('Sellvana_CatalogFields_Model_ProductFieldData').getProductFieldSetData([prod.id()]) %}
+{% set customFields = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products').getInitialData(prod) %}
 
 {% if customFields %}
     <div class="f-tab-heading">
