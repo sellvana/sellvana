@@ -43,11 +43,11 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
      */
     public function gridPermissionsConfig(FCom_Admin_Model_Role $model)
     {
-        $config      = [
-            'id'        => static::$_origClass . '_permissions',
-            'data_mode' => 'local',
+        $config = [
+            'id'             => static::$_origClass . '_permissions',
+            'data_mode'      => 'local',
             'mass_edit_type' => 'div',
-            'columns'   => [
+            'columns'        => [
                 ['type' => 'row_select'],
                 ['name' => 'title', 'label' => 'Permission Name', 'width' => 100],
                 ['name' => 'path', 'label' => 'Permission Path', 'width' => 100],
@@ -65,7 +65,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
                     'editor'             => 'select'
                 ]
             ],
-            'filters'   => [
+            'filters' => [
                 ['field' => 'title', 'type' => 'text'],
                 ['field' => 'status', 'type' => 'multiselect']
             ],
@@ -80,9 +80,15 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         $rolePermissions = $model->get('permissions');
 
         ksort($permissions);
+
         $data = [];
         foreach ($permissions as $path => $perm) {
-            $data[] = ['id' => str_replace('/','-',$path), 'title' => $perm['title'], 'path' => $path, 'status' => (array_key_exists($path, $rolePermissions)? 'all': 'none')];
+            $data[] = [
+                'id'     => str_replace('/', '-', $path),
+                'title'  => $perm['title'],
+                'path'   => $path,
+                'status' => (array_key_exists($path, $rolePermissions) ? 'all' : 'none')
+            ];
         }
 
         $config['data'] = $data;

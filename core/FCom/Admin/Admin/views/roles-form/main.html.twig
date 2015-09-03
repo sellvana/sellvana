@@ -24,7 +24,7 @@
 
 
 <script>
-    require(['jquery', 'jstree','underscore'], function ($,jt,_) {
+    require(['jquery', 'jstree', 'underscore'], function ($, jt, _) {
         $(function () {
             $('#roles-form').validate();
 
@@ -54,7 +54,7 @@
          * @param grid
          * @param trigger
          */
-        window.permissionsGridMounted = function(grid, trigger) {
+        window.permissionsGridMounted = function (grid, trigger) {
             var permissionsGrid = grid;
 
             if (trigger == 'componentDidMount') {
@@ -64,11 +64,11 @@
             }
         };
 
-        var updateStatusSelect = function(grid, rows){
-            _.each(rows, function(module){
+        var updateStatusSelect = function (grid, rows) {
+            _.each(rows, function (module) {
                 var id = grid.getConfig('id') + '-status-' + module.id;
 
-                $(grid.getDOMNode()).find("#"+ id).val(module.status);
+                $(grid.getDOMNode()).find("#" + id).val(module.status);
             });
         }
     })
