@@ -1,4 +1,4 @@
-{% set reviews = APP.instance('Sellvana_ProductReviews_Admin_Controller').getLatestProductReviews() %}
+{% set reviews = APP.instance('Sellvana_ProductReviews_Admin_Dashboard_LatestProductReviews').getData() %}
 
 <div class='box-content' style="height: 300px; overflow-y: scroll">
     <table class="table table-bordered table-hover table-striped">
