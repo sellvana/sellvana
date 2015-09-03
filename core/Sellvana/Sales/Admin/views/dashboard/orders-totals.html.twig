@@ -1,13 +1,13 @@
-{% set orderTotal = APP.instance('Sellvana_Sales_Admin_Controller_Orders').getOrderTotal() %}
+{% set orderTotal = APP.instance('Sellvana_Sales_Admin_Dashboard_OrdersTotals').getData() %}
 
 <div class='row'>
-  {% for  order in orderTotal %}
-      <div class='col-sm-6'>
-          <div class='box-content box-statistic'>
-              <h3 class='title text-error dashboard-order-total' data-id="{{ order.id }}">{{ order.order|_ }}</h3>
-              <small>{{ order.state_label|_ }}</small>
-              <div class='text-error icon-inbox align-right'></div>
-          </div>
-      </div>
-  {% endfor %}
+    {% for order in orderTotal %}
+        <div class='col-sm-6'>
+            <div class='box-content box-statistic'>
+                <h3 class='title text-error dashboard-order-total' data-id="{{ order.id }}">{{ order.order|_ }}</h3>
+                <small>{{ order.state_label|_ }}</small>
+                <div class='text-error icon-inbox align-right'></div>
+            </div>
+        </div>
+    {% endfor %}
 </div>

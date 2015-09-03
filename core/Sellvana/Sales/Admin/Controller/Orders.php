@@ -381,48 +381,6 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         }
     }
 
-    public function getOrderRecent()
-    {
-        $limit = $this->BConfig->get('modules/Sellvana_Sales/recent_day');
-        $orm = $this->Sellvana_Sales_Model_Order->orm('o')
-            ->join('Sellvana_Customer_Model_Customer', ['o.customer_id', '=', 'c.id'], 'c')
-            ->select(['o.*', 'c.firstname', 'c.lastname'])
-            ->order_by_desc('o.create_at');
-        if ($limit) {
-            $orm->where_raw("DATE_ADD(o.create_at, INTERVAL {$limit} DAY) > NOW()");
-        }
-
-        $result = $orm->find_many();
-
-        return $result;
-    }
-
-    public function getOrderTotal()
-    {
-        $orderTotal = $this->Sellvana_Sales_Model_StateCustom->orm('s')
-            ->left_outer_join('Sellvana_Sales_Model_Order', ['o.state_custom', '=', 's.state_code'], 'o')
-            ->group_by('s.id')
-            ->select_expr('COUNT(o.id)', 'order')
-            ->where('s.entity_type', 'order')
-            ->select(['s.id', 's.state_label']);
-
-        $this->_processFilters($orderTotal);
-
-        $result = $orderTotal->find_many();
-        return $result;
-    }
-
-    public function getAvgOrderTotal()
-    {
-        $orderTotal = $this->Sellvana_Sales_Model_Order->orm('o')
-            ->select_expr('AVG(o.grand_total)', 'avg_total');
-
-        $this->_processFilters($orderTotal);
-
-        $result = (float)$orderTotal->find_one()->get('avg_total');
-        return number_format($result, 2);
-    }
-
     public function getTopProducts()
     {
         $limit = $this->BConfig->get('modules/Sellvana_Sales/top_products');
