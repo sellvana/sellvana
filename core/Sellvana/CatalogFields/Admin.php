@@ -71,10 +71,19 @@ class Sellvana_CatalogFields_Admin extends BClass
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
-    protected function _saveProductCustom(Sellvana_Catalog_Model_Product $p, $fieldSets = [])
+    protected function _processProductCustom(Sellvana_Catalog_Model_Product $p, $data = [])
     {
-        if (!$fieldSets || !is_array($fieldSets)) {
+        if (!$data || !is_array($data)) {
             return;
+        }
+
+        if (!empty($data['fieldSets'])) {
+            $fieldSets = $this->BUtil->fromJson($data['fieldSets']);
+        }
+
+        $pfdRemoveIds = [];
+        if (!empty($data['pfdRemoveIds'])) {
+            $pfdRemoveIds = $this->BUtil->fromJson($data['pfdRemoveIds']);
         }
 
         foreach ($fieldSets as $set) {
@@ -82,11 +91,16 @@ class Sellvana_CatalogFields_Admin extends BClass
                 continue;
             }
             foreach ($set['fields'] as $field) {
-#var_dump($field);
+                #var_dump($field);
                 $p->set($field['field_code'], $field['value']);
             }
         }
         $pfdHlp = $this->Sellvana_CatalogFields_Model_ProductFieldData;
+
+        if (!empty($pfdRemoveIds)) {
+            $pfdHlp->deleteProductsFieldData($p, $pfdRemoveIds);
+        }
+
         $pfdHlp->saveProductsFieldData([$p]);
 
         $fieldsDataArr = $pfdHlp->fetchProductsFieldData([$p->id()]);
@@ -120,7 +134,7 @@ class Sellvana_CatalogFields_Admin extends BClass
 
         if (!empty($data['custom_fields'])) {
             // Save custom fields on fcom_product_custom
-            $this->_saveProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
+            $this->_processProductCustom($model, $data['custom_fields']);
             // $model->setData('custom_fields', $data['custom_fields']);
         }
 

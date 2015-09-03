@@ -120,7 +120,8 @@
 
 <div class="well">
   <div class="row">
-    <input type="hidden" id="custom_fields" name="custom_fields"/>
+    <input type="hidden" id="custom_fields" name="custom_fields[fieldSets]"/>
+    <input type="hidden" id="pfd_remove_ids" name="custom_fields[pfdRemoveIds]"/>
     <div class="col-sm-6">
       <select id="sel_sets" class="select2 form-control" style="width:150px;">
         {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
@@ -331,6 +332,7 @@ CONFLICT END #}
 
 
 <script>
+var pfdRemoveIds = {};
 $('#fcom_additional_info_field_form').append('<form id="prod-new-field-form" class="form form-horizontal validate-form"></form>');
 $('#prod-new-field-modal').appendTo('#prod-new-field-form');
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
@@ -501,6 +503,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         checkFieldSet();
         sortFieldSet();
         $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
+        $('#pfd_remove_ids').val(JSON.stringify(pfdRemoveIds));
 
         if(!$(this).valid()) {
             CustomField.checkingForm = true;
@@ -806,8 +809,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 this.undelegateEvents();
                 this.$el.removeData().unbind();
                 this.remove();
+                if (!pfdRemoveIds[this.parentSet.id]) {
+                    pfdRemoveIds[this.parentSet.id] = [];
+                }
+                pfdRemoveIds[this.parentSet.id].push(this.model.id);
                 delete this.model;
-
             }
         },
         _addLangView: function(langField) {

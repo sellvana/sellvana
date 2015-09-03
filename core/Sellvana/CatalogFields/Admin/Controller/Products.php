@@ -335,7 +335,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $set = $this->Sellvana_CatalogFields_Model_Set->load($id);
         $fields = $this->BDb->many_as_array($this->Sellvana_CatalogFields_Model_SetField->orm('sf')
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
-            ->select(['f.id', 'f.field_code', 'f.field_name', 'f.admin_input_type'])
+            ->select(['f.id', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.required'])
             ->where('sf.set_id', $id)->find_many()
         );
         foreach ($fields as &$field) {
