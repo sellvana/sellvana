@@ -74,7 +74,6 @@ modules:
 
                 observe:
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", "FCom_Admin_Admin.onSettingsPost" ]
-                    - [ "FCom_Admin_View_Dashboard::getWidgets", "FCom_Admin_Admin.onGetDashboardWidgets" ]
 
                 security:
                     request_fields_whitelist:

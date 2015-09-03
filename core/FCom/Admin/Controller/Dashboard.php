@@ -15,7 +15,8 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
             $this->BResponse->redirect('');
             return;
         }
-        $widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
+        $widgets = $this->layout('/')->view('dashboard')->getWidgets();
+        //$widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
         $widgetKeys = explode(',', $r->get('widgets'));
         $wrapped = $r->get('wrapped');
         $add = $r->get('add');
