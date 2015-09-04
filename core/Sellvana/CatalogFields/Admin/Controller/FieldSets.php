@@ -59,14 +59,12 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                     ['field' => 'set_code', 'type' => 'text'],
                     '_quick' => ['expr' => 'product_name like ? or set_code like ', 'args' => ['%?%', '%?%']]
                 ],
-                'grid_before_create' => 'customFieldsGridRegister'
 //                'new_button' => '#add_new_field_set'
+                'callbacks' => [
+                    'componentDidMount' => 'fieldsetGridRegister'
+                ],
+                'grid_before_create' => 'fieldsetGridRegister'
             ]
-        ];
-
-
-        $config['config']['callbacks'] = [
-            'componentDidMount' => 'fieldsetGridRegister'
         ];
 
         return $config;
@@ -77,7 +75,6 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
         $config = [
             'config' => [
                 'id' => 'fieldset-modal-selected-grid',
-                'dataUrl' => $this->BApp->href('catalogfields/fieldsets/fieldset_modal_selected_grid_data?set_id='),
                 'caption' => 'Fields',
                 'data_mode' => 'local',
                 'data' => [],
@@ -98,13 +95,12 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 'actions' => [
                     'delete' => ['caption' => 'Remove', 'confirm' => false]
                 ],
-                'grid_before_create' => 'selectedFieldGridRegister',
                 'afterMassDelete' => 'afterMassDeleteSelectedGrid',
+                'callbacks' => [
+                    'componentDidMount' => 'selectedModalGridRegister'
+                ],
+                'grid_before_create' => 'selectedModalGridRegister',
             ]
-        ];
-
-        $config['config']['callbacks'] = [
-            'componentDidMount' => 'selectedModalGridRegister'
         ];
 
         return $config;
@@ -140,14 +136,13 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                         'class' => 'btn-primary',
                     ]
                 ],
+                'callbacks' => [
+                    'componentDidMount' => 'fieldsModalGridRegister'
+                ],
                 'grid_before_create' => 'addFieldGridRegister',
             ]
         ];
-
-        $config['config']['callbacks'] = [
-            'componentDidMount' => 'fieldsModalGridRegister'
-        ];
-
+        
         return $config;
     }
 
@@ -456,7 +451,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
 
             // save options in case field is dropdown
             if (!empty($data['admin_input_type']) && in_array($data['admin_input_type'], ['select', 'multiselect']) && !empty($data['rows'])) {
-                $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($data['rows'], '.id'))->find_many_assoc();
+                $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($data['rows'], 'id'))->find_many_assoc();
 
                 $rowDeleteIds = !empty($data['rowsDelete']) ? $data['rowsDelete'] : [];
 

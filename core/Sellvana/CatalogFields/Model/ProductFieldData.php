@@ -134,7 +134,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
     public function deleteProductsFieldData($p, $pfdIds) {
         foreach ($pfdIds as $setId => $pfdIds) {
             foreach ($pfdIds as $pfdId) {
-                $pfd = $this->orm('pf')->where([
+                $pfd = $this->orm('pfd')->where([
                     'pfd.product_id' => $p->id(),
                     'pfd.set_id' => $setId,
                     'pfd.field_id' => $pfdId
