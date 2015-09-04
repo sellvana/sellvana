@@ -153,7 +153,7 @@ class Sellvana_CatalogFields_Frontend extends BClass
         if (!$cnt) {
             $cnt = 6;
         }
-        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->limit($cnt);
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->select('p.*')->limit($cnt);
         $this->Sellvana_CatalogFields_Model_ProductFieldData->addOrmFilter($orm, $field, 1);
         $products = $orm->find_many();
         $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
