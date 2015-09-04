@@ -165,28 +165,6 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
     }
 
     /**
-     * Delete product field data
-     * @param  Sellvana_Catalog_Model_Product $p 
-     * @param  Array $pfdIds 
-     * @return mixed
-     */
-    public function deleteProductsFieldData($p, $pfdIds) {
-        foreach ($pfdIds as $setId => $pfdIds) {
-            foreach ($pfdIds as $pfdId) {
-                $pfd = $this->orm('pfd')->where([
-                    'pfd.product_id' => $p->id(),
-                    'pfd.set_id' => $setId,
-                    'pfd.field_id' => $pfdId
-                ])->find_one();
-
-                if ($pfd) {
-                    $pfd->set('set_id', null)->save();
-                }
-            }
-        }
-    }
-
-    /**
      * @param array $productIds
      * @return Sellvana_CatalogFields_Model_ProductFieldData[][]
      */

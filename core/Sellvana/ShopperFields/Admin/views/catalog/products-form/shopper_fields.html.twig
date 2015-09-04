@@ -270,11 +270,11 @@
          */
         function toggleActionButton(valid) {
             if (!valid) {
-                shopperModalNode.find('tbody .btn-edit').addClass('disabled');
-                shopperModalNode.find('.modal-footer button.btn-primary').addClass('disabled');
+                shopperModalNode.find('tbody .btn-edit').prop('disabled', true);
+                shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', true);
             } else {
-                shopperModalNode.find('tbody .btn-edit').removeClass('disabled');
-                shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
+                shopperModalNode.find('tbody .btn-edit').prop('disabled', false);
+                shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', false);
             }
         }
 
@@ -452,9 +452,9 @@
          */
         window.editShopperOptionLabelCallback = function(e) {
             if (currentShopper.option_serialized && !currentShopper.option_serialized[e.target.value]) {
-                shopperModalNode.find('.modal-footer button.btn-primary').addClass('disabled');
+                shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', true);
             } else {
-                shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
+                shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', false);
             }
             validateAttrs();
         }
@@ -542,7 +542,7 @@
 
                 if (this.props.editedOption !== '') {
                     toggleTab(this.props.editedOption);
-                    shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
+                    shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', false);
                     this.props.editedOption = '';
                 }
 
