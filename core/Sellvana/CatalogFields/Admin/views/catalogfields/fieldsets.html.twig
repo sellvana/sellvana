@@ -7,32 +7,17 @@
 {% set fieldsGridConfig = fieldSetsCtrl.fieldsetModalAddGridConfig() %}
 {% set fieldsGridCompiled = THIS.view('core/griddle').set('grid', fieldsGridConfig).getGridConfig() %}
 
-<div class="f-admin-main-view">
-    <div class="page-header f-admin-page-header">
-        <h1 class="f-page-title">
-            <i class="icon-file"></i>
-            {{ "Field Sets" |_ }}
-        </h1>
-        <div class="btn-group">
-            <button id="add_new_field_set" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a FieldSet" |_ }}</span></button>
-        </div>
-    </div>
-    <div class="f-admin-main">
-        {{ THIS.view('core/griddle').set('grid', fieldSetsConfig) | raw }}
-    </div>
-</div>
-
 <script>
-var mainGrid, selectedAttachGrid, fieldsAttachGrid, url;
-/**
- * Register main grid
- * @param grid
- */
-window.fieldsetGridRegister = function(grid) {
-    mainGrid = grid;
-}
-
 require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, FComModalForm, Components) {
+    var mainGrid, selectedAttachGrid, selectedAttachNode, fieldsAttachGrid, fieldsGridData, url;
+
+    /**
+     * Register main grid
+     * @param grid
+     */
+    window.fieldsetGridRegister = function(grid) {
+        mainGrid = grid;
+    }
 
     /**
      * callback function for register selected modal grid
@@ -40,6 +25,10 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
      */
     window.selectedModalGridRegister = function(grid) {
         selectedAttachGrid = grid;
+        selectedAttachNode = $(selectedAttachGrid.getDOMNode());
+        selectedAttachNode.on('removedRows.griddle', function (e, removedRows) {
+            fieldsAttachGrid.addRows(removedRows);
+        });
     }
 
     /**
@@ -57,21 +46,21 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         var selectedRows = fieldsAttachGrid.getSelectedRows();
         if (selectedRows.length) {
             var addRows = [];
-            //process selected rows
-            selectedRows.forEach(function(attachRow) {
+            selectedRows.forEach(function(attachRow, i) {
                 if (_.findWhere(fieldsAttachGrid.getRows(), {id: attachRow.id})) {
                     addRows.push(attachRow);
                 }
             });
             if (addRows.length) {
                 selectedAttachGrid.addRows(addRows);
+                fieldsAttachGrid.removeRows(addRows);
                 if (selectedAttachGrid.getRows().length) {
-                    selectedAttachGrid.addSelectedRows(fieldsAttachGrid.getSelectedRows());
+                    selectedAttachGrid.addSelectedRows(addRows);
                 }
             }
             $('#{{ fieldSetsConfig.config.id }}_selected_tab').trigger('click');
         } else {
-            alert('please choose at least one product');
+            alert('please choose at least one field');
         }
     }
 
@@ -122,10 +111,16 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 
     /**
      * callback function for top action to show modal to edit fieldset
-     * @param rows
+     * @param row
      */
-    window.showModalToEditFieldset = function(rows) {
-        modalRender(rows);
+    window.showModalToEditFieldset = function(row) {
+        var url = '{{ APP.href('catalogfields/fieldsets/fieldset_modal_selected_grid_data?set_id=') | raw }}' + row.id;
+        $.get(url, function(data) {
+            if (!row.linkedData) {
+                row.linkedData = data[1];
+            }
+            modalRender(row);
+        }, 'json');
     }
 
     /**
@@ -164,10 +159,10 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                                             React.createElement("a", { "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_form_tab', href: "#{{ fieldSetsConfig.config.id }}_form_content" }, "Field Sets")
                                     ),
                                     React.createElement("li", null,
-                                            React.createElement("a", { "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_selected_tab', href: "#{{ fieldSetsConfig.config.id }}_selected_content" }, "Linked Field")
+                                            React.createElement("a", { "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_selected_tab', href: "#{{ fieldSetsConfig.config.id }}_selected_content" }, "Linked Fields")
                                     ),
                                     React.createElement("li", { className: "active" },
-                                            React.createElement("a", { "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_fields_tab', href: "#{{ fieldSetsConfig.config.id }}_fields_content" }, "Add Fields")
+                                            React.createElement("a", { "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_fields_tab', href: "#{{ fieldSetsConfig.config.id }}_fields_content" }, "Fields")
                                     )
                             ),
                             React.createElement("div", { className: "tab-content" },
@@ -184,27 +179,54 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         var fieldsGridContainerEle = document.getElementById('{{ fieldSetsConfig.config.id }}_fields_content');
 
         var selectedGridCompiled = {{ UTIL.toJson(selectedGridCompiled) | raw }};
-        if (typeof row !== 'undefined' && typeof row === 'object') {
-            var getUrl = selectedGridCompiled.dataUrl + row.id;
-            $.get(getUrl, function(data) {
-                //selectedGridCompiled.data.data = data[1];
-                selectedAttachGrid.addRows(data[1]);
-            }, 'json');
-        }
-
         var fieldsGridCompiled = {{ UTIL.toJson(fieldsGridCompiled) | raw }};
+
         React.render(
-                React.createElement(FComGriddleComponent, { config: selectedGridCompiled}),
-                selectedGridContainerEle
+            React.createElement(FComGriddleComponent, { config: fieldsGridCompiled}),
+            fieldsGridContainerEle
         );
 
         React.render(
-                React.createElement(FComGriddleComponent, { config: fieldsGridCompiled}),
-                fieldsGridContainerEle
+            React.createElement(FComGriddleComponent, { config: selectedGridCompiled}),
+            selectedGridContainerEle
         );
+
+        // Filter data for Fields modal view
+        if (row && row.linkedData) {
+            var linkedIds = _.pluck(row.linkedData, 'id');
+            var initRows = [];
+            _(fieldsGridCompiled.data.data).each(function(row, i) {
+                if (_.contains(linkedIds, row.id)) {
+                    initRows.push(row);
+                }
+            });
+
+            if (initRows.length) {
+                fieldsAttachGrid.removeRows(initRows);
+                selectedAttachGrid.addRows(initRows);
+            }
+        }
     }
 
 });
+</script>
+
+<div class="f-admin-main-view">
+    <div class="page-header f-admin-page-header">
+        <h1 class="f-page-title">
+            <i class="icon-file"></i>
+            {{ "Field Sets" |_ }}
+        </h1>
+        <div class="btn-group">
+            <button id="add_new_field_set" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a FieldSet" |_ }}</span></button>
+        </div>
+    </div>
+    <div class="f-admin-main">
+        {{ THIS.view('core/griddle').set('grid', fieldSetsConfig) | raw }}
+    </div>
+</div>
+
+<script>
 /* Backbone Grid Section */
 // require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
 //     var mainGrid, selectedGrid, addGrid, fieldAdd = [], fieldRemove = [], currentFieldSetId = null;

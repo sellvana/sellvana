@@ -174,7 +174,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'pf.field_id'], 'f')
             ->left_outer_join('Sellvana_CatalogFields_Model_FieldOption', ['fo.id', '=', 'pf.value_id'], 'fo')
             ->left_outer_join('Sellvana_CatalogFields_Model_Set', ['fs.id', '=', 'pf.set_id'], 'fs')
-            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.table_field_type', 'fs.set_name'])
+            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.required', 'f.admin_input_type', 'f.table_field_type', 'fs.set_name'])
             ->where_in('pf.product_id', $productIds)
             ->find_many_assoc(['product_id', 'id']);
     }
@@ -219,6 +219,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                     'admin_input_type' => $row->get('admin_input_type'),
                     'value' => $value,
                     'position' => $row->get('position'),
+                    'required' => $row->get('required')
                 ];
 
                 if ($row->get('table_field_type') === 'options') {

@@ -13,7 +13,7 @@
 
                 <div class="form-group">
                     <div class="control-label col-sm-3">
-                        <label for="field_code">{{ 'Field Code'|_ }}</label>
+                        <label for="field_code">{{ 'Field Code'|_ }} *</label>
                     </div>
                     <div class="controls col-sm-8">
                         <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
@@ -21,7 +21,7 @@
                 </div>
                 <div class="form-group">
                     <div class="control-label col-sm-3">
-                        <label for="field_name">{{ 'Field Name'|_ }}</label>
+                        <label for="field_name">{{ 'Field Name'|_ }} *</label>
                     </div>
                     <div class="controls col-sm-8">
                         <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
@@ -29,7 +29,7 @@
                 </div>
                 <div class="form-group">
                     <div class="control-label col-sm-3">
-                        <label for="frontend_label">{{ 'Frontend Label'|_ }}</label>
+                        <label for="frontend_label">{{ 'Frontend Label'|_ }} *</label>
                     </div>
                     <div class="controls col-sm-8">
                         <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
@@ -48,7 +48,7 @@
                 </div>
                 <div class="form-group">
                     <div class="control-label col-sm-3">
-                        <label for="sort_order">{{ 'Sort order'|_ }}</label>
+                        <label for="sort_order">{{ 'Sort order'|_ }} *</label>
                     </div>
                     <div class="controls col-sm-8">
                         <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
@@ -331,6 +331,7 @@ CONFLICT END #}
 
 
 <script>
+var pfdRemoveIds = {};
 $('#fcom_additional_info_field_form').append('<form id="prod-new-field-form" class="form form-horizontal validate-form"></form>');
 $('#prod-new-field-modal').appendTo('#prod-new-field-form');
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
@@ -456,6 +457,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     var s = field.view.getSwitch();
                     field.set('value', s.hasClass('switch-on') ? '1' : '0');
                 }
+
                 var invalid = 0;
                 field.langFields.each(function(langField) {
                     if (langField.wysiwyg) {
@@ -469,8 +471,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 });
 
                 if (field.get('required') === '1') {
-                    field.view.$el.find('div.col-md-9:last').find('span').remove();
                     if (invalid > 0 ) {
+                        field.view.$el.find('div.col-md-9:last').find('span').remove();
                         field.view.$el.find('div.col-md-9:last').append('<span class="badge badge-important">'+invalid+'</span>');
                         flag = true;
                     }
@@ -500,6 +502,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         checkFieldSet();
         sortFieldSet();
         $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
+        $('#pfd_remove_ids').val(JSON.stringify(pfdRemoveIds));
 
         if(!$(this).valid()) {
             CustomField.checkingForm = true;
@@ -805,8 +808,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 this.undelegateEvents();
                 this.$el.removeData().unbind();
                 this.remove();
+                if (!pfdRemoveIds[this.parentSet.id]) {
+                    pfdRemoveIds[this.parentSet.id] = [];
+                }
+                pfdRemoveIds[this.parentSet.id].push(this.model.id);
                 delete this.model;
-
             }
         },
         _addLangView: function(langField) {
@@ -959,8 +965,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             //delete set.fields;
             var setModel = new CustomField.Models.FieldSet(set);
             //setModel.fields.set(fields);
-            setCollection.add(setModel);
-            remove_options(setModel);
+            if (setModel.id !== '') {
+                setCollection.add(setModel);
+                remove_options(setModel);
+            }
 
         }
         $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));

@@ -228,7 +228,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 "applyClass": "btn-success",
                 "cancelClass": "btn-default",
                 "showDropdowns": true,
-                "separator": this.props.saleDateSeparator ? this.props.saleDateSeparator : '/'
+                "separator": this.props.saleDateSeparator ? this.props.saleDateSeparator : ' / '
             };
             if (e) {
                 options.endDate = e;
@@ -307,7 +307,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 if(price.valid_from) {
                     dates += price.valid_from;
                     if(price.valid_to) {
-                        dates += this.props.saleDateSeparator ? this.props.saleDateSeparator : '/';
+                        dates += this.props.saleDateSeparator ? this.props.saleDateSeparator : ' / ';
                         dates += price.valid_to;
                     }
                 }
