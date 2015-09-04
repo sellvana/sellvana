@@ -46,6 +46,7 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         'unique_key' => ['field_name', 'field_label','field_type'],
         'related'    => ['fcom_field_id' => 'Sellvana_CatalogFields_Model_Field.id'],
     ];
+
     public function getFields($context = 'all', $where = null)
     {
         if (!static::$_indexedFields) {

@@ -52,8 +52,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ],
                     ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select',
                         'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => 'Yes', 0 => 'No'], 'default' => 1],
-                    ['type' => 'input', 'name' => 'options', 'label' => 'Options', 'width' => 200, 'editable' => 'inline',
-                        'addable' => true, 'validation' => ['required' => true]],
+                    ['type' => 'link', 'name' => 'options', 'label' => 'Options', 'width' => 200, 'style' => ['fontSize' => '12px', 'lineHeight' => '32px', 'display' => 'block', 'textAlign' => 'center'], 'value' => 'Option', 'addable' => true, 'action' => 'showModalToEditShopperField'],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 200, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true]],
                     ['type' => 'btn_group', 'buttons' => [['name' => 'edit-custom', 'callback' => 'showModalToEditShopperField', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "], ['name' => 'delete']]]
@@ -84,5 +83,56 @@ class Sellvana_ShopperFields_Admin extends BClass
         ];
 
         return $config;
+    }
+
+    public function frontendOptionsGrid() {
+        $config = [
+            'config' => [
+                'id' => 'options-grid',
+                'caption' => 'Options Grid',
+                'data_mode' => 'local',
+                'data' => [],
+                'columns' => [
+                    ['type' => 'row_select'],
+                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
+                    ['type' => 'input', 'name' => 'label', 'label' => 'Option', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
+                    ['type' => 'input', 'name' => 'sku', 'label' => 'Sku', 'width' => 150, 'editable' => 'inline', 'sortable' => false],
+                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'cssClass' => 'optionPositionUnique ', 'callback' => 'editShopperOptionPositionCallback'],
+                    ['type' => 'btn_group', 'buttons' => [
+                            ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit ", 'textValue' => 'Edit Price', "icon" => " icon-dollar", 'attrs' => ['data-toggle' => 'tooltip', 'title' => 'Update Prices', 'data-placement' => 'top']], 
+                            ['name' => 'delete']
+                        ]
+                    ]
+                ],
+                'filters' => [
+                    '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
+                ],
+                'actions' => [
+                    //'new' => ['caption' => 'Add Fields'],
+                    'add-new-field-option' => [
+                        'caption'  => 'Add New Option',
+                        'type'     => 'button',
+                        'id'       => 'add-new-field-option',
+                        'class'    => 'btn-primary',
+                        'callback' => 'insertNewFieldOption'
+                    ],/*
+                    'add-prices' => [
+                        'caption'  => 'Add Prices',
+                        'type'     => 'button',
+                        'id'       => 'add-prices',
+                        'class'    => 'btn-info',
+                        'callback' => 'addPrices'
+                    ],*/
+                    'delete' => ['caption' => 'Remove']
+                ],
+                'callbacks' => [
+                    'componentDidMount' => 'optionsGridRegister'
+                ],
+                'grid_before_create' => 'optionsGridRegister'
+            ]
+        ];
+
+        return $config;
+
     }
 }

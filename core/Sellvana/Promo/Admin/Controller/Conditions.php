@@ -217,7 +217,7 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
 
         if ($fieldType == 'field') {
             if ($field) {
-                $options = $this->Sellvana_CatalogFields_Model_FieldOption->getListAssocbyId($field->id());
+                $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field->id());
             } else {
                 $options = [];
             }

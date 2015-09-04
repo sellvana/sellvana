@@ -362,7 +362,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
     public function action_options()
     {
         $id = $this->BRequest->get('id');
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getListAssocById($id);
+        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($id);
 
         $this->BResponse->json(
             [
@@ -456,7 +456,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
 
             // save options in case field is dropdown
             if (!empty($data['admin_input_type']) && in_array($data['admin_input_type'], ['select', 'multiselect']) && !empty($data['rows'])) {
-                $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($data['rows'], 'id'))->find_many_assoc();
+                $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($data['rows'], '.id'))->find_many_assoc();
 
                 $rowDeleteIds = !empty($data['rowsDelete']) ? $data['rowsDelete'] : [];
 
@@ -494,7 +494,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
         $hlp = $this->Sellvana_CatalogFields_Model_FieldOption;
         $op = 0;
 
-        $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], 'id'))->find_many_assoc();
+        $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], '.id'))->find_many_assoc();
         foreach ($p['rows'] as $row) {
             if (!empty($models[$row['id']])) {
                 $models[$row['id']]->set('label', $row['label'])->save();
