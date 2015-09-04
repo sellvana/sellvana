@@ -122,6 +122,10 @@ class Sellvana_CatalogIndex_Main extends BClass
 
     public function onCustomFieldAfterSave($args)
     {
+        if ($this->BDebug->is(BDebug::MODE_INSTALLATION)) {
+            return true;
+        }
+
         if (static::$_autoReindex && !$args['model']->isNewRecord()) {
             $indexField = $this->Sellvana_CatalogIndex_Model_Field->load($args['model']->field_code, 'field_name');
             if ($indexField) {

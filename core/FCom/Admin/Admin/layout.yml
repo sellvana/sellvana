@@ -276,6 +276,17 @@ form:
         #- [ requireJs, ModalLauncher, "@FCom_Admin/Admin/js/BackboneViews/ModalLauncher" ]
         #- [ requireJs, FormView, "@FCom_Admin/Admin/js/BackboneViews/FormView" ]
             - [ css, "@FCom_LibJsCommon/js/css/dragtable-akottr.css" ]
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - visitors-totals
+                -
+                    title: Visitors
+                    icon: group
+                    view: dashboard/visitors-totals
+                    cols: 2
+                    async: true
 
 /denied:
     - { include: base }

@@ -1567,6 +1567,9 @@ class BMigrate extends BClass
         }
 
         $this->BResponse->startLongResponse();
+
+        $this->BDebug->mode(BDebug::MODE_INSTALLATION);
+
         $view = $this->BView;
         echo '<html><body><h1>Migrating modules DB structure...</h1><pre>';
         $i = 0;
