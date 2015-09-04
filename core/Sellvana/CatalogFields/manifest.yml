@@ -1,6 +1,6 @@
 modules:
     Sellvana_CatalogFields:
-        version: 0.5.7.0
+        version: 0.5.8.0
         channel: alpha
         require: { module: { Sellvana_Catalog: 0.2.1 } }
         translations: { en: en.php }
@@ -29,6 +29,7 @@ modules:
                 observe:
                     - [ "Sellvana_Catalog_Admin_Controller_Products::gridColumns", Sellvana_CatalogFields_Admin.onProductGridColumns ]
                     - [ "Sellvana_Catalog_Admin_Controller_Products::formViewBefore", Sellvana_CatalogFields_Admin.onProductsFormViewBefore ]
+                    - [ "Sellvana_Catalog_Admin_Controller_Products::formPostBefore", Sellvana_CatalogFields_Admin.onProductFormPostBefore ]
                     - [ "Sellvana_Catalog_Admin_Controller_Products::formPostAfter:afterValidate", Sellvana_CatalogFields_Admin.onProductFormPostAfterValidate ]
                 security:
                     request_fields_whitelist:

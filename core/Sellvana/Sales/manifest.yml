@@ -13,6 +13,7 @@ modules:
                     default_shipping_method: plain
                     order_number: "0000000"
                     cart_cookie_token_ttl_days: 30
+                    orders_late_limit: 25
 
         areas:
             FCom_Admin:

@@ -15,6 +15,7 @@
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
+ * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
  */
 class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
 {
@@ -311,7 +312,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
     {
         $pId = $model->id();
         $data = $this->Sellvana_CatalogFields_Model_ProductFieldData->getProductFieldSetData([$pId]);
-        return $this->BUtil->toJson($data[$pId]);
+        return !empty($data[$pId]) ? $data[$pId] : [];
     }
 
     public function fieldsetAry()
@@ -340,7 +341,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         );
         foreach ($fields as &$field) {
             if ($field['admin_input_type'] === 'select' ||  $field['admin_input_type'] === 'multiselect') {
-                $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field['id']);
+                $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field['id'], false, 'label');
             }
         }
 

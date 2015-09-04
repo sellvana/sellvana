@@ -60,7 +60,7 @@ class Sellvana_CatalogFields_Main extends BClass
      */
     public function onProductAfterSave($args)
     {
-        $this->Sellvana_CatalogFields_Model_ProductFieldData->saveProductsFieldData([$args['model']]);
+        //$this->Sellvana_CatalogFields_Model_ProductFieldData->saveProductsFieldData([$args['model']]);
     }
 
     /**

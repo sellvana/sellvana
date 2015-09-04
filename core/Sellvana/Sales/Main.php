@@ -275,6 +275,15 @@ class Sellvana_Sales_Main extends BClass
             'filter' => true,
             'permission' => 'sales/orders'
         ]);
+        $view->addWidget('orders-late', [
+            'title' => 'Late Orders',
+            'icon' => 'inbox',
+            'cols' => 4,
+            'view' => 'dashboard/orders-late',
+            'async' => true,
+            'filter' => false,
+            'permission' => 'sales/orders'
+        ]);
     }
 
     public function workflowAction($actionName, $args = [])
