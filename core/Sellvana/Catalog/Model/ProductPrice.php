@@ -274,7 +274,12 @@ class Sellvana_Catalog_Model_ProductPrice
         parent::onAfterLoad();
     }
 
-    public function collectProductsPrices($products, $context = null)
+    /**
+     * @param Sellvana_Catalog_Model_Product[] $products
+     * @param array $context
+     * @return $this
+     */
+    public function collectProductsPrices($products, $context = [])
     {
         if (!$products) {
             return $this;
@@ -327,7 +332,7 @@ class Sellvana_Catalog_Model_ProductPrice
             ]]);
         }
 
-        if (empty($context['variants'])) {
+        if (!empty($context['no_variants'])) {
             $orm->where_null('variant_id');
         }
 

@@ -1,6 +1,6 @@
 {% set cnt = THIS.get('cnt') ?: 6 %}
 {% set flagField = THIS.get('field') %}
-{% set products = APP.instance('Sellvana_Catalog_Frontend').getCustomFlagProducts(flagField, cnt) %}
+{% set products = APP.instance('Sellvana_CatalogFields_Frontend').getCustomFlagProducts(flagField, cnt) %}
 {% set baseClasses = THIS.get('base_classes')|default(['f-widget', 'f-widget-featured-prods', 'f-prod-listing', 'f-prod-listing-grid']) %}
 {% set customClasses = THIS.get('custom_classes')|default([]) %}
 {% set gridLabel = THIS.get('label')|default('More Products') %}

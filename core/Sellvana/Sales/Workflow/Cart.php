@@ -173,12 +173,13 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
                 continue;
             }
             $p = $item['product'] = $products[$item['id']];
+            $costModel = $p->getPriceModelByType('cost');
             $item['details'] = [
                 'qty' => $item['qty'],
                 'product_id' => $p->id(),
                 'product_sku' => $p->get('product_sku'),
                 'inventory_sku' => $p->get('inventory_sku'),
-                'cost' => ($p->getPriceModelByType('cost')) ? $p->getPriceModelByType('cost')->getPrice() : null,
+                'cost' => $costModel ? $costModel->getPrice() : null,
                 #'manage_inventory' => $p->get('manage_inventory'),
             ];
 

@@ -656,7 +656,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $this->_processInventoryPost($model, $data);
                 $this->_processSystemLangFieldsPost($model, $data);
                 $this->_processPricesPost($model, $data);
-                $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
+                $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => &$data]);
+                $this->_processVariantPricesPost($model, $data);
                 $model->save();
             }
         }
@@ -1125,20 +1126,35 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $this->Sellvana_Catalog_Model_Product->orm()->select('url_key')->iterate($callback);
     }
 
+    /**
+     * Save product prices
+     * @param  [object] $model
+     * @param  [array] $data
+     * @return mixed
+     */
     protected function _processPricesPost($model, $data)
     {
-        if(empty($data['prices']) && empty($data['variantPrice'])){
+        if(empty($data['productPrice'])){
             return;
         }
-
-        // Process product prices
-        if (!empty($data['prices']['productPrice'])) {
-            $this->_savePrices($model, $data['prices']['productPrice']);
-        }
+        
+        $this->_savePrices($model, $data['productPrice']);
         
         // Process delete product prices
         if (!empty($data['prices']['delete'])) {
             $this->_deletePrices($data['prices']['delete']);
+        }
+    }
+
+    /**
+     * Save product variants prices
+     * @param  [object] $model
+     * @param  [array] $data
+     * @return mixed
+     */
+    protected function _processVariantPricesPost($model, $data) {
+        if (empty($data['variantPrice'])) {
+            return;
         }
 
         // Process variant prices
@@ -1195,7 +1211,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function action_skus()
     {
-
         $r       = $this->BRequest;
         $page    = $r->get('page')?: 1;
         $skuTerm = $r->get('q');
@@ -1226,101 +1241,5 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
 
         $this->BResponse->json($result);
-    }
-
-    public function getLatestNewProducts(){
-        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/latest_new_limit');
-        if (!$limit) {
-            $limit = 25;
-        }
-        $products = $this->Sellvana_Catalog_Model_Product->orm('p')
-            ->join('Sellvana_Catalog_Model_CategoryProduct', ['p.id', '=', 'cp.product_id'], 'cp')
-            ->join('Sellvana_Catalog_Model_Category', ['c.id', '=', 'cp.category_id'], 'c')
-            ->select([
-                'p.product_sku',
-                'p.product_name',
-                'p.create_at'
-            ])
-            ->select_expr('GROUP_CONCAT(c.node_name SEPARATOR "\n ")', 'categories')
-            ->group_by('p.id')
-            ->order_by_desc('p.create_at')
-            ->limit($limit);
-
-        return $products->find_many();
-    }
-
-    public function getProductsWithoutImages(){
-        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/products_without_images_limit');
-        if (!$limit) {
-            $limit = 25;
-        }
-
-        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
-        $tMedia = $this->Sellvana_Catalog_Model_ProductMedia->table();
-
-        $products = $this->Sellvana_Catalog_Model_Product->orm('p')
-            ->raw_join("INNER JOIN (
-                SELECT `sub_p`.`id`, IFNULL(COUNT(sub_m.id), 0) as `image_count`
-                FROM {$tProduct} sub_p
-                LEFT JOIN {$tMedia} sub_m ON (sub_m.product_id = sub_p.id)
-                GROUP BY `sub_p`.`id`
-                )", 'm.id = p.id', 'm')
-            ->group_by('p.id')
-            ->select([
-                'p.product_sku',
-                'p.product_name'
-            ])
-            ->where_equal('m.image_count', 0)
-            ->order_by_asc('p.update_at')
-            ->limit($limit);
-
-        return $products->find_many();
-    }
-
-    public function getSearchesRecentTerms() {
-        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/searches_recent_terms_limit');
-        if (!$limit) {
-            $limit = 25;
-        }
-
-        $terms = $this->Sellvana_Catalog_Model_SearchHistory->orm('sh')
-            ->select(['sh.query'])
-            ->order_by_desc('sh.last_at')
-            ->limit($limit);
-
-        return $terms->find_many();
-    }
-
-    /**
-     * @param ORM $orm
-     * @param string $field
-     */
-    protected function _processFilters($orm, $field = 'p.create_at')
-    {
-        $filter = $this->BApp->get('dashboard_date_filter');
-        $cond = $field . ' ' . $filter['condition'];
-
-        if ($filter) {
-            $orm->where_raw($cond, $filter['params']);
-        }
-    }
-
-    public function getSearchesTopTerms() {
-        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/searches_top_terms_limit');
-        if (!$limit) {
-            $limit = 25;
-        }
-
-        $terms = $this->Sellvana_Catalog_Model_SearchHistoryLog->orm('shl')
-            ->inner_join('Sellvana_Catalog_Model_SearchHistory', ['shl.query_id', '=', 'sh.id'], 'sh')
-            ->select(['sh.query'])
-            ->select_expr('COUNT(sh.id)', 'qty')
-            ->group_by('shl.query_id')
-            ->order_by_desc('qty')
-            ->limit($limit);
-
-        $this->_processFilters($terms, 'shl.create_at');
-
-        return $terms->find_many();
     }
 }

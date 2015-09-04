@@ -1336,7 +1336,7 @@ class BORM extends ORMWrapper
         $class = $this->_origClass();
         BEvents::i()->fire($class . '::find_many:orm', ['orm' => $this, 'class' => $class]);
         $result = parent::find_many();
-        BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'class' => $class]);
+        BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'orm' => $this, 'class' => $class]);
         return $result;
     }
 
@@ -1494,8 +1494,11 @@ class BORM extends ORMWrapper
      * @param null $table_alias
      * @return $this
      */
-    protected function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
-        if (!isset(self::$_classTableMap[$table])) {
+    protected function _add_join_source($join_operator, $table, $constraint, $table_alias = null)
+    {
+        if ($table instanceof BModel) {
+            self::$_classTableMap[$table] = $table->table();
+        } elseif (!isset(self::$_classTableMap[$table])) {
             if (class_exists($table) && is_subclass_of($table, 'BModel')) {
                 $class = BClassRegistry::className($table);
                 self::$_classTableMap[$table] = $class::table();
@@ -2396,9 +2399,10 @@ class BModel extends Model
     * Use XXX::i()->orm($alias) instead
     *
     * @param string|null $class_name optional
+    * @param string|null $context
     * @return BORM
     */
-    public static function factory($class_name = null)
+    public static function factory($class_name = null, $context = null)
     {
         if (null === $class_name) { // ADDED
             $class_name = get_called_class();
@@ -2414,6 +2418,7 @@ class BModel extends Model
             static::$_readConnectionName ? static::$_readConnectionName : static::$_connectionName,
             static::$_writeConnectionName ? static::$_writeConnectionName : static::$_connectionName
         );
+        $orm->set('_context', $context); // ADDED
         $orm->table_alias('_main');
         return $orm;
     }
@@ -2422,11 +2427,12 @@ class BModel extends Model
     * Alias for self::factory() with shortcut for table alias
     *
     * @param string $alias table alias
+    * @param string $context
     * @return BORM
     */
-    public static function orm($alias = null)
+    public static function orm($alias = null, $context = null)
     {
-        $orm = static::factory();
+        $orm = static::factory(null, $context);
         static::_findOrm($orm);
         if ($alias) {
             $orm->table_alias($alias);

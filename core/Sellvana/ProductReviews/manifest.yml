@@ -1,6 +1,6 @@
 modules:
     Sellvana_ProductReviews:
-        version: 0.5.1.0
+        version: 0.5.2.0
         channel: alpha
         require: { module: { Sellvana_Catalog: 0.1.0, Sellvana_Customer: 0.1.3, Sellvana_CatalogIndex: 0.1.0, Sellvana_Sales: 0.5.4.0 } }
         translations: { en: en.php }
@@ -21,7 +21,6 @@ modules:
                     - [ /prodreviews/.action, Sellvana_ProductReviews_Admin_Controller ]
                 observe:
                     - [ "BLayout::hook:catalog/products/tab/main", Sellvana_ProductReviews_Admin.hookProductTab ]
-                    - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_ProductReviews_Admin.onGetDashboardWidgets ]
 
             FCom_Frontend:
                 routing:

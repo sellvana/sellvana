@@ -82,7 +82,7 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
             if ($storeCurrency != $baseCurrency) {
                 $storeCurrencySubtotal = $item->calcRowTotal(true);
             } else {
-                $storeCurrencySubtotal = $subtotal;
+                $storeCurrencySubtotal = $rowTotal;
             }
 
             $item->set('row_total', $rowTotal)->setData('store_currency/row_total', $storeCurrencySubtotal);

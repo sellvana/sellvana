@@ -13,7 +13,7 @@ class Sellvana_Catalog_Admin_Controller_Report_LowInventory extends FCom_Admin_C
     protected $_mainTableAlias = 'i';
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/catalog/low_inventory';
-    protected $_gridHref = 'catalog/report/low_inventory';
+    protected $_gridHref = 'catalog/report/inventory/low_inventory';
     protected $_gridTitle = 'Low Inventory';
 
     protected $_statDays = [7, 30, 90, 180];

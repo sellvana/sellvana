@@ -20,21 +20,4 @@ class Sellvana_ProductReviews_Admin extends BClass
             'settings/Sellvana_ProductReviews' => BLocale::i()->_('Product Reviews Settings'),
         ]);
     }
-
-    /**
-     * @param array $args
-     */
-    public function onGetDashboardWidgets($args)
-    {
-        $view = $args['view'];
-        $view->addWidget('latest-product-reviews', [
-            'title' => 'Latest Product Reviews',
-            'icon' => 'inbox',
-            'view' => 'dashboard/latest-product-reviews',
-            'cols' => 4,
-            'async' => true,
-            'filter' => false,
-            'permission' => 'product_review'
-        ]);
-    }
 }
