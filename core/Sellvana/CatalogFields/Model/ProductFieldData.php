@@ -294,4 +294,19 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             return false;
         }
     }
+
+    public function addOrmFilter(BORM $orm, $fieldCode, $value)
+    {
+        $field = $this->Sellvana_CatalogFields_Model_Field->getField($fieldCode);
+        $fAlias = "f_{$fieldCode}";
+        $pfdAlias = "pfd_{$fieldCode}";
+        $pfdColumn = static::$_fieldTypeColumns[$field->get('table_field_type')];
+
+        $orm->join('Sellvana_CatalogFields_Model_ProductFieldData', ["{$pfdAlias}.product_id", '=', 'p.id'], $pfdAlias)
+            ->join('Sellvana_CatalogFields_Model_Field', ["{$fAlias}.id", '=', "{$pfdAlias}.field_id"], $fAlias)
+            ->where("{$fAlias}.field_code", $fieldCode)
+            ->where("{$pfdAlias}.{$pfdColumn}", $value);
+
+        return $this;
+    }
 }
