@@ -26,6 +26,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
         'varchar'       => 'value_var',
         'text'          => 'value_text',
         'int'           => 'value_int',
+        'tinyint'       => 'value_int',
         'decimal'       => 'value_dec',
         'date'          => 'value_date',
         'datetime'      => 'value_date',

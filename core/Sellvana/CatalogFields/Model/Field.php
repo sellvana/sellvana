@@ -37,6 +37,7 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
             'varchar'      => 'Short Text',
             'text'         => 'Long Text',
             'int'          => 'Integer',
+            'tinyint'      => 'Tiny Integer',
             'decimal'      => 'Decimal',
             'date'         => 'Date',
             'datetime'     => 'Date/Time',
