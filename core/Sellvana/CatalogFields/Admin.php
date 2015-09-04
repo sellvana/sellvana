@@ -410,4 +410,28 @@ class Sellvana_CatalogFields_Admin extends BClass
             }
         }
     }
+
+    public function onProductFormPostBefore($args)
+    {
+        /** @var Sellvana_Catalog_Model_Product $product */
+        $customFieldsData = $this->BUtil->fromJson($this->BRequest->post('custom_fields'));
+        $product = &$args['model'];
+        if (!$customFieldsData || !$product->id()) {
+            return;
+        }
+
+        $productFields = $this->Sellvana_CatalogFields_Model_ProductFieldData->orm('pf')
+            ->where_equal('product_id', $product->id())
+            ->group_by('field_id')
+            ->find_many_assoc('field_id', 'field_id');
+
+        foreach ($customFieldsData as $fieldSetData) {
+            foreach ($fieldSetData['fields'] as $fieldData) {
+                if (in_array($fieldData['id'], $productFields)) {
+                    unset($productFields[$fieldData['id']]);
+                }
+            }
+        }
+        $product->set('_custom_fields_remove', $productFields);
+    }
 }

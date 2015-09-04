@@ -362,8 +362,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     };
     var currentSet = null;
-    {% set initialData = APP.instance('Sellvana_CatalogFields_Model_ProductFieldData').getProductFieldSetData([model.id()]) %}
-    var initialData = {{ UTIL.toJson(initialData[model.id()]) | raw }};
+    {% set initialData = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products').getInitialData(model) %}
+    var initialData = {{ UTIL.toJson(initialData) | raw }};
 
     function refresh_selects()
     {
