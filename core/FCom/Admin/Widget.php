@@ -31,22 +31,20 @@ abstract class FCom_Admin_Widget extends BClass
     const            DEFAULT_LIMIT_CONFIG_PATH = 'modules/FCom_Admin/default_dashboard_widget_limit';
 
     static protected $_defaultLimit;
-    protected        $_limit;
-
-    public           $limitConfigPath = self::DEFAULT_LIMIT_CONFIG_PATH;
-
+    protected        $_limit = [];
 
     /**
      * Get row limit from the config
      * @return int
      */
-    public function getLimit()
+    public function getLimit($key = self::DEFAULT_LIMIT_CONFIG_PATH)
     {
-        if (null !== $this->_limit) {
-            return $this->_limit;
+
+        if (array_key_exists($key, $this->_limit)) {
+            return $this->_limit[$key];
         }
 
-        $limit = $this->BConfig->get($this->limitConfigPath);
+        $limit = $this->BConfig->get($key);
 
         if (null === $limit) {
             if (null === self::$_defaultLimit) {
@@ -56,8 +54,8 @@ abstract class FCom_Admin_Widget extends BClass
             $limit = self::$_defaultLimit;
         }
 
-        return $limit;
-    }
+        $this->_limit[$key] = $limit;
 
-    abstract public function getData();
+        return $this->_limit[$key];
+    }
 }

@@ -24,24 +24,23 @@
  */
 
 /**
- * Class Sellvana_ProductReviews_Admin_Dashboard_LatestProductReviews
+ * Class Sellvana_ProductReviews_Admin_Dashboard
  *
+ * @property Sellvana_ProductReviews_Model_Review $Sellvana_ProductReviews_Model_Review
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  */
-class Sellvana_ProductReviews_Admin_Dashboard_LatestProductReviews extends FCom_Admin_Widget
+class Sellvana_ProductReviews_Admin_Dashboard extends FCom_Admin_Widget
 {
-    static protected $_origClass      = __CLASS__;
-    protected        $_modelClass     = 'Sellvana_ProductReviews_Model_Review';
-
-    public           $limitConfigPath = 'modules/Sellvana_ProductReviews/latest-product-reviews-limit';
+    static protected $_origClass = __CLASS__;
+    protected        $_modelClass = 'Sellvana_ProductReviews_Model_Review';
 
     /**
-     * Get short data of latest new product reviews
      * @return array
      */
-    public function getData()
+    public function getLatestProductReviews()
     {
+        $limitConfigPath = 'modules/Sellvana_ProductReviews/latest-product-reviews-limit';
 
         $orm = $this->{$this->_modelClass}->orm('pr')
             ->join($this->Sellvana_Catalog_Model_Product->table(), ['p.id', '=', 'pr.product_id'], 'p')
@@ -53,7 +52,7 @@ class Sellvana_ProductReviews_Admin_Dashboard_LatestProductReviews extends FCom_
                 'pr.rating'
             ])
             ->order_by_desc('pr.create_at')
-            ->limit($this->getLimit());
+            ->limit($this->getLimit($limitConfigPath));
 
         return $orm->find_many();
     }

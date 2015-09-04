@@ -1,5 +1,5 @@
-{% set orders = APP.instance('Sellvana_Sales_Admin_Controller_Orders').getLateOrders() %}
-{% set ordersCount = APP.instance('Sellvana_Sales_Admin_Controller_Orders').getLateOrdersCount() %}
+{% set orders = APP.instance('Sellvana_Sales_Admin_Dashboard').getLateOrders() %}
+{% set ordersCount = APP.instance('Sellvana_Sales_Admin_Dashboard').getLateOrdersCount() %}
 <div class='box-content' style="height: 300px; overflow-y: scroll">
     {#<div id='stats-chart1'></div>#}
     <table class="table table-bordered table-hover table-striped">

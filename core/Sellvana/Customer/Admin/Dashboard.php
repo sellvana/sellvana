@@ -24,30 +24,29 @@
  */
 
 /**
- * Class Sellvana_Sales_Admin_Dashboard_OrdersTotals
+ * Class Sellvana_Customer_Admin_Dashboard
  *
- * @property Sellvana_Sales_Model_StateCustom $Sellvana_Sales_Model_StateCustom
- * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
+ * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  */
-class Sellvana_Sales_Admin_Dashboard_OrdersTotals extends Sellvana_Sales_Admin_Dashboard_Abstract
+class Sellvana_Customer_Admin_Dashboard extends FCom_Admin_Widget
 {
-    static protected $_origClass = __CLASS__;
-    protected        $_modelClass = 'Sellvana_Sales_Model_StateCustom';
+    static protected $_origClass      = __CLASS__;
+    protected        $_modelClass     = 'Sellvana_Customer_Model_Customer';
 
     /**
      * @return array
      */
-    public function getData()
+    public function getCustomerRecent()
     {
-        $orm = $this->Sellvana_Sales_Model_StateCustom->orm('s')
-            ->left_outer_join($this->Sellvana_Sales_Model_Order->table(), ['o.state_custom', '=', 's.state_code'], 'o')
-            ->group_by('s.id')
-            ->select_expr('COUNT(o.id)', 'order')
-            ->where('s.entity_type', 'order')
-            ->select(['s.id', 's.state_label']);
+        $dayLimit = $this->BConfig->get('modules/Sellvana_Customer/recent_day');
 
-        $this->_processFilters($orm);
-
+        $orm = $this->{$this->_modelClass}->orm()
+            ->select(['id' , 'email', 'firstname', 'lastname', 'create_at', 'status'])
+            ->order_by_desc('create_at');
+        if ($dayLimit) {
+            $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - $dayLimit * 86400);
+            $orm->where_gte('create_at', $recent);
+        }
         return $orm->find_many();
     }
 }

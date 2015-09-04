@@ -24,26 +24,30 @@
  */
 
 /**
- * Class Sellvana_Sales_Admin_Dashboard_AvgOrderValue
+ * Class Sellvana_Email_Admin_Dashboard
  *
- * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
+ * @property Sellvana_Email_Model_Pref $Sellvana_Email_Model_Pref
  */
-class Sellvana_Sales_Admin_Dashboard_AvgOrderValue extends Sellvana_Sales_Admin_Dashboard_Abstract
+class Sellvana_Email_Admin_Dashboard extends FCom_Admin_Widget
 {
-    static protected $_origClass = __CLASS__;
-    protected        $_modelClass = 'Sellvana_Sales_Model_Order';
+    static protected $_origClass      = __CLASS__;
+    protected        $_modelClass     = 'Sellvana_Email_Model_Pref';
+
+    public           $limitConfigPath = 'modules/Sellvana_Email/latest_new_limit';
 
     /**
      * @return array
      */
-    public function getData()
-    {
-        $orm = $this->{$this->_modelClass}->orm('o')
-            ->select_expr('AVG(o.grand_total)', 'avg_total');
+    public function getLatestNewsletterSubscriptions(){
 
-        $this->_processFilters($orm);
+        $orm = $this->{$this->_modelClass}->orm('p')
+            ->select([
+                'p.email'
+            ])
+            ->where('p.sub_newsletter', '1')
+            ->order_by_desc('p.create_at')
+            ->limit($this->getLimit());
 
-        $result = (float)$orm->find_one()->get('avg_total');
-        return number_format($result, 2);
+        return $orm->find_many();
     }
 }

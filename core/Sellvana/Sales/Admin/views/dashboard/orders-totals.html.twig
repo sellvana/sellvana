@@ -1,4 +1,4 @@
-{% set orderTotal = APP.instance('Sellvana_Sales_Admin_Dashboard_OrdersTotals').getData() %}
+{% set orderTotal = APP.instance('Sellvana_Sales_Admin_Dashboard').getOrderTotal() %}
 
 <div class='row'>
     {% for order in orderTotal %}

@@ -208,23 +208,4 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
                 break;
         }
     }
-
-    public function getLowStockProducts()
-    {
-        $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/notify_administrator_quantity');
-
-        $products = $this->Sellvana_Catalog_Model_InventorySku->orm('i')
-            ->select(['i.inventory_sku', 'i.title', 'i.qty_in_stock'])
-            ->where('i.manage_inventory', 1);
-
-        if (!$defaultMinQty) {
-            $products->where_not_null('i.qty_notify_admin')
-                ->where_raw('i.qty_in_stock <= i.qty_notify_admin');
-        } else {
-            $defaultMinQty--;
-            $products->where_raw("i.qty_in_stock <= IFNULL(i.qty_notify_admin, {$defaultMinQty})");
-        }
-
-        return $products->find_many();
-    }
 }

@@ -381,30 +381,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         }
     }
 
-    public function getTopProducts()
-    {
-        $limit = $this->BConfig->get('modules/Sellvana_Sales/top_products');
-        $items = $this->Sellvana_Sales_Model_Order->orm('o')
-            ->join('Sellvana_Sales_Model_Order_Item', 'oi.order_id = o.id', 'oi')
-            ->join('Sellvana_Catalog_Model_Product', 'p.id = oi.product_id', 'p')
-            ->select_expr('SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2))))', 'profit_fixed');
-        $this->_processFilters($items);
-        $totals = clone $items;
-        $total_profit = $totals->find_one()->get('profit_fixed') ?: 0;
-        $profitExpr = "ROUND(SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2)))) * 100 / {$total_profit}, 2)";
-        $items->select('p.*')
-            ->select_expr('SUM(oi.row_total)', 'revenue')
-            ->select_expr('SUM(oi.qty_ordered)', 'qty')
-            ->select_expr($profitExpr, 'profit_pc')
-            ->group_by('oi.product_id')
-            ->order_by_expr($profitExpr . ' DESC');
-        if ($limit) {
-            $items->limit($limit);
-        }
 
-        $result = $items->find_many();
-        return $result;
-    }
 
     public function action_validate_order_number__POST()
     {
@@ -780,64 +757,6 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         ];
 
         return ['config' => $config];
-    }
-
-    /**
-     * @return $this|ORM
-     */
-    protected function _getLateOrdersPrepare()
-    {
-        $state = $this->Sellvana_Sales_Model_Order_State_Overall->origClass();
-
-        $ignoreStateList = [
-//            $state::PENDING,
-//            $state::PLACED,
-//            $state::REVIEW,
-//            $state::FRAUD,
-//            $state::LEGIT,
-//            $state::PROCESSING,
-//            $state::BACKORDERED,
-            $state::COMPLETE,
-//            $state::CANCEL_REQUESTED,
-            $state::CANCELED,
-            $state::ARCHIVED
-        ];
-
-        $limit = $this->BConfig->get('modules/Sellvana_Sales/orders_late_day');
-
-        $orders = $this->Sellvana_Sales_Model_Order->orm('o')
-            ->select([
-                'o.unique_id',
-                'o.create_at',
-                'o.update_at'
-            ])
-            ->where_not_in('o.state_overall', $ignoreStateList);
-
-        if ($limit) {
-            $orders->where_raw("DATE_ADD(o.update_at, INTERVAL {$limit} DAY) < NOW()");
-        }
-
-        return $orders;
-    }
-
-    public function getLateOrders()
-    {
-        $limit = $this->BConfig->get('modules/Sellvana_Sales/orders_late_limit');
-        if (!$limit) {
-            $limit = 25;
-        }
-
-        $orders = $this->_getLateOrdersPrepare();
-        $orders->limit($limit);
-
-        return $orders->find_many();
-    }
-
-    public function getLateOrdersCount()
-    {
-        $orders = $this->_getLateOrdersPrepare();
-
-        return $orders->count();
     }
 }
 
