@@ -28,3 +28,16 @@ base:
 
 /header_search:
     - { hook: main, views: 'header-search/Sellvana_Customer' }
+
+/:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - customers-list
+                -
+                    title: Recent Customers
+                    icon: group
+                    view: dashboard/customers-list
+                    async: true
+                    permission: customers/manage

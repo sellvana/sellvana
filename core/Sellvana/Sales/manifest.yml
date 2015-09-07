@@ -1,6 +1,6 @@
 modules:
     Sellvana_Sales:
-        version: 0.5.4.0
+        version: 0.5.5.0
         channel: alpha
         require: { module: { FCom_Core: 0.1.0, Sellvana_Customer: 0.1.0, FCom_LibJsFlot: 0.1.0 } }
         description: "Fundamental Sales functionality"
@@ -13,6 +13,7 @@ modules:
                     default_shipping_method: plain
                     order_number: "0000000"
                     cart_cookie_token_ttl_days: 30
+                    orders_late_limit: 25
 
         areas:
             FCom_Admin:
@@ -38,7 +39,6 @@ modules:
                     - [ /sales/report/product_history/?.action, Sellvana_Sales_Admin_Controller_Report_ProductHistory ]
                 observe:
                     - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_Sales_Main.checkDefaultShippingPayment ]
-                    - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Sales_Main.onGetDashboardWidgets ]
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", Sellvana_Sales_Admin_Controller_Orders.onSaveAdminSettings ]
                     - [ "FCom_Admin_Controller_HeaderSearch::action_index", Sellvana_Sales_Admin_Controller_Orders.onHeaderSearch  ]
 

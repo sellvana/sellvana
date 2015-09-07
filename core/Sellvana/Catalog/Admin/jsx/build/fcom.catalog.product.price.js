@@ -201,6 +201,14 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }
         },
         initDateInput: function () {
+            if (!this.props.data.valid_from) {
+                this.props.data['valid_from'] = null;
+            }
+
+            if (!this.props.data.valid_to) {
+                this.props.data['valid_to'] = null;
+            }
+
             var s = this.props.data.valid_from, e = this.props.data.valid_to;
             var dateField = this.refs.salePeriod;
             if (!s) {
@@ -220,12 +228,28 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 "applyClass": "btn-success",
                 "cancelClass": "btn-default",
                 "showDropdowns": true,
-                "separator": this.props.saleDateSeparator ? this.props.saleDateSeparator : '/'
+                "separator": this.props.saleDateSeparator ? this.props.saleDateSeparator : ' / '
             };
             if (e) {
                 options.endDate = e;
             }
             input.daterangepicker(options);
+
+            if (this.props.isLocalMode()) {
+                // Apply sale_period data for local mode
+                input.on('apply.daterangepicker', function(ev, picker) {
+                    var dates = input.val();
+
+                    if (dates && dates.split(options.separator).length) {
+                        this.props.data.valid_from = dates.split(options.separator)[0];
+                        $(this.refs.validFrom.getDOMNode()).val(this.props.data.valid_from);
+
+                        this.props.data.valid_to = dates.split(options.separator)[1];
+                        $(this.refs.validTo.getDOMNode()).val(this.props.data.valid_to);
+                    }
+
+                }.bind(this));
+            }
             //todo set setStartDate and setEndDate
         },
         getFieldName: function (obj, field) {
@@ -277,18 +301,25 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }
 
             var dateRange = React.createElement("span", {key: "salePeriod"});
+            var validFrom = validTo = null;
             if(price.price_type === 'sale') {
                 var dates = "";
                 if(price.valid_from) {
                     dates += price.valid_from;
                     if(price.valid_to) {
-                        dates += this.props.saleDateSeparator ? this.props.saleDateSeparator : '/';
-                        dates += price.valid_to
+                        dates += this.props.saleDateSeparator ? this.props.saleDateSeparator : ' / ';
+                        dates += price.valid_to;
                     }
                 }
                 dateRange = React.createElement("input", {ref: "salePeriod", "data-type": "sale_period", key: "salePeriod", type: "text", 
-                                className: "form-control " + this.props.id + "PriceUnique", name: this.getFieldName(price, "sale_period"), 
-                                placeholder: Locale._("Select sale dates"), defaultValue: dates, readOnly: this.editable ? null : 'readonly'});
+                                className: "form-control " + this.props.id + "PriceUnique", 
+                                name: this.getFieldName(price, "sale_period"), placeholder: Locale._("Select sale dates"), 
+                                defaultValue: dates, readOnly: this.editable ? null : 'readonly'});
+
+                if (this.props.isLocalMode()) {
+                    validFrom = React.createElement("input", {ref: "validFrom", "data-type": "valid_from", key: "validFrom", type: "hidden", defaultValue: price.valid_from});
+                    validTo = React.createElement("input", {ref: "validTo", "data-type": "valid_to", key: "validTo", type: "hidden", defaultValue: price.valid_to});
+                }
             }
 
             var operation = null, baseField = null;
@@ -306,7 +337,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 if(price.operation && price.operation !== "=$") {
                     baseField =
                             React.createElement("select", {ref: "baseFields", "data-type": "base_field", key: "baseFields", name: this.getFieldName(price, 'base_field'), 
-                                    defaultValue: price.base_field, className: this.props.id + "_base_field form-control", 
+                                    defaultValue: price.base_field, className: this.props.id + "BaseField form-control", 
                                     onChange: this.updateOperation, 
                                     disabled: this.editable || this.props.theBase ? null : true}, 
                                 this.props.priceRelationOptions[price.price_type].map(function (p) {
@@ -383,7 +414,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                          baseField ? {baseField} : null
                     ), 
                     React.createElement("td", null, 
-                        [qty, dateRange]
+                        [qty, dateRange, validFrom, validTo]
                     ), 
                     React.createElement("td", null, 
                          price.calc_amount ? React.createElement("span", {className: "help-block"}, price.calc_amount.toFixed(2)) : null
@@ -530,7 +561,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
         },
         init: function(options) {
             this.props.options.isLocalMode = function() {
-                return options.dataMode === 'local' ? true : false;
+                return options.dataMode == 'local' ? true : false;
             }.bind(this);
 
             this.props.options.applyFilter = function (e) {

@@ -102,17 +102,4 @@ FCom.Admin.current_mode = "'.$this->BDebug->mode().'";
             }
         }
     }
-
-    public function onGetDashboardWidgets($args)
-    {
-        $view = $args['view'];
-        /** @var FCom_Admin_View_Dashboard $view */
-        $view->addWidget('visitors-totals', [
-            'title' => 'Visitors',
-            'icon' => 'group',
-            'view' => 'dashboard/visitors-totals',
-            'cols' => 2,
-            'async' => true,
-        ]);
-    }
 }

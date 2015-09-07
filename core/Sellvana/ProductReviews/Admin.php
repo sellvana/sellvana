@@ -20,5 +20,4 @@ class Sellvana_ProductReviews_Admin extends BClass
             'settings/Sellvana_ProductReviews' => BLocale::i()->_('Product Reviews Settings'),
         ]);
     }
-
 }

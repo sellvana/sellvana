@@ -15,6 +15,7 @@
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
+ * @property Sellvana_Catalog_Model_SearchHistoryLog $Sellvana_Catalog_Model_SearchHistoryLog
  */
 class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -1240,68 +1241,5 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
 
         $this->BResponse->json($result);
-    }
-
-    public function getLatestNewProducts(){
-        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/latest_new_limit');
-        if (!$limit) {
-            $limit = 25;
-        }
-        $products = $this->Sellvana_Catalog_Model_Product->orm('p')
-            ->join('Sellvana_Catalog_Model_CategoryProduct', ['p.id', '=', 'cp.product_id'], 'cp')
-            ->join('Sellvana_Catalog_Model_Category', ['c.id', '=', 'cp.category_id'], 'c')
-            ->select([
-                'p.product_sku',
-                'p.product_name',
-                'p.create_at'
-            ])
-            ->select_expr('GROUP_CONCAT(c.node_name SEPARATOR "\n ")', 'categories')
-            ->group_by('p.id')
-            ->order_by_desc('p.create_at')
-            ->limit($limit);
-
-        return $products->find_many();
-    }
-
-    public function getProductsWithoutImages(){
-        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/products_without_images_limit');
-        if (!$limit) {
-            $limit = 25;
-        }
-
-        $tProduct = $this->Sellvana_Catalog_Model_Product->table();
-        $tMedia = $this->Sellvana_Catalog_Model_ProductMedia->table();
-
-        $products = $this->Sellvana_Catalog_Model_Product->orm('p')
-            ->raw_join("INNER JOIN (
-                SELECT `sub_p`.`id`, IFNULL(COUNT(sub_m.id), 0) as `image_count`
-                FROM {$tProduct} sub_p
-                LEFT JOIN {$tMedia} sub_m ON (sub_m.product_id = sub_p.id)
-                GROUP BY `sub_p`.`id`
-                )", 'm.id = p.id', 'm')
-            ->group_by('p.id')
-            ->select([
-                'p.product_sku',
-                'p.product_name'
-            ])
-            ->where_equal('m.image_count', 0)
-            ->order_by_asc('p.update_at')
-            ->limit($limit);
-
-        return $products->find_many();
-    }
-
-    public function getSearchesRecentTerms() {
-        $limit = $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/searches_recent_terms_limit');
-        if (!$limit) {
-            $limit = 25;
-        }
-
-        $terms = $this->Sellvana_Catalog_Model_SearchHistory->orm('sh')
-            ->select(['sh.query'])
-            ->order_by_desc('sh.last_at')
-            ->limit($limit);
-
-        return $terms->find_many();
     }
 }

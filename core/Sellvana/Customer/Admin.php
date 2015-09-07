@@ -24,22 +24,8 @@ class Sellvana_Customer_Admin extends BClass
         $this->FCom_Admin_Controller_MediaLibrary->allowFolder('{random}/import/customers');
     }
 
-    public function onGetDashboardWidgets($args)
-    {
-        /** @var FCom_Admin_View_Dashboard $view */
-        $view = $args['view'];
-        $view->addWidget('customers-list', [
-            'title' => 'Recent Customers',
-            'icon' => 'group',
-            'view' => 'dashboard/customers-list',
-            'async' => true,
-            'permission' => 'customers/manage'
-        ]);
-    }
-
     public function onControllerBeforeDispatch($args)
     {
 
     }
-
 }

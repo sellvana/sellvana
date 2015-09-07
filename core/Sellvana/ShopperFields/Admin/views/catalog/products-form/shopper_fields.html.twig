@@ -270,11 +270,11 @@
          */
         function toggleActionButton(valid) {
             if (!valid) {
-                shopperModalNode.find('tbody .btn-edit').addClass('disabled');
-                shopperModalNode.find('.modal-footer button.btn-primary').addClass('disabled');
+                shopperModalNode.find('tbody .btn-edit').prop('disabled', true);
+                shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', true);
             } else {
-                shopperModalNode.find('tbody .btn-edit').removeClass('disabled');
-                shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
+                shopperModalNode.find('tbody .btn-edit').prop('disabled', false);
+                shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', false);
             }
         }
 
@@ -452,9 +452,9 @@
          */
         window.editShopperOptionLabelCallback = function(e) {
             if (currentShopper.option_serialized && !currentShopper.option_serialized[e.target.value]) {
-                shopperModalNode.find('.modal-footer button.btn-primary').addClass('disabled');
+                shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', true);
             } else {
-                shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
+                shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', false);
             }
             validateAttrs();
         }
@@ -542,7 +542,7 @@
 
                 if (this.props.editedOption !== '') {
                     toggleTab(this.props.editedOption);
-                    shopperModalNode.find('.modal-footer button.btn-primary').removeClass('disabled');
+                    shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', false);
                     this.props.editedOption = '';
                 }
 
@@ -626,6 +626,7 @@
                                         prices: prices,
                                         deleted: deletedPrices,
                                         option: option,
+                                        dataMode: 'local',
                                         addPriceTypeCallback: 'shopperPriceTypeCallback',
                                         priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
                                         editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
@@ -648,9 +649,9 @@
 
                                     
                                     var validateUniqueMethod = option+'PriceUnique',
-                                        validateBaseMethod = option+'BaseField',
-                                        validateUniqueRule = {},
-                                        validateBaseRule = {};
+                                        validateBaseMethod   = option+'BaseField',
+                                        validateUniqueRule   = {},
+                                        validateBaseRule     = {};
 
                                     validateUniqueRule[validateUniqueMethod] = true;
                                     $.validator.addMethod(validateUniqueMethod, this.validateUniquePrice(option), '{{"Price already exists."|_}}');
@@ -658,7 +659,7 @@
 
                                     validateBaseRule[validateBaseMethod] = true;
                                     $.validator.addMethod(validateBaseMethod, this.validateBasePrice(option), '{{"No matching base price"|_}}');
-                                    $.validator.addClassRules(option+"_base_field", validateBaseRule);
+                                    $.validator.addClassRules(option+"BaseField", validateBaseRule);
 
                                     return node;
                                 }.bind(this))

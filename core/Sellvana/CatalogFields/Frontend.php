@@ -4,13 +4,14 @@
  * Class Sellvana_CatalogFields_Frontend
  *
  * Uses:
- *
- *@property Sellvana_Sales_Model_Cart                  $Sellvana_Sales_Model_Cart
+ * @property Sellvana_Sales_Model_Cart                  $Sellvana_Sales_Model_Cart
  * @property Sellvana_CatalogFields_Model_ProductVariant  $Sellvana_CatalogFields_Model_ProductVariant
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
  * @property Sellvana_Catalog_Model_InventorySku        $Sellvana_Catalog_Model_InventorySku
- * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
-*/
+ * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
+ */
 class Sellvana_CatalogFields_Frontend extends BClass
 {
     /**
@@ -146,5 +147,17 @@ class Sellvana_CatalogFields_Frontend extends BClass
             }
         }
         return $result;
+    }
+
+    public function getCustomFlagProducts($field, $cnt = null)
+    {
+        if (!$cnt) {
+            $cnt = 6;
+        }
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->select('p.*')->limit($cnt);
+        $this->Sellvana_CatalogFields_Model_ProductFieldData->addOrmFilter($orm, $field, 1);
+        $products = $orm->find_many();
+        $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
+        return $products;
     }
 }
