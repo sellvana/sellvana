@@ -3,8 +3,8 @@
 /**
  * Created by pp
  *
- * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
- * @property Sellvana_CustomerFields_Model_CustomerField $Sellvana_CustomerFields_Model_CustomerField
+ * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerField
  * @project sellvana_core
  */
 class Sellvana_CustomerFields_Frontend extends BClass

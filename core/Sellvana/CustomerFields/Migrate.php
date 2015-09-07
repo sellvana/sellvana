@@ -3,12 +3,12 @@
 /**
  * Class Sellvana_CustomerFields_Migrate
  *
- * @property FCom_Core_Model_MediaLibrary                $FCom_Core_Model_MediaLibrary
- * @property Sellvana_Catalog_Model_Product              $Sellvana_Catalog_Model_Product
- * @property Sellvana_CustomerFields_Model_Field         $Sellvana_CustomerFields_Model_Field
- * @property Sellvana_CustomerFields_Model_FieldOption   $Sellvana_CustomerFields_Model_FieldOption
- * @property Sellvana_CustomerFields_Model_CustomerField $Sellvana_CustomerFields_Model_CustomerField
- * @property Sellvana_Customer_Model_Customer            $Sellvana_Customer_Model_Customer
+ * @property FCom_Core_Model_MediaLibrary                    $FCom_Core_Model_MediaLibrary
+ * @property Sellvana_Catalog_Model_Product                  $Sellvana_Catalog_Model_Product
+ * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
+ * @property Sellvana_CustomerFields_Model_FieldOption       $Sellvana_CustomerFields_Model_FieldOption
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerField
+ * @property Sellvana_Customer_Model_Customer                $Sellvana_Customer_Model_Customer
  */
 class Sellvana_CustomerFields_Migrate extends BClass
 {

@@ -3,10 +3,10 @@
 /**
  * Class Sellvana_CatalogFields_Admin
  *
- * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
- * @property Sellvana_CustomerFields_Model_FieldOption $Sellvana_CustomerFields_Model_FieldOption
- * @property Sellvana_CustomerFields_Model_CustomerField $Sellvana_CustomerFields_Model_CustomerField
- * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
+ * @property Sellvana_CustomerFields_Model_FieldOption       $Sellvana_CustomerFields_Model_FieldOption
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerField
+ * @property Sellvana_Customer_Model_Customer                $Sellvana_Customer_Model_Customer
  */
 class Sellvana_CustomerFields_Admin extends BClass
 {

@@ -66,7 +66,7 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
 
     protected static $_fieldTypes = [
         'customer' => [
-            'class' => 'Sellvana_CustomerFields_Model_CustomerField',
+            'class' => 'Sellvana_CustomerFields_Model_CustomerFieldData',
         ],
     ];
     protected static $_importExportProfile = [
@@ -97,18 +97,39 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return array
+     * @param string $key
+     * @param string $prop
+     * @return static|null
      */
-    public function getListAssoc()
+    public function getField($key, $prop = 'field_code')
     {
-        $result = [];
-        $cfList = $this->orm()->find_many();
-        /** @var self $cffield */
-        foreach ($cfList as $cffield) {
-            $result[$cffield->field_code] = $cffield;
+        $fields = $this->getAllFields();
+        if (!$key) {
+            return null;
+        }
+        if ($prop === 'field_code') {
+            return !empty($fields[$key])? $fields[$key]: null;
+        }
+        /** @var static $field */
+        foreach ($fields as $field) {
+            if ($field->get($prop) === $key) {
+                return $field;
+            }
         }
 
-        return $result;
+        return null;
+    }
+
+    /**
+     * @return Sellvana_CatalogFields_Model_Field[]
+     */
+    public function getAllFields()
+    {
+        if (null === static::$_fieldsCache) {
+            static::$_fieldsCache = $this->orm('f')->order_by_asc('field_name')->find_many_assoc('field_code');
+        }
+
+        return static::$_fieldsCache;
     }
 
     public function tableName() {

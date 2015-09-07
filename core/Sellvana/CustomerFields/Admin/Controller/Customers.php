@@ -3,11 +3,11 @@
 /**
  * Class Sellvana_CustomerFields_Admin_Controller_Customers
  *
- * @property Sellvana_CustomerFields_Model_CustomerField $Sellvana_CustomerFields_Model_CustomerField
- * @property Sellvana_CustomerFields_Model_FieldOption $Sellvana_CustomerFields_Model_FieldOption
- * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
- * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
- * @property FCom_Core_Main $FCom_Core_Main
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerField
+ * @property Sellvana_CustomerFields_Model_FieldOption       $Sellvana_CustomerFields_Model_FieldOption
+ * @property Sellvana_Customer_Model_Customer                $Sellvana_Customer_Model_Customer
+ * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
+ * @property FCom_Core_Main                                  $FCom_Core_Main
  */
 class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract
 {
