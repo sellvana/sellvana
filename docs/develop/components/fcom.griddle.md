@@ -1,479 +1,521 @@
 Sellvana - Fcom Griddle Manual
-============
+===
+___
 
-### 1. Configuration: `Example config for all modules`
+1. Configuration: 
+===
+
+`Configuration for all modules`
+
+### Example:
+
+>		$moduleConfig = [
+>			'config' => [
+>				'id'        => '...',
+>				'caption'   => '...',
+>				'data_mode' => '...',
+>				'data'      => [ ... ],
+>				'columns'   => [ ... ],
+>				'filters'   => [ ... ],
+>				'actions'   => [ ... ],
+>				'callbacks' => [ ... ],
+>			]
+>		];
+
+### Table Content:
+
+1. Id (id): `Define id of grid`
+
+2. Caption (caption): `Define caption of grid`
+
+3. [Data Mode](#2-data-mode) (data_mode): `Define mode of grid, eg. server or local mode`
+
+4. [Data](#3-data) (data): `Init data for grid`
+
+5. [Columns](#4-columns) (columns): `Columns config for data table`
+5.1 [Config](#41-config)
+5.2 [Detail](#42-detail)
+	* [Selector Columns](#selector-column-this-column-contains-checkbox-so-you-can-select-one-or-more-rows-for-editable-or-removable)
+	* [Action Columns](#actions-column-this-column-contains-action-buttons-so-you-can-perform-with-specific-row)
+	* [Default Columns](#default-columns-column-default-depend-on-database)
+
+6. [Filters](#5-filters) (filters): `Define filter for each column and type of it`
+
+7. [Actions](#6-actions) (actions): `Defind action button`
+
+8. [Callbacks](#7-callbacks) (callbacks): `Global function of react components`
+8.1 [Config](#71-config)
+8.2 [Detail](#72-detail)
+	* [componentDidMount](#721-componentDidMount)
+	* [componentDidMount](#722-componentDidUpdate)
+___
+
+2. Data Mode
+===
+
+`Comming soon ...`
+
+[Back to top](#sellvana-fcom-griddle-manual)
+
+___
+
+3. Data
+===
+
+`Comming soon ...`
+
+[Back to top](#sellvana-fcom-griddle-manual)
+
+___
+
+4. Columns
+===
+
+###### Define columns config for data table
+
+#### 4.1 Config:
+> 		...
+> 		'columns' => [
+> 			['type' => '...', 'width' => ...],
+> 			[
+>				'type' => '...',
+>				'buttons' => [
+>					['name' => '...', ...],
+>					...
+>				]
+>			],
+>			['name' => '...', 'label' => '...', 'type' => '...', 'width' => '...', ...],
+> 			...
+> 		]
+> 		...
+
+#### 4.2 Detail:
+
+##### Selector Column: `This column contains checkbox so you can select one or more rows for editable or removable`
 
 * Example code:
 
-	>		$moduleConfig = [
-				
-	>				'config' => [
-					
-	>						'id' => '...',
-	
-	>						'caption' => '...',
-	
-	>						'data_mode' => '...',
-	
-	>						'data' => ...,
-	
-	>						'columns' => [
-	>							...
-	>						],
-	
-	>						'filters' => [
-	>							...
-	>						],
-	
-	>						'actions' => [
-	>							...
-	>						],
-	
-	>						'callbacks' => [
-	>							...
-	>						],
-	
-	>						'grid_before_create' => '...'
-					
-	>				]
-				
-	>		];
+	>		...
+	>		['type' => 'row_select', 'width' => 55],
+	>		...
 
-* Functionality:
+* Attributes:
 
-	* Id (id): `Define id of grid`
-	
-	* Caption (caption): `Define caption of grid`
-	
-	* Data Mode (data_mode): `Define mode of grid, eg. server or local mode`
-	
-	* Data (data): `Init data for grid`
-	
-	* Columns (columns): `columns config for data table`
-	
-	* Filters (filters): `Define filter for each column and type of it`
-	
-	* Actions (actions): `Defind action button`
-	
-	* Callbacks (callbacks): `...`
+	>		1. type: row_select
+	>		2. width: Define width of column
 
-___
+##### Actions Column: `This column contains action buttons so you can perform with specific row`
 
-### 2. Filters
+* Example code:
 
-* Config:
+	>		...
+	>		[
+	>			'type' => 'btn_group',
+	>			'buttons' => [
+	>       		['name' => 'edit'],
+	>          		['name' => 'delete'],
+	>         		['name' => 'custom', 'cssClass' => '...', 'icon' => '...', 'callback' => '...']
+	>        	]
+	>       ]
+	>		...
 
-	> 		...
+* Attributes:
 
-	> 		'filters' => [
+	1. type: Just set `btn_group` to `type` key pair
 
-	> 	    	['field' => 'column_name', 'type' => 'text'],
+	2. buttons: Define buttons type, `eg. edit, delete button`
 
-	> 	    	...
+		* name: Define button's type eg. edit / delete ...
+		* cssClass: Define button's css class.
+		* icon: Define icon class for this button, just copy and paste source class of font-awesome or whatever
 
-	> 		]
+			* Example code:
 
-	> 		...
+				>		...
+				>		['name' => 'custom', 'icon' => 'fa fa-pencil', ...]
+				>		...
+
+		* callback: Define global callback for making own button functionality and only be affected on custom type button
+
+			* Example code:
+
+				*Subcribe on backend*
+				>		...
+				>		['name' => 'custom', ..., 'callback' => 'globalCallbackFunction']
+				>		...
+
+				*Define it on view*
+				>		window.globalCallbackFunction = function() {
+				>			// Code for custom button here
+				>		}
+
+
+##### Default Columns: `Column default depend on database`
+
+* Example code:
+
+	>		...
+	>		['name' => '...', 'label' => '..., 'width' => '...', ...],
+	>		...
 
 * Types:
 
-	Filter's types: `text`, `date-range`, `num-range`, `multiselect`. Assign it by append `type` key-value pair to each column in filters block.
+	#### input: 
 
-	> 		...
+	* Example code:
 
-	> 		'filters' => [
+		>		...
+		>		[
+		>			'name' => '...',
+		>			'label' => '...',
+		>			'type' => 'input'
+		>			...
+		>		]
+		>		...
 
-	>	    	['field' => 'column_name', 'type' => 'date-range'],
+	* Attributes: 
 
-	>	    	['field' => 'column_name', 'type' => 'num-range'],
+		* editable: `This attribute define type of input contained on each column`
 
-	>	    	['field' => 'column_name', 'type' => 'multiselect']
+			* inline: `In inline mode each column will contains input that you had specified and had record value so can change it directly.`
 
-	> 		]
+			* Example code:
 
-	> 		...
+				>		...
+				>		[
+				>			...
+				>			'type'       => 'input',		
+				>			'editable'   => 'inline',
+				>			...
+				>		]
+				>		...
 
-* Functionality:
+			* default: `Default column only contains the text value of record`
 
-	_ Filters is searching functionality for each data column on grid, to register it and ability to see it on view please follow the example above.
+		* editor: `Set editor attribute so that you can choose what input type which contains on column eg. dropdown, textbox or ...`
+
+			* Example code:
+
+				>		...
+				>		[
+				>			...
+				>			'type'       => 'input',		
+				>			'editable'   => 'inline',
+				>			'editor'     => 'checkbox',
+				>			...
+				>		]
+				>		...
+
+			* Editor Options:
+
+				1. [checkbox](#1-checkbox)
+				2. [radio](#2-radio)
+				3. [textarea](#3-textarea)
+				4. [select](#4-select)
+				5. [textbox](#5-textbox-default) ( default )
+						
+		* validation: `Set validation to input is simply`
+
+			[Validation Rules](#validation-rules)
+				
+			* Example code:
+			
+				>		...
+				>		[
+				>			...	
+				>			'validation' => ['required' => true, ...],
+				>			...
+				>		]
+				>		...
+
+				###### Validation rules:
+				
+				>		1. required: Check if input is empty.
+				>		2. email: Check if email is valid.
+				>		3. number: Check if value is numeric
+				>		4. digits: 
+				>		5. ip: Check if ip is valid.
+				>		6. url: Check if value is valid url.
+				>		7. phoneus: ...
+				>		8. minlength: ...
+				>		9. maxlength: ...
+				>		10. max: ...
+				>		11. min: ...
+				>		12. range: ...
+				>		13. date: Check if value is valid date format
+
+		* Option Functionality:
+					
+			###### 1. Checkbox:
+				
+			* Example code:
+
+				>		...
+				>		[
+				>			...
+				>			'type'       => 'input',		
+				>			'editable'   => 'inline',
+				>			'editor'     => 'checkbox',
+				>			...
+				>		]
+				>		...
+
+			* Functionality:
+							
+			###### 2. Radio:
+			
+			* Example code:
+
+				>		...
+				>		[
+				>			...
+				>			'type'       => 'input',		
+				>			'editable'   => 'inline',
+				>			'editor'     => 'radio',
+				>			...
+				>		]
+				>		...
+
+			* Functionality:	
+					
+			###### 3. Textarea:
+				
+			* Example code:
+
+				>		...
+				>		[
+				>			...
+				>			'type'     => 'input',		
+				>			'editable' => 'inline',
+				>			'editor'   => 'textarea',
+				>			'rows'     => '...',
+				>			'cols'     => '...',
+				>			...
+				>		]
+				>		...
+
+			* Functionality:
+					
+			###### 4. Select:
+			
+			* Example code:
+
+				>		...
+				>		[
+				>			...
+				>			'type'     => 'input',		
+				>			'editable' => 'inline',
+				>			'editor'   => 'select',
+				>			'options'  => [1 => 'Yes', 0 => 'No'],
+				>			'default'  => 0,
+				>			...
+				>		]
+				>		...
+
+			* Functionality:
+					
+			###### 5. Textbox (default):
+			
+			* Example code:
+
+				>		...
+				>		[
+				>			...
+				>			'type'       => 'input',		
+				>			'editable'   => 'inline',
+				>			...
+				>		]
+				>		...
+
+			* Functionality:
+	
+	#### link: `Comming soon ...`
+
+[Back to top](#sellvana-fcom-griddle-manual)
 
 ___
 
-### 3. Settings
+5. Filters
+===
 
-_ Setting contains a textbox for quickly searching all data on grid and some action button like `Delete`, `Refresh` ...
+###### Filters is searching functionality for each data column on grid, to register it and ability to see it on view please follow the example above.
 
-* Config: 
+#### 5.1 Config:
 
-	> 		...
+> 		...
+> 		'filters' => [
+> 	    	['field' => 'column_name', 'type' => 'text'],
+> 	    	...
+> 		]
+> 		...
 
-	> 		'actions' => [
+#### 5.2 Detail:
 
-	> 			'new'    => ['caption' => 'Title of button'],
+Filter's types: `text`, `date-range`, `num-range`, `multiselect`. Assign it by append `type` key-value pair to each column in filters block.
+
+> 		...
+> 		'filters' => [
+>	    	['field' => 'column_name', 'type' => 'date-range'],
+>	    	['field' => 'column_name', 'type' => 'num-range'],
+>	    	['field' => 'column_name', 'type' => 'multiselect']
+> 		]
+> 		...
+
+[Back to top](#sellvana-fcom-griddle-manual)
+
+___
+
+6. Settings
+===
+
+###### Setting contains a textbox for quickly searching all data on grid and some action button like `Delete`, `Refresh` ...
+
+#### 6.1 Config: 
+
+> 		...
+> 		'actions' => [
+> 			'new'    => ['caption' => 'Title of button'],
+> 			'edit'   => true,
+> 			'delete' => true
+> 			...
+> 		]
+> 		...
+
+#### 6.2 Detail:
+
+* New:
+
+	* Example code:
+
+		>		...
+		>		'new' => ['caption' => 'Title of button', 'class' => '... ...', 'modal' => true]
+		>		...
+			
+	* Attributes:
 	
-	> 			'edit'   => true,
+		>		1. caption: Define name of button
+		>		2. class: Class attributes for button
+		>		3. modal: 
+		>			* true: show modal popup and render form depend on column metadata
+		>			* default: Add new blank row to data grid
+
+* Edit:
+
+	* Example code:
+
+		>		...
+		>		'edit' => true
+		>		...
 	
-	> 			'delete' => true
+	* Attributes:
 
-	> 			...
+		>		1. true: show modal popup and render form depend on column metadata
 
-	> 		]
+* Delete:
 
-	> 		...
+	* Example code:
 
-* Functionality:
+		>		...
+		>		'delete' => true
+		>		...
 
-	* New: `Add new data grid row`
+	* Attributes:
 
-		* Example code:
-	
-			>		...
-		
-			>		'new' => ['caption' => 'Title of button', 'class' => '... ...', 'modal' => true]
-		
-			>		...
-				
-		* Attributes:
-		
-			>		1. caption: Define name of button
-		
-			>		2. class: Class attributes for button
-		
-			>		3. modal: 
-		
-			>			3.1 true: show modal popup and render form depend on column metadata
-		
-			>			3.2 default: Add new blank row to data grid
+		>		1. true: show modal popup and render form depend on column metadata
 
-	* Edit: `Edit data grid rows`
+* Custom:
 
-		* Example code:
+	* Example code:
 
-			>		...
+		>		...
+		>		'custom' => [
+		>			'caption'  => '...',	
+		>			'type'     => '...',	
+		>			'id'       => '...', 		
+		>			'class'    => '... ...', 		
+		>			'caption'  => '...', 		
+		>			'callback' => '...'
+		>		]
+		>		...
 
-			>		'edit' => true
+	* Attributes:
 
-			>		...
-		
-		* Attributes:
-
-			>		1. true: show modal popup and render form depend on column metadata
-
-	* Delete: `Delete data grid row`
-
-		* Example code:
+		1. caption: Define its title
+		2. class: Define class attribute
+		3. id: Define id attribute
+		4. type: Define type of button [ button / html ]
+		5. callback: 
+			*Subcribe on backend*
 
 			>		...
-
-			>		'delete' => true
-
-			>		...
-
-		* Attributes:
-
-			>		1. true: show modal popup and render form depend on column metadata
-
-	* Custom: `Custom button that allow user make own functionality`
-
-		* Example code:
-
-			>		...
-
 			>		'custom' => [
-
-			>			'caption'  => '...',
-						
-			>			'type'     => '...',
-						
-			>			'id'       => '...', 
-						
-			>			'class'    => '... ...', 
-						
-			>			'caption'  => '...', 
-						
-			>			'callback' => '...'
-
+			>			...
+			>			'callback' => 'globalCallbackFunction'
+			>			...
 			>		]
-
 			>		...
 
-		* Attributes:
+			*Define it on view*
 
-			>		1. caption: Define its title
+			>		window.globalCallbackFunction = function() {
+			>				// Code for custom button here
+			>		}
 
-			>		2. class: Define class attribute
-
-			>		3. id: Define id attribute
-
-			>		4. type: Define type of button [ button / html ]
-
-			>		5. callback: global callback for making own button functionality.
-
-			>				window.globalFunction = function() {
-
-			>						// Code for custom button here
-
-			>				}
+[Back to top](#sellvana-fcom-griddle-manual)
 
 ___
-### 4.Data Table
 
-* Config:
+7. Callbacks
+===
 
-	> 		...
+###### Receive grid's config and execute some functionality when initial load
 
-	> 			'columns' => [
+#### 7.1 Config:
 
-	> 					['type' => '...', 'width' => ...],
+>		...
+>		'callbacks' => [
+>			'componentDidMount' => '...'
+>			'componentDidUpdate' => '...'
+>		]
+>		...
+>		
 
-	> 					[
+#### 7.2 Detail:
 
-	>						'type' => '...', 
+##### 7.2.1 ComponentDiDMount: 
 
-	>						'buttons' => [
+This function will be called after grid is finish `rendered` on initial load and return grid's configuration.
 
-	>                			['name' => '...'],
+* Example code:
 
-	>							...
+	*Subcribe on backend*
+	>		...
+	>		'componentDidMount' => 'myGridRegister'
+	>		...
 
-	>           			]
+	*Define on view*
+	>		...
+	>		window.myGridRegister = function() {
+	>			// Code for componentDidMount here
+	>		}
+	>		...
 
-	>           		],
-		
-	>					['name' => '...', 'label' => '...', 'type' => '...', 'width' => '...', ...],
+##### 7.2.2 ComponentDidUpdate (Optional):
 
-	> 				...
+This function will be called after grid is `re-rendered`
 
-	> 			]
+* Example code:
 
-	> 		...
+	*Subcribe on backend*
+	>		...
+	>		'componentDidUpdate' => 'myGridAfterDidUpdate'
+	>		...
 
-* Column Type:
+	*Define on view*
+	>		...
+	>		window.myGridAfterDidUpdate = function() {
+	>			// Code for componentDidUpdate here
+	>		}
+	>		...
 
-	* Selector column: `contains checkbox so you can select one or more rows for edit or delete`
-
-		* Example code:
-
-			>		...
-
-			>		['type' => 'row_select', 'width' => 55],
-
-			>		...
-
-		* Attributes:
-
-			>		1. type: row_select
-
-			>		2. width: Define width of column
-
-	* Actions column: `contains action buttons so you can perform with specific row`
-
-		* Example code:
-
-			>		...
-
-			>			[
-			
-			>				'type' => 'btn_group',
-
-			>				'buttons' => [
-
-		    >       				['name' => 'edit'],
-
-		    >          				['name' => 'delete'],
-	
-		    >         				['name' => 'custom', 'cssClass' => '...', 'icon' => '...', 'callback' => '...']
-
-		    >        		]
-
-		    >       	]
-
-			>		...
-
-		* Attributes:
-
-			>		1. type: btn_group
-
-			>		2. buttons: Define buttons type
-
-			>			* name: Define button's type eg. edit / delete ...
-
-			>			* cssClass: Define button's css class.
-
-			>			* callback: Define global callback for making own button functionality and only be affected on custom type button
-
-			>					window.globalFunction = function() {
-
-			>							// Code for custom button here
-
-			>					}
-
-	* Default: `columns depend on database`
-
-		* Example code:
-
-			>		...
-
-			>		['name' => '...', 'label' => '...', 'type' => '...', 'width' => '...', ...],
-
-			>		...
-
-		* Column type:
-
-			* input: 
-
-				* Example code:
-		
-					>		...
-		
-					>				[
-					
-					>						'name'       => '...', 
-										
-					>						'label'      => '...', 
-										
-					>						'type'       => 'input', 
-										
-					>						'width'      => ..., 
-										
-					>						'editable'   => '...', 
-										
-					>						'editor'     => '...', 
-										
-					>						'validation' => [
-					>								'required' => true, 
-					>								...
-					>						]
-		
-					>				]
-	
-					>		...
-
-				* Attributes: 
-
-					* editable: `This attribute define type of input contained on each column`
-
-						* inline: `In inline mode each column will contains input that you had specified and had record value so can change it directly.`
-
-						* Example code:
-
-							>		...
-				
-							>				[
-				
-							>					...
-															
-							>					'type'       => 'input',
-															
-							>					'editable'   => 'inline', 
-															
-							>					'editor'     => '...',
-				
-							>					...
-				
-							>				]
-				
-							>		...
-
-						* default: `Default column only contains the text value of record`
-
-					* editor: `Set editor attribute so that you can choose what input type which contains on column eg. dropdown, textbox or ...`
-
-						* Example code:
-
-							>		...
-				
-							>				[
-				
-							>					...
-														
-							>					'editor'     => 'checkbox',
-				
-							>					...
-				
-							>				]
-				
-							>		...
-
-						* Editor Options:
-
-							>		1. checkbox
-			
-							>		2. radio
-			
-							>		3. textarea
-			
-							>		4. select
-					
-							>		5. textbox ( default )
-							
-						* Option Functionality:
-						
-							1. Checkbox:
-						
-								>		
-								
-							2. Radio:
-								
-								>		
-								
-							3. Textarea:
-							
-								>		
-								
-							4. Select:
-							
-								>		
-								
-							5. Textbox (default):
-							
-								>		
-		
-					* validation: `Set validation to input is simply`
-					
-						* Example code:
-						
-						
-							>		...
-				
-							>			[
-				
-							>				...
-														
-							>				'validation'     => ['required' => true, ...],
-				
-							>				...
-				
-							>			]
-				
-							>		...
-		
-						* Validation options:
-						
-							>		1. required: Check if input is empty.
-
-							>		2. email: Check if email is valid.
-
-							>		3. number: Check if value is numeric
-
-							>		4. digits: 
-
-							>		5. ip: Check if ip is valid.
-
-							>		6. url: Check if value is valid url.
-
-							>		7. phoneus: ...
-
-							>		8. minlength: ...
-
-							>		9. maxlength: ...
-
-							>		10. max: ...
-
-							>		11. min: ...
-
-							>		12. range: ...
-
-							>		13. date: Check if value is valid date format
-		
-			* link: `Comming soon ...`
+[Back to top](#sellvana-fcom-griddle-manual)
