@@ -160,8 +160,8 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function as_array(array $objHashes = [])
     {
         $data = parent::as_array();
-        unset($data['password_hash']);
-        unset($data['api_password_hash']);
+        #unset($data['password_hash']);
+        #unset($data['api_password_hash']);
         return $data;
     }
 
