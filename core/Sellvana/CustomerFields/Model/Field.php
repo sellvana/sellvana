@@ -33,14 +33,15 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
             'customer' => 'Customer',
         ],
         'table_field_type' => [
-            'varchar(255)' => 'Short Text',
-            'text' => 'Long Text',
-            'int(11)' => 'Integer',
-            'tinyint(3)' => 'Tiny Int',
-            'decimal(12,2)' => 'Decimal',
-            'date' => 'Date',
-            'datetime' => 'Date/Time',
-            '_serialized' => 'Serialized',
+            'options'      => 'Options',
+            'varchar'      => 'Short Text',
+            'text'         => 'Long Text',
+            'int'          => 'Integer',
+            'tinyint'      => 'Tiny Integer',
+            'decimal'      => 'Decimal',
+            'date'         => 'Date',
+            'datetime'     => 'Date/Time',
+            'serialized'   => 'Serialized',
         ],
         'admin_input_type' => [
             'text' => 'Text Line',
@@ -64,6 +65,9 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
         ],
     ];
 
+    protected static $_fieldDefaults = [
+        'field_type' => 'customer',
+    ];
     protected static $_fieldTypes = [
         'customer' => [
             'class' => 'Sellvana_CustomerFields_Model_CustomerFieldData',
@@ -242,14 +246,16 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
      */
     public function getDropdowns()
     {
-        $fields = $this->BDb->many_as_array($this->orm()->where('admin_input_type', 'select')->find_many());
+        $fields = $this->getAllFields();
         $res    = [];
         foreach ($fields as $field) {
-            $res[$field['id']] = ['text'                => $field['field_name'],
-                                  'data-code'           => $field['field_code'],
-                                  'data-frontend-label' => $field['frontend_label']
-            ];
-        }
+            if ($field->get('admin_input_type') === 'select') {
+                $result[$field->id()] = [
+                    'text'                => $field->get('field_name'),
+                    'data-code'           => $field->get('field_code'),
+                    'data-frontend-label' => $field->get('frontend_label')
+                ];
+            }        }
 
         return $res;
     }
@@ -271,8 +277,8 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
      */
     public function getFrontendLabel($code)
     {
-        $field = $this->load($code, 'field_code');
+        $field = $this->getField($code);
 
-        return $field->get('frontend_label');
+        return $field? $field->get('frontend_label'): null;
     }
 }

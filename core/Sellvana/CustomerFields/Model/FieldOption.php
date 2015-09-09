@@ -67,6 +67,9 @@ class Sellvana_CustomerFields_Model_FieldOption extends FCom_Core_Model_Abstract
      */
     public function getAllFieldsOptions()
     {
+        if(!static::$_optionsCache){
+            $this->preloadAllFieldsOptions();
+        }
         return static::$_optionsCache;
     }
 
