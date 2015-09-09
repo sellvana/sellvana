@@ -2,6 +2,32 @@ Sellvana - Fcom Griddle Manual
 ===
 ___
 
+### Table Content:
+
+1. [Configuration](#1-configuration): `Example configuration for all modules`
+
+2. [Data Mode](#2-data-mode) (data_mode): `Define mode of grid, eg. server or local mode`
+
+3. [Data](#3-data) (data): `Init data for grid`
+
+4. [Columns](#4-columns) (columns): `Columns config for data table`
+4.1 [Config](#41-config)
+4.2 [Detail](#42-detail)
+	* [Selector Columns](#selector-column-this-column-contains-checkbox-so-you-can-select-one-or-more-rows-for-editable-or-removable)
+	* [Action Columns](#actions-column-this-column-contains-action-buttons-so-you-can-perform-with-specific-row)
+	* [Default Columns](#default-columns-column-default-depend-on-database)
+
+5. [Filters](#5-filters) (filters): `Define filter for each column and type of it`
+
+6. [Actions](#6-actions) (actions): `Defind action button`
+
+7. [Callbacks](#7-callbacks) (callbacks): `Global function of react components`
+7.1 [Config](#71-config)
+7.2 [Detail](#72-detail)
+	* [componentDidMount](#721-componentDidMount)
+	* [componentDidMount](#722-componentDidUpdate)
+___
+
 1. Configuration: 
 ===
 
@@ -21,34 +47,6 @@ ___
 >				'callbacks' => [ ... ],
 >			]
 >		];
-
-### Table Content:
-
-1. Id (id): `Define id of grid`
-
-2. Caption (caption): `Define caption of grid`
-
-3. [Data Mode](#2-data-mode) (data_mode): `Define mode of grid, eg. server or local mode`
-
-4. [Data](#3-data) (data): `Init data for grid`
-
-5. [Columns](#4-columns) (columns): `Columns config for data table`
-5.1 [Config](#41-config)
-5.2 [Detail](#42-detail)
-	* [Selector Columns](#selector-column-this-column-contains-checkbox-so-you-can-select-one-or-more-rows-for-editable-or-removable)
-	* [Action Columns](#actions-column-this-column-contains-action-buttons-so-you-can-perform-with-specific-row)
-	* [Default Columns](#default-columns-column-default-depend-on-database)
-
-6. [Filters](#5-filters) (filters): `Define filter for each column and type of it`
-
-7. [Actions](#6-actions) (actions): `Defind action button`
-
-8. [Callbacks](#7-callbacks) (callbacks): `Global function of react components`
-8.1 [Config](#71-config)
-8.2 [Detail](#72-detail)
-	* [componentDidMount](#721-componentDidMount)
-	* [componentDidMount](#722-componentDidUpdate)
-___
 
 2. Data Mode
 ===
@@ -150,7 +148,7 @@ ___
 				>		}
 
 
-##### Default Columns: `Column default depend on database`
+##### Default Column:
 
 * Example code:
 
@@ -190,9 +188,9 @@ ___
 				>		]
 				>		...
 
-			* default: `Default column only contains the text value of record`
+			* default: `Default is only contains the text value of record`
 
-		* editor: `Set editor attribute so that you can choose what input type which contains on column eg. dropdown, textbox or ...`
+		* editor: `Set editor attribute so that you can specify what input type which is contained on table column eg. dropdown, textbox or ...`
 
 			* Example code:
 
@@ -259,8 +257,6 @@ ___
 				>			...
 				>		]
 				>		...
-
-			* Functionality:
 							
 			###### 2. Radio:
 			
@@ -275,8 +271,6 @@ ___
 				>			...
 				>		]
 				>		...
-
-			* Functionality:	
 					
 			###### 3. Textarea:
 				
@@ -293,8 +287,6 @@ ___
 				>			...
 				>		]
 				>		...
-
-			* Functionality:
 					
 			###### 4. Select:
 			
@@ -311,8 +303,6 @@ ___
 				>			...
 				>		]
 				>		...
-
-			* Functionality:
 					
 			###### 5. Textbox (default):
 			
@@ -326,8 +316,6 @@ ___
 				>			...
 				>		]
 				>		...
-
-			* Functionality:
 	
 	#### link: `Comming soon ...`
 
