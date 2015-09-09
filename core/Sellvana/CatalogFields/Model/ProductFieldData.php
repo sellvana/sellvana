@@ -33,7 +33,28 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
         'serialized'    => 'data_serialized',
     ];
 
+    protected static $_importExportProfile = 'THIS.importExportProfile';
+
     protected static $_autoCreateOptions = false;
+
+    public function importExportProfile()
+    {
+        $profile = [
+            'related' => [
+                'product_id' => 'Sellvana_Catalog_Model_Product.id',
+                'set_id' => 'Sellvana_CatalogFields_Model_Set.id',
+                'field_id' => 'Sellvana_CatalogFields_Model_Field.id',
+                'value_id' => 'Sellvana_CatalogFields_Model_FieldOption.id',
+            ],
+            'unique_key' => ['product_id', 'field_id'],
+        ];
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
+            $profile['related']['site_id'] = 'Sellvana_MultiSite_Model_Site.id';
+            $profile['unique_key'][] = 'site_id';
+        }
+
+        return $profile;
+    }
 
     public function setAutoCreateOptions($flag)
     {
