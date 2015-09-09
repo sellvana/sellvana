@@ -27,3 +27,18 @@ base:
     - view: settings
         do:
             - [ addTab, Sellvana_ProductReviews, { label: Product Reviews, group: catalog, async: true, permission: settings/Sellvana_ProductReviews } ]
+
+/:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - latest-product-reviews
+                -
+                    title: Latest Product Reviews
+                    icon: inbox
+                    view: dashboard/latest-product-reviews
+                    cols: 4
+                    async: true
+                    filter: false
+                    permission: product_review

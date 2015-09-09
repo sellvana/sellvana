@@ -15,7 +15,6 @@ modules:
 
         observe:
             - [ "BEmail::send:before", "Sellvana_Email_Main::onEmailSendBefore" ]
-            - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Email_Main.onGetDashboardWidgets ]
 
         areas:
             FCom_Admin:

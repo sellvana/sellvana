@@ -496,9 +496,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             $roles = $this->FCom_Admin_Model_Role->orm()->where_in('id', $roleIds)->find_many();
             $perms = [];
             foreach ($roles as $role) {
-                $permissions = array_flip(explode("\n", $role->get('permissions_data')));
+                /* @var FCom_Admin_Model_Role $role */
+                $permissions = $role->onAfterLoad()->get('permissions');
                 $perms = array_merge($perms, $permissions);
             }
+
             $this->set('permissions', $perms);
         }
         if (is_string($paths)) {

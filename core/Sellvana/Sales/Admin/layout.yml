@@ -52,3 +52,72 @@ base:
 /orderstatecustom:
     - { include: default_griddle }
     - { hook: main, views: order/customstates }
+
+/:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - orders-list
+                -
+                    title: Recent Orders
+                    icon: inbox
+                    view: dashboard/orders-list
+                    async: true
+                    filter: false
+                    permission: sales/orders
+            -
+                - addWidget
+                - orders-totals
+                -
+                    title: Order Totals
+                    icon: inbox
+                    view: dashboard/orders-totals
+                    cols: 4
+                    async: true
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - avg-order-value
+                -
+                    title: Average Order Value
+                    icon: inbox
+                    cols: 2
+                    view: dashboard/avg-order-value
+                    async: true
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - top-products
+                -
+                    title: Top Products
+                    icon: inbox
+                    cols: 4
+                    view: dashboard/top-products
+                    async: true
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - top-products-chart
+                -
+                    title: Top Products (Chart)
+                    icon: inbox
+                    cols: 4
+                    view: dashboard/top-products-chart
+                    async: true
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - orders-late
+                -
+                    title: Late Orders
+                    icon: inbox
+                    cols: 4
+                    view: dashboard/orders-late
+                    async: true
+                    filter: false
+                    permission: sales/orders

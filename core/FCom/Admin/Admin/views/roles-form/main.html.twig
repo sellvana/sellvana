@@ -15,7 +15,7 @@
 
             <div class="col-md-6">
                 <div id="permissions-grid">
-                    {{ THIS.view('core/griddle').set('grid', rolesHlp.gridPermissionsConfig())|raw }}
+                    {{ THIS.view('core/griddle').set('grid', rolesHlp.gridPermissionsConfig(m))|raw }}
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
 
 
 <script>
-    require(['jquery', 'jstree'], function ($) {
+    require(['jquery', 'jstree', 'underscore'], function ($, jt, _) {
         $(function () {
             $('#roles-form').validate();
 
@@ -47,6 +47,29 @@
                     data.instance.check_node('#' + id);
                 }
             });
-        })
+        });
+
+        /**
+         * callback function after permissions grid mounted
+         * @param grid
+         * @param trigger
+         */
+        window.permissionsGridMounted = function (grid, trigger) {
+            var permissionsGrid = grid;
+
+            if (trigger == 'componentDidMount') {
+                $(permissionsGrid.getDOMNode()).on('updatedRows.griddle', function (e, rows, data) {
+                    updateStatusSelect(permissionsGrid, rows);
+                });
+            }
+        };
+
+        var updateStatusSelect = function (grid, rows) {
+            _.each(rows, function (module) {
+                var id = grid.getConfig('id') + '-status-' + module.id;
+
+                $(grid.getDOMNode()).find("#" + id).val(module.status);
+            });
+        }
     })
 </script>

@@ -8,3 +8,18 @@ base:
     - view: settings
         do:
             - [ addTab, Sellvana_Email, { label: Emails, group: customers, async: true } ]
+
+/:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - latest-newsletter
+                -
+                    title: Latest Newsletter Subscriptions
+                    icon: inbox
+                    view: dashboard/latest-newsletter
+                    cols: 2
+                    async: true
+                    filter: false
+                    permission: subscriptions
