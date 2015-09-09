@@ -45,6 +45,8 @@ class FCom_Core_ImportExport extends BClass
     protected $_errors = 0;
     protected $_warnings = 0;
 
+    protected $_log = [];
+
     /**
      * @var FCom_Admin_Model_User
      */
@@ -88,6 +90,20 @@ class FCom_Core_ImportExport extends BClass
     public function setUser( $user )
     {
         $this->_user = $user;
+    }
+
+    public function log($message, $type = 'warning')
+    {
+        switch ($type) {
+            case 'warning':
+                $this->_warnings++;
+                break;
+            case 'error':
+                $this->_errors++;
+        }
+        $this->_log[] = ['type' => $type, 'message' => $message];
+        $this->_sendMessage($message);
+        return $this;
     }
     
     protected function _sendMessage($message, $channelName = 'import')
@@ -375,9 +391,14 @@ class FCom_Core_ImportExport extends BClass
                 }
 
                 if (!$this->_isArrayAssoc($data)) {
-                    if (sizeof($this->_currentFields) !== sizeof($data)) {
-                        $this->BDebug->warning('Invalid data: ' . print_r($this->_currentFields, 1) . ' | ' . print_r($data, 1));
+                    $fieldsCnt = sizeof($this->_currentFields);
+                    $dataCnt = sizeof($data);
+                    if ($dataCnt < $fieldsCnt) {
+                        $data = array_pad($data, sizeof($this->_currentFields), null);
+                    } elseif ($dataCnt > $fieldsCnt) {
+                        $data = array_slice($data, 0, $fieldsCnt);
                     }
+                    //$this->BDebug->warning('Invalid data: ' . print_r($this->_currentFields, 1) . ' | ' . print_r($data, 1));
                     $data = array_combine($this->_currentFields, $data);
                 }
 
@@ -386,6 +407,9 @@ class FCom_Core_ImportExport extends BClass
                 if (!empty($this->_currentConfig['unique_key'])) {
                     //TODO: add checking for existance of data for unique_key and proper handle it
                     foreach ((array)$this->_currentConfig['unique_key'] as $key) {
+                        if (!array_key_exists($key, $data)) {
+                            $this->BDebug->warning('Key is empty: ' . $key . ' | ' . print_r($this->_currentConfig, 1) . ' | ' . print_r($data, 1));
+                        }
                         $id .= $data[$key] . '/';
                     }
                 } else if (isset($data[$this->_currentModelIdField])) {

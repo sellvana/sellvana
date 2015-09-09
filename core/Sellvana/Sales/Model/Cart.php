@@ -65,7 +65,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     protected static $_importExportProfile = [
         'skip'       => ['id'],
-        'unique_key' => ['customer_id', 'status', 'create_at'],
+        'unique_key' => ['customer_id', 'state_overall', 'create_at'],
         'related'    => [
             'customer_id' => 'Sellvana_Customer_Model_Customer.id',
             'admin_id'    => 'FCom_Admin_Model_User.id'
