@@ -5,7 +5,7 @@
  *
  * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
  * @property Sellvana_CustomerFields_Model_FieldOption       $Sellvana_CustomerFields_Model_FieldOption
- * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerField
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerFieldData
  * @property Sellvana_Customer_Model_Customer                $Sellvana_Customer_Model_Customer
  */
 class Sellvana_CustomerFields_Admin extends BClass
@@ -27,6 +27,7 @@ class Sellvana_CustomerFields_Admin extends BClass
 
     public function onCustomerFormViewBefore()
     {
+        /** @var Sellvana_Customer_Model_Customer $c */
         $c = $this->BLayout->view('admin/form')->get('model');
 
         if (!$c) {
@@ -34,7 +35,7 @@ class Sellvana_CustomerFields_Admin extends BClass
         }
 
         $fieldsOptions = [];
-        $fields = $this->Sellvana_CustomerFields_Model_CustomerField->customerFields($c);
+        $fields = $this->Sellvana_CustomerFields_Model_CustomerFieldData->fetchCustomersFieldData([$c->id()]);
         if ($fields) {
             $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
             $fieldOptionsAll = $this->Sellvana_CustomerFields_Model_FieldOption->orm()->where_in("field_id", $fieldIds)

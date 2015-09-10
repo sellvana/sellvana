@@ -145,12 +145,12 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
     }
 
 
-    public function onAfterLoad()
-    {
-        parent::onAfterLoad();
-        $this->_oldTableFieldCode = $this->field_code;
-        $this->_oldTableFieldType = $this->table_field_type;
-    }
+    //public function onAfterLoad()
+    //{
+    //    parent::onAfterLoad();
+    //    $this->_oldTableFieldCode = $this->field_code;
+    //    $this->_oldTableFieldType = $this->table_field_type;
+    //}
 
     /**
      * @param array $data
@@ -169,68 +169,68 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
         return $field;
     }
 
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) {
-            return false;
-        }
+    //public function onBeforeSave()
+    //{
+    //    if (!parent::onBeforeSave()) {
+    //        return false;
+    //    }
+    //
+    //    if (!$this->field_type) {
+    //        $this->field_type = 'customer';
+    //    }
+    //
+    //    if ($this->_oldTableFieldCode !== $this->field_code &&
+    //        $this->field_type === '_serialized' && !empty($this->_oldTableFieldCode)
+    //    ) {
+    //        $this->field_code = $this->_oldTableFieldCode; // TODO: disallow code change in UI
+    //    }
+    //
+    //    return true;
+    //}
 
-        if (!$this->field_type) {
-            $this->field_type = 'customer';
-        }
+    //public function onAfterSave()
+    //{
+    //    $fTable        = $this->tableName();
+    //    $fCode         = preg_replace('#([^0-9A-Za-z_])#', '', $this->field_code);
+    //    $fType         = preg_replace('#([^0-9a-z\(\),])#', '', strtolower($this->table_field_type));
+    //    $field         = $this->BDb->ddlFieldInfo($fTable, $this->field_code);
+    //    $columnsUpdate = [];
+    //
+    //    if ($fType === '_serialized') {
+    //        if ($field) {
+    //            $columnsUpdate[$fCode] = 'DROP';
+    //        } elseif ($this->_oldTableFieldCode !== $fCode) {
+    //            //TODO: rename key name in all records??
+    //        }
+    //    } else {
+    //        if (!$field) {
+    //            $columnsUpdate[$fCode] = $fType;
+    //        } elseif ($this->_oldTableFieldCode !== $fCode) {
+    //            $columnsUpdate[$this->_oldTableFieldCode] = "RENAME {$fCode} {$fType}";
+    //        }
+    //    }
+    //    if ($columnsUpdate) {
+    //        $this->BDb->ddlTableDef($fTable, [BDb::COLUMNS => $columnsUpdate]);
+    //    }
+    //
+    //    $this->_oldTableFieldCode = $this->field_code;
+    //    $this->_oldTableFieldType = $this->table_field_type;
+    //    //fix field code name
+    //    if ($this->field_code != $fCode) {
+    //        $this->field_code = $fCode;
+    //        $this->save();
+    //    }
+    //
+    //    parent::onAfterSave();
+    //}
 
-        if ($this->_oldTableFieldCode !== $this->field_code &&
-            $this->field_type === '_serialized' && !empty($this->_oldTableFieldCode)
-        ) {
-            $this->field_code = $this->_oldTableFieldCode; // TODO: disallow code change in UI
-        }
-
-        return true;
-    }
-
-    public function onAfterSave()
-    {
-        $fTable        = $this->tableName();
-        $fCode         = preg_replace('#([^0-9A-Za-z_])#', '', $this->field_code);
-        $fType         = preg_replace('#([^0-9a-z\(\),])#', '', strtolower($this->table_field_type));
-        $field         = $this->BDb->ddlFieldInfo($fTable, $this->field_code);
-        $columnsUpdate = [];
-
-        if ($fType === '_serialized') {
-            if ($field) {
-                $columnsUpdate[$fCode] = 'DROP';
-            } elseif ($this->_oldTableFieldCode !== $fCode) {
-                //TODO: rename key name in all records??
-            }
-        } else {
-            if (!$field) {
-                $columnsUpdate[$fCode] = $fType;
-            } elseif ($this->_oldTableFieldCode !== $fCode) {
-                $columnsUpdate[$this->_oldTableFieldCode] = "RENAME {$fCode} {$fType}";
-            }
-        }
-        if ($columnsUpdate) {
-            $this->BDb->ddlTableDef($fTable, [BDb::COLUMNS => $columnsUpdate]);
-        }
-
-        $this->_oldTableFieldCode = $this->field_code;
-        $this->_oldTableFieldType = $this->table_field_type;
-        //fix field code name
-        if ($this->field_code != $fCode) {
-            $this->field_code = $fCode;
-            $this->save();
-        }
-
-        parent::onAfterSave();
-    }
-
-    public function onAfterDelete()
-    {
-        parent::onAfterDelete();
-        if ($this->table_field_type !== '_serialized') {
-            $this->BDb->ddlTableDef($this->tableName(), [BDb::COLUMNS => [$this->field_code => BDb::DROP]]);
-        }
-    }
+    //public function onAfterDelete()
+    //{
+    //    parent::onAfterDelete();
+    //    if ($this->table_field_type !== '_serialized') {
+    //        $this->BDb->ddlTableDef($this->tableName(), [BDb::COLUMNS => [$this->field_code => BDb::DROP]]);
+    //    }
+    //}
 
     /**
      * @return array

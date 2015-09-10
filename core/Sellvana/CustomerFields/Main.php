@@ -5,7 +5,7 @@
  *
  * @property FCom_Admin_Model_Role                           $FCom_Admin_Model_Role
  * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
- * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerField
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerFieldData
  * @property Sellvana_Customer_Model_Customer                $Sellvana_Customer_Model_Customer
  * @property Sellvana_CustomerFields_Model_FieldOption       $Sellvana_CustomerFields_Model_FieldOption
  */
@@ -60,9 +60,9 @@ class Sellvana_CustomerFields_Main extends BClass
         $data   = $c->as_array();
         $fields = $this->Sellvana_CustomerFields_Model_Field->fieldsInfo('customer', true);
         if (array_intersect($fields, array_keys($data))) {
-            $custom = $this->Sellvana_CustomerFields_Model_CustomerField->load($c->id(), 'customer_id');
+            $custom = $this->Sellvana_CustomerFields_Model_CustomerFieldData->load($c->id(), 'customer_id');
             if (!$custom) {
-                $custom = $this->Sellvana_CustomerFields_Model_CustomerField->create();
+                $custom = $this->Sellvana_CustomerFields_Model_CustomerFieldData->create();
             }
             $dataCustomKeys = array_intersect($fields, array_keys($data));
             $dataCustom     = [];
@@ -211,7 +211,7 @@ class Sellvana_CustomerFields_Main extends BClass
             }
 
             // get or create product custom field
-            $customsResult = $this->Sellvana_CustomerFields_Model_CustomerField->orm()
+            $customsResult = $this->Sellvana_CustomerFields_Model_CustomerFieldData->orm()
                                                                              ->where_in("customer_id", $customerIds)
                                                                              ->find_many();
             foreach ($customsResult as $cus) {
@@ -226,7 +226,7 @@ class Sellvana_CustomerFields_Main extends BClass
                 if (!empty($customsResult[$cId])) {
                     $custom = $customsResult[$cId];
                 } else {
-                    $custom = $this->Sellvana_CustomerFields_Model_CustomerField->create();
+                    $custom = $this->Sellvana_CustomerFields_Model_CustomerFieldData->create();
                 }
                 $custom->set($customerCustomFields);
                 $custom->save();

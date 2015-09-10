@@ -4,7 +4,7 @@
  * Created by pp
  *
  * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
- * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerField
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerFieldData
  * @project sellvana_core
  */
 class Sellvana_CustomerFields_Frontend extends BClass
@@ -26,7 +26,7 @@ class Sellvana_CustomerFields_Frontend extends BClass
         }
         /** @var Sellvana_Customer_Model_Customer $customer */
         $customer   = $args['customer'];
-        $customData = $this->Sellvana_CustomerFields_Model_CustomerField
+        $customData = $this->Sellvana_CustomerFields_Model_CustomerFieldData
             ->orm()
             ->select(array_keys($fieldNames))
             ->where('customer_id', $customer->id())

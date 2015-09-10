@@ -3,7 +3,7 @@
 /**
  * Class Sellvana_CustomerFields_Admin_Controller_Customers
  *
- * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerField
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerFieldData
  * @property Sellvana_CustomerFields_Model_FieldOption       $Sellvana_CustomerFields_Model_FieldOption
  * @property Sellvana_Customer_Model_Customer                $Sellvana_Customer_Model_Customer
  * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
@@ -22,7 +22,7 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
         if (!$hide_field) {
             return;
         }
-        $this->Sellvana_CustomerFields_Model_CustomerField->removeField($p, $hide_field);
+        $this->Sellvana_CustomerFields_Model_CustomerFieldData->removeField($p, $hide_field);
         $this->BResponse->json('');
     }
 
@@ -35,7 +35,7 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
         }
 
         $fields_options = [];
-        $fields = $this->Sellvana_CustomerFields_Model_CustomerField->customerFields($p, $this->BRequest->request());
+        $fields = $this->Sellvana_CustomerFields_Model_CustomerFieldData->customerFields($p, $this->BRequest->request());
         foreach ($fields as $field) {
             $fields_options[$field->id()] = $this->Sellvana_CustomerFields_Model_FieldOption->orm()
                 ->where("field_id", $field->id())->find_many();
@@ -70,7 +70,7 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
             $data = $this->BRequest->post();
             $customerId = $data['id'];
             $json = $data['json'];
-            $hlp = $this->Sellvana_CustomerFields_Model_CustomerField;
+            $hlp = $this->Sellvana_CustomerFields_Model_CustomerFieldData;
             $res = $hlp->load($customerId, 'product_id');
             if (!$res) {
                 $hlp->create(['product_id' => $customerId, '_data_serialized' => $json])->save();

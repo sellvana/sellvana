@@ -75,7 +75,7 @@ class Sellvana_CustomerFields_Model_CustomerFieldData extends FCom_Core_Model_Ab
         $rawFieldsData = $this->orm('cfd')->where_in('customer_id', $cIds)->find_many();
         $fieldsData    = [];
         foreach ($rawFieldsData as $rawData) {
-            $cId = $rawData->get('customer_id');
+            $cRawId = $rawData->get('customer_id');
             if (empty($fieldsData[$cRawId])) {
                 $fieldsData[$cRawId] = [];
             }
@@ -212,12 +212,12 @@ class Sellvana_CustomerFields_Model_CustomerFieldData extends FCom_Core_Model_Ab
      */
     public function collectCustomersFieldData($customers)
     {
-        $sutomerIds = $this->BUtil->arrayToOptions($customers, '.id');
-        if (!$sutomerIds) {
+        $customerIds = $this->BUtil->arrayToOptions($customers, '.id');
+        if (!$customerIds) {
             return $this;
         }
 
-        $fieldsData = $this->fetchCustomersFieldData($sutomerIds);
+        $fieldsData = $this->fetchCustomersFieldData($customerIds);
         foreach ($customers as $customer) {
             if (empty($fieldsData[$customer->id()])) {
                 continue;
