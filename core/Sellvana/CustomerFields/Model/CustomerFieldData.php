@@ -210,7 +210,7 @@ class Sellvana_CustomerFields_Model_CustomerFieldData extends FCom_Core_Model_Ab
      *
      * @return $this
      */
-    public function collectProductsFieldData($customers)
+    public function collectCustomersFieldData($customers)
     {
         $sutomerIds = $this->BUtil->arrayToOptions($customers, '.id');
         if (!$sutomerIds) {
