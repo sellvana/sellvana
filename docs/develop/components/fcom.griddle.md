@@ -37,9 +37,9 @@ ___
 
 >		$moduleConfig = [
 >			'config' => [
->				'id'        => '...',
->				'caption'   => '...',
->				'data_mode' => '...',
+>				'id'        => ' ... ',
+>				'caption'   => ' ... ',
+>				'data_mode' => ' ... ',
 >				'data'      => [ ... ],
 >				'columns'   => [ ... ],
 >				'filters'   => [ ... ],
@@ -47,6 +47,15 @@ ___
 >				'callbacks' => [ ... ],
 >			]
 >		];
+
+### Usage:
+
+Getting and setting configuration to griddle component on view
+
+>		{% set ctrl = APP.instance('Sellvana_Controller_Path_Instance') %}
+>		{% set moduleConfig = ctrl.getModuleConfig() %}
+>		...
+>		{{ THIS.view('core/griddle').set('grid', moduleConfig) | raw }}
 
 2. Data Mode
 ===
@@ -87,7 +96,7 @@ ___
 > 		]
 > 		...
 
-#### 4.2 Detail:
+#### 4.2 Usage:
 
 ##### Selector Column: `This column contains checkbox so you can select one or more rows for editable or removable`
 
@@ -337,7 +346,7 @@ ___
 > 		]
 > 		...
 
-#### 5.2 Detail:
+#### 5.2 Usage:
 
 Filter's types: `text`, `date-range`, `num-range`, `multiselect`. Assign it by append `type` key-value pair to each column in filters block.
 
@@ -369,7 +378,7 @@ ___
 > 		]
 > 		...
 
-#### 6.2 Detail:
+#### 6.2 Usage:
 
 * New:
 
@@ -468,7 +477,7 @@ ___
 >		...
 >		
 
-#### 7.2 Detail:
+#### 7.2 Usage:
 
 ##### 7.2.1 ComponentDiDMount: 
 

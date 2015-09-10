@@ -627,7 +627,7 @@
                                         deleted: deletedPrices,
                                         option: option,
                                         dataMode: 'local',
-                                        addPriceTypeCallback: 'shopperPriceTypeCallback',
+                                        addPriceCallback: 'shopperPriceTypeCallback',
                                         priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
                                         editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
                                         customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},

@@ -129,7 +129,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         React.createElement("tr", {className: "table-actions", style: {backgroundColor: "#ccc"}}, 
                             React.createElement("td", null), 
                             React.createElement("td", null, 
-                                React.createElement("select", {id: "price-types-" + this.props.id, "data-id": this.props.id, className: "form-control", ref: "price-types", onChange: this.props.addNewPrice.bind(null, this.props.addPriceTypeCallback)}, 
+                                React.createElement("select", {id: "price-types-" + this.props.id, "data-id": this.props.id, className: "form-control", ref: "price-types", onChange: this.props.addNewPrice.bind(null, this.props.addPriceCallback)}, 
                                     React.createElement("option", {value: "-1"}, Locale._("Add Price ...")), 
                                     _.map(priceOptions, function (pt, pk) {
                                         return React.createElement("option", {key: pk, value: pk, disabled: pk == 'promo' ? 'disabled' : null}, pt)
@@ -425,10 +425,10 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
     });
 
     function findBasePrice(price, prices) {
-        var baseField = price.base_field;
+        var baseField       = price.base_field;
         var customerGroupId = price.customer_group_id;
-        var currencyCode = price.currency_code;
-        var siteId = price.site_id;
+        var currencyCode    = price.currency_code;
+        var siteId          = price.site_id;
 
         var possiblePrices = _.filter(prices, function (p) {
             return p.price_type == baseField;
@@ -443,6 +443,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 p.currency_code == currencyCode &&
                 p.site_id == siteId;
         });
+
         if (!basePrice) {
             basePrice = _.find(possiblePrices, function (p) {
                 return (p.customer_group_id == null || p.customer_group_id == '') &&
@@ -450,6 +451,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     p.site_id == siteId;
             });
         }
+
         if (!basePrice) {
             basePrice = _.find(possiblePrices, function (p) {
                 return p.customer_group_id == customerGroupId &&
@@ -457,6 +459,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     p.site_id == siteId;
             });
         }
+
         if (!basePrice) {
             basePrice = _.find(possiblePrices, function (p) {
                 return p.customer_group_id == customerGroupId &&
@@ -464,6 +467,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     (p.site_id == null || p.site_id == '');
             });
         }
+
         if (!basePrice) {
             basePrice = _.find(possiblePrices, function (p) {
                 return (p.customer_group_id == null || p.customer_group_id == '') &&
@@ -471,6 +475,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     p.site_id == siteId;
             });
         }
+
         if (!basePrice) {
             basePrice = _.find(possiblePrices, function (p) {
                 return p.customer_group_id == customerGroupId &&
@@ -478,6 +483,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     (p.site_id == null || p.site_id == '');
             });
         }
+
         if (!basePrice) {
             basePrice = _.find(possiblePrices, function (p) {
                 return (p.customer_group_id == null || p.customer_group_id == '') &&
@@ -548,77 +554,98 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
     var Price = React.createClass({
         displayName: "FComPrice",
         mixins: [FCom.Mixin],
-        getDefaultProps: function() {
-            return  {
-                id: 'product',
-                options: {
-                    title: Locale._('Product Prices'),
-                    dataMode: 'local',
-                    prices: [],
-                    saleDateSeparator: ' / ',
-                }
+        getDefaultPriceTypes: function() {
+            return {
+                base: "Base Price",
+                cost: "Cost",
+                map: "MAP",
+                msrp: "MSRP",
+                promo: "Promo Price",
+                sale: "Sale Price",
+                tier: "Tier Price"
             };
         },
-        init: function(options) {
-            this.props.options.isLocalMode = function() {
-                return options.dataMode == 'local' ? true : false;
+        getDefaultEditablePrices: function() {
+            return ["base", "map", "msrp", "sale", "tier", "cost"];
+        },
+        getUrlParamByName: function(name){
+            if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+                return decodeURIComponent(name[1]);
+        },
+        getDefaultProps: function() {
+            return  {
+                title: Locale._('Prices'),
+                productId: '',
+                prices: [],
+                priceRelationOptions: {},
+                operationOptions: [],
+                priceTypes: this.getDefaultPriceTypes,
+                editablePrices: this.getDefaultEditablePrices,
+                customerGroups: null,
+                sites: null,
+                deleted: {},
+                showCustomers: false,
+                showSites: false,
+                showCurrency: false,
+                saleDateSeparator: ' / '
+            };
+        },
+        getInitialState: function() {
+            return _.extend({}, this.props, this.props.options);
+        },
+        init: function() {
+            this.state.isLocalMode = function() {
+                return this.state.dataMode && this.state.dataMode == 'local' || false;
             }.bind(this);
 
-            this.props.options.applyFilter = function (e) {
+            this.state.applyFilter = function (e) {
                 var el = $(e.target);
                 var filter = el.attr('id');
-                options[filter + '_value'] = el.val();
+                this.state[filter + '_value'] = el.val();
                 this.forceUpdate();
             }.bind(this);
 
-            this.props.options.addNewPrice = function (callback, e) {
+            this.state.addNewPrice = function (callback, e) {
                 var type = $(e.target).val();
                 var option = $(e.target).data('id');
                 $(e.target).val("-1");
 
                 var newPrice = {
                     id: guid(),
-                    product_id: options.productId,
+                    product_id: this.state.productId,
                     price_type: type,
-                    customer_group_id: options.filterCustomerGroupValue || null,
-                    site_id: options.filterSiteValue || null,
-                    currency_code: options.filterCurrencyValue || null,
+                    customer_group_id: this.state.filterCustomerGroupValue || null,
+                    site_id: this.state.filterSiteValue || null,
+                    currency_code: this.state.filterCurrencyValue || null,
                     amount: null,
                     qty: 1
                 };
 
-                if(!options.prices) {
-                    options.prices = [];
-                }
-
-                options.prices.push(newPrice);
+                this.state.prices.push(newPrice);
                 this.forceUpdate();
 
                 if (typeof window[callback] === 'function') {
-                    window[callback](options.prices, option);
+                    window[callback](this.state.prices, option);
                 }
             }.bind(this);
 
-            this.props.options.deletePrice = function (id) {
-                if (!options.deleted) {
-                    options.deleted = {};
-                }
-       
-                if (options.isLocalMode()) {
-                    var prices = options.prices;
+            this.state.deletePrice = function (id) {
+                if (this.state.isLocalMode()) {
+                    this.state.deleted = [];
+                    var prices = this.state.prices;
                     _.each(prices, function(price, index) {
                         if (price.id == id) {
-                            options.prices.splice(index, 1);
+                            this.state.prices.splice(index, 1);
                         }
                     }.bind(this));
-                    options.deleted.push(id);
-                } else options.deleted[id] = true;
+                    this.state.deleted.push(id);
+                } else this.state.deleted[id] = true;
 
                 this.forceUpdate();
             }.bind(this);
 
-            this.props.options.updatePriceType = function (priceId, priceType) {
-                _.each(options.prices, function (price) {
+            this.state.updatePriceType = function (priceId, priceType) {
+                _.each(this.state.prices, function (price) {
                     if (price.id == priceId) {
                         price.price_type = priceType;
                     }
@@ -626,25 +653,26 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 this.forceUpdate();
             }.bind(this);
 
-            this.props.options.updateOperation = function (priceId, operation, baseField) {
-                _.each(options.prices, function (price) {
+            this.state.updateOperation = function (priceId, operation, baseField) {
+                _.each(this.state.prices, function (price) {
                     if (price.id == priceId) {
                         price.operation = operation;
-                        var defBaseField = options.priceRelationOptions[price.price_type];
+                        var defBaseField = this.state.priceRelationOptions[price.price_type];
                         if(defBaseField) {
                             defBaseField = defBaseField[0].value;
                         }
                         price.base_field = baseField || defBaseField;
                     }
-                });
+                }.bind(this));
+
                 this.forceUpdate();
             }.bind(this);
 
-            this.props.options.updatePriceField = function (priceId, field, value) {
+            this.state.updatePriceField = function (priceId, field, value) {
                 if(value === '*') {
                     value = null;
                 }
-                _.each(options.prices, function (price) {
+                _.each(this.state.prices, function (price) {
                     if (price.id == priceId) {
                         price[field] = value;
                     }
@@ -652,10 +680,10 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 this.forceUpdate();
             }.bind(this);
 
-            this.props.options.addBlankPrice = function() {
+            this.state.addBlankPrice = function() {
                 var newPrice = {
                     id: guid(),
-                    product_id: options.productId,
+                    product_id: this.state.productId,
                     price_type: 'base',
                     customer_group_id: null,
                     site_id: null,
@@ -663,37 +691,40 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     amount: null,
                     qty: 1
                 };
-
-                if(!options.prices) {
-                    options.prices = [];
-                }
-
-                options.prices.push(newPrice);
+                this.state.prices.push(newPrice);
                 this.forceUpdate();
             }.bind(this);
 
-            calculateDynamicPrice(this.props.options);
+            calculateDynamicPrice(this.state);
+        },
+        componentWillMount: function() {
+            // TODO: Catch missing important data before component initial render
+            if (!this.state.productId) {
+                this.state.productId = this.getUrlParamByName('id');
+            }
+
+            if (!this.props.id) {
+                this.props.id = 'product';
+            }
         },
         componentDidMount: function() {
-            var options = this.props.options;
-            if (typeof options.prices === 'undefined' || options.prices.length === 0) {
-                options.addBlankPrice();
+            if (typeof this.state.prices === 'undefined' || this.state.prices.length === 0) {
+                this.state.addBlankPrice();
 
-                if (typeof window[options.addPriceTypeCallback] === 'function') {
-                    window[options.addPriceTypeCallback](options.prices, options.option);
+                if (this.state.addPriceTypeCallback && typeof window[this.state.addPriceTypeCallback] === 'function') {
+                    window[this.state.addPriceTypeCallback](this.state.prices, this.state.option);
                 }
             }
         },
         componentDidUpdate: function() {
-            var options = this.props.options;
-            if (typeof options.prices === 'undefined' || options.prices.length === 0) {
-                options.addBlankPrice();
+            if (typeof this.state.prices === 'undefined' || this.state.prices.length === 0) {
+                this.state.addBlankPrice();
             }
         },
         render: function() {
-            this.init(this.props.options);
+            this.init();
             return (
-                React.createElement(PricesApp, React.__spread({},  this.props.options, {id: this.props.id}))
+                React.createElement(PricesApp, React.__spread({},  this.state, {id: this.props.id}))
             );
         }
     });
