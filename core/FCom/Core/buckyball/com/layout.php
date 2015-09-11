@@ -2572,14 +2572,13 @@ if ($this->BDebug->is('DEBUG')) {
         $res1   = [];
         foreach ($this->_elements as $typeName => $els) {
             list($type, $name) = explode(':', $typeName, 2);
-            //$result[] = $this->getElement($type, $name);
+            $result[] = $this->getElement($type, $name);
 
-            $res1[$type == 'css' ? 0 : 1][] = $this->getElement($type, $name);
+            //$res1[$type == 'css' ? 0 : 1][] = $this->getElement($type, $name);
         }
-        for ($i = 0; $i <= 1; $i++) {
-            if (!empty($res1[$i])) $result[] = join("\n", $res1[$i]);
-
-        }
+//        for ($i = 0; $i <= 1; $i++) {
+//            if (!empty($res1[$i])) $result[] = join("\n", $res1[$i]);
+//        }
 
         return preg_replace('#\n{2,}#', "\n", join("\n", $result));
     }
