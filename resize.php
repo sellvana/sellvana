@@ -90,12 +90,12 @@ class ImageResizer
     protected function validateEnvironment()
     {
         if (empty($_SERVER['HTTP_REFERER'])) {
-            $this->restrict();
+            $this->restrict('Empty Referrer');
         }
         $scriptName = !empty($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) :
             (!empty($_SERVER['ORIG_SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['ORIG_SCRIPT_NAME']) : null);
         if (!$scriptName) {
-            $this->restrict();
+            $this->restrict('Empty Script Name');
         }
         if (!empty($this->config['resize.php']['allowed_hosts'])) {
             $hosts = $this->config['resize.php']['allowed_hosts'];
@@ -106,14 +106,14 @@ class ImageResizer
         } else {
             $httpHost = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
             if (!$httpHost) {
-                $this->restrict();
+                $this->restrict('Empty Host');
             }
             $webFolder = preg_replace('#' . preg_quote(basename(__FILE__), '#') . '$#', '', $scriptName);
             $regex = '#^(https?:)?//' . preg_quote($httpHost . $webFolder, '#') . '#';
         }
         $referrer = $_SERVER['HTTP_REFERER'];
         if (!preg_match($regex, $referrer)) {
-            $this->restrict();
+            $this->restrict('Referrer does not match');
         }
     }
 
