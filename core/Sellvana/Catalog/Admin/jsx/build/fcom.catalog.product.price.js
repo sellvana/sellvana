@@ -689,7 +689,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }
         },
         componentDidMount: function() {
-            if (!this.state.prices) {
+            if (!this.state.prices.length) {
                 this.state.addBlankPrice();
             }
 
@@ -698,7 +698,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }
         },
         componentDidUpdate: function() {
-            if (!this.state.prices) {
+            if (!this.state.prices.length) {
                 this.state.addBlankPrice();
             }
         },

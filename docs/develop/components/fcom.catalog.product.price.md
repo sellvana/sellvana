@@ -149,12 +149,12 @@ ___
 Default: If missing price types, component will load these below types
 
 * [Base Price](#base-price): ...
-* [Cost](#cost-price): ...
 * [Map](#map-price): ...
 * [MSRP](#msrp-price): ...
-* [Promo Price](#promo-price): ...
+* [Cost](#cost-price): ...
 * [Sale Price](#sale-price): ...
 * [Tier Price](#tier-price): ...
+* [Promo Price](#promo-price): ...
 
 ### 4.3 Functionality:
 
@@ -174,6 +174,8 @@ ___
 ### 5.2 Functionality:
 
 >       This config allow prices type are edited or not
+>       eg. if editable list is: ['base', 'map', 'msrp', 'cost', 'sale']
+>       then Tier and Promo price can not add or edit in price list
 
 ___
 
@@ -194,10 +196,6 @@ Default: If missing customer groups, component will load these below types as in
 * [Retail](#retail): ...
 * [ALL](#all): ...
 
-### 6.3 Functionality:
-
->       Comming soon ...
-
 ___
 
 7. Validate Prices
@@ -205,7 +203,7 @@ ___
 
 ### 7.1 Config:
 
-In order to apply validation to price, you need to require `fcom.catalog.components`, `jquery.validate`
+In order to apply validation to price, you need to require [fcom.catalog.components](#73-fcom-catalog-components), `jquery.validate`
 >       require([..., 'fcom.catalog.components', 'jquery.validate', ...], function() {
 >       
 >           ...
@@ -239,6 +237,17 @@ And do not forget subcribing unique class to jquery validate [addMethod](http://
 
 * For more detail *`validateUniquePrice()`* please refer `fcom.catalog.components`
 
+### 7.3 FCom Catalog Components
+This `fcom.catalog.components` is place where can push common functions using for price or others involve in catalog product eg. validation function, ...
+
+##### 7.3.1 Config:
+    
+>       ...
+>       mixins: [FCom.PriceMixin],
+>       ...
+
+After inlude `mixins`, please use **`this`** pointer to call any functions in that component.
+
 ___
 
 8. Price Relation Options
@@ -255,17 +264,17 @@ Each price type has own related options, you can calculate specific price amount
 ### 8.2 Options: 
 Related options of each price type is listed in below list
 
-* Base Type: [Cost](#cost-price) and [MRSP](#mrsp-price)
+* Base Price: [Cost](#cost-price) and [MRSP](#mrsp-price)
 
-* Cost Type: [Base](#base-price) and [Sale](#sale-price)
+* Cost Price: [Base](#base-price) and [Sale](#sale-price)
 
-* Sale Type: [Cost](#cost-price) and [Base](#base-price)
+* Sale Price: [Cost](#cost-price) and [Base](#base-price)
 
-* Map Type: [Cost](#cost-price) and [MRSP](#mrsp-price)
+* MAP: [Cost](#cost-price) and [MRSP](#mrsp-price)
 
-* MRSP Type: [Cost](#cost-price) and [Base](#base-price)
+* MRSP: [Cost](#cost-price) and [Base](#base-price)
 
-* Tier Type: [Cost](#cost-price), [Base](#base-price) and [Sale](#sale-price)
+* Tier Price: [Cost](#cost-price), [Base](#base-price) and [Sale](#sale-price)
 
 9. Operation Options
 ===
