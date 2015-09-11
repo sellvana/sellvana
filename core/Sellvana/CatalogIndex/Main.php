@@ -7,6 +7,7 @@
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
  * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
+ * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
  */
 
 class Sellvana_CatalogIndex_Main extends BClass
@@ -96,10 +97,32 @@ class Sellvana_CatalogIndex_Main extends BClass
         static::$_autoReindex = false;
     }
 
+    /**
+     * @TODO: Переделать, во время FCom_Core_ImportExport::FCom_Core_ImportExport
+     * евент FCom_Core_ImportExport::import:afterModel:Sellvana_Catalog_Model_Product
+     * происходит много раз. А должен только один раз.
+     * Связано это с потоковой загрузкой.
+     */
     public function onProductAfterImport($args)
     {
+        if (array_key_exists('', $args)){
+            $ids = $args['product_ids'];
+        }
+        if (array_key_exists('import_id', $args)){
+            $orm = $this->FCom_Core_Model_ImportExport_Id->orm('p');
+            $orm->inner_join('FCom_Core_Model_ImportExport_Site', ['s.id', '=', 'p.site_id'], 's')
+                ->inner_join('FCom_Core_Model_ImportExport_Model', ['m.id', '=', 'p.model_id'], 'm')
+                ->select('p.local_id')
+                ->group_by('p.local_id')
+                ->where('s.site_code', $args['import_id'])
+                ->where('m.model_name', 'Sellvana_Catalog_Model_Product');
+           $orm->find_many();
+            var_dump(BORM::get_last_query());
+            return;
+        }
+
         static::$_autoReindex = static::$_prevAutoReindex;
-        $this->Sellvana_CatalogIndex_Model_Doc->flagReindex($args['product_ids']);
+        $this->Sellvana_CatalogIndex_Model_Doc->flagReindex($ids);
         if (static::$_autoReindex) {
             $this->getIndexer()->indexPendingProducts();
         }

@@ -11,6 +11,7 @@ modules:
             - [ "Sellvana_Catalog_Model_Product::import:after", "Sellvana_CatalogIndex_Main::onProductAfterImport" ]
             - [ "Sellvana_Catalog_Model_Category::onAfterSave:products", "Sellvana_CatalogIndex_Main::onCategoryAfterSave" ]
             - [ "Sellvana_CatalogFields_Model_Field::onAfterSave", "Sellvana_CatalogIndex_Main::onCustomFieldAfterSave" ]
+            - [ "FCom_Core_ImportExport::import:afterModel:Sellvana_Catalog_Model_Product", "Sellvana_CatalogIndex_Main::onProductAfterImport" ]
         default_config:
             modules/Sellvana_CatalogIndex/show_root_categories: 1
             modules/Sellvana_CatalogIndex/show_sibling_categories: 1
