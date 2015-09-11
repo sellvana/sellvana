@@ -510,7 +510,6 @@
             },
             getDefaultProps: function() {
                 return  {
-                    row: {},
                     addedOption: '',
                     editedOption: '',
                     removedOption: ''
@@ -535,17 +534,16 @@
                 }.bind(this));
             },
             componentDidUpdate: function(prevProps, prevState) {
-                if (this.props.addedOption !== '') {
-                    toggleTab(this.props.addedOption);
-                    this.props.addedOption = '';
+                if (prevProps.addedOption !== '') {
+                    toggleTab(prevProps.addedOption);
+                    prevProps.addedOption = '';
                 }
 
-                if (this.props.editedOption !== '') {
-                    toggleTab(this.props.editedOption);
+                if (prevProps.editedOption !== '') {
+                    toggleTab(prevProps.editedOption);
                     shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', false);
-                    this.props.editedOption = '';
+                    prevProps.editedOption = '';
                 }
-
             },
             componentWillUnmount: function () {
                 $(OPTS).off('add');
@@ -626,7 +624,6 @@
                                         prices: prices,
                                         deleted: deletedPrices,
                                         option: option,
-                                        dataMode: 'local',
                                         addPriceCallback: 'shopperPriceTypeCallback',
                                         priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
                                         editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},

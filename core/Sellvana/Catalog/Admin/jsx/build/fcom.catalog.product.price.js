@@ -102,7 +102,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         ), 
                         React.createElement("tbody", null, 
                             _.map(this.props.prices, function (price) {
-                                if (this.props.deleted && this.props.deleted[price.id] && !this.props.isLocalMode()) {
+                                if (this.props.deleted && _.contains(this.props.deleted, parseInt(price.id))) {
                                     return React.createElement("input", {key: 'delete-' + price.id, type: "hidden", name: "prices[delete][]", value: price.id})
                                 }
 
@@ -235,21 +235,18 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }
             input.daterangepicker(options);
 
-            if (this.props.isLocalMode()) {
-                // Apply sale_period data for local mode
-                input.on('apply.daterangepicker', function(ev, picker) {
-                    var dates = input.val();
+            input.on('apply.daterangepicker', function(ev, picker) {
+                var dates = input.val();
 
-                    if (dates && dates.split(options.separator).length) {
-                        this.props.data.valid_from = dates.split(options.separator)[0];
-                        $(this.refs.validFrom.getDOMNode()).val(this.props.data.valid_from);
+                if (dates && dates.split(options.separator).length) {
+                    this.props.data.valid_from = dates.split(options.separator)[0];
+                    $(this.refs.validFrom.getDOMNode()).val(this.props.data.valid_from);
 
-                        this.props.data.valid_to = dates.split(options.separator)[1];
-                        $(this.refs.validTo.getDOMNode()).val(this.props.data.valid_to);
-                    }
+                    this.props.data.valid_to = dates.split(options.separator)[1];
+                    $(this.refs.validTo.getDOMNode()).val(this.props.data.valid_to);
+                }
 
-                }.bind(this));
-            }
+            }.bind(this));
             //todo set setStartDate and setEndDate
         },
         getFieldName: function (obj, field) {
@@ -316,10 +313,8 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                                 name: this.getFieldName(price, "sale_period"), placeholder: Locale._("Select sale dates"), 
                                 defaultValue: dates, readOnly: this.editable ? null : 'readonly'});
 
-                if (this.props.isLocalMode()) {
-                    validFrom = React.createElement("input", {ref: "validFrom", "data-type": "valid_from", key: "validFrom", type: "hidden", defaultValue: price.valid_from});
-                    validTo = React.createElement("input", {ref: "validTo", "data-type": "valid_to", key: "validTo", type: "hidden", defaultValue: price.valid_to});
-                }
+                validFrom = React.createElement("input", {ref: "validFrom", "data-type": "valid_from", key: "validFrom", type: "hidden", defaultValue: price.valid_from});
+                validTo = React.createElement("input", {ref: "validTo", "data-type": "valid_to", key: "validTo", type: "hidden", defaultValue: price.valid_to});
             }
 
             var operation = null, baseField = null;
@@ -583,7 +578,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 editablePrices: this.getDefaultEditablePrices,
                 customerGroups: null,
                 sites: null,
-                deleted: {},
+                deleted: [],
                 showCustomers: false,
                 showSites: false,
                 showCurrency: false,
@@ -594,10 +589,6 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             return _.extend({}, this.props, this.props.options);
         },
         init: function() {
-            this.state.isLocalMode = function() {
-                return this.state.dataMode && this.state.dataMode == 'local' || false;
-            }.bind(this);
-
             this.state.applyFilter = function (e) {
                 var el = $(e.target);
                 var filter = el.attr('id');
@@ -630,17 +621,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }.bind(this);
 
             this.state.deletePrice = function (id) {
-                if (this.state.isLocalMode()) {
-                    this.state.deleted = [];
-                    var prices = this.state.prices;
-                    _.each(prices, function(price, index) {
-                        if (price.id == id) {
-                            this.state.prices.splice(index, 1);
-                        }
-                    }.bind(this));
-                    this.state.deleted.push(id);
-                } else this.state.deleted[id] = true;
-
+                this.state.deleted.push(id);
                 this.forceUpdate();
             }.bind(this);
 
@@ -708,16 +689,16 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }
         },
         componentDidMount: function() {
-            if (typeof this.state.prices === 'undefined' || this.state.prices.length === 0) {
+            if (!this.state.prices) {
                 this.state.addBlankPrice();
+            }
 
-                if (this.state.addPriceTypeCallback && typeof window[this.state.addPriceTypeCallback] === 'function') {
-                    window[this.state.addPriceTypeCallback](this.state.prices, this.state.option);
-                }
+            if (this.state.addPriceCallback && typeof window[this.state.addPriceCallback] === 'function') {
+                window[this.state.addPriceCallback](this.state.prices, this.state.option);
             }
         },
         componentDidUpdate: function() {
-            if (typeof this.state.prices === 'undefined' || this.state.prices.length === 0) {
+            if (!this.state.prices) {
                 this.state.addBlankPrice();
             }
         },

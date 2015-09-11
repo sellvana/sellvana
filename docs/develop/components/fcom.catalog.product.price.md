@@ -4,66 +4,66 @@ ___
 
 ### Table Content:
 
-1. [Configuration](#1-configuration): `Example configuration for price`
+1. **[Configuration](#1-configuration):** `Example configuration for price`
 
-2. [Title](#2-title) (title): `Define price grid title`
+2. **[Title](#2-title) (title):** `Define price grid title`
 
-3. [Data Mode](#3-data-mode) (dataMode): `Define mode for price gird eg. local or server`
+3. **[Prices](#3-prices) (prices):** `Specify initial price data for grid`
 
-4. [Prices](#4-prices) (prices): `Specify initial price data for grid`
+4. **[Price Types](#4-price-types) (priceTypes):** `Specify price types for grid eg. Cost, Sale ...`
 
-5. [Price Types](#5-price-types) (priceTypes): `Specify price types for grid eg. Cost, Sale ...`
+5. **[Editable Prices](#5-editable-prices) (editablePrices):** `Specify which price type could be edited`
 
-6. [Editable Prices](#6-editable-prices) (editablePrices): `Specify which price type could be edited`
+6. **[Customer Groups](#6-customer-groups) (customerGroups):** 
 
-7. [Customer Groups](#7-customer-groups) (customerGroups): 
+7. **[Validate Prices](#7-validate-prices) (validatePrices):** `Validate function for checking unique price type`
 
-8. [Validate Prices](#8validate-prices) (validatePrices): `Validate function for checking unique price type`
+8. **[Price Relation Options](#8-price-relation-options) (priceRelationOptions):** `Options related to price and depend on it for calculating price amount`
 
-9. [Price Relation Options](#9price-relation-options) (priceRelationOptions): `Options related to price and depend on it for calculating price amount`
-
-10. [Operation Options](#operation-options) (operationOptions): `Operation options for calculating price amount`
+9. **[Operation Options](#9-operation-options) (operationOptions):** `Operation options for calculating price amount`
 
 ___
 
 1. Configuration: 
 ===
-Price component receive 2 important options: `id` and `options`
+Price component receive 2 important options: *`id`* and *`options`*
 
-    * id: Unique id for price grid, using for validation and some functionality.
-    * options: Configurations for rendering prices.
+* **id:** Unique name of grid, using for validation, determined what view we are working on and some functionality.
 
-### 1.1 Example:
-*`Id`* attribute example:
+    >       var id = 'product';
 
->       var id = 'product';
+* **options:** Configurations for prices grid.
 
-*`Options`* attribute example:
->       var options = {
->           'title'               : ' ... ',
->           'dataMode'            : ' ... ',
->           'prices'              : [ ... ],
->           'priceTypes'          : [ ... ],
->           'editablePrices'      : [ ... ],
->           'customerGroups'      : [ ... ],
->           'sites'               : [ ... ],
->           'productId'           : ' ... ',
->           'validatePrices'      : ' ... ',
->           'priceRelationOptions': [ ... ],
->           'operationOptions'    : [ ... ],
->           'saleDateSeparator'   : ' ... ',
->           'showCustomers'       : ' ... ',
->           'showSites'           : ' ... ',
->           'showCurrency'        : ' ... ',
->       };
+    >       var options = {
+    >           'title'               : ' ... ',
+    >           'dataMode'            : ' ... ',
+    >           'prices'              : [ ... ],
+    >           'priceTypes'          : [ ... ],
+    >           'editablePrices'      : [ ... ],
+    >           'customerGroups'      : [ ... ],
+    >           'sites'               : [ ... ],
+    >           'productId'           : ' ... ',
+    >           'validatePrices'      : ' ... ',
+    >           'priceRelationOptions': [ ... ],
+    >           'operationOptions'    : [ ... ],
+    >           'saleDateSeparator'   : ' ... ',
+    >           'showCustomers'       : ' ... ',
+    >           'showSites'           : ' ... ',
+    >           'showCurrency'        : ' ... ',
+    >       };
 
-### 1.2 Usage:
-Create a *`react component`* to render price grid *(recommended)*, so you can re-use validation methods from `fcom.catalog.components`
+### 1.1 Usage:
+
+Define *`react component`* to render grid *(recommended)*, so you can re-use validation methods from `fcom.catalog.components` and ease to react with `price component`
 
 >       require([..., 'fcom.catalog.product.price', 'fcom.catalog.components', ...], function(..., Price) {
 >           var PriceGrid = React.createClass({
 >               // Include [FCom.PriceMixin] to react mixins for re-using validation method
 >               mixins: [FCom.PriceMixin],
+>               componentDidMount: function() {
+>                   // React with price component after component is mounted on initial load
+>               },
+>               ...
 >               render: function() {
 >                   var options = { ... };
 >                   ...
@@ -73,33 +73,36 @@ Create a *`react component`* to render price grid *(recommended)*, so you can re
 >       });
 >       
 
-### 1.3 Functionality:
+### 1.2 Functionality:
 
 Upon this component rendered, there are some functionality follow with it.
 
-* Add New Prices: when new one is added it bring along with a callback so that you can do something after that.
+* **Add New Prices:** when new one is added it bring along with a callback so that you can do something after that.
 
     * Copy and insert this line below to *`Options`* configuration.
 
-    >       ...
-    >       addPriceCallback: 'callbackFunctionName',
-    >       ...
+        >       ...
+        >       addPriceCallback: 'callbackFunctionName',
+        >       ...
 
-    * After subcribe it in grid options configuration
+    * 
 
-    >       ...
-    >       window.callbackFunctionName = function(prices, priceGridId) {
-    >           // This callback bring back two args 
-    >           // `prices`: list of prices include new one
-    >           // 'priceGridId': name of grid that contains this lists
-    >           ...
-    >       }
-    >       ...
+        >       ...
+        >       window.callbackFunctionName = function(prices, gridName) {
+        >           // This callback bring back two args 
+        >           // `prices`: list of all prices
+        >           // 'gridName': grid name that contains this lists
+        >           ...
+        >       }
+        >       ...
+
+* **Others:** `Comming soon ...`
 
 ___
 
 2. Title
 ===
+
 This config simply allow you to define title of grid.
 
 ### 2.1 Config:
@@ -108,43 +111,42 @@ This config simply allow you to define title of grid.
 >       'title': 'My Example Price',
 >       ...
 
+### 2.2 Usage:
+
+Note: wrap it with Locale functionality for multi languages (Recommended).
+
+>       ...
+>       'title': Locale._('My Example Price'),
+>       ...
+
 ___
 
-3. Data Mode
+3. Prices
 ===
 
 ### 3.1 Config:
 
 >       ...
->       'dataMode' => 'local',
+>       'prices' => [ ... ],
 >       ...
 
-### 3.2 Functionality:
+### 3.2 Usage:
+
 `Comming soon ...`
 
 ___
 
-4. Prices
+4. Price Types
 ===
 
 ### 4.1 Config:
 
 >       ...
->       'prices' => [ ... ],
->       ...
-___
-
-5. Price Types
-===
-
-### 5.1 Config:
-
->       ...
 >       'priceTypes': [ ... ],
 >       ...
 
-### 5.2 Types:
-Default: If missing price types, component will load these below types as initial types
+### 4.2 Types:
+Default: If missing price types, component will load these below types
 
 * [Base Price](#base-price): ...
 * [Cost](#cost-price): ...
@@ -154,33 +156,37 @@ Default: If missing price types, component will load these below types as initia
 * [Sale Price](#sale-price): ...
 * [Tier Price](#tier-price): ...
 
-### 5.3 Functionality:
+### 4.3 Functionality:
 
 >       Comming soon ...
 
 ___
 
-6. Editable Prices
+5. Editable Prices
 ===
 
-### 6.1 Config:
+### 5.1 Config:
 
 >       ...
 >       'editablePrices': [ ... ],
 >       ...
 
+### 5.2 Functionality:
+
+>       This config allow prices type are edited or not
+
 ___
 
-7. Customer Groups
+6. Customer Groups
 ===
 
-### 7.1 Config:
+### 6.1 Config:
 
 >       ...
 >       'customerGroups': { ... },
 >       ...
 
-### 7.2 Group Types:
+### 6.2 Group Types:
 Default: If missing customer groups, component will load these below types as initial data
 
 * [General](#general): ...
@@ -188,16 +194,16 @@ Default: If missing customer groups, component will load these below types as in
 * [Retail](#retail): ...
 * [ALL](#all): ...
 
-### 7.3 Functionality:
+### 6.3 Functionality:
 
 >       Comming soon ...
 
 ___
 
-8. Validate Prices
+7. Validate Prices
 ===
 
-### 8.1 Config:
+### 7.1 Config:
 
 In order to apply validation to price, you need to require `fcom.catalog.components`, `jquery.validate`
 >       require([..., 'fcom.catalog.components', 'jquery.validate', ...], function() {
@@ -211,7 +217,7 @@ In order to apply validation to price, you need to require `fcom.catalog.compone
 >           ...
 >       });
 
-### 8.2 Usage:
+### 7.2 Usage:
 
 Example function for unique validation
 >       function uniquePriceValidator() {
@@ -231,14 +237,14 @@ And do not forget subcribing unique class to jquery validate [addMethod](http://
 >           productPriceUnique: true
 >       });
 
-* *`validateUniquePrice()`* is called from `fcom.catalog.components`
+* For more detail *`validateUniquePrice()`* please refer `fcom.catalog.components`
 
 ___
 
-9. Price Relation Options
+8. Price Relation Options
 ===
 
-### 9.1 Config:
+### 8.1 Config:
 
 Each price type has own related options, you can calculate specific price amount depend on it
 
@@ -246,7 +252,7 @@ Each price type has own related options, you can calculate specific price amount
 >       priceRelationOptions: [ ... ],
 >       ...
 
-### 9.2 Options: 
+### 8.2 Options: 
 Related options of each price type is listed in below list
 
 * Base Type: [Cost](#cost-price) and [MRSP](#mrsp-price)
@@ -261,17 +267,17 @@ Related options of each price type is listed in below list
 
 * Tier Type: [Cost](#cost-price), [Base](#base-price) and [Sale](#sale-price)
 
-10. Operation Options
+9. Operation Options
 ===
 Each operation  we can calculate amount such as `Set % of`, `Subtract % of`, ...
 
-### 10.1 Config:
+### 9.1 Config:
 
 >       ...
 >       'operationOptions': [ ... ],
 >       ...
 
-### 10.2 Options:
+### 9.2 Options:
 
 * [Fixed](#fixed) `(alias: =$)`
 * [Times](#times) `(alias: *$)`
@@ -281,5 +287,6 @@ Each operation  we can calculate amount such as `Set % of`, `Subtract % of`, ...
 * [Add % to](#add-%-to) `(alias: +%)`
 * [Subtract % from](#subtract-%-from) `(alias: -%)`
 
-### 10.3 Functionality:
+### 9.3 Functionality:
 
+>       Comming soon ...
