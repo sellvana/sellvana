@@ -32,22 +32,22 @@ class Sellvana_CustomerFields_Main extends BClass
         return $this;
     }
 
-    /**
-     * @param $args
-     */
-    public function onCustomerOrm($args)
-    {
-        if ($this->_disabled) {
-            return;
-        }
-        /** @var BORM $orm */
-        $orm = $args['orm'];
-        $tC = $orm->table_alias();
-        $orm->select($tC . '.*')
-            ->left_outer_join('Sellvana_CustomerFields_Model_CustomerFieldData', ['ccf.customer_id', '=', $tC . '.id'], 'ccf');
-        $fields = $this->Sellvana_CustomerFields_Model_Field->fieldsInfo('customer', true);
-        $orm->select($fields);
-    }
+    ///**
+    // * @param $args
+    // */
+    //public function onCustomerOrm($args)
+    //{
+    //    if ($this->_disabled) {
+    //        return;
+    //    }
+    //    /** @var BORM $orm */
+    //    $orm = $args['orm'];
+    //    $tC = $orm->table_alias();
+    //    $orm->select($tC . '.*')
+    //        ->left_outer_join('Sellvana_CustomerFields_Model_CustomerFieldData', ['ccf.customer_id', '=', $tC . '.id'], 'ccf');
+    //    $fields = $this->Sellvana_CustomerFields_Model_Field->getAllFields();
+    //    $orm->select($fields);
+    //}
 
     /**
      * @param $args
@@ -57,21 +57,22 @@ class Sellvana_CustomerFields_Main extends BClass
     {
         /** @var Sellvana_Customer_Model_Customer $c */
         $c      = $args['model'];
-        $data   = $c->as_array();
-        $fields = $this->Sellvana_CustomerFields_Model_Field->fieldsInfo('customer', true);
-        if (array_intersect($fields, array_keys($data))) {
-            $custom = $this->Sellvana_CustomerFields_Model_CustomerFieldData->load($c->id(), 'customer_id');
-            if (!$custom) {
-                $custom = $this->Sellvana_CustomerFields_Model_CustomerFieldData->create();
-            }
-            $dataCustomKeys = array_intersect($fields, array_keys($data));
-            $dataCustom     = [];
-            foreach ($dataCustomKeys as $key) {
-                $dataCustom[$key] = $data[$key];
-            }
-            //print_r($dataCustom);exit;
-            $custom->set($dataCustom)->set('customer_id', $c->id())->save();
-        }
+        $this->Sellvana_CustomerFields_Model_CustomerFieldData->saveCustomersFieldData([$c]);
+        //$data   = $c->as_array();
+        //$fields = $this->Sellvana_CustomerFields_Model_Field->fieldsInfo('customer', true);
+        //if (array_intersect($fields, array_keys($data))) {
+        //    $custom = $this->Sellvana_CustomerFields_Model_CustomerFieldData->load($c->id(), 'customer_id');
+        //    if (!$custom) {
+        //        $custom = $this->Sellvana_CustomerFields_Model_CustomerFieldData->create();
+        //    }
+        //    $dataCustomKeys = array_intersect($fields, array_keys($data));
+        //    $dataCustom     = [];
+        //    foreach ($dataCustomKeys as $key) {
+        //        $dataCustom[$key] = $data[$key];
+        //    }
+        //    //print_r($dataCustom);exit;
+        //    $custom->set($dataCustom)->set('customer_id', $c->id())->save();
+        //}
         // not deleting to preserve meta info about fields
     }
 

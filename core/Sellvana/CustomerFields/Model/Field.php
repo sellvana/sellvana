@@ -84,23 +84,6 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
     protected static $_fieldsCache = [];
 
     /**
-     * @param      $type
-     * @param bool $keysOnly
-     * @return array
-     */
-    public function fieldsInfo($type, $keysOnly = false)
-    {
-        if (empty(static::$_fieldsCache[$type])) {
-            $class  = static::$_fieldTypes[$type]['class'];
-            $fields = $this->BDb->ddlFieldInfo($class::table());
-            unset($fields['id'], $fields['customer_id']);
-            static::$_fieldsCache[$type] = $fields;
-        }
-
-        return $keysOnly? array_keys(static::$_fieldsCache[$type]): static::$_fieldsCache[$type];
-    }
-
-    /**
      * @param string $key
      * @param string $prop
      * @return static|null

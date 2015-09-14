@@ -5,7 +5,6 @@ modules:
         require: { module: { Sellvana_Customer: 0.5.0.0 } }
         auto_use: [ bootstrap, views ]
         observe:
-            - [ "Sellvana_Customer_Model_Customer::orm", Sellvana_CustomerFields_Main.onCustomerOrm ]
             - [ "Sellvana_Customer_Model_Customer::onAfterSave", Sellvana_CustomerFields_Main.onCustomerAfterSave ]
             - [ "Sellvana_Customer_Model_Customer::import:row", Sellvana_CustomerFields_Main.onCustomerImportRow ]
             - [ "Sellvana_Customer_Model_Customer::import:after_loop", Sellvana_CustomerFields_Main.onCustomerImportAfterLoop ]
