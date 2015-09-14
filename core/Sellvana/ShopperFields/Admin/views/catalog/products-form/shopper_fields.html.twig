@@ -498,11 +498,121 @@
         }
 
         /**
-         * React component for render option's price
+         * React component for render prices tab list
+         */
+        var PriceTabList = React.createClass({
+            getInitialState: function () {
+                return { active: 0 };
+            },
+            mixins: [FCom.Mixin, FCom.PriceMixin],
+            init: function(option) {
+                var optionSerialized = {};
+                if (!_.isEmpty(this.props.row.option_serialized)) {
+                    optionSerialized = this.props.row.option_serialized;
+                }
+                var prices    = [];
+
+                shopperPrices = !_.isEmpty(optionSerialized) && optionSerialized[option] ? optionSerialized[option].prices : (currentShopper.option_serialized && !_.isEmpty(currentShopper.option_serialized[option]) ? currentShopper.option_serialized[option].prices : []);
+
+                if (shopperPrices && shopperPrices.length) {
+                    prices = typeof shopperPrices === 'string' ? JSON.parse(shopperPrices) : shopperPrices;
+                }
+
+                /**
+                 * Validate unique price
+                 * @return mixed
+                 */
+                var validatePrices = function() {
+                    var valid = true;
+                    $('#{{ frontendFieldGrid.config.id }}_options_form').find('select.'+option+'PriceUnique').each(function (el) {
+                        if (!$(this).valid()) {
+                            valid = false;
+                        }
+                    });
+                    return valid;
+                }
+
+                var validateUniqueMethod = option+'PriceUnique',
+                    validateBaseMethod   = option+'BaseField',
+                    validateUniqueRule   = {},
+                    validateBaseRule     = {};
+
+                validateUniqueRule[validateUniqueMethod] = true;
+                $.validator.addMethod(validateUniqueMethod, this.validateUniquePrice(option), '{{"Price already exists."|_}}');
+                $.validator.addClassRules(validateUniqueMethod, validateUniqueRule);
+
+                validateBaseRule[validateBaseMethod] = true;
+                $.validator.addMethod(validateBaseMethod, this.validateBasePrice(option), '{{"No matching base price"|_}}');
+                $.validator.addClassRules(option+"BaseField", validateBaseRule);
+
+                return {
+                    title: Locale._(capitalizeFirstLetter(option) + ' Prices'),
+                    prices: prices,
+                    deleted: deletedPrices,
+                    option: option,
+                    addPriceCallback: 'shopperPriceTypeCallback',
+                    priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
+                    editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
+                    customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
+                    sites: {{ sites ? UTIL.toJson(sites) | raw : 'null' }},
+                    currencies: {{ currencies ? UTIL.toJson(currencies) | raw : 'null' }},
+                    productId: '{{ model.id() }}',
+                    fieldId: toggleSpace(this.props.row.name),
+                    validatePrices: validatePrices,
+                    priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
+                    operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
+                    showCustomers: {{ loadCustomerGroups ? 'true' : 'false' }},
+                    showSites: {{ loadSites ? 'true' : 'false' }},
+                    showCurrency: {{ loadCurrency ? 'true' : 'false' }}
+                };
+            },
+            render: function(){
+                var navTabs = [], tabPanes = [];
+                _(this.props.elements).each(function(option, i) {
+                    option = toggleSpace(option);
+                    priceOptions = this.init(option);
+
+                    var className;
+                    if (i == this.state.active){
+                        className = "active"
+                    } else {
+                        className = ""
+                    }
+
+                    var navTab = React.DOM.li({ className: className, role: 'presentation', key: option, id: option + '-tab' }, 
+                        React.DOM.a({ 
+                                id: 'btn'+capitalizeFirstLetter(option)+'Tab', 
+                                href: '#'+option, 
+                                role: 'tab', 
+                                'data-toggle': 'tab',
+                                'aria-controls': option,
+                                onClick: (function(event) {
+                                    // TODO: Re-rendering price grid if needed when tab changed or something like that
+                                }).bind(this)
+                            }, capitalizeFirstLetter(toggleSpace(option))
+                        )
+                    );
+
+                    var tabPane = React.DOM.div({ role: 'tabpanel', className: 'tab-pane ' + className, id: option , key: option}, 
+                        React.createElement(Price, { key: option, id: option, options: priceOptions })
+                    );
+
+                    navTabs.push(navTab);
+                    tabPanes.push(tabPane);
+                }.bind(this));
+
+                return React.DOM.div({ className:"tab-pane", id: 'shopper-tab', role: 'tabpanel' }, 
+                    React.DOM.ul({ id: shopperGrid.getConfig('id') + '-tabs', className: "nav nav-tabs prod-type f-horiz-nav-tabs" }, navTabs),
+                    React.DOM.div({ id: shopperGrid.getConfig('id') + '-data-tabs', className: "tab-content" }, tabPanes)
+                );
+            }
+        });
+
+        /**
+         * React component for render prices tab
          */
         var PriceTabs = React.createClass({
             displayName: "PriceTabs",
-            mixins: [FCom.Mixin, FCom.PriceMixin],
             getInitialState: function() {
                 return {
                     options: []
@@ -556,112 +666,20 @@
             render: function() {
                 var optionLabelIndex = optionDataIndex = 0;
                 var options = this.getOptions();
-                return React.createElement("div", { className: "tabbable" },
-                    React.createElement("ul", { className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
-                        React.createElement('li', { className: 'active', role: 'presentation' }, 
-                            React.createElement('a', { id: 'btnOptionsTab',href: '#options-tab', 'aria-controls': 'options-tab', role: 'tab', 'data-toggle': 'tab' }, 'Options')
+                return React.DOM.div({ className: "tabbable" },
+                    React.DOM.ul({ className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
+                        React.DOM.li({ className: 'active', role: 'presentation' }, 
+                            React.DOM.a({ id: 'btnOptionsTab',href: '#options-tab', 'aria-controls': 'options-tab', role: 'tab', 'data-toggle': 'tab' }, 'Options')
                         ),
-                        React.createElement('li', { className: '', role: 'presentation' }, 
-                            React.createElement('a', { id: 'btnShopperTab', href: '#shopper-tab', 'aria-controls': 'shopper-tab', role: 'tab', 'data-toggle': 'tab' }, 'Price rule')
+                        React.DOM.li({ className: '', role: 'presentation' }, 
+                            React.DOM.a({ id: 'btnShopperTab', href: '#shopper-tab', 'aria-controls': 'shopper-tab', role: 'tab', 'data-toggle': 'tab' }, 'Price rule')
                         )
                     ),
-                    React.createElement("div", { className: "tab-content" }, 
-                        React.createElement("div", { className: "tab-pane fade in active", id: 'options-tab', role: 'tabpanel' }, 
-                            React.createElement("div", {id:'{{ frontendFieldGrid.config.id }}_options_grid'})
+                    React.DOM.div({ className: "tab-content" }, 
+                        React.DOM.div({ className: "tab-pane active", id: 'options-tab', role: 'tabpanel' }, 
+                            React.DOM.div({ id: '{{ frontendFieldGrid.config.id }}_options_grid' })
                         ),
-                        React.createElement("div", { className: "tab-pane fade", id: 'shopper-tab', role: 'tabpanel' },
-                            React.createElement("ul", { id: shopperGrid.getConfig('id') + '-tabs', className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
-                                _(options).map(function(option) {
-                                    option = toggleSpace(option);
-                                    var className = '';
-                                    if (optionLabelIndex == 0) {
-                                        className = 'active';
-                                        optionLabelIndex++;
-                                    }
-                                    return React.createElement('li', { className: className, role: 'presentation', key: option, id: option + '-tab' }, 
-                                            React.createElement('a', { id: 'btn'+capitalizeFirstLetter(option)+'Tab', href: '#'+option, 'aria-controls': option, role: 'tab', 'data-toggle': 'tab' }, capitalizeFirstLetter(toggleSpace(option, true)))
-                                        );
-                                }.bind(this))
-                            ),
-                            React.createElement("div", { id: shopperGrid.getConfig('id') + '-data-tabs', className: "tab-content" }, 
-                                _(options).map(function(option, index) {
-                                    option = toggleSpace(option);
-                                    var optionSerialized = {};
-                                    if (!_.isEmpty(this.props.row.option_serialized)) {
-                                        // optionSerialized = JSON.parse(this.props.row.option_serialized);
-                                        optionSerialized = this.props.row.option_serialized;
-                                    }
-                                    var className = '',
-                                        prices    = [];
-
-                                    shopperPrices = !_.isEmpty(optionSerialized) && optionSerialized[option] ? optionSerialized[option].prices : (currentShopper.option_serialized && !_.isEmpty(currentShopper.option_serialized[option]) ? currentShopper.option_serialized[option].prices : []);
-
-                                    if (optionDataIndex == 0) {
-                                        className = 'in active';
-                                        optionDataIndex++;
-                                    }
-
-                                    if (shopperPrices && shopperPrices.length) {
-                                        prices = typeof shopperPrices === 'string' ? JSON.parse(shopperPrices) : shopperPrices;
-                                    }
-
-                                    /**
-                                     * Validate unique price
-                                     * @return mixed
-                                     */
-                                    var validatePrices = function() {
-                                        var valid = true;
-                                        $('#{{ frontendFieldGrid.config.id }}_options_form').find('select.'+option+'PriceUnique').each(function (el) {
-                                            if (!$(this).valid()) {
-                                                valid = false;
-                                            }
-                                        });
-                                        return valid;
-                                    }
-
-                                    var priceOptions = {
-                                        title: Locale._(capitalizeFirstLetter(option) + ' Prices'),
-                                        prices: prices,
-                                        deleted: deletedPrices,
-                                        option: option,
-                                        addPriceCallback: 'shopperPriceTypeCallback',
-                                        priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
-                                        editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
-                                        customerGroups: {{ customerGroups ? UTIL.toJson(customerGroups) | raw: 'null' }},
-                                        sites: {{ sites ? UTIL.toJson(sites) | raw : 'null' }},
-                                        currencies: {{ currencies ? UTIL.toJson(currencies) | raw : 'null' }},
-                                        productId: '{{ model.id() }}',
-                                        fieldId: toggleSpace(this.props.row.name),
-                                        validatePrices: validatePrices,
-                                        priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
-                                        operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
-                                        showCustomers: {{ loadCustomerGroups ? 'true' : 'false' }},
-                                        showSites: {{ loadSites ? 'true' : 'false' }},
-                                        showCurrency: {{ loadCurrency ? 'true' : 'false' }}
-                                    };
-
-                                    var node = React.createElement('div', { role: 'tabpanel', className: 'tab-pane fade ' + className, id: option , key: option}, 
-                                            React.createElement(Price, { id: option, options: priceOptions })
-                                        );
-
-                                    
-                                    var validateUniqueMethod = option+'PriceUnique',
-                                        validateBaseMethod   = option+'BaseField',
-                                        validateUniqueRule   = {},
-                                        validateBaseRule     = {};
-
-                                    validateUniqueRule[validateUniqueMethod] = true;
-                                    $.validator.addMethod(validateUniqueMethod, this.validateUniquePrice(option), '{{"Price already exists."|_}}');
-                                    $.validator.addClassRules(validateUniqueMethod, validateUniqueRule);
-
-                                    validateBaseRule[validateBaseMethod] = true;
-                                    $.validator.addMethod(validateBaseMethod, this.validateBasePrice(option), '{{"No matching base price"|_}}');
-                                    $.validator.addClassRules(option+"BaseField", validateBaseRule);
-
-                                    return node;
-                                }.bind(this))
-                            )
-                        )
+                        React.createElement(PriceTabList, { key: 'shopper-tab', elements: options, row: this.props.row })
                     )
                 );
             }
@@ -709,8 +727,8 @@
                         },
                         onConfirm: window.saveShopperModal
                     },
-                    React.createElement("div", { className: "row f-grid-wrapper" }, 
-                        React.createElement("form", {id:'{{ frontendFieldGrid.config.id }}_options_form'},
+                    React.DOM.div({ className: "row f-grid-wrapper" }, 
+                        React.DOM.form({id:'{{ frontendFieldGrid.config.id }}_options_form'},
                             React.createElement(PriceTabs, { row: currentShopper, options: options })
                         )
                     )

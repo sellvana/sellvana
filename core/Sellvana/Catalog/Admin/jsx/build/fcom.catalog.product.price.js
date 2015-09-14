@@ -540,7 +540,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             price.calc_amount = null;
         });
         _.each(prices, function (price) {
-            if (price.operation && price.operation != '=$') {
+            if (price.operation && price.operation !== '=$') {
                 collectPrice(price, prices);
             }
         });
@@ -586,7 +586,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             };
         },
         getInitialState: function() {
-            return _.extend({}, this.props, this.props.options);
+            return _.extend({}, this.props, this.props.options, { isUpdatePrice: false });
         },
         init: function() {
             this.state.applyFilter = function (e) {
@@ -603,11 +603,11 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
 
                 var newPrice = {
                     id: guid(),
-                    product_id: this.state.productId,
+                    product_id: parseInt(this.state.productId),
                     price_type: type,
-                    customer_group_id: this.state.filterCustomerGroupValue || null,
-                    site_id: this.state.filterSiteValue || null,
-                    currency_code: this.state.filterCurrencyValue || null,
+                    customer_group_id: this.state.filterCustomerGroupValue || '*',
+                    site_id: this.state.filterSiteValue || '*',
+                    currency_code: this.state.filterCurrencyValue || '*',
                     amount: null,
                     qty: 1
                 };
@@ -622,7 +622,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
 
             this.state.deletePrice = function (id) {
                 this.state.deleted.push(id);
-                this.forceUpdate();
+                this.setState({ isUpdatePrice: true });
             }.bind(this);
 
             this.state.updatePriceType = function (priceId, priceType) {
@@ -646,7 +646,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     }
                 }.bind(this));
 
-                this.forceUpdate();
+                this.setState({ isUpdatePrice: true });
             }.bind(this);
 
             this.state.updatePriceField = function (priceId, field, value) {
@@ -658,27 +658,27 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         price[field] = value;
                     }
                 });
-                this.forceUpdate();
+
+                this.setState({ isUpdatePrice: true });
             }.bind(this);
 
             this.state.addBlankPrice = function() {
                 var newPrice = {
                     id: guid(),
-                    product_id: this.state.productId,
+                    product_id: parseInt(this.state.productId),
                     price_type: 'base',
-                    customer_group_id: null,
-                    site_id: null,
-                    currency_code: null,
+                    customer_group_id: '*',
+                    site_id: '*',
+                    currency_code: '*',
                     amount: null,
                     qty: 1
                 };
                 this.state.prices.push(newPrice);
                 this.forceUpdate();
             }.bind(this);
-
-            calculateDynamicPrice(this.state);
         },
         componentWillMount: function() {
+            calculateDynamicPrice(this.state);
             // TODO: Catch missing important data before component initial render
             if (!this.state.productId) {
                 this.state.productId = this.getUrlParamByName('id');
@@ -697,9 +697,15 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 window[this.state.addPriceCallback](this.state.prices, this.state.option);
             }
         },
-        componentDidUpdate: function() {
-            if (!this.state.prices.length) {
-                this.state.addBlankPrice();
+        componentWillUpdate: function(nextProps, nextState) {
+            if (nextState.isUpdatePrice) {
+                calculateDynamicPrice(nextState);
+                nextState.isUpdatePrice = false;
+            }
+        },
+        componentDidUpdate: function(prevProps, prevState) {
+            if (!prevState.prices.length) {
+                prevState.addBlankPrice();
             }
         },
         render: function() {
