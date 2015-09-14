@@ -37,7 +37,7 @@
             mainGrid = grid;
             var modalContainerEle = document.getElementById('{{ catProductConfig.config.id }}-modal');
             React.unmountComponentAtNode(modalContainerEle);
-            React.renderComponent(
+            React.render(
                     React.createElement(Components.Modal, {
                                 id: "addProductModal",
                                 show: true,
@@ -54,7 +54,7 @@
                     ), modalContainerEle);
             var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById('allProductList');
-            var instanceAttachGrid = React.renderComponent(
+            var instanceAttachGrid = React.render(
                     React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
                     attachGridContainerEle
             );
