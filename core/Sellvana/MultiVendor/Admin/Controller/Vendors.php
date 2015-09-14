@@ -4,6 +4,9 @@
  * Class Sellvana_MultiVendor_Admin_Controller
  *
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
+ * @property Sellvana_MultiVendor_Model_Vendor $Sellvana_MultiVendor_Model_Vendor
+ * @property Sellvana_MultiVendor_Model_VendorProduct $Sellvana_MultiVendor_Model_VendorProduct
+ * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  */
 class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -98,6 +101,56 @@ class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controlle
         ];
 
         return $config;
+    }
+
+    public function formPostAfter($args) {
+        parent::formPostAfter($args);
+
+        $model = $args['model'];
+        $addedIds = $removedIds = [];
+        if (!empty($model->product_ids_add)) {
+            $addedIds = explode(',', $model->product_ids_add);
+            $this->_processAddVendorProduct($addedIds, $model);
+        }
+
+        if (!empty($model->product_ids_remove)) {
+            $removedIds = explode(',', $model->product_ids_remove);
+            $this->_processRemovedVendorProduct($removedIds, $model);
+        }
+    }
+
+    protected function _processAddVendorProduct($pIds, $vendorModel) {
+        $vId = $vendorModel->id();
+        $vpHlp = $this->Sellvana_MultiVendor_Model_VendorProduct;
+
+        foreach ($pIds as $pId) {
+            $p = $this->Sellvana_Catalog_Model_Product->load($pId);
+            $model = $vpHlp->orm('vp')->where_complex(['vendor_id' => $vId, 'product_id' => $pId])->find_one();
+            if (!$model) {
+                $model = $vpHlp->create();
+            }
+
+            $vpData = [
+                'product_id' => $p->id(),
+                'vendor_id' => $vId,
+                'vendor_sku' => $p->product_sku,
+                'vendor_product_name' => $vendorModel->vendor_name
+            ];
+
+            $model->set($vpData)->save();
+        }
+    }
+
+    protected function _processRemovedVendorProduct($pIds, $vendorModel) {
+        foreach ($pIds as $pId) {
+            $model = $this->Sellvana_MultiVendor_Model_VendorProduct
+            ->orm('vp')
+            ->where_complex(['product_id' => $pId, 'vendor_id' => $vendorModel->id()])
+            ->find_one();
+            if ($model) {
+                $model->delete();
+            }
+        }
     }
 
 }

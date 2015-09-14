@@ -69,7 +69,7 @@
             mainGrid = grid;
             var modalContainerEle = document.getElementById('{{ roleUserConfig.config.id }}-modal');
             React.unmountComponentAtNode(modalContainerEle);
-            React.renderComponent(
+            React.render(
                     React.createElement(Components.Modal, {
                                 id: "addUserModal",
                                 show: true,
@@ -86,7 +86,7 @@
                     ), modalContainerEle);
             var allUserConfigCompiled = {{ UTIL.toJson(allUserConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById('allUserList');
-            var instanceAttachGrid = React.renderComponent(
+            var instanceAttachGrid = React.render(
                     React.createElement(FComGriddleComponent, { config: allUserConfigCompiled}),
                     attachGridContainerEle
             );

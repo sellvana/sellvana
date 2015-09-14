@@ -677,6 +677,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                 this.forceUpdate();
             }.bind(this);
         },
+        shouldComponentUpdate: function(nextProps, nextState) {
+            return _.isEqual(this.state, nextState) || _.isEqual(this.props, nextProps);
+        },
         componentWillMount: function() {
             calculateDynamicPrice(this.state);
             // TODO: Catch missing important data before component initial render
