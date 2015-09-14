@@ -102,7 +102,7 @@ class Sellvana_CustomerFields_Model_CustomerFieldData extends FCom_Core_Model_Ab
             $cData        = $customer->as_array();
             $saveCustomer = false;
             foreach ($cData as $fieldCode => $value) { // go over all customer fields data
-                if (empty($fields[$fieldCode])) {
+                if (empty($fields[$fieldCode]) || empty($value)) {
                     continue;
                 }
 

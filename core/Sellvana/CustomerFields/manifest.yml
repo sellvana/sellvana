@@ -19,7 +19,7 @@ modules:
                 observe:
                     - [ "Sellvana_Customer_Admin_Controller_Customers::gridColumns", Sellvana_CustomerFields_Admin.onCustomerGridColumns ]
                     - [ "Sellvana_Customer_Admin_Controller_Customers::formViewBefore", Sellvana_CustomerFields_Admin.onCustomerFormViewBefore ]
-                    - [ "Sellvana_Customer_Admin_Controller_Customers::formPostAfter", Sellvana_CustomerFields_Admin.onCustomerFormPostAfter ]
+                    - [ "Sellvana_Customer_Admin_Controller_Customers::formPostBefore", Sellvana_CustomerFields_Admin.onCustomerFormPostBefore ]
                 security:
                     request_fields_whitelist:
                         /catalog/products/form:

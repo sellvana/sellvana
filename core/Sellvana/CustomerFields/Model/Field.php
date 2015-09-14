@@ -81,7 +81,7 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
     protected $_oldTableFieldCode;
     protected $_oldTableFieldType;
 
-    protected static $_fieldsCache = [];
+    protected static $_fieldsCache;
 
     /**
      * @param string $key

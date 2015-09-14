@@ -35,9 +35,10 @@ class Sellvana_CustomerFields_Admin extends BClass
         }
 
         $fieldsOptions = [];
-        $fields = $this->Sellvana_CustomerFields_Model_CustomerFieldData->fetchCustomersFieldData([$c->id()]);
-        if ($fields) {
-            $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
+        $id            = $c->id();
+        $fields        = $this->Sellvana_CustomerFields_Model_CustomerFieldData->fetchCustomersFieldData([$id]);
+        if (!empty($fields[$id])) {
+            $fieldIds = $this->BUtil->arrayToOptions($fields[$id], 'field_id');
             $fieldOptionsAll = $this->Sellvana_CustomerFields_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
                 ->order_by_asc('field_id')->order_by_asc('label')->find_many();
             foreach ($fieldOptionsAll as $option) {
@@ -48,7 +49,7 @@ class Sellvana_CustomerFields_Admin extends BClass
         $view->set('model', $c)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
-    public function onCustomerFormPostAfter($args)
+    public function onCustomerFormPostBefore($args)
     {
         /** @var Sellvana_Customer_Model_Customer $model */
         $model = $args['model'];
@@ -64,7 +65,7 @@ class Sellvana_CustomerFields_Admin extends BClass
                 }
             }
 
-            $model->setData('custom_fields', $customFields)->save();
+            $model->setData('custom_fields', $customFields);//->save();
         }
     }
 }
