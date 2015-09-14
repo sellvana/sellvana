@@ -97,34 +97,36 @@ class Sellvana_CatalogIndex_Main extends BClass
         static::$_autoReindex = false;
     }
 
-    /**
-     * @TODO: Переделать, во время FCom_Core_ImportExport::FCom_Core_ImportExport
-     * евент FCom_Core_ImportExport::import:afterModel:Sellvana_Catalog_Model_Product
-     * происходит много раз. А должен только один раз.
-     * Связано это с потоковой загрузкой.
-     */
     public function onProductAfterImport($args)
     {
-        if (array_key_exists('', $args)){
-            $ids = $args['product_ids'];
+        static::$_autoReindex = static::$_prevAutoReindex;
+        $this->Sellvana_CatalogIndex_Model_Doc->flagReindex($args['product_ids']);
+        if (static::$_autoReindex) {
+            $this->getIndexer()->indexPendingProducts();
         }
+    }
+
+    public function onProductAfterCoreImport($args){
         if (array_key_exists('import_id', $args)){
             $orm = $this->FCom_Core_Model_ImportExport_Id->orm('p');
             $orm->inner_join('FCom_Core_Model_ImportExport_Site', ['s.id', '=', 'p.site_id'], 's')
                 ->inner_join('FCom_Core_Model_ImportExport_Model', ['m.id', '=', 'p.model_id'], 'm')
+                ->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['i.id', '=', 'p.local_id'], 'i')
                 ->select('p.local_id')
                 ->group_by('p.local_id')
                 ->where('s.site_code', $args['import_id'])
-                ->where('m.model_name', 'Sellvana_Catalog_Model_Product');
-           $orm->find_many();
-            var_dump(BORM::get_last_query());
-            return;
-        }
+                ->where('m.model_name', 'Sellvana_Catalog_Model_Product')
+                ->where_null('i.id');
+            $ids = $orm->find_many_assoc('local_id','local_id');
 
-        static::$_autoReindex = static::$_prevAutoReindex;
-        $this->Sellvana_CatalogIndex_Model_Doc->flagReindex($ids);
-        if (static::$_autoReindex) {
-            $this->getIndexer()->indexPendingProducts();
+            $now = $this->BDb->now();
+            foreach ($ids as $id){
+                $this->Sellvana_CatalogIndex_Model_Doc->create([
+                    'id'=>$id,
+                    'last_indexed' => $now,
+                    'flag_reindex' => 1
+                ])->save();
+            }
         }
     }
 
