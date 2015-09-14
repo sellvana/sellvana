@@ -107,48 +107,48 @@ class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controlle
         parent::formPostAfter($args);
 
         $model = $args['model'];
-        $addedIds = $removedIds = [];
+
+        if (empty($args['validate_failed'])) {
+            $this->_processVendorProduct($model);
+        }
+    }
+
+    /**
+     * Process Vendors products
+     * @param  Sellvana_MultiVendor_Model_Vendor $model
+     * @return mixed
+     */
+    protected function _processVendorProduct($model) {
+        $vId = $model->id();
+        $vpHlp = $this->Sellvana_MultiVendor_Model_VendorProduct;
+
         if (!empty($model->product_ids_add)) {
-            $addedIds = explode(',', $model->product_ids_add);
-            $this->_processAddVendorProduct($addedIds, $model);
+            $addedIds = $this->BUtil->arrayCleanInt($model->product_ids_add);
+            foreach ($addedIds as $pId) {
+                $p = $this->Sellvana_Catalog_Model_Product->load($pId);
+                $vp = $vpHlp->orm('vp')->where_complex(['vendor_id' => $vId, 'product_id' => $pId])->find_one();
+                if (!$vp) {
+                    $vp = $vpHlp->create();
+                }
+
+                $vpData = [
+                    'product_id' => $p->id(),
+                    'vendor_id' => $vId,
+                    'vendor_sku' => $p->product_sku,
+                    'vendor_product_name' => $model->vendor_name
+                ];
+
+                $vp->set($vpData)->save();
+            }
         }
 
         if (!empty($model->product_ids_remove)) {
-            $removedIds = explode(',', $model->product_ids_remove);
-            $this->_processRemovedVendorProduct($removedIds, $model);
-        }
-    }
-
-    protected function _processAddVendorProduct($pIds, $vendorModel) {
-        $vId = $vendorModel->id();
-        $vpHlp = $this->Sellvana_MultiVendor_Model_VendorProduct;
-
-        foreach ($pIds as $pId) {
-            $p = $this->Sellvana_Catalog_Model_Product->load($pId);
-            $model = $vpHlp->orm('vp')->where_complex(['vendor_id' => $vId, 'product_id' => $pId])->find_one();
-            if (!$model) {
-                $model = $vpHlp->create();
-            }
-
-            $vpData = [
-                'product_id' => $p->id(),
-                'vendor_id' => $vId,
-                'vendor_sku' => $p->product_sku,
-                'vendor_product_name' => $vendorModel->vendor_name
-            ];
-
-            $model->set($vpData)->save();
-        }
-    }
-
-    protected function _processRemovedVendorProduct($pIds, $vendorModel) {
-        foreach ($pIds as $pId) {
-            $model = $this->Sellvana_MultiVendor_Model_VendorProduct
-            ->orm('vp')
-            ->where_complex(['product_id' => $pId, 'vendor_id' => $vendorModel->id()])
-            ->find_one();
-            if ($model) {
-                $model->delete();
+            $removedIds = $this->BUtil->arrayCleanInt($model->product_ids_remove);
+            foreach ($removedIds as $pId) {
+                $vp = $vpHlp->orm('vp')->where_complex(['vendor_id' => $vId, 'product_id' => $pId])->find_one();
+                if ($vp) {
+                    $vp->delete();
+                }
             }
         }
     }
