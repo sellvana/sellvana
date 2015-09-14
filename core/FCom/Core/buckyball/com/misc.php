@@ -1610,6 +1610,17 @@ class BUtil extends BClass
             . ($params ? '?' . http_build_query($params) : '');
     }
 
+    public function isCallable($cb)
+    {
+        if (is_callable($cb)) {
+            return true;
+        }
+        if (is_string($cb) && preg_match('#^([A-Za-z0-9_]+)(::|\.|->)([A-Za-z0-9_]+)$#', $cb)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param $callback
      * @return callable
@@ -1623,16 +1634,15 @@ class BUtil extends BClass
                 $callback = $callbackMapCache[$callback];
             } else {
                 $origCallback = $callback;
-                if (strpos($callback, '::') !== false) {
-                    list($class, $method) = explode('::', $callback);
-                    $reflMethod = new ReflectionMethod($class, $method);
-                    if ($reflMethod->isStatic()) {
-                        $class = null; // proceed with usual callback
+                if (preg_match('#^([A-Za-z0-9_]+)(::|\.|->)([A-Za-z0-9_]+)$#', $callback, $m)) {
+                    $class = $m[1];
+                    $method = $m[3];
+                    if ($m[2] === '::') {
+                        $reflMethod = new ReflectionMethod($class, $method);
+                        if ($reflMethod->isStatic()) {
+                            $class = null; // proceed with usual callback
+                        }
                     }
-                } elseif (strpos($callback, '.') !== false) {
-                    list($class, $method) = explode('.', $callback);
-                } elseif (strpos($callback, '->')) {
-                    list($class, $method) = explode('->', $callback);
                 }
                 if (!empty($class)) {
                     $instance = BClassRegistry::instance($class, [], true);
@@ -1658,6 +1668,33 @@ class BUtil extends BClass
         } else {
             return call_user_func($callback, $args);
         }
+    }
+
+    /**
+     * If callback, call and get result, otherwise pass through
+     *
+     * Do not apply on user data for security concerns
+     *
+     * @param mixed $data
+     * @param string $cacheKey
+     * @return mixed
+     */
+    public function maybeCallback($data, $cacheKey = null)
+    {
+        static $cache = [];
+
+        if ($cacheKey && !empty($cache[$cacheKey])) {
+            return $this->call($cache[$cacheKey]);
+        }
+        if ($this->isCallable($data)) {
+            $callback = $this->extCallback($data);
+            if ($cacheKey) {
+                $cache[$cacheKey] = $callback;
+            }
+            $result = $callback($data);
+            return $result;
+        }
+        return $data;
     }
 
     /**
