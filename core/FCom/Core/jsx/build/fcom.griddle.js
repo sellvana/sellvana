@@ -438,7 +438,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        React.createElement(Components.Modal, {show: true, title: "Mass Edit Form", confirm: "Save changes", cancel: "Close", onConfirm: this.modalSaveMassChanges, isLocalMode: isLocalMode, formType: this.getMassEditFormType()},
+                        React.createElement(Components.Modal, {show: true, title: "Mass Edit Form", confirm: "Save changes", cancel: "Close", onConfirm: this.modalSaveMassChanges, isLocalMode: isLocalMode, formType: this.getMassEditFormType()}, 
                             React.createElement(FComModalMassEditForm, {editUrl: editUrl, columnMetadata: this.props.columnMetadata, id: gridId, isLocalMode: isLocalMode, formType: this.getMassEditFormType()})
                         ),
                         modalEleContainer

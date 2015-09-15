@@ -8,7 +8,7 @@
         {% set type = 'images' %}
         {% set medialibConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({'id': 'all_' ~ type}) %}
         <!-- Att -->
-        <button type="button" class='btn btn-primary' id='{{ medialibConfig.id }}-media-modal-toggle'>{{ "Select Image"|_ }}</button>
+        <button type="button" class='btn btn-primary' id='{{ medialibConfig.config.id }}-media-modal-toggle'>{{ "Select Image"|_ }}</button>
         <div id="{{ medialibConfig.config.id }}-media-modal" class="fade modal">
             <div class="modal-dialog">
                 <div class="modal-content">
