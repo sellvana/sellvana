@@ -301,10 +301,12 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
     public function action_index()
     {
+        $gridConfig = $this->gridConfigLibrary();
+        unset($gridConfig['config']['pending_state']);
         $config = [
             'id'         => 'media_library',
             'title'      => $this->_("Media Library"),
-            'gridConfig' => $this->gridConfigLibrary(),
+            'gridConfig' => $gridConfig,
         ];
         $this->layout('/media');
         $view = $this->layout()->view('media')->set('config', $config);

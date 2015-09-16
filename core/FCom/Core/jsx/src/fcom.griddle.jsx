@@ -18,6 +18,9 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         componentWillMount: function () {
             this.initColumn();
         },
+        shouldComponentUpdate: function(nextProps, nextState) {
+            return !_.isEqual(this.props.config, nextProps.config);
+        },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
 
