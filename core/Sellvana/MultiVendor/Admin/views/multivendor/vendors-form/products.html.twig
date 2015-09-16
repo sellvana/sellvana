@@ -64,19 +64,6 @@
             if (typeof instanceAttachGrid.refs[prodAttachConfigCompiled.id] !== 'undefined') {
                 attachGrid = instanceAttachGrid.refs[prodAttachConfigCompiled.id];
             }
-
-            var assIds  = _.pluck(mainGrid.getRows(), 'id'),
-                assignedRows = [];
-
-            _.find(attachGrid.getRows(), function(row, i) {
-                if (_.contains(assIds, row.id)) {
-                    assignedRows.push(row);
-                }
-            });
-
-            if (assignedRows.length) {
-                attachGrid.removeRows(assignedRows);
-            }
         };
 
         /**

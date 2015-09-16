@@ -6,13 +6,14 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
     /**
      * FCom Griddle Componnent
      */
-    var FComGriddleComponent = React.createClass({displayName: "FComGriddleComponent",
+    var FComGriddleComponent = React.createClass({
+        displayName: "FComGriddleComponent",
         getDefaultProps: function () {
             return {
                 "config": {},
                 "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable',
                 "callbacks": {}
-            }
+            };
         },
         componentWillMount: function () {
             this.initColumn();
@@ -21,7 +22,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var columnsConfig = this.props.config.columns;
 
             var all = _.pluck(columnsConfig, 'name');
-            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden == true }), 'name');
+            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden === true; }), 'name');
             var show = _.difference(all, hide);
 
             this.props.columns = {all: all, show: show, hide: hide};

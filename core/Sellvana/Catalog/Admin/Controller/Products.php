@@ -452,7 +452,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 250],
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
         ];
-        $config['data'] = $this->Sellvana_Catalog_Model_Product->orm('p')->find_many();
         $config['actions'] = [
             #'add' => ['caption' => 'Add selected products']
         ];
@@ -466,8 +465,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         /*$config['_callbacks'] = "{
             'add':'categoryProdsMng.addSelectedProds'
         }";*/
-
-        $config['data_mode'] = 'local';
 
         return ['config' => $config];
     }

@@ -8,7 +8,7 @@
         {% set type = 'images' %}
         {% set medialibConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({'id': 'all_' ~ type}) %}
         <!-- Att -->
-        <button type="button" class='btn btn-primary' id='{{ medialibConfig.config.id }}-media-modal-toggle'>{{ "Select Image"|_ }}</button>
+        <button type="button" class='btn btn-primary btn-select-images' id='{{ medialibConfig.config.id }}-media-modal-toggle'>{{ "Select Image"|_ }}</button>
         <div id="{{ medialibConfig.config.id }}-media-modal" class="fade modal">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -30,13 +30,30 @@
         </div>
 
         <script type="text/javascript">
+            var isPending = {{ medialibConfig.config.pending_state }};
             require(['jquery'], function ($) {
+                window.registerGrid{{ medialibConfig.config.id }} = function(grid) {}
                 var mediaModal = $('#{{ medialibConfig.config.id }}-media-modal');
                 if (mediaModal) {
                     $('#{{ medialibConfig.config.id }}-media-modal-toggle').on('click', function () {
+                        if (isPending) {
+                            isPending = false;
+                            $(APP).trigger('onMounted', [{ pending_state: isPending }]);
+                        }
                         mediaModal.modal('show');
                     });
                 }
+                /*$(document).on('click', '.btn-select-images', function(e) {
+                    e.preventDefault();
+                    if (isPending) {
+                        isPending = false;
+                        $(APP).trigger('onMounted', [{ pending_state: isPending }]);
+                    }
+                    var mediaModal = $(this).next('.modal');
+                    if (mediaModal) {
+                        mediaModal.modal('show');
+                    }
+                });*/
             });
         </script>
         <!-- Att end -->
