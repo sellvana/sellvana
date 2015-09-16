@@ -15,7 +15,7 @@ class Sellvana_CustomerFields_Frontend extends BClass
 
         $customerFields = $this->Sellvana_CustomerFields_Model_Field
             ->orm()
-            ->where("account_edit", 1)->find_many();
+            ->where("account_edit", 1)->find_many_assoc();
         if (!$customerFields) {
             return '';
         }
@@ -26,18 +26,25 @@ class Sellvana_CustomerFields_Frontend extends BClass
         }
         /** @var Sellvana_Customer_Model_Customer $customer */
         $customer   = $args['customer'];
-        $customData = $this->Sellvana_CustomerFields_Model_CustomerFieldData
-            ->orm()
-            ->select(array_keys($fieldNames))
-            ->where('customer_id', $customer->id())
-            ->find_one();
+        //$cId        = $customer->id();
+        $this->Sellvana_CustomerFields_Model_CustomerFieldData
+            ->collectCustomersFieldData([$customer]);
 
         $data       = [];
-        if ($customData) {
-            foreach ($fieldNames as $fn => $field) {
-                $data[$fn] = ['value' => $customData->get($fn), 'field' => $field];
-            }
-
+        //if (!empty($customData[$cId])) {
+        //    $customData = $customData[$cId];
+        //}
+        /** @var Sellvana_CustomerFields_Model_Field $field */
+        foreach ($fieldNames as $fn => $field) {
+            //$fId = $field->id();
+            //$value = null;
+            $value = $customer->get($fn);
+            //if (isset($customData[$fId])) {
+            //    /** @var Sellvana_CustomerFields_Model_CustomerFieldData $cd */
+            //    $cd    = $customData[$fId];
+            //    $value = $cd->getCustomerFieldValue();
+            //}
+            $data[$fn] = ['value' => $value, 'field' => $field];
         }
 
         return $this->BLayout->view('customer/hook/customer-edit')

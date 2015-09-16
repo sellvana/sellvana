@@ -46,6 +46,24 @@ class Sellvana_CustomerFields_Model_CustomerFieldData extends FCom_Core_Model_Ab
 
     protected static $_autoCreateOptions = false;
 
+    public function getCustomerFieldValue()
+    {
+        $val = null;
+        $columnType = $this->get('table_field_type'); // when model created from fetchCustomersFieldData it has this field in it
+        if($columnType){
+            $column = static::$_fieldTypeColumns[$columnType];
+            $val = $this->get($column);
+        } else {
+            $columns = array_unique(static::$_fieldTypeColumns);
+            foreach ($columns as $column) {
+                $val = $this->get($column);
+                if($val){
+                    break;
+                }
+            }
+        }
+        return $val;
+    }
     /**
      * @param boolean $flag
      * @return $this

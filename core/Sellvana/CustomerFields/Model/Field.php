@@ -248,7 +248,7 @@ class Sellvana_CustomerFields_Model_Field extends FCom_Core_Model_Abstract
         $options = [];
         $input   = $this->get('admin_input_type');
         if($input == 'select' || $input == 'multiselect'){
-            $options = $this->Sellvana_CustomerFields_Model_FieldOption->getListAssocById($this->id());
+            $options = $this->Sellvana_CustomerFields_Model_FieldOption->getFieldOptions($this);
         }
         return $options;
     }

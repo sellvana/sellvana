@@ -11,13 +11,12 @@
         {% set input = field.get('admin_input_type') %}
         {% set lbl = field.get('frontend_label') %}
         {% set value = custmField.value %}
-
     <div class="form-group col-md-6">
         <label for="edit-{{ fieldId }}" class="control-label{{ req?' required':'' }}">{{ lbl|_ }}</label>
 
         <div class="controls">
             {% if input == 'text' %}
-            <input type="text" name="model[{{ fieldId }}]" class="{{ req? 'required ':'' }}form-control valid" value="{{ value }}"
+                <input type="text" name="model[{{ fieldId }}]" class="{{ req? 'required ':'' }}form-control valid" value="{{ value }}"
                    id="edit-{{ fieldId }}">
             {% elseif input == 'select' %}
                 {% set options = field.getOptions() %}
