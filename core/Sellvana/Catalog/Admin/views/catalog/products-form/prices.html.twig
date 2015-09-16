@@ -76,7 +76,6 @@
                 var options = {
                     prices: {{ UTIL.toJson(prices) | raw }},
                     title: Locale._('Product Prices'),
-                    dataMode: null,
                     priceTypes: {{ UTIL.toJson(m.priceTypeOptions()) | raw }},
                     editablePrices: {{ UTIL.toJson(priceHelper.fieldOptions('editable_prices')) | raw }},
                     customerGroups: {{ customerGroups? UTIL.toJson(customerGroups) | raw : 'null' }},

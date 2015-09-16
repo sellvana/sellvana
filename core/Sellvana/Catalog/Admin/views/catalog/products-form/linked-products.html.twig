@@ -71,7 +71,7 @@
                     ), modalContainerEle);
             var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById(mainGrid.getConfig('id')+'_tab');
-            var instanceAttachGrid = React.renderComponent(
+            var instanceAttachGrid = React.render(
                     React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
                     attachGridContainerEle
             );
