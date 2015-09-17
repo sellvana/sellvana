@@ -19,7 +19,7 @@
                 }.bind(this));
         	},
             shouldComponentUpdate: function(nextProps, nextState) {
-                return this.state.pending_state !== nextProps.pending_state;
+                return this.state.pending_state !== nextState.pending_state;
             },
         	componentWillUnmount: function() {
         		$(APP).off('onMounted');

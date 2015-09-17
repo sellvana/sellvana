@@ -248,6 +248,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $id = $this->BRequest->param('id', true);
         if ($id && !($model = $this->{$class}->load($id))) {
             /*$this->BDebug->error('Invalid ID: '.$id);*/
+            // Redirect if item does not exist
+            $this->BResponse->redirect($this->BApp->href($this->_gridHref));
             $this->message('This item does not exist', 'error');
         }
         if (empty($model)) {
