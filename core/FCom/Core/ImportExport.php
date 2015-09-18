@@ -364,6 +364,20 @@ class FCom_Core_ImportExport extends BClass
                     if(!isset($this->_currentConfig[static::AUTO_MODEL_ID])){
                         $this->_currentConfig[static::AUTO_MODEL_ID] = true; // default case, id is auto increment
                     }
+                    if (!array_key_exists('unique_key_not_null', $this->_currentConfig)
+                        && array_key_exists('unique_key', $this->_currentConfig)
+                    ) {
+                        $table = $this->{$cm}->table();
+                        $fields = BDb::ddlFieldInfo($table);
+                        foreach ($fields as $fieldName => $field) {
+                            if (!in_array($fieldName, (array)$this->_currentConfig['unique_key'])
+                                || $field->orm->get('Null') == 'YES'
+                            ) {
+                                continue;
+                            }
+                            $this->_currentConfig['unique_key_not_null'][] = $fieldName;
+                        }
+                    }
                     if (!$this->_currentConfig) {
                         $msg = $this->BLocale->_(
                             "%s Could not find I/E config for %s.",
@@ -520,12 +534,14 @@ class FCom_Core_ImportExport extends BClass
             //$this->BDebug->log(sprintf("%s - memory consumption: %.2f MB", $this->BDb->now(), memory_get_usage(1)/1024/1024));
             $modified = false;
             try {
-                if (!empty($this->_currentConfig['unique_key'])) {
-                    foreach ((array)$this->_currentConfig['unique_key'] as $k) {
+                if (!empty($this->_currentConfig['unique_key'])
+                    && !empty($this->_currentConfig['unique_key_not_null'])
+                ) {
+                    foreach ((array)$this->_currentConfig['unique_key_not_null'] as $k) {
                         if (empty($data[$k])) {
                             $this->_errors++;
                             $this->_sendMessage([
-                                'signal'  => 'problem',
+                                'signal' => 'problem',
                                 'problem' => $this->BLocale->_("%s Empty primary key fields: %s", [$this->BDb->now(), $id]),
                             ]);
                             continue 2;
