@@ -134,7 +134,7 @@
             $fArea.val($area.data('area'));
             if (added) {
                 nextWidgetId--;
-                $widget.data('id', nextWidgetId);
+                $widget.attr('data-id', nextWidgetId);
                 $widget.find('input,textarea,select').each(function(idx, el) {
                     var $el = $(el);
                     $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + nextWidgetId + ']'))

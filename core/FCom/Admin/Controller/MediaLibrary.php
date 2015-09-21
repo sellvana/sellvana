@@ -80,13 +80,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
         $config = [
             'config' => [
-                'id' => $id,
-                'caption' => 'Media Library',
-                'orm' => $orm,
+                'id'          => $id,
+                'caption'     => 'Media Library',
+                'orm'         => $orm,
                 //'data_mode' => 'json',
-                //'url' => $url.'/data?folder='.urlencode($folder),
-                'data_url' => $url . '/data?folder=' . urlencode($folder),
-                'edit_url' => $url . '/edit?folder=' . urlencode($folder),
+                //'url'       => $url.'/data?folder='.urlencode($folder),
+                'data_url'    => $url . '/data?folder=' . urlencode($folder),
+                'edit_url'    => $url . '/edit?folder=' . urlencode($folder),
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
@@ -115,7 +115,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     'componentDidMount' => 'registerGrid' . $id,
                 ],
                 'actions' => [
-                    'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
+                    'rescan'  => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
                     'refresh' => true,
                 ]
             ]
@@ -182,11 +182,12 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
         $config = [
             'config' => [
-                'id' => $id,
-                'caption' => 'Media Library',
-                'orm' => $orm,
-                'data_url' => $url . '/data',
-                'edit_url' => $url . '/edit',
+                'id'            => $id,
+                'caption'       => 'Media Library',
+                'orm'           => $orm,
+                'data_url'      => $url . '/data',
+                'edit_url'      => $url . '/edit',
+                'pending_state' => true,
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
@@ -244,8 +245,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     public function afterInitialLibraryData($rows)
     {
         $baseUrl = $this->BConfig->get('web/base_dir');
-        $hlp      = $this->FCom_Core_Main;
-        $images = ['jpeg', 'jpg', 'tiff', 'gif', 'png', 'bmp'];
+        $hlp     = $this->FCom_Core_Main;
+        $images  = ['jpeg', 'jpg', 'tiff', 'gif', 'png', 'bmp'];
         foreach ($rows as & $row) {
             $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
             if (!in_array($ext, $images)) {
@@ -300,10 +301,12 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
     public function action_index()
     {
+        $gridConfig = $this->gridConfigLibrary();
+        unset($gridConfig['config']['pending_state']);
         $config = [
-            'id' => 'media_library',
-            'title' => $this->_("Media Library"),
-            'gridConfig' => $this->gridConfigLibrary(),
+            'id'         => 'media_library',
+            'title'      => $this->_("Media Library"),
+            'gridConfig' => $gridConfig,
         ];
         $this->layout('/media');
         $view = $this->layout()->view('media')->set('config', $config);
@@ -347,8 +350,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 break;
 
             case 'download':
-                $folder = $this->getFolder();
-                $r = $this->BRequest;
+                $folder   = $this->getFolder();
+                $r        = $this->BRequest;
                 $fileName = basename($r->get('file'));
                 $fullName = $this->FCom_Core_Main->dir($folder) . '/' . $fileName;
 
@@ -388,14 +391,14 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
      */
     public function processGridPost($options = [])
     {
-        $r = $this->BRequest;
-        $gridId = $r->get('grid');
-        $folder = !empty($options['folder']) ? $options['folder'] : $this->getFolder();
+        $r         = $this->BRequest;
+        $gridId    = $r->get('grid');
+        $folder    = !empty($options['folder']) ? $options['folder'] : $this->getFolder();
         $subfolder = !empty($options['subfolder']) ? $options['subfolder'] : null;
         $targetDir = $this->FCom_Core_Main->dir($folder);
-
-        $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
-        $attModel = is_string($attModel) ? $this->{$attModel} : $attModel;
+        
+        $attModel  = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
+        $attModel  = is_string($attModel) ? $this->{$attModel} : $attModel;
 
         /*
          * class GridForm: "oper" use in grid, "do" use in form
@@ -519,7 +522,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                             'file_size'           => $fileSize,
                             'act'                 => $status,
                             'folder'              => $folder,
-                            'subfolder'              => '',
+                            'subfolder'           => '',
                             'associated_products' => $associatedProducts
                         ];
                     }

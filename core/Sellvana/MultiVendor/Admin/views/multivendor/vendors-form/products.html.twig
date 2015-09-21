@@ -58,8 +58,7 @@
             var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById('allProductList');
             var instanceAttachGrid = React.render(
-                    React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}),
-                    attachGridContainerEle
+                React.createElement(FComGriddleComponent, { config: prodAttachConfigCompiled}), attachGridContainerEle
             );
 
             if (typeof instanceAttachGrid.refs[prodAttachConfigCompiled.id] !== 'undefined') {

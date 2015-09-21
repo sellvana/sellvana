@@ -466,7 +466,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             'add':'categoryProdsMng.addSelectedProds'
         }";*/
 
-
         return ['config' => $config];
     }
 
