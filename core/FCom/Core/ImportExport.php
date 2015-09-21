@@ -485,7 +485,8 @@ class FCom_Core_ImportExport extends BClass
             $where = [];
             if (isset($this->_currentConfig['unique_key'])) {
                 foreach ((array)$this->_currentConfig['unique_key'] as $ukey) {
-                    if (!empty($data[$ukey])) {
+                    if(array_key_exists($ukey, $data)){
+//                    if (!empty($data[$ukey])) {
                         $where[$ukey] = $data[$ukey];
                         $oldIdKey .= $data[$ukey] . '/';
                     }

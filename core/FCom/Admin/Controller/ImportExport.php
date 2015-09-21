@@ -4,6 +4,7 @@
  * Class FCom_Admin_Controller_ImportExport
  *
  * @property FCom_Core_ImportExport $FCom_Core_ImportExport
+ * #@property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  */
 class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -204,6 +205,13 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         $uploads = $_FILES['upload'];
         $rows    = [];
         try {
+            $isSubscribed = null;
+            if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {
+                $isSubscribed = $this->FCom_PushServer_Model_Client->sessionClient()->isSubscribed('import');
+                if ($isSubscribed !== true){
+                    $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('import');
+                }
+            }
             foreach ($uploads['name'] as $i => $fileName) {
 
                 if (!$fileName) {
@@ -243,7 +251,13 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 }
                 $rows[] = $row;
             }
+            if ($isSubscribed !== true) {
+                $this->FCom_PushServer_Model_Client->sessionClient()->unsubscribe('import');
+            }
         } catch(Exception $e) {
+            if ($isSubscribed !== true) {
+                $this->FCom_PushServer_Model_Client->sessionClient()->unsubscribe('import');
+            }
             $this->BDebug->logException($e);
             $this->BResponse->json(['error' => $e->getMessage()]);
         }
