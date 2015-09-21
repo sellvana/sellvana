@@ -44,7 +44,7 @@ class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controlle
         $config['filters'] = [
             ['field' => 'id', 'type' => 'number-range'],
             ['field' => 'vendor_name', 'type' => 'text'],
-            ['field' => 'notify_type', 'type' => 'select'],
+            ['field' => 'notify_type', 'type' => 'multiselect'],
             ['field' => 'email_notify', 'type' => 'text'],
             ['field' => 'email_support', 'type' => 'text'],
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -103,22 +103,36 @@ class Sellvana_MultiVendor_Admin_Controller_Vendors extends FCom_Admin_Controlle
         return $config;
     }
 
+    /**
+     * @param array $args
+     */
+    public function formPostBefore($args) {
+        parent::formPostBefore($args);
+
+        $layout = $this->FCom_Core_LayoutEditor->processFormPost();
+        if ($layout) {
+            $args['model']->setData('layout', $layout);
+        }
+    }
+
     public function formPostAfter($args) {
         parent::formPostAfter($args);
 
         $model = $args['model'];
+        $data = $this->BRequest->post();
 
         if (empty($args['validate_failed'])) {
-            $this->_processVendorProduct($model);
+            $this->_processVendorProduct($model, $data);
         }
     }
 
     /**
      * Process Vendors products
      * @param  Sellvana_MultiVendor_Model_Vendor $model
+     * @param Array $data
      * @return mixed
      */
-    protected function _processVendorProduct($model) {
+    protected function _processVendorProduct($model, $data) {
         $vId = $model->id();
         $vpHlp = $this->Sellvana_MultiVendor_Model_VendorProduct;
 

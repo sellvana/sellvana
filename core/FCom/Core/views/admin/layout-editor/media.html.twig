@@ -7,9 +7,10 @@
     <div id="lib-images-{{ widget.id }}">
         {% set type = 'images' %}
         {% set medialibConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfigLibrary({'id': 'media_all_' ~ type}) %}
+        {% set medialibConfigCompiled = LAYOUT.view('core/griddle').set('grid', medialibConfig).getGridConfig() %}
         <!-- Att -->
-        <button type="button" class='btn btn-primary btn-select-images' id='{{ medialibConfig.config.id }}-media-modal-toggle'>{{ "Select Image"|_ }}</button>
-        <div id="{{ medialibConfig.config.id }}-media-modal" class="fade modal">
+        <button type="button" class='btn btn-primary btn-select-images'>{{ "Select Image"|_ }}</button>
+        <div class="fade modal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -19,7 +20,7 @@
                         <h4 class="modal-title">{{ "Choose Image"|_ }}</h4>
                     </div>
                     <div class="modal-body">
-                        {{ LAYOUT.view('core/griddle').set('grid', medialibConfig) | raw }}
+                        {# {{ LAYOUT.view('core/griddle').set('grid', medialibConfig) | raw }} #}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -30,30 +31,31 @@
         </div>
 
         <script type="text/javascript">
-            var isPending = {{ medialibConfig.config.pending_state }};
-            require(['jquery'], function ($) {
-                window.registerGrid{{ medialibConfig.config.id }} = function(grid) {}
-                var mediaModal = $('#{{ medialibConfig.config.id }}-media-modal');
-                if (mediaModal) {
-                    $('#{{ medialibConfig.config.id }}-media-modal-toggle').on('click', function () {
-                        if (isPending) {
-                            isPending = false;
-                            $(APP).trigger('onMounted', [{ pending_state: isPending }]);
-                        }
-                        mediaModal.modal('show');
-                    });
-                }
-                /*$(document).on('click', '.btn-select-images', function(e) {
+            window.registerGrid{{ medialibConfig.config.id }} = function(grid) {
+                // componentDidMout for specific insert_media widget
+            }
+
+            var grids = [];
+            require(['jquery', 'underscore', 'react', 'fcom.griddle'], function ($, _, React, FComGriddleComponent) {
+                $(document).on('click', '.btn-select-images', function(e) {
                     e.preventDefault();
-                    if (isPending) {
-                        isPending = false;
-                        $(APP).trigger('onMounted', [{ pending_state: isPending }]);
-                    }
                     var mediaModal = $(this).next('.modal');
-                    if (mediaModal) {
-                        mediaModal.modal('show');
+                    var ci         = $(this).parents('div.js-widget-box').data('id');
+                    var ele        = this.nextElementSibling.querySelector('.modal-body');
+                    var config     = {{ UTIL.toJson(medialibConfigCompiled) | raw }};
+                    var newId      = config.id + '_' + ci;
+
+                    if (!_.contains(grids, newId)) {
+                        React.unmountComponentAtNode(ele);
+                        var mConfig = _.extend(config, { id: newId });
+                        React.render(
+                            React.createElement(FComGriddleComponent, { key: newId, config: mConfig }), ele
+                        );
+                        grids.push(newId);
                     }
-                });*/
+
+                    mediaModal.modal('show');
+                });
             });
         </script>
         <!-- Att end -->
