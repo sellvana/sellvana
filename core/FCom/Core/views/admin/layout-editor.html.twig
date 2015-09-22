@@ -23,7 +23,7 @@
 
     <div class="col-md-10 js-layout-editor-container">
         <div class="js-layout-structure-control">
-            <select name="{{ context.prefix }}[area][header]" class="form-control input-sm">
+            <select id="{{ context.prefix }}--area-header" name="{{ context.prefix }}[area][header]" class="form-control input-sm">
                 {{ UTIL.optionsHtml({ '': 'Inherit Header Visibility'|_, 'show': 'Show Header'|_, 'hide': 'Hide Header'|_ }, layout.area.header) | raw }}
             </select>
             <select id="{{ context.prefix }}--area-footer" name="{{ context.prefix }}[area][footer]" class="form-control input-sm">
