@@ -15,6 +15,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     protected $_gridTitle = 'Import Export';
     protected $_formTitle = 'Import Export';
     protected $_recordName = 'Import Export';
+    protected $_formLayoutName = '/importexport';
 
     public function getExportConfig()
     {

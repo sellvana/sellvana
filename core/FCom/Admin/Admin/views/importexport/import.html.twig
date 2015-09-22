@@ -140,44 +140,10 @@
         });
     </script>
     <script type="text/javascript">
-        require(['jquery', 'fcom.pushclient'], function ($, PushClient) {
-            var $logCanvas = $('#ie-msg-log');
-            var found;
-
-            function channel_import(data) {
-                console.log(data);
-                /*
-                * signals:
-                * info
-                * problem
-                * start
-                * finished:[
-                *   'data'   => [
-                    'new_models'
-                    'updated_models'
-                    'not_changed'
-                ]]
-                * */
-                switch (data.signal) {
-                    case 'info':
-                        $logCanvas.html('<div class="alert-info">' + data.msg + '</div>');
-                        break;
-                    case 'problem':
-                        $logCanvas.append('<div class="alert-error">' + data.msg + '</div>');
-                        break;
-                    case 'finished':
-                        $logCanvas.append('<div class="alert-info">' + data.msg + '</div>');
-                            if(data.data) {
-                                for(var i in data.data) {
-                                    $logCanvas.append('<div class="alert-info">    ' + data.data[i] + '</div>');
-                                }
-                            }
-                        break;
-                }
-            }
-
-
-            PushClient.listen({channel: 'import', callback: channel_import});
+        require(['jquery', 'fcom.admin.import'], function ($, Import) {
+            $(document).ready(function () {
+                Import.init('ie-msg-log');
+            });
         });
     </script>
 </div>
