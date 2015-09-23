@@ -139,6 +139,18 @@
                     var $el = $(el);
                     $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + nextWidgetId + ']'))
                 });
+                
+                var $ul = $widget.find('ul.nav-tabs');
+                $ul.find('li a').each(function(index, el) {
+                    var $el = $(el);
+                    $el.prop('href', '#' + $el.prop('href').split('#')[1].replace(/_-ID-/g, nextWidgetId));
+                });
+
+                var $tabPane = $widget.find('.tab-content');
+                $tabPane.children('.tab-pane').each(function(index, el) {
+                    var $el = $(el);
+                    $el.prop('id', $el.prop('id').replace(/_-ID-/g, nextWidgetId));
+                });
             }
         }
 
