@@ -1,0 +1,40 @@
+#import-log {
+  .box {
+    margin: 0;
+    border: none;
+    .box-header {
+      .title {
+        font-size: 17px;
+      }
+      .actions {
+        .btn.box-collapse {
+          i:before {
+            content: "\f077";
+          }
+        }
+      }
+    }
+    .box-content {
+      padding: 10px;
+      border: 1px solid #dddddd;
+      background: white;
+      -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
+      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
+    }
+    &.box-collapsed {
+      .box-header {
+        .actions {
+          .btn.box-collapse {
+            i:before {
+              content: "\f078";
+            }
+          }
+        }
+      }
+    }
+  }
+  table {
+    width: 100%;
+  }
+}
