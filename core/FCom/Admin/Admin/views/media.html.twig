@@ -53,16 +53,16 @@
 
 <script type="text/javascript">
     require(['jquery'], function ($) {
-        var uploadConfigs = {{ UTIL.toJSON(uploadConfig)|raw }};
-        var uploadUrlBase = "{{ APP.href("media/grid/upload?type=") | raw }}";
-        var thumb_path = 'resize.php?s=68&f=media';
-        var $mediaTypes = $("#media-library-upload-types");
-        var type = $mediaTypes.val();
-        var uploadUrl = uploadUrlBase + type;
-        var $uploader = $("#{{config.id}}-media-upload");
+        var uploadConfigs       = {{ UTIL.toJSON(uploadConfig)|raw }};
+        var uploadUrlBase       = "{{ APP.href("media/grid/upload?type=") | raw }}";
+        var thumb_path          = 'resize.php?s=68&f=media';
+        var $mediaTypes         = $("#media-library-upload-types");
+        var type                = $mediaTypes.val();
+        var uploadUrl           = uploadUrlBase + type;
+        var $uploader           = $("#{{config.id}}-media-upload");
         var uploaderInitialized = false;
         $mediaTypes.on('change', function (e) {
-            type = $mediaTypes.val();
+            type = $(this).val();
             uploadUrl = uploadUrlBase + type;
             $uploader.fileupload('option', {url: uploadUrl});
             switch(type) {
