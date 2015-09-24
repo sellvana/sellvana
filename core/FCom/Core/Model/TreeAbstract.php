@@ -248,10 +248,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         if (!$this->get('url_key')) {
             $this->generateUrlKey();
         }
-        if (!$this->get('url_path') || $this->is_dirty('url_key')) {
+        if (!$this->get('url_path') || ($this->is_dirty('url_key') && !$this->_new)) {
             $this->generateUrlPath();
         }
-        if (!$this->get('full_name') || $this->is_dirty('node_name')) {
+        if (!$this->get('full_name') || ($this->is_dirty('node_name') && !$this->_new)) {
             $this->generateFullName();
         }
         if ($this->is_dirty('id_path')) {

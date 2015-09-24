@@ -619,6 +619,7 @@ class FCom_Core_ImportExport extends BClass
                 $this->_sendMessage([
                     'signal' => 'problem',
                     'problem' => $this->BLocale->_("Error: unexpected file fail"),
+                    'data' => ['Exception Message' => $e->getMessage()]
                 ]);
             }
 
