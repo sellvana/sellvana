@@ -2590,30 +2590,6 @@ class BErrorException extends Exception
 */
 class BDebug extends BClass
 {
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const EMERGENCY = 0,
         ALERT       = 1,
         CRITICAL    = 2,
@@ -2637,27 +2613,6 @@ class BDebug extends BClass
         self::DEBUG     => 'DEBUG',
     ];
 
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const MEMORY  = 0,
         FILE      = 1,
         SYSLOG    = 2,
@@ -2666,30 +2621,6 @@ class BDebug extends BClass
         EXCEPTION = 16,
         STOP      = 4096;
 
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const MODE_DEBUG      = 'DEBUG',
         MODE_DEVELOPMENT  = 'DEVELOPMENT',
         MODE_STAGING      = 'STAGING',
