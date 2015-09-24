@@ -26,7 +26,6 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
 
             if (objects[data.objectId] === undefined) {
                 objects[data.objectId] = {};
-                //objects[data.objectId] = React.createElement(FcomAdminImportPushServerObjects, {msg: data});
             }
             var currentObject = objects[data.objectId];
 
@@ -42,7 +41,6 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
                     that.handleFinishedSignal(data, currentObject);
                     break;
             }
-            console.log('alert ', objects);
             this.forceUpdate();
         },
         handleStartSignal: function (message, item) {
@@ -109,54 +107,38 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
             return data;
         },
         render: function () {
-            var boxClass = ['box', 'box-nomargin'],
-                boxHeader,
-                boxHeaderNodes = [],
-                boxHeaderActions = null,
-                boxContent,
-                boxContentNodes = [];
+            var contentNodes = [];
 
             for (var key in this.props.pushServerObjects) {
                 var pushServerObject = this.props.pushServerObjects[key];
 
-                boxContentNodes.push(React.createElement(FcomAdminImportPushServerObject, {
+                contentNodes.push(React.createElement(FcomAdminImportPushServerObject, {
+                    key: key,
                     title: pushServerObject.title,
                     storeId: pushServerObject.storeId,
                     models: pushServerObject.models
                 }));
             }
 
-            if (boxContentNodes.length == 0) {
-                boxClass.push('box-collapsed');
-            } else {
-                boxHeaderActions = React.createElement('div', {className: 'actions'}, [
-                    React.createElement('a', {className: 'btn box-collapse btn-xs btn-link', href: '#'},
-                        React.createElement('i', {className: 'icon-chevron-down'})
-                    )
-                ]);
-                boxContent = React.createElement('div', {className: 'box-content'}, boxContentNodes)
+            if (contentNodes.length == 0) {
+                collapsible = false;
+
+                contentNodes.push(
+                    React.createElement('span', {key: 'noData'}, Locale._('No data'))
+                );
             }
 
-            boxHeaderNodes.push(
-                React.createElement('div', {className: 'title'}, Locale._('Import Statistic'))
+            return React.createElement('div', {className: 'row', id: 'import-log'},
+                React.createElement('div', {className: 'col-sm-12'},
+                    React.createElement(FcomAdminBox, {
+                        id: 'import-log',
+                        additionalClassName: null,
+                        title: Locale._('Import Statistic'),
+                        collapsible: true,
+                        isCollapsed: false
+                    }, contentNodes)
+                )
             );
-
-            if (boxHeaderActions !== null) {
-                boxHeaderNodes.push(boxHeaderActions);
-            }
-
-            boxHeader = React.createElement('div', {className: 'box-header'}, boxHeaderNodes);
-
-
-            /*return React.createElement('div', {className: 'row', id: 'import-log'},
-             React.createElement('div', {className: 'col-sm-12'},
-             React.createElement('div', {className: boxClass.join(' ')}, [
-             boxHeader,
-             boxContent
-             ])
-             )
-             );*/
-            return React.createElement(FcomAdminBox, {}, boxHeaderNodes);
         }
     });
 
@@ -180,11 +162,11 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
                     modelInfoNodes = [];
 
                 modelInfoNodes.push(
-                    React.createElement('td', null, rowId++)
+                    React.createElement('td', {key: key + '-nr'}, rowId++)
                 );
 
                 modelInfoNodes.push(
-                    React.createElement('td', null, model.name)
+                    React.createElement('td', {key: key + '-name'}, model.name)
                 );
 
                 var keys = [
@@ -194,36 +176,40 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
                 ];
 
                 for (var index in keys) {
-                    var key = keys[index],
+                    var tkey = keys[index],
                         value = 0;
 
-                    if (model.info !== undefined && model.info[key] !== undefined) {
-                        value = model.info[key];
+                    if (model.info !== undefined && model.info[tkey] !== undefined) {
+                        value = model.info[tkey];
                     }
 
                     modelInfoNodes.push(
-                        React.createElement('td', {className: key}, value)
+                        React.createElement('td', {className: tkey, key: key + "-" + tkey}, value)
                     );
                 }
                 modelNodes.push(
-                    React.createElement('tr', null, modelInfoNodes)
+                    React.createElement('tr', {key: key + '-tr'}, modelInfoNodes)
                 );
             }
-            return React.createElement('div', null, [
-                props.title + " - " + props.storeId,
-                React.createElement('div', {className: 'responsive-table'},
-                    React.createElement('div', {className: 'scrollable-area'},
-                        React.createElement('table', {className: 'table table-bordered table-hover table-striped'}, [
-                            React.createElement('thead', null, [
-                                React.createElement('tr', null, [
-                                    React.createElement('th', null, " "),
-                                    React.createElement('th', null, Locale._('Model Name')),
-                                    React.createElement('th', null, Locale._('New')),
-                                    React.createElement('th', null, Locale._('Updated')),
-                                    React.createElement('th', null, Locale._('Not Changed'))
+            return React.createElement(FcomAdminBox, {
+                id: 'file-' + props['storeId'],
+                title: props['title'] + " - " + props['storeId'],
+                collapsible: true,
+                isCollapsed: true
+            }, [
+                React.createElement('div', {className: 'responsive-table', key: 'table-area'},
+                    React.createElement('div', {className: 'scrollable-area', key: 'area'},
+                        React.createElement('table', {className: 'table table-bordered table-hover table-striped', key: 'table'}, [
+                            React.createElement('thead', {key: 'thead'}, [
+                                React.createElement('tr', {key: 'thead-tr'}, [
+                                    React.createElement('th', {key: 'th-nr'}, " "),
+                                    React.createElement('th', {key: 'th-name'}, Locale._('Model Name')),
+                                    React.createElement('th', {key: 'th-new'}, Locale._('New')),
+                                    React.createElement('th', {key: 'th-updated'}, Locale._('Updated')),
+                                    React.createElement('th', {key: 'th-not-chanched'}, Locale._('Not Changed'))
                                 ])
                             ]),
-                            React.createElement('tbody', null, modelNodes)
+                            React.createElement('tbody', {key: 'tbody'}, modelNodes)
                         ])
                     )
                 )
@@ -293,22 +279,17 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
             var classes = [];
 
             if (typeof this.props.className === 'string') {
-                alert(1);
                 classes = classes.concat(this.props.className.split(" "));
             }
             if (Array.isArray(this.props.className)) {
-                //alert(2);
                 classes = classes.concat(this.props.className);
             }
 
             if (this.props.additionalClassName !== null) {
-                alert(3);
                 if (typeof this.props.additionalClassName === 'string') {
-                alert(4);
                     classes = classes.concat(this.props.additionalClassName.split(" "));
                 }
                 if (Array.isArray(this.props.additionalClassName)) {
-                alert(5);
                     classes = classes.concat(this.props.additionalClassName);
                 }
             }
@@ -325,7 +306,11 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
 
             if (props.collapsible) {
                 boxHeaderActions.push(
-                    React.createElement('a', {className: 'btn box-collapse btn-xs btn-link', href: '#'},
+                    React.createElement('a', {
+                            className: 'btn box-collapse btn-xs btn-link',
+                            href: '#',
+                            key: 'btn-collapse'
+                        },
                         React.createElement('i', {className: 'icon-chevron-down'})
                     )
                 );
@@ -334,19 +319,27 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
                 }
             }
 
-            boxHeaderActions = React.createElement('div', {className: 'actions'}, boxHeaderActions);
+            boxHeaderActions = React.createElement('div', {
+                className: 'actions',
+                key: 'header-actions'
+            }, boxHeaderActions);
 
             boxHeaderNodes.push(
-                React.createElement('div', {className: 'title'}, props.title)
+                React.createElement('div', {className: 'title', key: 'header-title'}, props.title)
             );
 
             boxHeaderNodes.push(boxHeaderActions);
 
-            boxHeader = React.createElement('div', {className: props.headerClassName.join(' ')}, boxHeaderNodes);
+            boxHeader = React.createElement('div', {
+                className: props.headerClassName.join(' '),
+                key: 'box-header'
+            }, boxHeaderNodes);
 
-            boxContent = React.createElement('div', {className: 'box-content'}, this.props.children);
+            boxContent = React.createElement('div', {
+                className: 'box-content',
+                key: 'box-content'
+            }, this.props.children);
 
-            console.log('asdf', boxClass);
             return React.createElement('div', {className: boxClass.join(' '), id: props.id}, [
                 boxHeader,
                 boxContent
@@ -354,21 +347,17 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
         }
     });
 
-    function log(msg) {
-        console.log('alog', msg);
-    }
-
     function init(statisticCanvas, logCanvas) {
         var statisticDom = document.getElementById(statisticCanvas),
             logDom = document.getElementById(logCanvas),
             importStatistic = React.render(
-                React.createElement(FcomAdminImportStatistic, null),
+                React.createElement(FcomAdminImportStatistic, {key: 'importStatistic'}),
                 statisticDom
             );
-            //importLog = React.render(
-            //    React.createElement(FcomAdminImportLog, null),
-            //    logDom
-            //);
+        //importLog = React.render(
+        //    React.createElement(FcomAdminImportLog, null),
+        //    logDom
+        //);
 
         PushClient.listen({channel: 'import', callback: importStatistic.handleMessage});
         //PushClient.listen({channel: 'import', callback: importLog.handleMessage});
