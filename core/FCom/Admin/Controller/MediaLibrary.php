@@ -238,6 +238,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         return $config;
     }
 
+    public function layoutGridLibraryConfig($options = [])
+    {
+        $config = $this->gridConfigLibrary($options);
+        unset($config['config']['actions']['add-image']);
+        return $config;
+    }
+
     /**
      * @param $rows
      * @return mixed

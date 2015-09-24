@@ -102,7 +102,7 @@ catalog_product_form_tabs:
                     view: dashboard/low-inventory
                     cols: 4
                     async: true
-                    filter: false
+                    filter: true
                     permission: catalog/inventory
             -
                 - addWidget
@@ -113,7 +113,7 @@ catalog_product_form_tabs:
                     view: dashboard/latest-new
                     cols: 4
                     async: true
-                    filter: false
+                    filter: true
                     permission: catalog/products
             -
                 - addWidget
@@ -124,7 +124,7 @@ catalog_product_form_tabs:
                     view: dashboard/without-images
                     cols: 3
                     async: true
-                    filter: false
+                    filter: true
                     permission: catalog/products
             -
                 - addWidget
@@ -135,7 +135,7 @@ catalog_product_form_tabs:
                     view: dashboard/searches-recent-terms
                     cols: 3
                     async: true
-                    filter: false
+                    filter: true
                     permission: catalog/products
             -
                 - addWidget
