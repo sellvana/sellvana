@@ -38,4 +38,5 @@
 'Product Description' => '',
 'Related Products' => '',
 'You may also like these items' => '',
-'Per page:' => ''];
+'Per page:' => '',
+];

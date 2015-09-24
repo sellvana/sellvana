@@ -207,8 +207,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $thumbUrl = $this->getDefaultImagePath();
                 break;
         }
-
-        if($thumbUrl){
+        if ($thumbUrl) {
             return $url . $media . '/' . $thumbUrl;
         }
 
@@ -227,17 +226,23 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function defaultImgUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'default'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        $imgUrl = $this->imageUrl(false, 'default');
+        $resizedUrl = $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $resizedUrl;
     }
 
     public function thumbUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'thumb'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        $imgUrl = $this->imageUrl(false, 'thumb');
+        $resizedUrl = $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $resizedUrl;
     }
 
     public function rolloverUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'rollover'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        $imgUrl = $this->imageUrl(false, 'rollover');
+        $resizedUrl = $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $resizedUrl;
     }
 
     public function onBeforeSave()
@@ -1177,76 +1182,11 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getPriceModelByType($type, $context = [], $useDefault = true)
     {
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
         if (!isset($this->_priceModels)) {
-            $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices([$this]);
+            $priceHlp->collectProductsPrices([$this]);
         }
-
-        $variantId = !empty($context['variant_id']) ? $context['variant_id'] : 0;
-
-        if (false === $this->_priceModels || empty($this->_priceModels[$variantId][$type])) {
-            return null;
-        }
-
-        $prices = $this->_priceModels[$variantId][$type];
-
-        if (!isset($context['site_id']) && !isset($context['customer_group_id']) && !isset($context['currency_code'])) {
-            return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
-        }
-
-        static $siteId = null, $customerGroupId = false, $currencyCode = false;
-        if (null === $siteId) {
-            $modHlp = $this->BModuleRegistry;
-            $siteId = false;
-            if ($modHlp->isLoaded('Sellvana_MultiSite')) {
-                $site = $this->Sellvana_MultiSite_Frontend->getCurrentSite();
-                $siteId = $site ? $site->id() : false;
-            }
-            if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
-                $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-                $customerGroupId = $customer ? $customer->get('customer_group_id')
-                    : $this->Sellvana_CustomerGroups_Model_Group->notLoggedInId();
-            }
-            if ($modHlp->isLoaded('Sellvana_MultiCurrency')) {
-                $currency = $this->Sellvana_MultiCurrency_Main->getCurrentCurrency();
-                $currencyCode = $currency ?: false;
-            }
-        }
-
-        if (!empty($context['default'])) {
-            $context['site_id'] = '*';
-            $context['customer_group_id'] = '*';
-            $context['currency_code'] = '*';
-        }
-
-        $s = !empty($context['site_id']) ? $context['site_id'] : $siteId;
-        $g = !empty($context['customer_group_id']) ? $context['customer_group_id'] : $customerGroupId;
-        $c = !empty($context['currency_code']) ? $context['currency_code'] : $currencyCode;
-
-        if (isset($prices["{$s}:{$g}:{$c}"])) {
-            return $prices["{$s}:{$g}:{$c}"];
-        }
-        if (!$useDefault) {
-            return null;
-        }
-        if ($s !== '*' && isset($prices["*:{$g}:{$c}"])) {
-            return $prices["*:{$g}:{$c}"];
-        }
-        if ($g !== '*' && isset($prices["{$s}:*:{$c}"])) {
-            return $prices["{$s}:*:{$c}"];
-        }
-        if ($c !== '*' && isset($prices["{$s}:{$g}:*"])) {
-            return $prices["{$s}:{$g}:*"];
-        }
-        if ($s !== '*' && $g !== '*' && isset($prices["*:*:{$c}"])) {
-            return $prices["*:*:{$c}"];
-        }
-        if ($s !== '*' && $c !== '*' && isset($prices["*:{$g}:*"])) {
-            return $prices["*:{$g}:*"];
-        }
-        if ($g !== '*' && $c !== '*' && isset($prices["*:*:{$c}"])) {
-            return $prices["*:*:{$c}"];
-        }
-        return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
+        return $priceHlp->getPriceModelByType($this->_priceModels, $type, $context, $useDefault);
     }
 
     /**
@@ -1262,13 +1202,12 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         } else {
             $currency = null;
         }
-        $priceModel = $this->getPriceModelByType('base', $context);
-        $price = $priceModel ? $priceModel->getPrice(null, $currency) : 0;
 
-        $salePriceModel = $this->getPriceModelByType('sale', $context);
-        if ($salePriceModel && $salePriceModel->isValid()) {
-            $price = min($price, $salePriceModel->getPrice(null, $currency));
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        if (!isset($this->_priceModels)) {
+            $priceHlp->collectProductsPrices([$this]);
         }
+        $price = $priceHlp->getCatalogPrice($this->_priceModels, $context);
 
         $this->BEvents->fire(__METHOD__, [
             'product' => $this,
@@ -1292,9 +1231,13 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $prices = [];
         $context = [];
 
-        $basePriceModel = $this->getPriceModelByType('base', $context);
-        $mapPriceModel = $this->getPriceModelByType('map', $context);
-        $msrpPriceModel = $this->getPriceModelByType('msrp', $context);
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        if (!isset($this->_priceModels)) {
+            $priceHlp->collectProductsPrices([$this]);
+        }
+        $basePriceModel = $priceHlp->getPriceModelByType($this->_priceModels, 'base', $context);
+        $mapPriceModel = $priceHlp->getPriceModelByType($this->_priceModels, 'map', $context);
+        $msrpPriceModel = $priceHlp->getPriceModelByType($this->_priceModels, 'msrp', $context);
         $basePrice = $basePriceModel ? $basePriceModel->getPrice() : 0;
 
         $finalPrice = $this->getCatalogPrice();

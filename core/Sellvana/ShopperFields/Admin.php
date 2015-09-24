@@ -50,6 +50,8 @@ class Sellvana_ShopperFields_Admin extends BClass
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true], 'default' => 'select',
                         'options' => ['textarea' => 'Text Area', 'text' => 'Text Line', 'select' => 'Drop Down', 'checkbox' => 'Check Box'],
                     ],
+                    ['name' => 'group', 'label' => 'Group Name', 'width' => 200, 'editable' => 'inline',
+                        'addable' => true, 'type' => 'input', 'validation' => ['required' => true]],
                     ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select',
                         'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => 'Yes', 0 => 'No'], 'default' => 1],
                     ['type' => 'link', 'name' => 'options', 'label' => 'Options', 'width' => 200, 'style' => ['fontSize' => '12px', 'lineHeight' => '32px', 'display' => 'block', 'textAlign' => 'center'], 'value' => 'Option', 'addable' => true, 'action' => 'showModalToEditShopperField'],
@@ -60,6 +62,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                 'filters' => [
                     ['field' => 'name', 'type' => 'text'],
                     ['field' => 'label', 'type' => 'text'],
+                    ['field' => 'group', 'type' => 'text'],
                     ['field' => 'input_type', 'type' => 'multiselect'],
                     ['field' => 'required', 'type' => 'multiselect'],
                     ['field' => 'options', 'type' => 'text']
