@@ -61,6 +61,7 @@
 
                 $(document).on('click', '.btn-select-images', function(e) {
                     e.preventDefault();
+                    $(this).next('.modal').find('.uploadTab').hide();
 
                     var ci                  = isNaN($(this).parents('div.js-widget-box').data('id')) 
                                                 ? $(this).parents('li').data('id') 
