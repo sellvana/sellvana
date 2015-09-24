@@ -199,7 +199,10 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
             }, [
                 React.createElement('div', {className: 'responsive-table', key: 'table-area'},
                     React.createElement('div', {className: 'scrollable-area', key: 'area'},
-                        React.createElement('table', {className: 'table table-bordered table-hover table-striped', key: 'table'}, [
+                        React.createElement('table', {
+                            className: 'table table-bordered table-hover table-striped',
+                            key: 'table'
+                        }, [
                             React.createElement('thead', {key: 'thead'}, [
                                 React.createElement('tr', {key: 'thead-tr'}, [
                                     React.createElement('th', {key: 'th-nr'}, " "),
@@ -217,51 +220,42 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
         }
     });
 
-    /*    var FcomAdminImportLog = React.createClass({
-     displayName: "FcomAdminImportLog",
-     handleMessage: function(data){
+    var FcomAdminImportLog = React.createClass({
+        displayName: "FcomAdminImportLog",
+        getDefaultProps: function () {
+            return {
+                "watched": [
+                    //'info'
+                    'problem'
+                    //,'start'
+                    //,'finished'
+                ]
+            }
+        },
+        /**
+         * string data.objectId @see php FCom_Core_ImportExport::_currentObjectId
+         * string data.signal [info, problem, start, finished]
+         * string data.msg
+         * undefined|array data.data
+         */
+        handleMessage: function (data) {
+            var logTitle = 'Import ('
+                + data.signal
+                + ')'
+                + data.objectId
+                + ': ';
+            if (this.props.watched.indexOf(data.signal) != -1) {
+                console.log(logTitle, data);
+            }
+        },
+        //watched channel
+        render: function () {
+            var that = this;
 
-     },
-     render: function(){
-     var boxClass = ['box', 'box-nomargin'],
-     boxHeader,
-     boxHeaderNodes = [],
-     boxHeaderActions = null,
-     boxContent,
-     boxContentNodes = [];
-
-     if (boxContentNodes.length == 0) {
-     boxClass.push('box-collapsed');
-     } else {
-     boxHeaderActions = React.createElement('div', {className: 'actions'}, [
-     React.createElement('a', {className: 'btn box-collapse btn-xs btn-link', href: '#'},
-     React.createElement('i', {className: 'icon-chevron-down'})
-     )
-     ]);
-     boxContent = React.createElement('div', {className: 'box-content'}, boxContentNodes)
-     }
-
-     boxHeaderNodes.push(
-     React.createElement('div', {className: 'title'}, Locale._('Import Log'))
-     );
-
-     if (boxHeaderActions !== null) {
-     boxHeaderNodes.push(boxHeaderActions);
-     }
-
-     boxHeader = React.createElement('div', {className: 'box-header'}, boxHeaderNodes);
-
-
-     return React.createElement('div', {className: 'row', id: 'import-log'},
-     React.createElement('div', {className: 'col-sm-12'},
-     React.createElement('div', {className: boxClass.join(' ')}, [
-     boxHeader,
-     boxContent
-     ])
-     )
-     );
-     }
-     });*/
+            return React.createElement('span', {key: 'import-log'},
+                Locale._('Console log enabled. Watched signals: ' + that.props.watched.join(', ')));
+        }
+    });
 
     var FcomAdminBox = React.createClass({
         displayName: "FcomAdminBox",
@@ -354,13 +348,13 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
                 React.createElement(FcomAdminImportStatistic, {key: 'importStatistic'}),
                 statisticDom
             );
-        //importLog = React.render(
-        //    React.createElement(FcomAdminImportLog, null),
-        //    logDom
-        //);
+        importLog = React.render(
+            React.createElement(FcomAdminImportLog, {key: 'importlog'}),
+            logDom
+        );
 
         PushClient.listen({channel: 'import', callback: importStatistic.handleMessage});
-        //PushClient.listen({channel: 'import', callback: importLog.handleMessage});
+        PushClient.listen({channel: 'import', callback: importLog.handleMessage});
     }
 
     _.extend(exports, {
