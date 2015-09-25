@@ -471,7 +471,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function siblings()
     {
         $siblings = [];
-        if ($parent = $this->parent()){
+        if ($parent = $this->parent()) {
             foreach ($parent->children() as $c) {
                 if ($c->id() != $this->id()) {
                     $siblings[$c->id()] = $c;
