@@ -471,9 +471,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function siblings()
     {
         $siblings = [];
-        foreach ($this->parent()->children() as $c) {
-            if ($c->id() != $this->id()) {
-                $siblings[$c->id()] = $c;
+        if ($parent = $this->parent()){
+            foreach ($parent->children() as $c) {
+                if ($c->id() != $this->id()) {
+                    $siblings[$c->id()] = $c;
+                }
             }
         }
         return $siblings;
@@ -486,19 +488,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function generateSortOrder()
     {
         $sortOrder = 0;
-        $parent = $this->parent();
-        if ($parent) {
-            $siblings = $parent->children();
+
+        foreach ($this->siblings() as $sibling) {
+            $sortOrder = max($sortOrder, $sibling->get('sort_order'));
         }
-        if (array_key_exists($this->_origClass(), static::$_cache)
-            && array_key_exists('id', static::$_cache[$this->_origClass()])
-        ) {
-            foreach (static::$_cache[$this->_origClass()]['id'] as $c) {
-                if ($c->get('sort_order') && $c->get('parent_id') == $this->get('parent_id')) {
-                    $sortOrder = max($sortOrder, $c->get('sort_order'));
-                }
-            }
-        }
+
         $this->set('sort_order', $sortOrder + 1);
         return $this;
     }
