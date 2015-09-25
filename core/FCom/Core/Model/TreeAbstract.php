@@ -490,9 +490,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         if ($parent) {
             $siblings = $parent->children();
         }
-        foreach (static::$_cache[$this->_origClass()]['id'] as $c) {
-            if ($c->get('sort_order') && $c->get('parent_id') == $this->get('parent_id')) {
-                $sortOrder = max($sortOrder, $c->get('sort_order'));
+        if (array_key_exists($this->_origClass(), static::$_cache)
+            && array_key_exists('id', static::$_cache[$this->_origClass()])
+        ) {
+            foreach (static::$_cache[$this->_origClass()]['id'] as $c) {
+                if ($c->get('sort_order') && $c->get('parent_id') == $this->get('parent_id')) {
+                    $sortOrder = max($sortOrder, $c->get('sort_order'));
+                }
             }
         }
         $this->set('sort_order', $sortOrder + 1);
