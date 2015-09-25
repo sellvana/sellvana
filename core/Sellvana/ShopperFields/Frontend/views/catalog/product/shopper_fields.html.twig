@@ -8,15 +8,19 @@
         {% for sh in shopper %}
             <div class="form-group" style="overflow: hidden">
                 <label class="col-md-2 control-label">{{ sh.label|_ }}</label>
-                <input type="hidden" name="shopper[{{ sh.name }}][label]" value="{{ sh.label }}" class="form-control"/>
                 <div class="col-md-3">
                     {% if sh.input_type == 'select' %}
                         {% set options = sh.options %}
-                        <select name="shopper[{{ sh.name }}][val]" class="form-control">
+                        <select name="shopper[{{ sh.name }}][val]" class="form-control js-shopperfields-select">
                             {% for op in options %}
                                 <option value="{{ op.label }}">{{ op.label|_ }}{{ op.price ? ' (' ~ op.price|currency ~ ')' }}</option>
                             {% endfor %}
                         </select>
+                        {% if sh.qty_min %}
+                            {{ 'Qty:'|_ }}
+                            <input type="number" name="shopper[{{ sh.name }}][qty]" class="form-control js-shopperfields-qty"
+                                value="{{ sh.qty_min }}" min="{{ sh.qty_min }}" {% if sh.qty_max %}max="{{ sh.qty_max }}"{% endif %} >
+                        {% endif %}
                     {% elseif  sh.input_type == 'textarea' %}
                         <textarea name="shopper[{{ sh.name }}][val]" class="form-control" cols="3" rows="2"></textarea>
                     {% elseif sh.input_type == 'text' %}
@@ -28,4 +32,10 @@
             </div>
         {% endfor %}
     </div>
+
+    <script>
+        require(['jquery'], function($) {
+
+        })
+    </script>
 {% endif %}
