@@ -7,10 +7,33 @@
 <div id="{{ config.id }}-modal"></div>
 
 <script type="text/javascript">
+	var APP = {};
     require(['react', 'fcom.griddle'], function(React, FComGriddleComponent) {
+        var GriddleGrid = React.createClass({
+        	getInitialState: function() {
+        		return _.extend({ pending_state: false }, this.props.config);
+        	},
+        	componentDidMount: function() {
+                $(APP).on('onMounted', function(e, config) {
+                	this.setState(config);
+                }.bind(this));
+        	},
+            shouldComponentUpdate: function(nextProps, nextState) {
+                return this.state.pending_state !== nextState.pending_state;
+            },
+        	componentWillUnmount: function() {
+        		$(APP).off('onMounted');
+        	},
+        	render: function() {
+        		if (!this.state.pending_state) {
+        			return React.createElement(FComGriddleComponent, { config: this.state });
+        		} else return false;
+        	}
+        });
+
         var config = {{ UTIL.toJson(config) | raw }};
         React.render(
-            React.createElement(FComGriddleComponent, {config: config}), document.getElementById(config.id)
+            React.createElement(GriddleGrid, { config: config }), document.getElementById(config.id)
         );
     });
 </script>

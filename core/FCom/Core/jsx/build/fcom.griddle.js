@@ -6,22 +6,26 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
     /**
      * FCom Griddle Componnent
      */
-    var FComGriddleComponent = React.createClass({displayName: "FComGriddleComponent",
+    var FComGriddleComponent = React.createClass({
+        displayName: "FComGriddleComponent",
         getDefaultProps: function () {
             return {
                 "config": {},
                 "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable',
                 "callbacks": {}
-            }
+            };
         },
         componentWillMount: function () {
             this.initColumn();
+        },
+        shouldComponentUpdate: function(nextProps, nextState) {
+            return !_.isEqual(this.props.config, nextProps.config);
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
 
             var all = _.pluck(columnsConfig, 'name');
-            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden == true }), 'name');
+            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden === true; }), 'name');
             var show = _.difference(all, hide);
 
             this.props.columns = {all: all, show: show, hide: hide};
@@ -438,7 +442,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        React.createElement(Components.Modal, {show: true, title: "Mass Edit Form", confirm: "Save changes", cancel: "Close", onConfirm: this.modalSaveMassChanges, isLocalMode: isLocalMode, formType: this.getMassEditFormType()},
+                        React.createElement(Components.Modal, {show: true, title: "Mass Edit Form", confirm: "Save changes", cancel: "Close", onConfirm: this.modalSaveMassChanges, isLocalMode: isLocalMode, formType: this.getMassEditFormType()}, 
                             React.createElement(FComModalMassEditForm, {editUrl: editUrl, columnMetadata: this.props.columnMetadata, id: gridId, isLocalMode: isLocalMode, formType: this.getMassEditFormType()})
                         ),
                         modalEleContainer
