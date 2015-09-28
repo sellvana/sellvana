@@ -77,7 +77,8 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                 $p = $this->_calculateDate($p);
             }
             $this->_processDateFilter($p);
-            $widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
+            $widgets = $this->layout('/')->view('dashboard')->getWidgets();
+            // $widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
             $result = [];
             $this->FCom_Admin_Model_User->personalize($persData);
             foreach ($widgets as $key => $widget) {

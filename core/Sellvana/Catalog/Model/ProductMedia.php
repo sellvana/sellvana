@@ -117,6 +117,7 @@ class Sellvana_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
                     $images[$type] = false;
                 }
             }
+
             $p->setProductImages($images);
         }
         return $this;

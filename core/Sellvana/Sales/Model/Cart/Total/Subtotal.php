@@ -7,6 +7,7 @@
  * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
  * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
+ * @property Sellvana_ShopperFields_Frontend $Sellvana_ShopperFields_Frontend
  */
 class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart_Total_Abstract
 {
@@ -62,9 +63,17 @@ class Sellvana_Sales_Model_Cart_Total_Subtotal extends Sellvana_Sales_Model_Cart
                 $itemPrice = $product->variantPrice($itemPrice, $item->get('variant'));
             }
 
-            if ($item->get('shopper_fields')) {
-                foreach ($item->get('shopper_fields') as $f => $fData) {
-                    $itemPrice = $this->priceFunction($itemPrice, $fData);
+            if ($item->getData('shopper_fields')) {
+                $frontendFields = $this->Sellvana_ShopperFields_Frontend->getProductFrontendFields($product);
+#var_dump(__METHOD__, $item->getData('shopper_fields'), $frontendFields); exit;
+                foreach ($item->getData('shopper_fields') as $f => $fData) {
+                    $field = $frontendFields[$f];
+                    if (!empty($field['options'][$fData['val']])) {
+                        $option = $field['options'][$fData['val']];
+                        if (!empty($option['price'])) {
+                            $itemPrice += $option['price'] * $fData['qty'];
+                        }
+                    }
                 }
             }
 

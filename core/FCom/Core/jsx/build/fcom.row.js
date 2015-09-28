@@ -1,4 +1,4 @@
-﻿/** @jsx React.DOM */
+/** @jsx React.DOM */
 
 /**
  * FCom Row Component
@@ -76,7 +76,7 @@ define(['underscore', 'react'], function (_, React) {
                                 return (
                                     React.createElement("button", React.__spread({className: "btn btn-link " + btn.cssClass, key: index, title: btn.title ? btn.title : "", type: "button", 
                                         "data-action": btn.name, "data-row": row.id},  btn.attrs, {onClick: that.props.doRowAction.bind(null, btn.callback)}), 
-                                        React.createElement("i", {className: btn.icon, "data-action": btn.name, "data-row": row.id}), 
+                                        React.createElement("i", {className: btn.icon, "data-action": btn.name, "data-row": row.id, "data-folder": row.folder ? row.folder : null}), 
                                         btn.caption
                                     )
                                 );
