@@ -2697,7 +2697,8 @@ class BDebug extends BClass
         MODE_MIGRATION    = 'MIGRATION',
         MODE_INSTALLATION = 'INSTALLATION',
         MODE_RECOVERY     = 'RECOVERY',
-        MODE_DISABLED     = 'DISABLED'
+        MODE_DISABLED     = 'DISABLED',
+        MODE_IMPORT       = 'IMPORT'
     ;
 
     /**
@@ -2790,6 +2791,15 @@ class BDebug extends BClass
             self::OUTPUT    => false,
             self::EXCEPTION => false,
             self::STOP      => false,
+        ],
+        self::MODE_IMPORT => [
+            self::MEMORY    => self::DEBUG,
+            self::SYSLOG    => false,
+            self::FILE      => self::WARNING,
+            self::EMAIL     => false, //self::CRITICAL,
+            self::OUTPUT    => self::NOTICE,
+            self::EXCEPTION => self::ERROR,
+            self::STOP      => self::CRITICAL,
         ],
     ];
 

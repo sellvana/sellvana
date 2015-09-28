@@ -229,13 +229,11 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);
-                    //if (function_exists('xdebug_start_trace')) {
-                    //    xdebug_start_trace();
-                    //}
+
+                    $this->BDebug->mode(BDebug::MODE_IMPORT);
+
                     $importer->importFile($fileName);
-                    //if (function_exists('xdebug_stop_trace')) {
-                    //    xdebug_stop_trace();
-                    //}
+
                     $error    = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
