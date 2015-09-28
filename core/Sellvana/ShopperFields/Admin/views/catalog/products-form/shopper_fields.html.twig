@@ -142,8 +142,7 @@
                 if (row.position == 0) {
                     row.position = 0;
                 }
-
-                var data = _.pick(row, 'id', 'name', 'label', 'group', 'input_type', 'required', 'options', 'position');
+                var data = _.pick(row, 'id', 'name', 'label', 'input_type', 'required', 'options', 'position', 'group', 'qty_min', 'qty_max');
                 data['id'] = ++index;
                 if (row.input_type === 'select') { // Only save prices when field is select
                     var $priceEle = $('input[data-shopper-id="'+row.id+'"]');

@@ -19,8 +19,10 @@ class Sellvana_ShopperFields_Frontend extends BClass
             return [];
         }
         $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
-        foreach ($frontendFields as &$field) {
+        $result = [];
+        foreach ($frontendFields as $field) {
             if (empty($field['option_serialized'])) {
+                $result[$field['name']] = $field;
                 continue;
             }
             $options = json_decode($field['option_serialized'], true);
@@ -55,16 +57,16 @@ class Sellvana_ShopperFields_Frontend extends BClass
                 return $pa < $pb ? -1 : ($pa > $pb ? 1 : 0);
             });
             $field['options'] = $options;
+            $result[$field['name']] = $field;
         }
-        unset($field);
 
-        usort($frontendFields, function ($a, $b) {
+        uasort($result, function ($a, $b) {
             $pa = isset($a['position']) ? (int)$a['position'] : 0;
             $pb = isset($b['position']) ? (int)$b['position'] : 0;
             return $pa < $pb ? -1 : ($pa > $pb ? 1 : 0);
         });
 
-        return $frontendFields;
+        return $result;
     }
 
     public function onWorkflowCustomerAddsItemsCalcDetails($args)
@@ -79,20 +81,55 @@ class Sellvana_ShopperFields_Frontend extends BClass
                 unset($args['items'][$i]);
                 continue;
             }
+#var_dump(__METHOD__, $item['shopper'], $frontendFields);
             foreach ($item['shopper'] as $key => $value) {
-                if (!isset($value['val']) || $value['val'] == '') {
+                if (!isset($value['val']) || $value['val'] === '') {
                     unset($item['shopper'][$key]);
                     continue;
                 }
-                if ($value['val'] === 'checkbox') {
-                    $item['shopper'][$key]['val'] = null;
+                if (empty($frontendFields[$key])) {
+                    unset($item['shopper'][$key]);
+                    continue;
                 }
-                $item['details']['signature']['shopper_fields'][$key] = $value['val'];
-                $item['details']['data']['shopper_fields'][$key] = $value['val'];
-                $item['details']['data']['display'][] = ['label' => $value['label'], 'value' => $value['val']];
+                $field = $frontendFields[$key];
+
+                $val = $value['val'];
+                if (!empty($field['options'])) {
+                    if (empty($field['options'][$val])) {
+                        unset($item['shopper'][$key]);
+                        continue;
+                    } else {
+                        $option = $field['options'][$val];
+                    }
+                }
+                if ($field['input_type'] === 'checkbox') {
+                    $val = $item['shopper'][$key]['val'] = 'Yes';
+                }
+                if (empty($field['qty_min'])) {
+                    $qty = 1;
+                } else {
+                    $qty = !empty($value['qty']) ? (int)$value['qty'] : $field['qty_min'];
+                    $qty = max($qty, $field['qty_min']);
+                    if (!empty($field['qty_max'])) {
+                        $qty = min($qty, $field['qty_max']);
+                    }
+                }
+                if (!empty($option['sku'])) {
+                    $item['details']['data']['inventory_skus'][] = [
+                        'sku' => $option['sku'],
+                        'qty' => $qty,
+                    ];
+                }
+                $item['details']['signature']['shopper_fields'][$key] = [$val, $qty];
+                $item['details']['data']['shopper_fields'][$key] = ['val' => $val, 'qty' => $qty];
+                $item['details']['data']['display'][] = [
+                    'label' => $field['label'],
+                    'value' => $val . ($qty > 1 ? ' x' . $qty : ''),
+                ];
             }
         }
         unset($item);
+
        # echo "<pre>"; print_r($args); exit;
         return true;
     }
