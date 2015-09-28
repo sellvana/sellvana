@@ -29,6 +29,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
             var that = this;
             var action = event.target.dataset.action;
             var rowId = event.target.dataset.row;
+            var folder = event.target.dataset.folder;
             var gridId = this.props.getConfig('id');
             var data = this.props.originalData ? this.props.originalData : this.props.data;
             var isLocalMode = !this.props.hasExternalResults();
@@ -67,9 +68,13 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                         if (isLocalMode) {
                             this.props.removeRows([row]);
                         } else {
-
+                            var oper = 'del';
                             if (editUrl.length > 0 && rowId) {
-                                $.post(editUrl, {id: rowId, oper: 'del'}, function() {
+                                if (folder && !editUrl.match("\\b"+"folder"+"\\b")) {
+                                    editUrl += '?folder=' + encodeURIComponent(folder);
+                                    oper = 'mass-delete';
+                                }
+                                $.post(editUrl, {id: rowId, oper: oper}, function() {
                                     that.props.removeSelectedRows([row]);
                                     that.props.refresh();
                                 });

@@ -44,6 +44,7 @@ class FCom_LibScssPhp_Main extends BClass
         if ($compile) {
             #$this->BUtil->ensureDir(dirname($compiledFilename)); // neeeded if target dir is different
             $scss = new Leafo\ScssPhp\Compiler();
+            $scss->setImportPaths(dirname($origFilepath));
             if (!empty($args['import'])) {
                 foreach ((array)$args['import'] as $import) {
                     $scss->addImportPath($import);
