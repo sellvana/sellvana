@@ -30,7 +30,6 @@
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
- * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item

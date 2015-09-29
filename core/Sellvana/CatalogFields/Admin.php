@@ -71,7 +71,12 @@ class Sellvana_CatalogFields_Admin extends BClass
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
-    protected function _saveProductCustom(Sellvana_Catalog_Model_Product $p, $fieldSets = [])
+    /**
+     * Process Save/Remove product custom fields
+     * @param  Sellvana_Catalog_Model_Product $p
+     * @param  array                          $fieldSets
+     */
+    protected function _processProductCustom(Sellvana_Catalog_Model_Product $p, $fieldSets = [])
     {
         if (!$fieldSets || !is_array($fieldSets)) {
             return;
@@ -82,7 +87,7 @@ class Sellvana_CatalogFields_Admin extends BClass
                 continue;
             }
             foreach ($set['fields'] as $field) {
-#var_dump($field);
+                #var_dump($field);
                 $p->set($field['field_code'], $field['value']);
             }
         }
@@ -120,7 +125,7 @@ class Sellvana_CatalogFields_Admin extends BClass
 
         if (!empty($data['custom_fields'])) {
             // Save custom fields on fcom_product_custom
-            $this->_saveProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
+            $this->_processProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
             // $model->setData('custom_fields', $data['custom_fields']);
         }
 

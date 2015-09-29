@@ -20,6 +20,7 @@ var CustomFormatContainer = require('./customFormatContainer.jsx');
 var CustomPaginationContainer = require('./customPaginationContainer.jsx');
 var _ = require('underscore');
 */
+var debug = FCom.jsdebug;
 var Griddle = React.createClass({displayName: "Griddle",
     mixins: [FCom.Mixin],
     getDefaultProps: function() {
@@ -871,7 +872,9 @@ var Griddle = React.createClass({displayName: "Griddle",
         var selectedRows = this.getSelectedRows();
         _.forEach(rows, function(row) {
             if (typeof row.id == 'undefined') {
-                console.log('griddle.addSelectedRow: row.id is undefined', row);
+                if (debug) {
+                    console.log('griddle.addSelectedRow: row.id is undefined', row);
+                }
             }
 
             if (!_.findWhere(selectedRows, { id: row.id })) {
@@ -1016,7 +1019,9 @@ var Griddle = React.createClass({displayName: "Griddle",
             }
         } else {
             //error
-            console.log('form validated fail');
+            if (debug) {
+                console.log('form validated fail');
+            }
             return false;
         }
     },
@@ -1140,10 +1145,14 @@ var Griddle = React.createClass({displayName: "Griddle",
 
         function callGlobalFunction(funcName) {
             if (typeof window[funcName] === 'function') {
-                console.log('triggerCallback:' + name);
+                if (debug) {
+                    console.log('triggerCallback:' + name);
+                }
                 return window[funcName](that, name);
             } else {
-                console.log('DEBUG: cannot find call back ' + funcName + ' for name ' + name);
+                if (debug) {
+                    console.log('DEBUG: cannot find call back ' + funcName + ' for name ' + name);
+                }
             }
         }
     },

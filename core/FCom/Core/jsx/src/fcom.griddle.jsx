@@ -6,22 +6,26 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
     /**
      * FCom Griddle Componnent
      */
-    var FComGriddleComponent = React.createClass({displayName: "FComGriddleComponent",
+    var FComGriddleComponent = React.createClass({
+        displayName: "FComGriddleComponent",
         getDefaultProps: function () {
             return {
                 "config": {},
                 "tableClassName": 'fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable',
                 "callbacks": {}
-            }
+            };
         },
         componentWillMount: function () {
             this.initColumn();
+        },
+        shouldComponentUpdate: function(nextProps, nextState) {
+            return !_.isEqual(this.props.config, nextProps.config);
         },
         initColumn: function () { //todo: almost useless, need to re-check this function
             var columnsConfig = this.props.config.columns;
 
             var all = _.pluck(columnsConfig, 'name');
-            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden == true }), 'name');
+            var hide = _.pluck(_.filter(columnsConfig, function(column) { return column.hidden == 'true' || column.hidden === true; }), 'name');
             var show = _.difference(all, hide);
 
             this.props.columns = {all: all, show: show, hide: hide};
@@ -328,11 +332,25 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         modalSaveMassChanges: function(modal) {
             //todo: combine this with FComGridBody::modalSaveChange()
             var that = this;
+            var gridId = this.props.getConfig('id');
             var url = this.props.getConfig('edit_url');
             var ids = _.pluck(this.props.getSelectedRows(), 'id');
             var hash = { oper: 'mass-edit', id: ids.join(',') };
             var isLocalMode = !this.props.hasExternalResults();
+            var formType = this.getMassEditFormType();
             var form = $(modal.getDOMNode()).find('form');
+
+            if (formType !== 'form'){
+                form = $(modal.getDOMNode()).find('#' + gridId + '-modal-mass-form');
+
+                var attrs = { };
+
+                $.each(form[0].attributes, function(idx, attr) {
+                    attrs[attr.nodeName] = attr.nodeValue;
+                });
+
+                form = $("<form/>", attrs).append(form.contents());
+            }
 
             form.find('textarea, input, select').each(function() {
                 var key = $(this).attr('id');
@@ -371,6 +389,17 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 //error
                 console.log('form validate fail');
                 return false;
+            }
+        },
+        getMassEditFormType: function(){
+            var massEditType = this.props.getConfig('mass_edit_type');
+            switch (massEditType){
+                case 'div':
+                    return 'div';
+                    break;
+                default:
+                    return 'form';
+                    break;
             }
         },
         doMassAction: function(event) { //top mass action
@@ -413,8 +442,8 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" cancel="Close" onConfirm={this.modalSaveMassChanges}>
-                            <FComModalMassEditForm editUrl={editUrl} columnMetadata={this.props.columnMetadata} id={gridId} />
+                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" cancel="Close" onConfirm={this.modalSaveMassChanges} isLocalMode={isLocalMode} formType={this.getMassEditFormType()}>
+                            <FComModalMassEditForm editUrl={editUrl} columnMetadata={this.props.columnMetadata} id={gridId} isLocalMode={isLocalMode} formType={this.getMassEditFormType()} />
                         </Components.Modal>,
                         modalEleContainer
                     );
@@ -702,6 +731,8 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var gridId = this.props.id;
             var oneField = this.state.oneField;
 
+            var formType = this.props.formType;
+
             var fieldDropdownDiv = null;
 
             if (!oneField) {
@@ -734,7 +765,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             return (
                 React.createElement("div", null,
                     fieldDropdownDiv,
-                    React.createElement("form", {className: "form form-horizontal validate-form", id: gridId + '-modal-mass-form'},
+                    React.createElement(formType, {className: "form form-horizontal validate-form", id: gridId + '-modal-mass-form'},
                         formElements
                     )
                 )

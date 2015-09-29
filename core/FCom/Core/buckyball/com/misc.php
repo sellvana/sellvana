@@ -1150,7 +1150,7 @@ class BUtil extends BClass
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
 #var_dump(__METHOD__, $rawResponse);
-            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2);
+            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + [''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
 #var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt);
             $respHeaders = explode("\r\n", $headers);
@@ -1610,6 +1610,17 @@ class BUtil extends BClass
             . ($params ? '?' . http_build_query($params) : '');
     }
 
+    public function isCallable($cb)
+    {
+        if (is_callable($cb)) {
+            return true;
+        }
+        if (is_string($cb) && preg_match('#^([A-Za-z0-9_]+)(::|\.|->)([A-Za-z0-9_]+)$#', $cb)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param $callback
      * @return callable
@@ -1623,16 +1634,15 @@ class BUtil extends BClass
                 $callback = $callbackMapCache[$callback];
             } else {
                 $origCallback = $callback;
-                if (strpos($callback, '::') !== false) {
-                    list($class, $method) = explode('::', $callback);
-                    $reflMethod = new ReflectionMethod($class, $method);
-                    if ($reflMethod->isStatic()) {
-                        $class = null; // proceed with usual callback
+                if (preg_match('#^([A-Za-z0-9_]+)(::|\.|->)([A-Za-z0-9_]+)$#', $callback, $m)) {
+                    $class = $m[1];
+                    $method = $m[3];
+                    if ($m[2] === '::') {
+                        $reflMethod = new ReflectionMethod($class, $method);
+                        if ($reflMethod->isStatic()) {
+                            $class = null; // proceed with usual callback
+                        }
                     }
-                } elseif (strpos($callback, '.') !== false) {
-                    list($class, $method) = explode('.', $callback);
-                } elseif (strpos($callback, '->')) {
-                    list($class, $method) = explode('->', $callback);
                 }
                 if (!empty($class)) {
                     $instance = BClassRegistry::instance($class, [], true);
@@ -1658,6 +1668,33 @@ class BUtil extends BClass
         } else {
             return call_user_func($callback, $args);
         }
+    }
+
+    /**
+     * If callback, call and get result, otherwise pass through
+     *
+     * Do not apply on user data for security concerns
+     *
+     * @param mixed $data
+     * @param string $cacheKey
+     * @return mixed
+     */
+    public function maybeCallback($data, $cacheKey = null)
+    {
+        static $cache = [];
+
+        if ($cacheKey && !empty($cache[$cacheKey])) {
+            return $this->call($cache[$cacheKey]);
+        }
+        if ($this->isCallable($data)) {
+            $callback = $this->extCallback($data);
+            if ($cacheKey) {
+                $cache[$cacheKey] = $callback;
+            }
+            $result = $callback($data);
+            return $result;
+        }
+        return $data;
     }
 
     /**
@@ -2553,30 +2590,6 @@ class BErrorException extends Exception
 */
 class BDebug extends BClass
 {
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const EMERGENCY = 0,
         ALERT       = 1,
         CRITICAL    = 2,
@@ -2600,27 +2613,6 @@ class BDebug extends BClass
         self::DEBUG     => 'DEBUG',
     ];
 
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const MEMORY  = 0,
         FILE      = 1,
         SYSLOG    = 2,
@@ -2629,30 +2621,6 @@ class BDebug extends BClass
         EXCEPTION = 16,
         STOP      = 4096;
 
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const MODE_DEBUG      = 'DEBUG',
         MODE_DEVELOPMENT  = 'DEVELOPMENT',
         MODE_STAGING      = 'STAGING',
@@ -2660,7 +2628,8 @@ class BDebug extends BClass
         MODE_MIGRATION    = 'MIGRATION',
         MODE_INSTALLATION = 'INSTALLATION',
         MODE_RECOVERY     = 'RECOVERY',
-        MODE_DISABLED     = 'DISABLED'
+        MODE_DISABLED     = 'DISABLED',
+        MODE_IMPORT       = 'IMPORT'
     ;
 
     /**
@@ -2753,6 +2722,15 @@ class BDebug extends BClass
             self::OUTPUT    => false,
             self::EXCEPTION => false,
             self::STOP      => false,
+        ],
+        self::MODE_IMPORT => [
+            self::MEMORY    => self::DEBUG,
+            self::SYSLOG    => false,
+            self::FILE      => self::WARNING,
+            self::EMAIL     => false, //self::CRITICAL,
+            self::OUTPUT    => self::NOTICE,
+            self::EXCEPTION => self::ERROR,
+            self::STOP      => self::CRITICAL,
         ],
     ];
 

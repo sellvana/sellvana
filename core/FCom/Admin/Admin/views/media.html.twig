@@ -53,18 +53,29 @@
 
 <script type="text/javascript">
     require(['jquery'], function ($) {
-        var uploadConfigs = {{ UTIL.toJSON(uploadConfig)|raw }};
-        var uploadUrlBase = "{{ APP.href("media/grid/upload?type=") | raw }}";
-        var $mediaTypes = $("#media-library-upload-types");
-        var type = $mediaTypes.val();
-        var uploadUrl = uploadUrlBase + type;
-        var $uploader = $("#{{config.id}}-media-upload");
+        var uploadConfigs       = {{ UTIL.toJSON(uploadConfig)|raw }};
+        var uploadUrlBase       = "{{ APP.href("media/grid/upload?type=") | raw }}";
+        var thumb_path          = 'resize.php?s=68&f=media';
+        var $mediaTypes         = $("#media-library-upload-types");
+        var type                = $mediaTypes.val();
+        var uploadUrl           = uploadUrlBase + type;
+        var $uploader           = $("#{{config.id}}-media-upload");
         var uploaderInitialized = false;
         $mediaTypes.on('change', function (e) {
-            type = $mediaTypes.val();
+            type = $(this).val();
             uploadUrl = uploadUrlBase + type;
             $uploader.fileupload('option', {url: uploadUrl});
-            console.log(uploadUrl);
+            switch(type) {
+                case 'product-images':
+                    thumb_path += '/product/images/';
+                    break;
+                case 'product-attachments':
+                    thumb_path += '/product/attachment/';
+                    break;
+                case 'images':
+                    thumb_path += '/images/';
+                    break;
+            }
         });
         var mediaLibGrid{{ config.id }};
 
@@ -96,7 +107,9 @@
                 mediaModal.modal('show');
                 if (!uploaderInitialized) {
                     var files = 0;
-                    $uploader.fileupload('option', {url: uploadUrl}).bind('fileuploadchange', function (e, data) {
+                    $uploader.fileupload('option', {
+                        url: uploadUrl
+                    }).bind('fileuploadchange', function (e, data) {
                         files += data.files.length;
                         if (files > 0) {
                             $mediaTypes.attr('disabled', true); // disable changing upload type after initiating upload
@@ -122,6 +135,11 @@
                 if ($.isArray(data.result.files)) {
                     var rows = [], selectedRows = [];
                     data.result.files.forEach(function (obj) {
+                        // Thumb path missing for display images or file after upload on grid
+                        if (!obj.thumb_path) {
+                            obj.thumb_path = thumb_path + obj.file_name;
+                        }
+
                         {% if config.multiSelAllowed %}
                         selectedRows.push(obj);
                         {% endif %}

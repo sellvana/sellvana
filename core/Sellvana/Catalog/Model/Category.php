@@ -209,12 +209,13 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     public function onAfterCreate()
     {
         parent::onAfterCreate();
-
-        $this->set([
-            'show_products' => 1,
-            'show_sidebar' => 1,
-            'is_enabled' => 1,
-        ]);
+        if (!$this->BDebug->is(BDebug::MODE_IMPORT)) {
+            $this->set([
+                'show_products' => 1,
+                'show_sidebar' => 1,
+                'is_enabled' => 1,
+            ]);
+        }
     }
 
     public function onAfterSave()
@@ -349,21 +350,24 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
                 }
             }
         }
-        $relatedData = $this->FCom_Core_Model_ImportExport_Id->orm()
-            ->join(
-              'FCom_Core_Model_ImportExport_Model',
-              'iem.id=model_id and iem.model_name=\'' . $this->origClass() . '\'',
-              'iem'
-            )
-            ->where(['site_id' => $importSite->id(), 'import_id' => array_keys($fetch)], null)
-            ->find_many_assoc('import_id');
 
-        foreach ($relations as $k => $v) {
-            $model = $toUpdate[$k];
-            foreach ($v as $field => $r) {
-                if (!empty($relatedData[$r])) {
-                    $rel = $relatedData[$r];
-                    $model->set($field, $rel->get('local_id'));
+        if (!empty(array_keys($fetch))){
+            $relatedData = $this->FCom_Core_Model_ImportExport_Id->orm()
+                ->join(
+                  'FCom_Core_Model_ImportExport_Model',
+                  'iem.id=model_id and iem.model_name=\'' . $this->origClass() . '\'',
+                  'iem'
+                )
+                ->where(['site_id' => $importSite->id(), 'import_id' => array_keys($fetch)], null)
+                ->find_many_assoc('import_id');
+
+            foreach ($relations as $k => $v) {
+                $model = $toUpdate[$k];
+                foreach ($v as $field => $r) {
+                    if (!empty($relatedData[$r])) {
+                        $rel = $relatedData[$r];
+                        $model->set($field, $rel->get('local_id'));
+                    }
                 }
             }
         }

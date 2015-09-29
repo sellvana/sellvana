@@ -67,6 +67,7 @@ FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
     {
         $userId = $this->FCom_Admin_Model_User->sessionUserId();
         $this->FCom_PushServer_Model_Client->delete_many(['admin_user_id' => $userId]);
+        //TODO: Implement deleting records older than X days
         //TODO: implement roster (online/offline) notifications
     }
 

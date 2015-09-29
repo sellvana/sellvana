@@ -33,7 +33,28 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
         'serialized'    => 'data_serialized',
     ];
 
+    protected static $_importExportProfile = 'THIS.importExportProfile';
+
     protected static $_autoCreateOptions = false;
+
+    public function importExportProfile()
+    {
+        $profile = [
+            'related' => [
+                'product_id' => 'Sellvana_Catalog_Model_Product.id',
+                'set_id' => 'Sellvana_CatalogFields_Model_Set.id',
+                'field_id' => 'Sellvana_CatalogFields_Model_Field.id',
+                'value_id' => 'Sellvana_CatalogFields_Model_FieldOption.id',
+            ],
+            'unique_key' => ['product_id', 'field_id'],
+        ];
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
+            $profile['related']['site_id'] = 'Sellvana_MultiSite_Model_Site.id';
+            $profile['unique_key'][] = 'site_id';
+        }
+
+        return $profile;
+    }
 
     public function setAutoCreateOptions($flag)
     {
@@ -174,7 +195,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'pf.field_id'], 'f')
             ->left_outer_join('Sellvana_CatalogFields_Model_FieldOption', ['fo.id', '=', 'pf.value_id'], 'fo')
             ->left_outer_join('Sellvana_CatalogFields_Model_Set', ['fs.id', '=', 'pf.set_id'], 'fs')
-            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.table_field_type', 'fs.set_name'])
+            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.required', 'f.admin_input_type', 'f.table_field_type', 'fs.set_name'])
             ->where_in('pf.product_id', $productIds)
             ->find_many_assoc(['product_id', 'id']);
     }
@@ -219,6 +240,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                     'admin_input_type' => $row->get('admin_input_type'),
                     'value' => $value,
                     'position' => $row->get('position'),
+                    'required' => $row->get('required')
                 ];
 
                 if ($row->get('table_field_type') === 'options') {
@@ -298,11 +320,12 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
     public function addOrmFilter(BORM $orm, $fieldCode, $value)
     {
         $field = $this->Sellvana_CatalogFields_Model_Field->getField($fieldCode);
+        $pAlias = $orm->table_alias();
         $fAlias = "f_{$fieldCode}";
         $pfdAlias = "pfd_{$fieldCode}";
         $pfdColumn = static::$_fieldTypeColumns[$field->get('table_field_type')];
 
-        $orm->join('Sellvana_CatalogFields_Model_ProductFieldData', ["{$pfdAlias}.product_id", '=', 'p.id'], $pfdAlias)
+        $orm->join('Sellvana_CatalogFields_Model_ProductFieldData', ["{$pfdAlias}.product_id", '=', "{$pAlias}.id"], $pfdAlias)
             ->join('Sellvana_CatalogFields_Model_Field', ["{$fAlias}.id", '=', "{$pfdAlias}.field_id"], $fAlias)
             ->where("{$fAlias}.field_code", $fieldCode)
             ->where("{$pfdAlias}.{$pfdColumn}", $value);

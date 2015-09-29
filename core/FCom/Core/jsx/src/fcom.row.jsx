@@ -76,7 +76,7 @@ define(['underscore', 'react'], function (_, React) {
                                 return (
                                     <button className={"btn btn-link " + btn.cssClass} key={index} title={btn.title ? btn.title : ""} type="button"
                                         data-action={btn.name} data-row={row.id} {...btn.attrs} onClick={that.props.doRowAction.bind(null, btn.callback)}>
-                                        <i className={btn.icon} data-action={btn.name} data-row={row.id}></i>
+                                        <i className={btn.icon} data-action={btn.name} data-row={row.id} data-folder={row.folder ? row.folder : null}></i>
                                         {btn.caption}
                                     </button>
                                 );
