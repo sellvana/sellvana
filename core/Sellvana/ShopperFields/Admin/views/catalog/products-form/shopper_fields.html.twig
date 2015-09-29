@@ -378,25 +378,35 @@
             if (form.valid()) {
                 // If available row is edited
                 if (!isNaN(editedRow.id)) {
-                    if (!_.contains(editedRows, editedRow.id)) {
-                        // Edited row do not exist on local data then just toggle tab
-                        $(OPTS).trigger('edit', [editedRow]);
-                    } else {
-                        // Edited row exist on local data then update local data and re-render price tabs grid
-                        $(OPTS).trigger('edit', [editedRow, true]);
-
-                        // Clear local data
-                        _(editedRows).each(function(id, i) {
-                            if (id == editedRow.id) delete editedRows[i];
-                        });
-                    }
+                    checkIfRowIsEditOrUpdateAttrs(editedRow);
                 } else { // edit new row
                     var existedRow = _.contains(_.pluck(addedRows, 'id'), editedRow.id);
                     if (!existedRow) // item does not exist in local data then add to local data and re-render price tabs
                         $(OPTS).trigger('add', [editedRow]);
                     else // item has existed in local data then edit
-                        $(OPTS).trigger('edit', [editedRow]);
+                        checkIfRowIsEditOrUpdateAttrs(editedRow);
                 }
+            }
+        }
+
+        /**
+         * Check if row attrs is edited or not
+         * @param  {Object} row 
+         * @return {mixed}
+         */
+        function checkIfRowIsEditOrUpdateAttrs(row) {
+            var rowId = row.id.toString();
+            if (!_.contains(editedRows, rowId)) {
+                // Edited row do not exist on local data then just toggle tab
+                $(OPTS).trigger('edit', [row]);
+            } else {
+                // Edited row exist on local data then update local data and re-render price tabs grid
+                $(OPTS).trigger('edit', [row, true]);
+
+                // Clear local data
+                _(editedRows).each(function(id, i) {
+                    if (id == rowId) delete editedRows[i];
+                });
             }
         }
 
@@ -415,13 +425,11 @@
 
             // If validation passes then save edited row on local data
             if (validateAttrs()) {
-                var id = $(e.target).attr('id').substring($(e.target).attr('id').length - 1);
-                id = parseInt(id);
-                // if row id is number
-                if (!isNaN(id)) {
-                    if (!_.contains(editedRows, id)) {
-                        editedRows.push(id);
-                    }
+                var id = $(e.target).attr('id').split('-').slice(3);
+                id = id.length > 1 ? id.join('-').toString() : id.toString();
+                // Update local data for edit price process
+                if (!_.contains(editedRows, id)) {
+                    editedRows.push(id);
                 }
             }
         }
@@ -620,7 +628,8 @@
                         // Update row attrs
                         options = _(shopper.options_serialized).map(function(item, index) {
                             index = toggleSpace(index);
-                            if (item.id == editedRow.id) {
+                            if (item.id == editedRow.id || (!item.id && isNaN(editedRow.id))) {
+                                // Update option field attrs
                                 item.sku      = editedRow.sku;
                                 item.position = editedRow.position;
                                 shopper.options_serialized[toggleSpace(editedRow.label)] = _.clone(item);
