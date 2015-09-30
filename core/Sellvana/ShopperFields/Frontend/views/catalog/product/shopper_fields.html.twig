@@ -13,13 +13,17 @@
                         {% set options = sh.options %}
                         <select name="shopper[{{ sh.name }}][val]" class="form-control js-shopperfields-select">
                             {% for op in options %}
-                                <option value="{{ op.label }}">{{ op.label|_ }}{{ op.price ? ' (' ~ op.price|currency ~ ')' }}</option>
+                                <option value="{{ op.label }}" {{ not op.available ? 'disabled' }}>
+                                    {{ op.label|_ }}
+                                    {{ op.price ? '(' ~ op.price|currency ~ ')' }}
+                                    {{ not op.available ? ' (not available)' }}
+                                </option>
                             {% endfor %}
                         </select>
                         {% if sh.qty_min %}
                             {{ 'Qty:'|_ }}
                             <input type="number" name="shopper[{{ sh.name }}][qty]" class="form-control js-shopperfields-qty"
-                                value="{{ sh.qty_min }}" min="{{ sh.qty_min }}" {% if sh.qty_max %}max="{{ sh.qty_max }}"{% endif %} >
+                                value="{{ sh.qty_min }}" min="{{ sh.qty_min }}" {% if op.qty_max %}max="{{ op.qty_max }}"{% endif %} >
                         {% endif %}
                     {% elseif  sh.input_type == 'textarea' %}
                         <textarea name="shopper[{{ sh.name }}][val]" class="form-control" cols="3" rows="2"></textarea>

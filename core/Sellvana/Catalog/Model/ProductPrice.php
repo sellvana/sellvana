@@ -557,7 +557,7 @@ class Sellvana_Catalog_Model_ProductPrice
 
         $prices = $priceModels[$variantId][$type];
 
-        if (!isset($context['site_id']) && !isset($context['customer_group_id']) && !isset($context['currency_code'])) {
+        if (!empty($context['default'])) {
             return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
         }
 

@@ -163,7 +163,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     public function action_index()
     {
         $model['export_config'] = $this->getExportConfig();
-        $model[ 'import_config' ] = $this->_getImportConfig();
+        $model['import_config'] = $this->_getImportConfig();
 
         $this->layout();
 
@@ -193,6 +193,22 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 //        $file = $this->BApp->storageRandomDir() . '/export/export.json';
 //        $this->FCom_Core_ImportExport->importFile($file);
 //    }
+
+    public function action_import()
+    {
+        $this->forward(false);
+        return; //disabled, for testing only
+
+        $this->BResponse->startLongResponse(false);
+
+        $this->BDebug->mode(BDebug::MODE_IMPORT);
+
+        $fileName = $this->BApp->storageRandomDir() . '/export/export.json';
+
+        $this->FCom_Core_ImportExport->importFile($fileName);
+
+        exit;
+    }
 
     public function action_import__POST()
     {

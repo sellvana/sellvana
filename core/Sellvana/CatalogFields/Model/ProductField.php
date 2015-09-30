@@ -25,8 +25,10 @@ class Sellvana_CatalogFields_Model_ProductField extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product_custom';
+    /*
     protected static $_importExportProfile = ['skip' => [],
      'related' => ['product_id' => 'Sellvana_Catalog_Model_Product.id',], 'unique_id' => ['product_id'] ];
+    */
 
     public function productFields($p, $r = [])
     {

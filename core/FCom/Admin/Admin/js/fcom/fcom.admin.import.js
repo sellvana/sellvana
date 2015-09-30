@@ -24,10 +24,10 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
             var that = this,
                 objects = this.props.pushServerObjects;
 
-            if (objects[data.objectId] === undefined) {
-                objects[data.objectId] = {};
+            if (objects[data.object_id] === undefined) {
+                objects[data.object_id] = {};
             }
-            var currentObject = objects[data.objectId];
+            var currentObject = objects[data.object_id];
 
 
             switch (data.signal) {
@@ -46,34 +46,34 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
         handleStartSignal: function (message, item) {
             var data = this.getMessageData(message);
 
-            if (data.fileName !== undefined) {
-                item.title = data.fileName;
+            if (data.file_name !== undefined) {
+                item.title = data.file_name;
             }
         },
         handleInfoSignal: function (message, item) {
             var data = this.getMessageData(message);
 
-            if (data.storeId !== undefined) {
-                item.storeId = data.storeId;
+            if (data.store_id !== undefined) {
+                item.store_id = data.store_id;
             }
 
-            if (data.startModel !== undefined) {
-                var modelName = data.startModel;
+            if (data.start_model !== undefined) {
+                var modelName = data.start_model;
                 this.setModelData(modelName, null, item);
                 this.props.currentModel = modelName;
             }
 
             if (data.modelStatistic !== undefined) {
-                this.setModelData(data.currentModel, {info: data.modelStatistic}, item);
+                this.setModelData(data.current_model, {info: data.models_statistics}, item);
             }
         },
         handleFinishedSignal: function (message, item) {
             var that = this,
                 data = this.getMessageData(message);
 
-            if (data.modelsStatistic !== undefined) {
-                for (key in data.modelsStatistic) {
-                    that.setModelData(key, {info: data.modelsStatistic[key]}, item);
+            if (data.models_statistics !== undefined) {
+                for (key in data.models_statistics) {
+                    that.setModelData(key, {info: data.models_statistics[key]}, item);
                 }
             }
         },
@@ -115,7 +115,7 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
                 contentNodes.push(React.createElement(FcomAdminImportPushServerObject, {
                     key: key,
                     title: pushServerObject.title,
-                    storeId: pushServerObject.storeId,
+                    storeId: pushServerObject.store_id,
                     models: pushServerObject.models
                 }));
             }
@@ -170,9 +170,9 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
                 );
 
                 var keys = [
-                    'newModels',
-                    'updatedModels',
-                    'notChanged'
+                    'new_models',
+                    'updated_models',
+                    'not_changed'
                 ];
 
                 for (var index in keys) {
@@ -233,7 +233,7 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
             }
         },
         /**
-         * string data.objectId @see php FCom_Core_ImportExport::_currentObjectId
+         * string data.object_id @see php FCom_Core_ImportExport::_currentObjectId
          * string data.signal [info, problem, start, finished]
          * string data.msg
          * undefined|array data.data
@@ -242,7 +242,7 @@ define(['jquery', 'react', 'underscore', 'fcom.pushclient', 'exports', 'fcom.loc
             var logTitle = 'Import ('
                 + data.signal
                 + ')'
-                + data.objectId
+                + data.object_id
                 + ': ';
             if (this.props.watched.indexOf(data.signal) != -1) {
                 console.log(logTitle, data);

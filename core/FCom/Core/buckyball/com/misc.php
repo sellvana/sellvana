@@ -2956,7 +2956,7 @@ class BDebug extends BClass
         if (!is_scalar($msg)) {
             $msg = print_r($msg, 1);
         }
-        error_log($msg . "\n", 3, $file);
+        error_log(date('c') . ' ' . $msg . "\n", 3, $file);
         if ($backtrace) {
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);

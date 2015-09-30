@@ -12,7 +12,7 @@ class Sellvana_CatalogFields_Model_Set extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_fieldset';
-    protected static $_importExportProfile = ['skip' => ['id'],  ];
+    protected static $_importExportProfile = ['skip' => ['id'],  'unique_key' => ['set_type', 'set_code']];
 
     /**
      * @param $data

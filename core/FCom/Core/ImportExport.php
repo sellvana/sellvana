@@ -49,9 +49,13 @@ class FCom_Core_ImportExport extends BClass
     protected $_changedModels;
     protected $_errors = 0;
     protected $_warnings = 0;
-    protected $_modelsStatistic = array();
+    protected $_modelsStatistics = array();
+
+    protected $_defaultExportBatchSize = 1000;
+    protected $_defaultImportBatchSize = 1000;
 
     protected $_log = [];
+    protected $_lastLogSentAt;
 
     /**
      * @var FCom_Admin_Model_User
@@ -102,7 +106,7 @@ class FCom_Core_ImportExport extends BClass
         $this->_user = $user;
     }
 
-    public function log($message, $type = 'warning')
+    public function log($message, $type = 'info')
     {
         switch ($type) {
             case 'warning':
@@ -110,9 +114,29 @@ class FCom_Core_ImportExport extends BClass
                 break;
             case 'error':
                 $this->_errors++;
+                break;
         }
-        $this->_log[] = ['type' => $type, 'message' => $message];
+        #$this->_log[] = ['type' => $type, 'message' => $message];
+        if (empty($message['signal']) && ($type === 'warning' || $type === 'error')) {
+            $message['signal'] = 'problem';
+        }
         $this->_sendMessage($message);
+//        $this->_log[] = $message;
+//        if (time() - $this->_lastLogSentAt > 1) {
+//            $this->_lastLogSentAt = time();
+//            foreach ($this->_log as $msg) {
+//                $this->_sendMessage($msg);
+//            }
+//            $this->_log = [];
+//        }
+
+        if ($type === 'warning' || $type === 'error') {
+            $this->BDebug->log($message, 'ie.log');
+        }
+        #echo "<hr><pre>"; print_r($message); echo "</pre>";
+        if ($type === 'error') {
+            #exit;
+        }
         return $this;
     }
     
@@ -127,7 +151,8 @@ class FCom_Core_ImportExport extends BClass
         } elseif (!$this->_channel) {
             return;
         }
-        $message = array_merge(['objectId' => $this->_currentObjectId], (array)$message);
+        $message = (array)$message;
+        $message['object_id'] = $this->_currentObjectId;
         
         $this->_channel->send($message);
     }
@@ -162,12 +187,16 @@ class FCom_Core_ImportExport extends BClass
         $fe = $this->_getWriteHandle($toFile);
 
         if (!$fe) {
-            $msg = $this->BLocale->_("%s Could not open %s for writing, aborting export.", [$this->BDb->now(), $toFile]);
-            $this->BDebug->log($msg);
+            $this->log([
+                'msg' => $this->BLocale->_('Could not open file for writing, aborting export.'),
+                'data' => [
+                    'file' => $toFile,
+                ],
+            ], 'error');
             return false;
         }
 
-        $bs = $this->BConfig->get("modules/FCom_Core/import_export/batch_size", 100);
+        $bs = $this->BConfig->get("modules/FCom_Core/import_export/batch_size", $this->_defaultExportBatchSize);
 
         if ($batch && is_numeric($batch)) {
             $bs = $batch;
@@ -191,12 +220,19 @@ class FCom_Core_ImportExport extends BClass
             $model   = $s[ 'model' ];
             $user = $this->getUser();
             if ($user && $user->getPermission($model) == false) {
-                $this->BDebug->warning($this->BLocale->_('%s User: %s, cannot export "%s". Permission denied.',
-                    [$this->BDb->now(), $this->getUser()->get('username'), $model]));
+                $this->log([
+                    'msg' => $this->BLocale->_('Cannot export model, permission denied.'),
+                    'data' => [
+                        'user' => $this->getUser()->get('username'),
+                        'model' => $model,
+                    ],
+                ], 'error');
                 continue;
-            } else if (empty($user)) {
-                $this->BDebug->warning($this->BLocale->_('No user found.'));
-                continue;
+            } elseif (empty($user)) {
+                $this->log([
+                    'msg' => $this->BLocale->_('Please re-login'),
+                ], 'error');
+                break;
             }
             if ( !isset( $s[ 'skip' ] ) ) {
                 $s[ 'skip' ] = [];
@@ -209,7 +245,13 @@ class FCom_Core_ImportExport extends BClass
             try {
                 $sample = $this->BDb->ddlFieldInfo($model::table());
             } catch(Exception $e) {
-                $this->BDebug->logException($e);
+                $this->log([
+                    'msg' => $this->BLocale->_('Error retrieving table fields info'),
+                    'data' => [
+                        'model' => $model,
+                        'table' => $model::table(),
+                    ],
+                ], 'error');
                 continue;
             }
 
@@ -272,26 +314,23 @@ class FCom_Core_ImportExport extends BClass
         $fi = $this->_getReadHandle($fromFile);
 
         if (!$fi) {
-            $msg = $this->BLocale->_("%s Could not find file to import. File: %s", [$this->BDb->now(), $fromFile]);
-            $this->_sendMessage([
-                'signal'  => 'problem',
-                'problem' => $msg,
-                'data' => ['fileName' => $fromFile]
-            ]);
-            $this->BDebug->log($msg);
+            $this->log([
+                'msg' => $this->BLocale->_("Could not find file to import"),
+                'data' => ['file_name' => $fromFile],
+            ], 'error');
             return false;
         }
-        $bs = $this->BConfig->get("modules/FCom_Core/import_export/batch_size", 100);
+        $bs = $this->BConfig->get("modules/FCom_Core/import_export/batch_size", $this->_defaultImportBatchSize);
         if ($batch && is_numeric($batch)) {
             $bs = $batch;
         }
         $cnt       = 1;
         $batchData = [];
-        $this->_sendMessage([
+        $this->log([
             'signal' => 'start',
             'msg' => $this->BLocale->_("Import started."),
-            'data' => ['fileName' => $fromFile]
-        ]);
+            'data' => ['file_name' => $fromFile]
+        ], 'info');
         while(($line = fgets($fi)) !== false) {
             $cnt++;
             $lineData     = (array)json_decode(trim($line, ","));
@@ -306,12 +345,11 @@ class FCom_Core_ImportExport extends BClass
 
         $this->import($batchData, $bs);
         if (!feof($fi)) {
-            $msg = $this->BLocale->_("%s Error: unexpected file fail", $this->BDb->now());
-            $this->_sendMessage([
-                'signal'  => 'problem',
-                'problem' => $msg,
-            ]);
-            $this->BDebug->debug($msg);
+            $this->log([
+                'msg' => $this->BLocale->_("Error: unexpected file fail"),
+                'line' => $line,
+                'cnt' => $cnt,
+            ], 'error');
         }
         fclose($fi);
         if($this->BConfig->get('modules/FCom_Core/import_export/delete_after_import')){
@@ -324,187 +362,193 @@ class FCom_Core_ImportExport extends BClass
     {
         $start = microtime(true);
 
-        if (!empty($importData)) {
-            $this->_sendMessage([
-                'signal' => 'start',
-                'msg' => $this->BLocale->_("Batch started.")
-            ]);
-            $bs = $this->BConfig->get("modules/FCom_Core/import_export/batch_size", 100);
-            if ($batch && is_numeric($batch)) {
-                $bs = $batch;
-            }
+        if (empty($importData)) {
+            return true;
+        }
+//        $this->log([
+//            'signal' => 'start',
+//            'msg' => $this->BLocale->_("Batch started.")
+//        ], 'info');
+        $bs = $this->BConfig->get("modules/FCom_Core/import_export/batch_size", $this->_defaultImportBatchSize);
+        if ($batch && is_numeric($batch)) {
+            $bs = $batch;
+        }
 
-            $ieConfig = $this->collectExportableModels();
-            /** @var FCom_Core_Model_ImportExport_Model $ieHelperMod */
-            $ieHelperMod = $this->FCom_Core_Model_ImportExport_Model;
+        $ieConfig = $this->collectExportableModels();
+        /** @var FCom_Core_Model_ImportExport_Model $ieHelperMod */
+        $ieHelperMod = $this->FCom_Core_Model_ImportExport_Model;
 
-            $importID = $this->_prepareImportMeta($importData);
+        $importID = $this->_prepareImportMeta($importData);
 
-            $batchData = [];
-            $cnt = 1;
-            foreach ($importData as $data) {
-                $cnt++;
-                $isHeading = false;
-                /** @var FCom_Core_Model_Abstract $model */
-                $model     = null;
-                if (!empty($data[static::DEFAULT_MODEL_KEY])) {
-                    // new model declaration found, import remainder of previous batch
-                    if (!empty($batchData)) {
-                        $this->_importBatch($batchData);
-                        $batchData = [];
-                    }
-
-                    if ($this->_currentModel) {
-                        $this->BEvents->fire(
-                            __METHOD__ . ':afterModel:' . $this->_currentModel,
-                            ['import_id' => $importID, 'models' => $this->_changedModels]
-                        );
-                    }
-
-                    $this->_currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
-                    $this->_modelsStatistic[$this->_currentModel] = [
-                        'notChanged' => 0,
-                        'newModels' => 0,
-                        'updatedModels' => 0
-                    ];
-                    if ($this->getUser()->getPermission($this->_currentModel) == false) {
-                        $this->_canImport = false;
-                        $this->BDebug->warning($this->BLocale->_(
-                            '%s User: %s, cannot import "%s". Permission denied.',
-                            [$this->BDb->now(), $this->getUser()->get('username'), $model]
-                        ));
-                        continue;
-                    } else {
-                        $this->_canImport = true;
-                    }
-                    $this->_changedModels = [];
-                    $this->_sendMessage([
-                        'signal' => 'info',
-                        'msg' => "Importing: {$this->_currentModel}",
-                        'data' => ['startModel' => $this->_currentModel]
-                    ]);
-                    if (!isset($this->_importModels[$this->_currentModel])) {
-                        // first time importing this model
-                        $tm = $ieHelperMod->load($this->_currentModel, 'model_name'); // check if it has been created
-                        if (!$tm) {
-                            // if not, create it and add it to list
-                            $tm = $ieHelperMod->create(['model_name' => $this->_currentModel])->save();
-                            $this->_importModels[$this->_currentModel] = $tm;
-                        }
-                    }
-                    $cm = $this->_currentModel;
-                    $this->_currentModelIdField = $this->{$cm}->getIdField();
-                    $this->_currentConfig  = $ieConfig[$this->_currentModel];
-                    if(!isset($this->_currentConfig[static::AUTO_MODEL_ID])){
-                        $this->_currentConfig[static::AUTO_MODEL_ID] = true; // default case, id is auto increment
-                    }
-                    if (!array_key_exists('unique_key_not_null', $this->_currentConfig)
-                        && array_key_exists('unique_key', $this->_currentConfig)
-                    ) {
-                        $table = $this->{$cm}->table();
-                        $fields = BDb::ddlFieldInfo($table);
-                        foreach ($fields as $fieldName => $field) {
-                            if (!in_array($fieldName, (array)$this->_currentConfig['unique_key'])
-                                || $field->orm->get('Null') == 'YES'
-                            ) {
-                                continue;
-                            }
-                            $this->_currentConfig['unique_key_not_null'][] = $fieldName;
-                        }
-                    }
-                    if (!$this->_currentConfig) {
-                        $msg = $this->BLocale->_(
-                            "%s Could not find I/E config for %s.",
-                            [$this->BDb->now(), $this->_currentModel]
-                        );
-                        $this->_sendMessage(['signal' => 'problem', 'problem' => $msg]);
-                        $this->BDebug->warning($msg);
-                        continue;
-                    }
-
-                    $isHeading = true;
+        $batchData = [];
+        $cnt = 1;
+        foreach ($importData as $data) {
+            $cnt++;
+            $isHeading = false;
+            /** @var FCom_Core_Model_Abstract $model */
+            $model     = null;
+            if (!empty($data[static::DEFAULT_MODEL_KEY])) {
+                // new model declaration found, import remainder of previous batch
+                if (!empty($batchData)) {
+                    $this->_importBatch($batchData);
+                    $batchData = [];
                 }
 
-                if (isset($data[static::DEFAULT_FIELDS_KEY])) {
-                    if (!empty($batchData)) {
-                        $this->_importBatch($batchData);
-                        $batchData = [];
-                    }
-                    $this->_currentFields = $data[static::DEFAULT_FIELDS_KEY];
-                    $isHeading     = true;
+                if ($this->_currentModel) {
+                    $this->BEvents->fire(
+                        __METHOD__ . ':afterModel:' . $this->_currentModel,
+                        ['import_id' => $importID, 'models' => $this->_changedModels]
+                    );
                 }
 
-                if ( $isHeading || !$this->_canImport) {
+                $cm = $this->_currentModel = $data[ static::DEFAULT_MODEL_KEY ];
+                if (empty($ieConfig[$cm])) {
+                    $this->_currentModel = null;
+                    continue; // model does not have import/export configuration
+                }
+                $this->_modelsStatistics[$cm] = [
+                    'not_changed' => 0,
+                    'new_models' => 0,
+                    'updated_models' => 0
+                ];
+                if ($this->getUser()->getPermission($cm) == false) {
+                    $this->_canImport = false;
+                    $this->log([
+                        'msg' => $this->BLocale->_('Permission denied.'),
+                        'data' => [
+                            'user' => $this->getUser()->get('username'),
+                            'model' => $model,
+                        ],
+                    ], 'error');
+                    continue;
+                } else {
+                    $this->_canImport = true;
+                }
+                $this->_changedModels = [];
+                $this->log([
+                    'signal' => 'info',
+                    'msg' => "Importing: {$cm}",
+                    'data' => ['start_model' => $cm]
+                ], 'info');
+                if (!isset($this->_importModels[$cm])) {
+                    // first time importing this model
+                    $tm = $ieHelperMod->load($cm, 'model_name'); // check if it has been created
+                    if (!$tm) {
+                        // if not, create it and add it to list
+                        $tm = $ieHelperMod->create(['model_name' => $cm])->save();
+                        $this->_importModels[$this->_currentModel] = $tm;
+                    }
+                }
+                $this->_currentModelIdField = $this->{$cm}->getIdField();
+                $this->_currentConfig  = $ieConfig[$cm];
+                if(!isset($this->_currentConfig[static::AUTO_MODEL_ID])){
+                    $this->_currentConfig[static::AUTO_MODEL_ID] = true; // default case, id is auto increment
+                }
+                if (!array_key_exists('unique_key_not_null', $this->_currentConfig)
+                    && array_key_exists('unique_key', $this->_currentConfig)
+                ) {
+                    $table = $this->{$cm}->table();
+                    $fields = BDb::ddlFieldInfo($table);
+                    foreach ($fields as $fieldName => $field) {
+                        if (!in_array($fieldName, (array)$this->_currentConfig['unique_key'])
+                            || $field->orm->get('Null') == 'YES'
+                        ) {
+                            continue;
+                        }
+                        $this->_currentConfig['unique_key_not_null'][] = $fieldName;
+                    }
+                }
+                if (!$this->_currentConfig) {
+                    $this->log([
+                        'msg' => $msg = $this->BLocale->_("Could not find I/E config for model."),
+                        'data' => [
+                            'model' => $cm,
+                        ],
+                    ], 'error');
                     continue;
                 }
 
-                if (!$this->_isArrayAssoc($data)) {
-                    $fieldsCnt = sizeof($this->_currentFields);
-                    $dataCnt = sizeof($data);
-                    if ($dataCnt < $fieldsCnt) {
-                        $data = array_pad($data, sizeof($this->_currentFields), null);
-                    } elseif ($dataCnt > $fieldsCnt) {
-                        $data = array_slice($data, 0, $fieldsCnt);
+                $isHeading = true;
+            }
+
+            if (isset($data[static::DEFAULT_FIELDS_KEY])) {
+                if (!empty($batchData)) {
+                    $this->_importBatch($batchData);
+                    $batchData = [];
+                }
+                $this->_currentFields = $data[static::DEFAULT_FIELDS_KEY];
+                $isHeading     = true;
+            }
+
+            if ( $isHeading || !$this->_canImport || !$this->_currentModel) {
+                continue;
+            }
+
+            if (!$this->_isArrayAssoc($data)) {
+                $fieldsCnt = sizeof($this->_currentFields);
+                $dataCnt = sizeof($data);
+                if ($dataCnt < $fieldsCnt) {
+                    $data = array_pad($data, sizeof($this->_currentFields), null);
+                } elseif ($dataCnt > $fieldsCnt) {
+                    $data = array_slice($data, 0, $fieldsCnt);
+                }
+                //$this->BDebug->warning('Invalid data: ' . print_r($this->_currentFields, 1) . ' | ' . print_r($data, 1));
+                $data = array_combine($this->_currentFields, $data);
+            }
+
+            $id = '';
+
+            if (!empty($this->_currentConfig['unique_key'])) {
+                //TODO: add checking for existance of data for unique_key and proper handle it
+                foreach ((array)$this->_currentConfig['unique_key'] as $key) {
+                    if (!array_key_exists($key, $data)) {
+                        $this->log('Key is empty: ' . $key . ' | ' . print_r($this->_currentConfig, 1) . ' | ' . print_r($data, 1), 'warning');
                     }
-                    //$this->BDebug->warning('Invalid data: ' . print_r($this->_currentFields, 1) . ' | ' . print_r($data, 1));
-                    $data = array_combine($this->_currentFields, $data);
+                    $id .= $data[$key] . '/';
                 }
+            } elseif (isset($data[$this->_currentModelIdField])) {
+                $id = $data[$this->_currentModelIdField];
+            } else {
+                // this is fall back, hopefully it shouldn't be used
+                $this->log('KEY FALLBACK USED', 'warning');
+                $id = $cnt;
+            }
 
-                $id = '';
+            $batchData[trim($id, '/')] = $data;
 
-                if (!empty($this->_currentConfig['unique_key'])) {
-                    //TODO: add checking for existance of data for unique_key and proper handle it
-                    foreach ((array)$this->_currentConfig['unique_key'] as $key) {
-                        if (!array_key_exists($key, $data)) {
-                            $this->BDebug->warning('Key is empty: ' . $key . ' | ' . print_r($this->_currentConfig, 1) . ' | ' . print_r($data, 1));
-                        }
-                        $id .= $data[$key] . '/';
-                    }
-                } else if (isset($data[$this->_currentModelIdField])) {
-                    $id = $data[$this->_currentModelIdField];
-                } else {
-                    // this is fall back, hopefully it shouldn't be used
-                    $id = $cnt;
-                }
-
-                $batchData[trim($id, '/')] = $data;
-
-                if ($cnt % $bs != 0) {
-                    continue; // accumulate batch data
-                } else {
-                    $this->_sendMessage([
-                        'signal' => 'info',
-                        'msg' => $this->BLocale->_("Importing # %s", $cnt),
-                        'data' => [
-                            'currentModel' => $this->_currentModel,
-                            'modelStatistic' => $this->_modelsStatistic[$this->_currentModel]
-                        ]
-                    ]);
-                }
+            if ($cnt % $bs === 0) {
+                $this->log([
+                    'signal' => 'info',
+                    'msg' => $this->BLocale->_("Importing %s rows", $cnt),
+                    'data' => [
+                        'current_model' => $this->_currentModel,
+                        'models_statistics' => $this->_modelsStatistics[$this->_currentModel],
+                    ],
+                ], 'info');
                 $this->_importBatch($batchData);
                 $batchData = [];
             }
-
-            if (!empty($batchData)) {
-                $this->_importBatch($batchData);
-            }
-
-            $this->BEvents->fire(
-                __METHOD__ . ':afterModel:' . $this->_currentModel,
-                ['import_id' => $importID, 'models' => $this->_changedModels]
-            );
         }
 
-        $this->_sendMessage([
+        if (!empty($batchData)) {
+            $this->_importBatch($batchData);
+        }
+
+        $this->BEvents->fire(
+            __METHOD__ . ':afterModel:' . $this->_currentModel,
+            ['import_id' => $importID, 'models' => $this->_changedModels]
+        );
+
+        $this->log([
             'signal' => 'finished',
             'msg'    => "Done in: " . round(microtime(true) - $start) . " sec.",
             'data'   => [
                 'new_models'     => $this->BLocale->_("Created %d new models", $this->_newModels),
                 'updated_models' => $this->BLocale->_("Updated %d models", $this->_updatedModels),
                 'not_changed'    => $this->BLocale->_("No changes for %d models", $this->_notChanged),
-                'modelsStatistic' => $this->_modelsStatistic
+                'models_statistics' => $this->_modelsStatistics
             ]
-        ]);
+        ], 'info');
 
         return true;
     }
@@ -538,7 +582,7 @@ class FCom_Core_ImportExport extends BClass
                     $existing[] = $where;
                 }
             }
-            $data['oldId'] = trim($oldIdKey, '/');
+            $data['old_id'] = trim($oldIdKey, '/');
             $batchData[$key] = $data;
         }
 
@@ -548,9 +592,15 @@ class FCom_Core_ImportExport extends BClass
         }
 
         foreach ($batchData as $id => $data) {
-            if(!isset($data[$this->_currentModelIdField])){
-                $this->BDebug->warning($this->BLocale->_("%s Invalid data: %s: %s", [$this->BDb->now(), $id, print_r($data, 1)]));
-                //TODO: better handling and reporting of invalid data
+            if (!isset($data[$this->_currentModelIdField])) {
+                $this->_errors++;
+                $this->log([
+                    'msg' => $this->BLocale->_("Invalid data"),
+                    'data' => [
+                        'id' => $id,
+                        'row' => $data,
+                    ],
+                ], 'error');
                 continue;
             }
             $ieData = [
@@ -568,12 +618,12 @@ class FCom_Core_ImportExport extends BClass
             }
             unset($data['failed_related']);
             /** @var FCom_Core_Model_Abstract $model */
-            if (!empty($data['oldId'])) {
-                $model = isset($oldModels[$data['oldId']])? $oldModels[$data['oldId']]: null;
+            if (!empty($data['old_id'])) {
+                $model = isset($oldModels[$data['old_id']])? $oldModels[$data['old_id']]: null;
             } else {
                 $model = isset($oldModels[$id]) ? $oldModels[$id] : null;
             }
-            unset($data['oldId']);
+            unset($data['old_id']);
             //$this->BDebug->log(sprintf("%s - memory consumption: %.2f MB", $this->BDb->now(), memory_get_usage(1)/1024/1024));
             $modified = false;
             try {
@@ -582,17 +632,31 @@ class FCom_Core_ImportExport extends BClass
                 ) {
                     foreach ((array)$this->_currentConfig['unique_key_not_null'] as $k) {
                         if (empty($data[$k])) {
-                            $this->_errors++;
-                            $this->_sendMessage([
-                                'signal' => 'problem',
-                                'problem' => $this->BLocale->_("%s Empty primary key fields: %s", [$this->BDb->now(), $id]),
-                            ]);
+                            /*
+                            $this->BDebug->log($this->BLocale->_("Empty primary key fields: %s",
+                                print_r(['id' => $id, 'data' => $data, 'config' => $this->_currentConfig], 1)), 'ie.log');
+                            */
+                            /*
+                            $this->log([
+                                'msg' => $this->BLocale->_("Empty primary key fields"),
+                                'data' => [
+                                    'id' => $id,
+                                    'row' => $data,
+                                    'config' => $this->_currentConfig,
+                                ],
+                            ], 'error');
+                            */
                             continue 2;
                         }
                     }
                 }
+                $import = [];
+                if (!empty($this->_currentConfig['skip'])) {
+                    foreach ($this->_currentConfig['skip'] as $skipField) {
+                        unset($data[$skipField]);
+                    }
+                }
                 if ($model) {
-                    $import = [];
                     foreach ($data as $k => $v) {
                         $oldValue = $model->get($k);
                         if ($oldValue != $v) {
@@ -603,24 +667,31 @@ class FCom_Core_ImportExport extends BClass
                         $model->set($import)->save();
                         $modified = true;
                         $this->_updatedModels++;
-                        $this->_modelsStatistic[$this->_currentModel]['updatedModels']++;
+                        $this->_modelsStatistics[$this->_currentModel]['updated_models']++;
                     } else {
                         $this->_notChanged++;
-                        $this->_modelsStatistic[$this->_currentModel]['notChanged']++;
+                        $this->_modelsStatistics[$this->_currentModel]['not_changed']++;
                     }
                 } else {
-                    $model = $this->{$cm}->create($data)->save(false);
+                    /** @var FCom_Core_Model_Abstract $model */
+                    $model = $this->{$cm}->create($data);
+                    $model->save(false);
                     $modified = true;
                     $this->_newModels++;
-                    $this->_modelsStatistic[$this->_currentModel]['newModels']++;
+                    $this->_modelsStatistics[$this->_currentModel]['new_models']++;
                 }
             } catch (PDOException $e) {
                 $this->BDebug->logException($e);
-                $this->_sendMessage([
-                    'signal' => 'problem',
-                    'problem' => $this->BLocale->_("Error: unexpected file fail"),
-                    'data' => ['Exception Message' => $e->getMessage()]
-                ]);
+                $this->log([
+                    'msg' => $this->BLocale->_("Exception during batch process"),
+                    'data' => [
+                        'msg' => $e->getMessage(),
+                        'config' => $this->_currentConfig,
+                        'row' => $data,
+                        'update' => $import,
+                        'model' => $model,
+                    ]
+                ], 'error');
             }
 
             if ($model) {
@@ -630,10 +701,13 @@ class FCom_Core_ImportExport extends BClass
                     $this->_changedModels[$model->id()] = $model;
                 }
             } else {
-                $this->_sendMessage([
-                    'signal'  => 'problem',
-                    'problem' => $this->BLocale->_("%s Invalid model: %s", [$this->BDb->now(), $id]),
-                ]);
+                $this->log([
+                    'msg' => $this->BLocale->_("Invalid model"),
+                    'data' => [
+                        'id' => $id,
+                        'row' => $ieData,
+                    ]
+                ], 'error');
             }
         }
         $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->_changedModels]);
@@ -699,7 +773,12 @@ class FCom_Core_ImportExport extends BClass
     protected function _sort(array $model, $name, array $models)
     {
         if (isset($this->_tempSorted[$name])) {
-            $this->BDebug->log("Circular reference, $name", "ie.log");
+            $this->log([
+                'msg' => $this->BLocale->_("Circular reference"),
+                'data' => [
+                    'name' => $name,
+                ],
+            ], 'error');
         } else {
             if (!isset($this->_isSorted[$name])) {
                 $this->_tempSorted[$name] = 1;
@@ -723,8 +802,12 @@ class FCom_Core_ImportExport extends BClass
                         }
 
                         if (!isset($tmpModel)) {
-                            $this->BDebug->log($this->BLocale->_("%s Could not find valid configuration for %s",
-                                [$this->BDb->now(), $node]), "ie.log");
+                            $this->log([
+                                'msg' => $this->BLocale->_("Could not find valid configuration for model"),
+                                'data' => [
+                                    'model' => $node,
+                                ],
+                            ], "error");
                             continue;
                         }
                         $this->_sort($tmpModel, $node, $models);
@@ -763,7 +846,12 @@ class FCom_Core_ImportExport extends BClass
             $written += fwrite($handle, trim(substr($line, $written)) . "\n");
 
             if (!$written) { // if written is false or 0, there has been an error writing.
-                $this->BDebug->log($this->BLocale->_("%s Writing failed", $this->BDb->now()), 'ie.log');
+                $this->log([
+                    'msg' => $this->BLocale->_("Writing failed"),
+                    'data' => [
+                        'line' => $line,
+                    ],
+                ], 'error');
                 break;
             }
         }
@@ -813,8 +901,13 @@ class FCom_Core_ImportExport extends BClass
             $orm->where_complex(['OR' => $modelKeyConditions], true);
             $models = $orm->find_many();
         } catch(Exception $e) {
-            $this->BDebug->log($orm->as_sql());
-            $this->BDebug->logException($e);
+            $this->log([
+                'msg' => $this->BLocale->_('SQL error during getExistingModels()'),
+                'data' => [
+                    'sql' => $orm->as_sql(),
+                    'error' => $e->getMessage(),
+                ],
+            ], 'error');
         }
 
         foreach ($models as $model) {
@@ -861,7 +954,20 @@ class FCom_Core_ImportExport extends BClass
         if (!empty($related) && !$this->_defaultSite) { // search related ids
             foreach ($this->_currentConfig['related'] as $f => $r) {
                 if (empty($related[$r][$f])) {
-                    $this->BDebug->log('IMPORT: Empty related (' . $r . ', ' . $f . ')', 'import.log');
+                    #$this->BDebug->log('IMPORT: Empty related (' . $r . ', ' . $f . ')', 'ie.log');
+                    /*
+                    $this->log([
+                        'msg' => 'IMPORT: Empty related (' . $r . ', ' . $f . ')',
+                        'data' => [
+                            'r' => $r,
+                            'f' => $f,
+                            'config' => $this->_currentConfig,
+                            'current_related' => $this->_currentRelated,
+                            'related' => $related,
+                            'batch' => $batchData,
+                        ],
+                    ], 'error');
+                    */
                     continue;
                 }
 
@@ -964,15 +1070,18 @@ class FCom_Core_ImportExport extends BClass
                 $meta = is_string($importMeta)? json_decode($importMeta, true): $importMeta;
                 if (isset($meta[static::STORE_UNIQUE_ID_KEY])) {
                     $importID = $meta[static::STORE_UNIQUE_ID_KEY];
-                    $this->_sendMessage([
+                    $this->log([
                         'signal' => 'info',
                         'msg' => "Store id: $importID",
-                        'data' => ['storeId' => $importID]
+                        'data' => ['store_id' => $importID],
                     ]);
                 } else {
-                    $msg = $this->BLocale->_("%s Unique store id is not found, using '%s' as key", [$this->BDb->now(), $importID]);
-                    $this->_sendMessage(['signal'  => 'problem', 'problem' => $msg]);
-                    $this->BDebug->warning($msg);
+                    $this->log([
+                        'msg' => $this->BLocale->_("Unique store id is not found, using default as key"),
+                        'data' => [
+                            'id' => $importID
+                        ]
+                    ], 'warning');
                     $this->_defaultSite = true;
                 }
             }
