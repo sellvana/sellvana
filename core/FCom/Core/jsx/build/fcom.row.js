@@ -3,7 +3,7 @@
 /**
  * FCom Row Component
  */
-define(['underscore', 'react'], function (_, React) {
+define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComSelect2) {
     /*
      var React = require('react/addons');
      var _ = require('underscore');
@@ -31,14 +31,23 @@ define(['underscore', 'react'], function (_, React) {
         handleChange: function(callback, event) {
             var col = event.target.getAttribute('data-col');
             this.props.row[col] = event.target.value;
+
             if (typeof window[callback] === 'function') {
                 return window[callback](event);
             }
         },
+        handleSelect2Change: function(event, callback, selections) {
+            var col = event.target.getAttribute('data-col');
+            this.props.row[col] = event.target.value;
+
+            if (typeof window[callback] === 'function') {
+                return window[callback](event, selections);
+            }
+        },
         render: function () {
             var that = this;
-            var id = this.props.getConfig('id');
-            var row = that.props.row;
+            var id   = this.props.getConfig('id');
+            var row  = that.props.row;
 
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
@@ -59,7 +68,7 @@ define(['underscore', 'react'], function (_, React) {
                     case 'btn_group':
                         var actions = col.buttons.map(function(btn, index) {
                             //var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
-                            if (btn.type == 'link') {
+                            if (btn.type === 'link') {
                                 return (
                                     React.createElement("a", {key: index, 
                                         className: "btn btn-link " + (btn.cssClass ? btn.cssClass : ""), 
@@ -97,20 +106,22 @@ define(['underscore', 'react'], function (_, React) {
                                     node = col.options && col.options[row[col.name]] ? col.options[row[col.name]] : row[col.name];
                                     break;
                                 default:
-                                    node = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+                                    node = (typeof row[col.name] !== 'undefined') ? row[col.name] : "";
                                     break;
                             }
                         } else { //inline mode
 
                             var validationRules = that.validationRules(col.validation);
-
-                            var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+                            
+                            var defaultValue    = (typeof row[col.name] !== 'undefined') ? row[col.name] : "";
+                            
+                            var isSelect2       = col.select2 || false;
 
                             var inlineProps = {
                                 id: id + '-' + col.name + '-' + row.id,
                                 name: id + '[' + row.id + '][' + col.name + ']',
                                 className: (col.cssClass ? col.cssClass : '') + ' form-control',
-                                "data-col": col.name
+                                'data-col': col.name
                             };
 
                             if (typeof row[col.name + '_disabled'] !== 'undefined' && row[col.name + '_disabled'] == true) {
@@ -129,17 +140,20 @@ define(['underscore', 'react'], function (_, React) {
                                     var selectOptions = [];
                                     if (_.isArray(col.options)) {
                                         selectOptions = col.options.map(function(opt, index) {
-                                            return React.createElement("option", {key: index, value: opt.value});
+                                            if (isSelect2)
+                                                return { id: index, text: opt };
+                                            else return React.createElement("option", {key: index, value: opt.value});
                                         });
                                     } else {
                                         for(var key in col.options) {
-                                            selectOptions.push(React.createElement("option", {key: key, value: key}, col.options[key]));
+                                            if (isSelect2)
+                                                selectOptions.push({ id: key, text: col.options[key] });
+                                            else
+                                                selectOptions.push(React.createElement("option", {key: key, value: key}, col.options[key]));
                                         }
                                     }
-                                    
-                                    node = (
-                                        React.createElement("select", React.__spread({key: col.name, defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange.bind(null, col.callback)}), selectOptions)
-                                    );
+
+                                    node = isSelect2 ? React.createElement(FComSelect2, React.__spread({},  inlineProps, {options: selectOptions, onChange: that.handleSelect2Change, defaultValue: isSelect2 ? [defaultValue] : defaultValue, callback: col.callback})) : React.createElement("select", React.__spread({key: col.name, defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange.bind(null, col.callback)}), selectOptions);
                                     break;
                                 default:
                                     node = React.createElement("input", React.__spread({key: col.name, type: "text"},  inlineProps,  col.attrs,  validationRules, {defaultValue: defaultValue, onChange: that.handleChange.bind(null, col.callback)}));
