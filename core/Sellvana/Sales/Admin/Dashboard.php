@@ -175,13 +175,13 @@ class Sellvana_Sales_Admin_Dashboard extends FCom_Admin_Widget
             ->join($this->Sellvana_Sales_Model_Order_Item->table(), 'oi.order_id = o.id', 'oi')
             ->join($this->Sellvana_Catalog_Model_Product->table(), 'p.id = oi.product_id', 'p')
             ->select_expr(
-                'SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2))))',
+                'SUM(IF(oi.cost IS NULL, oi.row_total ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2))))',
                 'profit_fixed'
             );
         $this->_processFilters($items);
         $totals = clone $items;
         $total_profit = $totals->find_one()->get('profit_fixed') ?: 0;
-        $profitExpr = "ROUND(SUM(IF(oi.cost IS NULL,0 ,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2)))) * 100 / {$total_profit}, 2)";
+        $profitExpr = "ROUND(SUM(IF(oi.cost IS NULL, oi.row_total,(oi.row_total - ROUND(oi.qty_ordered * oi.cost, 2)))) / {$total_profit} * 100, 2)";
         $items->select('p.*')
             ->select_expr('SUM(oi.row_total)', 'revenue')
             ->select_expr('SUM(oi.qty_ordered)', 'qty')

@@ -66,5 +66,5 @@ modules:
                     base_currency: USD
                     default_currency: USD
                     import_export:
-                        batch_size: 10
+                        batch_size: 1000
                         delete_after_import: 0

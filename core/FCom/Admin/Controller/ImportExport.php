@@ -4,6 +4,7 @@
  * Class FCom_Admin_Controller_ImportExport
  *
  * @property FCom_Core_ImportExport $FCom_Core_ImportExport
+ * #@property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  */
 class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -14,6 +15,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     protected $_gridTitle = 'Import Export';
     protected $_formTitle = 'Import Export';
     protected $_recordName = 'Import Export';
+    protected $_formLayoutName = '/importexport';
 
     public function getExportConfig()
     {
@@ -161,7 +163,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     public function action_index()
     {
         $model['export_config'] = $this->getExportConfig();
-        $model[ 'import_config' ] = $this->_getImportConfig();
+        $model['import_config'] = $this->_getImportConfig();
 
         $this->layout();
 
@@ -192,6 +194,22 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 //        $this->FCom_Core_ImportExport->importFile($file);
 //    }
 
+    public function action_import()
+    {
+        $this->forward(false);
+        return; //disabled, for testing only
+
+        $this->BResponse->startLongResponse(false);
+
+        $this->BDebug->mode(BDebug::MODE_IMPORT);
+
+        $fileName = $this->BApp->storageRandomDir() . '/export/export.json';
+
+        $this->FCom_Core_ImportExport->importFile($fileName);
+
+        exit;
+    }
+
     public function action_import__POST()
     {
         if (empty($_FILES) || !isset($_FILES['upload'])) {
@@ -204,6 +222,13 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         $uploads = $_FILES['upload'];
         $rows    = [];
         try {
+            $isSubscribed = null;
+            if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {
+                $isSubscribed = $this->FCom_PushServer_Model_Client->sessionClient()->isSubscribed('import');
+                if ($isSubscribed !== true){
+                    $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('import');
+                }
+            }
             foreach ($uploads['name'] as $i => $fileName) {
 
                 if (!$fileName) {
@@ -220,13 +245,11 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);
-                    //if (function_exists('xdebug_start_trace')) {
-                    //    xdebug_start_trace();
-                    //}
+
+                    $this->BDebug->mode(BDebug::MODE_IMPORT);
+
                     $importer->importFile($fileName);
-                    //if (function_exists('xdebug_stop_trace')) {
-                    //    xdebug_stop_trace();
-                    //}
+
                     $error    = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
@@ -243,7 +266,13 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 }
                 $rows[] = $row;
             }
+            if ($isSubscribed !== true) {
+                $this->FCom_PushServer_Model_Client->sessionClient()->unsubscribe('import');
+            }
         } catch(Exception $e) {
+            if ($isSubscribed !== true) {
+                $this->FCom_PushServer_Model_Client->sessionClient()->unsubscribe('import');
+            }
             $this->BDebug->logException($e);
             $this->BResponse->json(['error' => $e->getMessage()]);
         }

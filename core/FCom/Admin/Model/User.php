@@ -56,6 +56,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         ],
     ];
 
+    protected static $_fieldDefaults = [
+        'locale' => 'en_US',
+    ];
+
     protected static $_validationRules = [
         ['username', '@required'],
         ['username', '/^[A-Za-z0-9._@-]{1,255}$/', 'Username allowed characters are letters, numbers, dot, underscore, hyphen and @'],
@@ -115,10 +119,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         parent::onAfterCreate();
 
-        $this->set([
-            'tz' => $this->BConfig->get('modules/FCom_Core/default_tz'),
-            'locale' => $this->BConfig->get('modules/FCom_admin/default_locale'),
-        ]);
+        $defaultTz = $this->BConfig->get('modules/FCom_Core/default_tz');
+        if ($defaultTz) {
+            $this->set('tz', $defaultTz);
+        }
+        $defaultLocale = $this->BConfig->get('modules/FCom_admin/default_locale');
+        if ($defaultLocale) {
+            $this->set('locale', $defaultLocale);
+        }
     }
 
     public function onBeforeSave()

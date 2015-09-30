@@ -7,6 +7,7 @@
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
  * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
+ * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
  */
 
 class Sellvana_CatalogIndex_Main extends BClass
@@ -102,6 +103,30 @@ class Sellvana_CatalogIndex_Main extends BClass
         $this->Sellvana_CatalogIndex_Model_Doc->flagReindex($args['product_ids']);
         if (static::$_autoReindex) {
             $this->getIndexer()->indexPendingProducts();
+        }
+    }
+
+    public function onProductAfterCoreImport($args){
+        if (array_key_exists('import_id', $args)){
+            $orm = $this->FCom_Core_Model_ImportExport_Id->orm('p');
+            $orm->inner_join('FCom_Core_Model_ImportExport_Site', ['s.id', '=', 'p.site_id'], 's')
+                ->inner_join('FCom_Core_Model_ImportExport_Model', ['m.id', '=', 'p.model_id'], 'm')
+                ->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['i.id', '=', 'p.local_id'], 'i')
+                ->select('p.local_id')
+                ->group_by('p.local_id')
+                ->where('s.site_code', $args['import_id'])
+                ->where('m.model_name', 'Sellvana_Catalog_Model_Product')
+                ->where_null('i.id');
+            $ids = $orm->find_many_assoc('local_id','local_id');
+
+            $now = $this->BDb->now();
+            foreach ($ids as $id){
+                $this->Sellvana_CatalogIndex_Model_Doc->create([
+                    'id'=>$id,
+                    'last_indexed' => $now,
+                    'flag_reindex' => 1
+                ])->save();
+            }
         }
     }
 
