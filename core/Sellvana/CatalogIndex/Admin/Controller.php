@@ -41,6 +41,28 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
         ]);
     }
 
+    public function action_cat()
+    {
+        if (!$this->BDebug->is(['DEBUG', 'DEVELOPMENT'])) {
+            echo "DENIED";
+            exit;
+        }
+        $this->BResponse->startLongResponse();
+        $this->Sellvana_CatalogIndex_Main->autoReindex(false);
+        $this->Sellvana_Catalog_Model_Product->setFlag('skip_duplicate_checks', true);
+
+        // create categories / subcategories
+        if (true) {
+            echo $this->_('<p>Creating categories...</p>');
+            /** @var Sellvana_Catalog_Model_Category $root */
+            $root = $this->Sellvana_Catalog_Model_Category->load(1);
+            for ($i = 1; $i <= 1; $i++) {
+                $root->createChild('Category ' . $i);
+            }
+        }
+        echo 'DONE';
+    }
+
     public function action_test()
     {
         if (!$this->BDebug->is(['DEBUG', 'DEVELOPMENT'])) {

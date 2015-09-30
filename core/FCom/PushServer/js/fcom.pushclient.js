@@ -1,4 +1,5 @@
 define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports) {
+    var debug = FCom.jsdebug;
     if (!window.name) { // unique name for the browser window or tab
         window.name = (Math.random() + '').replace(/^0\./, 'f-');
     }
@@ -38,9 +39,13 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports
             //messages = _.filter(messages, function(qmsg) { return !_.isEmpty(qmsg.seq); });
 
             state.conn_cnt++;
-            console.log('send', data);
+            if (debug){
+                console.log('send', data);
+            }
         } else {
-            console.log('need define Fcom.pushserver_url to send PushServer');
+            if (debug) {
+                console.log('need define Fcom.pushserver_url to send PushServer');
+            }
         }
     }
 
@@ -49,7 +54,9 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports
             stop = true;
             return;
         }
-        console.log('receive', JSON.stringify(response.messages));
+        if (debug) {
+            console.log('receive', JSON.stringify(response.messages));
+        }
 
         _.each(response.messages, function (msg) {
             if (channels[msg.channel]) {
@@ -59,7 +66,9 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports
             }
             _.each(subscribers, function (sub) {
                 if (sub.regexp && sub.regexp.test(msg.channel)) {
-                    console.log('regexp subscriber', sub);
+                    if (debug) {
+                        console.log('regexp subscriber', sub);
+                    }
                     sub.callback(msg);
                 }
             });

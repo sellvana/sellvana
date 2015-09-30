@@ -100,6 +100,7 @@ modules:
                     theme: FCom_Admin_DefaultTheme
                     default_locale: en_US
                     default_dashboard_widget_limit: 25
+                    enable_debug_in_js: 0
 
         themes:
             FCom_Admin_DefaultTheme:

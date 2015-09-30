@@ -363,3 +363,10 @@ form:
 /systememails:
     - { include: base }
     - { view: admin/nav, do: [[ setNav, system/emails ]] }
+
+/importexport:
+    - { include: default_form }
+    - view: head
+        do:
+            - [ requireJs, fcom.admin.import, "@FCom_Admin/Admin/js/fcom/fcom.admin.import" ]
+            - [ scss, "@FCom_Admin/Admin/theme1/assets/scss/admin-import.scss" ]

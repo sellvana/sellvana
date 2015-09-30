@@ -248,10 +248,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         if (!$this->get('url_key')) {
             $this->generateUrlKey();
         }
-        if (!$this->get('url_path') || $this->is_dirty('url_key')) {
+        if (!$this->get('url_path') || ($this->is_dirty('url_key') && !$this->_new)) {
             $this->generateUrlPath();
         }
-        if (!$this->get('full_name') || $this->is_dirty('node_name')) {
+        if (!$this->get('full_name') || ($this->is_dirty('node_name') && !$this->_new)) {
             $this->generateFullName();
         }
         if ($this->is_dirty('id_path')) {
@@ -471,9 +471,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function siblings()
     {
         $siblings = [];
-        foreach ($this->parent()->children() as $c) {
-            if ($c->id() != $this->id()) {
-                $siblings[$c->id()] = $c;
+        if ($parent = $this->parent()) {
+            foreach ($parent->children() as $c) {
+                if ($c->id() != $this->id()) {
+                    $siblings[$c->id()] = $c;
+                }
             }
         }
         return $siblings;
@@ -486,15 +488,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function generateSortOrder()
     {
         $sortOrder = 0;
-        $parent = $this->parent();
-        if ($parent) {
-            $siblings = $parent->children();
+
+        foreach ($this->siblings() as $sibling) {
+            $sortOrder = max($sortOrder, $sibling->get('sort_order'));
         }
-        foreach (static::$_cache[$this->_origClass()]['id'] as $c) {
-            if ($c->get('sort_order') && $c->get('parent_id') == $this->get('parent_id')) {
-                $sortOrder = max($sortOrder, $c->get('sort_order'));
-            }
-        }
+
         $this->set('sort_order', $sortOrder + 1);
         return $this;
     }
