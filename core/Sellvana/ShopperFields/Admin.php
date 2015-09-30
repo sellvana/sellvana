@@ -52,13 +52,13 @@ class Sellvana_ShopperFields_Admin extends BClass
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true]],
                     ['name' => 'input_type', 'label' => 'Field Type', 'width' => 120, 'editable' => 'inline','editor' => 'select',
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true], 'default' => 'select',
-                        'options' => ['textarea' => 'Text Area', 'text' => 'Text Line', 'select' => 'Drop Down', 'checkbox' => 'Check Box'],
+                        'options' => ['textarea' => 'Text Area', 'text' => 'Text Line', 'select' => 'Drop Down', 'checkbox' => 'Check Box'], 'select2' => true, 'callback' => 'updateValidation'
                     ],
                     ['type' => 'link', 'name' => 'options', 'label' => 'Options', 'width' =>80, 'value' => 'Option',
                         'addable' => true, 'style' => ['fontSize' => '12px', 'lineHeight' => '32px', 'display' => 'block', 'textAlign' => 'center'],
                         'action' => 'showModalToEditShopperField'],
                     ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select',
-                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => 'Yes', 0 => 'No'], 'default' => 1],
+                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => 'Yes', 0 => 'No'], 'default' => 1, 'select2' => true],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 80, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true]],
 
@@ -109,12 +109,12 @@ class Sellvana_ShopperFields_Admin extends BClass
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Option', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique'],
+                    ['type' => 'input', 'name' => 'label', 'label' => 'Field name (Product Name)', 'width' => 300, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'callback' => 'editShopperOptionLabelCallback', 'cssClass' => 'optionLabelUnique '],
                     ['type' => 'input', 'name' => 'sku', 'label' => 'Sku', 'width' => 150, 'editable' => 'inline', 'sortable' => false],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => 'inline', 'sortable' => false, 'validation' => ['required' => true], 'cssClass' => 'optionPositionUnique ', 'callback' => 'editShopperOptionPositionCallback'],
                     ['type' => 'btn_group', 'buttons' => [
                             ['name' => 'edit-custom', 'callback' => 'editShopperOption', 'cssClass' => " btn-xs btn-edit ", 'textValue' => 'Edit Price', "icon" => " icon-dollar", 'attrs' => ['data-toggle' => 'tooltip', 'title' => 'Update Prices', 'data-placement' => 'top']], 
-                            ['name' => 'delete']
+                            ['name' => 'delete', 'callback' => 'deleteOptionRowCallback']
                         ]
                     ]
                 ],

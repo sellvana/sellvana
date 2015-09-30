@@ -2,7 +2,7 @@
 
 define(['underscore', 'react', 'jquery', 'griddle.fcomGridBody', 'griddle.fcomModalForm', 'griddle.fcomGridFilter', 'fcom.components', 'griddle.custom', 'bootstrap', 'unique'],
 function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Griddle) {
-    var debug = FCom.jsdebug;
+
     /**
      * FCom Griddle Componnent
      */
@@ -46,9 +46,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             }
         },
         render: function () {
-            if (debug) {
-                console.log('griddle.config-' + this.props.config.id, this.props.config);
-            }
+            console.log('griddle.config-' + this.props.config.id, this.props.config);
             var config = this.props.config;
 
             //prepare props base on data mode
@@ -152,9 +150,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
          * @param {function} triggerEvent
          */
         addRows: function(rows, triggerEvent) {
-            if (debug) {
-                console.log('addRowsExternal');
-            }
+            console.log('addRowsExternal');
             triggerEvent();
         },
         /**
@@ -163,9 +159,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
          * @param triggerEvent
          */
         removeRows: function(rows, triggerEvent) {
-            if (debug) {
-                console.log('removeRowsExternal');
-            }
+            console.log('removeRowsExternal');
             triggerEvent();
         },
         /**
@@ -174,9 +168,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
          * @param triggerEvent
          */
         updateRows: function(rows, triggerEvent) {
-            if (debug) {
-                console.log('updateRowsExternal');
-            }
+            console.log('updateRowsExternal');
             triggerEvent();
         }
     };
@@ -395,9 +387,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 }
             } else {
                 //error
-                if (debug) {
-                    console.log('form validate fail');
-                }
+                console.log('form validate fail');
                 return false;
             }
         },
@@ -467,9 +457,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     }
                     break;
                 default:
-                    if (debug) {
-                        console.log('do-mass-action');
-                    }
+                    console.log('do-mass-action');
                     break;
             }
 
@@ -726,20 +714,16 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         },
         removeField: function(event) {
             var fieldName = event.target.dataset.field;
-            if (debug) {
-                console.log('removeField.field', fieldName);
-                console.log('removeField.dataset', event.target.dataset);
-            }
+            console.log('removeField.field', fieldName);
+            console.log('removeField.dataset', event.target.dataset);
             if (fieldName && _.contains(this.state.shownFields, fieldName)) {
                 var shownFields = _.without(this.state.shownFields, fieldName);
                 this.setState({shownFields: shownFields});
             }
         },
         render: function() {
-            if (debug) {
-                console.log('state.fields', this.state.fields);
-                console.log('state.shownFields', this.state.shownFields);
-            }
+            console.log('state.fields', this.state.fields);
+            console.log('state.shownFields', this.state.shownFields);
             //todo: we have 2 types of render mass-edit, refer https://fulleron.atlassian.net/browse/SC-306
 
             //if (!this.props.editUrl) return null;

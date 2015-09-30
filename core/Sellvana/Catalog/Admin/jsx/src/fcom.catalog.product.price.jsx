@@ -102,7 +102,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         </thead>
                         <tbody>
                             {_.map(this.props.prices, function (price) {
-                                if (this.props.deleted && _.contains(this.props.deleted, parseInt(price.id))) {
+                                if (this.props.deleted && price.deleted && _.contains(this.props.deleted, parseInt(price.id))) {
                                     return <input key={'delete-' + price.id} type="hidden" name={"prices[delete][]"} value={price.id}/>
                                 }
 
@@ -621,6 +621,12 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }.bind(this);
 
             this.state.deletePrice = function (id) {
+                _.find(this.state.prices, function(price) {
+                    if (price.id === id) {
+                        price.deleted = true;
+                    }
+                });
+                
                 this.state.deleted.push(id);
                 this.setState({ isUpdatePrice: true });
             }.bind(this);
@@ -678,7 +684,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }.bind(this);
         },
         shouldComponentUpdate: function(nextProps, nextState) {
-            return _.isEqual(this.state, nextState) || _.isEqual(this.props, nextProps);
+            return !_.isEqual(this.state, nextState) || !_.isEqual(this.props, nextProps);
         },
         componentWillMount: function() {
             calculateDynamicPrice(this.state);
