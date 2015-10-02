@@ -176,10 +176,13 @@ class Sellvana_ShopperFields_Frontend extends BClass
 
         if ($skus) {
             /** @var Sellvana_Catalog_Model_InventorySku[] $skuModels */
-            $skuModels = $invHlp->orm('i')->where_in('inventory_sku', $skus)->find_many_assoc('inventory_sku');
+            $skuModels = $invHlp->orm('i')->where_in('inventory_sku', array_keys($skus))->find_many_assoc('inventory_sku');
             foreach ($skuModels as $skuModel) {
                 if (!$skuModel->canOrder()) {
-
+                    $sku = $skuModel->get('inventory_sku');
+                    foreach ($skus[$sku] as $s) {
+                        $args['items'][$s['item_idx']]['error'] = $this->BLocale->_('Bundled SKU %s out of stock', $sku);
+                    }
                 }
             }
         }
