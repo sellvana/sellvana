@@ -834,7 +834,7 @@
                         break;
                 }
             },
-            clearDeletedRows: function(options) {
+            clearDeletedOptions: function(options) {
                 if (deletedRows.length) { // Remove delete options before re-render price tabs
                     var deletedOpts = _.pluck(deletedRows, 'label');
                     _(options).each(function(option, i) {
@@ -872,13 +872,11 @@
                     }.bind(this));
 
                     // If local data contains rows has been deleted then clear them before re-render
-                    options = _.uniq(this.clearDeletedRows(options));
+                    options = _.uniq(this.clearDeletedOptions(options));
                     if (isDiff) {
-                        console.warn('isDiff true');
-                        console.warn('options', options);
                         this.props.tabIndex = options[0];
                         this.setState({ options: options });
-                    } else {console.warn('isDiff false');
+                    } else {
                         _toggleTab(_toggleSpace(options[0]));
                     }
                 }.bind(this));
@@ -891,7 +889,7 @@
                     options.push(_toggleSpace(row.label));
 
                     // If local data contains rows has been deleted then clear them before re-render
-                    options = _.uniq(this.clearDeletedRows(options));
+                    options = _.uniq(this.clearDeletedOptions(options));
 
                     this.props.tabIndex = row ? row.label : options[0].label;
                     this.setState({ options: options });
@@ -916,7 +914,7 @@
                         });
 
                         // If local data contains rows has been deleted then clear them before re-render
-                        options = _.uniq(this.clearDeletedRows(options));
+                        options = _.uniq(this.clearDeletedOptions(options));
 
                         if (isToggleTab)
                             this.props.tabIndex = row ? row.label : options[0].label;
@@ -1022,7 +1020,6 @@
                 return {
                     title: Locale._(_capitalizeFirstLetter(option) + ' Prices'),
                     prices: prices,
-                    // deleted: deletedPrices,
                     option: option,
                     addPriceCallback: 'shopperPriceTypeCallback',
                     priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
