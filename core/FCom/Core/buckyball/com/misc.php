@@ -3476,6 +3476,113 @@ class BFtpClient extends BClass
 }
 
 /**
+ * Class BHttpClient
+ */
+class BHttpClient extends BClass
+{
+    public function getContent($url){
+        throw new BErrorException('Not available at this moment');
+    }
+}
+
+/**
+ * Class BFile
+ *
+ * @property BHttpClient $BHttpClient
+ */
+class BFile extends BClass
+{
+    protected $_tpmDir;
+    protected $_currentTmpDir;
+
+    protected $_isRemoteFile;
+    protected $_isLocalFile;
+    protected $_previousStatus;
+
+    protected $_fileInfo;
+
+    protected $_fileContent;
+
+    /**
+     * Is necessary to keep the contents of file in the object or not
+     * @var bool
+     */
+    public $keepContent = false;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->_tpmDir = $this->BApp->storageRandomDir() . DIRECTORY_SEPARATOR . 'tmp';
+    }
+
+    /**
+     * @param $path
+     * @return mixed
+     * @throws BErrorException
+     */
+    public function load($path){
+        if (!is_string($path)){
+            throw new BErrorException('Support only string path of file');
+        }
+        if(filter_var($path, FILTER_VALIDATE_URL) !== false){
+            return self::i()->loadRemoteFile($path);
+        } else {
+            return self::i()->loadLocalFile($path);
+        }
+    }
+
+    /**
+     * @param $url
+     * @return $this
+     * @throws BErrorException
+     */
+    public function loadRemoteFile($url){
+        if (ini_get('allow_url_fopen')) {
+            $file = @file_get_contents($url);
+        } else {
+            $file = $this->BHttpClient->getContent($url);
+        }
+
+        $this->_isRemoteFile = true;
+
+        return $this;
+    }
+
+    /**
+     * @param $path
+     */
+    public function loadLocalFile($path){
+        $this->_isLocalFile = true;
+    }
+
+    /**
+     * @param $file
+     */
+    public function saveFileToTmp($file){
+
+    }
+
+    /**
+     * The file is stored on a this server
+     * @return bool
+     */
+    public function isLocal(){
+        return (bool)$this->_isLocalFile;
+    }
+
+    /**
+     * The file is stored on a remote server
+     * @return bool
+     */
+    public function isRemote(){
+        return (bool)$this->_isRemoteFile;
+    }
+}
+
+/**
 * Throttle invalid login attempts and potentially notify user and admin
 *
 * Usage:
