@@ -129,14 +129,14 @@ class Sellvana_ShopperFields_Admin extends BClass
                         'id'       => 'add-new-field-option',
                         'class'    => 'btn-primary',
                         'callback' => 'insertNewFieldOption'
-                    ],/*
+                    ],
                     'add-prices' => [
-                        'caption'  => 'Add Prices',
+                        'caption'  => 'Apply Prices',
                         'type'     => 'button',
                         'id'       => 'add-prices',
                         'class'    => 'btn-info',
-                        'callback' => 'addPrices'
-                    ],*/
+                        'callback' => 'applyPricesForAllFields'
+                    ],
                     'delete' => ['caption' => 'Remove']
                 ],
                 'callbacks' => [

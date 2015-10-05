@@ -258,31 +258,40 @@
 
         "use strict"
 
-        // var deletedPrices  = [];
+        /*=============================================
+        =            Define variables                 =
+        =============================================*/
+
         var shopper     = {};
-        var tmpShopper  = {};
         var addedRows   = [];
-        var editedRows  = [];
         var deletedRows = [];
         var shopperId   = '';
+        
         // Global objec event to connect two components fcom.griddle and fcom.catalog.product.price grid
         var OPTS        = {};
+        var form;
+        /*=====  End of Define variables block  ======*/
+
+        /*=============================================
+        =     Helper, validate and private funcs      =
+        =============================================*/
+
         /**
-         * Toggle tabs when edit trigger
+         * Helper to toggle tabs when edit trigger
          * @param  {string} label 
          * @return {mixed}
          */
-        function toggleTab(label) {
-            shopperModalNode.find('#btn'+capitalizeFirstLetter(toggleSpace(label))+'Tab').click();
+        function _toggleTab(label) {
+            shopperModalNode.find('#btn'+_capitalizeFirstLetter(_toggleSpace(label))+'Tab').click();
             shopperModalNode.find('#btnShopperTab').click();
         }
 
         /**
-         * Toggle action buttons if valid false
+         * Helper to toggle action buttons if valid false
          * @param  {Boolean} valid 
          * @return {mixed}
          */
-        function toggleActionButton(valid) {
+        function _toggleActionButton(valid) {
             if (!valid) {
                 shopperModalNode.find('tbody .btn-edit').prop('disabled', true);
                 shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', true);
@@ -293,27 +302,27 @@
         }
 
         /**
-         * Convert space chars to hyphen or on the contrary
-         * @param  {string}  string
+         * Helper to convert space chars to hyphen or on the contrary
+         * @param  {String}  str
          * @param  {Boolean} isRevert
-         * @return {string}
+         * @return {String}
          */
-        function toggleSpace(string, isRevert) {
-            string = $.trim(string);
+        function _toggleSpace(str, isRevert) {
+            str = $.trim(str);
             if (isRevert) {
-                return string.replace(/\-/g, ' ');
+                return str.replace(/\-/g, ' ');
             } else {
-                return string.replace(/\s/g, '-');
+                return str.replace(/\s+/g, '-');
             }
         }
 
         /**
-         * Parse options string to array
+         * Helper to parse options from string to array
          * 
          * @param  {string} options 
          * @return {Array}
          */
-        function parseOptions(options) {
+        function _parseOptions(options) {
             if (typeof options === 'string' && options.length) {
                 return options.replace(/\,+$/, '').split(',').map(function(option) {
                     return option;
@@ -323,30 +332,40 @@
         }
 
         /**
+         * Custom validate for options grid upon it's not active
+         * 
+         * @return {Boolean}
+         */
+        function _isEmptyOptions() {
+            var valid = true;
+            _(optionsModalGrid.getRows()).each(function(row, i) {
+                if (!row.label || row.label === '') valid = false;
+            });
+
+            return valid;
+        }
+
+        /**
          * Capitalize first letter
          * 
          * @param  {string} string 
          * @return {string}
          */
-        function capitalizeFirstLetter(string) {
+        function _capitalizeFirstLetter(string) {
             return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1);
         }
 
         /**
-         * Merge options of current row to global added options of specify row's options
+         * Helper to trim space between words
          * 
-         * @param  {string} curOptions
-         * @param  {Object} addedOptions
-         * @return {string}
+         * @param  {String} str
+         * @return {String}
          */
-        function mergeOptions(curOptions, addedOptions) {
-            _(addedOptions).map(function(addedOption) {
-                if (curOptions.indexOf(addedOption) === -1) {
-                    return curOptions += ',' + addedOption;
-                }
-            });
-
-            return curOptions;
+        function _trimSpaces(str) {
+            if (str.match(/\s\s+/g)) { // If option label has two spaces between words
+                return str.replace(/\s+/g, ' ');
+            }
+            return str;
         }
 
         /**
@@ -354,7 +373,7 @@
          * 
          * @return boolean
          */
-        function validateAttrs() {
+        function _validateAttrs() {
             var valid = true;
             shopperModalNode.find('input[data-col="label"], input[data-col="position"]').each(function (el) {
                 if (!$(this).valid()) {
@@ -370,37 +389,163 @@
          * @param  {Object} row 
          * @return {mixed}
          */
-        function checkIfRowIsEditOrUpdateAttrs(row) {
-            var rowId = row.id.toString();
-            if (!_.contains(editedRows, rowId)) {
+        function _checkIfRowIsEditOrUpdateAttrs(row) {
+            if (!row.edited) {
                 // Edited row do not exist on local data then just toggle tab
-                $(OPTS).trigger('edit', [row]);
+                $(OPTS).trigger('edit', [row, false, true]);
             } else {
                 // Edited row exist on local data then update local data and re-render price tabs grid
-                $(OPTS).trigger('edit', [row, true]);
-
-                // Clear local data
-                _(editedRows).each(function(id, i) {
-                    if (id == rowId) delete editedRows[i];
-                });
+                $(OPTS).trigger('edit', [row, true, true]);
             }
         }
 
         /**
          * Create options serialize
+         * 
          * @param  {String} option 
          * @return {mixed}
          */
-        function createOptionsSerializeItem(option) {
+        function _initOptionsSerializeItem(option) {
             if (!shopper.options_serialized) {
                 shopper.options_serialized = {};
             }
 
-            if (!shopper.options_serialized[toggleSpace(option)]) {
-                shopper.options_serialized[toggleSpace(option)] = {};
+            if (!shopper.options_serialized[_toggleSpace(option)]) {
+                shopper.options_serialized[_toggleSpace(option)] = {};
             }
         }
 
+
+        /**
+         * Unique validation for option label
+         * 
+         * @param  {String} value 
+         * @param  {Object} elem
+         * @return {Boolean}
+         */
+        function validateUniqueOption (value, elem) {
+            var valid = true;
+            if (typeof elem !== 'undefined') {
+                var $parent = $(elem).parents('tr');
+
+                var items = optionsModalNode.find('tr');
+                items.each(function() {
+                    if (!valid) {
+                        return;
+                    }
+
+                    var item = $(this);
+                    if (this === $parent[0]) {
+                        return;
+                    }
+
+                    valid = value !== item.find('input[data-col="label"]').val();
+                    _toggleActionButton(valid);
+                });
+                return valid;
+            }
+        }
+
+        /**
+         * Unique and number validation for option's position
+         * 
+         * @param  {String} value 
+         * @param  {Object} elem
+         * @return {Boolean}
+         */
+        function validateUniquePosition (value, elem) {
+            var valid = true;
+
+            if (isNaN(value)) return false;
+
+            if (typeof elem !== 'undefined') {
+                var $parent = $(elem).parents('tr');
+
+                var items = optionsModalNode.find('tr');
+                items.each(function() {
+                    if (!valid) {
+                        return;
+                    }
+
+                    var item = $(this);
+                    if (this === $parent[0]) {
+                        return;
+                    }
+
+                    valid = value !== item.find('input[data-col="position"]').val();
+                    _toggleActionButton(valid);
+                });
+                return valid;
+            }
+        }
+
+        /**
+         * Process data for post
+         * 
+         * @return {mixed}
+         */
+        function _processPostData() {
+            var rows            = optionsModalGrid.getRows(),
+                optionSaveStr   = '',
+                data            = {};
+
+            _(rows).each(function(row, index) {
+                var optionLabel = _toggleSpace(row.label);
+                if (typeof data[optionLabel] === 'undefined') {
+                    data[optionLabel] = {};
+                }
+
+                var $container  = $('#'+optionLabel+'-prices'),
+                    $trItems    = $container.find('.'+optionLabel+'-price-item'),
+                    prices      = [];
+
+                optionSaveStr += optionLabel + ',';
+
+                _initOptionsSerializeItem(optionLabel);
+                shopper.options_serialized[optionLabel].sku      = row.sku;
+                shopper.options_serialized[optionLabel].position = row.position;
+
+                data[optionLabel]['sku']      = row.sku; 
+                data[optionLabel]['position'] = row.position;
+
+                $trItems.each(function(i, item) {
+                    var price           = {};
+                    price['id']         = ++i;
+                    price['product_id'] = {{ model.id }};
+                    $(item).find('input, select').each(function(index, el) {
+                        var key = $(this).data('type'),
+                            val = $(this).val();
+                        if (typeof key !== 'undefined') {
+                            price[key] = shopperGrid.html2text(val);
+                        }
+                    });
+                    prices.push(price);
+                });
+
+                if (prices.length) {
+                    data[optionLabel]['prices'] = prices;
+                }
+            });
+
+            // If input data container does not exist then create
+            if ($('#shopper_field_prices_'+shopperId).length === 0) {
+                $('#tab-shopper_fields').append('<input type="hidden" data-shopper-id="'+shopperId+'" id="shopper_field_prices_'+shopperId+'" />');
+            }
+
+            var hiddenInput = $('#shopper_field_prices_'+shopperId);
+            if (hiddenInput.data('shopper-id') === shopperId) {
+                $('#shopper_field_prices_'+shopperId).val(JSON.stringify(data));
+            }
+
+            shopper.options = optionSaveStr.slice(0, optionSaveStr.length - 1);
+            shopperGrid.updateRows([shopper]);
+        }
+
+        /*=====  End of helper, validate and private funcs block  ======*/
+
+        /*==========================================================================
+        =            Global functions for interacting between components           =
+        ==========================================================================*/
         /**
          * Options grid register
          * 
@@ -427,23 +572,47 @@
         }
 
         /**
+         * Callback function to apply price for all fields
+         * 
+         * @return {mixed} 
+         */
+        window.applyPricesForAllFields = function() {
+            if (form.valid()) {
+                var rows = _(optionsModalGrid.getRows()).filter(function(row) {
+                    row.label = _trimSpaces(row.label);
+                    $('tr[id="'+row.id+'"]').find('input[data-col="label"]').val(row.label);
+                    if (row.edited) {
+                        $(OPTS).trigger('edit', [row, true, false]);
+                    }
+                    return row;
+                });
+
+                $(OPTS).trigger('apply', [rows]);
+            }
+        }
+
+        /**
          * Callback for edit row on option grid
          * 
          * @param  {Object} editedRow 
          * @return {mixed}
          */
         window.editShopperOption = function(editedRow, e) {
-            var form = shopperModalNode.find('#frontend-field-grid_options_form');
             if (form.valid()) {
+                // If option label has two spaces between words
+                editedRow.label = _trimSpaces(editedRow.label);
+                // Update option field val
+                $(e.target).parents('tr').find('input[data-col="label"]').val(editedRow.label);
+
                 // If available row is edited
-                if (!isNaN(editedRow.id)) {
-                    checkIfRowIsEditOrUpdateAttrs(editedRow);
+                if (typeof editedRow.id === 'number') {
+                    _checkIfRowIsEditOrUpdateAttrs(editedRow);
                 } else { // edit new row
                     var isAddedRow = _.contains(_.pluck(addedRows, 'id'), editedRow.id);
                     if (!isAddedRow) { // item does not exist in local data then add to local data and re-render price tabs
                         $(OPTS).trigger('add', [editedRow]);
                     } else { // item has existed in local data then edit
-                        checkIfRowIsEditOrUpdateAttrs(editedRow);
+                        _checkIfRowIsEditOrUpdateAttrs(editedRow);
                     }
                 }
             }
@@ -464,13 +633,15 @@
             }
 
             // If validation passes then save edited row on local data
-            if (validateAttrs()) {
-                var id = $(e.target).attr('id').split('-').slice(3);
-                id = id.length > 1 ? id.join('-').toString() : id.toString();
-                // Update local data for edit price process
-                if (!_.contains(editedRows, id)) {
-                    editedRows.push(id);
-                }
+            if (_validateAttrs()) {
+                $(e.target).on('blur', function(e) {
+                    e.preventDefault();
+                    var id = $(this).attr('id').split('-').slice(3);
+                    id = id.length > 1 ? id.join('-').toString() : id.toString();
+                    _(optionsModalGrid.getRows()).find(function(row) {
+                        if (row.id == id) row.edited = true;
+                    });
+                });
             }
         }
 
@@ -481,7 +652,7 @@
          * @return {mixed}
          */
         window.editShopperOptionPositionCallback = function(e) {
-            validateAttrs();
+            _validateAttrs();
         }
 
         /**
@@ -491,9 +662,312 @@
          * @param {string} option
          */
         window.shopperPriceTypeCallback = function(prices, option) {
-            createOptionsSerializeItem(option);
+            _initOptionsSerializeItem(option);
             shopper.options_serialized[option].prices = prices;
         }
+
+        /**
+         * Modal for editing shopper field item
+         * 
+         * @param  {Object} row
+         * @return React modal form
+         */
+        window.showModalToEditShopperField = function(row) {
+            // Return if input type does not select
+            if (row.input_type !== 'select') {
+                return;
+            }
+
+            shopper    = row;
+            shopperId  = shopper.id;
+
+            if (row.options_serialized && _.isString(row.options_serialized)) {
+                row.options_serialized = JSON.parse(row.options_serialized);
+            }
+
+            var options = shopper.options ? _parseOptions(shopper.options) : [];
+
+            var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "editShopperFieldsModal",
+                        show: true,
+                        title: 'Edit Form',
+                        confirm: 'Save changes',
+                        cancel: 'Close',
+                        onCancel: function(modal) {
+                            // Reset local data
+                            deletedRows = [];
+                            modal.close();
+                        },
+                        onLoad: function(modal) {
+                            shopperModalNode = $(modal.getDOMNode());
+                            form = shopperModalNode.find('#frontend-field-grid_options_form');
+                            shopperModalNode.find('.modal-dialog').css('width', '1280px');
+                        },
+                        onConfirm: window.saveShopperModal
+                    },
+                    React.DOM.div({ className: "row f-grid-wrapper" }, 
+                        React.DOM.form({id:'{{ frontendFieldGrid.config.id }}_options_form'},
+                            React.createElement(PriceTabs, { row: shopper, options: options })
+                        )
+                    )
+                ), modalContainerEle
+            );
+
+            // Register options grid
+            var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
+            var attachGridContainerEle = document.getElementById('{{ frontendFieldGrid.config.id }}_options_grid');
+
+            // Add available shopper dropdown options to options grid
+            if (options.length) {
+                var optionsSerialized = row.options_serialized;
+                options = options.map(function(option, i) {
+                    var index = ++i;
+                    if (shopper.options_serialized[_toggleSpace(option)]) {
+                        shopper.options_serialized[_toggleSpace(option)].id = index;
+                    }
+                    var res = {
+                        id: index,
+                        label: _toggleSpace(option, true),
+                        sku: (optionsSerialized && optionsSerialized[option] && optionsSerialized[option].sku) ? optionsSerialized[option].sku : option,
+                        position: (optionsSerialized && optionsSerialized[option] && optionsSerialized[option].position) ? optionsSerialized[option].position : i
+                    };
+                    // Save to local data
+                    addedRows.push(res);
+                    return res;
+                });
+                optionsConfigCompiled.data.data = options;
+            }
+
+            React.render(
+                React.createElement(FComGriddleComponent, { config: optionsConfigCompiled }
+            ), attachGridContainerEle);
+
+            $.validator.addMethod('validateUniquePosition', validateUniquePosition, '{{"Position exists or must be a number."|_}}');
+            $.validator.addClassRules('optionPositionUnique', {
+                validateUniquePosition: true
+            });
+            $.validator.addMethod('validateUniqueOption', validateUniqueOption, '{{"Option already exists."|_}}');
+            $.validator.addClassRules('optionLabelUnique', {
+                validateUniqueOption: true
+            });
+        }
+
+        /**
+         * Callback function for update field
+         * @return mixed
+         */
+        window.saveShopperModal = function(modal) {
+            if (form.valid()) { // Passes validation
+                // Custom check if price tab activate but options grid has empty entry
+                if (_isEmptyOptions()) {
+                    // If has deleted rows local data
+                    if (deletedRows && !_.isEmpty(deletedRows)) {
+                        // Clear new options modal grid
+                        optionsModalGrid.removeRows(deletedRows);
+
+                        // Update shopper grid data
+                        shopperGrid.updateRows([shopper]);
+                    }
+
+                    _processPostData();
+                    modal.close();
+                } else {
+                    $('#btnOptionsTab').click() && form.valid();
+                }
+            }
+        }
+        
+        /*=====  End of Global functions  ======*/
+        
+
+        /*==================================================================
+        =            React Components for rendering prices tabs            =
+        ==================================================================*/
+        
+        /**
+         * React component for render prices tabs
+         */
+        var PriceTabs = React.createClass({
+            displayName: "PriceTabs",
+            propTypes: {
+                options: React.PropTypes.array
+            },
+            getInitialState: function() {
+                return {
+                    options: []
+                };
+            },
+            getDefaultProps: function() {
+                return {
+                    tabIndex: ''
+                };
+            },
+            updateLocalData: function(rows, type) {
+                switch(type) {
+                    case 'add':
+                        if (!_.contains(_.pluck(addedRows, 'id'), rows.id)) addedRows.push(rows);
+                        _(deletedRows).each(function(row, i) {
+                            if (_toggleSpace(row.label) == _toggleSpace(rows.label)) 
+                                delete deletedRows[i];
+                        });
+                        break;
+                    case 'remove':
+                        _(rows).each(function(row) {
+                            deletedRows.push(row);
+                            _(addedRows).each(function(aRow, i) {
+                                if (row.id == aRow.id) delete addedRows[i];
+                            });
+                        });
+                        break;
+                    default:
+                        var flag = false;
+                        _(rows).each(function(row, i) {
+                            if (!_.contains(_.pluck(addedRows, 'id'), row.id)) {
+                                addedRows.push(row);
+                                flag = true;
+                            }
+                        });
+                        return flag;
+                        break;
+                }
+            },
+            clearDeletedOptions: function(options) {
+                if (deletedRows.length) { // Remove delete options before re-render price tabs
+                    var deletedOpts = _.pluck(deletedRows, 'label');
+                    _(options).each(function(option, i) {
+                        if (_.contains(deletedOpts, _toggleSpace(option, true))) {
+                            delete options[i];
+                        }
+                    });
+                }
+                return options;
+            },
+            updateOptionsSerializeIdForNewRow: function(row) {
+                var option = _toggleSpace(row.label);
+                _initOptionsSerializeItem(option);
+                if (shopper.options_serialized[option]) {
+                    shopper.options_serialized[option].id = row.id;
+                }
+            },
+            componentWillMount: function() {
+                // Just use props options for first load
+                this.setState({ options: this.props.options });
+            },
+            componentDidMount: function() {
+                var options = shopper.options ? _parseOptions(shopper.options) : [];
+
+                // Global event system for applying prices for all fields
+                $(OPTS).on('apply', function(e, rows) {
+
+                    var isDiff = this.updateLocalData(rows, 'apply');
+                    _(rows).each(function(row) {
+                        var opt = _toggleSpace(row.label);
+                        if (!_.contains(options, opt)) {
+                            this.updateOptionsSerializeIdForNewRow(row);
+                            options.push(opt);
+                        }
+                    }.bind(this));
+
+                    // If local data contains rows has been deleted then clear them before re-render
+                    options = _.uniq(this.clearDeletedOptions(options));
+                    if (isDiff) {
+                        this.props.tabIndex = options[0];
+                        this.setState({ options: options });
+                    } else {
+                        _toggleTab(_toggleSpace(options[0]));
+                    }
+                }.bind(this));
+
+                // Global event system for add row action on option grid
+                $(OPTS).on('add', function(e, row) { //console.log('add', row);
+                    this.updateLocalData(row, 'add');
+                    this.updateOptionsSerializeIdForNewRow(row);
+
+                    options.push(_toggleSpace(row.label));
+
+                    // If local data contains rows has been deleted then clear them before re-render
+                    options = _.uniq(this.clearDeletedOptions(options));
+
+                    this.props.tabIndex = row ? row.label : options[0].label;
+                    this.setState({ options: options });
+                }.bind(this));
+
+                // Global event system for edit row action on option grid
+                $(OPTS).on('edit', function(e, row, isEditAttrs, isToggleTab) { // console.log('edit', row);
+                    if (isEditAttrs) {
+                        // Update row attrs
+                        options = _(shopper.options_serialized).map(function(item, index) {
+                            index = _toggleSpace(index);
+                            if (item.id == row.id) {
+                                // Update option field attrs
+                                item.sku      = row.sku;
+                                item.position = row.position;
+                                shopper.options_serialized[_toggleSpace(row.label)] = _.clone(item);
+                                // Delete old option field
+                                delete shopper.options_serialized[index];
+
+                                return _toggleSpace(row.label);
+                            } else return index;
+                        });
+
+                        // If local data contains rows has been deleted then clear them before re-render
+                        options = _.uniq(this.clearDeletedOptions(options));
+
+                        if (isToggleTab)
+                            this.props.tabIndex = row ? row.label : options[0].label;
+
+                        this.setState({ options: options });
+                        row.edited = false;
+                    } else {
+                        _toggleTab(_toggleSpace(row.label));
+                    }
+
+                }.bind(this));
+
+                // Global event system for remove row action on option grid
+                $(OPTS).on('remove', function(e, rows) { // console.log('remove', removedRow);
+                    this.updateLocalData(rows, 'remove');
+                    options = _(optionsModalGrid.getRows()).map(function(row) {
+                        return _toggleSpace(row.label);
+                    });
+                    this.setState({ options: options });
+                }.bind(this));
+            },
+            componentDidUpdate: function(prevProps, prevState) {
+                if (prevProps.tabIndex !== '') {
+                    _toggleTab(_toggleSpace(prevProps.tabIndex));
+                    // Reset tabIndex for next time edited
+                    prevProps.tabIndex = '';
+                }
+            },
+            componentWillUnmount: function () {
+                $(OPTS).off('add');
+                $(OPTS).off('edit');
+                $(OPTS).off('remove');
+                $(OPTS).off('apply');
+            },
+            render: function() {
+                return React.DOM.div({ className: "tabbable" },
+                    React.DOM.ul({ className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
+                        React.DOM.li({ className: 'active', role: 'presentation' }, 
+                            React.DOM.a({ id: 'btnOptionsTab',href: '#options-tab', 'aria-controls': 'options-tab', role: 'tab', 'data-toggle': 'tab' }, 'Options')
+                        ),
+                        React.DOM.li({ className: '', role: 'presentation' }, 
+                            React.DOM.a({ id: 'btnShopperTab', href: '#shopper-tab', 'aria-controls': 'shopper-tab', role: 'tab', 'data-toggle': 'tab' }, 'Price rule')
+                        )
+                    ),
+                    React.DOM.div({ className: "tab-content" }, 
+                        React.DOM.div({ className: "tab-pane active", id: 'options-tab', role: 'tabpanel' }, 
+                            React.DOM.div({ id: '{{ frontendFieldGrid.config.id }}_options_grid' })
+                        ),
+                        React.createElement(PriceTabList, { key: 'shopper-tab', options: this.state.options, row: this.props.row })
+                    )
+                );
+            }
+        });
 
         /**
          * React component for render prices tab list
@@ -544,9 +1018,8 @@
                 $.validator.addClassRules(option+"BaseField", validateBaseRule);
 
                 return {
-                    title: Locale._(capitalizeFirstLetter(option) + ' Prices'),
+                    title: Locale._(_capitalizeFirstLetter(option) + ' Prices'),
                     prices: prices,
-                    // deleted: deletedPrices,
                     option: option,
                     addPriceCallback: 'shopperPriceTypeCallback',
                     priceTypes: {{ UTIL.toJson(model.priceTypeOptions()) | raw }},
@@ -555,7 +1028,7 @@
                     sites: {{ sites ? UTIL.toJson(sites) | raw : 'null' }},
                     currencies: {{ currencies ? UTIL.toJson(currencies) | raw : 'null' }},
                     productId: '{{ model.id() }}',
-                    optionId: toggleSpace(this.props.row.name),
+                    optionId: _toggleSpace(this.props.row.name),
                     validatePrices: validatePrices,
                     priceRelationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('price_relation_options')) | raw }},
                     operationOptions: {{ UTIL.toJson(priceHelper.fieldOptions('operation_options')) | raw }},
@@ -570,7 +1043,7 @@
             render: function(){
                 var navTabs = [], tabPanes = [];
                 _(this.props.options).each(function(option, i) {
-                    option = toggleSpace(option);
+                    option = _toggleSpace(option);
                     var priceOptions = this.init(option);
 
                     var className = '';
@@ -580,7 +1053,7 @@
 
                     var navTab = React.DOM.li({ className: className, role: 'presentation', key: option, id: option + '-tab' }, 
                         React.DOM.a({ 
-                                id: 'btn'+capitalizeFirstLetter(option)+'Tab', 
+                                id: 'btn'+_capitalizeFirstLetter(option)+'Tab', 
                                 href: '#'+option, 
                                 role: 'tab', 
                                 'data-toggle': 'tab',
@@ -588,7 +1061,7 @@
                                 onClick: (function(event) {
                                     // TODO: Re-rendering price grid if needed when tab changed or something like that
                                 }).bind(this)
-                            }, capitalizeFirstLetter(toggleSpace(option, true))
+                            }, _capitalizeFirstLetter(_toggleSpace(option, true))
                         )
                     );
 
@@ -606,389 +1079,9 @@
                 );
             }
         });
-
-        /**
-         * React component for render prices tab
-         */
-        var PriceTabs = React.createClass({
-            displayName: "PriceTabs",
-            propTypes: {
-                options: React.PropTypes.array
-            },
-            getInitialState: function() {
-                return {
-                    options: []
-                };
-            },
-            getDefaultProps: function() {
-                return {
-                    tabIndex: ''
-                };
-            },
-            updateLocalData: function(rows, type) {
-                switch(type) {
-                    case 'add':
-                        if (!_.contains(_.pluck(addedRows, 'id'), rows.id)) 
-                            addedRows.push(rows);
-                        _(deletedRows).each(function(row, i) {
-                            if (toggleSpace(row.label) == toggleSpace(rows.label)) 
-                                delete deletedRows[i];
-                        });
-                        break;
-                    case 'remove':
-                        _(rows).each(function(row) {
-                            deletedRows.push(row);
-                            _(addedRows).each(function(aRow, i) {
-                                if (row.id == aRow.id) delete addedRows[i];
-                            });
-                        });
-                        break;
-                    default:
-                        break;
-                }
-            },
-            clearDeletedRows: function(options) {
-                if (deletedRows.length) { // Remove delete options before re-render price tabs
-                    var deletedOpts = _.pluck(deletedRows, 'label');
-                    _(options).each(function(option, i) {
-                        if (_.contains(deletedOpts, toggleSpace(option, true))) {
-                            delete options[i];
-                        }
-                    });
-                }
-                return options;
-            },
-            updateOptionsSerializeIdForNewRow: function(row) {
-                var option = toggleSpace(row.label);
-                createOptionsSerializeItem(option);
-                if (shopper.options_serialized[option]) {
-                    shopper.options_serialized[option].id = row.id;
-                }
-            },
-            componentDidMount: function() {
-                var options = shopper.options ? parseOptions(shopper.options) : [];
-
-                // Global event system for add row action on option grid
-                $(OPTS).on('add', function(e, addedRow) { //console.log('add', addedRow);
-                    this.updateLocalData(addedRow, 'add');
-                    this.updateOptionsSerializeIdForNewRow(addedRow);
-
-                    options.push(toggleSpace(addedRow.label));
-
-                    // If local data contains rows has been deleted then clear them before re-render
-                    options = _.uniq(this.clearDeletedRows(options));
-
-                    this.props.tabIndex = addedRow ? addedRow.label : options[0].label;
-                    this.setState({ options: options });
-                }.bind(this));
-
-                // Global event system for edit row action on option grid
-                $(OPTS).on('edit', function(e, editedRow, isEditAttrs) { //console.log('edit', editedRow);
-                    if (isEditAttrs) {
-                        // Update row attrs
-                        options = _(shopper.options_serialized).map(function(item, index) {
-                            index = toggleSpace(index);
-                            if (item.id == editedRow.id) {
-                                // Update option field attrs
-                                item.sku      = editedRow.sku;
-                                item.position = editedRow.position;
-                                shopper.options_serialized[toggleSpace(editedRow.label)] = _.clone(item);
-                                // Delete old option field
-                                delete shopper.options_serialized[index];
-
-                                return toggleSpace(editedRow.label);
-                            } else return index;
-                        });
-
-                        // If local data contains rows has been deleted then clear them before re-render
-                        options = _.uniq(this.clearDeletedRows(options));
-
-                        this.props.tabIndex = editedRow ? editedRow.label : options[0].label;
-                        this.setState({ options: options });
-                    } else {
-                        toggleTab(toggleSpace(editedRow.label));
-                    }
-
-                }.bind(this));
-
-                // Global event system for remove row action on option grid
-                $(OPTS).on('remove', function(e, removedRows) { // console.log('remove', removedRow);
-                    this.updateLocalData(removedRows, 'remove');
-                    options = _(optionsModalGrid.getRows()).map(function(row) {
-                        return toggleSpace(row.label);
-                    });
-                    this.setState({ options: options });
-                }.bind(this));
-            },
-            componentDidUpdate: function(prevProps, prevState) {
-                if (prevProps.tabIndex !== '') {
-                    toggleTab(toggleSpace(prevProps.tabIndex));
-                    // Reset tabIndex for next time edited
-                    prevProps.tabIndex = '';
-                }
-            },
-            componentWillUnmount: function () {
-                $(OPTS).off('add');
-                $(OPTS).off('edit');
-                $(OPTS).off('remove');
-            },
-            getOptions: function() {
-                return _.isEmpty(this.state.options) ? this.props.options : this.state.options;
-            },
-            render: function() {
-                var options = this.getOptions();
-                return React.DOM.div({ className: "tabbable" },
-                    React.DOM.ul({ className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
-                        React.DOM.li({ className: 'active', role: 'presentation' }, 
-                            React.DOM.a({ id: 'btnOptionsTab',href: '#options-tab', 'aria-controls': 'options-tab', role: 'tab', 'data-toggle': 'tab' }, 'Options')
-                        ),
-                        React.DOM.li({ className: '', role: 'presentation' }, 
-                            React.DOM.a({ id: 'btnShopperTab', href: '#shopper-tab', 'aria-controls': 'shopper-tab', role: 'tab', 'data-toggle': 'tab' }, 'Price rule')
-                        )
-                    ),
-                    React.DOM.div({ className: "tab-content" }, 
-                        React.DOM.div({ className: "tab-pane active", id: 'options-tab', role: 'tabpanel' }, 
-                            React.DOM.div({ id: '{{ frontendFieldGrid.config.id }}_options_grid' })
-                        ),
-                        React.createElement(PriceTabList, { key: 'shopper-tab', options: options, row: this.props.row })
-                    )
-                );
-            }
-        });
-
-        /**
-         * Modal for editing shopper field item
-         * 
-         * @param  {Object} row
-         * @return React modal form
-         */
-        window.showModalToEditShopperField = function(row) {
-            // Return if input type does not select
-            if (row.input_type !== 'select') {
-                return;
-            }
-
-            shopper    = row;
-            shopperId  = shopper.id;
-
-            if (row.options_serialized && _.isString(row.options_serialized)) {
-                row.options_serialized = JSON.parse(row.options_serialized);
-            }
-
-            var options = shopper.options ? parseOptions(shopper.options) : [];
-
-            var modalContainerEle = document.getElementById('fcom_append_form');
-            React.unmountComponentAtNode(modalContainerEle);
-            React.render(
-                React.createElement(Components.Modal, {
-                        id: "editShopperFieldsModal",
-                        show: true,
-                        title: 'Edit Form',
-                        confirm: 'Save changes',
-                        cancel: 'Close',
-                        onCancel: function(modal) {
-                            // Remove new rows on options grid
-                            _(optionsModalGrid.getRows()).each(function(row) {
-                                if (isNaN(row.id)) {
-                                    // Clear new price on current shopper
-                                    if (shopper.options_serialized[toggleSpace(row.label)]) {
-                                        delete shopper.options_serialized[toggleSpace(row.label)];
-                                    }
-                                }
-                            });
-                            deletedRows = [];
-                            modal.close();
-                        },
-                        onLoad: function(modal) {
-                            shopperModalNode = $(modal.getDOMNode());
-                            shopperModalNode.find('.modal-dialog').css('width', '1280px');
-                        },
-                        onConfirm: window.saveShopperModal
-                    },
-                    React.DOM.div({ className: "row f-grid-wrapper" }, 
-                        React.DOM.form({id:'{{ frontendFieldGrid.config.id }}_options_form'},
-                            React.createElement(PriceTabs, { row: shopper, options: options })
-                        )
-                    )
-                ), modalContainerEle
-            );
-
-            // Register options grid
-            var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
-            var attachGridContainerEle = document.getElementById('{{ frontendFieldGrid.config.id }}_options_grid');
-
-            // Add available shopper dropdown options to options grid
-            if (options.length) {
-                var optionsSerialized = row.options_serialized;
-                options = options.map(function(option, i) {
-                    var index = ++i;
-                    if (shopper.options_serialized[toggleSpace(option)]) {
-                        shopper.options_serialized[toggleSpace(option)].id = index;
-                    }
-                    return {
-                        id: index,
-                        label: toggleSpace(option, true),
-                        sku: (optionsSerialized && optionsSerialized[option] && optionsSerialized[option].sku) ? optionsSerialized[option].sku : option,
-                        position: (optionsSerialized && optionsSerialized[option] && optionsSerialized[option].position) ? optionsSerialized[option].position : i
-                    };
-                });
-                optionsConfigCompiled.data.data = options;
-            }
-
-            React.render(
-                React.createElement(FComGriddleComponent, { config: optionsConfigCompiled }
-            ), attachGridContainerEle);
-
-            // Position unique validation
-            function validateUniquePosition (value, elem) {
-                var valid = true;
-
-                if (isNaN(value)) return false;
-
-                if (typeof elem !== 'undefined') {
-                    var $parent = $(elem).parents('tr');
-
-                    var items = optionsModalNode.find('tr');
-                    items.each(function() {
-                        if (!valid) {
-                            return;
-                        }
-
-                        var item = $(this);
-                        if (this === $parent[0]) {
-                            return;
-                        }
-
-                        valid = value !== item.find('input[data-col="position"]').val();
-                        toggleActionButton(valid);
-                    });
-                    return valid;
-                }
-            }
-            $.validator.addMethod('validateUniquePosition', validateUniquePosition, '{{"Position exists or must be a number."|_}}');
-            $.validator.addClassRules('optionPositionUnique', {
-                validateUniquePosition: true
-            });
-
-            // Option unique validation
-            function validateUniqueOption (value, elem) {
-                var valid = true;
-                if (typeof elem !== 'undefined') {
-                    var $parent = $(elem).parents('tr');
-
-                    var items = optionsModalNode.find('tr');
-                    items.each(function() {
-                        if (!valid) {
-                            return;
-                        }
-
-                        var item = $(this);
-                        if (this === $parent[0]) {
-                            return;
-                        }
-
-                        valid = value !== item.find('input[data-col="label"]').val();
-                        toggleActionButton(valid);
-                    });
-                    return valid;
-                }
-            }
-            $.validator.addMethod('validateUniqueOption', validateUniqueOption, '{{"Option already exists."|_}}');
-            $.validator.addClassRules('optionLabelUnique', {
-                validateUniqueOption: true
-            });
-        }
-
-        /**
-         * Callback function for update field
-         * @return mixed
-         */
-        window.saveShopperModal = function(modal) {
-            var form            = shopperModalNode.find('#frontend-field-grid_options_form');
-            if (form.valid()) { // Passes validation
-                // If has deleted rows local data
-                if (deletedRows && !_.isEmpty(deletedRows)) {
-                    // Clear new options modal grid
-                    optionsModalGrid.removeRows(deletedRows);
-
-                    // Update shopper grid data
-                    shopperGrid.updateRows([shopper]);
-                }
-
-                processPostData();
-                modal.close();
-            }
-        }
-
-        /**
-         * Process post data
-         * 
-         * @return {mixed}
-         */
-        function processPostData() {
-            var rows            = optionsModalGrid.getRows(),
-                optionSaveStr   = '',
-                data            = {};
-
-            _(rows).each(function(row, index) {
-                var optionLabel = toggleSpace(row.label);
-                if (typeof data[optionLabel] === 'undefined') {
-                    data[optionLabel] = {};
-                }
-
-                var $container  = $('#'+optionLabel+'-prices'),
-                    $trItems    = $container.find('.'+optionLabel+'-price-item'),
-                    prices      = [];
-
-                optionSaveStr += optionLabel + ',';
-
-                if (!shopper.options_serialized) {
-                    shopper.options_serialized = {};
-                }
-
-                if (!shopper.options_serialized[optionLabel]) {
-                    shopper.options_serialized[optionLabel] = {};
-                }
-
-                shopper.options_serialized[optionLabel].sku      = row.sku;
-                shopper.options_serialized[optionLabel].position = row.position;
-
-                data[optionLabel]['sku']      = row.sku; 
-                data[optionLabel]['position'] = row.position;
-
-                $trItems.each(function(i, item) {
-                    var price           = {};
-                    price['id']         = ++i;
-                    price['product_id'] = {{ model.id }};
-                    $(item).find('input, select').each(function(index, el) {
-                        var key = $(this).data('type'),
-                            val = $(this).val();
-                        if (typeof key !== 'undefined') {
-                            price[key] = shopperGrid.html2text(val);
-                        }
-                    });
-                    prices.push(price);
-                });
-
-                if (prices.length) {
-                    data[optionLabel]['prices'] = prices;
-                }
-            });
-
-            // If input data container does not exist then create
-            if ($('#shopper_field_prices_'+shopperId).length === 0) {
-                $('#tab-shopper_fields').append('<input type="hidden" data-shopper-id="'+shopperId+'" id="shopper_field_prices_'+shopperId+'" />');
-            }
-
-            var hiddenInput = $('#shopper_field_prices_'+shopperId);
-            if (hiddenInput.data('shopper-id') === shopperId) {
-                $('#shopper_field_prices_'+shopperId).val(JSON.stringify(data));
-            }
-
-            shopper.options = optionSaveStr.slice(0, optionSaveStr.length - 1);
-            shopperGrid.updateRows([shopper]);
-        }
-
+        
+        /*=====  End of React Components for rendering prices tabs  ======*/
+        
     });
 </script>
 <div class="row">
