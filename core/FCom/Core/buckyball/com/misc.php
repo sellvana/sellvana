@@ -3492,11 +3492,13 @@ class BHttpClient extends BClass
  */
 class BFile extends BClass
 {
+    const STATUS_REMOTE_FILE = 'remote',
+          STATUS_LOCAL_FILE  = 'local';
+
     protected $_tpmDir;
     protected $_currentTmpDir;
 
-    protected $_isRemoteFile;
-    protected $_isLocalFile;
+    protected $_currentStatus;
     protected $_previousStatus;
 
     protected $_fileInfo;
@@ -3523,14 +3525,15 @@ class BFile extends BClass
      * @return mixed
      * @throws BErrorException
      */
-    public function load($path){
-        if (!is_string($path)){
+    public function load($path)
+    {
+        if (!is_string($path)) {
             throw new BErrorException('Support only string path of file');
         }
-        if(filter_var($path, FILTER_VALIDATE_URL) !== false){
-            return self::i()->loadRemoteFile($path);
+        if (filter_var($path, FILTER_VALIDATE_URL) !== false) {
+            return self::i()->_loadRemoteFile($path);
         } else {
-            return self::i()->loadLocalFile($path);
+            return self::i()->_loadLocalFile($path);
         }
     }
 
@@ -3539,14 +3542,40 @@ class BFile extends BClass
      * @return $this
      * @throws BErrorException
      */
-    public function loadRemoteFile($url){
+    private function _loadRemoteFile($url)
+    {
         if (ini_get('allow_url_fopen')) {
             $file = @file_get_contents($url);
         } else {
             $file = $this->BHttpClient->getContent($url);
         }
 
-        $this->_isRemoteFile = true;
+        $this->_fileInfo['remote_url'] = $url;
+
+        $urlPath = parse_url($url, PHP_URL_PATH);
+        $urlPath = explode('/', $urlPath);
+        $fullFileName = array_pop($urlPath);
+        if ($fullFileName === '') {
+            //TODO: generate file name;
+        }
+        $fileName = explode('.', $fullFileName);
+        if (count($fileName) >= 2) {
+            $fileExtension = array_pop($fileName);
+        } else {
+            $fileExtension = null;
+        }
+        $fileName = implode('.', $fileName);
+
+        $this->_fileInfo['full_file_name'] = $fullFileName;
+        $this->_fileInfo['file_extension'] = $fileExtension;
+        $this->_fileInfo['file_name'] = $fileName;
+
+        if ($this->keepContent) {
+            $this->_fileContent = $file;
+        }
+        $this->_saveFileToTmp($file);
+
+        $this->_currentStatus = self::STATUS_REMOTE_FILE;
 
         return $this;
     }
@@ -3554,31 +3583,94 @@ class BFile extends BClass
     /**
      * @param $path
      */
-    public function loadLocalFile($path){
-        $this->_isLocalFile = true;
+    private function _loadLocalFile($path)
+    {
+        $this->_currentStatus = self::STATUS_LOCAL_FILE;
     }
 
     /**
      * @param $file
      */
-    public function saveFileToTmp($file){
+    private function _saveFileToTmp($file)
+    {
+        $this->_currentTmpDir = $this->_tpmDir . DIRECTORY_SEPARATOR . md5(spl_object_hash($this));
+        if (!is_dir($this->_currentTmpDir)) {
+            mkdir($this->_currentTmpDir, 0777, true);
+        }
+        $this->_fileInfo['file_path'] = $this->_currentTmpDir;
+        $fullPath =  $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
 
+        if (@file_put_contents($fullPath, $file)
+        ) {
+            $this->_fileInfo['file_size'] = filesize($fullPath);
+        }
+    }
+
+    /**
+     * @param $name
+     * @param $path
+     * @return $this
+     */
+    public function save($name, $path)
+    {
+        if (@rename($this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'],
+            $path . DIRECTORY_SEPARATOR . $name)
+        ) {
+            $this->_previousStatus = $this->_currentStatus;
+            $this->_currentStatus = self::STATUS_LOCAL_FILE;
+        }
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFileInfo(){
+        return $this->_fileInfo;
     }
 
     /**
      * The file is stored on a this server
      * @return bool
      */
-    public function isLocal(){
-        return (bool)$this->_isLocalFile;
+    public function isLocal()
+    {
+        return $this->_currentStatus == self::STATUS_LOCAL_FILE;
     }
 
     /**
      * The file is stored on a remote server
      * @return bool
      */
-    public function isRemote(){
-        return (bool)$this->_isRemoteFile;
+    public function isRemote()
+    {
+        return $this->_currentStatus == self::STATUS_REMOTE_FILE;
+    }
+
+    /**
+     * Destructor
+     */
+    public function __destruct()
+    {
+        self::delTree($this->_currentTmpDir);
+    }
+
+    /**
+     * Recursively delete a tree
+     *
+     * @param $dir
+     * @return bool
+     */
+    public static function delTree($dir)
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
+        }
+        return rmdir($dir);
     }
 }
 
