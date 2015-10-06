@@ -19,6 +19,9 @@ class Sellvana_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
         'unique_key' => [
             'product_id', 'file_id'
         ],
+        'unique_key_not_null' => [
+            'product_id', 'file_id'
+        ]
     ];
 
     const MEDIA_TYPE_IMG = "I"

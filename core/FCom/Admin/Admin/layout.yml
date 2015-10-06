@@ -113,6 +113,7 @@ common_js_libs:
             - [ requireJs, griddle.fcomRow, @FCom_Core/jsx/build/fcom.row, { deps : [ react, griddle.custom ]} ]
             - [ requireJs, griddle.fcomModalForm, @FCom_Core/jsx/build/fcom.modalForm, { deps : [ react, griddle.custom ]} ]
             - [ requireJs, griddle.fcomMediaLib, @FCom_Core/jsx/build/fcom.medialib, { deps : [ react, fcom.griddle ]} ]
+            - [ requireJs, griddle.fcomSelect2, @FCom_Core/jsx/build/fcom.select2, { deps : [ react ]} ]
 
 
 lib_admin_theme1:
@@ -363,3 +364,10 @@ form:
 /systememails:
     - { include: base }
     - { view: admin/nav, do: [[ setNav, system/emails ]] }
+
+/importexport:
+    - { include: default_form }
+    - view: head
+        do:
+            - [ requireJs, fcom.admin.import, "@FCom_Admin/Admin/js/fcom/fcom.admin.import" ]
+            - [ scss, "@FCom_Admin/Admin/theme1/assets/scss/admin-import.scss" ]

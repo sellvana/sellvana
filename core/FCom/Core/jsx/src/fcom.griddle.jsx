@@ -567,30 +567,32 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var actionKey = gridId + '-fcom-settings-action-' + name;
                     var actionProps = {
                         key: gridId + '-fcom-settings-action-' + name,
-                        class: action.class
+                        className: action.class
                     };
                     switch (name) {
                         case 'refresh':
-                            node = <a href="#" className={action.class} key={actionKey}>{action.caption}</a>;
+                            node = <a href="#" {...actionProps}>{action.caption}</a>;
                             break;
                         case 'export':
-                            node = <button className={action.class} data-action='export' onClick={that.doMassAction} key={actionKey}>{action.caption}</button>;
+                            node = <button {...actionProps} data-action='export' onClick={that.doMassAction}>{action.caption}</button>;
                             break;
                         case 'link_to_page':
-                            node = <a href="#" className={action.class} key={actionKey}>{action.caption}</a>;
+                            node = <a href="#" {...actionProps}>{action.caption}</a>;
                             break;
                         case 'edit':
-                            node = <a href='#' className={action.class + disabledClass} data-action="mass-edit" onClick={that.doMassAction} role="button" key={actionKey}>{action.caption}</a>;
+                            actionProps.disabled = disabledClass;
+                            node = <a href='#' {...actionProps} data-action="mass-edit" onClick={that.doMassAction} role="button">{action.caption}</a>;
                             break;
                         case 'delete':
-                            node = <button className={action.class + disabledClass} type="button" data-action="mass-delete" onClick={that.doMassAction} key={actionKey}>{action.caption}</button>;
+                            actionProps.disabled = disabledClass;
+                            node = <button type="button" {...actionProps} data-action="mass-delete" onClick={that.doMassAction}>{action.caption}</button>;
                             break;
                         //todo: checking again new and add type
                         case 'add':
-                            node = <button className={action.class} type="button" key={actionKey}>{action.caption}</button>;
+                            node = <button {...actionProps} type="button">{action.caption}</button>;
                             break;
                         case 'new':
-                            node = <button className={action.class} onClick={that.handleClick} type="button" key={actionKey}>{action.caption}</button>;
+                            node = <button {...actionProps} onClick={that.handleClick} type="button">{action.caption}</button>;
                             break;
                         default:
                             if (action.type) {
@@ -598,6 +600,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                                     case 'button':
                                     default:
                                         //compatibility with old backbone grid
+                                        
                                         node = <button className={action.class + (action.isMassAction ? disabledClass : '')} key={actionKey} id={action.id}
                                             type="button" onClick={that.handleCustom.bind(null, action.callback)}>{action.caption}</button>;
                                         break;

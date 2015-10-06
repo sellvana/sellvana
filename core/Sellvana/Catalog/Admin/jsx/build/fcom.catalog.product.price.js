@@ -102,7 +102,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         ), 
                         React.createElement("tbody", null, 
                             _.map(this.props.prices, function (price) {
-                                if (this.props.deleted && _.contains(this.props.deleted, parseInt(price.id))) {
+                                if (this.props.deleted && price.deleted && _.contains(this.props.deleted, price.id)) {
                                     return React.createElement("input", {key: 'delete-' + price.id, type: "hidden", name: "prices[delete][]", value: price.id})
                                 }
 
@@ -586,7 +586,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             };
         },
         getInitialState: function() {
-            return _.extend({}, this.props, this.props.options, { isUpdatePrice: false });
+            return _.extend({}, this.props, this.props.options, { isPriceUpdated: false });
         },
         init: function() {
             this.state.applyFilter = function (e) {
@@ -621,8 +621,14 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }.bind(this);
 
             this.state.deletePrice = function (id) {
+                _.find(this.state.prices, function(price) {
+                    if (price.id == id) {
+                        price.deleted = true;
+                    }
+                });
+                
                 this.state.deleted.push(id);
-                this.setState({ isUpdatePrice: true });
+                this.setState({ isPriceUpdated: true });
             }.bind(this);
 
             this.state.updatePriceType = function (priceId, priceType) {
@@ -646,7 +652,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     }
                 }.bind(this));
 
-                this.setState({ isUpdatePrice: true });
+                this.setState({ isPriceUpdated: true });
             }.bind(this);
 
             this.state.updatePriceField = function (priceId, field, value) {
@@ -659,7 +665,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                     }
                 });
 
-                this.setState({ isUpdatePrice: true });
+                this.setState({ isPriceUpdated: true });
             }.bind(this);
 
             this.state.addBlankPrice = function() {
@@ -678,7 +684,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }.bind(this);
         },
         shouldComponentUpdate: function(nextProps, nextState) {
-            return _.isEqual(this.state, nextState) || _.isEqual(this.props, nextProps);
+            return !_.isEqual(this.state, nextState) || !_.isEqual(this.props, nextProps);
         },
         componentWillMount: function() {
             calculateDynamicPrice(this.state);
@@ -701,9 +707,9 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
             }
         },
         componentWillUpdate: function(nextProps, nextState) {
-            if (nextState.isUpdatePrice) {
+            if (nextState.isPriceUpdated) {
                 calculateDynamicPrice(nextState);
-                nextState.isUpdatePrice = false;
+                nextState.isPriceUpdated = false;
             }
         },
         componentDidUpdate: function(prevProps, prevState) {
