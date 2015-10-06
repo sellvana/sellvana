@@ -6,6 +6,7 @@
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
  * @property Sellvana_MultiSite_Model_SiteUser $Sellvana_MultiSite_Model_SiteUser
+ * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  */
 class Sellvana_MultiSite_Admin extends BClass
 {
@@ -77,6 +78,60 @@ class Sellvana_MultiSite_Admin extends BClass
                 if (empty($exists[$sId][$rId])) {
                     $hlp->create(['user_id' => $uId, 'site_id' => $sId, 'role_id' => $rId])->save();
                 }
+            }
+        }
+    }
+
+    public function onGetProductFieldSetData($args)
+    {
+        foreach ($args['data'] as $productId => $productData) {
+            $args['data'][$productId]['site_values'] = [];
+            foreach ($productData as $fieldSetId => $fieldSetData) {
+                foreach ($fieldSetData['fields'] as $fieldId => $fieldData) {
+                    $data = json_decode($fieldData['serialized']);
+                    $siteId = $data->site_id ?: 'default';
+                    if (empty($args['data']['site_values'][$siteId])) {
+                        $args['data']['site_values'][$siteId] = [];
+                    }
+                    if (isset($args['data'][$productId]['site_values'][$siteId][$fieldData['id']])) {
+                        $args['data'][$productId]['site_values'][$siteId][$fieldData['id']] .= ',' . $fieldData['value'];
+                    } else {
+                        $args['data'][$productId]['site_values'][$siteId][$fieldData['id']] = $fieldData['value'];
+                    }
+                }
+            }
+        }
+    }
+
+    public function onFindManyBefore($args)
+    {
+        /** @var BORM $orm */
+        $orm = $args['orm'];
+        $orm->order_by_asc('pf.site_id');
+    }
+
+    public function onAfterFetchProductsFieldData($args)
+    {
+        return;
+        foreach ($args['data'] as $productId => $productData) {
+            $args['data'][$productId] = [];
+            $hasSiteData = [];
+            $valuesByField = [];
+
+            foreach ($productData as $productFieldId => $productFieldData) {
+                if (empty($hasSiteData[$productFieldData->get('field_id')]) && $productFieldData->get('site_id')) {
+                    if (!empty($valuesByField[$productFieldData->get('field_id')])) {
+                        // removing the default values
+                        foreach ($valuesByField[$productFieldData->get('field_id')] as $defaultValue) {
+                            unset($args['data'][$productId][$defaultValue]);
+                        }
+                        unset($valuesByField[$productFieldData->get('field_id')]);
+                    }
+                    $hasSiteData[$productFieldData->get('field_id')] = true;
+                }
+
+                $args['data'][$productId][$productFieldId] = $productFieldData;
+                $valuesByField[$productFieldData->get('field_id')][] = $productFieldId;
             }
         }
     }

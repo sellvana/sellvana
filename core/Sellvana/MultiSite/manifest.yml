@@ -16,6 +16,9 @@ modules:
                     - [ "FCom_Admin_Controller_Settings::action_index", Sellvana_MultiSite_Admin.onSettingsIndexGet ]
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", Sellvana_MultiSite_Admin.onSettingsIndexPost ]
                     - [ "FCom_Admin_Controller_Users::formPostAfter", Sellvana_MultiSite_Admin.onUsersFormPostAfter ]
+                    - [ "Sellvana_CatalogFields_Model_ProductFieldData::find_many:orm", Sellvana_MultiSite_Admin.onFindManyBefore ]
+                    - [ "Sellvana_CatalogFields_Model_ProductFieldData::getProductFieldSetData", Sellvana_MultiSite_Admin.onGetProductFieldSetData ]
+                    - [ "Sellvana_CatalogFields_Model_ProductFieldData::getProductFieldSetData:afterFetchProductsFieldData", Sellvana_MultiSite_Admin.onAfterFetchProductsFieldData ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]
