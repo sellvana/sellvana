@@ -69,11 +69,23 @@ class Sellvana_CatalogFields_Model_FieldOption extends FCom_Core_Model_Abstract
             return $this;
         }
         $options = $this->orm()->order_by_asc('field_id')->order_by_asc('label')->find_many();
+        $this->updateOptionsCache($options);
+        static::$_allOptionsLoaded = true;
+        return $this;
+    }
+
+    public function updateOptionsCache(array $options)
+    {
         foreach ($options as $option) {
             static::$_optionsCache[$option->get('field_id')][$option->id()] = $option;
         }
-        static::$_allOptionsLoaded = true;
         return $this;
+    }
+
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+        $this->updateOptionsCache([$this]);
     }
 
     /**
