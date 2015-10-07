@@ -1834,7 +1834,9 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         // call install migration script
         try {
-            $this->_processMigrationDependencies('before', $mod, $version);
+            if (!$this->_processMigrationDependencies('before', $mod, $version)) {
+                return false;
+            }
 
             if (is_callable($callback)) {
                 $result = $this->BUtil->call($callback);
@@ -1845,13 +1847,16 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
                 $result = null;
             }
 
-            $this->_processMigrationDependencies('after', $mod, $version);
-
             if (false === $result) {
                 static::$_lastQuery = BORM::get_last_query();
                 $module->delete();
                 return false;
             }
+
+            if (!$this->_processMigrationDependencies('after', $mod, $version)) {
+                return false;
+            }
+
             $module->set(['last_status' => 'INSTALLED'])->save();
             $mod['schema_version'] = $version;
         } catch (Exception $e) {
@@ -1911,7 +1916,9 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         ])->save();
         // call upgrade migration script
         try {
-            $this->_processMigrationDependencies('before', $mod, $toVersion);
+            if (!$this->_processMigrationDependencies('before', $mod, $toVersion)) {
+                return false;
+            }
 
             if (is_callable($callback)) {
                 $result = $this->BUtil->call($callback);
@@ -1922,11 +1929,14 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
                 $result = null;
             }
 
-            $this->_processMigrationDependencies('after', $mod, $toVersion);
-
             if (false === $result) {
                 return false;
             }
+
+            if (!$this->_processMigrationDependencies('after', $mod, $toVersion)) {
+                return false;
+            }
+
             // update module schema version to new one
             $mod['schema_version'] = $toVersion;
             $module->set([
@@ -2050,6 +2060,12 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         return true;
     }
 
+    /**
+     * @param string $when before|after
+     * @param array $mod
+     * @param string $version
+     * @return boolean
+     */
     protected function _processMigrationDependencies($when, $mod, $version)
     {
         $modName = $mod['module_name'];
@@ -2058,9 +2074,14 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
             $singleton = $this->{$class};
             $method = "{$when}__{$modName}__" . str_replace('.', '_', $version);
             if (method_exists($singleton, $method)) {
-                call_user_func([$singleton, $method], $mod, $version);
+                echo "+{$iterModName}:{$when}; ";
+                $result = call_user_func([$singleton, $method], $mod, $version);
+                if (false === $result) {
+                    return false;
+                }
             }
         }
+        return true;
     }
 }
 
