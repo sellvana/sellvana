@@ -288,6 +288,7 @@
 
         /**
          * Helper to toggle action buttons if valid false
+         * 
          * @param  {Boolean} valid 
          * @return {mixed}
          */
@@ -303,6 +304,7 @@
 
         /**
          * Helper to convert space chars to hyphen or on the contrary
+         * 
          * @param  {String}  str
          * @param  {Boolean} isRevert
          * @return {String}
@@ -891,7 +893,7 @@
                     // If local data contains rows has been deleted then clear them before re-render
                     options = _.uniq(this.clearDeletedOptions(options));
 
-                    this.props.tabIndex = row ? row.label : options[0].label;
+                    this.props.tabIndex = row ? row.label : options[0];
                     this.setState({ options: options });
                 }.bind(this));
 
@@ -917,7 +919,7 @@
                         options = _.uniq(this.clearDeletedOptions(options));
 
                         if (isToggleTab)
-                            this.props.tabIndex = row ? row.label : options[0].label;
+                            this.props.tabIndex = row ? row.label : options[0];
 
                         this.setState({ options: options });
                         row.edited = false;
