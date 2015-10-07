@@ -1,0 +1,78 @@
+<!--{ label: Wishlist Items }-->
+<!--{ pos: 70 }-->
+<!--{ model_new_hide: true }-->
+<!--{ async: false }-->
+
+{% set m = THIS.get('model') %}
+{% set hlp = APP.instance('Sellvana_Wishlist_Admin_Controller') %}
+
+<script>
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomSelect2'], function(React, _, $, Components, FComSelect2) {
+    	var wishlistItemsGrid, wishlistItemsModalNode, currRow;
+
+    	window.wishlistItemsGridRegister = function(grid) {
+    		wishlistItemsGrid = grid;
+    	}
+
+    	window.showModalToEditWishlistItems = function(row) {
+    		console.warn('wishlistItemsGrid', wishlistItemsGrid);
+    		currRow = row;
+            var inlineProps = {
+                id: 'wishlist_id',
+                name: 'id',
+                className: 'form-control'
+            };
+
+    		var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "editWishlistModal",
+                        show: true,
+                        title: 'Change Wishlist',
+                        confirm: 'Save changes',
+                        cancel: 'Close',
+                        onLoad: function(modal) {
+                            wishlistItemsModalNode = $(modal.getDOMNode());
+                            wishlistItemsModalNode.find('.modal-dialog').css('width', '450px');
+                        },
+                        onConfirm: window.saveWishlistModal
+                    },
+                    React.DOM.form({id: 'wishlist-edit-form', className: 'form form-horizontal validate-form', noValidate: "novalidate"}, 
+                        React.DOM.input({ type: 'hidden', defaultValue: row.id, id: 'product' }),
+                        React.DOM.input({ type: 'hidden', defaultValue: row.wishlist_id, id: 'wishlist' }),
+                        React.DOM.div({ className: '' }, 
+							React.DOM.label(null, 'Wishlist'),
+							React.createElement(FComSelect2, React.__spread({},  inlineProps, {options: JSON.parse(wishlistItemsGrid.getConfig('wishlists')), defaultValue: [row.wishlist_id], callback: 'switchWishlist'}))
+						)
+                    )
+                ), modalContainerEle
+            );
+    	}
+
+    	window.saveWishlistModal = function(modal) {
+		 	var form = wishlistItemsModalNode.find('form'),
+				id   = form.find('#wishlist_id').val(),
+				wlId = form.find('#wishlist').val(),
+				pId  = form.find('#product').val(),
+				url  = "{{ APP.href('wishlist/move') }}?product=" + pId + '&wishlist=' + wlId + '&id=' + id;
+
+			if (form.valid()) {
+				$.get(url, function(r) {console.log(r);
+					if (r.success === true) {
+						currRow.wishlist_id    = r.wishlist_id;
+						currRow.wishlist_title = r.wishlist_title;
+                	    wishlistItemsGrid.updateRows([currRow]);
+                	    modal.close();
+                	} else {
+                	    alert('error when save');
+                	    return false;
+                	}
+				});
+			}
+    	}
+    });
+</script>
+
+{# {{ THIS.view('core/backbonegrid').set('grid', hlp.customerWishlistGridConfig(m)) | raw }} #}
+{{ THIS.view('core/griddle').set('grid', hlp.customerWishlistItemsGridConfig(m)) | raw }}

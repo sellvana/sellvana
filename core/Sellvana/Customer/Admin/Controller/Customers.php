@@ -5,6 +5,7 @@
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
+ * @property Sellvana_Wishlist_Model_Wishlist $Sellvana_Wishlist_Model_Wishlist
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Admin_Main $FCom_Admin_Main
  */
@@ -187,6 +188,17 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
                 if ($address->is_default_shipping == 0 && $address->customer_id == $customer->id) {
                     $hlp->update_many(['is_default_shipping' => 0], ['customer_id' => $customer->id]);
                     $address->set('is_default_shipping', 1)->save();
+                }
+            }
+
+            if (!empty($data['is_default'])) {
+                $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()->where('customer_id', $customer->id)->find_many();
+                foreach ($wishlists as $wishlist) {
+                    if ($wishlist->id() == $data['is_default'])
+                        $wishlist->is_default = 1;
+                    else $wishlist->is_default = 0;
+                    
+                    $wishlist->save();
                 }
             }
         }

@@ -11,6 +11,7 @@ modules:
             FCom_Admin:
                 auto_use: [ bootstrap ]
                 routing:
+                    - [ "/wishlist/?.action", Sellvana_Wishlist_Admin_Controller ]
                     - [ /catalog/report/wishlist_items/?.action, Sellvana_Wishlist_Admin_Controller_Report_WishlistItems ]
             FCom_Frontend:
                 routing:

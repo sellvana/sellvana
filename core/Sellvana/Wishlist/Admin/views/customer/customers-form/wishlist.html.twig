@@ -1,9 +1,68 @@
 <!--{ label: Wishlist }-->
-<!--{ pos: 70 }-->
+<!--{ pos: 65 }-->
 <!--{ model_new_hide: true }-->
-<!--{ async: true }-->
+<!--{ async: false }-->
 
 {% set m = THIS.get('model') %}
 {% set hlp = APP.instance('Sellvana_Wishlist_Admin_Controller') %}
-{# {{ THIS.view('core/backbonegrid').set('grid', hlp.customerWishlistGridConfig(m)) | raw }} #}
+
+<script>
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm'], function(React, _, $, Components, FComModalForm) {
+    	var wishlistGrid, wishlistModalNode, currRow;
+
+    	window.wishlistGridRegister = function(grid) {
+    		wishlistGrid = grid;
+    	}
+
+    	window.showModalToEditWishlist = function(row) {
+    		currRow = row;
+    		var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "editWishlistModal",
+                        show: true,
+                        title: 'Edit Wishlist',
+                        confirm: 'Save changes',
+                        cancel: 'Close',
+                        onLoad: function(modal) {
+                            wishlistModalNode = $(modal.getDOMNode());
+                            wishlistModalNode.find('.modal-dialog').css('width', '450px');
+                        },
+                        onConfirm: window.saveWishlistModal
+                    }, 
+                    React.createElement(FComModalForm, { columnMetadata: wishlistGrid.getConfig('columns'), id: wishlistGrid.getConfig('id'), row: row })
+                ), modalContainerEle
+            );
+    	}
+
+    	window.saveWishlistModal = function(modal) {
+	        var form = $(modal.getDOMNode()).find('form'),
+				id   = form.find('#id').val(),
+				url  = "{{ APP.href('wishlist') }}",
+				hash = { oper: id ? 'edit' : 'add' };
+
+
+	        form.find('textarea, input, select').each(function() {
+	            var key = $(this).attr('id');
+	            var val = $(this).val();
+	            hash[key] = wishlistGrid.html2text(val);
+	        });
+
+			if (form.valid()) {
+				$.post(url, hash, function(r) {
+                    if (r.success === true) {
+                    	currRow.title = r.title;
+                    	wishlistGrid.updateRows([currRow]);
+                        modal.close();
+                    } else {
+                        alert('error when save');
+                        return false;
+                    }
+                });
+			}
+    	}
+    });
+</script>
+
 {{ THIS.view('core/griddle').set('grid', hlp.customerWishlistGridConfig(m)) | raw }}
