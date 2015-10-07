@@ -1387,6 +1387,11 @@ class BMigrate extends BClass
     protected static $_breakFlag;
 
     /**
+     * @var array
+     */
+    protected static $_migrationData;
+
+    /**
     * Shortcut to help with IDE autocompletion
     *
     * @return BMigrate
@@ -1411,13 +1416,15 @@ class BMigrate extends BClass
             }
             if ($mod->version && $mod->migrate) {
                 $connName = $mod->db_connection_name ? $mod->db_connection_name : 'DEFAULT';
-                $migration[$connName][$modName] = [
+                $mod = [
                     'code_version' => $mod->version,
                     'script' => $mod->migrate,
                     'run_status' => $mod->run_status,
                     'module_name' => $modName,
                     'connection_name' => $connName,
                 ];
+                $migration[$connName][$modName] = $mod;
+                static::$_migrationData[$modName] = $mod;
             }
         }
         return $migration;
@@ -1814,6 +1821,7 @@ class BMigrate extends BClass
         echo '*' . $version . '; ';
 
 BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
+
         // creating module before running install, so the module configuration values can be created within script
         $module = $this->BDbModule->load($mod['module_name'], 'module_name');
         if (!$module) {
@@ -1826,6 +1834,8 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         // call install migration script
         try {
+            $this->_processMigrationDependencies('before', $mod, $version);
+
             if (is_callable($callback)) {
                 $result = $this->BUtil->call($callback);
             } elseif (is_file($callback)) {
@@ -1834,6 +1844,9 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
                 $this->BDb->run($callback);
                 $result = null;
             }
+
+            $this->_processMigrationDependencies('after', $mod, $version);
+
             if (false === $result) {
                 static::$_lastQuery = BORM::get_last_query();
                 $module->delete();
@@ -1898,6 +1911,8 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         ])->save();
         // call upgrade migration script
         try {
+            $this->_processMigrationDependencies('before', $mod, $toVersion);
+
             if (is_callable($callback)) {
                 $result = $this->BUtil->call($callback);
             } elseif (is_file($callback)) {
@@ -1906,6 +1921,9 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
                 $this->BDb->run($callback);
                 $result = null;
             }
+
+            $this->_processMigrationDependencies('after', $mod, $toVersion);
+
             if (false === $result) {
                 return false;
             }
@@ -2030,6 +2048,19 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         // delete module schema version from db, related configuration entries will be deleted
         $this->BDbModule->load($mod['module_name'], 'module_name')->delete();
         return true;
+    }
+
+    protected function _processMigrationDependencies($when, $mod, $version)
+    {
+        $modName = $mod['module_name'];
+        foreach (static::$_migrationData as $iterModName => $iterMod) {
+            $class = "{$iterModName}_Migrate";
+            $singleton = $this->{$class};
+            $method = "{$when}__{$modName}__" . str_replace('.', '_', $version);
+            if (method_exists($singleton, $method)) {
+                call_user_func([$singleton, $method], $mod, $version);
+            }
+        }
     }
 }
 
