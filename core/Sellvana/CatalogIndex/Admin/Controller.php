@@ -10,6 +10,7 @@
  * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  */
 class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
@@ -101,10 +102,16 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
 
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
-            $this->Sellvana_CatalogFields_Main->disable(true);
+            $customFieldsLoaded = $this->BModuleRegistry->isLoaded('Sellvana_CatalogFields');
+            if ($customFieldsLoaded) {
+                $this->Sellvana_CatalogFields_Main->disable(true);
+            }
             $max = $this->Sellvana_Catalog_Model_Product->orm()->select_expr('(max(id))', 'id')->find_one();
-            $this->Sellvana_CatalogFields_Main->disable(false);
             $maxId = $max->id();
+            if ($customFieldsLoaded) {
+                $this->Sellvana_CatalogFields_Main->disable(false);
+                $this->Sellvana_CatalogFields_Model_ProductFieldData->setAutoCreateOptions(true);
+            }
 //            $categories = $this->Sellvana_Catalog_Model_Category->orm()->where_raw("id_path like '1/%/%'")->select('id')->find_many();
             $products = [];
             for ($i = 0; $i < 1000; $i++) {

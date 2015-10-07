@@ -8,6 +8,8 @@
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
  * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  */
 abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements Sellvana_CatalogIndex_Indexer_Interface
 {
@@ -98,8 +100,8 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
         $i = 0;
         //$start = 0;
         $t = time();
-        $orm = $this->Sellvana_Catalog_Model_Product
-            ->orm('p')->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->select('p.*')
+            ->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
             ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']]);
         if (empty(static::$_cnt_total)) {
             $count = clone $orm;
@@ -128,6 +130,12 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 
     protected function _indexFetchProductsData($products)
     {
+        $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($products);
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
+            $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductsFieldData($products);
+        }
+
         $fields = $this->Sellvana_CatalogIndex_Model_Field->getFields();
         static::$_indexData = [];
 
