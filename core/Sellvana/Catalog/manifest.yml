@@ -1,8 +1,9 @@
 modules:
     Sellvana_Catalog:
-        version: 0.5.6.0
+        version: 0.5.7.0
         channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
+        before: [ Sellvana_MultiSite ]
         categories: [ Catalog, Products ]
         translations: { en: en.php }
         description: "Categories and products management, admin and frontend"

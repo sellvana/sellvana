@@ -83,8 +83,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                             } else {
                                 //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
-                                    React.createElement("button", React.__spread({className: "btn btn-link " + btn.cssClass, key: index, title: btn.title ? btn.title : "", type: "button", 
-                                        "data-action": btn.name, "data-row": row.id},  btn.attrs, {onClick: that.props.doRowAction.bind(null, btn.callback)}), 
+                                    React.createElement("button", React.__spread({className: "btn btn-link " + btn.cssClass, key: index, title: btn.title ? btn.title : "", type: "button", "data-action": btn.name, "data-row": row.id},  btn.attrs, {onClick: that.props.doRowAction.bind(null, btn.callback)}), 
                                         React.createElement("i", {className: btn.icon, "data-action": btn.name, "data-row": row.id, "data-folder": row.folder ? row.folder : null}), 
                                         btn.caption
                                     )
@@ -206,9 +205,9 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                 }
 
                 if (customNodeHtml) {
-                    return React.createElement("td", {key: col.name, "data-col": col.name, dangerouslySetInnerHTML: {__html: node}});
+                    return React.createElement("td", {key: col.name, style: col.tdStyle, "data-col": col.name, dangerouslySetInnerHTML: {__html: node}});
                 }
-                return React.createElement("td", {"data-col": col.name, key: col.name}, node);
+                return React.createElement("td", {"data-col": col.name, style: col.tdStyle, key: col.name}, node);
             });
 
             return (
