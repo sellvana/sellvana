@@ -5,3 +5,4 @@ base:
 
 /settings:
     - { view: settings, do: [[ addTab, Sellvana_Wishlist, { label: Wishlist, group: customers, async: true, permission: settings/Sellvana_Wishlist } ]] }
+    - { view: settings, do: [[ addTab, Sellvana_Wishlist_Items, { label: Wishlist Items, group: customers, async: true, permission: settings/Sellvana_Wishlist } ]] }

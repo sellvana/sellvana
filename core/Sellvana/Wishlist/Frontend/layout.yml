@@ -14,3 +14,7 @@ customer_account_sidebar:
     - { include: base }
     - { hook: main, views: wishlist }
     - { include: customer_account_sidebar }
+
+/wishlist/form:
+    - { include: base }
+    - { hook: main, views: wishlist/form }
