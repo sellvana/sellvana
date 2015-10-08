@@ -2083,6 +2083,29 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         return true;
     }
+
+    public function isModuleVersion($moduleName, $version)
+    {
+        if (!$this->BModuleRegistry->isLoaded($moduleName)) {
+            return false;
+        }
+        $module = $this->BDbModule->load($moduleName);
+        if (!$module) {
+            return false;
+        }
+        $modVer = $module->get('schema_version');
+        if (preg_match('#^(.*)~(.*)$#', $version, $m)) {
+            if (!empty($m[1]) && version_compare($modVer, $m[1], '<')) {
+                return false;
+            }
+            if (!empty($m[2]) && version_compare($modVer, $m[2], '>')) {
+                return false;
+            }
+        } elseif (version_compare($modVer, $version, '!=')) {
+            return false;
+        }
+        return true;
+    }
 }
 
 
