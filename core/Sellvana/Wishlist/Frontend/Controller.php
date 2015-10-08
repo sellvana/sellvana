@@ -18,17 +18,25 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $this->forward('unauthenticated');
             return;
         }
+
         $this->BResponse->nocache();
         $layout = $this->BLayout;
         $this->layout('/wishlist');
         $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
+        $isMultiWishlist = (bool)$this->BConfig->get('modules/Sellvana_Wishlist/multiple_wishlist');
 
         $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()
             ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
             ->order_by_desc('is_default')
-            #TODO: Revert it after fix default wishlist title for new customer
-            // ->order_by_asc('title') 
+            ->order_by_asc('title') 
             ->find_many_assoc();
+
+        if (!$isMultiWishlist) {
+            $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()
+                ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
+                ->where('is_default', 1)
+                ->find_many_assoc();
+        }
 
         if (!empty($wishlists)) {
             $itemRows = $this->Sellvana_Wishlist_Model_WishlistItem->orm('wi')
@@ -47,7 +55,10 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             }
         }
 
-        $layout->view('wishlist')->wishlists = $wishlists;
+        $layout->view('wishlist')->set([
+                'wishlists'       => $wishlists,
+                'isMultiWishlist' => $isMultiWishlist
+            ]);
     }
 
     /**
@@ -181,8 +192,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()
             ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
             ->order_by_desc('is_default')
-            #TODO: Revert it after fix default wishlist title for new customer
-            // ->order_by_asc('title') 
+            ->order_by_asc('title') 
             ->find_many_assoc();
         
         $this->layout('/wishlist/form');

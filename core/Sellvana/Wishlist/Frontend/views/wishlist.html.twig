@@ -1,4 +1,5 @@
 {% set wishlists = THIS.get('wishlists') %}
+{% set isMultiWishlist = THIS.get('isMultiWishlist') %}
 {% set wishlist = THIS.get('wishlist').items(false, true) %}
 <noscript>
     <style type="text/css">
@@ -14,15 +15,19 @@
                 More <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a data-toggle="modal" href='#new-wishlist-modal'>{{ 'Create a Wishlists' | _ }}</a></li>
-                <li role="separator" class="divider"></li>
+                {% if isMultiWishlist %}
+                    <li><a data-toggle="modal" href='#new-wishlist-modal'>{{ 'Create a Wishlists' | _ }}</a></li>
+                    <li role="separator" class="divider"></li>
+                {% endif %}
                 <li><a data-toggle="modal" href='#wishlist-setting-modal'>{{ 'Wishlists Settings' | _ }}</a></li>
             </ul>
         </div>
         <noscript>
             <form action="{{ APP.href('wishlist/create') }}" method="POST">
-                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-                <button type="submit" class="btn btn-default btn-xs" role="button">{{ 'Create a Wishlists' | _ }}</button>
+                {% if isMultiWishlist %}
+                    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                    <button type="submit" class="btn btn-default btn-xs" role="button">{{ 'Create a Wishlists' | _ }}</button>
+                {% endif %}
                 <a class="btn btn-primary btn-xs" href="{{ APP.href('wishlist/settings') }}" role="button">{{ 'Wishlists Settings' | _ }}</a>
             </form>
         </noscript>
@@ -47,7 +52,9 @@
                                 <th>{{ "Select" | _ }}</th>
                                 <th colspan="2">{{ "Product" | _ }}</th>
                                 <th>{{ "Price" | _ }}</th>
-                                <th>{{ 'Move' | _ }}</th>
+                                {% if isMultiWishlist %}
+                                    <th>{{ 'Move' | _ }}</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
@@ -68,16 +75,18 @@
                                             <span class="price">{{ p.getCatalogPrice() | currency }}</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <select data-wishlist="{{ wId }}" data-product="{{ p.get('id') }}" name="wishlist_ids[{{ item.get('id')}}]" class="slt-wishlist-move">
-                                            <option value="">{{ 'Select wishlist' | _ }}</option>
-                                            {% for oId, wl in wishlists %}
-                                                {% if wl.id != wishlist.id %}
-                                                    <option value="{{ oId }}">{{ wl.title }}</option>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                    </td>
+                                    {% if isMultiWishlist %}
+                                        <td>
+                                            <select data-wishlist="{{ wId }}" data-product="{{ p.get('id') }}" name="wishlist_ids[{{ item.get('id')}}]" class="slt-wishlist-move">
+                                                <option value="">{{ 'Select wishlist' | _ }}</option>
+                                                {% for oId, wl in wishlists %}
+                                                    {% if wl.id != wishlist.id %}
+                                                        <option value="{{ oId }}">{{ wl.title }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                    {% endif %}
                                 </tr>
                             {% endfor %}
                         </tbody>
