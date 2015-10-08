@@ -1,11 +1,15 @@
 {% set wishlists = THIS.get('wishlists') %}
 {% set wishlist = THIS.get('wishlist').items(false, true) %}
-
+<noscript>
+    <style type="text/css">
+        .wishlist-more-btn { display:none; }
+    </style>
+</noscript>
 <div class="row f-mb-slideout-menu">
     <div class="col-sm-9 f-col-main">
     <header class="f-page-header">
         <h1 class="f-page-title">{{ "Wishlists" | _ }}</h1>
-        <div class="btn-group btn-xs" role="group">
+        <div class="btn-group btn-xs wishlist-more-btn" role="group">
             <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 More <span class="caret"></span>
             </button>
@@ -15,6 +19,13 @@
                 <li><a data-toggle="modal" href='#wishlist-setting-modal'>{{ 'Wishlists Settings' | _ }}</a></li>
             </ul>
         </div>
+        <noscript>
+            <form action="{{ APP.href('wishlist/create') }}" method="POST">
+                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                <button type="submit" class="btn btn-default btn-xs" role="button">{{ 'Create a Wishlists' | _ }}</button>
+                <a class="btn btn-primary btn-xs" href="{{ APP.href('wishlist/settings') }}" role="button">{{ 'Wishlists Settings' | _ }}</a>
+            </form>
+        </noscript>
         <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ 'Menu'|_ }}</a>
     </header>
     {{ THIS.view('core/messages') | raw }}
@@ -58,7 +69,8 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <select data-wishlist="{{ wId }}" data-product="{{ p.get('id') }}" class="slt-wishlist-move">
+                                        <select data-wishlist="{{ wId }}" data-product="{{ p.get('id') }}" name="wishlist_ids[{{ item.get('id')}}]" class="slt-wishlist-move">
+                                            <option value="">{{ 'Select wishlist' | _ }}</option>
                                             {% for oId, wl in wishlists %}
                                                 {% if wl.id != wishlist.id %}
                                                     <option value="{{ oId }}">{{ wl.title }}</option>
@@ -73,6 +85,9 @@
                             <td colspan="4">
                                 <button type="submit" class="btn btn-primary btn-xs" name="do" value="add_to_cart.{{ wId }}">{{ "Add Selected To Cart" | _ }}</button>
                                 <button type="submit" class="btn btn-warning btn-xs" name="do" value="remove.{{ wId }}">{{ "Remove Selected" | _ }}</button>
+                                <noscript>
+                                    <button type="submit" class="btn btn-default btn-xs" name="do" value="move.{{ wId }}">{{ "Move" | _ }}</button>
+                                </noscript>
                             </td>
                         </tfoot>
                     </table>
@@ -120,36 +135,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert" style="display: none;"></div>
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>{{ "Wish Lists" | _ }}</th>
-                                <th style="text-align: center;">{{ "Default" | _ }}</th>
-                                <th style="text-align: center;">{{ "Delete" | _ }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for wId, wishlist in wishlists %}
-                            <tr>
-                                <td><input type="text" name="Wishlist[{{ wId }}][title]" class="form-control" value="{{ wishlist.title }}" required="required"></td>
-                                <td style="text-align: center;">
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="Wishlist[is_default]" value="{{ wishlist.id }}" {{ wishlist.is_default == '1' ? 'checked' : '' }}>
-                                        </label>
-                                    </div>
-                                </td>
-                                <td style="text-align: center;">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" name="delete[]" value="{{ wishlist.id }}">
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    {{ THIS.view('wishlist/settings').set('wishlists', wishlists) | raw }}
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary btn-xs" data-loading-text="{{ 'Updating...' | _ }}">{{ 'Submit' | _ }}</button>
@@ -159,7 +145,6 @@
         </div>
     </form>
 </div>
-
 <script>
     require(['jquery', 'jquery.validate', 'select2'], function($) {
         jQuery(document).ready(function($) {
@@ -172,14 +157,15 @@
             $('.slt-wishlist-move').each(function() {
                 $(this).select2().on("change", function(e) {
                     var $o   = $(e.target);
+                    var id   = $o.val();
                     var wlId = $o.data('wishlist');
                     var pId  = $o.data('product');
 
-                    if (!wlId || !pId) {
+                    if (!wlId || !pId || !id) {
                         return false;
                     }
 
-                    $.ajax("{{ APP.href('wishlist/move') }}?product="+pId+"&wishlist="+wlId+'&id='+$o.val(), {
+                    $.ajax("{{ APP.href('wishlist/move') }}?product="+pId+"&wishlist="+wlId+'&id='+id, {
                         dataType: "json"
                     }).done(function(r) {
                         if (r.success == true) {

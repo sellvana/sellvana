@@ -53,69 +53,42 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
      */
     public function action_create__POST()
     {
-        $wishlistHref = $this->BApp->href('wishlist/create');
-        $post         = $this->BRequest->post();
-        $wishlist     = $this->Sellvana_Wishlist_Model_Wishlist->create();
-        $customer     = $this->Sellvana_Customer_Model_Customer->sessionUser();
+        $post     = $this->BRequest->post();
+        $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->create();
+        $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+
+        // Set model attributes
+        $data = [
+            'title'       => (string)$post['title'] ? : 'New Wish List',
+            'is_default'  => 0,
+            'customer_id' => $customer->id()
+        ];
 
         if ($this->BRequest->xhr()) {
             $r = [];
-
-            // Set model attributes
-            $wishlist->title       = $post['title'];
-            $wishlist->is_default  = 0;
-            $wishlist->customer_id = $customer->id();
-
-            if ($wishlist->save()) {
+            if ($wishlist->set($data)->save()) {
                 $r = [
                     'success' => true,
-                    'title' => 'Create wishlist successfull.'
+                    'title'   => 'Create wishlist successfull.'
                 ];
             }
 
             $this->message('Create wishlist successfull.');
             $this->BResponse->json($r);
-        }
-    }
-
-    public function action_settings__POST()
-    {
-        $post = $this->BRequest->post();
-        if ($this->BRequest->xhr()) {
-            $wishlists  = $post['Wishlist'];
-            $deletedIds = $post['delete'];
-
-            foreach ($wishlists as $id => $wishlist) {
-                $model = $this->Sellvana_Wishlist_Model_Wishlist->load($id);
-                if ($model) {
-                    if (in_array($id, $deletedIds)) {
-                        $model->delete();
-                    } else {
-                        $model->title      = $wishlist['title'];
-                        $model->is_default = $wishlist['is_default'];
-
-                        if ($wishlists['is_default'] && $wishlists['is_default'] == $id)
-                            $model->is_default = 1;
-                        else $model->is_default = 0;
-
-                        if (!$model->save()) {
-                            $this->message('Update wishlists fail deal to system error.');
-                            $this->BResponse->json(['success' => false, 'title' => 'Update wishlists fail deal to system error.']);
-                        }
-                    }
-                }
+        } else {
+            if ($wishlist->set($data)->save()) {
+                $this->message('Create wishlist successfull.');
             }
-
-            $this->message('Update wishlists successfull.');
-            $this->BResponse->json(['success' => true, 'title' => 'Update wishlists successfull.']);
+            $this->BResponse->redirect('wishlist');
         }
     }
 
     public function action_index__POST()
     {
         $wishlistHref = $this->BApp->href('wishlist');
-        $post = $this->BRequest->post();
-        $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->sessionWishlist(true);
+        $post         = $this->BRequest->post();
+        $wishlist     = $this->Sellvana_Wishlist_Model_Wishlist->sessionWishlist(true);
+        $locale       = BLocale::i();
 
         if ($this->BRequest->xhr()) {
             $result = [];
@@ -132,7 +105,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                         'success' => true,
                         'title' => 'Added to wishlist',
                         'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars($p->product_name)
-                            . '<br><br><a href="' . $wishlistHref . '" class="button">Go to wishlist</a>'
+                            . '<br><br><a href="' . $wishlistHref . '" class="button">'. $locale->_('Go to wishlist') .'</a>'
                     ];
                     break;
                 case 'remove':
@@ -141,7 +114,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                         'success' => true,
                         'title' => 'Removed from wishlist',
                         'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars($p->product_name)
-                            . '<br><br><a href="' . $wishlistHref . '" class="button">Go to wishlist</a>'
+                            . '<br><br><a href="' . $wishlistHref . '" class="button">'. $locale->_('Go to wishlist') .'</a>'
                     ];
                     break;
             }
@@ -173,9 +146,85 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                             $wishlist->removeItem($id);
                         }
                         break;
+                    case 'move':
+                        $wlIds = $post['wishlist_ids'];
+                        foreach ($post['selected'] as $id) {
+                            $wishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->load($id);
+
+                            if (empty($wlIds[$id])) {
+                                $this->message('Can not define wishlist', 'error');
+                                $this->BResponse->redirect('wishlist');
+                            }
+                            $wlId = $wlIds[$id];
+
+                            $wishlistItem->set('wishlist_id', $wlId)->save();
+
+                        }
+
+                        $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->load($wlId);
+                        $this->message('Product was moved to ' . $wishlist->title);
+                        $this->BResponse->redirect('wishlist');
+                        break;
                 }
             }
             $this->BResponse->redirect($wishlistHref);
+        }
+    }
+
+    public function action_settings()
+    {
+        $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()
+            ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
+            ->order_by_desc('is_default')
+            ->order_by_asc('title')
+            ->find_many_assoc();
+
+        $this->layout('/wishlist/form');
+        $this->view('wishlist/settings')->set([
+            'wishlists' => $wishlists,
+            'action' => 'settings'
+        ]);
+    }
+
+    public function action_settings__POST()
+    {
+        $post = $this->BRequest->post();
+        $error = false;
+        $wishlists  = $post['Wishlist'];
+        $deletedIds = $post['delete'];
+
+        foreach ($wishlists as $id => $wishlist) {
+            $model = $this->Sellvana_Wishlist_Model_Wishlist->load($id);
+            if ($model) {
+                if (in_array($id, $deletedIds)) {
+                    $model->delete();
+                } else {
+                    $data = [
+                        'title'      => $wishlist['title'],
+                        'is_default' => $wishlists['is_default'] == $id
+                    ];
+
+                    if (!$model->set($data)->save()) {
+                        $error = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        if ($this->BRequest->xhr()) {
+            if ($error) {
+                $this->message('Update wishlists fail deal to system error.');
+                $this->BResponse->json(['success' => false, 'title' => 'Update wishlists fail deal to system error.']);
+            }
+            $this->message('Update wishlists successfull.');
+            $this->BResponse->json(['success' => true, 'title' => 'Update wishlists successfull.']);
+        } else {
+            if ($error) {
+                $this->message('Update wishlists fail deal to system error.');
+            }
+            $this->message('Update wishlists successfull.');
+            $this->BResponse->redirect('wishlist');
         }
     }
 
@@ -194,21 +243,18 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $r = [];
 
-        $id           = $this->BRequest->get('id');
-        $wishlist     = $this->Sellvana_Wishlist_Model_Wishlist->load($id);
-        $wishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->loadOrCreate([
-                              'wishlist_id' => $this->BRequest->get('wishlist'), 
-                              'product_id' => $this->BRequest->get('product')
-                          ]);
+        $id           = (int)$this->BRequest->get('id');
+        $pId          = (int)$this->BRequest->get('product');
+        $wlId         = (int)$this->BRequest->get('wishlist');
+        $wishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->loadOrCreate(['wishlist_id' => $wlId, 'product_id' => $pId]);
 
         if ($this->BRequest->xhr() && $wishlistItem) {
-            $wishlistItem->wishlist_id = $wishlist->id();
-
-            if ($wishlistItem->save()) {
+            $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->load($id);
+            if ($wishlistItem->set('wishlist_id', $id)->save()) {
                 $r = ['success' => true];
+                $this->message('Product was moved to ' . $wishlist->title);
             }
 
-            $this->message('Product was moved to ' . $wishlist->title);
             $this->BResponse->json($r);
         }
     }
@@ -222,7 +268,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
 
         $id = $this->BRequest->get('id');
-        $p = $this->Sellvana_Catalog_Model_Product->load($id);
+        $p  = $this->Sellvana_Catalog_Model_Product->load($id);
         if (!$p) {
             $this->message('Invalid product', 'error');
         } else {

@@ -1,7 +1,7 @@
 <!--{ label: Wishlist Items }-->
 <!--{ pos: 70 }-->
 <!--{ model_new_hide: true }-->
-<!--{ async: false }-->
+<!--{ async: true }-->
 
 {% set m = THIS.get('model') %}
 {% set hlp = APP.instance('Sellvana_Wishlist_Admin_Controller') %}
@@ -15,7 +15,6 @@
     	}
 
     	window.showModalToEditWishlistItems = function(row) {
-    		console.warn('wishlistItemsGrid', wishlistItemsGrid);
     		currRow = row;
             var inlineProps = {
                 id: 'wishlist_id',
@@ -58,7 +57,7 @@
 				url  = "{{ APP.href('wishlist/move') }}?product=" + pId + '&wishlist=' + wlId + '&id=' + id;
 
 			if (form.valid()) {
-				$.get(url, function(r) {console.log(r);
+				$.get(url, function(r) {
 					if (r.success === true) {
 						currRow.wishlist_id    = r.wishlist_id;
 						currRow.wishlist_title = r.wishlist_title;

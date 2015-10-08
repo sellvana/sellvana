@@ -124,6 +124,7 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
                 }
             }
         }
+
         $config['data'] = $data;
         $config['wishlists'] = $this->BUtil->toJson($wishlists);
         $config['data_mode'] = 'local';
@@ -133,20 +134,11 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
 
     public function action_index__POST()
     {
-        if ($this->BRequest->csrf('referrer', 'GET')) {
-            $this->message('CSRF detected', 'error');
-            $this->BResponse->redirect('wishlist');
-            return;
-        }
-
         $post = $this->BRequest->post();
-
         switch ($post['oper']) {
             case 'edit':
                 $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->load($post['id']);
-                $wishlist->title = $post['title'];
-
-                if ($wishlist->save()) {
+                if ($wishlist->set('title', $post['title'])->save()) {
                     $this->BResponse->json(['success' => true, 'title' => $wishlist->title]);
                 }
                 break;
@@ -171,23 +163,20 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
         }
 
         $id           = $this->BRequest->get('id');
-        $pId          = $this->BRequest->get('product');
-        $wlId         = $this->BRequest->get('wishlist');
+        $pId          = (int)$this->BRequest->get('product');
+        $wlId         = (int)$this->BRequest->get('wishlist');
         $wishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->loadOrCreate(['wishlist_id' => $wlId, 'product_id' => $pId]);
 
         if ($this->BRequest->xhr() && $wishlistItem) {
-            $wishlistItem->wishlist_id = $id;
-
-            if ($wishlistItem->save()) {
+            if ($wishlistItem->set('wishlist_id', $id)->save()) {
                 $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->load($id);
                 $r = [
                     'success' => true,
                     'wishlist_id' => $wishlist->id,
-                    'wishlist_title' => $wishlist->title,
+                    'wishlist_title' => $wishlist->title
                 ];
             }
-
-            $this->message('Product was moved to ' . $wishlist->title);
+            
             $this->BResponse->json($r);
         }
     }
