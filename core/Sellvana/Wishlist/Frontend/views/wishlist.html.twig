@@ -154,27 +154,21 @@
                 $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
             });
 
-            $('.slt-wishlist-move').each(function() {
-                $(this).select2().on("change", function(e) {
-                    var $o   = $(e.target);
-                    var id   = $o.val();
-                    var wlId = $o.data('wishlist');
-                    var pId  = $o.data('product');
+            $('.slt-wishlist-move').select2().on("change", function(e) {
+                var $o   = $(e.target);
+                var id   = $o.val();
+                var wlId = $o.data('wishlist');
+                var pId  = $o.data('product');
 
-                    if (!wlId || !pId || !id) {
-                        return false;
+                $.ajax("{{ APP.href('wishlist/move') }}?product=" + pId + "&wishlist=" + wlId + '&id=' + id, {
+                    dataType: "json"
+                }).done(function(r) {
+                    if (r.success == true) {
+                        setInterval(function() {
+                            window.location.href = "{{ APP.href('wishlist') }}";
+                        }, 1000);
                     }
-
-                    $.ajax("{{ APP.href('wishlist/move') }}?product="+pId+"&wishlist="+wlId+'&id='+id, {
-                        dataType: "json"
-                    }).done(function(r) {
-                        if (r.success == true) {
-                            setInterval(function() {
-                                window.location.href = "{{ APP.href('wishlist') }}";
-                            }, 1000);
-                        }
-                    });
-                }).select2('val', null);
+                });
             });
 
             $('#new-wishlist-form').validate({ rules: { title: "required" } });

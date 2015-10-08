@@ -56,6 +56,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $post     = $this->BRequest->post();
         $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->create();
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+        $locale   = BLocale::i();
 
         // Set model attributes
         $data = [
@@ -69,7 +70,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             if ($wishlist->set($data)->save()) {
                 $r = [
                     'success' => true,
-                    'title'   => 'Create wishlist successfull.'
+                    'title'   => $locale->_('Create wishlist successfull.')
                 ];
             }
 
@@ -94,7 +95,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $result = [];
             $p = $this->Sellvana_Catalog_Model_Product->load($post['id']);
             if (!$p) {
-                $this->BResponse->json(['title' => "Incorrect product id"]);
+                $this->BResponse->json(['title' => $locale->_('Incorrect product id')]);
                 return;
             }
             switch ($post['action']) {
@@ -162,7 +163,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                         }
 
                         $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->load($wlId);
-                        $this->message('Product was moved to ' . $wishlist->title);
+                        $this->message(sprintf('Product was moved to %s', $wishlist->title));
                         $this->BResponse->redirect('wishlist');
                         break;
                 }
@@ -188,10 +189,10 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
     public function action_settings__POST()
     {
-        $post = $this->BRequest->post();
-        $error = false;
+        $post       = $this->BRequest->post();
         $wishlists  = $post['Wishlist'];
         $deletedIds = $post['delete'];
+        $error      = false;
 
         foreach ($wishlists as $id => $wishlist) {
             $model = $this->Sellvana_Wishlist_Model_Wishlist->load($id);
@@ -215,10 +216,10 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         if ($this->BRequest->xhr()) {
             if ($error) {
                 $this->message('Update wishlists fail deal to system error.');
-                $this->BResponse->json(['success' => false, 'title' => 'Update wishlists fail deal to system error.']);
+                $this->BResponse->json(['success' => false, 'title' => $locale->_('Update wishlists fail deal to system error.')]);
             }
             $this->message('Update wishlists successfull.');
-            $this->BResponse->json(['success' => true, 'title' => 'Update wishlists successfull.']);
+            $this->BResponse->json(['success' => true, 'title' => $locale->_('Update wishlists successfull.')]);
         } else {
             if ($error) {
                 $this->message('Update wishlists fail deal to system error.');
@@ -252,7 +253,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->load($id);
             if ($wishlistItem->set('wishlist_id', $id)->save()) {
                 $r = ['success' => true];
-                $this->message('Product was moved to ' . $wishlist->title);
+                $this->message(sprintf('Product was moved to %s', $wishlist->title));
             }
 
             $this->BResponse->json($r);
@@ -273,7 +274,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $this->message('Invalid product', 'error');
         } else {
             $this->Sellvana_Wishlist_Model_Wishlist->sessionWishlist(true)->addItem($id);
-            $this->message('Product was added to wishlist');
+            $this->message('Product was added to wishlist.');
         }
         $this->BResponse->redirect('wishlist');
     }
