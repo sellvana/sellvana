@@ -26,7 +26,8 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()
             ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
             ->order_by_desc('is_default')
-            ->order_by_asc('title')
+            #TODO: Revert it after fix default wishlist title for new customer
+            // ->order_by_asc('title') 
             ->find_many_assoc();
 
         if (!empty($wishlists)) {
@@ -45,8 +46,6 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                 $wishlists[$wId]->items = $items;
             }
         }
-
-
 
         $layout->view('wishlist')->wishlists = $wishlists;
     }
@@ -182,8 +181,10 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()
             ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
             ->order_by_desc('is_default')
+            #TODO: Revert it after fix default wishlist title for new customer
+            // ->order_by_asc('title') 
             ->find_many_assoc();
-
+        
         $this->layout('/wishlist/form');
         $this->view('wishlist/settings')->set([
             'wishlists' => $wishlists,

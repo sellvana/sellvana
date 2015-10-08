@@ -64,8 +64,6 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
                 $item['customer_name'] = $customer->lastname;
                 $data[] = $item;
             }
-        } else {
-            $wishlists = [];
         }
 
         $config['data'] = $data;
@@ -111,6 +109,7 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
         $data = [];
         /** @var Sellvana_Wishlist_Model_Wishlist[] $wishlistArr */
         $wishlistArr = $this->Sellvana_Wishlist_Model_Wishlist->orm()->where('customer_id', $customer->id)->find_many();
+        $wishlists   = [];
         if ($wishlistArr) {
             foreach ($wishlistArr as $wishlist) {
                 $wishlists[] = ['id' => $wishlist->id(), 'text' => $wishlist->title];
