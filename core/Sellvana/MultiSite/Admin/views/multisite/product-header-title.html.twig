@@ -48,6 +48,15 @@
                     currentState[fieldId] = $('[name=' + name + ']').val();
                 } else {
                     delete currentState[fieldId];
+                    main:
+                    for (var setNum in setCollection.models) {
+                        for(var fieldNum in setCollection.models[setNum].fields.models) {
+                            if (setCollection.models[setNum].fields.models[fieldNum].id == fieldId) {
+                                setCollection.models[setNum].fields.models[fieldNum].set('value', siteStates['default'][fieldId]);
+                                break main;
+                            }
+                        }
+                    }
                     $('[name=' + name + ']').val(siteStates['default'][fieldId]);
                 }
                 $(document).trigger('currentState:updated');
@@ -64,6 +73,8 @@
                         }
                     }
                 }
+                $('#multisite-selector').val('').trigger('change');
+                $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
                 $('#site_values').val(JSON.stringify(siteStates));
             });
         })

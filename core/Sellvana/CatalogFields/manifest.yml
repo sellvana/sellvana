@@ -9,7 +9,7 @@ modules:
         auto_use: [ bootstrap ]
         observe:
             - [ "Sellvana_Catalog_Model_Product::onAfterLoad", Sellvana_CatalogFields_Main.onProductAfterLoad ]
-            - [ "Sellvana_Catalog_Model_Product::onAfterSave", Sellvana_CatalogFields_Main.onProductAfterSave ]
+            #- [ "Sellvana_Catalog_Model_Product::onAfterSave", Sellvana_CatalogFields_Main.onProductAfterSave ]
             - [ "Sellvana_CatalogFields_Model_ProductVariant::find_one:after", Sellvana_CatalogFields_Main.onProductVariantFindAfter ]
             - [ "Sellvana_CatalogFields_Model_ProductVariant::find_many:after", Sellvana_CatalogFields_Main.onProductVariantFindAfter ]
             - [ "Sellvana_Catalog_Model_Product::import:row", Sellvana_CatalogFields_Main.onProductImportRow ]

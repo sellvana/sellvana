@@ -13,6 +13,7 @@
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_MultiSite_Admin $Sellvana_MultiSite_Admin
  */
 class Sellvana_CatalogFields_Admin extends BClass
 {
@@ -93,6 +94,10 @@ class Sellvana_CatalogFields_Admin extends BClass
         }
         $pfdHlp = $this->Sellvana_CatalogFields_Model_ProductFieldData;
         $pfdHlp->saveProductsFieldData([$p]);
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
+            $this->Sellvana_MultiSite_Admin->saveProductsFieldSiteData([$p]);
+        }
 
         $fieldsDataArr = $pfdHlp->fetchProductsFieldData([$p->id()]);
         if (!empty($fieldsDataArr[$p->id()])) {

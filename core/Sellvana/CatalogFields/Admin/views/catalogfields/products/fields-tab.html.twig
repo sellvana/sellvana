@@ -756,6 +756,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         initialize: function() {
             this.model.langFields.on('add', this._addLangView, this);
             this.model.langFields.on('remove', this._removeLangView, this);
+            this.model.on('add change', this._saveState, this);
+        },
+        _saveState: function(field) {
+            currentState[field.get('id')] = field.get('value');
+            $(document).trigger('currentState:updated');
         },
         _refresh: function() {
             this.model.url = '{{ APP.href('/catalogfields/products/get_field?id=') | raw }}'+this.model.get('id');
@@ -818,7 +823,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             var val = this.$el.find('input[type="hidden"]').val();
         },
         _changeSelect2: function() {
-            var val = this.$el.find('select').val();
+            var val = this.$el.find('select:last').val();
             if (typeof(val) === 'object')
                 val = val.join(',');
 
@@ -895,7 +900,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         initialize: function() {
             //this.model.on('change', this._checkCollapse, this);
             this.model.fields.on('add', this._addField, this);
-            this.model.fields.on('add change', this._saveState, this);
+            //this.model.fields.on('add change', this._saveState, this);
         },
         events: {
             'click a.btn-edit': '_showSelf',
