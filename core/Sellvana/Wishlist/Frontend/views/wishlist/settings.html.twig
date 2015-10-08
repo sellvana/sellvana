@@ -2,6 +2,7 @@
 {% set action = THIS.get('action') ? THIS.get('action') : 'add' %}
 
 {% if action == 'settings' or (action == 'edit' and pr is not empty) %}
+{% if wishlists %}
 <style>
     #wishlist-setting-form {
         margin: 0 auto;
@@ -44,4 +45,7 @@
 {% if action == 'settings' or (action == 'edit' and pr is not empty) %}
     <button type="submit" class="btn btn-primary pull-right" data-loading-text="{{ 'Updating...' | _ }}">{{ 'Submit' | _ }}</button>
 </form>
+{% else %}
+    <div class="alert alert-info">{{ "There are no products in wishlist" | _ }}.</div>
+{% endif %}
 {% endif %}

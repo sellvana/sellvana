@@ -58,12 +58,14 @@ class Sellvana_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_
 
         $data = [];
         $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()->where('customer_id', $customer->id)->find_many();
-        if ($wishlists) {
+        if (!empty($wishlists)) {
             foreach ($wishlists as $wishlist) {
                 $item = $wishlist->as_array();
                 $item['customer_name'] = $customer->lastname;
                 $data[] = $item;
             }
+        } else {
+            $wishlists = [];
         }
 
         $config['data'] = $data;
