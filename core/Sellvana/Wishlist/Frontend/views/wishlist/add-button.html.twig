@@ -1,7 +1,34 @@
 {% set loggedIn = APP.instance("Sellvana_Customer_Model_Customer").isLoggedIn() %}
-{% if loggedIn %}
-    {% set prod = THIS.get('prod') %}
-    <button type="submit" title="{{ "Add to Wishlist" | _ }}" class="btn btn-primary"
-            onclick="add_wishlist({{ prod.get('id') }})" name="add2wishlist" value="{{ prod.get('id') }}"
-            >+ {{ "Add to Wishlist" | _ }}</button>
+{% set isMultiple = CONFIG.get('modules/Sellvana_Wishlist/multiple_wishlist') %}
+{% set p = THIS.get('product') %}
+{% set wishlist = APP.instance('Sellvana_Wishlist_Model_Wishlist').sessionWishlist() %}
+
+{% if loggedIn and isMultiple %}
+    {% set wishlists = APP.instance("Sellvana_Wishlist_Model_Wishlist").getMultipleWishlists() %}
+    {% if wishlists|length > 1 %}
+        <div class="btn-group">
+            <a title="{{ "Add to Wishlist" | _ }}" class="btn btn-warning" href="{{ APP.href('wishlist/add?id=') ~ p.id() }}"
+               onclick="add_wishlist({{ p.id() }})" name="add2wishlist" value="{{ p.id() }}" rel="nofollow"
+                    >{{ "Add to Wishlist" | _ }}</a>
+            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only">{{ 'Toggle Dropdown'|_ }}</span>
+            </button>
+            <ul class="dropdown-menu">
+                {% for id, wishlist in wishlists %}
+                    <li><a href="{{ APP.href('wishlist/add?id=' ~ p.id() ~ '&wishlist_id=' ~ wishlist.id()) }}"
+                           onclick="add_wishlist({{ p.id() }}, {{ wishlist.id() }})">{{ wishlist.get('title') }}</a></li>
+                    {% if wishlist.get('is_default') %}
+                        <li role="separator" class="divider"></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <a title="{{ "Add to Wishlist" | _ }}" class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ p.id() }}"
+           onclick="add_wishlist({{ p.id() }})" rel="nofollow">{{ "Add to Wishlist" | _ }}</a>
+    {% endif %}
+{% else %}
+    <a title="{{ "Add to Wishlist" | _ }}" class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ p.id() }}"
+       onclick="add_wishlist({{ p.id() }})" rel="nofollow">{{ "Add to Wishlist" | _ }}</a>
 {% endif %}
