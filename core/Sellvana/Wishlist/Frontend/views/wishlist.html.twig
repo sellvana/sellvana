@@ -10,18 +10,18 @@
     <div class="col-sm-9 f-col-main">
     <header class="f-page-header">
         <h1 class="f-page-title">{{ "Wishlists" | _ }}</h1>
-        <div class="btn-group btn-xs wishlist-more-btn" role="group">
-            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                More <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-                {% if isMultiWishlist %}
+        {% if isMultiWishlist %}
+            <div class="btn-group btn-xs wishlist-more-btn" role="group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
                     <li><a data-toggle="modal" href='#new-wishlist-modal'>{{ 'Create a Wishlists' | _ }}</a></li>
                     <li role="separator" class="divider"></li>
-                {% endif %}
-                <li><a data-toggle="modal" href='#wishlist-setting-modal'>{{ 'Wishlists Settings' | _ }}</a></li>
-            </ul>
-        </div>
+                    <li><a data-toggle="modal" href='#wishlist-setting-modal'>{{ 'Wishlists Settings' | _ }}</a></li>
+                </ul>
+            </div>
+        {% endif %}
         <noscript>
             <form action="{{ APP.href('wishlist/create') }}" method="POST">
                 {% if isMultiWishlist %}
@@ -54,7 +54,7 @@
                                     <th>{{ "Select" | _ }}</th>
                                     <th colspan="2">{{ "Product" | _ }}</th>
                                     <th>{{ "Price" | _ }}</th>
-                                    {% if isMultiWishlist %}
+                                    {% if isMultiWishlist and wishlists|length > 1 %}
                                         <th>{{ 'Move' | _ }}</th>
                                     {% endif %}
                                 </tr>
@@ -77,7 +77,7 @@
                                                 <span class="price">{{ p.getCatalogPrice() | currency }}</span>
                                             </div>
                                         </td>
-                                        {% if isMultiWishlist %}
+                                        {% if isMultiWishlist and wishlists|length > 1 %}
                                             <td>
                                                 <select data-wishlist="{{ wId }}" data-product="{{ p.get('id') }}" name="wishlist_ids[{{ item.get('id')}}]" class="slt-wishlist-move">
                                                     <option value="">{{ 'Select wishlist' | _ }}</option>

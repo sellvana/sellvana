@@ -25,17 +25,12 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
         $isMultiWishlist = (bool)$this->BConfig->get('modules/Sellvana_Wishlist/multiple_wishlist');
 
-        $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()
-            ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
-            ->order_by_desc('is_default')
-            ->order_by_asc('title') 
-            ->find_many_assoc();
-
-        if (!$isMultiWishlist) {
-            $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()
-                ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
-                ->where('is_default', 1)
-                ->find_many_assoc();
+        $wishlistsOrm = $this->Sellvana_Wishlist_Model_Wishlist->orm()
+            ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId());
+        if ($isMultiWishlist) {
+            $wishlists = $wishlistsOrm->order_by_desc('is_default')->order_by_asc('title')->find_many_assoc();
+        } else {
+            $wishlists = $wishlistsOrm->where('is_default', 1)->find_many_assoc();
         }
 
         if (!empty($wishlists)) {
@@ -285,12 +280,27 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
 
         $id = $this->BRequest->get('id');
+        $wishlistId = $this->BRequest->get('wishlist_id');
         $p  = $this->Sellvana_Catalog_Model_Product->load($id);
         if (!$p) {
             $this->message('Invalid product', 'error');
         } else {
-            $this->Sellvana_Wishlist_Model_Wishlist->sessionWishlist(true)->addItem($id);
-            $this->message('Product was added to wishlist.');
+            $wishlist = null;
+            if ($wishlistId) {
+                $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->orm('w')
+                    ->where('customer_id', $this->Sellvana_Customer_Model_Customer->sessionUserId())
+                    ->where('id', $wishlistId)
+                    ->find_one();
+                if (!$wishlist) {
+                    $this->message('Invalid wishlist', 'error');
+                }
+            } else {
+                $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->sessionWishlist(true);
+            }
+            if ($wishlist) {
+                $wishlist->addItem($id);
+                $this->message('Product was added to wishlist.');
+            }
         }
         $this->BResponse->redirect('wishlist');
     }

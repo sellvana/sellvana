@@ -232,4 +232,14 @@ class Sellvana_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         // clear cookie token
         $this->BResponse->cookie('wishlist', false);
     }
+
+    public function getMultipleWishlists($customerId = null)
+    {
+        if (null === $customerId) {
+            $customerId = $this->Sellvana_Customer_Model_Customer->sessionUserId();
+        }
+        return $this->orm()->where('customer_id', $customerId)
+            ->order_by_desc('is_default')->order_by_asc('title')
+            ->find_many_assoc();
+    }
 }
