@@ -22,18 +22,18 @@
         <tbody>
             {% for wId, wishlist in wishlists %}
             <tr>
-                <td><input type="text" name="Wishlist[{{ wId }}][title]" class="form-control" value="{{ wishlist.title }}" required="required"></td>
+                <td><input type="text" name="Wishlist[{{ wId }}][title]" class="form-control" value="{{ wishlist.get('title') | default('Default Wishlist') }}" required="required"></td>
                 <td style="text-align: center;">
                     <div class="radio">
                         <label>
-                            <input type="radio" name="Wishlist[is_default]" value="{{ wishlist.id }}" {{ wishlist.is_default == '1' ? 'checked' : '' }}>
+                            <input type="radio" name="Wishlist[is_default]" value="{{ wishlist.get('id') }}" {{ wishlist.get('is_default') == '1' ? 'checked' : '' }}>
                         </label>
                     </div>
                 </td>
                 <td style="text-align: center;">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" name="delete[]" value="{{ wishlist.id }}">
+                            <input type="checkbox" name="delete[]" value="{{ wishlist.get('id') }}">
                         </label>
                     </div>
                 </td>
