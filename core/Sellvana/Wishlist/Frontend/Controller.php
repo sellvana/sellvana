@@ -67,6 +67,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->create();
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
         $locale   = BLocale::i();
+        $error    = false;
 
         // Set model attributes
         $data = [
@@ -75,21 +76,25 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             'customer_id' => $customer->id()
         ];
 
+        if (!$wishlist->set($data)->save()) {
+            $error = true;
+        }
+
         if ($this->BRequest->xhr()) {
-            $r = [];
-            if ($wishlist->set($data)->save()) {
-                $r = [
-                    'success' => true,
-                    'title'   => $locale->_('Create wishlist successfull.')
-                ];
+            if (!$error) {
+                $r = ['success' => true, 'title' => $locale->_('Create wishlist successfull.')];
+            } else {
+                $r = ['success' => false, 'title' => $locale->_('Create wishlist failure due to system error.')];
             }
 
-            $this->message('Create wishlist successfull.');
             $this->BResponse->json($r);
         } else {
-            if ($wishlist->set($data)->save()) {
+            if (!$error) {
                 $this->message('Create wishlist successfull.');
+            } else {
+                $this->message('Create wishlist failure due to system error.');
             }
+
             $this->BResponse->redirect('wishlist');
         }
     }
@@ -163,8 +168,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                             $wishlistItem = $this->Sellvana_Wishlist_Model_WishlistItem->load($id);
 
                             if (empty($wlIds[$id])) {
-                                $this->message('Can not define wishlist', 'error');
-                                $this->BResponse->redirect('wishlist');
+                                continue;
                             }
                             $wlId = $wlIds[$id];
 
@@ -204,6 +208,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $deletedIds = $post['delete'];
         $error      = false;
         $locale     = BLocale::i();
+        $r          = [];
 
         foreach ($wishlists as $id => $wishlist) {
             $model = $this->Sellvana_Wishlist_Model_Wishlist->load($id);
@@ -226,16 +231,21 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         if ($this->BRequest->xhr()) {
             if ($error) {
-                $this->message('Update wishlists fail deal to system error.');
-                $this->BResponse->json(['success' => false, 'title' => $locale->_('Update wishlists fail deal to system error.')]);
+                $r = ['success' => false, 'title' => $locale->_('Update wishlists failure deal to system error.')];
+                $this->message('Update wishlists failure deal to system error.');
+            } else {
+                $r = ['success' => true, 'title' => $locale->_('Update wishlists successfull.')];
+                $this->message('Update wishlists successfull.');
             }
-            $this->message('Update wishlists successfull.');
-            $this->BResponse->json(['success' => true, 'title' => $locale->_('Update wishlists successfull.')]);
+
+            $this->BResponse->json($r);
         } else {
             if ($error) {
-                $this->message('Update wishlists fail deal to system error.');
+                $this->message('Update wishlists failure deal to system error.');
+            } else {
+                $this->message('Update wishlists successfull.');
             }
-            $this->message('Update wishlists successfull.');
+
             $this->BResponse->redirect('wishlist');
         }
     }

@@ -9,6 +9,8 @@
  * @property string $remote_ip
  * @property datetime $create_at
  * @property datetime $update_at
+ * @property string $title
+ * @property tinyint $is_default
  *
  * DI
  * @property Sellvana_Wishlist_Model_WishlistItem $Sellvana_Wishlist_Model_WishlistItem
