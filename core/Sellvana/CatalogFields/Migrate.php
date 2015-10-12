@@ -663,7 +663,7 @@ class Sellvana_CatalogFields_Migrate extends BClass
         }
     }
 
-    public function upgrade__0_5_7_0__0_5_8_0()
+    public function after__Sellvana_MultiSite__0_5_2_0()
     {
         $tProductField = $this->Sellvana_CatalogFields_Model_ProductFieldData->table();
         $tSite = $this->Sellvana_MultiSite_Model_Site->table();
@@ -674,7 +674,13 @@ class Sellvana_CatalogFields_Migrate extends BClass
             ],
             BDb::CONSTRAINTS => [
                 'site' => ['site_id', $tSite],
-            ]
+            ],
         ]);
+    }
+    public function upgrade__0_5_7_0__0_5_8_0()
+    {
+        if ($this->BMigrate->isModuleVersion('Sellvana_MultiSite', '0.5.2.0~')) {
+            $this->after__Sellvana_MultiSite__0_5_2_0();
+        }
     }
 }
