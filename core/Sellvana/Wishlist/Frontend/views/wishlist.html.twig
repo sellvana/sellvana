@@ -1,4 +1,5 @@
 {% set wishlists = THIS.get('wishlists') %}
+{% set isMultiWishlist = THIS.get('isMultiWishlist') %}
 {% set wishlist = THIS.get('wishlist').items(false, true) %}
 <noscript>
     <style type="text/css">
@@ -9,20 +10,24 @@
     <div class="col-sm-9 f-col-main">
     <header class="f-page-header">
         <h1 class="f-page-title">{{ "Wishlists" | _ }}</h1>
-        <div class="btn-group btn-xs wishlist-more-btn" role="group">
-            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                More <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a data-toggle="modal" href='#new-wishlist-modal'>{{ 'Create a Wishlists' | _ }}</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a data-toggle="modal" href='#wishlist-setting-modal'>{{ 'Wishlists Settings' | _ }}</a></li>
-            </ul>
-        </div>
+        {% if isMultiWishlist %}
+            <div class="btn-group btn-xs wishlist-more-btn" role="group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a data-toggle="modal" href='#new-wishlist-modal'>{{ 'Create a Wishlists' | _ }}</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a data-toggle="modal" href='#wishlist-setting-modal'>{{ 'Wishlists Settings' | _ }}</a></li>
+                </ul>
+            </div>
+        {% endif %}
         <noscript>
             <form action="{{ APP.href('wishlist/create') }}" method="POST">
-                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-                <button type="submit" class="btn btn-default btn-xs" role="button">{{ 'Create a Wishlists' | _ }}</button>
+                {% if isMultiWishlist %}
+                    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                    <button type="submit" class="btn btn-default btn-xs" role="button">{{ 'Create a Wishlists' | _ }}</button>
+                {% endif %}
                 <a class="btn btn-primary btn-xs" href="{{ APP.href('wishlist/settings') }}" role="button">{{ 'Wishlists Settings' | _ }}</a>
             </form>
         </noscript>
@@ -33,69 +38,76 @@
         <form name="cart" action="{{ APP.href('wishlist') }}" method="post">
             {% for wId, wishlist in wishlists %}
                 <h2>{{ wishlist.get('title') | default('Default Wishlist') }}</h2>
-                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-                <div class="table-responsive">
-                    <table class="table">
-                        <col width="30"/>
-                        <col width="60"/>
-                        <col/>
-                        <col width="180"/>
-                        <col width="70"/>
-                        <col width="70"/>
-                        <thead>
-                            <tr>
-                                <th>{{ "Select" | _ }}</th>
-                                <th colspan="2">{{ "Product" | _ }}</th>
-                                <th>{{ "Price" | _ }}</th>
-                                <th>{{ 'Move' | _ }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in wishlist.items() %}
-                                {% set p = item.product() %}
-                                <tr id="f-product-row-{{ p.get('id') }}">
-                                    <td>
-                                        <label><input type="checkbox" name="selected[]" class="selected-checkbox" value="{{ item.get('id')}}"></label>
-                                    </td>
-                                    <td>
-                                        <img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img" alt="{{ p.getName() }}"/>
-                                    </td>
-                                    <td>
-                                        <strong class="f-prod-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.getName() }}</a></strong>
-                                    </td>
-                                    <td>
-                                        <div class="price-box">
-                                            <span class="price">{{ p.getCatalogPrice() | currency }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <select data-wishlist="{{ wId }}" data-product="{{ p.get('id') }}" name="wishlist_ids[{{ item.get('id')}}]" class="slt-wishlist-move">
-                                            <option value="">{{ 'Select wishlist' | _ }}</option>
-                                            {% for oId, wl in wishlists %}
-                                                {% if wl.id != wishlist.id %}
-                                                    <option value="{{ oId }}">{{ wl.title }}</option>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                    </td>
+                {% set wishlistItems = wishlist.items() %}
+                {% if wishlistItems %}
+                    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <col width="30"/>
+                            <col width="60"/>
+                            <col/>
+                            <col width="180"/>
+                            <col width="70"/>
+                            <col width="70"/>
+                            <thead>
+                                <tr>
+                                    <th>{{ "Select" | _ }}</th>
+                                    <th colspan="2">{{ "Product" | _ }}</th>
+                                    <th>{{ "Price" | _ }}</th>
+                                    {% if isMultiWishlist and wishlists|length > 1 %}
+                                        <th>{{ 'Move' | _ }}</th>
+                                    {% endif %}
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                        <tfoot>
-                            <td colspan="4">
-                                <button type="submit" class="btn btn-primary btn-xs" name="do" value="add_to_cart.{{ wId }}">{{ "Add Selected To Cart" | _ }}</button>
-                                <button type="submit" class="btn btn-warning btn-xs" name="do" value="remove.{{ wId }}">{{ "Remove Selected" | _ }}</button>
-                                <noscript>
-                                    <button type="submit" class="btn btn-default btn-xs" name="do" value="move.{{ wId }}">{{ "Move" | _ }}</button>
-                                </noscript>
-                            </td>
-                        </tfoot>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {% for item in wishlistItems %}
+                                    {% set p = item.product() %}
+                                    <tr id="f-product-row-{{ p.get('id') }}">
+                                        <td>
+                                            <label><input type="checkbox" name="selected[]" class="selected-checkbox" value="{{ item.get('id')}}"></label>
+                                        </td>
+                                        <td>
+                                            <img src="{{ p.thumbUrl(85, 60) }}" width="85" height="60" class="product-img" alt="{{ p.getName() }}"/>
+                                        </td>
+                                        <td>
+                                            <strong class="f-prod-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.getName() }}</a></strong>
+                                        </td>
+                                        <td>
+                                            <div class="price-box">
+                                                <span class="price">{{ p.getCatalogPrice() | currency }}</span>
+                                            </div>
+                                        </td>
+                                        {% if isMultiWishlist and wishlists|length > 1 %}
+                                            <td>
+                                                <select data-wishlist="{{ wId }}" data-product="{{ p.get('id') }}" name="wishlist_ids[{{ item.get('id')}}]" class="slt-wishlist-move">
+                                                    <option value="">{{ 'Select wishlist' | _ }}</option>
+                                                    {% for oId, wl in wishlists %}
+                                                        {% if wl.id != wishlist.id %}
+                                                            <option value="{{ oId }}">{{ wl.title }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <td colspan="4">
+                                    <button type="submit" class="btn btn-primary btn-xs" name="do" value="add_to_cart.{{ wId }}">{{ "Add Selected To Cart" | _ }}</button>
+                                    <button type="submit" class="btn btn-warning btn-xs" name="do" value="remove.{{ wId }}">{{ "Remove Selected" | _ }}</button>
+                                    <noscript>
+                                        <button type="submit" class="btn btn-default btn-xs" name="do" value="move.{{ wId }}">{{ "Move" | _ }}</button>
+                                    </noscript>
+                                </td>
+                            </tfoot>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">{{ "There are no products in this wishlist" | _ }}.</div>
+                {% endif %}
             {% endfor %}
         </form>
-    {% else %}
-        <div class="alert alert-info">{{ "There are no products in wishlist" | _ }}.</div>
     {% endif %}
     </div>
     {{ THIS.view('customer/account/sidebar').set('current', 'wishlist') | raw }}
