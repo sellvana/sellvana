@@ -111,134 +111,16 @@ class Sellvana_MultiSite_Admin extends BClass
         $orm->order_by_asc('pf.site_id');
     }
 
-    public function saveProductsFieldSiteData($products)
+    public function onProductFormPostBefore($args)
     {
-        $siteValues = json_decode($this->BRequest->post('site_values'), true);
-        if (!$siteValues) {
-            return $this;
-        }
-        unset($siteValues->default);
-
-        $fields = $this->Sellvana_CatalogFields_Model_Field->getAllFields('id');
-
-        $pIds = $this->BUtil->arrayToOptions($products, '.id');
-        if (!$pIds) {
-            return $this;
-        }
-        /** @var Sellvana_CatalogFields_Model_ProductFieldData[][][][] $fieldsData */
-        $rawFieldsData = $this->Sellvana_CatalogFields_Model_ProductFieldData->orm('pf')
-            ->where_in('product_id', $pIds)
-            ->find_many();
-        $fieldsData = [];
-        foreach ($rawFieldsData as $rawData) {
-            $siteId = $rawData->get('site_id') ?: 'default';
-            if (empty($fieldsData[$rawData->get('product_id')])) {
-                $fieldsData[$rawData->get('product_id')] = [];
-            }
-
-            if (empty($fieldsData[$rawData->get('product_id')][$siteId])) {
-                $fieldsData[$rawData->get('product_id')][$siteId] = [];
-            }
-
-            if (empty($fieldsData[$rawData->get('product_id')][$siteId][$rawData->get('field_id')])) {
-                $fieldsData[$rawData->get('product_id')][$siteId][$rawData->get('field_id')] = [];
-            }
-
-            array_push($fieldsData[$rawData->get('product_id')][$siteId][$rawData->get('field_id')], $rawData);
+        /** @var Sellvana_Catalog_Model_Product $product */
+        $siteData = $this->BUtil->fromJson($this->BRequest->post('site_values'));
+        $product = &$args['model'];
+        if (!$siteData || !$product->id()) {
+            return;
         }
 
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->preloadAllFieldsOptions()->getAllFieldsOptions();
-        $optionsByLabel = [];
-        foreach ($options as $fieldId => $fieldOptions) {
-            foreach ($fieldOptions as $optionId => $option) {
-                $optionsByLabel[$fieldId][strtolower($option->get('label'))] = $option->id();
-            }
-        }
-        foreach ($products as $product) { // go over products
-#echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>"; var_dump($product->as_array());
-            $pId = $product->id();
-            $pData = $product->as_array();
-            foreach ($siteValues as $siteId => $siteValue) {
-                foreach ($siteValue as $fieldId => $value) { // go over all product fields data
-                    if (empty($fields[$fieldId])) {
-                        continue;
-                    }
-
-                    $field = $fields[$fieldId];
-                    $fId = $field->id();
-                    $fieldType = $field->get('table_field_type');
-                    $fieldCode = $field->get('field_code');
-                    $tableColumn = $this->Sellvana_CatalogFields_Model_ProductFieldData->getTableColumn($fieldType);
-
-                    if ($fieldType === 'options') {
-                        $value = explode(',', $value);
-                    } elseif (!is_array($value)) {
-                        $value = [$value];
-                    }
-
-                    foreach ($value as $singleValue) {
-                        if (true) { // if this product has this field data
-                        //if (null !== $product->get($fieldCode)) { // if this product has this field data
-                            if (!empty($fieldsData[$pId][$siteId][$fId])) { // if this field data record already exists
-                                $fData = array_shift($fieldsData[$pId][$siteId][$fId]);
-                                if (!empty($pData['_custom_fields_remove']) && in_array($fId, $pData['_custom_fields_remove'])) {
-                                    $fData->delete();
-                                    $product->set($fieldCode, null);
-                                    continue;
-                                }
-                            } else { // if this is a new entry
-                                $fData = $this->Sellvana_CatalogFields_Model_ProductFieldData->create([
-                                    'product_id' => $pId,
-                                    'field_id' => $fId,
-                                    'site_id' => $siteId,
-                                    'set_id' => (!empty($fieldsData[$pId]['default'][$fId][0])) ? $fieldsData[$pId]['default'][$fId][0]->get('set_id') : null
-                                ]);
-                            }
-                            if ($fieldType === 'options') {
-                                $valueLower = strtolower($singleValue);
-                                if (!empty($optionsByLabel[$fId][$valueLower])) { // option exists?
-                                    $singleValue = $optionsByLabel[$fId][$valueLower];
-                                } else {                                   // option doesn't exist
-                                    if ($this->Sellvana_CatalogFields_Model_ProductFieldData->getAutoCreateOptions()) { // allow option auto-creation?
-                                        $optionId = $this->Sellvana_CatalogFields_Model_FieldOption->create([
-                                            'field_id' => $fId,
-                                            'label' => $singleValue,
-                                        ])->save()->id();
-                                        $singleValue = $optionId;
-                                        $optionsByLabel[$fId][$valueLower] = $optionId;
-                                    } else { // don't auto-create
-                                        $singleValue = null;
-                                    }
-                                }
-                            }
-                            $fData->set($tableColumn, $singleValue);
-                            $fData->save();
-                        } else { // this product doesn't have data for this field
-                            if (!empty($fieldsData[$pId][$siteId][$fId])) { // there's old data
-                                foreach ($fieldsData[$pId][$siteId][$fId] as $wrongData) {
-                                    $wrongData->set($tableColumn, null); // delete old data record for this product/field
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // cleaning up deleted values
-            foreach ($fieldsData as $prodData) {
-                foreach ($prodData as $siteId => $siteData) {
-                    if ($siteId == 'default') {
-                        continue;
-                    }
-                    foreach ($siteData as $fieldData) {
-                        foreach ($fieldData as $valueData) {
-                            $valueData->delete();
-                        }
-                    }
-                }
-            }
-        }
-
-        return $this->Sellvana_CatalogFields_Model_ProductFieldData;
+        $product->set('multisite_fields', $siteData);
     }
+
 }
