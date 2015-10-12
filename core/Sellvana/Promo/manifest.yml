@@ -21,7 +21,7 @@ modules:
                     - [ "/promo/coupons/import", Sellvana_Promo_Admin_Controller.coupons_import ]
                     - [ "/promo/.action", Sellvana_Promo_Admin_Controller ]
 
-                    - ["/promo/conditions/.action", Sellvana_Promo_Admin_Controller_Conditions]
+                    - [ "/promo/conditions/.action", Sellvana_Promo_Admin_Controller_Conditions]
                     - [ "/promo/form/:id/products", Sellvana_Promo_Admin_Controller.form_products ]
                     - [ "/promo/form/:id/group", Sellvana_Promo_Admin_Controller.form_group ]
 
