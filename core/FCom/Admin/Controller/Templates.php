@@ -73,7 +73,6 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             $tplContents = file_get_contents($tplViewFile);
         } else {
             $tplViewName = '';
-            $tplViewName = '';
             $tplContents = '';
         }
         $model = new BData([
