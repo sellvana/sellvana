@@ -6,9 +6,10 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: [ views ]
+                auto_use: [ layout, views ]
                 routing:
                     - [ /rewards/balances/.action, Sellvana_Rewards_Admin_Controller_Balances ]
+                    - [ /rewards/.action, Sellvana_Rewards_Admin_Controller ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]

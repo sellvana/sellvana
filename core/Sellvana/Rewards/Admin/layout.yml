@@ -1,0 +1,19 @@
+base:
+    - { view: admin/nav, do: [[ addNav, customer/rewards, { label: Rewards, href: /rewards } ]] }
+    - view: head
+        do:
+            - [ requireJs, fcom.components, @FCom_Core/jsx/build/fcom.components ]
+            - [ requireJs, fcom.promo, @Sellvana_Promo/Admin/jsx/build/fcom.promo, [jquery, react] ]
+            - [ requireJs, fcom.promo.details, @Sellvana_Promo/Admin/jsx/build/fcom.promo.details, [react] ]
+            - [ requireJs, store, @FCom_LibJsCommon/js/store ]
+
+    - { include: lib_griddle }
+
+rewards_form_tabs:
+    - view: admin/form
+        set: { tab_view_prefix: 'reward/form/' }
+
+/rewards/form:
+    - { include: default_form }
+    - { include: rewards_form_tabs }
+

@@ -1,0 +1,39 @@
+<!--{ label: Reward Details }-->
+<!--{ pos: 10 }-->
+
+{% set validator = THIS.get('validator') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+{{ forms.hidden({field:"data_serialized", value: validator.fieldValue("data_serialized")}) }}
+<div class="form-group">
+    <label class="control-label col-md-3" for="model-conditions">{{ "Conditions"|_ }}&nbsp;
+        <a id="help-model-conditions" class="pull-right help-icon" href="#"
+           data-toggle="popover" data-trigger="focus" data-content="{{ "Configure conditions"|_ }}"
+           data-container="body">
+            <span class="glyphicon glyphicon-question-sign"></span></a>
+    </label>
+
+    <div class="col-md-5">
+        <select id="model-conditions_operator" name="model[conditions_operator]" class="form-control to-select2">
+            {{ UTIL.optionsHtml(m.fieldOptions('conditions_operator'), validator.fieldValue("conditions_operator"))|raw }}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="model-conditions_type" class="sr-only">{{ "Condition type"|_ }}</label>
+        <select id="model-conditions_type" class="form-control to-select2">
+            <option value="-1">{{ "Add Condition Type..."|_ }}</option>
+            <option value="sku">{{ "Products"|_ }}</option>
+            <option value="category">{{ "Categories"|_ }}</option>
+            <option value="combination">{{ "Attribute Combination"|_ }}</option>
+            <option value="total" {{ promo_type == 'catalog'? 'disabled':'' }}
+                    class="cart-only">{{ "Cart Total"|_ }}</option>
+            <option value="shipping" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">
+                {{ "Shipping Destination"|_ }}</option>
+        </select>
+    </div>
+</div>
+<div id="conditions-options">
+    <div style="width: 200px;margin:10px auto;" class="progress">
+        <div class="progress-bar progress-bar-info" style="float: none;width: 100%">{{ "Loading ..."|_ }}</div>
+    </div>
+</div>
