@@ -27,13 +27,7 @@
                 <label for="model-conditions_type" class="sr-only">{{ "Condition type"|_ }}</label>
                 <select id="model-conditions_type" class="form-control to-select2">
                     <option value="-1">{{ "Add Condition Type..."|_ }}</option>
-                    <option value="sku">{{ "Products"|_ }}</option>
-                    <option value="category">{{ "Categories"|_ }}</option>
-                    <option value="combination">{{ "Attribute Combination"|_ }}</option>
-                    <option value="total" {{ promo_type == 'catalog'? 'disabled':'' }}
-                            class="cart-only">{{ "Cart Total"|_ }}</option>
-                    <option value="shipping" {{ promo_type == 'catalog'? 'disabled':'' }} class="cart-only">
-                        {{ "Shipping Destination"|_ }}</option>
+                    {{ UTIL.optionsHtml(m.fieldOptions('conditions_options'))|raw }}
                 </select>
             </div>
         </div>
