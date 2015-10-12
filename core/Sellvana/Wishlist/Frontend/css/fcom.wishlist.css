@@ -23,3 +23,13 @@
 .link-wishlist .if-not-active { display: block; }
 .link-wishlist.active .if-active { display: block; }
 .link-wishlist.active .if-not-active { display: none; }
+
+#new-wishlist-modal .modal-dialog, 
+#wishlist-setting-modal .modal-dialog {
+    margin: 100px auto;
+}
+
+#new-wishlist-modal .modal-dialog { width: 400px; }
+#wishlist-setting-modal .modal-dialog { width: 600px; }
+
+.modal-header h4 { font-weight: bold; }

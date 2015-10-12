@@ -567,30 +567,32 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var actionKey = gridId + '-fcom-settings-action-' + name;
                     var actionProps = {
                         key: gridId + '-fcom-settings-action-' + name,
-                        class: action.class
+                        className: action.class
                     };
                     switch (name) {
                         case 'refresh':
-                            node = React.createElement("a", {href: "#", className: action.class, key: actionKey}, action.caption);
+                            node = React.createElement("a", React.__spread({href: "#"},  actionProps), action.caption);
                             break;
                         case 'export':
-                            node = React.createElement("button", {className: action.class, "data-action": "export", onClick: that.doMassAction, key: actionKey}, action.caption);
+                            node = React.createElement("button", React.__spread({},  actionProps, {"data-action": "export", onClick: that.doMassAction}), action.caption);
                             break;
                         case 'link_to_page':
-                            node = React.createElement("a", {href: "#", className: action.class, key: actionKey}, action.caption);
+                            node = React.createElement("a", React.__spread({href: "#"},  actionProps), action.caption);
                             break;
                         case 'edit':
-                            node = React.createElement("a", {href: "#", className: action.class + disabledClass, "data-action": "mass-edit", onClick: that.doMassAction, role: "button", key: actionKey}, action.caption);
+                            actionProps.disabled = disabledClass;
+                            node = React.createElement("a", React.__spread({href: "#"},  actionProps, {"data-action": "mass-edit", onClick: that.doMassAction, role: "button"}), action.caption);
                             break;
                         case 'delete':
-                            node = React.createElement("button", {className: action.class + disabledClass, type: "button", "data-action": "mass-delete", onClick: that.doMassAction, key: actionKey}, action.caption);
+                            actionProps.disabled = disabledClass;
+                            node = React.createElement("button", React.__spread({type: "button"},  actionProps, {"data-action": "mass-delete", onClick: that.doMassAction}), action.caption);
                             break;
                         //todo: checking again new and add type
                         case 'add':
-                            node = React.createElement("button", {className: action.class, type: "button", key: actionKey}, action.caption);
+                            node = React.createElement("button", React.__spread({},  actionProps, {type: "button"}), action.caption);
                             break;
                         case 'new':
-                            node = React.createElement("button", {className: action.class, onClick: that.handleClick, type: "button", key: actionKey}, action.caption);
+                            node = React.createElement("button", React.__spread({},  actionProps, {onClick: that.handleClick, type: "button"}), action.caption);
                             break;
                         default:
                             if (action.type) {
@@ -598,6 +600,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                                     case 'button':
                                     default:
                                         //compatibility with old backbone grid
+                                        
                                         node = React.createElement("button", {className: action.class + (action.isMassAction ? disabledClass : ''), key: actionKey, id: action.id, 
                                             type: "button", onClick: that.handleCustom.bind(null, action.callback)}, action.caption);
                                         break;

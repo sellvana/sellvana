@@ -18,6 +18,7 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
+ * @property Sellvana_Catalog_Model_ProductMediaSite $Sellvana_Catalog_Model_ProductMediaSite
  */
 class Sellvana_Catalog_Migrate extends BClass
 {
@@ -897,4 +898,33 @@ class Sellvana_Catalog_Migrate extends BClass
         ]);
     }
 
+    public function after__Sellvana_MultiSite__0_5_2_0()
+    {
+        $tSite = $this->Sellvana_MultiSite_Model_Site->table();
+        $tMedia = $this->Sellvana_Catalog_Model_ProductMedia->table();
+        $tMediaSite = $this->Sellvana_Catalog_Model_ProductMediaSite->table();
+
+        $this->BDb->ddlTableDef($tMediaSite, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'media_id' => 'int unsigned not null',
+                'site_id' => 'int unsigned not null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_media_site' => 'UNIQUE (media_id, site_id)',
+            ],
+            BDb::CONSTRAINTS => [
+                'media' => ['media_id', $tMedia],
+                'site' => ['site_id', $tSite],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_6_0__0_5_7_0()
+    {
+        if ($this->BMigrate->isModuleVersion('Sellvana_MultiSite', '0.5.2.0~')) {
+            $this->after__Sellvana_MultiSite__0_5_2_0();
+        }
+    }
 }
