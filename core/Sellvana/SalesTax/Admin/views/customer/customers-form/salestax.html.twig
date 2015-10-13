@@ -6,10 +6,19 @@
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
+
 {% set allTaxClasses = APP.instance('Sellvana_SalesTax_Model_CustomerClass').getAllTaxClasses() %}
 {% set taxClassIds = APP.instance('Sellvana_SalesTax_Model_CustomerTax').getCustomerTaxClassIds(m) %}
 
+{% set isGroupLoaded = APP.instance('BModuleRegistry').isLoaded('Sellvana_CustomerGroups') %}
+{% set useGroupTax = APP.instance('Sellvana_SalesTax_Model_CustomerGroupTax').getUseGroupTax(m) %}
+
 <fieldset name="main-product">
+    {% if isGroupLoaded %}
+    <div class="f-section">
+        {{ forms.boolean(fieldData, { field:'use_group_tax', label:'Use customer group classes', value:useGroupTax }) }}
+    </div>
+    {% endif %}
     <div class="f-section">
         {{ forms.select(fieldData, {field:'tax_class_ids', label:'Tax Classes'|_, select2: true, multiple: true,
                                     options: allTaxClasses, value:taxClassIds}) }}
