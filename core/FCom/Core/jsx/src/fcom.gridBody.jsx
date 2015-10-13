@@ -27,9 +27,9 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 return this.doRowLocalAction(event);
             }*/
             var that = this;
-            var action = event.target.dataset.action;
-            var rowId = event.target.dataset.row;
-            var folder = event.target.dataset.folder;
+            var action = event.currentTarget.dataset.action;
+            var rowId = event.currentTarget.dataset.row;
+            var folder = event.currentTarget.dataset.folder;
             var gridId = this.props.getConfig('id');
             var data = this.props.originalData ? this.props.originalData : this.props.data;
             var isLocalMode = !this.props.hasExternalResults();

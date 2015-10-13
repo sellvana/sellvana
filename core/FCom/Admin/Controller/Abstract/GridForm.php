@@ -287,6 +287,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         /** @var FCom_Core_Model_Abstract $m */
         $m = $args['model'];
+        $id = $m ? (method_exists($m, 'id') ? $m->id() : $m->get('id')) : null;
         $actions = [];
 
         $actions['back'] = [
@@ -301,7 +302,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             ]
         ];
 
-        if ($m->id()) {
+        if ($id) {
             $actions['delete'] = [
                 'button',
                 [
@@ -316,6 +317,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 ]
             ];
         }
+
         $actions['save'] = [
             'button',
             [
@@ -327,7 +329,6 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             ]
         ];
 
-        $id = $m ? (method_exists($m, 'id') ? $m->id() : $m->get('id')) : null;
         if ($id) {
             $titleFieldValue = is_string($this->_formTitleField) && preg_match('#^[a-z0-9_]+$#i', $this->_formTitleField)
                 ? $m->get($this->_formTitleField)
