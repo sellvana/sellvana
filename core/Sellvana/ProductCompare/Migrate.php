@@ -122,7 +122,7 @@ class Sellvana_ProductCompare_Migrate extends BClass
     {
         $tSet = $this->Sellvana_ProductCompare_Model_Set->table();
         $tHistory = $this->Sellvana_ProductCompare_Model_History->table();
-        
+
         $this->BDb->ddlTableDef($tSet, [
             BDb::COLUMNS => [
                 'cookie_token' => 'varchar(40)',
