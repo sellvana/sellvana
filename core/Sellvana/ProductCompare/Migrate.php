@@ -12,7 +12,7 @@
 
 class Sellvana_ProductCompare_Migrate extends BClass
 {
-    public function install__0_5_1()
+    public function install__0_5_2_0()
     {
         $tSet = $this->Sellvana_ProductCompare_Model_Set->table();
         $tSetItem = $this->Sellvana_ProductCompare_Model_SetItem->table();
@@ -23,7 +23,7 @@ class Sellvana_ProductCompare_Migrate extends BClass
         $this->BDb->ddlTableDef($tSet, [
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
-                'cookie_token' => 'binary(40) default null',
+                'cookie_token' => 'varchar(40) default null',
                 'customer_id' => 'int unsigned default null',
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime not null',
@@ -65,7 +65,6 @@ class Sellvana_ProductCompare_Migrate extends BClass
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
-                'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
                 'IDX_token_customer_update' => '(cookie_token, customer_id, update_at)',
             ],
             BDb::CONSTRAINTS => [
@@ -92,7 +91,7 @@ class Sellvana_ProductCompare_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_5_0_0__0_5_1()
+    public function upgrade__0_5_0_0__0_5_1_0()
     {
         $tHistory = $this->Sellvana_ProductCompare_Model_History->table();
         $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
@@ -115,6 +114,23 @@ class Sellvana_ProductCompare_Migrate extends BClass
             BDb::CONSTRAINTS => [
                 'customer' => ['customer_id', $tCustomer],
                 'product' => ['product_id', $tProduct],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $tSet = $this->Sellvana_ProductCompare_Model_Set->table();
+        $tHistory = $this->Sellvana_ProductCompare_Model_History->table();
+        
+        $this->BDb->ddlTableDef($tSet, [
+            BDb::COLUMNS => [
+                'cookie_token' => 'varchar(40)',
+            ],
+        ]);
+        $this->BDb->ddlTableDef($tHistory, [
+            BDb::KEYS => [
+                'UNQ_cookie_token' => BDb::DROP,
             ],
         ]);
     }
