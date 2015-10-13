@@ -140,6 +140,8 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
 
         $this->setDate('from_date', $this->get("from_date"));
         $this->setDate('to_date', $this->get("to_date"));
+        $this->set('limit_per_customer', (int)$this->get('limit_per_customer'));
+        $this->set('limit_per_promo', (int)$this->get('limit_per_promo'));
 
         return true;
     }
