@@ -76,4 +76,31 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
             ->where($data['key'], $data['value'])->find_many());
         $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
     }
+
+    /**
+     * get config for grid: all customer groups
+     * @param $group Sellvana_CustomerGroups_Model_Group
+     * @return array
+     */
+    public function getAllCustomerGroupsConfig($group)
+    {
+        $config            = parent::gridConfig();
+        $config['id']      = 'group_all_customer_groups_grid_' . $group->id;
+        $config['columns'] = [
+            ['type' => 'row_select'],
+            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+            ['name' => 'title', 'label' => 'Title', 'index' => 'c.firstname', 'width' => 400],
+            ['name' => 'code', 'label' => 'Code', 'index' => 'c.lastname', 'width' => 200],
+        ];
+        $config['actions'] = [
+            'add' => ['caption' => 'Add selected customer groups']
+        ];
+        $config['filters'] = [
+            ['field' => 'title', 'type' => 'text'],
+            ['field' => 'code', 'type' => 'text'],
+            '_quick' => ['expr' => 'title like ? or code like ? or c.id=?', 'args' => ['?%', '%?%', '?']]
+        ];
+
+        return ['config' => $config];
+    }
 }
