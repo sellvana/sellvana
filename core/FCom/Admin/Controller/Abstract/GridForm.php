@@ -28,6 +28,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_formTitleField = 'id';
     protected $_formNoNewRecord = false;
 
+    protected $_messages = [];
+
 
     public function __construct()
     {
@@ -381,6 +383,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
                 if ($validated) {
                     $model->save();
+                    $result = ['status' => 'success'];
                     $this->message('Changes have been saved');
                     if ($r->post('do') === 'save_and_continue') {
                         $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $model->id();
@@ -388,6 +391,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 } else {
                     $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                     $args['validate_failed'] = true;
+                    $result = ['status' => 'error'];
                     $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
                 }
 
@@ -402,8 +406,13 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $traceMsg = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $traceMsg);
             $this->message($e->getMessage() . ': ' . $traceMsg, 'error');
             $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
+            $result = ['status' => 'error'];
         }
+
         if ($r->xhr()) {
+            $result['messages'] = $this->_messages;
+            $result['redirect'] = $r->post('do') !== 'save_and_continue' ? $this->BApp->href($this->_gridHref) : false;
+            $this->BResponse->json($result);
             $this->forward('form', null, ['id' => $id]);
         } else {
             $this->BResponse->redirect($redirectUrl);
@@ -454,5 +463,27 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             }
             $this->message($msg, 'error');
         }
+    }
+
+    /**
+     * @param $msg
+     * @param string $type
+     * @param string $tag
+     * @param array $options
+     * @return $this
+     */
+    public function message($msg, $type = 'success', $tag = 'admin', $options = [])
+    {
+        if (is_array($msg)) {
+            array_walk($msg, [$this->BLocale, '_']);
+        } else {
+            $msg = $this->BLocale->_($msg);
+        }
+        if ($this->BRequest->xhr()) {
+            $this->_messages[] = ['text' => $msg, 'type' => $type, 'options' => $options];
+        } else {
+            $this->BSession->addMessage($msg, $type, $tag, $options);
+        }
+        return $this;
     }
 }

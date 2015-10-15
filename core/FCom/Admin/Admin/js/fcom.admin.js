@@ -1,4 +1,4 @@
-var fcomAdminDeps = ["jquery", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch'];
+var fcomAdminDeps = ["jquery", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch', 'jquery.pnotify'];
 if (require.specified('ckeditor')) {
     fcomAdminDeps.push('ckeditor');
 }
@@ -1271,23 +1271,31 @@ define(fcomAdminDeps, function ($) {
          * @param el
          * @returns {boolean}
          */
-        function saveAll(el) {
-            return true;
+        function saveAll(el, saveAndContinue) {
             //TODO
             var form = $(el).closest('form');
+            $(form).submit(function(event) {
+                event.preventDefault();
+            });
+            $(form).trigger('submit');
             var postData = form.serializeArray();
             var url_post = options.url_get + (options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post + 'tabs=ALL&mode=view', postData, function (data, status, req) {
                 FCom.Admin.log(data);
                 $.pnotify({
-                    pnotify_title: data.message || 'The form has been saved',
+                    pnotify_title: data.messages[0].text || 'The form has been saved',
                     pnotify_type: data.status == 'error' ? 'error' : null,
                     pnotify_history: false,
-                    pnotify_nonblock: true, pnotify_nonblock_opacity: .3
+                    pnotify_nonblock: true, pnotify_nonblock_opacity: .3,
+                    pnotify_delay: 5000
                 });
-                loadTabs(data);
-                for (var i in data.tabs) {
-                    tabClass(i);
+                if (data.redirect) {
+                    document.location = data.redirect;
+                } else {
+                    loadTabs(data);
+                    for (var i in data.tabs) {
+                        tabClass(i);
+                    }
                 }
             });
             return false;
