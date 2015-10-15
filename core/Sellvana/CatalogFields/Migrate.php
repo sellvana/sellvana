@@ -683,4 +683,14 @@ class Sellvana_CatalogFields_Migrate extends BClass
             $this->after__Sellvana_MultiSite__0_5_2_0();
         }
     }
+
+    public function upgrade__0_5_8_0__0_5_9_0()
+    {
+        $set = $this->Sellvana_CatalogFields_Model_Set;
+        $set->create([
+            'set_type' => 'product',
+            'set_name' => 'Default',
+            'set_code' => 'default',
+        ])->save();
+    }
 }

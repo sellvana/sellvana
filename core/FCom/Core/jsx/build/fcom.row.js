@@ -81,10 +81,17 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                     )
                                 );
                             } else {
-                                //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
-                                    React.createElement("button", React.__spread({className: "btn btn-link " + btn.cssClass, key: index, title: btn.title ? btn.title : "", type: "button", "data-action": btn.name, "data-row": row.id},  btn.attrs, {onClick: that.props.doRowAction.bind(null, btn.callback)}), 
-                                        React.createElement("i", {className: btn.icon, "data-action": btn.name, "data-row": row.id, "data-folder": row.folder ? row.folder : null}), 
+                                    React.createElement("button", React.__spread({className: "btn btn-link " + btn.cssClass, 
+                                            key: index, 
+                                            title: btn.title ? btn.title : "", 
+                                            type: "button", 
+                                            "data-action": btn.name, 
+                                            "data-row": row.id, 
+                                            "data-folder": row.folder ? row.folder : null}, 
+                                            btn.attrs, 
+                                            {onClick: that.props.doRowAction.bind(null, btn.callback)}), 
+                                        React.createElement("i", {className: btn.icon}), 
                                         btn.caption
                                     )
                                 );

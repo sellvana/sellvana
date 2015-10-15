@@ -70,7 +70,9 @@ class BUtil extends BClass
     *
     * @var string
     */
-    protected static $_defaultCharPool = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ';
+    const CHARPOOL_DEFAULT = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ',
+          CHARPOOL_ALNUMCAP = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+          CHARPOOL_ALNUMLOW = '1234567890abcdefghijklmnopqrstuvwxyz';
 
     /**
     * Shortcut to help with IDE auto-completion
@@ -837,11 +839,8 @@ class BUtil extends BClass
      * @param string $chars allowed characters to be used
      * @return string
      */
-    public function randomString($strLen = 8, $chars = null)
+    public function randomString($strLen = 8, $chars = self::CHARPOOL_DEFAULT)
     {
-        if (null === $chars) {
-            $chars = static::$_defaultCharPool;
-        }
         $charsLen = strlen($chars)-1;
         $str = '';
         mt_srand();
@@ -878,11 +877,8 @@ class BUtil extends BClass
      * @param null $chars
      * @return string
      */
-    public function nextStringValue($string = '', $chars = null)
+    public function nextStringValue($string = '', $chars = self::CHARPOOL_DEFAULT)
     {
-        if (null === $chars) {
-            $chars = static::$_defaultCharPool; // avoid leading 0
-        }
         $pos = strlen($string);
         $lastChar = substr($chars, -1);
         while (--$pos >= -1) {

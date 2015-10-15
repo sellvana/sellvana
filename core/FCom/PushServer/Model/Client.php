@@ -384,7 +384,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                     $this->BDebug->log("{$logId} SYNC EMPTY: " . print_r($connections, 1));
                 }
 
-                $messages[] = ['channel' => 'client', 'signal' => 'noop'];
+                //TODO: figure out in which cases this is needed
+                #$messages[] = ['channel' => 'client', 'signal' => 'noop'];
             }
         }
         // foreach ($connections as $connId => $conn) {
