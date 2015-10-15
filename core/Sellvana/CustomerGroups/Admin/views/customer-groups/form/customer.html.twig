@@ -1,15 +1,10 @@
+<!--{ label: {{ 'Customers'|_ }}}-->
+<!--{ pos: 20 }-->
 {% set m = THIS.get('model') %}
 {% set customerCtrl = APP.instance('Sellvana_Customer_Admin_Controller_Customers') %}
 <input type='hidden' name='model[customer_ids_add]' id='customer_ids_add'/>
 <input type='hidden' name='model[customer_ids_remove]' id='customer_ids_remove'/>
 
-<script>
-/*
-*Not used
-*/
-
-
-</script>
 
 {{ THIS.view('core/backbonegrid').set('grid', customerCtrl.getGroupCustomersConfig(m)) | raw }}
 

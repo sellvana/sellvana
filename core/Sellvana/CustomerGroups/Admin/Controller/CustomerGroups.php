@@ -15,14 +15,14 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
     protected $_gridTitle = 'Customer Groups';
     protected $_recordName = 'Customer Group';
     protected $_mainTableAlias = 'cg';
+    protected $_permission = 'customer_groups/manage';
     protected $_navPath = 'customer/customer-groups';
-    protected $_permission = 'customer_groups';
+    protected $_formViewPrefix = 'customer-groups/form/';
     protected $_formTitleField = 'title';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
@@ -34,7 +34,6 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
                 'validation' => ['required' => true, 'unique' => $this->BApp->href('customer-groups/unique')]],
         ];
         $config['actions'] = [
-            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),
             'edit' => true,
             'delete' => true
         ];

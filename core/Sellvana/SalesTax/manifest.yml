@@ -17,6 +17,7 @@ modules:
             - [ Sellvana_Sales_Model_Cart_Total_Tax::calculate, Sellvana_SalesTax_Main.onCartTaxCalculate ]
             - [ Sellvana_Catalog_Model_Product::onAfterSave, Sellvana_SalesTax_Main.onProductAfterSave ]
             - [ Sellvana_Customer_Model_Customer::onAfterSave, Sellvana_SalesTax_Main.onCustomerAfterSave ]
+            - [ Sellvana_CustomerGroups_Model_Group::onAfterSave, Sellvana_SalesTax_Main.onCustomerGroupAfterSave ]
 
         default_config:
             modules:

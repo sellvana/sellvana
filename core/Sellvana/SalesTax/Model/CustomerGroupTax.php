@@ -13,14 +13,14 @@ class Sellvana_SalesTax_Model_CustomerGroupTax extends FCom_Core_Model_Abstract
         'skip'       => ['id'],
         'unique_key' => ['customer_group_id', 'customer_class_id'],
         'related'    => [
-            'customer_group_id'       => 'Sellvana_CustomerGroups_Model_Group.id',
+            'customer_group_id' => 'Sellvana_CustomerGroups_Model_Group.id',
             'customer_class_id' => 'Sellvana_SalesTax_Model_CustomerClass.id'
         ],
     ];
 
     public function getCustomerTaxClassIds($group)
     {
-        return $this->orm()->where('customer_id', $group->id())->find_many_assoc('id', 'customer_class_id');
+        return $this->orm()->where('customer_group_id', $group->id())->find_many_assoc('id', 'customer_class_id');
     }
 
     /**
