@@ -51,6 +51,7 @@ class Sellvana_Catalog_Admin extends BClass
             ->allowFolder('media/category/images')
             ->allowFolder('media/product/images')
             ->allowFolder('media/product/attachment')
+            ->allowFolder('media/product/videos')
             ->allowFolder('storage/import/products')
             ->allowFolder('{random}/import/products')
         ;

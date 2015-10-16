@@ -1,0 +1,138 @@
+{% set m = THIS.get('model') %}
+{% set prodVideosConfig = APP.instance('Sellvana_Catalog_Admin_Controller_Products').productVideosGridConfig(m) %}
+
+{% set type = 'videos' %}
+{% set targetType = 'product' %}
+{% set medialibConfig = {
+    id: 'all_' ~ type,
+    mode: 'videos',
+    type: 'product-videos',
+    title: 'Videos',
+    folder: 'media/product/videos',
+    config: {actions: {delete: {caption : 'Remove'}}}
+} %}
+
+{% set attachmentsConfig = {
+    type: type,
+    targetType: targetType,
+    elementContainer: '#tab-videos',
+    medialibConfig: medialibConfig,
+    gridConfig: prodVideosConfig
+} %}
+{% set combineType = targetType ~ type %}
+{{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}
+
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'griddle.fcomModalForm', 'jquery.validate', 'jquery.media-element'], function ($, _, React, FComGriddleComponent, Components, FComModalForm) {
+        var productVideosGrid = {{ combineType }}Grid, productVideosNode, videoExt, editedRow;
+        if (productVideosGrid) {
+            $(productVideosGrid.getDOMNode())
+                .on('removedRows.griddle', function (e, rows) {
+                    // 
+                }).on('addedRows.griddle', function (e, rows) {
+                    // 
+                });
+        }
+
+        window.savePreviewModal = function(modal) {
+            var $form = productVideosNode.find('form'),
+                id = $form.find('#id').val(),
+                url = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
+                hash = { oper: id ? 'edit' : 'add' };
+
+            $form.find('textarea, input, select').each(function() {
+                var key = $(this).attr('id');
+                var val = $(this).val();
+                hash[key] = productVideosGrid.html2text(val);
+            });
+
+            $form.validate();
+            if ($form.valid()) {
+                $.post(url, hash, function(data) {
+                    if (data.success == true) {
+                        _(hash).each(function(val, i) {
+                            editedRow[i] = val;
+                        });
+                        productVideosGrid.updateRows([editedRow]);
+                        modal.close();
+                    } else {
+                        alert('error when save');
+                        return false;
+                    }
+                });
+            }
+        }
+
+        /**
+         * Capitalize first letter
+         * 
+         * @param  {string} string 
+         * @return {string}
+         */
+        function _capitalizeFirstLetter(string) {
+            return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        window.showModalToPreviewVideo = function(row) {
+            editedRow = row;
+            videoExt = row.file_name.slice(row.file_name.lastIndexOf('.') + 1);
+            var modalContainerEle = document.getElementById('fcom_append_form');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                React.createElement(Components.Modal, {
+                        id: "previewProductVideo",
+                        show: true,
+                        title: 'Video Details',
+                        confirm: 'Save changes',
+                        cancel: 'Close',
+                        onLoad: function(modal) {
+                            productVideosNode = $(modal.getDOMNode());
+                            productVideosNode.find('.modal-dialog').css('width', '960px');
+                        },
+                        onConfirm: window.savePreviewModal
+                    },
+                    React.DOM.div({ className: "row f-grid-wrapper col-sm-12" }, 
+                        React.DOM.div({ id: "video-container", style: { padding: '0 10px' }, className: 'col-sm-7' },
+                            React.DOM.video({ width: "480", height: "320", id: "video" + row.id, controls: "controls", preload: "none" },
+                                React.DOM.source({ src: "{{ APP.src() }}" + row.folder + '/' + row.file_name,  type: "video/mp4"  }),
+                                React.DOM.track({ kind: "subtitles", src: "", srclang: "en" })
+                            )
+                        ),
+                        React.DOM.div({ id: "video-infos", className: 'col-sm-5', style: { background: '#F3F3F3' } },
+                            React.DOM.div({ id: 'video-details' },
+                                React.DOM.h3(null, _capitalizeFirstLetter(row.file_name.slice(0, row.file_name.lastIndexOf('.'))) + ' Details'),
+                                React.DOM.div({ className: 'file-name' }, 
+                                    React.DOM.strong(null, 'File name: '),
+                                    React.DOM.span(null, row.file_name)
+                                ),
+                                React.DOM.div({ className: 'file-type' }, 
+                                    React.DOM.strong(null, 'File type: '),
+                                    React.DOM.span(null, 'video/' + videoExt)
+                                ),
+                                React.DOM.div({ className: 'folder' }, 
+                                    React.DOM.strong(null, 'Folder: '),
+                                    React.DOM.span(null, row.folder)
+                                ),
+                                React.DOM.div({ className: 'file-size' }, 
+                                    React.DOM.strong(null, 'File size: '),
+                                    React.DOM.span(null, Math.ceil(row.file_size/1024000) + ' MB')
+                                ),
+                                React.DOM.div({ className: 'create-at' }, 
+                                    React.DOM.strong(null, 'Upload on: '),
+                                    React.DOM.span(null, row.create_at)
+                                )
+                            ),
+                            React.DOM.hr(),
+                            React.createElement(FComModalForm, { columnMetadata: productVideosGrid.getConfig('columns'), id: productVideosGrid.getConfig('id'), row: row, hiddenId: row.file_id }),
+                            React.DOM.hr()
+                        )
+                    )
+                ), modalContainerEle
+            );
+            
+            $('video,audio').mediaelementplayer({
+                features: ['playpause','progress','current','duration','tracks','volume','fullscreen']
+            });
+        }
+    });
+</script>

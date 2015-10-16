@@ -496,7 +496,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                                 'update_at' => $this->BDb->now()
                             ])->save();
                         } else {
-                            if(in_array($type, ['product-images', 'product-attachments'])
+                            if (in_array($type, ['product-images', 'product-attachments', 'product-videos'])
                                 && $this->BModuleRegistry->isLoaded('Sellvana_Catalog')
                             ) {
                                 $associatedProducts = $this->Sellvana_Catalog_Model_ProductMedia
