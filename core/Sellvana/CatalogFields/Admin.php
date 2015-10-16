@@ -123,6 +123,7 @@ class Sellvana_CatalogFields_Admin extends BClass
         $model = $args['model'];
         $data = &$args['data'];
 
+        $this->BApp->set('ignore_custom_fields', true);
         if (!empty($data['custom_fields'])) {
             // Save custom fields on fcom_product_custom
             $this->_processProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
