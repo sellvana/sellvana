@@ -33,6 +33,14 @@ class Sellvana_CatalogFields_Main extends BClass
     }
 
     /**
+     * @return bool
+     */
+    public function isDisabled()
+    {
+        return (bool)$this->_disabled;
+    }
+
+    /**
      * @param array $args
      */
     public function onProductVariantFindAfter($args)
@@ -60,7 +68,7 @@ class Sellvana_CatalogFields_Main extends BClass
      */
     public function onProductAfterSave($args)
     {
-        if (!$this->BApp->get('ignore_custom_fields')) {
+        if (!$this->isDisabled()) {
             $this->Sellvana_CatalogFields_Model_ProductFieldData->saveProductsFieldData([$args['model']]);
         }
     }
