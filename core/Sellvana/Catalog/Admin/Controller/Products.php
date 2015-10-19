@@ -450,8 +450,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'id' => 'product_videos',
                 'caption' => 'Product Videos',
                 'data_mode' => 'local',
-                'baseSrc' => rtrim($this->BConfig->get('web/base_src'), '/') . '/',
-                'data' => $data,
+                'data' => $this->_processMediaLink($data),
                 'columns' => [
                     ['type' => 'row_select'],
                     ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
@@ -1326,5 +1325,23 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
 
         $this->BResponse->json($result);
+    }
+
+    /**
+     * Collect media source link
+     * 
+     * @param  array $data
+     * @return array
+     */
+    protected function _processMediaLink($mediaItems) {
+        if (empty($mediaItems)) {
+            return  [];
+        }
+
+        foreach ($mediaItems as $key => $item) {
+            $mediaItems[$key]['source'] = sprintf('%s/%s/%s', rtrim($this->BConfig->get('web/base_src'), '/'), $item['folder'], $item['file_name']);
+        }
+
+        return $mediaItems;
     }
 }

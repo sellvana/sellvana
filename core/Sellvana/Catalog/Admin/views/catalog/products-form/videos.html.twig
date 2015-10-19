@@ -97,7 +97,7 @@
                         productVideosGrid.updateRows([editedRow]);
                         modal.close();
                     } else {
-                        alert('error when save');
+                        alert('Error when save');
                         return false;
                     }
                 });
@@ -125,30 +125,30 @@
                     React.DOM.div({ className: "row f-grid-wrapper col-sm-12" }, 
                         React.DOM.div({ id: "video-container", style: { padding: '0 10px' }, className: 'col-sm-7' },
                             React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
-                                React.DOM.source({ src: productVideosGrid.getConfig('baseSrc') + row.folder + '/' + row.file_name,  type: "video/" + videoExt  })
+                                React.DOM.source({ src: row.source,  type: "video/" + videoExt  })
                             )
                         ),
                         React.DOM.div({ id: "video-infos", className: 'col-sm-5', style: { background: '#F3F3F3' } },
                             React.DOM.div({ id: 'video-details' },
-                                React.DOM.h3(null, 'Video Details'),
+                                React.DOM.h3(null, "{{ 'Video Details' | _ }}"),
                                 React.DOM.div({ className: 'file-name' }, 
-                                    React.DOM.strong(null, 'File name: '),
+                                    React.DOM.strong(null, "{{ 'File name: ' | _ }}"),
                                     React.DOM.span(null, row.file_name)
                                 ),
                                 React.DOM.div({ className: 'file-type' }, 
-                                    React.DOM.strong(null, 'File type: '),
+                                    React.DOM.strong(null, "{{ 'File type: ' | _ }}"),
                                     React.DOM.span(null, 'video/' + videoExt)
                                 ),
                                 React.DOM.div({ className: 'folder' }, 
-                                    React.DOM.strong(null, 'Folder: '),
+                                    React.DOM.strong(null, "{{ 'Folder: ' | _ }}"),
                                     React.DOM.span(null, row.folder)
                                 ),
                                 React.DOM.div({ className: 'file-size' }, 
-                                    React.DOM.strong(null, 'File size: '),
+                                    React.DOM.strong(null, "{{ 'File size: ' | _ }}"),
                                     React.DOM.span(null, Math.ceil(row.file_size/1024000) + ' MB')
                                 ),
                                 React.DOM.div({ className: 'create-at' }, 
-                                    React.DOM.strong(null, 'Upload on: '),
+                                    React.DOM.strong(null, "{{ 'Upload on: ' | _ }}"),
                                     React.DOM.span(null, row.create_at)
                                 )
                             ),
@@ -164,8 +164,8 @@
                 features: ['playpause','progress','current','duration','tracks','volume','fullscreen']
             });
 
-            $.validator.addMethod('validateVideoName', validateVideoName, '{{"File name must contains supported suffix."|_}}');
-            $.validator.addMethod('validateVideoExtension', validateVideoExtension, '{{"File extention must be "|_}}' + videoExt);
+            $.validator.addMethod('validateVideoName', validateVideoName, '{{ "Incorrect name or must contains supported extension suffix." | _ }}');
+            $.validator.addMethod('validateVideoExtension', validateVideoExtension, '{{ "File extention must be " | _ }}' + videoExt);
             $.validator.addClassRules('valid-video-name', {
                 validateVideoName: true,
                 validateVideoExtension: true
