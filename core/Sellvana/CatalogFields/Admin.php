@@ -13,6 +13,7 @@
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
  */
 class Sellvana_CatalogFields_Admin extends BClass
 {
@@ -123,6 +124,7 @@ class Sellvana_CatalogFields_Admin extends BClass
         $model = $args['model'];
         $data = &$args['data'];
 
+        $this->Sellvana_CatalogFields_Main->disable();
         if (!empty($data['custom_fields'])) {
             // Save custom fields on fcom_product_custom
             $this->_processProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
