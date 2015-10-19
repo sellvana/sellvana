@@ -351,7 +351,7 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             }
         }
 
-        if (!empty(array_keys($fetch))){
+        if (count(array_keys($fetch))){
             $relatedData = $this->FCom_Core_Model_ImportExport_Id->orm()
                 ->join(
                   'FCom_Core_Model_ImportExport_Model',
