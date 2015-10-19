@@ -1,27 +1,133 @@
 <!--{ label: {{ 'Customers'|_ }}}-->
 <!--{ pos: 20 }-->
+
 {% set m = THIS.get('model') %}
-{% set customerCtrl = APP.instance('Sellvana_Customer_Admin_Controller_Customers') %}
-<input type='hidden' name='model[customer_ids_add]' id='customer_ids_add'/>
-<input type='hidden' name='model[customer_ids_remove]' id='customer_ids_remove'/>
 
+{% set allCustomersConfig = APP.instance('Sellvana_Customer_Admin_Controller_Customers').getAllCustomersConfig(m) %}
+{% set custmerAttachConfigCompiled = THIS.view('core/griddle').set('grid', allCustomersConfig).getGridConfig() %}
+{% set customerGroupConfig = APP.instance('Sellvana_CustomerGroups_Admin_Controller_CustomerGroups').getGroupCustomersConfig(m) %}
 
-{{ THIS.view('core/backbonegrid').set('grid', customerCtrl.getGroupCustomersConfig(m)) | raw }}
+<input type='hidden' name='model[customers][add]' id='customer_ids_add'/>
+<input type='hidden' name='model[customers][del]' id='customer_ids_remove'/>
 
-<a role="button" href="#customer-grid-add" data-toggle="modal" style='display:none;' id='btn_add_customer'>{{ "Add"|_ }}</a>
-<div class='modal fade' id='customer-grid-add' tabindex='-1'>
-    <div class='modal-dialog' style='width:900px;'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>{{ "Add user"|_ }}</h4>
-            </div>
-            <div class='modal-body'>
-                {{ THIS.view('core/backbonegrid').set('grid', customerCtrl.getAllCustomersConfig(m)) | raw }}
-            </div>
-            <div class='modal-footer'>
-                <button class='btn btn-default btn-close group-customer-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>
-        </div>
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'],
+            function ($, _, React, FComGriddleComponent, Components) {
+                var mainGrid, attachGrid;
+
+                /**
+                 * calc rows when save
+                 * @param rows
+                 * @param ids
+                 * @returns {Array}
+                 */
+                function calcAddRemoveRows(rows, ids) {
+                    var temp = [];
+                    rows.forEach(function (row) {
+                        if (_.contains(ids, row.id) !== false) {
+                            temp.push(row.id);
+                        }
+                    });
+                    return temp;
+                }
+
+                /**
+                 * callback function for top action to show modal to add customers
+                 * @param grid
+                 */
+                window.showModalToAddCustomer = function (grid) {
+//                    debugger;
+                    mainGrid = grid;
+                    var modalContainerEle = document.getElementById('{{ customerGroupConfig.config.id }}-modal');
+                    React.unmountComponentAtNode(modalContainerEle);
+                    React.render(
+                            React.createElement(Components.Modal, {
+                                        className: "GroupProductModal",
+                                        show: true,
+                                        title: 'Customers List',
+                                        confirm: 'Add',
+                                        cancel: 'Close',
+                                        onLoad: function (modal) {
+                                            var relatedNode = $(modal.getDOMNode());
+                                            relatedNode.find('.modal-dialog').css('width', '900px');
+                                        },
+                                        onConfirm: window.addSelectedCustomer
+                                    },
+                                    React.createElement('div', {className: 'f-grid-wrapper', id: 'taxProductList'})
+                            ), modalContainerEle);
+                    var custmerAttachConfigCompiled = {{ UTIL.toJson(custmerAttachConfigCompiled) | raw }};
+                    var attachGridContainerEle = document.getElementById('taxProductList');
+                    var instanceAttachGrid = React.render(
+                            React.createElement(FComGriddleComponent, {config: custmerAttachConfigCompiled}),
+                            attachGridContainerEle
+                    );
+
+                    if (typeof instanceAttachGrid.refs[custmerAttachConfigCompiled.id] !== 'undefined') {
+                        attachGrid = instanceAttachGrid.refs[custmerAttachConfigCompiled.id];
+                    }
+                };
+
+                /**
+                 * add selected customers from full customers grid to tax-customers grid
+                 * @param modal
+                 */
+                window.addSelectedCustomer = function (modal) {
+                    var selectedRows = attachGrid.getSelectedRows();
+                    if (selectedRows.length) {
+                        var addRows = [];
+                        //process selected rows
+                        selectedRows.forEach(function (attachRow) {
+                            if (!_.findWhere(mainGrid.getRows(), {id: attachRow.id})) {
+                                addRows.push(attachRow);
+                            }
+
+                            if (addRows.length) {
+                                mainGrid.addRows(addRows);
+                            }
+                        });
+                        modal.close();
+                    } else {
+                        alert('please choose at least one product');
+                    }
+                };
+
+                window.setGroupCustomerMainGrid = function (grid) {
+                    mainGrid = grid;
+                    var addedIds = [], removedIds = [],
+                            arrCurrentAddedIds, arrCurrentRemovedIds, temp,
+                            originIds = _.pluck(grid.getRows(), 'id'),
+                            taxProdIdsAddEle = $('#customer_ids_add'),
+                            taxProdIdsRemovedEle = $('#customer_ids_remove');
+
+                    $(mainGrid.getDOMNode())
+                            .on('removedRows.griddle', function (e, removedRows, grid) {
+                                removedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                                var diffRemoveIds = _.difference(originIds, removedIds);
+                                taxProdIdsRemovedEle.val(diffRemoveIds.join(','));
+                                arrCurrentAddedIds = taxProdIdsAddEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentAddedIds)) {
+                                    temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                                    taxProdIdsAddEle.val(temp.join(','));
+                                }
+                            })
+                            .on('addedRows.griddle', function (e, addedRows, grid) {
+                                addedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                                var diffAddIds = _.difference(addedIds, originIds);
+                                taxProdIdsAddEle.val(diffAddIds.join(','));
+                                arrCurrentRemovedIds = taxProdIdsRemovedEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentRemovedIds)) {
+                                    temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                                    taxProdIdsRemovedEle.val(temp.join(','));
+                                }
+                            });
+                };
+
+            });
+</script>
+
+<div class='row'>
+    <div class='col-sm-12'>
+        {{ THIS.view('core/griddle').set('grid', customerGroupConfig) | raw }}
     </div>
 </div>
+

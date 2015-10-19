@@ -55,15 +55,25 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
 
     public function formPostAfter($args)
     {
-        $data = $args['data'];
+        parent::formPostAfter($args);
         $model = $args['model'];
-        if (!empty($data['removed_ids'])) {
-            $customerIds = explode(",", $data['removed_ids']);
-            $this->Sellvana_Customer_Model_Customer->update_many(['customer_group' => null], ['id' => $customerIds]);
-        }
-        if (!empty($data['rows'])) {
-            $customerIds = explode(",", $data['rows']);
-            $this->Sellvana_Customer_Model_Customer->update_many(['customer_group' => $model->id()], ['id' => $customerIds]);
+        $data = $this->BRequest->post();
+        if (!empty($data['model']['customers'])) {
+            $customers = $data['model']['customers'];
+            if (!empty($customers['add'])) {
+                $customerIds = explode(",", $customers['add']);
+                $this->Sellvana_Customer_Model_Customer->update_many(
+                    ['customer_group' => $model->id()],
+                    ['id' => $customerIds]
+                );
+            }
+            if (!empty($customers['del'])) {
+                $customerIds = explode(",", $customers['del']);
+                $this->Sellvana_Customer_Model_Customer->update_many(
+                    ['customer_group' => null],
+                    ['id' => $customerIds]
+                );
+            }
         }
     }
 
@@ -101,5 +111,61 @@ class Sellvana_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin
         ];
 
         return ['config' => $config];
+    }
+
+    /**
+     * get config for grid: customers of group
+     * @param $group Sellvana_CustomerGroups_Model_Group
+     * @return array
+     */
+    public function getGroupCustomersConfig($group)
+    {
+        $class = $this->Sellvana_Customer_Model_Customer;
+        $orm = $class::i()->orm('c')
+            ->select(['c.id', 'c.firstname', 'c.lastname', 'c.email'])
+            ->join('Sellvana_CustomerGroups_Model_Group', ['c.customer_group', '=', 'cg.id'], 'cg')
+            ->where('c.customer_group', $group ? $group->id : 0);
+
+        $gridId = 'group_customers_grid_' . $group->id;;
+
+        $config['config'] = [
+            'id' => $gridId,
+            'data' => null,
+            'data_mode' => 'local',
+            'columns' => [
+                ['type' => 'row_select'],
+                ['name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200],
+                ['name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200],
+                ['name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200],
+            ],
+            'actions' => [
+                'delete' => ['caption' => 'Remove'],
+                'add-group-customer' => [
+                    'caption' => 'Add customer',
+                    'type' => 'button',
+                    'id' => 'add-customer-from-grid',
+                    'class' => 'btn-primary',
+                    'callback' => 'showModalToAddCustomer'
+                ]
+            ],
+            'filters' => [
+                ['field' => 'firstname', 'type' => 'text'],
+                ['field' => 'lastname', 'type' => 'text'],
+                ['field' => 'email', 'type' => 'text']
+            ],
+            'events' => ['init', 'add', 'mass-delete'],
+            'grid_before_create' => $gridId . '_register'
+        ];
+
+        $data = $this->BDb->many_as_array($orm->find_many());
+
+        $config['config']['data'] = $data;
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'setGroupCustomerMainGrid'
+        ];
+
+        return $config;
     }
 }

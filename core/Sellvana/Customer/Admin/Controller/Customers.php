@@ -201,46 +201,6 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
     }
 
     /**
-     * get config for grid: customers of group
-     * @param $group Sellvana_CustomerGroups_Model_Group
-     * @return array
-     */
-    public function getGroupCustomersConfig($group)
-    {
-        $class = $this->_modelClass;
-        $orm = $class::i()->orm('c')
-            ->select(['c.id', 'c.firstname', 'c.lastname', 'c.email'])
-            ->join('Sellvana_CustomerGroups_Model_Group', ['c.customer_group', '=', 'cg.id'], 'cg')
-            ->where('c.customer_group', $group ? $group->id : 0);
-
-        $config = parent::gridConfig();
-
-        // TODO for empty local grid, it throws exception
-        unset($config['orm']);
-        $config['data'] = $orm->find_many();
-        $config['id'] = 'group_customers_grid_' . $group->id;
-        $config['columns'] = [
-            ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true],
-            ['name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200],
-            ['name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200],
-            ['name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200],
-        ];
-        $config['actions'] = [
-            'add' => ['caption' => 'Add customer'],
-        ];
-        $config['filters'] = [
-            ['field' => 'firstname', 'type' => 'text'],
-            ['field' => 'lastname', 'type' => 'text'],
-            ['field' => 'email', 'type' => 'text'],
-        ];
-        $config['data_mode'] = 'local';
-
-
-        return ['config' => $config];
-    }
-
-    /**
      * get config for grid: all customer
      * @param $group Sellvana_CustomerGroups_Model_Group
      * @return array
