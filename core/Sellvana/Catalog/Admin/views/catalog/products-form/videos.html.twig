@@ -34,8 +34,42 @@
                 });
         }
 
+        /**
+         * Get file extension
+         * @param  {String} str
+         * @return {String}
+         */
+        function getFileExtension(str) {
+            return str.slice(str.lastIndexOf('.') + 1);
+        }
+
+        /**
+         * Unique and number validation for option's position
+         * 
+         * @param  {String} value 
+         * @param  {Object} elem
+         * @return {Boolean}
+         */
+        function validateVideoName (value, elem) {
+            if (!value.match(/\w+\.(mp[34]|ogg|webm)$/)) {
+                $(elem).focus();
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Capitalize first letter
+         * 
+         * @param  {string} string 
+         * @return {string}
+         */
+        function _capitalizeFirstLetter(string) {
+            return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1);
+        }
+
         window.savePreviewModal = function(modal) {
-            var $form = productVideosNode.find('form'),
+            var $form = productVideosNode.find('form#' + productVideosGrid.getConfig('id') + '-modal-form'),
                 id = $form.find('#id').val(),
                 url = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
                 hash = { oper: id ? 'edit' : 'add' };
@@ -46,7 +80,6 @@
                 hash[key] = productVideosGrid.html2text(val);
             });
 
-            $form.validate();
             if ($form.valid()) {
                 $.post(url, hash, function(data) {
                     if (data.success == true) {
@@ -61,16 +94,6 @@
                     }
                 });
             }
-        }
-
-        /**
-         * Capitalize first letter
-         * 
-         * @param  {string} string 
-         * @return {string}
-         */
-        function _capitalizeFirstLetter(string) {
-            return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1);
         }
 
         window.showModalToPreviewVideo = function(row) {
@@ -93,9 +116,8 @@
                     },
                     React.DOM.div({ className: "row f-grid-wrapper col-sm-12" }, 
                         React.DOM.div({ id: "video-container", style: { padding: '0 10px' }, className: 'col-sm-7' },
-                            React.DOM.video({ width: "480", height: "320", id: "video" + row.id, controls: "controls", preload: "none" },
-                                React.DOM.source({ src: "{{ APP.src() }}" + row.folder + '/' + row.file_name,  type: "video/mp4"  }),
-                                React.DOM.track({ kind: "subtitles", src: "", srclang: "en" })
+                            React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
+                                React.DOM.source({ src: "{{ APP.src() }}" + row.folder + '/' + row.file_name,  type: "video/" + videoExt  })
                             )
                         ),
                         React.DOM.div({ id: "video-infos", className: 'col-sm-5', style: { background: '#F3F3F3' } },
@@ -132,6 +154,11 @@
             
             $('video,audio').mediaelementplayer({
                 features: ['playpause','progress','current','duration','tracks','volume','fullscreen']
+            });
+
+            $.validator.addMethod('validateVideoName', validateVideoName, '{{"File name must contains supported suffix."|_}}');
+            $.validator.addClassRules('valid-video-name', {
+                validateVideoName: true
             });
         }
     });

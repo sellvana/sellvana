@@ -82,7 +82,7 @@
         });
     });
 
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'griddle.fcomMediaLib'], function () {
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'griddle.fcomMediaLib', 'jquery.media-element'], function () {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
         var maxFileSize = parseInt({{ defaultFileSizeConfig }}) * 1024000;
 
@@ -124,6 +124,10 @@
                     mediaGrid.addRows(rows);
                 }
             }
+        });
+            
+        $('video,audio').mediaelementplayer({
+            features: ['playpause','progress','current','duration','tracks','volume','fullscreen']
         });
     });
 </script>

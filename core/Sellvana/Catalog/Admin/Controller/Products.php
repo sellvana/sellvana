@@ -465,9 +465,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
                     // ['name' => 'file_name', 'label' => 'File Name'],
                     ['type' => 'link', 'name' => 'file_name', 'label' => 'File Name', 'width' => 80,
-                        'addable' => true, 'action' => 'showModalToPreviewVideo', 'editable' => true],
+                        'addable' => true, 'action' => 'showModalToPreviewVideo', 'editable' => true, 'className' => 'valid-video-name'
+                    ],
                     ['name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'file_size'],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline'],
+                    ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline', 'attributes' => ['required' => true]],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
                     ['name' => 'is_default', 'label' => 'Default', 'width' => 50, 'display' => 'eval',
