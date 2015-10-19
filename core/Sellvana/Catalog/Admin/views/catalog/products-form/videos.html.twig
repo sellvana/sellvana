@@ -24,7 +24,7 @@
 
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'griddle.fcomModalForm', 'jquery.validate', 'jquery.media-element'], function ($, _, React, FComGriddleComponent, Components, FComModalForm) {
-        var productVideosGrid = {{ combineType }}Grid, productVideosNode, videoExt, editedRow;
+        var productVideosGrid = {{ combineType }}Grid, productVideosNode, videoExt, videoName, editedRow;
         if (productVideosGrid) {
             $(productVideosGrid.getDOMNode())
                 .on('removedRows.griddle', function (e, rows) {
@@ -76,51 +76,59 @@
             return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1);
         }
 
+        function _refreshGrid(data) {
+            _(data).each(function(val, i) {
+                editedRow[i] = val;
+            });
+            productVideosGrid.updateRows([editedRow]);
+        }
+
         window.savePreviewModal = function(modal) {
             var $form = productVideosNode.find('form#' + productVideosGrid.getConfig('id') + '-modal-form'),
                 $alert = productVideosNode.find('.alert'),
                 id = $form.find('#id').val(),
                 url = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
-                hash = { oper: id ? 'edit' : 'add' };
+                hash = { oper: id ? 'edit' : 'add' }
+                isNameChanged = false;
 
             $form.find('textarea, input, select').each(function() {
                 var key = $(this).attr('id');
                 var val = $(this).val();
+                if (key == 'file_name' && val !== videoName) isNameChanged = true;
                 hash[key] = productVideosGrid.html2text(val);
             });
 
             if ($form.valid()) {
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    dataType: 'json',
-                    data: hash,
-                    beforeSend: function() {
-                        $alert.hide();
-                    }
-                })
-                .done(function(r) {
-                    if (r.error) {
-                        if (!r.message) {
-                            $alert.find('.alert-message').html("{{ 'Save file error due to system error, please try again.' | _ }}").show();
-                        } else {
-                            $alert.find('.alert-message').html(r.message).show();
+                if (isNameChanged) {
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: hash,
+                        beforeSend: function() {
+                            $alert.hide();
                         }
-                        return;
-                    }
-
-                    _(hash).each(function(val, i) {
-                        editedRow[i] = val;
+                    })
+                    .done(function(r) {
+                        if (r.error) {
+                            var msg = r.message ? r.message : "{{ 'Save file error due to system error, please try again.' | _ }}";
+                            $alert.find('.alert-message').html(msg).show();
+                            return;
+                        }
+                        _refreshGrid(hash);
+                        modal.close();
                     });
-                    productVideosGrid.updateRows([editedRow]);
+                } else {
+                    _refreshGrid(hash);
                     modal.close();
-                });
+                }
             }
         }
 
         window.showModalToPreviewVideo = function(row) {
             editedRow = row;
             videoExt = _getFileExtension(row.file_name);
+            videoName = row.file_name;
             var modalContainerEle = document.getElementById('fcom_append_form');
             React.unmountComponentAtNode(modalContainerEle);
             React.render(
