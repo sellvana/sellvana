@@ -25,7 +25,8 @@ class Sellvana_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
     ];
 
     const MEDIA_TYPE_IMG = "I"
-        , MEDIA_TYPE_ATTACH = "A"; // any other media types?
+        , MEDIA_TYPE_ATTACH = "A"
+        , MEDIA_TYPE_VIDEO = "V"; // any other media types?
 
     public function getUrl()
     {

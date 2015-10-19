@@ -2,6 +2,7 @@
 {% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
 {% set uploadConfig = mediaLib.uploadConfig(config.type) %}
 {% set mediaLibAttachConfig = mediaLib.gridConfig({'id': config.id, 'folder': uploadConfig.folder, 'config': config.config, 'mode': config.mode}) %}
+{% set defaultFileSizeConfig = CONFIG.get('modules/FCom_Admin/default_media_file_size') | default('1') %}
 
 {# need to processe config by class FCom_Core_View_BackboneGrid #}
 {% set mediaLibAttachConfigProcessed = THIS.view('core/griddle').set('grid', mediaLibAttachConfig).getGridConfig() %}
@@ -81,19 +82,21 @@
         });
     });
 
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp',
-        'jquery.fileupload-ui', 'griddle.fcomMediaLib'], function () {
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'griddle.fcomMediaLib', 'jquery.media-element'], function () {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
+        var maxFileSize = parseInt({{ defaultFileSizeConfig }}) * 1024000;
+
         $('#{{config.id}}-media-upload').fileupload({
             url: uploadUrl,
-            multiple: true
+            multiple: true,
+            maxFileSize: maxFileSize
             {% if config.mode and config.mode == 'thumbnail' %}
             , acceptFileTypes: /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i
             {% elseif uploadConfig.filetype_regex %}
             , acceptFileTypes: {{ uploadConfig.filetype_regex }}
             {% endif %}
         }).bind('fileuploadalways', function (e, data) {
-            //console.log('DEBUG: fileuploadalways.data', data);
+            // console.log('DEBUG: fileuploadalways.data', data);
 
             var mediaGrid = mediaLibGrid{{ config.id }};
 
@@ -121,6 +124,10 @@
                     mediaGrid.addRows(rows);
                 }
             }
+        });
+            
+        $('video,audio').mediaelementplayer({
+            features: ['playpause','progress','current','duration','tracks','volume','fullscreen']
         });
     });
 </script>
