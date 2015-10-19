@@ -39,7 +39,7 @@
          * @param  {String} str
          * @return {String}
          */
-        function getFileExtension(str) {
+        function _getFileExtension(str) {
             return str.slice(str.lastIndexOf('.') + 1);
         }
 
@@ -52,6 +52,14 @@
          */
         function validateVideoName (value, elem) {
             if (!value.match(/\w+\.(mp[34]|ogg|webm)$/)) {
+                $(elem).focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validateVideoExtension(value, elem) {
+            if (_getFileExtension(value) !== videoExt) {
                 $(elem).focus();
                 return false;
             }
@@ -98,7 +106,7 @@
 
         window.showModalToPreviewVideo = function(row) {
             editedRow = row;
-            videoExt = row.file_name.slice(row.file_name.lastIndexOf('.') + 1);
+            videoExt = _getFileExtension(row.file_name);
             var modalContainerEle = document.getElementById('fcom_append_form');
             React.unmountComponentAtNode(modalContainerEle);
             React.render(
@@ -157,8 +165,10 @@
             });
 
             $.validator.addMethod('validateVideoName', validateVideoName, '{{"File name must contains supported suffix."|_}}');
+            $.validator.addMethod('validateVideoExtension', validateVideoExtension, '{{"File extention must be "|_}}' + videoExt);
             $.validator.addClassRules('valid-video-name', {
-                validateVideoName: true
+                validateVideoName: true,
+                validateVideoExtension: true
             });
         }
     });
