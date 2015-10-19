@@ -28,9 +28,9 @@
         if (productVideosGrid) {
             $(productVideosGrid.getDOMNode())
                 .on('removedRows.griddle', function (e, rows) {
-                    // 
+                    // Removed videos on main video tab grid
                 }).on('addedRows.griddle', function (e, rows) {
-                    // 
+                    // Added videos on main video tab grid
                 });
         }
 
@@ -78,6 +78,7 @@
 
         window.savePreviewModal = function(modal) {
             var $form = productVideosNode.find('form#' + productVideosGrid.getConfig('id') + '-modal-form'),
+                $alert = productVideosNode.find('.alert'),
                 id = $form.find('#id').val(),
                 url = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
                 hash = { oper: id ? 'edit' : 'add' };
@@ -89,17 +90,30 @@
             });
 
             if ($form.valid()) {
-                $.post(url, hash, function(data) {
-                    if (data.success == true) {
-                        _(hash).each(function(val, i) {
-                            editedRow[i] = val;
-                        });
-                        productVideosGrid.updateRows([editedRow]);
-                        modal.close();
-                    } else {
-                        alert('Error when save');
-                        return false;
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: hash,
+                    beforeSend: function() {
+                        $alert.hide();
                     }
+                })
+                .done(function(r) {
+                    if (r.error) {
+                        if (!r.message) {
+                            $alert.find('.alert-message').html("{{ 'Save file error due to system error, please try again.' | _ }}").show();
+                        } else {
+                            $alert.find('.alert-message').html(r.message).show();
+                        }
+                        return;
+                    }
+
+                    _(hash).each(function(val, i) {
+                        editedRow[i] = val;
+                    });
+                    productVideosGrid.updateRows([editedRow]);
+                    modal.close();
                 });
             }
         }
@@ -123,6 +137,11 @@
                         onConfirm: window.savePreviewModal
                     },
                     React.DOM.div({ className: "row f-grid-wrapper col-sm-12" }, 
+                        React.DOM.div({ className: 'alert alert-danger alert-dismissible',  role: 'alert', style: { display: 'none' } },
+                            React.DOM.button({ type: 'button', className: 'close', 'data-dismiss': 'alert', 'aria-hidden': 'true', dangerouslySetInnerHTML: {__html: '&times;'} }),
+                            React.DOM.strong(null, "{{ 'Error' | _ }}"),
+                            React.DOM.span({ className: 'alert-message' }, '')
+                        ),
                         React.DOM.div({ id: "video-container", style: { padding: '0 10px' }, className: 'col-sm-7' },
                             React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
                                 React.DOM.source({ src: row.source,  type: "video/" + videoExt  })

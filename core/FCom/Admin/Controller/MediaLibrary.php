@@ -558,7 +558,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $fileName = $r->post('file_name');
             $att = $attModel->load($id);
             if (!$att) {
-                $this->BResponse->json(['error' => true]);
+                $this->BResponse->json(['error' => true, 'message' => $this->BApp->t('Can not load related model.')]);
                 return;
             }
             $oldFileName = $att->file_name;
@@ -570,7 +570,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 }
                 $this->BResponse->json(['success' => true]);
             } else {
-                $this->BResponse->json(['error' => true]);
+                $this->BResponse->json(['error' => true, 'message' => $this->BApp->t('Can not rename file due to system error.')]);
             }
             break;
 
