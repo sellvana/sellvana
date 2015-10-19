@@ -125,7 +125,7 @@
                     React.DOM.div({ className: "row f-grid-wrapper col-sm-12" }, 
                         React.DOM.div({ id: "video-container", style: { padding: '0 10px' }, className: 'col-sm-7' },
                             React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
-                                React.DOM.source({ src: "{{ CONFIG.get('web/base_src') }}" + row.folder + '/' + row.file_name,  type: "video/" + videoExt  })
+                                React.DOM.source({ src: productVideosGrid.getConfig('baseSrc') + row.folder + '/' + row.file_name,  type: "video/" + videoExt  })
                             )
                         ),
                         React.DOM.div({ id: "video-infos", className: 'col-sm-5', style: { background: '#F3F3F3' } },

@@ -450,6 +450,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'id' => 'product_videos',
                 'caption' => 'Product Videos',
                 'data_mode' => 'local',
+                'baseSrc' => rtrim($this->BConfig->get('web/base_src'), '/') . '/',
                 'data' => $data,
                 'columns' => [
                     ['type' => 'row_select'],
