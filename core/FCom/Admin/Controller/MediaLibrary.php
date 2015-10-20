@@ -78,6 +78,16 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 . ' pm WHERE pm.file_id = a.id)', 'associated_products');
         }
         $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
+
+        if ($id == 'all_videos') {
+            $elementPrint = '
+                "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ rc.row["id"] +"\' preload=\'none\'><source src=\''. $baseSrc .'" + rc.row["folder"] + "/" + rc.row["file_name"] + "\' type=\'video/" + rc.row["file_name"].slice(rc.row["file_name"].lastIndexOf(".") + 1) + "\'></video>"
+            ';
+        } else {
+            $elementPrint = '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
+                            . '<img src=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"';
+        }
+
         $config = [
             'config' => [
                 'id'          => $id,
@@ -90,10 +100,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
-                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
-                        'print' => '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
-                            . '<img src=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
-                        'sortable' => false],
+                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval', 'print' => $elementPrint, 'sortable' => false],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
                     ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
                         'display' => 'file_size'],
@@ -496,7 +503,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                                 'update_at' => $this->BDb->now()
                             ])->save();
                         } else {
-                            if(in_array($type, ['product-images', 'product-attachments'])
+                            if (in_array($type, ['product-images', 'product-attachments', 'product-videos'])
                                 && $this->BModuleRegistry->isLoaded('Sellvana_Catalog')
                             ) {
                                 $associatedProducts = $this->Sellvana_Catalog_Model_ProductMedia
@@ -551,7 +558,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $fileName = $r->post('file_name');
             $att = $attModel->load($id);
             if (!$att) {
-                $this->BResponse->json(['error' => true]);
+                $this->BResponse->json(['error' => true, 'message' => $this->BApp->t('Can not load related model.')]);
                 return;
             }
             $oldFileName = $att->file_name;
@@ -563,7 +570,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 }
                 $this->BResponse->json(['success' => true]);
             } else {
-                $this->BResponse->json(['error' => true]);
+                $this->BResponse->json(['error' => true, 'message' => $this->BApp->t('Can not rename file due to system error.')]);
             }
             break;
 

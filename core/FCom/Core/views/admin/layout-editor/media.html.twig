@@ -7,10 +7,15 @@
     <div id="lib-images-{{ widget.id }}">
         {% set type = 'images' %}
         {% set mediaLib = APP.instance('FCom_Admin_Controller_MediaLibrary') %}
+
+        {# Widget media library grid config #}
         {% set medialibConfig = mediaLib.layoutGridLibraryConfig({'id': 'media_all_' ~ type}) %}
-        {% set mediaUploadConfig = { id: 'widget_media_library_' ~ widget.id, title: 'Media Library', gridConfig: medialibConfig } %}
-        {% set uploadConfig = mediaLib.uploadConfig() %}
         {% set medialibConfigCompiled = LAYOUT.view('core/griddle').set('grid', medialibConfig).getGridConfig() %}
+            
+        {# Widget upload grid config #}
+        {% set uploadConfig = mediaLib.uploadConfig() %}
+        {% set mediaUploadConfig = { id: 'widget_' ~ widget.id, title: 'Media Library', gridConfig: medialibConfig, type: widget.type } %}
+
         <!-- Att -->
         <button type="button" class='btn btn-primary btn-select-images'>{{ "Select Image"|_ }}</button>
         <div class="fade modal">
@@ -48,7 +53,6 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
                     </div>
                 </div>
             </div>
@@ -61,53 +65,52 @@
 
                 $(document).on('click', '.btn-select-images', function(e) {
                     e.preventDefault();
-                    $(this).next('.modal').find('.uploadTab').hide();
-
                     var ci                  = isNaN($(this).parents('div.js-widget-box').data('id')) 
-                                                ? $(this).parents('li').data('id') 
+                                                ? $(this).parents('li').attr('id') 
                                                 : $(this).parents('div.js-widget-box').data('id');
                     var mediaModal          = $(this).next('.modal');
                     var ele                 = this.nextElementSibling.querySelector('.mediaGrid');
                     var config              = {{ UTIL.toJson(medialibConfigCompiled) | raw }};
                     var newId               = config.id + (ci < 0 ? '' : '_') + ci;
                     var uploadConfigs       = {{ UTIL.toJSON(uploadConfig)|raw }};
-                    var uploadUrlBase       = "{{ APP.href("media/grid/upload?type=") | raw }}";
-                    var thumb_path          = 'resize.php?s=68&f=media';
-                    var $mediaTypes         = $("#media-library-upload-types-" + ci);
-                    var type                = $mediaTypes.val();
+                    var uploadUrlBase       = "{{ APP.href('media/grid/upload?type=') | raw }}";
+                    var $mediaTypes         = $("#media-library-upload-types-" + $(this).parents('li').data('id').toString().replace(/\-/g, ''));
+                    var type                = $mediaTypes.val() ? $mediaTypes.val() : '';
                     var uploadUrl           = uploadUrlBase + type;
                     var uploaderInitialized = false;
-                    var $uploader           = $("#widget_media_library_" + ci + "-media-upload");
+                    var $uploader           = $("#widget_" + ci + "-media-upload");
+                    var thumb_path          = '';
                     $mediaTypes.on('change', function (e) {
                         type = $(this).val();
                         uploadUrl = uploadUrlBase + type;
                         $uploader.fileupload('option', { url: uploadUrl });
                         switch(type) {
                             case 'product-images':
-                                thumb_path += '/product/images/';
+                                thumb_path = 'resize.php?s=68&f=media/product/images/';
                                 break;
                             case 'product-attachments':
-                                thumb_path += '/product/attachment/';
+                                thumb_path = 'resize.php?s=68&f=media/product/attachment/';
                                 break;
                             case 'images':
-                                thumb_path += '/images/';
+                                thumb_path = 'resize.php?s=68&f=media/images/';
                                 break;
                         }
                     });
 
                     window.registerGrid{{ medialibConfig.config.id }} = function(grid) {
                         // componentDidMout for specific insert_media widget
-                        window['widget_media_library_' + ci + '_grid'] = mediaLibGrid = grid;
+                        window['widget_' + ci + '_grid'] = mediaLibGrid = grid;
                     }
 
                     if (!_.contains(grids, newId)) {
                         React.unmountComponentAtNode(ele);
-                        var mConfig = _.extend(config, { id: newId });
                         React.render(
-                            React.createElement(FComGriddleComponent, { key: newId, config: mConfig }), ele
+                            React.createElement(FComGriddleComponent, { key: newId, config: _.extend(config, { id: newId }) }), ele
                         );
                         grids.push(newId);
+                    
                     }
+                    $(MediaApp).trigger('onMounted', [{ id: 'widget_' + ci }]);
 
                     mediaModal.modal('show');
 
@@ -120,7 +123,7 @@
                             if (files > 0) {
                                 $mediaTypes.attr('disabled', true); // disable changing upload type after initiating upload
                             }
-                        }).bind('fileuploadfail', function () {
+                        }).bind('fileuploadfail', function (e, data) {
                             files--;
                             if (files == 0) {
                                 $mediaTypes.attr('disabled', false);
