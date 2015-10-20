@@ -1122,6 +1122,7 @@ define(fcomAdminDeps, function ($) {
             url_post: '.../edit/:id'
         } */
         var tabs, panes, curLi, curPane, editors = {};
+        var ajaxPassed = false;
 
         /**
          *
@@ -1269,19 +1270,32 @@ define(fcomAdminDeps, function ($) {
         /**
          *
          * @param el
+         * @param saveAndContinue
          * @returns {boolean}
          */
         function saveAll(el, saveAndContinue) {
             //TODO
+            ajaxPassed = true;
             var form = $(el).closest('form');
             $(form).submit(function(event) {
-                event.preventDefault();
+                if (ajaxPassed) {
+                    event.preventDefault();
+                }
             });
             $(form).trigger('submit');
+            var btnId = form.attr('id') + '-do';
+            var isNew = options.is_new;
+            if (saveAndContinue && isNew) {
+                form.append('<input id="' + btnId + '" type="hidden" name="do" value="save_and_continue">');
+            }
             var postData = form.serializeArray();
             var url_post = options.url_get + (options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post + 'tabs=ALL&mode=view', postData, function (data, status, req) {
                 FCom.Admin.log(data);
+                var message = '';
+                for (var msgId in data.messages) {
+                    message += "<br />" + data.messages[msgId].text;
+                }
                 $.pnotify({
                     pnotify_title: data.messages[0].text || 'The form has been saved',
                     pnotify_type: data.status == 'error' ? 'error' : null,
@@ -1292,10 +1306,38 @@ define(fcomAdminDeps, function ($) {
                 if (data.redirect) {
                     document.location = data.redirect;
                 } else {
-                    loadTabs(data);
-                    for (var i in data.tabs) {
-                        tabClass(i);
+                    var actionUrl = form.attr('action');
+                    var urlInfo = actionUrl.split('?');
+                    if (urlInfo[1]) {
+                        var params = urlInfo[1].split('&');
+                        var newParams = [];
+                        for (var paramId = 0; paramId < params.length; paramId++) {
+                            var pair = params[paramId].split('=');
+                            if (pair[0] == 'id') {
+                                pair[1] = data.id;
+                            }
+                            newParams.push(pair.join('='));
+                        }
+                        actionUrl = urlInfo[0] + '?' + newParams.join('&');
+                    } else {
+                        actionUrl = urlInfo[0] + '?id=' + data.id;
                     }
+                    options.url_get = actionUrl;
+                    form.attr('action', actionUrl);
+                    if (isNew && saveAndContinue) {
+                        if (window.history !== undefined) {
+                            window.history.replaceState({}, data.title, options.url_get);
+                        }
+                        form.find('.btn-group').html(data.buttons);
+                        var textNodes = form.find('.f-page-title').contents().filter(function () {
+                            return this.nodeType == 3;
+                        });
+                        textNodes[textNodes.length-1].nodeValue = data.title;
+                        $('title').text(data.title);
+                    }
+                    ajaxPassed = false;
+                    $('#' + btnId).remove();
+                    form.find('#tabs li.hidden').removeClass('hidden');
                 }
             });
             return false;

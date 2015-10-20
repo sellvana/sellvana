@@ -355,6 +355,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $args = [];
         $formId = $this->formId();
         $redirectUrl = $this->BApp->href($this->_gridHref);
+        $model = null;
         try {
             $class = $this->_modelClass;
             $id = $r->param('id', true);
@@ -410,10 +411,28 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         }
 
         if ($r->xhr()) {
-            $result['messages'] = $this->_messages;
-            $result['redirect'] = $r->post('do') !== 'save_and_continue' ? $this->BApp->href($this->_gridHref) : false;
+            $result['messages'] = [];
+            foreach ($this->BSession->messages('admin') as $message) {
+                $result['messages'][] = [
+                    'text' => $message['msg'],
+                    'type' => $result['status'],
+                ];
+            }
+            $result['redirect'] = false;
+            /*if (!$id && $r->post('do') === 'save_and_continue' && $model) {
+                $result['redirect'] = $this->BApp->href($this->_formHref) . '?id=' . $model->id();
+            } else*/
+            if ($r->post('do') !== 'save_and_continue') {
+                $result['redirect'] = $this->BApp->href($this->_gridHref);
+            } elseif (!is_null($model)) {
+                $result['id'] = $model->id();
+                $viewArgs = ['model' => $model, 'view' => new FCom_Admin_View_Form()];
+                $this->formViewBefore($viewArgs);
+                $result['buttons'] = $viewArgs['view']->getActionsHtml();
+                $result['title'] = $viewArgs['view']->get('title');
+            }
             $this->BResponse->json($result);
-            $this->forward('form', null, ['id' => $id]);
+            //$this->forward('form', null, ['id' => $id]);
         } else {
             $this->BResponse->redirect($redirectUrl);
         }
@@ -479,11 +498,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         } else {
             $msg = $this->BLocale->_($msg);
         }
-        if ($this->BRequest->xhr()) {
-            $this->_messages[] = ['text' => $msg, 'type' => $type, 'options' => $options];
-        } else {
-            $this->BSession->addMessage($msg, $type, $tag, $options);
-        }
+        $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;
     }
 }

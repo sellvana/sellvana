@@ -155,10 +155,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $newAction['save_and_continue'] = [
             'button',
             [
-                'type' => 'submit',
                 'class' => ['btn', 'btn-primary'],
-                'name' => 'do',
-                'value' => 'save_and_continue',
+                'onclick' => 'return adminForm.saveAll(this, true)',
             ],
             [
                 ['span', null, $this->BLocale->_('Save And Continue')],
