@@ -478,12 +478,21 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function mediaORM($type)
     {
-        return $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
-            ->where('pa.product_id', $this->id)->where('pa.media_type', $type)
-            //->select(array('pa.manuf_vendor_id'))
-            ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
-            ->select(['a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label'])
-            ->order_by_asc('position');
+        $orm = $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
+                    ->where('pa.product_id', $this->id)
+                    ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
+                    ->select(['a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label', 'pa.media_type']);
+
+        if (is_array($type)) {
+            list($I, $V) = $type;
+            $orm->where_raw("pa.media_type = '$I' OR (pa.media_type = '$V' AND pa.is_default = 1)")
+                ->order_by_desc('pa.media_type');
+        } else {
+            $orm->where('pa.media_type', $type)
+                ->order_by_asc('position');
+        }
+
+        return $orm;
     }
 
     /**
@@ -495,9 +504,16 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->mediaORM($type)->find_many_assoc();
     }
 
-    public function gallery()
+    public function gallery($isVideoIncluded = false)
     {
-        return $this->mediaORM('I')->where(["pa.in_gallery" => 1])->order_by_desc('is_default')->find_many_assoc();
+        $type = 'I';
+        if ($isVideoIncluded) {
+            $type = ['I', 'V'];
+        }
+
+        return $this->mediaORM($type)
+                    ->where(["pa.in_gallery" => 1])
+                    ->find_many_assoc();
     }
 
     /**

@@ -26,7 +26,7 @@
 
 {% set prod = THIS.get('product') %}
 {% set inventory = prod.getInventoryModel() %}
-{% set images = prod.gallery() %}
+{% set mediaItems = prod.gallery(true) %}
 {% set cat = THIS.get('category') %}
 
 {% set productLinks = prod.getProductLinks() %}
@@ -43,9 +43,17 @@
         <div class="col-md-5 f-col-prod-img">
             <div class="f-rslides-container">
                 <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
-                    {% for img in images %}
-                        <li><img data-id="{{ img.id() }}" class="f-prod-img img-responsive" src="{{ img.thumbUrl(458) }}{#{ img.imageUrl(1) }#}"
-                                 alt="" itemprop="image"/></li>
+                    {% for media in mediaItems %}
+                        {% if media.get('media_type') == 'V' %}
+                            {% set mediaExt = media.get('file_name') | split('.') %}
+                            <li class="product-video-item" style="padding: 80px 0;">
+                                <video id="product-video" width="480" height="320" poster="" controls="controls" preload="true">
+                                    <source type="video/{{ mediaExt[1] }}" src="{{ media.getUrl() }}" />
+                                </video>
+                            </li>
+                        {% else %}
+                            <li><img data-id="{{ media.id() }}" class="f-prod-img img-responsive" src="{{ media.thumbUrl(458) }}{#{ img.imageUrl(1) }#}" alt="" itemprop="image"/></li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>
@@ -53,9 +61,14 @@
                 <small>{{ 'Mouse move on Image to zoom'|_ }}</small>
             </p>
             <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
-                {% for img in images %}
-                    <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.thumbUrl(90) }}"
-                                                                                            alt="" title=""></a></li>
+                {% for media in mediaItems %}
+                    {% if media.get('media_type') == 'V' %}
+                        <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
+                            <a href="javascript:void(0)"><img src="{{ APP.src('@FCom_LibJsCommon/js/images/mediaelement/video-default.jpg') }}" title="There's no image for this video"></a>
+                        </li>
+                    {% else %}
+                        <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}"><a href="#"><img src="{{ media.thumbUrl(90) }}" alt="" title=""></a></li>
+                    {% endif %}
                 {% endfor %}
             </ul>
             <a href="#" hidden id="display-all-images"><i
@@ -164,7 +177,7 @@
 {{ THIS.view('catalog/product/quickview') | raw }}
 
 <script>
-    require(['jquery', 'responsiveslides', 'jquery.zoom'], function ($) {
+    require(['jquery', 'responsiveslides', 'jquery.zoom', 'jquery.media-element'], function ($) {
         var pager = $('#product-rslides-pager');
         $("#product-rslides").responsiveSlides({
             auto: false,
@@ -173,6 +186,10 @@
             namespace: "f",
             manualControls: '#product-rslides-pager'
         });
-        $('#product-rslides li').addClass('zoom').zoom();
+        $('#product-rslides li:not(.product-video-item)').addClass('zoom').zoom();
+            
+        $('video').mediaelementplayer({
+            features: ['playpause','progress','current','duration','tracks','volume','fullscreen']
+        });
     })
 </script>
