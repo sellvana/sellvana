@@ -9,8 +9,9 @@ modules:
                 auto_use: [ layout, views ]
                 routing:
                     - [ /rewards/balances/.action, Sellvana_Rewards_Admin_Controller_Balances ]
+                    - [ /rewards/, Sellvana_Rewards_Admin_Controller.index ]
                     - [ /rewards/.action, Sellvana_Rewards_Admin_Controller ]
-                    - [ "/rewards/conditions/.action", Sellvana_Rewards_Admin_Controller_Conditions]
+                    - [ /rewards/conditions/.action, Sellvana_Rewards_Admin_Controller_Conditions]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]

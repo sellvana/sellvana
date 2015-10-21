@@ -3,8 +3,7 @@ base:
     - view: head
         do:
             - [ requireJs, fcom.components, @FCom_Core/jsx/build/fcom.components ]
-            - [ requireJs, fcom.promo, @Sellvana_Promo/Admin/jsx/build/fcom.promo, [jquery, react] ]
-            - [ requireJs, fcom.promo.details, @Sellvana_Promo/Admin/jsx/build/fcom.promo.details, [react] ]
+            - [ requireJs, fcom.rulesWidget, @FCom_Core/jsx/build/fcom.rulesWidget, [jquery, react] ]
             - [ requireJs, store, @FCom_LibJsCommon/js/store ]
 
     - { include: lib_griddle }

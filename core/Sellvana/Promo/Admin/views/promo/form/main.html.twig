@@ -188,7 +188,7 @@
         </div>
         {% set elView = LAYOUT.view('core/form-elements') %}
         <script type="text/javascript">
-            require(['react', 'fcom.promo'], function (React, Promo) {
+            require(['react', 'fcom.rulesWidget'], function (React, RulesWidget) {
                 $('select.to-select2').select2();
                 var promo_type_id = '{{ elView.getInputId({'field':'promo_type'}) }}';
                 var coupon_type_id = '{{ elView.getInputId({'field':'coupon_type'}) }}';
@@ -253,7 +253,7 @@
                     buttonViewLabel: '{{ numCodes? "View (%d) Codes"|_(numCodes) : "No coupon codes" }}',
                     base_fields: {{ UTIL.toJson(APP.instance('Sellvana_Catalog_Model_ProductPrice').fieldOptions('price_relation_options'))|raw }}
                 };
-                Promo.init(options);
+                RulesWidget.init(options);
             });
         </script>
     </div>
