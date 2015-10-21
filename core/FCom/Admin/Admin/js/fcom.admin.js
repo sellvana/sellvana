@@ -1285,7 +1285,7 @@ define(fcomAdminDeps, function ($) {
             $(form).trigger('submit');
             var btnId = form.attr('id') + '-do';
             var isNew = options.is_new;
-            if (saveAndContinue && isNew) {
+            if (saveAndContinue) {
                 form.append('<input id="' + btnId + '" type="hidden" name="do" value="save_and_continue">');
             }
             var postData = form.serializeArray();
@@ -1297,7 +1297,7 @@ define(fcomAdminDeps, function ($) {
                     message += "<br />" + data.messages[msgId].text;
                 }
                 $.pnotify({
-                    pnotify_title: data.messages[0].text || 'The form has been saved',
+                    pnotify_title: message || 'The form has been saved',
                     pnotify_type: data.status == 'error' ? 'error' : null,
                     pnotify_history: false,
                     pnotify_nonblock: true, pnotify_nonblock_opacity: .3,
@@ -1324,7 +1324,7 @@ define(fcomAdminDeps, function ($) {
                     }
                     options.url_get = actionUrl;
                     form.attr('action', actionUrl);
-                    if (isNew && saveAndContinue) {
+                    if (isNew && saveAndContinue && data.status == 'success') {
                         if (window.history !== undefined) {
                             window.history.replaceState({}, data.title, options.url_get);
                         }
@@ -1334,10 +1334,10 @@ define(fcomAdminDeps, function ($) {
                         });
                         textNodes[textNodes.length-1].nodeValue = data.title;
                         $('title').text(data.title);
+                        form.find('#tabs li.hidden').removeClass('hidden');
                     }
-                    ajaxPassed = false;
                     $('#' + btnId).remove();
-                    form.find('#tabs li.hidden').removeClass('hidden');
+                    ajaxPassed = false;
                 }
             });
             return false;

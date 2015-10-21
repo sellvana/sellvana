@@ -412,9 +412,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
         if ($r->xhr()) {
             $result['messages'] = [];
-            foreach ($this->BSession->messages('admin') as $message) {
+            foreach ($this->BSession->messages('_,admin,validator-errors:' . $formId) as $message) {
                 $result['messages'][] = [
-                    'text' => $message['msg'],
+                    'text' => is_array($message['msg']) ? $message['msg']['error'] : $message['msg'],
                     'type' => $result['status'],
                 ];
             }
@@ -422,7 +422,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             /*if (!$id && $r->post('do') === 'save_and_continue' && $model) {
                 $result['redirect'] = $this->BApp->href($this->_formHref) . '?id=' . $model->id();
             } else*/
-            if ($r->post('do') !== 'save_and_continue') {
+            if ($r->post('do') !== 'save_and_continue' && $result['status'] === 'success') {
                 $result['redirect'] = $this->BApp->href($this->_gridHref);
             } elseif (!is_null($model)) {
                 $result['id'] = $model->id();
