@@ -70,10 +70,13 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                         } else {
                             var oper = 'del';
                             if (editUrl.length > 0 && rowId) {
-                                if (folder && !editUrl.match("\\b"+"folder"+"\\b")) {
-                                    editUrl += '?folder=' + encodeURIComponent(folder);
+                                if (folder) {
                                     oper = 'mass-delete';
+                                    if (!editUrl.match("\\b"+"folder"+"\\b")) {
+                                        editUrl += '?folder=' + encodeURIComponent(folder);
+                                    }
                                 }
+                                
                                 $.post(editUrl, {id: rowId, oper: oper}, function() {
                                     that.props.removeSelectedRows([row]);
                                     that.props.refresh();

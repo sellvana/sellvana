@@ -135,6 +135,7 @@
             if (added) {
                 nextWidgetId--;
                 $widget.attr('data-id', nextWidgetId);
+                $widget.attr('id', $widget.data('type') + nextWidgetId);
                 $widget.find('input,textarea,select').each(function(idx, el) {
                     var $el = $(el);
                     $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + nextWidgetId + ']'))
@@ -151,6 +152,9 @@
                     var $el = $(el);
                     $el.prop('id', $el.prop('id').replace(/_-ID-/g, nextWidgetId));
                 });
+
+                $tabPane.find('#widget_-ID--media-upload').attr('id', 'widget_' + $widget.attr('id') +'-media-upload');
+                $tabPane.find('#media-library-upload-types--ID-').attr('id', 'media-library-upload-types' + nextWidgetId);
             }
         }
 
@@ -199,7 +203,7 @@
                 $newParams.find('input,textarea,select').each(function(idx, el) {
                     var $el = $(el);
                     $el.prop('disabled', false);
-                    $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + widgetId + ']'))
+                    $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + widgetId + ']'));
                 });
             } else {
                 $newParams = '';
@@ -223,7 +227,7 @@
         {% import _self as source %}
     {% endif %}
     {% set macro = widget.macro ?: 'widget__' ~ widget.type %}
-    <li>
+    <li data-type="{{ widget.type }}" data-id="{{ widget.id }}">
         <div class="box {{ widget.box_class }} js-widget-box" data-id="{{ widget.id }}">
             <div class="box-header js-sortable-handle {{ widget.header_class }}">
                 <div class="title"><i class="icon-{{ widget.icon }}"></i>{{ widget.title }}</div>

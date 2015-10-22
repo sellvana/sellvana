@@ -170,27 +170,20 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         }
                         break;
                     case 'link':
-                        var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
-                        var count = 0;
-                        if (defaultValue) {
-                            count = defaultValue.split(',').length;
-                        }
-                        var value = count + ' ' + col.value + (count <= 1 ? '' : 's');
+                        var defaultValue = col.value ? col.value : (typeof row[col.name] != 'undefined') ? row[col.name] : "";
                         
                         var inlineProps = {
                             href: col.href ? col.href : 'javascript:void(0)',
                             id: id + '-' + col.name + '-' + row.id,
                             name: id + '[' + row.id + '][' + col.name + ']',
                             className: (col.cssClass ? col.cssClass : ''),
-                            style: (col.style ? col.style : ''),
+                            style: (col.style ? col.style : {}),
                             "data-col": col.name,
                             'data-action': col.name,
-                            'data-row': row.id,
-                            'data-length': count,
-                            defaultValue: defaultValue
+                            'data-row': row.id
                         };
 
-                        node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{value}</a>;
+                        node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{defaultValue}</a>;
                         break;
                     default:
                         if (col.display == 'eval') {

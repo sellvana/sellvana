@@ -40,7 +40,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        {{ THIS.view('core/medialib/upload').set({'config': config, 'uploadConfig': uploadConfig})|raw }}
+                        {{ THIS.view('core/medialib/upload').set({'config': config, 'uploadConfig': uploadConfig}) | raw }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">{{ "Close"|_ }}</button>
@@ -52,10 +52,11 @@
 </div>
 
 <script type="text/javascript">
+console.log({{ UTIL.toJson(uploadConfig) | raw }});
     require(['jquery'], function ($) {
-        var uploadConfigs       = {{ UTIL.toJSON(uploadConfig)|raw }};
+        var uploadConfigs       = {{ UTIL.toJSON(uploadConfig) | raw }};
         var uploadUrlBase       = "{{ APP.href("media/grid/upload?type=") | raw }}";
-        var thumb_path          = 'resize.php?s=68&f=media';
+        var thumb_path          = '';
         var $mediaTypes         = $("#media-library-upload-types");
         var type                = $mediaTypes.val();
         var uploadUrl           = uploadUrlBase + type;
@@ -67,21 +68,23 @@
             $uploader.fileupload('option', {url: uploadUrl});
             switch(type) {
                 case 'product-images':
-                    thumb_path += '/product/images/';
+                    thumb_path = 'resize.php?s=68&f=media/product/images/';
                     break;
                 case 'product-attachments':
-                    thumb_path += '/product/attachment/';
+                    thumb_path = 'resize.php?s=68&f=media/product/attachment/';
+                    break;
+                case 'product-videos':
+                    thumb_path = 'resize.php?s=68&f=media/product/videos';
                     break;
                 case 'images':
-                    thumb_path += '/images/';
+                    thumb_path = 'resize.php?s=68&f=media/images/';
                     break;
             }
         });
         var mediaLibGrid{{ config.id }};
 
         window.registerGrid{{ config.id }} = function (grid) {
-            mediaLibGrid{{ config.id }} = grid;
-            window.{{ config.id }}_grid = grid;
+            window.{{ config.id }}_grid = mediaLibGrid{{ config.id }} = grid;
             //re-scan image button
             $('#{{ config.id }}-attach_library').find('.btn-rescan-images').on('click', function () {
                 $.post('{{ APP.href("media/grid/rescan_library") | raw }}', {do: 'rescan_library'}, function (response) {

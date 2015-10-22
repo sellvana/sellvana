@@ -13,7 +13,8 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
             return {
                 'row': {},
                 'id': 'modal-form',
-                'columnMetadata': []
+                'columnMetadata': [],
+                'hiddenId': ''
             }
         },
         getInitialState: function () {
@@ -43,10 +44,10 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
             });
 
             //add id
-            nodes.push(React.createElement("input", {type: "hidden", name: "id", id: "id", value: this.props.row.id, key: nodes.length++}));
+            nodes.push(React.createElement("input", {type: "hidden", name: "id", id: "id", value: this.props.hiddenId ? this.props.hiddenId : this.props.row.id, key: nodes.length++}));
 
             return (
-                React.createElement("form", {className: "form form-horizontal validate-form", id: gridId + '-modal-form'}, 
+                React.createElement("form", {className: "form form-horizontal", id: gridId + '-modal-form', noValidate: true}, 
                     nodes
                 )
             )
