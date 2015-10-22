@@ -301,7 +301,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             ],
             [
                 ['span', null, $this->BLocale->_('Back to list')],
-            ]
+            ], 10
         ];
 
         if ($id) {
@@ -316,7 +316,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 ],
                 [
                     ['span', null, $this->BLocale->_('Delete')],
-                ]
+                ], 20
             ];
         }
 
@@ -328,7 +328,18 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             ],
             [
                 ['span', null, $this->BLocale->_('Save')],
-            ]
+            ], 30
+        ];
+
+        $actions['save_and_continue'] = [
+            'button',
+            [
+                'class' => ['btn', 'btn-primary'],
+                'onclick' => 'return adminForm.saveAll(this, true)',
+            ],
+            [
+                ['span', null, $this->BLocale->_('Save And Continue')],
+            ], 1000
         ];
 
         if ($id) {

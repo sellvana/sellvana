@@ -1283,6 +1283,10 @@ define(fcomAdminDeps, function ($) {
                 }
             });
             $(form).trigger('submit');
+            if (!form.validate().checkForm()) {
+                return false;
+            }
+
             var btnId = form.attr('id') + '-do';
             var isNew = options.is_new;
             if (saveAndContinue) {
@@ -1337,6 +1341,7 @@ define(fcomAdminDeps, function ($) {
                         form.find('#tabs li.hidden').removeClass('hidden');
                     }
                     $('#' + btnId).remove();
+                    $('#tabs .icon-pencil, #tabs .icon-warning-sign.error').remove();
                     ajaxPassed = false;
                 }
             });
