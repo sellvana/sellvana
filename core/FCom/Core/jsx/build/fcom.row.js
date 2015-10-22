@@ -191,7 +191,29 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                             var rc = {
                                 row: row
                             };
-                            node = eval(col.print);
+
+                            if (col.type === 'external_link' && !_.isEmpty(row.data_serialized)) {
+                                var data = JSON.parse(row.data_serialized);
+                                var provider = data.provider_name.toLowerCase();
+                                switch(provider) {
+                                    case 'youtube': //https:\/\/www.youtube.com\/embed\/8UVNT4wvIGY?feature=oembed
+                                        var src = data.html.replace(/https?:\w+\/\/embed\/\w{11}\?feature=oembed/, function(url) {
+                                            return url;
+                                        });
+                                        node = "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ row.id +"\' preload=\'none\'><source src=\'" + src + "/" + data.title + "\' type=\'video/" + provider + "\'></video>";
+                                        break
+                                    case 'vimeo':
+                                        var html = data.html.replace(/(width="\d{3}"\s+height="\d{3}")/, 'width="200" height="140"');
+                                        node = eval(JSON.stringify(html));
+                                        break;
+                                    default:
+                                        node = eval(JSON.stringify(data.html));
+                                        break;
+                                }
+                            } else {
+                                node = eval(col.print);
+                            }
+                            // node = eval(col.print);
                             customNodeHtml = true;
                         } else if (col.display == 'file_size') {
                             node = that.fileSizeFormat(row[col.name]);

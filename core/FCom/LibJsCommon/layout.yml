@@ -103,4 +103,5 @@ lib_media_player:
     - view: head
         do:
             - [ css, "@FCom_LibJsCommon/js/css/mediaelementplayer.min.css" ]
+            - [ requireJs, jquery.froogaloop2, "@FCom_LibJsCommon/js/froogaloop2.min", { deps: [ jquery ] } ]
             - [ requireJs, jquery.media-element, "@FCom_LibJsCommon/js/mediaelement-and-player.min", { deps: [ jquery ] } ]

@@ -45,10 +45,9 @@
                 <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
                     {% for media in mediaItems %}
                         {% if media.get('media_type') == 'V' %}
-                            {% set mediaExt = media.get('file_name') | split('.') %}
                             <li class="product-video-item" style="padding: 80px 0;">
                                 <video id="product-video" width="480" height="320" poster="" controls="controls" preload="true">
-                                    <source type="video/{{ mediaExt[1] }}" src="{{ media.getUrl() }}" />
+                                    <source type="video/{{ media.get('file_name')[-3: 3] }}" src="{{ media.getUrl() }}" />
                                 </video>
                             </li>
                         {% else %}
