@@ -8,7 +8,7 @@
 
 class FCom_Cron_Migrate extends BClass
 {
-    public function install__0_1_1()
+    public function install__0_5_0_0()
     {
         $tCron = $this->FCom_Cron_Model_Task->table();
         $this->BDb->run("
