@@ -198,11 +198,9 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                     case 'all_videos':
                                         var provider = data.provider_name.toLowerCase();
                                         switch(provider) {
-                                            case 'youtube': //https:\/\/www.youtube.com\/embed\/8UVNT4wvIGY?feature=oembed
-                                                var src = data.html.replace(/https?:\w+\/\/embed\/\w{11}\?feature=oembed/, function(url) {
-                                                    return url;
-                                                });
-                                                node = "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ row.id +"\' preload=\'none\'><source src=\'" + src + "/" + data.title + "\' type=\'video/" + provider + "\'></video>";
+                                            case 'youtube':
+                                                var src = $(data.html).prop('src');
+                                                node = "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ row.id +"\' preload=\'none\'><source src=\'" + src + "\' title=\'" + data.title + "\' type=\'video/" + provider + "\'></video>";
                                                 break
                                             case 'vimeo':
                                                 var html = data.html.replace(/(width="\d{3}"\s+height="\d{3}")/, 'width="200" height="140"');
