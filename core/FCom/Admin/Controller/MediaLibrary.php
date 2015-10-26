@@ -68,8 +68,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $folder = $this->_parseFolder($options['folder']);
         $url = $this->BApp->href('/media/grid');
         $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
-            // ->where('folder', $folder)
-            // ->where_raw('folder = ? OR folder = ?', [$folder, 'external_link'])
+            ->where('folder', $folder)
             ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size', 'a.data_serialized'])
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
             //  ->order_by_expr('id asc')
@@ -81,12 +80,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
 
         if ($id == 'all_videos') {
-            $orm->where_raw('folder = ? OR folder = ?', [$folder, 'external_link']);
             $elementPrint = '
                 "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ rc.row["id"] +"\' preload=\'none\'><source src=\''. $baseSrc .'" + rc.row["folder"] + "/" + rc.row["file_name"] + "\' type=\'video/" + rc.row["file_name"].slice(rc.row["file_name"].lastIndexOf(".") + 1) + "\'></video>"
             ';
         } else {
-            $orm->where('folder', $folder);
             $elementPrint = '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
                             . '<img src=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"';
         }

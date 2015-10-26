@@ -1,3 +1,14 @@
+<style type="text/css" media="screen">
+    .oembed_container {
+        padding: 20px 0;
+        text-align: center;
+        display: none;
+    }
+
+    .mejs-container {
+        margin: 0 auto;
+    }
+</style>
 {% set config = THIS.get('config') %}
 {% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
 {% set uploadConfig = mediaLib.uploadConfig(config.type) %}
@@ -64,7 +75,7 @@
         mediaLibGrid{{ config.id }} = mediaLibComponent{{ config.id }}.getMainGridComponent();
 
         //re-scan image button
-        $(mediaLibComponent{{ config.id }}.getDOMNode()).find('.btn-rescan-images').on('click', function () {
+        $(mediaLibComponent{{ config.id }}.getDOMNode()).find('.btn-rescan-media').on('click', function () {
             $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}',
                     {do: 'rescan'}, function (response) {
                         if (response.status == 'success') {
@@ -124,6 +135,83 @@
                     mediaGrid.addRows(rows);
                 }
             }
+        });
+
+        $(document).on('click', '.btn-preview', function(event) {
+            event.preventDefault();
+            var $container = $('.video-tab-container');
+            var $oembedContainer = $('.oembed_container');
+            var $alert = $container.find('.alert');
+            var provider = $('input[name="provider"]:checked').val();
+            $alert.hide();
+
+            var url = $('#oembed_url').val();
+            if (url === '') {
+                $.bootstrapGrowl("Error: Please enter video link.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                return;
+            }
+
+            switch (provider) {
+                case 'youtube': // https://www.youtube.com/watch?v=8UVNT4wvIGY
+                    if (!url.match(/http?s:\/\/[w]{3}\.youtube\.com\/watch\?v=\w{11}/g)) {
+                        $.bootstrapGrowl("Error: Youtube link is invalid.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                        return;
+                    }
+
+                    $oembedContainer.html('<video width="640" height="360" id="media-player" controls="controls" preload="true"><source src="'+url+'" type="video/youtube" /></video>').show();
+                    var playerPreview = new MediaElementPlayer('video#media-player', {
+                        success: function (mediaElement, domObject) {
+                            playerPreview.play();
+                        }
+                    });
+                    break;
+                case 'vimeo': // https://vimeo.com/channels/staffpicks/143075521
+                    if (!url.match(/http?s:\/\/vimeo\.com\/\w+\/\w+\/\d+/g)) {
+                        $.bootstrapGrowl("Error: Vimeo link is invalid.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                        return;
+                    }
+
+                    if (!url.match(/https?:\/\/player\.vimeo\.com\/video\/\d{9}\?api=\d{1}&player_id=vimeo_player/)) {
+                        var id = url.slice(url.lastIndexOf('/') + 1);
+                        var url = 'https://player.vimeo.com/video/' + id + '?api=1&player_id=vimeo_player';
+                    }
+
+                    $oembedContainer.empty().html('<iframe src="'+url+'" height="360" width="640" frameBorder="0"></iframe>').show();
+                    break;
+                default:
+                    $.post("{{ APP.href('/catalog/products/embed_video') }}", { url: url }, function(r) {
+                        if (r) $oembedContainer.empty().html(r).show();
+                    });
+                    break;
+            }
+        });
+
+        $(document).on('click', '.btn-embed', function(event) {
+            event.preventDefault();
+            var $container = $('.video-tab-container');
+            var $oembedContainer = $('.oembed_container');
+            var $alert = $container.find('.alert');
+            $alert.hide();
+
+            var url = $('.oembed_url').val();
+            if (!url) {
+                $.bootstrapGrowl("Error: Please enter video link.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+            }
+
+            var hash = {
+                oper: 'add',
+                url: url
+            };
+
+            $.post("{{ APP.href('/catalog/products/embed_video') }}", hash, function(r) {
+                if (!r.error) {
+                    $.bootstrapGrowl("Success: Add library success.", { type: 'success', align: 'center', width: 'auto', delay: 5000 });
+                    var data = JSON.parse(r);
+                    $oembedContainer.empty().html(data.html).show();
+                } else {
+                    $.bootstrapGrowl("Error: Add library failure, please check your link.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                }
+            });
         });
             
         $('video,audio').mediaelementplayer({

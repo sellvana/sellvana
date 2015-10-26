@@ -89,22 +89,51 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
         getMainGridEle: function() {
             return React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
         },
+        getEmbedGrid: function () {
+            return (
+                <div className='video-tab-container'>
+                    <div className="col-sm-12">
+                        <div className="control-label col-sm-1">
+                            <label htmlFor="oembed_url">URL: </label>
+                        </div>
+                        <div className="controls col-sm-7">
+                            <input type="text" id="oembed_url"  name='oembed_url' className='form-control oembed_url' />
+                        </div>
+                        <div className="controls col-sm-1">
+                            <button type='button' className='btn btn-primary btn-sm btn-preview' data-loading-text='Processing...'>Preview</button>
+                        </div>
+                        <div className="controls col-sm-2">
+                            <button type='button' className='btn btn-success btn-sm btn-embed' data-loading-text='Processing...'>Add to Library</button>
+                        </div>
+                    </div>
+                    <div className="col-sm-12">
+                        <div className="control-label col-sm-1">
+                            <label htmlFor="">Provider: </label>
+                        </div>
+                        <div className="col-sm-11">
+                            <label className='radio-inline'><input type="radio" name='provider' value='youtube' />Youtube</label>
+                            <label className='radio-inline'><input type="radio" name='provider' value='vimeo' />Vimeo</label>
+                            <label className='radio-inline'><input type="radio" name='provider' value='other' />Other Providers</label>
+                        </div>
+                    </div>
+                    <div className="col-sm-12 oembed_container"></div>
+                </div>
+            );
+        },
         renderModal: function(modalConfig) {
             return (
                 <Components.Modal {...modalConfig}>
-                    <div className="row">
-                        <div className="tabbable">
-                            <ul className="nav nav-tabs prod-type f-horiz-nav-tabs">
-                                <li className="active">
-                                    <a data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-attach_library'}>Library</a>
-                                </li>
-                                {this.props.uploadConfig.can_upload ? <li><a data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-media-upload'}>Upload</a></li> : null}
-                            </ul>
-                            <div className="tab-content">
-                                <div className="tab-pane active" id={this.props.mediaConfig.id + '-attach_library'}>{this.getMainGridEle()}</div>
-                                {this.props.uploadConfig.can_upload ? <div className="tab-pane" id={this.props.mediaConfig.id + '-media-upload'}>{this.mediaUploadElement()}</div> : null}
-                            </div>
-                        </div>
+                    <ul className="nav nav-tabs f-horiz-nav-tabs" role="tablist">
+                        <li role='presentation' className="active">
+                            <a href={'#' + this.props.mediaConfig.id + '-attach_library'} role='tab' data-toggle="tab" aria-controls={this.props.mediaConfig.id + '-attach_library'}>Library</a>
+                        </li>
+                        {this.props.uploadConfig.can_upload ? <li role='presentation'><a href={'#' + this.props.mediaConfig.id + '-media-upload'} role='tab' data-toggle="tab" aria-controls={this.props.mediaConfig.id + '-media-upload'}>Upload</a></li> : null}
+                        <li role='presentation'><a role='tab' data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-media-embed'}>Media Embed</a></li>
+                    </ul>
+                    <div className="tab-content">
+                        <div role="tabpanel" className="tab-pane active" id={this.props.mediaConfig.id + '-attach_library'}>{this.getMainGridEle()}</div>
+                        {this.props.uploadConfig.can_upload ? <div role="tabpanel" style={{ width: '870px', 'padding': '20px' }} className="tab-pane" id={this.props.mediaConfig.id + '-media-upload'}>{this.mediaUploadElement()}</div> : null}
+                        {this.props.uploadConfig.can_upload ? <div role="tabpanel" className="tab-pane" style={{ width: '870px', 'padding': '20px' }} id={this.props.mediaConfig.id + '-media-embed'}>{this.getEmbedGrid()}</div> : null}
                     </div>
                 </Components.Modal>
             );

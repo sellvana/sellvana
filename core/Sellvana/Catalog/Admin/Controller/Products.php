@@ -509,13 +509,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'id'       => 'add-video-from-grid',
                     'class'    => 'btn-primary',
                     'callback' => 'gridShowMedia' . $config['config']['id']
-                ],
-                'add-external-link' => [
-                    'caption' => 'Add External Videos Link',
-                    'type' => 'button',
-                    'id' => 'add-video-with-external-link',
-                    'class' => 'btn-info',
-                    'callback' => 'gridAddVideoLink' . $config['config']['id']
                 ]
             ];
         }
@@ -744,7 +737,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
             $data    = [
                 'file_name'       => $temp->title,
-                'folder'          => 'external_link',
+                'folder'          => 'media/product/videos',
                 'data_serialized' => $content
             ];
 
