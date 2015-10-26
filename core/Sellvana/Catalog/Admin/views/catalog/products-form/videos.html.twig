@@ -23,7 +23,7 @@
 {{ THIS.view('core/attachmentgrid-griddle').set('config', attachmentsConfig) | raw }}
 
 <script>
-    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'griddle.fcomModalForm', 'jquery.validate', 'jquery.media-element', 'jquery.froogaloop2'], function ($, _, React, FComGriddleComponent, Components, FComModalForm) {
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'griddle.fcomModalForm', 'jquery.validate', 'jquery.media-element'], function ($, _, React, FComGriddleComponent, Components, FComModalForm) {
         var productVideosGrid = {{ combineType }}Grid, productVideosNode, productExternalModalGrid, productExternalModalNode, videoExt, videoName, editedRow;
         var linkInfo = {}, isExternalLink = false;
 

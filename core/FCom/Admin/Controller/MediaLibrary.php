@@ -122,7 +122,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     'componentDidMount' => 'registerGrid' . $id,
                 ],
                 'actions' => [
-                    'rescan'  => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
+                    'rescan'  => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-media'],
                     'refresh' => true,
                 ]
             ]
@@ -231,7 +231,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         'class'    => 'btn-primary',
                         'callback' => 'gridShowMedia' . $id
                     ],
-                    'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
+                    'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-media'],
                     //'refresh' => true,
                 ],
                 'page_rows_data_callback' => [$this, 'afterInitialLibraryData']

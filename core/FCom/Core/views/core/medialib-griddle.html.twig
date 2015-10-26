@@ -93,7 +93,7 @@
         });
     });
 
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'griddle.fcomMediaLib', 'jquery.media-element'], function () {
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'griddle.fcomMediaLib', 'jquery.media-element', 'jquery.vimeo'], function () {
         var uploadUrl   = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
         var maxFileSize = parseInt({{ defaultFileSizeConfig }}) * 1024000;
         var mediaGrid   = mediaLibGrid{{ config.id }};
@@ -143,15 +143,23 @@
 
             var url = $('#oembed_url').val();
             if (url === '') {
-                $.bootstrapGrowl("Error: Please enter video link.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                $.bootstrapGrowl("{{ 'Error: Please enter video link.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                 return;
             }
 
             switch (provider) {
-                case 'youtube': // https://www.youtube.com/watch?v=8UVNT4wvIGY
-                    if (!url.match(/http?s:\/\/[w]{3}\.youtube\.com\/watch\?v=\w{11}/g)) {
-                        $.bootstrapGrowl("Error: Youtube link is invalid.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                case 'youtube':
+                    // Default: https://www.youtube.com/watch?v=xxxxxxxxxxx
+                    // Short: https://youtu.be/xxxxxxxxxxx
+                    // Very short: http://y2u.be/xxxxxxxxxxx
+                    var match = url.match(new RegExp('^(https?://)?(www\.)?(youtube\.com|youtu\.be|y2u\.be)/?(watch\?v=[^&]+|[^&]+)', 'i'));
+                    if (!match) {
+                        $.bootstrapGrowl("{{ 'Error: Youtube link is invalid.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                         return;
+                    }
+
+                    if (match && match[3] === 'y2u.be') {
+                        url = url.replace('y2u', 'youtu');
                     }
 
                     $oembedContainer.html('<video width="640" height="360" id="media-player" controls="controls" preload="true"><source src="'+url+'" type="video/youtube" /></video>').show();
@@ -161,9 +169,11 @@
                         }
                     });
                     break;
-                case 'vimeo': // https://vimeo.com/channels/staffpicks/143075521
-                    if (!url.match(/http?s:\/\/vimeo\.com\/\w+\/\w+\/\d+/g)) {
-                        $.bootstrapGrowl("Error: Vimeo link is invalid.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                case 'vimeo': 
+                    // Default: https://vimeo.com/.../.../xxxxxxxxx
+                    // Shorten: https://vimeo.com/xxxxxxxxx
+                    if (!url.match(new RegExp('^(https?://)?(www\.)?(vimeo\.com)/?([^&]+)', 'i'))) {
+                        $.bootstrapGrowl("{{ 'Error: Vimeo link is invalid.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                         return;
                     }
 
@@ -172,12 +182,12 @@
                         var url = 'https://player.vimeo.com/video/' + id + '?api=1&player_id=vimeo_player';
                     }
 
-                    $oembedContainer.empty().html('<iframe src="'+url+'" height="360" width="640" frameBorder="0"></iframe>').show();
+                    $oembedContainer.empty().html('<iframe src="' + url + '" height="360" width="640" frameBorder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>').show();
                     break;
                 default:
                     $.post("{{ APP.href('/catalog/products/embed_video') }}", { url: url }, function(r) {
                         if (r.error) {
-                            $.bootstrapGrowl("Error: This video type has not been supported.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                            $.bootstrapGrowl("{{ 'Error: This video type has not been supported.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                             return;
                         }
 
@@ -189,12 +199,36 @@
 
         $(document).on('click', '.btn-embed', function(event) {
             event.preventDefault();
-            var $container = $('.video-tab-container');
+            var $container       = $('.video-tab-container');
             var $oembedContainer = $('.oembed_container');
+            var provider         = $('input[name="provider"]:checked').val();
 
             var url = $('.oembed_url').val();
             if (!url) {
-                $.bootstrapGrowl("Error: Please enter video link.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                $.bootstrapGrowl("{{ 'Error: Please enter video link.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+            }
+
+            switch(provider) {
+                case 'youtube':
+                    var match = url.match(new RegExp('^(https?://)?(www\.)?(youtube\.com|youtu\.be|y2u\.be)/?(watch\?v=[^&]+|[^&]+)', 'i'));
+            
+                    if (!match) {
+                        $.bootstrapGrowl("{{ 'Error: Youtube link is invalid.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                        return;
+                    }
+
+                    if (match && match[3] === 'y2u.be') {
+                        url = url.replace('y2u', 'youtu');
+                    }
+                    break;
+                case 'vimeo':
+                    if (!url.match(new RegExp('^(https?://)?(www\.)?(vimeo\.com)/?([^&]+)', 'i'))) {
+                        $.bootstrapGrowl("{{ 'Error: Vimeo link is invalid.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                        return;
+                    }
+                    break;
+                default:
+                    break;
             }
 
             var hash = {
@@ -204,17 +238,15 @@
 
             $.post("{{ APP.href('/catalog/products/embed_video') }}", hash, function(r) {
                 if (!r.error) {
-                    $.bootstrapGrowl("Success: Add library success.", { type: 'success', align: 'center', width: 'auto', delay: 5000 });
+                    $.bootstrapGrowl("{{ 'Success: Add library success.' | _ }}", { type: 'success', align: 'center', width: 'auto', delay: 5000 });
                     mediaGrid.addRows([r]);
                 } else {
-                    $.bootstrapGrowl("Error: Add library failure, please check your link.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                    $.bootstrapGrowl("{{ 'Error: Add library failure, please check your link.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                 }
             });
         });
-            
-        $('video,audio').mediaelementplayer({
-            features: ['playpause','progress','current','duration','tracks','volume','fullscreen']
-        });
+        
+        $('video,audio').mediaelementplayer({ pauseOtherPlayers: true });
     });
 </script>
 

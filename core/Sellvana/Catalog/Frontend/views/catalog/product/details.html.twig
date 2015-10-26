@@ -63,7 +63,7 @@
                 {% for media in mediaItems %}
                     {% if media.get('media_type') == 'V' %}
                         <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
-                            <a href="javascript:void(0)"><img src="{{ APP.src('@FCom_LibJsCommon/js/images/mediaelement/video-default.jpg') }}" title="There's no image for this video"></a>
+                            <a href="javascript:void(0)"><img src="{{ CONFIG.get('web/media_dir') ~ '/video-default.jpg' }}" title="There's no image for this video"></a>
                         </li>
                     {% else %}
                         <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}"><a href="#"><img src="{{ media.thumbUrl(90) }}" alt="" title=""></a></li>
