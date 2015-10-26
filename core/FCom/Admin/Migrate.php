@@ -14,7 +14,7 @@
 
 class FCom_Admin_Migrate extends BClass
 {
-    public function install__0_2_0()
+    public function install__0_5_1_0()
     {
         $tRole = $this->FCom_Admin_Model_Role->table();
         $this->BDb->run("
@@ -83,19 +83,23 @@ class FCom_Admin_Migrate extends BClass
         $this->BDb->ddlTableDef($tActivity, [
             BDb::COLUMNS => [
                 'id' => "int unsigned not null auto_increment",
-                'status' => "enum('new', 'recent', 'archived') not null default 'new'",
-                'type' => "enum('workflow', 'alert') not null default 'workflow'",
-                'event_code' => "varchar(50) not null",
+                'status' => "varchar(20) not null default 'new'",
+                'type' => "varchar(20) not null default 'info'",
+                'feed' => "varchar(20) not null default 'local'",
+                'event_code' => 'varchar(50) default null',
                 'permissions' => "varchar(50)",
                 'action_user_id' => 'int unsigned',
                 'customer_id' => 'int unsigned',
                 'order_id' => 'int unsigned',
+                'unique_hash' => 'varchar(50) default null',
+                'ts' => 'datetime default null',
                 'create_at' => 'datetime not null',
                 'data_serialized' => 'text',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
                 'IDX_status_type_create' => '(`status`, `type`, `create_at`)',
+                'UNQ_unique_hash' => '(`unique_hash`)',
             ],
         ]);
 
