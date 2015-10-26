@@ -192,7 +192,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                 row: row
                             };
 
-                            if (row.data_serialized !== undefined && !_.isEmpty(row.data_serialized) && col.type !== undefined && col.type === 'external_link') {
+                            if (!row.file_size && row.data_serialized !== null && col.type !== undefined && col.type === 'external_link') {
                                 var data = typeof row.data_serialized === 'string' ? JSON.parse(row.data_serialized) : row.data_serialized;
                                 switch(id) {
                                     case 'all_videos':

@@ -481,7 +481,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $orm = $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
                     ->where('pa.product_id', $this->id)
                     ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
-                    ->select(['a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label', 'pa.media_type']);
+                    ->select(['a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label', 'pa.media_type', 'a.data_serialized']);
 
         if (is_array($type)) {
             list($I, $V) = $type;
