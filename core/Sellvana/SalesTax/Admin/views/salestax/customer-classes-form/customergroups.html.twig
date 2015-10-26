@@ -1,14 +1,14 @@
-<!--{ label: {{ 'Customers'|_ }}}-->
+<!--{ label: {{ 'Customer Groups'|_ }} }-->
 <!--{ pos: 20 }-->
 
 {% set m = THIS.get('model') %}
 
-{% set allCustomersConfig = APP.instance('Sellvana_Customer_Admin_Controller_Customers').getAllCustomersConfig(m) %}
+{% set allCustomersConfig = APP.instance('Sellvana_CustomerGroups_Admin_Controller_CustomerGroups').getAllCustomerGroupsConfig(m) %}
 {% set custmerAttachConfigCompiled = THIS.view('core/griddle').set('grid', allCustomersConfig).getGridConfig() %}
-{% set customerGroupConfig = APP.instance('Sellvana_CustomerGroups_Admin_Controller_CustomerGroups').getGroupCustomersConfig(m) %}
+{% set customerTaxConfig = APP.instance('Sellvana_SalesTax_Admin_Controller_CustomerClasses').customerGroupsTaxGridConfig(m) %}
 
-<input type='hidden' name='model[customers][add]' id='customer_ids_add'/>
-<input type='hidden' name='model[customers][del]' id='customer_ids_remove'/>
+<input type='hidden' name='grid[customergroups][add]' id='customergroups_add'/>
+<input type='hidden' name='grid[customergroups][del]' id='customergroups_del'/>
 
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'],
@@ -35,16 +35,15 @@
                  * callback function for top action to show modal to add customers
                  * @param grid
                  */
-                window.showModalToAddCustomer = function (grid) {
-//                    debugger;
+                window.showModalToAddTaxCustomerGroup = function (grid) {
                     mainGrid = grid;
-                    var modalContainerEle = document.getElementById('{{ customerGroupConfig.config.id }}-modal');
+                    var modalContainerEle = document.getElementById('{{ customerTaxConfig.config.id }}-modal');
                     React.unmountComponentAtNode(modalContainerEle);
                     React.render(
                             React.createElement(Components.Modal, {
-                                        className: "GroupProductModal",
+                                        className: "taxProductModal",
                                         show: true,
-                                        title: 'Customers List',
+                                        title: 'Group List',
                                         confirm: 'Add',
                                         cancel: 'Close',
                                         onLoad: function (modal) {
@@ -91,13 +90,13 @@
                     }
                 };
 
-                window.setGroupCustomerMainGrid = function (grid) {
+                window.setTaxCustomerGroupMainGrid = function (grid) {
                     mainGrid = grid;
                     var addedIds = [], removedIds = [],
                             arrCurrentAddedIds, arrCurrentRemovedIds, temp,
                             originIds = _.pluck(grid.getRows(), 'id'),
-                            taxProdIdsAddEle = $('#customer_ids_add'),
-                            taxProdIdsRemovedEle = $('#customer_ids_remove');
+                            taxProdIdsAddEle = $('#customergroups_add'),
+                            taxProdIdsRemovedEle = $('#customergroups_del');
 
                     $(mainGrid.getDOMNode())
                             .on('removedRows.griddle', function (e, removedRows, grid) {
@@ -122,12 +121,12 @@
                             });
                 };
 
-            });
+            }
+    );
 </script>
 
 <div class='row'>
     <div class='col-sm-12'>
-        {{ THIS.view('core/griddle').set('grid', customerGroupConfig) | raw }}
+        {{ THIS.view('core/griddle').set('grid', customerTaxConfig) | raw }}
     </div>
 </div>
-
