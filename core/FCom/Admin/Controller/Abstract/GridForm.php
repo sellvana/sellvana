@@ -323,8 +323,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $actions['save'] = [
             'button',
             [
-                'class' => ['btn', 'btn-primary'],
+                'class' => ['btn', 'btn-primary', 'ladda-button'],
                 'onclick' => 'return adminForm.saveAll(this)',
+                'data-style' => 'expand-left',
             ],
             [
                 ['span', null, $this->BLocale->_('Save')],
@@ -334,8 +335,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $actions['save_and_continue'] = [
             'button',
             [
-                'class' => ['btn', 'btn-primary'],
+                'class' => ['btn', 'btn-primary', 'ladda-button'],
                 'onclick' => 'return adminForm.saveAll(this, true)',
+                'data-style' => 'expand-left',
             ],
             [
                 ['span', null, $this->BLocale->_('Save And Continue')],

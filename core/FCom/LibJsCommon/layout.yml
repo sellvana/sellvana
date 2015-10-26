@@ -21,6 +21,8 @@ common_js_libs:
 
             - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
             - [ requireJs, bootstrap-notify, @FCom_LibJsCommon/js/bootstrap-notify.min, { deps: [ jquery, bootstrap ] } ]
+            - [ requireJs, bootstrap-ladda-spin, @FCom_LibJsCommon/js/bootstrap-ladda-spin.min, { deps: [ bootstrap ] } ]
+            - [ requireJs, bootstrap-ladda, @FCom_LibJsCommon/js/bootstrap-ladda.min, { deps: [ bootstrap, bootstrap-ladda-spin ] } ]
 
             - [ requireJs, typeahead-bundle, "@FCom_LibJsCommon/js/typeahead/typeahead-bundle" ]
             - [ requireJs, bloodhound, "@FCom_LibJsCommon/js/typeahead/bloodhound" ]
@@ -37,6 +39,7 @@ common_js_libs:
             #- [ requireModulePath, FCom_Core ]
             #- [ requireJs, jquery.tools, @FCom_LibJsCommon/js/jquery.tools.min, { deps: [ jquery ] } ]
             - [ css, @FCom_LibJsCommon/js/css/ngprogress.css ]
+            - [ css, @FCom_LibJsCommon/js/css/bootstrap-ladda.css ]
 
             #- [ css, "@FCom_LibJsCommon/js/css/select2.css" ]
             #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]

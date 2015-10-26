@@ -1,4 +1,4 @@
-var fcomAdminDeps = ["jquery", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch', 'jquery.pnotify'];
+var fcomAdminDeps = ["jquery", 'bootstrap-ladda', "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch', 'jquery.pnotify', 'bootstrap-ladda-spin'];
 if (require.specified('ckeditor')) {
     fcomAdminDeps.push('ckeditor');
 }
@@ -21,7 +21,7 @@ if (require.specified('ckeditor')) {
  * @property {String} current_mode current application mode
  */
 
-define(fcomAdminDeps, function ($) {
+define(fcomAdminDeps, function ($, Ladda) {
     /*
      var myApp = angular.module("fcomApp", [], function($interpolateProvider) {
      $interpolateProvider.startSymbol("<%");
@@ -1277,6 +1277,8 @@ define(fcomAdminDeps, function ($) {
             //TODO
             ajaxPassed = true;
             var form = $(el).closest('form');
+            var loader = Ladda.create(el);
+            loader.start();
             $(form).submit(function(event) {
                 if (ajaxPassed) {
                     event.preventDefault();
@@ -1310,6 +1312,7 @@ define(fcomAdminDeps, function ($) {
                 if (data.redirect) {
                     document.location = data.redirect;
                 } else {
+                    loader.stop();
                     var actionUrl = form.attr('action');
                     var urlInfo = actionUrl.split('?');
                     if (urlInfo[1]) {
