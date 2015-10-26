@@ -94,8 +94,9 @@
     });
 
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'griddle.fcomMediaLib', 'jquery.media-element'], function () {
-        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
+        var uploadUrl   = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
         var maxFileSize = parseInt({{ defaultFileSizeConfig }}) * 1024000;
+        var mediaGrid   = mediaLibGrid{{ config.id }};
 
         $('#{{config.id}}-media-upload').fileupload({
             url: uploadUrl,
@@ -108,9 +109,6 @@
             {% endif %}
         }).bind('fileuploadalways', function (e, data) {
             // console.log('DEBUG: fileuploadalways.data', data);
-
-            var mediaGrid = mediaLibGrid{{ config.id }};
-
             if (mediaGrid) {
                 //push data to media grid after upload
                 if ($.isArray(data.result.files)) {
@@ -180,7 +178,12 @@
                     break;
                 default:
                     $.post("{{ APP.href('/catalog/products/embed_video') }}", { url: url }, function(r) {
-                        if (r) $oembedContainer.empty().html(r).show();
+                        if (!r.error) {
+                            $.bootstrapGrowl("Error: This video type has not been supported.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                            return;
+                        }
+
+                        $oembedContainer.empty().html(r).show();
                     });
                     break;
             }
@@ -206,8 +209,7 @@
             $.post("{{ APP.href('/catalog/products/embed_video') }}", hash, function(r) {
                 if (!r.error) {
                     $.bootstrapGrowl("Success: Add library success.", { type: 'success', align: 'center', width: 'auto', delay: 5000 });
-                    var data = JSON.parse(r);
-                    $oembedContainer.empty().html(data.html).show();
+                    mediaGrid.addRows([r]);
                 } else {
                     $.bootstrapGrowl("Error: Add library failure, please check your link.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                 }

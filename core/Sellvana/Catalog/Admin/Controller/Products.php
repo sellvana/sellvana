@@ -744,12 +744,15 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             if (!$model->set($data)->save()) {
                 $this->BResponse->json(['error' => true]);
             }
+
+            $this->BResponse->json($model->as_array());
         } else {
             $content = $oembed->parse($r->post('url'));
-
+            if (!$content) {
+                $this->BResponse->json(['error' => true]);
+            }
+            $this->BResponse->json($content);
         }
-
-        $this->BResponse->json($content);
     }
 
     public function formPostAfter($args)

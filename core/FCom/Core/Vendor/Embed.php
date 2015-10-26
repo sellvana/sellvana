@@ -29,6 +29,11 @@ class FCom_Core_Vendor_Embed extends BClass
         '#http://instagr(\.am|am\.com)/p/.*#i'               => ['http://api.instagram.com/oembed',                   true ],
     ];
 
+    /**
+     * Set flag for returning media info
+     * 
+     * @return $this
+     */
     public function linkInfo()
     {
         $this->linkInfo = true;
@@ -560,6 +565,10 @@ class FCom_Core_Vendor_Embed extends BClass
         }
 
         return $atts;
+    }
+
+    public function __destruct() {
+        $this->linkInfo = false;
     }
         
 }
