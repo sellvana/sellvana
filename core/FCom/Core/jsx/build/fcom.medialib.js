@@ -5,6 +5,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
     var FComMediaLib = React.createClass({
         displayName: "FComMediaLib",
         mixins: [FCom.Mixin],
+        getInitialState: function() {
+            return {
+                isChecked: true 
+            };
+        },
         getDefaultProps: function() {
             //todo: validate received props
             return {
@@ -86,6 +91,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
             }
             return null
         },
+        handleProviderChange: function() {
+            this.setState({
+                isChecked: !this.state.isChecked 
+            });
+        },
         getMainGridEle: function() {
             return React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
         },
@@ -111,9 +121,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                             React.createElement("label", {htmlFor: ""}, "Provider: ")
                         ), 
                         React.createElement("div", {className: "col-sm-11"}, 
-                            React.createElement("label", {className: "radio-inline"}, React.createElement("input", {type: "radio", name: "provider", value: "youtube"}), "Youtube"), 
-                            React.createElement("label", {className: "radio-inline"}, React.createElement("input", {type: "radio", name: "provider", value: "vimeo"}), "Vimeo"), 
-                            React.createElement("label", {className: "radio-inline"}, React.createElement("input", {type: "radio", name: "provider", value: "other"}), "Other Providers")
+                            React.createElement("label", {className: "radio-inline"}, React.createElement("input", {type: "radio", name: "provider", value: "youtube", checked: this.state.isChecked, onChange: this.handleProviderChange}), "Youtube"), 
+                            React.createElement("label", {className: "radio-inline"}, React.createElement("input", {type: "radio", name: "provider", value: "vimeo", onChange: this.handleProviderChange}), "Vimeo")
                         )
                     ), 
                     React.createElement("div", {className: "col-sm-12 oembed_container"})

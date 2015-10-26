@@ -178,7 +178,7 @@
                     break;
                 default:
                     $.post("{{ APP.href('/catalog/products/embed_video') }}", { url: url }, function(r) {
-                        if (!r.error) {
+                        if (r.error) {
                             $.bootstrapGrowl("Error: This video type has not been supported.", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                             return;
                         }

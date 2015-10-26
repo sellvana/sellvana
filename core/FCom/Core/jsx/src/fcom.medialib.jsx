@@ -5,6 +5,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
     var FComMediaLib = React.createClass({
         displayName: "FComMediaLib",
         mixins: [FCom.Mixin],
+        getInitialState: function() {
+            return {
+                isChecked: true 
+            };
+        },
         getDefaultProps: function() {
             //todo: validate received props
             return {
@@ -86,6 +91,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
             }
             return null
         },
+        handleProviderChange: function() {
+            this.setState({
+                isChecked: !this.state.isChecked 
+            });
+        },
         getMainGridEle: function() {
             return React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
         },
@@ -111,9 +121,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                             <label htmlFor="">Provider: </label>
                         </div>
                         <div className="col-sm-11">
-                            <label className='radio-inline'><input type="radio" name='provider' value='youtube' />Youtube</label>
-                            <label className='radio-inline'><input type="radio" name='provider' value='vimeo' />Vimeo</label>
-                            <label className='radio-inline'><input type="radio" name='provider' value='other' />Other Providers</label>
+                            <label className='radio-inline'><input type="radio" name='provider' value='youtube' checked={this.state.isChecked} onChange={this.handleProviderChange} />Youtube</label>
+                            <label className='radio-inline'><input type="radio" name='provider' value='vimeo' onChange={this.handleProviderChange} />Vimeo</label>
                         </div>
                     </div>
                     <div className="col-sm-12 oembed_container"></div>
