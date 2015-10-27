@@ -191,6 +191,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                             var rc = {
                                 row: row
                             };
+
                             node = eval(col.print);
                             customNodeHtml = true;
                         } else if (col.display == 'file_size') {

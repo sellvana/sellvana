@@ -44,10 +44,6 @@ common_js_libs:
             - [ requireJs, sortable, @FCom_LibJsCommon/js/sortable.min ]
             - [ requireJs, ajaxify, @FCom_LibJsCommon/js/ajaxify.min, { deps: [ jquery ] } ]
 
-            #TODO: Move below require block to right lib module
-            - [ css, "@FCom_LibJsCommon/js/css/mediaelementplayer.min.css" ]
-            - [ requireJs, jquery.media-element, "@FCom_LibJsCommon/js/mediaelement-and-player.min", { deps: [ jquery.fileupload ] } ]
-
 lib_visualsearch:
     - view: head
         do:
@@ -102,3 +98,10 @@ lib_file_upload:
             - [ requireJs, jquery.fileupload-fp, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-fp.min", { deps: [ jquery.fileupload ] } ]
             - [ requireJs, jquery.fileupload-init, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-init", { deps: [ jquery.fileupload ] } ]
             - [ requireJs, jquery.fileupload-ui, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-ui.min", { deps: [ jquery.fileupload ] } ]
+
+lib_media_player:
+    - view: head
+        do:
+            - [ css, "@FCom_LibJsCommon/js/css/mediaelementplayer.min.css" ]
+            - [ requireJs, jquery.vimeo, "@FCom_LibJsCommon/js/jquery.vimeo.api.min", { deps: [ jquery ] } ]
+            - [ requireJs, jquery.media-element, "@FCom_LibJsCommon/js/mediaelement-and-player.min", { deps: [ jquery ] } ]

@@ -35,6 +35,7 @@ base:
     - { include: common_js_libs }
     - { include: lib_griddle }
     - { include: lib_admin_theme1 }
+    - { include: lib_media_player }
 
     - view: admin/nav
         do:
