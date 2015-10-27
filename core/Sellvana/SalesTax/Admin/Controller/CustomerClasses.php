@@ -6,6 +6,8 @@
  * @property Sellvana_SalesTax_Model_CustomerClass $Sellvana_SalesTax_Model_CustomerClass
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_SalesTax_Model_CustomerTax $Sellvana_SalesTax_Model_CustomerTax
+ * @property Sellvana_SalesTax_Model_CustomerGroupTax $Sellvana_SalesTax_Model_CustomerGroupTax
+ * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  */
 class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Controller_Abstract_GridForm {
     protected static $_origClass = __CLASS__;
@@ -87,6 +89,32 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
                 }
             }
         }
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CustomerGroups')) {
+            if (!empty($data['grid']['customergroups'])) {
+                if (!empty($data['grid']['customergroups']['add'])) {
+                    // add ProductTax models
+                    $addIds = explode(',', $data['grid']['customergroups']['add']);
+                    foreach ($addIds as $id) {
+                        $this->Sellvana_SalesTax_Model_CustomerGroupTax
+                            ->create(['customer_group_id' => (int)trim($id), 'customer_class_id' => $model->id()])
+                            ->save();
+                    }
+                }
+
+                if (!empty($data['grid']['customergroups']['del'])) {
+                    // del ProductTax models
+                    $rmIds = explode(',', $data['grid']['customergroups']['del']);
+                    $toDel = $this->Sellvana_SalesTax_Model_CustomerGroupTax
+                        ->orm()->where('customer_class_id', $model->id())
+                        ->where(['customer_group_id' => $rmIds])->find_many();
+                    if ($toDel) {
+                        foreach ($toDel as $d) {
+                            $d->delete();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -96,13 +124,18 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
     public function customersTaxGridConfig($model)
     {
         $orm = $this->Sellvana_Customer_Model_Customer->orm('c')
-                                                    ->select([
-                                                        'c.id',
-                                                        'c.firstname',
-                                                        'c.lastname',
-                                                        'c.email'
-                                                    ])->join($this->Sellvana_SalesTax_Model_CustomerTax->table(), 'ct.customer_id=c.id', 'ct')
-                                                    ->where('ct.customer_class_id', $model->id());
+            ->select([
+                'c.id',
+                'c.firstname',
+                'c.lastname',
+                'c.email'
+            ])
+            ->join(
+                $this->Sellvana_SalesTax_Model_CustomerTax->table(),
+                'ct.customer_id=c.id',
+                'ct'
+            )
+            ->where('ct.customer_class_id', $model->id());
 
         $gridId = 'customer_tax_grid';
 
@@ -143,6 +176,68 @@ class Sellvana_SalesTax_Admin_Controller_CustomerClasses extends FCom_Admin_Cont
 
         $config['config']['callbacks'] = [
             'componentDidMount' => 'setTaxCustomerMainGrid'
+        ];
+
+        return $config;
+    }
+
+
+    /**
+     * @param $model Sellvana_SalesTax_Model_CustomerClass
+     * @return mixed
+     */
+    public function customerGroupsTaxGridConfig($model)
+    {
+        $orm = $this->Sellvana_CustomerGroups_Model_Group->orm('c')
+            ->select([
+                'c.id',
+                'c.title',
+                'c.code',
+            ])
+            ->join(
+                $this->Sellvana_SalesTax_Model_CustomerGroupTax->table(),
+                'ct.customer_group_id=c.id',
+                'ct'
+            )
+            ->where('ct.customer_class_id', $model->id());
+
+        $gridId = 'customer_group_tax_grid';
+
+        $config['config'] = [
+            'id'                 => $gridId,
+            'data'               => null,
+            'data_mode'          => 'local',
+            'columns'            => [
+                ['type' => 'row_select'],
+                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'title', 'label' => 'Title', 'index' => 'c.firstname', 'width' => 400],
+                ['name' => 'code', 'label' => 'Code', 'index' => 'c.lastname', 'width' => 200],
+            ],
+            'actions'            => [
+                #'add' => ['caption' => 'Add products'],
+                'delete'          => ['caption' => 'Remove'],
+                'add-tax-product' => [
+                    'caption'  => 'Add Tax Groups',
+                    'type'     => 'button',
+                    'id'       => 'add-tax-customergroup-from-grid',
+                    'class'    => 'btn-primary',
+                    'callback' => 'showModalToAddTaxCustomerGroup'
+                ]
+            ],
+            'filters'            => [
+                ['field' => 'title', 'type' => 'text'],
+                ['field' => 'code', 'type' => 'text'],
+            ],
+            'events'             => ['init', 'add', 'mass-delete'],
+            'grid_before_create' => $gridId . '_register'
+        ];
+
+        $data = $this->BDb->many_as_array($orm->find_many());
+
+        $config['config']['data'] = $data;
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'setTaxCustomerGroupMainGrid'
         ];
 
         return $config;

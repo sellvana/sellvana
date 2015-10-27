@@ -591,6 +591,22 @@ class FCom_Core_ImportExport extends BClass
             $oldModels = $this->_getExistingModels($cm, $existing);
         }
 
+        if (!empty($oldModels)){
+            $oldModelsIds = [];
+            foreach($oldModels as $key => $model){
+                $oldModelsIds[$key] = $model->{$this->_currentModelIdField};
+            }
+
+            $ieOrm = $ieHelperId->orm('i')->select(['i.local_id'])
+                ->where('site_id', $this->_importId)
+                ->where_in('local_id', array_values($oldModelsIds))
+                ->where('model_id', $this->_importModels[$this->_currentModel]->id())
+                ;
+            $res = $ieOrm->find_many_assoc('local_id', 'local_id');
+
+            $ieAbsentIds = array_diff(array_values($oldModelsIds), $res);
+        }
+
         foreach ($batchData as $id => $data) {
             if (!isset($data[$this->_currentModelIdField])) {
                 $this->_errors++;
@@ -669,6 +685,9 @@ class FCom_Core_ImportExport extends BClass
                         $this->_updatedModels++;
                         $this->_modelsStatistics[$this->_currentModel]['updated_models']++;
                     } else {
+                        if (in_array($model->id(),$ieAbsentIds)){
+                            $modified = true;
+                        }
                         $this->_notChanged++;
                         $this->_modelsStatistics[$this->_currentModel]['not_changed']++;
                     }

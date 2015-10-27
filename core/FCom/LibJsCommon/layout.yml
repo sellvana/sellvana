@@ -18,6 +18,7 @@ common_js_libs:
             - [ requireJs, fcom.ipmode, @FCom_Core/js/fcom/fcom.ipmode ]
             - [ requireJs, fcom.validate.ext, @FCom_Core/js/fcom/fcom.validate.ext ]
             - [ requireJs, fcom.locale, @FCom_Core/js/fcom/fcom.locale ]
+            - [ requireJs, fcom.message, @FCom_Core/js/fcom/fcom.message, { deps: [ jquery, react ] } ]
 
             - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
             - [ requireJs, bootstrap-notify, @FCom_LibJsCommon/js/bootstrap-notify.min, { deps: [ jquery, bootstrap ] } ]
