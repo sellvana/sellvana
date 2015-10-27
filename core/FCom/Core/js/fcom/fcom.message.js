@@ -25,8 +25,10 @@ define(['jquery', 'react'], function ($, React) {
 
             if (Array.isArray(messages)) {
                 for (var key in messages) {
-                    needRender = true;
-                    messagesQueue.push(messages[key]);
+                    if (messages.hasOwnProperty(key)) {
+                        needRender = true;
+                        messagesQueue.push(messages[key]);
+                    }
                 }
             } else {
                 needRender = true;
@@ -42,14 +44,21 @@ define(['jquery', 'react'], function ($, React) {
             var messagesQueue = this.props.messages;
 
             for (var index in messagesQueue) {
-                var messageConfig = messagesQueue[index];
+                if (messagesQueue.hasOwnProperty(index)) {
 
-                messageConfig.key = 'FcomMessage-' + index;
-                messageConfig.messageIndex = index;
-                messagesNodes.push(React.createElement(
-                    FcomMessage,
-                    messageConfig
-                ));
+                    var messageConfig = {};
+                    //debugger;
+                    if (undefined !== messagesQueue[index].type) {
+                        messageConfig.type = messagesQueue[index].type;
+                    }
+                    messageConfig.config = messagesQueue[index];
+                    messageConfig.key = 'FcomMessage-' + index;
+                    messageConfig.messageIndex = index;
+                    messagesNodes.push(React.createElement(
+                        FcomMessage,
+                        messageConfig
+                    ));
+                }
             }
 
             return React.createElement('div', {key: 'messagesQueue'}, messagesNodes);
@@ -62,20 +71,29 @@ define(['jquery', 'react'], function ($, React) {
      *   info
      *   warning
      *   danger
+     *   error
      */
     var FcomMessage = React.createClass({
             displayName: "FcomMessage",
             getDefaultProps: function () {
                 return {
                     type: 'info',
-                    class: 'info',
-                    title: 'Info',
-                    icon: 'info'
+                    types: {
+                        success: {class: 'success', title: 'Success', icon: 'ok'},
+                        info: {class: 'info', title: 'Info', icon: 'info'},
+                        warning: {class: 'warning', title: 'Warning', icon: 'exclamation'},
+                        danger: {class: 'danger', title: 'Danger', icon: 'remove'},
+                        error: {class: 'danger', title: 'Danger', icon: 'remove'}
+                    }
                 }
             },
             render: function () {
                 var props = this.props,
+                    type = this.props.type,
+                    config,
                     nodes = [];
+
+                config = $.extend({msg: null, msgs: null}, props.types[type], props['config']);
 
                 nodes.push(React.createElement('a',
                     {
@@ -87,23 +105,31 @@ define(['jquery', 'react'], function ($, React) {
                     "\u00D7"
                 ));
 
-                if (props.title) {
+                if (config.title) {
                     nodes.push(React.createElement('h4', {key: 'title'}, [
                         React.createElement('i', {
                             key: 'icon',
-                            className: 'icon-' + props.icon + '-sign'
+                            className: 'icon-' + config.icon + '-sign'
                         }),
-                        ' ' + props.title
+                        ' ' + config.title
                     ]));
                 }
 
-                //TODO: check if exist - props.msgs
-                nodes.push(props.msg);
-
+                if (null != config.msgs) {
+                    for (var id in config.msgs) {
+                        if (config.msgs.hasOwnProperty(id)) {
+                            nodes.push(config.msgs[id]);
+                            nodes.push(React.createElement('br', {key: 'br' + id}));
+                        }
+                    }
+                    nodes.pop();
+                } else {
+                    nodes.push(config.msg);
+                }
 
                 return React.createElement('div',
                     {
-                        className: 'alert alert-dismissable alert-' + props.class,
+                        className: 'alert alert-dismissable alert-' + config.class,
                         id: 'import-log',
                         key: 'message'
                     },
@@ -136,5 +162,4 @@ define(['jquery', 'react'], function ($, React) {
         init: init,
         push: push
     }
-})
-;
+});
