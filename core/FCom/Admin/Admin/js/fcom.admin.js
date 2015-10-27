@@ -1301,8 +1301,7 @@ define(fcomAdminDeps, function ($, Ladda) {
                 for (var msgId in data.messages) {
                     sysMessages.push({
                         msg: data.messages[msgId].text || 'The form has been saved',
-                        class: data.status == 'error' ? 'danger' : 'success',
-                        icon: data.status == 'error' ? 'exclamation' : 'ok'
+                        type: data.status == 'error' ? 'danger' : 'success'
                     });
                 }
                 if (data.redirect) {
