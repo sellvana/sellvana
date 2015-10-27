@@ -27,10 +27,6 @@
         var productVideosGrid = {{ combineType }}Grid, productVideosNode, productExternalModalGrid, productExternalModalNode, videoExt, videoName, editedRow;
         var linkInfo = {}, isExternalLink = false;
 
-        /*gapi.client.load('plus', 'v3', function() {
-            console.log('plus loaded!');
-        });*/
-
         if (productVideosGrid) {
             $(productVideosGrid.getDOMNode())
                 .on('removedRows.griddle', function (e, rows) {
@@ -94,23 +90,28 @@
 
         function _refreshGrid(data) {
             _(data).each(function(val, i) {
-                editedRow[i] = val;
+                if (editedRow[i] != undefined && editedRow[i] != val) {
+                    $('#product_videos-' + i + '-' + data['id']).val(val);
+                    editedRow[i] = val;
+                }
             });
+
             productVideosGrid.updateRows([editedRow]);
         }
 
         window.savePreviewModal = function(modal) {
-            var $form = productVideosNode.find('form#' + productVideosGrid.getConfig('id') + '-modal-form'),
-                $alert = productVideosNode.find('.alert'),
-                id = $form.find('#id').val(),
-                url = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
-                hash = { oper: id ? 'edit' : 'add' }
+            var $form         = productVideosNode.find('form#' + productVideosGrid.getConfig('id') + '-modal-form'),
+                id            = $form.find('#id').val(),
+                url           = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
+                hash          = { oper: id ? 'edit' : 'add' }
                 isNameChanged = false;
 
             $form.find('textarea, input, select').each(function() {
                 var key = $(this).attr('id');
                 var val = $(this).val();
-                if (key == 'file_name' && val !== videoName) isNameChanged = true;
+                if (key == 'file_name' && val !== videoName) {
+                    isNameChanged = true;
+                }
                 hash[key] = productVideosGrid.html2text(val);
             });
 
@@ -120,14 +121,10 @@
                         url: url,
                         type: 'POST',
                         dataType: 'json',
-                        data: hash,
-                        beforeSend: function() {
-                            $alert.hide();
-                        }
+                        data: hash
                     }).done(function(r) {
                         if (r.error) {
-                            var msg = r.message ? r.message : "{{ 'Save file error due to system error, please try again.' | _ }}";
-                            $alert.find('.alert-message').html(msg).show();
+                            $.bootstrapGrowl("{{ 'Error: Save file error due to system error, please try again.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                             return;
                         }
                         _refreshGrid(hash);
@@ -146,17 +143,22 @@
             videoExt       = _getFileExtension(row.file_name);
             videoName      = row.file_name;
 
-            if (row.data_serialized !== undefined) {
+            if (!row.file_size) {
                 isExternalLink = true;
-                var data = JSON.parse(row.data_serialized);
-                var provider = data.provider_name.toLowerCase();
-                if (provider == 'youtube') {
-                    var src = data.html.substring(data.html.search('src') + 4, data.html.search('oembed') + 6);
-                    var videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
-                            React.DOM.source({ src: src,  type: "video/youtube"  })
-                        );
-                } else {
-                    videoNode = React.DOM.div({ dangerouslySetInnerHTML: {__html: data.html} });
+                var data = typeof row.data_serialized === 'string' ? JSON.parse(row.data_serialized) : row.data_serialized;
+                var provider = data !== undefined ? data.provider_name.toLowerCase() : '';
+                switch(provider) {
+                    case 'youtube':
+                        var src = data.html.substring(data.html.search('src') + 4, data.html.search('oembed') + 6);
+                        var videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
+                                React.DOM.source({ src: src,  type: "video/youtube"  })
+                            );
+                        break;
+                    case 'vimeo':
+                        var videoNode = React.DOM.div({ dangerouslySetInnerHTML: {__html: data.html} });
+                        break;
+                    default:
+                        break;
                 }
             } else {
                 var videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
@@ -180,11 +182,6 @@
                         onConfirm: window.savePreviewModal
                     },
                     React.DOM.div({ className: "row f-grid-wrapper col-sm-12" }, 
-                        React.DOM.div({ className: 'alert alert-danger alert-dismissible',  role: 'alert', style: { display: 'none' } },
-                            React.DOM.button({ type: 'button', className: 'close', 'data-dismiss': 'alert', 'aria-hidden': 'true', dangerouslySetInnerHTML: {__html: '&times;'} }),
-                            React.DOM.strong(null, "{{ 'Error' | _ }}"),
-                            React.DOM.span({ className: 'alert-message' }, '')
-                        ),
                         React.DOM.div({ id: "video-container", style: { padding: '0 10px' }, className: 'col-sm-7' },
                             videoNode
                         ),

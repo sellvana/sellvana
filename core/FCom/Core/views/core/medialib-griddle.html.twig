@@ -91,6 +91,14 @@
                         }
                     });
         });
+
+        $(mediaLibComponent{{ config.id }}.getDOMNode())
+            .on('removedRows.griddle', function (e, rows) {
+                // Removed videos on main video tab grid
+            }).on('addedRows.griddle', function (e, rows) {
+                // Added videos on main video tab grid
+                mediaLibGrid{{ config.id }}.addSelectedRows(rows);
+            });
     });
 
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui', 'griddle.fcomMediaLib', 'jquery.media-element', 'jquery.vimeo'], function () {
