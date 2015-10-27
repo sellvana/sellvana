@@ -1298,17 +1298,13 @@ define(fcomAdminDeps, function ($, Ladda) {
             var url_post = options.url_get + (options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post + 'tabs=ALL&mode=view', postData, function (data, status, req) {
                 FCom.Admin.log(data);
-                var message = '';
                 for (var msgId in data.messages) {
-                    message += "<br />" + data.messages[msgId].text;
+                    sysMessages.push({
+                        msg: data.messages[msgId].text || 'The form has been saved',
+                        class: data.status == 'error' ? 'danger' : 'success',
+                        icon: data.status == 'error' ? 'exclamation' : 'ok'
+                    });
                 }
-                $.pnotify({
-                    pnotify_title: message || 'The form has been saved',
-                    pnotify_type: data.status == 'error' ? 'error' : null,
-                    pnotify_history: false,
-                    pnotify_nonblock: true, pnotify_nonblock_opacity: .3,
-                    pnotify_delay: 5000
-                });
                 if (data.redirect) {
                     document.location = data.redirect;
                 } else {
