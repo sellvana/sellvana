@@ -192,29 +192,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                 row: row
                             };
 
-                            if (!row.file_size && row.data_serialized !== null && col.type !== undefined && col.type === 'external_link') {
-                                var data = typeof row.data_serialized === 'string' ? JSON.parse(row.data_serialized) : row.data_serialized;
-                                switch(id) {
-                                    case 'all_videos':
-                                        var provider = data.provider_name.toLowerCase();
-                                        switch(provider) {
-                                            case 'youtube':
-                                                var src = $(data.html).prop('src');
-                                                node = "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ row.id +"\' preload=\'none\'><source src=\'" + src + "\' title=\'" + data.title + "\' type=\'video/" + provider + "\'></video>";
-                                                break
-                                            case 'vimeo':
-                                                var html = data.html.replace(/(width="\d{3}"\s+height="\d{3}")/, 'width="200" height="140"');
-                                                node = eval(JSON.stringify(html));
-                                                break;
-                                            default:
-                                                node = eval(JSON.stringify(data.html));
-                                                break;
-                                        }
-                                        break;
-                                }
-                            } else {
-                                node = eval(col.print);
-                            }
+                            node = eval(col.print);
                             customNodeHtml = true;
                         } else if (col.display == 'file_size') {
                             node = that.fileSizeFormat(row[col.name]);

@@ -81,7 +81,26 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         if ($id == 'all_videos') {
             $elementPrint = '
-                "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ rc.row["id"] +"\' preload=\'none\'><source src=\''. $baseSrc .'" + rc.row["folder"] + "/" + rc.row["file_name"] + "\' type=\'video/" + rc.row["file_name"].slice(rc.row["file_name"].lastIndexOf(".") + 1) + "\'></video>"
+                if (rc.row["file_size"] !== undefined && rc.row["file_size"] !== null) {
+                    "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ rc.row["id"] +"\' class=\'product-video-media\' preload=\'none\'><source src=\''. $baseSrc .'" + rc.row["folder"] + "/" + rc.row["file_name"] + "\' type=\'video/" + rc.row["file_name"].slice(rc.row["file_name"].lastIndexOf(".") + 1) + "\'></video>"
+                } else {
+                    var data = typeof rc.row[\'data_serialized\'] === \'string\' ? JSON.parse(rc.row[\'data_serialized\']) : rc.row[\'data_serialized\'];
+                    if (data !== undefined) {
+                        var provider = data !== undefined ? data.provider_name.toLowerCase() : "";
+                        switch(provider) {
+                            case \'youtube\':
+                                var src = $(data.html).prop(\'src\');
+                                "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ row.id +"\' class=\'product-video-media\' preload=\'none\'><source src=\'" + src + "\' title=\'" + data.title + "\' type=\'video/youtube\'></video>"
+                                break;
+                            case \'vimeo\':
+                                data.html.replace(/(width="\d{3}"\s+height="\d{3}")/, \'width="200" height="140"\');
+                                break;
+                            default:
+                                data.html
+                                break;
+                        }
+                    }
+                }
             ';
         } else {
             $elementPrint = '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
@@ -337,7 +356,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 $folder = $this->getFolder();
     //            $r = $this->BRequest->get();
                 $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
-                    ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
+                    ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size', 'a.data_serialized'])
                     ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ;
                 if($folder){
