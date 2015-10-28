@@ -1,5 +1,6 @@
 {% set fieldSetModel = APP.instance('Sellvana_CatalogFields_Model_Set') %}
 {% set ctrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products') %}
+{% set initialData = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products').getInitialData(model) %}
 <div id="prod-new-field-modal" class="modal fade in" tabindex='-1'>
     <div class="modal-dialog">
         <div class="modal-content">
@@ -119,7 +120,10 @@
 {# CONFLICT START #}
 
 <div class="well">
-  <div class="row">
+    <div>
+        {{ THIS.hook('settings_header_title') | raw }}
+    </div>
+    <div class="row">
     <input type="hidden" id="custom_fields" name="custom_fields"/>
     <div class="col-sm-6">
       <select id="sel_sets" class="select2 form-control" style="width:150px;">
@@ -332,6 +336,10 @@ CONFLICT END #}
 
 <script>
 var pfdRemoveIds = {};
+var initialData = {};
+var setCollection = {};
+var mainView = {};
+var currentState = {};
 $('#fcom_additional_info_field_form').append('<form id="prod-new-field-form" class="form form-horizontal validate-form"></form>');
 $('#prod-new-field-modal').appendTo('#prod-new-field-form');
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
@@ -361,8 +369,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     };
     var currentSet = null;
-    {% set initialData = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products').getInitialData(model) %}
-    var initialData = {{ UTIL.toJson(initialData) | raw }};
+    initialData = {{ UTIL.toJson(initialData) | raw }};
 
     function refresh_selects()
     {
@@ -659,7 +666,28 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     });
 
     CustomField.Collections.FieldSetCollection = Backbone.Collection.extend({
-        model: CustomField.Models.FieldSet
+        model: CustomField.Models.FieldSet,
+        setValuesFromField: function(field, key) {
+            var fieldSetModel;
+            var fieldModel;
+            var newValues;
+            var newValue;
+
+            if (field) {
+                newValues = initialData[field][key] || initialData[field]['default'];
+            } else {
+                newValues = initialData[key];
+            }
+            for (var i = 0; i < setCollection.models.length; i++) {
+                fieldSetModel = setCollection.models[i];
+                for (var j = 0; j < fieldSetModel.fields.models.length; j++) {
+                    fieldModel = fieldSetModel.fields.models[j];
+                    newValue = currentState[fieldModel.id] || newValues[fieldModel.id] || initialData[field]['default'][fieldModel.id];
+                    fieldModel.set('value', newValue);
+                }
+            }
+            mainView.render();
+        }
     });
     CustomField.Views.LangFieldView = Backbone.View.extend({
         className: 'row',
@@ -728,6 +756,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         initialize: function() {
             this.model.langFields.on('add', this._addLangView, this);
             this.model.langFields.on('remove', this._removeLangView, this);
+            this.model.on('add change', this._saveState, this);
+        },
+        _saveState: function(field) {
+            currentState[field.get('id')] = field.get('value');
+            $(document).trigger('currentState:updated');
         },
         _refresh: function() {
             this.model.url = '{{ APP.href('/catalogfields/products/get_field?id=') | raw }}'+this.model.get('id');
@@ -790,7 +823,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             var val = this.$el.find('input[type="hidden"]').val();
         },
         _changeSelect2: function() {
-            var val = this.$el.find('select').val();
+            var val = this.$el.find('select:last').val();
             if (typeof(val) === 'object')
                 val = val.join(',');
 
@@ -867,6 +900,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         initialize: function() {
             //this.model.on('change', this._checkCollapse, this);
             this.model.fields.on('add', this._addField, this);
+            //this.model.fields.on('add change', this._saveState, this);
         },
         events: {
             'click a.btn-edit': '_showSelf',
@@ -906,8 +940,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
         },
         _addField: function(field) {
+            if (currentState[field.get('id')] !== undefined) {
+                return true;
+            }
             var fieldView = new CustomField.Views.FieldView({model: field});
             this.$el.find('div.box-content').append(fieldView.render().el);
+            $(document).trigger('field:added', {field: field, view: fieldView});
 
             switch (field.get('admin_input_type')) {
                 case 'multiselect':
@@ -928,8 +966,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     break;
             }
 
+            currentState[field.get('id')] = field.get('value');
+            $(document).trigger('currentState:updated');
             fieldView.parentSet = this.model;
 
+        },
+        _saveState: function(field) {
+            currentState[field.get('id')] = field.get('value');
+            $(document).trigger('currentState:updated');
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
@@ -956,7 +1000,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
 
-    var setCollection = new CustomField.Collections.FieldSetCollection();
+    setCollection = new CustomField.Collections.FieldSetCollection();
     var setModel = null;
     if (initialData !== -1) {
         for(var i in initialData) {
@@ -976,7 +1020,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     refresh_selects();
 
-    var mainView = new CustomField.Views.MainView({collection: setCollection});
+    mainView = new CustomField.Views.MainView({collection: setCollection});
     mainView.render();
     if (setCollection.length === 0) {
         $('#td_fields').css('display', 'none');
