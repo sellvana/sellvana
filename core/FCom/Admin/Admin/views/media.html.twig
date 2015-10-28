@@ -52,7 +52,6 @@
 </div>
 
 <script type="text/javascript">
-console.log({{ UTIL.toJson(uploadConfig) | raw }});
     require(['jquery'], function ($) {
         var uploadConfigs       = {{ UTIL.toJSON(uploadConfig) | raw }};
         var uploadUrlBase       = "{{ APP.href("media/grid/upload?type=") | raw }}";
@@ -86,7 +85,7 @@ console.log({{ UTIL.toJson(uploadConfig) | raw }});
         window.registerGrid{{ config.id }} = function (grid) {
             window.{{ config.id }}_grid = mediaLibGrid{{ config.id }} = grid;
             //re-scan image button
-            $('#{{ config.id }}-attach_library').find('.btn-rescan-images').on('click', function () {
+            $('#{{ config.id }}-attach_library').find('.btn-rescan-media').on('click', function () {
                 $.post('{{ APP.href("media/grid/rescan_library") | raw }}', {do: 'rescan_library'}, function (response) {
                     if (response.status == 'success') {
                         $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});

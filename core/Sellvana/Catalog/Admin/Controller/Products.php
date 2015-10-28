@@ -441,7 +441,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_VIDEO)
             ->clear_columns()
             ->select('pa.*')
-            ->select(['a.folder', 'a.subfolder', 'a.file_name', 'a.file_size'])
+            ->select(['a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'a.data_serialized'])
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
             ->find_many());
 
@@ -721,6 +721,38 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         //$this->BEvents->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
         return $config;
+    }
+
+    public function action_embed_video__POST()
+    {
+        $r     = $this->BRequest;
+        $do    = $r->post('oper');
+
+        $oembed  = $this->BApp->instance('FCom_Core_Vendor_Embed');
+
+        if (!empty($do) && $do == 'add') {
+            $content = $oembed->linkInfo()->parse($r->post('url'));
+            $temp    = json_decode($content);
+            $model   = $this->FCom_Core_Model_MediaLibrary->create();
+
+            $data    = [
+                'file_name'       => $temp->title,
+                'folder'          => 'media/product/videos',
+                'data_serialized' => $content
+            ];
+
+            if (!$model->set($data)->save()) {
+                $this->BResponse->json(['error' => true]);
+            }
+
+            $this->BResponse->json($model->as_array());
+        } else {
+            $content = $oembed->parse($r->post('url'));
+            if (!$content) {
+                $this->BResponse->json(['error' => true]);
+            }
+            $this->BResponse->json($content);
+        }
     }
 
     public function formPostAfter($args)

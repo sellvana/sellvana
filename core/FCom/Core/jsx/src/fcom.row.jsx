@@ -170,7 +170,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         }
                         break;
                     case 'link':
-                        var defaultValue = col.value ? col.value : (typeof row[col.name] != 'undefined') ? row[col.name] : "";
+                        var defaultValue = col.defaultValue ? col.defaultValue : (typeof row[col.name] != 'undefined') ? row[col.name] : "";
                         
                         var inlineProps = {
                             href: col.href ? col.href : 'javascript:void(0)',
@@ -191,6 +191,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                             var rc = {
                                 row: row
                             };
+
                             node = eval(col.print);
                             customNodeHtml = true;
                         } else if (col.display == 'file_size') {

@@ -20,6 +20,11 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
     protected static $_cnt_reindexed;
     protected static $_cnt_total;
 
+    /**
+     * @var array
+     */
+    protected $_bus;
+
     public function indexProducts($products)
     {
         if (empty($products)) {
@@ -219,7 +224,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 
     protected function _buildBus(array $params)
     {
-        $bus = [
+        $this->_bus = [
             'request' => [
                 'query' => isset($params['query']) ? $params['query'] : null,
                 'filters' => isset($params['filters']) ? $params['filters'] : null,
@@ -235,11 +240,9 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             ],
         ];
 
-        if (is_null($bus['request']['filters'])) {
-            $bus['request']['filters'] = $this->Sellvana_CatalogIndex_Main->parseUrl();
+        if (is_null($this->_bus['request']['filters'])) {
+            $this->_bus['request']['filters'] = $this->Sellvana_CatalogIndex_Main->parseUrl();
         }
-
-        return $bus;
     }
 
 }

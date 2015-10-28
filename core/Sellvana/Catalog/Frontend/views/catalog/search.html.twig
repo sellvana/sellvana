@@ -16,6 +16,14 @@
         <header class="f-page-header hidden-xs">
           <h1 class="f-page-title">{{ 'Search: %s' | _(THIS.get('query')) }}</h1>
         </header>
+
+        {% if THIS.get('data').correct %}
+          {{ 'Did you mean:'|_ }}
+          {% for wrong, correct in THIS.get('data').correct %}
+            <strike>{{ wrong }}</strike> <strong>{{ correct }}</strong>
+          {% endfor %}
+        {% endif %}
+
         {{ THIS.hook('main_products') | raw }}
       </div>
     </div>
