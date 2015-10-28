@@ -71,19 +71,20 @@ class Sellvana_CatalogFields_Main extends BClass
     {
         $fieldSets = $p->get('custom_fields');
 
-        if (!$fieldSets || !is_array($fieldSets)) {
-            return;
+        if (is_array($fieldSets)) {
+            foreach ($fieldSets as $set) {
+                if (empty($set['fields'])) {
+                    continue;
+                }
+                foreach ($set['fields'] as $field) {
+                    #var_dump($field);
+                    $p->set($field['field_code'], $field['value']);
+                }
+            }
+        } else {
+            $fieldSets = [];
         }
 
-        foreach ($fieldSets as $set) {
-            if (empty($set['fields'])) {
-                continue;
-            }
-            foreach ($set['fields'] as $field) {
-                #var_dump($field);
-                $p->set($field['field_code'], $field['value']);
-            }
-        }
         $pfdHlp = $this->Sellvana_CatalogFields_Model_ProductFieldData;
         $pfdHlp->saveProductsFieldData([$p]);
 
@@ -120,9 +121,7 @@ class Sellvana_CatalogFields_Main extends BClass
      */
     public function onProductAfterSave($args)
     {
-        if (!$this->isDisabled()) {
-            $this->_processProductCustom($args['model']);
-        }
+        $this->_processProductCustom($args['model']);
     }
 
     /**

@@ -79,14 +79,6 @@ class Sellvana_CatalogFields_Admin extends BClass
         $model = $args['model'];
         $data = &$args['data'];
 
-        $this->Sellvana_CatalogFields_Main->disable();
-        if (!empty($data['custom_fields'])) {
-            // Save custom fields on fcom_product_custom
-            $model->set('custom_fields', $this->BUtil->fromJson($data['custom_fields']));
-            //$this->_processProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
-            // $model->setData('custom_fields', $data['custom_fields']);
-        }
-
         if (empty($data['vfields']) && empty($data['variants'])) {
             return;
         }
@@ -382,5 +374,12 @@ class Sellvana_CatalogFields_Admin extends BClass
             }
         }
         $product->set('_custom_fields_remove', $productFields);
+
+        if (!empty($customFieldsData)) {
+            // Save custom fields on fcom_product_custom
+            $product->set('custom_fields', $customFieldsData);
+            //$this->_processProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
+            // $model->setData('custom_fields', $data['custom_fields']);
+        }
     }
 }
