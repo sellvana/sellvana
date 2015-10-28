@@ -68,7 +68,7 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
                 'width' => 80, 'hidden' => true],
         ];
         $config['actions'] = [
-//            'new'    => array('caption' => 'Add New Index Field', 'modal' => true),
+            'new'    => ['caption' => 'Add New Index Field', 'modal' => true],
             'edit'   => true,
             'delete' => true
         ];
