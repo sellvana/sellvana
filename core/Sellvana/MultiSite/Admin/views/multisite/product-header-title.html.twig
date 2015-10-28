@@ -1,0 +1,82 @@
+{% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
+{% if sites %}
+    <select id="multisite-selector" name="site">
+        <option value="">{{ 'Default configuration'|_ }}</option>
+        {{ UTIL.optionsHtml(sites, REQUEST.get('site')) | raw }}
+    </select>
+    <input type="hidden" name="site_values" id="site_values">
+    <script>
+        require(['jquery'], function($) {
+            var siteStates = {};
+            $('#multisite-selector').change(function(ev) {
+                var siteId = this.value || 'default';
+                currentState = siteStates[siteId] || {};
+                setCollection.setValuesFromField('site_values', siteId);
+            });
+
+            $(document).on('field:added', function(ev, data) {
+                if ($('#multisite-selector').val()) {
+                    var field = data.field;
+                    var view = data.view;
+                    var element = view.$el.find('.form-control');
+
+                    element.before('<select class="site-value" rel="' + element.attr('name') + '" data-field-id="' + field.id + '">' +
+                        '<option value="0">Use Default Value</option>' +
+                        '<option value="1">Use Site Specific Value</option>' +
+                    '</select>');
+
+                    if (currentState[field.id] == undefined || siteStates['default'][field.id] == field.get('value')) {
+                        element.prop('disabled', true);
+                        element.parent().find('.site-value').val(0);
+                    } else {
+                        element.parent().find('.site-value').val(1);
+                    }
+                }
+            });
+
+            $(document).on('currentState:updated', function(ev) {
+                var siteId = $('#multisite-selector').val() || 'default';
+                siteStates[siteId] = currentState;
+            });
+
+            $(document).on('change', '.site-value', function(ev) {
+                var name = $(ev.target).attr('rel');
+                var fieldId = $(ev.target).data('field-id');
+                var isSiteSpecific = parseInt(this.value);
+                $('[name=' + name + ']').prop('disabled', !isSiteSpecific);
+                if (isSiteSpecific) {
+                    currentState[fieldId] = $('[name=' + name + ']').val();
+                } else {
+                    delete currentState[fieldId];
+                    main:
+                    for (var setNum in setCollection.models) {
+                        for(var fieldNum in setCollection.models[setNum].fields.models) {
+                            if (setCollection.models[setNum].fields.models[fieldNum].id == fieldId) {
+                                setCollection.models[setNum].fields.models[fieldNum].set('value', siteStates['default'][fieldId]);
+                                break main;
+                            }
+                        }
+                    }
+                    $('[name=' + name + ']').val(siteStates['default'][fieldId]);
+                }
+                $(document).trigger('currentState:updated');
+            });
+
+            // cleaning up extra values before submit
+            $(document).on('submit', '#catalog-products-form', function(ev) {
+                for (var site in siteStates) {
+                    if (site != 'default') {
+                        for (var field in siteStates[site]) {
+                            if (siteStates[site][field] == siteStates['default'][field]) {
+                                delete siteStates[site][field];
+                            }
+                        }
+                    }
+                }
+                $('#multisite-selector').val('').trigger('change');
+                $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
+                $('#site_values').val(JSON.stringify(siteStates));
+            });
+        })
+    </script>
+{% endif %}
