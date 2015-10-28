@@ -41,9 +41,9 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $data = [];
         foreach ($layout->getAllViews() as $view) {
             $row = [
-                'id' => md5(uniqid('templates_')),
-                'view_name' => $view->param('view_name'),
-                'file_ext' => $view->param('file_ext'),
+                'id'          => md5(uniqid('templates_')),
+                'view_name'   => $view->param('view_name'),
+                'file_ext'    => $view->param('file_ext'),
                 'module_name' => $view->param('module_name'),
             ];
             $data[] = $row;
@@ -51,13 +51,18 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $config['data'] = $data;
         $config['data_mode'] = 'local';
         $config['filters'] = [
-            ['field' => 'name', 'type' => 'text'],
+            ['field' => 'view_name', 'type' => 'text'],
+            ['field' => 'file_ext', 'type' => 'text'],
+            ['field' => 'module_name', 'type' => 'text']
         ];
         $config['actions'] = [
             'delete' => ['caption' => 'Remove/Revert'],
         ];
         $config['events'] = ['delete', 'mass-delete'];
         $config['grid_before_create'] = 'template_grid';
+        $config['callbacks'] = [
+            'componentDidMount' => 'template_grid'
+        ];
         //$config['state'] =array(5,6,7,8);
         return $config;
     }
@@ -72,7 +77,6 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             $tplViewFile = $tplView->getTemplateFileName();
             $tplContents = file_get_contents($tplViewFile);
         } else {
-            $tplViewName = '';
             $tplViewName = '';
             $tplContents = '';
         }

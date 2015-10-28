@@ -9,6 +9,7 @@
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
  */
 class Sellvana_CatalogFields_Main extends BClass
 {
@@ -30,6 +31,14 @@ class Sellvana_CatalogFields_Main extends BClass
     {
         $this->_disabled = $flag;
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabled()
+    {
+        return (bool)$this->_disabled;
     }
 
     /**
@@ -55,12 +64,64 @@ class Sellvana_CatalogFields_Main extends BClass
     }
 
     /**
+     * Process Save/Remove product custom fields
+     * @param  Sellvana_Catalog_Model_Product $p
+     */
+    protected function _processProductCustom(Sellvana_Catalog_Model_Product $p)
+    {
+        $fieldSets = $p->get('custom_fields');
+
+        if (is_array($fieldSets)) {
+            foreach ($fieldSets as $set) {
+                if (empty($set['fields'])) {
+                    continue;
+                }
+                foreach ($set['fields'] as $field) {
+                    #var_dump($field);
+                    $p->set($field['field_code'], $field['value']);
+                }
+            }
+        } else {
+            $fieldSets = [];
+        }
+
+        $pfdHlp = $this->Sellvana_CatalogFields_Model_ProductFieldData;
+        $pfdHlp->saveProductsFieldData([$p]);
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
+            $this->Sellvana_MultiSite_Main->saveProductsFieldSiteData([$p]);
+        }
+
+        $fieldsDataArr = $pfdHlp->fetchProductsFieldData([$p->id()]);
+        if (!empty($fieldsDataArr[$p->id()])) {
+            $fieldsData = $fieldsDataArr[$p->id()];
+            foreach ($fieldSets as $set) {
+                if (empty($set['fields'])) {
+                    continue;
+                }
+                foreach ($set['fields'] as $field) {
+                    /** @var Sellvana_CatalogFields_Model_ProductFieldData $row */
+                    foreach ($fieldsData as $row) {
+                        if ($row->get('field_id') != $field['id']) {
+                            continue;
+                        }
+                        $row->set([
+                            'set_id' => $set['id'] ?: null,
+                            'position' => $field['position'],
+                        ])->save();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * @param $args
      * @throws BException
      */
     public function onProductAfterSave($args)
     {
-        $this->Sellvana_CatalogFields_Model_ProductFieldData->saveProductsFieldData([$args['model']]);
+        $this->_processProductCustom($args['model']);
     }
 
     /**

@@ -1,17 +1,8 @@
-{% for msg in THIS.getMessages() %}
-    <div class="alert alert-dismissable alert-{{ msg.class }}">
-        <a class="close" data-dismiss="alert" href="#">&times;</a>
-        {% if msg.title %}
-            <h4><i class="icon-{{ msg.icon }}-sign"></i> {{ msg.title }}</h4>
-        {% else %}
-            <i class="icon-{{ msg.icon }}-sign"></i>
-        {% endif %}
-        {% if msg.msgs %}
-            {% for m in msg.msgs %}
-                {{ m }}<br>
-            {% endfor %}
-        {% else %}
-            {{ msg.msg }}
-        {% endif %}
-    </div>
-{% endfor %}
+<div id="systemMessages"></div>
+<script type="text/javascript">
+    var sysMessages;
+    require(['jquery', 'fcom.message'], function ($, Message) {
+        sysMessages = Message;
+        sysMessages.init('systemMessages', {{ THIS.getMessages()|json_encode|raw }});
+    });
+</script>

@@ -9,11 +9,12 @@
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
  * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ * @property FCom_Core_Model_ExternalConfig $FCom_Core_Model_ExternalConfig
  */
 
 class FCom_Core_Migrate extends BClass
 {
-    public function install__0_2_0()
+    public function install__0_5_0_0()
     {
         $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
         if (!$this->BDb->ddlTableExists($tMediaLibrary)) {
@@ -292,5 +293,26 @@ UPDATE {$tModule} SET module_name=CASE module_name
         @$this->BUtil->ensureDir($cacheDir);
 
         $this->BMigrate->stopMigration();
+    }
+
+    public function upgrade__0_5_0_0__0_5_0_1()
+    {
+        $tableExternalConfig = $this->FCom_Core_Model_ExternalConfig->table();
+
+        $tableDef = [
+            BDb::COLUMNS => [
+                'id'                => 'int(10) unsigned not null auto_increment',
+                'source_type'       => 'varchar(50) not null',
+                'path'              => 'varchar(255) not null',
+                'value'             => 'text not null',
+                'site_id'           => 'int(11) unsigned default null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS    => [
+                'UNQ_external_config' => 'UNIQUE (source_type, path, site_id)',
+            ],
+        ];
+
+        $this->BDb->ddlTableDef($tableExternalConfig, $tableDef);
     }
 }

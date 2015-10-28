@@ -427,13 +427,13 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                         _.forEach(column.options, function(text, value) {
                             options.push(<option value={value} key={value}>{text}</option>);
                         });
-                        input = <select key={this.props.key} name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules}>{options}</select>;
+                        input = <select key={this.props.key} name={column.name} id={column.name} className={"form-control " + (column.className ? column.className : '')} defaultValue={this.props.value} {...validationRules}>{options}</select>;
                         break;
                     case 'textarea':
-                        input = <textarea key={this.props.key} name={column.name} id={column.name} className="form-control" rows="5" defaultValue={this.props.value} {...validationRules} />;
+                        input = <textarea key={this.props.key} name={column.name} id={column.name} className={"form-control " + (column.className ? column.className : '')} rows="5" defaultValue={this.props.value} {...validationRules} />;
                         break;
                     default:
-                        input = <input key={this.props.key} name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules} />;
+                        input = <input key={this.props.key} name={column.name} id={column.name} className={"form-control " + (column.className ? column.className : '')} defaultValue={this.props.value} {...column.attributes} {...validationRules} />;
                         break;
                 }
             }

@@ -81,10 +81,17 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                     </a>
                                 );
                             } else {
-                                //todo: find another way to not use 2 times data-action and data-row in both <button> and <i> to make it is worked in Chrome + Firefox
                                 return (
-                                    <button className={"btn btn-link " + btn.cssClass} key={index} title={btn.title ? btn.title : ""} type="button" data-action={btn.name} data-row={row.id} {...btn.attrs} onClick={that.props.doRowAction.bind(null, btn.callback)}>
-                                        <i className={btn.icon} data-action={btn.name} data-row={row.id} data-folder={row.folder ? row.folder : null}></i>
+                                    <button className={"btn btn-link " + btn.cssClass}
+                                            key={index}
+                                            title={btn.title ? btn.title : ""}
+                                            type="button"
+                                            data-action={btn.name}
+                                            data-row={row.id}
+                                            data-folder={row.folder ? row.folder : null}
+                                            {...btn.attrs}
+                                            onClick={that.props.doRowAction.bind(null, btn.callback)}>
+                                        <i className={btn.icon}></i>
                                         {btn.caption}
                                     </button>
                                 );
@@ -163,27 +170,20 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         }
                         break;
                     case 'link':
-                        var defaultValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
-                        var count = 0;
-                        if (defaultValue) {
-                            count = defaultValue.split(',').length;
-                        }
-                        var value = count + ' ' + col.value + (count <= 1 ? '' : 's');
+                        var defaultValue = col.defaultValue ? col.defaultValue : (typeof row[col.name] != 'undefined') ? row[col.name] : "";
                         
                         var inlineProps = {
                             href: col.href ? col.href : 'javascript:void(0)',
                             id: id + '-' + col.name + '-' + row.id,
                             name: id + '[' + row.id + '][' + col.name + ']',
                             className: (col.cssClass ? col.cssClass : ''),
-                            style: (col.style ? col.style : ''),
+                            style: (col.style ? col.style : {}),
                             "data-col": col.name,
                             'data-action': col.name,
-                            'data-row': row.id,
-                            'data-length': count,
-                            defaultValue: defaultValue
+                            'data-row': row.id
                         };
 
-                        node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{value}</a>;
+                        node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{defaultValue}</a>;
                         break;
                     default:
                         if (col.display == 'eval') {
@@ -191,6 +191,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                             var rc = {
                                 row: row
                             };
+
                             node = eval(col.print);
                             customNodeHtml = true;
                         } else if (col.display == 'file_size') {

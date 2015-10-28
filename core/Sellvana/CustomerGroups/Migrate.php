@@ -141,4 +141,9 @@ class Sellvana_CustomerGroups_Migrate extends BClass
     //    $this->BDb->ddlDropTable($tPrices);
     //
     //}
+
+    public function upgrade__0_5_0_0__0_5_0_1()
+    {
+        //Need for Sellvana_SalesTax_Migrate::after__Sellvana_CustomerGroups__0_5_0_1
+    }
 }

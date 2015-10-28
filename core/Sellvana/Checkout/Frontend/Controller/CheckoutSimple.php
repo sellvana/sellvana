@@ -190,6 +190,10 @@ class Sellvana_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend
             return;
         }
         $order = $this->Sellvana_Sales_Model_Order->load($orderId);
+        if (!$order) {
+            $this->BResponse->redirect('');
+            return;
+        }
         $custHlp = $this->Sellvana_Customer_Model_Customer;
         $this->view('checkout-simple/success')->set([
             'order' => $order,

@@ -233,12 +233,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             if (!empty($params['disabled'])) {
                 continue;
             }
-            if (!empty($params['model_new_hide'])) {
+            /*if (!empty($params['model_new_hide'])) {
                 $model = $formView->get('model');
                 if (!$model || !$model->id()) {
                     continue;
                 }
-            }
+            }*/
             $formView->addTab($id, $params);
         }
         return $this;

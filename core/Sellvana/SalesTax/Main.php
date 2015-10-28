@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_SalesTax_Model_CustomerTax $Sellvana_SalesTax_Model_CustomerTax
+ * @property Sellvana_SalesTax_Model_CustomerGroupTax $Sellvana_SalesTax_Model_CustomerGroupTax
  * @property Sellvana_SalesTax_Model_ProductTax $Sellvana_SalesTax_Model_ProductTax
  * @property Sellvana_SalesTax_Model_Rule $Sellvana_SalesTax_Model_Rule
  * @property Sellvana_SalesTax_Model_RuleCustomerClass $Sellvana_SalesTax_Model_RuleCustomerClass
@@ -353,6 +354,35 @@ class Sellvana_SalesTax_Main extends BClass
             foreach ($newTaxIds as $tcId) {
                 if (empty($existingTaxIds[$tcId])) {
                     $hlp->create(['customer_id' => $cId, 'customer_class_id' => $tcId])->save();
+                }
+            }
+        }
+    }
+
+    public function onCustomerGroupAfterSave($args)
+    {
+        $model = $args['model'];
+        $cId = $model->id();
+                $hlp = $this->Sellvana_SalesTax_Model_CustomerGroupTax;
+        $existingTaxIds = $hlp->orm()->where('customer_group_id', $cId)->find_many_assoc('customer_class_id', 'id');
+        $newTaxIds = $model->get('tax_class_ids') ?: [];
+
+        if ($existingTaxIds) {
+            $deleteIds = [];
+            foreach ($existingTaxIds as $tcId => $tId) {
+                if (!in_array($tcId, $newTaxIds)) {
+                    $deleteIds[] = $tId;
+                }
+            }
+            if ($deleteIds) {
+                $hlp->delete_many(['id' => $deleteIds]);
+            }
+        }
+
+        if ($newTaxIds) {
+            foreach ($newTaxIds as $tcId) {
+                if (empty($existingTaxIds[$tcId])) {
+                    $hlp->create(['customer_group_id' => $cId, 'customer_class_id' => $tcId])->save();
                 }
             }
         }

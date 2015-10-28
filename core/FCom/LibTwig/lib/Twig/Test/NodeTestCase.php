@@ -25,7 +25,7 @@ abstract class Twig_Test_NodeTestCase extends PHPUnit_Framework_TestCase
         $compiler = $this->getCompiler($environment);
         $compiler->compile($node);
 
-        $this->assertEquals($source, trim($compiler->getSource()));
+        $this->assertStringMatchesFormat($source, trim($compiler->getSource()));
     }
 
     protected function getCompiler(Twig_Environment $environment = null)
@@ -35,16 +35,18 @@ abstract class Twig_Test_NodeTestCase extends PHPUnit_Framework_TestCase
 
     protected function getEnvironment()
     {
-        return new Twig_Environment();
+        return new Twig_Environment(new Twig_Loader_Array(array()));
     }
 
-    protected function getVariableGetter($name)
+    protected function getVariableGetter($name, $line = false)
     {
-        if (version_compare(phpversion(), '5.4.0RC1', '>=')) {
-            return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
+        $line = $line > 0 ? "// line {$line}\n" : '';
+
+        if (PHP_VERSION_ID >= 50400) {
+            return sprintf('%s(isset($context["%s"]) ? $context["%s"] : null)', $line, $name, $name);
         }
 
-        return sprintf('$this->getContext($context, "%s")', $name);
+        return sprintf('%s$this->getContext($context, "%s")', $line, $name);
     }
 
     protected function getAttributeGetter()
