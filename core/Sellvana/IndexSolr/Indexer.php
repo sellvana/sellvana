@@ -73,8 +73,8 @@ class Sellvana_IndexSolr_Indexer extends Sellvana_CatalogIndex_Indexer_Abstract
 
     public function searchProducts(array $params = [])
     {
-        $bus = $this->_buildBus($params);
+        $this->_buildBus($params);
 
-        return $bus['result'];
+        return $this->_bus['result'];
     }
 }
