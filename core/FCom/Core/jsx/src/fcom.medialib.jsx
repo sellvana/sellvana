@@ -17,6 +17,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                 "modalConfig": {},
                 "uploadConfig": {
                     "can_upload": false,
+                    "can_embed_video": false,
                     "filetype_regex": "",
                     "folder": ""
                 },
@@ -137,12 +138,12 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                             <a href={'#' + this.props.mediaConfig.id + '-attach_library'} role='tab' data-toggle="tab" aria-controls={this.props.mediaConfig.id + '-attach_library'}>Library</a>
                         </li>
                         {this.props.uploadConfig.can_upload ? <li role='presentation'><a href={'#' + this.props.mediaConfig.id + '-media-upload'} role='tab' data-toggle="tab" aria-controls={this.props.mediaConfig.id + '-media-upload'}>Upload</a></li> : null}
-                        <li role='presentation'><a role='tab' data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-media-embed'}>Media Embed</a></li>
+                        {this.props.uploadConfig.can_embed_video ? <li role='presentation'><a role='tab' data-toggle="tab" href={'#' + this.props.mediaConfig.id + '-media-embed'}>Media Embed</a></li> : null}
                     </ul>
                     <div className="tab-content">
                         <div role="tabpanel" className="tab-pane active" id={this.props.mediaConfig.id + '-attach_library'}>{this.getMainGridEle()}</div>
                         {this.props.uploadConfig.can_upload ? <div role="tabpanel" style={{ width: '870px', 'padding': '20px' }} className="tab-pane" id={this.props.mediaConfig.id + '-media-upload'}>{this.mediaUploadElement()}</div> : null}
-                        {this.props.uploadConfig.can_upload ? <div role="tabpanel" className="tab-pane" style={{ width: '870px', 'padding': '20px' }} id={this.props.mediaConfig.id + '-media-embed'}>{this.getEmbedGrid()}</div> : null}
+                        {this.props.uploadConfig.can_embed_video ? <div role="tabpanel" className="tab-pane" style={{ width: '870px', 'padding': '20px' }} id={this.props.mediaConfig.id + '-media-embed'}>{this.getEmbedGrid()}</div> : null}
                     </div>
                 </Components.Modal>
             );

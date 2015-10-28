@@ -46,7 +46,6 @@
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Media Library'|_, id:'settings-FCom_Admin-group5'}) }}
-        {{ forms.boolean(fieldData, {field:'allowed_video_upload', label:'Enable Video Upload'|_ }) }}
         {{ forms.input(fieldData, {field:'default_media_file_size', label:'Default Media File Size (MB)'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
