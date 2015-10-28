@@ -119,7 +119,7 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
             'button',
             [
                 'id' => 'add_new_index_field',
-                'class' => ['btn', 'grid-new', 'btn-primary', '_modal'],
+                'class' => ['btn', 'grid-new', 'btn-primary hidden', '_modal'],
             ],
             [
                 ['span', null, $this->BLocale->_('Add New Index Field')],
