@@ -17,6 +17,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                 "modalConfig": {},
                 "uploadConfig": {
                     "can_upload": false,
+                    "can_embed_video": false,
                     "filetype_regex": "",
                     "folder": ""
                 },
@@ -137,12 +138,12 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                             React.createElement("a", {href: '#' + this.props.mediaConfig.id + '-attach_library', role: "tab", "data-toggle": "tab", "aria-controls": this.props.mediaConfig.id + '-attach_library'}, "Library")
                         ), 
                         this.props.uploadConfig.can_upload ? React.createElement("li", {role: "presentation"}, React.createElement("a", {href: '#' + this.props.mediaConfig.id + '-media-upload', role: "tab", "data-toggle": "tab", "aria-controls": this.props.mediaConfig.id + '-media-upload'}, "Upload")) : null, 
-                        React.createElement("li", {role: "presentation"}, React.createElement("a", {role: "tab", "data-toggle": "tab", href: '#' + this.props.mediaConfig.id + '-media-embed'}, "Media Embed"))
+                        this.props.uploadConfig.can_embed_video ? React.createElement("li", {role: "presentation"}, React.createElement("a", {role: "tab", "data-toggle": "tab", href: '#' + this.props.mediaConfig.id + '-media-embed'}, "Media Embed")) : null
                     ), 
                     React.createElement("div", {className: "tab-content"}, 
                         React.createElement("div", {role: "tabpanel", className: "tab-pane active", id: this.props.mediaConfig.id + '-attach_library'}, this.getMainGridEle()), 
                         this.props.uploadConfig.can_upload ? React.createElement("div", {role: "tabpanel", style: { width: '870px', 'padding': '20px'}, className: "tab-pane", id: this.props.mediaConfig.id + '-media-upload'}, this.mediaUploadElement()) : null, 
-                        this.props.uploadConfig.can_upload ? React.createElement("div", {role: "tabpanel", className: "tab-pane", style: { width: '870px', 'padding': '20px'}, id: this.props.mediaConfig.id + '-media-embed'}, this.getEmbedGrid()) : null
+                        this.props.uploadConfig.can_embed_video ? React.createElement("div", {role: "tabpanel", className: "tab-pane", style: { width: '870px', 'padding': '20px'}, id: this.props.mediaConfig.id + '-media-embed'}, this.getEmbedGrid()) : null
                     )
                 )
             );

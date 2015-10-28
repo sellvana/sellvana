@@ -500,18 +500,15 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ]
         ];
 
-        $isAllowVideoUpload = (bool)$this->BConfig->get('modules/FCom_Admin/allowed_video_upload');
-        if ($isAllowVideoUpload) {
-            $config['config']['actions'] += [
-                'add-videos' => [
-                    'caption'  => 'Add Videos',
-                    'type'     => 'button',
-                    'id'       => 'add-video-from-grid',
-                    'class'    => 'btn-primary',
-                    'callback' => 'gridShowMedia' . $config['config']['id']
-                ]
-            ];
-        }
+        $config['config']['actions'] += [
+            'add-videos' => [
+                'caption'  => 'Add Videos',
+                'type'     => 'button',
+                'id'       => 'add-video-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'gridShowMedia' . $config['config']['id']
+            ]
+        ];
 
         $config['config']['callbacks'] = [
             'componentDidMount' => 'gridRegister' . $config['config']['id']

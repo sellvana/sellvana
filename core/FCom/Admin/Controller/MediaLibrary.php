@@ -90,10 +90,12 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         switch(provider) {
                             case \'youtube\':
                                 var src = $(data.html).prop(\'src\');
-                                "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ row.id +"\' class=\'product-video-media\' preload=\'none\'><source src=\'" + src + "\' title=\'" + data.title + "\' type=\'video/youtube\'></video>"
+                                var html = $("<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ row.id +"\' class=\'product-video-media\' preload=\'none\'><source src=\'" + src + "\' title=\'" + data.title + "\' type=\'video/youtube\'></video>");
+                                "<a href=\'javascript:void(0)\' class=\'btn-video-player\' title=\'Click to preview\' data-html=\'"+ html[0].outerHTML +"\'><img src=\'"+ data.thumbnail_url +"\' width=\'200\' height=\'140\' alt=\'"+ data.title +"\'></a>"
                                 break;
                             case \'vimeo\':
-                                data.html.replace(/(width="\d{3}"\s+height="\d{3}")/, \'width="200" height="140"\');
+                                var html = data.html.replace(/(width="\d{3}"\s+height="\d{3}")/, \'width="200" height="140"\');
+                                "<a href=\'javascript:void(0)\' title=\'Click to preview\' class=\'btn-video-player\' data-html=\'"+html+"\'><img src=\'"+ data.thumbnail_url +"\' width=\'200\' height=\'140\' alt=\'"+data.title+"\'></a>"
                                 break;
                             default:
                                 data.html
