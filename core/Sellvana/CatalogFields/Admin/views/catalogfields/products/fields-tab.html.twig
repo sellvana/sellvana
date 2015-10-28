@@ -940,6 +940,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
         },
         _addField: function(field) {
+            if (currentState[field.get('id')] !== undefined) {
+                return true;
+            }
             var fieldView = new CustomField.Views.FieldView({model: field});
             this.$el.find('div.box-content').append(fieldView.render().el);
             $(document).trigger('field:added', {field: field, view: fieldView});
