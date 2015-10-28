@@ -16,7 +16,7 @@
 
 class Sellvana_CatalogIndex_Migrate extends BClass
 {
-    public function install__0_2_0()
+    public function install__0_5_0_0()
     {
         $tCustField = $this->Sellvana_CatalogFields_Model_Field->table();
         $tProduct = $this->Sellvana_Catalog_Model_Product->table();
@@ -121,13 +121,15 @@ class Sellvana_CatalogIndex_Migrate extends BClass
         $this->BDb->ddlTableDef($tDocValue, [
             BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
-                'doc_id' => 'int(10) unsigned NOT NULL',
-                'field_id' => 'int(10) unsigned NOT NULL',
-                'value_id' => 'int(10) unsigned NOT NULL',
+                'doc_id' => 'int unsigned NOT NULL',
+                'field_id' => 'int unsigned NOT NULL',
+                'value_id' => 'int unsigned default null',
+                'value_decimal' => 'decimal(12,2) default null',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
                 'UNQ_doc_field_value' => 'UNIQUE (`doc_id`,`field_id`,`value_id`)',
+                'IDX_value_decimal' => '(value_decimal)',
             ],
             BDb::CONSTRAINTS => [
                 'doc' => ['doc_id', $tDoc],
@@ -207,7 +209,7 @@ VALUES
 (6,'color','Color','varchar',0,NULL,'field',NULL,'inclusive',0,1,0,2,NULL,'none','none',NULL,NULL),
 (7,'size','Size','varchar',0,NULL,'field',NULL,'inclusive',0,1,0,3,NULL,'none','none',NULL,NULL),
 (8,'price_range','Price Range','varchar',0,NULL,'callback','Sellvana_CatalogIndex_Model_Field::indexPriceRange','inclusive',0,1,0,4,NULL,'none','none',NULL,NULL),
-(9,'price','Price','decimal',0,NULL,'field',NULL,'none',0,0,0,4,NULL,'none','both','Price (Min-Max) || Price (Max-Min)',NULL)
+(9,'price','Price','decimal',0,NULL,'field',NULL,'none',0,0,0,4,'catalog/category/_filter_price','none','both','Price (Min-Max) || Price (Max-Min)',NULL)
         ");
     }
 
@@ -305,6 +307,79 @@ VALUES
         $priceField = $this->Sellvana_CatalogIndex_Model_Field->load('price', 'field_name');
         if ($priceField) {
             $priceField->set(['filter_type' => 'range', 'filter_custom_view' => 'catalog/category/_filter_price'])->save();
+        }
+    }
+
+    public function upgrade__0_5_0_0__0_5_1_0()
+    {
+        //SEE: http://www.artfulsoftware.com/infotree/qrytip.php?id=552
+        $functions = [
+            'levenshtein' => <<<EOT
+CREATE FUNCTION levenshtein( s1 VARCHAR(255), s2 VARCHAR(255) )
+  RETURNS INT
+  DETERMINISTIC
+  BEGIN
+    DECLARE s1_len, s2_len, i, j, c, c_temp, cost INT;
+    DECLARE s1_char CHAR;
+    -- max strlen=255
+    DECLARE cv0, cv1 VARBINARY(256);
+    SET s1_len = CHAR_LENGTH(s1), s2_len = CHAR_LENGTH(s2), cv1 = 0x00, j = 1, i = 1, c = 0;
+    IF s1 = s2 THEN
+      RETURN 0;
+    ELSEIF s1_len = 0 THEN
+      RETURN s2_len;
+    ELSEIF s2_len = 0 THEN
+      RETURN s1_len;
+    ELSE
+      WHILE j <= s2_len DO
+        SET cv1 = CONCAT(cv1, UNHEX(HEX(j))), j = j + 1;
+      END WHILE;
+      WHILE i <= s1_len DO
+        SET s1_char = SUBSTRING(s1, i, 1), c = i, cv0 = UNHEX(HEX(i)), j = 1;
+        WHILE j <= s2_len DO
+          SET c = c + 1;
+          IF s1_char = SUBSTRING(s2, j, 1) THEN
+            SET cost = 0; ELSE SET cost = 1;
+          END IF;
+          SET c_temp = CONV(HEX(SUBSTRING(cv1, j, 1)), 16, 10) + cost;
+          IF c > c_temp THEN SET c = c_temp; END IF;
+            SET c_temp = CONV(HEX(SUBSTRING(cv1, j+1, 1)), 16, 10) + 1;
+            IF c > c_temp THEN
+              SET c = c_temp;
+            END IF;
+            SET cv0 = CONCAT(cv0, UNHEX(HEX(c))), j = j + 1;
+        END WHILE;
+        SET cv1 = cv0, i = i + 1;
+      END WHILE;
+    END IF;
+    RETURN c;
+  END;
+EOT
+        , 'levenshtein_ratio' => <<<EOT
+CREATE FUNCTION levenshtein_ratio( s1 VARCHAR(255), s2 VARCHAR(255) )
+  RETURNS INT
+  DETERMINISTIC
+  BEGIN
+    DECLARE s1_len, s2_len, max_len INT;
+    SET s1_len = LENGTH(s1), s2_len = LENGTH(s2);
+    IF s1_len > s2_len THEN
+      SET max_len = s1_len;
+    ELSE
+      SET max_len = s2_len;
+    END IF;
+    RETURN ROUND((1 - LEVENSHTEIN(s1, s2) / max_len) * 100);
+  END;
+EOT
+        ];
+
+        $this->BDb->connect();
+        $orm = BORM::i();
+        $functionsExist = $orm->raw_query("SHOW FUNCTION STATUS LIKE 'levenshtein%'")->find_many_assoc('Name');
+        foreach ($functions as $name => $func) {
+            if (!empty($functionsExist[$name])) {
+                $orm->raw_query("DROP FUNCTION {$name}")->execute();
+            }
+            $orm->raw_query($func)->execute();
         }
     }
 }
