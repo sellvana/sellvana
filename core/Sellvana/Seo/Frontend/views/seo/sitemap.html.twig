@@ -1,23 +1,24 @@
-<!--{ title: Sitemap }-->
+{% set categories = THIS.get('categories') %}
+{% set products = THIS.get('products') %}
+{% set searches = THIS.get('searches') %}
+{% set nextPage = THIS.get('next_page') %}
 
-<h1>LIST OF CATEGORIES AND PRODUCTS</h1>
+<!--{ title: {{ 'Sitemap'|_ }} }-->
 
-<ul>
-    <li><a href="#">Category 1</a></li>
-    <li><a href="#">Category 2</a></li>
-    <li><a href="#">Category 3</a></li>
-</ul>
-
-<ul>
-    <li><a href="#">Product 1</a></li>
-    <li><a href="#">Product 2</a></li>
-    <li><a href="#">Product 3</a></li>
-</ul>
+<h1>{{ 'LIST OF CATEGORIES AND PRODUCTS'|_ }}</h1>
 
 <ul>
-    <li><a href="#">Featured Search 1</a></li>
-    <li><a href="#">Featured Search 2</a></li>
-    <li><a href="#">Featured Search 3</a></li>
+    {% for c in categories %}
+        <li><a href="{{ c.url() }}" title="{{ c.get('node_name') }}">{{ c.get('node_name') }}</a></li>
+    {% endfor %}
+    {% for p in products %}
+        <li><a href="{{ p.url() }}">{{ p.get('product_name') }}</a></li>
+    {% endfor %}
+    {% for s in searches %}
+        <li><a href="{{ s.get('target_url') }}">{{ s.get('title') }}</a></li>
+    {% endfor %}
 </ul>
 
-<a href="#">link to next page</a>
+{% if nextPage %}
+    <a href="{{ APP.href('sitemap?page=') ~ nextPage }}">{{ 'Next page'|_ }}</a>
+{% endif %}

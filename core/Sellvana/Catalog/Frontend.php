@@ -89,11 +89,16 @@ class Sellvana_Catalog_Frontend extends BClass
 
                 $products = $this->Sellvana_Catalog_Model_Product->orm()->where('is_hidden', 0)
                     ->order_by_asc('id')->offset($page * $pageSize)->limit($pageSize)->find_many_assoc();
-                $media = $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
-                    ->where_in('product_id', array_keys($products))->where('media_type', 'I')
-                    ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
-                    ->select(['pa.product_id', 'a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label'])
-                    ->find_many();
+                if ($products) {
+                    $media = $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
+                        ->where_in('product_id', array_keys($products))->where('media_type', 'I')
+                        ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
+                        ->select(['pa.product_id', 'a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size',
+                            'pa.label'])
+                        ->find_many();
+                } else {
+                    $media = [];
+                }
                 foreach ($products as $pId => $p) {
                     $images = [];
                     foreach ($media as $m) {
