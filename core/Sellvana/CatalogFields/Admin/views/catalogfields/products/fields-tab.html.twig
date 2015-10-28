@@ -940,8 +940,19 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
         },
         _addField: function(field) {
-            if (currentState[field.get('id')] !== undefined) {
-                return true;
+            var found = false;
+            var model = this.model;
+            mainView.collection.each(function(el) {
+                if (el.cid != model.cid) {
+                    el.fields.each(function(newField) {
+                        if (newField.get('id') == field.get('id')) {
+                            found = true;
+                        }
+                    });
+                }
+            });
+            if (found) {
+                return;
             }
             var fieldView = new CustomField.Views.FieldView({model: field});
             this.$el.find('div.box-content').append(fieldView.render().el);
