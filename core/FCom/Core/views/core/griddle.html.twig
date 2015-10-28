@@ -9,6 +9,35 @@
 <script type="text/javascript">
 	var APP = {};
     require(['react', 'fcom.griddle'], function(React, FComGriddleComponent) {
+        var gridCallback = "{{ config.callbacks.componentDidMount ? config.callbacks.componentDidMount : config.id }}";
+        if (typeof window[gridCallback] === 'undefined') {
+            window[gridCallback] = function (grid) {
+                $(grid.getDOMNode()).on('removedRows.griddle', function (e, removedRows) {
+                    _(removedRows).each(function (row) {
+                        var hash = {};
+                        switch (grid.getConfig('id')) {
+                            case 'FCom_Admin_Controller_Templates':
+                                hash = {
+                                    do: 'DELETE',
+                                    model: {
+                                        'view_name': row.view_name
+                                    }
+                                };
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (config.edit_url && !_.isEmpty(hash)) {
+                            $.post(config.edit_url, hash);
+                        }
+                    });
+                }).on('addedRows.griddle', function (e, addedRows) {
+                    // console.log('addedRows.griddle', addedRows);
+                });
+            };
+        }
+
         var GriddleGrid = React.createClass({
         	getInitialState: function() {
         		return _.extend({ pending_state: false }, this.props.config);
@@ -35,5 +64,6 @@
         React.render(
             React.createElement(GriddleGrid, { config: config }), document.getElementById(config.id)
         );
+
     });
 </script>

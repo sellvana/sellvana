@@ -13,6 +13,8 @@
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
+ * @property Sellvana_MultiSite_Admin $Sellvana_MultiSite_Admin
  */
 class Sellvana_CatalogFields_Admin extends BClass
 {
@@ -71,63 +73,11 @@ class Sellvana_CatalogFields_Admin extends BClass
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
-    /**
-     * Process Save/Remove product custom fields
-     * @param  Sellvana_Catalog_Model_Product $p
-     * @param  array                          $fieldSets
-     */
-    protected function _processProductCustom(Sellvana_Catalog_Model_Product $p, $fieldSets = [])
-    {
-        if (!$fieldSets || !is_array($fieldSets)) {
-            return;
-        }
-
-        foreach ($fieldSets as $set) {
-            if (empty($set['fields'])) {
-                continue;
-            }
-            foreach ($set['fields'] as $field) {
-                #var_dump($field);
-                $p->set($field['field_code'], $field['value']);
-            }
-        }
-        $pfdHlp = $this->Sellvana_CatalogFields_Model_ProductFieldData;
-        $pfdHlp->saveProductsFieldData([$p]);
-
-        $fieldsDataArr = $pfdHlp->fetchProductsFieldData([$p->id()]);
-        if (!empty($fieldsDataArr[$p->id()])) {
-            $fieldsData = $fieldsDataArr[$p->id()];
-            foreach ($fieldSets as $set) {
-                if (empty($set['fields'])) {
-                    continue;
-                }
-                foreach ($set['fields'] as $field) {
-                    /** @var Sellvana_CatalogFields_Model_ProductFieldData $row */
-                    foreach ($fieldsData as $row) {
-                        if ($row->get('field_id') != $field['id']) {
-                            continue;
-                        }
-                        $row->set([
-                            'set_id' => $set['id'] ?: null,
-                            'position' => $field['position'],
-                        ])->save();
-                    }
-                }
-            }
-        }
-    }
-
     public function onProductFormPostAfterValidate($args)
     {
         /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         $data = &$args['data'];
-
-        if (!empty($data['custom_fields'])) {
-            // Save custom fields on fcom_product_custom
-            $this->_processProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
-            // $model->setData('custom_fields', $data['custom_fields']);
-        }
 
         if (empty($data['vfields']) && empty($data['variants'])) {
             return;
@@ -424,5 +374,12 @@ class Sellvana_CatalogFields_Admin extends BClass
             }
         }
         $product->set('_custom_fields_remove', $productFields);
+
+        if (!empty($customFieldsData)) {
+            // Save custom fields on fcom_product_custom
+            $product->set('custom_fields', $customFieldsData);
+            //$this->_processProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
+            // $model->setData('custom_fields', $data['custom_fields']);
+        }
     }
 }

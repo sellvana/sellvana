@@ -5,6 +5,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
     var FComMediaLib = React.createClass({
         displayName: "FComMediaLib",
         mixins: [FCom.Mixin],
+        getInitialState: function() {
+            return {
+                isChecked: true 
+            };
+        },
         getDefaultProps: function() {
             //todo: validate received props
             return {
@@ -12,6 +17,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
                 "modalConfig": {},
                 "uploadConfig": {
                     "can_upload": false,
+                    "can_embed_video": false,
                     "filetype_regex": "",
                     "folder": ""
                 },
@@ -86,25 +92,58 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components'], fun
             }
             return null
         },
+        handleProviderChange: function() {
+            this.setState({
+                isChecked: !this.state.isChecked 
+            });
+        },
         getMainGridEle: function() {
             return React.createElement(FComGriddleComponent, { config: this.props.mediaConfig, ref: 'fcomGriddleComponent' });
+        },
+        getEmbedGrid: function () {
+            return (
+                React.createElement("div", {className: "video-tab-container"}, 
+                    React.createElement("div", {className: "col-sm-12"}, 
+                        React.createElement("div", {className: "control-label col-sm-1"}, 
+                            React.createElement("label", {htmlFor: "oembed_url"}, "URL: ")
+                        ), 
+                        React.createElement("div", {className: "controls col-sm-7"}, 
+                            React.createElement("input", {type: "text", id: "oembed_url", name: "oembed_url", className: "form-control oembed_url"})
+                        ), 
+                        React.createElement("div", {className: "controls col-sm-1"}, 
+                            React.createElement("button", {type: "button", className: "btn btn-primary btn-sm btn-preview", "data-loading-text": "Processing..."}, "Preview")
+                        ), 
+                        React.createElement("div", {className: "controls col-sm-2"}, 
+                            React.createElement("button", {type: "button", className: "btn btn-success btn-sm btn-embed", "data-loading-text": "Processing..."}, "Add to Library")
+                        )
+                    ), 
+                    React.createElement("div", {className: "col-sm-12"}, 
+                        React.createElement("div", {className: "control-label col-sm-1"}, 
+                            React.createElement("label", {htmlFor: ""}, "Provider: ")
+                        ), 
+                        React.createElement("div", {className: "col-sm-11"}, 
+                            React.createElement("label", {className: "radio-inline"}, React.createElement("input", {type: "radio", name: "provider", value: "youtube", checked: this.state.isChecked, onChange: this.handleProviderChange}), "Youtube"), 
+                            React.createElement("label", {className: "radio-inline"}, React.createElement("input", {type: "radio", name: "provider", value: "vimeo", onChange: this.handleProviderChange}), "Vimeo")
+                        )
+                    ), 
+                    React.createElement("div", {className: "col-sm-12 oembed_container"})
+                )
+            );
         },
         renderModal: function(modalConfig) {
             return (
                 React.createElement(Components.Modal, React.__spread({},  modalConfig), 
-                    React.createElement("div", {className: "row"}, 
-                        React.createElement("div", {className: "tabbable"}, 
-                            React.createElement("ul", {className: "nav nav-tabs prod-type f-horiz-nav-tabs"}, 
-                                React.createElement("li", {className: "active"}, 
-                                    React.createElement("a", {"data-toggle": "tab", href: '#' + this.props.mediaConfig.id + '-attach_library'}, "Library")
-                                ), 
-                                this.props.uploadConfig.can_upload ? React.createElement("li", null, React.createElement("a", {"data-toggle": "tab", href: '#' + this.props.mediaConfig.id + '-media-upload'}, "Upload")) : null
-                            ), 
-                            React.createElement("div", {className: "tab-content"}, 
-                                React.createElement("div", {className: "tab-pane active", id: this.props.mediaConfig.id + '-attach_library'}, this.getMainGridEle()), 
-                                this.props.uploadConfig.can_upload ? React.createElement("div", {className: "tab-pane", id: this.props.mediaConfig.id + '-media-upload'}, this.mediaUploadElement()) : null
-                            )
-                        )
+                    React.createElement("ul", {className: "nav nav-tabs f-horiz-nav-tabs", role: "tablist"}, 
+                        React.createElement("li", {role: "presentation", className: "active"}, 
+                            React.createElement("a", {href: '#' + this.props.mediaConfig.id + '-attach_library', role: "tab", "data-toggle": "tab", "aria-controls": this.props.mediaConfig.id + '-attach_library'}, "Library")
+                        ), 
+                        this.props.uploadConfig.can_upload ? React.createElement("li", {role: "presentation"}, React.createElement("a", {href: '#' + this.props.mediaConfig.id + '-media-upload', role: "tab", "data-toggle": "tab", "aria-controls": this.props.mediaConfig.id + '-media-upload'}, "Upload")) : null, 
+                        this.props.uploadConfig.can_embed_video ? React.createElement("li", {role: "presentation"}, React.createElement("a", {role: "tab", "data-toggle": "tab", href: '#' + this.props.mediaConfig.id + '-media-embed'}, "Media Embed")) : null
+                    ), 
+                    React.createElement("div", {className: "tab-content"}, 
+                        React.createElement("div", {role: "tabpanel", className: "tab-pane active", id: this.props.mediaConfig.id + '-attach_library'}, this.getMainGridEle()), 
+                        this.props.uploadConfig.can_upload ? React.createElement("div", {role: "tabpanel", style: { width: '870px', 'padding': '20px'}, className: "tab-pane", id: this.props.mediaConfig.id + '-media-upload'}, this.mediaUploadElement()) : null, 
+                        this.props.uploadConfig.can_embed_video ? React.createElement("div", {role: "tabpanel", className: "tab-pane", style: { width: '870px', 'padding': '20px'}, id: this.props.mediaConfig.id + '-media-embed'}, this.getEmbedGrid()) : null
                     )
                 )
             );

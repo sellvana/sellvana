@@ -19,6 +19,9 @@ base:
             - [ requireJs, jquery.hotkeys, "@FCom_LibJsCommon/js/jquery.hotkeys", { deps: [ jquery ] } ]
             - [ requireJs, jquery.contextmenu, "@FCom_LibJsCommon/js/jqGrid/plugins/jquery.contextmenu", { deps: [ jquery ] } ]
 
+            - [ requireJs, jquery.pnotify, "@FCom_LibJsCommon/js/jquery.pnotify.min", { deps: [ jquery ] } ]
+            - [ css, @FCom_LibJsCommon/js/css/jquery.pnotify.default.css ]
+
             - [ requireJs, jquery.splitter, "@FCom_LibJsCommon/js/splitter/jquery.splitter", { deps: [ jquery ] } ]
             - [ css, "@FCom_LibJsCommon/js/splitter/jquery.splitter.css" ]
 
@@ -35,6 +38,7 @@ base:
     - { include: common_js_libs }
     - { include: lib_griddle }
     - { include: lib_admin_theme1 }
+    - { include: lib_media_player }
 
     - view: admin/nav
         do:

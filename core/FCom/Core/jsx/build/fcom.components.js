@@ -427,13 +427,13 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                         _.forEach(column.options, function(text, value) {
                             options.push(React.createElement("option", {value: value, key: value}, text));
                         });
-                        input = React.createElement("select", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control", defaultValue: this.props.value},  validationRules), options);
+                        input = React.createElement("select", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control " + (column.className ? column.className : ''), defaultValue: this.props.value},  validationRules), options);
                         break;
                     case 'textarea':
-                        input = React.createElement("textarea", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: this.props.value},  validationRules));
+                        input = React.createElement("textarea", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control " + (column.className ? column.className : ''), rows: "5", defaultValue: this.props.value},  validationRules));
                         break;
                     default:
-                        input = React.createElement("input", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control", defaultValue: this.props.value},  validationRules));
+                        input = React.createElement("input", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control " + (column.className ? column.className : ''), defaultValue: this.props.value},  column.attributes,  validationRules));
                         break;
                 }
             }

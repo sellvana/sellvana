@@ -309,8 +309,11 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function as_array(array $objHashes = [])
     {
-        $data = parent::as_array();
-        unset($data['password_hash']);
+        $data = parent::as_array($objHashes);
+        if (array_key_exists('password_hash', $data))
+        {
+            $data['password_hash'] = null;
+        }
         return $data;
     }
 

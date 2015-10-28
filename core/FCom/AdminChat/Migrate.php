@@ -13,7 +13,7 @@
 
 class FCom_AdminChat_Migrate extends BClass
 {
-    public function install__0_1_4()
+    public function install__0_5_0_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);

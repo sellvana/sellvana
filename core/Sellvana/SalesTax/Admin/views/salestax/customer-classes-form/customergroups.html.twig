@@ -1,0 +1,132 @@
+<!--{ label: {{ 'Customer Groups'|_ }} }-->
+<!--{ pos: 20 }-->
+
+{% set m = THIS.get('model') %}
+
+{% set allCustomersConfig = APP.instance('Sellvana_CustomerGroups_Admin_Controller_CustomerGroups').getAllCustomerGroupsConfig(m) %}
+{% set custmerAttachConfigCompiled = THIS.view('core/griddle').set('grid', allCustomersConfig).getGridConfig() %}
+{% set customerTaxConfig = APP.instance('Sellvana_SalesTax_Admin_Controller_CustomerClasses').customerGroupsTaxGridConfig(m) %}
+
+<input type='hidden' name='grid[customergroups][add]' id='customergroups_add'/>
+<input type='hidden' name='grid[customergroups][del]' id='customergroups_del'/>
+
+<script>
+    require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'unique'],
+            function ($, _, React, FComGriddleComponent, Components) {
+                var mainGrid, attachGrid;
+
+                /**
+                 * calc rows when save
+                 * @param rows
+                 * @param ids
+                 * @returns {Array}
+                 */
+                function calcAddRemoveRows(rows, ids) {
+                    var temp = [];
+                    rows.forEach(function (row) {
+                        if (_.contains(ids, row.id) !== false) {
+                            temp.push(row.id);
+                        }
+                    });
+                    return temp;
+                }
+
+                /**
+                 * callback function for top action to show modal to add customers
+                 * @param grid
+                 */
+                window.showModalToAddTaxCustomerGroup = function (grid) {
+                    mainGrid = grid;
+                    var modalContainerEle = document.getElementById('{{ customerTaxConfig.config.id }}-modal');
+                    React.unmountComponentAtNode(modalContainerEle);
+                    React.render(
+                            React.createElement(Components.Modal, {
+                                        className: "taxProductModal",
+                                        show: true,
+                                        title: 'Group List',
+                                        confirm: 'Add',
+                                        cancel: 'Close',
+                                        onLoad: function (modal) {
+                                            var relatedNode = $(modal.getDOMNode());
+                                            relatedNode.find('.modal-dialog').css('width', '900px');
+                                        },
+                                        onConfirm: window.addSelectedCustomer
+                                    },
+                                    React.createElement('div', {className: 'f-grid-wrapper', id: 'taxProductList'})
+                            ), modalContainerEle);
+                    var custmerAttachConfigCompiled = {{ UTIL.toJson(custmerAttachConfigCompiled) | raw }};
+                    var attachGridContainerEle = document.getElementById('taxProductList');
+                    var instanceAttachGrid = React.render(
+                            React.createElement(FComGriddleComponent, {config: custmerAttachConfigCompiled}),
+                            attachGridContainerEle
+                    );
+
+                    if (typeof instanceAttachGrid.refs[custmerAttachConfigCompiled.id] !== 'undefined') {
+                        attachGrid = instanceAttachGrid.refs[custmerAttachConfigCompiled.id];
+                    }
+                };
+
+                /**
+                 * add selected customers from full customers grid to tax-customers grid
+                 * @param modal
+                 */
+                window.addSelectedCustomer = function (modal) {
+                    var selectedRows = attachGrid.getSelectedRows();
+                    if (selectedRows.length) {
+                        var addRows = [];
+                        //process selected rows
+                        selectedRows.forEach(function (attachRow) {
+                            if (!_.findWhere(mainGrid.getRows(), {id: attachRow.id})) {
+                                addRows.push(attachRow);
+                            }
+
+                            if (addRows.length) {
+                                mainGrid.addRows(addRows);
+                            }
+                        });
+                        modal.close();
+                    } else {
+                        alert('please choose at least one product');
+                    }
+                };
+
+                window.setTaxCustomerGroupMainGrid = function (grid) {
+                    mainGrid = grid;
+                    var addedIds = [], removedIds = [],
+                            arrCurrentAddedIds, arrCurrentRemovedIds, temp,
+                            originIds = _.pluck(grid.getRows(), 'id'),
+                            taxProdIdsAddEle = $('#customergroups_add'),
+                            taxProdIdsRemovedEle = $('#customergroups_del');
+
+                    $(mainGrid.getDOMNode())
+                            .on('removedRows.griddle', function (e, removedRows, grid) {
+                                removedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                                var diffRemoveIds = _.difference(originIds, removedIds);
+                                taxProdIdsRemovedEle.val(diffRemoveIds.join(','));
+                                arrCurrentAddedIds = taxProdIdsAddEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentAddedIds)) {
+                                    temp = _.difference(arrCurrentAddedIds, calcAddRemoveRows(removedRows, arrCurrentAddedIds));
+                                    taxProdIdsAddEle.val(temp.join(','));
+                                }
+                            })
+                            .on('addedRows.griddle', function (e, addedRows, grid) {
+                                addedIds = _.uniq(_.pluck(grid.getRows(), 'id'));
+                                var diffAddIds = _.difference(addedIds, originIds);
+                                taxProdIdsAddEle.val(diffAddIds.join(','));
+                                arrCurrentRemovedIds = taxProdIdsRemovedEle.val().split(',');
+                                if (!_.isEmpty(arrCurrentRemovedIds)) {
+                                    temp = _.difference(arrCurrentRemovedIds, calcAddRemoveRows(addedRows, arrCurrentRemovedIds));
+                                    taxProdIdsRemovedEle.val(temp.join(','));
+                                }
+                            });
+                };
+
+            }
+    );
+</script>
+
+<div class='row'>
+    <div class='col-sm-12'>
+        {{ THIS.view('core/griddle').set('grid', customerTaxConfig) | raw }}
+    </div>
+</div>

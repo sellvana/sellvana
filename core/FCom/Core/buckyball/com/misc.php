@@ -70,7 +70,9 @@ class BUtil extends BClass
     *
     * @var string
     */
-    protected static $_defaultCharPool = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ';
+    const CHARPOOL_DEFAULT = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ',
+          CHARPOOL_ALNUMCAP = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+          CHARPOOL_ALNUMLOW = '1234567890abcdefghijklmnopqrstuvwxyz';
 
     /**
     * Shortcut to help with IDE auto-completion
@@ -837,11 +839,8 @@ class BUtil extends BClass
      * @param string $chars allowed characters to be used
      * @return string
      */
-    public function randomString($strLen = 8, $chars = null)
+    public function randomString($strLen = 8, $chars = self::CHARPOOL_DEFAULT)
     {
-        if (null === $chars) {
-            $chars = static::$_defaultCharPool;
-        }
         $charsLen = strlen($chars)-1;
         $str = '';
         mt_srand();
@@ -878,11 +877,8 @@ class BUtil extends BClass
      * @param null $chars
      * @return string
      */
-    public function nextStringValue($string = '', $chars = null)
+    public function nextStringValue($string = '', $chars = self::CHARPOOL_DEFAULT)
     {
-        if (null === $chars) {
-            $chars = static::$_defaultCharPool; // avoid leading 0
-        }
         $pos = strlen($string);
         $lastChar = substr($chars, -1);
         while (--$pos >= -1) {
@@ -1150,7 +1146,7 @@ class BUtil extends BClass
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
 #var_dump(__METHOD__, $rawResponse);
-            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + [''];
+            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
 #var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt);
             $respHeaders = explode("\r\n", $headers);
@@ -3472,6 +3468,205 @@ class BFtpClient extends BClass
             ftp_chdir($conn, '..');
         }
         return $errors;
+    }
+}
+
+/**
+ * Class BHttpClient
+ */
+class BHttpClient extends BClass
+{
+    public function getContent($url){
+        throw new BErrorException('Not available at this moment');
+    }
+}
+
+/**
+ * Class BFile
+ *
+ * @property BHttpClient $BHttpClient
+ */
+class BFile extends BClass
+{
+    const STATUS_REMOTE_FILE = 'remote',
+          STATUS_LOCAL_FILE  = 'local';
+
+    protected $_tpmDir;
+    protected $_currentTmpDir;
+
+    protected $_currentStatus;
+    protected $_previousStatus;
+
+    protected $_fileInfo;
+
+    protected $_fileContent;
+
+    /**
+     * Is necessary to keep the contents of file in the object or not
+     * @var bool
+     */
+    public $keepContent = false;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->_tpmDir = $this->BApp->storageRandomDir() . DIRECTORY_SEPARATOR . 'tmp';
+    }
+
+    /**
+     * @param $path
+     * @return mixed
+     * @throws BErrorException
+     */
+    public function load($path)
+    {
+        if (!is_string($path)) {
+            throw new BErrorException('Support only string path of file');
+        }
+        if (filter_var($path, FILTER_VALIDATE_URL) !== false) {
+            return self::i()->_loadRemoteFile($path);
+        } else {
+            return self::i()->_loadLocalFile($path);
+        }
+    }
+
+    /**
+     * @param $url
+     * @return $this
+     * @throws BErrorException
+     */
+    private function _loadRemoteFile($url)
+    {
+        if (ini_get('allow_url_fopen')) {
+            $file = @file_get_contents($url);
+        } else {
+            $file = $this->BHttpClient->getContent($url);
+        }
+
+        $this->_fileInfo['remote_url'] = $url;
+
+        $urlPath = parse_url($url, PHP_URL_PATH);
+        $urlPath = explode('/', $urlPath);
+        $fullFileName = array_pop($urlPath);
+        if ($fullFileName === '') {
+            //TODO: generate file name;
+        }
+        $fileName = explode('.', $fullFileName);
+        if (count($fileName) >= 2) {
+            $fileExtension = array_pop($fileName);
+        } else {
+            $fileExtension = null;
+        }
+        $fileName = implode('.', $fileName);
+
+        $this->_fileInfo['full_file_name'] = $fullFileName;
+        $this->_fileInfo['file_extension'] = $fileExtension;
+        $this->_fileInfo['file_name'] = $fileName;
+
+        if ($this->keepContent) {
+            $this->_fileContent = $file;
+        }
+        $this->_saveFileToTmp($file);
+
+        $this->_currentStatus = self::STATUS_REMOTE_FILE;
+
+        return $this;
+    }
+
+    /**
+     * @param $path
+     */
+    private function _loadLocalFile($path)
+    {
+        $this->_currentStatus = self::STATUS_LOCAL_FILE;
+    }
+
+    /**
+     * @param $file
+     */
+    private function _saveFileToTmp($file)
+    {
+        $this->_currentTmpDir = $this->_tpmDir . DIRECTORY_SEPARATOR . md5(spl_object_hash($this));
+        if (!is_dir($this->_currentTmpDir)) {
+            mkdir($this->_currentTmpDir, 0777, true);
+        }
+        $this->_fileInfo['file_path'] = $this->_currentTmpDir;
+        $fullPath =  $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
+
+        if (@file_put_contents($fullPath, $file)
+        ) {
+            $this->_fileInfo['file_size'] = filesize($fullPath);
+        }
+    }
+
+    /**
+     * @param $name
+     * @param $path
+     * @return $this
+     */
+    public function save($name, $path)
+    {
+        if (@rename($this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'],
+            $path . DIRECTORY_SEPARATOR . $name)
+        ) {
+            $this->_previousStatus = $this->_currentStatus;
+            $this->_currentStatus = self::STATUS_LOCAL_FILE;
+        }
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFileInfo(){
+        return $this->_fileInfo;
+    }
+
+    /**
+     * The file is stored on a this server
+     * @return bool
+     */
+    public function isLocal()
+    {
+        return $this->_currentStatus == self::STATUS_LOCAL_FILE;
+    }
+
+    /**
+     * The file is stored on a remote server
+     * @return bool
+     */
+    public function isRemote()
+    {
+        return $this->_currentStatus == self::STATUS_REMOTE_FILE;
+    }
+
+    /**
+     * Destructor
+     */
+    public function __destruct()
+    {
+        self::delTree($this->_currentTmpDir);
+    }
+
+    /**
+     * Recursively delete a tree
+     *
+     * @param $dir
+     * @return bool
+     */
+    public static function delTree($dir)
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
+        }
+        return rmdir($dir);
     }
 }
 

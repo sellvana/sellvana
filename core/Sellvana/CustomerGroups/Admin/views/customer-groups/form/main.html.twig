@@ -1,7 +1,14 @@
+<!--{ label: General Info }-->
+<!--{ pos: 10 }-->
 {% set model = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
-<fieldset>
-    {{ forms.input({label: 'Group Title'|_, name: "model[title]", value: validator.fieldValue('title'), id: "model-title" }) }}
-    {{ forms.input({label: 'Group Code'|_, name: "model[code]", value: validator.fieldValue('code'), id: "model-code" }) }}
-</fieldset>
+<div class="col-md-12">
+    <fieldset class="f-fieldset-group">
+        <div class="f-section">
+            {{ forms.input({label: 'Group Title'|_, name: "model[title]", value: validator.fieldValue('title'), id: "model-title" }) }}
+            {{ forms.input({label: 'Group Code'|_, name: "model[code]", value: validator.fieldValue('code'), id: "model-code" }) }}
+        </div>
+    </fieldset>
+</div>

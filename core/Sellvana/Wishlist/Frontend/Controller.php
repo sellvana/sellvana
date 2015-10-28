@@ -41,6 +41,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
                 ->where_in('wishlist_id', array_keys($wishlists))
                 ->find_many();
 
+            $wishlistItems = [];
             foreach ($itemRows as $item) {
                 $wishlistItems[$item->get('wishlist_id')][] = $item;
             }
