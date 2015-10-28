@@ -363,7 +363,7 @@ class Sellvana_Catalog_Model_ProductPrice
         }
         /** @var Sellvana_Catalog_Model_Product $p */
         foreach ($products as $p) {
-            $p->setPriceModels(!empty($prices[$p->id()]) ? $prices[$p->id()] : false);
+            $p->setPriceModels(!empty($prices[$p->id()]) ? $prices[$p->id()] : []);
         }
         return $this;
     }
