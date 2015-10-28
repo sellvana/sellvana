@@ -63,6 +63,9 @@ class Sellvana_MultiVendor_Main extends BClass
         foreach ($vendorProducts as $vp) {
             $vIds[$vp->get('vendor_id')] = 1;
         }
+        if (!$vIds) {
+            return;
+        }
         $vendors = $this->Sellvana_MultiVendor_Model_Vendor->orm()->where_in('id', $vIds)->find_many();
         foreach ($vendors as $vendor) {
             // going through all vendors to account for future "digest" notification type

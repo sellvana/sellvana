@@ -58,6 +58,9 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         ];
         $config['events'] = ['delete', 'mass-delete'];
         $config['grid_before_create'] = 'template_grid';
+        $config['callbacks'] = [
+            'componentDidMount' => 'template_grid'
+        ];
         //$config['state'] =array(5,6,7,8);
         return $config;
     }
@@ -72,7 +75,6 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             $tplViewFile = $tplView->getTemplateFileName();
             $tplContents = file_get_contents($tplViewFile);
         } else {
-            $tplViewName = '';
             $tplViewName = '';
             $tplContents = '';
         }

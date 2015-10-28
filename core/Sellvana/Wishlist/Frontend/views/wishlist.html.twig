@@ -82,8 +82,8 @@
                                                 <select data-wishlist="{{ wId }}" data-product="{{ p.get('id') }}" name="wishlist_ids[{{ item.get('id')}}]" class="slt-wishlist-move">
                                                     <option value="">{{ 'Select wishlist' | _ }}</option>
                                                     {% for oId, wl in wishlists %}
-                                                        {% if wl.id != wishlist.id %}
-                                                            <option value="{{ oId }}">{{ wl.title }}</option>
+                                                        {% if wl.id() != wishlist.id() %}
+                                                            <option value="{{ oId }}">{{ wl.get('title') | default('Default Wishlist'|_) }}</option>
                                                         {% endif %}
                                                     {% endfor %}
                                                 </select>

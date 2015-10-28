@@ -4,7 +4,7 @@
 {% set wishlist = APP.instance('Sellvana_Wishlist_Model_Wishlist').sessionWishlist() %}
 {% if loggedIn and isMultiple %}
     {% set wishlists = APP.instance("Sellvana_Wishlist_Model_Wishlist").getMultipleWishlists() %}
-    {% if wishlists | length > 1 %}
+    {% if wishlists %}
         <div class="btn-group">
             <a title="{{ "Add to Wishlist" | _ }}" class="btn btn-warning btn-lg btn-wishlist" href="{{ APP.href('wishlist/add?id=') ~ p.id() }}"
                onclick="add_wishlist({{ p.id() }})" name="add2wishlist" value="{{ p.id() }}" rel="nofollow"
@@ -16,7 +16,7 @@
             <ul class="dropdown-menu">
                 {% for id, wishlist in wishlists %}
                     <li><a href="{{ APP.href('wishlist/add?id=' ~ p.id() ~ '&wishlist_id=' ~ wishlist.id()) }}"
-                           onclick="add_wishlist({{ p.id() }}, {{ wishlist.id() }})">{{ wishlist.get('title') }}</a></li>
+                           onclick="add_wishlist({{ p.id() }}, {{ wishlist.id() }})">{{ wishlist.get('title') | default('Default Wishlist'|_)}}</a></li>
                     {% if wishlist.get('is_default') %}
                         <li role="separator" class="divider"></li>
                     {% endif %}

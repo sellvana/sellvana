@@ -96,7 +96,7 @@ class FCom_AutoTranslate_Main extends BClass
 
     public function callGoogleTranslateApi($query, $targetLanguage = null, $sourceLanguage = null)
     {
-        if (!$query) {
+        if (!$query || !$this->_apiKey) {
             return $query;
         }
         if (!$sourceLanguage) {
@@ -108,6 +108,16 @@ class FCom_AutoTranslate_Main extends BClass
         if ($sourceLanguage === $targetLanguage) {
             return $query;
         }
+
+        if (is_array($query) && sizeof($query) > 100) {
+            $chunks = array_chunk($query, 100);
+            $result = [];
+            foreach ($chunks as $chunk) {
+                $result = array_merge($result, $this->callGoogleTranslateApi($chunk, $targetLanguage, $sourceLanguage));
+            }
+            return $result;
+        }
+
         $requestUrl = $this->BUtil->setUrlQuery($this->_apiUrl, [
             'key' => $this->_apiKey,
             'source' => $sourceLanguage,

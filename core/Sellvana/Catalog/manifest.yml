@@ -71,6 +71,10 @@ modules:
                         permission: catalog/product/attachements
                         filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt
                         folder: media/product/attachment
+                    product-videos:
+                        permission: catalog/product/videos
+                        filetype: mp4,ogg,webm
+                        folder: media/product/videos
                     category-images:
                         permission: catalog/category/images
                         filetype: jpeg,jpg,tiff,gif,png,bmp

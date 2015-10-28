@@ -54,7 +54,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true], 'default' => 'select',
                         'options' => ['textarea' => 'Text Area', 'text' => 'Text Line', 'select' => 'Drop Down', 'checkbox' => 'Check Box'], 'select2' => true, 'callback' => 'updateValidation'
                     ],
-                    ['type' => 'link', 'name' => 'options', 'label' => 'Options', 'width' =>80, 'value' => 'Option',
+                    ['type' => 'link', 'name' => 'options', 'label' => 'Options', 'width' => 80, 'defaultValue' => 'Edit Prices',
                         'addable' => true, 'style' => ['fontSize' => '12px', 'lineHeight' => '32px', 'display' => 'block', 'textAlign' => 'center'],
                         'action' => 'showModalToEditShopperField'],
                     ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select',

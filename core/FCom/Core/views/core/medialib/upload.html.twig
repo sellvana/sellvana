@@ -1,6 +1,7 @@
 {#{{ dump(uploadConfig) }}#}
-<div class='' id='{{ config.id }}-media-upload'>
-    <div class='box-content'>
+{% set defaultFileSizeConfig = CONFIG.get('modules/FCom_Admin/default_media_file_size') | default('1') %}
+<div id='{{ config.id }}-media-upload'>
+    {# <div class='box-content'>
         <div class='row fileupload-buttonbar'>
             <div class='col-sm-12'>
                 <span class='btn btn-success fileinput-button'>
@@ -30,151 +31,224 @@
         <table class='table table-striped' role='presentation'>
             <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
         </table>
-    </div>
+    </div> #}
     <script>
         var uploadTr = '{{ 'Upload'|_ }}';
         var errorTr = '{{ 'Error'|_ }}';
         var cancelTr = '{{ 'Cancel'|_ }}';
     </script>
-    {% verbatim %}
-    <script id="template-upload" type="text/x-tmpl">
-        {% for (var i=0, file; file=o.files[i]; i++) { %}
-            <tr class="template-upload fade">
-                <td class="preview"><span class="fade"></span></td>
-                <td class="name"><span>{%=file.name%}</span></td>
-                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                {% if (file.error) { %}
-                    <td class="error" colspan="2"><span class="label label-important">{%=
-                        errorTr%}</span> {%=file.error%}</td>
-                {% } else if (o.files.valid && !i) { %}
-                <td>
-                    <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                        <div class="bar" style="width:0%;"></div>
-                    </div>
-                </td>
-                <td>
-                    {% if (!o.options.autoUpload) { %}
-                        <button class="btn btn-primary start">
-                            <i class="icon-upload icon-white"></i>
-                            <span>{%=uploadTr%}</span>
-                        </button>
-                    {% } %}
-                </td>
-                {% } else { %}
-                    <td colspan="2"></td>
-                {% } %}
-                <td>
-                   {% if (!i) { %}
-                    <button class="btn btn-warning cancel">
-                        <i class="icon-ban-circle icon-white"></i>
-                        <span>{%=cancelTr%}</span>
-                    </button>
-                    {% } %}
-                </td>
-            </tr>
-        {% } %}
-
-    </script>
-<!-- The template to display files available for download -->
-
-    <script id="template-download" type="text/x-tmpl">
-        {% for (var i=0, file; file=o.files[i]; i++) { %}
-            <tr class="template-download fade">
-               {% if (file.error) { %}
-                    <td></td>
-                    <td class="name"><span>{%=file.name%}</span></td>
-                    <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                    <td class="error" colspan="2"><span class="label label-important">{%=
-                          errorTr%}</span> {%=file.error%}</td>
-               {% } else { %}
-                    <td class="previe">
-                   {% if (file.thumbnail_url) { %}
-                       <a href="{%=file.url%}" title="{%=
-                         file.name%}" data-gallery="gallery" download="{%=file.name%}">
-                           <img src="{%=file.thumbnail_url%}">
-                       </a>
-                   {% } %}
-                   </td>
-                   <td class="name">
-                       <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=
-                         file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">
-                           {%=file.name%}
-                       </a>
-                   </td>
-                   <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                   <td colspan="2"></td>
-               {% } %}
-               <td>
-                   <input type="checkbox" name="delete" value="1" class="toggle">
-               </td>
-            </tr>
-        {% } %}
-
-    </script>
-    {% endverbatim %}
 </div>
 
 <script type="text/javascript">
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
-        var uploadUrl = "{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}";
-        $("#{{config.id}}-media-upload").fileupload({
-            url: uploadUrl,
-            multiple:true
-            {% if config.mode and config.mode == "thumbnail" %}
-                ,acceptFileTypes:  /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i
-            {% elseif uploadConfig.filetype_regex %}
-                ,acceptFileTypes: {{ uploadConfig.filetype_regex }}
-            {% endif %}
-        })
-        .bind('fileuploadalways', function(e, data) {
-            var grid = {{config.id}}_grid;
-            if ($.isArray(data.result.files)) {
-                if (typeof grid.getRows.add == 'function') {//get self media grid
-                    data.result.files.forEach(function (obj) {
-
-                        //insert uploaded file in media grid and get selected
-                        var newRow = obj;
-                        if (newRow.error) {
-                            return;
-                        }
-
-                        //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
-                        {% if config.multiSelAllowed %}
-                        newRow.selected = true;
-                        grid.getSelectedRows().add(obj);
-                        {% endif %}
-
-                        grid.getRows().add(newRow, {merge: true}).trigger('render');
-
-                        $('td.name span').each(function (i) {
-                            if ($(this).html() === obj.file_name) {
-                                $(this).parents('tr:first').remove();
-                            }
-                        });
-                    })
-                } else {
-                    var rows = [], selectedRows = [];
-                    data.result.files.forEach(function (obj) {
-                        {% if config.multiSelAllowed %}
-                        selectedRows.push(obj);
-                        {% endif %}
-
-                        rows.push(obj);
-
-                        $('td.name span').each(function (i) {
-                            if ($(this).html() === obj.file_name) {
-                                $(this).parents('tr:first').remove();
-                            }
-                        });
-                    });
-
-                    if (selectedRows.length) {
-                        grid.addSelectedRows(selectedRows);
-                    }
-                    grid.addRows(rows);
+    MediaApp = {};
+    require(['jquery', 'underscore', 'react', 'tmpl', 'jquery.fileupload-ui', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp'], function ($, _, React) {
+        var MediaGrid = React.createClass({
+            getInitialState: function() {
+                return $.extend(true, {}, this.props.config);
+            },
+            calFileSize: function() {
+                var fileSizeConfig = {{ defaultFileSizeConfig }};
+                if (fileSizeConfig && fileSizeConfig != 0) {
+                    return parseInt(fileSizeConfig) * 1024000;
                 }
+                return 1024000;
+            },
+            initUploadFile: function() {
+                var uploadUrl = "{{ APP.href("media/grid/upload?type=") | raw }}" + this.state.type ? this.state.type : '';
+                var acceptFileTypes = this.state && this.state.mode == 'thumbnail' ? new RegExp(/(\.|\/)(jpe?g|tiff|gif|png|bmp|mp4)$/i) : new RegExp({{ uploadConfig.filetype_regex }});
+                var maxFileSize = this.calFileSize();
+
+                $('#'+this.state.id+'-media-upload').fileupload({
+                    url: uploadUrl,
+                    multiple: true,
+                    acceptFileTypes: acceptFileTypes,
+                    maxFileSize: maxFileSize
+                }).bind('fileuploadalways', function(e, data) {
+                    var grid = window[this.state.id + '_grid'];
+                    if ($.isArray(data.result.files)) {
+                        if (typeof grid.getRows.add == 'function') {//get self media grid
+                            data.result.files.forEach(function (obj) {
+                                //insert uploaded file in media grid and get selected
+                                var newRow = obj;
+                                if (newRow.error) {
+                                    return;
+                                }
+
+                                //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
+                                if (this.state.multiSelAllowed) {
+                                    newRow.selected = true;
+                                    grid.getSelectedRows().add(obj);
+                                }
+
+                                grid.getRows().add(newRow, {merge: true}).trigger('render');
+
+                                $('td.name span').each(function (i) {
+                                    if ($(this).html() === obj.file_name) {
+                                        $(this).parents('tr:first').remove();
+                                    }
+                                });
+                            }.bind(this))
+                        } else {
+                            var rows = [], selectedRows = [];
+                            data.result.files.forEach(function (obj) {
+                                if (this.state.multiSelAllowed) {
+                                    selectedRows.push(obj);
+                                }
+
+                                rows.push(obj);
+
+                                $('td.name span').each(function (i) {
+                                    if ($(this).html() === obj.file_name) {
+                                        $(this).parents('tr:first').remove();
+                                    }
+                                });
+                            }.bind(this));
+
+                            if (selectedRows.length) {
+                                grid.addSelectedRows(selectedRows);
+                            }
+                            grid.addRows(rows);
+                        }
+                    }
+                }.bind(this));
+            },
+            componentDidMount: function() {
+                this.initUploadFile();
+
+                $(MediaApp).on('onMounted', function(e, config) {
+                    this.setState(config);
+                }.bind(this));
+            },
+            shouldComponentUpdate: function(nextProps, nextState) {
+                return nextState.id != this.state.id;
+            },
+            componentDidUpdate: function(prevProps, prevState) {
+                this.initUploadFile();
+            },
+            componentWillUnmount: function() {
+                $(MediaApp).off('onMounted');
+            },
+            render: function() {
+                var node = React.DOM.div({ id: 'box-content' }, 
+                        React.DOM.div({ className: 'row fileupload-buttonbar' }, 
+                            React.DOM.div({ className: 'col-sm-12' }, 
+                                React.DOM.span({ className: 'btn btn-success fileinput-button' }, 
+                                    React.DOM.i({ className: 'icon-plus icon-white' }),
+                                    React.DOM.span(null, 'Add files...'),
+                                    React.DOM.input({ 'data-bfi-disabled': '', multiple: '', name: 'upload[]', type: 'file' })
+                                ),
+                                React.DOM.button({ className: 'btn btn-primary start', type: 'submit' },
+                                    React.DOM.i({ className: 'icon-upload icon-white' }),
+                                    React.DOM.span(null, 'Start upload')
+                                ),
+                                React.DOM.button({ className: 'btn btn-warning cancel', type: 'reset' },
+                                    React.DOM.i({ className: 'icon-ban-circle icon-white' }),
+                                    React.DOM.span(null, 'Cancel upload')
+                                )
+                            ),
+                            React.DOM.div({ className: 'col-sm-5 fileupload-progress fade' },
+                                React.DOM.div({ 'aria-valuemax': '100', 'aria-valuemin': '0', className: 'progress progress-success progress-striped active',
+                 role: 'progressbar' },
+                                    React.DOM.div({ className: 'bar', style: { width: '0%' } })
+                                ),
+                                React.DOM.div({ className: 'progress-extended' })
+                            )
+                        ),
+                        React.DOM.div({ className: 'fileupload-loading' }),
+                        React.DOM.br(),
+                        React.DOM.table({ className: 'table table-striped', role: 'presentation' },
+                            React.DOM.tbody({ className: 'files', 'data-target': '#modal-gallery', 'data-toggle': 'modal-gallery' })
+                        )
+                    );
+                
+                return node;
             }
         });
+
+        var config = {{ UTIL.toJson(config) | raw }};
+        var mediaUploadContainer = document.getElementById('{{ config.id }}-media-upload');
+        React.unmountComponentAtNode(mediaUploadContainer);
+        React.render(
+            React.createElement(MediaGrid, { config: config }), mediaUploadContainer
+        );
+
     });
 
 </script>
+
+{% verbatim %}
+<script id="template-upload" type="text/x-tmpl">
+    {% for (var i=0, file; file=o.files[i]; i++) { %}
+        <tr class="template-upload fade">
+            <td class="preview"><span class="fade"></span></td>
+            <td class="name"><span>{%=file.name%}</span></td>
+            <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+            {% if (file.error) { %}
+                <td class="error" colspan="2"><span class="label label-important">{%=
+                    errorTr%}</span> {%=file.error%}</td>
+            {% } else if (o.files.valid && !i) { %}
+            <td>
+                <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div class="bar" style="width:0%;"></div>
+                </div>
+            </td>
+            <td>
+                {% if (!o.options.autoUpload) { %}
+                    <button class="btn btn-primary start">
+                        <i class="icon-upload icon-white"></i>
+                        <span>{%=uploadTr%}</span>
+                    </button>
+                {% } %}
+            </td>
+            {% } else { %}
+                <td colspan="2"></td>
+            {% } %}
+            <td>
+               {% if (!i) { %}
+                <button class="btn btn-warning cancel">
+                    <i class="icon-ban-circle icon-white"></i>
+                    <span>{%=cancelTr%}</span>
+                </button>
+                {% } %}
+            </td>
+        </tr>
+    {% } %}
+
+</script>
+<!-- The template to display files available for download -->
+
+<script id="template-download" type="text/x-tmpl">
+    {% for (var i=0, file; file=o.files[i]; i++) { %}
+        <tr class="template-download fade">
+           {% if (file.error) { %}
+                <td></td>
+                <td class="name"><span>{%=file.name%}</span></td>
+                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                <td class="error" colspan="2"><span class="label label-important">{%=
+                      errorTr%}</span> {%=file.error%}</td>
+           {% } else { %}
+                <td class="previe">
+               {% if (file.thumbnail_url) { %}
+                   <a href="{%=file.url%}" title="{%=
+                     file.name%}" data-gallery="gallery" download="{%=file.name%}">
+                       <img src="{%=file.thumbnail_url%}">
+                   </a>
+               {% } %}
+               </td>
+               <td class="name">
+                   <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=
+                     file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">
+                       {%=file.name%}
+                   </a>
+               </td>
+               <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+               <td colspan="2"></td>
+           {% } %}
+           <td>
+               <input type="checkbox" name="delete" value="1" class="toggle">
+           </td>
+        </tr>
+    {% } %}
+
+</script>
+{% endverbatim %}

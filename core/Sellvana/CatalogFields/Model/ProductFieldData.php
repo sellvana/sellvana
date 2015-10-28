@@ -15,6 +15,7 @@
  *
  * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
+ * @property Sellvana_CatalogFields_Model_Set $Sellvana_CatalogFields_Model_Set
  *
  * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
  */
@@ -76,6 +77,11 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
      */
     public function saveProductsFieldData($products)
     {
+        $defaultSet = $this->Sellvana_CatalogFields_Model_Set->loadWhere([
+            'set_code' => 'default',
+            'set_type' => 'product',
+        ]);
+
         $fields = $this->Sellvana_CatalogFields_Model_Field->getAllFields();
         //$this->Sellvana_CatalogFields_Model_FieldOption->preloadAllFieldsOptions();
 
@@ -140,6 +146,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                             $fData = $this->create([
                                 'product_id' => $pId,
                                 'field_id' => $fId,
+                                'set_id' => $defaultSet ? $defaultSet->id() : null,
                             ]);
                         }
                         if ($fieldType === 'options') {

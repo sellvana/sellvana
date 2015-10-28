@@ -96,5 +96,12 @@ lib_file_upload:
             - [ requireJs, iframe-transport, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.iframe-transport.min", { deps: [ tmpl ] } ]
             - [ requireJs, jquery.fileupload, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload.min", { deps: [tmpl ] } ]
             - [ requireJs, jquery.fileupload-fp, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-fp.min", { deps: [ jquery.fileupload ] } ]
-            - [ requireJs, jquery.fileupload-ui, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-ui.min", { deps: [ jquery.fileupload ] } ]
             - [ requireJs, jquery.fileupload-init, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-init", { deps: [ jquery.fileupload ] } ]
+            - [ requireJs, jquery.fileupload-ui, "@FCom_LibJsCommon/js/plugins/fileupload/jquery.fileupload-ui.min", { deps: [ jquery.fileupload ] } ]
+
+lib_media_player:
+    - view: head
+        do:
+            - [ css, "@FCom_LibJsCommon/js/css/mediaelementplayer.min.css" ]
+            - [ requireJs, jquery.vimeo, "@FCom_LibJsCommon/js/jquery.vimeo.api.min", { deps: [ jquery ] } ]
+            - [ requireJs, jquery.media-element, "@FCom_LibJsCommon/js/mediaelement-and-player.min", { deps: [ jquery ] } ]
