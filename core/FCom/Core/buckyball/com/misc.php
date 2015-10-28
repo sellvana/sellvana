@@ -1146,7 +1146,7 @@ class BUtil extends BClass
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
 #var_dump(__METHOD__, $rawResponse);
-            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + [''];
+            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
 #var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt);
             $respHeaders = explode("\r\n", $headers);
