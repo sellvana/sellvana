@@ -251,12 +251,6 @@
                 if (!r.error) {
                     $.bootstrapGrowl("{{ 'Success: Add library success.' | _ }}", { type: 'success', align: 'center', width: 'auto', delay: 5000 });
                     mediaGrid.addRows([r]);
-                    new MediaElementPlayer('video#video-' + r.id, { 
-                        pauseOtherPlayers: true,
-                        success: function (mediaElement, domObject) {
-                            mediaElement.load();
-                        }
-                    });
                 } else {
                     $.bootstrapGrowl("{{ 'Error: Add library failure, please check your link.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                 }
