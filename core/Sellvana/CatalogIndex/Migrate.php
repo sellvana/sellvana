@@ -374,12 +374,31 @@ EOT
 
         $this->BDb->connect();
         $orm = BORM::i();
-        $functionsExist = $orm->raw_query("SHOW FUNCTION STATUS LIKE 'levenshtein%'")->find_many_assoc('Name');
+        $dbName = $orm->get_config('dbname');
+        $functionsExist = $orm->raw_query("SHOW FUNCTION STATUS LIKE 'levenshtein%'")
+            ->find_many_assoc('Name');
         foreach ($functions as $name => $func) {
-            if (!empty($functionsExist[$name])) {
+            if (!empty($functionsExist[$name]) && $functionsExist[$name]->get('Db') === $dbName) {
                 $orm->raw_query("DROP FUNCTION {$name}")->execute();
             }
             $orm->raw_query($func)->execute();
         }
+    }
+
+    public function upgrade__0_5_1_0__0_5_2_0()
+    {
+        $fieldHlp = $this->Sellvana_CatalogIndex_Model_Field;
+        $relevanceField = $fieldHlp->load('relevance', 'field_name');
+        if (!$relevanceField) {
+            $relevanceField = $fieldHlp->create();
+        }
+        $relevanceField->set([
+            'field_name' => 'relevance',
+            'field_label' => 'Relevance',
+            'field_type' => 'int',
+            'source_type' => 'callback',
+            'source_callback' => 'Sellvana_CatalogIndex_Model_Field::relevance',
+            'sort_type' => 'asc',
+        ])->save();
     }
 }
