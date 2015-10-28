@@ -71,17 +71,19 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
     protected $_oldTableFieldCode;
     protected $_oldTableFieldType;
 
-    protected static $_fieldsCache;
+    protected static $_fieldsCache = [];
 
     /**
+     * @param string $key
+     *
      * @return Sellvana_CatalogFields_Model_Field[]
      */
-    public function getAllFields()
+    public function getAllFields($key = 'field_code')
     {
-        if (null === static::$_fieldsCache) {
-            static::$_fieldsCache = $this->orm('f')->order_by_asc('field_name')->find_many_assoc('field_code');
+        if (!isset(static::$_fieldsCache[$key])) {
+            static::$_fieldsCache[$key] = $this->orm('f')->order_by_asc('field_name')->find_many_assoc($key);
         }
-        return static::$_fieldsCache;
+        return static::$_fieldsCache[$key];
     }
 
     /**
