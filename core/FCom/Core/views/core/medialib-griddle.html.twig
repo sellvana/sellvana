@@ -12,6 +12,9 @@
 {% set config = THIS.get('config') %}
 {% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
 {% set uploadConfig = mediaLib.uploadConfig(config.type) %}
+{% if config.can_embed_video %}
+    {% set uploadConfig = uploadConfig | merge({ can_embed_video: config.can_embed_video }) %}
+{% endif %}
 {% set mediaLibAttachConfig = mediaLib.gridConfig({'id': config.id, 'folder': uploadConfig.folder, 'config': config.config, 'mode': config.mode}) %}
 {% set defaultFileSizeConfig = CONFIG.get('modules/FCom_Admin/default_media_file_size') | default('1') %}
 
@@ -173,7 +176,7 @@
                     $oembedContainer.html('<video width="640" height="360" id="media-player" controls="controls" preload="true"><source src="'+url+'" type="video/youtube" /></video>').show();
                     new MediaElementPlayer('video#media-player', {
                         success: function (mediaElement, domObject) {
-                            playerPreview.play();
+                            playerPreview.load();
                         }
                     });
                     break;
@@ -248,19 +251,23 @@
                 if (!r.error) {
                     $.bootstrapGrowl("{{ 'Success: Add library success.' | _ }}", { type: 'success', align: 'center', width: 'auto', delay: 5000 });
                     mediaGrid.addRows([r]);
-                    new MediaElementPlayer('video#video-' + r.id, { 
-                        pauseOtherPlayers: true,
-                        success: function (mediaElement, domObject) {
-                            mediaElement.load();
-                        }
-                    });
                 } else {
                     $.bootstrapGrowl("{{ 'Error: Add library failure, please check your link.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                 }
             });
         });
 
-        $('.product-video-media').mediaelementplayer({ pauseOtherPlayers: true });
+        $(document).on('click', '.btn-video-player', function(event) {
+            event.preventDefault();
+            var $td = $(this).parent().html($(this).data('html'));
+            var $video = $td.children('video.product-video-media');
+            new MediaElementPlayer('video#' + $video.prop('id'), {
+                pauseOtherPlayers: true,
+                success: function (mediaElement, domObject) {
+                    mediaElement.load();
+                }
+            });
+        });
     });
 </script>
 

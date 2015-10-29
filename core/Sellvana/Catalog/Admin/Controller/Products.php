@@ -149,21 +149,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 ],
                 [
                     ['span', null, $this->_('Duplicate')],
-                ]
+                ], 50
             ];
         }
-        $newAction['save_and_continue'] = [
-            'button',
-            [
-                'type' => 'submit',
-                'class' => ['btn', 'btn-primary'],
-                'name' => 'do',
-                'value' => 'save_and_continue',
-            ],
-            [
-                ['span', null, $this->BLocale->_('Save And Continue')],
-            ]
-        ];
         $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set([
             'sidebar_img' => $m->thumbUrl(98),
@@ -500,18 +488,15 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ]
         ];
 
-        $isAllowVideoUpload = (bool)$this->BConfig->get('modules/FCom_Admin/allowed_video_upload');
-        if ($isAllowVideoUpload) {
-            $config['config']['actions'] += [
-                'add-videos' => [
-                    'caption'  => 'Add Videos',
-                    'type'     => 'button',
-                    'id'       => 'add-video-from-grid',
-                    'class'    => 'btn-primary',
-                    'callback' => 'gridShowMedia' . $config['config']['id']
-                ]
-            ];
-        }
+        $config['config']['actions'] += [
+            'add-videos' => [
+                'caption'  => 'Add Videos',
+                'type'     => 'button',
+                'id'       => 'add-video-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'gridShowMedia' . $config['config']['id']
+            ]
+        ];
 
         $config['config']['callbacks'] = [
             'componentDidMount' => 'gridRegister' . $config['config']['id']

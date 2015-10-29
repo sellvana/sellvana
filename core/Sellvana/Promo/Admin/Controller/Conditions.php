@@ -12,6 +12,7 @@
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_Sales_Main                    $Sellvana_Sales_Main
  * @property Sellvana_Cms_Model_Block               $Sellvana_Cms_Model_Block
+ * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
  */
 class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstract
 {
@@ -127,53 +128,14 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
         $type   = $r->get('promo_type')?: 'cart';
         $offset = ($page - 1) * $limit;
 
-        $orm = $this->Sellvana_CatalogFields_Model_Field->orm()->where('field_type', 'product');
+        $results = [];
+        $this->getCatalogFieldsList($term, $results, $limit, $offset);
+        $this->getCustomersFieldsList($term, $results, $limit, $offset);
 
-        if ($term && $term != '*') {
-            $orm->where(['OR' => [['field_code LIKE ?', "%{$term}%"], ['field_name LIKE ?', "%{$term}%"]]]);
-        }
-
-        $countOrm = clone $orm;
-        $count    = $countOrm->count();
-        $results  = ['total_count' => $count, 'items' => []];
-        if($type == 'cart'){
+        if ($type == 'cart') {
             $results['items'][] = ['id' => 'cart.qty', 'text' => 'Total Qty (cart)', 'input' => 'number'];
             $results['items'][] = ['id' => 'cart.amt', 'text' => 'Total Amount (cart)', 'input' => 'number'];
         }
-        $orm->limit((int) $limit)->offset($offset)->order_by_desc('frontend_label');
-
-        $orm->iterate(function ($model) use (&$results) {
-            /** @var $model BModel */
-            $result = [
-                'id'   => 'field' . '.' . $model->get('field_code'),
-                'text' => $model->get('frontend_label') . ' (field)',
-            ];
-            switch ($model->get('admin_input_type')) {
-                case 'text':
-                    $result['input'] = 'text';
-                    break;
-                case 'select':
-                case 'multiselect':
-                    $result['input'] = 'select';
-                    break;
-                case 'boolean':
-                    $result['input'] = 'yes_no';
-                    break;
-                case 'number':
-                    $result['input'] = 'number';
-                    break;
-                case 'date':
-                    $result['input'] = 'date';
-                    break;
-                case 'wysiwyg':
-                case 'textarea':
-                default:
-                    $result['input'] = 'text';
-            }
-            $results['items'][] = $result;
-
-            return $results;
-        });
 
         $base_product_fields = $this->_searchTableFields($this->Sellvana_Catalog_Model_Product, $term);
         $baseExclude         = ['id', 'images_data', 'data_serialized'];
@@ -429,5 +391,110 @@ class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_A
         $res = $instance->orm()->raw_query($sql, [$term])->find_many_assoc('Field');
 
         return $res;
+    }
+
+    /**
+     * @param $term
+     * @param $results
+     * @param $limit
+     * @param $offset
+     * @return array
+     */
+    protected function getCatalogFieldsList($term, &$results, $limit, $offset)
+    {
+        $orm = $this->Sellvana_CatalogFields_Model_Field->orm()->where('field_type', 'product');
+
+        if ($term && $term != '*') {
+            $orm->where(['OR' => [['field_code LIKE ?', "%{$term}%"], ['field_name LIKE ?', "%{$term}%"]]]);
+        }
+
+        $countOrm = clone $orm;
+        $count    = $countOrm->count();
+        isset($results['total_count'])? $results['total_count'] += $count: $results['total_count'] = $count;
+
+        if (empty($results['items'])) {
+            $results['items'] = [];
+        }
+
+        $orm->limit((int) $limit)->offset($offset)->order_by_desc('frontend_label');
+
+        $orm->iterate($this->prepareCustomField($results));
+
+        return $results;
+    }
+
+    /**
+     * @param $term
+     * @param $results
+     * @param $limit
+     * @param $offset
+     * @return array
+     */
+    protected function getCustomersFieldsList($term, &$results, $limit, $offset)
+    {
+        $orm = $this->Sellvana_CustomerFields_Model_Field->orm();
+
+        if ($term && $term != '*') {
+            $orm->where(['OR' => [['field_code LIKE ?', "%{$term}%"], ['field_name LIKE ?', "%{$term}%"]]]);
+        }
+
+        $countOrm = clone $orm;
+        $count    = $countOrm->count();
+        isset($results['total_count'])? $results['total_count'] += $count: $results['total_count'] = $count;
+
+        if (empty($results['items'])) {
+            $results['items'] = [];
+        }
+        $orm->limit((int) $limit)->offset($offset)->order_by_desc('frontend_label');
+
+        $orm->iterate($this->prepareCustomField($results));
+
+        return $results;
+    }
+
+    /**
+     * @param $results
+     * @return Closure
+     */
+    protected function prepareCustomField(&$results)
+    {
+        return function ($model) use (&$results) {
+            /** @var $model BModel */
+            $fieldLabel = ' (field)';
+            if($model instanceof Sellvana_CustomerFields_Model_Field){
+                $fieldLabel = ' (customer field)';
+            } elseif($model instanceof Sellvana_CatalogFields_Model_Field) {
+                $fieldLabel = ' (catalog field)';
+            }
+            $result = [
+                'id'   => 'field' . '.' . $model->get('field_code'),
+                'text' => $model->get('frontend_label') . $fieldLabel,
+            ];
+            switch ($model->get('admin_input_type')) {
+                case 'text':
+                    $result['input'] = 'text';
+                    break;
+                case 'select':
+                case 'multiselect':
+                    $result['input'] = 'select';
+                    break;
+                case 'boolean':
+                    $result['input'] = 'yes_no';
+                    break;
+                case 'number':
+                    $result['input'] = 'number';
+                    break;
+                case 'date':
+                    $result['input'] = 'date';
+                    break;
+                case 'wysiwyg':
+                case 'textarea':
+                default:
+                    $result['input'] = 'text';
+            }
+            $results['items'][] = $result;
+
+            return $results;
+        };
     }
 }

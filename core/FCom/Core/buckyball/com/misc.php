@@ -1146,7 +1146,7 @@ class BUtil extends BClass
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
 #var_dump(__METHOD__, $rawResponse);
-            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + [''];
+            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
 #var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt);
             $respHeaders = explode("\r\n", $headers);
@@ -1238,13 +1238,19 @@ class BUtil extends BClass
                 $arr = explode(':', $line, 2);
                 static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {
-                preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m);
-                static::$_lastRemoteHttpInfo['headers']['http'] = [
-                    'full' => $m[0],
-                    'protocol' => $m[1],
-                    'code' => $m[2],
-                    'status' => $m[3],
-                ];
+                IF (preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m)) {
+                    static::$_lastRemoteHttpInfo['headers']['http'] = [
+                        'unparsed' => $line,
+                        'full' => $m[0],
+                        'protocol' => $m[1],
+                        'code' => $m[2],
+                        'status' => $m[3],
+                    ];
+                } else {
+                    static::$_lastRemoteHttpInfo['headers']['http'] = [
+                        'unparsed' => $line,
+                    ];
+                }
             }
         }
 /*

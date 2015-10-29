@@ -22,6 +22,10 @@
         background-color: #EE8371 !important;
         color: #fff;
     }
+
+    .external_thumb {
+        height: 43px;
+    }
 </style>
 
 {% set prod = THIS.get('product') %}
@@ -69,9 +73,19 @@
             <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
                 {% for media in mediaItems %}
                     {% if media.get('media_type') == 'V' %}
-                        <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
-                            <a href="javascript:void(0)"><img src="{{ CONFIG.get('web/media_dir') ~ '/video-default.jpg' }}" title="There's no image for this video"></a>
-                        </li>
+                        {% if media.get('file_size') %}
+                            <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
+                                <a href="javascript:void(0)"><img src="{{ CONFIG.get('web/media_dir') ~ '/video-default.jpg' }}" title="There's no image for this video"></a>
+                            </li>
+                        {% else %}
+                            {% set data = UTIL.fromJson(media.get('data_serialized')) | raw %}
+                            {% if data %}
+                                <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 3px;">
+                                    <a href="javascript:void(0)"><img class="external_thumb" src="{{ data.thumbnail_url | raw }}" title="{{ data.title | raw }}"></a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                        
                     {% else %}
                         <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}"><a href="#"><img src="{{ media.thumbUrl(90) }}" alt="" title=""></a></li>
                     {% endif %}
@@ -194,6 +208,12 @@
         });
 
         $('#product-rslides li:not(.product-video-item)').addClass('zoom').zoom();
+
+        // Fix external video size
+        var $externalVideoNode = $('.external_link').children('iframe');
+        if ($externalVideoNode.length) {
+            $externalVideoNode.prop('width', '460');
+        }
 
         $('video').mediaelementplayer({
             features: ['playpause','progress','current','duration','tracks','volume','fullscreen']

@@ -179,7 +179,7 @@ class Sellvana_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
 
         $model = $this->Sellvana_Cms_Model_FormData->create();
-        $model->set('form_id', $block->id())
+        $model->set('block_id', $block->id())
               ->set('customer_id', $data['customer_id'])
               ->set('session_id', $sessId)
               ->set('remote_ip', $data['ip'])

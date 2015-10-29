@@ -9,7 +9,8 @@
     type: 'product-videos',
     title: 'Videos',
     folder: 'media/product/videos',
-    config: {actions: {delete: {caption : 'Remove'}}}
+    config: {actions: {delete: {caption : 'Remove'}}},
+    can_embed_video: true
 } %}
 
 {% set attachmentsConfig = {
@@ -24,8 +25,14 @@
 
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'griddle.fcomModalForm', 'jquery.validate', 'jquery.media-element'], function ($, _, React, FComGriddleComponent, Components, FComModalForm) {
-        var productVideosGrid = {{ combineType }}Grid, productVideosNode, productExternalModalGrid, productExternalModalNode, videoExt, videoName, editedRow;
-        var linkInfo = {}, isExternalLink = false;
+        var productVideosGrid = {{ combineType }}Grid, 
+            productVideosNode, 
+            productExternalModalGrid, 
+            productExternalModalNode, 
+            videoExt       = '', 
+            videoName      = '', 
+            editedRow      = {},
+            isExternalLink = false;
 
         if (productVideosGrid) {
             $(productVideosGrid.getDOMNode())
@@ -140,7 +147,6 @@
         window.showModalToPreviewVideo = function(row) {
             editedRow      = row;
             isExternalLink = false;
-            videoExt       = _getFileExtension(row.file_name);
             videoName      = row.file_name;
 
             if (!row.file_size) {
@@ -149,9 +155,9 @@
                 var provider = data !== undefined ? data.provider_name.toLowerCase() : '';
                 switch(provider) {
                     case 'youtube':
-                        var src = data.html.substring(data.html.search('src') + 4, data.html.search('oembed') + 6);
+                        $html = $(data.html);
                         var videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
-                                React.DOM.source({ src: src,  type: "video/youtube"  })
+                                React.DOM.source({ src: $html.prop('src'),  type: "video/youtube"  })
                             );
                         break;
                     case 'vimeo':
@@ -161,6 +167,7 @@
                         break;
                 }
             } else {
+                videoExt = _getFileExtension(row.file_name);
                 var videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
                         React.DOM.source({ src: row.source,  type: "video/" + videoExt  })
                     );

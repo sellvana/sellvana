@@ -1,9 +1,36 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class Sellvana_Seo_Frontend_Controller_Sitemaps
+ *
+ * @property Sellvana_Catalog_Model_Category $Sellvana_Catalog_Model_Category
+ * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ */
 class Sellvana_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abstract
 {
     public function action_sitemap()
     {
+        $categoriesOrm = $this->Sellvana_Catalog_Model_Category->orm()->where_gte('level', 1);
+        $productsOrm = $this->Sellvana_Catalog_Model_Product->orm();
+
+        $pageSize = $this->BConfig->get('modules/Sellvana_Seo/page_size');
+        $page = $this->BRequest->get('page') ?: 1;
+
+        if ($page) {
+            $categoriesOrm->offset($pageSize * ($page - 1));
+            $productsOrm->offset($pageSize * ($page - 1));
+        }
+
+        $categories = $categoriesOrm->limit($pageSize)->find_many();
+        $products = $productsOrm->limit($pageSize)->find_many();
+
+        $this->view('seo/sitemap')->set([
+            'categories' => $categories,
+            'products' => $products,
+            'searches' => [],
+            'next_page' => (sizeof($categories) === $pageSize || sizeof($products) === $pageSize) ? ($page + 1) : false,
+        ]);
+
         $this->layout('/sitemap');
     }
 
