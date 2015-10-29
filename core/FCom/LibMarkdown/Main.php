@@ -2,6 +2,9 @@
 
 class FCom_LibMarkdown_Main extends BClass
 {
+    /**
+     * @var \Michelf\MarkdownExtra
+     */
     static protected $_parser;
 
     protected static $_cacheDir;
@@ -18,8 +21,11 @@ class FCom_LibMarkdown_Main extends BClass
     public function parser()
     {
         if (!static::$_parser) {
-            require_once __DIR__ . '/lib/markdown.php';
-            static::$_parser = new MarkdownExtra_Parser;
+            #require_once __DIR__ . '/lib/markdown.php';
+            #static::$_parser = new MarkdownExtra_Parser;
+
+            require_once __DIR__ . '/lib/Michelf/MarkdownExtra.inc.php';
+            static::$_parser = new \Michelf\MarkdownExtra;
             static::$_cacheDir = $this->BConfig->get('fs/cache_dir') . '/markdown';
             $this->BUtil->ensureDir(static::$_cacheDir);
         }
@@ -50,11 +56,17 @@ class FCom_LibMarkdown_Main extends BClass
             if (!$source) {
                 $source = file_get_contents($sourceFile);
             }
-            $output = $parser->transform($source);
+            $output = static::$_parser->transform($source);
             file_put_contents($cacheFilename, $output);
         } else {
             $output = file_get_contents($cacheFilename);
         }
+
+        /** @var BView $view */
+        $output = preg_replace_callback('#\{\{\s*([a-zA-Z0-9_]+)\s*\}\}#', function($m) use ($view) {
+            return $view->get($m[1]);
+        }, $output);
+
         $this->BDebug->profile($pId);
 
         return $output;

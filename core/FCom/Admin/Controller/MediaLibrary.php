@@ -69,7 +69,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $url = $this->BApp->href('/media/grid');
         $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
             ->where('folder', $folder)
-            ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
+            ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size', 'a.data_serialized'])
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
             //  ->order_by_expr('id asc')
         ;
@@ -81,7 +81,26 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         if ($id == 'all_videos') {
             $elementPrint = '
-                "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ rc.row["id"] +"\' preload=\'none\'><source src=\''. $baseSrc .'" + rc.row["folder"] + "/" + rc.row["file_name"] + "\' type=\'video/" + rc.row["file_name"].slice(rc.row["file_name"].lastIndexOf(".") + 1) + "\'></video>"
+                if (rc.row["file_size"] !== undefined && rc.row["file_size"] !== null) {
+                    "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ rc.row["id"] +"\' class=\'product-video-media\' preload=\'none\'><source src=\''. $baseSrc .'" + rc.row["folder"] + "/" + rc.row["file_name"] + "\' type=\'video/" + rc.row["file_name"].slice(rc.row["file_name"].lastIndexOf(".") + 1) + "\'></video>"
+                } else {
+                    var data = typeof rc.row[\'data_serialized\'] === \'string\' ? JSON.parse(rc.row[\'data_serialized\']) : rc.row[\'data_serialized\'];
+                    if (data !== undefined) {
+                        var provider = data !== undefined ? data.provider_name.toLowerCase() : "";
+                        switch(provider) {
+                            case \'youtube\':
+                                var src = $(data.html).prop(\'src\');
+                                "<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ row.id +"\' class=\'product-video-media\' preload=\'none\'><source src=\'" + src + "\' title=\'" + data.title + "\' type=\'video/youtube\'></video>"
+                                break;
+                            case \'vimeo\':
+                                data.html.replace(/(width="\d{3}"\s+height="\d{3}")/, \'width="200" height="140"\');
+                                break;
+                            default:
+                                data.html
+                                break;
+                        }
+                    }
+                }
             ';
         } else {
             $elementPrint = '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
@@ -100,7 +119,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
-                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval', 'print' => $elementPrint, 'sortable' => false],
+                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval', 'print' => $elementPrint, 'sortable' => false, 'type' => 'external_link'],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
                     ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
                         'display' => 'file_size'],
@@ -122,7 +141,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     'componentDidMount' => 'registerGrid' . $id,
                 ],
                 'actions' => [
-                    'rescan'  => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
+                    'rescan'  => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-media'],
                     'refresh' => true,
                 ]
             ]
@@ -231,7 +250,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         'class'    => 'btn-primary',
                         'callback' => 'gridShowMedia' . $id
                     ],
-                    'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
+                    'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-media'],
                     //'refresh' => true,
                 ],
                 'page_rows_data_callback' => [$this, 'afterInitialLibraryData']
@@ -337,7 +356,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 $folder = $this->getFolder();
     //            $r = $this->BRequest->get();
                 $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
-                    ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
+                    ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size', 'a.data_serialized'])
                     ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ;
                 if($folder){
@@ -424,241 +443,200 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         }
 
         switch ($do) {
-        case 'upload':
-            $type = $r->get('type');
-            if (!$type) {
-                throw new BException("Missing upload type");
-            }
-            $uploadConfigs = $this->uploadConfig($type);
-            if (empty($uploadConfigs)) {
-                throw new BException("Unknown upload type.");
-            }
-            $canUpload = isset($uploadConfigs['can_upload'])? $uploadConfigs['can_upload']: false;// allow upload in case no permission is configured? Or deny?
-            $blacklistExt = [
-                'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
-                'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
-            ];
-
-            if (isset($uploadConfigs['filetype'])) { // todo figure out how to merge processed config file types
-                $fileTypes = explode(',', $uploadConfigs['filetype']);
-                if (empty($options['whitelist_ext'])) {
-                    $options['whitelist_ext'] = $fileTypes;
-                } else {
-                    $options['whitelist_ext'] = $this->BUtil->arrayMerge($options['whitelist_ext'], $fileTypes);
+            case 'upload':
+                $type = $r->get('type');
+                if (!$type) {
+                    throw new BException("Missing upload type");
                 }
-            }
-
-            if (!empty($options['whitelist_ext'])) {
-                foreach ($options['whitelist_ext'] as $ext) {
-                    unset($blacklistExt[$ext]);
+                $uploadConfigs = $this->uploadConfig($type);
+                if (empty($uploadConfigs)) {
+                    throw new BException("Unknown upload type.");
                 }
-            }
+                $canUpload = isset($uploadConfigs['can_upload'])? $uploadConfigs['can_upload']: false;// allow upload in case no permission is configured? Or deny?
+                $blacklistExt = [
+                    'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
+                    'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
+                ];
 
-            //set_time_limit(0);
-            //ob_implicit_flush();
-            //ignore_user_abort(true);
-            if ($canUpload) {
-
-                $uploads = $_FILES['upload'];
-                $rows    = [];
-                foreach ($uploads['name'] as $i => $fileName) {
-
-                    if (!$fileName) {
-                        continue;
-                    }
-                    $associatedProducts = 0;
-                    $fileSize           = 0;
-                    $message            = '';
-                    $ext                = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-                    $fileName           = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
-
-                    if (!empty($uploads['error'][$i])) {
-                        $id      = '';
-                        $status  = static::ERROR;
-                        $message = $uploads['error'][$i];
-                    } elseif (!empty($blacklistExt[$ext]) || !in_array($ext, $options['whitelist_ext'])) {
-                        $id      = '';
-                        $status  = static::ERROR;
-                        $message = 'Illegal file extension';
-                    } elseif (preg_match('#\.(gif|jpe?g|png)$#',
-                            $fileName) && !@getimagesize($uploads['tmp_name'][$i])
-                    ) {
-                        $id      = '';
-                        $status  = static::ERROR;
-                        $message = 'Invalid image uploaded';
-                    } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
-                        $id      = '';
-                        $status  = static::ERROR;
-                        $message = 'Unable to save the file';
+                if (isset($uploadConfigs['filetype'])) { // todo figure out how to merge processed config file types
+                    $fileTypes = explode(',', $uploadConfigs['filetype']);
+                    if (empty($options['whitelist_ext'])) {
+                        $options['whitelist_ext'] = $fileTypes;
                     } else {
-                        $att = $attModel->loadWhere(['folder' => (string)$folder, 'file_name' => (string)$fileName]);
+                        $options['whitelist_ext'] = $this->BUtil->arrayMerge($options['whitelist_ext'], $fileTypes);
+                    }
+                }
 
-                        if (!$att) {
-                            $att = $attModel->create([
-                                'folder'    => $folder,
-                                'subfolder' => $subfolder,
-                                'file_name' => $fileName,
-                                'file_size' => $uploads['size'][$i],
-                                'create_at' => $this->BDb->now(),
-                                'update_at' => $this->BDb->now()
-                            ])->save();
+                if (!empty($options['whitelist_ext'])) {
+                    foreach ($options['whitelist_ext'] as $ext) {
+                        unset($blacklistExt[$ext]);
+                    }
+                }
+
+                //set_time_limit(0);
+                //ob_implicit_flush();
+                //ignore_user_abort(true);
+                if ($canUpload) {
+
+                    $uploads = $_FILES['upload'];
+                    $rows    = [];
+                    foreach ($uploads['name'] as $i => $fileName) {
+
+                        if (!$fileName) {
+                            continue;
+                        }
+                        $associatedProducts = 0;
+                        $fileSize           = 0;
+                        $message            = '';
+                        $ext                = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                        $fileName           = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
+
+                        if (!empty($uploads['error'][$i])) {
+                            $id      = '';
+                            $status  = static::ERROR;
+                            $message = $uploads['error'][$i];
+                        } elseif (!empty($blacklistExt[$ext]) || !in_array($ext, $options['whitelist_ext'])) {
+                            $id      = '';
+                            $status  = static::ERROR;
+                            $message = 'Illegal file extension';
+                        } elseif (preg_match('#\.(gif|jpe?g|png)$#',
+                                $fileName) && !@getimagesize($uploads['tmp_name'][$i])
+                        ) {
+                            $id      = '';
+                            $status  = static::ERROR;
+                            $message = 'Invalid image uploaded';
+                        } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
+                            $id      = '';
+                            $status  = static::ERROR;
+                            $message = 'Unable to save the file';
                         } else {
-                            if (in_array($type, ['product-images', 'product-attachments', 'product-videos'])
-                                && $this->BModuleRegistry->isLoaded('Sellvana_Catalog')
-                            ) {
-                                $associatedProducts = $this->Sellvana_Catalog_Model_ProductMedia
-                                    ->orm()
-                                    ->select_expr('COUNT(*)', 'associated_products')
-                                    ->where('file_id', $att->get('id'))
-                                    ->find_one();
-                                $associatedProducts = $associatedProducts->get('associated_products');
+                            $att = $attModel->loadWhere(['folder' => (string)$folder, 'file_name' => (string)$fileName]);
+
+                            if (!$att) {
+                                $att = $attModel->create([
+                                    'folder'    => $folder,
+                                    'subfolder' => $subfolder,
+                                    'file_name' => $fileName,
+                                    'file_size' => $uploads['size'][$i],
+                                    'create_at' => $this->BDb->now(),
+                                    'update_at' => $this->BDb->now()
+                                ])->save();
+                            } else {
+                                if (in_array($type, ['product-images', 'product-attachments', 'product-videos'])
+                                    && $this->BModuleRegistry->isLoaded('Sellvana_Catalog')
+                                ) {
+                                    $associatedProducts = $this->Sellvana_Catalog_Model_ProductMedia
+                                        ->orm()
+                                        ->select_expr('COUNT(*)', 'associated_products')
+                                        ->where('file_id', $att->get('id'))
+                                        ->find_one();
+                                    $associatedProducts = $associatedProducts->get('associated_products');
+                                }
+                                $att->set(['file_size' => $uploads['size'][$i], 'update_at' => $this->BDb->now()])->save();
                             }
-                            $att->set(['file_size' => $uploads['size'][$i], 'update_at' => $this->BDb->now()])->save();
+                            $this->BEvents->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
+                            if (!empty($options['on_upload'])) {
+                                $this->BUtil->call($options['on_upload'], $att);
+                            }
+                            $id       = $att->id;
+                            $fileSize = $att->file_size;
+                            $status   = '';
                         }
-                        $this->BEvents->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
-                        if (!empty($options['on_upload'])) {
-                            $this->BUtil->call($options['on_upload'], $att);
+
+                        if($status == static::ERROR){
+                            $rows[] = [
+                                'error'     => $message,
+                                'file_name' => $fileName,
+                            ];
+                        } else {
+                            $rows[] = [
+                                'id'                  => $id,
+                                'file_name'           => $fileName,
+                                'file_size'           => $fileSize,
+                                'act'                 => $status,
+                                'folder'              => $folder,
+                                'subfolder'           => '',
+                                'associated_products' => $associatedProducts
+                            ];
                         }
-                        $id       = $att->id;
-                        $fileSize = $att->file_size;
-                        $status   = '';
+
+                        //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".$this->BUtil->toJson($row)."); </script>";
+                        // TODO: properly refresh grid after file upload
+                        // solution one "addRowData method" - will work if we could prevent add new row after Upload file on client side
+                        // echo "<script>parent.\$('#$gridId').addRowData('$fileName', ".$this->BUtil->toJson($row)."); </script>";
+                        // solution two is to find a way to pass rowid to the server side
+                        //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
+
                     }
-
-                    if($status == static::ERROR){
-                        $rows[] = [
-                            'error'     => $message,
-                            'file_name' => $fileName,
-                        ];
-                    } else {
-                        $rows[] = [
-                            'id'                  => $id,
-                            'file_name'           => $fileName,
-                            'file_size'           => $fileSize,
-                            'act'                 => $status,
-                            'folder'              => $folder,
-                            'subfolder'           => '',
-                            'associated_products' => $associatedProducts
-                        ];
-                    }
-
-                    //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".$this->BUtil->toJson($row)."); </script>";
-                    // TODO: properly refresh grid after file upload
-                    // solution one "addRowData method" - will work if we could prevent add new row after Upload file on client side
-                    // echo "<script>parent.\$('#$gridId').addRowData('$fileName', ".$this->BUtil->toJson($row)."); </script>";
-                    // solution two is to find a way to pass rowid to the server side
-                    //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
-
+                    $this->BResponse->json(['files' => $rows]);
                 }
-                $this->BResponse->json(['files' => $rows]);
-            }
-            break;
-
-        case 'edit':
-            $id = $r->post('id');
-            $fileName = $r->post('file_name');
-            $att = $attModel->load($id);
-            if (!$att) {
-                $this->BResponse->json(['error' => true, 'message' => $this->BApp->t('Can not load related model.')]);
-                return;
-            }
-            $oldFileName = $att->file_name;
-            if (@rename($targetDir . '/' . $oldFileName, $targetDir . '/' . $fileName)) {
-                $att->set('file_name', $fileName)->save();
-                $this->BEvents->fire(__METHOD__ . ':' . $folder . ':edit', ['model' => $att]);
-                if (!empty($options['on_edit'])) {
-                    $this->BUtil->call($options['on_edit'], $att);
+                break;
+            case 'edit':
+                $id = $r->post('id');
+                $fileName = $r->post('file_name');
+                $att = $attModel->load($id);
+                if (!$att) {
+                    $this->BResponse->json(['error' => true, 'message' => $this->BApp->t('Can not load related model.')]);
+                    return;
+                }
+                $oldFileName = $att->file_name;
+                $oldFile = sprintf('%s/%s', $targetDir, $oldFileName);
+                $newFile = sprintf('%s/%s', $targetDir, $fileName);
+                if (file_exists($oldFile) && @rename($oldFile, $newFile)) {
+                    $att->set('file_name', $fileName)->save();
+                    $this->BEvents->fire(__METHOD__ . ':' . $folder . ':edit', ['model' => $att]);
+                    if (!empty($options['on_edit'])) {
+                        $this->BUtil->call($options['on_edit'], $att);
+                    }
+                    $this->BResponse->json(['success' => true]);
+                } else if (!file_exists($oldFile)) {
+                    $att->set('file_name', $fileName)->save();
+                    $this->BResponse->json(['success' => true]);
+                } else {
+                    $this->BResponse->json(['error' => true, 'message' => $this->BApp->t('Can not edit file due to system error.')]);
+                }
+                break;
+            case 'delete':
+                $files = (array)$r->post('delete');
+                foreach ($files as $fileName) {
+                    @unlink($targetDir . '/' . $fileName);
+                }
+                $args = ['folder' => $folder, 'file_name' => $files];
+                $attModel->delete_many($args);
+                $this->BEvents->fire(__METHOD__ . ':' . $folder . ':delete', ['files' => $files]);
+                if (!empty($options['on_delete'])) {
+                    $this->BUtil->call($options['on_delete'], $args);
                 }
                 $this->BResponse->json(['success' => true]);
-            } else {
-                $this->BResponse->json(['error' => true, 'message' => $this->BApp->t('Can not rename file due to system error.')]);
-            }
-            break;
-
-        case 'delete':
-            $files = (array)$r->post('delete');
-            foreach ($files as $fileName) {
-                @unlink($targetDir . '/' . $fileName);
-            }
-            $args = ['folder' => $folder, 'file_name' => $files];
-            $attModel->delete_many($args);
-            $this->BEvents->fire(__METHOD__ . ':' . $folder . ':delete', ['files' => $files]);
-            if (!empty($options['on_delete'])) {
-                $this->BUtil->call($options['on_delete'], $args);
-            }
-            $this->BResponse->json(['success' => true]);
-            break;
-        case 'mass-delete':
-            $listIds = $r->post('id');
-            $listIds = explode(',', $listIds);
-            foreach ($listIds as $id) {
-                $file = $attModel->load($id);
-                if ($file) {
-                   $file->delete();
-                }
-            }
-            $this->BResponse->json(['success' => true]);
-            break;
-        case 'rescan':
-            try {
-                $fileSPLObjects =  new RecursiveIteratorIterator(
-                    new RecursiveDirectoryIterator($targetDir),
-                    RecursiveIteratorIterator::SELF_FIRST
-                );
-                $arrImages = [];
-                $records = $this->BDb->many_as_array($this->FCom_Core_Model_MediaLibrary->orm()
-                    ->select(['folder', 'subfolder', 'file_name'])->where('folder', $folder)->find_many());
-                foreach ($fileSPLObjects as $fullFileName => $fileSPLObject) {
-                    $fileName = $fileSPLObject->getFilename();
-                    $path = $fileSPLObject->getPath();
-                    $subFolder = null;
-                    if (is_file($fullFileName) && getimagesize($fullFileName)) {
-                        if ($path != $targetDir) {
-                            $path = str_replace('\\', '/', $path);
-                            $subFolder = trim(str_replace($targetDir . '/', '', $path));
-                            $subFolder = ltrim($subFolder, '/');
-                        }
-                        $tmp = ['folder' => $folder, 'subfolder' => $subFolder, 'file_name' => $fileName];
-                        if (!in_array($tmp, $records)) {
-                            array_push($arrImages, $tmp);
-                        }
+                break;
+            case 'mass-delete':
+                $listIds = $r->post('id');
+                $listIds = explode(',', $listIds);
+                foreach ($listIds as $id) {
+                    $file = $attModel->load($id);
+                    if ($file) {
+                       $file->delete();
                     }
                 }
-                foreach ($arrImages as $arr) {
-                    $arr['file_size'] = ($arr['subfolder']) ? filesize($targetDir . '/' . $arr['subfolder'] . '/' . $arr['file_name']) :
-                                        filesize($targetDir . '/' . $arr['file_name']);
-                    $attModel->create($arr)->save();
-                }
-                $this->BResponse->json(['status' => 'success']);
-            } catch (Exception $e) {
-                $this->BResponse->json(['status' => 'error', 'messages' => $e->getMessage()]);
-            }
-            break;
-        case 'rescan_library':
-            try {
-                $uploadConfigs = $this->uploadConfig();
-
-                foreach ($uploadConfigs as $uc) {
-                    $folder = $this->_parseFolder($uc['folder']);
-                    $targetDirLocal = $targetDir . $folder;
-                    $fileSPLObjects = new RecursiveIteratorIterator(
-                        new RecursiveDirectoryIterator($targetDirLocal),
+                $this->BResponse->json(['success' => true]);
+                break;
+            case 'rescan':
+                try {
+                    $fileSPLObjects =  new RecursiveIteratorIterator(
+                        new RecursiveDirectoryIterator($targetDir),
                         RecursiveIteratorIterator::SELF_FIRST
                     );
-                    $arrImages      = [];
-
+                    $arrImages = [];
                     $records = $this->BDb->many_as_array($this->FCom_Core_Model_MediaLibrary->orm()
-                        ->select(['folder', 'subfolder', 'file_name'])
-                        ->where('folder', $folder)->find_many());
-
-                    /** @var SplFileInfo $fileSPLObject */
+                        ->select(['folder', 'subfolder', 'file_name'])->where('folder', $folder)->find_many());
                     foreach ($fileSPLObjects as $fullFileName => $fileSPLObject) {
-                        if ($fileSPLObject->isFile() && $fileSPLObject->isReadable() && @getimagesize($fullFileName)) {
-                            $fileName  = $fileSPLObject->getFilename();
-                            $path      = $fileSPLObject->getPath();
-                            $subFolder = null;
-                            if ($path != $targetDirLocal) {
-                                $path      = str_replace('\\', '/', $path);
-                                $subFolder = trim(str_replace($targetDirLocal . '/', '', $path));
+                        $fileName = $fileSPLObject->getFilename();
+                        $path = $fileSPLObject->getPath();
+                        $subFolder = null;
+                        if (is_file($fullFileName) && getimagesize($fullFileName)) {
+                            if ($path != $targetDir) {
+                                $path = str_replace('\\', '/', $path);
+                                $subFolder = trim(str_replace($targetDir . '/', '', $path));
                                 $subFolder = ltrim($subFolder, '/');
                             }
                             $tmp = ['folder' => $folder, 'subfolder' => $subFolder, 'file_name' => $fileName];
@@ -668,21 +646,65 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         }
                     }
                     foreach ($arrImages as $arr) {
-                        $filePath = $targetDirLocal . '/';
-                        if($arr['subfolder']){
-                            $filePath .= $arr['subfolder'] . '/';
-                        }
-                        $filePath .= $arr['file_name'];
-
-                        $arr['file_size'] = filesize($filePath);
+                        $arr['file_size'] = ($arr['subfolder']) ? filesize($targetDir . '/' . $arr['subfolder'] . '/' . $arr['file_name']) :
+                                            filesize($targetDir . '/' . $arr['file_name']);
                         $attModel->create($arr)->save();
                     }
+                    $this->BResponse->json(['status' => 'success']);
+                } catch (Exception $e) {
+                    $this->BResponse->json(['status' => 'error', 'messages' => $e->getMessage()]);
                 }
-                $this->BResponse->json(['status' => 'success']);
-            } catch(Exception $e) {
-                $this->BResponse->json(['status' => 'error', 'messages' => $e->getMessage()]);
-            }
-            break;
+                break;
+            case 'rescan_library':
+                try {
+                    $uploadConfigs = $this->uploadConfig();
+
+                    foreach ($uploadConfigs as $uc) {
+                        $folder = $this->_parseFolder($uc['folder']);
+                        $targetDirLocal = $targetDir . $folder;
+                        $fileSPLObjects = new RecursiveIteratorIterator(
+                            new RecursiveDirectoryIterator($targetDirLocal),
+                            RecursiveIteratorIterator::SELF_FIRST
+                        );
+                        $arrImages      = [];
+
+                        $records = $this->BDb->many_as_array($this->FCom_Core_Model_MediaLibrary->orm()
+                            ->select(['folder', 'subfolder', 'file_name'])
+                            ->where('folder', $folder)->find_many());
+
+                        /** @var SplFileInfo $fileSPLObject */
+                        foreach ($fileSPLObjects as $fullFileName => $fileSPLObject) {
+                            if ($fileSPLObject->isFile() && $fileSPLObject->isReadable() && @getimagesize($fullFileName)) {
+                                $fileName  = $fileSPLObject->getFilename();
+                                $path      = $fileSPLObject->getPath();
+                                $subFolder = null;
+                                if ($path != $targetDirLocal) {
+                                    $path      = str_replace('\\', '/', $path);
+                                    $subFolder = trim(str_replace($targetDirLocal . '/', '', $path));
+                                    $subFolder = ltrim($subFolder, '/');
+                                }
+                                $tmp = ['folder' => $folder, 'subfolder' => $subFolder, 'file_name' => $fileName];
+                                if (!in_array($tmp, $records)) {
+                                    array_push($arrImages, $tmp);
+                                }
+                            }
+                        }
+                        foreach ($arrImages as $arr) {
+                            $filePath = $targetDirLocal . '/';
+                            if($arr['subfolder']){
+                                $filePath .= $arr['subfolder'] . '/';
+                            }
+                            $filePath .= $arr['file_name'];
+
+                            $arr['file_size'] = filesize($filePath);
+                            $attModel->create($arr)->save();
+                        }
+                    }
+                    $this->BResponse->json(['status' => 'success']);
+                } catch(Exception $e) {
+                    $this->BResponse->json(['status' => 'error', 'messages' => $e->getMessage()]);
+                }
+                break;
         }
     }
 

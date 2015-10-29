@@ -122,7 +122,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             React.createElement(FComGriddleComponent, { config: optionsConfigCompiled}), attachGridContainerEle
         );
 
-        if (row && (row.admin_input_type == 'select' || row.admin_input_type == 'multiselect' )) {
+        if (row && $.inArray(row.admin_input_type, ['select', 'multiselect'])) {
             optionsNode.find('button#add_new_field').prop('disabled', false);
         } else {
             optionsNode.find('button#add_new_field').prop('disabled', true);

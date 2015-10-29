@@ -14,7 +14,7 @@
 
 class FCom_Core_Migrate extends BClass
 {
-    public function install__0_2_0()
+    public function install__0_5_0_0()
     {
         $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
         if (!$this->BDb->ddlTableExists($tMediaLibrary)) {

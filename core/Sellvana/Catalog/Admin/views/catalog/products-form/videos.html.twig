@@ -24,7 +24,9 @@
 
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'griddle.fcomModalForm', 'jquery.validate', 'jquery.media-element'], function ($, _, React, FComGriddleComponent, Components, FComModalForm) {
-        var productVideosGrid = {{ combineType }}Grid, productVideosNode, videoExt, videoName, editedRow;
+        var productVideosGrid = {{ combineType }}Grid, productVideosNode, productExternalModalGrid, productExternalModalNode, videoExt, videoName, editedRow;
+        var linkInfo = {}, isExternalLink = false;
+
         if (productVideosGrid) {
             $(productVideosGrid.getDOMNode())
                 .on('removedRows.griddle', function (e, rows) {
@@ -40,26 +42,36 @@
          * @return {String}
          */
         function _getFileExtension(str) {
-            return str.slice(str.lastIndexOf('.') + 1);
+            if (str.match(/mp[34]|webm|ogg/)) {
+                return str.slice(str.lastIndexOf('.') + 1);
+            }
+            return '';
         }
 
         /**
-         * Unique and number validation for option's position
+         * Check if file name has no supported suffix
          * 
          * @param  {String} value 
          * @param  {Object} elem
          * @return {Boolean}
          */
         function validateVideoName (value, elem) {
-            if (!value.match(/\w+\.(mp[34]|ogg|webm)$/)) {
+            if (isExternalLink === false && !value.match(/\w+\.(mp[34]|ogg|webm)$/)) {
                 $(elem).focus();
                 return false;
             }
             return true;
         }
 
+        /**
+         * Check if file extension is changed
+         * 
+         * @param  {String} value 
+         * @param  {Object} elem
+         * @return {Boolean}
+         */
         function validateVideoExtension(value, elem) {
-            if (_getFileExtension(value) !== videoExt) {
+            if (isExternalLink === false && _getFileExtension(value) !== videoExt) {
                 $(elem).focus();
                 return false;
             }
@@ -78,23 +90,28 @@
 
         function _refreshGrid(data) {
             _(data).each(function(val, i) {
-                editedRow[i] = val;
+                if (editedRow[i] != undefined && editedRow[i] != val) {
+                    $('#product_videos-' + i + '-' + data['id']).val(val);
+                    editedRow[i] = val;
+                }
             });
+
             productVideosGrid.updateRows([editedRow]);
         }
 
         window.savePreviewModal = function(modal) {
-            var $form = productVideosNode.find('form#' + productVideosGrid.getConfig('id') + '-modal-form'),
-                $alert = productVideosNode.find('.alert'),
-                id = $form.find('#id').val(),
-                url = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
-                hash = { oper: id ? 'edit' : 'add' }
+            var $form         = productVideosNode.find('form#' + productVideosGrid.getConfig('id') + '-modal-form'),
+                id            = $form.find('#id').val(),
+                url           = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
+                hash          = { oper: id ? 'edit' : 'add' }
                 isNameChanged = false;
 
             $form.find('textarea, input, select').each(function() {
                 var key = $(this).attr('id');
                 var val = $(this).val();
-                if (key == 'file_name' && val !== videoName) isNameChanged = true;
+                if (key == 'file_name' && val !== videoName) {
+                    isNameChanged = true;
+                }
                 hash[key] = productVideosGrid.html2text(val);
             });
 
@@ -104,15 +121,10 @@
                         url: url,
                         type: 'POST',
                         dataType: 'json',
-                        data: hash,
-                        beforeSend: function() {
-                            $alert.hide();
-                        }
-                    })
-                    .done(function(r) {
+                        data: hash
+                    }).done(function(r) {
                         if (r.error) {
-                            var msg = r.message ? r.message : "{{ 'Save file error due to system error, please try again.' | _ }}";
-                            $alert.find('.alert-message').html(msg).show();
+                            $.bootstrapGrowl("{{ 'Error: Save file error due to system error, please try again.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
                             return;
                         }
                         _refreshGrid(hash);
@@ -126,9 +138,34 @@
         }
 
         window.showModalToPreviewVideo = function(row) {
-            editedRow = row;
-            videoExt = _getFileExtension(row.file_name);
-            videoName = row.file_name;
+            editedRow      = row;
+            isExternalLink = false;
+            videoExt       = _getFileExtension(row.file_name);
+            videoName      = row.file_name;
+
+            if (!row.file_size) {
+                isExternalLink = true;
+                var data = typeof row.data_serialized === 'string' ? JSON.parse(row.data_serialized) : row.data_serialized;
+                var provider = data !== undefined ? data.provider_name.toLowerCase() : '';
+                switch(provider) {
+                    case 'youtube':
+                        var src = data.html.substring(data.html.search('src') + 4, data.html.search('oembed') + 6);
+                        var videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
+                                React.DOM.source({ src: src,  type: "video/youtube"  })
+                            );
+                        break;
+                    case 'vimeo':
+                        var videoNode = React.DOM.div({ dangerouslySetInnerHTML: {__html: data.html} });
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                var videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
+                        React.DOM.source({ src: row.source,  type: "video/" + videoExt  })
+                    );
+            }
+
             var modalContainerEle = document.getElementById('fcom_append_form');
             React.unmountComponentAtNode(modalContainerEle);
             React.render(
@@ -145,15 +182,8 @@
                         onConfirm: window.savePreviewModal
                     },
                     React.DOM.div({ className: "row f-grid-wrapper col-sm-12" }, 
-                        React.DOM.div({ className: 'alert alert-danger alert-dismissible',  role: 'alert', style: { display: 'none' } },
-                            React.DOM.button({ type: 'button', className: 'close', 'data-dismiss': 'alert', 'aria-hidden': 'true', dangerouslySetInnerHTML: {__html: '&times;'} }),
-                            React.DOM.strong(null, "{{ 'Error' | _ }}"),
-                            React.DOM.span({ className: 'alert-message' }, '')
-                        ),
                         React.DOM.div({ id: "video-container", style: { padding: '0 10px' }, className: 'col-sm-7' },
-                            React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
-                                React.DOM.source({ src: row.source,  type: "video/" + videoExt  })
-                            )
+                            videoNode
                         ),
                         React.DOM.div({ id: "video-infos", className: 'col-sm-5', style: { background: '#F3F3F3' } },
                             React.DOM.div({ id: 'video-details' },
@@ -164,15 +194,15 @@
                                 ),
                                 React.DOM.div({ className: 'file-type' }, 
                                     React.DOM.strong(null, "{{ 'File type: ' | _ }}"),
-                                    React.DOM.span(null, 'video/' + videoExt)
+                                    React.DOM.span(null, videoExt ? 'video/'+videoExt : 'External Video')
                                 ),
                                 React.DOM.div({ className: 'folder' }, 
                                     React.DOM.strong(null, "{{ 'Folder: ' | _ }}"),
-                                    React.DOM.span(null, row.folder)
+                                    React.DOM.span(null, row.folder ? row.folder : 'External Video')
                                 ),
                                 React.DOM.div({ className: 'file-size' }, 
                                     React.DOM.strong(null, "{{ 'File size: ' | _ }}"),
-                                    React.DOM.span(null, Math.ceil(row.file_size/1024000) + ' MB')
+                                    React.DOM.span(null, row.file_size ? Math.ceil(row.file_size/1024000) + ' MB' : 'External Video')
                                 ),
                                 React.DOM.div({ className: 'create-at' }, 
                                     React.DOM.strong(null, "{{ 'Upload on: ' | _ }}"),
