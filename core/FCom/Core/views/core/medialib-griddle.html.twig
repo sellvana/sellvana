@@ -261,12 +261,14 @@
             event.preventDefault();
             var $td = $(this).parent().html($(this).data('html'));
             var $video = $td.children('video.product-video-media');
-            new MediaElementPlayer('video#' + $video.prop('id'), {
-                pauseOtherPlayers: true,
-                success: function (mediaElement, domObject) {
-                    mediaElement.load();
-                }
-            });
+            if ($video.length) {
+                new MediaElementPlayer('video#' + $video.prop('id'), {
+                    pauseOtherPlayers: true,
+                    success: function (mediaElement, domObject) {
+                        mediaElement.load();
+                    }
+                });
+            }
         });
     });
 </script>
