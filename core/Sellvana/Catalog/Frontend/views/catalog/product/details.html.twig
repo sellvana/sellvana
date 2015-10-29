@@ -22,6 +22,10 @@
         background-color: #EE8371 !important;
         color: #fff;
     }
+
+    .external_thumb {
+        height: 43px;
+    }
 </style>
 
 {% set prod = THIS.get('product') %}
@@ -76,8 +80,8 @@
                         {% else %}
                             {% set data = UTIL.fromJson(media.get('data_serialized')) | raw %}
                             {% if data %}
-                                <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
-                                    <a href="javascript:void(0)"><img src="{{ data.thumbnail_url | raw }}" title="{{ data.title | raw }}"></a>
+                                <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 3px;">
+                                    <a href="javascript:void(0)"><img class="external_thumb" src="{{ data.thumbnail_url | raw }}" title="{{ data.title | raw }}"></a>
                                 </li>
                             {% endif %}
                         {% endif %}
