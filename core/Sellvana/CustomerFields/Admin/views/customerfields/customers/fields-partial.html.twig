@@ -1,5 +1,4 @@
 {% set m = THIS.get('model') %}
-<input type="hidden" name="model[_fieldset_ids]" value="{{ m.get('_fieldset_ids') }}">
 <input type="hidden" name="model[_add_field_ids]" value="{{ m.get('_add_field_ids') }}" id="cf_add_fields_ids">
 <input type="hidden" name="model[_hide_field_ids]" value="{{ m.get('_hide_field_ids') }}" id="cf_hide_fields_ids">
 {% if THIS.get('fields') %}

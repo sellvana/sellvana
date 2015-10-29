@@ -514,10 +514,11 @@ class FCom_Core_Main extends BClass
     }
 
     /**
-    * @deprecated
-    *
-    * @param mixed $str
-    */
+     * @deprecated
+     *
+     * @param mixed $str
+     * @return mixed|string
+     */
     public function getUrlKey($str)
     {
         return $this->BLocale->transliterate($str);

@@ -1,20 +1,16 @@
 <?php
 
 /**
- * Created by
- * User: pp
- * Date: 24.Nov14
- *
  * @property Sellvana_CatalogFields_Model_Field       $Sellvana_CatalogFields_Model_Field
- * @property Sellvana_Catalog_Model_Product         $Sellvana_Catalog_Model_Product
- * @property Sellvana_Catalog_Model_Category        $Sellvana_Catalog_Model_Category
- * @property Sellvana_Catalog_Model_InventorySku    $Sellvana_Catalog_Model_InventorySku
+ * @property Sellvana_Catalog_Model_Product           $Sellvana_Catalog_Model_Product
+ * @property Sellvana_Catalog_Model_Category          $Sellvana_Catalog_Model_Category
+ * @property Sellvana_Catalog_Model_InventorySku      $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
- * @property Sellvana_Sales_Main                    $Sellvana_Sales_Main
- * @property Sellvana_Cms_Model_Block               $Sellvana_Cms_Model_Block
- * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
+ * @property Sellvana_Sales_Main                      $Sellvana_Sales_Main
+ * @property Sellvana_Cms_Model_Block                 $Sellvana_Cms_Model_Block
+ * @property Sellvana_CustomerFields_Model_Field      $Sellvana_CustomerFields_Model_Field
  */
-class Sellvana_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstract
+class Sellvana_Rewards_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstract
 {
 
     /**

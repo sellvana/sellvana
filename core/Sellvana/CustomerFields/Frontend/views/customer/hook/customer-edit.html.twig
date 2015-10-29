@@ -1,0 +1,52 @@
+{% set customer = THIS.get('customer') %}
+{% set data = THIS.get('data') %}
+
+{#{{ dump(data) }}#}
+
+<div class="row">
+    {% for custmField in data %}
+        {% set field = custmField.field %}
+        {% set fieldId = field.get('field_code') %}
+        {% set req = field.get('required') %}
+        {% set input = field.get('admin_input_type') %}
+        {% set lbl = field.get('frontend_label') %}
+        {% set value = custmField.value %}
+    <div class="form-group col-md-6">
+        <label for="edit-{{ fieldId }}" class="control-label{{ req?' required':'' }}">{{ lbl|_ }}</label>
+
+        <div class="controls">
+            {% if input == 'text' %}
+                <input type="text" name="model[{{ fieldId }}]" class="{{ req? 'required ':'' }}form-control valid" value="{{ value }}"
+                   id="edit-{{ fieldId }}">
+            {% elseif input == 'select' %}
+                {% set options = field.getOptions() %}
+                <select name="model[{{ fieldId }}]"
+                        class="{{ req? 'required ':'' }}form-control valid" id="edit-{{ fieldId }}">
+                    {% for op in options %}
+                        <option value="{{ op }}"{{ op == value?'selected' }}>{{ op }}</option>
+                    {% endfor %}
+                </select>
+            {% elseif input == 'multiselect' %}
+                {% set options = field.getOptions() %}
+                {% set values = value|split(",") %}
+                <select name="model[{{ fieldId }}]" multiple size="{{ options|length }}"
+                        class="{{ req? 'required ':'' }}form-control valid" id="edit-{{ fieldId }}">
+                    {% for op in options %}
+                        <option value="{{ op }}"{{ op in values?'selected' }}>{{ op }}</option>
+                    {% endfor %}
+                </select>
+            {% elseif input == 'boolean' %}
+                <select name="model[{{ fieldId }}]"
+                    class="{{ req? 'required ':'' }}form-control valid" id="edit-{{ fieldId }}">
+                    <option value="1"{{ '1' == value?'selected' }}>{{ 'Yes'|_ }}</option>
+                    <option value="0"{{ '0' == value?'selected' }}>{{ 'No'|_ }}</option>
+                </select>
+            {% elseif input == 'textarea' %}
+                <textarea {{ req ? 'data-rule-required="true"' }} name="model[{{ fieldId }}]" id="edit-{{ fieldId }}" class="form-control" >{{ value }}</textarea>
+            {% elseif input == 'wysiwyg' %}
+                <textarea {{ req ? 'data-rule-required="true"' }} name="model[{{ fieldId }}]" id="edit-{{ fieldId }}" class="form-control ckeditor" >{{ value }}</textarea>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>

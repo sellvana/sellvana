@@ -2,33 +2,22 @@ base:
     - view: head
         do:
             - [ requireJs, fcom.customerfields, "@Sellvana_CustomerFields/Admin/js/fcom.customerfields" ]
-
     - view: admin/nav
         do:
-            - [ addNav, catalog/fieldsets, { label: Field Sets, href: /customerfields/fieldsets } ]
-            - [ addNav, catalog/fields, { label: Fields, href: /customerfields/fields } ]
+            - [ addNav, customer/fields, { label: Customer Fields, href: /customerfields/fields } ]
 
 customer_form_tabs:
     - view: admin/form
         do:
-            - [ addTab, fields, { label: Additional Info, pos: 82, view: customerfields/products/fields-tab, async: true } ]
-
-/customerfields/fieldsets:
-    - { include: base }
-    - { hook: main, views: customerfields/fieldsets }
-    - { view: admin/nav, do: [[ setNav, catalog/fieldsets ]] }
+            - [ addTab, fields, { label: Additional Info, pos: 82, view: customerfields/customers/fields-tab, async: true } ]
 
 /customerfields/fields:
     - { include: base }
     - { hook: main, views: customerfields/fields }
-    - { view: admin/nav, do: [[ setNav, catalog/fields ]] }
+    - { view: admin/nav, do: [[ setNav, customer/fields ]] }
 
-/customerfields/fieldsets/form:
-    - { include: base }
-    - { include: form }
-    - { hook: main, views: customerfields/fieldsets/form }
 
 /settings:
     - view: settings
         do:
-            - [ addTab, Sellvana_CustomerFields, { label: Catalog Fields, group: catalog, async: true } ]
+            - [ addTab, Sellvana_CustomerFields, { label: Customer Fields, group: customers, async: true, permission: settings/Sellvana_CustomerFields } ]
