@@ -109,7 +109,7 @@ class Sellvana_CustomerFields_Migrate extends BClass
         ]);
 
         $tCustomerField = $this->Sellvana_CustomerFields_Model_CustomerFieldData->table();
-        $this->BDb->run(sprintf('RENAME TABLE `%s` TO `%s`', $this->BDb->t('fcom_customer_custom'), $tCustomerField));
+        //$this->BDb->run(sprintf('RENAME TABLE `%s` TO `%s`', $this->BDb->t('fcom_customer_custom'), $tCustomerField));
         $this->BDb->ddlTableDef($tCustomerField, [
             BDb::COLUMNS => [
                 '_fieldset_ids'   => 'DROP',
