@@ -49,7 +49,10 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
 
     public function getFields($context = 'all', $where = null)
     {
-        if (!static::$_indexedFields) {
+        if ($context === 'sort') {
+            return $this->getSortFields();
+        }
+        if (empty(static::$_indexedFields['all'])) {
             $orm = $this->orm();
             if ($where) {
                 $orm->where($where);
@@ -72,6 +75,22 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             }
         }
         return static::$_indexedFields[$context];
+    }
+
+    public function getSortFields()
+    {
+        if (!static::$_indexedFields['sort']) {
+            $fields = $this->orm()->order_by_asc('sort_order')->find_many();
+            foreach ($fields as $f) {
+                $k = $f->get('field_name');
+                if ($f->get('sort_type') !== 'none') {
+                    static::$_indexedFields['sort'][$k] = $f;
+                    $ft = $f->get('field_type');
+                    $f->set('sort_method', $ft === 'varchar' || $ft === 'text');
+                }
+            }
+        }
+        return static::$_indexedFields['sort'];
     }
 
     public function getSortingArray()

@@ -14,6 +14,8 @@
  * @property Sellvana_SalesTax_Model_RuleZone $Sellvana_SalesTax_Model_RuleZone
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_SalesTax_Model_CustomerGroupTax $Sellvana_SalesTax_Model_CustomerGroupTax
+ * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  */
 class Sellvana_SalesTax_Migrate extends BClass
 {
@@ -233,6 +235,36 @@ class Sellvana_SalesTax_Migrate extends BClass
         $this->BDb->ddlTableDef($tRule, [
             BDb::COLUMNS => [
                 'fpt_amount' => 'decimal(12,2) default null',
+            ],
+        ]);
+    }
+
+    public function after__Sellvana_CustomerGroups__0_5_0_1()
+    {
+        $tCustomer = $this->Sellvana_Customer_Model_Customer->table();
+        $tCustomerClass = $this->Sellvana_SalesTax_Model_CustomerClass->table();
+        $tCustomerGroup = $this->Sellvana_CustomerGroups_Model_Group->table();
+        $tCustomerGroupTax = $this->Sellvana_SalesTax_Model_CustomerGroupTax->table();
+
+        $this->BDb->ddlTableDef($tCustomerGroupTax, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'customer_group_id' => 'int unsigned not null',
+                'customer_class_id' => 'int unsigned not null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_customer_class' => 'UNIQUE (customer_group_id, customer_class_id)',
+            ],
+            BDb::CONSTRAINTS => [
+                'customer_group' => ['customer_group_id', $tCustomerGroup],
+                'customer_class' => ['customer_class_id', $tCustomerClass],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tCustomer, [
+            BDb::COLUMNS => [
+                'use_group_tax' => 'tinyint not null default 1',
             ],
         ]);
     }

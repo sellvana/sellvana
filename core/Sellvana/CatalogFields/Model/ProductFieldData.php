@@ -16,6 +16,8 @@
  * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_Set $Sellvana_CatalogFields_Model_Set
+ *
+ * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
  */
 class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abstract
 {
@@ -63,6 +65,11 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
         return $this;
     }
 
+    public function getAutoCreateOptions()
+    {
+        return static::$_autoCreateOptions;
+    }
+
     /**
      * @param Sellvana_Catalog_Model_Product[] $products
      *
@@ -83,7 +90,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             return $this;
         }
         /** @var Sellvana_CatalogFields_Model_ProductFieldData[][][] $fieldsData */
-        $rawFieldsData = $this->orm('pfd')->where_in('product_id', $pIds)->find_many();
+        $rawFieldsData = $this->orm('pf')->where_in('product_id', $pIds)->find_many();
         $fieldsData = [];
         foreach ($rawFieldsData as $rawData) {
             if (empty($fieldsData[$rawData->get('product_id')])) {
@@ -180,6 +187,9 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             foreach ($fieldsData as $prodData) {
                 foreach ($prodData as $fieldData) {
                     foreach ($fieldData as $valueData) {
+                        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite') && $valueData->get('site_id')) {
+                            continue;
+                        }
                         $valueData->delete();
                     }
                 }
@@ -198,18 +208,22 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
      */
     public function fetchProductsFieldData($productIds)
     {
-        return $this->orm('pf')
+        $orm = $this->orm('pf')
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'pf.field_id'], 'f')
             ->left_outer_join('Sellvana_CatalogFields_Model_FieldOption', ['fo.id', '=', 'pf.value_id'], 'fo')
             ->left_outer_join('Sellvana_CatalogFields_Model_Set', ['fs.id', '=', 'pf.set_id'], 'fs')
-            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.required', 'f.admin_input_type', 'f.table_field_type', 'fs.set_name'])
-            ->where_in('pf.product_id', $productIds)
-            ->find_many_assoc(['product_id', 'id']);
+            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.table_field_type', 'fs.set_name'])
+            ->where_in('pf.product_id', $productIds);
+
+        $this->BEvents->fire(__METHOD__, ['orm' => $orm]);
+
+        return $orm->find_many_assoc(['product_id', 'id']);
     }
 
     public function getProductFieldSetData($productIds)
     {
         $data = $this->fetchProductsFieldData($productIds);
+        $this->BEvents->fire(__METHOD__ . ':afterFetchProductsFieldData', ['data' => &$data]);
 
         $fieldsData = [];
         foreach ($data as $productId => $pData) {
@@ -247,7 +261,8 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                     'admin_input_type' => $row->get('admin_input_type'),
                     'value' => $value,
                     'position' => $row->get('position'),
-                    'required' => $row->get('required')
+                    'required' => $row->get('required'),
+                    'serialized' => json_encode($row->as_array())
                 ];
 
                 if ($row->get('table_field_type') === 'options') {
@@ -257,7 +272,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 $found = false;
                 if ($field['admin_input_type'] == 'multiselect') {
                     foreach ($fieldsData[$productId][$setId]['fields'] as &$oldField) {
-                        if ($oldField['field_code'] == $field['field_code']) {
+                        if ($this->shouldCombineValues($oldField, $field)) {
                             $oldField['value'] .= ',' . $field['value'];
                             $found = true;
                             break;
@@ -270,6 +285,8 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 }
             }
         }
+
+        $this->BEvents->fire(__METHOD__, ['data' => &$fieldsData]);
 
         return $fieldsData;
     }
@@ -294,6 +311,10 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 continue;
             }
             foreach ($fieldsData[$product->id()] as $row) {
+                if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')
+                    && $this->Sellvana_MultiSite_Main->isFieldDataBelongsToThisSite($row)) {
+                    continue;
+                }
                 $column = static::$_fieldTypeColumns[$row->get('table_field_type')];
                 $value = $row->get($column);
                 if ($row->get('table_field_type') === 'options') {
@@ -338,5 +359,19 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             ->where("{$pfdAlias}.{$pfdColumn}", $value);
 
         return $this;
+    }
+
+    /**
+     * @param $oldField
+     * @param $field
+     * @return bool
+     */
+    protected function shouldCombineValues($oldField, $field)
+    {
+        if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')) {
+            return $this->Sellvana_MultiSite_Main->shouldCombineFieldDataValues($oldField, $field);
+        }
+
+        return $oldField['field_code'] == $field['field_code'];
     }
 }

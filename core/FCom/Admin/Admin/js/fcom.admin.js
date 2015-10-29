@@ -1,4 +1,4 @@
-var fcomAdminDeps = ["jquery", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch'];
+var fcomAdminDeps = ["jquery", 'bootstrap-ladda', "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch', 'jquery.pnotify', 'bootstrap-ladda-spin'];
 if (require.specified('ckeditor')) {
     fcomAdminDeps.push('ckeditor');
 }
@@ -21,7 +21,7 @@ if (require.specified('ckeditor')) {
  * @property {String} current_mode current application mode
  */
 
-define(fcomAdminDeps, function ($) {
+define(fcomAdminDeps, function ($, Ladda) {
     /*
      var myApp = angular.module("fcomApp", [], function($interpolateProvider) {
      $interpolateProvider.startSymbol("<%");
@@ -1122,6 +1122,7 @@ define(fcomAdminDeps, function ($) {
             url_post: '.../edit/:id'
         } */
         var tabs, panes, curLi, curPane, editors = {};
+        var ajaxPassed = false;
 
         /**
          *
@@ -1269,25 +1270,77 @@ define(fcomAdminDeps, function ($) {
         /**
          *
          * @param el
+         * @param saveAndContinue
          * @returns {boolean}
          */
-        function saveAll(el) {
-            return true;
+        function saveAll(el, saveAndContinue) {
             //TODO
+            ajaxPassed = true;
             var form = $(el).closest('form');
+            var loader = Ladda.create(el);
+            loader.start();
+            $(form).submit(function(event) {
+                if (ajaxPassed) {
+                    event.preventDefault();
+                }
+            });
+            $(form).trigger('submit');
+            if (!form.validate().checkForm()) {
+                return false;
+            }
+
+            var btnId = form.attr('id') + '-do';
+            var isNew = options.is_new;
+            if (saveAndContinue) {
+                form.append('<input id="' + btnId + '" type="hidden" name="do" value="save_and_continue">');
+            }
             var postData = form.serializeArray();
             var url_post = options.url_get + (options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post + 'tabs=ALL&mode=view', postData, function (data, status, req) {
                 FCom.Admin.log(data);
-                $.pnotify({
-                    pnotify_title: data.message || 'The form has been saved',
-                    pnotify_type: data.status == 'error' ? 'error' : null,
-                    pnotify_history: false,
-                    pnotify_nonblock: true, pnotify_nonblock_opacity: .3
-                });
-                loadTabs(data);
-                for (var i in data.tabs) {
-                    tabClass(i);
+                for (var msgId in data.messages) {
+                    sysMessages.push({
+                        msg: data.messages[msgId].text || 'The form has been saved',
+                        type: data.status == 'error' ? 'danger' : 'success'
+                    });
+                }
+                if (data.redirect) {
+                    document.location = data.redirect;
+                } else {
+                    loader.stop();
+                    var actionUrl = form.attr('action');
+                    var urlInfo = actionUrl.split('?');
+                    if (urlInfo[1]) {
+                        var params = urlInfo[1].split('&');
+                        var newParams = [];
+                        for (var paramId = 0; paramId < params.length; paramId++) {
+                            var pair = params[paramId].split('=');
+                            if (pair[0] == 'id') {
+                                pair[1] = data.id;
+                            }
+                            newParams.push(pair.join('='));
+                        }
+                        actionUrl = urlInfo[0] + '?' + newParams.join('&');
+                    } else {
+                        actionUrl = urlInfo[0] + '?id=' + data.id;
+                    }
+                    options.url_get = actionUrl;
+                    form.attr('action', actionUrl);
+                    if (isNew && saveAndContinue && data.status == 'success') {
+                        if (window.history !== undefined) {
+                            window.history.replaceState({}, data.title, options.url_get);
+                        }
+                        form.find('.btn-group').html(data.buttons);
+                        var textNodes = form.find('.f-page-title').contents().filter(function () {
+                            return this.nodeType == 3;
+                        });
+                        textNodes[textNodes.length-1].nodeValue = data.title;
+                        $('title').text(data.title);
+                        form.find('#tabs li.hidden').removeClass('hidden');
+                    }
+                    $('#' + btnId).remove();
+                    $('#tabs .icon-pencil, #tabs .icon-warning-sign.error').remove();
+                    ajaxPassed = false;
                 }
             });
             return false;
