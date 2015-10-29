@@ -207,8 +207,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $thumbUrl = $this->getDefaultImagePath();
                 break;
         }
-
-        if($thumbUrl){
+        if ($thumbUrl) {
             return $url . $media . '/' . $thumbUrl;
         }
 
@@ -227,17 +226,23 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function defaultImgUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'default'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        $imgUrl = $this->imageUrl(false, 'default');
+        $resizedUrl = $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $resizedUrl;
     }
 
     public function thumbUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'thumb'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        $imgUrl = $this->imageUrl(false, 'thumb');
+        $resizedUrl = $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $resizedUrl;
     }
 
     public function rolloverUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false, 'rollover'), ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        $imgUrl = $this->imageUrl(false, 'rollover');
+        $resizedUrl = $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+        return $resizedUrl;
     }
 
     public function onBeforeSave()
@@ -473,12 +478,22 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function mediaORM($type)
     {
-        return $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
-            ->where('pa.product_id', $this->id)->where('pa.media_type', $type)
-            //->select(array('pa.manuf_vendor_id'))
-            ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
-            ->select(['a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label'])
-            ->order_by_asc('position');
+        $orm = $this->Sellvana_Catalog_Model_ProductMedia->orm('pa')
+                    ->where('pa.product_id', $this->id)
+                    ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
+                    ->select(['a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label', 'pa.media_type', 'a.data_serialized']);
+
+        if (is_array($type)) {
+            list($I, $V) = $type;
+            // $orm->where_raw("pa.media_type = '$I' OR (pa.media_type = '$V' AND pa.is_default = 1)")
+            $orm->where_raw("pa.media_type = '$I' OR pa.media_type = '$V'")
+                ->order_by_desc('pa.media_type');
+        } else {
+            $orm->where('pa.media_type', $type)
+                ->order_by_asc('position');
+        }
+
+        return $orm;
     }
 
     /**
@@ -490,9 +505,16 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->mediaORM($type)->find_many_assoc();
     }
 
-    public function gallery()
+    public function gallery($isVideoIncluded = false)
     {
-        return $this->mediaORM('I')->where(["pa.in_gallery" => 1])->order_by_desc('is_default')->find_many_assoc();
+        $type = 'I';
+        if ($isVideoIncluded) {
+            $type = ['I', 'V'];
+        }
+
+        return $this->mediaORM($type)
+                    ->where(["pa.in_gallery" => 1])
+                    ->find_many_assoc();
     }
 
     /**
@@ -1171,105 +1193,38 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * @param string $type
-     * @param array|boolean $context
+     * @param array $context
      * @param bool $useDefault
      * @return Sellvana_Catalog_Model_ProductPrice
      */
-    public function getPriceModelByType($type, $context = null, $useDefault = true)
+    public function getPriceModelByType($type, $context = [], $useDefault = true)
     {
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
         if (!isset($this->_priceModels)) {
-            $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices([$this], true);
+            $priceHlp->collectProductsPrices([$this]);
         }
-        if (false === $this->_priceModels || empty($this->_priceModels[0][$type])) {
-            return null;
-        }
-
-        $prices = $this->_priceModels[0][$type];
-
-        if (!$context) {
-            return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
-        }
-
-        static $siteId = null, $customerGroupId = false, $currencyCode = false;
-        if (null === $siteId) {
-            $modHlp = $this->BModuleRegistry;
-            $siteId = false;
-            if ($modHlp->isLoaded('Sellvana_MultiSite')) {
-                $site = $this->Sellvana_MultiSite_Frontend->getCurrentSite();
-                $siteId = $site ? $site->id() : false;
-            }
-            if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
-                $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-                $customerGroupId = $customer ? $customer->get('customer_group_id')
-                    : $this->Sellvana_CustomerGroups_Model_Group->notLoggedInId();
-            }
-            if ($modHlp->isLoaded('Sellvana_MultiCurrency')) {
-                $currency = $this->Sellvana_MultiCurrency_Main->getCurrentCurrency();
-                $currencyCode = $currency ?: false;
-            }
-        }
-
-        if (true === $context) {
-            $context = [
-                'site_id' => true,
-                'customer_group_id' => true,
-                'currency_code' => true,
-            ];
-        }
-
-        $s = !empty($context['site_id']) ? (true !== $context['site_id'] ? $context['site_id'] : $siteId) : '*';
-        $g = !empty($context['customer_group_id']) ? (true !== $context['customer_group_id'] ? $context['customer_group_id'] : $customerGroupId) : '*';
-        $c = !empty($context['currency_code']) ? (true !== $context['currency_code'] ? $context['currency_code'] : $currencyCode) : '*';
-
-        if (isset($prices["{$s}:{$g}:{$c}"])) {
-            return $prices["{$s}:{$g}:{$c}"];
-        }
-        if (!$useDefault) {
-            return null;
-        }
-        if ($s !== '*' && isset($prices["*:{$g}:{$c}"])) {
-            return $prices["*:{$g}:{$c}"];
-        }
-        if ($g !== '*' && isset($prices["{$s}:*:{$c}"])) {
-            return $prices["{$s}:*:{$c}"];
-        }
-        if ($c !== '*' && isset($prices["{$s}:{$g}:*"])) {
-            return $prices["{$s}:{$g}:*"];
-        }
-        if ($s !== '*' && $g !== '*' && isset($prices["*:*:{$c}"])) {
-            return $prices["*:*:{$c}"];
-        }
-        if ($s !== '*' && $c !== '*' && isset($prices["*:{$g}:*"])) {
-            return $prices["*:{$g}:*"];
-        }
-        if ($g !== '*' && $c !== '*' && isset($prices["*:*:{$c}"])) {
-            return $prices["*:*:{$c}"];
-        }
-        return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
+        return $priceHlp->getPriceModelByType($this->_priceModels, $type, $context, $useDefault);
     }
 
     /**
      * Get final price of product in catalog
      *
-     * @param boolean|array $context
+     * @param array $context
      * @return mixed
-     *
-     * @todo assume $context true when null, or when components null - same for ProductPrice::getPrice()
      */
-    public function getCatalogPrice($context = true)
+    public function getCatalogPrice($context = [])
     {
-        if (is_array($context) && !empty($context['currency_code']) && $context['currency_code'] !== true) {
+        if (!empty($context['currency_code']) && $context['currency_code'] !== '*') {
             $currency = $context['currency_code'];
         } else {
             $currency = null;
         }
-        $priceModel = $this->getPriceModelByType('base', $context);
-        $price = $priceModel ? $priceModel->getPrice(null, $currency) : 0;
 
-        $salePriceModel = $this->getPriceModelByType('sale', $context);
-        if ($salePriceModel && $salePriceModel->isValid()) {
-            $price = min($price, $salePriceModel->getPrice(null, $currency));
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        if (!isset($this->_priceModels)) {
+            $priceHlp->collectProductsPrices([$this]);
         }
+        $price = $priceHlp->getCatalogPrice($this->_priceModels, $context);
 
         $this->BEvents->fire(__METHOD__, [
             'product' => $this,
@@ -1291,11 +1246,15 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
          * - pos: 0,1,2,3
          */
         $prices = [];
-        $context = true;
+        $context = [];
 
-        $basePriceModel = $this->getPriceModelByType('base', $context);
-        $mapPriceModel = $this->getPriceModelByType('map', $context);
-        $msrpPriceModel = $this->getPriceModelByType('msrp', $context);
+        $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+        if (!isset($this->_priceModels)) {
+            $priceHlp->collectProductsPrices([$this]);
+        }
+        $basePriceModel = $priceHlp->getPriceModelByType($this->_priceModels, 'base', $context);
+        $mapPriceModel = $priceHlp->getPriceModelByType($this->_priceModels, 'map', $context);
+        $msrpPriceModel = $priceHlp->getPriceModelByType($this->_priceModels, 'msrp', $context);
         $basePrice = $basePriceModel ? $basePriceModel->getPrice() : 0;
 
         $finalPrice = $this->getCatalogPrice();
@@ -1345,7 +1304,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $prices;
     }
 
-    public function getAllTierPrices($context = true)
+    public function getAllTierPrices($context = [])
     {
         return $this->getPriceModelByType('tier', $context);
     }
@@ -1357,7 +1316,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * @param array|boolean $context
      * @return null|float
      */
-    public function getTierPrice($qty, $context = true)
+    public function getTierPrice($qty, $context = [])
     {
         /** @var Sellvana_Catalog_Model_ProductPrice[] $tierPrices */
         $tierPrices = $this->getPriceModelByType('tier', $context);

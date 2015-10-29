@@ -1,5 +1,5 @@
 //noinspection JSPotentiallyInvalidUsageOfThis
-define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (React, $, Locale) {
+define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'], function (React, $, Locale) {
     FCom.Components = {};
 
     /**
@@ -9,7 +9,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
     FCom.Mixin = {
         text2html: function (val) {
             var text = $.parseHTML(val);
-            return (text != null) ? text[0].data: null;
+            return (text !== null) ? text[0].data: null;
         },
         html2text: function (val) {
             return $('<div/>').text(val).html();
@@ -60,7 +60,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
         getInputId: function () {
             var field = this.props.field;
             if (this.props.id) {
-                return this.props.id
+                return this.props.id;
             }
             if (!field) {
                 return '';
@@ -404,7 +404,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
             var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
             if (typeof(column['form_hidden_label']) === 'undefined' || !column['form_hidden_label']) {
                 label = (
-                    <div className="control-label col-sm-3">
+                    <div className="control-label col-sm-3" key={this.props.key}>
                         <label htmlFor={column.name}>
                             {column.label} {iconRequired}
                         </label>
@@ -419,28 +419,28 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
                     input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
                 }
                 input += '<div class="controls col-sm-8">' + column['element_print'] + '</div>';
-                return <div className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
+                return <div key={this.props.key} className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
             } else {
                 switch (column.editor) {
                     case 'select':
                         var options = [];
                         _.forEach(column.options, function(text, value) {
-                            options.push(<option value={value}>{text}</option>);
+                            options.push(<option value={value} key={value}>{text}</option>);
                         });
-                        input = <select name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules}>{options}</select>;
+                        input = <select key={this.props.key} name={column.name} id={column.name} className={"form-control " + (column.className ? column.className : '')} defaultValue={this.props.value} {...validationRules}>{options}</select>;
                         break;
                     case 'textarea':
-                        input = <textarea name={column.name} id={column.name} className="form-control" rows="5" defaultValue={this.props.value} {...validationRules} />;
+                        input = <textarea key={this.props.key} name={column.name} id={column.name} className={"form-control " + (column.className ? column.className : '')} rows="5" defaultValue={this.props.value} {...validationRules} />;
                         break;
                     default:
-                        input = <input name={column.name} id={column.name} className="form-control" defaultValue={this.props.value} {...validationRules} />;
+                        input = <input key={this.props.key} name={column.name} id={column.name} className={"form-control " + (column.className ? column.className : '')} defaultValue={this.props.value} {...column.attributes} {...validationRules} />;
                         break;
                 }
             }
 
             var removeFieldButton = '';
             if (this.props.removeFieldDisplay) {
-                removeFieldButton = (<button className="btn box-remove btn-xs btn-link btn-remove remove-field icon-remove" type="button" onClick={this.props.removeFieldHandle} data-field={column.name}></button>);
+                removeFieldButton = (<button key={this.props.key} className="btn box-remove btn-xs btn-link btn-remove remove-field icon-remove" type="button" onClick={this.props.removeFieldHandle} data-field={column.name}></button>);
             }
 
             return (
@@ -448,6 +448,120 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore'], function (
                     {label}<div className="controls col-sm-8">{input}</div>{removeFieldButton}
                 </div>
             )
+        }
+    });
+
+    FCom.Components.Select2 = React.createClass({
+        getDefaultProps: function () {
+            return {
+                hasError: false,
+                multiple: false,
+                placeholder: "Select Options",
+                val: [],
+                style: {
+                    witdh: "100%"
+                },
+                enabled: true,
+                options: []
+            };
+        },
+        componentDidUpdate: function (prevProps, prevState) {
+            if (this._isOptionsUpdated(prevProps.options)) {
+                this.createSelect2();
+            } else {
+                // Change placeholder
+                if (prevProps.placeholder !== this.props.placeholder) {
+                    this.setPlaceholderTo(this.getElement(), this.props.placeholder);
+                }
+
+                // Handle val prop
+                var updateVal = false;
+                if (prevProps.val.length === this.props.val.length) {
+                    $.each(prevProps.val, function (index, value) {
+                        if (this.props.val[index] != value) {
+                            updateVal = true;
+                        }
+                    }.bind(this));
+
+                } else {
+                    updateVal = true;
+                }
+
+                // ...update our val if we need to
+                if (updateVal) this.getElement().select2("val", this.props.val);
+
+                // Enable/disable
+                if (prevProps.enabled != this.props.enabled) this.getElement().select2("enable", this.props.enabled);
+            }
+        },
+        componentDidMount: function () {
+            // Set up Select2
+            var $select2 = this.createSelect2();
+        },
+        setPlaceholderTo: function($elem, placeholder) {
+            if (!placeholder) {
+                placeholder = "";
+            }
+            var currData = $elem.select2("data");
+
+            // Set placeholder to new placeholder
+            $elem.attr("placeholder", placeholder);
+
+            // Now workaround the fact that Select2 doesn't pick up on this
+            // ..First assign null
+            $elem.select2("data", null);
+
+            // ..Then assign dummy value in case that currData is null since
+            //   that won't do anything.
+
+            $elem.select2("data", {});
+
+            // ..Then put original data back
+            $elem.select2("data", currData);
+        },
+        createSelect2: function () {
+            // Get inital value
+            var val = null;
+            if (this.props.val.length > 0) {
+                val = this.props.multiple ? this.props.val : this.props.val[0];
+            }
+
+            var $select2 = this.getElement();
+            $select2.attr({
+                'name': this.props.name,
+                'class': this.props.className,
+                'data-col': this.props['data-col']
+            })
+            .val(val)
+            .select2({
+                data: this.props.options,
+                multiple: this.props.multiple,
+                val: val
+            })
+            .on("change", this.handleChange)
+            .select2("enable", this.props.enabled);
+
+            this.setPlaceholderTo($select2, this.props.placeholder);
+        },
+        handleChange: function (e) {
+            if (this.props.onSelection) {
+                this.props.onSelection(e, this.getElement().select2("data"));
+            }
+        },
+        getElement: function () {
+            return $("#" + this.props.id);
+        },
+        _isOptionsUpdated: function (oldOptions) {
+            if (oldOptions.length != this.props.options.length)
+                return true;
+            return false;
+        },
+        render: function () {
+            return (
+                <div>
+                    <input id={this.props.id} type='hidden' style={this.props.style}/>
+                </div>
+            );
         }
     });
 

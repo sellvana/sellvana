@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_Abstract_Report
+ *
+ * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
+ */
 abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_periodTypes = [
@@ -9,6 +14,53 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         'quarter' => 'Quarter',
         'year' => 'Year'
     ];
+
+    protected $_systemFields = [];
+    protected $_visibleFields = [];
+    protected $_selectModels = [];
+
+    /**
+     * @return BView|FCom_Core_View_BackboneGrid
+     */
+    public function gridView()
+    {
+        $view = parent::gridView();
+        $grid = $view->get('grid');
+        $config = $grid['config'];
+
+        $labels = $this->_getFieldLabels();
+        $this->BEvents->fire(static::$_origClass . '::fieldLabels', ['data' => &$labels]);
+
+        $this->_selectAllFields($config['orm']);
+        foreach ($config['columns'] as &$column) {
+            if (!empty($column['name']) && !empty($labels[$column['name']])) {
+                $column['label'] = $labels[$column['name']];
+            }
+        }
+
+        $view->set('grid', ['config' => $config]);
+        return $view;
+    }
+
+    /**
+     * return config to build grid
+     * @return array
+     */
+    public function gridConfig()
+    {
+        $config = parent::gridConfig();
+        $config['columns'] = array_merge($config['columns'], $this->_addAllColumns());
+        return $config;
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [];
+    }
 
     public function gridViewBefore($args)
     {
@@ -21,6 +73,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
      * @param array $filter
      * @param string $val
      * @param BORM $orm
+     *
+     * @return bool
      */
     public function periodTypeCallback($filter, $val, $orm)
     {
@@ -46,6 +100,8 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
 
         $orm->group_by_expr($expr);
         $orm->select_expr($expr, 'period');
+
+        return true;
     }
 
     /**
@@ -75,5 +131,72 @@ abstract class FCom_Admin_Controller_Abstract_Report extends FCom_Admin_Controll
         }
 
         return [];
+    }
+
+    /**
+     * @return array
+     */
+    protected function _addAllColumns()
+    {
+        $columns = [];
+        /** @var FCom_Core_Model_Abstract $model */
+        foreach ($this->_selectModels as $alias => $model) {
+            $table = $model->table();
+            $fields = BDb::ddlFieldInfo($table);
+            foreach ($fields as $field) {
+                $fieldId = $field->orm->get('Field');
+                $fieldName = $alias . '_' . $fieldId;
+                if (!in_array($fieldName, $this->_systemFields)) {
+                    $columns[] = [
+                        'name' => $fieldName,
+                        'index' => $alias . '.' . $fieldId,
+                        'hidden' => (!in_array($fieldName, $this->_visibleFields))
+                    ];
+                }
+            }
+        }
+
+        return $columns;
+    }
+
+    /**
+     * @param BORM $orm
+     */
+    protected function _selectAllFields($orm)
+    {
+        /** @var FCom_Core_Model_Abstract $model */
+        foreach ($this->_selectModels as $alias => $model) {
+            $table = $model->table();
+            $fields = BDb::ddlFieldInfo($table);
+            foreach ($fields as $field) {
+                $orm->select($alias . '.' . $field->orm->get('Field'), $alias . '_' . $field->orm->get('Field'));
+            }
+        }
+    }
+
+    protected function _addProductCustomFields($config)
+    {
+        $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
+        foreach ($fields as $field) {
+            $type = 'text';
+            if (substr($field->get('table_field_type'), 0, 3) == 'int') {
+                $type = 'number-range';
+            }
+            $config['columns'][] = ['name' => $field->get('field_code'), 'index' => $field->get('field_code'), 'hidden' => true];
+            $config['filters'][] = ['field' => $field->get('field_code'), 'type' => $type, 'hidden' => true];
+        }
+
+        return $config;
+    }
+
+    protected function _getProductCustomFieldLabels()
+    {
+        $labels = [];
+        $fields = $this->Sellvana_CatalogFields_Model_Field->orm('f')->find_many();
+        foreach ($fields as $field) {
+            $labels[$field->get('field_code')] = $field->get('field_name');
+        }
+
+        return $labels;
     }
 }

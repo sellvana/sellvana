@@ -1,0 +1,58 @@
+{% set m = THIS.get('model') %}
+<input type="hidden" name="model[_add_field_ids]" value="{{ m.get('_add_field_ids') }}" id="cf_add_fields_ids">
+<input type="hidden" name="model[_hide_field_ids]" value="{{ m.get('_hide_field_ids') }}" id="cf_hide_fields_ids">
+{% if THIS.get('fields') %}
+  <br/>
+  <h2>
+    {{ 'Custom Fields'|_ }}
+  </h2>
+  {% for field in THIS.get('fields') %}
+    <div id="cf_field_{{ field.id() }}" style="margin-top: 15px;">
+      <h3>
+        {{ field.get('frontend_label') }}
+      </h3>
+      {% if field.get('admin_input_type') == 'select' %}
+
+        <select name="model[{{ field.get('field_code') }}]">
+          {% for field_option in THIS.get('fields_options')[field.id()] %}
+            <option value="{{ field_option.get('label') }}" {{ field_option.get('label') == m.get(field.get('field_code')) ? 'selected' }}>
+              {{ field_option.get('label') }}
+            </option>
+          {% endfor %}
+        </select>
+
+      {% elseif field.get('admin_input_type') == 'text' %}
+        {% if field.get('table_field_type') == 'date' or field.get('table_field_type') == 'datetime' %}
+          <div class="datepicker_wrapper">
+            <input type="text" name="model[{{ field.get('field_code') }}]" value="{{ m.get(field.get('field_code')) }}" id="datepicker">
+          </div>
+          <script>
+            require(['jquery', 'jquery-ui'], function($) {
+                $(function() {
+                    $( "#datepicker" ).datepicker({ dateFormat: "yy-mm-dd", constrainInput: false });
+                });
+            })
+          </script>
+        {% else %}
+          <input type="text" name="model[{{ field.get('field_code') }}]" value="{{ m.get(field.get('field_code')) }}">
+        {% endif %}
+
+      {% elseif field.get('admin_input_type') == 'textarea' %}
+
+        <textarea name="model[{{ field.get('field_code') }}]">{{ m.get(field.get('field_code')) }}</textarea>
+
+      {% elseif field.get('admin_input_type') == 'boolean' %}
+
+        <select name="model[{{ field.get('field_code') }}]">
+          {{ UTIL.optionsHtml({0:'No', 1:'Yes'}, m.get(field.get('field_code'))) }}
+        </select>
+
+      {% endif %}
+
+      {% if not field.get('system') %}
+        <br/>
+        <a href="javascript:void(0);" onclick="cf_field_remove({{ field.id() }})">{{ 'remove'|_ }}</a>
+      {% endif %}
+    </div>
+  {% endfor %}
+{% endif %}

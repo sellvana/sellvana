@@ -17,15 +17,19 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                 "originalData": [],
                 "columnMetadata": [],
                 "className": ""
-            }
+            };
         },
         doRowAction: function(callback, event) {
+            // Remove focus for prevent re-render modal when keypress
+            event.currentTarget.blur();
+            
             /*if (this.props.getConfig('data_mode') == 'local') {
                 return this.doRowLocalAction(event);
             }*/
             var that = this;
-            var action = event.target.dataset.action;
-            var rowId = event.target.dataset.row;
+            var action = event.currentTarget.dataset.action;
+            var rowId = event.currentTarget.dataset.row;
+            var folder = event.currentTarget.dataset.folder;
             var gridId = this.props.getConfig('id');
             var data = this.props.originalData ? this.props.originalData : this.props.data;
             var isLocalMode = !this.props.hasExternalResults();
@@ -43,11 +47,6 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
 
             switch (action) {
                 case 'edit':
-                    // If button has custom editable
-                    if (typeof callback !== 'undefined' && typeof window[callback] === 'function') {
-                        return window[callback](row);
-                    }
-
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
@@ -69,9 +68,16 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                         if (isLocalMode) {
                             this.props.removeRows([row]);
                         } else {
-
+                            var oper = 'del';
                             if (editUrl.length > 0 && rowId) {
-                                $.post(editUrl, {id: rowId, oper: 'del'}, function() {
+                                if (folder) {
+                                    oper = 'mass-delete';
+                                    if (!editUrl.match("\\b"+"folder"+"\\b")) {
+                                        editUrl += '?folder=' + encodeURIComponent(folder);
+                                    }
+                                }
+                                
+                                $.post(editUrl, {id: rowId, oper: oper}, function() {
                                     that.props.removeSelectedRows([row]);
                                     that.props.refresh();
                                 });
@@ -81,7 +87,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     break;
                 default:
                     if (typeof window[callback] === 'function') {
-                        return window[callback](row);
+                        return window[callback](row, event);
                     } else {
                         console.log('Do row custom action');
                     }

@@ -1,0 +1,22 @@
+{% set subscriptions = APP.instance('Sellvana_Email_Admin_Dashboard').getLatestNewsletterSubscriptions() %}
+
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "Email"|_ }}</th>
+        </tr>
+        </thead>
+        {% if subscriptions is empty %}
+            <tr>
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+        {% else %}
+            {% for subscription in subscriptions %}
+                <tr>
+                    <td>{{ subscription.get('email') }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>

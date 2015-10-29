@@ -291,7 +291,9 @@ class FCom_Core_LayoutEditor extends BClass
         foreach ($layoutData['widgets'] as $widget) {
             $args = ['layout' => &$layout, 'context' => &$context, 'widget' => $widget];
             $layoutUpdate = $this->BUtil->call($widget['compile'], $args);
-
+            if (!$layoutUpdate) {
+                continue;
+            }
             foreach ($layoutUpdate as $i => $update) {
                 if (!empty($update['hook']) && $update['hook'] === 'main') {
                     $update['params']['insert'] = function ($obs) use ($context) {

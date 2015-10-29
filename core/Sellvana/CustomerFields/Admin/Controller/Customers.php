@@ -3,259 +3,18 @@
 /**
  * Class Sellvana_CustomerFields_Admin_Controller_Customers
  *
- * @property Sellvana_CustomerFields_Model_CustomerField $Sellvana_CustomerFields_Model_CustomerField
- * @property Sellvana_CustomerFields_Model_FieldOption $Sellvana_CustomerFields_Model_FieldOption
- * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
- * @property Sellvana_CustomerFields_Model_Field $Sellvana_CustomerFields_Model_Field
- * @property FCom_Core_Main $FCom_Core_Main
+ * @property Sellvana_CustomerFields_Model_CustomerFieldData $Sellvana_CustomerFields_Model_CustomerFieldData
+ * @property Sellvana_CustomerFields_Model_FieldOption       $Sellvana_CustomerFields_Model_FieldOption
+ * @property Sellvana_Customer_Model_Customer                $Sellvana_Customer_Model_Customer
+ * @property Sellvana_CustomerFields_Model_Field             $Sellvana_CustomerFields_Model_Field
+ * @property FCom_Core_Main                                  $FCom_Core_Main
  */
 class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract
 {
-    /**
-     * @return array
-     */
-    public function fieldsetsGridConfig()
-    {
-        $config = [
-            'grid' => [
-                'id'      => 'product_fieldsets',
-                'caption' => 'Field Sets',
-                'url' => $this->BApp->href('catalogfields/fieldsets/grid_data'),
-                'orm' => 'Sellvana_CustomerFields_Model_SetField',
-                'columns' => [
-                    'id' => ['label' => 'ID', 'width' => 55, 'sorttype' => 'number', 'key' => true],
-                    'set_code' => ['label' => 'Set Code', 'width' => 100, 'editable' => true],
-                    'set_name' => ['label' => 'Set Name', 'width' => 200, 'editable' => true],
-                    'num_fields' => ['label' => 'Fields', 'width' => 30],
-                ],
-                'actions' => [
-                    'edit' => true,
-                    'delete' => true
-                ],
-                'filters' => [
-                    ['field' => 'set_name', 'type' => 'text'],
-                    ['field' => 'set_code', 'type' => 'text'],
-                    '_quick' => ['expr' => 'product_name like ? or set_code like ', 'args' =>  ['%?%', '%?%']]
-                ]
-            ]
-        ];
-
-        return $config;
-    }
-
-    /**
-     * @param Sellvana_Catalog_Model_Product $model
-     * @return array
-     */
-    public function variantFieldGridConfig($model)
-    {
-        //$data = $model->getData('variants_fields');
-        $varFields = $this->Sellvana_CustomerFields_Model_ProductVarfield->orm('vf')
-            ->join('Sellvana_CustomerFields_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
-            ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
-            ->select(['f.field_code', 'f.field_name'])
-            ->order_by_asc('vf.position')
-            ->find_many_assoc('field_id');
-        if ($varFields) {
-            $varFieldsOptions = $this->Sellvana_CustomerFields_Model_FieldOption->orm()
-                ->where_in('field_id', array_keys($varFields))
-                ->find_many_assoc();
-            $options = [];
-            foreach ($varFieldsOptions as $vfo) {
-                $options[$vfo->get('field_id')][$vfo->id()] = $vfo->get('label');
-            }
-        }
-
-        $data = [];
-        foreach ($varFields as $vf) {
-            $fId = $vf->get('field_id');
-            $data[] = [
-                'id'          => $fId,
-                'varfield_id' => $vf->get('varfield_id'),
-                'field_code'  => $vf->get('field_code'),
-                'name'        => $vf->get('field_name'),
-                'options'     => !empty($options[$fId]) ? $options[$fId] : [],
-            ];
-        }
-        $config = [
-            'config' => [
-                'id' => 'variable-field-grid',
-                'caption' => 'Variable Field Grid',
-                'data_mode' => 'local',
-                'data' => ($data === null ? [] : $data),
-                'columns' => [
-                    ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['name' => 'name', 'label' => 'Field Name', 'width' => 300],
-                    ['name' => 'field_code', 'label' => 'Field Code', 'width' => 300],
-                    ['name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 300],
-                    ['type' => 'btn_group',  'buttons' => [['name' => 'delete']]]
-                ],
-                'actions' => [
-                   'delete' => ['caption' => 'Remove']
-                ],
-                'grid_before_create' => 'variantFieldGridRegister',
-                'callbacks' => [
-                    'componentDidMount' => 'variantFieldGriddleRegister'
-                ]
-            ]
-        ];
-
-        return $config;
-    }
-
-    /**
-     * @param Sellvana_Catalog_Model_Product $model
-     * @return array
-     */
-    public function variantGridConfig($model)
-    {
-        $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 30]);
-        $columns = [
-            ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
-        ];
-
-        //$vFields = $model->getData('variants_fields');
-
-        $varFields = $this->Sellvana_CustomerFields_Model_ProductVarfield->orm('vf')
-            ->join('Sellvana_CustomerFields_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
-            ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
-            ->select(['f.field_code', 'f.field_name'])
-            ->order_by_asc('vf.position')
-            ->find_many_assoc('field_id');
-
-        if ($varFields) {
-            $varFieldsOptions = $this->Sellvana_CustomerFields_Model_FieldOption->orm()
-                ->where_in('field_id', array_keys($varFields))
-                ->find_many_assoc();
-            $options = [];
-            foreach ($varFieldsOptions as $vfo) {
-                $options[$vfo->get('field_id')][$vfo->get('label')] = $vfo->get('label');
-            }
-        }
-
-        if ($varFields) {
-            $pos = 2;
-            foreach ($varFields as $fId => $vf) {
-                $f = [];
-                $f['options'] = !empty($options[$fId]) ? $options[$fId] : [];
-                $f['label'] = $vf->get('field_name');
-                $f['name'] = $vf->get('field_code');
-                $f['field_id'] = $fId;
-                $f['addable'] = true;
-                $f['multirow_edit'] = true;
-                $f['width'] = 200;
-                $f['position'] = $pos++;
-                $f['validation'] = ['required' => true];
-                $f['display'] = 'eval';
-                $f['print'] = '"<p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $vf->get('field_code').'\' class=\"select-value-field required\" style=\"width: 170px\" /></p>"';
-                $f['default'] = '';
-                $columns[] = $f;
-            }
-#var_dump($columns); exit;
-        }
-        $image = $this->variantImageGrid($model);
-        $columns[] = ['type' => 'input', 'name' => 'product_sku', 'label' => 'Variant SKU', 'width' => 150, 'editable' => 'inline',
-            'addable' => true, 'default' => ''];
-        $columns[] = ['type' => 'input', 'name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 150, 'editable' => 'inline',
-            'addable' => true, 'default' => ''];
-        $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline',
-                        'addable' => true, 'validation' => ['number' => true], 'default' => ''];
-        $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline',
-                        'addable' => true, 'validation' => ['number' => true], 'default' => ''];
-        $columns[] = ['name' => 'image', 'label' => 'IMAGES', 'width' => 250, 'display' => 'eval',
-            'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["variant_file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
-        $columns[] = ['name' => 'variant_file_id',  'hidden' => true];
-        $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
-        $columns[] = ['name' => 'field_values',  'hidden' => true, 'default' => ''];
-        $columns[] = ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl];
-        $columns[] = ['type' => 'btn_group',  'buttons' => [['name' => 'delete']] ];
-
-        $data = [];
-
-        /** @var Sellvana_CustomerFields_Model_ProductVariant[] $variants */
-        $variants = $this->Sellvana_CustomerFields_Model_ProductVariant->orm()->where('product_id', $model->id())->find_many();
-        $images = $this->Sellvana_CustomerFields_Model_ProductVariantImage->orm()->where('product_id', $model->id())->find_many();
-        $invSkus = [];
-        if ($variants !== null) {
-            foreach ($variants as $v) {
-                $fileIds = [];
-                foreach ($images as $img) {
-                    if ($img->get('variant_id') == $v->id()) {
-                        $fileIds[] = $img->get('file_id');
-                    }
-                }
-                $vField = [];
-                $vField['field_values'] = $this->BUtil->fromJson($v->field_values);
-                $vField['product_sku'] = $v->product_sku;
-                $vField['inventory_sku'] = $v->inventory_sku;
-                $vField['variant_qty'] = $v->variant_qty;
-                $vField['variant_price'] = $v->variant_price;
-                $vField['variant_file_id'] = join(',', $fileIds);
-                $vField['id'] = $v->id();
-                $data[] = $vField;
-                if ($v->inventory_sku) {
-                    $invSkus[] = $vField['inventory_sku'];
-                }
-            }
-        }
-        if ($invSkus) {
-            $skus = $this->Sellvana_Catalog_Model_InventorySku->orm()
-                ->where_in('inventory_sku', $invSkus)->find_many_assoc('inventory_sku');
-            foreach ($data as $i => $v) {
-                if (!empty($skus[$v['inventory_sku']])) {
-                    $data[$i]['variant_qty'] = $skus[$v['inventory_sku']]->qty_in_stock;
-                }
-            }
-        }
-
-        $config = [
-            'config' => [
-                'id' => 'variant-grid',
-                'caption' => 'Variable Field Grid',
-                'data_mode' => 'local',
-                'data' => $data,
-                'columns' => $columns,
-                'filters' => [
-                    '_quick' => ['expr' => 'field_name like ? or id like ', 'args' => ['%?%', '%?%']]
-                ],
-                'actions' => [
-                    'new' => ['caption' => 'New Variant'],
-                    'delete' => ['caption' => 'Remove']
-                ],
-                'grid_before_create' => 'variantGridRegister',
-                'callbacks' => [
-                    'componentDidMount' => 'variantGriddleRegister',
-                    'componentDidUpdate' => 'variantGriddleRegister'
-                ]
-            ]
-        ];
-
-        return $config;
-
-    }
-
-    /**
-     * @param Sellvana_Catalog_Model_Product $model
-     * @return array
-     */
-    public function variantImageGrid($model)
-    {
-        $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
-            ->left_outer_join('Sellvana_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
-            ->select(['pa.id', 'pa.position',  'a.file_name'])
-            ->select('a.id', 'file_id')
-            ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
-            ->group_by('pa.id')
-            ->find_many());
-        return $data;
-    }
-
     public function action_field_remove()
     {
         $id = $this->BRequest->param('id', true);
-        $p = $this->Sellvana_Catalog_Model_Product->load($id);
+        $p = $this->Sellvana_Customer_Model_Customer->load($id);
         if (!$p) {
             return;
         }
@@ -263,28 +22,28 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
         if (!$hide_field) {
             return;
         }
-        $this->Sellvana_CustomerFields_Model_ProductField->removeField($p, $hide_field);
+        $this->Sellvana_CustomerFields_Model_CustomerFieldData->removeField($p, $hide_field);
         $this->BResponse->json('');
     }
 
     public function action_fields_partial()
     {
         $id = $this->BRequest->param('id', true);
-        $p = $this->Sellvana_Catalog_Model_Product->load($id);
+        $p = $this->Sellvana_Customer_Model_Customer->load($id);
         if (!$p) {
-            $p = $this->Sellvana_Catalog_Model_Product->create();
+            $p = $this->Sellvana_Customer_Model_Customer->create();
         }
 
         $fields_options = [];
-        $fields = $this->Sellvana_CustomerFields_Model_ProductField->productFields($p, $this->BRequest->request());
+        $fields = $this->Sellvana_CustomerFields_Model_CustomerFieldData->customerFields($p, $this->BRequest->request());
         foreach ($fields as $field) {
             $fields_options[$field->id()] = $this->Sellvana_CustomerFields_Model_FieldOption->orm()
                 ->where("field_id", $field->id())->find_many();
         }
 
-        $view = $this->view('catalogfields/products/fields-partial');
+        $view = $this->view('customerfields/customers/fields-partial');
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fields_options);
-        $this->BLayout->setRootView('catalogfields/products/fields-partial');
+        $this->BLayout->setRootView('customerfields/customers/fields-partial');
         $this->BResponse->render();
     }
 
@@ -293,38 +52,6 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
         $customFields = $model->getData('custom_fields');
         return !isset($customFields) ? -1 : $customFields;
     }
-    public function fieldsetAry()
-    {
-        $sets = $this->BDb->many_as_array($this->Sellvana_CustomerFields_Model_Set->orm('s')->select('s.*')->find_many());
-
-        return json_encode($sets);
-    }
-
-    public function fieldAry()
-    {
-        $fields = $this->BDb->many_as_array($this->Sellvana_CustomerFields_Model_SetField->orm('s')->select('s.*')->find_many());
-
-        return json_encode($fields);
-    }
-
-    public function action_get_fieldset()
-    {
-        $r = $this->BRequest;
-        $id = $r->get('id');
-        $set = $this->Sellvana_CustomerFields_Model_Set->load($id);
-        $fields = $this->BDb->many_as_array($this->Sellvana_CustomerFields_Model_SetField->orm('sf')
-            ->join('Sellvana_CustomerFields_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
-            ->select(['f.id', 'f.field_name', 'f.admin_input_type'])
-            ->where('sf.set_id', $id)->find_many()
-        );
-        foreach ($fields as &$field) {
-            if ($field['admin_input_type'] === 'select' ||  $field['admin_input_type'] === 'multiselect') {
-                $field['options'] = $this->Sellvana_CustomerFields_Model_FieldOption->getListAssocById($field['id']);
-            }
-        }
-
-        $this->BResponse->json(['id' => $set->id(), 'set_name' => $set->set_name, 'fields' => ($fields)]);
-    }
 
     public function action_get_field()
     {
@@ -332,7 +59,7 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
         $id = $r->get('id');
         $field = $this->Sellvana_CustomerFields_Model_Field->load($id);
         $options = $this->Sellvana_CustomerFields_Model_FieldOption->getListAssocById($field->id());
-        $this->BResponse->json(['id' => $field->id(), 'field_name' => $field->field_name,
+        $this->BResponse->json(['id' => $field->id(), 'field_name' => $field->field_name, 'field_code' => $field->field_code,
             'admin_input_type' => $field->admin_input_type, 'multilang' => $field->multilanguage,
             'options' => $options, 'required' => $field->required]);
     }
@@ -341,12 +68,12 @@ class Sellvana_CustomerFields_Admin_Controller_Customers extends FCom_Admin_Cont
     {
         try {
             $data = $this->BRequest->post();
-            $prodId = $data['id'];
+            $customerId = $data['id'];
             $json = $data['json'];
-            $hlp = $this->Sellvana_CustomerFields_Model_ProductField;
-            $res = $hlp->load($prodId, 'product_id');
+            $hlp = $this->Sellvana_CustomerFields_Model_CustomerFieldData;
+            $res = $hlp->load($customerId, 'product_id');
             if (!$res) {
-                $hlp->create(['product_id' => $prodId, '_data_serialized' => $json])->save();
+                $hlp->create(['product_id' => $customerId, '_data_serialized' => $json])->save();
                 $status = 'Successfully saved.';
             } else {
                 $res->set('_data_serialized', $json)->save();

@@ -70,7 +70,9 @@ class BUtil extends BClass
     *
     * @var string
     */
-    protected static $_defaultCharPool = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ';
+    const CHARPOOL_DEFAULT = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ',
+          CHARPOOL_ALNUMCAP = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+          CHARPOOL_ALNUMLOW = '1234567890abcdefghijklmnopqrstuvwxyz';
 
     /**
     * Shortcut to help with IDE auto-completion
@@ -283,7 +285,7 @@ class BUtil extends BClass
      * @param array|string $mapFields
      * @return array
      */
-    public function arraySeqToMap($array, $idField, $mapFields = null)
+    public function arraySeqToMap($array, $idField = 'id', $mapFields = null)
     {
         $map = [];
         foreach ($array as $k => $row) {
@@ -291,6 +293,8 @@ class BUtil extends BClass
                 $outRow = $this->BUtil->arrayMask($row, $mapFields);
             } elseif (is_string($mapFields)) {
                 $outRow = !empty($row[$mapFields]) ? $row[$mapFields] : null;
+            } else {
+                $outRow = !empty($row[$idField]) ? $row[$idField] : null;
             }
             if (!is_numeric($k)) {
                 $map[$k] = $outRow;
@@ -732,9 +736,11 @@ class BUtil extends BClass
         $isObject = is_object(current($source));
         foreach ($source as $k => $item) {
             if ($isObject) {
-                $key = null === $keyField ? $k : $item->$keyField;
-                $label = $labelField[0] === '.' ? $item-> {substr($labelField, 1)}() : $item->labelField;
-                $options[$key] = $label;
+                $key = null === $keyField ? $k : $item->get($keyField);
+                $label = $labelField[0] === '.' ? $item->{substr($labelField, 1)}() : $item->get($labelField);
+                if (null !== $label) {
+                    $options[$key] = $label;
+                }
             } else {
                 $key = null === $keyField ? $k : $item[$keyField];
                 $options[$key] = $item[$labelField];
@@ -833,11 +839,8 @@ class BUtil extends BClass
      * @param string $chars allowed characters to be used
      * @return string
      */
-    public function randomString($strLen = 8, $chars = null)
+    public function randomString($strLen = 8, $chars = self::CHARPOOL_DEFAULT)
     {
-        if (null === $chars) {
-            $chars = static::$_defaultCharPool;
-        }
         $charsLen = strlen($chars)-1;
         $str = '';
         mt_srand();
@@ -874,11 +877,8 @@ class BUtil extends BClass
      * @param null $chars
      * @return string
      */
-    public function nextStringValue($string = '', $chars = null)
+    public function nextStringValue($string = '', $chars = self::CHARPOOL_DEFAULT)
     {
-        if (null === $chars) {
-            $chars = static::$_defaultCharPool; // avoid leading 0
-        }
         $pos = strlen($string);
         $lastChar = substr($chars, -1);
         while (--$pos >= -1) {
@@ -1035,7 +1035,7 @@ class BUtil extends BClass
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
         $timeout = !empty($options['timeout']) ? $options['timeout'] : 5;
         $userAgent = !empty($options['useragent']) ? $options['useragent'] : 'Mozilla/5.0';
-        $useCurl = isset($options['curl']) ? $options['curl'] : false;
+        $useCurl = isset($options['curl']) ? $options['curl'] : true;
         if (preg_match('#^//#', $url)) {
             $url = 'http:' . $url;
         }
@@ -1145,9 +1145,10 @@ class BUtil extends BClass
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
-            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2);
+#var_dump(__METHOD__, $rawResponse);
+            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
-#echo "<xmp>"; var_dump($rawResponse, static::$_lastRemoteHttpInfo); echo "</xmp>";
+#var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt);
             $respHeaders = explode("\r\n", $headers);
             if (curl_errno($ch) != 0) {
                 static::$_lastRemoteHttpInfo['errno'] = curl_errno($ch);
@@ -1156,7 +1157,7 @@ class BUtil extends BClass
             curl_close($ch);
         } else {
             $streamOptions = ['http' => [
-                'protocol_version' => '1.1',
+                'protocol_version' => '1.0',
                 'method' => $method,
                 'timeout' => $timeout,
                 'header' => [
@@ -1237,13 +1238,19 @@ class BUtil extends BClass
                 $arr = explode(':', $line, 2);
                 static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {
-                preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m);
-                static::$_lastRemoteHttpInfo['headers']['http'] = [
-                    'full' => $m[0],
-                    'protocol' => $m[1],
-                    'code' => $m[2],
-                    'status' => $m[3],
-                ];
+                IF (preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m)) {
+                    static::$_lastRemoteHttpInfo['headers']['http'] = [
+                        'unparsed' => $line,
+                        'full' => $m[0],
+                        'protocol' => $m[1],
+                        'code' => $m[2],
+                        'status' => $m[3],
+                    ];
+                } else {
+                    static::$_lastRemoteHttpInfo['headers']['http'] = [
+                        'unparsed' => $line,
+                    ];
+                }
             }
         }
 /*
@@ -1605,6 +1612,17 @@ class BUtil extends BClass
             . ($params ? '?' . http_build_query($params) : '');
     }
 
+    public function isCallable($cb)
+    {
+        if (is_callable($cb)) {
+            return true;
+        }
+        if (is_string($cb) && preg_match('#^([A-Za-z0-9_]+)(::|\.|->)([A-Za-z0-9_]+)$#', $cb)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param $callback
      * @return callable
@@ -1618,16 +1636,15 @@ class BUtil extends BClass
                 $callback = $callbackMapCache[$callback];
             } else {
                 $origCallback = $callback;
-                if (strpos($callback, '::') !== false) {
-                    list($class, $method) = explode('::', $callback);
-                    $reflMethod = new ReflectionMethod($class, $method);
-                    if ($reflMethod->isStatic()) {
-                        $class = null; // proceed with usual callback
+                if (preg_match('#^([A-Za-z0-9_]+)(::|\.|->)([A-Za-z0-9_]+)$#', $callback, $m)) {
+                    $class = $m[1];
+                    $method = $m[3];
+                    if ($m[2] === '::') {
+                        $reflMethod = new ReflectionMethod($class, $method);
+                        if ($reflMethod->isStatic()) {
+                            $class = null; // proceed with usual callback
+                        }
                     }
-                } elseif (strpos($callback, '.') !== false) {
-                    list($class, $method) = explode('.', $callback);
-                } elseif (strpos($callback, '->')) {
-                    list($class, $method) = explode('->', $callback);
                 }
                 if (!empty($class)) {
                     $instance = BClassRegistry::instance($class, [], true);
@@ -1653,6 +1670,33 @@ class BUtil extends BClass
         } else {
             return call_user_func($callback, $args);
         }
+    }
+
+    /**
+     * If callback, call and get result, otherwise pass through
+     *
+     * Do not apply on user data for security concerns
+     *
+     * @param mixed $data
+     * @param string $cacheKey
+     * @return mixed
+     */
+    public function maybeCallback($data, $cacheKey = null)
+    {
+        static $cache = [];
+
+        if ($cacheKey && !empty($cache[$cacheKey])) {
+            return $this->call($cache[$cacheKey]);
+        }
+        if ($this->isCallable($data)) {
+            $callback = $this->extCallback($data);
+            if ($cacheKey) {
+                $cache[$cacheKey] = $callback;
+            }
+            $result = $callback($data);
+            return $result;
+        }
+        return $data;
     }
 
     /**
@@ -2548,30 +2592,6 @@ class BErrorException extends Exception
 */
 class BDebug extends BClass
 {
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const EMERGENCY = 0,
         ALERT       = 1,
         CRITICAL    = 2,
@@ -2595,27 +2615,6 @@ class BDebug extends BClass
         self::DEBUG     => 'DEBUG',
     ];
 
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const MEMORY  = 0,
         FILE      = 1,
         SYSLOG    = 2,
@@ -2624,30 +2623,6 @@ class BDebug extends BClass
         EXCEPTION = 16,
         STOP      = 4096;
 
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
-    /**
-     *
-     */
     const MODE_DEBUG      = 'DEBUG',
         MODE_DEVELOPMENT  = 'DEVELOPMENT',
         MODE_STAGING      = 'STAGING',
@@ -2655,7 +2630,8 @@ class BDebug extends BClass
         MODE_MIGRATION    = 'MIGRATION',
         MODE_INSTALLATION = 'INSTALLATION',
         MODE_RECOVERY     = 'RECOVERY',
-        MODE_DISABLED     = 'DISABLED'
+        MODE_DISABLED     = 'DISABLED',
+        MODE_IMPORT       = 'IMPORT'
     ;
 
     /**
@@ -2748,6 +2724,15 @@ class BDebug extends BClass
             self::OUTPUT    => false,
             self::EXCEPTION => false,
             self::STOP      => false,
+        ],
+        self::MODE_IMPORT => [
+            self::MEMORY    => self::DEBUG,
+            self::SYSLOG    => false,
+            self::FILE      => self::WARNING,
+            self::EMAIL     => false, //self::CRITICAL,
+            self::OUTPUT    => self::NOTICE,
+            self::EXCEPTION => self::ERROR,
+            self::STOP      => self::CRITICAL,
         ],
     ];
 
@@ -2973,7 +2958,7 @@ class BDebug extends BClass
         if (!is_scalar($msg)) {
             $msg = print_r($msg, 1);
         }
-        error_log($msg . "\n", 3, $file);
+        error_log(date('c') . ' ' . $msg . "\n", 3, $file);
         if ($backtrace) {
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -3489,6 +3474,205 @@ class BFtpClient extends BClass
             ftp_chdir($conn, '..');
         }
         return $errors;
+    }
+}
+
+/**
+ * Class BHttpClient
+ */
+class BHttpClient extends BClass
+{
+    public function getContent($url){
+        throw new BErrorException('Not available at this moment');
+    }
+}
+
+/**
+ * Class BFile
+ *
+ * @property BHttpClient $BHttpClient
+ */
+class BFile extends BClass
+{
+    const STATUS_REMOTE_FILE = 'remote',
+          STATUS_LOCAL_FILE  = 'local';
+
+    protected $_tpmDir;
+    protected $_currentTmpDir;
+
+    protected $_currentStatus;
+    protected $_previousStatus;
+
+    protected $_fileInfo;
+
+    protected $_fileContent;
+
+    /**
+     * Is necessary to keep the contents of file in the object or not
+     * @var bool
+     */
+    public $keepContent = false;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->_tpmDir = $this->BApp->storageRandomDir() . DIRECTORY_SEPARATOR . 'tmp';
+    }
+
+    /**
+     * @param $path
+     * @return mixed
+     * @throws BErrorException
+     */
+    public function load($path)
+    {
+        if (!is_string($path)) {
+            throw new BErrorException('Support only string path of file');
+        }
+        if (filter_var($path, FILTER_VALIDATE_URL) !== false) {
+            return self::i()->_loadRemoteFile($path);
+        } else {
+            return self::i()->_loadLocalFile($path);
+        }
+    }
+
+    /**
+     * @param $url
+     * @return $this
+     * @throws BErrorException
+     */
+    private function _loadRemoteFile($url)
+    {
+        if (ini_get('allow_url_fopen')) {
+            $file = @file_get_contents($url);
+        } else {
+            $file = $this->BHttpClient->getContent($url);
+        }
+
+        $this->_fileInfo['remote_url'] = $url;
+
+        $urlPath = parse_url($url, PHP_URL_PATH);
+        $urlPath = explode('/', $urlPath);
+        $fullFileName = array_pop($urlPath);
+        if ($fullFileName === '') {
+            //TODO: generate file name;
+        }
+        $fileName = explode('.', $fullFileName);
+        if (count($fileName) >= 2) {
+            $fileExtension = array_pop($fileName);
+        } else {
+            $fileExtension = null;
+        }
+        $fileName = implode('.', $fileName);
+
+        $this->_fileInfo['full_file_name'] = $fullFileName;
+        $this->_fileInfo['file_extension'] = $fileExtension;
+        $this->_fileInfo['file_name'] = $fileName;
+
+        if ($this->keepContent) {
+            $this->_fileContent = $file;
+        }
+        $this->_saveFileToTmp($file);
+
+        $this->_currentStatus = self::STATUS_REMOTE_FILE;
+
+        return $this;
+    }
+
+    /**
+     * @param $path
+     */
+    private function _loadLocalFile($path)
+    {
+        $this->_currentStatus = self::STATUS_LOCAL_FILE;
+    }
+
+    /**
+     * @param $file
+     */
+    private function _saveFileToTmp($file)
+    {
+        $this->_currentTmpDir = $this->_tpmDir . DIRECTORY_SEPARATOR . md5(spl_object_hash($this));
+        if (!is_dir($this->_currentTmpDir)) {
+            mkdir($this->_currentTmpDir, 0777, true);
+        }
+        $this->_fileInfo['file_path'] = $this->_currentTmpDir;
+        $fullPath =  $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
+
+        if (@file_put_contents($fullPath, $file)
+        ) {
+            $this->_fileInfo['file_size'] = filesize($fullPath);
+        }
+    }
+
+    /**
+     * @param $name
+     * @param $path
+     * @return $this
+     */
+    public function save($name, $path)
+    {
+        if (@rename($this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'],
+            $path . DIRECTORY_SEPARATOR . $name)
+        ) {
+            $this->_previousStatus = $this->_currentStatus;
+            $this->_currentStatus = self::STATUS_LOCAL_FILE;
+        }
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFileInfo(){
+        return $this->_fileInfo;
+    }
+
+    /**
+     * The file is stored on a this server
+     * @return bool
+     */
+    public function isLocal()
+    {
+        return $this->_currentStatus == self::STATUS_LOCAL_FILE;
+    }
+
+    /**
+     * The file is stored on a remote server
+     * @return bool
+     */
+    public function isRemote()
+    {
+        return $this->_currentStatus == self::STATUS_REMOTE_FILE;
+    }
+
+    /**
+     * Destructor
+     */
+    public function __destruct()
+    {
+        self::delTree($this->_currentTmpDir);
+    }
+
+    /**
+     * Recursively delete a tree
+     *
+     * @param $dir
+     * @return bool
+     */
+    public static function delTree($dir)
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? self::delTree("$dir/$file") : unlink("$dir/$file");
+        }
+        return rmdir($dir);
     }
 }
 

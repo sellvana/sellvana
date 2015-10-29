@@ -56,6 +56,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         ],
     ];
 
+    protected static $_fieldDefaults = [
+        'locale' => 'en_US',
+    ];
+
     protected static $_validationRules = [
         ['username', '@required'],
         ['username', '/^[A-Za-z0-9._@-]{1,255}$/', 'Username allowed characters are letters, numbers, dot, underscore, hyphen and @'],
@@ -115,10 +119,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         parent::onAfterCreate();
 
-        $this->set([
-            'tz' => $this->BConfig->get('modules/FCom_Core/default_tz'),
-            'locale' => $this->BConfig->get('modules/FCom_admin/default_locale'),
-        ]);
+        $defaultTz = $this->BConfig->get('modules/FCom_Core/default_tz');
+        if ($defaultTz) {
+            $this->set('tz', $defaultTz);
+        }
+        $defaultLocale = $this->BConfig->get('modules/FCom_admin/default_locale');
+        if ($defaultLocale) {
+            $this->set('locale', $defaultLocale);
+        }
     }
 
     public function onBeforeSave()
@@ -160,8 +168,8 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function as_array(array $objHashes = [])
     {
         $data = parent::as_array();
-        unset($data['password_hash']);
-        unset($data['api_password_hash']);
+        #unset($data['password_hash']);
+        #unset($data['api_password_hash']);
         return $data;
     }
 
@@ -496,15 +504,18 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             $roles = $this->FCom_Admin_Model_Role->orm()->where_in('id', $roleIds)->find_many();
             $perms = [];
             foreach ($roles as $role) {
-                $perms = array_merge($perms, $role->get('permissions'));
+                /* @var FCom_Admin_Model_Role $role */
+                $permissions = $role->onAfterLoad()->get('permissions');
+                $perms = array_merge($perms, $permissions);
             }
+
             $this->set('permissions', $perms);
         }
         if (is_string($paths)) {
             $paths = explode(',', $paths);
         }
         foreach ($paths as $p) {
-            if (!empty($perms[$p])) {
+            if (array_key_exists($p, $perms)) {
                 return true;
             }
         }

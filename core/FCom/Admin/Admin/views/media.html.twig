@@ -40,7 +40,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        {{ THIS.view('core/medialib/upload').set({'config': config, 'uploadConfig': uploadConfig})|raw }}
+                        {{ THIS.view('core/medialib/upload').set({'config': config, 'uploadConfig': uploadConfig}) | raw }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">{{ "Close"|_ }}</button>
@@ -53,26 +53,39 @@
 
 <script type="text/javascript">
     require(['jquery'], function ($) {
-        var uploadConfigs = {{ UTIL.toJSON(uploadConfig)|raw }};
-        var uploadUrlBase = "{{ APP.href("media/grid/upload?type=") | raw }}";
-        var $mediaTypes = $("#media-library-upload-types");
-        var type = $mediaTypes.val();
-        var uploadUrl = uploadUrlBase + type;
-        var $uploader = $("#{{config.id}}-media-upload");
+        var uploadConfigs       = {{ UTIL.toJSON(uploadConfig) | raw }};
+        var uploadUrlBase       = "{{ APP.href("media/grid/upload?type=") | raw }}";
+        var thumb_path          = '';
+        var $mediaTypes         = $("#media-library-upload-types");
+        var type                = $mediaTypes.val();
+        var uploadUrl           = uploadUrlBase + type;
+        var $uploader           = $("#{{config.id}}-media-upload");
         var uploaderInitialized = false;
         $mediaTypes.on('change', function (e) {
-            type = $mediaTypes.val();
+            type = $(this).val();
             uploadUrl = uploadUrlBase + type;
             $uploader.fileupload('option', {url: uploadUrl});
-            console.log(uploadUrl);
+            switch(type) {
+                case 'product-images':
+                    thumb_path = 'resize.php?s=68&f=media/product/images/';
+                    break;
+                case 'product-attachments':
+                    thumb_path = 'resize.php?s=68&f=media/product/attachment/';
+                    break;
+                case 'product-videos':
+                    thumb_path = 'resize.php?s=68&f=media/product/videos';
+                    break;
+                case 'images':
+                    thumb_path = 'resize.php?s=68&f=media/images/';
+                    break;
+            }
         });
         var mediaLibGrid{{ config.id }};
 
         window.registerGrid{{ config.id }} = function (grid) {
-            mediaLibGrid{{ config.id }} = grid;
-            window.{{ config.id }}_grid = grid;
+            window.{{ config.id }}_grid = mediaLibGrid{{ config.id }} = grid;
             //re-scan image button
-            $('#{{ config.id }}-attach_library').find('.btn-rescan-images').on('click', function () {
+            $('#{{ config.id }}-attach_library').find('.btn-rescan-media').on('click', function () {
                 $.post('{{ APP.href("media/grid/rescan_library") | raw }}', {do: 'rescan_library'}, function (response) {
                     if (response.status == 'success') {
                         $.bootstrapGrowl("Rescan success", {type: 'success', align: 'center', width: 'auto'});
@@ -96,7 +109,9 @@
                 mediaModal.modal('show');
                 if (!uploaderInitialized) {
                     var files = 0;
-                    $uploader.fileupload('option', {url: uploadUrl}).bind('fileuploadchange', function (e, data) {
+                    $uploader.fileupload('option', {
+                        url: uploadUrl
+                    }).bind('fileuploadchange', function (e, data) {
                         files += data.files.length;
                         if (files > 0) {
                             $mediaTypes.attr('disabled', true); // disable changing upload type after initiating upload
@@ -122,6 +137,11 @@
                 if ($.isArray(data.result.files)) {
                     var rows = [], selectedRows = [];
                     data.result.files.forEach(function (obj) {
+                        // Thumb path missing for display images or file after upload on grid
+                        if (!obj.thumb_path) {
+                            obj.thumb_path = thumb_path + obj.file_name;
+                        }
+
                         {% if config.multiSelAllowed %}
                         selectedRows.push(obj);
                         {% endif %}

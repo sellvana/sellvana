@@ -11,6 +11,9 @@
  * @property int   $qty
  *
  * @property Sellvana_MultiCurrency_Main $Sellvana_MultiCurrency_Main
+ * @property Sellvana_MultiSite_Frontend $Sellvana_MultiSite_Frontend
+ * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
  */
 class Sellvana_Catalog_Model_ProductPrice
     extends FCom_Core_Model_Abstract
@@ -274,7 +277,12 @@ class Sellvana_Catalog_Model_ProductPrice
         parent::onAfterLoad();
     }
 
-    public function collectProductsPrices($products, $context = null)
+    /**
+     * @param Sellvana_Catalog_Model_Product[] $products
+     * @param array $context
+     * @return $this
+     */
+    public function collectProductsPrices($products, $context = [])
     {
         if (!$products) {
             return $this;
@@ -327,7 +335,7 @@ class Sellvana_Catalog_Model_ProductPrice
             ]]);
         }
 
-        if (empty($context['variants'])) {
+        if (!empty($context['no_variants'])) {
             $orm->where_null('variant_id');
         }
 
@@ -355,7 +363,7 @@ class Sellvana_Catalog_Model_ProductPrice
         }
         /** @var Sellvana_Catalog_Model_Product $p */
         foreach ($products as $p) {
-            $p->setPriceModels(!empty($prices[$p->id()]) ? $prices[$p->id()] : false);
+            $p->setPriceModels(!empty($prices[$p->id()]) ? $prices[$p->id()] : []);
         }
         return $this;
     }
@@ -529,6 +537,109 @@ class Sellvana_Catalog_Model_ProductPrice
                 $saleModel->save();
             }
         }
+    }
+
+
+    /**
+     * @param Sellvana_Catalog_Model_ProductPrice[] $priceModels
+     * @param string $type
+     * @param array $context
+     * @param bool $useDefault
+     * @return Sellvana_Catalog_Model_ProductPrice
+     */
+    public function getPriceModelByType(array $priceModels, $type, $context = [], $useDefault = true)
+    {
+        $variantId = !empty($context['variant_id']) ? $context['variant_id'] : 0;
+
+        if (false === $priceModels || empty($priceModels[$variantId][$type])) {
+            return null;
+        }
+
+        $prices = $priceModels[$variantId][$type];
+
+        if (!empty($context['default'])) {
+            return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
+        }
+
+        static $siteId = null, $customerGroupId = false, $currencyCode = false;
+        if (null === $siteId) {
+            $modHlp = $this->BModuleRegistry;
+            $siteId = false;
+            if ($modHlp->isLoaded('Sellvana_MultiSite')) {
+                $site = $this->Sellvana_MultiSite_Frontend->getCurrentSite();
+                $siteId = $site ? $site->id() : false;
+            }
+            if ($modHlp->isLoaded('Sellvana_CustomerGroups')) {
+                $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
+                $customerGroupId = $customer ? $customer->get('customer_group_id')
+                    : $this->Sellvana_CustomerGroups_Model_Group->notLoggedInId();
+            }
+            if ($modHlp->isLoaded('Sellvana_MultiCurrency')) {
+                $currency = $this->Sellvana_MultiCurrency_Main->getCurrentCurrency();
+                $currencyCode = $currency ?: false;
+            }
+        }
+
+        if (!empty($context['default'])) {
+            $context['site_id'] = '*';
+            $context['customer_group_id'] = '*';
+            $context['currency_code'] = '*';
+        }
+
+        $s = !empty($context['site_id']) ? $context['site_id'] : $siteId;
+        $g = !empty($context['customer_group_id']) ? $context['customer_group_id'] : $customerGroupId;
+        $c = !empty($context['currency_code']) ? $context['currency_code'] : $currencyCode;
+
+        if (isset($prices["{$s}:{$g}:{$c}"])) {
+            return $prices["{$s}:{$g}:{$c}"];
+        }
+        if (!$useDefault) {
+            return null;
+        }
+        if ($s !== '*' && isset($prices["*:{$g}:{$c}"])) {
+            return $prices["*:{$g}:{$c}"];
+        }
+        if ($g !== '*' && isset($prices["{$s}:*:{$c}"])) {
+            return $prices["{$s}:*:{$c}"];
+        }
+        if ($c !== '*' && isset($prices["{$s}:{$g}:*"])) {
+            return $prices["{$s}:{$g}:*"];
+        }
+        if ($s !== '*' && $g !== '*' && isset($prices["*:*:{$c}"])) {
+            return $prices["*:*:{$c}"];
+        }
+        if ($s !== '*' && $c !== '*' && isset($prices["*:{$g}:*"])) {
+            return $prices["*:{$g}:*"];
+        }
+        if ($g !== '*' && $c !== '*' && isset($prices["*:*:{$c}"])) {
+            return $prices["*:*:{$c}"];
+        }
+        return isset($prices['*:*:*']) ? $prices['*:*:*'] : null;
+    }
+
+    /**
+     * @param Sellvana_Catalog_Model_ProductPrice[] $priceModels
+     * @param array $context
+     * @param float $basePrice
+     * @return Sellvana_Catalog_Model_ProductPrice
+     */
+    public function getCatalogPrice(array $priceModels, array $context = [], $basePrice = null)
+    {
+        $currency = !empty($context['currency_code']) ? $context['currency_code'] : null;
+
+        /** @var static $priceModel */
+        $priceModel = $this->getPriceModelByType($priceModels, 'base', $context);
+        $price = $priceModel ? $priceModel->getPrice($basePrice, $currency) : 0;
+        /** @var static $salePriceModel */
+        $salePriceModel = $this->getPriceModelByType($priceModels, 'sale', $context);
+        if ($salePriceModel && $salePriceModel->isValid()) {
+            $salePrice = $salePriceModel->getPrice($price, $currency);
+            if ($salePrice) {
+                $price = min($price, $salePrice);
+            }
+        }
+
+        return $price;
     }
 
     protected function _parsePriceField($value)

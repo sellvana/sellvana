@@ -8,7 +8,10 @@ modules:
         auto_use: [ views, bootstrap, layout ]
 
         default_config:
-            modules/Sellvana_Email/default_handler: Sellvana_Email
+            modules:
+                Sellvana_Email:
+                    default_handler: Sellvana_Email
+                    latest_newsletter_limit: 25
 
         observe:
             - [ "BEmail::send:before", "Sellvana_Email_Main::onEmailSendBefore" ]

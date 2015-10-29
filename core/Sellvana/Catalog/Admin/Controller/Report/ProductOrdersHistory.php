@@ -10,19 +10,19 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory extends FCom
     protected $_mainTableAlias = 'oi';
     protected $_permission = 'catalog/reports';
     protected $_navPath = 'reports/catalog/product_orders_history';
-    protected $_gridHref = 'catalog/report/product_orders_history';
+    protected $_gridHref = 'catalog/report/inventory/product_orders_history';
     protected $_gridTitle = 'Product Orders History';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
-            ['name' => 'product_sku', 'index' => 'oi.product_sku', 'label' => 'SKU'],
-            ['name' => 'unique_id', 'index' => 'unique_id', 'label' => 'Order #'],
-            ['name' => 'qty_ordered', 'index' => 'oi.qty_ordered', 'label' => 'Qty of ordered'],
-            ['name' => 'price', 'index' => 'oi.price', 'label' => 'Unit Price'],
-            ['name' => 'row_price', 'index' => 'row_price', 'label' => 'Row Total'],
+            ['name' => 'create_at', 'index' => 'o.create_at'],
+            ['name' => 'product_sku', 'index' => 'oi.product_sku'],
+            ['name' => 'unique_id', 'index' => 'unique_id'],
+            ['name' => 'qty_ordered', 'index' => 'oi.qty_ordered'],
+            ['name' => 'price', 'index' => 'oi.price'],
+            ['name' => 'row_price', 'index' => 'row_price'],
         ];
         $config['filters'] = [
             ['field' => 'product_sku', 'type' => 'text'],
@@ -31,6 +31,22 @@ class Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory extends FCom
 
         return $config;
     }
+
+    /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'create_at' => 'Order Date',
+            'product_sku' => 'SKU',
+            'unique_id' => 'Order #',
+            'qty_ordered' => 'Qty of ordered',
+            'price' => 'Unit Price',
+            'row_price' => 'Row Total',
+        ];
+    }
+
 
     /**
      * @param $orm BORM

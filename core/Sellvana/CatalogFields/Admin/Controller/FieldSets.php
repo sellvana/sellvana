@@ -16,7 +16,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
         $orm = $this->Sellvana_CatalogFields_Model_Set->orm('s')->select('s.*')
             ->select('(select count(*) from ' . $this->Sellvana_CatalogFields_Model_SetField->table() . ' where set_id=s.id)', 'num_fields');
 
-        ;
+
         $config = [
             'config' => [
                 'id'     => 'fieldsets',
@@ -59,14 +59,12 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                     ['field' => 'set_code', 'type' => 'text'],
                     '_quick' => ['expr' => 'product_name like ? or set_code like ', 'args' => ['%?%', '%?%']]
                 ],
-                'grid_before_create' => 'customFieldsGridRegister'
 //                'new_button' => '#add_new_field_set'
+                'callbacks' => [
+                    'componentDidMount' => 'fieldsetGridRegister'
+                ],
+                'grid_before_create' => 'fieldsetGridRegister'
             ]
-        ];
-
-
-        $config['config']['callbacks'] = [
-            'componentDidMount' => 'fieldsetGridRegister'
         ];
 
         return $config;
@@ -77,7 +75,6 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
         $config = [
             'config' => [
                 'id' => 'fieldset-modal-selected-grid',
-                'dataUrl' => $this->BApp->href('catalogfields/fieldsets/fieldset_modal_selected_grid_data?set_id='),
                 'caption' => 'Fields',
                 'data_mode' => 'local',
                 'data' => [],
@@ -98,13 +95,12 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 'actions' => [
                     'delete' => ['caption' => 'Remove', 'confirm' => false]
                 ],
-                'grid_before_create' => 'selectedFieldGridRegister',
                 'afterMassDelete' => 'afterMassDeleteSelectedGrid',
+                'callbacks' => [
+                    'componentDidMount' => 'selectedModalGridRegister'
+                ],
+                'grid_before_create' => 'selectedModalGridRegister',
             ]
-        ];
-
-        $config['config']['callbacks'] = [
-            'componentDidMount' => 'selectedModalGridRegister'
         ];
 
         return $config;
@@ -140,14 +136,13 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                         'class' => 'btn-primary',
                     ]
                 ],
+                'callbacks' => [
+                    'componentDidMount' => 'fieldsModalGridRegister'
+                ],
                 'grid_before_create' => 'addFieldGridRegister',
             ]
         ];
-
-        $config['config']['callbacks'] = [
-            'componentDidMount' => 'fieldsModalGridRegister'
-        ];
-
+        
         return $config;
     }
 
@@ -362,7 +357,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
     public function action_options()
     {
         $id = $this->BRequest->get('id');
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getListAssocById($id);
+        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($id);
 
         $this->BResponse->json(
             [
@@ -380,7 +375,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
         if (isset($data['field_ids'])) {
             $field_ids = $data['field_ids'];
         }
-        
+
         $model = $this->Sellvana_CatalogFields_Model_SetField;
         switch ($r->post('oper')) {
             case 'add':
@@ -494,7 +489,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
         $hlp = $this->Sellvana_CatalogFields_Model_FieldOption;
         $op = 0;
 
-        $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], 'id'))->find_many_assoc();
+        $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], '.id'))->find_many_assoc();
         foreach ($p['rows'] as $row) {
             if (!empty($models[$row['id']])) {
                 $models[$row['id']]->set('label', $row['label'])->save();

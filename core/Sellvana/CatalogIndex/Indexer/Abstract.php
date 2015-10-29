@@ -6,6 +6,10 @@
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
+ * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
+ * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
+ * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  */
 abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements Sellvana_CatalogIndex_Indexer_Interface
 {
@@ -15,6 +19,11 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
     protected static $_filterValues;
     protected static $_cnt_reindexed;
     protected static $_cnt_total;
+
+    /**
+     * @var array
+     */
+    protected $_bus;
 
     public function indexProducts($products)
     {
@@ -96,8 +105,8 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
         $i = 0;
         //$start = 0;
         $t = time();
-        $orm = $this->Sellvana_Catalog_Model_Product
-            ->orm('p')->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
+        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->select('p.*')
+            ->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
             ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']]);
         if (empty(static::$_cnt_total)) {
             $count = clone $orm;
@@ -126,6 +135,12 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 
     protected function _indexFetchProductsData($products)
     {
+        $this->Sellvana_Catalog_Model_ProductPrice->collectProductsPrices($products);
+
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
+            $this->Sellvana_CatalogFields_Model_ProductFieldData->collectProductsFieldData($products);
+        }
+
         $fields = $this->Sellvana_CatalogIndex_Model_Field->getFields();
         static::$_indexData = [];
 
@@ -134,8 +149,8 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 //        }
 
         foreach ($fields as $fName => $field) {
-            $source = $field->source_callback ? $field->source_callback : $fName;
-            switch ($field->source_type) {
+            $source = $field->get('source_callback') ?: $fName;
+            switch ($field->get('source_type')) {
                 case 'field':
                     foreach ($products as $p) {
                         static::$_indexData[$p->id()][$fName] = $p->get($source);
@@ -143,7 +158,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
                     break;
                 case 'method':
                     foreach ($products as $p) {
-                        static::$_indexData[$p->id()][$fName] = $p->$source($field);
+                        static::$_indexData[$p->id()][$fName] = $p->{$source}($field);
                     }
                     break;
                 case 'callback':
@@ -161,7 +176,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
     protected function _indexFetchVariantsData($products)
     {
         if (!$this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
-            return;
+            return; // should be always loaded, as it's dep
         }
         $pIds = [];
         foreach ($products as $p) {
@@ -209,7 +224,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
 
     protected function _buildBus(array $params)
     {
-        $bus = [
+        $this->_bus = [
             'request' => [
                 'query' => isset($params['query']) ? $params['query'] : null,
                 'filters' => isset($params['filters']) ? $params['filters'] : null,
@@ -219,17 +234,15 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             ],
             'config' => $this->BConfig->get('modules/Sellvana_CatalogIndex'),
             'result' => [
-                'orm' => $this->Sellvana_Catalog_Model_Product->orm('p')
+                'orm' => $this->Sellvana_Catalog_Model_Product->orm('p', 'catalog_products')
                     ->join('Sellvana_CatalogIndex_Model_Doc', ['d.id', '=', 'p.id'], 'd'),
                 'facets' => [],
             ],
         ];
 
-        if (is_null($bus['request']['filters'])) {
-            $bus['request']['filters'] = $this->Sellvana_CatalogIndex_Main->parseUrl();
+        if (is_null($this->_bus['request']['filters'])) {
+            $this->_bus['request']['filters'] = $this->Sellvana_CatalogIndex_Main->parseUrl();
         }
-
-        return $bus;
     }
 
 }

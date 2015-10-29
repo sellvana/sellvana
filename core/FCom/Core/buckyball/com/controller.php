@@ -2177,7 +2177,7 @@ class BRouteNode extends BClass
                 $part = '';
                 if ($k0 === '?') {
                     $k = substr($k, 1);
-                    $k0 = $k[0];
+                    $k0 = !empty($k[0]) ? $k[0] : '';
                     $part = '?';
                 }
                 if ($k0 === ':') { // optional param

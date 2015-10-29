@@ -46,6 +46,7 @@ class FCom_Admin_Admin extends BClass
         $css = $this->BLayout->view('head_css');
 
         $text = '
+FCom.jsdebug = ' . ($this->BConfig->get('modules/FCom_Admin/enable_debug_in_js') ? 'true' : 'false') . ';
 FCom.Admin = {};
 FCom.Admin.base_url = "' . rtrim($this->BConfig->get('web/base_src'), '/') . '/' . '";
 FCom.Admin.code_mirror_base_url = "' . $this->BApp->src('@FCom_Admin/Admin/js/codemirror') . '";
@@ -101,18 +102,5 @@ FCom.Admin.current_mode = "'.$this->BDebug->mode().'";
                 unset($modes);
             }
         }
-    }
-
-    public function onGetDashboardWidgets($args)
-    {
-        $view = $args['view'];
-        /** @var FCom_Admin_View_Dashboard $view */
-        $view->addWidget('visitors-totals', [
-            'title' => 'Visitors',
-            'icon' => 'group',
-            'view' => 'dashboard/visitors-totals',
-            'cols' => 2,
-            'async' => true,
-        ]);
     }
 }

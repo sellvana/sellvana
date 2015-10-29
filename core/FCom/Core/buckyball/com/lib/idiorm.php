@@ -1151,4 +1151,26 @@
         public function __isset($key) {
             return isset($this->_data[$key]);
         }
+
+        /**
+         * Magic method to capture calls to undefined class methods.
+         * In this case we are attempting to convert camel case formatted
+         * methods into underscore formatted methods.
+         *
+         * This allows us to call methods using camel case and remain
+         * backwards compatible.
+         *
+         * @param  string $name
+         * @param  array  $arguments
+         * @throws ParisMethodMissingException
+         * @return bool|ORMWrapper
+         */
+        public function __call($name, $arguments) {
+            $method = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $name));
+            if (method_exists($this, $method)) {
+                return call_user_func_array(array($this, $method), $arguments);
+            } else {
+                throw new ParisMethodMissingException("Method $name() does not exist in class " . get_class($this));
+            }
+        }
     }

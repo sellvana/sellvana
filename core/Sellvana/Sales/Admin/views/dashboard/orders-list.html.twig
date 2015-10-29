@@ -1,0 +1,33 @@
+{% set orders = APP.instance('Sellvana_Sales_Admin_Dashboard').getOrderRecent() %}
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    {#<div id='stats-chart1'></div>#}
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "ID"|_ }}</th>
+            <th>{{ "Bill to Name"|_ }}</th>
+            <th>{{ "Order Total"|_ }}</th>
+            <th>{{ "Paid"|_ }}</th>
+            <th>{{ "Status"|_ }}</th>
+            <th>{{ "Order Date"|_ }}</th>
+        </tr>
+        </thead>
+
+        {% if orders is empty %}
+            <tr>
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+        {% else %}
+            {% for  order in orders %}
+                <tr>
+                    <td>{{ order.id() }}</td>
+                    <td>{{ order.get('firstname') }} {{ order.get('lastname') }}</td>
+                    <td>{{ order.get('grand_total') }}</td>
+                    <td>{{ order.get('amount_due') }}</td>
+                    <td>{{ order.state().overall().getValueLabel() }}</td>
+                    <td>{{ order.get('create_at')|date }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>

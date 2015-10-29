@@ -5,6 +5,7 @@
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
  * @property Sellvana_CustomerGroups_Model_Group $Sellvana_CustomerGroups_Model_Group
+ * @property Sellvana_Wishlist_Model_Wishlist $Sellvana_Wishlist_Model_Wishlist
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_Admin_Main $FCom_Admin_Main
  */
@@ -20,6 +21,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
     protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
     protected $_formTitleField = 'Sellvana_Customer_Admin_Controller_Customers.formTitleField';
+    protected $_formLayoutName = '/customers/form';
 
     public function gridConfig()
     {
@@ -189,47 +191,14 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
                     $address->set('is_default_shipping', 1)->save();
                 }
             }
+
+            if (!empty($data['is_default'])) {
+                $wishlists = $this->Sellvana_Wishlist_Model_Wishlist->orm()->where('customer_id', $customer->id)->find_many();
+                foreach ($wishlists as $wishlist) {
+                    $wishlist->set('is_default', $wishlist->id() == $data['is_default'])->save();
+                }
+            }
         }
-    }
-
-    /**
-     * get config for grid: customers of group
-     * @param $group Sellvana_CustomerGroups_Model_Group
-     * @return array
-     */
-    public function getGroupCustomersConfig($group)
-    {
-        $class = $this->_modelClass;
-        $orm = $class::i()->orm('c')
-            ->select(['c.id', 'c.firstname', 'c.lastname', 'c.email'])
-            ->join('Sellvana_CustomerGroups_Model_Group', ['c.customer_group', '=', 'cg.id'], 'cg')
-            ->where('c.customer_group', $group ? $group->id : 0);
-
-        $config = parent::gridConfig();
-
-        // TODO for empty local grid, it throws exception
-        unset($config['orm']);
-        $config['data'] = $orm->find_many();
-        $config['id'] = 'group_customers_grid_' . $group->id;
-        $config['columns'] = [
-            ['type' => 'row_select'],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true],
-            ['name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200],
-            ['name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200],
-            ['name' => 'email', 'label' => 'Email', 'index' => 'c.email', 'width' => 200],
-        ];
-        $config['actions'] = [
-            'add' => ['caption' => 'Add customer'],
-        ];
-        $config['filters'] = [
-            ['field' => 'firstname', 'type' => 'text'],
-            ['field' => 'lastname', 'type' => 'text'],
-            ['field' => 'email', 'type' => 'text'],
-        ];
-        $config['data_mode'] = 'local';
-
-
-        return ['config' => $config];
     }
 
     /**
@@ -281,19 +250,6 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
         }
 
         $this->BResponse->redirect($redirectUrl);
-    }
-
-    public function getCustomerRecent()
-    {
-        $limit = $this->BConfig->get('modules/Sellvana_Customer/recent_day');
-        $result = $this->Sellvana_Customer_Model_Customer->orm()
-            ->select(['id' , 'email', 'firstname', 'lastname', 'create_at', 'status'])
-            ->order_by_desc('create_at');
-        if ($limit) {
-            $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - $limit * 86400);
-            $result->where_gte('create_at', $recent);
-        }
-        return $result->find_many();
     }
 
     public function onHeaderSearch($args)

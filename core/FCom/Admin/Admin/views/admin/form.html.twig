@@ -1,8 +1,8 @@
-{% set tabs = THIS.get('tabs') %}
-{% set formUrl = THIS.get('form_url') %}
-{% set formId = THIS.get('form_id') %}
-{% set curTab = THIS.get('cur_tab') %}
-{% set model = THIS.get('model') %}
+{% set tabs      = THIS.get('tabs') %}
+{% set formUrl   = THIS.get('form_url') %}
+{% set formId    = THIS.get('form_id') %}
+{% set curTab    = THIS.get('cur_tab') %}
+{% set model     = THIS.get('model') %}
 {% set validator = THIS.validator(formId, model) %}
 
 <script>
@@ -13,7 +13,8 @@
                 tabs:     '.adm-tabs-sidebar li',
                 panes:    '.adm-tabs-content',
                 url_get:  '{{ formUrl }}',
-                url_post: '{{ formUrl }}'
+                url_post: '{{ formUrl }}',
+                is_new:   {% if model.id is same as(null) %}true{% else %}false{% endif %}
             });
 
             var mainForm = '{{ formId }}';
@@ -147,7 +148,7 @@
                     {%  endif %}
                     {% for k, tab in tabs %}
                         {% if tab.disabled is empty %}
-                            <li>
+                            <li{% if tab.model_new_hide == 'true' and model.id() is same as(null) %} class="hidden"{% endif %}>
                                 <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
                                     <span class="icon"></span>
                                     {{ tab.label }}
@@ -173,6 +174,6 @@
         </div>
     </form>
 
-    <div id="fcom_append_form">
-    </div>
+    <div id="fcom_append_form"></div>
+    <div id="fcom_additional_info_field_form"></div>
 </div>

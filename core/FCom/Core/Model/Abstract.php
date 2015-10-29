@@ -164,9 +164,14 @@ class FCom_Core_Model_Abstract extends BModel
     {
         if (!empty(static::$_importExportProfile)) {
             $key = static::$_origClass ?: __CLASS__;
-            $config[$key] = static::$_importExportProfile;
+            $ieProfile = static::$_importExportProfile;
+            if (is_string($ieProfile) && preg_match('#^THIS\.(.+)$#', $ieProfile, $m)) {
+                $ieProfile = $key . '.' . $m[1];
+            }
+            $config[$key] = $this->BUtil->maybeCallback($ieProfile, 'ieprofile/' . $key);
             $config[$key]['model'] = $key;
         }
+        return $this;
     }
 
     public function getIdField()

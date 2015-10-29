@@ -64,8 +64,9 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
     ];
 
     protected static $_importExportProfile = [
-        'skip'       => ['id'],
-        'unique_key' => ['customer_id', 'status', 'create_at'],
+        'skip'       => ['id', 'cookie_token'],
+        'unique_key' => ['customer_id', 'state_overall', 'create_at'],
+        'unique_key_not_null' => ['customer_id'],
         'related'    => [
             'customer_id' => 'Sellvana_Customer_Model_Customer.id',
             'admin_id'    => 'FCom_Admin_Model_User.id'
@@ -436,7 +437,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!empty($params['inventory_id'])) {
             $skuModel = $this->Sellvana_Catalog_Model_InventorySku->load($params['inventory_id']);
         } else {
-            $skuModel = $this->Sellvana_Catalog_Model_InventorySku->load($product->get('inventory_sku'), 'inventory_sku');
+            $skuModel = $product->getInventoryModel();
         }
 
         if (!$item) {

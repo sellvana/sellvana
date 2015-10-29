@@ -8,3 +8,6 @@ base:
     - view: settings
         do:
             - [ addTab, Sellvana_MultiSite, { label: Multi Site, group: catalog, async: true, permission: settings/Sellvana_MultiSite } ]
+
+catalog_product_form_tabs:
+    - { hook: settings_header_title, views: multisite/product-header-title }

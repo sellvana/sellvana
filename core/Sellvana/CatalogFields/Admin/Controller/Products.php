@@ -3,7 +3,7 @@
 /**
  * Class Sellvana_CatalogFields_Admin_Controller_Products
  *
- * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
+ * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
@@ -15,6 +15,7 @@
  * @property Sellvana_CatalogFields_Model_ProductVarfield $Sellvana_CatalogFields_Model_ProductVarfield
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
+ * @property Sellvana_CatalogFields_Model_ProductField $Sellvana_CatalogFields_Model_ProductField
  */
 class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
 {
@@ -113,10 +114,10 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
     }
 
     /**
-     * @param Sellvana_Catalog_Model_Product $model
+     * @param Sellvana_Catalog_Model_Product $product
      * @return array
      */
-    public function variantGridConfig($model)
+    public function variantGridConfig($product)
     {
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 30]);
         $columns = [
@@ -125,7 +126,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                 'type' => 'btn_group',  
                 'buttons' => [
                     ['name' => 'delete'], 
-                    ['name' => 'edit', 'callback' => 'showModalToEditVariantPrice', 'isNew' => ['visibility' => 'hidden']]
+                    ['name' => 'edit-custom', 'callback' => 'showModalToEditVariantPrice', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "]
                 ]
             ],
             ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
@@ -137,7 +138,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
             ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
             ->select(['f.field_code', 'f.field_name'])
-            ->where('product_id', $model->id())
+            ->where('product_id', $product->id())
             ->order_by_asc('vf.position')
             ->find_many_assoc('field_id');
 
@@ -171,10 +172,10 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             }
 #var_dump($columns); exit;
         }
-        $image = $this->variantImageGrid($model);
+        $image = $this->variantImageGrid($product);
         $columns[] = ['type' => 'input', 'name' => 'product_sku', 'label' => 'Variant SKU', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'default' => ''];
         $columns[] = ['type' => 'input', 'name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'default' => ''];
-        $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => '', 'attrs' => ['readOnly' => 'readOnly']];
         $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline', 'addable' => true, 'validation' => ['number' => true], 'default' => ''];
         $columns[] = ['name' => 'image', 'label' => 'IMAGES', 'width' => 250, 'display' => 'eval',
             'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["variant_file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
@@ -186,8 +187,8 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $data = [];
 
         /** @var Sellvana_CatalogFields_Model_ProductVariant[] $variants */
-        $variants = $this->Sellvana_CatalogFields_Model_ProductVariant->orm()->where('product_id', $model->id())->find_many();
-        $images = $this->Sellvana_CatalogFields_Model_ProductVariantImage->orm()->where('product_id', $model->id())->find_many();
+        $variants = $this->Sellvana_CatalogFields_Model_ProductVariant->orm()->where('product_id', $product->id())->find_many();
+        $images = $this->Sellvana_CatalogFields_Model_ProductVariantImage->orm()->where('product_id', $product->id())->find_many();
         $invSkus = [];
         if ($variants !== null) {
             foreach ($variants as $v) {
@@ -202,7 +203,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                 $vField['product_sku'] = $v->product_sku;
                 $vField['inventory_sku'] = $v->inventory_sku;
                 $vField['variant_qty'] = $v->variant_qty;
-                $vField['variant_price'] = $v->variant_price;
+                $vField['variant_price'] = $v->getCatalogPrice($product);
                 $vField['variant_file_id'] = join(',', $fileIds);
                 $vField['id'] = $v->id();
                 $data[] = $vField;
@@ -221,9 +222,17 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
             }
         }
 
+        // Get prices for each variant
+        if (!empty($data)) {
+            $priceHlp = $this->Sellvana_Catalog_Model_ProductPrice;
+            foreach ($data as $key => $variant) {
+                $data[$key]['prices'] = $priceHlp->getProductPrices($product, $variant['id']);
+            }
+        }
+
         $config = [
             'config' => [
-                'id' => 'variant-grid-' . $model->id(),
+                'id' => 'variant-grid-' . $product->id(),
                 'caption' => 'Variable Field Grid',
                 'data_mode' => 'local',
                 'data' => $data,
@@ -301,9 +310,11 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
 
     public function getInitialData($model)
     {
-        $customFields = $model->getData('custom_fields');
-        return !isset($customFields) ? -1 : $customFields;
+        $pId = $model->id();
+        $data = $this->Sellvana_CatalogFields_Model_ProductFieldData->getProductFieldSetData([$pId]);
+        return !empty($data[$pId]) ? $data[$pId] : [];
     }
+
     public function fieldsetAry()
     {
         $sets = $this->BDb->many_as_array($this->Sellvana_CatalogFields_Model_Set->orm('s')->select('s.*')->find_many());
@@ -325,12 +336,12 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $set = $this->Sellvana_CatalogFields_Model_Set->load($id);
         $fields = $this->BDb->many_as_array($this->Sellvana_CatalogFields_Model_SetField->orm('sf')
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
-            ->select(['f.id', 'f.field_name', 'f.admin_input_type'])
+            ->select(['f.id', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.required'])
             ->where('sf.set_id', $id)->find_many()
         );
         foreach ($fields as &$field) {
             if ($field['admin_input_type'] === 'select' ||  $field['admin_input_type'] === 'multiselect') {
-                $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getListAssocById($field['id']);
+                $field['options'] = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field['id'], false, 'label');
             }
         }
 
@@ -350,10 +361,10 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $r = $this->BRequest;
         $id = $r->get('id');
         $field = $this->Sellvana_CatalogFields_Model_Field->load($id);
-        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getListAssocById($field->id());
-        $this->BResponse->json(['id' => $field->id(), 'field_name' => $field->field_name,
-            'admin_input_type' => $field->admin_input_type, 'multilang' => $field->multilanguage,
-            'options' => $options, 'required' => $field->required]);
+        $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field->id(), false, 'label');
+        $this->BResponse->json(['id' => $field->id(), 'field_code' => $field->field_code,
+            'field_name' => $field->field_name, 'admin_input_type' => $field->admin_input_type,
+            'multilang' => $field->multilanguage, 'options' => $options, 'required' => $field->required]);
     }
 
     public function action_save__POST()
@@ -391,7 +402,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                     'name' => $field->field_name,
                     'label' => $field->frontend_label,
                     'input_type' => $field->admin_input_type,
-                    'options' => join(',', array_keys($optionsHlp->getListAssocById($id))),
+                    'options' => join(',', array_keys($optionsHlp->getFieldOptions($id))),
                     'required' => $field->required,
                     'field_code' => $field->field_code,
                     'position' => ''

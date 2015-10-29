@@ -1,0 +1,11 @@
+{% set value = APP.instance('Sellvana_Sales_Admin_Dashboard').getAvgOrderTotal() %}
+
+<div class='row'>
+    <div class='col-sm-12'>
+        <div class='box-content box-statistic'>
+            <h3 class='title text-warning'>{{ value }}</h3>
+
+            <div class='text-warning icon-money align-right'></div>
+        </div>
+    </div>
+</div>

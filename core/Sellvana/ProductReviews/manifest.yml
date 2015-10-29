@@ -1,12 +1,16 @@
 modules:
     Sellvana_ProductReviews:
-        version: 0.5.1.0
+        version: 0.5.2.0
         channel: alpha
         require: { module: { Sellvana_Catalog: 0.1.0, Sellvana_Customer: 0.1.3, Sellvana_CatalogIndex: 0.1.0, Sellvana_Sales: 0.5.4.0 } }
         translations: { en: en.php }
         description: "Product reviews by customers"
 
         auto_use: [ bootstrap, layout, views ]
+
+        default_config:
+            modules/Sellvana_ProductReviews/latest-product-reviews-limit: 25
+
         views:
             - [ prodreviews/grid, { view_class: FCom_Core_View_BackboneGrid } ]
 

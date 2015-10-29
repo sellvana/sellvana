@@ -1,0 +1,26 @@
+{% set reviews = APP.instance('Sellvana_ProductReviews_Admin_Dashboard').getLatestProductReviews() %}
+
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "Product Name"|_ }}</th>
+            <th>{{ "Customer"|_ }}</th>
+            <th>{{ "Rating"|_ }}</th>
+        </tr>
+        </thead>
+        {% if reviews is empty %}
+            <tr>
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+        {% else %}
+            {% for review in reviews %}
+                <tr>
+                    <td>{{ review.get('product_name') }}</td>
+                    <td>{{ review.get('firstname') }} {{ review.get('lastname') }}</td>
+                    <td>{{ review.get('rating') }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>

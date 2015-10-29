@@ -82,17 +82,14 @@
             $("#block_form_fields_data").val(JSON.stringify(res));
         });
 
-        /**
-         * Add form fields
-         */
-        window.addFormField = function(modal) {
+        function collectFields() {
             var fields = formFieldsModalNode.find('select,input,textarea'),
-                form = formFieldsModalNode.find('form'),
-                addBtn = formFieldsModalNode.find('button.save'),
-                options = {},
-                addRows = {};
+                    form = formFieldsModalNode.find('form'),
+                    options = {},
+                    addRows = {};
 
             var mainFields = {
+                id: 1,
                 name: 1,
                 label: 1,
                 input_type: 1,
@@ -101,7 +98,7 @@
             };
 
             var rows = formFieldsGrid.getRows();
-            if($.isEmptyObject(addRows) == true) {
+            if ($.isEmptyObject(addRows) == true) {
                 addRows['id'] = 0;
             }
 
@@ -135,11 +132,31 @@
                     addRows['_new'] = true;
                     addRows['id'] = id + 1;
                 }
+            }
+            return addRows;
+        }
+        /**
+         * Add form fields
+         */
+        window.addFormField = function(modal) {
+            var addRows = collectFields();
 
+            if (addRows.id && addRows.id !== 0) {
                 formFieldsGrid.addRows([addRows]);
                 modal.close();
             }
         };
+
+        window.updateFormField = function(modal) {
+            var updateRows = collectFields();
+
+            if (updateRows.id && updateRows.id !== 0) {
+                formFieldsGrid.updateRows([updateRows]);
+                modal.close();
+            }
+        };
+
+
 
         var formColumns = [
             {
@@ -267,6 +284,15 @@
                     'columnMetadata': []
                 }
             },
+            componentWillMount: function () {
+                var data = this.props.row;
+//                console.log(data);
+                if (data) {
+                    if (data.input_type) {
+                        this.setState({inputType: data.input_type})
+                    }
+                }
+            },
             componentDidMount: function() {
 
             },
@@ -322,15 +348,23 @@
                 var key = 1;
 
                 var nodes = renderColumns.map(function(column) {
+                    var k = column.name + (key++);
+                    if(_.isNaN(k)) {
+                        k = key;
+                    }
                     if((that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
                     if (column.name === 'input_type') {
                         return React.createElement(formFieldsModalElement, {
-                            key: column.name + (key++), column: column, value: that.props.row[column.name],
+                            key: k, column: column, value: that.props.row[column.name],
                             setInputTypeHandle: that.setInputType})
                     }
                     return React.createElement(formFieldsModalElement, {
-                        key: column.name + (key++), column: column, value: that.props.row[column.name]})
+                        key: k, column: column, value: that.props.row[column.name]})
                 });
+                if(this.props.row['id']) {
+                    var rowId = React.createElement('input', {key: 'row-id', value: this.props.row['id'], name: 'id', type: 'hidden'});
+                    nodes.unshift(rowId);
+                }
 
                 return (
                     React.createElement("div", {className: " field-element-wrapper"}, nodes)
@@ -357,7 +391,7 @@
                 var that = this;
                 var inputs = columns.map(function(column, index) {
                     return (
-                        React.createElement("div", {className: column.formGroupClass, style: column.style},
+                        React.createElement("div", {className: column.formGroupClass, style: column.style, key: index},
                             that.renderLabel(column), React.createElement("div", {className: "controls " + column.cssClass}, that.renderNode(column))
                         )
                     );
@@ -378,30 +412,31 @@
             renderNode: function(column) {
                 var that = this;
                 var validationRules = that.validationRules(column.validation);
+                var value = this.props.value;
                 switch (column.editor) {
                     case 'select':
                         var options = [];
                         _.forEach(column.options, function(text, value) {
-                            options.push(React.createElement("option", {value: value}, text));
+                            options.push(React.createElement("option", {value: value, key: value}, text));
                         });
                         if (typeof this.props.setInputTypeHandle !== 'undefined') {
-                            return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: '', onChange: that.props.setInputTypeHandle},  validationRules), options);
+                            return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: value, onChange: that.props.setInputTypeHandle},  validationRules), options);
                         } else {
-                            return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules), options);
+                            return React.createElement("select", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: value},  validationRules), options);
                         }
                         break;
                     case 'textarea':
-                        return React.createElement("textarea", React.__spread({name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: ''},  validationRules));
+                        return React.createElement("textarea", React.__spread({name: column.name, id: column.name, className: "form-control", rows: "5", defaultValue: value},  validationRules));
                         break;
                     default:
-                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: ''},  validationRules));
+                        return React.createElement("input", React.__spread({name: column.name, id: column.name, className: "form-control", defaultValue: value},  validationRules));
                         break;
                 }
             },
             render: function() {
                 var that = this;
                 var column = this.props.column;
-
+                console.log(column);
                 if (column.editor == 'clearfix') {
                     return React.createElement('div', {className: 'clearfix', style: column.style});
                 }
@@ -444,6 +479,61 @@
                     });
                 });
             }
+        };
+
+        window.showModalToEditFormField = function(row) {
+            var grid = formFieldsGrid;
+            var modalContainerEle = document.getElementById('{{ grid.config.id }}-modal');
+            var data = {};
+            _.extend(data, row);
+            if(row.options) {
+                var options;
+                if(typeof row.options == 'string') {
+                    try {
+                        options = JSON.parse(row.options)
+                    } catch (e) {
+                        console.log("row.options not valid JSON string", row.options);
+                    }
+                } else {
+                    options = row.options;
+                }
+
+                if (typeof options == 'object') {
+                    _.extend(data, options);
+                }
+            }
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                    React.createElement(Components.Modal, {
+                                className: "formFieldsModal",
+                                show: true,
+                                title: 'Edit Field',
+                                confirm: 'Save',
+                                cancel: 'Close',
+                                onLoad: function (modal) {
+                                    formFieldsModalNode = $(modal.getDOMNode());
+                                    formFieldsModalNode.find('.modal-dialog').css('width', '900px');
+                                },
+                                onConfirm: window.updateFormField
+                            },
+                            React.createElement('div', {
+                                className: 'f-grid-wrapper',
+                                id: formFieldsGrid.getConfig('id') + '-wrap'
+                            })
+                    ), modalContainerEle);
+
+            var modalWrapEle = $('#{{ grid.config.id }}-wrap');
+            modalWrapEle.append('<form id="{{ grid.config.id }}-modal-form" class="form form-horizontal validate-form"></form>');
+            var modalFormEle = document.getElementById('{{ grid.config.id }}-modal-form');
+            React.unmountComponentAtNode(modalFormEle);
+            React.render(
+                    React.createElement(FormFieldModalForm, {
+                        columnMetadata: formColumns,
+                        id: formFieldsGrid.getConfig('id'),
+                        row: data
+                    }), modalFormEle
+            );
+            setValidateForm($(modalFormEle));
         };
 
         window.showModalToAddFormField = function(grid) {

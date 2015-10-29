@@ -83,6 +83,18 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
             "always" => "Apply Always",
             "all" => "All Conditions Have to Match",
             "any" => "Any Condition Has to Match",
+        ],
+        'conditions_options'  => [
+            "sku"         => "Products",
+            "category"    => "Categories",
+            "combination" => "Attribute Combination",
+            "total"       => "Cart Total",
+            "shipping"    => "Shipping Destination",
+        ],
+        'actions_options' => [
+            "discount" => "Discount",
+            "shipping" => "Shipping",
+            "free_product" => "Free Products",
         ]
     ];
 
@@ -140,6 +152,8 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
 
         $this->setDate('from_date', $this->get("from_date"));
         $this->setDate('to_date', $this->get("to_date"));
+        $this->set('limit_per_customer', (int)$this->get('limit_per_customer'));
+        $this->set('limit_per_promo', (int)$this->get('limit_per_promo'));
 
         return true;
     }
@@ -391,6 +405,42 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         if ($ppIdsToDelete) {
             $this->delete_many(['id' => $ppIdsToDelete]);
         }
+    }
+
+    public function conditionsOptions()
+    {
+        $options = $this->fieldOptions('conditions_options');
+        $promoType= $this->get('promo_type');
+
+        if($promoType == 'catalog'){
+            if (isset($options['total'])) {
+                $options['total'] = ['text' => $options['total'], 'disabled' => true];
+            }
+
+            if (isset($options['shipping'])) {
+                $options['shipping'] = ['text' => $options['shipping'], 'disabled' => true];
+            }
+        }
+
+        return $options;
+    }
+
+    public function actionOptions()
+    {
+        $options = $this->fieldOptions('actions_options');
+        $promoType= $this->get('promo_type');
+
+        if($promoType == 'catalog'){
+            // if promo type is catalog disable free_product and shipping action
+            if (isset($options['free_product'])) {
+                $options['free_product'] = ['text' => $options['free_product'], 'disabled' => true];
+            }
+            if (isset($options['shipping'])) {
+                $options['shipping'] = ['text' => $options['shipping'], 'disabled' => true];
+            }
+        }
+
+        return $options;
     }
 
     protected function _calcPromoProductsBySku(array $condition, array $context, array &$result)

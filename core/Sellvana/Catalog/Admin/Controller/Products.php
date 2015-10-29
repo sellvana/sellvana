@@ -14,6 +14,8 @@
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  * @property FCom_Core_LayoutEditor $FCom_Core_LayoutEditor
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
+ * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
+ * @property Sellvana_Catalog_Model_SearchHistoryLog $Sellvana_Catalog_Model_SearchHistoryLog
  */
 class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -147,21 +149,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 ],
                 [
                     ['span', null, $this->_('Duplicate')],
-                ]
+                ], 50
             ];
         }
-        $newAction['save_and_continue'] = [
-            'button',
-            [
-                'type' => 'submit',
-                'class' => ['btn', 'btn-primary'],
-                'name' => 'do',
-                'value' => 'save_and_continue',
-            ],
-            [
-                ['span', null, $this->BLocale->_('Save And Continue')],
-            ]
-        ];
         $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set([
             'sidebar_img' => $m->thumbUrl(98),
@@ -351,6 +341,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'data' => $data,
                 'columns' => [
                     ['type' => 'row_select'],
+                    ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                        'buttons' => [['name' => 'delete']]],
                     ['name' => 'id', 'hidden' => true],
                     ['name' => 'file_id',  'hidden' => true],
                     ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
@@ -387,9 +379,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                             . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images["+rc.row["id"]+"][in_gallery]\' '
                             . 'data-in-gallery=\'"+rc.row["in_gallery"]+"\'/>"'],
                     ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
-                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200],
-                    ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                        'buttons' => [['name' => 'delete']]],
+                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200]
                 ],
                 'actions' => [
                     'refresh' => true,
@@ -433,6 +423,88 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         return $config;
     }
 
+    public function productVideosGridConfig($model)
+    {
+        $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/videos&file=');
+        $data = $this->BDb->many_as_array($model->mediaORM(Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_VIDEO)
+            ->clear_columns()
+            ->select('pa.*')
+            ->select(['a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'a.data_serialized'])
+            ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
+            ->find_many());
+
+        $config =  [
+            'config' => [
+                'id' => 'product_videos',
+                'caption' => 'Product Videos',
+                'data_mode' => 'local',
+                'data' => $this->_processMediaLink($data),
+                'columns' => [
+                    ['type' => 'row_select'],
+                    ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                        'buttons' => [
+                            ['name' => 'edit-custom', 'callback' => 'showModalToPreviewVideo', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-eye-open ", 'title' => 'Preview'],
+                            ['name' => 'delete']
+                        ]
+                    ],
+                    ['name' => 'id', 'hidden' => true],
+                    ['name' => 'file_id',  'hidden' => true],
+                    ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
+                    ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
+                    // ['name' => 'file_name', 'label' => 'File Name'],
+                    ['type' => 'link', 'name' => 'file_name', 'label' => 'File Name', 'width' => 80,
+                        'addable' => true, 'action' => 'showModalToPreviewVideo', 'editable' => true, 'className' => 'valid-video-name'
+                    ],
+                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'file_size'],
+                    ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline', 'attributes' => ['required' => true]],
+                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
+                        'editable' => 'inline', 'validation' => ['number' => true]],
+                    ['name' => 'is_default', 'label' => 'Default', 'width' => 50, 'display' => 'eval',
+                        'print' => '"<input class=\'is-default\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+                            . ' "+(rc.row["is_default"]==1 ? checked=\'checked\' : \'\')+" '
+                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos[is_default]\' '
+                            . 'data-is-default=\'"+rc.row["is_default"]+"\'/>"'],
+                    ['name' => 'in_gallery', 'label' => 'In Gallery', 'width' => 50, 'display' => 'eval',
+                        'print' => '"<input class=\'in-gallery\' value=\'1\' type=\'checkbox\' '
+                            . ' "+(rc.row["in_gallery"]==1 ? checked=\'checked\' : \'\')+" '
+                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos["+rc.row["id"]+"][in_gallery]\' '
+                            . 'data-in-gallery=\'"+rc.row["in_gallery"]+"\'/>"'],
+                    ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
+                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200]
+                ],
+                'actions' => [
+                    'refresh' => true,
+                    'delete' => ['caption' => 'Remove'],
+                ],
+                'grid_after_built' => 'afterBuiltImagesGrid',
+                'afterMassDelete' => 'afterMassDelete',
+                'filters' => [
+                    ['field' => 'file_name', 'type' => 'text'],
+                    ['field' => 'label', 'type' => 'text'],
+                    //TODO: remove all unused server side '_quick' filters
+                    '_quick' => ['expr' => 'file_name like ? ', 'args' => ['%?%']]
+                ],
+
+            ]
+        ];
+
+        $config['config']['actions'] += [
+            'add-videos' => [
+                'caption'  => 'Add Videos',
+                'type'     => 'button',
+                'id'       => 'add-video-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'gridShowMedia' . $config['config']['id']
+            ]
+        ];
+
+        $config['config']['callbacks'] = [
+            'componentDidMount' => 'gridRegister' . $config['config']['id']
+        ];
+
+        return $config;
+    }
+
     /**
      * modal grid on category/product tab
      * @param $model Sellvana_Catalog_Model_Product
@@ -463,7 +535,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         /*$config['_callbacks'] = "{
             'add':'categoryProdsMng.addSelectedProds'
         }";*/
-
 
         return ['config' => $config];
     }
@@ -637,6 +708,38 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         return $config;
     }
 
+    public function action_embed_video__POST()
+    {
+        $r     = $this->BRequest;
+        $do    = $r->post('oper');
+
+        $oembed  = $this->BApp->instance('FCom_Core_Vendor_Embed');
+
+        if (!empty($do) && $do == 'add') {
+            $content = $oembed->linkInfo()->parse($r->post('url'));
+            $temp    = json_decode($content);
+            $model   = $this->FCom_Core_Model_MediaLibrary->create();
+
+            $data    = [
+                'file_name'       => $temp->title,
+                'folder'          => 'media/product/videos',
+                'data_serialized' => $content
+            ];
+
+            if (!$model->set($data)->save()) {
+                $this->BResponse->json(['error' => true]);
+            }
+
+            $this->BResponse->json($model->as_array());
+        } else {
+            $content = $oembed->parse($r->post('url'));
+            if (!$content) {
+                $this->BResponse->json(['error' => true]);
+            }
+            $this->BResponse->json($content);
+        }
+    }
+
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
@@ -648,13 +751,14 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             $this->deleteRelatedInfo($model);
         } else {
             if (empty($args['validate_failed'])) {
-                $this->processCategoriesPost($model, $data);
-                $this->processLinkedProductsPost($model, $data);
-                $this->processMediaPost($model, $data);
-                $this->processInventoryPost($model, $data);
-                $this->processSystemLangFieldsPost($model, $data);
+                $this->_processCategoriesPost($model, $data);
+                $this->_processLinkedProductsPost($model, $data);
+                $this->_processMediaPost($model, $data);
+                $this->_processInventoryPost($model, $data);
+                $this->_processSystemLangFieldsPost($model, $data);
                 $this->_processPricesPost($model, $data);
-                $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
+                $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => &$data]);
+                $this->_processVariantPricesPost($model, $data);
                 $model->save();
             }
         }
@@ -687,7 +791,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @param $model Sellvana_Catalog_Model_Product
      * @param $post []
      */
-    public function processCategoriesPost($model, $post)
+    protected function _processCategoriesPost($model, $post)
     {
         $categories = [];
         foreach ($post as $key => $value) {
@@ -718,7 +822,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @return $this
      * @throws BException
      */
-    public function processLinkedProductsPost($model, $data)
+    protected function _processLinkedProductsPost($model, $data)
     {
         //echo "<pre>"; print_r($data); echo "</pre>";die;
         $hlp = $this->Sellvana_Catalog_Model_ProductLink;
@@ -765,10 +869,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @return $this
      * @throws BException
      */
-    public function processMediaPost($model, $data)
+    protected function _processMediaPost($model, $data)
     {
         $hlp = $this->Sellvana_Catalog_Model_ProductMedia;
-        foreach (['A' => 'attachments', 'I' => 'images'] as $type => $typeName) {
+        foreach (['A' => 'attachments', 'I' => 'images', 'V' => 'videos'] as $type => $typeName) {
 
             if (!empty($data['grid'][$typeName]['del'])) {
                 $hlp->delete_many([
@@ -782,60 +886,60 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $rows = $this->BUtil->fromJson($data['grid'][$typeName]['rows']);
             }
             if (!empty($rows)) {
-                foreach ($rows as $image) {
-                    $key = $image['id'];
-                    unset($image['id']);
+                foreach ($rows as $media) {
+                    $key = $media['id'];
+                    unset($media['id']);
                     if (!in_array($key, ['is_thumb', 'is_default', 'is_rollover'])) {
                         $mediaModel =  $hlp->load($key);
                         $is_thumb = $is_default = $is_rollover = $in_gallery = 0;
-                        if ($type == 'I') {
+                        if ($type == 'I' || $type == 'V') {
                             if (isset($data['product_' . $typeName]['is_thumb'])
                                 && $data['product_' . $typeName]['is_thumb'] == $key
                             ) {
                                 $is_thumb = 1;
                             }
-                            $image['is_thumb'] = $is_thumb;
+                            $media['is_thumb'] = $is_thumb;
 
                             if (isset($data['product_' . $typeName]['is_default'])
                                 && $data['product_' . $typeName]['is_default'] == $key
                             ) {
                                 $is_default = 1;
                             }
-                            $image['is_default'] = $is_default;
+                            $media['is_default'] = $is_default;
 
                             if (isset($data['product_' . $typeName]['is_rollover'])
                                 && $data['product_' . $typeName]['is_rollover'] == $key
                             ) {
                                 $is_rollover = 1;
                             }
-                            $image['is_rollover'] = $is_rollover;
+                            $media['is_rollover'] = $is_rollover;
 
                             if(isset($data['product_' . $typeName][$key]['in_gallery'])){
                                 $in_gallery = $data['product_' . $typeName][$key]['in_gallery'];
                             }
-                            if($image['is_default']){
+                            if($media['is_default']){
                                 $in_gallery = 1;
                             }
-                            $image['in_gallery'] = $in_gallery;
+                            $media['in_gallery'] = $in_gallery;
                         }
 
-                        if (isset($image['position'])) {
-                            $image['position'] = (is_numeric($image['position'])) ? (int) $image['position'] : 0;
+                        if (isset($media['position'])) {
+                            $media['position'] = (is_numeric($media['position'])) ? (int) $media['position'] : 0;
                         }
 
                         if ($mediaModel) {
-                            $mediaModel->set($image)->save();
+                            $mediaModel->set($media)->save();
                         } else {
                             $productMediaModel = $hlp->orm()->where('product_id', $model->id)
-                                ->where('file_id', $image['file_id'])->find_one();
+                                ->where('file_id', $media['file_id'])->find_one();
                             if (!$productMediaModel) {
-                                $image['file_id'] = (int) $image['file_id'];
-                                $image['product_id'] = $model->id;
-                                $image['media_type'] = $type;
+                                $media['file_id'] = (int) $media['file_id'];
+                                $media['product_id'] = $model->id;
+                                $media['media_type'] = $type;
 
                                 //TODO remote_url and file_path can be fetched based on file_id. Beside, file_name can be changed in media libary.
                                 //'remote_url' =>$this->BApp->href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
-                                $hlp->create($image)->save();
+                                $hlp->create($media)->save();
                             }
                         }
                     }
@@ -863,7 +967,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @param array $data
      * @throws BException
      */
-    public function processInventoryPost($model, $data)
+    protected function _processInventoryPost($model, $data)
     {
         // update product inventory sku if needed
         if (!empty($data['inventory']['inventory_sku'])) {
@@ -889,7 +993,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      * @param Sellvana_Catalog_Model_Product $model
      * @param $data
      */
-    public function processSystemLangFieldsPost($model, $data)
+    protected function _processSystemLangFieldsPost($model, $data)
     {
         $model->setData('name_lang_fields', $data['name_lang_fields']);
         $model->setData('short_desc_lang_fields', $data['short_desc_lang_fields']);
@@ -1123,52 +1227,84 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $this->Sellvana_Catalog_Model_Product->orm()->select('url_key')->iterate($callback);
     }
 
+    /**
+     * Save product prices
+     * @param  [object] $model
+     * @param  [array] $data
+     * @return mixed
+     */
     protected function _processPricesPost($model, $data)
     {
-        if(empty($data['prices'])){
+        if(empty($data['productPrice'])){
+            return;
+        }
+        
+        $this->_savePrices($model, $data['productPrice']);
+        
+        // Process delete product prices
+        if (!empty($data['prices']['delete'])) {
+            $this->_deletePrices($data['prices']['delete']);
+        }
+    }
+
+    /**
+     * Save product variants prices
+     * @param  [object] $model
+     * @param  [array] $data
+     * @return mixed
+     */
+    protected function _processVariantPricesPost($model, $data) {
+        if (empty($data['variantPrice'])) {
             return;
         }
 
-        if (!empty($data['prices']['productPrice'])) {
-            foreach ($data['prices']['productPrice'] as $id => $priceData) {
-                foreach ($priceData as $field => $pf) {
-                    if (in_array($field, ['customer_group_id', 'site_id']) && !is_numeric($pf)) {
-                        $priceData[$field] = null;
-                    }
-
-                    if($field == 'currency_code' && $pf == '*'){
-                        $priceData[$field] = null;
-                    }
-                }
-
-                $priceData['product_id'] = $model->id();
-                if (is_numeric($id)) {
-                    $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
-                } else {
-                    $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
-                }
-                $price->set($priceData)->save();
-            }
-        }
-
-        if(!empty($data['prices']['delete'])){
-            foreach ($data['prices']['delete'] as $delPrice) {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($delPrice);
-                if($price){
-                    $price->delete();
+        // Process variant prices
+        if (!empty($data['variantPrice'])) {
+            $variantPrices = $data['variantPrice'];
+            if (!empty($variantPrices['prices'])) {
+                foreach ($variantPrices['prices'] as $vId => $data) {
+                    parse_str($data, $prices);
+                    $this->_savePrices($model, $prices['variantPrice']);
                 }
             }
 
+            // Process delete variant prices
+            if (!empty($variantPrices['delete'])) {
+                $deletedPrices = $this->BUtil->fromJson($variantPrices['delete']);
+                $this->_deletePrices($deletedPrices);
+            }
         }
-
     }
 
-    public function action_save_variant_prices__POST() {
-        $r          = $this->BRequest;
-        $pricesData = $r->request();
-        $model      = $this->Sellvana_Catalog_Model_Product->load($r->get('id'));
-        $this->_processPricesPost($model, $pricesData);
-        $this->BResponse->json(['success' => 1]);
+    protected function _deletePrices($delPrices) {
+        foreach ($delPrices as $delPrice) {
+            $price = $this->Sellvana_Catalog_Model_ProductPrice->load($delPrice);
+            if($price){
+                $price->delete();
+            }
+        }
+    }
+
+    protected function _savePrices($model, $pricesData) {
+        foreach ($pricesData as $id => $priceData) {
+            foreach ($priceData as $field => $pf) {
+                if (in_array($field, ['customer_group_id', 'site_id']) && !is_numeric($pf)) {
+                    $priceData[$field] = null;
+                }
+
+                if($field == 'currency_code' && $pf == '*'){
+                    $priceData[$field] = null;
+                }
+            }
+
+            $priceData['product_id'] = $model->id();
+            if (is_numeric($id)) {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
+            } else {
+                $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
+            }
+            $price->set($priceData)->save();
+        }
     }
 
     /**
@@ -1176,7 +1312,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function action_skus()
     {
-
         $r       = $this->BRequest;
         $page    = $r->get('page')?: 1;
         $skuTerm = $r->get('q');
@@ -1207,5 +1342,23 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
 
         $this->BResponse->json($result);
+    }
+
+    /**
+     * Collect media source link
+     * 
+     * @param  array $data
+     * @return array
+     */
+    protected function _processMediaLink($mediaItems) {
+        if (empty($mediaItems)) {
+            return  [];
+        }
+
+        foreach ($mediaItems as $key => $item) {
+            $mediaItems[$key]['source'] = sprintf('%s/%s/%s', rtrim($this->BConfig->get('web/base_src'), '/'), $item['folder'], $item['file_name']);
+        }
+
+        return $mediaItems;
     }
 }

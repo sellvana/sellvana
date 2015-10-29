@@ -1,8 +1,9 @@
 modules:
     Sellvana_Catalog:
-        version: 0.5.4.0
+        version: 0.5.7.0
         channel: alpha
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
+        before: [ Sellvana_MultiSite ]
         categories: [ Catalog, Products ]
         translations: { en: en.php }
         description: "Categories and products management, admin and frontend"
@@ -19,6 +20,10 @@ modules:
                     length_unit: in
                     enable_rollover: true
                     rollover_effect: fade
+                    latest_new_limit: 25
+                    products_without_images_limit: 25
+                    searches_recent_terms_limit: 25
+                    searches_recent_top_limit: 25
 
         areas:
             FCom_Admin:
@@ -36,13 +41,17 @@ modules:
 
                     - [ "/catalog/inventory/?.action", Sellvana_Catalog_Admin_Controller_Inventory ]
 
-                    - [ /catalog/report/search_terms/?.action, Sellvana_Catalog_Admin_Controller_Report_SearchTerms ]
-                    - [ /catalog/report/product_orders_history/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory ]
+                    - [ /catalog/report/inventory/search_terms/?.action, Sellvana_Catalog_Admin_Controller_Report_SearchTerms ]
+                    - [ /catalog/report/inventory/product_orders_history/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductOrdersHistory ]
+                    - [ /catalog/report/inventory/low_inventory/?.action, Sellvana_Catalog_Admin_Controller_Report_LowInventory ]
+
+                    - [ /catalog/report/integrity/product_images/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductImages ]
+                    - [ /catalog/report/integrity/product_categories/?.action, Sellvana_Catalog_Admin_Controller_Report_ProductCategories ]
+                    - [ /catalog/report/integrity/category_products/?.action, Sellvana_Catalog_Admin_Controller_Report_CategoryProducts ]
                 observe:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, Sellvana_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, Sellvana_Catalog_Admin_Controller_Products.onGenerateSiteMap ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, Sellvana_Catalog_Admin_Controller_Categories.onGenerateSiteMap ]
-                    - [ "FCom_Admin_View_Dashboard::getWidgets", Sellvana_Catalog_Main.onGetDashboardWidgets ]
                 security:
                     request_fields_whitelist:
                         /catalog/categories/tree_form:
@@ -62,6 +71,10 @@ modules:
                         permission: catalog/product/attachements
                         filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt
                         folder: media/product/attachment
+                    product-videos:
+                        permission: catalog/product/videos
+                        filetype: mp4,ogg,webm
+                        folder: media/product/videos
                     category-images:
                         permission: catalog/category/images
                         filetype: jpeg,jpg,tiff,gif,png,bmp

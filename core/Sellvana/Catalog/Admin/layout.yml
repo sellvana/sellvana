@@ -7,9 +7,14 @@ base:
             - [ addNav, catalog/inventory, { label: Inventory, href: /catalog/inventory } ]
             - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
             - [ addNav, catalog/searchalias, { label: Search Terms, href: /catalog/searchalias } ]
-            - [ addNav, reports/catalog, { label: Products and Inventory, pos: 30 }]
-            - [ addNav, reports/catalog/search_terms, { label: Search Terms, href: /catalog/report/search_terms, pos: 30 }]
-            - [ addNav, reports/catalog/product_orders_history, { label: Product Orders History, href: /catalog/report/product_orders_history, pos: 70 }]
+            - [ addNav, reports/catalog, { label: Products and Inventory, pos: 40 }]
+            - [ addNav, reports/catalog/search_terms, { label: Search Terms, href: /catalog/report/inventory/search_terms, pos: 30 }]
+            - [ addNav, reports/catalog/product_orders_history, { label: Product Orders History, href: /catalog/report/inventory/product_orders_history, pos: 70 }]
+            - [ addNav, reports/catalog/low_inventory, { label: Low Inventory Report, href: /catalog/report/inventory/low_inventory, pos: 90 }]
+            - [ addNav, reports/integrity, { label: Data Integrity, pos: 50 }]
+            - [ addNav, reports/integrity/product_images, { label: Products with no images, href: /catalog/report/integrity/product_images, pos: 10 }]
+            - [ addNav, reports/integrity/product_categories, { label: Products without a category, href: /catalog/report/integrity/product_categories, pos: 20 }]
+            - [ addNav, reports/integrity/category_products, { label: Category without Products, href: /catalog/report/integrity/category_products, pos: 30 }]
     - view: admin/header
         do:
             - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
@@ -25,7 +30,7 @@ catalog_product_form_tabs:
             - [ addTab, linked-products, { label: Merchandising, pos: 45, async: true } ]
             - [ addTab, categories, { label: Categories, pos: 50, async: true } ]
             - [ addTab, images, { label: Images, pos: 60, async: true } ]
-            #- [ addTab, images-griddle, { label: Images (Griddle), pos: 65, async: true } ]
+            - [ addTab, videos, { label: Videos, pos: 65, async: true } ]
             - [ addTab, attachments, { label: Attachments, pos: 70, async: true } ]
             - [ addTab, layout, { label: Layout, pos: 80, async: true } ]
 
@@ -38,7 +43,8 @@ catalog_product_form_tabs:
         do:
             - [ css, "@Sellvana_Catalog/Admin/css/prices.css" ]
             - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.product.price, { deps: [ jquery, react ] } ]
-            - [ requireJs, fcom.catalog.variant.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.variant.price, { deps: [ jquery, react ] } ]
+            - [ requireJs, fcom.catalog.price, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.price, { deps : [ react ]} ]
+            - [ requireJs, fcom.catalog.components, @Sellvana_Catalog/Admin/jsx/build/fcom.catalog.components, { deps : [ react ]} ]
 #            - [ requireJs, fcom.catalog.product.price, @Sellvana_Catalog/Admin/jsx/src/fcom.catalog.product.price, [jquery, react]]
 
 /catalog/products/import:
@@ -83,3 +89,62 @@ catalog_product_form_tabs:
 /catalog/inventory:
     - { include: default_griddle }
     - { hook: main, views: catalog/inventory }
+
+/:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - low-inventory
+                -
+                    title: Low Inventory Products
+                    icon: inbox
+                    view: dashboard/low-inventory
+                    cols: 4
+                    async: true
+                    filter: true
+                    permission: catalog/inventory
+            -
+                - addWidget
+                - latest-new
+                -
+                    title: Latest New Products
+                    icon: inbox
+                    view: dashboard/latest-new
+                    cols: 4
+                    async: true
+                    filter: true
+                    permission: catalog/products
+            -
+                - addWidget
+                - without-images
+                -
+                    title: Products With No Images
+                    icon: inbox
+                    view: dashboard/without-images
+                    cols: 3
+                    async: true
+                    filter: true
+                    permission: catalog/products
+            -
+                - addWidget
+                - searches-recent-terms
+                -
+                    title: Searches - recent terms (internal)
+                    icon: inbox
+                    view: dashboard/searches-recent-terms
+                    cols: 3
+                    async: true
+                    filter: true
+                    permission: catalog/products
+            -
+                - addWidget
+                - searches-top-terms
+                -
+                    title: Searches - top terms (internal)
+                    icon: inbox
+                    view: dashboard/searches-top-terms
+                    cols: 3
+                    async: true
+                    filter: true
+                    permission: catalog/products

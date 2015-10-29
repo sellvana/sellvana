@@ -78,20 +78,4 @@ class Sellvana_Catalog_Main extends BClass
             ])
         ;
     }
-
-    /**
-     * @param array $args
-     */
-    public function onGetDashboardWidgets($args)
-    {
-        $view = $args['view'];
-        $view->addWidget('low-inventory', [
-            'title' => 'Low Inventory Products',
-            'icon' => 'inbox',
-            'view' => 'catalog/dashboard/low-inventory',
-            'cols' => 4,
-            'async' => true,
-            'filter' => false,
-        ]);
-    }
 }

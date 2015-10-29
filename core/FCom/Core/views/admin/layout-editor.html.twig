@@ -23,7 +23,7 @@
 
     <div class="col-md-10 js-layout-editor-container">
         <div class="js-layout-structure-control">
-            <select name="{{ context.prefix }}[area][header]" class="form-control input-sm">
+            <select id="{{ context.prefix }}--area-header" name="{{ context.prefix }}[area][header]" class="form-control input-sm">
                 {{ UTIL.optionsHtml({ '': 'Inherit Header Visibility'|_, 'show': 'Show Header'|_, 'hide': 'Hide Header'|_ }, layout.area.header) | raw }}
             </select>
             <select id="{{ context.prefix }}--area-footer" name="{{ context.prefix }}[area][footer]" class="form-control input-sm">
@@ -134,11 +134,27 @@
             $fArea.val($area.data('area'));
             if (added) {
                 nextWidgetId--;
-                $widget.data('id', nextWidgetId);
+                $widget.attr('data-id', nextWidgetId);
+                $widget.attr('id', $widget.data('type') + nextWidgetId);
                 $widget.find('input,textarea,select').each(function(idx, el) {
                     var $el = $(el);
                     $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + nextWidgetId + ']'))
                 });
+                
+                var $ul = $widget.find('ul.nav-tabs');
+                $ul.find('li a').each(function(index, el) {
+                    var $el = $(el);
+                    $el.prop('href', '#' + $el.prop('href').split('#')[1].replace(/_-ID-/g, nextWidgetId));
+                });
+
+                var $tabPane = $widget.find('.tab-content');
+                $tabPane.children('.tab-pane').each(function(index, el) {
+                    var $el = $(el);
+                    $el.prop('id', $el.prop('id').replace(/_-ID-/g, nextWidgetId));
+                });
+
+                $tabPane.find('#widget_-ID--media-upload').attr('id', 'widget_' + $widget.attr('id') +'-media-upload');
+                $tabPane.find('#media-library-upload-types--ID-').attr('id', 'media-library-upload-types' + nextWidgetId);
             }
         }
 
@@ -187,7 +203,7 @@
                 $newParams.find('input,textarea,select').each(function(idx, el) {
                     var $el = $(el);
                     $el.prop('disabled', false);
-                    $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + widgetId + ']'))
+                    $el.prop('name', $el.prop('name').replace(/[\[]-ID-[\]]/, '[' + widgetId + ']'));
                 });
             } else {
                 $newParams = '';
@@ -211,7 +227,7 @@
         {% import _self as source %}
     {% endif %}
     {% set macro = widget.macro ?: 'widget__' ~ widget.type %}
-    <li>
+    <li data-type="{{ widget.type }}" data-id="{{ widget.id }}">
         <div class="box {{ widget.box_class }} js-widget-box" data-id="{{ widget.id }}">
             <div class="box-header js-sortable-handle {{ widget.header_class }}">
                 <div class="title"><i class="icon-{{ widget.icon }}"></i>{{ widget.title }}</div>

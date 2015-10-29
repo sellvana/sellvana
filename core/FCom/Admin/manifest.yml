@@ -1,9 +1,15 @@
 modules:
     FCom_Admin:
-        version: 0.5.0.0
+        version: 0.5.1.0
         channel: alpha
-        description: Base Admin functionality
-        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0, FCom_LibScssPhp: 0.1.0 } }
+        description: Admin Panel base functionality and platform
+        custom:
+            status:
+                dev: 90
+                todo:
+                    - AJAX Save and Save and continue
+
+        require: { module: { FCom_Core: 0.5.0.0, FCom_LibJsCommon: 0.5.0.0, FCom_LibTwig: 0.5.0.0, FCom_Frontend: 0.5.0.0, FCom_LibScssPhp: 0.5.0.0 } }
 
         translations:
             de: de.php
@@ -74,7 +80,6 @@ modules:
 
                 observe:
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", "FCom_Admin_Admin.onSettingsPost" ]
-                    - [ "FCom_Admin_View_Dashboard::getWidgets", "FCom_Admin_Admin.onGetDashboardWidgets" ]
 
                 security:
                     request_fields_whitelist:
@@ -100,6 +105,8 @@ modules:
                 FCom_Admin:
                     theme: FCom_Admin_DefaultTheme
                     default_locale: en_US
+                    default_dashboard_widget_limit: 25
+                    enable_debug_in_js: 0
 
         themes:
             FCom_Admin_DefaultTheme:

@@ -15,7 +15,8 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
             $this->BResponse->redirect('');
             return;
         }
-        $widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
+        $widgets = $this->layout('/')->view('dashboard')->getWidgets();
+        //$widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
         $widgetKeys = explode(',', $r->get('widgets'));
         $wrapped = $r->get('wrapped');
         $add = $r->get('add');
@@ -32,6 +33,13 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
             }
             $persData = [];
         }
+
+        $result['filter'] = (isset($persData['dashboard']['filter'])) ? $persData['dashboard']['filter']: [];
+        if (!empty($result['filter']['range']) && $result['filter']['range'] == 'range') {
+            $result['filter'] = $this->_calculateDate($result['filter']);
+        }
+        $this->_processDateFilter($result['filter']);
+
         foreach ($widgetKeys as $wKey) {
             if (empty($widgets[$wKey])) {
                 continue;
@@ -53,8 +61,6 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                 $persData['dashboard']['widgets'][$wKey]['pos'] = ++$pos;
             }
         }
-        $result['filter'] = (isset($persData['dashboard']['filter'])) ? $persData['dashboard']['filter']: [];
-        $this->_processDateFilter($result['filter']);
         if ($add && $persData) {
             $this->FCom_Admin_Model_User->personalize($persData);
         }
@@ -68,29 +74,11 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
             $persData = $this->FCom_Admin_Model_User->personalize();
             $persData['dashboard']['filter'] = $p;
             if ($p['range'] == 'range') {
-                switch ($p['date']) {
-                    case 'last-month':
-                        $p['min'] = date("Y-m-1", strtotime("last month"));
-                        $p['max'] = date("Y-m-t", strtotime("last month"));
-                        break;
-                    case 'last-week':
-                        $p['min'] = date("Y-m-d", strtotime("last week"));
-                        $p['max'] = date("Y-m-d", strtotime("last week + 7 days"));
-                        break;
-                    case 'today':
-                        $p['date'] = date("Y-m-d");
-                        break;
-                    case 'all':
-                        break;
-                    default:
-                        $tmp = explode('~', $p['date']);
-                        $p['min'] = $tmp[0];
-                        $p['max'] = $tmp[1];
-                        break;
-                }
+                $p = $this->_calculateDate($p);
             }
             $this->_processDateFilter($p);
-            $widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
+            $widgets = $this->layout('/')->view('dashboard')->getWidgets();
+            // $widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
             $result = [];
             $this->FCom_Admin_Model_User->personalize($persData);
             foreach ($widgets as $key => $widget) {
@@ -116,6 +104,10 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
      */
     protected function _processDateFilter($filter)
     {
+        if (empty($filter['date'])) {
+            return;
+        }
+
         $dayRecent = ($this->BConfig->get('modules/Sellvana_Sales/recent_day')) ? $this->BConfig->get('modules/Sellvana_Sales/recent_day') : 7;
         $params = [];
         if (strpos($filter['date'], '~') !== FALSE) {
@@ -184,10 +176,10 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                 $cond = '> DATE_SUB(NOW(), ? DAY)';
                 $params[] = $dayRecent;
         }
-        $this->BApp->set('dashboard_date_filter', array(
+        $this->BApp->set('dashboard_date_filter', [
             'condition' => $cond,
             'params' => $params
-        ));
+        ]);
     }
 
     /**
@@ -221,5 +213,34 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                 break;
         }
         return $error;
+    }
+
+    /**
+     * @param $p
+     * @return mixed
+     */
+    protected function _calculateDate($p)
+    {
+        switch ($p['date']) {
+            case 'last-month':
+                $p['min'] = date("Y-m-1", strtotime("last month"));
+                $p['max'] = date("Y-m-t", strtotime("last month"));
+                break;
+            case 'last-week':
+                $p['min'] = date("Y-m-d", strtotime("last week"));
+                $p['max'] = date("Y-m-d", strtotime("last week + 7 days"));
+                break;
+            case 'today':
+                $p['date'] = date("Y-m-d");
+                break;
+            case 'all':
+                break;
+            default:
+                $tmp = explode('~', $p['date']);
+                $p['min'] = $tmp[0];
+                $p['max'] = $tmp[1];
+                break;
+        }
+        return $p;
     }
 }

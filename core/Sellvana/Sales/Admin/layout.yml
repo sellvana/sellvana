@@ -8,13 +8,15 @@ base:
             - [ addNav, sales/carts, { label: Shopping Carts, href: /carts } ]
             - [ addNav, reports/sales, { label: Sales, pos: 10 }]
             - [ addNav, reports/sales/product_performance, { label: Product Performance, href: /sales/report/product_performance, pos: 10 }]
-            - [ addNav, reports/sales/customer_groups, { label: Sales by Customer Group, href: /sales/report/customer_groups, pos: 30 }]
             - [ addNav, reports/sales/abandoned_carts, { label: Cart Abandonment, href: /sales/report/abandoned_carts, pos: 20 }]
+            - [ addNav, reports/sales/customer_groups, { label: Sales by Customer Group, href: /sales/report/customer_groups, pos: 30 }]
             - [ addNav, reports/sales/payment_method, { label: Sales by Payment Method, href: /sales/report/payment_method, pos: 60 }]
             - [ addNav, reports/sales/country, { label: Sales by Country, href: /sales/report/country, pos: 70 }]
             - [ addNav, reports/sales/state, { label: Sales by State/Province, href: /sales/report/state, pos: 80 }]
             - [ addNav, reports/sales/hour, { label: Sales by Hour of the Day, href: /sales/report/hour, pos: 90 }]
             - [ addNav, reports/sales/day, { label: Sales by Day of Week, href: /sales/report/day, pos: 100 }]
+            - [ addNav, reports/sales/order_detail, { label: Sales Order Detail Report, href: /sales/report/order_detail, pos: 110 }]
+            - [ addNav, reports/sales/order_item_detail, { label: Sales Item Detail Report, href: /sales/report/order_item_detail, pos: 120 }]
             - [ addNav, reports/sales/shipping_method, { label: Shipping Methods, href: /sales/report/shipping_method, pos: 150 }]
             - [ addNav, reports/sales/customer_performance, { label: Customer Performance, href: /sales/report/customer_performance, pos: 170 }]
             - [ addNav, reports/sales/product_history, { label: Product History, href: /sales/report/product_history, pos: 210 }]
@@ -50,3 +52,72 @@ base:
 /orderstatecustom:
     - { include: default_griddle }
     - { hook: main, views: order/customstates }
+
+/:
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - orders-list
+                -
+                    title: Recent Orders
+                    icon: inbox
+                    view: dashboard/orders-list
+                    async: true
+                    filter: false
+                    permission: sales/orders
+            -
+                - addWidget
+                - orders-totals
+                -
+                    title: Order Totals
+                    icon: inbox
+                    view: dashboard/orders-totals
+                    cols: 4
+                    async: true
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - avg-order-value
+                -
+                    title: Average Order Value
+                    icon: inbox
+                    cols: 2
+                    view: dashboard/avg-order-value
+                    async: true
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - top-products
+                -
+                    title: Top Products
+                    icon: inbox
+                    cols: 4
+                    view: dashboard/top-products
+                    async: true
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - top-products-chart
+                -
+                    title: Top Products (Chart)
+                    icon: inbox
+                    cols: 4
+                    view: dashboard/top-products-chart
+                    async: true
+                    filter: true
+                    permission: sales/orders
+            -
+                - addWidget
+                - orders-late
+                -
+                    title: Late Orders
+                    icon: inbox
+                    cols: 4
+                    view: dashboard/orders-late
+                    async: true
+                    filter: false
+                    permission: sales/orders

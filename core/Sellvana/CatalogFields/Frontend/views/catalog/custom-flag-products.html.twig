@@ -1,0 +1,25 @@
+{% set cnt = THIS.get('cnt') ?: 6 %}
+{% set flagField = THIS.get('field') %}
+{% set products = APP.instance('Sellvana_CatalogFields_Frontend').getCustomFlagProducts(flagField, cnt) %}
+{% set baseClasses = THIS.get('base_classes')|default(['f-widget', 'f-widget-featured-prods', 'f-prod-listing', 'f-prod-listing-grid']) %}
+{% set customClasses = THIS.get('custom_classes')|default([]) %}
+{% set gridLabel = THIS.get('label')|default('More Products') %}
+
+{% if products %}
+    <div class="{{ baseClasses is iterable ? baseClasses|join(' ') : baseClasses }} {{ customClasses is iterable ? customClasses|join(' ') : customClasses }}">
+        <header class="f-widget-header">
+            <strong class="f-widget-title">{{ gridLabel|_ }}</strong>
+        </header>
+        <div class="f-widget-content">
+            {{ THIS.view('catalog/product/grid-tiles').set({
+                lg_columns: cnt,
+                md_columns: cnt,
+                sm_columns: 4,
+                xs_columns: 2,
+                products: products,
+                simple_view: true,
+                list_name: gridLabel,
+            }) | raw }}
+        </div>
+    </div><!-- /.widget-custom-flag-prods -->
+{% endif %}

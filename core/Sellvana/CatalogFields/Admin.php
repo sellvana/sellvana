@@ -12,6 +12,9 @@
  * @property Sellvana_CatalogFields_Model_ProductVariantImage $Sellvana_CatalogFields_Model_ProductVariantImage
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
+ * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
+ * @property Sellvana_MultiSite_Admin $Sellvana_MultiSite_Admin
  */
 class Sellvana_CatalogFields_Admin extends BClass
 {
@@ -59,7 +62,7 @@ class Sellvana_CatalogFields_Admin extends BClass
         $fieldsOptions = [];
         $fields = $this->Sellvana_CatalogFields_Model_ProductField->productFields($p);
         if ($fields) {
-            $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
+            $fieldIds = $this->BUtil->arrayToOptions($fields, '.id');
             $fieldOptionsAll = $this->Sellvana_CatalogFields_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
                 ->order_by_asc('field_id')->order_by_asc('label')->find_many();
             foreach ($fieldOptionsAll as $option) {
@@ -74,11 +77,7 @@ class Sellvana_CatalogFields_Admin extends BClass
     {
         /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
-        $data = $args['data'];
-
-        if (!empty($data['custom_fields'])) {
-            $model->setData('custom_fields', $data['custom_fields']);
-        }
+        $data = &$args['data'];
 
         if (empty($data['vfields']) && empty($data['variants'])) {
             return;
@@ -231,7 +230,8 @@ class Sellvana_CatalogFields_Admin extends BClass
                 if (!empty($matchedVariants[$i])) {
                     $m = $prodVariantModels[$matchedVariants[$i]];
                 } else {
-                    $m = $prodVariantHlp->create(['product_id' => $pId]);
+                    $tmpId  = $vd['id'];
+                    $m      = $prodVariantHlp->create(['product_id' => $pId]);
                 }
                 if (!empty($vd['inventory_sku']) && $vd['variant_qty'] !== '') {
                     if (empty($invModels[$vd['inventory_sku']])) {
@@ -250,6 +250,11 @@ class Sellvana_CatalogFields_Admin extends BClass
                     'variant_price' => $vd['variant_price'] !== '' ? $vd['variant_price'] : null,
                     'manage_inventory' => $vd['variant_qty'] !== '' ? 1 : 0,
                 ])->save();
+
+                if ($m->isNewRecord() && !empty($data['variantPrice'])) {
+                    $this->_setVariantId($m, $tmpId, $data['variantPrice']);
+                }
+
                 if (empty($matchedVariants[$i])) {
 
                     foreach ($vd['field_values'] as $f => $fv) {
@@ -324,6 +329,57 @@ class Sellvana_CatalogFields_Admin extends BClass
             if ($fileIdsToDelete) {
                 $prodVariantImageHlp->delete_many(['product_id' => $pId, 'id' => $fileIdsToDelete]);
             }
+        }
+    }
+
+    /**
+     * Update variant_id for each price of each new variant after saved ( Only has prices data )
+     * @param [object] $variantModel
+     * @param [string] $tmpId
+     * @param [array] &$variantsPrices
+     */
+    protected function _setVariantId($variantModel, $tmpId, &$variantsPrices) {
+        if (!empty($variantsPrices['prices'])) {
+            foreach ($variantsPrices['prices'] as $vId => $data) {
+                parse_str($data, $prices);
+                foreach ($prices['variantPrice'] as $id => $price) {
+                    if ($price['variant_id'] == $tmpId) {
+                        $prices['variantPrice'][$id]['variant_id'] = $variantModel->id();
+                    }
+                }
+                $variantsPrices['prices'][$vId] = http_build_query($prices);
+            }
+        }
+    }
+
+    public function onProductFormPostBefore($args)
+    {
+        /** @var Sellvana_Catalog_Model_Product $product */
+        $customFieldsData = $this->BUtil->fromJson($this->BRequest->post('custom_fields'));
+        $product = &$args['model'];
+        if (!$customFieldsData || !$product->id()) {
+            return;
+        }
+
+        $productFields = $this->Sellvana_CatalogFields_Model_ProductFieldData->orm('pf')
+            ->where_equal('product_id', $product->id())
+            ->group_by('field_id')
+            ->find_many_assoc('field_id', 'field_id');
+
+        foreach ($customFieldsData as $fieldSetData) {
+            foreach ($fieldSetData['fields'] as $fieldData) {
+                if (in_array($fieldData['id'], $productFields)) {
+                    unset($productFields[$fieldData['id']]);
+                }
+            }
+        }
+        $product->set('_custom_fields_remove', $productFields);
+
+        if (!empty($customFieldsData)) {
+            // Save custom fields on fcom_product_custom
+            $product->set('custom_fields', $customFieldsData);
+            //$this->_processProductCustom($model, $this->BUtil->fromJson($data['custom_fields']));
+            // $model->setData('custom_fields', $data['custom_fields']);
         }
     }
 }

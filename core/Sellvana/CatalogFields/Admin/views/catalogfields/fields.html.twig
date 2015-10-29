@@ -119,14 +119,13 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         }
 
         React.render(
-                React.createElement(FComGriddleComponent, { config: optionsConfigCompiled}),
-                attachGridContainerEle
+            React.createElement(FComGriddleComponent, { config: optionsConfigCompiled}), attachGridContainerEle
         );
 
-        if (row && row.admin_input_type == 'select') {
-            optionsNode.find('button#add_new_field').removeClass('disabled');
+        if (row && $.inArray(row.admin_input_type, ['select', 'multiselect'])) {
+            optionsNode.find('button#add_new_field').prop('disabled', false);
         } else {
-            optionsNode.find('button#add_new_field').addClass('disabled');
+            optionsNode.find('button#add_new_field').prop('disabled', true);
         }
     }
 

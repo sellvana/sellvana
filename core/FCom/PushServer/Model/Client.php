@@ -384,7 +384,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                     $this->BDebug->log("{$logId} SYNC EMPTY: " . print_r($connections, 1));
                 }
 
-                $messages[] = ['channel' => 'client', 'signal' => 'noop'];
+                //TODO: figure out in which cases this is needed
+                #$messages[] = ['channel' => 'client', 'signal' => 'noop'];
             }
         }
         // foreach ($connections as $connId => $conn) {
@@ -506,8 +507,32 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             unset($sessData['pushserver']['channels'][$channel->channel_name]);
             unset($sessData['pushserver']['subscribed'][$channel->channel_name]);
         }
-
         return $this;
+    }
+
+    /**
+     * Check if the client is subscribed to a channel, ignore session data.
+     *
+     * @param $channel
+     * @return bool
+     * @throws BException
+     */
+    public function isSubscribed($channel){
+        if (null === $channel) {
+            $channel = $this->getChannel();
+        }
+        $isSessionClient = $this->session_id === $this->BSession->sessionId();
+        if (!is_object($channel)) {
+            $channel = $this->FCom_PushServer_Model_Channel->getChannel($channel, true, $isSessionClient);
+        }
+        $hlp = $this->FCom_PushServer_Model_Subscriber;
+        $data = ['client_id' => $this->id(), 'channel_id' => $channel->id()];
+        $subscriber = $hlp->loadWhere($data);
+        if (!$subscriber) {
+            $this->unsubscribe($channel);
+            return false;
+        }
+        return true;
     }
 
     /**

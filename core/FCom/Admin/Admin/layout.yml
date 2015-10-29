@@ -19,6 +19,9 @@ base:
             - [ requireJs, jquery.hotkeys, "@FCom_LibJsCommon/js/jquery.hotkeys", { deps: [ jquery ] } ]
             - [ requireJs, jquery.contextmenu, "@FCom_LibJsCommon/js/jqGrid/plugins/jquery.contextmenu", { deps: [ jquery ] } ]
 
+            - [ requireJs, jquery.pnotify, "@FCom_LibJsCommon/js/jquery.pnotify.min", { deps: [ jquery ] } ]
+            - [ css, @FCom_LibJsCommon/js/css/jquery.pnotify.default.css ]
+
             - [ requireJs, jquery.splitter, "@FCom_LibJsCommon/js/splitter/jquery.splitter", { deps: [ jquery ] } ]
             - [ css, "@FCom_LibJsCommon/js/splitter/jquery.splitter.css" ]
 
@@ -35,6 +38,7 @@ base:
     - { include: common_js_libs }
     - { include: lib_griddle }
     - { include: lib_admin_theme1 }
+    - { include: lib_media_player }
 
     - view: admin/nav
         do:
@@ -113,6 +117,7 @@ common_js_libs:
             - [ requireJs, griddle.fcomRow, @FCom_Core/jsx/build/fcom.row, { deps : [ react, griddle.custom ]} ]
             - [ requireJs, griddle.fcomModalForm, @FCom_Core/jsx/build/fcom.modalForm, { deps : [ react, griddle.custom ]} ]
             - [ requireJs, griddle.fcomMediaLib, @FCom_Core/jsx/build/fcom.medialib, { deps : [ react, fcom.griddle ]} ]
+            - [ requireJs, griddle.fcomSelect2, @FCom_Core/jsx/build/fcom.select2, { deps : [ react ]} ]
 
 
 lib_admin_theme1:
@@ -276,6 +281,17 @@ form:
         #- [ requireJs, ModalLauncher, "@FCom_Admin/Admin/js/BackboneViews/ModalLauncher" ]
         #- [ requireJs, FormView, "@FCom_Admin/Admin/js/BackboneViews/FormView" ]
             - [ css, "@FCom_LibJsCommon/js/css/dragtable-akottr.css" ]
+    - view: dashboard
+        do:
+            -
+                - addWidget
+                - visitors-totals
+                -
+                    title: Visitors
+                    icon: group
+                    view: dashboard/visitors-totals
+                    cols: 2
+                    async: true
 
 /denied:
     - { include: base }
@@ -352,3 +368,10 @@ form:
 /systememails:
     - { include: base }
     - { view: admin/nav, do: [[ setNav, system/emails ]] }
+
+/importexport:
+    - { include: default_form }
+    - view: head
+        do:
+            - [ requireJs, fcom.admin.import, "@FCom_Admin/Admin/js/fcom/fcom.admin.import" ]
+            - [ scss, "@FCom_Admin/Admin/theme1/assets/scss/admin-import.scss" ]

@@ -18,15 +18,15 @@ class Sellvana_Customer_Admin_Controller_Report_Country extends FCom_Admin_Contr
     {
         $config = parent::gridConfig();
         $config['columns'] = [
-            ['name' => 'country', 'index' => 'ca.country', 'label' => 'Country', 'width' => 100, 'options' => $this->BLocale->getAvailableCountries('name')],
-            ['name' => 'region', 'index' => 'ca.region', 'label' => 'State'],
-            ['name' => 'city', 'index' => 'ca.city', 'label' => 'City'],
-            ['name' => 'customer_count', 'index' => 'customer_count', 'label' => '# of Customers'],
-            ['name' => 'customer_with_order_count', 'index' => 'customer_with_order_count', 'label' => '# of Customers who Ordered'],
-            ['name' => 'order_count', 'index' => 'order_count', 'label' => '# of Orders'],
-            ['name' => 'item_count', 'index' => 'item_count', 'label' => '# of Items'],
-            ['name' => 'total_amount', 'index' => 'total_amount', 'label' => 'Total Sales'],
-            ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Created', 'hidden' => true],
+            ['name' => 'country', 'index' => 'ca.country', 'width' => 100, 'options' => $this->BLocale->getAvailableCountries('name')],
+            ['name' => 'region', 'index' => 'ca.region'],
+            ['name' => 'city', 'index' => 'ca.city'],
+            ['name' => 'customer_count', 'index' => 'customer_count'],
+            ['name' => 'customer_with_order_count', 'index' => 'customer_with_order_count'],
+            ['name' => 'order_count', 'index' => 'order_count'],
+            ['name' => 'item_count', 'index' => 'item_count'],
+            ['name' => 'total_amount', 'index' => 'total_amount'],
+            ['name' => 'create_at', 'index' => 'o.create_at', 'hidden' => true],
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
@@ -39,13 +39,31 @@ class Sellvana_Customer_Admin_Controller_Report_Country extends FCom_Admin_Contr
     }
 
     /**
+     * @return array
+     */
+    protected function _getFieldLabels()
+    {
+        return [
+            'country' => 'Country',
+            'region' => 'State',
+            'city' => 'City',
+            'customer_count' => '# of Customers',
+            'customer_with_order_count' => '# of Customers who Ordered',
+            'order_count' => '# of Orders',
+            'item_count' => '# of Items',
+            'total_amount' => 'Total Sales',
+            'create_at' => 'Created'
+        ];
+    }
+
+    /**
      * @param $orm BORM
      */
     public function gridOrmConfig($orm)
     {
         parent::gridOrmConfig($orm);
 
-        $orm->left_outer_join('Sellvana_Customer_Model_Address', 'ca.customer_id = c.id AND c.default_billing_id = ca.id', 'ca')
+        $orm->left_outer_join('Sellvana_Customer_Model_Address', 'ca.customer_id = c.id AND c.default_shipping_id = ca.id', 'ca')
             ->left_outer_join('Sellvana_Sales_Model_Order', 'o.customer_id = c.id', 'o')
             ->select_expr('COUNT(DISTINCT c.id)', 'customer_count')
             ->select_expr('COUNT(DISTINCT o.customer_id)', 'customer_with_order_count')

@@ -17,13 +17,21 @@
     .zoom img::selection {
         background-color: transparent;
     }
+
+    .btn-wishlist {
+        background-color: #EE8371 !important;
+        color: #fff;
+    }
+
+    .external_thumb {
+        height: 43px;
+    }
 </style>
 
 {% set prod = THIS.get('product') %}
 {% set inventory = prod.getInventoryModel() %}
-{% set images = prod.gallery() %}
+{% set mediaItems = prod.gallery(true) %}
 {% set cat = THIS.get('category') %}
-{% set customFields = prod.getData('custom_fields') %}
 
 {% set productLinks = prod.getProductLinks() %}
 
@@ -39,9 +47,23 @@
         <div class="col-md-5 f-col-prod-img">
             <div class="f-rslides-container">
                 <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
-                    {% for img in images %}
-                        <li><img data-id="{{ img.id() }}" class="f-prod-img img-responsive" src="{{ img.thumbUrl(458) }}{#{ img.imageUrl(1) }#}"
-                                 alt="" itemprop="image"/></li>
+                    {% for media in mediaItems %}
+                        {% if media.get('media_type') == 'V' %}
+                            {% if media.get('file_size') %}
+                                <li class="product-video-item" style="padding: 80px 0;">
+                                    <video id="product-video" width="480" height="320" poster="" controls="controls" preload="true">
+                                        <source type="video/{{ media.get('file_name')[-3: 3] }}" src="{{ media.getUrl() }}" />
+                                    </video>
+                                </li>
+                            {% else %}
+                                {% set data = UTIL.fromJson(media.get('data_serialized')) | raw %}
+                                {% if data %}
+                                    <li class="product-video-item external_link" style="padding: 80px 0;">{{ data.html | raw }}</li>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <li><img data-id="{{ media.id() }}" class="f-prod-img img-responsive" src="{{ media.thumbUrl(458) }}{#{ img.imageUrl(1) }#}" alt="" itemprop="image"/></li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>
@@ -49,9 +71,24 @@
                 <small>{{ 'Mouse move on Image to zoom'|_ }}</small>
             </p>
             <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
-                {% for img in images %}
-                    <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.thumbUrl(90) }}"
-                                                                                            alt="" title=""></a></li>
+                {% for media in mediaItems %}
+                    {% if media.get('media_type') == 'V' %}
+                        {% if media.get('file_size') %}
+                            <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
+                                <a href="javascript:void(0)"><img src="{{ CONFIG.get('web/media_dir') ~ '/video-default.jpg' }}" title="There's no image for this video"></a>
+                            </li>
+                        {% else %}
+                            {% set data = UTIL.fromJson(media.get('data_serialized')) | raw %}
+                            {% if data %}
+                                <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 3px;">
+                                    <a href="javascript:void(0)"><img class="external_thumb" src="{{ data.thumbnail_url | raw }}" title="{{ data.title | raw }}"></a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                        
+                    {% else %}
+                        <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}"><a href="#"><img src="{{ media.thumbUrl(90) }}" alt="" title=""></a></li>
+                    {% endif %}
                 {% endfor %}
             </ul>
             <a href="#" hidden id="display-all-images"><i
@@ -107,8 +144,11 @@
                         <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}"
                                 id="prod-add-to-cart">
                             <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
-                        <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
-                           rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
+
+                        {{ THIS.view('wishlist/add-button').set('product', prod) | raw }}
+
+                        <!--<a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
+                           rel="nofollow">{{ "Add to Wishlist"|_ }}</a>-->
 
                         {{ THIS.view('catalog/compare-link').set('product_id', prod.id()) | raw }}
 
@@ -127,25 +167,10 @@
                     <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>
                 </div>
                 <div itemprop="description">{{ prod.getDescription() | raw }}</div>
-                {% if customFields %}
-                    <div class="f-tab-heading">
-                        <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
-                    </div>
-                    {% for cf in customFields %}
-                        <div class="form-group" style="overflow: hidden">
-                            <label class="col-md-2 control-label">{{ cf.set_name |_ }}</label> <br>
-                            {% for field in cf.fields %}
-                                <div class="col-md-12">
-                                    <label class="control-label">{{ field.field_name ~": "~ field.value |_ }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endfor %}
-                {% endif %}
+
+                {{ THIS.hook('catalog/product/details:after_description', {product: prod}) | raw }}
             </section>
-
-            {{ THIS.view('prodreviews/product-details').set('prod', prod).set('type', 'short') | raw }}
-
+            {{ THIS.hook('catalog/product/details:after_content', {product: prod}) | raw }}
         </div>
     </div><!-- /.f-prod-info -->
 </div>
@@ -172,7 +197,7 @@
 {{ THIS.view('catalog/product/quickview') | raw }}
 
 <script>
-    require(['jquery', 'responsiveslides', 'jquery.zoom'], function ($) {
+    require(['jquery', 'underscore', 'responsiveslides', 'jquery.zoom', 'jquery.media-element'], function ($, _s) {
         var pager = $('#product-rslides-pager');
         $("#product-rslides").responsiveSlides({
             auto: false,
@@ -181,6 +206,17 @@
             namespace: "f",
             manualControls: '#product-rslides-pager'
         });
-        $('#product-rslides li').addClass('zoom').zoom();
+
+        $('#product-rslides li:not(.product-video-item)').addClass('zoom').zoom();
+
+        // Fix external video size
+        var $externalVideoNode = $('.external_link').children('iframe');
+        if ($externalVideoNode.length) {
+            $externalVideoNode.prop('width', '460');
+        }
+
+        $('video').mediaelementplayer({
+            features: ['playpause','progress','current','duration','tracks','volume','fullscreen']
+        });
     })
 </script>
