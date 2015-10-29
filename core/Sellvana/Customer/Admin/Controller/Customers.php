@@ -21,6 +21,7 @@ class Sellvana_Customer_Admin_Controller_Customers extends FCom_Admin_Controller
     protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
     protected $_formTitleField = 'Sellvana_Customer_Admin_Controller_Customers.formTitleField';
+    protected $_formLayoutName = '/customers/form';
 
     public function gridConfig()
     {

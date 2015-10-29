@@ -132,6 +132,7 @@ class Sellvana_CatalogFields_Frontend extends BClass
     }
 
     /**
+     * @param Sellvana_Catalog_Model_Product $product
      * @return array
      */
     public function customFieldsShowOnFrontend(Sellvana_Catalog_Model_Product $product)

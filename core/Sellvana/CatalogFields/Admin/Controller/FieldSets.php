@@ -16,7 +16,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
         $orm = $this->Sellvana_CatalogFields_Model_Set->orm('s')->select('s.*')
             ->select('(select count(*) from ' . $this->Sellvana_CatalogFields_Model_SetField->table() . ' where set_id=s.id)', 'num_fields');
 
-        ;
+
         $config = [
             'config' => [
                 'id'     => 'fieldsets',
@@ -375,7 +375,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
         if (isset($data['field_ids'])) {
             $field_ids = $data['field_ids'];
         }
-        
+
         $model = $this->Sellvana_CatalogFields_Model_SetField;
         switch ($r->post('oper')) {
             case 'add':

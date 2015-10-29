@@ -1,0 +1,11 @@
+include:
+    - core/FCom/*/Test
+    - core/Sellvana/*/Test
+paths:
+    log: storage/testlogs
+settings:
+    colors: true
+    html: true
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed

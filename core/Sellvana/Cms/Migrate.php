@@ -301,4 +301,21 @@ class Sellvana_Cms_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_5_0_1__0_5_0_2()
+    {
+        $tFormData = $this->Sellvana_Cms_Model_FormData->table();
+        $tBlock = $this->Sellvana_Cms_Model_Block->table();
+
+        $this->BDb->ddlTableDef($tFormData, [
+            BDb::COLUMNS => [
+                'form_id' => 'DROP',
+                'block_id' => 'int(10) unsigned NOT NULL'
+            ],
+            BDb::CONSTRAINTS => [
+                'form' => 'DROP',
+                'block'=> ['block_id', $tBlock]
+            ]
+        ]);
+    }
 }

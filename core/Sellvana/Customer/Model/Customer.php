@@ -686,9 +686,9 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
-        $orm = $this->orm()->where('email', $data[$args['field']]);
+        $orm = $this->orm('c')->where('c.email', $data[$args['field']]);
         if (!empty($data['id'])) {
-            $orm->where_not_equal('id', $data['id']);
+            $orm->where_not_equal('c.id', $data['id']);
         }
         if ($orm->find_one()) {
             return false;
