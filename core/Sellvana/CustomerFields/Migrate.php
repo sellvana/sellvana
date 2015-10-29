@@ -205,7 +205,6 @@ class Sellvana_CustomerFields_Migrate extends BClass
                 'field_id'    => "int(10) UNSIGNED NOT NULL",
                 'position'    => "tinyint(3) NOT NULL DEFAULT '0'",
                 'locale'      => "varchar(10) DEFAULT NULL",
-                'site_id'     => "int(10) UNSIGNED DEFAULT NULL",
                 'value_id'    => "int(10) UNSIGNED",
                 'value_int'   => "int",
                 'value_dec'   => "decimal(12,2)",
@@ -218,7 +217,6 @@ class Sellvana_CustomerFields_Migrate extends BClass
                 'customer' => ['customer_id', $tCustomer],
                 'field'    => ['field_id', $tField],
                 'value'    => ['value_id', $tFieldOption],
-                'site'     => ['site_id', $tSite],
             ],
         ]);
 
@@ -276,6 +274,24 @@ class Sellvana_CustomerFields_Migrate extends BClass
             }
             $row->set(['value_var' => null, 'value_id' => $valueId])->save();
         });
+
+        if ($this->BMigrate->isModuleVersion('Sellvana_MultiSite', '0.5.2.0~')) {
+            $this->after__Sellvana_MultiSite__0_5_2_0();
+        }
     }
 
+    public function after__Sellvana_MultiSite__0_5_2_0()
+    {
+        $tCustomerField = $this->Sellvana_CustomerFields_Model_CustomerFieldData->table();
+        $tSite          = $this->Sellvana_MultiSite_Model_Site->table();
+
+        $this->BDb->ddlTableDef($tCustomerField, [
+            BDb::COLUMNS => [
+                'site_id' => "int(10) UNSIGNED DEFAULT NULL",
+            ],
+            BDb::CONSTRAINTS => [
+                'site' => ['site_id', $tSite],
+            ],
+        ]);
+    }
 }
