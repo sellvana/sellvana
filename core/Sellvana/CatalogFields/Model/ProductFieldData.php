@@ -311,11 +311,12 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 continue;
             }
             foreach ($fieldsData[$product->id()] as $row) {
-//                if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')
-//                    && $this->Sellvana_MultiSite_Main->isFieldDataBelongsToThisSite($row)
-//                ) {
-//                    continue;
-//                }
+                if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')
+                    && !$this->Sellvana_MultiSite_Main->isFieldDataBelongsToThisSite($row)
+                ) {
+                    exit('zzz');
+                    continue;
+                }
                 $column = static::$_fieldTypeColumns[$row->get('table_field_type')];
                 $value  = $row->get($column);
                 if ($row->get('table_field_type') === 'options') {
