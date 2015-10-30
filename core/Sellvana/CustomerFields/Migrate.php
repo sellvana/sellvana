@@ -17,8 +17,6 @@ class Sellvana_CustomerFields_Migrate extends BClass
     {
         $tField         = $this->Sellvana_CustomerFields_Model_Field->table();
         $tFieldOption   = $this->Sellvana_CustomerFields_Model_FieldOption->table();
-        $tCustomerField = $this->Sellvana_CustomerFields_Model_CustomerFieldData->table();
-        $tCustomer      = $this->Sellvana_Customer_Model_Customer->table();
 
         $this->BDb->ddlTableDef($tField, [
             BDb::COLUMNS => [
@@ -63,27 +61,13 @@ class Sellvana_CustomerFields_Migrate extends BClass
                 'field' => ['field_id', $tField],
             ],
         ]);
-
-        $this->BDb->ddlTableDef($tCustomerField, [
-            BDb::COLUMNS     => [
-                'id'               => 'int unsigned not null auto_increment',
-                'customer_id'      => 'int unsigned not null',
-                '_fieldset_ids'    => 'text',
-                '_add_field_ids'   => 'text',
-                '_hide_field_ids'  => 'text',
-                '_data_serialized' => 'text',
-            ],
-            BDb::PRIMARY     => '(id)',
-            BDb::CONSTRAINTS => [
-                'customer' => ['customer_id', $tCustomer],
-            ],
-        ]);
-
     }
 
     public function upgrade__0_5_0_0__0_5_1_0()
     {
         $tField = $this->Sellvana_CustomerFields_Model_Field->table();
+        $tCustomerField = $this->Sellvana_CustomerFields_Model_CustomerFieldData->table();
+        $tCustomer      = $this->Sellvana_Customer_Model_Customer->table();
 
         // update field type to have customer option
         $this->BDb->ddlTableDef($tField, [
@@ -108,15 +92,18 @@ class Sellvana_CustomerFields_Migrate extends BClass
             ]
         ]);
 
-        $tCustomerField = $this->Sellvana_CustomerFields_Model_CustomerFieldData->table();
-        //$this->BDb->run(sprintf('RENAME TABLE `%s` TO `%s`', $this->BDb->t('fcom_customer_custom'), $tCustomerField));
         $this->BDb->ddlTableDef($tCustomerField, [
-            BDb::COLUMNS => [
-                '_fieldset_ids'   => 'DROP',
-                '_add_field_ids'  => 'DROP',
-                '_hide_field_ids' => 'DROP',
+            BDb::COLUMNS     => [
+                'id'               => 'int unsigned not null auto_increment',
+                'customer_id'      => 'int unsigned not null',
+                '_data_serialized' => 'text',
+            ],
+            BDb::PRIMARY     => '(id)',
+            BDb::CONSTRAINTS => [
+                'customer' => ['customer_id', $tCustomer],
             ],
         ]);
+
     }
 
     public function upgrade__0_5_1_0__0_5_1_1()
@@ -130,6 +117,7 @@ class Sellvana_CustomerFields_Migrate extends BClass
                 'account_edit'  => "BOOLEAN DEFAULT 0",
             ]
         ]);
+
     }
 
     public function upgrade__0_5_1_1__0_5_2_0()
