@@ -314,7 +314,6 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')
                     && !$this->Sellvana_MultiSite_Main->isFieldDataBelongsToThisSite($row)
                 ) {
-                    exit('zzz');
                     continue;
                 }
                 $column = static::$_fieldTypeColumns[$row->get('table_field_type')];
