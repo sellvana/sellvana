@@ -485,7 +485,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         if (is_array($type)) {
             list($I, $V) = $type;
-            $orm->where_raw("pa.media_type = '$I' OR (pa.media_type = '$V' AND pa.is_default = 1)")
+            // $orm->where_raw("pa.media_type = '$I' OR (pa.media_type = '$V' AND pa.is_default = 1)")
+            $orm->where_raw("pa.media_type = '$I' OR pa.media_type = '$V'")
                 ->order_by_desc('pa.media_type');
         } else {
             $orm->where('pa.media_type', $type)
