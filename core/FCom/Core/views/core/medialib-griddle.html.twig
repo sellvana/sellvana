@@ -217,6 +217,7 @@
             var url = $('.oembed_url').val();
             if (!url) {
                 $.bootstrapGrowl("{{ 'Error: Please enter video link.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                return;
             }
 
             switch(provider) {
