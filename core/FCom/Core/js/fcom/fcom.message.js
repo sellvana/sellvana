@@ -5,7 +5,7 @@ define(['jquery', 'react'], function ($, React) {
             return Object.prototype.toString.call(arg) === '[object Array]';
         };
     }
-    var Messages;
+    var Messages = {};
 
     var FcomMessages = React.createClass({
         displayName: "FcomMessagesQueue",
@@ -142,24 +142,27 @@ define(['jquery', 'react'], function ($, React) {
     function init(messagesDomId, messages) {
         var messagesDom = document.getElementById(messagesDomId);
 
+        this.id = messagesDomId;
+
         if (null !== messagesDom) {
-            Messages = React.render(
+            Messages[messagesDomId] = React.render(
                 React.createElement(FcomMessages, {key: 'messages'}),
                 messagesDom
             );
 
-            Messages.pushMessage(messages);
+            Messages[messagesDomId].pushMessage(messages);
         }
     }
 
     function push(messages) {
         if (undefined !== messages) {
-            Messages.pushMessage(messages);
+            Messages[this.id].pushMessage(messages);
         }
     }
 
     return {
         init: init,
-        push: push
+        push: push,
+        id: null
     }
 });
