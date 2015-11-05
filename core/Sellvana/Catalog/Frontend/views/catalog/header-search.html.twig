@@ -1,17 +1,45 @@
 <style type="text/css">
-    .short-desc {
-        color: #595959;
-        font-size: 0.6em;
-    }
     .product-search-img {
         width: 20%;
         display: inline-block;
     }
 
-    .product-search-info {
-        width: 70%;
-        height: 100%;
-        display: inline-block;
+    .typeahead-product-info {
+        display: block;
+        font-size: 0.9em;
+    }
+
+    .short-desc {
+        display: inline;
+        color: #595959;
+        font-size: 0.6em;
+    }
+
+    .typeahead-header, .typeahead-footer {
+        padding: 5px 10px;
+    }
+
+    .typeahead-footer a {
+        font-size: 1em;
+        padding: 10px 0;
+        display: block;
+    }
+
+    .typeahead-footer a:hover {
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        background: #4B65B1;
+        color: #fff;
+    }
+
+    .typeahead-footer a:hover .search-text {
+        color: #fff;
+    }
+
+    .search-text {
+        font-size: 0.9em;
+        text-transform: uppercase;
     }
 
     .tt-menu {
@@ -28,14 +56,36 @@
         -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
         box-shadow: 0 5px 10px rgba(0,0,0,.2);
     }
+    
     .tt-suggestion {
         padding: 3px 20px;
         font-size: 18px;
         line-height: 24px;
+        position: relative;
     }
 
     .tt-suggestion a {
-        color: #000;
+        display: block;
+        width: 100%;
+        height: 40px;
+        color: #66757F;
+        line-height: 15px;
+        font-size: 0.8em;
+    }
+
+    .tt-suggestion a img {
+        margin-right: 15px;
+        float: left;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+    }
+
+    .btn-search-preview {
+        display: block;
+        float: right;
+        font-size: 1em;
+        line-height: 40px;
     }
 
     .tt-cursor {
@@ -52,11 +102,6 @@
         color: #fff;
     }
 
-    .tt-suggestion a {
-        margin: 0;
-        font-size: 0.8em;
-    }
-
     .tt-highlight {
         color: #4B65B1;
     }
@@ -64,27 +109,83 @@
     .empty-message {
         padding-left: 12px;
     }
+
+    .product-preview-modal {
+        position: absolute;
+        width: 500px;
+        background: #f8f8f8;
+        padding: 12px;
+        -webkit-border-radius: 6px;
+        -moz-border-radius: 6px;
+        border-radius: 6px;
+        left: 430px;
+        top: -20px;
+        -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+        -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+        box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    }
+
+    .product-preview-modal .product-preview-left {
+        width: 30%;
+        display: block;
+        margin-right: 15px;
+        float: left;
+    }
+
+    .product-preview-modal .product-preview-left img {
+        vertical-align: inherit !important;
+        -webkit-border-radius: 6px;
+        -moz-border-radius: 6px;
+        border-radius: 6px;
+    }
+
+    .product-preview-modal .product-preview-right {
+        width: 60%;
+        display: block;
+        line-height: 30px;
+        float: left;
+    }
+
+    p.product-preview-desc {
+        margin-top: 15px;
+    }
+
+    .base-price {
+        color: #999;
+        text-decoration: line-through;
+    }
+
+    .product-preview-modal .product-preview-right p {
+        font-size: 0.7em;
+        line-height: 15px;
+    }
+
+    .product-preview-modal .product-preview-right h4 {
+        color: #fff;
+        font-size: 1em;
+        margin-bottom: 10px;
+        color: #4B65B1;
+        font-weight: bold;
+        padding-top: 0;
+    }
 </style>
 <form class="navbar-form f-header-search-form {{ THIS.get('for_mobile') ? 'visible-xs' : 'hidden-xs' }}" role="search" action="{{ APP.href('catalog/search') }}">
-    <input type="text" class="form-control typeahead" autocomplete="off" placeholder="{{ 'Search the store'|_ }}" name="q" value="{{ THIS.get('query') }}">
+    <input type="text" class="form-control typeahead" placeholder="{{ 'Search the store'|_ }}" name="q">
     <button type="submit" class="btn btn-default {{ THIS.get('for_mobile') ? 'btn-sm' }}"><span class="glyphicon glyphicon-search"></span></button>
 </form>
+
 {% if not THIS.get('for_mobile') %}
   <script type="text/javascript">
     require(['jquery', 'underscore', 'bloodhound', 'typeahead'], function($, _, Bloodhound) {
-        var $input = $('.f-header-search-form input[name=q]');
+        var $input = $('.typeahead');
         var url = '{{ APP.href('catalog/search/autocomplete') }}';
-        var products = {{ UTIL.toJson(THIS.get('products')) | raw }};
-        if (_.isEmpty(products)) {
-            products = [];
-        }
 
         var engine = new Bloodhound({
-            name: 'products',
-            limit: 10,
             queryTokenizer: Bloodhound.tokenizers.whitespace,
-            datumTokenizer: function(d) {
-                return Bloodhound.tokenizers.whitespace(d.val);
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('val'),
+            sufficient: 20,
+            identify: function(datum) {
+                return datum.id;
             },
             /*local: $.map(products, function(item) {
                 return { val: item.product_name };
@@ -92,7 +193,9 @@
             prefetch: {
                 url: url,
                 filter: function(products) {
-                    return products;
+                    return $.map(products, function(item) {
+                        return { val: item };
+                    });
                 }
             },
             remote: {
@@ -107,44 +210,43 @@
 
         engine.initialize();
 
-        var substringMatcher = function(strs) {
-            return function findMatches(q, cb) {
-                var matches, substringRegex;
-
-                // an array that will be populated with substring matches
-                matches = [];
-
-                // regex used to determine if a string contains the substring `q`
-                substrRegex = new RegExp(q, 'i');
-
-                // iterate through the pool of strings and for any string that
-                // contains the substring `q`, add it to the `matches` array
-                $.each(strs, function(i, str) {
-                    var n = str.product_name;
-                    if (substrRegex.test(n)) {
-                        matches.push(str);
-                    }
-                });
-
-                cb(matches);
-            };
-        };
-
-        $input.typeahead({ hint: true, highlight: true }, {
+        $input.typeahead(null, {
             name: 'products',
             displayKey: 'val',
             limit: 5,
-            // source: substringMatcher(products),
+            minLength: 3,
             source: engine.ttAdapter(),
             templates: {
                 suggestion: function (data) {
-                    return '<div class="tt-suggestion tt-selectable"><div class="product-search-img"><img src="'+data.thumb_url+'" title="'+data.product_name+'" /></div><div class="product-search-info"><a href="{{ APP.frontendHref() }}'+data.url_key+'">' + data.product_name + '</a><p class="small short-desc"><em>'+data.short_description+'</em></p></div></div>';
+                    return '<div class="tt-suggestion tt-selectable"><a href="{{ APP.frontendHref() }}'+data.url_key+'" class="search-product-item" title="'+data.product_name+'"><img src="'+data.thumb_url+'" title="'+data.product_name+'" /><span class="typeahead-product-info"><strong>' + data.product_name + '</strong><i onmouseover="window.showPreviewProduct(this)" onmouseout="window.hidePreviewProduct(this)" class="btn-search-preview fa fa-search text-right" title="preview"></i></span><span class="short-desc"><em>'+data.short_description+'</em></span></a><div class="product-preview-modal" style="display: none;"><div class="preview-body"><div class="product-preview-left"><img src="'+data.preview_thumb+'" title="'+data.product_name+'" /></div><div class="product-preview-right"><h4 class="preview-header-title">'+data.product_name+'</h4><p class="product-preview-price">'+data.price.base.label+': <span class="base-price">$'+data.price.base.value+'</span></p><p class="sale product-preview-sale text-danger">'+data.price.sale.label+': $'+data.price.sale.value+'</p><p class="sale text-danger">'+data.price.save.label+': '+data.price.save.formatted+'</p><p class="product-preview-desc">'+data.description.replace(/<[^>]*>?/g, '')+'</p></div></div></div></div>';
                 },
-                empty: '<div class="empty-message">No matches.</div>'
+                empty: '<div class="empty-message">No matches.</div>',
+                pending: "<div class='waiting' style='text-align: center;'><img width='40px' src='{{ CONFIG.get('web/media_dir') ~ '/waiting.gif' }}'></div>",
+                header: function (data) {
+                    return '<div class="typeahead-header text-muted text-center">Searched for <strong>' + data.query + '</strong></div>';
+                },
+                footer: function(data) {
+                    return '<div class="typeahead-footer text-mute text-center"><a href="{{ APP.href('catalog/search') }}?q='+encodeURIComponent(data.query)+'" title="Search All Products" class="btn-load-more">Search all product for <strong class="search-text text-primary">'+data.query+'</strong></a></div>';
+                }
             }
+        })
+        .on('typeahead:selected', function($e, datum) {
+            document.location = "{{ APP.href('/') }}" + encodeURIComponent(datum.url_key);
+        })
+        .on('typeahead:cursorchange', function($e, datum) {
+            if (datum) $input.val(datum.product_name);
         });
 
-        
+        window.showPreviewProduct = function(target) {
+            var $container = $(target).parents('.tt-suggestion');
+            $preview = $container.find('.product-preview-modal');
+            $preview.fadeIn('200');
+        }
+        window.hidePreviewProduct = function(target) {
+            $container = $(target).parents('.tt-suggestion');
+            $preview = $container.find('.product-preview-modal');
+            $preview.fadeOut('200');
+        }
     });
   </script>
 {% endif %}
