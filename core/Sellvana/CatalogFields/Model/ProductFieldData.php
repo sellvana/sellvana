@@ -16,6 +16,7 @@
  * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_Set $Sellvana_CatalogFields_Model_Set
+ * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
  *
  * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
  */
@@ -77,6 +78,10 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
      */
     public function saveProductsFieldData($products)
     {
+        if ($this->Sellvana_CatalogFields_Main->isDisabled()) {
+            return $this;
+        }
+
         $defaultSet = $this->Sellvana_CatalogFields_Model_Set->loadWhere([
             'set_code' => 'default',
             'set_type' => 'product',
@@ -311,11 +316,11 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 continue;
             }
             foreach ($fieldsData[$product->id()] as $row) {
-//                if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')
-//                    && $this->Sellvana_MultiSite_Main->isFieldDataBelongsToThisSite($row)
-//                ) {
-//                    continue;
-//                }
+                if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')
+                    && !$this->Sellvana_MultiSite_Main->isFieldDataBelongsToThisSite($row)
+                ) {
+                    continue;
+                }
                 $column = static::$_fieldTypeColumns[$row->get('table_field_type')];
                 $value  = $row->get($column);
                 if ($row->get('table_field_type') === 'options') {

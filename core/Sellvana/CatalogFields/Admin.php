@@ -75,6 +75,8 @@ class Sellvana_CatalogFields_Admin extends BClass
 
     public function onProductFormPostAfterValidate($args)
     {
+        $this->Sellvana_CatalogFields_Main->disable();
+
         /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         $data = &$args['data'];
