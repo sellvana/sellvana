@@ -1123,6 +1123,7 @@ define(fcomAdminDeps, function ($, Ladda) {
         } */
         var tabs, panes, curLi, curPane, editors = {};
         var ajaxPassed = false;
+        var loader;
 
         /**
          *
@@ -1267,6 +1268,28 @@ define(fcomAdminDeps, function ($, Ladda) {
             return false;
         }
 
+        function _processSessionTimeout(event, data, el, saveAndContinue) {
+            if ($.inArray(event.status, [401, 403]) || data.error == 'login') {
+                $.get(options.url_get, function(data) {
+                    if (data.form !== undefined) {
+                        if ($('#login_modal_form').length == 0) {
+                            $('body').append(data.form);
+                            $('#login_modal_form').modal({keyboard: false}).on('hidden.bs.modal', function() {
+                                loader.stop();
+                                $(this).data('bs.modal', null).remove();
+                            });
+                        }
+                        $('#login_modal_form_btn').click(function() {
+                            $('#login-form').on('login:modal_form:result', function() {
+                                $("#login_modal_form").modal('hide');
+                                saveAll(el, saveAndContinue);
+                            }).submit();
+                        });
+                    }
+                });
+            }
+        }
+
         /**
          *
          * @param el
@@ -1274,10 +1297,11 @@ define(fcomAdminDeps, function ($, Ladda) {
          * @returns {boolean}
          */
         function saveAll(el, saveAndContinue) {
-            //TODO
             ajaxPassed = true;
             var form = $(el).closest('form');
-            var loader = Ladda.create(el);
+            if (!loader) {
+                loader = Ladda.create(el);
+            }
             loader.start();
             $(form).submit(function(event) {
                 if (ajaxPassed) {
@@ -1298,6 +1322,11 @@ define(fcomAdminDeps, function ($, Ladda) {
             var url_post = options.url_get + (options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post + 'tabs=ALL&mode=view', postData, function (data, status, req) {
                 FCom.Admin.log(data);
+                if (data.error == 'login') {
+                    _processSessionTimeout({status: status}, data, el, saveAndContinue);
+                    return;
+                }
+
                 for (var msgId in data.messages) {
                     sysMessages.push({
                         msg: data.messages[msgId].text || 'The form has been saved',
@@ -1342,6 +1371,8 @@ define(fcomAdminDeps, function ($, Ladda) {
                     $('#tabs .icon-pencil, #tabs .icon-warning-sign.error').remove();
                     ajaxPassed = false;
                 }
+            }).fail(function(event, data) {
+                _processSessionTimeout(event, data, el, saveAndContinue);
             });
             return false;
         }
@@ -1670,7 +1701,7 @@ define(fcomAdminDeps, function ($, Ladda) {
             if (request.responseText[0]==='{' && (data = $.parseJSON(request.responseText))) {
                 if (data.error == 'login') {
 //                    location.href = FCom.base_href;
-                    location.reload(true);
+                    //location.reload(true);
                 }
             }
         });

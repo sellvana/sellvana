@@ -46,7 +46,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = $this->BRequest;
         if ($r->xhr()) {
             $this->BSession->set('admin_login_orig_url', $r->referrer());
-            $this->BResponse->json(['error' => 'login']);
+            $loginForm = $this->BLayout->getView('login')->render();
+            $this->BResponse->json([
+                'error' => 'login',
+                'form' => $this->BLayout->getView('login/modal_form')->set('loginForm', $loginForm)->render()
+            ]);
         } else {
             $this->BSession->set('admin_login_orig_url', $r->currentUrl());
             $this->layout('/login');
