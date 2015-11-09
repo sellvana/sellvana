@@ -220,7 +220,7 @@ DELETE FROM {$tTerm} WHERE NOT EXISTS (SELECT dt.term_id FROM {$tDocTerm} dt whe
         if ($this->_bus['request']['query']) {
             $terms = $this->_retrieveTerms($this->_bus['request']['query']);
             //TODO: put weight for `position` in search relevance
-            $tDocTerm = $tDocTerm = $this->Sellvana_CatalogIndex_Model_DocTerm->table();
+            $tDocTerm = $this->Sellvana_CatalogIndex_Model_DocTerm->table();
             $orm = $this->Sellvana_CatalogIndex_Model_Term->orm();
             //$orm->where_in('term', $terms);
             $orm->where_in('term', $terms);
