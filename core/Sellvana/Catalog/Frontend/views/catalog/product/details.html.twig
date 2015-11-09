@@ -75,7 +75,7 @@
                     {% if media.get('media_type') == 'V' %}
                         {% if media.get('file_size') %}
                             <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
-                                <a href="javascript:void(0)"><img src="{{ CONFIG.get('web/media_dir') ~ '/video-default.jpg' }}" title="There's no image for this video"></a>
+                                <a href="javascript:void(0)"><img src="{{ APP.src('@FCom_Admin/Admin/theme1/assets/images/video-default.jpg') }}" title="There's no image for this video"></a>
                             </li>
                         {% else %}
                             {% set data = UTIL.fromJson(media.get('data_serialized')) | raw %}

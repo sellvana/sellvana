@@ -80,7 +80,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
 
         if ($id == 'all_videos') {
-            $defaultThumbnail = $this->BConfig->get('web/media_dir') . '/video-default.jpg';
+            $defaultThumbnail = $this->BApp->src('@FCom_Admin/Admin/theme1/assets/images/video-default.jpg');
             $elementPrint = '
                 if (rc.row["file_size"] !== undefined && rc.row["file_size"] !== null) {
                     var html = $("<video width=\'200\' height=\'140\' controls=\'controls\' id=\'video-"+ rc.row["id"] +"\' class=\'product-video-media\' preload=\'none\'><source src=\''. $baseSrc .'" + rc.row["folder"] + "/" + rc.row["file_name"] + "\' type=\'video/" + rc.row["file_name"].slice(rc.row["file_name"].lastIndexOf(".") + 1) + "\'></video>");
