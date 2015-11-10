@@ -233,6 +233,7 @@ DELETE FROM {$tTerm} WHERE NOT EXISTS (SELECT dt.term_id FROM {$tDocTerm} dt whe
                     }
                     $func = "(levenshtein(term, {$orm->get_db()->quote($term)}))";
                     $correct = $this->Sellvana_CatalogIndex_Model_Term->orm()
+                        ->where_like('term', $term[0] . '%')
                         ->where_raw($func)
                         ->order_by_asc($func)
                         ->find_one();
