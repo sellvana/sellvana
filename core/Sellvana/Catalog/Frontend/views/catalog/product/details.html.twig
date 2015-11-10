@@ -51,8 +51,8 @@
                         {% if media.get('media_type') == 'V' %}
                             {% if media.get('file_size') %}
                                 <li class="product-video-item" style="padding: 80px 0;">
-                                    <video id="product-video" width="480" height="320" poster="" controls="controls" preload="true">
-                                        <source type="video/{{ media.get('file_name')[-3: 3] }}" src="{{ media.getUrl() }}" />
+                                    <video id="product-video" width="460" height="320" preload="metadata" src="{{ media.getUrl() }}">
+                                        <source type="video/{{ media.get('file_name')[-3: 3] }}" src="{{ media.getUrl() }}"></source>
                                     </video>
                                 </li>
                             {% else %}
@@ -75,7 +75,7 @@
                     {% if media.get('media_type') == 'V' %}
                         {% if media.get('file_size') %}
                             <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
-                                <a href="javascript:void(0)"><img src="{{ CONFIG.get('web/media_dir') ~ '/video-default.jpg' }}" title="There's no image for this video"></a>
+                                <a href="javascript:void(0)"><img src="{{ APP.src('@FCom_Admin/Admin/theme1/assets/images/video-default.jpg') }}" title="There's no image for this video"></a>
                             </li>
                         {% else %}
                             {% set data = UTIL.fromJson(media.get('data_serialized')) | raw %}
