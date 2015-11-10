@@ -1308,6 +1308,7 @@ define(fcomAdminDeps, function ($, Ladda) {
             });
             $(form).trigger('submit');
             if (!form.validate().checkForm()) {
+                loader.stop();
                 return false;
             }
 
@@ -1378,6 +1379,7 @@ define(fcomAdminDeps, function ($, Ladda) {
                     }
                 }
             }).fail(function(event, data) {
+                loader.stop();
                 _processSessionTimeout(event, data, el, saveAndContinue);
             });
             return false;

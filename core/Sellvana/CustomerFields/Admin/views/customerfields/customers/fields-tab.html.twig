@@ -263,8 +263,7 @@
     </script>
 
 <script>
-    console.log(262);
-    $('#fcom_append_form').append('<form id="cust-new-field-form1" class="form form-horizontal validate-form"></form>');
+$('#fcom_append_form').append('<form id="cust-new-field-form1" class="form form-horizontal validate-form"></form>');
 var $custModal = $("#cust-new-field-modal");
 var html = $custModal.html();
 $custModal.remove();
@@ -375,7 +374,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     $(_mainForm).submit(function(ev) {
 
         var newVal = JSON.stringify(setCollection.toJSON());
-        console.log(newVal);
         $('#custom_fields').val(newVal);
 
         if(!$(this).valid()) {
@@ -399,7 +397,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             url: '{{ APP.href('/customerfields/fields/unique_field') | raw }}',
             type: 'post',
              data: {
-                name: 'field_code'
+                _name: 'field_code'
             },
             dataFilter: function (responseString) {
                 var response = jQuery.parseJSON(responseString);
@@ -432,7 +430,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             hash[$(this).attr('id')] = $(this).val();
         });
         hash.oper = 'add';
-        $.post('{{ APP.href('/customerfields/fieldsets/field_grid_data') | raw }}', hash, function(res) {
+        $.post('{{ APP.href('/customerfields/fields/field_grid_data') | raw }}', hash, function(res) {
             var field = new CustomField.Models.Field(res);
             var flag = false;
 //            setCollection.each(function(set) {
@@ -681,7 +679,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         _remove: function() {
             var confirm = window.confirm("{{ "Do you want to really remove?"|_ }}");
             if (confirm) {
-                console.log(684);
                 add_option(this.model);
                 if (this.options.parentSet) {
                     console.log("removing");
@@ -739,7 +736,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _addFieldView: function(field) {
 //            var setView = new  CustomField.Views.FieldSetView({model: set});
-            console.log(field);
             var fieldView = new CustomField.Views.FieldView({model: field, parentSet: setCollection});
             this.$el.find('div.box-content').append(fieldView.render().el);
 
@@ -796,7 +792,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 //    }
     setCollection.on('add remove change', function (ev, data) {
         var newVal = JSON.stringify(setCollection.toJSON());
-        console.log(newVal);
         $('#custom_fields').val(newVal);
 
 //        if (setCollection.length === 0) {
