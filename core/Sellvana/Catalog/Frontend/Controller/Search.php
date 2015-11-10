@@ -13,6 +13,7 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
  * @property Sellvana_Catalog_Model_SearchHistoryLog $Sellvana_Catalog_Model_SearchHistoryLog
+ * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  */
 
 class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
@@ -101,13 +102,22 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
     public function action_autocomplete()
     {
         $products = [];
-        $orm = $this->Sellvana_CatalogIndex_Main->getIndexer()->searchProducts([
-                'query' => $this->BRequest->get('q')
-            ])['orm'];
-        if ($orm) {
-            $products = $orm->select(['p.id', 'p.product_name', 'p.thumb_url', 'p.avg_rating', 'p.description', 'p.short_description', 'p.url_key'])
-                            ->limit(10)
-                            ->find_many();
+        $q = $this->BRequest->get('q');
+        $alias = $this->Sellvana_Catalog_Model_SearchAlias->fetchSearchAlias($q);
+        if ($alias) {
+            $q = $alias->get('target_term');
+        }
+        if ($this->BModuleRegistry->isLoaded('Sellvana_CatalogIndex')) {
+            $indexResult = $this->Sellvana_CatalogIndex_Main->getIndexer()->searchProducts(['query' => $q]);
+            $orm = $indexResult['orm'];
+        }  else {
+            $orm = $this->Sellvana_Catalog_Model_Product->searchProductOrm($q);
+        }
+        if (!empty($orm)) {
+            $products = $orm->select(['p.id', 'p.product_name', 'p.thumb_url', 'p.avg_rating', 'p.description',
+                    'p.short_description', 'p.url_key'])
+                ->limit(10)
+                ->find_many();
 
             if (!empty($products)) {
                 array_walk($products, function($product) {
@@ -119,6 +129,7 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
             }
         }
 
-        $this->BResponse->json($products);
+        $result = $this->BDb->many_as_array($products);
+        $this->BResponse->json($result);
     }
 }

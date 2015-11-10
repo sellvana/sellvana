@@ -9,7 +9,14 @@ modules:
                 todo:
                     - AJAX Save and Save and continue
 
-        require: { module: { FCom_Core: 0.5.0.0, FCom_LibJsCommon: 0.5.0.0, FCom_LibTwig: 0.5.0.0, FCom_Frontend: 0.5.0.0, FCom_LibScssPhp: 0.5.0.0 } }
+        require:
+            module:
+                FCom_Core: 0.5.0.0
+                FCom_LibJsCommon: 0.5.0.0
+                FCom_LibTwig: 0.5.0.0
+                FCom_Frontend: 0.5.0.0
+                FCom_LibScssPhp: 0.5.0.0
+                FCom_LibJsCkeditor: 0.5.0.0
 
         translations:
             de: de.php
