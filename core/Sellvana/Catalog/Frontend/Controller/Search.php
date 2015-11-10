@@ -100,11 +100,25 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
 
     public function action_autocomplete()
     {
-        $result = [
-            'abc',
-            'def',
-            'efg',
-        ];
-        $this->BResponse->json($result);
+        $products = [];
+        $orm = $this->Sellvana_CatalogIndex_Main->getIndexer()->searchProducts([
+                'query' => $this->BRequest->get('q')
+            ])['orm'];
+        if ($orm) {
+            $products = $orm->select(['p.id', 'p.product_name', 'p.thumb_url', 'p.avg_rating', 'p.description', 'p.short_description', 'p.url_key'])
+                            ->limit(10)
+                            ->find_many();
+
+            if (!empty($products)) {
+                array_walk($products, function($product) {
+                    if (empty($product->thumb_url)) {
+                        $product->thumb_url = $product->thumbUrl(140);
+                    }
+                    $product->price = $product->getFrontendPrices();
+                });
+            }
+        }
+
+        $this->BResponse->json($products);
     }
 }
