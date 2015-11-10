@@ -181,6 +181,19 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ]
             ];
 
+            $actions['mark_paid'] = [
+                'button',
+                [
+                    'name' => 'do',
+                    'type' => 'submit',
+                    'value' => 'MARK_PAID',
+                    'class' => ['btn', 'btn-default'],
+                ],
+                [
+                    ['span', null, $this->BLocale->_('Mark as Paid')],
+                ]
+            ];
+
             $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($m->get('grand_total'))
                 . ' | ' . $this->_('Overall Status') . ': ' . $m->state()->overall()->getValueLabel()
                 . ' | ' . $this->_('Payment') . ': ' . $m->state()->payment()->getValueLabel()
@@ -217,7 +230,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         }
 
         if ($args['do'] === 'SHIP_ALL') {
+            /*$this->Sellvana_Sales_Main->workflowAction('adminMarksOrderAsShipped', [
+                'order' => $order
+            ]);*/
             $order->shipAllShipments();
+        } elseif ($args['do'] === 'MARK_PAID') {
+            $this->Sellvana_Sales_Main->workflowAction('adminMarksOrderAsPaid', [
+                'order' => $order
+            ]);
         }
 
         $pay = $this->BRequest->post('pay');

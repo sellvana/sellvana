@@ -6,6 +6,7 @@
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
 {
@@ -141,4 +142,22 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         $args['order']->addHistoryEvent('custom_state', 'Admin user has changed custom order state to "' . $label . '"');
         $args['order']->save();
     }
+
+    public function action_adminMarksOrderAsPaid($args)
+    {
+        $this->Sellvana_Sales_Main->workflowAction('adminMarksPaymentAsPaid', [
+            'payments' => $args['order']->payments()
+        ]);
+
+        //$args['order']->state()->payment()->setPaid();
+        $args['order']->addHistoryEvent('processing', 'Admin user has marked the order as paid');
+
+        $args['order']->state()->calcAllStates();
+        $args['order']->saveAllDetails();
+    }
+
+    /*public function action_adminMarksOrderAsShipped($args)
+    {
+        $args['order']->shipAllShipments();
+    }*/
 }

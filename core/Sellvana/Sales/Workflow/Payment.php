@@ -181,4 +181,14 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $args['payment']->addHistoryEvent('custom_state', 'Admin user has changed custom payment state to "' . $label . '"');
         $args['payment']->save();
     }
+
+    public function action_adminMarksPaymentAsPaid($args)
+    {
+        /** @var Sellvana_Sales_Model_Order_Payment $payment */
+        foreach ($args['payments'] as &$payment) {
+            $payment->state()->overall()->setPaid();
+            $payment->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
+            $payment->save();
+        }
+    }
 }
