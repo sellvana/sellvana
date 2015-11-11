@@ -1,0 +1,4 @@
+{% set m = THIS.get('model') %}
+{% set hlp = APP.instance('Sellvana_Email_Admin_Controller_Messages') %}
+{% set messagesConfig = hlp.messagesGridConfig(m) %}
+{{ THIS.view('core/griddle').set('grid', messagesConfig) | raw }}
