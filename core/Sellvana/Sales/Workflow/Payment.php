@@ -174,6 +174,9 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 
     }
 
+    /**
+     * @param Sellvana_Sales_Model_Order_Payment[] $args
+     */
     public function action_adminChangesPaymentCustomState($args)
     {
         $newState = $args['payment']->state()->custom()->setState($args['state']);
@@ -182,13 +185,13 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
         $args['payment']->save();
     }
 
+    /**
+     * @param Sellvana_Sales_Model_Order_Payment[] $args
+     */
     public function action_adminMarksPaymentAsPaid($args)
     {
-        /** @var Sellvana_Sales_Model_Order_Payment $payment */
-        foreach ($args['payments'] as &$payment) {
-            $payment->state()->overall()->setPaid();
-            $payment->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
-            $payment->save();
-        }
+        $args['payment']->state()->overall()->setPaid();
+        $args['payment']->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
+        $args['payment']->save();
     }
 }

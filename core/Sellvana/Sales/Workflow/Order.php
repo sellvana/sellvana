@@ -143,17 +143,12 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         $args['order']->save();
     }
 
+    /**
+     * @param Sellvana_Sales_Model_Order[] $args
+     */
     public function action_adminMarksOrderAsPaid($args)
     {
-        $this->Sellvana_Sales_Main->workflowAction('adminMarksPaymentAsPaid', [
-            'payments' => $args['order']->payments()
-        ]);
-
-        //$args['order']->state()->payment()->setPaid();
-        $args['order']->addHistoryEvent('processing', 'Admin user has marked the order as paid');
-
-        $args['order']->state()->calcAllStates();
-        $args['order']->saveAllDetails();
+        $args['order']->markAsPaid();
     }
 
     /*public function action_adminMarksOrderAsShipped($args)
