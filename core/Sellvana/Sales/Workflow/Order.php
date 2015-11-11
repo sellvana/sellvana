@@ -151,8 +151,11 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         $args['order']->markAsPaid();
     }
 
-    /*public function action_adminMarksOrderAsShipped($args)
+    /**
+     * @param Sellvana_Sales_Model_Order[] $args
+     */
+    public function action_adminMarksOrderAsShipped($args)
     {
         $args['order']->shipAllShipments();
-    }*/
+    }
 }
