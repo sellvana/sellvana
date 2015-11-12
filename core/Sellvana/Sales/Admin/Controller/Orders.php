@@ -497,7 +497,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ],
             'actions' => [
                 'add' => ['caption' => 'Add payment'],
-                'delete' => ['caption' => 'Remove']
+                'delete' => ['caption' => 'Remove'],
+                /*'mark_paid' => [
+                    'caption'      => 'Mark as paid',
+                    'type'         => 'button',
+                    'class'        => 'btn btn-primary',
+                    'isMassAction' => true,
+                    'callback'     => 'markAsPaid',
+                ],*/
             ],
             'filters' => [
                 ['field' => 'payment_method', 'type' => 'multiselect'],

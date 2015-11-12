@@ -190,8 +190,22 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
      */
     public function action_adminMarksPaymentAsPaid($args)
     {
-        $args['payment']->state()->overall()->setPaid();
-        $args['payment']->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
-        $args['payment']->save();
+        $args['payment']->markAsPaid();
+
+        $items = [];
+        /** @var Sellvana_Sales_Model_Order_Payment_Item $paymentItem */
+        foreach ($args['payment']->items() as $paymentItem) {
+            $items[$paymentItem->get('order_item_id')] = $paymentItem->get('qty');
+        }
+
+        /** @var Sellvana_Sales_Model_Order_Item $orderItem */
+        foreach ($args['payment']->order()->items() as $orderItem) {
+            if (!empty($items[$orderItem->id()])) {
+                $orderItem->markAsPaid($items[$orderItem->id()]);
+            }
+        }
+
+        $args['payment']->order()->state()->calcAllStates();
+        $args['payment']->order()->saveAllDetails();
     }
 }
