@@ -1299,8 +1299,6 @@ define(fcomAdminDeps, function ($, Ladda) {
         function saveAll(el, saveAndContinue) {
             ajaxPassed = true;
             var form = $(el).closest('form');
-            loader = Ladda.create(el);
-            loader.start();
             $(form).submit(function(event) {
                 if (ajaxPassed) {
                     event.preventDefault();
@@ -1311,6 +1309,8 @@ define(fcomAdminDeps, function ($, Ladda) {
                 return false;
             }
 
+            loader = Ladda.create(el);
+            loader.start();
             var btnId = form.attr('id') + '-do';
             var isNew = options.is_new;
             if (saveAndContinue) {
