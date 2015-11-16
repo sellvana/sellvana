@@ -98,6 +98,20 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this->get('qty_paid') - $this->get('qty_refunded');
     }
 
+    /**
+     * @param float|null $qty
+     */
+    public function markAsPaid($qty = null)
+    {
+        if ($qty === null) {
+            $qty = $this->get('qty_ordered');
+        } else {
+            $qty = max($this->get('qty_paid') + $qty, $this->get('qty_ordered'));
+        }
+
+        $this->set('qty_paid', $qty);
+    }
+
     public function __destruct()
     {
         parent::__destruct();

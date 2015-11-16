@@ -19,6 +19,7 @@ class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abs
     protected $_mainTableAlias = 'p';
     protected $_permission = 'sales/payments';
     protected $_navPath = 'sales/payments';
+    protected $_gridLayoutName = '/payments';
 
     public function gridConfig()
     {
@@ -31,6 +32,7 @@ class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abs
         $stateCustomOptions = $this->Sellvana_Sales_Model_Order_Payment_State_Custom->getAllValueLabels();
 
         $config = parent::gridConfig();
+        $config['edit_url'] = $this->BApp->href($this->_gridHref . '/mass_change_state');
         $config['orm'] = $this->Sellvana_Sales_Model_Order_Payment->orm('p')
             ->select('p.*')
             ->join('Sellvana_Sales_Model_Order', ['o.id', '=', 'p.order_id'], 'o')
@@ -56,6 +58,13 @@ class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abs
         $config['actions'] = [
             'add' => ['caption' => 'Add payment'],
             'delete' => ['caption' => 'Remove'],
+            'mark_paid' => [
+                'caption'      => 'Mark as paid',
+                'type'         => 'button',
+                'class'        => 'btn btn-primary',
+                'isMassAction' => true,
+                'callback'     => 'markAsPaid',
+            ],
         ];
         $config['filters'] = [
             ['field' => 'order_unique_id', 'type' => 'number-range'],
@@ -69,4 +78,23 @@ class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abs
 
         return $config;
     }
+
+    public function action_mass_change_state__POST()
+    {
+        $request = $this->BRequest;
+        $ids = explode(',', $request->post('id'));
+        $payments = $this->Sellvana_Sales_Model_Order_Payment->orm('op')->where_in('id', $ids)->find_many();
+        $action = 'adminMarksPaymentAs' . ucfirst($request->post('state_overall'));
+
+        foreach ($payments as $payment) {
+            $this->Sellvana_Sales_Main->workflowAction($action, [
+                'payment' => $payment
+            ]);
+        }
+
+        $result = ['success' => true];
+        $this->BResponse->json($result);
+    }
+
+
 }
