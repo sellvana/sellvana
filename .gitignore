@@ -2,6 +2,7 @@ storage/
 media/
 dlc/*
 local/*
+vendor/
 index.local.php
 .idea
 .sass-cache/
@@ -13,10 +14,10 @@ index.local.php
 /storage/
 /bin/
 *.phar
-*.lock
+#*.lock
 *.log
 *.sql
-composer.*
+#composer.*
 notes.txt
 FCom/Test/Test/Unit/buckyball/com/db_test_config.php
 
