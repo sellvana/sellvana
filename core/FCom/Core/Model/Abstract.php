@@ -180,4 +180,29 @@ class FCom_Core_Model_Abstract extends BModel
 
         return $this->_get_id_column_name($class);
     }
+
+    public function updateManyToManyIds(FCom_Core_Model_Abstract $mainModel, $mainIdField, $relIdField, array $newRelIds)
+    {
+        $mId = $mainModel->id();
+
+        $existingRelIds = $this->orm()->where($mainIdField, $mainModel->id())->find_many_assoc('id', $relIdField);
+
+        if ($existingRelIds) {
+            $idsToDelete = array_diff($existingRelIds, $newRelIds);
+            if ($idsToDelete) {
+                $this->delete_many([$mainIdField => $mId, $relIdField => $idsToDelete]);
+            }
+        }
+
+        if ($newRelIds) {
+            $idsToCreate = array_diff($newRelIds, $existingRelIds);
+            if ($idsToCreate) {
+                foreach ($idsToCreate as $rId) {
+                    $this->create([$mainIdField => $mId, $relIdField => $rId])->save();
+                }
+            }
+        }
+
+        return $this;
+    }
 }
