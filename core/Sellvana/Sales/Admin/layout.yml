@@ -45,6 +45,11 @@ base:
             - [ addTab, refunds, { label: Refunds, pos: 60, async: true } ]
             - [ addTab, comments, { label: Comments, pos: 80, async: true } ]
             - [ addTab, history, { label: History, pos: 90, async: true } ]
+    - { hook: main, views: payments/grid }
+
+/payments:
+    - { include: default_griddle }
+    - { hook: main, views: payments/grid }
 
 /header_search:
     - { hook: main, views: "header-search/Sellvana_Sales_Orders" }
