@@ -217,6 +217,7 @@
             var url = $('.oembed_url').val();
             if (!url) {
                 $.bootstrapGrowl("{{ 'Error: Please enter video link.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                return;
             }
 
             switch(provider) {
@@ -261,12 +262,14 @@
             event.preventDefault();
             var $td = $(this).parent().html($(this).data('html'));
             var $video = $td.children('video.product-video-media');
-            new MediaElementPlayer('video#' + $video.prop('id'), {
-                pauseOtherPlayers: true,
-                success: function (mediaElement, domObject) {
-                    mediaElement.load();
-                }
-            });
+            if ($video.length) {
+                new MediaElementPlayer('video#' + $video.prop('id'), {
+                    pauseOtherPlayers: true,
+                    success: function (mediaElement, domObject) {
+                        mediaElement.load();
+                    }
+                });
+            }
         });
     });
 </script>

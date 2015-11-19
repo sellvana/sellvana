@@ -219,6 +219,11 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         return $data;
     }
 
+    public function relevance($products, $field)
+    {
+        return [];
+    }
+
     public function getSortMethod()
     {
         $ft = $this->get('field_type');

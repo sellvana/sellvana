@@ -1123,6 +1123,7 @@ define(fcomAdminDeps, function ($, Ladda) {
         } */
         var tabs, panes, curLi, curPane, editors = {};
         var ajaxPassed = false;
+        var loader;
 
         /**
          *
@@ -1267,6 +1268,28 @@ define(fcomAdminDeps, function ($, Ladda) {
             return false;
         }
 
+        function _processSessionTimeout(event, data, el, saveAndContinue) {
+            if ($.inArray(event.status, [401, 403]) || data.error == 'login') {
+                $.get(options.url_get, function(data) {
+                    if (data.form !== undefined) {
+                        if ($('#login_modal_form').length == 0) {
+                            $('body').append(data.form);
+                            $('#login_modal_form').modal({keyboard: false}).on('hidden.bs.modal', function() {
+                                loader.stop();
+                                $(this).data('bs.modal', null).remove();
+                            });
+                        }
+                        $('#login_modal_form_btn').click(function() {
+                            $('#login-form').on('login:modal_form:result', function() {
+                                $("#login_modal_form").modal('hide');
+                                saveAll(el, saveAndContinue);
+                            }).submit();
+                        });
+                    }
+                });
+            }
+        }
+
         /**
          *
          * @param el
@@ -1274,11 +1297,8 @@ define(fcomAdminDeps, function ($, Ladda) {
          * @returns {boolean}
          */
         function saveAll(el, saveAndContinue) {
-            //TODO
             ajaxPassed = true;
             var form = $(el).closest('form');
-            var loader = Ladda.create(el);
-            loader.start();
             $(form).submit(function(event) {
                 if (ajaxPassed) {
                     event.preventDefault();
@@ -1289,6 +1309,8 @@ define(fcomAdminDeps, function ($, Ladda) {
                 return false;
             }
 
+            loader = Ladda.create(el);
+            loader.start();
             var btnId = form.attr('id') + '-do';
             var isNew = options.is_new;
             if (saveAndContinue) {
@@ -1298,50 +1320,65 @@ define(fcomAdminDeps, function ($, Ladda) {
             var url_post = options.url_get + (options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post + 'tabs=ALL&mode=view', postData, function (data, status, req) {
                 FCom.Admin.log(data);
-                for (var msgId in data.messages) {
+                if (typeof data == 'string') {
                     sysMessages.push({
-                        msg: data.messages[msgId].text || 'The form has been saved',
-                        type: data.status == 'error' ? 'danger' : 'success'
+                        msg: data,
+                        type: 'error'
                     });
-                }
-                if (data.redirect) {
-                    document.location = data.redirect;
-                } else {
                     loader.stop();
-                    var actionUrl = form.attr('action');
-                    var urlInfo = actionUrl.split('?');
-                    if (urlInfo[1]) {
-                        var params = urlInfo[1].split('&');
-                        var newParams = [];
-                        for (var paramId = 0; paramId < params.length; paramId++) {
-                            var pair = params[paramId].split('=');
-                            if (pair[0] == 'id') {
-                                pair[1] = data.id;
-                            }
-                            newParams.push(pair.join('='));
-                        }
-                        actionUrl = urlInfo[0] + '?' + newParams.join('&');
-                    } else {
-                        actionUrl = urlInfo[0] + '?id=' + data.id;
+                } else {
+                    if (data.error == 'login') {
+                        _processSessionTimeout({status: status}, data, el, saveAndContinue);
+                        return;
                     }
-                    options.url_get = actionUrl;
-                    form.attr('action', actionUrl);
-                    if (isNew && saveAndContinue && data.status == 'success') {
-                        if (window.history !== undefined) {
-                            window.history.replaceState({}, data.title, options.url_get);
-                        }
-                        form.find('.btn-group').html(data.buttons);
-                        var textNodes = form.find('.f-page-title').contents().filter(function () {
-                            return this.nodeType == 3;
+
+                    for (var msgId in data.messages) {
+                        sysMessages.push({
+                            msg: data.messages[msgId].text || 'The form has been saved',
+                            type: data.status == 'error' ? 'error' : 'success'
                         });
-                        textNodes[textNodes.length-1].nodeValue = data.title;
-                        $('title').text(data.title);
-                        form.find('#tabs li.hidden').removeClass('hidden');
                     }
-                    $('#' + btnId).remove();
-                    $('#tabs .icon-pencil, #tabs .icon-warning-sign.error').remove();
-                    ajaxPassed = false;
+                    if (data.redirect) {
+                        document.location = data.redirect;
+                    } else {
+                        loader.stop();
+                        var actionUrl = form.attr('action');
+                        var urlInfo = actionUrl.split('?');
+                        if (urlInfo[1]) {
+                            var params = urlInfo[1].split('&');
+                            var newParams = [];
+                            for (var paramId = 0; paramId < params.length; paramId++) {
+                                var pair = params[paramId].split('=');
+                                if (pair[0] == 'id') {
+                                    pair[1] = data.id;
+                                }
+                                newParams.push(pair.join('='));
+                            }
+                            actionUrl = urlInfo[0] + '?' + newParams.join('&');
+                        } else {
+                            actionUrl = urlInfo[0] + '?id=' + data.id;
+                        }
+                        options.url_get = actionUrl;
+                        form.attr('action', actionUrl);
+                        if (isNew && saveAndContinue && data.status == 'success') {
+                            if (window.history !== undefined) {
+                                window.history.replaceState({}, data.title, options.url_get);
+                            }
+                            form.find('.btn-group').html(data.buttons);
+                            var textNodes = form.find('.f-page-title').contents().filter(function () {
+                                return this.nodeType == 3;
+                            });
+                            textNodes[textNodes.length-1].nodeValue = data.title;
+                            $('title').text(data.title);
+                            form.find('#tabs li.hidden').removeClass('hidden');
+                        }
+                        $('#' + btnId).remove();
+                        $('#tabs .icon-pencil, #tabs .icon-warning-sign.error').remove();
+                        ajaxPassed = false;
+                    }
                 }
+            }).fail(function(event, data) {
+                _processSessionTimeout(event, data, el, saveAndContinue);
             });
             return false;
         }
@@ -1670,7 +1707,7 @@ define(fcomAdminDeps, function ($, Ladda) {
             if (request.responseText[0]==='{' && (data = $.parseJSON(request.responseText))) {
                 if (data.error == 'login') {
 //                    location.href = FCom.base_href;
-                    location.reload(true);
+                    //location.reload(true);
                 }
             }
         });

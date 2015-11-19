@@ -556,6 +556,23 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this->Sellvana_Customer_Model_Customer->load($this->get('customer_email'), 'email');
     }
 
+    public function markAsPaid()
+    {
+        /** @var Sellvana_Sales_Model_Order_Payment $payment */
+        foreach ($this->payments() as $payment) {
+            $payment->markAsPaid();
+        }
+
+        /** @var Sellvana_Sales_Model_Order_Item $item */
+        foreach ($this->items() as $item) {
+            $item->markAsPaid();
+        }
+
+        $this->addHistoryEvent('processing', 'Admin user has marked the order as paid');
+        $this->state()->calcAllStates();
+        $this->saveAllDetails();
+    }
+
     public function __destruct()
     {
         parent::__destruct();

@@ -40,7 +40,7 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     protected $_parent;
 
     /**
-     * @var FCOM_Sales_Model_Order_Payment_Item[]
+     * @var Sellvana_Sales_Model_Order_Payment_Item[]
      */
     protected $_items;
 
@@ -416,6 +416,13 @@ class Sellvana_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         ]);
 
         return $this;
+    }
+
+    public function markAsPaid()
+    {
+        $this->state()->overall()->setPaid();
+        $this->addHistoryEvent('paid', 'Admin user has changed payment state to "Paid"');
+        $this->save();
     }
 
     public function __destruct()
