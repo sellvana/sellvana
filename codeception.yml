@@ -4,7 +4,6 @@ include:
 paths:
     log: storage/testlogs
 settings:
-    bootstrap: _bootstrap.php
     colors: true
     html: true
 extensions:
