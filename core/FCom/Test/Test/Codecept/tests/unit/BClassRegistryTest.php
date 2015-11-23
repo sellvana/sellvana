@@ -1,11 +1,11 @@
 <?php
-namespace core\FCom\Test;
+namespace FCom\Test;
 
 
 class BClassRegistryTest extends \Codeception\TestCase\Test
 {
     /**
-     * @var \core\FCom\Test\UnitTester
+     * @var \FCom\Test\UnitTester
      */
     protected $tester;
 
@@ -31,13 +31,13 @@ class BClassRegistryTest extends \Codeception\TestCase\Test
     public function tearDown()
     {
         $this->registry->unsetInstance();
-        $this->registry->overrideClass('core\FCom\Test\BClassRegistry_Test_A', null);
+        $this->registry->overrideClass('FCom\Test\BClassRegistry_Test_A', null);
     }
 
     public function testOverrideClass()
     {
-        $class = 'core\FCom\Test\BClassRegistry_Test_A';
-        $newClass = 'core\FCom\Test\BClassRegistry_Test_B';
+        $class = 'FCom\Test\BClassRegistry_Test_A';
+        $newClass = 'FCom\Test\BClassRegistry_Test_B';
         $this->registry->overrideClass($class, $newClass);
         $a = $class::i();
         $this->assertInstanceOf($newClass, $a);
@@ -47,10 +47,10 @@ class BClassRegistryTest extends \Codeception\TestCase\Test
     //fixed: need to understand why overrideMethod doesn't work
     public function testOverrideMethod()
     {
-        $class = 'core\FCom\Test\BClassRegistry_Test_A';
+        $class = 'FCom\Test\BClassRegistry_Test_A';
         $method = 'sayA';
 
-        $newClass = 'core\FCom\Test\BClassRegistry_Test_B';
+        $newClass = 'FCom\Test\BClassRegistry_Test_B';
         $this->registry->overrideMethod($class, $method, ['' . $newClass . '', 'sayB']);
 
         $a = $class::i();
@@ -61,10 +61,10 @@ class BClassRegistryTest extends \Codeception\TestCase\Test
     //fixed: need to understand why augmentMethod doesn't work
     public function testAugmentMethod()
     {
-        $class = 'core\FCom\Test\BClassRegistry_Test_A';
+        $class = 'FCom\Test\BClassRegistry_Test_A';
         $method = 'augmentA';
 
-        $this->registry->augmentMethod($class, $method, ['core\FCom\Test\BClassRegistry_Test_B', 'augmentB']);
+        $this->registry->augmentMethod($class, $method, ['FCom\Test\BClassRegistry_Test_B', 'augmentB']);
 
         $a = $class::i();
 
@@ -74,8 +74,8 @@ class BClassRegistryTest extends \Codeception\TestCase\Test
     //todo: why don't work
     public function testAugmentPropertySet()
     {
-        $this->registry->augmentProperty('core\FCom\Test\BClassRegistry_Test_A', 'foo', 'set',
-                'override', 'core\FCom\Test\BClassRegistry_Test_AugmentProperty::newSetter');
+        $this->registry->augmentProperty('FCom\Test\BClassRegistry_Test_A', 'foo', 'set',
+                'override', 'FCom\Test\BClassRegistry_Test_AugmentProperty::newSetter');
         $a = BClassRegistry_Test_A::i(true);
         $a->foo = 1;
 
@@ -86,8 +86,8 @@ class BClassRegistryTest extends \Codeception\TestCase\Test
     //todo: why don't work
     public function testAugmentPropertyGet()
     {
-        $this->registry->augmentProperty('core\FCom\Test\BClassRegistry_Test_A', 'foo', 'get',
-                'after', 'core\FCom\Test\BClassRegistry_Test_AugmentProperty::newGetter');
+        $this->registry->augmentProperty('FCom\Test\BClassRegistry_Test_A', 'foo', 'get',
+                'after', 'FCom\Test\BClassRegistry_Test_AugmentProperty::newGetter');
 
         $a = BClassRegistry_Test_A::i(true);
 

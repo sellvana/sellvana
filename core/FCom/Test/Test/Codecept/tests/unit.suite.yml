@@ -6,4 +6,4 @@ class_name: UnitTester
 modules:
     enabled:
         - Asserts
-        - \core\FCom\Test\Helper\Unit
+        - \FCom\Test\Helper\Unit

@@ -1,5 +1,5 @@
 <?php
-namespace core\FCom\Test\Helper;
+namespace FCom\Test\Helper;
 
 class Sellvana
 {
@@ -10,7 +10,7 @@ class Sellvana
     protected $dbh;
 
     /**
-     * @var \core\FCom\Test\Helper\Sellvana
+     * @var \FCom\Test\Helper\Sellvana
      */
     public static $instance;
 
@@ -64,7 +64,7 @@ class Sellvana
      * @param $user
      * @param $password
      *
-     * @return \core\FCom\Test\Helper\Sellvana
+     * @return \FCom\Test\Helper\Sellvana
      */
     public static function connect($dsn = null, $user = null, $password = null)
     {

@@ -1,5 +1,5 @@
 include:
-    #- core/FCom/*/Test/Codecept
+    - core/FCom/*/Test/Codecept
     - core/Sellvana/*/Test/Codecept
 paths:
     log: storage/testlogs

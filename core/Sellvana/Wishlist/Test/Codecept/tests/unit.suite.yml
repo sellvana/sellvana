@@ -7,5 +7,5 @@ modules:
     enabled:
         - Asserts
         #- Db
-        - \core\Sellvana\Wishlist\Helper\Unit
-        - \core\FCom\Test\Helper\Db
+        - \Sellvana\Wishlist\Helper\Unit
+        - \FCom\Test\Helper\Db

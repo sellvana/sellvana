@@ -1,5 +1,5 @@
 <?php
-namespace core\FCom\Test;
+namespace FCom\Test;
 
 /**
  * Inherited Methods

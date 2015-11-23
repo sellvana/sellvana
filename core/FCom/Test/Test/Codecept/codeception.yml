@@ -1,4 +1,4 @@
-namespace: core\FCom\Test
+namespace: FCom\Test
 actor: Tester
 paths:
     tests: tests
@@ -13,10 +13,3 @@ settings:
 extensions:
     enabled:
         - Codeception\Extension\RunFailed
-modules:
-    config:
-        Db:
-            dsn: ''
-            user: ''
-            password: ''
-            dump: tests/_data/dump.sql

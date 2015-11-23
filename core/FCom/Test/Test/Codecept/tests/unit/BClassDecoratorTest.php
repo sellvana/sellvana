@@ -1,11 +1,11 @@
 <?php
-namespace core\FCom\Test;
+namespace FCom\Test;
 
 
 class BClassDecoratorTest extends \Codeception\TestCase\Test
 {
     /**
-     * @var \core\FCom\Test\UnitTester
+     * @var \FCom\Test\UnitTester
      */
     protected $tester;
 
@@ -19,7 +19,7 @@ class BClassDecoratorTest extends \Codeception\TestCase\Test
 
     public function testConstructor()
     {
-        $a = new \BClassDecorator(["core\FCom\Test\BClassDecorator_Test_A"]);
+        $a = new \BClassDecorator(["FCom\Test\BClassDecorator_Test_A"]);
 
         $this->assertTrue(is_object($a));
         $this->assertInstanceOf("BClassDecorator", $a);
@@ -27,19 +27,19 @@ class BClassDecoratorTest extends \Codeception\TestCase\Test
 
     public function testFunctionCall()
     {
-        $a = new \BClassDecorator(["core\FCom\Test\BClassDecorator_Test_A"]);
+        $a = new \BClassDecorator(["FCom\Test\BClassDecorator_Test_A"]);
         $this->assertEquals("A", $a->me());
     }
 
     public function testFunctionCallStatic()
     {
-        $a = new \BClassDecorator(["core\FCom\Test\BClassDecorator_Test_A"]);
+        $a = new \BClassDecorator(["FCom\Test\BClassDecorator_Test_A"]);
         $this->assertEquals("A", $a->meStatic());
     }
 
     public function testPropertySetUnset()
     {
-        $a = new \BClassDecorator(["core\FCom\Test\BClassDecorator_Test_A"]);
+        $a = new \BClassDecorator(["FCom\Test\BClassDecorator_Test_A"]);
         $a->foo = 123;
         $b = $a->getDecoratedComponent();
 

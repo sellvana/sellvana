@@ -1,11 +1,11 @@
 <?php
-namespace core\FCom\Test;
+namespace FCom\Test;
 
 
 class BAppTest extends \Codeception\TestCase\Test
 {
     /**
-     * @var \core\FCom\Test\UnitTester
+     * @var \FCom\Test\UnitTester
      */
     protected $tester;
 

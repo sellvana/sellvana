@@ -1,4 +1,4 @@
-namespace: core\Sellvana\Wishlist
+namespace: Sellvana\Wishlist
 actor: Tester
 paths:
     tests: tests

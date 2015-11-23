@@ -8,4 +8,4 @@ class_name: FunctionalTester
 modules:
     enabled:
         # add framework module here
-        - \core\FCom\Test\Helper\Functional
+        - \FCom\Test\Helper\Functional

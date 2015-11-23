@@ -9,4 +9,4 @@ modules:
     enabled:
         - PhpBrowser:
             url: http://localhost/sellvana
-        - \core\Sellvana\Wishlist\Helper\Acceptance
+        - \Sellvana\Wishlist\Helper\Acceptance

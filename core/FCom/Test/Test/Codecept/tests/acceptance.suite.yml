@@ -9,4 +9,4 @@ modules:
     enabled:
         - PhpBrowser:
             url: http://localhost/myapp
-        - \core\FCom\Test\Helper\Acceptance
+        - \FCom\Test\Helper\Acceptance
