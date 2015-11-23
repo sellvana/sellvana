@@ -1,5 +1,5 @@
 <?php
-namespace Wishlist;
+namespace core\Sellvana\Wishlist;
 
 /**
  * Inherited Methods

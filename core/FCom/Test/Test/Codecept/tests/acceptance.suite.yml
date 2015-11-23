@@ -8,5 +8,5 @@ class_name: AcceptanceTester
 modules:
     enabled:
         - PhpBrowser:
-            url: http://localhost/sellvana
-        - \core\Sellvana\Wishlist\Helper\Acceptance
+            url: http://localhost/myapp
+        - \core\FCom\Test\Helper\Acceptance

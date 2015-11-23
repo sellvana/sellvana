@@ -7,7 +7,7 @@ index.local.php
 .idea
 .sass-cache/
 *.scssc
-
+.phpintel
 /nbproject/private/
 /nbproject/project.properties
 /nbproject/project.xml

@@ -1,8 +1,7 @@
 <?php
+namespace core\Sellvana\Wishlist;
 
-namespace Wishlist;
-
-use Wishlist\Helper\Unit;
+use Codeception\Util\Stub;
 
 class WishlistTest extends \Codeception\TestCase\Test
 {
@@ -11,11 +10,30 @@ class WishlistTest extends \Codeception\TestCase\Test
      */
     protected $tester;
 
-    /**
-     * @var \Wishlist\Helper\Unit
-     */
-    protected $helper;
+    protected function _before()
+    {
+        $this->initDataSet();
+    }
 
+    protected function _after()
+    {
+    }
+
+    /**
+     * function xml2array
+     *
+     * This function is part of the PHP manual.
+     *
+     * The PHP manual text and comments are covered by the Creative Commons 
+     * Attribution 3.0 License, copyright (c) the PHP Documentation Group
+     *
+     * @author  k dot antczak at livedata dot pl
+     * @date    2011-04-22 06:08 UTC
+     * @link    http://www.php.net/manual/en/ref.simplexml.php#103617
+     * @license http://www.php.net/license/index.php#doc-lic
+     * @license http://creativecommons.org/licenses/by/3.0/
+     * @license CC-BY-3.0 <http://spdx.org/licenses/CC-BY-3.0>
+     */
     function xml2array ( $xmlObject, $out = array () )
     {
         foreach ( (array) $xmlObject as $index => $node )
@@ -24,16 +42,14 @@ class WishlistTest extends \Codeception\TestCase\Test
         return $out;
     }
 
-    protected function _before()
+    public function initDataSet()
     {
         $xml = simplexml_load_file(__DIR__ . '/WishlistTest.xml');
-        foreach ($xml->children() as $table => $field) {
-            $this->tester->haveInDatabase((string)$table, (array)$this->xml2array($field)['@attributes']);
-        }
-    }
-
-    protected function _after()
-    {
+        if ($xml) {
+            foreach ($xml->children() as $table => $field) {
+                $this->tester->haveInDatabase((string)$table, (array)$this->xml2array($field)['@attributes']);
+            }
+        } else die('__ERROR__');
     }
 
     public function testAddEntry()
@@ -42,20 +58,18 @@ class WishlistTest extends \Codeception\TestCase\Test
         $mWislist = \Sellvana_Wishlist_Model_Wishlist::i(true);
         $data = ['customer_id' => 3, 'title' => 'test'];
         $mWislist->create($data)->save();
-        $this->tester->seeInDatabase('fcom_wishlist', ['customer_id' => 3, 'title' => 'test']);
-
         $this->tester->seeNumRecords(3, 'fcom_wishlist');
+        $this->tester->seeInDatabase('fcom_wishlist', ['customer_id' => 3, 'title' => 'test']);
     }
 
     public function testAddItem()
     {
-        $this->tester->seeNumRecords(3, 'fcom_wishlist_items');
         $mWislist = \Sellvana_Wishlist_Model_Wishlist::i(true);
-        $wishlist = $mWislist->load(2);
+        $wishlist = $mWislist->load(1);
         $wishlist->addItem(4);
-        $this->tester->seeInDatabase('fcom_wishlist_items', ['product_id' => 4]);
 
         $this->tester->seeNumRecords(4, 'fcom_wishlist_items');
+        $this->tester->seeInDatabase('fcom_wishlist_items', ['product_id' => 4]);
     }
 
     public function testRemoveItem()
@@ -66,6 +80,7 @@ class WishlistTest extends \Codeception\TestCase\Test
         $this->assertEquals(2, count($wishlist->items()), "Count items before remove");
         $wishlist->removeProduct(1);
         $this->assertEquals(1, count($wishlist->items()), "Count items after remove");
+
         $this->tester->seeNumRecords(2, 'fcom_wishlist_items');
     }
 

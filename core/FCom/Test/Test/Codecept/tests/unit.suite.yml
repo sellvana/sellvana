@@ -6,6 +6,4 @@ class_name: UnitTester
 modules:
     enabled:
         - Asserts
-        #- Db
-        - \core\Sellvana\Wishlist\Helper\Unit
-        - \core\FCom\Test\Helper\Db
+        - \core\FCom\Test\Helper\Unit

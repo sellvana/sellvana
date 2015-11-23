@@ -8,4 +8,4 @@ class_name: FunctionalTester
 modules:
     enabled:
         # add framework module here
-        - \core\Sellvana\Wishlist\Helper\Functional
+        - \core\FCom\Test\Helper\Functional

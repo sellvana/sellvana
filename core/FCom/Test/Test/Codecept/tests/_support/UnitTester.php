@@ -1,5 +1,5 @@
 <?php
-namespace core\Sellvana\Wishlist;
+namespace core\FCom\Test;
 
 /**
  * Inherited Methods

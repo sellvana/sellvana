@@ -1,5 +1,5 @@
 <?php
-namespace core\Sellvana\Wishlist;
+namespace core\FCom\Test;
 
 /**
  * Inherited Methods
@@ -16,9 +16,9 @@ namespace core\Sellvana\Wishlist;
  *
  * @SuppressWarnings(PHPMD)
 */
-class UnitTester extends \Codeception\Actor
+class AcceptanceTester extends \Codeception\Actor
 {
-    use _generated\UnitTesterActions;
+    use _generated\AcceptanceTesterActions;
 
    /**
     * Define custom actions here
