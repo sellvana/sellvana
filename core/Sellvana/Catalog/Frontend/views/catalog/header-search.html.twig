@@ -13,23 +13,18 @@
         width: 0;
         position: absolute;
         pointer-events: none;
+        top: 60px;
+        border-color: rgba(248, 248, 248, 0);
+        border-right-color: #fff;
     }
 
     .product-preview-modal:after {
-        border-color: rgba(248, 248, 248, 0);
-        position: absolute;
-        border-right-color: #fff;
         border-width: 15px;
         margin-top: -15px;
-        top: 60px;
     }
     .product-preview-modal:before {
-        border-color: rgba(248, 248, 248, 0);
-        position: absolute;
-        border-right-color: #fff;
         border-width: 22px;
         margin-top: -22px;
-        top: 60px;
     }
 
     .product-search-img {
@@ -277,11 +272,11 @@
                 }
             }
         })
-        .on('typeahead:selected', function($e, datum) {
-            document.location = "{{ APP.href('/') }}" + encodeURIComponent(datum.url_key);
+        .on('typeahead:selected', function($e, product) {
+            document.location = "{{ APP.href('/') }}" + encodeURIComponent(product.url_key);
         })
-        .on('typeahead:cursorchange', function($e, datum) {
-            if (datum) $input.val(datum.product_name);
+        .on('typeahead:cursorchange', function($e, product) {
+            if (product) $input.val(product.product_name);
         });
 
         window.showPreviewProduct = function(target) {
