@@ -51,6 +51,8 @@ class FCom_Test_Core_Test extends BClass
      */
     private $passed = false;
 
+    private $module;
+
     /**
      * Possible test states
      */
@@ -139,6 +141,7 @@ class FCom_Test_Core_Test extends BClass
         $this->file     = $file;
         $this->type     = $type;
         $this->state    = self::STATE_READY; // Not used yet.
+        $this->module   = explode('/', $file->getPathname())[7];
     }
 
     /**
@@ -161,6 +164,10 @@ class FCom_Test_Core_Test extends BClass
     public function makeHash($string)
     {
         return md5($string);
+    }
+
+    public function getModule() {
+        return $this->module;
     }
 
     /**

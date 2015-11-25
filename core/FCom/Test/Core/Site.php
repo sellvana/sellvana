@@ -118,6 +118,10 @@ class FCom_Test_Core_Site extends BClass
         return $this->hash;
     }
 
+    public function getSitePath($m) {
+        return $this->sites[md5($m)]['path'];
+    }
+
     /**
      * Return full list of sites.
      *
@@ -164,7 +168,7 @@ class FCom_Test_Core_Site extends BClass
     /**
      * Confirm that Site class has more than one option available.
      *
-     * This is used on the Webception front-end to decide
+     * This is used on front-end to decide
      * if a dropdown is required to swap sites.
      *
      * @return boolean Checks if details are ready and more than one site.

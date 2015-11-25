@@ -1,0 +1,275 @@
+{% set codeceptConfig = THIS.get('codeceptConfig') %}
+{% set codecept = THIS.get('codecept') %}
+{% set tests = THIS.get('tests') %}
+{% set testsCount = THIS.get('testsCount') %}
+<style type="text/css">
+    .green {
+        color: green;
+    }
+    .red {
+        color: darkred;
+    }
+    .console-header { padding: 5px 10px; }
+    .console { height: 350px; overflow: scroll; background: #F0F0F0}
+</style>
+<div class="f-admin-main-view">
+    <div class="f-admin-main">
+        <div class="tab-content">
+            {#<div id="console_container" class="panel console hide"></div>#}
+            <div class="contain-to-grid">
+                {{ THIS.view('core/griddle').set('grid', grid) | raw }}
+            </div>
+            <div class='console-header'>
+                <h3 class='text-left'><strong>Console</strong> Results</h3>
+            </div>
+            <div id="console_container" class="panel-body console" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require(['jquery', 'jquery.bootstrap-growl'], function ($) {
+
+        "use strict";
+
+        var codeceptGrid;
+
+        var helper = {
+
+            data: function()
+            {
+                if (location.search.indexOf('test=') >= 0)
+                    return {'test' : helper.getParameterByName('test') };
+
+                return {};
+            },
+
+            getParameterByName: function(name)
+            {
+                name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                        results = regex.exec(location.search);
+                return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+            }
+        };
+
+        var Test = {
+            vars: {
+                url: 'codecept_run',
+                states: {
+                    'ready': {
+                        css: 'disabled',
+                        label: '<strong>Ready</strong>',
+                    },
+                    'running': {
+                        css: '',
+                        label: '<strong>Running</strong>',
+                    },
+                    'error': {
+                        css: 'alert',
+                        label: '<strong>Error</strong>',
+                    },
+                    'stopped': {
+                        css: 'alert',
+                        label: '<strong>Stopped</strong>',
+                    },
+                    'failed': {
+                        css: 'alert',
+                        label: '<strong>Failed</strong>',
+                    },
+                    'passed': {
+                        css: 'success',
+                        label: '<strong>Passed</strong>',
+                    },
+                }
+            },
+            /**
+             * Test Runner.
+             *
+             * @param Array  List of test IDs.
+             */
+            run: function(tests)
+            {
+                if (tests.length > 0) {
+                    var test = tests.shift();
+                    var type = test.type.toLowerCase();
+                    var hash = test.id;
+
+                    // Run the test
+                    $.ajax({
+                        url         : Test.vars.url + '?type=' + type + '&id=' + hash,
+                        method      : 'GET',
+                        cache       : false,
+                        dataType    : "json",
+                        beforeSend  : function (xhr, settings)
+                        {
+                            $.bootstrapGrowl("Please wait while "+test.test+" running.", { type: 'success', align: 'center', width: 'auto', delay: 3000});
+                            Test.refresh(test, 'running');
+                        },
+                        success     : function(data, status, xhr)
+                        {
+                            // After a successful run, update the test status.
+                            Test.complete(test, data, xhr);
+                            // Carry on running the tests...
+                            Test.run(tests);
+                        }
+                    });
+                }
+            },
+            /**
+             * Set the test state after it's been run (whether it's pass or fail)
+             */
+            complete: function(test, data, xhr)
+            {
+                var state;
+
+                // Check the state of the completed test and
+                // set the UI state and updated counts.
+                state = (data.passed == true) ? 'passed' : 'failed';
+
+                // Update the single test state
+                Test.refresh(test, state);
+
+                // Append the test log to the console
+                Console.add(data);
+            },
+            /**
+             * Start running the tests.
+             */
+            start: function() {
+                var tests = codeceptGrid.getSelectedRows();
+
+                // If there are tests available...
+                if (tests.length > 0)
+                {
+                    Console.clear();
+                    Test.run(tests);
+                } else {
+                    $.bootstrapGrowl("Error: Please choose at least one test.", { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                }
+            },
+            /**
+             * Set the state of the given test to Running.
+             *
+             * @param Form Object   test
+             * @param String        state
+             */
+            refresh: function (test, state) {
+
+                // Load the details of the current state
+                var chosenState = Test.vars.states[state];
+
+                // Update the test
+                $('tr#' + test.id)
+                        .find('td[data-col="status"]')
+                        .html(chosenState.label);
+            },
+        };
+
+        var Console = {
+            init: function() {
+                //
+            },
+            vars: {
+                eConsoleContainer: '#console_container'
+            },
+            /**
+             * Given the result of a running a test, append the console output.
+             *
+             * @param object Test
+             */
+            add: function(test)
+            {
+                var consoleContainer = $(Console.vars.eConsoleContainer);
+                consoleContainer.show();
+                // Load the details of the current state
+                var chosenState = Test.vars.states[test.state];
+
+                var testResult = $('<div/>', {'class': test.state +' all'});
+                var state = $('<span/>', {'class': Test.vars.sButton + chosenState.css,
+                }).html(chosenState.label).appendTo(testResult);
+
+                $('<h5/>', {'text': test.title}).appendTo(testResult);
+                $('<pre/>', {'text': test.log}).appendTo(testResult);
+                $('<hr>').appendTo(testResult);
+
+                testResult.appendTo(consoleContainer);
+
+                // Move down to the bottom of the container
+                consoleContainer[0].scrollTop = consoleContainer[0].scrollHeight;
+            },
+
+            /**
+             * Empty the content of the console
+             */
+            clear: function() {
+                $(Console.vars.eConsoleContainer).html('');
+            }
+        };
+
+        var Codeception = {
+
+            vars: {
+
+                ready: false,
+                btnRunCgi: '#run-test-cgi',
+                checks: {
+                    'executable': {
+                        url: 'codecept_executable'
+                    }
+                }
+            },
+
+            init: function()
+            {
+                $(Codeception.vars.btnRunCgi).prop('disabled', true);
+                Codeception.check('executable');
+            },
+
+            /**
+             * Make an AJAX call to see if Codeception is executable.
+             */
+            check: function(type)
+            {
+                var cType = Codeception.vars.checks[type];
+
+                $.ajax({
+                    url         : cType.url,
+                    method      : 'GET',
+                    cache       : false,
+                    dataType    : 'json',
+                    data        : helper.data(),
+                    success: function(data, status, xhr)
+                    {
+                        // Update the Codeception button to indicate success!
+                        if (data.ready) {
+                            $.bootstrapGrowl("Check codeception is executable done.", { type: 'success', align: 'center', width: 'auto', delay: 3000});
+                            $(Codeception.vars.btnRunCgi).prop('disabled', false);
+                        } else {
+                            $.bootstrapGrowl("Error:<br /> Please check " + data.resource + " is available", { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                        }
+                    },
+                    error: function(xhr, status, message)
+                    {
+                        // Update the Codeception button to indicate it's not ready.
+                        console.log('check error', message);
+                    }
+                });
+            }
+        };
+
+        window.codeceptionTestsGridRegister = function (grid) {
+            codeceptGrid = grid;
+            // Check if codeception.phar is executable
+            Codeception.init();
+        };
+
+        window.runTestCgi = function () {
+            Test.start();
+        };
+
+        window.runTestWeb = function () {
+            console.log('runTestWeb');
+        };
+
+    });
+</script>

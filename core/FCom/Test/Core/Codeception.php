@@ -7,12 +7,12 @@ class FCom_Test_Core_Codeception extends BClass
      *
      * @var array
      */
-    private $site;
+    public $site;
 
     /**
      * Configuration for Codeception
      *
-     * Merges the Codeception.yml and Webception Codeception.php
+     * Merges the Codeception.yml and Codeception.php
      *
      * @var boolean
      */
@@ -55,7 +55,7 @@ class FCom_Test_Core_Codeception extends BClass
         if (sizeof($config) == 0)
             return;
 
-        // Setup the sites available to Webception
+        // Setup the sites available
         $this->site = $site;
 
         // If the site class isn't ready, we can't load codeception.
@@ -113,9 +113,7 @@ class FCom_Test_Core_Codeception extends BClass
         }
 
         foreach ($this->config->get('tests') as $type => $active) {
-
-            // If the test type has been disabled in the Webception config,
-            //      skip processing the directory read for those tests.
+            
             if (!$active) {
                 continue;
             }
@@ -154,22 +152,24 @@ class FCom_Test_Core_Codeception extends BClass
                     $testsDir = $rootDir . '/Test/Codecept/tests/' . strtolower($type);
                     if (is_dir($testsDir)) {
                         $files = new \RecursiveIteratorIterator(
-                            new \RecursiveDirectoryIterator(realpath($testsDir), \FilesystemIterator::SKIP_DOTS),
-                            \RecursiveIteratorIterator::SELF_FIRST
+                            new \RecursiveDirectoryIterator(realpath($testsDir)),
+                            \RecursiveIteratorIterator::LEAVES_ONLY
                         );
                         foreach ($files as $file) {
                             $ext = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
                             $isTest = preg_match('/[A-z]+Test/', $file->getFilename());
-                            if ($ext == 'php' && $isTest && !in_array($file->getFilename(), $this->config->get('ignore')) && $file->isFile()) {
+                            if ($ext == 'php' && $isTest && !in_array($file->getFilename(),
+                                    $this->config->get('ignore')) && $file->isFile()
+                            ) {
                                 // Declare a new test and add it to the list.
-                                $test = $this->BApp->instance('FCom_Test_Core_Test');
+                                /** @var FCom_Test_Core_Test $test */
+                                $test = new FCom_Test_Core_Test;
                                 $test->init($type, $file);
                                 $this->addTest($test);
                                 unset($test);
                             }
 
                         }
-                        continue;
                     }
                 }
             }
@@ -234,7 +234,7 @@ class FCom_Test_Core_Codeception extends BClass
     public function run($test)
     {
         // Get the full command path to run the test.
-        $command = $this->getCommandPath($test->getType(), $test->getFilename());
+        $command = $this->getCommandPath($test->getType(), $test->getFilename(), $test->getModule());
 
         // Attempt to set the correct writes to Codeceptions Log path.
         @chmod($this->getLogPath(), 0777);
@@ -266,18 +266,29 @@ class FCom_Test_Core_Codeception extends BClass
      * @param  string $filename Name of the Test
      * @return string Full command to execute Codeception with requred parameters.
      */
-    public function getCommandPath($type, $filename)
+    public function getCommandPath($type, $filename, $module)
     {
         // Build all the different parameters as part of the console command
         $params = array(
             $this->config->get('executable'),   // Codeception Executable
             "run",                              // Command to Codeception
             "--no-colors",                      // Forcing Codeception to not use colors, if enabled in codeception.yml
-            "--config=\"{$this->site->getConfig()}\"", // Full path & file of Codeception
+            "--config=\"{$this->site->getSitePath($module)}\"", // Full path & file of Codeception
             $type,                              // Test Type (Acceptance, Unit, Functional)
             $filename,                          // Filename of the Codeception test
             "2>&1"
         );
+
+        // Build the command to be run.
+        return implode(' ', $params);
+    }
+
+    public function getRootCmdPath()
+    {
+        $params = [
+            $this->config->get('executable'),
+            'run'
+        ];
 
         // Build the command to be run.
         return implode(' ', $params);
@@ -292,34 +303,62 @@ class FCom_Test_Core_Codeception extends BClass
      */
     public function response($type, $hash)
     {
-        $response = array(
-            'message'     => null,
-            'run'         => false,
-            'passed'      => false,
-            'state'       => 'error',
-            'log'         => null
-        );
+        $response = [
+            'message' => null,
+            'run' => false,
+            'passed' => false,
+            'state' => 'error',
+            'log' => null
+        ];
 
         // If Codeceptions not properly configured, the test won't be found
         // and it won't be run.
-        if (! $this->ready())
+        if (!$this->ready()) {
             $response['message'] = 'The Codeception configuration could not be loaded.';
-
+        }
         // If the test can't be found, we can't run the test.
-        if (! $test = $this->getTest($type, $hash))
+        if (!$test = $this->getTest($type, $hash)) {
             $response['message'] = 'The test could not be found.';
+        }
 
         // If there's no error message set yet, it means we're good to go!
         if (is_null($response['message'])) {
 
             // Run the test!
-            $test               = $this->run($test);
-            $response['run']    = $test->ran();
-            $response['log']    = $test->getLog();
+            $test = $this->run($test);
+            $response['run'] = $test->ran();
+            $response['log'] = $test->getLog();
             $response['passed'] = $test->passed();
-            $response['state']  = $test->getState();
-            $response['title']  = $test->getTitle();
+            $response['state'] = $test->getState();
+            $response['title'] = $test->getTitle();
         }
+
+        return $response;
+    }
+
+    /**
+     * Check that the Codeception executable exists and is runnable.
+     *
+     * @param  string $file   File name of the Codeception executable.
+     * @param  string $config Full path of the config of where the $file was defined.
+     * @return array  Array of flags used in the JSON respone.
+     */
+    public function checkExecutable($file, $config)
+    {
+        $response = [];
+        $response['resource'] = $file;
+
+        // Set this to ensure the developer knows there $file was set.
+        $response['config'] = realpath($config);
+
+        if (!file_exists($file)) {
+            $response['error'] = 'The Codeception executable could not be found.';
+        } elseif (!is_executable($file) && strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            $response['error'] = 'Codeception isn\'t executable. Have you set executable rights to the following (try chmod o+x).';
+        }
+
+        // If there wasn't an error, then it's good!
+        $response['ready'] = !isset($response['error']);
 
         return $response;
     }

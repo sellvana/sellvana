@@ -14,3 +14,4 @@ modules:
                     - [ /tests/run, FCom_Test_Admin_Controller_Tests.run ]
                     - [ /tests/run2, FCom_Test_Admin_Controller_Tests.run2 ]
                     - [ /tests/codecept_run, FCom_Test_Admin_Controller_CodecetionTests.run ]
+                    - [ /tests/codecept_executable, FCom_Test_Admin_Controller_CodecetionTests.executable ]
