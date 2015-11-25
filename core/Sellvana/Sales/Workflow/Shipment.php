@@ -23,4 +23,15 @@ class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
         $args['shipment']->addHistoryEvent('custom_state', 'Admin user has changed custom shipment state to "' . $label . '"');
         $args['shipment']->save();
     }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Shipment[] $args
+     */
+    public function action_adminMarksShipmentAsShipped($args)
+    {
+        $args['shipment']->shipItems();
+
+        $args['shipment']->order()->state()->calcAllStates();
+        $args['shipment']->order()->saveAllDetails();
+    }
 }
