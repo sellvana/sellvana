@@ -10,8 +10,8 @@ modules:
                 auto_use: [ layout, views ]
                 routing:
                     - [ /tests/index, FCom_Test_Admin_Controller_Tests.index ]
-                    - [ /tests/codeception, FCom_Test_Admin_Controller_CodecetionTests.index ]
+                    - [ /tests/codeception, FCom_Test_Admin_Controller_CodeceptionTests.index ]
                     - [ /tests/run, FCom_Test_Admin_Controller_Tests.run ]
                     - [ /tests/run2, FCom_Test_Admin_Controller_Tests.run2 ]
-                    - [ /tests/codecept_run, FCom_Test_Admin_Controller_CodecetionTests.run ]
-                    - [ /tests/codecept_executable, FCom_Test_Admin_Controller_CodecetionTests.executable ]
+                    - [ /tests/codecept_run, FCom_Test_Admin_Controller_CodeceptionTests.run ]
+                    - [ /tests/codecept_executable, FCom_Test_Admin_Controller_CodeceptionTests.executable ]

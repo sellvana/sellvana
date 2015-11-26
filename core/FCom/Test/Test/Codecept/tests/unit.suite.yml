@@ -7,3 +7,4 @@ modules:
     enabled:
         - Asserts
         - \FCom\Test\Helper\Unit
+        - \Common\Helper\Db

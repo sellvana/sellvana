@@ -1,5 +1,5 @@
 <?php
-namespace FCom\Test\Helper;
+namespace Common\Helper;
 
 class Sellvana
 {

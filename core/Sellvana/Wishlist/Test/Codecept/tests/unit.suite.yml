@@ -6,12 +6,6 @@ class_name: UnitTester
 modules:
     enabled:
         - Asserts
-        - Db
+        #- Db
         - \Sellvana\Wishlist\Helper\Unit
-        #- \FCom\Test\Helper\Db
-    config:
-        Db:
-            dsn: 'mysql:host=localhost;dbname=sellvana'
-            user: 'root'
-            password: 'root'
-            dump: 'tests/_data/sellvana.sql'
+        - \Common\Helper\Db

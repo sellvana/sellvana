@@ -1,11 +1,11 @@
 <?php
-namespace FCom\Test\Helper;
+namespace Common\Helper;
 
 use Codeception\Exception\ModuleException;
 use Codeception\Exception\ModuleConfigException;
 use Codeception\Lib\Interfaces\Db as DbInterface;
 use Codeception\TestCase;
-use FCom\Test\Helper\Sellvana as Driver;
+use Common\Helper\Sellvana as Driver;
 
 class Db extends \Codeception\Module implements DbInterface
 {

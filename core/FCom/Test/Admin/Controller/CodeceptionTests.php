@@ -162,7 +162,7 @@ class FCom_Test_Admin_Controller_CodecetionTests extends FCom_Admin_Controller_A
                 $obj['id'] = $file->getHash();
                 $obj['type'] = ucfirst($file->getType());
                 $obj['test'] = $file->getTitle();
-                $obj['status'] = 'Ready';
+                $obj['status'] = 'Pending';
                 $gridData[] = $obj;
                 unset($class);
 
@@ -229,8 +229,10 @@ class FCom_Test_Admin_Controller_CodecetionTests extends FCom_Admin_Controller_A
         if (!file_exists($codecept)) {
             if (touch($codecept)) {
                 $codeceptUrl = 'http://codeception.com/codecept.phar';
-                $raw = $this->BUtil->remoteHttp('GET', $codeceptUrl);
-                file_put_contents($codecept, $raw);
+                #TODO: Temporary use file_get_contents for getting codeception executable
+                $content = file_get_contents($codeceptUrl);
+                // $raw = $this->BUtil->remoteHttp('GET', $codeceptUrl);
+                file_put_contents($codecept, $content);
                 if (function_exists('chmod')) {
                     chmod($codecept, 0755); // make executable
                 }
@@ -238,8 +240,6 @@ class FCom_Test_Admin_Controller_CodecetionTests extends FCom_Admin_Controller_A
                 $this->BDebug->warning($this->_("Could not create $codecept file."));
             }
         }
-
-        $this->codeceptPhar = $codecept;
     }
 
     /**
