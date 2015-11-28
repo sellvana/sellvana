@@ -55,32 +55,40 @@
         var Test = {
             vars: {
                 url: 'codecept_run',
+                ckbTest: '.select-row',
                 states: {
+                    'pending': {
+                        css: '',
+                        label: 'Pending'
+                    },
                     'ready': {
                         css: 'disabled',
-                        label: '<strong>Ready</strong>',
+                        label: '<strong class="label label-default">Ready</strong>'
                     },
                     'running': {
                         css: '',
-                        label: '<strong>Running</strong>',
+                        label: '<strong class="label label-primary">Running</strong>'
                     },
                     'error': {
                         css: 'alert',
-                        label: '<strong>Error</strong>',
+                        label: '<strong class="label label-danger">Error</strong>'
                     },
                     'stopped': {
                         css: 'alert',
-                        label: '<strong>Stopped</strong>',
+                        label: '<strong class="label label-info">Stopped</strong>'
                     },
                     'failed': {
                         css: 'alert',
-                        label: '<strong>Failed</strong>',
+                        label: '<strong class="label label-danger">Failed</strong>'
                     },
                     'passed': {
                         css: 'success',
-                        label: '<strong>Passed</strong>',
+                        label: '<strong class="label label-success">Passed</strong>'
                     },
                 }
+            },
+            init: function() {
+                Test.binds();
             },
             /**
              * Test Runner.
@@ -157,12 +165,26 @@
 
                 // Load the details of the current state
                 var chosenState = Test.vars.states[state];
+                var $tr = $('tr#' + test.id);
 
                 // Update the test
-                $('tr#' + test.id)
-                        .find('td[data-col="status"]')
-                        .html(chosenState.label);
+                $tr.find('td[data-col="status"]').html(chosenState.label);
+                $tr.find(Test.vars.ckbTest).prop('checked', false);
             },
+            binds: function () {
+                $(Test.vars.ckbTest).on('change', function(e)
+                {
+                    var state = 'pending';
+                    if ($(this).is(':checked')) {
+                        state = 'ready';
+                    }
+
+                    var chosenState = Test.vars.states[state];
+                    $(this).parents('tr')
+                            .find('td[data-col="status"]')
+                            .html(chosenState.label);
+                });
+            }
         };
 
         var Console = {
@@ -245,7 +267,7 @@
                             $.bootstrapGrowl("Check codeception is executable done.", { type: 'success', align: 'center', width: 'auto', delay: 3000});
                             $(Codeception.vars.btnRunCgi).prop('disabled', false);
                         } else {
-                            $.bootstrapGrowl("Error:<br /> Please check " + data.resource + " is available", { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                            $.bootstrapGrowl("Error:<br /> " + data.error, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                         }
                     },
                     error: function(xhr, status, message)
@@ -261,6 +283,7 @@
             codeceptGrid = grid;
             // Check if codeception.phar is executable
             Codeception.init();
+            Test.init();
         };
 
         window.runTestCgi = function () {

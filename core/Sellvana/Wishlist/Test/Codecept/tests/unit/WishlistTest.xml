@@ -9,8 +9,8 @@
     <fcom_product id="3" product_name="Product 3" product_sku="product3" url_key="product-3" />
     <fcom_product id="4" product_name="Product 4" product_sku="product4" url_key="product-4" />
 
-    <fcom_wishlist id="1" customer_id="1" />
-    <fcom_wishlist id="2" customer_id="2" />
+    <fcom_wishlist id="1" customer_id="1" title="wishlist test 1" />
+    <fcom_wishlist id="2" customer_id="2" title="wishlist test 2" />
 
     <fcom_wishlist_items id="1" wishlist_id="1" product_id="1" />
     <fcom_wishlist_items id="2" wishlist_id="1" product_id="2" />

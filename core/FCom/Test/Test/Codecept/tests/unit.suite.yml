@@ -8,3 +8,6 @@ modules:
         - Asserts
         - \FCom\Test\Helper\Unit
         - \Common\Helper\Db
+    config:
+        \Common\Helper\Db:
+            load_dump: true

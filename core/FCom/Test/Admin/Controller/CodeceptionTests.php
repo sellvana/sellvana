@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Test_Admin_Controller_CodecetionTests extends FCom_Admin_Controller_Abstract_GridForm
+class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_Abstract_GridForm
 {
     const TESTS_GRID_ID = 'tests_grid';
 
@@ -16,8 +16,8 @@ class FCom_Test_Admin_Controller_CodecetionTests extends FCom_Admin_Controller_A
         */
         'sites' => [
             'Codeception' => FULLERON_ROOT_DIR . '/codeception.yml',
-            'Wishlist' => FULLERON_ROOT_DIR . '/core/Sellvana/Wishlist/Test/Codecept/codeception.yml',
-            'Test' => FULLERON_ROOT_DIR . '/core/FCom/Test/Test/Codecept/codeception.yml'
+            'Sellvana_Wishlist' => FULLERON_ROOT_DIR . '/core/Sellvana/Wishlist/Test/Codecept/codeception.yml',
+            'FCom_Test' => FULLERON_ROOT_DIR . '/core/FCom/Test/Test/Codecept/codeception.yml'
         ],
 
         /*
@@ -147,14 +147,15 @@ class FCom_Test_Admin_Controller_CodecetionTests extends FCom_Admin_Controller_A
                 'id'       => 'run-test-cgi',
                 'class'    => 'btn-default',
                 'callback' => 'runTestCgi'
-            ]/*,
-            'run-test-web' => [
+            ],
+            /*'run-test-web' => [
                 'caption'  => 'Run Test Web',
                 'type'     => 'button',
                 'id'       => 'run-test-web',
                 'class'    => 'btn-default',
                 'callback' => 'runTestWeb'
             ]*/
+
         ];
         $gridData = [];
         foreach ($tests as $type => $files) {
@@ -240,6 +241,8 @@ class FCom_Test_Admin_Controller_CodecetionTests extends FCom_Admin_Controller_A
                 $this->BDebug->warning($this->_("Could not create $codecept file."));
             }
         }
+
+        $this->config['executable'] = $codecept;
     }
 
     /**
@@ -247,7 +250,9 @@ class FCom_Test_Admin_Controller_CodecetionTests extends FCom_Admin_Controller_A
      */
     protected function getCodecetionExecutable()
     {
-        return FULLERON_ROOT_DIR . '/codecept.phar';
+        $base = $this->BConfig->get('fs/storage_dir') . '/' . $this->BConfig->get('core/storage_random_dir');
+        $codecept = $base . '/codecept.phar';
+        return $codecept;
     }
 
 }

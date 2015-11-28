@@ -3,6 +3,7 @@ namespace Common\Helper;
 
 use Codeception\Exception\ModuleException;
 use Codeception\Exception\ModuleConfigException;
+use Codeception\Configuration;
 use Codeception\Lib\Interfaces\Db as DbInterface;
 use Codeception\TestCase;
 use Common\Helper\Sellvana as Driver;
@@ -13,7 +14,7 @@ class Db extends \Codeception\Module implements DbInterface
      * @api
      * @var
      */
-    public $dbh;
+    public $dbh = null;
 
     /**
      * @var array
@@ -27,7 +28,8 @@ class Db extends \Codeception\Module implements DbInterface
         'populate' => true,
         'cleanup' => true,
         'reconnect' => false,
-        'loadDump' => true,
+        // Test db name
+        'load_dump' => false,
         'dump' => null
     ];
 
@@ -37,7 +39,7 @@ class Db extends \Codeception\Module implements DbInterface
     protected $populated = false;
 
     /**
-     * @var \Codeception\Lib\Driver\Db
+     * @var \Common\Helper\Db
      */
     public $driver;
 
@@ -84,7 +86,7 @@ class Db extends \Codeception\Module implements DbInterface
 
     public function _initialize()
     {
-        if ($this->config['loadDump'] && ($this->config['cleanup'] or ($this->config['populate']))) {
+        if ($this->config['load_dump'] && ($this->config['cleanup'] or ($this->config['populate']))) {
             $dump = $this->config['dump'] ? : $this->getDumpPath();
 
             if (!file_exists($dump)) {
@@ -121,26 +123,23 @@ class Db extends \Codeception\Module implements DbInterface
      */
     private function connect()
     {
-        try {
-            if ($this->getDsn() && $this->getDbUsername() && $this->getDbPassword()) {
+        if ($this->dbh === null) {
+            try {
                 $this->driver = Driver::connect(
                     $this->getDsn(),
                     $this->getDbUsername(),
                     $this->getDbPassword()
                 );
-            } else {
-                $this->driver = Driver::getInstance();
-            }
-        } catch (\PDOException $e) {
-            $message = $e->getMessage();
-            if ($message === 'could not find driver') {
-                list ($missingDriver,) = explode(':', $this->getDsn(), 2);
-                $message = "could not find $missingDriver driver";
-            }
+            } catch (\PDOException $e) {
+                $message = $e->getMessage();
+                if ($message === 'could not find driver') {
+                    list ($missingDriver,) = explode(':', $this->getDsn(), 2);
+                    $message = "could not find $missingDriver driver";
+                }
 
-            throw new ModuleException(__CLASS__, $message . ' while creating PDO connection');
+                throw new ModuleException(__CLASS__, $message . ' while creating PDO connection');
+            }
         }
-
         $this->dbh = $this->driver->getDbh();
     }
 
@@ -197,10 +196,7 @@ class Db extends \Codeception\Module implements DbInterface
      */
     private function getDsn()
     {
-        if (empty($this->config['dsn'])) {
-            return sprintf('mysql:host=%s;dbname=%s', \BConfig::i()->get('db/host'), \BConfig::i()->get('db/dbname'));
-        }
-        return $this->config['dsn'];
+        return $this->config['dsn'] ?: null;
     }
 
     /**
@@ -210,10 +206,7 @@ class Db extends \Codeception\Module implements DbInterface
      */
     private function getDbUsername()
     {
-        if (empty($this->config['username'])) {
-            return \BConfig::i()->get('db/username');
-        }
-        return $this->config['username'];
+        return $this->config['user'] ?: null;
     }
 
     /**
@@ -222,14 +215,11 @@ class Db extends \Codeception\Module implements DbInterface
      */
     private function getDbPassword()
     {
-        if (empty($this->config['password'])) {
-            return \BConfig::i()->get('db/password');
-        }
-        return $this->config['password'];
+        return $this->config['password'] ?: null;
     }
 
     /**
-     * Get dump sql path
+     * Get default dump sql path
      * 
      * @return string
      */
@@ -351,6 +341,11 @@ class Db extends \Codeception\Module implements DbInterface
         return $this->proceedSeeInDatabase($table, $column, $criteria);
     }
 
+    public function getDbConfigFile()
+    {
+        return FULLERON_ROOT_DIR . '/tests/_data/db_test_config.php';
+    }
+
     /**
      * Inserts SQL record into database. This record will be erased after the test.
      *
@@ -377,5 +372,14 @@ class Db extends \Codeception\Module implements DbInterface
         $this->addInsertedRow($table, $data, $lastInsertId);
 
         return $lastInsertId;
+    }
+
+    /**
+     * Manual make connection if reconnect is false
+     *
+     * @throws ModuleException
+     */
+    public function createConnection() {
+        $this->connect();
     }
 }

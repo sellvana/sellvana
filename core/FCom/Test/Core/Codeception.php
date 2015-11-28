@@ -164,7 +164,7 @@ class FCom_Test_Core_Codeception extends BClass
                                 // Declare a new test and add it to the list.
                                 /** @var FCom_Test_Core_Test $test */
                                 $test = new FCom_Test_Core_Test;
-                                $test->init($type, $file);
+                                $test->init($type, $file, $module->name);
                                 $this->addTest($test);
                                 unset($test);
                             }

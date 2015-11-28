@@ -12,15 +12,16 @@ class Sellvana
     /**
      * @var \FCom\Test\Helper\Sellvana
      */
-    public static $instance;
+    static public $instance;
 
-    /**
-     * @var string
-     */
-    private static $dsn;
+    static private $pdo = null;
 
-    private static $user;
-    private static $pwd;
+    static private $dbConfig = [
+        'dbname' => null,
+        'host' => null,
+        'username' => null,
+        'password' => null,
+    ];
 
     /**
      * @var string
@@ -34,28 +35,37 @@ class Sellvana
      */
     protected $primaryKeys = [];
 
-    private function __construct()
+    private function __construct($dsn, $user, $password)
     {
-        if (!static::$dsn && !static::$user && !static::$pwd) {
-            $this->dbh = \BDb::i()->connect();
-        } else {
-            $this->dbh = new \PDO(static::$dsn, static::$user, static::$pwd);
-            $this->dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        if ($this->dbh === null) {
+            if (!empty($dsn) && !empty($user) && !empty($password)) {
+                static::$dbConfig = \BUtil::i()->arrayMerge(static::$dbConfig, [
+                    'dbname' => $this->getProvider($dsn, 'dbname'),
+                    'host' => $this->getProvider($dsn, 'host'),
+                    'username' => $user,
+                    'password' => $password
+                ]);
+            } else {
+                static::$dbConfig = \BUtil::i()->arrayMerge(static::$dbConfig, include FULLERON_ROOT_DIR . '/tests/_data/db_test_config.php');
+                $dsn = sprintf('mysql:host=%s;dbname=%s', static::$dbConfig['host'], static::$dbConfig['dbname']);
+                $user = static::$dbConfig['username'];
+                $password = static::$dbConfig['password'];
+            }
+
+            \BConfig::i()->add(['db' => static::$dbConfig]);
+
+            if (static::$pdo === null) {
+                static::$pdo = new \BPDO($dsn, $user, $password);
+            }
+
+            \BORM::set_db(static::$pdo);
+            $this->dbh = \BORM::get_db();
         }
+
+        return $this->dbh;
     }
 
     private function __clone() {}
-
-    /**
-     * @return Sellvana
-     */
-    public static function getInstance()
-    {
-        if (null === static::$instance) {
-            static::$instance = new Sellvana;
-        }
-        return static::$instance;
-    }
 
     /**
      * @static
@@ -68,14 +78,33 @@ class Sellvana
      */
     public static function connect($dsn = null, $user = null, $password = null)
     {
-        // Set connection info
-        if ($dsn && $user && $password) {
-            static::$dsn = $dsn ?: null;
-            static::$user = $user ?: null;
-            static::$pwd = $password ?: null;
+        if (null === static::$instance) {
+            static::$instance = new Sellvana($dsn, $user, $password);
         }
+        return static::$instance;
+    }
 
-        return static::getInstance();
+
+    /**
+     * Parse connection info from DSN
+     *
+     * @param $dsn
+     * @param null $type
+     * @return string
+     */
+    private function getProvider($dsn, $type = null)
+    {
+        switch($type) {
+            case 'dbname':
+                return substr($dsn, strrpos($dsn, '=') + 1, strlen($dsn) - 1);
+                break;
+            case 'host':
+                return substr(substr($dsn, 0, strpos($dsn, ';') + 1), strpos($dsn, '=') + 1, -1);
+                break;
+            default:
+                return substr($dsn, 0, strpos($dsn, ':'));
+                break;
+        }
     }
 
     /**
@@ -288,7 +317,18 @@ class Sellvana
      */
     public function getPrimaryKey($tableName)
     {
-        return [];
+        if (!isset($this->primaryKeys[$tableName])) {
+            $primaryKey = [];
+            $stmt = $this->getDbh()->query('SHOW KEYS FROM ' . $this->getQuotedName($tableName) . ' WHERE Key_name = "PRIMARY"');
+            $columns = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            foreach ($columns as $column) {
+                $primaryKey []= $column['Column_name'];
+            }
+            $this->primaryKeys[$tableName] = $primaryKey;
+        }
+
+        return $this->primaryKeys[$tableName];
     }
 
     /**

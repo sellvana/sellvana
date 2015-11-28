@@ -43,7 +43,7 @@ class WishlistTest extends \Codeception\TestCase\Test
         return $out;
     }
 
-    public function initDataSet()
+    private function initDataSet()
     {
         $xml = simplexml_load_file(__DIR__ . '/WishlistTest.xml');
         if ($xml) {
@@ -65,6 +65,7 @@ class WishlistTest extends \Codeception\TestCase\Test
 
     public function testAddItem()
     {
+        $this->tester->seeNumRecords(3, 'fcom_wishlist_items');
         $mWishlist = \Sellvana_Wishlist_Model_Wishlist::i(true);
         $wishlist = $mWishlist->load(1);
         $wishlist->addItem(4);

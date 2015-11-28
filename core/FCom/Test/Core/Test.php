@@ -130,7 +130,7 @@ class FCom_Test_Core_Test extends BClass
      * @param string $type Type of Test
      * @param object $file File for the Test
      */
-    public function init($type, $file)
+    public function init($type, $file, $module)
     {
         $filename       = $this->filterFileName($file->getFileName());
         $posTypePath    = strpos($file->getPathname(), "/{$type}/") + strlen("/{$type}/");
@@ -141,7 +141,7 @@ class FCom_Test_Core_Test extends BClass
         $this->file     = $file;
         $this->type     = $type;
         $this->state    = self::STATE_READY; // Not used yet.
-        $this->module   = explode('/', $file->getPathname())[7];
+        $this->module   = $module;
     }
 
     /**
