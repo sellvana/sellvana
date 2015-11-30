@@ -1,6 +1,8 @@
 <?php
 namespace Common\Helper;
 
+use Codeception\Configuration;
+
 class Sellvana
 {
 
@@ -37,32 +39,28 @@ class Sellvana
 
     private function __construct($dsn, $user, $password)
     {
-        if ($this->dbh === null) {
-            if (!empty($dsn) && !empty($user) && !empty($password)) {
-                static::$dbConfig = \BUtil::i()->arrayMerge(static::$dbConfig, [
-                    'dbname' => $this->getProvider($dsn, 'dbname'),
-                    'host' => $this->getProvider($dsn, 'host'),
-                    'username' => $user,
-                    'password' => $password
-                ]);
-            } else {
-                static::$dbConfig = \BUtil::i()->arrayMerge(static::$dbConfig, include FULLERON_ROOT_DIR . '/tests/_data/db_test_config.php');
-                $dsn = sprintf('mysql:host=%s;dbname=%s', static::$dbConfig['host'], static::$dbConfig['dbname']);
-                $user = static::$dbConfig['username'];
-                $password = static::$dbConfig['password'];
-            }
-
-            \BConfig::i()->add(['db' => static::$dbConfig]);
-
-            if (static::$pdo === null) {
-                static::$pdo = new \BPDO($dsn, $user, $password);
-            }
-
-            \BORM::set_db(static::$pdo);
-            $this->dbh = \BORM::get_db();
+        if (!empty($dsn) && !empty($user) && !empty($password)) {
+            static::$dbConfig = \BUtil::i()->arrayMerge(static::$dbConfig, [
+                'dbname' => $this->getProvider($dsn, 'dbname'),
+                'host' => $this->getProvider($dsn, 'host'),
+                'username' => $user,
+                'password' => $password
+            ]);
+        } else {
+            static::$dbConfig = \BUtil::i()->arrayMerge(static::$dbConfig, include FULLERON_ROOT_DIR . '/tests/_config/db_test_config.php');
+            $dsn = sprintf('mysql:host=%s;dbname=%s', static::$dbConfig['host'], static::$dbConfig['dbname']);
+            $user = static::$dbConfig['username'];
+            $password = static::$dbConfig['password'];
         }
 
-        return $this->dbh;
+        \BConfig::i()->add(['db' => static::$dbConfig]);
+
+        if (static::$pdo === null) {
+            static::$pdo = new \BPDO($dsn, $user, $password);
+        }
+
+        \BORM::set_db(static::$pdo);
+        $this->dbh = \BORM::get_db();
     }
 
     private function __clone() {}

@@ -145,7 +145,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
                 'caption'  => 'Run Test CGI',
                 'type'     => 'button',
                 'id'       => 'run-test-cgi',
-                'class'    => 'btn-default',
+                'class'    => 'btn-primary',
                 'callback' => 'runTestCgi'
             ],
             /*'run-test-web' => [
@@ -163,7 +163,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
                 $obj['id'] = $file->getHash();
                 $obj['type'] = ucfirst($file->getType());
                 $obj['test'] = $file->getTitle();
-                $obj['status'] = 'Pending';
+                $obj['status'] = '';
                 $gridData[] = $obj;
                 unset($class);
 

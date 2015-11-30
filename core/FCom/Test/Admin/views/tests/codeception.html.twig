@@ -27,11 +27,11 @@
     </div>
 </div>
 <script type="text/javascript">
-    require(['jquery', 'jquery.bootstrap-growl'], function ($) {
+    require(['jquery', 'underscore', 'jquery.bootstrap-growl'], function ($, _) {
 
         "use strict";
 
-        var codeceptGrid;
+        var codeceptGrid, codeceptNode;
 
         var helper = {
 
@@ -56,34 +56,32 @@
             vars: {
                 url: 'codecept_run',
                 ckbTest: '.select-row',
+                aCheckAll: 'a[data-select="select_visible"]',
+                aUncheckAll: 'a[data-select="unselect_visible"], a[data-select="unselect_all"]',
                 states: {
+                    'normal': {
+                        label: ''
+                    },
                     'pending': {
-                        css: '',
-                        label: 'Pending'
+                        label: '<strong class="label label-info">{{ "Pending" | _ }}</strong>'
                     },
                     'ready': {
-                        css: 'disabled',
-                        label: '<strong class="label label-default">Ready</strong>'
+                        label: '<strong class="label label-default">{{ "Ready" | _ }}</strong>'
                     },
                     'running': {
-                        css: '',
-                        label: '<strong class="label label-primary">Running</strong>'
+                        label: '<strong class="label label-primary">{{ "Running" | _ }}</strong>'
                     },
                     'error': {
-                        css: 'alert',
-                        label: '<strong class="label label-danger">Error</strong>'
+                        label: '<strong class="label label-danger">{{ "Error" | _ }}</strong>'
                     },
                     'stopped': {
-                        css: 'alert',
-                        label: '<strong class="label label-info">Stopped</strong>'
+                        label: '<strong class="label label-info">{{ "Stopped" | _ }}</strong>'
                     },
                     'failed': {
-                        css: 'alert',
-                        label: '<strong class="label label-danger">Failed</strong>'
+                        label: '<strong class="label label-danger">{{ "Failed" | _ }}</strong>'
                     },
                     'passed': {
-                        css: 'success',
-                        label: '<strong class="label label-success">Passed</strong>'
+                        label: '<strong class="label label-success">{{ "Passed" | _ }}</strong>'
                     },
                 }
             },
@@ -97,7 +95,7 @@
              */
             run: function(tests)
             {
-                if (tests.length > 0) {
+                if (State.isRunning() && tests.length > 0) {
                     var test = tests.shift();
                     var type = test.type.toLowerCase();
                     var hash = test.id;
@@ -110,8 +108,10 @@
                         dataType    : "json",
                         beforeSend  : function (xhr, settings)
                         {
-                            $.bootstrapGrowl("Please wait while "+test.test+" running.", { type: 'success', align: 'center', width: 'auto', delay: 3000});
-                            Test.refresh(test, 'running');
+                            $.bootstrapGrowl("{{ 'Please wait while' | _ }} " + test.test + " {{ 'running' | _ }}.", { type: 'success', align: 'center', width: 'auto', delay: 3000});
+                            ++State.vars.countRun; // Update number of test had runned
+                            Test.refresh(test, 'running'); // Refresh test
+                            State.refresh('running'); // Refresh test state
                         },
                         success     : function(data, status, xhr)
                         {
@@ -121,6 +121,14 @@
                             Test.run(tests);
                         }
                     });
+                } else if (State.isStopped()) {
+
+                    State.refresh('stopped'); // Set state is `stopped`
+
+                } else if (State.isCompleted()) {console.log('isCompleted');
+                    // Re-enable the checkboxes
+                    Test.checkboxToggle();
+                    State.refresh('ready');
                 }
             },
             /**
@@ -128,11 +136,9 @@
              */
             complete: function(test, data, xhr)
             {
-                var state;
-
                 // Check the state of the completed test and
                 // set the UI state and updated counts.
-                state = (data.passed == true) ? 'passed' : 'failed';
+                var state = (data.passed == true) ? 'passed' : 'failed';
 
                 // Update the single test state
                 Test.refresh(test, state);
@@ -144,16 +150,38 @@
              * Start running the tests.
              */
             start: function() {
-                var tests = codeceptGrid.getSelectedRows();
-
+                var tests = Test.find();
                 // If there are tests available...
-                if (tests.length > 0)
-                {
-                    Console.clear();
-                    Test.run(tests);
+                if (tests.length > 0) {
+                    if (State.vars.countTests == 0) {
+                        State.updateCount();
+                    }
+
+                    Console.clear(); // Clear console panel
+                    Test.checkboxToggle(); // Disable all checkboxes
+                    State.refresh('running'); // Update state to running
+                    Test.run(tests); // Run test
                 } else {
-                    $.bootstrapGrowl("Error: Please choose at least one test.", { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                    $.bootstrapGrowl("{{ 'Error: Please select some tests to run.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 5000});
                 }
+            },
+            find: function () {
+                var tests = codeceptGrid.getSelectedRows();
+                if (_.isEmpty(tests)) {
+                    tests = codeceptGrid.getSelectedRows();
+                }
+
+                return tests;
+            },
+            /**
+             * Stop the tests from running.
+             */
+            stop: function() {
+                // Re-enable the checkboxes
+                Test.checkboxToggle();
+
+                // And set the state to Stopped.
+                State.refresh('stopped');
             },
             /**
              * Set the state of the given test to Running.
@@ -172,18 +200,50 @@
                 $tr.find(Test.vars.ckbTest).prop('checked', false);
             },
             binds: function () {
-                $(Test.vars.ckbTest).on('change', function(e)
+                $(document).on('change', Test.vars.ckbTest, function(e)
                 {
-                    var state = 'pending';
+                    var state = 'normal';
                     if ($(this).is(':checked')) {
                         state = 'ready';
                     }
+
+                    State.updateCount();
 
                     var chosenState = Test.vars.states[state];
                     $(this).parents('tr')
                             .find('td[data-col="status"]')
                             .html(chosenState.label);
                 });
+
+                $(document).on('click', Test.vars.aCheckAll, function(e) {
+                    var chosenState = Test.vars.states['ready'];
+                    $('td[data-col="status"]').html(chosenState.label);
+                });
+
+                $(document).on('click', Test.vars.aUncheckAll, function(e) {
+                    var chosenState = Test.vars.states['normal'];
+                    $('td[data-col="status"]').html(chosenState.label);
+                });
+            },
+            /**
+             * Reset the Application state to ready.
+             */
+            reset: function()
+            {
+                // Reset all the tests
+                _(codeceptGrid.getRows()).each(function(row) {
+                    Test.refresh(row, 'ready');
+                });
+            },
+            /**
+             * Checkboxes are enabled by default.
+             *
+             * On start, they're disabled.
+             * On reset, they're enabled.
+             */
+            checkboxToggle: function()
+            {
+                $('input:checkbox').toggleDisabled();
             }
         };
 
@@ -228,6 +288,106 @@
             }
         };
 
+        /**
+         * Store and Update the state of the Application
+         */
+        var State = {
+            vars: {
+                // Default state. Used to reset the state if states change.
+                currentState: 'ready',
+                // Tallies for the test states
+                countTests: 0,
+                countRun: 0,
+                // State booleans
+                running: false,
+                stopped: false,
+
+                // All possible states
+                states : {
+                    'ready': {
+                        running: false,
+                        stopped: false
+                    },
+                    'running': {
+                        running: true,
+                        stopped: false
+                    },
+                    'stopped': {
+                        running: false,
+                        stopped: true
+                    },
+                    'failed': {
+                        running: false,
+                        stopped: false
+                    },
+                    'passed': {
+                        running: false,
+                        stopped: false
+                    }
+                }
+            },
+            init: function() {
+
+                // Initial count of all the available tests
+                State.updateCount();
+
+                // Update the UI to reflect the current state
+                State.refresh('ready');
+            },
+            /**
+             * Set the Application state.
+             *
+             * @param String state
+             */
+            refresh: function(state) {
+
+                // Get the current state
+                State.vars.currentState = state;
+
+                if (State.vars.currentState == 'ready') {
+                    State.vars.countRun = 0;
+                    State.vars.countTests = 0;
+                }
+
+                // Load the details of the current state
+                var chosenState = State.vars.states[state];
+
+                // Update the message state and button states.
+                State.vars.running = chosenState.running ;
+                State.vars.stopped = chosenState.stopped;
+            },
+            /**
+             * Update the count of chosen tests.
+             */
+            updateCount: function()
+            {
+                var tests = Test.find();
+                if (_.isEmpty(tests)) {
+                    tests = codeceptGrid.getSelectedRows();
+                }
+
+                State.vars.countTests = tests.length;
+            },
+            /*
+             * State Check: Return if the Tests are running.
+             */
+            isRunning: function() {
+                return State.vars.running;
+            },
+            /*
+             * State Check: Return if the Tests have been stopped.
+             */
+            isStopped: function() {
+                return State.vars.stopped;
+            },
+            /*
+             * State Check: Return if the chosen tests have been run.
+             */
+            isCompleted: function() {
+                return State.vars.countRun == State.vars.countTests
+            }
+        };
+
         var Codeception = {
 
             vars: {
@@ -260,20 +420,24 @@
                     cache       : false,
                     dataType    : 'json',
                     data        : helper.data(),
+                    beforeSend  : function (xhr, settings)
+                    {
+                        $.bootstrapGrowl("{{ 'Please wait while codeception is checking.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 2000});
+                        Test.refresh(test, 'running');
+                    },
                     success: function(data, status, xhr)
                     {
                         // Update the Codeception button to indicate success!
                         if (data.ready) {
-                            $.bootstrapGrowl("Check codeception is executable done.", { type: 'success', align: 'center', width: 'auto', delay: 3000});
+                            $.bootstrapGrowl("{{ 'Done, codeception is now available.' | _ }}", { type: 'success', align: 'center', width: 'auto', delay: 2000});
                             $(Codeception.vars.btnRunCgi).prop('disabled', false);
                         } else {
-                            $.bootstrapGrowl("Error:<br /> " + data.error, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                            $.bootstrapGrowl("{{ 'Error' | _ }}:<br /> " + data.error, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                         }
                     },
                     error: function(xhr, status, message)
                     {
-                        // Update the Codeception button to indicate it's not ready.
-                        console.log('check error', message);
+                        $.bootstrapGrowl("{{ 'Error' | _ }}:<br /> " + message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                     }
                 });
             }
@@ -281,9 +445,14 @@
 
         window.codeceptionTestsGridRegister = function (grid) {
             codeceptGrid = grid;
+            codeceptNode = $(grid.getDOMNode());
             // Check if codeception.phar is executable
             Codeception.init();
+
+            // Bind all actions for running test
             Test.init();
+
+            State.init();
         };
 
         window.runTestCgi = function () {
@@ -293,6 +462,26 @@
         window.runTestWeb = function () {
             console.log('runTestWeb');
         };
+
+        /**
+         * If refresh page then confirm to force stop
+         */
+        $(document).keydown(function (e)
+        {
+            if (e.which == 116 || e.which == 17) {
+                if (State.isRunning() && window.confirm('Do you want to force shutdown test.')) {
+                    Test.stop();
+                } else {
+                    window.location.reload();
+                }
+            }
+        });
+
+        $.fn.toggleDisabled = function() {
+            return this.each(function() {
+                this.disabled = !this.disabled;
+            });
+        }
 
     });
 </script>

@@ -3,7 +3,6 @@ namespace Common\Helper;
 
 use Codeception\Exception\ModuleException;
 use Codeception\Exception\ModuleConfigException;
-use Codeception\Configuration;
 use Codeception\Lib\Interfaces\Db as DbInterface;
 use Codeception\TestCase;
 use Common\Helper\Sellvana as Driver;
@@ -343,7 +342,7 @@ class Db extends \Codeception\Module implements DbInterface
 
     public function getDbConfigFile()
     {
-        return FULLERON_ROOT_DIR . '/tests/_data/db_test_config.php';
+        return FULLERON_ROOT_DIR . '/tests/_config/db_test_config.php';
     }
 
     /**
