@@ -6,6 +6,7 @@ use Codeception\Exception\ModuleConfigException;
 use Codeception\Lib\Interfaces\Db as DbInterface;
 use Codeception\TestCase;
 use Common\Helper\Sellvana as Driver;
+use Common\Helper\LoadDump;
 
 class Db extends \Codeception\Module implements DbInterface
 {
@@ -85,8 +86,22 @@ class Db extends \Codeception\Module implements DbInterface
 
     public function _initialize()
     {
-        if ($this->config['load_dump'] && ($this->config['cleanup'] or ($this->config['populate']))) {
-            $dump = $this->config['dump'] ? : $this->getDumpPath();
+        if ($this->config['load_dump'] && ($this->config['cleanup'] || ($this->config['populate']))) {
+            $dump = $this->config['dump'] ? : $this->getDumpPath('sellvana_test.sql');
+
+            if (!file_exists($dump)) {
+                // If dump is not available then load it
+                $ld = new \Common\Helper\LoadDump(
+                    \BConfig::i()->get('db/host'),
+                    \BConfig::i()->get('db/username'),
+                    \BConfig::i()->get('db/password'),
+                    \BConfig::i()->get('db/dbname')
+                );
+
+                if ($ld->make('*', $this->getDumpPath())) {
+                    $dump = $this->getDumpPath($ld->getDumpName());
+                }
+            }
 
             if (!file_exists($dump)) {
                 throw new ModuleConfigException(
@@ -222,9 +237,17 @@ class Db extends \Codeception\Module implements DbInterface
      * 
      * @return string
      */
-    private function getDumpPath()
+    private function getDumpPath($dump = '')
     {
-        return dirname(dirname(__DIR__)) . '/_data/sellvana.sql';
+        $dataDir = FULLERON_ROOT_DIR . '/tests/_data';
+        if (!file_exists($dataDir)) {
+            mkdir($dataDir, 755, true);
+        }
+
+        if (empty($dump)) {
+            return $dataDir . '/';
+        }
+        return $dataDir . '/' . $dump;
     }
 
     /**
