@@ -1,6 +1,6 @@
 include:
-    - core/FCom/*/Test
-    - core/Sellvana/*/Test
+    - core/FCom/*/Test/Codecept
+    - core/Sellvana/*/Test/Codecept
 paths:
     log: storage/testlogs
 settings:

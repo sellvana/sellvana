@@ -2111,6 +2111,66 @@ class BUtil extends BClass
     }
 
     /**
+     * Given a file name, remove any file extension from the string.
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function removeFileExtension($string)
+    {
+        return preg_replace("/\\.[^.\\s]{3,4}$/", "", $string);
+    }
+
+    /**
+     * Take a camel cased string and turn it into a word seperated sentance.
+     * e.g. 'ThisIsASentance' would turn into 'This Is A Sentance'
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function camelToSentance($string)
+    {
+        return trim(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $string));
+    }
+
+    /**
+     * Run a terminal command.
+     *
+     * @param  string $command
+     * @return array  Each array entry is a line of output from running the command.
+     */
+    public function runCLI($command) {
+        $output = [];
+
+        $spec = array(
+            0 => array("pipe", "r"),   // stdin is a pipe that the child will read from
+            1 => array("pipe", "w"),   // stdout is a pipe that the child will write to
+            2 => array("pipe", "w")    // stderr is a pipe that the child will write to
+        );
+
+        flush();
+
+        $process = proc_open($command, $spec, $pipes, realpath('./'), $_ENV);
+
+        if (is_resource($process)) {
+
+            while ($line = fgets($pipes[1])) {
+
+                // Trim any line breaks and white space
+                $line = trim(preg_replace("/\r|\n/", "", $line));
+
+                // If the line has content, add to the output log.
+                if (! empty($line))
+                    $output[] = $line;
+
+                flush();
+            }
+        }
+
+        return $output;
+    }
+
+    /**
      * Alias of version_compare for use in Twig templates
      */
     public function versionCompare($v1, $v2, $op = null)
