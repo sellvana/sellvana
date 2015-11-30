@@ -86,7 +86,7 @@ class LoadDump {
                 $tables = is_array($tables) ? $tables : explode(',', $tables);
             }
 
-            $this->dumpName = $this->dbName . '_test';
+            $this->dumpName = $this->dbName . '_test.sql';
 
             $sql = 'CREATE DATABASE IF NOT EXISTS ' . $this->dumpName . ";\n\n";
             $sql .= 'USE ' . $this->dumpName . ";\n\n";
@@ -147,7 +147,7 @@ class LoadDump {
         }
 
         try {
-            $handle = fopen($outputDir . $this->newDbName, 'w+');
+            $handle = fopen($outputDir . $this->dumpName, 'w+');
             fwrite($handle, $sql);
             fclose($handle);
         } catch (Exception $e) {
