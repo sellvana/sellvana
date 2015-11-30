@@ -46,6 +46,7 @@ base:
             - [ addTab, comments, { label: Comments, pos: 80, async: true } ]
             - [ addTab, history, { label: History, pos: 90, async: true } ]
     - { hook: main, views: payments/grid }
+    - { hook: main, views: shipments/grid }
 
 /payments:
     - { include: default_griddle }
