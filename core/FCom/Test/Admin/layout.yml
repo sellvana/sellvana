@@ -3,11 +3,17 @@ base:
         do:
             - [ addNav, system/dev, { label: Developers } ]
             - [ addNav, system/dev/tests, { label: Tests, pos: 100, href: /tests/index } ]
+            - [ addNav, system/dev/codeception, { label: Codeception Tests, pos: 105, href: /tests/codeception } ]
 
 /tests/index:
     - { include: base }
     - { hook: main, views: tests/index }
     - { view: admin/nav, do: [[ setNav, test/index ]] }
+
+/tests/codeception:
+    - { include: base }
+    - { hook: main, views: tests/codeception }
+    - { view: admin/nav, do: [[ setNav, test/codeception ]] }
 
 /settings:
     - { view: settings, do: [[ addTab, FCom_Test, { label: Unit Tests, group: areas, async: true } ]] }

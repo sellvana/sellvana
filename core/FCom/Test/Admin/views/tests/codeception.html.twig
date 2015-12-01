@@ -1,0 +1,487 @@
+{% set codeceptConfig = THIS.get('codeceptConfig') %}
+{% set codecept = THIS.get('codecept') %}
+{% set tests = THIS.get('tests') %}
+{% set testsCount = THIS.get('testsCount') %}
+<style type="text/css">
+    .green {
+        color: green;
+    }
+    .red {
+        color: darkred;
+    }
+    .console-header { padding: 5px 10px; }
+    .console { height: 350px; overflow: scroll; background: #F0F0F0}
+</style>
+<div class="f-admin-main-view">
+    <div class="f-admin-main">
+        <div class="tab-content">
+            {#<div id="console_container" class="panel console hide"></div>#}
+            <div class="contain-to-grid">
+                {{ THIS.view('core/griddle').set('grid', grid) | raw }}
+            </div>
+            <div class='console-header'>
+                <h3 class='text-left'><strong>Console</strong> Results</h3>
+            </div>
+            <div id="console_container" class="panel-body console" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require(['jquery', 'underscore', 'jquery.bootstrap-growl'], function ($, _) {
+
+        "use strict";
+
+        var codeceptGrid, codeceptNode;
+
+        var helper = {
+
+            data: function()
+            {
+                if (location.search.indexOf('test=') >= 0)
+                    return {'test' : helper.getParameterByName('test') };
+
+                return {};
+            },
+
+            getParameterByName: function(name)
+            {
+                name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                        results = regex.exec(location.search);
+                return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+            }
+        };
+
+        var Test = {
+            vars: {
+                url: 'codecept_run',
+                ckbTest: '.select-row',
+                aCheckAll: 'a[data-select="select_visible"]',
+                aUncheckAll: 'a[data-select="unselect_visible"], a[data-select="unselect_all"]',
+                states: {
+                    'normal': {
+                        label: ''
+                    },
+                    'pending': {
+                        label: '<strong class="label label-info">{{ "Pending" | _ }}</strong>'
+                    },
+                    'ready': {
+                        label: '<strong class="label label-default">{{ "Ready" | _ }}</strong>'
+                    },
+                    'running': {
+                        label: '<strong class="label label-primary">{{ "Running" | _ }}</strong>'
+                    },
+                    'error': {
+                        label: '<strong class="label label-danger">{{ "Error" | _ }}</strong>'
+                    },
+                    'stopped': {
+                        label: '<strong class="label label-info">{{ "Stopped" | _ }}</strong>'
+                    },
+                    'failed': {
+                        label: '<strong class="label label-danger">{{ "Failed" | _ }}</strong>'
+                    },
+                    'passed': {
+                        label: '<strong class="label label-success">{{ "Passed" | _ }}</strong>'
+                    },
+                }
+            },
+            init: function() {
+                Test.binds();
+            },
+            /**
+             * Test Runner.
+             *
+             * @param Array  List of test IDs.
+             */
+            run: function(tests)
+            {
+                if (State.isRunning() && tests.length > 0) {
+                    var test = tests.shift();
+                    var type = test.type.toLowerCase();
+                    var hash = test.id;
+
+                    // Run the test
+                    $.ajax({
+                        url         : Test.vars.url + '?type=' + type + '&id=' + hash,
+                        method      : 'GET',
+                        cache       : false,
+                        dataType    : "json",
+                        beforeSend  : function (xhr, settings)
+                        {
+                            $.bootstrapGrowl("{{ 'Please wait while' | _ }} " + test.test + " {{ 'running' | _ }}.", { type: 'success', align: 'center', width: 'auto', delay: 3000});
+                            ++State.vars.countRun; // Update number of test had runned
+                            Test.refresh(test, 'running'); // Refresh test
+                            State.refresh('running'); // Refresh test state
+                        },
+                        success     : function(data, status, xhr)
+                        {
+                            // After a successful run, update the test status.
+                            Test.complete(test, data, xhr);
+                            // Carry on running the tests...
+                            Test.run(tests);
+                        }
+                    });
+                } else if (State.isStopped()) {
+
+                    State.refresh('stopped'); // Set state is `stopped`
+
+                } else if (State.isCompleted()) {console.log('isCompleted');
+                    // Re-enable the checkboxes
+                    Test.checkboxToggle();
+                    State.refresh('ready');
+                }
+            },
+            /**
+             * Set the test state after it's been run (whether it's pass or fail)
+             */
+            complete: function(test, data, xhr)
+            {
+                // Check the state of the completed test and
+                // set the UI state and updated counts.
+                var state = (data.passed == true) ? 'passed' : 'failed';
+
+                // Update the single test state
+                Test.refresh(test, state);
+
+                // Append the test log to the console
+                Console.add(data);
+            },
+            /**
+             * Start running the tests.
+             */
+            start: function() {
+                var tests = Test.find();
+                // If there are tests available...
+                if (tests.length > 0) {
+                    if (State.vars.countTests == 0) {
+                        State.updateCount();
+                    }
+
+                    Console.clear(); // Clear console panel
+                    Test.checkboxToggle(); // Disable all checkboxes
+                    State.refresh('running'); // Update state to running
+                    Test.run(tests); // Run test
+                } else {
+                    $.bootstrapGrowl("{{ 'Error: Please select some tests to run.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 5000});
+                }
+            },
+            find: function () {
+                var tests = codeceptGrid.getSelectedRows();
+                if (_.isEmpty(tests)) {
+                    tests = codeceptGrid.getSelectedRows();
+                }
+
+                return tests;
+            },
+            /**
+             * Stop the tests from running.
+             */
+            stop: function() {
+                // Re-enable the checkboxes
+                Test.checkboxToggle();
+
+                // And set the state to Stopped.
+                State.refresh('stopped');
+            },
+            /**
+             * Set the state of the given test to Running.
+             *
+             * @param Form Object   test
+             * @param String        state
+             */
+            refresh: function (test, state) {
+
+                // Load the details of the current state
+                var chosenState = Test.vars.states[state];
+                var $tr = $('tr#' + test.id);
+
+                // Update the test
+                $tr.find('td[data-col="status"]').html(chosenState.label);
+                $tr.find(Test.vars.ckbTest).prop('checked', false);
+            },
+            binds: function () {
+                $(document).on('change', Test.vars.ckbTest, function(e)
+                {
+                    var state = 'normal';
+                    if ($(this).is(':checked')) {
+                        state = 'ready';
+                    }
+
+                    State.updateCount();
+
+                    var chosenState = Test.vars.states[state];
+                    $(this).parents('tr')
+                            .find('td[data-col="status"]')
+                            .html(chosenState.label);
+                });
+
+                $(document).on('click', Test.vars.aCheckAll, function(e) {
+                    var chosenState = Test.vars.states['ready'];
+                    $('td[data-col="status"]').html(chosenState.label);
+                });
+
+                $(document).on('click', Test.vars.aUncheckAll, function(e) {
+                    var chosenState = Test.vars.states['normal'];
+                    $('td[data-col="status"]').html(chosenState.label);
+                });
+            },
+            /**
+             * Reset the Application state to ready.
+             */
+            reset: function()
+            {
+                // Reset all the tests
+                _(codeceptGrid.getRows()).each(function(row) {
+                    Test.refresh(row, 'ready');
+                });
+            },
+            /**
+             * Checkboxes are enabled by default.
+             *
+             * On start, they're disabled.
+             * On reset, they're enabled.
+             */
+            checkboxToggle: function()
+            {
+                $('input:checkbox').toggleDisabled();
+            }
+        };
+
+        var Console = {
+            init: function() {
+                //
+            },
+            vars: {
+                eConsoleContainer: '#console_container'
+            },
+            /**
+             * Given the result of a running a test, append the console output.
+             *
+             * @param object Test
+             */
+            add: function(test)
+            {
+                var consoleContainer = $(Console.vars.eConsoleContainer);
+                consoleContainer.show();
+                // Load the details of the current state
+                var chosenState = Test.vars.states[test.state];
+
+                var testResult = $('<div/>', {'class': test.state +' all'});
+                var state = $('<span/>', {'class': Test.vars.sButton + chosenState.css,
+                }).html(chosenState.label).appendTo(testResult);
+
+                $('<h5/>', {'text': test.title}).appendTo(testResult);
+                $('<pre/>', {'text': test.log}).appendTo(testResult);
+                $('<hr>').appendTo(testResult);
+
+                testResult.appendTo(consoleContainer);
+
+                // Move down to the bottom of the container
+                consoleContainer[0].scrollTop = consoleContainer[0].scrollHeight;
+            },
+
+            /**
+             * Empty the content of the console
+             */
+            clear: function() {
+                $(Console.vars.eConsoleContainer).html('');
+            }
+        };
+
+        /**
+         * Store and Update the state of the Application
+         */
+        var State = {
+            vars: {
+                // Default state. Used to reset the state if states change.
+                currentState: 'ready',
+                // Tallies for the test states
+                countTests: 0,
+                countRun: 0,
+                // State booleans
+                running: false,
+                stopped: false,
+
+                // All possible states
+                states : {
+                    'ready': {
+                        running: false,
+                        stopped: false
+                    },
+                    'running': {
+                        running: true,
+                        stopped: false
+                    },
+                    'stopped': {
+                        running: false,
+                        stopped: true
+                    },
+                    'failed': {
+                        running: false,
+                        stopped: false
+                    },
+                    'passed': {
+                        running: false,
+                        stopped: false
+                    }
+                }
+            },
+            init: function() {
+
+                // Initial count of all the available tests
+                State.updateCount();
+
+                // Update the UI to reflect the current state
+                State.refresh('ready');
+            },
+            /**
+             * Set the Application state.
+             *
+             * @param String state
+             */
+            refresh: function(state) {
+
+                // Get the current state
+                State.vars.currentState = state;
+
+                if (State.vars.currentState == 'ready') {
+                    State.vars.countRun = 0;
+                    State.vars.countTests = 0;
+                }
+
+                // Load the details of the current state
+                var chosenState = State.vars.states[state];
+
+                // Update the message state and button states.
+                State.vars.running = chosenState.running ;
+                State.vars.stopped = chosenState.stopped;
+            },
+            /**
+             * Update the count of chosen tests.
+             */
+            updateCount: function()
+            {
+                var tests = Test.find();
+                if (_.isEmpty(tests)) {
+                    tests = codeceptGrid.getSelectedRows();
+                }
+
+                State.vars.countTests = tests.length;
+            },
+            /*
+             * State Check: Return if the Tests are running.
+             */
+            isRunning: function() {
+                return State.vars.running;
+            },
+            /*
+             * State Check: Return if the Tests have been stopped.
+             */
+            isStopped: function() {
+                return State.vars.stopped;
+            },
+            /*
+             * State Check: Return if the chosen tests have been run.
+             */
+            isCompleted: function() {
+                return State.vars.countRun == State.vars.countTests
+            }
+        };
+
+        var Codeception = {
+
+            vars: {
+
+                ready: false,
+                btnRunCgi: '#run-test-cgi',
+                checks: {
+                    'executable': {
+                        url: 'codecept_executable'
+                    }
+                }
+            },
+
+            init: function()
+            {
+                $(Codeception.vars.btnRunCgi).prop('disabled', true);
+                Codeception.check('executable');
+            },
+
+            /**
+             * Make an AJAX call to see if Codeception is executable.
+             */
+            check: function(type)
+            {
+                var cType = Codeception.vars.checks[type];
+
+                $.ajax({
+                    url         : cType.url,
+                    method      : 'GET',
+                    cache       : false,
+                    dataType    : 'json',
+                    data        : helper.data(),
+                    beforeSend  : function (xhr, settings)
+                    {
+                        $.bootstrapGrowl("{{ 'Please wait while codeception is checking.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 2000});
+                        Test.refresh(test, 'running');
+                    },
+                    success: function(data, status, xhr)
+                    {
+                        // Update the Codeception button to indicate success!
+                        if (data.ready) {
+                            $.bootstrapGrowl("{{ 'Done, codeception is now available.' | _ }}", { type: 'success', align: 'center', width: 'auto', delay: 2000});
+                            $(Codeception.vars.btnRunCgi).prop('disabled', false);
+                        } else {
+                            $.bootstrapGrowl("{{ 'Error' | _ }}:<br /> " + data.error, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                        }
+                    },
+                    error: function(xhr, status, message)
+                    {
+                        $.bootstrapGrowl("{{ 'Error' | _ }}:<br /> " + message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                    }
+                });
+            }
+        };
+
+        window.codeceptionTestsGridRegister = function (grid) {
+            codeceptGrid = grid;
+            codeceptNode = $(grid.getDOMNode());
+            // Check if codeception.phar is executable
+            Codeception.init();
+
+            // Bind all actions for running test
+            Test.init();
+
+            State.init();
+        };
+
+        window.runTestCgi = function () {
+            Test.start();
+        };
+
+        window.runTestWeb = function () {
+            console.log('runTestWeb');
+        };
+
+        /**
+         * If refresh page then confirm to force stop
+         */
+        $(document).keydown(function (e)
+        {
+            if (e.which == 116 || e.which == 17) {
+                if (State.isRunning() && window.confirm('Do you want to force shutdown test.')) {
+                    Test.stop();
+                } else {
+                    window.location.reload();
+                }
+            }
+        });
+
+        $.fn.toggleDisabled = function() {
+            return this.each(function() {
+                this.disabled = !this.disabled;
+            });
+        }
+
+    });
+</script>

@@ -174,11 +174,38 @@ class Sellvana_Sales_Workflow_Payment extends Sellvana_Sales_Workflow_Abstract
 
     }
 
+    /**
+     * @param Sellvana_Sales_Model_Order_Payment[] $args
+     */
     public function action_adminChangesPaymentCustomState($args)
     {
         $newState = $args['payment']->state()->custom()->setState($args['state']);
         $label = $newState->getValueLabel();
         $args['payment']->addHistoryEvent('custom_state', 'Admin user has changed custom payment state to "' . $label . '"');
         $args['payment']->save();
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order_Payment[] $args
+     */
+    public function action_adminMarksPaymentAsPaid($args)
+    {
+        $args['payment']->markAsPaid();
+
+        $items = [];
+        /** @var Sellvana_Sales_Model_Order_Payment_Item $paymentItem */
+        foreach ($args['payment']->items() as $paymentItem) {
+            $items[$paymentItem->get('order_item_id')] = $paymentItem->get('qty');
+        }
+
+        /** @var Sellvana_Sales_Model_Order_Item $orderItem */
+        foreach ($args['payment']->order()->items() as $orderItem) {
+            if (!empty($items[$orderItem->id()])) {
+                $orderItem->markAsPaid($items[$orderItem->id()]);
+            }
+        }
+
+        $args['payment']->order()->state()->calcAllStates();
+        $args['payment']->order()->saveAllDetails();
     }
 }

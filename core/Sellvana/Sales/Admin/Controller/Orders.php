@@ -181,6 +181,19 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ]
             ];
 
+            $actions['mark_paid'] = [
+                'button',
+                [
+                    'name' => 'do',
+                    'type' => 'submit',
+                    'value' => 'MARK_PAID',
+                    'class' => ['btn', 'btn-default'],
+                ],
+                [
+                    ['span', null, $this->BLocale->_('Mark as Paid')],
+                ]
+            ];
+
             $info = $this->_('Grand Total') . ': ' . $this->BLocale->currency($m->get('grand_total'))
                 . ' | ' . $this->_('Overall Status') . ': ' . $m->state()->overall()->getValueLabel()
                 . ' | ' . $this->_('Payment') . ': ' . $m->state()->payment()->getValueLabel()
@@ -217,7 +230,13 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
         }
 
         if ($args['do'] === 'SHIP_ALL') {
-            $order->shipAllShipments();
+            $this->Sellvana_Sales_Main->workflowAction('adminMarksOrderAsShipped', [
+                'order' => $order
+            ]);
+        } elseif ($args['do'] === 'MARK_PAID') {
+            $this->Sellvana_Sales_Main->workflowAction('adminMarksOrderAsPaid', [
+                'order' => $order
+            ]);
         }
 
         $pay = $this->BRequest->post('pay');
@@ -459,6 +478,8 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'orm' => $orm,
             'data_mode' => 'local',
             //'caption'      =>$caption,
+            'edit_url_required' => true,
+            'edit_url' => $this->BApp->href('payments/mass_change_state'),
             'columns' => [
                 ['type' => 'row_select'],
                 ['type' => 'btn_group', 'buttons' => [
@@ -478,7 +499,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ],
             'actions' => [
                 'add' => ['caption' => 'Add payment'],
-                'delete' => ['caption' => 'Remove']
+                'delete' => ['caption' => 'Remove'],
+                'mark_paid' => [
+                    'caption'      => 'Mark as paid',
+                    'type'         => 'button',
+                    'class'        => 'btn btn-primary',
+                    'isMassAction' => true,
+                    'callback'     => 'markAsPaid',
+                ],
             ],
             'filters' => [
                 ['field' => 'payment_method', 'type' => 'multiselect'],
@@ -521,6 +549,8 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             'orm' => $orm,
             'data_mode' => 'local',
             //'caption'      =>$caption,
+            'edit_url_required' => true,
+            'edit_url' => $this->BApp->href('shipments/mass_change_state'),
             'columns' => [
                 ['type' => 'row_select'],
                 ['type' => 'btn_group', 'buttons' => [
@@ -538,7 +568,14 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ],
             'actions' => [
                 'add' => ['caption' => 'Add shipment'],
-                'delete' => ['caption' => 'Remove']
+                'delete' => ['caption' => 'Remove'],
+                'mark_paid' => [
+                    'caption'      => 'Mark as Shipped',
+                    'type'         => 'button',
+                    'class'        => 'btn btn-primary',
+                    'isMassAction' => true,
+                    'callback'     => 'markAsShipped',
+                ],
             ],
             'filters' => [
                 ['field' => 'carrier_code', 'type' => 'multiselect'],

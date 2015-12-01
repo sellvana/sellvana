@@ -22,6 +22,7 @@ modules:
                 routing:
                     - [ /subscriptions, Sellvana_Email_Admin_Controller_Subscriptions.index ]
                     - [ /subscriptions/.action, Sellvana_Email_Admin_Controller_Subscriptions ]
+                    - [ /messages/.action, Sellvana_Email_Admin_Controller_Messages ]
 
             FCom_Frontend:
                 routing:
