@@ -4,6 +4,11 @@ base:
             - [ addNav, customer/subscriptions, { label: Email Subscriptions, href: /subscriptions, pos: 100 } ]
             #- [ addNav, customer/email-queues, { label: Email Queues, href: /email-queues, pos: 110 } ]
 
+customer_form_tabs:
+    - view: admin/form
+        do:
+            - [ addTab, messages, { label: Messages, pos: 84, view: emails/customers/messages, async: true } ]
+
 /settings:
     - view: settings
         do:

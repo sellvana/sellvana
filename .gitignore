@@ -2,11 +2,12 @@ storage/
 media/
 dlc/*
 local/*
+vendor/
 index.local.php
 .idea
 .sass-cache/
 *.scssc
-
+.phpintel
 /nbproject/private/
 /nbproject/project.properties
 /nbproject/project.xml
@@ -23,3 +24,4 @@ FCom/Test/Test/Unit/buckyball/com/db_test_config.php
 #nodejs: cache folder when build jsx -> js
 .module-cache
 tests/_output/*
+*Actions.php
