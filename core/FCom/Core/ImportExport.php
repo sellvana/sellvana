@@ -116,26 +116,19 @@ class FCom_Core_ImportExport extends BClass
                 $this->_errors++;
                 break;
         }
-        #$this->_log[] = ['type' => $type, 'message' => $message];
-        if (empty($message['signal']) && ($type === 'warning' || $type === 'error')) {
+        if (is_string($message)){
+            $message = ['msg' => $message];
+        }
+
+        if (empty($message['signal']) && ($type === 'warning' || $type === 'error')
+        ) {
             $message['signal'] = 'problem';
         }
         $this->_sendMessage($message);
-//        $this->_log[] = $message;
-//        if (time() - $this->_lastLogSentAt > 1) {
-//            $this->_lastLogSentAt = time();
-//            foreach ($this->_log as $msg) {
-//                $this->_sendMessage($msg);
-//            }
-//            $this->_log = [];
-//        }
+
 
         if ($type === 'warning' || $type === 'error') {
             $this->BDebug->log($message, 'ie.log');
-        }
-        #echo "<hr><pre>"; print_r($message); echo "</pre>";
-        if ($type === 'error') {
-            #exit;
         }
         return $this;
     }
