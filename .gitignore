@@ -25,3 +25,9 @@ FCom/Test/Test/Unit/buckyball/com/db_test_config.php
 .module-cache
 tests/_output/*
 *Actions.php
+core/*/*/Test/tests/_data
+core/*/*/Test/tests/_envs
+core/*/*/Test/tests/_output
+core/*/*/Test/tests/_support
+*.suite.yml
+_bootstrap.php
