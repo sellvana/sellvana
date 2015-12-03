@@ -15,9 +15,8 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         | This is where you add your Codeception configurations.
         */
         'sites' => [
-            'Codeception' => FULLERON_ROOT_DIR . '/codeception.yml',
-            'Sellvana_Wishlist' => FULLERON_ROOT_DIR . '/core/Sellvana/Wishlist/Test/Codecept/codeception.yml',
-            'FCom_Test' => FULLERON_ROOT_DIR . '/core/FCom/Test/Test/Codecept/codeception.yml'
+            'Sellvana_Wishlist' => FULLERON_ROOT_DIR . '/core/Sellvana/Wishlist/Test/codeception.yml',
+            'FCom_Test' => FULLERON_ROOT_DIR . '/core/FCom/Test/Test/codeception.yml'
         ],
 
         /*
@@ -26,19 +25,17 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         |--------------------------------------------------------------------------
         |
         */
-
-        'executable' => FULLERON_ROOT_DIR .'/codecept.phar',
+        'executable' => FULLERON_ROOT_DIR . '/codecept.phar',
 
         /*
         |--------------------------------------------------------------------------
         | Decide which type of tests get included.
         |--------------------------------------------------------------------------
         */
-
         'tests' => [
             'acceptance' => false,
             'functional' => false,
-            'unit'       => true,
+            'unit' => true,
         ],
 
         /*
@@ -46,7 +43,6 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         | When scan for the tests, we need to ignore the following files.
         |--------------------------------------------------------------------------
         */
-
         'ignore' => [
             'WebGuy.php',
             'TestGuy.php',
@@ -57,12 +53,22 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
 
         /*
         |--------------------------------------------------------------------------
+        | When load tests it will require on codeception global bootstrap
+        |--------------------------------------------------------------------------
+        */
+        'codecept_bootstrap' => [
+            FULLERON_ROOT_DIR . '/core/FCom/Test/bootstrap.php',
+            FULLERON_ROOT_DIR . '/tests/_support/Helper/Sellvana.php',
+            FULLERON_ROOT_DIR . '/tests/_support/Helper/Db.php'
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Setting the location as the current file helps with offering information
         | about where this configuration file sits on the server.
         |--------------------------------------------------------------------------
         */
-
-        'location'   => __FILE__,
+        'location' => __FILE__,
     ];
 
     public function __construct()
@@ -112,7 +118,6 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
     public function action_run()
     {
         $rq = $this->BRequest;
-        $rp = $this->BResponse;
 
         $type = strtolower($rq->get('type'));
         $hash = $rq->get('id');
@@ -121,6 +126,14 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         $rs = $this->BUtil->toJson($response);
         echo $rs;
         exit;
+    }
+
+    /**
+     * Attempt to run all selected tests on background jobs
+     */
+    public function action_run_background__POST()
+    {
+
     }
 
     public function getTestsConfig($tests)
@@ -142,10 +155,10 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         ];
         $config['actions'] = [
             'run-test-cgi' => [
-                'caption'  => 'Run Test CGI',
-                'type'     => 'button',
-                'id'       => 'run-test-cgi',
-                'class'    => 'btn-primary',
+                'caption' => 'Run Test CGI',
+                'type' => 'button',
+                'id' => 'run-test-cgi',
+                'class' => 'btn-primary',
                 'callback' => 'runTestCgi'
             ],
             /*'run-test-web' => [
@@ -158,15 +171,17 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
 
         ];
         $gridData = [];
-        foreach ($tests as $type => $files) {
-            foreach ($files as $file) {
-                $obj['id'] = $file->getHash();
-                $obj['type'] = ucfirst($file->getType());
-                $obj['test'] = $file->getTitle();
-                $obj['status'] = '';
-                $gridData[] = $obj;
-                unset($class);
+        if (!empty($tests)) {
+            foreach ($tests as $type => $files) {
+                foreach ($files as $file) {
+                    $obj['id'] = $file->getHash();
+                    $obj['type'] = ucfirst($file->getType());
+                    $obj['test'] = $file->getTitle();
+                    $obj['status'] = '';
+                    $gridData[] = $obj;
+                    unset($class);
 
+                }
             }
         }
 
@@ -223,7 +238,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
     }
 
     /**
-     * @param string $phpunit desired phpunit filename
+     * @param string $codecept desired codecept filename
      */
     protected function ensureCodeception($codecept)
     {
