@@ -1,7 +1,7 @@
-<?php
-namespace Common\Helper;
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class LoadDump {
+class FCom_Test_Core_LoadDump extends BClass
+{
     /**
      * Host where database is located
      */
@@ -44,10 +44,10 @@ class LoadDump {
     */
     public function __construct($host, $username, $passwd, $dbName, $charset = 'utf8')
     {
-        $this->host = $host;
-        $this->username = $username;
-        $this->passwd = $passwd;
-        $this->dbName = $dbName;
+        $this->host = $host ?: $this->BConfig->get('db/host');
+        $this->username = $username ?: $this->BConfig->get('db/username');
+        $this->passwd = $passwd ?: $this->BConfig->get('db/password');
+        $this->dbName = $dbName ?: $this->BConfig->get('db/dbname');
         $this->charset = $charset;
 
         $this->initializeDatabase();
@@ -68,9 +68,10 @@ class LoadDump {
      *
      * @param string $tables
      * @param string $outputDir
+     * @param bool $raw If true will load dump with data
      * @return bool
      */
-    public function make($tables = '*', $outputDir = '.')
+    public function make($tables = '*', $outputDir = '.', $raw = true)
     {
         try {
             /**
@@ -95,31 +96,34 @@ class LoadDump {
              * Iterate tables
              */
             foreach ($tables as $table) {
-                $result = mysqli_query($this->conn, 'SELECT * FROM ' . $table);
-                $numFields = mysqli_num_fields($result);
 
                 $sql .= 'DROP TABLE IF EXISTS ' . $table . ';';
                 $row2 = mysqli_fetch_row(mysqli_query($this->conn, 'SHOW CREATE TABLE ' . $table));
                 $sql .= "\n\n" . $row2[1] . ";\n\n";
 
-                for ($i = 0; $i < $numFields; $i++) {
-                    while ($row = mysqli_fetch_row($result)) {
-                        $sql .= 'INSERT INTO ' . $table . ' VALUES(';
-                        for ($j = 0; $j < $numFields; $j++) {
-                            $row[$j] = addslashes($row[$j]);
-                            $row[$j] = preg_replace("/\n/", "\\n", $row[$j]);
-                            if (isset($row[$j])) {
-                                $sql .= '"' . $row[$j] . '"';
-                            } else {
-                                $sql .= '""';
+                if (!$raw) {
+                    $result = mysqli_query($this->conn, 'SELECT * FROM ' . $table);
+                    $numFields = mysqli_num_fields($result);
+
+                    for ($i = 0; $i < $numFields; $i++) {
+                        while ($row = mysqli_fetch_row($result)) {
+                            $sql .= 'INSERT INTO ' . $table . ' VALUES(';
+                            for ($j = 0; $j < $numFields; $j++) {
+                                $row[$j] = addslashes($row[$j]);
+                                $row[$j] = preg_replace("/\n/", "\\n", $row[$j]);
+                                if (isset($row[$j])) {
+                                    $sql .= '"' . $row[$j] . '"';
+                                } else {
+                                    $sql .= '""';
+                                }
+
+                                if ($j < ($numFields - 1)) {
+                                    $sql .= ',';
+                                }
                             }
 
-                            if ($j < ($numFields - 1)) {
-                                $sql .= ',';
-                            }
+                            $sql .= ");\n";
                         }
-
-                        $sql .= ");\n";
                     }
                 }
 
