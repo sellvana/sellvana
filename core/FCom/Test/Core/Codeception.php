@@ -380,12 +380,12 @@ class FCom_Test_Core_Codeception extends BClass
                     $bgp->run();
 
                     while ($bgp->isRunning()) {
-                        sleep(3);
+                        sleep(1);
                     }
 
                     if (!empty($this->config->get('codecept_bootstrap'))) {
                         $content = "<?php \r\n";
-                        foreach ($this->config->get('codecept_bootstrap') as $path => $desc) {
+                        foreach ($this->config->get('codecept_bootstrap') as $path) {
                             $content .= sprintf("require_once \"%s\";\r\n", $path);
                         }
 
