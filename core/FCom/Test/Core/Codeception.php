@@ -252,6 +252,7 @@ class FCom_Test_Core_Codeception extends BClass
     {
         // Build all the different parameters as part of the console command
         $params = array(
+            'php',
             $this->config->get('executable'),   // Codeception Executable
             "run",                              // Command to Codeception
             "--no-colors",                      // Forcing Codeception to not use colors, if enabled in codeception.yml
@@ -272,6 +273,7 @@ class FCom_Test_Core_Codeception extends BClass
     public function getRootCmdPath()
     {
         $params = [
+            'php',
             $this->config->get('executable'),
             'run'
         ];
@@ -289,6 +291,7 @@ class FCom_Test_Core_Codeception extends BClass
      */
     public function getInitCodeceptCmd($module = null, $dir = '') {
         $params = array(
+            'php',
             $this->config->get('executable'),
             'bootstrap',
             $dir,
@@ -376,12 +379,26 @@ class FCom_Test_Core_Codeception extends BClass
             foreach ($modules as $mName => $ymlPath) {
                 if (!file_exists($ymlPath)) {
                     exec($this->getInitCodeceptCmd(str_replace('_', '\\', $mName),
-                            dirname($ymlPath)));
+                        dirname($ymlPath)));
 
                     if (!empty($this->config->get('codecept_bootstrap'))) {
-                        $content = "<?php \r\n";
+                        $content = "<?php";
                         foreach ($this->config->get('codecept_bootstrap') as $path) {
-                            $content .= sprintf("require_once \"%s\";\r\n", $path);
+                            $content .= sprintf("\r\nrequire_once \"%s\";", $path);
+                        }
+
+                        file_put_contents(sprintf('%s/tests/_bootstrap.php', dirname($ymlPath)), $content);
+                    }
+                } else {
+                    // Update bootstrap config
+                    $lines = explode("\r\n", file_get_contents(sprintf('%s/tests/_bootstrap.php', dirname($ymlPath))));
+                    $codeceptBs = $this->config->get('codecept_bootstrap');
+                    unset($lines[0]);
+
+                    if (!empty($codeceptBs) && count($lines) != count($codeceptBs)) {
+                        $content = "<?php";
+                        foreach ($codeceptBs as $path) {
+                            $content .= sprintf("\r\nrequire_once \"%s\";", $path);
                         }
 
                         file_put_contents(sprintf('%s/tests/_bootstrap.php', dirname($ymlPath)), $content);
