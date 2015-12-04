@@ -375,13 +375,8 @@ class FCom_Test_Core_Codeception extends BClass
         if (!empty($modules)) {
             foreach ($modules as $mName => $ymlPath) {
                 if (!file_exists($ymlPath)) {
-                    $bgp = new FCom_Test_Core_BGP($this->getInitCodeceptCmd(str_replace('_', '\\', $mName),
-                        dirname($ymlPath)));
-                    $bgp->run();
-
-                    while ($bgp->isRunning()) {
-                        sleep(1);
-                    }
+                    exec($this->getInitCodeceptCmd(str_replace('_', '\\', $mName),
+                            dirname($ymlPath)));
 
                     if (!empty($this->config->get('codecept_bootstrap'))) {
                         $content = "<?php \r\n";

@@ -133,7 +133,7 @@ class FCom_Test_Core_Test extends BClass
     public function init($type, $file, $module)
     {
         $filename       = $this->filterFileName($file->getFileName());
-        $posTypePath    = strpos($file->getPathname(), "/{$type}/") + strlen("/{$type}/");
+        $posTypePath    = strpos($file->getPathname(), $type) + (strlen($type) + 1);
 
         $this->hash     = $this->makeHash($type . $filename);
         $this->title    = $this->filterTitle($filename);
