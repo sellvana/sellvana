@@ -6,7 +6,6 @@ use Codeception\Exception\ModuleConfigException;
 use Codeception\Lib\Interfaces\Db as DbInterface;
 use Codeception\TestCase;
 use Common\Helper\Sellvana as Driver;
-use Common\Helper\LoadDump;
 
 class Db extends \Codeception\Module implements DbInterface
 {
@@ -87,16 +86,12 @@ class Db extends \Codeception\Module implements DbInterface
     public function _initialize()
     {
         if ($this->config['load_dump'] && ($this->config['cleanup'] || ($this->config['populate']))) {
-            $dump = $this->config['dump'] ? : $this->getDumpPath('sellvana_test.sql');
+            $dump = $this->config['dump'] ?: $this->getDumpPath(sprintf('%s_test.sql',
+                \BConfig::i()->get('db/dbname')));
 
             if (!file_exists($dump)) {
                 // If dump is not available then load it
-                $ld = new \Common\Helper\LoadDump(
-                    \BConfig::i()->get('db/host'),
-                    \BConfig::i()->get('db/username'),
-                    \BConfig::i()->get('db/password'),
-                    \BConfig::i()->get('db/dbname')
-                );
+                $ld = \BApp::i()->instance('FCom_Test_Core_LoadDump');
 
                 if ($ld->make('*', $this->getDumpPath())) {
                     $dump = $this->getDumpPath($ld->getDumpName());
@@ -111,6 +106,7 @@ class Db extends \Codeception\Module implements DbInterface
                     . $dump
                 );
             }
+
             $sql = file_get_contents($dump);
             $sql = preg_replace('%/\*(?!!\d+)(?:(?!\*/).)*\*/%s', "", $sql);
             if (!empty($sql)) {
@@ -210,7 +206,7 @@ class Db extends \Codeception\Module implements DbInterface
      */
     private function getDsn()
     {
-        return $this->config['dsn'] ?: null;
+        return isset($this->config['dsn']) ?: null;
     }
 
     /**
@@ -220,7 +216,7 @@ class Db extends \Codeception\Module implements DbInterface
      */
     private function getDbUsername()
     {
-        return $this->config['user'] ?: null;
+        return isset($this->config['user']) ?: null;
     }
 
     /**
@@ -229,7 +225,7 @@ class Db extends \Codeception\Module implements DbInterface
      */
     private function getDbPassword()
     {
-        return $this->config['password'] ?: null;
+        return isset($this->config['password']) ?: null;
     }
 
     /**

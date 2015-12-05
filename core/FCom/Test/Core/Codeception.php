@@ -45,6 +45,7 @@ class FCom_Test_Core_Codeception extends BClass
      * Initialization of the Codeception class.
      *
      * @param array $config The codeception.php configuration file.
+     * @param null $site
      */
     public function __construct($config = array(), $site = NULL)
     {
@@ -62,10 +63,14 @@ class FCom_Test_Core_Codeception extends BClass
         if (! $site->ready())
             return;
 
+        if (!empty($this->config->get('sites'))) {
+            $this->initModules($this->config->get('sites'));
+        }
+
         // If the Configuration was loaded successfully, merge the configs!
         if ($this->yaml = $this->loadConfig($site->getConfigPath(), $site->getConfigFile())) {
             $this->config->add($this->yaml);
-            $this->loadTests();
+            $this->loadTests(); // Load tests file on each modules on config
         }
     }
 
@@ -113,63 +118,38 @@ class FCom_Test_Core_Codeception extends BClass
         }
 
         foreach ($this->config->get('tests') as $type => $active) {
-            
             if (!$active) {
                 continue;
             }
 
-            if ($this->config->get('paths/tests')) {
-                // If codeception.yml has config `tests`
-
-                $files = new \RecursiveIteratorIterator(
-                    new \RecursiveDirectoryIterator("{$this->config->get('paths/tests')}/{$type}/",
-                        \FilesystemIterator::SKIP_DOTS),
-                    \RecursiveIteratorIterator::SELF_FIRST
-                );
-
-                // Iterate through all the files, and filter out
-                //      any files that are in the ignore list.
-                foreach ($files as $file) {
-
-                    if (!in_array($file->getFilename(), $this->config->get('ignore')) && $file->isFile()) {
-                        // Declare a new test and add it to the list.
-                        $test = $this->BApp->instance('FCom_Test_Core_Test');
-                        $test->init($type, $file);
-                        $this->addTest($test);
-                        unset($test);
-                    }
-
+            // Load and init all modules tests
+            $modules = $this->BModuleRegistry->getAllModules();
+            foreach ($modules as $module) {
+                /** @var BModule $module */
+                if (!$module || !$module instanceof BModule) {
+                    continue;
                 }
-            } else {
-                // Load and init all modules tests
-                $modules = $this->BModuleRegistry->getAllModules();
-                foreach ($modules as $module) {
-                    /** @var BModule $module */
-                    if (!$module || !$module instanceof BModule) {
-                        continue;
-                    }
-                    $rootDir = $module->root_dir;
-                    $testsDir = $rootDir . '/Test/Codecept/tests/' . strtolower($type);
-                    if (is_dir($testsDir)) {
-                        $files = new \RecursiveIteratorIterator(
-                            new \RecursiveDirectoryIterator(realpath($testsDir)),
-                            \RecursiveIteratorIterator::LEAVES_ONLY
-                        );
-                        foreach ($files as $file) {
-                            $ext = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
-                            $isTest = preg_match('/[A-z]+Test/', $file->getFilename());
-                            if ($ext == 'php' && $isTest && !in_array($file->getFilename(),
-                                    $this->config->get('ignore')) && $file->isFile()
-                            ) {
-                                // Declare a new test and add it to the list.
-                                /** @var FCom_Test_Core_Test $test */
-                                $test = new FCom_Test_Core_Test;
-                                $test->init($type, $file, $module->name);
-                                $this->addTest($test);
-                                unset($test);
-                            }
-
+                $rootDir = $module->root_dir;
+                $testsDir = $rootDir . '/Test/tests/' . strtolower($type);
+                if (is_dir($testsDir)) {
+                    $files = new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator(realpath($testsDir)),
+                        \RecursiveIteratorIterator::LEAVES_ONLY
+                    );
+                    foreach ($files as $file) {
+                        $ext = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
+                        $isTest = preg_match('/[A-z]+Test/', $file->getFilename());
+                        if ($ext == 'php' && $isTest && !in_array($file->getFilename(),
+                                $this->config->get('ignore')) && $file->isFile()
+                        ) {
+                            // Declare a new test and add it to the list.
+                            /** @var FCom_Test_Core_Test $test */
+                            $test = new FCom_Test_Core_Test;
+                            $test->init($type, $file, $module->name);
+                            $this->addTest($test);
+                            unset($test);
                         }
+
                     }
                 }
             }
@@ -264,33 +244,60 @@ class FCom_Test_Core_Codeception extends BClass
      *
      * @param  string $type     Test Type (Acceptance, Functional, Unit)
      * @param  string $filename Name of the Test
+     * @param  string $module Name of module is running
+     *
      * @return string Full command to execute Codeception with requred parameters.
      */
     public function getCommandPath($type, $filename, $module)
     {
         // Build all the different parameters as part of the console command
         $params = array(
+            'php',
             $this->config->get('executable'),   // Codeception Executable
             "run",                              // Command to Codeception
             "--no-colors",                      // Forcing Codeception to not use colors, if enabled in codeception.yml
             "--config=\"{$this->site->getSitePath($module)}\"", // Full path & file of Codeception
             $type,                              // Test Type (Acceptance, Unit, Functional)
-            $filename,                          // Filename of the Codeception test
-            "2>&1"
+            $filename                          // Filename of the Codeception test
         );
 
         // Build the command to be run.
         return implode(' ', $params);
     }
 
+    /**
+     * Command to run codeception test on root.
+     *
+     * @return string
+     */
     public function getRootCmdPath()
     {
         $params = [
+            'php',
             $this->config->get('executable'),
             'run'
         ];
 
         // Build the command to be run.
+        return implode(' ', $params);
+    }
+
+    /**
+     * Command to init codeception on each module.
+     *
+     * @param null $module
+     * @param string $dir
+     * @return string
+     */
+    public function getInitCodeceptCmd($module = null, $dir = '') {
+        $params = array(
+            'php',
+            $this->config->get('executable'),
+            'bootstrap',
+            $dir,
+            "--namespace=\"$module\""
+        );
+
         return implode(' ', $params);
     }
 
@@ -361,5 +368,43 @@ class FCom_Test_Core_Codeception extends BClass
         $response['ready'] = !isset($response['error']);
 
         return $response;
+    }
+
+    /**
+     * Generate codeception boilerplate on each register module
+     */
+    private function initModules($modules)
+    {
+        if (!empty($modules)) {
+            foreach ($modules as $mName => $ymlPath) {
+                if (!file_exists($ymlPath)) {
+                    exec($this->getInitCodeceptCmd(str_replace('_', '\\', $mName),
+                        dirname($ymlPath)));
+
+                    if (!empty($this->config->get('codecept_bootstrap'))) {
+                        $content = "<?php";
+                        foreach ($this->config->get('codecept_bootstrap') as $path) {
+                            $content .= sprintf("\r\nrequire_once \"%s\";", $path);
+                        }
+
+                        file_put_contents(sprintf('%s/tests/_bootstrap.php', dirname($ymlPath)), $content);
+                    }
+                } else {
+                    // Update bootstrap config
+                    $lines = explode("\r\n", file_get_contents(sprintf('%s/tests/_bootstrap.php', dirname($ymlPath))));
+                    $codeceptBs = $this->config->get('codecept_bootstrap');
+                    unset($lines[0]);
+
+                    if (!empty($codeceptBs) && count($lines) != count($codeceptBs)) {
+                        $content = "<?php";
+                        foreach ($codeceptBs as $path) {
+                            $content .= sprintf("\r\nrequire_once \"%s\";", $path);
+                        }
+
+                        file_put_contents(sprintf('%s/tests/_bootstrap.php', dirname($ymlPath)), $content);
+                    }
+                }
+            }
+        }
     }
 }
