@@ -252,7 +252,7 @@ class FCom_Test_Core_Codeception extends BClass
     {
         // Build all the different parameters as part of the console command
         $params = array(
-            'php',
+            $this->config->get('php_executable') ?: 'php',
             $this->config->get('executable'),   // Codeception Executable
             "run",                              // Command to Codeception
             "--no-colors",                      // Forcing Codeception to not use colors, if enabled in codeception.yml
@@ -273,7 +273,7 @@ class FCom_Test_Core_Codeception extends BClass
     public function getRootCmdPath()
     {
         $params = [
-            'php',
+            $this->config->get('php_executable') ?: 'php',
             $this->config->get('executable'),
             'run'
         ];
@@ -291,7 +291,7 @@ class FCom_Test_Core_Codeception extends BClass
      */
     public function getInitCodeceptCmd($module = null, $dir = '') {
         $params = array(
-            'php',
+            $this->config->get('php_executable') ?: 'php',
             $this->config->get('executable'),
             'bootstrap',
             $dir,
