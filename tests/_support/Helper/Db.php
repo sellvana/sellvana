@@ -91,7 +91,7 @@ class Db extends \Codeception\Module implements DbInterface
 
             if (!file_exists($dump)) {
                 // If dump is not available then load it
-                $ld = \BApp::i()->instance('FCom_Test_Core_LoadDump');
+                $ld = new \FCom_Test_Core_LoadDump;
 
                 if ($ld->make('*', $this->getDumpPath())) {
                     $dump = $this->getDumpPath($ld->getDumpName());

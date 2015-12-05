@@ -42,7 +42,7 @@ class FCom_Test_Core_BGP extends BClass
     {
         switch ($this->getOS()) {
             case self::OS_WINDOWS:
-                shell_exec(sprintf('%s &', $this->command, $outputFile));
+                shell_exec(sprintf('%s &', $this->command));
                 break;
             case self::OS_NIX:
                 $this->pid = (int)shell_exec(sprintf('%s >> %s 2>&1 & echo $!', $this->command, $outputFile));
