@@ -44,11 +44,16 @@ class FCom_Test_Core_Sellvana extends BClass
                 'password' => $password
             ]);
         } else {
-            if (is_null($this->BConfig->get('codecept_test_db'))) {
-                $this->BConfig->add($this->getConfig());
+            if (is_null($this->BConfig->get('db/named/codeception'))) {
+                $this->BConfig->add([
+                    'db' => [
+                        'named' => [
+                            'codeception' => $this->BUtil->arrayGet($this->getConfig(), 'codecept_test_db')
+                        ]
+                    ]
+                ]);
             }
-
-            static::$dbConfig = $this->BUtil->arrayMerge(static::$dbConfig, $this->BConfig->get('codecept_test_db'));
+            static::$dbConfig = $this->BUtil->arrayMerge(static::$dbConfig, $this->BConfig->get('db/named/codeception'));
             $dsn = sprintf('mysql:host=%s;dbname=%s', static::$dbConfig['host'], static::$dbConfig['dbname']);
             $user = static::$dbConfig['username'];
             $password = static::$dbConfig['password'];

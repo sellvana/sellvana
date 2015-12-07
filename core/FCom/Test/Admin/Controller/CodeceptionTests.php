@@ -15,7 +15,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         // Register to app
         $site = $this->initSite($this->config['codecept_sites']);
         $this->codecept = $this->BApp->instance('FCom_Test_Core_Codeception', false,
-            ['config' => $this->getCodeceptionConfig(), 'site' => $site]);
+            ['config' => $this->config, 'site' => $site]);
 
         parent::__construct();
     }
@@ -141,36 +141,6 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         $this->BSession->set('site_session', $site->getHash());
 
         return $site;
-    }
-
-    /**
-     *
-     */
-    private function getCodeceptionConfig()
-    {
-        $config = false;
-        $testType = $this->BRequest->get('test');
-
-        // If the test query string parameter is set,
-        // a test config will be loaded.
-        if ($testType !== null) {
-
-            // Sanitize the test type.
-            $testType = trim(strtolower($this->BUtil->removeFileExtension($testType)));
-
-            // Filter the test type into the test string.
-            $testConfig = sprintf($this->config['test'], $testType);
-            // Load the config if it can be found
-            if (file_exists($testConfig)) {
-                $config = $this->BConfig->addFile($testConfig);
-            }
-        }
-
-        if ($config === false) {
-            $config = $this->BConfig->add($this->config);
-        }
-
-        return $config;
     }
 
     /**
