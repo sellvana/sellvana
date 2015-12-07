@@ -33,7 +33,7 @@ return [
     'tests' => [
         'acceptance' => false,
         'functional' => false,
-        'unit' => true,
+        'unit' => true
     ],
 
     /*
@@ -46,7 +46,7 @@ return [
         'TestGuy.php',
         'CodeGuy.php',
         '_bootstrap.php',
-        '.DS_Store',
+        '.DS_Store'
     ],
 
     /*
@@ -56,8 +56,8 @@ return [
     */
     'codecept_bootstrap' => [
         FULLERON_ROOT_DIR . '/core/FCom/Test/bootstrap.php',
-        FULLERON_ROOT_DIR . '/tests/_support/Helper/Sellvana.php',
-        FULLERON_ROOT_DIR . '/tests/_support/Helper/Db.php'
+        FULLERON_ROOT_DIR . '/core/FCom/Test/Core/Sellvana.php',
+        FULLERON_ROOT_DIR . '/core/FCom/Test/Core/Db.php'
     ],
 
     /*
@@ -81,5 +81,5 @@ return [
     | about where this configuration file sits on the server.
     |--------------------------------------------------------------------------
     */
-    'location' => __FILE__,
+    'location' => __FILE__
 ];

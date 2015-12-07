@@ -395,7 +395,7 @@ class FCom_Test_Core_Codeception extends BClass
                     $codeceptBs = $this->config->get('codecept_bootstrap');
                     unset($lines[0]);
 
-                    if (!empty($codeceptBs) && count($lines) != count($codeceptBs)) {
+                    if (!empty($codeceptBs) && $this->BUtil->arrayCompare(array_keys($lines), $codeceptBs)) {
                         $content = "<?php";
                         foreach ($codeceptBs as $path) {
                             $content .= sprintf("\r\nrequire_once \"%s\";", $path);
