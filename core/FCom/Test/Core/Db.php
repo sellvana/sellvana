@@ -1,11 +1,11 @@
 <?php
-namespace Common\Helper;
+namespace FCom\Test\Core;
 
 use Codeception\Exception\ModuleException;
 use Codeception\Exception\ModuleConfigException;
 use Codeception\Lib\Interfaces\Db as DbInterface;
 use Codeception\TestCase;
-use Common\Helper\Sellvana as Driver;
+use FCom_Test_Core_Sellvana as Driver;
 
 class Db extends \Codeception\Module implements DbInterface
 {
@@ -38,7 +38,7 @@ class Db extends \Codeception\Module implements DbInterface
     protected $populated = false;
 
     /**
-     * @var \Common\Helper\Db
+     * @var \FCom_Test_Core_Sellvana
      */
     public $driver;
 
@@ -101,8 +101,7 @@ class Db extends \Codeception\Module implements DbInterface
             if (!file_exists($dump)) {
                 throw new ModuleConfigException(
                     __CLASS__,
-                    "\nFile with dump doesn't exist.\n"
-                    . "Please, check path for sql file: "
+                    \BApp::i()->t("\nFile with dump doesn't exist.\nPlease, check path for sql file: ")
                     . $dump
                 );
             }
@@ -144,10 +143,10 @@ class Db extends \Codeception\Module implements DbInterface
                 $message = $e->getMessage();
                 if ($message === 'could not find driver') {
                     list ($missingDriver,) = explode(':', $this->getDsn(), 2);
-                    $message = "could not find $missingDriver driver";
+                    $message = \BApp::i()->t("Could not find $missingDriver driver");
                 }
 
-                throw new ModuleException(__CLASS__, $message . ' while creating PDO connection');
+                throw new ModuleException(__CLASS__, $message . \BApp::i()->t(' while creating PDO connection'));
             }
         }
         $this->dbh = $this->driver->getDbh();
@@ -165,7 +164,7 @@ class Db extends \Codeception\Module implements DbInterface
         if (!$dbh) {
             throw new ModuleConfigException(
                 __CLASS__,
-                'No connection to database. Remove this module from config if you don\'t need database repopulation'
+                \BApp::i()->t('No connection to database. Remove this module from config if you don\'t need database repopulation')
             );
         }
         try {
@@ -194,7 +193,7 @@ class Db extends \Codeception\Module implements DbInterface
         } catch (\PDOException $e) {
             throw new ModuleException(
                 __CLASS__,
-                $e->getMessage() . "\nSQL query being executed: " . $this->driver->sqlToRun
+                $e->getMessage() . \BApp::i()->t("\nSQL query being executed: ") . $this->driver->sqlToRun
             );
         }
     }
@@ -235,7 +234,7 @@ class Db extends \Codeception\Module implements DbInterface
      */
     private function getDumpPath($dump = '')
     {
-        $dataDir = FULLERON_ROOT_DIR . '/tests/_data';
+        $dataDir = sprintf('%s/%s/data', \BConfig::i()->get('fs/storage_dir'), \BConfig::i()->get('core/storage_random_dir'));
         if (!file_exists($dataDir)) {
             mkdir($dataDir, 755, true);
         }
@@ -265,7 +264,7 @@ class Db extends \Codeception\Module implements DbInterface
                     if (isset($row[$column])) {
                         $primary[$column] = $row[$column];
                     } else {
-                        throw new \InvalidArgumentException('Primary key field ' . $column . ' is not set for table ' . $table);
+                        throw new \InvalidArgumentException(\BApp::i()->t("Primary key field ' . $column . ' is not set for table ") . $table);
                     }
                 }
             }
@@ -288,7 +287,7 @@ class Db extends \Codeception\Module implements DbInterface
             try {
                 $this->driver->deleteQueryByCriteria($row['table'], $row['primary']);
             } catch (\Exception $e) {
-                $this->debug("coudn't delete record " . json_encode($row['primary']) ." from {$row['table']}");
+                $this->debug(\BApp::i()->t("coudn't delete record ") . json_encode($row['primary']) . \BApp::i()->t(" from ") . $row['table']);
             }
         }
         $this->insertedRows = [];
@@ -303,7 +302,7 @@ class Db extends \Codeception\Module implements DbInterface
     public function seeInDatabase($table, $criteria = [])
     {
         $res = $this->countInDatabase($table, $criteria);
-        $this->assertGreaterThan(0, $res, 'No matching records found for criteria ' . json_encode($criteria) . ' in table ' . $table);
+        $this->assertGreaterThan(0, $res, \BApp::i()->t('No matching records found for criteria ') . json_encode($criteria) . \BApp::i()->t(' in table ') . $table);
     }
 
     /**
@@ -316,7 +315,7 @@ class Db extends \Codeception\Module implements DbInterface
     public function seeNumRecords($expectedNumber, $table, array $criteria = [])
     {
         $actualNumber = $this->countInDatabase($table, $criteria);
-        $this->assertEquals($expectedNumber, $actualNumber, 'The number of found rows (' . $actualNumber. ') does not match expected number ' . $expectedNumber . ' for criteria ' . json_encode($criteria) . ' in table ' . $table);
+        $this->assertEquals($expectedNumber, $actualNumber, \BApp::i()->t('The number of found rows (') . $actualNumber. \BApp::i()->t(') does not match expected number ') . $expectedNumber . \BApp::i()->t(' for criteria ') . json_encode($criteria) . \BApp::i()->t(' in table ') . $table);
     }
 
     /**
@@ -328,7 +327,7 @@ class Db extends \Codeception\Module implements DbInterface
     public function dontSeeInDatabase($table, $criteria = [])
     {
         $count = $this->countInDatabase($table, $criteria);
-        $this->assertLessThan(1, $count, 'Unexpectedly found matching records for criteria ' . json_encode($criteria) . ' in table ' . $table);
+        $this->assertLessThan(1, $count, \BApp::i()->t('Unexpectedly found matching records for criteria ') . json_encode($criteria) . \BApp::i()->t(' in table ') . $table);
     }
 
     /**
@@ -357,11 +356,6 @@ class Db extends \Codeception\Module implements DbInterface
     public function grabFromDatabase($table, $column, $criteria = [])
     {
         return $this->proceedSeeInDatabase($table, $column, $criteria);
-    }
-
-    public function getDbConfigFile()
-    {
-        return FULLERON_ROOT_DIR . '/tests/_config/db_test_config.php';
     }
 
     /**

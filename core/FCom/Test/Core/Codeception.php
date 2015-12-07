@@ -63,8 +63,8 @@ class FCom_Test_Core_Codeception extends BClass
         if (! $site->ready())
             return;
 
-        if (!empty($this->config->get('sites'))) {
-            $this->initModules($this->config->get('sites'));
+        if (!empty($this->config->get('codecept_sites'))) {
+            $this->initModules($this->config->get('codecept_sites'));
         }
 
         // If the Configuration was loaded successfully, merge the configs!
@@ -113,11 +113,11 @@ class FCom_Test_Core_Codeception extends BClass
      */
     public function loadTests()
     {
-        if (!$this->config->get('tests')) {
+        if (!$this->config->get('codecept_tests')) {
             return;
         }
 
-        foreach ($this->config->get('tests') as $type => $active) {
+        foreach ($this->config->get('codecept_tests') as $type => $active) {
             if (!$active) {
                 continue;
             }
@@ -126,7 +126,7 @@ class FCom_Test_Core_Codeception extends BClass
             $modules = $this->BModuleRegistry->getAllModules();
             foreach ($modules as $module) {
                 /** @var BModule $module */
-                if (!$module || !$module instanceof BModule) {
+                if (!$module || !$module instanceof BModule || !in_array($module->name, array_keys($this->config->get('codecept_sites')))) {
                     continue;
                 }
                 $rootDir = $module->root_dir;
@@ -140,7 +140,7 @@ class FCom_Test_Core_Codeception extends BClass
                         $ext = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
                         $isTest = preg_match('/[A-z]+Test/', $file->getFilename());
                         if ($ext == 'php' && $isTest && !in_array($file->getFilename(),
-                                $this->config->get('ignore')) && $file->isFile()
+                                $this->config->get('codecept_ignore')) && $file->isFile()
                         ) {
                             // Declare a new test and add it to the list.
                             /** @var FCom_Test_Core_Test $test */
@@ -252,13 +252,13 @@ class FCom_Test_Core_Codeception extends BClass
     {
         // Build all the different parameters as part of the console command
         $params = array(
-            $this->config->get('php_executable') ?: 'php',
-            $this->config->get('executable'),   // Codeception Executable
-            "run",                              // Command to Codeception
-            "--no-colors",                      // Forcing Codeception to not use colors, if enabled in codeception.yml
+            $this->config->get('php_executable') ?: 'php', // Php executable | Unix base system please ignore it
+            $this->config->get('codecept_executable'), // Codeception Executable
+            "run", // Command to Codeception
+            "--no-colors", // Forcing Codeception to not use colors, if enabled in codeception.yml
             "--config=\"{$this->site->getSitePath($module)}\"", // Full path & file of Codeception
-            $type,                              // Test Type (Acceptance, Unit, Functional)
-            $filename                          // Filename of the Codeception test
+            $type, // Test Type (Acceptance, Unit, Functional)
+            $filename // Filename of the Codeception test
         );
 
         // Build the command to be run.
@@ -274,7 +274,7 @@ class FCom_Test_Core_Codeception extends BClass
     {
         $params = [
             $this->config->get('php_executable') ?: 'php',
-            $this->config->get('executable'),
+            $this->config->get('codecept_executable'),
             'run'
         ];
 
@@ -292,7 +292,7 @@ class FCom_Test_Core_Codeception extends BClass
     public function getInitCodeceptCmd($module = null, $dir = '') {
         $params = array(
             $this->config->get('php_executable') ?: 'php',
-            $this->config->get('executable'),
+            $this->config->get('codecept_executable'),
             'bootstrap',
             $dir,
             "--namespace=\"$module\""
@@ -350,13 +350,10 @@ class FCom_Test_Core_Codeception extends BClass
      * @param  string $config Full path of the config of where the $file was defined.
      * @return array  Array of flags used in the JSON respone.
      */
-    public function checkExecutable($file, $config)
+    public function checkExecutable($file)
     {
         $response = [];
         $response['resource'] = $file;
-
-        // Set this to ensure the developer knows there $file was set.
-        $response['config'] = realpath($config);
 
         if (!file_exists($file)) {
             $response['error'] = 'The Codeception executable could not be found.';

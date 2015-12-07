@@ -10,10 +10,10 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
 
     public function __construct()
     {
-        $this->config = include FULLERON_ROOT_DIR . '/tests/_config/codeception.php';
+        $this->config = include sprintf('%s/codecept.php', $this->BConfig->get('fs/config_dir'));
         $this->ensureCodeception($this->getCodecetionExecutable());
         // Register to app
-        $site = $this->initSite($this->config['sites']);
+        $site = $this->initSite($this->config['codecept_sites']);
         $this->codecept = $this->BApp->instance('FCom_Test_Core_Codeception', false,
             ['config' => $this->getCodeceptionConfig(), 'site' => $site]);
 
@@ -40,8 +40,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
     public function action_executable()
     {
         $response = $this->codecept->checkExecutable(
-            $this->config['executable'],
-            $this->config['location']
+            $this->config['codecept_executable']
         );
 
         $r = $this->BResponse;
@@ -181,9 +180,8 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
     {
         if (!file_exists($codecept)) {
             if (touch($codecept)) {
-                $codeceptUrl = 'http://codeception.com/codecept.phar';
                 #TODO: Temporary use file_get_contents for getting codeception executable
-                $content = file_get_contents($codeceptUrl);
+                $content = file_get_contents($this->config['codecept_executable_url']);
                 // $raw = $this->BUtil->remoteHttp('GET', $codeceptUrl);
                 file_put_contents($codecept, $content);
                 if (function_exists('chmod')) {
@@ -194,7 +192,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
             }
         }
 
-        $this->config['executable'] = $codecept;
+        $this->config['codecept_executable'] = $codecept;
     }
 
     /**
@@ -206,5 +204,4 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         $codecept = $base . '/codecept.phar';
         return $codecept;
     }
-
 }
