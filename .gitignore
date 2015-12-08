@@ -29,4 +29,4 @@ core/*/*/Test/tests/_*
 core/*/*/Test/tests/*.yml
 core/*/*/Test/*.yml
 _bootstrap.php
-tests/_config/db_test_config.php
+db_test_config.php
