@@ -1,9 +1,6 @@
-<?php
-namespace Common\Helper;
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-use Codeception\Configuration;
-
-class Sellvana
+class FCom_Test_Core_Sellvana extends BClass
 {
 
     /**
@@ -12,7 +9,7 @@ class Sellvana
     protected $dbh;
 
     /**
-     * @var \FCom\Test\Helper\Sellvana
+     * @var FCom_Test_Core_Sellvana
      */
     static public $instance;
 
@@ -40,27 +37,36 @@ class Sellvana
     private function __construct($dsn, $user, $password)
     {
         if (!empty($dsn) && !empty($user) && !empty($password)) {
-            static::$dbConfig = \BUtil::i()->arrayMerge(static::$dbConfig, [
+            static::$dbConfig = $this->BUtil->arrayMerge(static::$dbConfig, [
                 'dbname' => $this->getProvider($dsn, 'dbname'),
                 'host' => $this->getProvider($dsn, 'host'),
                 'username' => $user,
                 'password' => $password
             ]);
         } else {
-            static::$dbConfig = \BUtil::i()->arrayMerge(static::$dbConfig, include FULLERON_ROOT_DIR . '/tests/_config/db_test_config.php');
+            if (is_null($this->BConfig->get('db/named/codeception'))) {
+                $this->BConfig->add([
+                    'db' => [
+                        'named' => [
+                            'codeception' => $this->BUtil->arrayGet($this->getConfig(), 'codecept_test_db')
+                        ]
+                    ]
+                ]);
+            }
+            static::$dbConfig = $this->BUtil->arrayMerge(static::$dbConfig, $this->BConfig->get('db/named/codeception'));
             $dsn = sprintf('mysql:host=%s;dbname=%s', static::$dbConfig['host'], static::$dbConfig['dbname']);
             $user = static::$dbConfig['username'];
             $password = static::$dbConfig['password'];
         }
 
-        \BConfig::i()->add(['db' => static::$dbConfig]);
+        $this->BConfig->add(['db' => static::$dbConfig]);
 
         if (static::$pdo === null) {
-            static::$pdo = new \BPDO($dsn, $user, $password);
+            static::$pdo = new BPDO($dsn, $user, $password);
         }
 
-        \BORM::set_db(static::$pdo);
-        $this->dbh = \BORM::get_db();
+        BORM::set_db(static::$pdo);
+        $this->dbh = BORM::get_db();
     }
 
     private function __clone() {}
@@ -72,12 +78,12 @@ class Sellvana
      * @param $user
      * @param $password
      *
-     * @return \FCom\Test\Helper\Sellvana
+     * @return FCom_Test_Core_Sellvana
      */
     public static function connect($dsn = null, $user = null, $password = null)
     {
         if (null === static::$instance) {
-            static::$instance = new Sellvana($dsn, $user, $password);
+            static::$instance = new FCom_Test_Core_Sellvana($dsn, $user, $password);
         }
         return static::$instance;
     }
@@ -359,5 +365,12 @@ class Sellvana
         }
 
         return $matches[1];
+    }
+
+    /**
+     * @return array
+     */
+    private function getConfig() {
+        return include sprintf('%s/codecept.php', $this->BConfig->get('fs/config_dir'));
     }
 }

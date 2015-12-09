@@ -814,7 +814,7 @@ class BConfig extends BClass
     {
         //TODO: make more flexible, to account for other (custom) file names
         if (null === $files) {
-            $files = ['core', 'db', 'local'];
+            $files = ['core', 'db', 'local', 'codecept'];
         }
         if (is_string($files)) {
             $files = explode(',', strtolower($files));
@@ -847,6 +847,39 @@ class BConfig extends BClass
                 'db,install_status,module_run_levels,recovery,mode_by_ip,cache,core',
                 true);
             $this->writeFile('local.php', $local);
+        }
+        if (in_array('codecept', $files)) {
+            $codecept = [
+                'codecept_sites' => [
+                    'FCom_Test' => FULLERON_ROOT_DIR . '/core/FCom/Test/Test/codeception.yml'
+                ],
+                'codecept_executable' => FULLERON_ROOT_DIR . '/codecept.phar',
+                'codecept_executable_url' => 'http://codeception.com/codecept.phar',
+                'php_executable' => '',
+                'codecept_tests' => [
+                    'acceptance' => false,
+                    'functional' => false,
+                    'unit' => true
+                ],
+                'codecept_ignore' => [
+                    'WebGuy.php',
+                    'TestGuy.php',
+                    'CodeGuy.php',
+                    '_bootstrap.php',
+                    '.DS_Store'
+                ],
+                'codecept_bootstrap' => [
+                    FULLERON_ROOT_DIR . '/core/FCom/Test/bootstrap.php',
+                    FULLERON_ROOT_DIR . '/core/FCom/Test/Core/Db.php'
+                ],
+                'codecept_test_db' => [
+                    'host' => '127.0.0.1',
+                    'dbname' => 'dbname',
+                    'username' => 'user',
+                    'password' => 'pass'
+                ]
+            ];
+            $this->writeFile('codecept.php', $codecept);
         }
         return $this;
     }

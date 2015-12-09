@@ -1,5 +1,4 @@
-<?php
-namespace Sellvana\Wishlist;
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class WishlistTest extends \Codeception\TestCase\Test
 {
@@ -56,7 +55,7 @@ class WishlistTest extends \Codeception\TestCase\Test
     public function testAddEntry()
     {
         $this->tester->seeNumRecords(2, 'fcom_wishlist');
-        $mWishlist = \Sellvana_Wishlist_Model_Wishlist::i(true);
+        $mWishlist = Sellvana_Wishlist_Model_Wishlist::i(true);
         $data = ['customer_id' => 3, 'title' => 'test'];
         $mWishlist->create($data)->save();
         $this->tester->seeNumRecords(3, 'fcom_wishlist');
@@ -66,7 +65,7 @@ class WishlistTest extends \Codeception\TestCase\Test
     public function testAddItem()
     {
         $this->tester->seeNumRecords(3, 'fcom_wishlist_items');
-        $mWishlist = \Sellvana_Wishlist_Model_Wishlist::i(true);
+        $mWishlist = Sellvana_Wishlist_Model_Wishlist::i(true);
         $wishlist = $mWishlist->load(1);
         $wishlist->addItem(4);
 
@@ -77,7 +76,7 @@ class WishlistTest extends \Codeception\TestCase\Test
     public function testRemoveItem()
     {
         $this->tester->seeNumRecords(3, 'fcom_wishlist_items');
-        $mWishlist = \Sellvana_Wishlist_Model_Wishlist::i(true);
+        $mWishlist = Sellvana_Wishlist_Model_Wishlist::i(true);
         $wishlist = $mWishlist->load(1);
         $this->assertEquals(2, count($wishlist->items()), "Count items before remove");
         $wishlist->removeProduct(1);
@@ -89,7 +88,7 @@ class WishlistTest extends \Codeception\TestCase\Test
     public function testClearWishlist()
     {
         $this->tester->seeNumRecords(2, 'fcom_wishlist');
-        $mWishlist = \Sellvana_Wishlist_Model_Wishlist::i(true);
+        $mWishlist = Sellvana_Wishlist_Model_Wishlist::i(true);
         $wishlist = $mWishlist->load(1);
         $this->assertEquals(2, count($wishlist->items()), "Items count is not correct");
 
@@ -102,13 +101,13 @@ class WishlistTest extends \Codeception\TestCase\Test
 
     public function testSessionWishListReturnsValidModel()
     {
-        \BSession::i()->set('customer_id', 3); // set session user
-        /** @var \Sellvana_Wishlist_Model_Wishlist $mWishlist */
-        $mWishlist = \Sellvana_Wishlist_Model_Wishlist::i(true);
-        /** @var \Sellvana_Wishlist_Model_Wishlist $sessionWhishlist */
-        $sessionWhishlist = $mWishlist->sessionWishlist(true);
+        BSession::i()->set('customer_id', 3); // set session user
+        /** @var Sellvana_Wishlist_Model_Wishlist $mWishlist */
+        $mWishlist = Sellvana_Wishlist_Model_Wishlist::i(true);
+        /** @var Sellvana_Wishlist_Model_Wishlist $sessionWhishlist */
+        $sessionWishlist = $mWishlist->sessionWishlist(true);
 
-        $this->assertNotEmpty($sessionWhishlist->id());
-        \BSession::i()->set('customer_id', null); // set session user
+        $this->assertNotEmpty($sessionWishlist->id());
+        BSession::i()->set('customer_id', null); // set session user
     }
 }

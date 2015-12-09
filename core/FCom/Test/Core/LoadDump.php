@@ -42,11 +42,11 @@ class FCom_Test_Core_LoadDump extends BClass
     /**
     * Constructor initializes database
     */
-    public function __construct($host, $username, $passwd, $dbName, $charset = 'utf8')
+    public function __construct($host = null, $username = null, $passwd = null, $dbName = null, $charset = 'utf8')
     {
         $this->host = $host ?: $this->BConfig->get('db/host');
         $this->username = $username ?: $this->BConfig->get('db/username');
-        $this->passwd = $passwd ?: $this->BConfig->get('db/password');
+        $this->passwd = $passwd;
         $this->dbName = $dbName ?: $this->BConfig->get('db/dbname');
         $this->charset = $charset;
 
