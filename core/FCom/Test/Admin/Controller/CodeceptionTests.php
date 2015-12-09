@@ -6,73 +6,16 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
 
     public $codecept;
 
-    protected $config = [
-        /*
-        |--------------------------------------------------------------------------
-        | Codeception Configurations
-        |--------------------------------------------------------------------------
-        |
-        | This is where you add your Codeception configurations.
-        */
-        'sites' => [
-            'Codeception' => FULLERON_ROOT_DIR . '/codeception.yml',
-            'Sellvana_Wishlist' => FULLERON_ROOT_DIR . '/core/Sellvana/Wishlist/Test/Codecept/codeception.yml',
-            'FCom_Test' => FULLERON_ROOT_DIR . '/core/FCom/Test/Test/Codecept/codeception.yml'
-        ],
-
-        /*
-        |--------------------------------------------------------------------------
-        | Codeception Executable
-        |--------------------------------------------------------------------------
-        |
-        */
-
-        'executable' => FULLERON_ROOT_DIR .'/codecept.phar',
-
-        /*
-        |--------------------------------------------------------------------------
-        | Decide which type of tests get included.
-        |--------------------------------------------------------------------------
-        */
-
-        'tests' => [
-            'acceptance' => false,
-            'functional' => false,
-            'unit'       => true,
-        ],
-
-        /*
-        |--------------------------------------------------------------------------
-        | When scan for the tests, we need to ignore the following files.
-        |--------------------------------------------------------------------------
-        */
-
-        'ignore' => [
-            'WebGuy.php',
-            'TestGuy.php',
-            'CodeGuy.php',
-            '_bootstrap.php',
-            '.DS_Store',
-        ],
-
-        /*
-        |--------------------------------------------------------------------------
-        | Setting the location as the current file helps with offering information
-        | about where this configuration file sits on the server.
-        |--------------------------------------------------------------------------
-        */
-
-        'location'   => __FILE__,
-    ];
+    protected $config = [];
 
     public function __construct()
     {
+        $this->config = include sprintf('%s/codecept.php', $this->BConfig->get('fs/config_dir'));
         $this->ensureCodeception($this->getCodecetionExecutable());
-
         // Register to app
-        $site = $this->initSite($this->config['sites']);
+        $site = $this->initSite($this->config['codecept_sites']);
         $this->codecept = $this->BApp->instance('FCom_Test_Core_Codeception', false,
-            ['config' => $this->getCodeceptionConfig(), 'site' => $site]);
+            ['config' => $this->config, 'site' => $site]);
 
         parent::__construct();
     }
@@ -97,8 +40,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
     public function action_executable()
     {
         $response = $this->codecept->checkExecutable(
-            $this->config['executable'],
-            $this->config['location']
+            $this->config['codecept_executable']
         );
 
         $r = $this->BResponse;
@@ -112,7 +54,6 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
     public function action_run()
     {
         $rq = $this->BRequest;
-        $rp = $this->BResponse;
 
         $type = strtolower($rq->get('type'));
         $hash = $rq->get('id');
@@ -121,6 +62,14 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         $rs = $this->BUtil->toJson($response);
         echo $rs;
         exit;
+    }
+
+    /**
+     * Attempt to run all selected tests on background jobs
+     */
+    public function action_run_background__POST()
+    {
+
     }
 
     public function getTestsConfig($tests)
@@ -142,10 +91,10 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         ];
         $config['actions'] = [
             'run-test-cgi' => [
-                'caption'  => 'Run Test CGI',
-                'type'     => 'button',
-                'id'       => 'run-test-cgi',
-                'class'    => 'btn-primary',
+                'caption' => 'Run Test CGI',
+                'type' => 'button',
+                'id' => 'run-test-cgi',
+                'class' => 'btn-primary',
                 'callback' => 'runTestCgi'
             ],
             /*'run-test-web' => [
@@ -158,15 +107,17 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
 
         ];
         $gridData = [];
-        foreach ($tests as $type => $files) {
-            foreach ($files as $file) {
-                $obj['id'] = $file->getHash();
-                $obj['type'] = ucfirst($file->getType());
-                $obj['test'] = $file->getTitle();
-                $obj['status'] = '';
-                $gridData[] = $obj;
-                unset($class);
+        if (!empty($tests)) {
+            foreach ($tests as $type => $files) {
+                foreach ($files as $file) {
+                    $obj['id'] = $file->getHash();
+                    $obj['type'] = ucfirst($file->getType());
+                    $obj['test'] = $file->getTitle();
+                    $obj['status'] = '';
+                    $gridData[] = $obj;
+                    unset($class);
 
+                }
             }
         }
 
@@ -193,45 +144,14 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
     }
 
     /**
-     *
-     */
-    private function getCodeceptionConfig()
-    {
-        $config = false;
-        $testType = $this->BRequest->get('test');
-
-        // If the test query string parameter is set,
-        // a test config will be loaded.
-        if ($testType !== null) {
-
-            // Sanitize the test type.
-            $testType = trim(strtolower($this->BUtil->removeFileExtension($testType)));
-
-            // Filter the test type into the test string.
-            $testConfig = sprintf($this->config['test'], $testType);
-            // Load the config if it can be found
-            if (file_exists($testConfig)) {
-                $config = $this->BConfig->addFile($testConfig);
-            }
-        }
-
-        if ($config === false) {
-            $config = $this->BConfig->add($this->config);
-        }
-
-        return $config;
-    }
-
-    /**
-     * @param string $phpunit desired phpunit filename
+     * @param string $codecept desired codecept filename
      */
     protected function ensureCodeception($codecept)
     {
         if (!file_exists($codecept)) {
             if (touch($codecept)) {
-                $codeceptUrl = 'http://codeception.com/codecept.phar';
                 #TODO: Temporary use file_get_contents for getting codeception executable
-                $content = file_get_contents($codeceptUrl);
+                $content = file_get_contents($this->config['codecept_executable_url']);
                 // $raw = $this->BUtil->remoteHttp('GET', $codeceptUrl);
                 file_put_contents($codecept, $content);
                 if (function_exists('chmod')) {
@@ -242,7 +162,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
             }
         }
 
-        $this->config['executable'] = $codecept;
+        $this->config['codecept_executable'] = $codecept;
     }
 
     /**
@@ -254,5 +174,4 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         $codecept = $base . '/codecept.phar';
         return $codecept;
     }
-
 }
