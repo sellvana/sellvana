@@ -27,72 +27,81 @@
         height: 43px;
     }
 
-    @media screen and (min-width: 240px) and (max-width: 319px) {
-        iframe {
-            width: 240px;
-            height: 200px;
+
+    .external_link {
+        padding: 0 !important;
+    }
+
+    @media screen and (min-width: 320px) and (max-width: 359px) {
+        .product-video, .mejs-overlay-play, iframe {
+            width: 280px !important;
+            height: 160px !important;
+        }
+
+        .external_thumb, .video_thumb {
+            height: 33px;
         }
     }
 
-    @media screen and (min-width: 320px) and (max-width: 413px) {
-        iframe {
-            width: 360px;
-            height: 200px;
+    @media screen and (min-width: 360px) and (max-width: 413px) {
+        .product-video, .mejs-overlay-play, iframe {
+            width: 340px !important;
+            height: 200px !important;
         }
 
-        .external_thumb {
+        .external_thumb, .video_thumb {
             height: 33px;
         }
     }
 
     @media screen and (min-width: 414px) and (max-width: 500px) {
-        iframe {
-            width: 450px;
-            height: 250px;
+        .product-video, .mejs-overlay-play, iframe {
+            width: 410px !important;
+            height: 230px !important;
         }
 
-        .external_thumb {
-            height: 36px;
+        .external_thumb, .video_thumb {
+            height: 42px;
         }
     }
 
     @media screen and (min-width: 501px) and (max-width: 600px) {
-        iframe {
-            width: 550px;
-            height: 310px;
+        .product-video, .mejs-overlay-play, iframe {
+            width: 530px !important;
+            height: 310px !important;
         }
 
-        .external_thumb {
+        .external_thumb, .video_thumb {
             height: 50px;
         }
     }
 
     @media screen and (min-width: 601px) and (max-width: 700px) {
-        iframe {
-            width: 650px;
-            height: 370px;
+        .product-video, .mejs-overlay-play, iframe {
+            width: 640px !important;
+            height: 370px !important;
         }
 
-        .external_thumb {
+        .external_thumb, .video_thumb {
             height: 57px;
         }
     }
 
     @media screen and (min-width: 701px) and (max-width: 750px) {
-        iframe {
-            width: 690px;
-            height: 390px;
+        .product-video, .mejs-overlay-play, iframe {
+            width: 690px !important;
+            height: 390px !important;
         }
 
-        .external_thumb {
-            height: 62px;
+        .external_thumb, .video_thumb {
+            height: 69px;
         }
     }
 
     @media screen and (min-width: 751px) and (max-width: 800px) {
-        iframe {
-            width: 680px;
-            height: 370px;
+        .product-video, .mejs-overlay-play, iframe {
+            width: 700px !important;
+            height: 370px !important;
         }
 
         .external_thumb {
@@ -101,9 +110,9 @@
     }
 
     @media screen and (min-width: 801px) and (max-width: 901px) {
-        iframe {
-            width: 720px;
-            height: 390px;
+        .product-video, .mejs-overlay-play, iframe {
+            width: 720px !important;
+            height: 390px !important;
         }
 
         .external_thumb {
@@ -112,9 +121,9 @@
     }
 
     @media screen and (min-width: 901px) and (max-width: 991px) {
-        iframe {
-            width: 720px;
-            height: 410px;
+        .product-video, .mejs-overlay-play, iframe {
+            width: 720px !important;
+            height: 410px !important;
         }
 
         .external_thumb {
@@ -123,9 +132,9 @@
     }
 
     @media screen and (min-width: 992px) and (max-width: 1200px) {
-        iframe {
-            width: 375px;
-            height: 210px;
+        .product-video, .mejs-overlay-play, iframe {
+            width: 375px !important;
+            height: 210px !important;
         }
 
         .external_thumb {
@@ -134,9 +143,9 @@
     }
 
     @media screen and (min-width: 1201px) {
-        iframe {
-            width: 460px;
-            height: 265px;
+        .product-video, .mejs-overlay-play, iframe {
+            width: 460px !important;
+            height: 265px !important;
         }
     }
 </style>
@@ -163,8 +172,8 @@
                     {% for media in mediaItems %}
                         {% if media.get('media_type') == 'V' %}
                             {% if media.get('file_size') %}
-                                <li class="product-video-item" style="padding: 80px 0;">
-                                    <video class="product-video" width="460" height="320" preload="metadata" src="{{ media.getUrl() }}">
+                                <li class="product-video-item">
+                                    <video class="product-video" preload="metadata" src="{{ media.getUrl() }}">
                                         <source type="video/{{ media.get('file_name')[-3: 3] }}" src="{{ media.getUrl() }}" />
                                     </video>
                                 </li>
@@ -188,7 +197,7 @@
                     {% if media.get('media_type') == 'V' %}
                         {% if media.get('file_size') %}
                             <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
-                                <a href="javascript:void(0)"><img src="{{ APP.src('@FCom_Admin/Admin/theme1/assets/images/video-default.jpg') }}" title="There's no image for this video" class="img-responsive"></a>
+                                <a href="javascript:void(0)"><img src="{{ APP.src('@FCom_Admin/Admin/theme1/assets/images/video-default.jpg') }}" title="There's no image for this video" class="video_thumb"></a>
                             </li>
                         {% else %}
                             {% set data = UTIL.fromJson(media.get('data_serialized')) | raw %}
