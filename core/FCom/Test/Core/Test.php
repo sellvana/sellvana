@@ -49,7 +49,7 @@ class FCom_Test_Core_Test extends BClass
      *
      * @var bool
      */
-    private $passed = false;
+    private $passed;
 
     private $module;
 
@@ -76,6 +76,9 @@ class FCom_Test_Core_Test extends BClass
             'OK \('     // Unit Test
         ),
         'failed'    => 'FAILURES',
+        'incomplete' => [
+            'incomplete', 'skipped', 'risky' // Unit Test
+        ]
     ];
 
     /**
@@ -84,6 +87,21 @@ class FCom_Test_Core_Test extends BClass
      * @var string
      */
     private $passed_regex;
+
+    /**
+     * On Test __construct, the incomplete matches are turned into a regex.
+     *
+     * @var string
+     */
+    private $incomplete_regex;
+
+
+    /**
+     * On Test __construct, the failure matches are turned into a regex.
+     *
+     * @var string
+     */
+    private $failure_regex;
 
     /**
      * Colour tags from Codeception's coloured output.
@@ -120,6 +138,8 @@ class FCom_Test_Core_Test extends BClass
         // can indicate that as a passed test.
         $this->passed_regex = implode('|', $this->responses['passed']);
 
+        $this->incomplete_regex = implode('|', $this->responses['incomplete']);
+
         // maybe there will be any more failures? Then we are going to need this
         $this->failure_regex = $this->responses['failed'];
     }
@@ -133,7 +153,7 @@ class FCom_Test_Core_Test extends BClass
     public function init($type, $file, $module)
     {
         $filename       = $this->filterFileName($file->getFileName());
-        $posTypePath    = strpos($file->getPathname(), "/{$type}/") + strlen("/{$type}/");
+        $posTypePath    = strpos($file->getPathname(), $type) + (strlen($type) + 1);
 
         $this->hash     = $this->makeHash($type . $filename);
         $this->title    = $this->filterTitle($filename);
@@ -235,6 +255,13 @@ class FCom_Test_Core_Test extends BClass
     }
 
     /**
+     * Set if the test has been passed but incomplete because having skipped test
+     */
+    public function setIncomplete() {
+        $this->passed = 'incomplete';
+    }
+
+    /**
      * Sets passed to false if test fails
      */
     public function setFailed()
@@ -289,6 +316,10 @@ class FCom_Test_Core_Test extends BClass
             if ($this->checkLogForTestPass($line) && $failed==false)
                 $this->setPassed();
 
+            if ($this->checkLogForTestIncomplete($line) && $failed==false) {
+                $this->setIncomplete();
+            }
+
             if ($this->checkLogForTestFailure($line)) {
                 $this->setFailed();
                 $failed = true;
@@ -330,6 +361,17 @@ class FCom_Test_Core_Test extends BClass
     public function checkLogForTestPass($line)
     {
         return count(preg_grep("/({$this->passed_regex})/", [$line])) > 0;
+    }
+
+    /**
+     * Check if it contains any text that indiciates that the test has passed.
+     *
+     * @param  string  $line
+     * @return boolean
+     */
+    public function checkLogForTestIncomplete($line)
+    {
+        return count(preg_grep("/({$this->incomplete_regex})/", [$line])) > 0;
     }
 
     /**
