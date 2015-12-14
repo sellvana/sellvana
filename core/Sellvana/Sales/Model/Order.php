@@ -144,6 +144,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function addHistoryEvent($type, $description, $params = null)
     {
+        /** @var Sellvana_Sales_Model_Order_History $history */
         $history = $this->Sellvana_Sales_Model_Order_History->create([
             'order_id' => $this->id(),
             'entity_type' => 'order',
@@ -194,6 +195,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $result = [];
         foreach ($orders as $i => $order) {
+            /** @var Sellvana_Sales_Model_Order $order */
             $result[$i] = [
                 'id'               => $order->id,
                 'customer_id'      => $order->customer_id,
