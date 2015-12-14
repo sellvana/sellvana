@@ -83,6 +83,9 @@
                     'passed': {
                         label: '<strong class="label label-success">{{ "Passed" | _ }}</strong>'
                     },
+                    'incomplete': {
+                        label: '<strong class="label label-warning">{{ "incomplete" | _ }}</strong>'
+                    }
                 }
             },
             init: function() {
@@ -108,7 +111,7 @@
                         dataType    : "json",
                         beforeSend  : function (xhr, settings)
                         {
-                            $.bootstrapGrowl("{{ 'Please wait while' | _ }} " + test.test + " {{ 'running' | _ }}.", { type: 'success', align: 'center', width: 'auto', delay: 3000});
+                            $.bootstrapGrowl("{{ 'Please wait while' | _ }} " + test.test + " {{ 'running' | _ }}.", { type: 'success', align: 'center', width: 'auto', delay: 1000});
                             ++State.vars.countRun; // Update number of test had runned
                             Test.refresh(test, 'running'); // Refresh test
                             State.refresh('running'); // Refresh test state
@@ -125,7 +128,7 @@
 
                     State.refresh('stopped'); // Set state is `stopped`
 
-                } else if (State.isCompleted()) {console.log('isCompleted');
+                } else if (State.isCompleted()) {
                     // Re-enable the checkboxes
                     Test.checkboxToggle();
                     State.refresh('ready');
@@ -138,7 +141,7 @@
             {
                 // Check the state of the completed test and
                 // set the UI state and updated counts.
-                var state = (data.passed == true) ? 'passed' : 'failed';
+                var state = (data.passed === true) ? 'passed' : typeof data.passed === 'string' ? data.passed : 'failed';
 
                 // Update the single test state
                 Test.refresh(test, state);
@@ -162,7 +165,7 @@
                     State.refresh('running'); // Update state to running
                     Test.run(tests); // Run test
                 } else {
-                    $.bootstrapGrowl("{{ 'Error: Please select some tests to run.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 5000});
+                    $.bootstrapGrowl("{{ 'Error: Please select some tests to run.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 3000});
                 }
             },
             find: function () {

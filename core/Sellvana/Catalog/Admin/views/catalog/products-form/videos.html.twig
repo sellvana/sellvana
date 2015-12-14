@@ -26,9 +26,7 @@
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.griddle', 'fcom.components', 'griddle.fcomModalForm', 'jquery.validate', 'jquery.media-element'], function ($, _, React, FComGriddleComponent, Components, FComModalForm) {
         var productVideosGrid = {{ combineType }}Grid, 
-            productVideosNode, 
-            productExternalModalGrid, 
-            productExternalModalNode, 
+            productVideosNode,
             videoExt       = '', 
             videoName      = '', 
             editedRow      = {},
@@ -142,12 +140,13 @@
                     modal.close();
                 }
             }
-        }
+        };
 
         window.showModalToPreviewVideo = function(row) {
             editedRow      = row;
             isExternalLink = false;
             videoName      = row.file_name;
+            var videoNode;
 
             if (!row.file_size) {
                 isExternalLink = true;
@@ -156,19 +155,19 @@
                 switch(provider) {
                     case 'youtube':
                         $html = $(data.html);
-                        var videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
+                        videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
                                 React.DOM.source({ src: $html.prop('src'),  type: "video/youtube"  })
                             );
                         break;
                     case 'vimeo':
-                        var videoNode = React.DOM.div({ dangerouslySetInnerHTML: {__html: data.html} });
+                        videoNode = React.DOM.div({ dangerouslySetInnerHTML: {__html: data.html} });
                         break;
                     default:
                         break;
                 }
             } else {
                 videoExt = _getFileExtension(row.file_name);
-                var videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
+                videoNode = React.DOM.video({ width: "480", height: "320", id: "video-" + row.id, controls: "controls", preload: "none" },
                         React.DOM.source({ src: row.source,  type: "video/" + videoExt  })
                     );
             }

@@ -506,6 +506,9 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->mediaORM($type)->find_many_assoc();
     }
 
+    /**
+     * @param bool|false $isVideoIncluded
+     */
     public function gallery($isVideoIncluded = false)
     {
         $type = 'I';
@@ -513,9 +516,19 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $type = ['I', 'V'];
         }
 
-        return $this->mediaORM($type)
-                    ->where(["pa.in_gallery" => 1])
-                    ->find_many_assoc();
+        $mediaItems = $this->mediaORM($type)
+            ->where(["pa.in_gallery" => 1])
+            ->find_many_assoc();
+
+        // Remove default width and height for responsive
+        foreach ($mediaItems as $k => $media) {
+            if (!empty($media->data_serialized)) {
+                $mediaItems[$k]->data_serialized = preg_replace('/(width=\\\"\d+\\\")|(height=\\\"\d+\\\")/', '',
+                    $media->data_serialized);
+            }
+        }
+
+        return $mediaItems;
     }
 
     /**
