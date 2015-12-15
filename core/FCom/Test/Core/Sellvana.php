@@ -53,7 +53,8 @@ class FCom_Test_Core_Sellvana extends BClass
                     ]
                 ]);
             }
-            static::$dbConfig = $this->BUtil->arrayMerge(static::$dbConfig, $this->BConfig->get('db/named/codeception'));
+            static::$dbConfig = $this->BUtil->arrayMerge(static::$dbConfig,
+                $this->BConfig->get('db/named/codeception'));
             $dsn = sprintf('mysql:host=%s;dbname=%s', static::$dbConfig['host'], static::$dbConfig['dbname']);
             $user = static::$dbConfig['username'];
             $password = static::$dbConfig['password'];
@@ -69,7 +70,9 @@ class FCom_Test_Core_Sellvana extends BClass
         $this->dbh = BORM::get_db();
     }
 
-    private function __clone() {}
+    private function __clone()
+    {
+    }
 
     /**
      * @static
@@ -98,7 +101,7 @@ class FCom_Test_Core_Sellvana extends BClass
      */
     private function getProvider($dsn, $type = null)
     {
-        switch($type) {
+        switch ($type) {
             case 'dbname':
                 return substr($dsn, strrpos($dsn, '=') + 1, strlen($dsn) - 1);
                 break;
@@ -281,14 +284,14 @@ class FCom_Test_Core_Sellvana extends BClass
      *
      * @param $query
      * @param array $params
-     * @return \PDOStatement
-     * @throws \Exception
+     * @return PDOStatement
+     * @throws Exception
      */
     public function executeQuery($query, array $params)
     {
         $sth = $this->dbh->prepare($query);
         if (!$sth) {
-            throw new \Exception("Query '$query' can't be prepared.");
+            throw new Exception("Query '$query' can't be prepared.");
         }
 
         $sth->execute($params);
@@ -308,7 +311,7 @@ class FCom_Test_Core_Sellvana extends BClass
         if (empty($primaryKey)) {
             return null;
         } elseif (count($primaryKey) > 1) {
-            throw new \Exception('getPrimaryColumn method does not support composite primary keys, use getPrimaryKey instead');
+            throw new Exception('getPrimaryColumn method does not support composite primary keys, use getPrimaryKey instead');
         }
 
         return $primaryKey[0];
@@ -324,10 +327,10 @@ class FCom_Test_Core_Sellvana extends BClass
         if (!isset($this->primaryKeys[$tableName])) {
             $primaryKey = [];
             $stmt = $this->getDbh()->query('SHOW KEYS FROM ' . $this->getQuotedName($tableName) . ' WHERE Key_name = "PRIMARY"');
-            $columns = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($columns as $column) {
-                $primaryKey []= $column['Column_name'];
+                $primaryKey [] = $column['Column_name'];
             }
             $this->primaryKeys[$tableName] = $primaryKey;
         }
@@ -346,7 +349,7 @@ class FCom_Test_Core_Sellvana extends BClass
     }
 
     /**
-     * @return \PDO
+     * @return PDO
      */
     public function getDbh()
     {
@@ -354,23 +357,10 @@ class FCom_Test_Core_Sellvana extends BClass
     }
 
     /**
-     * @return bool
-     */
-    public function getDb()
-    {
-        $matches = [];
-        $matched = preg_match('~dbname=(.*);~s', static::$dsn, $matches);
-        if (!$matched) {
-            return false;
-        }
-
-        return $matches[1];
-    }
-
-    /**
      * @return array
      */
-    private function getConfig() {
+    private function getConfig()
+    {
         return include sprintf('%s/codecept.php', $this->BConfig->get('fs/config_dir'));
     }
 }

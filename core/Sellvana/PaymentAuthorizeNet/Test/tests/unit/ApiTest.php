@@ -8,13 +8,18 @@
 class ApiTest extends \Codeception\TestCase\Test
 {
     /**
+     * @var \Sellvana\Wishlist\UnitTester
+     */
+    protected $tester;
+
+    /**
      * @var Sellvana_PaymentAuthorizeNet_AimApi
      */
     public $model;
 
     protected function _before()
     {
-        $this->model = $this->Sellvana_PaymentAuthorizeNet_AimApi->i(true);
+        $this->model = Sellvana_PaymentAuthorizeNet_AimApi::i()->i(true);
     }
 
     public function testGetApi()

@@ -47,21 +47,23 @@ class FCom_Test_Core_Codeception extends BClass
      * @param array $config The codeception.php configuration file.
      * @param null $site
      */
-    public function __construct($config = array(), $site = NULL)
+    public function __construct($config = array(), $site = null)
     {
         // Set the basic config, just incase.
         $this->config = $config;
 
         // If the array wasn't loaded, we can't go any further.
-        if (sizeof($config) == 0)
+        if (sizeof($config) == 0) {
             return;
+        }
 
         // Setup the sites available
         $this->site = $site;
 
         // If the site class isn't ready, we can't load codeception.
-        if (! $site->ready())
+        if (!$site->ready()) {
             return;
+        }
 
         if (!empty($this->config['codecept_sites'])) {
             $this->initModules($this->config['codecept_sites']);
@@ -96,8 +98,9 @@ class FCom_Test_Core_Codeception extends BClass
         $fullPath = $path . $file;
 
         // If the Codeception YAML can't be found, the application can't go any further.
-        if (! file_exists($fullPath))
+        if (!file_exists($fullPath)) {
             return false;
+        }
 
         $config = $this->BYAML->load($fullPath);
         // Update the config to include the full path.
@@ -126,7 +129,9 @@ class FCom_Test_Core_Codeception extends BClass
             $modules = $this->BModuleRegistry->getAllModules();
             foreach ($modules as $module) {
                 /** @var BModule $module */
-                if (!$module || !$module instanceof BModule || !in_array($module->name, array_keys($this->config['codecept_sites']))) {
+                if (!$module || !$module instanceof BModule || !in_array($module->name,
+                        array_keys($this->config['codecept_sites']))
+                ) {
                     continue;
                 }
                 $rootDir = $module->root_dir;
@@ -183,14 +188,15 @@ class FCom_Test_Core_Codeception extends BClass
     /**
      * Given a test type & hash, return a single Test.
      *
-     * @param  string       $type Test type (Unit, Acceptance, Functional)
-     * @param  string       $hash Hash of the test.
+     * @param  string $type Test type (Unit, Acceptance, Functional)
+     * @param  string $hash Hash of the test.
      * @return FCom_Test_Core_Test or false.
      */
     public function getTest($type, $hash)
     {
-        if (isset($this->tests[$type][$hash]))
+        if (isset($this->tests[$type][$hash])) {
             return $this->tests[$type][$hash];
+        }
 
         return false;
     }
@@ -221,7 +227,7 @@ class FCom_Test_Core_Codeception extends BClass
 
         // Run the helper function (as it's not specific to Codeception)
         // which returns the result of running the terminal command into an array.
-        $output  = $this->BUtil->runCLI($command);
+        $output = $this->runCLI($command);
 
         // Add the log to the test which also checks to see if there was a pass/fail.
         $test->setLog($output);
@@ -242,7 +248,7 @@ class FCom_Test_Core_Codeception extends BClass
     /**
      * Full command to run a Codeception test.
      *
-     * @param  string $type     Test Type (Acceptance, Functional, Unit)
+     * @param  string $type Test Type (Acceptance, Functional, Unit)
      * @param  string $filename Name of the Test
      * @param  string $module Name of module is running
      *
@@ -289,7 +295,8 @@ class FCom_Test_Core_Codeception extends BClass
      * @param string $dir
      * @return string
      */
-    public function getInitCodeceptCmd($module = null, $dir = '') {
+    public function getInitCodeceptCmd($module = null, $dir = '')
+    {
         $params = array(
             $this->config['php_executable'] ?: 'php',
             $this->config['codecept_executable'],
@@ -346,7 +353,7 @@ class FCom_Test_Core_Codeception extends BClass
     /**
      * Check that the Codeception executable exists and is runnable.
      *
-     * @param  string $file   File name of the Codeception executable.
+     * @param  string $file File name of the Codeception executable.
      * @param  string $config Full path of the config of where the $file was defined.
      * @return array  Array of flags used in the JSON respone.
      */
@@ -375,6 +382,12 @@ class FCom_Test_Core_Codeception extends BClass
         if (!empty($modules)) {
             foreach ($modules as $mName => $ymlPath) {
                 if (!file_exists($ymlPath)) {
+                    $testDIr = dirname($ymlPath);
+
+                    if (!file_exists($testDIr)) {
+                        mkdir($testDIr, 0777, true);
+                    }
+
                     exec($this->getInitCodeceptCmd(str_replace('_', '\\', $mName),
                         dirname($ymlPath)));
 
@@ -403,5 +416,44 @@ class FCom_Test_Core_Codeception extends BClass
                 }
             }
         }
+    }
+
+    /**
+     * Run a terminal command.
+     *
+     * @param  string $command
+     * @return array  Each array entry is a line of output from running the command.
+     */
+    private function runCLI($command)
+    {
+        $output = [];
+
+        $spec = array(
+            0 => array("pipe", "r"),   // stdin is a pipe that the child will read from
+            1 => array("pipe", "w"),   // stdout is a pipe that the child will write to
+            2 => array("pipe", "w")    // stderr is a pipe that the child will write to
+        );
+
+        flush();
+
+        $process = proc_open($command, $spec, $pipes, realpath('./'), $_ENV);
+
+        if (is_resource($process)) {
+
+            while ($line = fgets($pipes[1])) {
+
+                // Trim any line breaks and white space
+                $line = trim(preg_replace("/\r|\n/", "", $line));
+
+                // If the line has content, add to the output log.
+                if (!empty($line)) {
+                    $output[] = $line;
+                }
+
+                flush();
+            }
+        }
+
+        return $output;
     }
 }

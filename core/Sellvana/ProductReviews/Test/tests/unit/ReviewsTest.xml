@@ -7,6 +7,4 @@
 
     <fcom_product_review id="1" product_id="1" customer_id="1" rating="5" title="Test review" text="test" helpful="5" helpful_voices="2" />
     <fcom_product_review id="2" product_id="2" customer_id="1" rating="4" title="Test review2" text="test2" helpful="15" helpful_voices="4" />
-
-
 </dataset>

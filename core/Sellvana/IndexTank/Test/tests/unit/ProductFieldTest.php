@@ -42,7 +42,8 @@ class ProductFieldTest extends \Codeception\TestCase\Test
             'source_value'      => "description",
             'search'            => 1
         ];
-        $this->Sellvana_IndexTank_Model_ProductField->create($data)->save();
+
+        Sellvana_IndexTank_Model_ProductField::i()->create($data)->save();
 
         $this->tester->seeNumRecords(3, 'fcom_indextank_product_field');
     }
@@ -51,7 +52,7 @@ class ProductFieldTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_indextank_product_field');
 
-        $list = $this->Sellvana_IndexTank_Model_ProductField->getList();
+        $list = Sellvana_IndexTank_Model_ProductField::i()->getList();
         $this->assertTrue(is_array($list));
         $this->assertEquals(2, count($list));
     }
@@ -60,7 +61,7 @@ class ProductFieldTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_indextank_product_field');
 
-        $list = $this->Sellvana_IndexTank_Model_ProductField->getFacetsList();
+        $list = Sellvana_IndexTank_Model_ProductField::i()->getFacetsList();
         $this->assertEquals(1, count($list));
     }
 
@@ -68,7 +69,7 @@ class ProductFieldTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_indextank_product_field');
 
-        $list = $this->Sellvana_IndexTank_Model_ProductField->getSearchList();
+        $list = Sellvana_IndexTank_Model_ProductField::i()->getSearchList();
         $this->assertEquals(1, count($list));
     }
 
@@ -76,7 +77,7 @@ class ProductFieldTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_indextank_product_field');
 
-        $list = $this->Sellvana_IndexTank_Model_ProductField->getVariablesList();
+        $list = Sellvana_IndexTank_Model_ProductField::i()->getVariablesList();
         $this->assertEquals(1, count($list));
     }
 
@@ -84,7 +85,7 @@ class ProductFieldTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_indextank_product_field');
 
-        $list = $this->Sellvana_IndexTank_Model_ProductField->getInclusiveList();
+        $list = Sellvana_IndexTank_Model_ProductField::i()->getInclusiveList();
         $this->assertEquals(1, count($list));
     }
 
@@ -92,7 +93,7 @@ class ProductFieldTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_indextank_product_field');
 
-        $field = $this->Sellvana_IndexTank_Model_ProductField->load(1);
+        $field = Sellvana_IndexTank_Model_ProductField::i()->load(1);
         $field->delete();
 
         $this->tester->seeNumRecords(1, 'fcom_indextank_product_field');
@@ -101,12 +102,12 @@ class ProductFieldTest extends \Codeception\TestCase\Test
     public function testUpdateEntry()
     {
         $this->tester->seeNumRecords(2, 'fcom_indextank_product_field');
-
-        $field = $this->Sellvana_IndexTank_Model_ProductField->load(1);
+        /** @var Sellvana_IndexTank_Model_ProductField $field */
+        $field = Sellvana_IndexTank_Model_ProductField::i()->load(1);
         $this->assertEquals(0, $field->facets, "Load failed");
         $field->facets = 1;
         $field->save();
-        $field = $this->Sellvana_IndexTank_Model_ProductField->load(1);
+        $field = Sellvana_IndexTank_Model_ProductField::i()->load(1);
         $this->assertEquals(1, $field->facets, "Update failed");
     }
 }

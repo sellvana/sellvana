@@ -8,11 +8,16 @@
 
 class ProductTest extends \Codeception\TestCase\Test
 {
+    /**
+     * @var \Sellvana\Wishlist\UnitTester
+     */
+    protected $tester;
+
     private $_model = null;
 
     public function _before()
     {
-        $this->_model = $this->Sellvana_IndexTank_Index_Product->model();
+        $this->_model = Sellvana_IndexTank_Index_Product::i()->model();
     }
 
     public function testIndex()
@@ -22,7 +27,7 @@ class ProductTest extends \Codeception\TestCase\Test
 
     public function testIndexStatus()
     {
-        $status = $this->Sellvana_IndexTank_Index_Product->status();
+        $status = Sellvana_IndexTank_Index_Product::i()->status();
         $this->assertTrue(is_array($status));
     }
 

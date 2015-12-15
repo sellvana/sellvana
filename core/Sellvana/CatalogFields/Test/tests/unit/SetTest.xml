@@ -1,7 +1,5 @@
 <?xml version="1.0" ?>
 <dataset>
-    <fcom_fieldset_field />
-    
     <fcom_fieldset id="1" set_type="product" set_code="test1" set_name="Test 1" />
     <fcom_fieldset id="2" set_type="product" set_code="test2" set_name="Test 2" />
 

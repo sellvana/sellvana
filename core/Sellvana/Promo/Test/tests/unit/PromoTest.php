@@ -23,7 +23,9 @@ class PromoTest extends \Codeception\TestCase\Test
             foreach ($xml->children() as $table => $field) {
                 $this->tester->haveInDatabase((string)$table, (array)BUtil::i()->arrayFromXml($field)['@attributes']);
             }
-        } else die('__ERROR__');
+        } else {
+            die('__ERROR__');
+        }
     }
 
     public function testAddEntry()
@@ -41,10 +43,11 @@ class PromoTest extends \Codeception\TestCase\Test
         $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
 
         $cart->addProduct(3, ['qty' => 2, 'price' => 5]);
-        $this->tester->seeNumRecords(2, 'fcom_sales_cart');
-        $this->assertEquals(3, count($cart->items()), "Items count is not correct");
+        $items = Sellvana_Sales_Model_Cart_Item::i()->orm()->where('cart_id', 1)->find_many_assoc();
+        $this->assertEquals(3, count($items), "Items count is not correct");
         $this->assertEquals(7, $cart->itemQty(), "Items count is not correct");
 
+        $this->tester->seeNumRecords(2, 'fcom_sales_cart');
     }
 }
  

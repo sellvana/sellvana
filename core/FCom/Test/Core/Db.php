@@ -28,7 +28,7 @@ class Db extends \Codeception\Module implements DbInterface
         'cleanup' => true,
         'reconnect' => false,
         // Test db name
-        'load_dump' => false,
+        'load_dump' => true,
         'dump' => null
     ];
 

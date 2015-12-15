@@ -5,7 +5,6 @@
  *
  * @property Sellvana_ProductReviews_Model_Review $Sellvana_ProductReviews_Model_Review
  */
-
 class ReviewsTest extends \Codeception\TestCase\Test
 {
     /**
@@ -29,17 +28,25 @@ class ReviewsTest extends \Codeception\TestCase\Test
             foreach ($xml->children() as $table => $field) {
                 $this->tester->haveInDatabase((string)$table, (array)BUtil::i()->arrayFromXml($field)['@attributes']);
             }
-        } else die('__ERROR__');
+        } else {
+            die('__ERROR__');
+        }
     }
 
     public function testAddEntry()
     {
         $this->tester->seeNumRecords(2, 'fcom_product_review');
+        $mReview = Sellvana_ProductReviews_Model_Review::i(true);
 
-        $customerId = 1;
-        $productId = 1;
-        $data = ['title' => 'Review 3', 'text' => 'review 3', 'rating' => 4, 'customer_id' => $customerId, 'product_id' => $productId];
-        $this->Sellvana_ProductReviews_Model_Review->create($data)->save();
+        $data = [
+            'title' => 'Review 3',
+            'text' => 'review 3',
+            'rating' => 4,
+            'customer_id' => 1,
+            'product_id' => 1
+        ];
+
+        $mReview->create($data)->save();
 
         $this->tester->seeNumRecords(3, 'fcom_product_review');
     }
@@ -48,7 +55,8 @@ class ReviewsTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_product_review');
 
-        $review = $this->Sellvana_ProductReviews_Model_Review->load(1);
+        /** @var Sellvana_ProductReviews_Model_Review $review */
+        $review = Sellvana_ProductReviews_Model_Review::i()->load(1);
         $helpfulVoices = $review->helpful_voices;
         $helpful = $review->helpful;
         $this->assertTrue($helpful > 0);
@@ -57,7 +65,7 @@ class ReviewsTest extends \Codeception\TestCase\Test
         $newMark = 5;
         $review->helpful($newMark);
 
-        $review = $this->Sellvana_ProductReviews_Model_Review->load(1);
+        $review = Sellvana_ProductReviews_Model_Review::i()->load(1);
         $this->assertEquals($newMark + $helpful, $review->helpful, "Update helpful mark failed");
         $this->assertEquals($helpfulVoices + 1, $review->helpful_voices, "Update helpful mark failed");
     }
@@ -66,7 +74,7 @@ class ReviewsTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_product_review');
 
-        $review = $this->Sellvana_ProductReviews_Model_Review->load(1);
+        $review = Sellvana_ProductReviews_Model_Review::i()->load(1);
         $review->delete();
 
         $this->tester->seeNumRecords(1, 'fcom_product_review');

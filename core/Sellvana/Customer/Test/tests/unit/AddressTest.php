@@ -37,9 +37,9 @@ class AddressTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_customer_address');
 
-        $cust = $this->Sellvana_Customer_Model_Customer->load(1);
+        $cust = Sellvana_Customer_Model_Customer::i()->load(1);
         $data = ['id' => 3, 'city' => "Big city", 'country' => 'US', 'region' => 'California', 'firstname' => "Test 1"];
-        $this->Sellvana_Customer_Model_Address->import($data, $cust, 'billing');
+        Sellvana_Customer_Model_Address::i()->import($data, $cust, 'billing');
 
         $this->tester->seeNumRecords(3, 'fcom_customer_address');
     }
@@ -48,9 +48,9 @@ class AddressTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_customer_address');
 
-        $cust = $this->Sellvana_Customer_Model_Customer->load(1);
+        $cust = Sellvana_Customer_Model_Customer::i()->load(1);
         $data = ['id' => 3, 'city' => "Big city", 'country' => 'US', 'region' => 'California', 'firstname' => "Test 1"];
-        $address = $this->Sellvana_Customer_Model_Address->import($data, $cust, 'billing');
+        $address = Sellvana_Customer_Model_Address::i()->import($data, $cust, 'billing');
 
         $this->tester->seeNumRecords(3, 'fcom_customer_address');
         $this->assertEquals($cust->id(), $address->customer_id, "Address association to customer failed");
@@ -60,9 +60,11 @@ class AddressTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_customer_address');
 
-        $cust = $this->Sellvana_Customer_Model_Customer->load(1);
+        /** @var Sellvana_Customer_Model_Customer $cust */
+        $cust = Sellvana_Customer_Model_Customer::i()->load(1);
         $data = ['id' => 3, 'city' => "Big city", 'country' => 'US', 'region' => 'California', 'firstname' => "Test 1"];
-        $address = $this->Sellvana_Customer_Model_Address->import($data, $cust, 'billing');
+        /** @var Sellvana_Customer_Model_Address $address */
+        $address = Sellvana_Customer_Model_Address::i()->import($data, $cust, 'billing');
 
         $this->tester->seeNumRecords(3, 'fcom_customer_address');
 
@@ -74,7 +76,7 @@ class AddressTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_customer_address');
 
-        $address = $this->Sellvana_Customer_Model_Address->load(1);
+        $address = Sellvana_Customer_Model_Address::i()->load(1);
         $address->delete();
 
         $this->tester->seeNumRecords(1, 'fcom_customer_address');
@@ -84,17 +86,17 @@ class AddressTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_customer_address');
 
-        $customer = $this->Sellvana_Customer_Model_Customer->load(1);
-        $address = $customer->defaultShipping();
+        /** @var Sellvana_Customer_Model_Customer $customer */
+        $customer = Sellvana_Customer_Model_Customer::i()->load(1);
+        $address = $customer->getDefaultShippingAddress();
         $address->delete();
 
         $this->tester->seeNumRecords(1, 'fcom_customer_address');
 
         //refresh customer cache
-        $customer = $this->Sellvana_Customer_Model_Customer->load(1);
+        $customer = Sellvana_Customer_Model_Customer::i()->load(1);
 
-
-        $this->assertTrue($customer->defaultShipping() == false);
+        $this->assertTrue($customer->getDefaultShippingAddress() == false);
 
         $this->assertTrue($customer->default_shipping_id == null);
     }

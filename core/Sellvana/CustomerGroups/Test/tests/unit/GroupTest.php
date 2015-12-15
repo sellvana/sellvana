@@ -14,7 +14,7 @@ class GroupTest extends \Codeception\TestCase\Test
 
     protected function _before()
     {
-        $this->model = $this->Sellvana_CustomerGroups_Model_Group->i(true);
+        $this->model = Sellvana_CustomerGroups_Model_Group::i(true);
     }
 
     /**
@@ -22,7 +22,7 @@ class GroupTest extends \Codeception\TestCase\Test
      */
     public function testGetGroupsOptionsForHtml()
     {
-        $groupOptions = $this->Sellvana_CustomerGroups_Model_Group->groupsOptions();
+        $groupOptions = Sellvana_CustomerGroups_Model_Group::i()->groupsOptions();
 
         $this->assertTrue(is_array($groupOptions));
 

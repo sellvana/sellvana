@@ -39,7 +39,7 @@ class OrderTest extends \Codeception\TestCase\Test
         $this->tester->seeNumRecords(2, 'fcom_sales_order');
 
         $data = ['cart_id' => 3, 'customer_id' => 2];
-        $this->Sellvana_Sales_Model_Order->create($data)->save();
+        Sellvana_Sales_Model_Order::i()->create($data)->save();
 
         $this->tester->seeNumRecords(3, 'fcom_sales_order');
     }
@@ -47,12 +47,12 @@ class OrderTest extends \Codeception\TestCase\Test
     public function testAddItems()
     {
         $this->tester->seeNumRecords(2, 'fcom_sales_order');
-
-        $order = $this->Sellvana_Sales_Model_Order->load(2);
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = Sellvana_Sales_Model_Order::i()->load(2);
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = ['order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10];
-        $this->Sellvana_Sales_Model_Order_Item->create($orderItem)->save();
+        Sellvana_Sales_Model_Order_Item::i()->create($orderItem)->save();
 
         $this->assertEquals(2, count($order->items()), "After add failed");
     }
@@ -61,25 +61,26 @@ class OrderTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_sales_order');
 
-        $order = $this->Sellvana_Sales_Model_Order->load(2);
+        /** @var Sellvana_Sales_Model_Order $order */
+        $order = Sellvana_Sales_Model_Order::i()->load(2);
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = ['order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10];
-        $this->Sellvana_Sales_Model_Order_Item->create($orderItem)->save();
+        Sellvana_Sales_Model_Order_Item::i()->create($orderItem)->save();
 
         $this->assertEquals(2, count($order->items()), "After add failed");
 
-        $testItem = $this->Sellvana_Sales_Model_Order_Item->isItemExist($order->id(), 1);
+        $testItem = Sellvana_Sales_Model_Order_Item::i()->isItemExist($order->id(), 1);
         $this->assertTrue(is_object($testItem), "Item exists failed");
 
-        $testItem = $this->Sellvana_Sales_Model_Order_Item->isItemExist($order->id(), 111111);
+        $testItem = Sellvana_Sales_Model_Order_Item::i()->isItemExist($order->id(), 111111);
         $this->assertFalse(is_object($testItem), "Item not exists failed");
     }
 
     public function testAddPaymentMethod()
     {
-        $this->Sellvana_Sales_Main->addPaymentMethod('paypal', 'Sellvana_PaymentPaypal_Frontend');
-        $methods = $this->Sellvana_Sales_Main->getPaymentMethods();
+        Sellvana_Sales_Main::i()->addPaymentMethod('paypal', 'Sellvana_PaymentPaypal_Frontend');
+        $methods = Sellvana_Sales_Main::i()->getPaymentMethods();
         $this->assertTrue(isset($methods['paypal']));
     }
 }

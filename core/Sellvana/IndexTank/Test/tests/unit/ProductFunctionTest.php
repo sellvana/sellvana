@@ -41,20 +41,20 @@ class ProductFunctionTest extends \Codeception\TestCase\Test
             'definition'       => '-d[0]'
         ];
 
-        $this->Sellvana_IndexTank_Model_ProductFunction->create($data)->save();
+        Sellvana_IndexTank_Model_ProductFunction::i()->create($data)->save();
         $data = [
             'name'        => "base_price_desc",
             'number'        => "3",
             'definition'       => 'd[0]'
         ];
-        $this->Sellvana_IndexTank_Model_ProductFunction->create($data)->save();
+        Sellvana_IndexTank_Model_ProductFunction::i()->create($data)->save();
 
         $this->tester->seeNumRecords(4, 'fcom_indextank_product_function');
     }
 
     public function testListCount()
     {
-        $list = $this->Sellvana_IndexTank_Model_ProductFunction->getList();
+        $list = Sellvana_IndexTank_Model_ProductFunction::i()->getList();
         $this->assertTrue(is_array($list));
         $this->assertEquals(2, count($list));
     }
@@ -63,7 +63,7 @@ class ProductFunctionTest extends \Codeception\TestCase\Test
     {
         $this->tester->seeNumRecords(2, 'fcom_indextank_product_function');
 
-        $field = $this->Sellvana_IndexTank_Model_ProductFunction->load(1);
+        $field = Sellvana_IndexTank_Model_ProductFunction::i()->load(1);
         $field->delete();
 
         $this->tester->seeNumRecords(1, 'fcom_indextank_product_function');
@@ -72,12 +72,12 @@ class ProductFunctionTest extends \Codeception\TestCase\Test
     public function testUpdateEntry()
     {
         $this->tester->seeNumRecords(2, 'fcom_indextank_product_function');
-
-        $func = $this->Sellvana_IndexTank_Model_ProductFunction->load(1);
+        /** @var Sellvana_IndexTank_Model_ProductFunction $func */
+        $func = Sellvana_IndexTank_Model_ProductFunction::i()->load(1);
         $this->assertEquals("age", $func->name, "Load failed");
         $func->name = "seconds";
         $func->save();
-        $func = $this->Sellvana_IndexTank_Model_ProductFunction->load(1);
+        $func = Sellvana_IndexTank_Model_ProductFunction::i()->load(1);
         $this->assertEquals("seconds", $func->name, "Update failed");
     }
 }
