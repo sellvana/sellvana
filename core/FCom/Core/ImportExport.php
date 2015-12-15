@@ -15,6 +15,7 @@ class FCom_Core_ImportExport extends BClass
     const STORE_UNIQUE_ID_KEY = '_store_unique_id';
     const DEFAULT_FIELDS_KEY = '_default_fields';
     const DEFAULT_MODEL_KEY = '_default_model';
+    const CUSTOM_DATA_KEY = '_custom_data';
     const AUTO_MODEL_ID = 'auto_increment';
     const DEFAULT_STORE_ID = 'default';
     
@@ -182,7 +183,7 @@ class FCom_Core_ImportExport extends BClass
      * @param null  $batch
      * @return bool
      */
-    public function export( $models = [], $toFile = null, $batch = null )
+    public function export($models = [], $toFile = null, $batch = null)
     {
         $fe = $this->_getWriteHandle($toFile);
 
@@ -217,7 +218,7 @@ class FCom_Core_ImportExport extends BClass
 
         foreach ($sorted as $s) {
             /** @var FCom_Core_Model_Abstract $model */
-            $model   = $s[ 'model' ];
+            $model   = $s['model'];
             $user = $this->getUser();
             if ($user && $user->getPermission($model) == false) {
                 $this->log([
@@ -234,8 +235,8 @@ class FCom_Core_ImportExport extends BClass
                 ], 'error');
                 break;
             }
-            if ( !isset( $s[ 'skip' ] ) ) {
-                $s[ 'skip' ] = [];
+            if (!isset($s['skip'])) {
+                $s['skip'] = [];
             }
             if ($model == 'Sellvana_Catalog_Model_Product' && $this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
                 // disable custom fields to avoid them adding bunch of fields to export
@@ -263,14 +264,19 @@ class FCom_Core_ImportExport extends BClass
                     $heading[static::DEFAULT_FIELDS_KEY][] = $key;
                 }
             }
+            $dbFields = $heading[static::DEFAULT_FIELDS_KEY];
+            if (!empty($s['custom_data'])) {
+                $heading[static::DEFAULT_FIELDS_KEY][] = static::CUSTOM_DATA_KEY;
+                $dbFields[] = 'data_serialized';
+            }
             $offset = 0;
             $records = $this->{$model}->orm()
-                ->select($heading[static::DEFAULT_FIELDS_KEY])
+                ->select($dbFields)
                 ->limit($bs)
                 ->offset($offset)
                 ->find_many();
             if ($records) {
-                $this->_writeLine($fe, ',' . $this->BUtil->toJson($heading));
+                $this->_writeLine($fe, ',' . $this->BUtil->toJson($heading[static::DEFAULT_FIELDS_KEY]));
                 while($records) {
                     $this->BEvents->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
                     foreach ($records as $r) {
@@ -278,6 +284,13 @@ class FCom_Core_ImportExport extends BClass
                         /** @var FCom_Core_Model_Abstract $r */
                         $data = $r->as_array();
                         $data = array_values($data);
+                        if (!empty($s['custom_data'])) {
+                            if (is_array($s['custom_data'])) {
+                                foreach ($s['custom_data'] as $cdk) {
+                                    $cData[$cdk] = $r->getData($cdk);
+                                }
+                            }
+                        }
 
                         $json = $this->BUtil->toJson($data);
                         $this->_writeLine($fe, ',' . $json);
@@ -285,7 +298,7 @@ class FCom_Core_ImportExport extends BClass
                     $offset += $bs;
                     $records = $this->{$model}
                         ->orm()
-                        ->select($heading[static::DEFAULT_FIELDS_KEY])
+                        ->select($dbFields)
                         ->limit($bs)
                         ->offset($offset)
                         ->find_many();
@@ -680,12 +693,19 @@ class FCom_Core_ImportExport extends BClass
                         }
                     }
                     if (!empty($import)) {
+                        if (!empty($import[static::CUSTOM_DATA_KEY])) {
+                            $cData = $import[static::CUSTOM_DATA_KEY];
+                            $merge = isset($cData['_merge']) ? $cData['_merge'] : true;
+                            foreach ($cData as $cdk => $cdkData) {
+                                $model->setData($cdk, $cdkData, $merge);
+                            }
+                        }
                         $model->set($import)->save();
                         $modified = true;
                         $this->_updatedModels++;
                         $this->_modelsStatistics[$this->_currentModel]['updated_models']++;
                     } else {
-                        if (in_array($model->id(),$ieAbsentIds)){
+                        if (in_array($model->id(), $ieAbsentIds)){
                             $modified = true;
                         }
                         $this->_notChanged++;
@@ -694,6 +714,13 @@ class FCom_Core_ImportExport extends BClass
                 } else {
                     /** @var FCom_Core_Model_Abstract $model */
                     $model = $this->{$cm}->create($data);
+                    if (!empty($data[static::CUSTOM_DATA_KEY])) {
+                        $cData = $data[static::CUSTOM_DATA_KEY];
+                        $merge = isset($cData['_merge']) ? $cData['_merge'] : true;
+                        foreach ($cData as $cdk => $cdkData) {
+                            $model->setData($cdk, $cdkData, $merge);
+                        }
+                    }
                     $model->save(false);
                     $modified = true;
                     $this->_newModels++;

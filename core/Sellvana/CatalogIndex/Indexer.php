@@ -46,7 +46,10 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
             $row = ['id' => $pId, 'last_indexed' => $now];
 
             foreach ($sortColumn as $fName => $field) {
-                $row['sort_' . $fName] = substr((string)$pData[$fName], 0, 50);
+                if (!array_key_exists($fName, $pData)) {
+                    continue;
+                }
+                $row['sort_' . $fName] = null !== $pData[$fName] ? substr((string)$pData[$fName], 0, 50) : null;
             }
 
             $docHlp->create($row)->save();
