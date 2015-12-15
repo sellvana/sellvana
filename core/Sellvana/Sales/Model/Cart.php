@@ -197,6 +197,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         if (!$this->items) {
             $this->items = $this->Sellvana_Sales_Model_Cart_Item->orm()->where('cart_id', $this->id())->find_many_assoc();
+            /** @var Sellvana_Sales_Model_Cart_Item $item */
             foreach ($this->items as $item) {
                 $item->setCart($this);
             }

@@ -491,7 +491,7 @@
                             var name = $(this).attr('name');
                             var val = $(this).val();
                             var field = _.findWhere(variantFields.customFields, { field_code: name });
-                            if (val != '' && field && typeof field.options[val] === 'undefined') {
+                            if (val != '' && field && !_.contains(field.options, val)) {
                                 var confirm = window.confirm("A new field value will be created. Are you sure?");
                                 if (confirm) {
                                     field.options[val] = val;

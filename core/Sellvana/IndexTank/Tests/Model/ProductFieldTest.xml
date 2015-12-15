@@ -1,5 +1,0 @@
-<?xml version="1.0" ?>
-<dataset>
-    <fcom_indextank_product_field id="1" field_name="product_name" field_type="varchar" search="1" facets="0" scoring="1" var_number="0" filter="" source_type="product" source_value="product_name" />
-    <fcom_indextank_product_field id="2" field_name="price_range" field_type="text" search="0" facets="1" scoring="0" var_number="-1"  filter="inclusive" source_type="function" source_value="fieldPriceRange" />
-</dataset>
