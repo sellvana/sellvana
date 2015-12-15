@@ -121,8 +121,7 @@ class FCom_Core_ImportExport extends BClass
             $message = ['msg' => $message];
         }
 
-        if (empty($message['signal']) && ($type === 'warning' || $type === 'error')
-        ) {
+        if (empty($message['signal']) && ($type === 'warning' || $type === 'error')) {
             $message['signal'] = 'problem';
         }
         $this->_sendMessage($message);
