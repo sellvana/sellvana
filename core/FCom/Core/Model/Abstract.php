@@ -99,7 +99,7 @@ class FCom_Core_Model_Abstract extends BModel
     {
         if (is_array($path)) {
             foreach ($path as $p => $v) {
-                $this->setData($p, $v);
+                $this->setData($p, $v, $merge);
             }
             return $this;
         }

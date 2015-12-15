@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_customer id="1" email="test1@test.com" firstname="Test 1" default_shipping_id="1" />
+
+    <fcom_product id="1" product_name="Product 1" url_key="product-1" />
+    <fcom_product id="2" product_name="Product 2" url_key="product-2" />
+
+    <fcom_product_review id="1" product_id="1" customer_id="1" rating="5" title="Test review" text="test" helpful="5" helpful_voices="2" />
+    <fcom_product_review id="2" product_id="2" customer_id="1" rating="4" title="Test review2" text="test2" helpful="15" helpful_voices="4" />
+</dataset>

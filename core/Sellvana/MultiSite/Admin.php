@@ -108,7 +108,8 @@ class Sellvana_MultiSite_Admin extends BClass
     {
         /** @var BORM $orm */
         $orm = $args['orm'];
-        $orm->order_by_asc('pf.site_id');
+        $alias = $orm->table_alias();
+        $orm->order_by_asc($alias . '.site_id');
     }
 
     public function onProductFormPostBefore($args)
