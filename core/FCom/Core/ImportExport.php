@@ -269,13 +269,14 @@ class FCom_Core_ImportExport extends BClass
                 ->offset($offset)
                 ->find_many();
             if ($records) {
-                $this->_writeLine($fe, ',' . $this->BUtil->toJson($heading[static::DEFAULT_FIELDS_KEY]));
+                $this->_writeLine($fe, ',' . $this->BUtil->toJson($heading));
                 while($records) {
                     $this->BEvents->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
                     foreach ($records as $r) {
 
                         /** @var FCom_Core_Model_Abstract $r */
                         $data = $r->as_array();
+                        unset($data['data_serialized']);
                         $data = array_values($data);
                         if (!empty($s['custom_data'])) {
                             if (is_array($s['custom_data'])) {
