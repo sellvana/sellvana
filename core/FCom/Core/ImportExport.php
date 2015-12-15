@@ -276,7 +276,7 @@ class FCom_Core_ImportExport extends BClass
                 ->offset($offset)
                 ->find_many();
             if ($records) {
-                $this->_writeLine($fe, ',' . $this->BUtil->toJson($heading[static::DEFAULT_FIELDS_KEY]));
+                $this->_writeLine($fe, ',' . $this->BUtil->toJson($heading));
                 while($records) {
                     $this->BEvents->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
                     foreach ($records as $r) {
