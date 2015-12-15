@@ -1,5 +1,0 @@
-<?xml version="1.0" ?>
-<dataset>
-    <fcom_checkout_address id="1" cart_id="1" atype="shipping" firstname="Test 1" city="Los Angeles" state="California" country="US" />
-    <fcom_checkout_address id="2" cart_id="2" atype="billing" firstname="Test 2" city="California"  state="California" country="US" />
-</dataset>

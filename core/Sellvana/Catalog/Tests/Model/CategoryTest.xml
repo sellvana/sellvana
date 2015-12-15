@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<dataset>
-    <fcom_category id="1" full_name="Category 1" node_name="Category 1" url_path="category-1" id_path="1" />
-    <fcom_category id="2" parent_id="1" full_name="Category 1 | Category 2" node_name="Category 2" url_path="category-1/category-2" id_path="1/2" />
-    <fcom_product id="1" product_name="Product 1" url_key="product-1" />
-    <fcom_product id="2" product_name="Product 2" url_key="product-2" />
-    <fcom_category_product id="1" product_id="1" category_id="1"/>
-</dataset>
