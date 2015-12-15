@@ -117,7 +117,7 @@ class FCom_Core_ImportExport extends BClass
                 $this->_errors++;
                 break;
         }
-        if (is_string($message)){
+        if (is_string($message)) {
             $message = ['msg' => $message];
         }
 
