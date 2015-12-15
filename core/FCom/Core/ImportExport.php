@@ -252,6 +252,9 @@ class FCom_Core_ImportExport extends BClass
             $idField = $this->{$model}->getIdField();
             $heading = [static::DEFAULT_MODEL_KEY => $model, static::DEFAULT_FIELDS_KEY => []];
             foreach ($sample as $key => $value) {
+                if (!empty($s['custom_data']) && $key == 'data_serialized') {
+                    continue;
+                }
                 if (!in_array($key, $s['skip']) || $idField == $key) {
                     // always export id column
                     $heading[static::DEFAULT_FIELDS_KEY][] = $key;
@@ -283,9 +286,15 @@ class FCom_Core_ImportExport extends BClass
                                 foreach ($s['custom_data'] as $cdk) {
                                     $cData[$cdk] = $r->getData($cdk);
                                 }
+                            } else {
+                                $cData = $r->getData();
+                                $cdks = array_keys($cData);
+                                foreach ($cdks as $cdk) {
+                                    $cData[$cdk] = $r->getData($cdk);
+                                }
                             }
+                            $data[] = $cData;
                         }
-
                         $json = $this->BUtil->toJson($data);
                         $this->_writeLine($fe, ',' . $json);
                     }
@@ -688,11 +697,16 @@ class FCom_Core_ImportExport extends BClass
                     }
                     if (!empty($import)) {
                         if (!empty($import[static::CUSTOM_DATA_KEY])) {
-                            $cData = $import[static::CUSTOM_DATA_KEY];
-                            $merge = isset($cData['_merge']) ? $cData['_merge'] : true;
+                            $cData = (array)$import[static::CUSTOM_DATA_KEY];
+                            $merge = true;
+                            if (isset($cData['_merge'])) {
+                                $merge = $cData['_merge'];
+                                unset($cData['_merge']);
+                            }
                             foreach ($cData as $cdk => $cdkData) {
                                 $model->setData($cdk, $cdkData, $merge);
                             }
+                            unset($import[static::CUSTOM_DATA_KEY]);
                         }
                         $model->set($import)->save();
                         $modified = true;
@@ -706,16 +720,27 @@ class FCom_Core_ImportExport extends BClass
                         $this->_modelsStatistics[$this->_currentModel]['not_changed']++;
                     }
                 } else {
+                    $cData = null;
+                    if (!empty($data[static::CUSTOM_DATA_KEY])) {
+                        $cData = (array)$data[static::CUSTOM_DATA_KEY];
+                        unset($data[static::CUSTOM_DATA_KEY]);
+                    }
                     /** @var FCom_Core_Model_Abstract $model */
                     $model = $this->{$cm}->create($data);
-                    if (!empty($data[static::CUSTOM_DATA_KEY])) {
-                        $cData = $data[static::CUSTOM_DATA_KEY];
-                        $merge = isset($cData['_merge']) ? $cData['_merge'] : true;
+                    if (!empty($cData)) {
+                        $merge = true;
+                        if(isset($cData['_merge'])) {
+                            $merge = $cData['_merge'];
+                            unset($cData['_merge']);
+                        }
                         foreach ($cData as $cdk => $cdkData) {
+                            if ($cdkData == '[]') {
+                                $cdkData = null;
+                            }
                             $model->setData($cdk, $cdkData, $merge);
                         }
                     }
-                    $model->save(false);
+                    $model->save();
                     $modified = true;
                     $this->_newModels++;
                     $this->_modelsStatistics[$this->_currentModel]['new_models']++;
