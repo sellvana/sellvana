@@ -283,6 +283,7 @@ class FCom_Core_ImportExport extends BClass
 
                         /** @var FCom_Core_Model_Abstract $r */
                         $data = $r->as_array();
+                        unset($data['data_serialized']);
                         $data = array_values($data);
                         if (!empty($s['custom_data'])) {
                             if (is_array($s['custom_data'])) {
