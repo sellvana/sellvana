@@ -7,9 +7,9 @@
     id: 'all_' ~ type,
     mode: 'images',
     type: 'product-images',
-    title: 'Images',
+    title: 'Images'|_,
     folder: 'media/product/images',
-    config: {actions: {delete: {caption : 'Remove'}}}
+    config: {actions: {delete: {caption : 'Remove'|_}}}
 } %}
 
 {% set attachmentsConfig = {
@@ -216,7 +216,7 @@
                         }
 
                         if (success) {
-                            $.bootstrapGrowl("Successfully uploaded.", {
+                            $.bootstrapGrowl("{{ 'Successfully uploaded.' |_ }}", {
                                 type: 'success',
                                 align: 'center',
                                 width: 'auto'
@@ -226,7 +226,7 @@
                 })
                 .bind('fileuploadstop', function (e, data) {
                     if (file_error.join(',') != '') {
-                        alert('Illegal file extension: ' + file_error.join(','));
+                        alert("{{ 'Illegal file extension: ' |_ }}" + file_error.join(','));
                         file_error = [];
                     }
                 });
@@ -238,7 +238,7 @@
                     if (!span.attr('data-text')) {
                         span.attr('data-text', span.html());
                     }
-                    span.html('Drop images to here');
+                    span.html("{{ 'Drop images to here' |_ }}");
                 })
                 .bind('drop dragleave', function (e) {
                     //console.log('drop');

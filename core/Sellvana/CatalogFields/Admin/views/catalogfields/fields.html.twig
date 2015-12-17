@@ -78,6 +78,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 
         if (fieldsForm.valid() && optionsForm.valid()) {
             $.post(url, hash, function(data) {
+                $.bootstrapGrowl("{{ 'Saved succeeded.' | _ }}", { type: 'success', align: 'center', width: 'auto', delay: 3000 });
                 fieldsGrid.refresh();
                 modal.close();
             }, 'json');

@@ -60,7 +60,7 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             }
             $('#{{ fieldSetsConfig.config.id }}_selected_tab').trigger('click');
         } else {
-            alert('please choose at least one field');
+            $.bootstrapGrowl("{{ 'Please choose at least one field.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 3000 });
         }
     };
 
@@ -89,23 +89,9 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         });
 
         $.post(url, hash, function(data) {
-            //todo: add alert or notify success
+            $.bootstrapGrowl("{{ 'Saved succeeded.' | _ }}", { type: 'success', align: 'center', width: 'auto', delay: 3000 });
             mainGrid.refresh();
             modal.close();
-            /*if (data) {
-                switch(hash.oper) {
-                    case 'add':
-                        mainGrid.addRows([data]);
-                        break;
-                    case 'edit':
-                        mainGrid.updateRows([data]);
-                        break;
-                }
-                modal.close();
-            } else {
-                console.log('error when save');
-                return false;
-            }*/
         }, 'json');
     };
 

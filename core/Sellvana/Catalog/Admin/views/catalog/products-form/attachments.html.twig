@@ -6,7 +6,7 @@
 {% set medialibConfig = {
     id: 'all_' ~ type,
     type: 'product-attachments',
-    config: {actions: {delete: {caption : 'Remove'}}}
+    config: {actions: {delete: {caption : 'Remove'|_}}}
 } %}
 
 {% set attachmentsConfig = {
