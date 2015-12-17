@@ -16,38 +16,12 @@ class WishlistTest extends \Codeception\TestCase\Test
     {
     }
 
-    /**
-     * function xml2array
-     *
-     * This function is part of the PHP manual.
-     *
-     * The PHP manual text and comments are covered by the Creative Commons 
-     * Attribution 3.0 License, copyright (c) the PHP Documentation Group
-     *
-     * @author  k dot antczak at livedata dot pl
-     * @date    2011-04-22 06:08 UTC
-     * @link    http://www.php.net/manual/en/ref.simplexml.php#103617
-     * @license http://www.php.net/license/index.php#doc-lic
-     * @license http://creativecommons.org/licenses/by/3.0/
-     * @license CC-BY-3.0 <http://spdx.org/licenses/CC-BY-3.0>
-     *
-     * TODO: Bring it to BUtil class
-     */
-    function xml2array($xmlObject, $out = [])
-    {
-        foreach ((array)$xmlObject as $index => $node) {
-            $out[$index] = is_object($node) ? xml2array($node) : $node;
-        }
-
-        return $out;
-    }
-
     private function initDataSet()
     {
         $xml = simplexml_load_file(__DIR__ . '/WishlistTest.xml');
         if ($xml) {
             foreach ($xml->children() as $table => $field) {
-                $this->tester->haveInDatabase((string)$table, (array)$this->xml2array($field)['@attributes']);
+                $this->tester->haveInDatabase((string)$table, (array)BUtil::i()->arrayFromXml($field)['@attributes']);
             }
         } else die('__ERROR__');
     }
@@ -65,6 +39,7 @@ class WishlistTest extends \Codeception\TestCase\Test
     public function testAddItem()
     {
         $this->tester->seeNumRecords(3, 'fcom_wishlist_items');
+        /** @var Sellvana_Wishlist_Model_Wishlist $mWishlist */
         $mWishlist = Sellvana_Wishlist_Model_Wishlist::i(true);
         $wishlist = $mWishlist->load(1);
         $wishlist->addItem(4);
@@ -76,6 +51,7 @@ class WishlistTest extends \Codeception\TestCase\Test
     public function testRemoveItem()
     {
         $this->tester->seeNumRecords(3, 'fcom_wishlist_items');
+        /** @var Sellvana_Wishlist_Model_Wishlist $mWishlist */
         $mWishlist = Sellvana_Wishlist_Model_Wishlist::i(true);
         $wishlist = $mWishlist->load(1);
         $this->assertEquals(2, count($wishlist->items()), "Count items before remove");
@@ -88,6 +64,7 @@ class WishlistTest extends \Codeception\TestCase\Test
     public function testClearWishlist()
     {
         $this->tester->seeNumRecords(2, 'fcom_wishlist');
+        /** @var Sellvana_Wishlist_Model_Wishlist $mWishlist */
         $mWishlist = Sellvana_Wishlist_Model_Wishlist::i(true);
         $wishlist = $mWishlist->load(1);
         $this->assertEquals(2, count($wishlist->items()), "Items count is not correct");

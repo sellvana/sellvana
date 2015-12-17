@@ -1,6 +1,4 @@
-<?php
-namespace FCom\Test;
-
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class BAppTest extends \Codeception\TestCase\Test
 {

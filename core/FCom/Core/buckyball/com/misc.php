@@ -799,6 +799,22 @@ class BUtil extends BClass
     }
 
     /**
+     * Convert xml object to array
+     *
+     * @param $xmlObject
+     * @param array $out
+     * @return array
+     */
+    public function arrayFromXml($xmlObject, $out = [])
+    {
+        foreach ((array)$xmlObject as $index => $node) {
+            $out[$index] = is_object($node) ? $this->arrayFromXml($node) : $node;
+        }
+
+        return $out;
+    }
+
+    /**
     * Create IV for mcrypt operations
     *
     * @return string
@@ -2160,43 +2176,6 @@ class BUtil extends BClass
     public function camelToSentance($string)
     {
         return trim(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $string));
-    }
-
-    /**
-     * Run a terminal command.
-     *
-     * @param  string $command
-     * @return array  Each array entry is a line of output from running the command.
-     */
-    public function runCLI($command) {
-        $output = [];
-
-        $spec = array(
-            0 => array("pipe", "r"),   // stdin is a pipe that the child will read from
-            1 => array("pipe", "w"),   // stdout is a pipe that the child will write to
-            2 => array("pipe", "w")    // stderr is a pipe that the child will write to
-        );
-
-        flush();
-
-        $process = proc_open($command, $spec, $pipes, realpath('./'), $_ENV);
-
-        if (is_resource($process)) {
-
-            while ($line = fgets($pipes[1])) {
-
-                // Trim any line breaks and white space
-                $line = trim(preg_replace("/\r|\n/", "", $line));
-
-                // If the line has content, add to the output log.
-                if (! empty($line))
-                    $output[] = $line;
-
-                flush();
-            }
-        }
-
-        return $output;
     }
 
     /**
