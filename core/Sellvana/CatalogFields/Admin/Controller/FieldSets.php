@@ -252,8 +252,12 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 300, 'editable' => 'inline',
+                    ['name' => 'label', 'type' => 'input', 'label' => 'Label', 'width' => 100, 'editable' => 'inline',
                         'sortable' => false, 'validation' => ['required' => true]],
+                    ['name' => 'langs', 'label' => 'Multi Languages', 'width' => 300, 'editor' => 'select',
+                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'sortable' => false, 'options' => ['en_US' => 'en_US', 'de_DE' => 'de_DE', 'zh-CN' => 'zh-CN', 'fr-FR' => 'fr-FR', 'nl_NL' => 'nl_NL'], 'select2' => true, 'multiple' => true, 'placeholder' => 'Select some languages', 'callback' => 'addLangField'],
+                    ['name' => 'lang_vals', 'type' => 'input', 'label' => 'Language Value', 'width' => 300, 'editable' => 'inline',
+                        'sortable' => false],
                     ['type' => 'btn_group',
                         'buttons' => [['name' => 'delete', 'noconfirm' => true]]
                     ]
@@ -458,7 +462,11 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 foreach ($data['rows'] as $row) {
                     if (!in_array($row['id'], $rowDeleteIds)) { //make sure this row is not in rows will be deleted
                         if (!empty($models[$row['id']])) { //update option
-                            $models[$row['id']]->set('label', $row['label'])->save();
+                            $dataUpdate = [
+                                'label' => $row['label'],
+                                'data_serialized' => $row['data_serialized']
+                            ];
+                            $models[$row['id']]->set($dataUpdate)->save();
                             $op++;
                         } else { //create option
                             $rowData = ['field_id' => $model->id, 'label' => (string)$row['label']];

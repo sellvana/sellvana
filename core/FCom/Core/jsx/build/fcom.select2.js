@@ -31,7 +31,7 @@ define(['underscore', 'react', 'fcom.components'], function (_, React, Component
             return nextState.selections !== this.state.selections;
         },
         render: function () {
-            return (React.createElement(Components.Select2, {id: this.props.id, className: this.props.className, "data-col": this.props['data-col'], name: this.props.name, options: this.props.options, onSelection: this.handleSelections, placeholder: "Select some options", multiple: this.props.multiple || false, val: this.props.defaultValue}));
+            return (React.createElement(Components.Select2, {id: this.props.id, className: this.props.className, "data-col": this.props['data-col'], name: this.props.name, options: this.props.options, onSelection: this.handleSelections, placeholder: this.props.placeholder, multiple: this.props.multiple || false, val: this.props.defaultValue}));
         }
     });
     

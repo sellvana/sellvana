@@ -120,7 +120,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                             var validationRules = that.validationRules(col.validation);
                             
                             var defaultValue    = (typeof row[col.name] !== 'undefined') ? row[col.name] : "";
-                            
+
                             var isSelect2       = col.select2 || false;
 
                             var inlineProps = {
@@ -159,7 +159,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                         }
                                     }
 
-                                    node = isSelect2 ? React.createElement(FComSelect2, React.__spread({},  inlineProps, {options: selectOptions, onChange: that.handleSelect2Change, defaultValue: isSelect2 ? [defaultValue] : defaultValue, callback: col.callback})) : React.createElement("select", React.__spread({key: col.name, defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange.bind(null, col.callback)}), selectOptions);
+                                    node = isSelect2 ? React.createElement(FComSelect2, React.__spread({},  inlineProps, {options: selectOptions, onChange: that.handleSelect2Change, defaultValue: [defaultValue], multiple: col.multiple || false, placeholder: col.placeholder || "Select some options", callback: col.callback})) : React.createElement("select", React.__spread({key: col.name, defaultValue: defaultValue},  inlineProps,  validationRules, {onChange: that.handleChange.bind(null, col.callback)}), selectOptions);
                                     break;
                                 default:
                                     node = React.createElement("input", React.__spread({key: col.name, type: "text"},  inlineProps,  col.attrs,  validationRules, {defaultValue: defaultValue, onChange: that.handleChange.bind(null, col.callback)}));

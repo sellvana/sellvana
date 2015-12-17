@@ -456,7 +456,6 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             return {
                 hasError: false,
                 multiple: false,
-                placeholder: "Select Options",
                 val: [],
                 style: {
                     witdh: "100%"
@@ -552,9 +551,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             return $("#" + this.props.id);
         },
         _isOptionsUpdated: function (oldOptions) {
-            if (oldOptions.length != this.props.options.length)
-                return true;
-            return false;
+            return oldOptions.length != this.props.options.length || false;
         },
         render: function () {
             return (
