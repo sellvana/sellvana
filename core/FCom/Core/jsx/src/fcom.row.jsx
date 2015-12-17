@@ -170,9 +170,8 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         }
                         break;
                     case 'link':
-                        var defaultValue = col.defaultValue ? col.defaultValue : (typeof row[col.name] != 'undefined') ? row[col.name] : "";
-                        
-                        var inlineProps = {
+                        var options = row.options.split(',');
+                        inlineProps = {
                             href: col.href ? col.href : 'javascript:void(0)',
                             id: id + '-' + col.name + '-' + row.id,
                             name: id + '[' + row.id + '][' + col.name + ']',
@@ -183,7 +182,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                             'data-row': row.id
                         };
 
-                        node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{defaultValue}</a>;
+                        node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{options.length + " " + col.label}</a>;
                         break;
                     default:
                         if (col.display == 'eval') {
