@@ -101,7 +101,8 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'indextank_indexed',
             'indextank_indexed_at',
         ],
-        'unique_key' => 'product_sku'
+        'unique_key' => 'product_sku',
+        'custom_data' => true,
     ];
 
     protected $_importErrors = null;
