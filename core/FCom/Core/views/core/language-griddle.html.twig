@@ -1,0 +1,21 @@
+{% set config = THIS.get('config') %}
+
+<script type="text/javascript">
+    var mainConfig = {{ UTIL.toJSON(config) | raw }};
+
+    require(['underscore', 'react', 'griddle.fcomLanguage'], function(_, React, FComMultiLanguage) {
+        var containerEle = document.getElementById('multilang-field-{{ config.id }}');
+
+        React.render(
+            React.createElement(FComMultiLanguage, {
+                id: mainConfig.id,
+                type: mainConfig.type,
+                availLangs: mainConfig.availLangs,
+                modalConfig: mainConfig.modalConfig,
+                callback: 'addLangFieldCallback'
+            }), containerEle
+        );
+    });
+</script>
+
+<div id="multilang-field-{{ config.id }}"></div>

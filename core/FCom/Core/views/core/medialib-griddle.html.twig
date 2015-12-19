@@ -62,11 +62,12 @@
         var uploadConfig = {{ UTIL.toJSON(uploadConfig) | raw }};
         var modalConfig = getMediaModalConfig(mediaGridId);
         var mainConfig = {{ UTIL.toJSON(config) | raw }};
+        var containerEle;
 
         if (typeof mainConfig.showModal !== 'undefined' && mainConfig.showModal === false) {
-            var containerEle = document.getElementById(mediaGridId + '-media-container');
+            containerEle = document.getElementById(mediaGridId + '-media-container');
         } else {
-            var containerEle = document.getElementById(mediaGridId + '-media-modal-container');
+            containerEle = document.getElementById(mediaGridId + '-media-modal-container');
         }
 
         mediaLibComponent{{ config.id }} = React.render(React.createElement(FComMediaLib, {
@@ -190,7 +191,7 @@
 
                     if (!url.match(/https?:\/\/player\.vimeo\.com\/video\/\d{9}\?api=\d{1}&player_id=vimeo_player/)) {
                         var id = url.slice(url.lastIndexOf('/') + 1);
-                        var url = 'https://player.vimeo.com/video/' + id + '?api=1&player_id=vimeo_player';
+                        url = 'https://player.vimeo.com/video/' + id + '?api=1&player_id=vimeo_player';
                     }
 
                     $oembedContainer.empty().html('<iframe src="' + url + '" height="360" width="640" frameBorder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>').show();

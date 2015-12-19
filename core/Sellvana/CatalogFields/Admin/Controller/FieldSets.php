@@ -462,11 +462,12 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 foreach ($data['rows'] as $row) {
                     if (!in_array($row['id'], $rowDeleteIds)) { //make sure this row is not in rows will be deleted
                         if (!empty($models[$row['id']])) { //update option
-                            $dataUpdate = [
-                                'label' => $row['label'],
-                                'data_serialized' => $row['data_serialized']
-                            ];
-                            $models[$row['id']]->set($dataUpdate)->save();
+                            if (!empty($row['data_serialized'])) {
+                                foreach($row['data_serialized'] as $lang) {
+                                    $models[$row['id']]->setData(sprintf('frontend_label_translation/%s', $lang['lang_code']), $lang['value']);
+                                }
+                            }
+                            $models[$row['id']]->set('label', $row['label'])->save();
                             $op++;
                         } else { //create option
                             $rowData = ['field_id' => $model->id, 'label' => (string)$row['label']];

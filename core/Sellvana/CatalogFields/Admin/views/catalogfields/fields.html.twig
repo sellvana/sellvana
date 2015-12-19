@@ -57,20 +57,16 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             if (row.langs && row.lang_vals) {
                 var langs = row.langs.split(',');
                 var lang_vals = row.lang_vals.split(',');
-                var lang_fields = [];
-
-                _(langs).each(function (lang, i) {
-                    lang_fields.push({
-                        value: lang_vals[i],
-                        lang_code: lang,
-                        input_type: 'text'
-                    });
-                });
 
                 delete row.langs;
                 delete row.lang_vals;
 
-                row.data_serialized = JSON.stringify({ lang_fields: lang_fields });
+                row.data_serialized = _(langs).map(function (lang, i) {
+                    return {
+                        value: lang_vals[i],
+                        lang_code: lang
+                    };
+                });
             }
 
             return row;
@@ -141,9 +137,15 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
 
                     var rows = _(data[1]).map(function(row, i) {
                         if (row.data_serialized) {
-                            var s = JSON.parse(row.data_serialized)['lang_fields'];
-                            row['langs'] = _.pluck(s, 'lang_code').join(',');
-                            row['lang_vals'] = _.pluck(s, 'value').join(',');
+                            var serialized = JSON.parse(row.data_serialized)['frontend_label_translation'];
+                            var langs = [], lang_vals = [];
+                            _(serialized).each(function(lang, code) {
+                                langs.push(code);
+                                lang_vals.push(lang);
+                            });
+
+                            row['langs'] = langs.join(',');
+                            row['lang_vals'] = lang_vals.join(',');
                         }
 
                         return row;

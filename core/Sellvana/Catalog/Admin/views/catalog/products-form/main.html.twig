@@ -8,6 +8,15 @@
         {{ forms.input(fieldData, {field:'product_name', required:1, label:'Product Name'|_, form_group_class:'has-multilang'}) }}
         <div id="main-product-name-lang"></div>
 
+        {{ THIS.view('core/language-griddle').set('config', {
+            id: m.get('id'),
+            type: 'product-name-lang',
+            availLangs: m.getData('name_lang_fields'),
+            modalConfig: {
+                onConfirm: 'saveNameFieldLang'
+            }
+        }) | raw }}
+
         {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_ ~ ' (' ~ 'optional'|_ ~ ')'}) }}
 
         {{ forms.input(fieldData, {field:'product_sku', required:1, label:'Product SKU'|_}) }}
@@ -110,6 +119,9 @@
 </script>
 
 <script>
+window.saveNameFieldLang = function () {
+    console.log('saveNameFieldLang');
+};
 var prodVariantGrid = null;
 var submitCallback = [];
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
@@ -151,7 +163,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         $("#desc_lang_fields").val(JSON.stringify(descModel.langFields.toJSON()));
 
         //setting hidden values, 'if' statement is required to check tab is load or not.
-        for(var i=0; i<submitCallback.length; i++){
+        for(var i = 0; i < submitCallback.length; i++){
             if(typeof submitCallback[i] === 'function') {
                 submitCallback[i]();
             }
