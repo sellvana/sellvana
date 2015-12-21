@@ -54,6 +54,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 availLangs: [],
                 select2Config: {},
                 modalConfig: {},
+                btnLangLabel: '',
                 defaultLangs: [
                     {id: 'en_US', text: 'en_US'},
                     {id: 'de_DE', text: 'de_DE'},
@@ -65,6 +66,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
         },
         componentWillMount: function () {
             this.props.modalConfig = this.getModalConfig();
+
             this.setState({
                 availLangs: this.props.availLangs,
                 defaultLangs: this.props.defaultLangs
@@ -133,6 +135,18 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
         setSelection: function(selection) {
             this.state.selection = selection.text;
         },
+        getDefaultLangs: function () {
+            var that = this;
+            var defaultLangs = [];
+
+            var diff = _.difference(_.pluck(this.state.defaultLangs, 'id'), _.pluck(this.state.availLangs, 'lang_code'));
+
+            _(this.state.defaultLangs).each(function (lang) {
+                if (_.contains(diff, lang.id)) defaultLangs.push(lang);
+            });
+
+            return _.sortBy(defaultLangs, 'id');
+        },
         removeLangField: function (code) {
             var defaultLangs = this.getDefaultLangs();
             var defaultIds = _.pluck(defaultLangs, 'id');
@@ -151,18 +165,6 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 defaultLangs: _.sortBy(defaultLangs, 'id'),
                 availLangs: _.sortBy(availLangs, 'lang_code')
             });
-        },
-        getDefaultLangs: function () {
-            var that = this;
-            var defaultLangs = [];
-
-            var diff = _.difference(_.pluck(this.state.defaultLangs, 'id'), _.pluck(this.state.availLangs, 'lang_code'));
-
-            _(this.state.defaultLangs).each(function (lang) {
-                if (_.contains(diff, lang.id)) defaultLangs.push(lang);
-            });
-
-            return defaultLangs;
         },
         AddLocaleField: function(e) {
             if (null === this.state.selection) {
@@ -186,12 +188,17 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             var inlineProps = this.getSelect2Config();
             var defaultLangs = this.getDefaultLangs();
 
+            if (this.state.availLangs.length) {
+                var langIds = _.pluck(this.state.availLangs, 'lang_code');
+                this.props.btnLangLabel = langIds.filter(function (item) { return item != undefined }).join(',');
+            }
+
             return (
                 <div key={this.props.id} className="row multilang-field">
                     <div className="col-md-2"></div>
                     <div className="col-md-5">
                         <button type="button" style={{marginTop: '5px', marginBottom: '10px'}} onClick={this.showModal}
-                                className="btn btn-xs multilang"><i className="icon icon-globe" /> Translate
+                                className={"btn btn-xs multilang " + (this.props.btnLangLabel ? 'btn-info' : '')}>{!this.props.btnLangLabel ? <i className="icon icon-globe" /> : ''} {this.props.btnLangLabel || Locale._('Translate')}
                         </button>
                     </div>
                     <Components.Modal {...this.props.modalConfig}>
