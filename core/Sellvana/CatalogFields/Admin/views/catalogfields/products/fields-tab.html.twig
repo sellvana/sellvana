@@ -81,8 +81,8 @@
                     </div>
                     <div class="controls col-sm-8">
                         <select name="system" id="system" class="form-control" data-rule-required="true">
-                            <option value="0">No</option>
-                            <option value="1">Yes</option>
+                            <option value="0">{{ 'No' |_ }}</option>
+                            <option value="1">{{ 'Yes' |_ }}</option>
                         </select>
                     </div>
                 </div>
@@ -92,8 +92,8 @@
                     </div>
                     <div class="controls col-sm-8">
                         <select name="multilanguage" id="multilanguage" class="form-control" data-rule-required="true">
-                            <option value="0">No</option>
-                            <option value="1">Yes</option>
+                            <option value="0">{{ 'No' |_ }}</option>
+                            <option value="1">{{ 'Yes' |_ }}</option>
                         </select>
                     </div>
                 </div>
@@ -103,8 +103,8 @@
                     </div>
                     <div class="controls col-sm-8">
                         <select name="required" id="required" class="form-control" data-rule-required="true">
-                            <option value="0">No</option>
-                            <option value="1">Yes</option>
+                            <option value="0">{{ 'No' |_ }}</option>
+                            <option value="1">{{ 'Yes' |_ }}</option>
                         </select>
                     </div>
                 </div>
@@ -141,22 +141,22 @@
   </div>
 </div>
 <hr/>
-<div id='fields_list'/>
-<script type="template" id="fieldset-template">
-    <div class="box-header box-header-small">
-        <div class="title"><%- rc.set_name %></div>
-        <div class="actions">
-            <button class="btn box-remove btn-xs btn-link btn-remove" type="button" ><i class='icon-remove'></i>
-            </button>
+<div id='fields_list'>
+    <script type="template" id="fieldset-template">
+        <div class="box-header box-header-small">
+            <div class="title"><%- rc.set_name %></div>
+            <div class="actions">
+                <button class="btn box-remove btn-xs btn-link btn-remove" type="button" ><i class='icon-remove'></i>
+                </button>
 
-            <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i class="icon-chevron-down"></i>
-            </button>
+                <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i class="icon-chevron-down"></i>
+                </button>
+            </div>
         </div>
-    </div>
-    <div class="box-content">
-        <!-- field template here -->
-    </div>
-</script>
+        <div class="box-content">
+            <!-- field template here -->
+        </div>
+    </script>
 
 {# CONFLICT MIDDLE
 <div class="row">
@@ -208,7 +208,7 @@
 CONFLICT END #}
 
 
-        <script type="template" id="field-template">
+    <script type="template" id="field-template">
         <div class="row">
             <div class="col-md-9 col-lg-push-3">
                 <label class="col-md-2 control-label dd-handle control-handle" for="prod-review-text">
@@ -261,12 +261,12 @@ CONFLICT END #}
             </div>
 
         </div>
-        <% if (rc.multilang === '1' && (rc.admin_input_type === 'text' || rc.admin_input_type === 'textarea' || rc.admin_input_type === 'wysiwyg')) { %>
+        <% if (rc.multilanguage === '1' && (rc.admin_input_type === 'text' || rc.admin_input_type === 'textarea' || rc.admin_input_type === 'wysiwyg')) { %>
         <div class="row">
             <div class="col-md-3"></div>
             <div class="col-md-9">
                 <button class="btn btn-info btn-xs multilang" style="margin-top: 5px;" type="button">
-                    Set Locale Field Value
+                    {{ 'Set Locale Field Value' |_ }}
                 </button>
             </div>
         </div>
@@ -292,7 +292,7 @@ CONFLICT END #}
                                     </select>
                                 </td>
                                 <td>
-                                    <button class="btn btn-primary save" type="button">Add Locale</button>
+                                    <button class="btn btn-primary save" type="button">{{ 'Add Locale' |_ }}</button>
                                 </td>
                             </tr>
                         </table>
@@ -300,37 +300,37 @@ CONFLICT END #}
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-default btn-close" data-dismiss="modal" type="button" id="btn-locale-close">Close</button>
+                        <button class="btn btn-default btn-close" data-dismiss="modal" type="button" id="btn-locale-close">{{ 'Close' |_ }}</button>
                     </div>
                 </div>
             </div>
         </div>
         <% } %>
-        </script>
+    </script>
 
-        <script type="template" id="lang-field-template">
-            <div class="col-md-3 control-label">
-                <span class="badge badge-default"><%- rc.lang_code %></span>
-            </div>
-            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
-                <% switch(rc.admin_input_type) {
-                    case 'text':
-                        print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
-                        break;
-                    case 'textarea':
-                        print('<textarea  id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
-                        break;
-                    case 'wysiwyg':
-                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
-                        break;
-                } %>
-            </div>
-            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
-                <button class="btn btn-danger btn-xs field-remove" style="margin-top: 5px;">
-                    <i class="icon-remove"></i>
-                </button>
-            </div>
-        </script>
+    <script type="template" id="lang-field-template">
+        <div class="col-md-3 control-label">
+            <span class="badge badge-default"><%- rc.lang_code %></span>
+        </div>
+        <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
+            <% switch(rc.admin_input_type) {
+                case 'text':
+                    print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
+                    break;
+                case 'textarea':
+                    print('<textarea  id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
+                    break;
+                case 'wysiwyg':
+                    print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
+                    break;
+            } %>
+        </div>
+        <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
+            <button class="btn btn-danger btn-xs field-remove" style="margin-top: 5px;">
+                <i class="icon-remove"></i>
+            </button>
+        </div>
+    </script>
 </div>
 
 
@@ -360,7 +360,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     return $(e).closest('.help-block').css('display','block');
               },
               success: function(e) {
-
                     e.closest(".form-group").removeClass("has-error");
                     return e.closest(".help-block").css('display','none');
               }
@@ -370,36 +369,37 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     };
     var currentSet = null;
     initialData = {{ UTIL.toJson(initialData) | raw }};
-
+    var $selFields = $('#sel_fields');
+    var $selSets = $('#sel_sets');
     function refresh_selects()
     {
-        $('#sel_sets').val('');
-        $('#sel_fields').val('');
-        $('#sel_sets').select2();
-        $('#sel_fields').select2();
+        $selSets.val('');
+        $selFields.val('');
+        $selSets.select2();
+        $selFields.select2();
     }
 
     function remove_options(set)
     {
-        $("#sel_sets option[value='"+set.get('id')+"']").remove();
+        $selSets.find("option[value='"+set.get('id')+"']").remove();
         var fields = set.fields;
         fields.each(function(f) {
-            $("#sel_fields option[value='"+f.get('id')+"']").remove();
+            $selFields.find("option[value='"+f.get('id')+"']").remove();
         });
         refresh_selects();
     }
 
     function add_options(set)
     {
-        if ($("#sel_sets option[value='"+set.get('id')+"']").length === 0)
-            $('#sel_sets')
+        if ($selSets.find("option[value='"+set.get('id')+"']").length === 0)
+            $selSets
              .append($("<option></option>")
              .attr("value",set.get('id'))
              .text(set.get('set_name')));
         var fields = set.fields;
         fields.each(function(f) {
-            if ($("#sel_fields option[value='"+f.get('id')+"']").length === 0)
-                $('#sel_fields')
+            if ($selFields.find("option[value='"+f.get('id')+"']").length === 0)
+                $selFields
                  .append($("<option></option>")
                  .attr("value",f.get('id'))
                  .text(f.get('field_name')));
@@ -410,14 +410,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     function remove_option(field)
     {
-        $("#sel_fields option[value='"+field.get('id')+"']").remove();
+        $selFields.find("option[value='"+field.get('id')+"']").remove();
         refresh_selects();
     }
 
     function add_option(field)
     {
-        if ($("#sel_fields option[value='"+field.get('id')+"']").length === 0)
-            $('#sel_fields')
+        if ($selFields.find("option[value='"+field.get('id')+"']").length === 0)
+            $selFields
              .append($("<option></option>")
              .attr("value",field.get('id'))
              .text(field.get('field_name')));
@@ -541,17 +541,18 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
         },
         messages: {
-            remote: "This field code is already taken place"
+            remote: "{{ 'This field code is already taken place' |_ }}"
         }
     });
     $('#btn_new_field').click(function() {
-        $('#prod-new-field-modal').find('input').val('');
-        $('#prod-new-field-modal').find('select').each(function(index) {
+        var $fieldModal = $('#prod-new-field-modal');
+        $fieldModal.find('input').val('');
+        $fieldModal.find('select').each(function(index) {
             $(this).find('option').removeAttr('selected');
             $(this).find('option:first').attr('selected','selected');
-        })
+        });
 
-        $('#prod-new-field-modal').modal('show');
+        $fieldModal.modal('show');
 
     });
 
@@ -560,7 +561,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             return;
 
         var hash = {};
-        $('#prod-new-field-form .form-control').each(function(index) {
+        $("#prod-new-field-form").find('.form-control').each(function(index) {
             hash[$(this).attr('id')] = $(this).val();
         });
         hash.oper = 'add';
@@ -618,8 +619,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 return;
             }
             this.langFields = new CustomField.Collections.LangFieldCollection((typeof(config.langFields) !== 'undefined') ? config.langFields : undefined);
-            if (typeof(config.langFields) !== 'undefined')
+            if (typeof(config.langFields) !== 'undefined') {
                 delete this.attributes['langFields'];
+            }
         },
         toJSON: function() {
             var hash = Backbone.Model.prototype.toJSON.call(this);
@@ -704,7 +706,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.model.set('value', val);
         },
         _remove: function() {
-            var confirm = window.confirm("Do you want to really remove?");
+            var confirm = window.confirm("{{ 'Do you want to really remove?' |_ }}");
             if (confirm) {
                 this.parentSet.langFields.remove(this.model);
                 this.undelegateEvents();
@@ -748,8 +750,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                     break;
                 case 'textarea':
                     hash['change textarea'] = '_changeVal';
+                    break;
                 case 'text':
                     hash['change input[type="text"]'] = '_changeVal';
+                    break;
             }
             return hash;
         },
@@ -787,7 +791,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _updateLangTag: function() {
             var langs = _.difference(CustomField.Langs, this.model.get('avail_langs'));
-            var html = 'Set Locale...'
+            var html = "{{ 'Set Locale...' |_ }}";
             if(langs.length>0) {
                 html = langs.join(',');
             }
@@ -834,7 +838,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.model.set('value', val);
         },
         _remove: function() {
-            var confirm = window.confirm("Do you want to really remove?");
+            var confirm = window.confirm("{{ 'Do you want to really remove?' |_ }}");
             if (confirm) {
                 add_option(this.model);
                 this.parentSet.fields.remove(this.model);
@@ -907,7 +911,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             'click button.btn-remove': '_removeSelf'
         },
         _removeSelf: function() {
-            var confirm = window.confirm("Do you want to really remove?");
+            var confirm = window.confirm("{{ 'Do you want to really remove?' |_ }}");
             if (confirm) {
                 add_options(this.model);
                 setCollection.remove(this.model);
@@ -1000,7 +1004,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             this.collection.on('add', this._addSetView, this);
         },
         _addSetView: function(set) {
-            var setView = new  CustomField.Views.FieldSetView({model: set});
+            if (!set.id) return;
+            var setView = new CustomField.Views.FieldSetView({model: set});
             this.$el.append(setView.render().el);
         },
         render: function() {
@@ -1018,7 +1023,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             var set = initialData[i];
             //var fields = _.clone(set.fields);
             //delete set.fields;
-            var setModel = new CustomField.Models.FieldSet(set);
+            setModel = new CustomField.Models.FieldSet(set);
             //setModel.fields.set(fields);
             if (setModel.id !== '') {
                 setCollection.add(setModel);

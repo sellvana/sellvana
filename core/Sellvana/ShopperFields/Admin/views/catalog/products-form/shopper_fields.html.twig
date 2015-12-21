@@ -119,14 +119,14 @@
             .on('addedRows.griddle', function (e, removedRows, grid) {
                 updateValidation();
             });
-        }
+        };
 
         /**
          * Add blank row to grid
          */
         window.addBlankRows = function(grid) {
             shopperGrid.addRows([{id : guid()}]);
-        }
+        };
 
         /*
          *function to set attachment grid data into form fields to send them server
@@ -187,7 +187,6 @@
                     $select.parents('tr').find(inputOption)[0].innerText = '';
                 } else {
                     var optionLabel = count <= 1 ? ' Option' : ' Options';
-                    var count = $tr.find(inputOption).data('length');
                     $tr.find(inputOption)[0].innerText = count + optionLabel;
                 }
             } else {
@@ -232,7 +231,7 @@
                 return error;
             }
 
-            $.validator.addMethod('checkUnique', checkUnique , 'Field Name are already taken place.');
+            $.validator.addMethod('checkUnique', checkUnique , "{{ 'Field Name are already taken place.' |_ }}");
 
             $.validator.addClassRules("requiredOptions", {
                 required: function (value, elem, params) {
@@ -530,13 +529,13 @@
             });
 
             // If input data container does not exist then create
-            if ($('#shopper_field_prices_'+shopperId).length === 0) {
+            var $hiddenInput = $('#shopper_field_prices_'+shopperId);
+            if ($hiddenInput.length === 0) {
                 $('#tab-shopper_fields').append('<input type="hidden" data-shopper-id="'+shopperId+'" id="shopper_field_prices_'+shopperId+'" />');
             }
 
-            var hiddenInput = $('#shopper_field_prices_'+shopperId);
-            if (hiddenInput.data('shopper-id') === shopperId) {
-                $('#shopper_field_prices_'+shopperId).val(JSON.stringify(data));
+            if ($hiddenInput.data('shopper-id') === shopperId) {
+                $hiddenInput.val(JSON.stringify(data));
             }
 
             shopper.options = optionSaveStr.slice(0, optionSaveStr.length - 1);
@@ -551,7 +550,7 @@
         /**
          * Options grid register
          * 
-         * @param  {Objec} grid 
+         * @param  {Object} grid
          * @return {mixed}
          */
         window.optionsGridRegister = function(grid) {
@@ -564,14 +563,14 @@
             .on('addedRows.griddle', function (e, addedRows, grid) {
                 // 
             });
-        }
+        };
 
         /**
          * Add new option row
          */
         window.insertNewFieldOption = function() {
             optionsModalGrid.addRows([{id : guid()}]);
-        }
+        };
 
         /**
          * Callback function to apply price for all fields
@@ -591,12 +590,12 @@
 
                 $(OPTS).trigger('apply', [rows]);
             }
-        }
+        };
 
         /**
          * Callback for edit row on option grid
          * 
-         * @param  {Object} editedRow 
+         * @param {Object} editedRow
          * @return {mixed}
          */
         window.editShopperOption = function(editedRow, e) {
@@ -618,12 +617,12 @@
                     }
                 }
             }
-        }
+        };
 
         /**
          * Callback functions onchange option name
          * 
-         * @param  {Object} e 
+         * @param  {Object} e
          * @return {mixed}
          */
         window.editShopperOptionLabelCallback = function(e) {
@@ -645,7 +644,7 @@
                     });
                 });
             }
-        }
+        };
 
         /**
          * Callback functions onchange option position
@@ -655,7 +654,7 @@
          */
         window.editShopperOptionPositionCallback = function(e) {
             _validateAttrs();
-        }
+        };
 
         /**
          * Callback function for storing prices
@@ -666,7 +665,7 @@
         window.shopperPriceTypeCallback = function(prices, option) {
             _initOptionsSerializeItem(option);
             shopper.options_serialized[option].prices = prices;
-        }
+        };
 
         /**
          * Modal for editing shopper field item
@@ -695,9 +694,9 @@
                 React.createElement(Components.Modal, {
                         id: "editShopperFieldsModal",
                         show: true,
-                        title: 'Edit Form',
-                        confirm: 'Save changes',
-                        cancel: 'Close',
+                        title: "{{ 'Edit Form' |_ }}",
+                        confirm: "{{ 'Save changes' |_ }}",
+                        cancel: "{{ 'Close' |_ }}",
                         onCancel: function(modal) {
                             // Reset local data
                             deletedRows = [];
@@ -755,7 +754,7 @@
             $.validator.addClassRules('optionLabelUnique', {
                 validateUniqueOption: true
             });
-        }
+        };
 
         /**
          * Callback function for update field
@@ -780,7 +779,7 @@
                     $('#btnOptionsTab').click() && form.valid();
                 }
             }
-        }
+        };
         
         /*=====  End of Global functions  ======*/
         
@@ -1004,7 +1003,7 @@
                         }
                     });
                     return valid;
-                }
+                };
 
                 var validateUniqueMethod = option + 'PriceUnique',
                     validateBaseMethod   = option + 'BaseField',

@@ -6,7 +6,16 @@
 <fieldset name="main-product">
     <div class="f-section">
         {{ forms.input(fieldData, {field:'product_name', required:1, label:'Product Name'|_, form_group_class:'has-multilang'}) }}
-        <div id="main-product-name-lang"></div>
+        {#<div id="main-product-name-lang"></div>#}
+
+        {{ THIS.view('core/language-griddle').set('config', {
+            id: 'product_name_lang_' ~ m.get('id'),
+            availLangs: m.getData('name_lang_fields'),
+            modalConfig: {
+                onConfirm: 'saveNameFieldLang'
+            },
+            select2Callback: 'chooseNameFieldLang'
+        }) | raw }}
 
         {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_ ~ ' (' ~ 'optional'|_ ~ ')'}) }}
 
@@ -18,10 +27,29 @@
         #}
 
         {{ forms.textarea(fieldData, {field:'short_description', required:1, label:'Short Description'|_, form_group_class:'has-multilang'}) }}
-        <div id="main-product-shortdesc-lang"></div>
+
+        {{ THIS.view('core/language-griddle').set('config', {
+            id: 'product_shortdesc_lang_' ~ m.get('id'),
+            availLangs: m.getData('short_desc_lang_fields'),
+            modalConfig: {
+                onConfirm: 'saveShortDescFieldLang'
+            },
+            select2Callback: 'chooseShortDescFieldLang'
+        }) | raw }}
+
+        {#<div id="main-product-shortdesc-lang"></div>#}
 
         {{ forms.wysiwyg(fieldData, {field:'description', required:1, label:'Long Description'|_, form_group_class:'has-multilang', input_div_class:'col-md-10', raw:1}) }}
-        <div id="main-product-desc-lang"></div>
+
+        {{ THIS.view('core/language-griddle').set('config', {
+            id: 'product_desc_lang_' ~ m.get('id'),
+            availLangs: m.getData('desc_lang_fields'),
+            modalConfig: {
+                onConfirm: 'saveDescFieldLang'
+            },
+            select2Callback: 'chooseDescFieldLang'
+        }) | raw }}
+        {#<div id="main-product-desc-lang"></div>#}
 
         {{ forms.boolean(fieldData, {field:'is_hidden', label:'Hide Product'|_}) }}
 
@@ -40,7 +68,7 @@
 
 <script type="template" id="main-lang-view-template">
     <div class="row multilang-field">
-        <div class="col-md-2" />
+        <div class="col-md-2"></div>
         <div class="col-md-5" id="translate-product-<%- rc.field_name %>">
             <button type="button" style="margin-top:5px;margin-bottom:10px" class="btn btn-xs multilang"></button>
         </div>
@@ -61,11 +89,12 @@
                           <tr>
                               <td>
                                   <select class="prod_sel_locale form-control" style="width:150px;">
-                                  <% var langs = rc.avail_langs;
-                                     for(var i in langs) {
-                                      %>
-                                          <option value="<%=langs[i] %>"><%=langs[i] %></option>
-                                      <% } %>
+                                  <%
+                                      var langs = rc.avail_langs;
+                                      for (var i in langs) {
+                                  %>
+                                      <option value="<%=langs[i] %>"><%=langs[i] %></option>
+                                  <% } %>
                                   </select>
                               </td>
                               <td>
@@ -116,6 +145,48 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     var _mainForm = $('#catalog-products-form');
     var _submitted = false; //flag for prevent infitive loop
 
+    var $nameLangContainer = $('#name_lang_fields');
+    var $shortDescContainer = $('#short_desc_lang_fields');
+    var $descContainer = $('#desc_lang_fields');
+
+    function initLangData() {
+        $nameLangContainer.val({{ UTIL.toJson(m.getData('name_lang_fields')) | raw }});
+        $shortDescContainer.val({{ UTIL.toJson(m.getData('short_desc_lang_fields')) | raw }});
+        $descContainer.val({{ UTIL.toJson(m.getData('desc_lang_fields')) | raw }});
+    }
+
+    window.saveNameFieldLang = function (modal) {
+        var node = $(modal.getDOMNode());
+        _saveLangs(node, $nameLangContainer);
+        modal.close();
+    };
+
+    window.saveShortDescFieldLang = function (modal) {
+        var node = $(modal.getDOMNode());
+        _saveLangs(node, $shortDescContainer);
+        modal.close();
+    };
+
+    window.saveDescFieldLang = function (modal) {
+        var node = $(modal.getDOMNode());
+        _saveLangs(node, $descContainer);
+        modal.close();
+    };
+
+    function _saveLangs(node, container) {
+        var hash = [];
+
+        _(node.find('input[data-type="lang"]')).each(function(ele) {
+            hash.push({
+                value: $(ele).val(),
+                lang_code: $(ele).data('code'),
+                input_type: 'text'
+            });
+        });
+
+        container.val(JSON.stringify(hash));
+    }
+
     function checkLangField(field)
     {
         var invalid = 0;
@@ -142,16 +213,16 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         var descWysiwyg = CKEDITOR.instances['model-description'];
         $('textarea.js-desc-wysiwyg').val(descWysiwyg.getData());
 
-        checkLangField(nameModel);
-        checkLangField(shortDescModel);
-        checkLangField(descModel);
+//        checkLangField(nameModel);
+//        checkLangField(shortDescModel);
+//        checkLangField(descModel);
 
-        $("#name_lang_fields").val(JSON.stringify(nameModel.langFields.toJSON()));
-        $("#short_desc_lang_fields").val(JSON.stringify(shortDescModel.langFields.toJSON()));
-        $("#desc_lang_fields").val(JSON.stringify(descModel.langFields.toJSON()));
+//        $("#name_lang_fields").val(JSON.stringify(nameModel.langFields.toJSON()));
+//        $("#short_desc_lang_fields").val(JSON.stringify(shortDescModel.langFields.toJSON()));
+//        $("#desc_lang_fields").val(JSON.stringify(descModel.langFields.toJSON()));
 
         //setting hidden values, 'if' statement is required to check tab is load or not.
-        for(var i=0; i<submitCallback.length; i++){
+        for(var i = 0; i < submitCallback.length; i++){
             if(typeof submitCallback[i] === 'function') {
                 submitCallback[i]();
             }
@@ -283,7 +354,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _updateLangTag: function() {
             var langs = this.model.langFields.pluck('lang_code');
-            var html = '<i class="icon icon-globe"></i>'
+            var html = '<i class="icon icon-globe"></i>';
             var multilang = this.$el.find('.multilang');
             if (langs.length>0) {
                 html += ' '+langs.join(', ');
@@ -372,5 +443,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     var descView = new SystemFields.Views.LangView({model: descModel, el: '#main-product-desc-lang'});
     descView.render();
+
+    initLangData();
 });
 </script>
