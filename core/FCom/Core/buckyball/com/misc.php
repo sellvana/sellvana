@@ -3372,7 +3372,7 @@ class BDebug extends BClass
         }
 ?></tbody></table></div><script>
 
-        if (typeof require !== 'undefined') {
+        if (typeof require !== 'undefined' && require.defined("jquery.tablesorter")) {
             require(['jquery.tablesorter'], function() {
                 $('#buckyball-debug-table').tablesorter();
             })
