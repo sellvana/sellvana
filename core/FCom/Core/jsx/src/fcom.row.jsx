@@ -52,7 +52,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
                 if (!col) {
-                    return <td></td>;
+                    return <td />;
                 }
 
                 var node = "";
@@ -76,7 +76,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                         href={btn.href + row[btn.col]}
                                         target={btn.target ? btn.target : ""}
                                     >
-                                        <i className={btn.icon}></i>
+                                        <i className={btn.icon} />
                                         {btn.caption}
                                     </a>
                                 );
@@ -91,7 +91,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                             data-folder={row.folder ? row.folder : null}
                                             {...btn.attrs}
                                             onClick={that.props.doRowAction.bind(null, btn.callback)}>
-                                        <i className={btn.icon}></i>
+                                        <i className={btn.icon} />
                                         {btn.caption}
                                     </button>
                                 );
@@ -148,7 +148,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                         selectOptions = col.options.map(function(opt, index) {
                                             if (isSelect2)
                                                 return { id: index, text: opt };
-                                            else return <option key={index} value={opt.value}></option>;
+                                            else return <option key={index} value={opt.value} />;
                                         });
                                     } else {
                                         for(var key in col.options) {
@@ -170,7 +170,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         }
                         break;
                     case 'link':
-                        var options = row.options.split(',');
+                        var options = row && row.options ? row.options.split(',') : [];
                         inlineProps = {
                             href: col.href ? col.href : 'javascript:void(0)',
                             id: id + '-' + col.name + '-' + row.id,
@@ -205,7 +205,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                 }
 
                 if (customNodeHtml) {
-                    return <td key={col.name} style={col.tdStyle} data-col={col.name} dangerouslySetInnerHTML={{__html: node}}></td>;
+                    return <td key={col.name} style={col.tdStyle} data-col={col.name} dangerouslySetInnerHTML={{__html: node}} />;
                 }
                 return <td data-col={col.name} style={col.tdStyle} key={col.name}>{node}</td>;
             });
@@ -220,4 +220,4 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
 
     //module.exports = CustomRow;
     return FComRow;
-})
+});

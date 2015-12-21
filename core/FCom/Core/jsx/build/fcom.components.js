@@ -535,7 +535,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             .select2({
                 data: this.props.options,
                 multiple: this.props.multiple,
-                val: val
+                val: val,
+                placeholder: this.props.placeholder
             })
             .on("change", this.handleChange)
             .select2("enable", this.props.enabled);

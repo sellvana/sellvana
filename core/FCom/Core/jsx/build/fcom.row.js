@@ -170,7 +170,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         }
                         break;
                     case 'link':
-                        var options = row.options.split(',');
+                        var options = row && row.options ? row.options.split(',') : [];
                         inlineProps = {
                             href: col.href ? col.href : 'javascript:void(0)',
                             id: id + '-' + col.name + '-' + row.id,
@@ -220,4 +220,4 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
 
     //module.exports = CustomRow;
     return FComRow;
-})
+});
