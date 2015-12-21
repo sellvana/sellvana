@@ -1,10 +1,18 @@
+<style>
+    #multilang-field-{{ config.id }} .select2-container .select2-choice {
+        height: 33px;
+        width: 150px;
+        font-size: 0.8em;
+    }
+</style>
+
 {% set config = THIS.get('config') %}
 
 <script type="text/javascript">
     require(['underscore', 'react', 'griddle.fcomLanguage'], function(_, React, FComMultiLanguage) {
         var config = {{ UTIL.toJSON(config) | raw }};
         var containerEle = document.getElementById('multilang-field-{{ config.id }}');
-
+        React.unmountComponentAtNode(containerEle);
         React.render(
             React.createElement(FComMultiLanguage, {
                 id: config.id,

@@ -1,11 +1,3 @@
-<style>
-    .select2-container .select2-choice {
-        padding: 5px 10px;
-        height: 33px;
-        width: 150px;
-        font-size: 0.8em;
-    }
-</style>
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
@@ -76,7 +68,7 @@
 
 <script type="template" id="main-lang-view-template">
     <div class="row multilang-field">
-        <div class="col-md-2" />
+        <div class="col-md-2"></div>
         <div class="col-md-5" id="translate-product-<%- rc.field_name %>">
             <button type="button" style="margin-top:5px;margin-bottom:10px" class="btn btn-xs multilang"></button>
         </div>
@@ -97,11 +89,12 @@
                           <tr>
                               <td>
                                   <select class="prod_sel_locale form-control" style="width:150px;">
-                                  <% var langs = rc.avail_langs;
-                                     for(var i in langs) {
-                                      %>
-                                          <option value="<%=langs[i] %>"><%=langs[i] %></option>
-                                      <% } %>
+                                  <%
+                                      var langs = rc.avail_langs;
+                                      for (var i in langs) {
+                                  %>
+                                      <option value="<%=langs[i] %>"><%=langs[i] %></option>
+                                  <% } %>
                                   </select>
                               </td>
                               <td>
@@ -361,7 +354,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         },
         _updateLangTag: function() {
             var langs = this.model.langFields.pluck('lang_code');
-            var html = '<i class="icon icon-globe"></i>'
+            var html = '<i class="icon icon-globe"></i>';
             var multilang = this.$el.find('.multilang');
             if (langs.length>0) {
                 html += ' '+langs.join(', ');
