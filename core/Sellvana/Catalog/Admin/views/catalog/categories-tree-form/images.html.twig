@@ -8,7 +8,7 @@
     {field:'featured_image_url', label:'Featured Image'|_ },
     {field:'nav_callout_image_url', label:'Navigation Callout Image'|_ }
 ]) }}
-{{ THIS.view('core/medialib').set('config', {id: mediaId, title: 'Category Image', type: 'category-images'}) | raw }}
+{{ THIS.view('core/medialib').set('config', {id: mediaId, title: 'Category Image'|_, type: 'category-images'}) | raw }}
 
 <script>
     var {{ mediaId }}_grid;

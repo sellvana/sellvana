@@ -15,12 +15,11 @@
                 $.post(BackboneGrid.edit_url, hash)
                         .done(function (data) {
                             if (data.success) {
-                                $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+                                $.bootstrapGrowl("{{ 'Successfully saved.' |_ }}", { type: 'success', align: 'center', width: 'auto' });
                                 grid.getGridView().render();
                             } else {
                                 $.bootstrapGrowl(data.error, { type: 'danger', align: 'center', width: 'auto' });
                             }
-
                         });
                 delete BackboneGrid.modalElementVals.id;
                 delete BackboneGrid.modalElementVals.oper;

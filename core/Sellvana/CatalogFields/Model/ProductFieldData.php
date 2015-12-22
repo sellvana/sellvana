@@ -217,7 +217,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'pf.field_id'], 'f')
             ->left_outer_join('Sellvana_CatalogFields_Model_FieldOption', ['fo.id', '=', 'pf.value_id'], 'fo')
             ->left_outer_join('Sellvana_CatalogFields_Model_Set', ['fs.id', '=', 'pf.set_id'], 'fs')
-            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.table_field_type', 'fs.set_name'])
+            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.frontend_show', 'f.multilanguage', 'f.data_serialized', 'f.table_field_type', 'fs.set_name'])
             ->where_in('pf.product_id', $productIds);
 
         $this->BEvents->fire(__METHOD__, ['orm' => $orm]);
@@ -264,10 +264,13 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                     'field_code' => $row->get('field_code'),
                     'field_name' => $row->get('field_name'),
                     'admin_input_type' => $row->get('admin_input_type'),
+                    'frontend_show' => $row->get('frontend_show'),
+                    'multilanguage' => $row->get('multilanguage'),
                     'value' => $value,
                     'position' => $row->get('position'),
                     'required' => $row->get('required'),
-                    'serialized' => json_encode($row->as_array())
+                    'serialized' => json_encode($row->as_array()),
+                    'data_serialized' => $row->get('data_serialized')
                 ];
 
                 if ($row->get('table_field_type') === 'options') {

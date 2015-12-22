@@ -38,20 +38,20 @@
             var modalContainerEle = document.getElementById('{{ catProductConfig.config.id }}-modal');
             React.unmountComponentAtNode(modalContainerEle);
             React.render(
-                    React.createElement(Components.Modal, {
-                                id: "addProductModal",
-                                show: true,
-                                title: 'Products List',
-                                confirm: 'Add',
-                                cancel: 'Close',
-                                onLoad: function(modal) {
-                                    var node = $(modal.getDOMNode());
-                                    node.find('.modal-dialog').css('width', '900px');
-                                },
-                                onConfirm: window.addSelectedProduct
-                            },
-                            React.createElement('div', {className: 'f-grid-wrapper', id: 'allProductList'})
-                    ), modalContainerEle);
+                React.createElement(Components.Modal, {
+                        id: "addProductModal",
+                        show: true,
+                        title: "{{ 'Products List' |_ }}",
+                        confirm: "{{ 'Add' |_ }}",
+                        cancel: "{{ 'Close' |_ }}",
+                        onLoad: function(modal) {
+                            var node = $(modal.getDOMNode());
+                            node.find('.modal-dialog').css('width', '900px');
+                        },
+                        onConfirm: window.addSelectedProduct
+                    },
+                    React.DOM.div({className: 'f-grid-wrapper', id: 'allProductList'})
+                ), modalContainerEle);
             var prodAttachConfigCompiled = {{ UTIL.toJson(prodAttachConfigCompiled) | raw }};
             var attachGridContainerEle = document.getElementById('allProductList');
             var instanceAttachGrid = React.render(
@@ -84,7 +84,7 @@
                 });
                 modal.close();
             } else {
-                alert('please choose at least one product');
+                $.bootstrapGrowl("{{ 'Please choose at least one product.' | _ }}", { type: 'warning', align: 'center', width: 'auto', delay: 3000 });
             }
         };
 

@@ -7,9 +7,9 @@
     id: 'all_' ~ type,
     mode: 'videos',
     type: 'product-videos',
-    title: 'Videos',
+    title: 'Videos'|_,
     folder: 'media/product/videos',
-    config: {actions: {delete: {caption : 'Remove'}}},
+    config: {actions: {delete: {caption : 'Remove'|_}}},
     can_embed_video: true
 } %}
 
@@ -108,7 +108,7 @@
             var $form         = productVideosNode.find('form#' + productVideosGrid.getConfig('id') + '-modal-form'),
                 id            = $form.find('#id').val(),
                 url           = "{{ APP.href('media/grid/data?folder=') }}" + encodeURIComponent('media/product/videos'),
-                hash          = { oper: id ? 'edit' : 'add' }
+                hash          = { oper: id ? 'edit' : 'add'},
                 isNameChanged = false;
 
             $form.find('textarea, input, select').each(function() {
@@ -129,7 +129,7 @@
                         data: hash
                     }).done(function(r) {
                         if (r.error) {
-                            $.bootstrapGrowl("{{ 'Error: Save file error due to system error, please try again.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 5000 });
+                            $.bootstrapGrowl("{{ 'Error: Save file error due to system error, please try again.' | _ }}", { type: 'danger', align: 'center', width: 'auto', delay: 3000 });
                             return;
                         }
                         _refreshGrid(hash);
@@ -178,9 +178,9 @@
                 React.createElement(Components.Modal, {
                         id: "previewProductVideo",
                         show: true,
-                        title: 'Video Details',
-                        confirm: 'Save changes',
-                        cancel: 'Close',
+                        title: "{{ 'Video Details' |_ }}",
+                        confirm: "{{ 'Save changes' |_ }}",
+                        cancel: "{{ 'Close' |_ }}",
                         onLoad: function(modal) {
                             productVideosNode = $(modal.getDOMNode());
                             productVideosNode.find('.modal-dialog').css('width', '960px');
@@ -200,15 +200,15 @@
                                 ),
                                 React.DOM.div({ className: 'file-type' }, 
                                     React.DOM.strong(null, "{{ 'File type: ' | _ }}"),
-                                    React.DOM.span(null, videoExt ? 'video/'+videoExt : 'External Video')
+                                    React.DOM.span(null, videoExt ? 'video/'+videoExt : "{{ 'External Video' |_ }}")
                                 ),
                                 React.DOM.div({ className: 'folder' }, 
                                     React.DOM.strong(null, "{{ 'Folder: ' | _ }}"),
-                                    React.DOM.span(null, row.folder ? row.folder : 'External Video')
+                                    React.DOM.span(null, row.folder ? row.folder : "{{ 'External Video' |_ }}")
                                 ),
                                 React.DOM.div({ className: 'file-size' }, 
                                     React.DOM.strong(null, "{{ 'File size: ' | _ }}"),
-                                    React.DOM.span(null, row.file_size ? Math.ceil(row.file_size/1024000) + ' MB' : 'External Video')
+                                    React.DOM.span(null, row.file_size ? Math.ceil(row.file_size/1024000) + "{{ ' MB' |_ }}" : "{{ 'External Video' |_ }}")
                                 ),
                                 React.DOM.div({ className: 'create-at' }, 
                                     React.DOM.strong(null, "{{ 'Upload on: ' | _ }}"),

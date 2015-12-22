@@ -4,6 +4,9 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
 {
     const TESTS_GRID_ID = 'tests_grid';
 
+    /**
+     * @var FCom_Test_Core_Codeception
+     */
     public $codecept;
 
     protected $config = [];
@@ -64,14 +67,6 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         exit;
     }
 
-    /**
-     * Attempt to run all selected tests on background jobs
-     */
-    public function action_run_background__POST()
-    {
-
-    }
-
     public function getTestsConfig($tests)
     {
         $config = parent::gridConfig();
@@ -83,6 +78,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
             ['type' => 'row_select'],
             ['name' => 'test', 'label' => "Select tests to run"],
             ['name' => 'type', 'label' => 'Engine'],
+            ['name' => 'module', 'label' => 'Module'],
             ['name' => 'status', 'label' => 'Status']
         ];
         $config['filters'] = [['field' => 'test', 'type' => 'text']];
@@ -113,6 +109,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
                     $obj['id'] = $file->getHash();
                     $obj['type'] = ucfirst($file->getType());
                     $obj['test'] = $file->getTitle();
+                    $obj['module'] = $file->getModule();
                     $obj['status'] = '';
                     $gridData[] = $obj;
                     unset($class);
@@ -136,6 +133,7 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
         }
 
         $site = $this->BApp->instance('FCom_Test_Core_Site', false, ['sites' => $sites]);
+        /** @var FCom_Test_Core_Site $site */
         $site->set($hash);
         // Update the users session to use the chosen site
         $this->BSession->set('site_session', $site->getHash());
