@@ -12,9 +12,8 @@
             id: 'product_name_lang_' ~ m.get('id'),
             availLangs: m.getData('name_lang_fields'),
             modalConfig: {
-                onConfirm: 'saveNameFieldLang'
-            },
-            select2Callback: 'chooseNameFieldLang'
+                onSaved: 'saveNameFieldLang'
+            }
         }) | raw }}
 
         {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_ ~ ' (' ~ 'optional'|_ ~ ')'}) }}
@@ -32,9 +31,8 @@
             id: 'product_shortdesc_lang_' ~ m.get('id'),
             availLangs: m.getData('short_desc_lang_fields'),
             modalConfig: {
-                onConfirm: 'saveShortDescFieldLang'
-            },
-            select2Callback: 'chooseShortDescFieldLang'
+                onSaved: 'saveShortDescFieldLang'
+            }
         }) | raw }}
 
         {#<div id="main-product-shortdesc-lang"></div>#}
@@ -45,9 +43,8 @@
             id: 'product_desc_lang_' ~ m.get('id'),
             availLangs: m.getData('desc_lang_fields'),
             modalConfig: {
-                onConfirm: 'saveDescFieldLang'
-            },
-            select2Callback: 'chooseDescFieldLang'
+                onSaved: 'saveDescFieldLang'
+            }
         }) | raw }}
         {#<div id="main-product-desc-lang"></div>#}
 
