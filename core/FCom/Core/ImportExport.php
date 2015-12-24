@@ -739,13 +739,13 @@ class FCom_Core_ImportExport extends BClass
                             $model->setData($cdk, $cdkData, $merge);
                         }
                     }
-                    $model->save();
+                    $model->save(false);
                     $modified = true;
                     $this->_newModels++;
                     $this->_modelsStatistics[$this->_currentModel]['new_models']++;
                 }
             } catch (PDOException $e) {
-                $this->BDebug->logException($e);
+                //$this->BDebug->logException($e);
                 $this->log([
                     'msg' => $this->BLocale->_("Exception during batch process"),
                     'data' => [
