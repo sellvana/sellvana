@@ -18,24 +18,35 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.props.setLangVal($input.data('code'), $input.val());
         },
         render: function () {
-            var that = this;
+            var that = this, node;
             return (
                 React.createElement("div", null, 
                     _.map(this.props.langs, function (lang, key) {
+                        switch (lang.input_type) {
+                            case 'textarea':
+                                node = React.createElement("textarea", {name: that.props.id, "data-type": "lang", "data-code": lang.lang_code, className: "form-control", 
+                                                 "data-rule-required": "true"}, lang.value);
+                                break;
+                            case 'wysiwyg':
+                                node = React.createElement("textarea", {name: that.props.id, "data-type": "lang", className: "form-control ckeditor", 
+                                                 rows: "20"}, lang.value);
+                                break;
+                            default:
+                                node = React.createElement("input", {type: "text", className: "form-control", "data-type": "lang", 
+                                              onBlur: that.handleChange, 
+                                              "data-code": lang.lang_code, "data-rule-required": "true", name: that.props.id, 
+                                              defaultValue: lang.value});
+                                break;
+                        }
                         return (
                             React.createElement("div", {key: key, className: "form-group"}, 
                                 React.createElement("div", {className: "col-md-3 control-label"}, 
                                     React.createElement("span", {className: "badge badge-default"}, lang.lang_code)
                                 ), 
-                                React.createElement("div", {className: "col-md-6"}, 
-                                    React.createElement("input", {type: "text", className: "form-control", "data-type": "lang", 
-                                           onBlur: that.handleChange, 
-                                           "data-code": lang.lang_code, "data-rule-required": "true", name: that.props.id, 
-                                           defaultValue: lang.value})
-                                ), 
+                                React.createElement("div", {className: "col-md-6"}, node), 
                                 React.createElement("div", {className: "col-md-3"}, 
                                     React.createElement("button", {type: "button", onClick: that.removeLangField, "data-code": lang.lang_code, 
-                                            className: "btn btn-default btn-sm field-remove"}, 
+                                            className: "btn btn-danger btn-sm field-remove"}, 
                                         React.createElement("i", {className: "icon-remove"})
                                     )
                                 )
@@ -177,7 +188,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 availLangs: availLangs
             });
         },
-        AddLocaleField: function (e) {
+        addLocaleField: function (e) {
             if (null === this.state.selection) {
                 $.bootstrapGrowl(Locale._("Please choose language."), {
                     type: 'warning',
@@ -218,13 +229,10 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             }
 
             return (
-                React.createElement("div", {key: this.props.id, className: "row multilang-field"}, 
-                    React.createElement("div", {className: "col-md-2"}), 
-                    React.createElement("div", {className: "col-md-5"}, 
-                        React.createElement("button", {type: "button", style: {marginBottom: '10px'}, onClick: this.showModal, 
-                                className: "btn btn-xs multilang " + (this.props.btnLangLabel ? 'btn-info' : '')}, !this.props.btnLangLabel ?
-                            React.createElement("i", {className: "icon icon-globe"}) : '', " ", this.props.btnLangLabel || Locale._('Translate')
-                        )
+                React.createElement("div", null, 
+                    React.createElement("button", {type: "button", style: {marginBottom: '10px'}, onClick: this.showModal, 
+                            className: "btn btn-xs multilang " + (this.props.btnLangLabel ? 'btn-info' : '')}, !this.props.btnLangLabel ?
+                        React.createElement("i", {className: "icon icon-globe"}) : '', " ", this.props.btnLangLabel || Locale._('Translate')
                     ), 
                     React.createElement(Components.Modal, React.__spread({},  this.props.modalConfig), 
                         React.createElement("div", {className: "well"}, 
@@ -236,7 +244,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                                                       defaultValue: []}))
                                     ), 
                                     React.createElement("td", null, 
-                                        React.createElement("button", {className: "btn btn-primary", onClick: this.AddLocaleField, 
+                                        React.createElement("button", {className: "btn btn-primary", onClick: this.addLocaleField, 
                                                 type: "button"}, Locale._('Add Locale'))
                                     )
                                 )

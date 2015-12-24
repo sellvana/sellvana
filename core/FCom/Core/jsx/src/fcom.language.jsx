@@ -18,24 +18,35 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.props.setLangVal($input.data('code'), $input.val());
         },
         render: function () {
-            var that = this;
+            var that = this, node;
             return (
                 <div>
                     {_.map(this.props.langs, function (lang, key) {
+                        switch (lang.input_type) {
+                            case 'textarea':
+                                node = <textarea name={that.props.id} data-type="lang" data-code={lang.lang_code} className="form-control"
+                                                 data-rule-required="true">{lang.value}</textarea>;
+                                break;
+                            case 'wysiwyg':
+                                node = <textarea name={that.props.id} data-type="lang" className="form-control ckeditor"
+                                                 rows="20">{lang.value}</textarea>;
+                                break;
+                            default:
+                                node = <input type="text" className="form-control" data-type="lang"
+                                              onBlur={that.handleChange}
+                                              data-code={lang.lang_code} data-rule-required="true" name={that.props.id}
+                                              defaultValue={lang.value}/>;
+                                break;
+                        }
                         return (
                             <div key={key} className="form-group">
                                 <div className="col-md-3 control-label">
                                     <span className="badge badge-default">{lang.lang_code}</span>
                                 </div>
-                                <div className="col-md-6">
-                                    <input type="text" className="form-control" data-type="lang"
-                                           onBlur={that.handleChange}
-                                           data-code={lang.lang_code} data-rule-required="true" name={that.props.id}
-                                           defaultValue={lang.value}/>
-                                </div>
+                                <div className="col-md-6">{node}</div>
                                 <div className="col-md-3">
                                     <button type="button" onClick={that.removeLangField} data-code={lang.lang_code}
-                                            className="btn btn-default btn-sm field-remove">
+                                            className="btn btn-danger btn-sm field-remove">
                                         <i className="icon-remove"/>
                                     </button>
                                 </div>
@@ -177,7 +188,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 availLangs: availLangs
             });
         },
-        AddLocaleField: function (e) {
+        addLocaleField: function (e) {
             if (null === this.state.selection) {
                 $.bootstrapGrowl(Locale._("Please choose language."), {
                     type: 'warning',
@@ -218,14 +229,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             }
 
             return (
-                <div key={this.props.id} className="row multilang-field">
-                    <div className="col-md-2"></div>
-                    <div className="col-md-5">
-                        <button type="button" style={{marginBottom: '10px'}} onClick={this.showModal}
-                                className={"btn btn-xs multilang " + (this.props.btnLangLabel ? 'btn-info' : '')}>{!this.props.btnLangLabel ?
-                            <i className="icon icon-globe"/> : ''} {this.props.btnLangLabel || Locale._('Translate')}
-                        </button>
-                    </div>
+                <div>
+                    <button type="button" style={{marginBottom: '10px'}} onClick={this.showModal}
+                            className={"btn btn-xs multilang " + (this.props.btnLangLabel ? 'btn-info' : '')}>{!this.props.btnLangLabel ?
+                        <i className="icon icon-globe"/> : ''} {this.props.btnLangLabel || Locale._('Translate')}
+                    </button>
                     <Components.Modal {...this.props.modalConfig}>
                         <div className="well">
                             <table>
@@ -236,7 +244,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                                                       defaultValue={[]}/>
                                     </td>
                                     <td>
-                                        <button className='btn btn-primary' onClick={this.AddLocaleField}
+                                        <button className='btn btn-primary' onClick={this.addLocaleField}
                                                 type="button">{Locale._('Add Locale')}</button>
                                     </td>
                                 </tr>
