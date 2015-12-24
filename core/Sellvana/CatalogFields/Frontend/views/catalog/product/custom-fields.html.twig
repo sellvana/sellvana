@@ -5,13 +5,15 @@
     <div class="f-tab-heading">
         <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
     </div>
-    {% for cf in customFields[prod.id()] %}
+    {% for cf in customFields %}
         <div class="form-group" style="overflow: hidden">
             <label class="col-md-2 control-label">{{ cf.set_name |_ }}</label> <br>
             {% for field in cf.fields %}
+                {% if field.frontend_show == 1 %}
                 <div class="col-md-12">
                     <label class="control-label">{{ field.field_name ~": "~ field.value |_ }}</label>
                 </div>
+                {% endif %}
             {% endfor %}
         </div>
     {% endfor %}

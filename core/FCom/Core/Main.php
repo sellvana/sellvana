@@ -208,6 +208,12 @@ class FCom_Core_Main extends BClass
         if (file_exists($coreConfigFile)) {
             $config->addFile($coreConfigFile, true);
         }
+
+        $codeceptConfigFile = sprintf('%s/codecept.php', $config->get('fs/config_dir'));
+        if (!file_exists($codeceptConfigFile)) {
+            $config->writeConfigFiles('codecept');
+        }
+
         $randomDirName = $config->get('core/storage_random_dir');
         if (!$randomDirName || strpos($randomDirName, 'storage/') !== false) {
             $randomDirGlob = glob($storageDir . '/random-*');
@@ -219,7 +225,6 @@ class FCom_Core_Main extends BClass
             }
             $config->set('core/storage_random_dir', $randomDirName, false, true);
             $config->writeConfigFiles('core');
-            $config->writeConfigFiles('codecept');
         }
         $randomDir = $storageDir . '/' . $randomDirName;
         $this->BUtil->ensureDir($randomDir);

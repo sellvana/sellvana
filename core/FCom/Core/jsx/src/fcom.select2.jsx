@@ -25,13 +25,14 @@ define(['underscore', 'react', 'fcom.components'], function (_, React, Component
                 this.props.onChange(e, this.props.callback, this.state.selections);
             }
         },
-        componentDidUpdate: function() { 
+        componentDidUpdate: function() {
+
         },
         shouldComponentUpdate: function(nextProps, nextState) {
-            return nextState.selections !== this.state.selections;
+            return nextState.selections !== this.state.selections || nextProps.options !== this.props.options;
         },
         render: function () {
-            return (<Components.Select2 id={this.props.id} className={this.props.className} data-col={this.props['data-col']} name={this.props.name} options={this.props.options} onSelection={this.handleSelections} placeholder="Select some options" multiple={this.props.multiple || false} val={this.props.defaultValue} />);
+            return (<Components.Select2 id={this.props.id} className={this.props.className} data-col={this.props['data-col']} name={this.props.name} options={this.props.options} onSelection={this.handleSelections} placeholder={this.props.placeholder} multiple={this.props.multiple || false} val={this.props.defaultValue} />);
         }
     });
     
