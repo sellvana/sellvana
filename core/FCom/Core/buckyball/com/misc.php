@@ -3670,6 +3670,7 @@ class BFile extends BClass
         $this->_fileInfo['file_path'] = $this->_currentTmpDir;
         $fullPath =  $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
 
+        $this->_fileInfo['file_size'] = 0;
         if (@file_put_contents($fullPath, $file)
         ) {
             $this->_fileInfo['file_size'] = filesize($fullPath);
