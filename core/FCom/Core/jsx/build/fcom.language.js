@@ -23,11 +23,17 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             var that = this;
             if (CKEDITOR.instances) {
                 _(CKEDITOR.instances).each(function (editor, id) {
-                    if (that.state.editors[id]) editor.destroy(true);
+                    if (that.state.editors[id]) {
+                        editor.destroy(true);
+                        delete that.state.editors[id];
+                    }
                 });
             }
         },
         componentDidUpdate: function () {
+            _(this.props.langs).each(function (lang, i) {
+                $('[data-type="lang_input_field"]').val(lang.value);
+            });
             this.initSpecialInput(this.state.inputTypes);
         },
         initSpecialInput: function (types) {
@@ -66,19 +72,19 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             var that = this, node;
             return (
                 React.createElement("div", null, 
-                    _.map(this.props.langs, function (lang, key) {
+                    _(this.props.langs).map(function (lang, key) {
                         switch (lang.input_type) {
                             case 'textarea':
-                                node = React.createElement("textarea", {id: guid(), name: that.props.id, "data-type": "lang", "data-code": lang.lang_code, className: "form-control", 
+                                node = React.createElement("textarea", {id: guid(), name: that.props.id, "data-type": "lang_input_field", "data-code": lang.lang_code, className: "form-control", 
                                                  "data-rule-required": "true", defaultValue: lang.value});
                                 break;
                             case 'wysiwyg':
-                                node = React.createElement("textarea", {id: guid(), name: that.props.id, "data-type": "lang", "data-code": lang.lang_code, className: "form-control lang-ckeditor", 
+                                node = React.createElement("textarea", {id: guid(), name: that.props.id, "data-type": "lang_input_field", "data-code": lang.lang_code, className: "form-control lang-ckeditor", 
                                                  rows: "5", defaultValue: lang.value});
                                 that.state.inputTypes[lang.lang_code] = lang.input_type;
                                 break;
                             default:
-                                node = React.createElement("input", {type: "text", className: "form-control", "data-type": "lang", 
+                                node = React.createElement("input", {type: "text", className: "form-control", "data-type": "lang_input_field", 
                                               onBlur: that.handleChange, 
                                               "data-code": lang.lang_code, "data-rule-required": "true", name: that.props.id, 
                                               defaultValue: lang.value});
@@ -86,7 +92,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                         }
 
                         return (
-                            React.createElement("div", {key: key, className: "form-group"}, 
+                            React.createElement("div", {key: lang.lang_code, className: "form-group"}, 
                                 React.createElement("div", {className: "col-md-3 control-label"}, 
                                     React.createElement("span", {className: "badge badge-default"}, lang.lang_code)
                                 ), 
@@ -225,7 +231,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
 
             var availLangs = this.state.availLangs;
             _(availLangs).each(function (lang, i) {
-                if (lang.lang_code == code) availLangs.splice(i, 1);
+                if (lang && lang.lang_code == code) availLangs.splice(i, 1);
             });
 
             this.setState({

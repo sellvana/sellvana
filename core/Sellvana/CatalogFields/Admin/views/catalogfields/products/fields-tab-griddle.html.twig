@@ -111,13 +111,16 @@
             componentWillUnmount: function () {
                 $(APP).off('addField');
                 $(APP).off('addSet');
+                $(APP).off('refreshLangs');
             },
             clearCKEDITORIntances: function () {
                 var that = this;
                 if (CKEDITOR.instances) {
                     _(CKEDITOR.instances).each(function (editor, id) {
-                        if (that.state.editors[id])
+                        if (that.state.editors[id]) {
                             editor.destroy(true);
+                            delete that.state.editors[id];
+                        }
                     });
                 }
             },
@@ -580,6 +583,16 @@
             addSet: function (e) {
                 var that = this;
                 var setId = this.state.selection;
+
+                if (!setId) {
+                    $.bootstrapGrowl("{{ 'Please choose field set.' |_ }}", {
+                        type: 'danger',
+                        align: 'center',
+                        width: 'auto',
+                        delay: 3000
+                    });
+                }
+
                 var fieldIds = [];
                 $.get('{{ APP.href('/catalogfields/products/get_fieldset?id=') | raw }}' + setId, function (r) {
                     var sets = that.props.fieldSets;
@@ -805,6 +818,16 @@
             addField: function () {
                 var that = this;
                 var id = this.state.selection;
+
+                if (!id) {
+                    $.bootstrapGrowl("{{ 'Please choose field.' |_ }}", {
+                        type: 'danger',
+                        align: 'center',
+                        width: 'auto',
+                        delay: 3000
+                    });
+                }
+
                 var inputType = {};
                 $.get('{{ APP.href('/catalogfields/products/get_field?id=') | raw }}' + id, function (r) {
                     switch (r.admin_input_type) {
