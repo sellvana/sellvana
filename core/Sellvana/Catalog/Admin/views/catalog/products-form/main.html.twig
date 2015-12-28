@@ -8,47 +8,59 @@
         {{ forms.input(fieldData, {field:'product_name', required:1, label:'Product Name'|_, form_group_class:'has-multilang'}) }}
         {#<div id="main-product-name-lang"></div>#}
 
-        {{ THIS.view('core/language-griddle').set('config', {
-            id: 'product_name_lang_' ~ m.get('id'),
-            availLangs: m.getData('name_lang_fields'),
-            modalConfig: {
-                onConfirm: 'saveNameFieldLang'
-            },
-            select2Callback: 'chooseNameFieldLang'
-        }) | raw }}
+        <div class="multilang-field row">
+            <div class="col-md-2"></div>
+            <div class="col-md-5">
+                {{ THIS.view('core/language-griddle').set('config', {
+                    id: 'product_name_lang_' ~ m.get('id'),
+                    availLangs: m.getData('name_lang_fields'),
+                    modalConfig: {
+                        onSaved: 'saveNameFieldLang'
+                    }
+                }) | raw }}
+            </div>
+        </div>
 
         {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_ ~ ' (' ~ 'optional'|_ ~ ')'}) }}
 
         {{ forms.input(fieldData, {field:'product_sku', required:1, label:'Product SKU'|_}) }}
-        {#
-        {% if CONFIG.get('modules/Sellvana_Catalog/separate_inventory_sku') %}
+
+        {#{% if CONFIG.get('modules/Sellvana_Catalog/separate_inventory_sku') %}
             {{ forms.input(fieldData, {field:'inventory_sku', label:'Inventory SKU (leave empty to use Product SKU)'|_}) }}
-        {% endif %}
-        #}
+        {% endif %}#}
 
         {{ forms.textarea(fieldData, {field:'short_description', required:1, label:'Short Description'|_, form_group_class:'has-multilang'}) }}
 
-        {{ THIS.view('core/language-griddle').set('config', {
-            id: 'product_shortdesc_lang_' ~ m.get('id'),
-            availLangs: m.getData('short_desc_lang_fields'),
-            modalConfig: {
-                onConfirm: 'saveShortDescFieldLang'
-            },
-            select2Callback: 'chooseShortDescFieldLang'
-        }) | raw }}
+        <div class="multilang-field row">
+            <div class="col-md-2"></div>
+            <div class="col-md-5">
+                {{ THIS.view('core/language-griddle').set('config', {
+                    id: 'product_shortdesc_lang_' ~ m.get('id'),
+                    availLangs: m.getData('short_desc_lang_fields'),
+                    modalConfig: {
+                        onSaved: 'saveShortDescFieldLang'
+                    }
+                }) | raw }}
+            </div>
+        </div>
 
         {#<div id="main-product-shortdesc-lang"></div>#}
 
         {{ forms.wysiwyg(fieldData, {field:'description', required:1, label:'Long Description'|_, form_group_class:'has-multilang', input_div_class:'col-md-10', raw:1}) }}
 
-        {{ THIS.view('core/language-griddle').set('config', {
-            id: 'product_desc_lang_' ~ m.get('id'),
-            availLangs: m.getData('desc_lang_fields'),
-            modalConfig: {
-                onConfirm: 'saveDescFieldLang'
-            },
-            select2Callback: 'chooseDescFieldLang'
-        }) | raw }}
+        <div class="multilang-field row">
+            <div class="col-md-2"></div>
+            <div class="col-md-5">
+                {{ THIS.view('core/language-griddle').set('config', {
+                    id: 'product_desc_lang_' ~ m.get('id'),
+                    availLangs: m.getData('desc_lang_fields'),
+                    modalConfig: {
+                        onSaved: 'saveDescFieldLang'
+                    }
+                }) | raw }}
+            </div>
+        </div>
+
         {#<div id="main-product-desc-lang"></div>#}
 
         {{ forms.boolean(fieldData, {field:'is_hidden', label:'Hide Product'|_}) }}
@@ -66,7 +78,7 @@
 
 {{ THIS.hook('catalog/products/tab/main', {'model' : m}) | raw }}
 
-<script type="template" id="main-lang-view-template">
+{#<script type="template" id="main-lang-view-template">
     <div class="row multilang-field">
         <div class="col-md-2"></div>
         <div class="col-md-5" id="translate-product-<%- rc.field_name %>">
@@ -112,9 +124,9 @@
             </div>
         </div>
     </div>
-</script>
+</script>#}
 
-<script type="template" id="main-lang-field-template">
+{#<script type="template" id="main-lang-field-template">
     <div class="col-md-3 control-label">
         <span class="badge badge-default"><%- rc.lang_code %></span>
     </div>
@@ -136,9 +148,9 @@
             <i class="icon-remove"></i>
         </button>
     </div>
-</script>
+</script>#}
 
-<script>
+<script type="text/javascript">
 var prodVariantGrid = null;
 var submitCallback = [];
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
@@ -187,7 +199,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         container.val(JSON.stringify(hash));
     }
 
-    function checkLangField(field)
+    /*function checkLangField(field)
     {
         var invalid = 0;
         field.langFields.each(function(langField) {
@@ -207,7 +219,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             $('#translate-product-' + field_name).append('<span id="error-translate-'+ field_name +'" class="badge badge-important">'+invalid+'</span>');
         }
 
-    }
+    }*/
 
     $(_mainForm).submit(function(ev) {
         var descWysiwyg = CKEDITOR.instances['model-description'];
@@ -295,7 +307,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
 
-    SystemFields.Views.LangFieldView = Backbone.View.extend({
+    /*SystemFields.Views.LangFieldView = Backbone.View.extend({
         className: 'form-group',
         events: {
             'click button.field-remove': '_remove',
@@ -328,9 +340,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
             return this;
         }
-    });
+    });*/
 
-    SystemFields.Views.LangView = Backbone.View.extend({
+    /*SystemFields.Views.LangView = Backbone.View.extend({
         template: _.template($('#main-lang-view-template').html()),
         events: {
                     'click button.multilang': '_showLangModal',
@@ -413,36 +425,36 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
             return this;
         }
-    });
+    });*/
 
 
-    var nameModel = new SystemFields.Models.Field({
-                                                    id: 1,
-                                                    field_name: 'name',
-                                                    input_type: 'text',
-                                                    langFields: {{ m.getData('name_lang_fields') == null ? '[]' : m.getData('name_lang_fields') | raw }}
-                                                });
-    var shortDescModel = new SystemFields.Models.Field({
-                                                    id: 2,
-                                                    field_name: 'shortDesc',
-                                                    input_type: 'textarea',
-                                                    langFields: {{ m.getData('short_desc_lang_fields') == null ? '[]' : m.getData('short_desc_lang_fields') | raw }}
-                                                });
-    var descModel = new SystemFields.Models.Field({
-                                                    id: 3,
-                                                    field_name: 'desc',
-                                                    input_type: 'wysiwyg',
-                                                    langFields: {{ m.getData('desc_lang_fields') == null ? '[]' : m.getData('desc_lang_fields') | raw }}
-                                                });
+    {#var nameModel = new SystemFields.Models.Field({#}
+                                                    {#id: 1,#}
+                                                    {#field_name: 'name',#}
+                                                    {#input_type: 'text',#}
+                                                    {#langFields: {{ m.getData('name_lang_fields') == null ? '[]' : m.getData('name_lang_fields') | raw }}#}
+                                                {#});#}
+    {#var shortDescModel = new SystemFields.Models.Field({#}
+                                                    {#id: 2,#}
+                                                    {#field_name: 'shortDesc',#}
+                                                    {#input_type: 'textarea',#}
+                                                    {#langFields: {{ m.getData('short_desc_lang_fields') == null ? '[]' : m.getData('short_desc_lang_fields') | raw }}#}
+                                                {#});#}
+    {#var descModel = new SystemFields.Models.Field({#}
+                                                    {#id: 3,#}
+                                                    {#field_name: 'desc',#}
+                                                    {#input_type: 'wysiwyg',#}
+                                                    {#langFields: {{ m.getData('desc_lang_fields') == null ? '[]' : m.getData('desc_lang_fields') | raw }}#}
+                                                {#});#}
 
-    var nameView = new SystemFields.Views.LangView({model: nameModel, el: '#main-product-name-lang'});
-    nameView.render();
+    {#var nameView = new SystemFields.Views.LangView({model: nameModel, el: '#main-product-name-lang'});#}
+    {#nameView.render();#}
 
-    var shortDescView = new SystemFields.Views.LangView({model: shortDescModel, el: '#main-product-shortdesc-lang'});
-    shortDescView.render();
+    {#var shortDescView = new SystemFields.Views.LangView({model: shortDescModel, el: '#main-product-shortdesc-lang'});#}
+    {#shortDescView.render();#}
 
-    var descView = new SystemFields.Views.LangView({model: descModel, el: '#main-product-desc-lang'});
-    descView.render();
+    {#var descView = new SystemFields.Views.LangView({model: descModel, el: '#main-product-desc-lang'});#}
+    {#descView.render();#}
 
     initLangData();
 });

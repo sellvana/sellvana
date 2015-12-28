@@ -532,11 +532,10 @@
             var $hiddenInput = $('#shopper_field_prices_'+shopperId);
             if ($hiddenInput.length === 0) {
                 $('#tab-shopper_fields').append('<input type="hidden" data-shopper-id="'+shopperId+'" id="shopper_field_prices_'+shopperId+'" />');
+                $hiddenInput = $('input#shopper_field_prices_'+shopperId);
             }
 
-            if ($hiddenInput.data('shopper-id') === shopperId) {
-                $hiddenInput.val(JSON.stringify(data));
-            }
+            $hiddenInput.val(JSON.stringify(data));
 
             shopper.options = optionSaveStr.slice(0, optionSaveStr.length - 1);
             shopperGrid.updateRows([shopper]);

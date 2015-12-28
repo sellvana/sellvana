@@ -270,7 +270,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                     'position' => $row->get('position'),
                     'required' => $row->get('required'),
                     'serialized' => json_encode($row->as_array()),
-                    'data_serialized' => $row->get('data_serialized')
+                    'languages' => $row->get('data_serialized')
                 ];
 
                 if ($row->get('table_field_type') === 'options') {
