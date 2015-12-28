@@ -120,7 +120,6 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 availLangs: [],
                 select2Config: {},
                 modalConfig: {},
-                btnLangLabel: '',
                 defaultLangs: [
                     {id: 'en_US', text: 'en_US'},
                     {id: 'de_DE', text: 'de_DE'},
@@ -226,7 +225,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
 
             var availLangs = this.state.availLangs;
             _(availLangs).each(function (lang, i) {
-                if (lang.lang_code == code) delete availLangs[i];
+                if (lang.lang_code == code) availLangs.splice(i, 1);
             });
 
             this.setState({
@@ -265,21 +264,18 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.getModalNode().modal('show');
         },
         render: function () {
-            var inlineProps = this.getSelect2Config();
-            var defaultLangs = this.getDefaultLangs();
-
-            if (this.state.availLangs.length) {
-                var langIds = _.pluck(this.state.availLangs, 'lang_code');
-                this.props.btnLangLabel = langIds.filter(function (item) {
+            var inlineProps = this.getSelect2Config(),
+                defaultLangs = this.getDefaultLangs(),
+                langIds = _.pluck(this.state.availLangs, 'lang_code'),
+                langLabel = langIds ? langIds.filter(function (item) {
                     return item != undefined
-                }).join(',');
-            }
+                }).join(',') : null;
 
             return (
                 React.createElement("div", null, 
                     React.createElement("button", {type: "button", style: {marginBottom: '10px'}, onClick: this.showModal, 
-                            className: "btn btn-xs multilang " + (this.props.btnLangLabel ? 'btn-info' : '')}, !this.props.btnLangLabel ?
-                        React.createElement("i", {className: "icon icon-globe"}) : '', " ", this.props.btnLangLabel || Locale._('Translate')
+                            className: "btn btn-xs multilang " + (langLabel ? 'btn-info' : '')}, !this.props.btnLangLabel ?
+                        React.createElement("i", {className: "icon icon-globe"}) : '', " ", langLabel || Locale._('Translate')
                     ), 
                     React.createElement(Components.Modal, React.__spread({},  this.props.modalConfig), 
                         React.createElement("div", {className: "well"}, 
@@ -299,7 +295,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                             )
                         ), 
                         React.createElement("div", {className: this.props.id + '-container'}, 
-                            React.createElement(LangFields, {id: this.props.id, langs: this.state.availLangs, 
+                            React.createElement(LangFields, {id: this.props.id, langs: this.state.availLangs || [], 
                                         removeField: this.removeLangField, 
                                         setLangVal: this.setLangVal})
                         )
