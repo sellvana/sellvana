@@ -1304,13 +1304,14 @@ define(fcomAdminDeps, function ($, Ladda) {
                     event.preventDefault();
                 }
             });
+
+            loader = Ladda.create(el);
             $(form).trigger('submit');
             if (!form.validate().checkForm()) {
                 loader.stop();
                 return false;
             }
 
-            loader = Ladda.create(el);
             loader.start();
             var btnId = form.attr('id') + '-do';
             var isNew = options.is_new;

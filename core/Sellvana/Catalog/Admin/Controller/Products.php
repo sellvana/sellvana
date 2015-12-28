@@ -745,6 +745,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
         parent::formPostAfter($args);
 
+        /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         $data = $this->BRequest->post();
 
@@ -1006,12 +1007,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $fields = $cField['fields'];
                 foreach($fields as $field) {
                     $fieldModel = $this->Sellvana_CatalogFields_Model_Field->load($field['id']);
-                    if (!in_array(['select', 'multiselect'], $field['admin_input_type']) && !empty($field['languages'])) {
-                        $fieldModel->setData('frontend_label_translation', array_filter($field['languages']));
-                    } else {
-                        $fieldModel->set('data_serialized', null);
+                    if ($fieldModel && !in_array(['select', 'multiselect'], $field['admin_input_type']) && !empty($field['lang_fields'])) {
+                        $fieldModel->setData('frontend_label_translation', array_filter($field['lang_fields']))->save();
                     }
-                    $fieldModel->save();
                 }
             }
         }

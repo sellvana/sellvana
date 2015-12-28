@@ -31,9 +31,6 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             }
         },
         componentDidUpdate: function () {
-            _(this.props.langs).each(function (lang, i) {
-                $('[data-type="lang_input_field"]').val(lang.value);
-            });
             this.initSpecialInput(this.state.inputTypes);
         },
         initSpecialInput: function (types) {
@@ -41,7 +38,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             _(types).each(function (type, code) {
                 switch (type) {
                     case 'wysiwyg':
-                        var id = $('textarea.lang-ckeditor[data-code="'+ code +'"]').prop('id');
+                        var id = $('textarea.lang-ckeditor[data-code="' + code + '"]').prop('id');
                         if (id && CKEDITOR !== undefined && !CKEDITOR.instances[id]) {
                             that.state.editors[id] = true;
 
@@ -75,16 +72,18 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                     {_(this.props.langs).map(function (lang, key) {
                         switch (lang.input_type) {
                             case 'textarea':
-                                node = <textarea id={guid()} name={that.props.id} data-type="lang_input_field" data-code={lang.lang_code} className="form-control"
-                                                 data-rule-required="true" defaultValue={lang.value} />;
+                                node = <textarea id={guid()} name={that.props.id} data-type={that.props.id}
+                                                 data-code={lang.lang_code} className="form-control"
+                                                 data-rule-required="true" defaultValue={lang.value}/>;
                                 break;
                             case 'wysiwyg':
-                                node = <textarea id={guid()} name={that.props.id} data-type="lang_input_field" data-code={lang.lang_code} className="form-control lang-ckeditor"
-                                                 rows="5" defaultValue={lang.value} />;
+                                node = <textarea id={guid()} name={that.props.id} data-type={that.props.id}
+                                                 data-code={lang.lang_code} className="form-control lang-ckeditor"
+                                                 rows="5" defaultValue={lang.value}/>;
                                 that.state.inputTypes[lang.lang_code] = lang.input_type;
                                 break;
                             default:
-                                node = <input type="text" className="form-control" data-type="lang_input_field"
+                                node = <input type="text" className="form-control" data-type={that.props.id}
                                               onBlur={that.handleChange}
                                               data-code={lang.lang_code} data-rule-required="true" name={that.props.id}
                                               defaultValue={lang.value}/>;
@@ -92,7 +91,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                         }
 
                         return (
-                            <div key={lang.lang_code} className="form-group">
+                            <div key={that.props.id + lang.lang_code} className="form-group">
                                 <div className="col-md-3 control-label">
                                     <span className="badge badge-default">{lang.lang_code}</span>
                                 </div>
@@ -261,9 +260,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.forceUpdate();
         },
         setLangVal: function (code, value) {
+            var that = this;
             var langs = this.state.availLangs;
             _(langs).each(function (lang, i) {
-                if (lang.lang_code == code) lang.value = value;
+                if (lang && lang.lang_code == code)
+                    that.state.availLangs[i].value = value;
             });
         },
         showModal: function () {
@@ -280,7 +281,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             return (
                 <div>
                     <button type="button" style={{marginBottom: '10px'}} onClick={this.showModal}
-                            className={"btn btn-xs multilang " + (langLabel ? 'btn-info' : '')}>{!this.props.btnLangLabel ?
+                            className={"btn btn-xs multilang " + (langLabel ? 'btn-info' : '')}>{!langLabel ?
                         <i className="icon icon-globe"/> : ''} {langLabel || Locale._('Translate')}
                     </button>
                     <Components.Modal {...this.props.modalConfig}>

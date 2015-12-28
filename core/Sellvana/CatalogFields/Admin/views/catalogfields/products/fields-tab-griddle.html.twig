@@ -84,10 +84,10 @@
                         var fieldCodes = _.pluck(set.fields, 'field_code');
                         if (_.contains(fieldCodes, code)) {
                             if (!langs.length) {
-                                delete sets[i].fields[_.indexOf(fieldCodes, code)].languages;
+                                delete sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields;
                             } else {
                                 var index = _.indexOf(fieldCodes, code);
-                                sets[i].fields[index].languages = langs;
+                                sets[i].fields[index].lang_fields = langs;
                             }
                         }
                     });
@@ -130,11 +130,15 @@
                     switch (type) {
                         case 'boolean':
                             var $switchCbx = $('.switch-cbx');
-                            $switchCbx.bootstrapSwitch({
-                                onSwitchChange: function (e, state) {
-                                    var s = state ? '1' : '0';
-                                    that.refreshChanged(code, s);
-                                }
+                            $switchCbx.each(function () {
+                                $(this).bootstrapSwitch({
+                                    onText: '<i class="icon-ok" />',
+                                    offText: '<i class="icon-remove" />',
+                                    onSwitchChange: function (e, state) {
+                                        var s = state ? '1' : '0';
+                                        that.refreshChanged(code, s);
+                                    }
+                                });
                             });
                             break;
                         case 'wysiwyg':
@@ -172,7 +176,7 @@
             },
             refreshSortable: function () {
                 var that = this;
-                $(".prod-fieldset").find('.box-content').each(function () {
+                $('.prod-fieldset').find('.box-content').each(function () {
                     Sortable.create(this, {
                         revert: true,
                         axis: 'y',
@@ -250,7 +254,7 @@
                 var sets = this.state.fieldSets;
                 _(sets).each(function (set, i) {
                     _(set.fields).each(function (f, j) {
-                        if (f.id == fieldId) sets[i].fields.splice(j, 1);
+                        if (f && f.id == fieldId) sets[i].fields.splice(j, 1);
                     });
                 });
 
@@ -289,19 +293,12 @@
                 this.refreshChanged($input.data('code'), $input.val());
             },
             parseLangs: function (data) {
-                var r = [];
                 var langs = data ? JSON.parse(data) : data;
                 if (!langs || !langs.frontend_label_translation) {
-                    return r;
+                    return [];
                 }
 
-                _(langs.frontend_label_translation).each(function (lang, code) {
-                    if (lang) {
-                        r.push(lang);
-                    }
-                });
-
-                return r;
+                return langs.frontend_label_translation;
             },
             render: function () {
                 return (
@@ -448,7 +445,7 @@
 
                                                                     return (
                                                                             React.DOM.div({
-                                                                                        key: i,
+                                                                                        key: field.field_code,
                                                                                         id: field.id,
                                                                                         className: 'form-group'
                                                                                     },
@@ -591,6 +588,7 @@
                         width: 'auto',
                         delay: 3000
                     });
+                    return;
                 }
 
                 var fieldIds = [];
@@ -826,6 +824,7 @@
                         width: 'auto',
                         delay: 3000
                     });
+                    return;
                 }
 
                 var inputType = {};
