@@ -2794,13 +2794,13 @@ class BDebug extends BClass
             self::STOP      => false,
         ],
         self::MODE_IMPORT => [
-            self::MEMORY    => self::DEBUG,
+            self::MEMORY    => false,//self::DEBUG,
             self::SYSLOG    => false,
-            self::FILE      => self::WARNING,
+            self::FILE      => false,//self::WARNING,
             self::EMAIL     => false, //self::CRITICAL,
-            self::OUTPUT    => self::NOTICE,
-            self::EXCEPTION => self::ERROR,
-            self::STOP      => self::CRITICAL,
+            self::OUTPUT    => false,//self::NOTICE,
+            self::EXCEPTION => false,//self::ERROR,
+            self::STOP      => false,//self::CRITICAL,
         ],
     ];
 
