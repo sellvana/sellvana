@@ -565,7 +565,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 return (
                     React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
                         React.createElement("div", {className: "col-md-4"}, 
-                            React.createElement(Common.Compare, {opts: opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
+                            React.createElement(Common.Compare, {opts:  opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
                                 ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
                         ), 
                         React.createElement("div", {className: "col-md-5"}, input)
@@ -2002,7 +2002,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 return (
                     React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
                         React.createElement("div", {className: "col-md-4"}, 
-                            React.createElement(Common.Compare, {opts: opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
+                            React.createElement(Common.Compare, {opts:  opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
                                 ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
                         ), 
                         React.createElement("div", {className: "col-md-5"}, input)
@@ -3359,7 +3359,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
     var ConditionsApp = conditions(React, $, Components, Locale, Common);
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {minimumResultsForSearch: 15, dropdownAutoWidth: true});
-    var Promo = {
+    var RulesWidget = {
         $modalContainerCoupons: null,
         $modalContainerConditions: null,
         $modalContainerActions: null,
@@ -3413,7 +3413,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
         initActionsApp: function (selector, $modalContainer) {
             var $actionsSelector = $('#' + selector);
             if ($actionsSelector.length == 0) {
-                Promo.log("Actions drop-down not found");
+                RulesWidget.log("Actions drop-down not found");
                 return;
             }
             var $container = $("#" + this.options.actions_container_id);
@@ -3556,7 +3556,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 $codeLength.prop('disabled', false);
             }
             $codePattern.change(function (e) {
-                Promo.log(e);
+                RulesWidget.log(e);
                 var val = $.trim($codePattern.val());
                 if (val == '') {
                     $codeLength.prop('disabled', false);
@@ -3602,7 +3602,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                         });
                         console.log(newRows);
                         var grid_id = result['grid_id'];
-                        Promo.updateGrid(grid_id, newRows);
+                        RulesWidget.updateGrid(grid_id, newRows);
                     }
                 })
                 .always(function (r) {
@@ -3614,7 +3614,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                         //e.close();//close it
                     }
                     // hide notification
-                    Promo.log(r);
+                    RulesWidget.log(r);
                 });
             //});
             if ($.isFunction(e.preventDefault)) {
@@ -3635,7 +3635,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             this.loadModalContent($modalBody, this.options['importCouponsUrl']);
             $(document).on("coupon_import", function (event) {
                 console.log(event.codes);
-                Promo.updateGrid(event.grid_id, event.codes);
+                RulesWidget.updateGrid(event.grid_id, event.codes);
             });
         },
         log: function (msg) {
@@ -3703,7 +3703,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             this.onCouponsUpdate(newRows);
             if (grid) {
                 console.log("grid found, adding to grid");
-                Promo.addGridRows(grid, newRows)
+                RulesWidget.addGridRows(grid, newRows)
             } else {
                 console.log("grid not loaded yet, adding to store");
                 var codes = store.get('promo.coupons'); // check of there are other codes stored and if yes, merge them
@@ -3775,8 +3775,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
         //console.log(newRows);
         if (newRows) {
             newRows = JSON.parse(newRows);
-            Promo.addGridRows(grid, newRows);
+            RulesWidget.addGridRows(grid, newRows);
         }
     };
-    return Promo;
+    return RulesWidget;
 });

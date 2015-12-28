@@ -18,7 +18,7 @@
                 id: config.id,
                 availLangs: config.availLangs ? JSON.parse(config.availLangs) : [],
                 modalConfig: config.modalConfig,
-                select2Callback: config.select2Callback
+                select2Config: config.select2Config || {}
             }), containerEle
         );
     });

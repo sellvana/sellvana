@@ -364,7 +364,7 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
         $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($field->id(), false, 'label');
         $this->BResponse->json(['id' => $field->id(), 'field_code' => $field->field_code,
             'field_name' => $field->field_name, 'admin_input_type' => $field->admin_input_type,
-            'multilang' => $field->multilanguage, 'options' => $options, 'required' => $field->required]);
+            'multilanguage' => $field->multilanguage, 'options' => $options, 'required' => $field->required]);
     }
 
     public function action_save__POST()
