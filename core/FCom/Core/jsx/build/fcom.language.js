@@ -3,12 +3,57 @@
  *
  * FCom Multi Languages Component
  */
-define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale'], function (_, React, $, FComGriddleComponent, Components, FComSelect2, Locale) {
+define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale', 'ckeditor'], function (_, React, $, FComGriddleComponent, Components, FComSelect2, Locale) {
 
     var LangFields = React.createClass({displayName: "LangFields",
         mixins: [FCom.Mixin],
+        getInitialState: function () {
+            return {
+                inputTypes: {},
+                editors: {}
+            };
+        },
         componentDidMount: function () {
+            this.initSpecialInput(this.state.inputTypes);
+        },
+        componentWillUpdate: function () {
+            this.clearCKEDITORIntances();
+        },
+        clearCKEDITORIntances: function () {
+            var that = this;
+            if (CKEDITOR.instances) {
+                _(CKEDITOR.instances).each(function (editor, id) {
+                    if (that.state.editors[id]) editor.destroy(true);
+                });
+            }
+        },
+        componentDidUpdate: function () {
+            this.initSpecialInput(this.state.inputTypes);
+        },
+        initSpecialInput: function (types) {
+            var that = this;
+            _(types).each(function (type, code) {
+                switch (type) {
+                    case 'wysiwyg':
+                        var id = $('textarea.lang-ckeditor[data-code="'+ code +'"]').prop('id');
+                        if (id && CKEDITOR !== undefined && !CKEDITOR.instances[id]) {
+                            that.state.editors[id] = true;
 
+                            CKEDITOR.replace(id, {
+                                startupMode: 'wysiwyg'
+                            });
+
+                            CKEDITOR.instances[id].on('blur', function (e) {
+                                e.editor.updateElement();
+                                var data = e.editor.getData();
+                                that.props.setLangVal(code, data);
+                            });
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            });
         },
         removeLangField: function (e) {
             this.props.removeField($(e.currentTarget).data('code'));
@@ -24,12 +69,13 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                     _.map(this.props.langs, function (lang, key) {
                         switch (lang.input_type) {
                             case 'textarea':
-                                node = React.createElement("textarea", {name: that.props.id, "data-type": "lang", "data-code": lang.lang_code, className: "form-control", 
-                                                 "data-rule-required": "true"}, lang.value);
+                                node = React.createElement("textarea", {id: guid(), name: that.props.id, "data-type": "lang", "data-code": lang.lang_code, className: "form-control", 
+                                                 "data-rule-required": "true", defaultValue: lang.value});
                                 break;
                             case 'wysiwyg':
-                                node = React.createElement("textarea", {name: that.props.id, "data-type": "lang", className: "form-control ckeditor", 
-                                                 rows: "20"}, lang.value);
+                                node = React.createElement("textarea", {id: guid(), name: that.props.id, "data-type": "lang", "data-code": lang.lang_code, className: "form-control lang-ckeditor", 
+                                                 rows: "5", defaultValue: lang.value});
+                                that.state.inputTypes[lang.lang_code] = lang.input_type;
                                 break;
                             default:
                                 node = React.createElement("input", {type: "text", className: "form-control", "data-type": "lang", 
@@ -38,6 +84,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                               defaultValue: lang.value});
                                 break;
                         }
+
                         return (
                             React.createElement("div", {key: key, className: "form-group"}, 
                                 React.createElement("div", {className: "col-md-3 control-label"}, 
@@ -120,9 +167,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
 
             this.props.tmpAvailLangs = _.clone(this.state.availLangs);
             this.props.tmpDefaultLangs = _.clone(this.state.defaultLangs);
-
             if (modalConfig.onSaved && typeof modalConfig.onSaved === 'string') {
-                window[modalConfig.onSaved](modal);
+                window[modalConfig.onSaved](modal, this.state.availLangs);
             }
         },
         cancelEditLangs: function (modal) {
@@ -203,6 +249,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
 
             this.state.availLangs.push({
                 lang_code: this.state.selection,
+                input_type: this.props.inputType || 'text',
                 value: ''
             });
 
@@ -244,7 +291,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                                                       defaultValue: []}))
                                     ), 
                                     React.createElement("td", null, 
-                                        React.createElement("button", {className: "btn btn-primary", onClick: this.addLocaleField, 
+                                        React.createElement("button", {className: "btn btn-sm btn-primary", onClick: this.addLocaleField, 
                                                 type: "button"}, Locale._('Add Locale'))
                                     )
                                 )
