@@ -312,7 +312,7 @@ class Sellvana_SalesTax_Main extends BClass
         if ($existingTaxIds) {
             $deleteIds = [];
             foreach ($existingTaxIds as $tcId => $tId) {
-                if (!in_array($tcId, $newTaxIds)) {
+                if ($newTaxIds && !in_array($tcId, $newTaxIds)) {
                     $deleteIds[] = $tId;
                 }
             }

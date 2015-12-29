@@ -54,6 +54,8 @@ class FCom_Core_Model_Abstract extends BModel
 
     static protected $_importExportProfile;
 
+    protected $_importing = false;
+
     protected $_readOnly = false;
 
     /**
@@ -172,6 +174,14 @@ class FCom_Core_Model_Abstract extends BModel
             $config[$key]['model'] = $key;
         }
         return $this;
+    }
+
+    public function saveImport()
+    {
+        $this->_importing = true;
+        $result = $this->save();
+        $this->_importing = false;
+        return $result;
     }
 
     public function getIdField()

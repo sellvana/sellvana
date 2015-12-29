@@ -69,7 +69,7 @@ modules:
                         folder: media/product/images
                     product-attachments:
                         permission: catalog/product/attachements
-                        filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt
+                        filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt,zip
                         folder: media/product/attachment
                     product-videos:
                         permission: catalog/product/videos
