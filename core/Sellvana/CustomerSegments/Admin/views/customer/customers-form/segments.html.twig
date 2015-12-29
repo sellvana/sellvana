@@ -1,0 +1,15 @@
+<!--{ label: {{ 'Segmentation'|_ }} }-->
+<!--{ pos: 200 }-->
+<!--{ async: true }-->
+
+{% set m = THIS.get('model') %}
+{% set allSegments = APP.instance('Sellvana_CustomerSegments_Model_Segment').options() %}
+{% set custSegments = APP.instance('Sellvana_CustomerSegments_Model_SegmentCustomer').getCustomerSegmentIds(m.id()) %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+<div class="col-md-12">
+    <fieldset class="f-fieldset-group">
+        {{ forms.input({type: 'hidden', name: "model[segment_ids]", value: "" }) }}
+        {{ forms.select({label: 'Status'|_, options: allSegments, value: custSegments, name: "model[segment_ids]", id: "model-segment_ids", select2: {}, multiple: true }) }}
+    </fieldset>
+</div>

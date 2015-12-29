@@ -49,6 +49,18 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         array('url_path', '@required'),*/
     ];
 
+    protected static $_fieldDefaults = [
+        'num_children' => 0,
+        'num_descendants' => 0,
+    ];
+
+    protected static $_defaultRootId = 1;
+
+    public function getRootId()
+    {
+        return static::$_defaultRootId;
+    }
+
     /**
      * @param array|int|string $id
      * @param null $field
@@ -251,6 +263,9 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         if (!$this->get('url_path') || ($this->is_dirty('url_key') && !$this->_new)) {
             $this->generateUrlPath();
         }
+        if (!$this->get('parent_id') && $this->_new) {
+            $this->generateParentId();
+        }
         if (!$this->get('full_name') || ($this->is_dirty('node_name') && !$this->_new)) {
             $this->generateFullName();
         }
@@ -336,11 +351,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      */
     public function register($save = false)
     {
-        if ($parent = $this->parent()) {
-            $parent->add('num_children');
-        }
         $numDesc = 1 + $this->get('num_descendants');
         foreach ($this->ascendants() as $c) {
+            if ($c->id() === $this->get('parent_id')) {
+                $c->add('num_children');
+            }
             // TODO: fix updating when re-registering existing node
             $c->add('num_descendants', $numDesc);
             if ($save) {
@@ -524,6 +539,33 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
             $urlKey = trim($urlPath . '/' . $urlKey, '/');
         }
         $this->set('url_path', $urlKey);
+        return $this;
+    }
+
+    /**
+     * @param boolean $force
+     * @return static
+     * @throws BException
+     */
+    public function generateParentId()
+    {
+        $urlPath = $this->get('url_path');
+        if (!$urlPath) {
+            #debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            throw new BException('Empty url_path ' . print_r($this->as_array(), 1));
+        }
+        $pathArr = explode('/', trim($urlPath, '/'));
+        if (sizeof($pathArr) === 1) {
+            $this->set('parent_id', $this->getRootId());
+            return $this;
+        }
+        array_pop($pathArr);
+        $parentPath = join('/', $pathArr);
+        $parent = $this->load($parentPath, 'url_path');
+        if (!$parent) {
+            throw new BException('Parent identified by url_path is not found');
+        }
+        $this->set('parent_id', $parent->id());
         return $this;
     }
 
