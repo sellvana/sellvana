@@ -1,12 +1,12 @@
 <style>
-    #fields-container .select2-container .select2-choice,
-    div.modal .select2-container .select2-choice {
+    #tab-fields #fields-container .select2-container .select2-choice,
+    #tab-fields div.modal .select2-container .select2-choice {
         height: 28px;
         width: 150px;
         font-size: 0.8em;
     }
 
-    .select2-container .select2-choice {
+    #tab-fields .select2-container .select2-choice {
         width: 200px;
     }
 </style>
@@ -883,7 +883,7 @@
                         }, "{{ 'Add a Field'|_ }}"),
                         React.DOM.button({
                             type: 'button',
-                            className: 'btn btn-sm',
+                            className: 'btn btn-sm btn-warning',
                             id: 'btn_new_field',
                             onClick: this.showAddFieldsModal
                         }, "{{ 'New Field'|_ }}")

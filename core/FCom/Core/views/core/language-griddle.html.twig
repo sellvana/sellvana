@@ -16,6 +16,7 @@
         React.render(
             React.createElement(FComMultiLanguage, {
                 id: config.id,
+                inputType: config.inputType,
                 availLangs: config.availLangs ? JSON.parse(config.availLangs) : [],
                 modalConfig: config.modalConfig,
                 select2Config: config.select2Config || {}
