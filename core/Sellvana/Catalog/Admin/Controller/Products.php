@@ -16,6 +16,7 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
  * @property Sellvana_Catalog_Model_SearchHistoryLog $Sellvana_Catalog_Model_SearchHistoryLog
+ * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  */
 class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -744,6 +745,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
         parent::formPostAfter($args);
 
+        /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         $data = $this->BRequest->post();
 
@@ -998,8 +1000,19 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $model->setData('name_lang_fields', $data['name_lang_fields']);
         $model->setData('short_desc_lang_fields', $data['short_desc_lang_fields']);
         $model->setData('desc_lang_fields', $data['desc_lang_fields']);
-        //$model->save();
 
+        // Process saving language for custom fields
+        if (!empty($model->custom_fields)) {
+            foreach($model->custom_fields as $cField) {
+                $fields = $cField['fields'];
+                foreach($fields as $field) {
+                    $fieldModel = $this->Sellvana_CatalogFields_Model_Field->load($field['id']);
+                    if ($fieldModel && !in_array(['select', 'multiselect'], $field['admin_input_type']) && !empty($field['lang_fields'])) {
+                        $fieldModel->setData('frontend_label_translation', array_filter($field['lang_fields']))->save();
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -147,7 +147,7 @@ class FCom_Core_ImportExport extends BClass
         $message = (array)$message;
         $message['object_id'] = $this->_currentObjectId;
         
-        $this->_channel->send($message);
+        //$this->_channel->send($message);
     }
 
     /**
@@ -421,6 +421,11 @@ class FCom_Core_ImportExport extends BClass
                     $this->_currentModel = null;
                     continue; // model does not have import/export configuration
                 }
+                $this->BEvents->fire(
+                    __METHOD__ . ':beforeModel:' . $this->_currentModel,
+                    ['import_id' => $importID]
+                );
+
                 $this->_modelsStatistics[$cm] = [
                     'not_changed' => 0,
                     'new_models' => 0,
@@ -662,7 +667,7 @@ class FCom_Core_ImportExport extends BClass
                     && !empty($this->_currentConfig['unique_key_not_null'])
                 ) {
                     foreach ((array)$this->_currentConfig['unique_key_not_null'] as $k) {
-                        if (empty($data[$k])) {
+                        if (!(array_key_exists($k, $data) && $data[$k] !== null)) {
                             /*
                             $this->BDebug->log($this->BLocale->_("Empty primary key fields: %s",
                                 print_r(['id' => $id, 'data' => $data, 'config' => $this->_currentConfig], 1)), 'ie.log');
@@ -745,7 +750,7 @@ class FCom_Core_ImportExport extends BClass
                     $this->_modelsStatistics[$this->_currentModel]['new_models']++;
                 }
             } catch (PDOException $e) {
-                $this->BDebug->logException($e);
+                //$this->BDebug->logException($e);
                 $this->log([
                     'msg' => $this->BLocale->_("Exception during batch process"),
                     'data' => [
