@@ -147,7 +147,7 @@ class FCom_Core_ImportExport extends BClass
         $message = (array)$message;
         $message['object_id'] = $this->_currentObjectId;
         
-        $this->_channel->send($message);
+        //$this->_channel->send($message);
     }
 
     /**
@@ -421,6 +421,11 @@ class FCom_Core_ImportExport extends BClass
                     $this->_currentModel = null;
                     continue; // model does not have import/export configuration
                 }
+                $this->BEvents->fire(
+                    __METHOD__ . ':beforeModel:' . $this->_currentModel,
+                    ['import_id' => $importID]
+                );
+
                 $this->_modelsStatistics[$cm] = [
                     'not_changed' => 0,
                     'new_models' => 0,
@@ -739,7 +744,7 @@ class FCom_Core_ImportExport extends BClass
                             $model->setData($cdk, $cdkData, $merge);
                         }
                     }
-                    $model->save(false);
+                    $model->save();
                     $modified = true;
                     $this->_newModels++;
                     $this->_modelsStatistics[$this->_currentModel]['new_models']++;
