@@ -328,14 +328,22 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      */
     public function unregister($save = false)
     {
-        if ($this->parent()) {
-            $this->parent()->add('num_children', -1);
-        }
+        $parentUpdated = false;
         $numDesc = 1 + $this->get('num_descendants');
         foreach ($this->ascendants() as $c) {
-            $c->add('num_descendants', - $numDesc);
+            if ($c->id() === $this->get('parent_id')) {
+                $c->add('num_children', -1);
+                $parentUpdated = true;
+            }
+            $c->add('num_descendants', -$numDesc);
             if ($save) {
                 $c->save();
+            }
+        }
+        if (!$parentUpdated && ($parent = $this->parent())) {
+            $parent->add('num_children', -1)->add('num_descendants', -$numDesc);
+            if ($save) {
+                $parent->save();
             }
         }
         $this->saveInstanceCache('parent', null);
@@ -351,15 +359,23 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      */
     public function register($save = false)
     {
+        $parentUpdated = false;
         $numDesc = 1 + $this->get('num_descendants');
         foreach ($this->ascendants() as $c) {
             if ($c->id() === $this->get('parent_id')) {
                 $c->add('num_children');
+                $parentUpdated = true;
             }
             // TODO: fix updating when re-registering existing node
             $c->add('num_descendants', $numDesc);
             if ($save) {
                 $c->save();
+            }
+        }
+        if (!$parentUpdated && ($parent = $this->parent())) {
+            $parent->add('num_children')->add('num_descendants');
+            if ($save) {
+                $parent->save();
             }
         }
         return $this;
