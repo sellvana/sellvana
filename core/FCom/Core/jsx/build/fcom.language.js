@@ -62,7 +62,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.props.removeField($(e.currentTarget).data('code'));
         },
         handleChange: function (e) {
-            $input = $(e.currentTarget);
+            var $input = $(e.currentTarget);
             this.props.setLangVal($input.data('code'), $input.val());
         },
         render: function () {
