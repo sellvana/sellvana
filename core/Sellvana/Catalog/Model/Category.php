@@ -374,8 +374,7 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
         foreach ($toUpdate as $model) {
             /** @var Sellvana_Catalog_Model_Category $model */
-            $model->generateIdPath()->save();
+            $model->generateIdPath()->recalculateNumDescendants()->save();
         }
-
     }
 }
