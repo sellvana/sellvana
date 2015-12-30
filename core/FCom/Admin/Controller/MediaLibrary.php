@@ -637,6 +637,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 break;
             case 'rescan':
                 try {
+                    if (!file_exists($targetDir)) {
+                        $this->BResponse->json(['status' => 'success']);
+                        break;
+                    }
                     $fileSPLObjects =  new RecursiveIteratorIterator(
                         new RecursiveDirectoryIterator($targetDir),
                         RecursiveIteratorIterator::SELF_FIRST
@@ -672,11 +676,19 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 break;
             case 'rescan_library':
                 try {
+                    if (!file_exists($targetDir)) {
+                        $this->BResponse->json(['status' => 'success']);
+                        break;
+                    }
                     $uploadConfigs = $this->uploadConfig();
 
                     foreach ($uploadConfigs as $uc) {
                         $folder = $this->_parseFolder($uc['folder']);
                         $targetDirLocal = $targetDir . $folder;
+
+                        if (!file_exists($targetDirLocal)) {
+                            continue;
+                        }
                         $fileSPLObjects = new RecursiveIteratorIterator(
                             new RecursiveDirectoryIterator($targetDirLocal),
                             RecursiveIteratorIterator::SELF_FIRST
