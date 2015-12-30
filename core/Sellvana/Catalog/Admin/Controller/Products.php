@@ -1309,6 +1309,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
     }
 
+    /**
+     * @param $model Sellvana_Catalog_Model_Product
+     * @param array $pricesData
+     * @throws BException
+     */
     protected function _savePrices($model, $pricesData) {
         foreach ($pricesData as $id => $priceData) {
             foreach ($priceData as $field => $pf) {
