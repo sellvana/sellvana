@@ -611,6 +611,7 @@ class FCom_Core_ImportExport extends BClass
             $oldModels = $this->_getExistingModels($cm, $existing);
         }
 
+        $ieAbsentIds = [];
         if (!empty($oldModels)){
             $oldModelsIds = [];
             foreach($oldModels as $key => $model){
@@ -744,7 +745,7 @@ class FCom_Core_ImportExport extends BClass
                             $model->setData($cdk, $cdkData, $merge);
                         }
                     }
-                    $model->save();
+                    $model->saveImport();
                     $modified = true;
                     $this->_newModels++;
                     $this->_modelsStatistics[$this->_currentModel]['new_models']++;
