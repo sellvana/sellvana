@@ -11,6 +11,16 @@
 <script type="text/javascript">
     require(['underscore', 'react', 'griddle.fcomLanguage'], function(_, React, FComMultiLanguage) {
         var config = {{ UTIL.toJSON(config) | raw }};
+        var defaultLangs = [];
+        if (config.defaultLangs) {
+            defaultLangs = _(config.defaultLangs).map(function (locale, i) {
+                return {
+                    id: locale,
+                    text: locale
+                };
+            });
+        }
+
         var containerEle = document.getElementById('multilang-field-{{ config.id }}');
         React.unmountComponentAtNode(containerEle);
         React.render(
@@ -19,7 +29,8 @@
                 inputType: config.inputType,
                 availLangs: config.availLangs ? JSON.parse(config.availLangs) : [],
                 modalConfig: config.modalConfig,
-                select2Config: config.select2Config || {}
+                select2Config: config.select2Config || {},
+                defaultLangs: defaultLangs
             }), containerEle
         );
     });

@@ -125,13 +125,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 availLangs: [],
                 select2Config: {},
                 modalConfig: {},
-                defaultLangs: [
-                    {id: 'en_US', text: 'en_US'},
-                    {id: 'de_DE', text: 'de_DE'},
-                    {id: 'zh-CN', text: 'zh-CN'},
-                    {id: 'fr-FR', text: 'fr-FR'},
-                    {id: 'nl_NL', text: 'nl_NL'}
-                ]
+                defaultLangs: []
             };
         },
         componentWillMount: function () {
