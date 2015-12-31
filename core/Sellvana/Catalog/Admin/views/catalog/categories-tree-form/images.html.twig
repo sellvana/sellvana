@@ -8,41 +8,92 @@
     {field:'featured_image_url', label:'Featured Image'|_ },
     {field:'nav_callout_image_url', label:'Navigation Callout Image'|_ }
 ]) }}
-{{ THIS.view('core/medialib').set('config', {id: mediaId, title: 'Category Image'|_, type: 'category-images'}) | raw }}
+{#{{ THIS.view('core/medialib').set('config', {id: mediaId, title: 'Category Image'|_, type: 'category-images'}) | raw }}#}
 
-<script>
-    var {{ mediaId }}_grid;
-    require(['backbone', 'underscore', 'jquery', 'fcom.admin'], function(Backbone, _, $) {
-        window.{{ mediaId }}_register = function(grid) {
-            {{ mediaId }}_grid = grid;
-            grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {
-                var selectedRows = grid.getSelectedRows();
-                var checked = $(ev.target).is(':checked');
-                $('.select-row').prop('checked', false);
-                $(ev.target).prop('checked', checked);
-                this.model.set('selected', checked);
-                selectedRows.reset();
-                if (checked) {
-                    selectedRows.add(this.model);
-                    $('.btn_category_images_add').removeClass('disabled');
-                } else {
-                    $('.btn_category_images_add').addClass('disabled');
-                }
-                ev.stopPropagation();
-                ev.preventDefault();
+{% set medialibConfig = {
+    id: 'category_images',
+    mode: 'images',
+    type: 'category-images',
+    title: 'Images',
+    folder: 'media/category/images',
+    multiSelAllowed: true,
+    config: {actions: {delete: {caption : 'Remove'}}}
+} %}
 
-                return;
-            };
-            grid.build();
-            FCom.Admin.buttonAddImage({
-                grid: grid,
-                text_add_image: '{{ "Add Image..."|_ }}',
-                text_change_image: '{{ "Add Image..."|_ }}',
-                text_modal_add: '{{ "Add"|_ }}',
-                text_modal_change: '{{ "Change"|_ }}',
-                config_id: 'category_images',
-                resize_url: '{{ resizeUrl }}'
+<script type="text/javascript">
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'fcom.admin'], function(React, _, $, Components) {
+        var $btnAddImage = $('.category_images_btn_add_image');
+        var $btnImageAdd = null;
+        if (typeof setMediaModalConfig == 'function') {
+            //set modal config
+            setMediaModalConfig('{{ medialibConfig.id }}', {
+                confirm: 'Add',
+                title: '{{ 'Category Images' |_ }}',
+                confirmClass: '{{ mediaId }}_images_add',
+                onConfirm: addImagesToCategory
             });
         }
-    })
+
+        function processImage(el, data) {
+            var parents = $(el).parents('.form-group');
+            parents.find('.{{ mediaId }}_btn_add_text').html(data.text);
+            parents.find('.{{ mediaId }}_btn_remove_image').css('display', data.display);
+            parents.find('.{{ mediaId }}_current_image').html(data.image_tag);
+            parents.find('.model_image_url').val(data.path);
+        }
+
+        function addImagesToCategory(modal) {
+            var node = $(modal.getDOMNode());
+            $btnImageAdd = node.find('.{{ mediaId }}_images_add');
+            if (typeof mediaLibGrid{{ medialibConfig.id }} != 'undefined') {
+                var selectedRows = mediaLibGrid{{ medialibConfig.id }}.getSelectedRows();
+                if (selectedRows.length) {
+                    var row = selectedRows[0];
+                    var path = row.folder + '/' + row.file_name;
+                    var thumb = row.thumb_url + '/' + row.file_name;
+                    var imageTag = $('<img/>').attr('src', thumb);
+                    $($btnAddImage).each(function () {
+                        if ($(this).hasClass('active')) {
+                            processImage(this, {
+                                text: '{{ "Add Image..."|_ }}',
+                                display: 'block',
+                                image_tag: imageTag,
+                                path: path
+                            });
+                            $(this).parents('.form-group').find('.{{ mediaId }}_btn_add_image').addClass('data-change');
+                            mediaLibGrid{{ medialibConfig.id }}.clearSelectedRows();
+                            $btnImageAdd.html('{{ "Change"|_ }}');
+                        }
+                    });
+
+                    modal.close();
+                } else {
+                    $.bootstrapGrowl("{{ 'Please choose images.' |_ }}", {
+                        type: 'warning',
+                        align: 'center',
+                        width: 'auto',
+                        delay: 3000
+                    });
+                }
+            }
+        }
+
+        $(document).on('click', '.{{ mediaId }}_btn_add_image', function (e) {
+            $btnAddImage.removeClass('active');
+            $(this).addClass('active');
+            $('#{{ mediaId }}-media-modal').modal('show');
+        })
+        .on('click', '.{{ mediaId }}_btn_remove_image', function (e) {
+            processImage(this, {
+                text: '{{ "Add Image..."|_ }}',
+                display: 'none',
+                image_tag: '',
+                path: ''
+            });
+            $(this).parents('.form-group').find('.{{ mediaId }}_btn_add_image').removeClass('data-change');
+            if ($btnImageAdd) $btnImageAdd.html('{{ "Add"|_ }}');
+        });
+    });
 </script>
+
+{{ THIS.view('core/medialib-griddle').set('config', medialibConfig) | raw }}

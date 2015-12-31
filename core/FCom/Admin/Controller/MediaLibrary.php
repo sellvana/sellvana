@@ -173,7 +173,20 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         if ($options['mode'] && $options['mode'] === 'images') {
             $downloadUrl = $this->BApp->href('/media/grid/download?folder=' . $folder . '&file=');
-            $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
+            switch ($options['folder']) {
+                case 'media/category/images':
+                    $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/category/images', ['s' => 100]);
+                    break;
+                case 'media/product/videos':
+                    $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/videos', ['s' => 100]);
+                    break;
+                case 'media/product/attachment':
+                    $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/attachment', ['s' => 100]);
+                    break;
+                default:
+                    $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
+                    break;
+            }
             $config['config']['columns'] = [
                 ['type' => 'row_select'],
                 ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
