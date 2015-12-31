@@ -23,7 +23,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 size = size / 1024;
                 size = size.toFixed(2) + ' KB';
             } else {
-                size = size + ' Byte';
+                size = size ? size + ' Byte' : '';
             }
 
             return size;

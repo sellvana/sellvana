@@ -73,18 +73,18 @@
                     if ($priceEle.length) { // If price modal is saved changed
                         optionsSerialized = $priceEle.val();
                     } else {
-                        if (typeof row.options_serialized === 'string' && row.options_serialized.length) { // 
-                            optionsSerialized = row.options_serialized;
+                        if (typeof row.option_serialized === 'string' && row.option_serialized.length) { // 
+                            optionsSerialized = row.option_serialized;
                         } else { // If added prices but not saved changed then remove
-                            _(row.options_serialized).each(function (optionPrice, index) {
+                            _(row.option_serialized).each(function (optionPrice, index) {
                                 if (isNaN(optionPrice.prices[0].id)) {
-                                    delete row.options_serialized[index];
+                                    delete row.option_serialized[index];
                                 }
                             });
-                            optionsSerialized = JSON.stringify(row.options_serialized);
+                            optionsSerialized = JSON.stringify(row.option_serialized);
                         }
                     }
-                    data['options_serialized'] = optionsSerialized;
+                    data['option_serialized'] = optionsSerialized;
                 /*} else {
                     // If change from select to others then clear options
                     if (data.options) delete data.options;
@@ -332,12 +332,12 @@
          * @return {mixed}
          */
         function _initOptionsSerializeItem(option) {
-            if (!shopper.options_serialized) {
-                shopper.options_serialized = {};
+            if (!shopper.option_serialized) {
+                shopper.option_serialized = {};
             }
 
-            if (!shopper.options_serialized[_toggleSpace(option)]) {
-                shopper.options_serialized[_toggleSpace(option)] = {};
+            if (!shopper.option_serialized[_toggleSpace(option)]) {
+                shopper.option_serialized[_toggleSpace(option)] = {};
             }
         }
 
@@ -466,8 +466,8 @@
                 optionSaveStr += optionLabel + ',';
 
                 _initOptionsSerializeItem(optionLabel);
-                shopper.options_serialized[optionLabel].sku = row.sku;
-                shopper.options_serialized[optionLabel].position = row.position;
+                shopper.option_serialized[optionLabel].sku = row.sku;
+                shopper.option_serialized[optionLabel].position = row.position;
 
                 data[optionLabel]['sku'] = row.sku;
                 data[optionLabel]['position'] = row.position;
@@ -589,7 +589,7 @@
          */
         window.editShopperOptionLabelCallback = function (e) {
             // Disable save change button if validation fail
-            if (shopper.options_serialized && !shopper.options_serialized[e.target.value]) {
+            if (shopper.option_serialized && !shopper.option_serialized[e.target.value]) {
                 shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', true);
             } else {
                 shopperModalNode.find('.modal-footer button.btn-primary').prop('disabled', false);
@@ -626,7 +626,7 @@
          */
         window.shopperPriceTypeCallback = function (prices, option) {
             _initOptionsSerializeItem(option);
-            shopper.options_serialized[option].prices = prices;
+            shopper.option_serialized[option].prices = prices;
         };
 
         var isDropdownList = false;
@@ -643,8 +643,8 @@
             shopper = row;
             shopperId = shopper.id;
 
-            if (row.options_serialized && _.isString(row.options_serialized)) {
-                row.options_serialized = JSON.parse(row.options_serialized);
+            if (row.option_serialized && _.isString(row.option_serialized)) {
+                row.option_serialized = JSON.parse(row.option_serialized);
             }
 
             var options = isDropdownList && shopper.options ? _parseOptions(shopper.options) : !isDropdownList ? [shopper.label] : [];
@@ -684,11 +684,11 @@
 
             // Add available shopper dropdown options to options grid
             if (options.length) {
-                var optionsSerialized = row.options_serialized;
+                var optionsSerialized = row.option_serialized;
                 options = options.map(function (option, i) {
                     var index = ++i;
-                    if (shopper.options_serialized[_toggleSpace(option)]) {
-                        shopper.options_serialized[_toggleSpace(option)].id = index;
+                    if (shopper.option_serialized[_toggleSpace(option)]) {
+                        shopper.option_serialized[_toggleSpace(option)].id = index;
                     }
                     var res = {
                         id: index,
@@ -816,8 +816,8 @@
             updateOptionsSerializeIdForNewRow: function (row) {
                 var option = _toggleSpace(row.label);
                 _initOptionsSerializeItem(option);
-                if (shopper.options_serialized[option]) {
-                    shopper.options_serialized[option].id = row.id;
+                if (shopper.option_serialized[option]) {
+                    shopper.option_serialized[option].id = row.id;
                 }
             },
             componentWillMount: function () {
@@ -867,15 +867,15 @@
                 $(OPTS).on('edit', function (e, row, isEditAttrs, isToggleTab) { // console.log('edit', row);
                     if (isEditAttrs) {
                         // Update row attrs
-                        options = _(shopper.options_serialized).map(function (item, index) {
+                        options = _(shopper.option_serialized).map(function (item, index) {
                             index = _toggleSpace(index);
                             if (item.id == row.id) {
                                 // Update option field attrs
                                 item.sku = row.sku;
                                 item.position = row.position;
-                                shopper.options_serialized[_toggleSpace(row.label)] = _.clone(item);
+                                shopper.option_serialized[_toggleSpace(row.label)] = _.clone(item);
                                 // Delete old option field
-                                delete shopper.options_serialized[index];
+                                delete shopper.option_serialized[index];
 
                                 return _toggleSpace(row.label);
                             } else return index;
@@ -972,11 +972,11 @@
             mixins: [FCom.Mixin, FCom.PriceMixin],
             init: function (option) {
                 var optionsSerialized = {};
-                if (!_.isEmpty(this.props.row.options_serialized)) {
-                    optionsSerialized = this.props.row.options_serialized;
+                if (!_.isEmpty(this.props.row.option_serialized)) {
+                    optionsSerialized = this.props.row.option_serialized;
                 }
                 var prices = [];
-                var shopperPrices = !_.isEmpty(optionsSerialized) && optionsSerialized[option] ? optionsSerialized[option].prices : (shopper.options_serialized && !_.isEmpty(shopper.options_serialized[option]) ? shopper.options_serialized[option].prices : []);
+                var shopperPrices = !_.isEmpty(optionsSerialized) && optionsSerialized[option] ? optionsSerialized[option].prices : (shopper.option_serialized && !_.isEmpty(shopper.option_serialized[option]) ? shopper.option_serialized[option].prices : []);
 
                 if (shopperPrices && shopperPrices.length) {
                     prices = typeof shopperPrices === 'string' ? JSON.parse(shopperPrices) : shopperPrices;
@@ -1048,12 +1048,12 @@
             mixins: [FCom.Mixin, FCom.PriceMixin],
             init: function (option) {
                 var optionsSerialized = {};
-                if (!_.isEmpty(this.props.row.options_serialized)) {
-                    optionsSerialized = this.props.row.options_serialized;
+                if (!_.isEmpty(this.props.row.option_serialized)) {
+                    optionsSerialized = this.props.row.option_serialized;
                 }
                 var prices = [];
 
-                var shopperPrices = !_.isEmpty(optionsSerialized) && optionsSerialized[option] ? optionsSerialized[option].prices : (shopper.options_serialized && !_.isEmpty(shopper.options_serialized[option]) ? shopper.options_serialized[option].prices : []);
+                var shopperPrices = !_.isEmpty(optionsSerialized) && optionsSerialized[option] ? optionsSerialized[option].prices : (shopper.option_serialized && !_.isEmpty(shopper.option_serialized[option]) ? shopper.option_serialized[option].prices : []);
 
                 if (shopperPrices && shopperPrices.length) {
                     prices = typeof shopperPrices === 'string' ? JSON.parse(shopperPrices) : shopperPrices;
