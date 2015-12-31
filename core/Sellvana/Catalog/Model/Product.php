@@ -5,7 +5,7 @@
  *
  * The followings are the available columns in table 'fcom_product':
  *
-*@property string  $id
+ * @property string  $id
  * @property string  $product_sku
  * @property string  $product_name
  * @property string  $short_description
@@ -956,7 +956,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getProductLinks()
     {
-        $arrProduct = $this->Sellvana_Catalog_Model_Product->orm('p')->select('pl.link_type')
+        $arrProduct = $this->Sellvana_Catalog_Model_Product->orm('p')->select(['p.*', 'pl.link_type'])
             ->left_outer_join('Sellvana_Catalog_Model_ProductLink', ['p.id', '=', 'pl.linked_product_id'], 'pl')
             ->where('pl.product_id', $this->id)->find_many();
         $productLink = [

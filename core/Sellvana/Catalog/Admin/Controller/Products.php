@@ -424,6 +424,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         return $config;
     }
 
+    /**
+     * @param Sellvana_Catalog_Model_Product $model
+     * @return array
+     */
     public function productVideosGridConfig($model)
     {
         $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/videos&file=');
@@ -433,6 +437,22 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ->select(['a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'a.data_serialized'])
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
             ->find_many());
+
+        $fileSizeEle = '
+            rc.row["file_sieze"] ? rc.row["file_sieze"] : ""
+        ';
+
+        $isDefaultEle = '
+            "<input class=\'is-default\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+            . ' "+(rc.row["is_default"]==1 ? checked=\'checked\' : \'\')+" '
+            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos[is_default]\' '
+            . 'data-is-default=\'"+rc.row["is_default"]+"\'/>"
+        ';
+
+        $inGalleryEle = '"<input class=\'in-gallery\' value=\'1\' type=\'checkbox\' '
+            . ' "+(rc.row["in_gallery"]==1 ? checked=\'checked\' : \'\')+" '
+            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos["+rc.row["id"]+"][in_gallery]\' '
+            . 'data-in-gallery=\'"+rc.row["in_gallery"]+"\'/>"';
 
         $config =  [
             'config' => [
@@ -452,24 +472,15 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'file_id',  'hidden' => true],
                     ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
                     ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
-                    // ['name' => 'file_name', 'label' => 'File Name'],
-                    ['type' => 'link', 'name' => 'file_name', 'label' => 'File Name', 'width' => 80,
-                        'addable' => true, 'action' => 'showModalToPreviewVideo', 'editable' => true, 'className' => 'valid-video-name'
-                    ],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'file_size'],
+                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 80],
+                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'eval', 'print' => $fileSizeEle],
                     ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline', 'attributes' => ['required' => true]],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
                     ['name' => 'is_default', 'label' => 'Default', 'width' => 50, 'display' => 'eval',
-                        'print' => '"<input class=\'is-default\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
-                            . ' "+(rc.row["is_default"]==1 ? checked=\'checked\' : \'\')+" '
-                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos[is_default]\' '
-                            . 'data-is-default=\'"+rc.row["is_default"]+"\'/>"'],
+                        'print' => $isDefaultEle],
                     ['name' => 'in_gallery', 'label' => 'In Gallery', 'width' => 50, 'display' => 'eval',
-                        'print' => '"<input class=\'in-gallery\' value=\'1\' type=\'checkbox\' '
-                            . ' "+(rc.row["in_gallery"]==1 ? checked=\'checked\' : \'\')+" '
-                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos["+rc.row["id"]+"][in_gallery]\' '
-                            . 'data-in-gallery=\'"+rc.row["in_gallery"]+"\'/>"'],
+                        'print' => $inGalleryEle],
                     ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
                     ['name' => 'update_at', 'label' => 'Updated', 'width' => 200]
                 ],
@@ -1007,7 +1018,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $fields = $cField['fields'];
                 foreach($fields as $field) {
                     $fieldModel = $this->Sellvana_CatalogFields_Model_Field->load($field['id']);
-                    if ($fieldModel && !in_array(['select', 'multiselect'], $field['admin_input_type']) && !empty($field['lang_fields'])) {
+                    if ($fieldModel && !in_array(['select', 'multiselect'], $field['admin_input_type'])) {
                         $fieldModel->setData('frontend_label_translation', array_filter($field['lang_fields']))->save();
                     }
                 }
@@ -1298,6 +1309,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
     }
 
+    /**
+     * @param $model Sellvana_Catalog_Model_Product
+     * @param array $pricesData
+     * @throws BException
+     */
     protected function _savePrices($model, $pricesData) {
         foreach ($pricesData as $id => $priceData) {
             foreach ($priceData as $field => $pf) {

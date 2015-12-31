@@ -129,21 +129,21 @@
                 $(MediaApp).off('onMounted');
             },
             render: function() {
-                var node = React.DOM.div({ id: 'box-content' }, 
-                        React.DOM.div({ className: 'row fileupload-buttonbar' }, 
-                            React.DOM.div({ className: 'col-sm-12' }, 
-                                React.DOM.span({ className: 'btn btn-success fileinput-button' }, 
+                var node = React.DOM.div({ id: 'box-content' },
+                        React.DOM.div({ className: 'row fileupload-buttonbar' },
+                            React.DOM.div({ className: 'col-sm-12' },
+                                React.DOM.span({ className: 'btn btn-success fileinput-button' },
                                     React.DOM.i({ className: 'icon-plus icon-white' }),
-                                    React.DOM.span(null, 'Add files...'),
+                                    React.DOM.span(null, "{{ 'Add files...' |_ }}"),
                                     React.DOM.input({ 'data-bfi-disabled': '', multiple: '', name: 'upload[]', type: 'file' })
                                 ),
                                 React.DOM.button({ className: 'btn btn-primary start', type: 'submit' },
                                     React.DOM.i({ className: 'icon-upload icon-white' }),
-                                    React.DOM.span(null, 'Start upload')
+                                    React.DOM.span(null, "{{ 'Start upload' |_ }}")
                                 ),
                                 React.DOM.button({ className: 'btn btn-warning cancel', type: 'reset' },
                                     React.DOM.i({ className: 'icon-ban-circle icon-white' }),
-                                    React.DOM.span(null, 'Cancel upload')
+                                    React.DOM.span(null, "{{ 'Cancel upload'|_ }}")
                                 )
                             ),
                             React.DOM.div({ className: 'col-sm-5 fileupload-progress fade' },
@@ -160,7 +160,7 @@
                             React.DOM.tbody({ className: 'files', 'data-target': '#modal-gallery', 'data-toggle': 'modal-gallery' })
                         )
                     );
-                
+
                 return node;
             }
         });

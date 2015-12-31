@@ -221,7 +221,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             ->where_in('pf.product_id', $productIds);
 
         $this->BEvents->fire(__METHOD__, ['orm' => $orm]);
-
+        /** @var BORM $orm */
         return $orm->find_many_assoc(['product_id', 'id']);
     }
 

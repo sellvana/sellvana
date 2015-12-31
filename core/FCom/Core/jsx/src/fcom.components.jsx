@@ -9,7 +9,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
     FCom.Mixin = {
         text2html: function (val) {
             var text = $.parseHTML(val);
-            return (text !== null) ? text[0].data: null;
+            return (text !== null) ? text[0].data : null;
         },
         html2text: function (val) {
             return $('<div/>').text(val).html();
@@ -38,7 +38,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
 
             return dateTime;
         },
-        updateModalWidth: function(modal) {
+        updateModalWidth: function (modal) {
             //todo: add css class to modal to pre-define width, eg: large, medium, small
             $(modal.getDOMNode()).find('.modal-dialog').css('width', '900px');
         },
@@ -46,7 +46,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
          * remove special chars
          * @param {string} str
          */
-        removeSpecialChars: function(str) { //todo: put this function to global utilities object
+        removeSpecialChars: function (str) { //todo: put this function to global utilities object
             var label = str.substr(0, str.lastIndexOf('.'));
             return label.replace(/[^A-Z0-9]/ig, ' ');
         }
@@ -88,7 +88,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             }
             return name;
         },
-        validationRules: function(data) {
+        validationRules: function (data) {
             var rules = {};
             for (var key in data) {
                 if (!data.hasOwnProperty(key)) {
@@ -148,7 +148,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             var cl = "control-label " + this.props.label_class + (this.props.required ? ' required' : '');
             return (
                 <label className={cl}
-                    htmlFor={ this.props.input_id }>{this.props.children}</label>
+                       htmlFor={ this.props.input_id }>{this.props.children}</label>
             );
         },
         getDefaultProps: function () {
@@ -168,7 +168,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
     });
 
     FCom.Components.Input = React.createClass({
-        mixins:[FCom.FormMixin],
+        mixins: [FCom.FormMixin],
         render: function () {
             var formGroupClass = this.props.formGroupClass,
                 inputDivClass = this.props.inputDivClass,
@@ -176,19 +176,19 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 inputValue = this.props.inputValue,
                 other = _.omit(this.props, ['formGroupClass', 'inputDivClass', 'inputClass', 'inputValue']);
             var className = "form-control";
-            if(inputClass) {
+            if (inputClass) {
                 className += " " + inputClass;
             }
-            if(this.props.required) {
+            if (this.props.required) {
                 className += " required";
             }
             var helpBlock = <span/>;
-            if(this.props['helpBlockText']) {
+            if (this.props['helpBlockText']) {
                 helpBlock = <FCom.Components.HelpBlock text={this.props['helpBlockText']}/>;
             }
-        var inputId = this.getInputId();
+            var inputId = this.getInputId();
 
-        return (
+            return (
                 <div className={"form-group " + formGroupClass}>
                     <FCom.Components.ControlLabel {...other} input_id={inputId}>
                         {this.props.label}
@@ -206,7 +206,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 </div>
             );
         },
-        getDefaultProps: function() {
+        getDefaultProps: function () {
             // component default properties
             return {
                 formGroupClass: '',
@@ -214,7 +214,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 type: 'text',
                 inputId: '',
                 inputName: '',
-                inputClass:''
+                inputClass: ''
             };
         }
     });
@@ -223,9 +223,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         render: function () {
             return (
                 <a id={this.props.id} className="pull-right" href="#" ref="icon"
-                    data-toggle="popover" data-trigger="focus" tabIndex="-1"
-                    data-content={this.props.content} data-container="body">
-                    <span className="icon-question-sign"></span>
+                   data-toggle="popover" data-trigger="focus" tabIndex="-1"
+                   data-content={this.props.content} data-container="body">
+                    <span className="icon-question-sign" />
                 </a>
             );
         },
@@ -250,8 +250,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         render: function () {
             return (
                 <select name={this.props.name} id={this.props.id}
-                    className={"form-control to-select2 " + this.props.className} style={this.props.style}
-                    defaultValue={this.props.value}>
+                        className={"form-control to-select2 " + this.props.className} style={this.props.style}
+                        defaultValue={this.props.value}>
                     <option value="0">{this.props.optNo}</option>
                     <option value="1">{this.props.optYes}</option>
                 </select>
@@ -322,14 +322,14 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
 
             if (this.props.confirm) {
                 confirmButton = (
-                    <FCom.Components.Button onClick={this.handleConfirm} className="btn-primary" type="button">
+                    <FCom.Components.Button onClick={this.handleConfirm} className={"btn-primary " + (this.props.confirmClass || '')} type="button">
                         {this.props.confirm}
                     </FCom.Components.Button>
                 );
             }
             if (this.props.cancel) {
                 cancelButton = (
-                    <FCom.Components.Button onClick={this.handleCancel} className="btn-default" type="button">
+                    <FCom.Components.Button onClick={this.handleCancel} className={"btn-default " + (this.props.cancelClass || '')} type="button">
                         {this.props.cancel}
                     </FCom.Components.Button>
                 );
@@ -341,7 +341,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                         <div className="modal-content">
                             <div className="modal-header">
                                 <button type="button" className="close" onClick={this.handleCancel}>
-                                &times;
+                                    &times;
                                 </button>
                                 <h4 className="modal-title">{this.props.title}</h4>
                             </div>
@@ -349,8 +349,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                                 {this.props.children}
                             </div>
                             <div className="modal-footer">
-                                  {cancelButton}
-                                  {confirmButton}
+                                {cancelButton}
+                                {confirmButton}
                             </div>
                         </div>
                     </div>
@@ -388,7 +388,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
      */
     FCom.Components.ModalElement = React.createClass({
         mixins: [FCom.Mixin, FCom.FormMixin],
-        getDefaultProps: function() {
+        getDefaultProps: function () {
             return {
                 'value': '', //default value
                 'column': {}, //column info and option,
@@ -396,12 +396,12 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 'removeFieldHandle': null
             }
         },
-        render: function() {
+        render: function () {
             var that = this;
             var column = this.props.column;
 
             var label = '';
-            var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
+            var iconRequired = (typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
             if (typeof(column['form_hidden_label']) === 'undefined' || !column['form_hidden_label']) {
                 label = (
                     <div className="control-label col-sm-3" key={this.props.key}>
@@ -416,41 +416,56 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             var input = '';
             if (typeof column['element_print'] != 'undefined') { //custom html for element_print
                 if (typeof(column['form_hidden_label']) === 'undefined' || !column['form_hidden_label']) {
-                    input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                    input = '<div class="control-label col-sm-3"><label for=' + column.name + '>' + column.label + '</label></div>';
                 }
                 input += '<div class="controls col-sm-8">' + column['element_print'] + '</div>';
-                return <div key={this.props.key} className="form-group element_print" dangerouslySetInnerHTML={{__html: input}}></div>
+                return <div key={this.props.key} className="form-group element_print"
+                            dangerouslySetInnerHTML={{__html: input}}></div>
             } else {
                 switch (column.editor) {
                     case 'select':
                         var options = [];
-                        _.forEach(column.options, function(text, value) {
+                        _.forEach(column.options, function (text, value) {
                             options.push(<option value={value} key={value}>{text}</option>);
                         });
-                        input = <select key={this.props.key} name={column.name} id={column.name} className={"form-control " + (column.className ? column.className : '')} defaultValue={this.props.value} {...validationRules}>{options}</select>;
+                        input = <select key={this.props.key} name={column.name} id={column.name}
+                                        className={"form-control " + (column.className ? column.className : '')}
+                                        defaultValue={this.props.value} {...validationRules}>{options}</select>;
                         break;
                     case 'textarea':
-                        input = <textarea key={this.props.key} name={column.name} id={column.name} className={"form-control " + (column.className ? column.className : '')} rows="5" defaultValue={this.props.value} {...validationRules} />;
+                        input = <textarea key={this.props.key} name={column.name} id={column.name}
+                                          className={"form-control " + (column.className ? column.className : '')}
+                                          rows="5" defaultValue={this.props.value} {...validationRules} />;
                         break;
                     default:
-                        input = <input key={this.props.key} name={column.name} id={column.name} className={"form-control " + (column.className ? column.className : '')} defaultValue={this.props.value} {...column.attributes} {...validationRules} />;
+                        input = <input key={this.props.key} name={column.name} id={column.name}
+                                       className={"form-control " + (column.className ? column.className : '')}
+                                       defaultValue={this.props.value} {...column.attributes} {...validationRules} />;
                         break;
                 }
             }
 
             var removeFieldButton = '';
             if (this.props.removeFieldDisplay) {
-                removeFieldButton = (<button key={this.props.key} className="btn box-remove btn-xs btn-link btn-remove remove-field icon-remove" type="button" onClick={this.props.removeFieldHandle} data-field={column.name}></button>);
+                removeFieldButton = (<button key={this.props.key}
+                                             className="btn box-remove btn-xs btn-link btn-remove remove-field icon-remove"
+                                             type="button" onClick={this.props.removeFieldHandle}
+                                             data-field={column.name}></button>);
             }
 
             return (
                 <div className="form-group">
-                    {label}<div className="controls col-sm-8">{input}</div>{removeFieldButton}
+                    {label}
+                    <div className="controls col-sm-8">{input}</div>
+                    {removeFieldButton}
                 </div>
             )
         }
     });
 
+    /**
+     * Render select2 element
+     */
     FCom.Components.Select2 = React.createClass({
         getDefaultProps: function () {
             return {
@@ -497,7 +512,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             // Set up Select2
             var $select2 = this.createSelect2();
         },
-        setPlaceholderTo: function($elem, placeholder) {
+        setPlaceholderTo: function ($elem, placeholder) {
             if (!placeholder) {
                 placeholder = "";
             }

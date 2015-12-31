@@ -23,6 +23,7 @@
 
         {{ forms.boolean(fieldData, {field:'enable_locales', label:'Enable UI Multi Locale'|_ }) }}
         {{ forms.select(fieldData, {field:'default_locale', label:'Default Product Locale', select2: {}, options:locales }) }}
+        {{ forms.select(fieldData, {field:'default_locale_items', label:'Default Locale Items', select2: {}, multiple: true, options:locales }) }}
         {{ forms.select(fieldData, {field:'allowed_locales', label:'Allowed Admin UI Locales', select2: {},
             multiple: true, options:locales }) }}
         {{ forms.boolean(fieldData, {field:'enable_debug_in_js', label:'Enable Debug Mode In JS'|_ }) }}
