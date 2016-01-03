@@ -16,7 +16,7 @@
 {% set fieldsConfig = setCtrl.fieldsGridConfig() %}
 {% set fieldsConfigCompiled = THIS.view('core/griddle').set('grid', fieldsConfig).getGridConfig() %}
 {% set initialData = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products').getInitialData(model) %}
-{% set locales = CONFIG.get('modules/FCom_Admin/default_locale_items') %}
+{% set locales = CONFIG.get('modules/Sellvana_MultiLanguage/allowed_locales') %}
 
 <script type="text/javascript">
     require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'sortable', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage, Sortable) {

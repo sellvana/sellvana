@@ -1,7 +1,7 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
-{% set locales = CONFIG.get('modules/FCom_Admin/default_locale_items') %}
+{% set locales = CONFIG.get('modules/Sellvana_MultiLanguage/allowed_locales') %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">

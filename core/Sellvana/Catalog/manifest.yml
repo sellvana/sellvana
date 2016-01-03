@@ -24,6 +24,11 @@ modules:
                     products_without_images_limit: 25
                     searches_recent_terms_limit: 25
                     searches_recent_top_limit: 25
+                    default_origin_country: US
+                FCom_Frontend:
+                    nav_top:
+                        type: root_selected
+                        root_category: 1
 
         areas:
             FCom_Admin:
