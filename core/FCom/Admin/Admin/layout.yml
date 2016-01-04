@@ -51,7 +51,7 @@ base:
             - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
             #- [ addNav, system/emails, { label: System Emails, href: /systememails  } ]
             - [ addNav, system/templates, { label: Templates, href: /templates  } ]
-            - [ addNav, system/backups, { label: Backups, href: /backups  } ]
+            #- [ addNav, system/backups, { label: Backups, href: /backups  } ]
             - [ addNav, system/importexport, { label: Import/Export, href: /importexport  } ]
             - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
             - [ addNav, system/media_library, { label: "Media Library", href: /media_library, class: media-library } ]
