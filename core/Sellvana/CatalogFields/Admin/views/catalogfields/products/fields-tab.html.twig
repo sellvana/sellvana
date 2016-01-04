@@ -254,10 +254,10 @@
                 $(APP).trigger('reloadFields', [null, fieldIds]);
             },
             removeField: function (e) {
-                var $target = $(e.currentTarget);
-                var fieldId = $target.data('field-id'),
-                        fieldName = $target.data('field-value');
-                var sets = this.state.fieldSets;
+                var $target = $(e.currentTarget),
+                    fieldId = $target.data('field-id'),
+                    fieldName = $target.data('field-value'),
+                    sets = this.state.fieldSets;
                 _(sets).each(function (set, i) {
                     _(set.fields).each(function (f, j) {
                         if (f && f.id == fieldId) sets[i].fields.splice(j, 1);

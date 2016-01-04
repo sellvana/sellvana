@@ -470,6 +470,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         getDefaultProps: function () {
             return {
                 hasError: false,
+                errorClass: "has-error",  // default to Bootstrap 3's error class
                 multiple: false,
                 val: [],
                 style: {
@@ -554,9 +555,25 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 placeholder: this.props.placeholder
             })
             .on("change", this.handleChange)
+            .on("select2-open", this.handleErrorState)
             .select2("enable", this.props.enabled);
 
             this.setPlaceholderTo($select2, this.props.placeholder);
+        },
+        handleErrorState: function () {
+            var $dropNode = $('#select2-drop');
+            var classNames = $dropNode[0].className.split(/\s+/);
+
+            if (this.props.hasError) {
+                var hasErrorClass = $.inArray(this.props.errorClass, classNames);
+
+                if (hasErrorClass == -1) {
+                    $dropNode.addClass(this.props.errorClass);
+                }
+
+            } else {
+                $dropNode.removeClass(this.props.errorClass);
+            }
         },
         handleChange: function (e) {
             if (this.props.onSelection) {
