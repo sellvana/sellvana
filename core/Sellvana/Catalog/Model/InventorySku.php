@@ -48,6 +48,10 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
             $this->set('pack_separate', 0);
         }
 
+        if (null === $this->get('origin_country')) {
+            $this->set('origin_country', $this->BConfig->get('modules/Sellvana_Catalog/default_origin_country'));
+        }
+
         return true;
     }
 
