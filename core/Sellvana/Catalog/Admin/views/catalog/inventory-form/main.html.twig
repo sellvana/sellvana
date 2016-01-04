@@ -4,6 +4,8 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
+{% set countries = APP.instance('BLocale').getAvailableCountries() %}
+{% set defCountry = CONFIG.get('modules/Sellvana_Catalog/default_origin_country') %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
@@ -27,5 +29,8 @@
         {{ forms.input(fieldData,    { field: 'net_weight', label: 'Net Weight'|_ }) }}
         {{ forms.input(fieldData,    { field: 'shipping_weight', label: 'Shipping Weight'|_ }) }}
         {{ forms.input(fieldData,    { field: 'shipping_size', label: 'Shipping Size (WxDxH)'|_ }) }}
+
+        {{ forms.input(invFieldData,    { field: 'hs_tariff_number', label: 'Harmonized Tariff Number'|_ }) }}
+        {{ forms.select(invFieldData,   { field: 'origin_country', label: 'Country of Origin'|_, options: countries, default: defCountry }) }}
     </div>
 </fieldset>

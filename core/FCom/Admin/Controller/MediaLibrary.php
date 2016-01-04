@@ -123,7 +123,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
-                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval', 'print' => $elementPrint, 'sortable' => false, 'type' => 'external_link'],
+                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval', 'print' => $elementPrint, 'sortable' => false],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
                     ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
                         'display' => 'file_size'],
@@ -173,7 +173,20 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         if ($options['mode'] && $options['mode'] === 'images') {
             $downloadUrl = $this->BApp->href('/media/grid/download?folder=' . $folder . '&file=');
-            $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
+            switch ($options['folder']) {
+                case 'media/category/images':
+                    $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/category/images', ['s' => 100]);
+                    break;
+                case 'media/product/videos':
+                    $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/videos', ['s' => 100]);
+                    break;
+                case 'media/product/attachment':
+                    $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/attachment', ['s' => 100]);
+                    break;
+                default:
+                    $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
+                    break;
+            }
             $config['config']['columns'] = [
                 ['type' => 'row_select'],
                 ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
@@ -202,7 +215,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $folder = 'media';
         $url = $this->BApp->href('/media/grid');
         $orm = $this->FCom_Core_Model_MediaLibrary->orm('a')
-            ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
+            ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size', 'a.data_serialized'])
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder');
 
         if ($this->BModuleRegistry->isLoaded('Sellvana_Catalog')) {
@@ -210,6 +223,18 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 . ' pm WHERE pm.file_id = a.id)', 'associated_products');
         }
         $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
+
+        $elementPrint = '
+            if (rc.row["file_size"]) {
+                "<a href=\''.$url.'/download?folder="+rc.row["folder"]+ "&file="+rc.row["file_name"]+"\' target=_blank><img src=\'/"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["file_name"]+"\' width=100></a>"
+            } else if (rc.row[\'data_serialized\']) {
+                var data = JSON.parse(rc.row[\'data_serialized\']);
+                if (data) {
+                    "<img src=\'"+ data.thumbnail_url +"\' width=100 alt=\'"+ data.title +"\'>"
+                }
+            }
+        ';
+
         $config = [
             'config' => [
                 'id'            => $id,
@@ -222,8 +247,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
                     ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
-                        'print' => '"<a href=\'' . $url . '/download?folder="+rc.row["folder"]+ "&file="+rc.row["file_name"]+"\' target=_blank>'
-                            . '<img src=\'' . $baseSrc . '"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
+                        'print' => $elementPrint,
                         'sortable' => false],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
                     ['name' => 'folder', 'label' => 'Folder', 'width' => 200],

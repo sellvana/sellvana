@@ -42,7 +42,7 @@ class Sellvana_ShopperFields_Admin extends BClass
                 'columns' => [
                     ['type' => 'row_select', 'width' => 80],
                     ['type' => 'btn_group', 'width' => 80, 'buttons' => [
-                        ['name' => 'edit-custom', 'callback' => 'showModalToEditShopperField', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil "],
+                        ['name' => 'edit-custom', 'callback' => 'showModalToEditShopperField', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-dollar ", 'title' => 'Edit Prices'],
                         ['name' => 'delete'],
                     ]],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
@@ -53,7 +53,6 @@ class Sellvana_ShopperFields_Admin extends BClass
                     ['name' => 'input_type', 'label' => 'Field Type', 'width' => 120, 'editable' => 'inline','editor' => 'select',
                         'addable' => true, 'type' => 'input' , 'validation' => ['required' => true], 'default' => 'select',
                         'options' => ['textarea' => 'Text Area', 'text' => 'Text Line', 'select' => 'Drop Down', 'checkbox' => 'Check Box'], 'select2' => true, 'callback' => 'updateValidation'],
-                    ['type' => 'link', 'name' => 'options', 'label' => 'Options', 'width' => 80, 'addable' => true, 'style' => ['fontSize' => '12px', 'lineHeight' => '32px', 'display' => 'block', 'textAlign' => 'center'], 'action' => 'showModalToEditShopperField'],
                     ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select', 'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => 'Yes', 0 => 'No'], 'default' => 1, 'select2' => true],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 80, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true]],

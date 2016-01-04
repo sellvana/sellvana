@@ -1,6 +1,7 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
+{% set locales = CONFIG.get('modules/Sellvana_MultiLanguage/allowed_locales') %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
@@ -14,6 +15,7 @@
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_name_lang_' ~ m.get('id'),
                     availLangs: m.getData('name_lang_fields'),
+                    defaultLangs: locales,
                     modalConfig: {
                         onSaved: 'saveNameFieldLang'
                     }
@@ -37,6 +39,8 @@
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_shortdesc_lang_' ~ m.get('id'),
                     availLangs: m.getData('short_desc_lang_fields'),
+                    defaultLangs: locales,
+                    inputType: 'textarea',
                     modalConfig: {
                         onSaved: 'saveShortDescFieldLang'
                     }
@@ -54,6 +58,8 @@
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_desc_lang_' ~ m.get('id'),
                     availLangs: m.getData('desc_lang_fields'),
+                    defaultLangs: locales,
+                    inputType: 'wysiwyg',
                     modalConfig: {
                         onSaved: 'saveDescFieldLang'
                     }
@@ -175,24 +181,24 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     window.saveShortDescFieldLang = function (modal) {
         var node = $(modal.getDOMNode());
-        _saveLangs(node, $shortDescContainer);
+        _saveLangs(node, $shortDescContainer, 'textarea');
         modal.close();
     };
 
     window.saveDescFieldLang = function (modal) {
         var node = $(modal.getDOMNode());
-        _saveLangs(node, $descContainer);
+        _saveLangs(node, $descContainer, 'wysiwyg');
         modal.close();
     };
 
-    function _saveLangs(node, container) {
+    function _saveLangs(node, container, input_type) {
         var hash = [];
 
-        _(node.find('input[data-type="lang"]')).each(function(ele) {
+        _(node.find('.lang-field')).each(function(ele) {
             hash.push({
                 value: $(ele).val(),
                 lang_code: $(ele).data('code'),
-                input_type: 'text'
+                input_type: input_type || 'text'
             });
         });
 

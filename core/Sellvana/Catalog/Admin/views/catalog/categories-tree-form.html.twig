@@ -60,7 +60,7 @@
                     success: function (data)
                     {
                         if (data.status == 'error') {
-                            $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                            $.bootstrapGrowl("{{ 'Error' |_ }}:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                         }
                         if (data.status == 'success') {
                             $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });

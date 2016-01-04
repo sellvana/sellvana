@@ -62,7 +62,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.props.removeField($(e.currentTarget).data('code'));
         },
         handleChange: function (e) {
-            $input = $(e.currentTarget);
+            var $input = $(e.currentTarget);
             this.props.setLangVal($input.data('code'), $input.val());
         },
         render: function () {
@@ -73,17 +73,17 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                         switch (lang.input_type) {
                             case 'textarea':
                                 node = React.createElement("textarea", {id: guid(), name: that.props.id, "data-type": that.props.id, 
-                                                 "data-code": lang.lang_code, className: "form-control", 
+                                                 "data-code": lang.lang_code, className: "form-control lang-field", 
                                                  "data-rule-required": "true", defaultValue: lang.value});
                                 break;
                             case 'wysiwyg':
                                 node = React.createElement("textarea", {id: guid(), name: that.props.id, "data-type": that.props.id, 
-                                                 "data-code": lang.lang_code, className: "form-control lang-ckeditor", 
+                                                 "data-code": lang.lang_code, className: "form-control lang-ckeditor lang-field", 
                                                  rows: "5", defaultValue: lang.value});
                                 that.state.inputTypes[lang.lang_code] = lang.input_type;
                                 break;
                             default:
-                                node = React.createElement("input", {type: "text", className: "form-control", "data-type": that.props.id, 
+                                node = React.createElement("input", {type: "text", className: "form-control lang-field", "data-type": that.props.id, 
                                               onBlur: that.handleChange, 
                                               "data-code": lang.lang_code, "data-rule-required": "true", name: that.props.id, 
                                               defaultValue: lang.value});
@@ -125,13 +125,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 availLangs: [],
                 select2Config: {},
                 modalConfig: {},
-                defaultLangs: [
-                    {id: 'en_US', text: 'en_US'},
-                    {id: 'de_DE', text: 'de_DE'},
-                    {id: 'zh-CN', text: 'zh-CN'},
-                    {id: 'fr-FR', text: 'fr-FR'},
-                    {id: 'nl_NL', text: 'nl_NL'}
-                ]
+                defaultLangs: []
             };
         },
         componentWillMount: function () {

@@ -204,14 +204,14 @@
                                 ),
                                 React.DOM.div({ className: 'folder' }, 
                                     React.DOM.strong(null, "{{ 'Folder: ' | _ }}"),
-                                    React.DOM.span(null, row.folder ? row.folder : "{{ 'External Video' |_ }}")
+                                    React.DOM.span(null, !isExternalLink ? row.folder : "")
                                 ),
                                 React.DOM.div({ className: 'file-size' }, 
                                     React.DOM.strong(null, "{{ 'File size: ' | _ }}"),
-                                    React.DOM.span(null, row.file_size ? Math.ceil(row.file_size/1024000) + "{{ ' MB' |_ }}" : "{{ 'External Video' |_ }}")
+                                    React.DOM.span(null, row.file_size ? Math.ceil(row.file_size/1024000) + "{{ ' MB' |_ }}" : "")
                                 ),
                                 React.DOM.div({ className: 'create-at' }, 
-                                    React.DOM.strong(null, "{{ 'Upload on: ' | _ }}"),
+                                    React.DOM.strong(null, (isExternalLink ? "{{ 'Embed on: ' | _ }}" : "{{ 'Upload on: ' | _ }}")),
                                     React.DOM.span(null, row.create_at)
                                 )
                             ),
