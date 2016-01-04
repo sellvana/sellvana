@@ -11,8 +11,19 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
     protected $_modelClass = 'Sellvana_Catalog_Model_SearchAlias';
     protected $_gridHref = 'catalog/searchalias';
     protected $_gridTitle = 'Search Terms';
-    protected $_recordName = 'Search Term';
+    protected $_recordName = 'Search Terms';
     protected $_mainTableAlias = 's';
+
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+
+        /** @var FCom_Admin_View_Grid $view */
+        $view = $args['page_view'];
+        $actions = (array)$view->get('actions');
+        unset($actions['new']);
+        $view->set('actions', $actions);
+    }
 
     public function gridConfig()
     {
@@ -49,7 +60,7 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 's.update_at', 'width' => 100],
         ];
         $config['actions'] = [
-            'new' => ['caption' => 'Add New Search Term'],
+            'new' => ['caption' => 'New Search Term'],
             'delete' => true,
         ];
         $config['filters'] = [
@@ -61,7 +72,7 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'update_at', 'type' => 'date-range'],
         ];
-        $config['new_button'] = '#grid_new_form_button';
+        $config['new_button'] = '';
         return $config;
     }
 }

@@ -1,81 +1,92 @@
 <script>
+    require(["jquery", "underscore", 'react', 'fcom.components', 'griddle.fcomModalForm', "jquery.validate", "fcom.admin", "bootstrap"], function ($, _, React, Components, FComModalForm) {
+        var prodReviewGrid = null, prodReviewNode = null;
+        var prodReviewModalNode = null, prodModalForm = null;
 
-require(["jquery", "underscore", "jquery.validate"], function($, _) {
-
-    /** BEGIN callback functions for custom action in fcom.backbonegrid */
-    //TODO: will remove these functions when complete griddle
-    var reviewGrid;
-    window.{{ grid['config']['id']}}_register = function(grid) {
-        reviewGrid = grid;
-        grid.getGridSkeleton().Views.GridView.prototype.afterSelectionChanged = function() {
-            if (reviewGrid.getSelectedRows().length > 0) {
-                btnApprove.removeClass('disabled');
-                btnDeny.removeClass('disabled');
-            } else {
-                btnApprove.addClass('disabled');
-                btnDeny.addClass('disabled');
-            }
+        /** BEGIN callback functions for custom action in react.js griddle grid */
+        window.prodReviewsRegister = function (grid) {
+            prodReviewGrid = grid;
+            prodReviewNode = $(prodReviewGrid.getDOMNode());
         };
-        grid.build();
 
-    };
+        window.approveReviews = function (grid) {
+            updateMassStatus(grid, 1);
+        };
+        window.denyReviews = function (grid) {
+            updateMassStatus(grid, 0);
+        };
 
-    var btnApprove = $('#prod-reviews-approve');
-    var btnDeny = $('#prod-reviews-deny');
+        window.showModalToEditReview = function (row) {
+            var modalContainerEle = document.getElementById(prodReviewGrid.getConfig('id') + '-modal');
+            React.unmountComponentAtNode(modalContainerEle);
+            React.render(
+                    React.createElement(Components.Modal, {
+                                id: "editProReviewModal",
+                                show: true,
+                                title: "{{ 'Edit Form' |_ }}",
+                                confirm: "{{ 'Save changes' |_ }}",
+                                cancel: "{{ 'Close' |_ }}",
+                                onLoad: function (modal) {
+                                    prodReviewModalNode = $(modal.getDOMNode());
+                                    prodModalForm = prodReviewModalNode.find('#'+ prodReviewGrid.getConfig('id') +'-modal-form');
+                                    prodReviewModalNode.find('.modal-dialog').css('width', '600px')
+                                },
+                                onConfirm: window.saveReviewModal
+                            },
+                            React.DOM.div({className: "row f-grid-wrapper", style: {margin: '0 auto'}},
+                                    React.createElement(FComModalForm, {
+                                        columnMetadata: prodReviewGrid.getConfig('columns'),
+                                        id: prodReviewGrid.getConfig('id'),
+                                        row: row
+                                    })
+                            )
+                    ), modalContainerEle
+            );
+        };
 
-    btnApprove.on('click', function() {
-        updateStatus(1);
-    });
+        window.saveReviewModal = function (modal) {
+            if (!prodModalForm.valid()) return false;
 
-    btnDeny.on('click', function() {
-        updateStatus(0);
-    });
-
-    function updateStatus(approve)
-    {
-        var selectedRows = reviewGrid.getRows().toJSON();
-        for (var index = 0; index < selectedRows.length; index++) {
-            var row = reviewGrid.getRows().findWhere({id:selectedRows[index].id});
-            row.set('approved', approve);
-            row.save();
-            row.trigger('render');
-            //TODO implement collection update method
-
-        }
-        $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
-    }
-    /** END callback functions for custom action in fcom.backbonegrid **/
-
-    /** BEGIN callback functions for custom action in react.js griddle grid */
-    window.approveReviews = function(grid) {
-        updateMassStatus(grid, 1);
-    };
-    window.denyReviews = function(grid) {
-        updateMassStatus(grid, 0);
-    };
-
-    function updateMassStatus(grid, approve)
-    {
-        var selectedRows = grid.getSelectedRows();
-        var editUrl = grid.getConfig('edit_url');
-        if (editUrl) {
-            var post = {
-                oper: 'mass-edit',
-                id: (_.pluck(selectedRows, 'id')).join(','),
-                approved: approve
+            var hash = {
+                oper: 'edit'
             };
 
-            $.post(editUrl, post, function(resp) {
-                if (resp.success) {
-                    $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
-                    grid.refresh(); //re-render grid
-                } else {
-                    $.bootstrapGrowl("Fail saved.", { type: 'danger', align: 'center', width: 'auto' });
+            _(prodReviewModalNode.find('input, select, textarea')).each(function (ele) {
+                hash[$(ele).attr('name')] = $(ele).val();
+            });
+
+            $.post(prodReviewGrid.getConfig('edit_url'), hash, function (r) {
+                if (r) {
+                    prodReviewGrid.refresh();
+                    $.bootstrapGrowl("{{ 'Successfully saved.' | _ }}", {type: 'success', align: 'center', width: 'auto'});
                 }
-            })
+            });
+
+            modal.close();
+        };
+
+        function updateMassStatus(grid, approve) {
+            var selectedRows = grid.getSelectedRows();
+            var editUrl = grid.getConfig('edit_url');
+            if (editUrl) {
+                var post = {
+                    oper: 'mass-edit',
+                    id: (_.pluck(selectedRows, 'id')).join(','),
+                    approved: approve
+                };
+
+                $.post(editUrl, post, function (resp) {
+                    if (resp.success) {
+                        $.bootstrapGrowl("Successfully saved.", {type: 'success', align: 'center', width: 'auto'});
+                        grid.refresh(); //re-render grid
+                    } else {
+                        $.bootstrapGrowl("Fail saved.", {type: 'danger', align: 'center', width: 'auto'});
+                    }
+                })
+            }
         }
-    }
-    /** END callback functions for custom action in react.js griddle grid */
-});
+
+        /** END callback functions for custom action in react.js griddle grid */
+    });
 
 </script>
