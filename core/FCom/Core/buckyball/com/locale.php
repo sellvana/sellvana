@@ -353,7 +353,7 @@ class BLocale extends BClass
         return $result;
     }
 
-    public function getAvailableCountries($format = 'name', $limitCountries = null)
+    public function getAvailableCountries($format = 'name', $limitCountries = null, $showEmpty = false)
     {
         static $countries = [
             ['AD', 'Andorra', 'AND', '20'],
@@ -634,6 +634,9 @@ class BLocale extends BClass
 
             default:
                 throw new BException('Invalid label type');
+        }
+        if ($showEmpty) {
+            $result = ['' => ''] + $result;
         }
         return $result;
     }

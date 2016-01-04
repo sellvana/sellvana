@@ -4,27 +4,36 @@
 {% set prod = APP.instance('Sellvana_Catalog_Model_Product') %}
 {% set backOrders = prod.backOrders() %}
 {% set rolloverEffects = prod.getRolloverEffects() %}
+{% set navTopTypes = APP.instance('Sellvana_Catalog_Main').getNavTopTypeOptions() %}
+{% set rootCategories = APP.instance('Sellvana_Catalog_Model_Category').getRootCategories() %}
+{% set countries = APP.instance('BLocale').getAvailableCountries() %}
+
 {% import THIS.view('core/form-elements').twigName() as forms %}
 <h2>{{ "Catalog Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-Sellvana_Catalog'}) }}
-     {{ forms.accordion_panel_start({label:'Stock Management'|_, id:'settings-Sellvana_Catalog-group0', in:1}) }}
+    {{ forms.accordion_panel_start({label:'Stock Management'|_, id:'settings-Sellvana_Catalog-group0', in:1}) }}
         {{ forms.boolean(fieldData, {field:'separate_inventory_sku', label:'Use Separate Inventory SKU'|_ }) }}
         {{ forms.boolean(fieldData, {field:'manage_stock', label:'Manage Stock'|_ }) }}
         {{ forms.select(fieldData, {field:'back_order', label:'Back Orders'|_, options: backOrders }) }}
         {{ forms.input(fieldValidate, {field:'maximum_quantity_shopping', label:'Maximum Quantity Allowed in Shopping'|_ }) }}
         {{ forms.input(fieldValidate, {field:'quantity_items_status', label:'Quantity for Item\'s Status to Become Out of Stock'|_}) }}
         {{ forms.input(fieldValidate, {field:'notify_administrator_quantity', label:'Notify Administrator for Quantity Below'|_ }) }}
+        {{ forms.select(fieldData, {field:'default_origin_country', label:'Default Country Of Origin'|_, options: countries }) }}
     {{ forms.accordion_panel_end }}
-    {{ forms.accordion_panel_start({label:'Web'|_, id:'settings-Sellvana_Catalog-group1'}) }}
+    {{ forms.accordion_panel_start({label:'Top Navigation'|_, id:'settings-Sellvana_Catalog-group1', in:1}) }}
+        {{ forms.select({ name:'config[modules][FCom_Frontend][nav_top][type]', label:'Root id categories'|_, value:c.get('modules/FCom_Frontend/nav_top/type'), options: navTopTypes }) }}
+        {{ forms.input({ name:'config[modules][FCom_Frontend][nav_top][root_category]', label:'Root id categories'|_, value:c.get('modules/FCom_Frontend/nav_top/root_category'), options: rootCategories }) }}
+    {{ forms.accordion_panel_end }}
+    {{ forms.accordion_panel_start({label:'Web'|_, id:'settings-Sellvana_Catalog-group2'}) }}
         {{ forms.input(fieldData, {field:'url_prefix', label:'URL Prefix'|_ }) }}
         {{ forms.boolean(fieldData, {field:'enable_rollover', label:'Enable Rollover Effect'|_ }) }}
         {{ forms.select(fieldData, {field:'rollover_effect', label:'Rollover Effect'|_, options: rolloverEffects }) }}
     {{ forms.accordion_panel_end }}
-    {{ forms.accordion_panel_start({label:'Units'|_, id:'settings-Sellvana_Catalog-group2'}) }}
+    {{ forms.accordion_panel_start({label:'Units'|_, id:'settings-Sellvana_Catalog-group3'}) }}
         {{ forms.select(fieldData, {field:'weight_unit', label:'Default Weight Unit'|_, options: {lb: 'Pound (lb)', kg: 'Kilogram (kg)'} }) }}
         {{ forms.select(fieldData, {field:'length_unit', label:'Default Length Unit'|_, options: {in: 'Inch (in)', cm: 'Centimetre (cm)'} }) }}
     {{ forms.accordion_panel_end }}
-    {{ forms.accordion_panel_start({label:'Dashboard'|_, id:'settings-Sellvana_Catalog-group3'}) }}
+    {{ forms.accordion_panel_start({label:'Dashboard'|_, id:'settings-Sellvana_Catalog-group4'}) }}
         {{ forms.input(fieldData, {field:'latest_new_limit', label:'Latest New Products Limit'|_ }) }}
         {{ forms.input(fieldData, {field:'products_without_images_limit', label:'Products With No Images Limit'|_ }) }}
         {{ forms.input(fieldData, {field:'searches_recent_terms_limit', label:'Searches - Recent Terms (internal)'|_ }) }}
