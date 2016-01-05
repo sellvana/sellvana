@@ -22,6 +22,10 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
     protected $_permission = 'product_review';
     protected $_navPath = 'catalog/prodreviews';
 
+    /**
+     * @param $productModel Sellvana_Catalog_Model_Product
+     * @return array
+     */
     public function gridConfig($productModel = false)
     {
         //$formUrl = $this->BApp->href("prodreviews/form");
@@ -31,15 +35,15 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
         $columns = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 55, 'hidden' => true],
-            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 250, 'addable' => true,
+            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'addable' => true,
                 'editable' => true, 'validation' => ['required' => true]],
-            ['type' => 'input', 'name' => 'text', 'label' => 'Comment', 'width' => 250, 'addable' => true,
+            ['type' => 'input', 'name' => 'text', 'label' => 'Comment', 'addable' => true,
                 'editable' => true, 'editor' => 'textarea'],
-            ['type' => 'input', 'name' => 'rating', 'label' => 'Total Rating', 'width' => 60, 'addable' => true,
+            ['type' => 'input', 'name' => 'rating', 'label' => 'Total Rating', 'addable' => true,
                 'editable' => true, 'element_print' => $this->inputRatingHtml('rating'),
                 'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
                 /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))*/],
-            ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'width' => 60, 'addable' => true,
+            ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'addable' => true,
                 'editable' => true, 'validation' => ['number' => true]],
             ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
                 'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
@@ -110,7 +114,8 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             $orm = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->where('product_id', $productModel->id())
                 ->join('Sellvana_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
                 ->left_outer_join('Sellvana_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
-                ->select('pr.*')->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
+                ->select(['pr.*', 'p.product_name'])
+                ->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
 
             $data = $this->BDb->many_as_array($orm->find_many());
             unset($config['orm']);
@@ -142,17 +147,30 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
 
         /*$config['columns'][] = ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
             'buttons' => [['name' => 'edit'], ['name' => 'delete']]];*/
-        $config['columns'][] = ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]];
+        $config['columns'][] = ['type' => 'btn_group',
+            'buttons' => [
+                ['name' => 'edit-custom', 'callback' => 'showModalToEditReview', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-pencil ", 'title' => 'Edit Review'],
+                ['name' => 'delete']
+            ]
+        ];
 
         $callbacks = '$(".rateit").rateit();
-            $("#' . $config['id'] . '-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
-        $config['callbacks'] = ['after_gridview_render' => $callbacks];
+
+        $("#' . $config['id'] . '-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
+
+        $config['callbacks'] = [
+            'after_gridview_render' => $callbacks,
+            'componentDidMount' => 'prodReviewsRegister'
+        ];
 //        $config['new_button'] = '#add_new_product_review';
 
         $config['grid_before_create'] = $config['id'] . '_register';
         return $config;
     }
 
+    /**
+     * @param $orm BORM
+     */
     public function gridOrmConfig($orm)
     {
         parent::gridOrmConfig($orm);

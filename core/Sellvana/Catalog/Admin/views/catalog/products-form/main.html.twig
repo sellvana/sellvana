@@ -174,19 +174,25 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     }
 
     window.saveNameFieldLang = function (modal) {
+        if (!_mainForm.valid()) return;
         var node = $(modal.getDOMNode());
+
         _saveLangs(node, $nameLangContainer);
         modal.close();
     };
 
     window.saveShortDescFieldLang = function (modal) {
+        if (!_mainForm.valid()) return;
         var node = $(modal.getDOMNode());
+
         _saveLangs(node, $shortDescContainer, 'textarea');
         modal.close();
     };
 
     window.saveDescFieldLang = function (modal) {
+        if (!_mainForm.valid()) return;
         var node = $(modal.getDOMNode());
+
         _saveLangs(node, $descContainer, 'wysiwyg');
         modal.close();
     };
