@@ -355,7 +355,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                             . '<img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
                             . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
                         'sortable' => false],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'file_size'],
+                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 80, 'display' => 'file_size'],
                     ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline'],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
@@ -462,7 +462,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'data' => $this->_processMediaLink($data),
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                    ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'width' => 60, 'sortable' => false,
                         'buttons' => [
                             ['name' => 'edit-custom', 'callback' => 'showModalToPreviewVideo', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-eye-open ", 'title' => 'Preview'],
                             ['name' => 'delete']
@@ -472,8 +472,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'file_id',  'hidden' => true],
                     ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
                     ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
-                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 80],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'eval', 'print' => $fileSizeEle],
+                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 180],
+                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 80, 'display' => 'eval', 'print' => $fileSizeEle],
                     ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline', 'attributes' => ['required' => true]],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
@@ -481,8 +481,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                         'print' => $isDefaultEle],
                     ['name' => 'in_gallery', 'label' => 'In Gallery', 'width' => 50, 'display' => 'eval',
                         'print' => $inGalleryEle],
-                    ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
-                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200]
+                    ['name' => 'create_at', 'label' => 'Created', 'width' => 130],
+                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 130]
                 ],
                 'actions' => [
                     'refresh' => true,

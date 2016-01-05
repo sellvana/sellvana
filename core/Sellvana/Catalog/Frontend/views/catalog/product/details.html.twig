@@ -247,16 +247,16 @@
 
                     <div class="f-prod-add-cart">
                         {{ THIS.view('catalog/product/custom-fields').set('product', prod) | raw }}
-
+                        <hr />
                         {{ THIS.view('catalog/product/variants').set('product', prod) | raw }}
-
+                        <hr />
                         {{ THIS.view('catalog/product/shopper_fields').set('product', prod) | raw }}
-
+                        <hr />
                         <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
 
                         <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
 
-                        <div class="form-group overflow-hidden">
+                        <div class="form-group row overflow-hidden">
                             <label class="col-md-3 control-label">{{ 'Quantity:' |_ }}</label>
 
                             <div class="col-md-2">

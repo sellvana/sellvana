@@ -22,7 +22,7 @@
 
 <script type="text/javascript">
     require(['react', 'underscore', 'jquery', 'fcom.components', 'fcom.admin'], function(React, _, $, Components) {
-        var $btnAddImage = $('.category_images_btn_add_image');
+        var $btnAddImage = $('.{{ mediaId }}_btn_add_image');
         var $btnImageAdd = null;
         if (typeof setMediaModalConfig == 'function') {
             //set modal config
