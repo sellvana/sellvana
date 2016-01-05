@@ -19,6 +19,19 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
     }
 
     /**
+     * @param array $p
+     * @return array
+     */
+    public function getOptions(array $p)
+    {
+        $options = !empty($p['options']) ? $p['options'] : [];
+        if (!empty($p['add_empty'])) {
+            $options = ['' => ''] + $options;
+        }
+        return $options;
+    }
+
+    /**
      * @param $p
      * @return string
      */
