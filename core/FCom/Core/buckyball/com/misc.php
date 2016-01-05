@@ -770,6 +770,25 @@ class BUtil extends BClass
     }
 
     /**
+     * Parse default locales to select2 options
+     *
+     * @param array $locales
+     * @return array
+     */
+    public function localesToSelect2Options($locales = []) {
+        if (empty($locales)) {
+            $locales = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales');
+        }
+
+        $result = [];
+        foreach($locales as $locale) {
+            $result[$locale] = $locale;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get an item from an array using "dot" notation.
      *
      * @param  array   $array

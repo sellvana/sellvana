@@ -21,6 +21,7 @@
 <script type="text/javascript">
     require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'sortable', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage, Sortable) {
         var APP = {},
+            $mainForm = $('#catalog-products-form'),
             initData = {{ UTIL.toJson(initialData) | raw }},
             fieldsModalNode,
             fieldsForm,
@@ -387,6 +388,7 @@
                                                                         });
 
                                                                         window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
+                                                                            if (!$mainForm.valid()) return;
                                                                             var code = modal.props.fieldCode;
                                                                             $(APP).trigger('refreshLangs', [code, langs]);
                                                                             modal.close();

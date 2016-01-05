@@ -340,9 +340,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <button type="button" className="close" onClick={this.handleCancel}>
+                                {cancelButton ? <button type="button" className="close" onClick={this.handleCancel}>
                                     &times;
-                                </button>
+                                </button> : null}
                                 <h4 className="modal-title">{this.props.title}</h4>
                             </div>
                             <div className="modal-body">

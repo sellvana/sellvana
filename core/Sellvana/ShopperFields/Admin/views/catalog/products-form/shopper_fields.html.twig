@@ -191,7 +191,7 @@
         var shopperId = '';
 
         // Global objec event to connect two components fcom.griddle and fcom.catalog.product.price grid
-        var OPTS = {};
+        var APP = {};
         var form;
 
         /*=====  End of Define variables block  ======*/
@@ -317,11 +317,11 @@
          */
         function _checkIfRowIsEditOrUpdateAttrs(row) {
             if (!row.edited) {
-                // Edited row do not exist on local data then just toggle tab
-                $(OPTS).trigger('edit', [row, false, true]);
+                // Edited row do not exist on local data then update local data and re-render price tabs grid
+                $(APP).trigger('edit', [row, false, true]);
             } else {
-                // Edited row exist on local data then update local data and re-render price tabs grid
-                $(OPTS).trigger('edit', [row, true, true]);
+                // Edited row exist on local data then update local data then just toggle tab
+                $(APP).trigger('edit', [row, true, true]);
             }
         }
 
@@ -520,7 +520,7 @@
             optionsModalNode = $(optionsModalGrid.getDOMNode());
 
             optionsModalNode.on('removedRows.griddle', function (e, removedRows, grid) {
-                $(OPTS).trigger('remove', [removedRows]);
+                $(APP).trigger('remove', [removedRows]);
             })
             .on('addedRows.griddle', function (e, addedRows, grid) {
                 // 
@@ -536,8 +536,6 @@
 
         /**
          * Callback function to apply price for all fields
-         *
-         * @return {mixed}
          */
         window.applyPricesForAllFields = function () {
             if (form.valid()) {
@@ -545,12 +543,12 @@
                     row.label = _trimSpaces(row.label);
                     $('tr[id="' + row.id + '"]').find('input[data-col="label"]').val(row.label);
                     if (row.edited) {
-                        $(OPTS).trigger('edit', [row, true, false]);
+                        $(APP).trigger('edit', [row, true, false]);
                     }
                     return row;
                 });
 
-                $(OPTS).trigger('apply', [rows]);
+                $(APP).trigger('apply', [rows]);
             }
         };
 
@@ -558,7 +556,7 @@
          * Callback for edit row on option grid
          *
          * @param {Object} editedRow
-         * @return {mixed}
+         * @param {Object} e
          */
         window.editShopperOption = function (editedRow, e) {
             if (form.valid()) {
@@ -573,7 +571,7 @@
                 } else { // edit new row
                     var isAddedRow = _.contains(_.pluck(addedRows, 'id'), editedRow.id);
                     if (!isAddedRow) { // item does not exist in local data then add to local data and re-render price tabs
-                        $(OPTS).trigger('add', [editedRow]);
+                        $(APP).trigger('add', [editedRow]);
                     } else { // item has existed in local data then edit
                         _checkIfRowIsEditOrUpdateAttrs(editedRow);
                     }
@@ -585,7 +583,6 @@
          * Callback functions onchange option name
          *
          * @param  {Object} e
-         * @return {mixed}
          */
         window.editShopperOptionLabelCallback = function (e) {
             // Disable save change button if validation fail
@@ -612,7 +609,6 @@
          * Callback functions onchange option position
          *
          * @param  {Object} e
-         * @return {mixed}
          */
         window.editShopperOptionPositionCallback = function (e) {
             _validateAttrs();
@@ -785,9 +781,8 @@
                     case 'remove':
                         _(rows).each(function (row) {
                             deletedRows.push(row);
-                            _(addedRows).each(function (aRow, i) {
-                                if (row.id == aRow.id) delete addedRows[i];
-                            });
+                            var i = _.findIndex(addedRows, row.id);
+                            if (i != -1) delete addedRows[i];
                         });
                         break;
                     default:
@@ -804,9 +799,9 @@
             },
             clearDeletedOptions: function (options) {
                 if (deletedRows.length) { // Remove delete options before re-render price tabs
-                    var deletedOpts = _.pluck(deletedRows, 'label');
+                    var deletedAPP = _.pluck(deletedRows, 'label');
                     _(options).each(function (option, i) {
-                        if (_.contains(deletedOpts, _toggleSpace(option, true))) {
+                        if (_.contains(deletedAPP, _toggleSpace(option, true))) {
                             delete options[i];
                         }
                     });
@@ -828,7 +823,7 @@
                 var options = shopper.options ? _parseOptions(shopper.options) : [];
 
                 // Global event system for applying prices for all fields
-                $(OPTS).on('apply', function (e, rows) {
+                $(APP).on('apply', function (e, rows) {
 
                     var isDiff = this.updateLocalData(rows, 'apply');
                     _(rows).each(function (row) {
@@ -850,7 +845,7 @@
                 }.bind(this));
 
                 // Global event system for add row action on option grid
-                $(OPTS).on('add', function (e, row) { //console.log('add', row);
+                $(APP).on('add', function (e, row) { //console.log('add', row);
                     this.updateLocalData(row, 'add');
                     this.updateOptionsSerializeIdForNewRow(row);
 
@@ -864,7 +859,7 @@
                 }.bind(this));
 
                 // Global event system for edit row action on option grid
-                $(OPTS).on('edit', function (e, row, isEditAttrs, isToggleTab) { // console.log('edit', row);
+                $(APP).on('edit', function (e, row, isEditAttrs, isToggleTab) { // console.log('edit', row);
                     if (isEditAttrs) {
                         // Update row attrs
                         options = _(shopper.option_serialized).map(function (item, index) {
@@ -896,7 +891,7 @@
                 }.bind(this));
 
                 // Global event system for remove row action on option grid
-                $(OPTS).on('remove', function (e, rows) { // console.log('remove', removedRow);
+                $(APP).on('remove', function (e, rows) { // console.log('remove', removedRow);
                     this.updateLocalData(rows, 'remove');
                     options = _(optionsModalGrid.getRows()).map(function (row) {
                         return _toggleSpace(row.label);
@@ -955,10 +950,10 @@
                 )
             },
             componentWillUnmount: function () {
-                $(OPTS).off('add');
-                $(OPTS).off('edit');
-                $(OPTS).off('remove');
-                $(OPTS).off('apply');
+                $(APP).off('add');
+                $(APP).off('edit');
+                $(APP).off('remove');
+                $(APP).off('apply');
             },
             render: function () {
                 return this.props.isDropdownList ? this.renderTabs() : this.renderGrid();
