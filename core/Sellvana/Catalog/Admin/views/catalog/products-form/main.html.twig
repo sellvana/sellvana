@@ -1,7 +1,6 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
-{% set locales = CONFIG.get('modules/Sellvana_MultiLanguage/allowed_locales') %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
@@ -15,7 +14,7 @@
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_name_lang_' ~ m.get('id'),
                     availLangs: m.getData('name_lang_fields'),
-                    defaultLangs: locales,
+                    defaultLangs: UTIL.localesToSelect2Options(),
                     modalConfig: {
                         onSaved: 'saveNameFieldLang'
                     }
@@ -39,7 +38,7 @@
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_shortdesc_lang_' ~ m.get('id'),
                     availLangs: m.getData('short_desc_lang_fields'),
-                    defaultLangs: locales,
+                    defaultLangs: UTIL.localesToSelect2Options(),
                     inputType: 'textarea',
                     modalConfig: {
                         onSaved: 'saveShortDescFieldLang'
@@ -58,7 +57,7 @@
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_desc_lang_' ~ m.get('id'),
                     availLangs: m.getData('desc_lang_fields'),
-                    defaultLangs: locales,
+                    defaultLangs: UTIL.localesToSelect2Options(),
                     inputType: 'wysiwyg',
                     modalConfig: {
                         onSaved: 'saveDescFieldLang'
