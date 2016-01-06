@@ -21,6 +21,17 @@ class Sellvana_Sales_Admin_Controller_Payments extends FCom_Admin_Controller_Abs
     protected $_navPath = 'sales/payments';
     protected $_gridLayoutName = '/payments';
 
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+
+        /** @var FCom_Admin_View_Grid $view */
+        $view = $args['page_view'];
+        $actions = (array)$view->get('actions');
+        unset($actions['new']);
+        $view->set('actions', $actions);
+    }
+
     public function gridConfig()
     {
         $methods = $this->Sellvana_Sales_Main->getPaymentMethods();
