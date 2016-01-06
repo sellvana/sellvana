@@ -18,7 +18,7 @@ class Sellvana_Email_Admin_Controller_Messages extends FCom_Admin_Controller_Abs
     {
         $config = parent::gridConfig();
         unset($config['form_url']);
-        $config['id'] = 'customer_addresses_grid_' . $customer->id;
+        $config['id'] = 'customer_messages_grid_' . $customer->id;
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'view_name', 'label' => 'View Name'],

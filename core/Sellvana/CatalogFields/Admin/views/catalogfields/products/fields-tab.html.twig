@@ -374,7 +374,11 @@
                                                                         });
 
                                                                         window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
-                                                                            if (!$mainForm.valid()) return;
+                                                                            var modalNode = $(modal.getDOMNode());
+                                                                            var container = modalNode.find('div[id$="-container"]');
+                                                                            if (!$.fn.modalValidate(container))
+                                                                                return;
+
                                                                             var code = modal.props.fieldCode;
                                                                             $(APP).trigger('refreshLangs', [code, langs]);
                                                                             modal.close();

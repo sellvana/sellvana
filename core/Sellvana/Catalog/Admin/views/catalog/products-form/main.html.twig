@@ -173,26 +173,29 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     }
 
     window.saveNameFieldLang = function (modal) {
-        if (!_mainForm.valid()) return;
-        var node = $(modal.getDOMNode());
+        var modalNode = $(modal.getDOMNode());
+        var container = modalNode.find('div[id$="-container"]');
+        if (!$.fn.modalValidate(container)) return;
 
-        _saveLangs(node, $nameLangContainer);
+        _saveLangs(modalNode, $nameLangContainer);
         modal.close();
     };
 
     window.saveShortDescFieldLang = function (modal) {
-        if (!_mainForm.valid()) return;
-        var node = $(modal.getDOMNode());
+        var modalNode = $(modal.getDOMNode());
+        var container = modalNode.find('div[id$="-container"]');
+        if (!$.fn.modalValidate(container)) return;
 
-        _saveLangs(node, $shortDescContainer, 'textarea');
+        _saveLangs(modalNode, $shortDescContainer, 'textarea');
         modal.close();
     };
 
     window.saveDescFieldLang = function (modal) {
-        if (!_mainForm.valid()) return;
-        var node = $(modal.getDOMNode());
+        var modalNode = $(modal.getDOMNode());
+        var container = modalNode.find('div[id$="-container"]');
+        if (!$.fn.modalValidate(container)) return;
 
-        _saveLangs(node, $descContainer, 'wysiwyg');
+        _saveLangs(modalNode, $descContainer, 'wysiwyg');
         modal.close();
     };
 
