@@ -180,7 +180,8 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             }
         }
         do {
-            $products = $orm
+            $limitOrm = clone $orm;
+            $products = $limitOrm
                 ->limit(static::$_maxChunkSize)
                 //->offset($start)
                 ->find_many();
