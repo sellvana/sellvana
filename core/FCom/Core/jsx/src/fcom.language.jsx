@@ -268,7 +268,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                             className={"btn btn-xs multilang " + (langLabel ? 'btn-info' : '')}>{!langLabel ?
                         <i className="icon icon-globe"/> : ''} {langLabel || Locale._('Translate')}
                     </button>
-                    <Components.Modal {...this.props.modalConfig} cancel={null}>
+                    <Components.Modal {...this.getModalConfig()} cancel={null}>
                         <div className="well">
                             <table>
                                 <tbody>
@@ -285,7 +285,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 </tbody>
                             </table>
                         </div>
-                        <div className={this.props.id + '-container'}>
+                        <div id={this.props.id + '-container'}>
                             <LangFields id={this.props.id} langs={this.state.availLangs || []}
                                         removeField={this.removeLangField}
                                         setLangVal={this.setLangVal}/>

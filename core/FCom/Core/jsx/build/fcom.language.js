@@ -268,7 +268,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                             className: "btn btn-xs multilang " + (langLabel ? 'btn-info' : '')}, !langLabel ?
                         React.createElement("i", {className: "icon icon-globe"}) : '', " ", langLabel || Locale._('Translate')
                     ), 
-                    React.createElement(Components.Modal, React.__spread({},  this.props.modalConfig, {cancel: null}), 
+                    React.createElement(Components.Modal, React.__spread({},  this.getModalConfig(), {cancel: null}), 
                         React.createElement("div", {className: "well"}, 
                             React.createElement("table", null, 
                                 React.createElement("tbody", null, 
@@ -285,7 +285,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 )
                             )
                         ), 
-                        React.createElement("div", {className: this.props.id + '-container'}, 
+                        React.createElement("div", {id: this.props.id + '-container'}, 
                             React.createElement(LangFields, {id: this.props.id, langs: this.state.availLangs || [], 
                                         removeField: this.removeLangField, 
                                         setLangVal: this.setLangVal})
