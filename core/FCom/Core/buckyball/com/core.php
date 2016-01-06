@@ -1843,6 +1843,9 @@ class BEvents extends BClass
      */
     public function onRegex($eventPattern, $callback, $args = [], $params = null)
     {
+        if (strpos($eventPattern, '^') === 0) {
+            $eventPattern = '#' . $eventPattern . '#';
+        }
         $this->_regexObservers[] = [
             'event_pattern' => $eventPattern,
             'callback' => $callback,
@@ -1921,17 +1924,12 @@ class BEvents extends BClass
     {
         if (!empty($this->_regexObservers)) {
             foreach ($this->_regexObservers as $i => &$reObs) {
-                $pattern = $reObs['event_pattern'];
-                if (strpos($pattern, '^') === 0) {
-                    $reObs['event_pattern'] = $pattern = '#' . $pattern . '#';
-                }
-                foreach ($this->_events as $eventName => &$event) {
-                    if (empty($reObs['events_tested'][$eventName]) && preg_match($pattern, $eventName)) {
+                foreach ($this->_events as $eventName => $event) {
+                    if (empty($reObs['events_tested'][$eventName]) && preg_match($reObs['event_pattern'], $eventName)) {
                         $this->on($eventName, $reObs['callback'], $reObs['args'], $reObs['params']);
                     }
                     $reObs['events_tested'][$eventName] = 1;
                 }
-                unset($event);
             }
             unset($reObs);
         }
