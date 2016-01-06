@@ -68,27 +68,24 @@
                 }
                 var data = _.pick(row, 'id', 'name', 'label', 'input_type', 'required', 'options', 'position', 'group', 'qty_min', 'qty_max');
                 data['id'] = ++index;
-                // if (row.input_type === 'select') { // Only save prices when field is select
-                    var $priceEle = $('input[data-shopper-id="' + row.id + '"]');
-                    if ($priceEle.length) { // If price modal is saved changed
-                        optionsSerialized = $priceEle.val();
-                    } else {
-                        if (typeof row.option_serialized === 'string' && row.option_serialized.length) { // 
-                            optionsSerialized = row.option_serialized;
-                        } else { // If added prices but not saved changed then remove
-                            _(row.option_serialized).each(function (optionPrice, index) {
-                                if (isNaN(optionPrice.prices[0].id)) {
-                                    delete row.option_serialized[index];
-                                }
-                            });
-                            optionsSerialized = JSON.stringify(row.option_serialized);
-                        }
+
+                var $priceEle = $('input[data-shopper-id="' + row.id + '"]');
+                if ($priceEle.length) { // If price modal is saved changed
+                    optionsSerialized = $priceEle.val();
+                } else {
+                    if (typeof row.option_serialized === 'string' && row.option_serialized.length) { //
+                        optionsSerialized = row.option_serialized;
+                    } else { // If added prices but not saved changed then remove
+                        _(row.option_serialized).each(function (optionPrice, index) {
+                            if (isNaN(optionPrice.prices[0].id)) {
+                                delete row.option_serialized[index];
+                            }
+                        });
+                        optionsSerialized = JSON.stringify(row.option_serialized);
                     }
-                    data['option_serialized'] = optionsSerialized;
-                /*} else {
-                    // If change from select to others then clear options
-                    if (data.options) delete data.options;
-                }*/
+                }
+
+                data['option_serialized'] = optionsSerialized;
                 results.push(data);
             });
 
@@ -203,7 +200,6 @@
         /**
          * Helper to toggle tabs when edit trigger
          * @param  {string} label
-         * @return {mixed}
          */
         function _toggleTab(label) {
             shopperModalNode.find('#btn' + _capitalizeFirstLetter(_toggleSpace(label)) + 'Tab').click();
@@ -214,7 +210,6 @@
          * Helper to toggle action buttons if valid false
          *
          * @param  {Boolean} valid
-         * @return {mixed}
          */
         function _toggleActionButton(valid) {
             if (!valid) {
@@ -313,7 +308,6 @@
          * Check if row attrs is edited or not
          *
          * @param  {Object} row
-         * @return {mixed}
          */
         function _checkIfRowIsEditOrUpdateAttrs(row) {
             if (!row.edited) {
@@ -329,7 +323,6 @@
          * Create options serialize
          *
          * @param  {String} option
-         * @return {mixed}
          */
         function _initOptionsSerializeItem(option) {
             if (!shopper.option_serialized) {
@@ -513,7 +506,6 @@
          * Options grid register
          *
          * @param  {Object} grid
-         * @return {mixed}
          */
         window.optionsGridRegister = function (grid) {
             optionsModalGrid = grid;
@@ -657,6 +649,11 @@
                                 onCancel: function (modal) {
                                     // Reset local data
                                     deletedRows = [];
+                                    _(shopper.option_serialized).each(function (option) {
+                                        _(option.prices).each(function (price) {
+                                            if (price.deleted) price.deleted = false;
+                                        });
+                                    });
                                     modal.close();
                                 },
                                 onLoad: function (modal) {
@@ -717,31 +714,37 @@
 
         /**
          * Callback function for update field
-         * @return mixed
          */
         window.saveShopperModal = function (modal) {
-            if (form.valid()) { // Passes validation
-                // Custom check if price tab activate but options grid has empty entry
-                if (!isDropdownList) {
-                    _processPostData();
-                } else {
-                    if (_isEmptyOptions()) {
-                        // If has deleted rows local data
-                        if (deletedRows && !_.isEmpty(deletedRows)) {
-                            // Clear new options modal grid
-                            optionsModalGrid.removeRows(deletedRows);
+            if (!form.valid()) return;
 
-                            // Update shopper grid data
-                            shopperGrid.updateRows([shopper]);
-                        }
+            // Clear prices had been marked as deleted
+            _(shopper.option_serialized).each(function (option, oi) {
+                shopper.option_serialized[oi].prices = _(option.prices).filter(function (price, pi) {
+                    if (!price.deleted) return price;
+                });
+            });
 
-                        _processDropdownPostData();
-                    } else {
-                        $('#btnOptionsTab').click() && form.valid();
+            // Custom check if price tab activate but options grid has empty entry
+            if (!isDropdownList) {
+                _processPostData();
+            } else {
+                if (_isEmptyOptions()) {
+                    // If has deleted rows local data
+                    if (deletedRows && !_.isEmpty(deletedRows)) {
+                        // Clear new options modal grid
+                        optionsModalGrid.removeRows(deletedRows);
+
+                        // Update shopper grid data
+                        shopperGrid.updateRows([shopper]);
                     }
+
+                    _processDropdownPostData();
+                } else {
+                    $('#btnOptionsTab').click() && form.valid();
                 }
-                modal.close();
             }
+            modal.close();
         };
 
         /*=====  End of Global functions  ======*/
@@ -799,9 +802,9 @@
             },
             clearDeletedOptions: function (options) {
                 if (deletedRows.length) { // Remove delete options before re-render price tabs
-                    var deletedAPP = _.pluck(deletedRows, 'label');
+                    var deletedOpts = _.pluck(deletedRows, 'label');
                     _(options).each(function (option, i) {
-                        if (_.contains(deletedAPP, _toggleSpace(option, true))) {
+                        if (_.contains(deletedOpts, _toggleSpace(option, true))) {
                             delete options[i];
                         }
                     });
