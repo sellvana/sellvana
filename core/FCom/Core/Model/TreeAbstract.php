@@ -597,10 +597,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         array_pop($pathArr);
         $parentPath = join('/', $pathArr);
         $parent = $this->load($parentPath, 'url_path');
-        if (!$parent) {
-            throw new BException('Parent identified by url_path is not found');
+        if ($parent) {
+            $this->set('parent_id', $parent->id());
+        } else {
+            #throw new BException('Parent identified by url_path is not found');
         }
-        $this->set('parent_id', $parent->id());
         return $this;
     }
 
