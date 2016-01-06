@@ -1736,6 +1736,8 @@ class BEvents extends BClass
      */
     protected $_events = [];
 
+    protected $_regexObservers = [];
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -1779,9 +1781,10 @@ class BEvents extends BClass
      * observe|watch|on|sub|subscribe ?
      *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
+     *          if starts with ^ will be processed as regular expression
      * @param mixed $callback
      * @param array|object $args
-     * @param arary $params - alias, insert (function, 0=skip, -1=before, 1=after)
+     * @param arary $params - alias, insert (function, 0=skip, -1=before, 1=after), regex (true, false)
      * @return BEvents
      */
     public function on($eventName, $callback = null, $args = [], $params = null)
@@ -1794,6 +1797,9 @@ class BEvents extends BClass
         }
         if (is_string($params)) {
             $params = ['alias' => $params];
+        }
+        if (strpos($eventName, '^') === 0 || !empty($params['regex'])) {
+            return $this->onRegex($eventName, $callback, $args, $params);
         }
         if (empty($params['alias']) && is_string($callback)) {
             $params['alias'] = $callback;
@@ -1825,6 +1831,24 @@ class BEvents extends BClass
             }
         }
         BDebug::debug('SUBSCRIBE ' . $eventName, 1);
+        return $this;
+    }
+
+    /**
+     * @param $eventPattern can start with ^ or a regex delimiter for full pattern
+     * @param $callback
+     * @param array $args
+     * @param null $params
+     * @return $this
+     */
+    public function onRegex($eventPattern, $callback, $args = [], $params = null)
+    {
+        $this->_regexObservers[] = [
+            'event_pattern' => $eventPattern,
+            'callback' => $callback,
+            'args' => $args,
+            'params' => $params,
+        ];
         return $this;
     }
 
@@ -1895,6 +1919,22 @@ class BEvents extends BClass
      */
     public function fire($eventName, $args = [])
     {
+        if (!empty($this->_regexObservers)) {
+            foreach ($this->_regexObservers as $i => &$reObs) {
+                $pattern = $reObs['event_pattern'];
+                if (strpos($pattern, '^') === 0) {
+                    $reObs['event_pattern'] = $pattern = '#' . $pattern . '#';
+                }
+                foreach ($this->_events as $eventName => &$event) {
+                    if (empty($reObs['events_tested'][$eventName]) && preg_match($pattern, $eventName)) {
+                        $this->on($eventName, $reObs['callback'], $reObs['args'], $reObs['params']);
+                    }
+                    $reObs['events_tested'][$eventName] = 1;
+                }
+                unset($event);
+            }
+            unset($reObs);
+        }
         $eventName    = strtolower($eventName);
         $profileStart =
             BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
@@ -1983,6 +2023,7 @@ class BEvents extends BClass
             if (preg_match($eventRegexp, $eventName)) {
                 $results += (array)$this->fire($eventName, $args);
             }
+
         }
         return $results;
     }
