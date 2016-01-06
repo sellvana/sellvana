@@ -107,6 +107,22 @@ class Sellvana_CatalogIndex_Main extends BClass
         }
     }
 
+    /**
+     * Run indexing process for marked products
+     *
+     * @param $args
+     * @throws BException
+     */
+    public function onAfterCoreImport($args)
+    {
+        $this->getIndexer()->indexPendingProducts();
+    }
+
+    /**
+     * Mark imported products as required to reindex
+     *
+     * @param $args
+     */
     public function onProductAfterCoreImport($args){
         if (array_key_exists('import_id', $args)){
             $orm = $this->FCom_Core_Model_ImportExport_Id->orm('p');
