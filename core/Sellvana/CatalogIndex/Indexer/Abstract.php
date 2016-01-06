@@ -117,7 +117,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
         $this->BEvents->fire($this->origClass() . '::onBeforeIndexPendingProducts', ['self' => $this]);
 
         $orm = $this->getProductOrm();
-        $orm->where_complex('idx.id is null');
+        $orm->where_null('idx.id');
 
         $now = $this->BDb->now();
 
@@ -168,8 +168,8 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
         //$start = 0;
         $t = time();
         $orm = $this->getProductOrm();
-        $orm->where_complex('idx.flag_reindex=1')
-            ->where_complex('idx.id is not null');
+        $orm->where('idx.flag_reindex', 1)
+            ->where_not_null('idx.id');
 
         if (empty(static::$_cnt_total)) {
             $count = clone $orm;
