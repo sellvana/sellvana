@@ -43,7 +43,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             $chunks = array_chunk($products, static::$_maxChunkSize);
             foreach ($chunks as $i => $chunk) {
                 $this->indexProducts($chunk);
-                echo 'DONE CHUNK ' . $i . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true) . "\n";
+                //echo 'DONE CHUNK ' . $i . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true) . "\n";
             }
             $this->indexGC();
             return;
@@ -180,7 +180,8 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             }
         }
         do {
-            $products = $orm
+            $limitOrm = clone $orm;
+            $products = $limitOrm
                 ->limit(static::$_maxChunkSize)
                 //->offset($start)
                 ->find_many();
