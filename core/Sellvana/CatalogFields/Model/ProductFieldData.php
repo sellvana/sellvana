@@ -326,13 +326,17 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 }
                 $column = static::$_fieldTypeColumns[$row->get('table_field_type')];
                 $value  = $row->get($column);
+                //if ($row->get('admin_input_type') === 'multiselect') {
                 if ($row->get('table_field_type') === 'options') {
                     $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($row->get('field_id'));
                     if (!empty($options[$value])) {
                         $value = $options[$value];
                     }
                     if ($oldValue = $product->get($row->get('field_code'))) {
-                        $value = $oldValue . ',' . $value;
+                        $oldValues = explode(',', $oldValue);
+                        if (!in_array($value, $oldValues)) {
+                            $value = $oldValue . ',' . $value;
+                        }
                     }
                 }
                 $product->set($row->get('field_code'), $value);
