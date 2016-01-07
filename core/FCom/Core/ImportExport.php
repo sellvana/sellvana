@@ -52,6 +52,9 @@ class FCom_Core_ImportExport extends BClass
     protected $_warnings = 0;
     protected $_modelsStatistics = array();
 
+    /** @var bool Import status */
+    protected $_importInProcessing = false;
+
     protected $_defaultExportBatchSize = 1000;
     protected $_defaultImportBatchSize = 1000;
 
@@ -147,7 +150,7 @@ class FCom_Core_ImportExport extends BClass
         $message = (array)$message;
         $message['object_id'] = $this->_currentObjectId;
         
-        //$this->_channel->send($message);
+        $this->_channel->send($message);
     }
 
     /**
@@ -346,6 +349,11 @@ class FCom_Core_ImportExport extends BClass
             'msg' => $this->BLocale->_("Import started."),
             'data' => ['file_name' => $fromFile]
         ], 'info');
+
+        $this->_importInProcessing = true;
+
+        $this->BEvents->fire(self::$_origClass . "::beforeImport");
+
         while(($line = fgets($fi)) !== false) {
             $cnt++;
             $lineData     = (array)json_decode(trim($line, ","));
@@ -359,6 +367,9 @@ class FCom_Core_ImportExport extends BClass
         }
 
         $this->import($batchData, $bs);
+
+        $this->BEvents->fire(self::$_origClass . "::afterImport");
+
         if (!feof($fi)) {
             $this->log([
                 'msg' => $this->BLocale->_("Error: unexpected file fail"),
@@ -377,7 +388,18 @@ class FCom_Core_ImportExport extends BClass
     {
         $start = microtime(true);
 
+        $origImportStatus = $this->_importInProcessing;
+
+        if ($origImportStatus != true) {
+            $this->_importInProcessing = true;
+            $this->BEvents->fire(self::$_origClass . "::beforeImport");
+        }
+
         if (empty($importData)) {
+            if ($origImportStatus == true) {
+                $this->_importInProcessing = $origImportStatus;
+                $this->BEvents->fire(self::$_origClass . "::afterImport");
+            }
             return true;
         }
 //        $this->log([
@@ -414,6 +436,11 @@ class FCom_Core_ImportExport extends BClass
                         __METHOD__ . ':afterModel:' . $this->_currentModel,
                         ['import_id' => $importID, 'models' => $this->_changedModels]
                     );
+                    $this->BEvents->fire(
+                        __METHOD__ . ':afterModel',
+                        ['import_id' => $importID, 'modelName' => $this->_currentModel,
+                            'models' => $this->_changedModels]
+                    );
                 }
 
                 $cm = $this->_currentModel = $data[ static::DEFAULT_MODEL_KEY ];
@@ -424,6 +451,11 @@ class FCom_Core_ImportExport extends BClass
                 $this->BEvents->fire(
                     __METHOD__ . ':beforeModel:' . $this->_currentModel,
                     ['import_id' => $importID]
+                );
+
+                $this->BEvents->fire(
+                    __METHOD__ . ':beforeModel',
+                    ['import_id' => $importID, 'modelName' => $this->_currentModel]
                 );
 
                 $this->_modelsStatistics[$cm] = [
@@ -559,6 +591,11 @@ class FCom_Core_ImportExport extends BClass
             ['import_id' => $importID, 'models' => $this->_changedModels]
         );
 
+        $this->BEvents->fire(
+            __METHOD__ . ':afterModel',
+            ['import_id' => $importID, 'modelName' => $this->_currentModel, 'models' => $this->_changedModels]
+        );
+
         $this->log([
             'signal' => 'finished',
             'msg'    => "Done in: " . round(microtime(true) - $start) . " sec.",
@@ -569,6 +606,11 @@ class FCom_Core_ImportExport extends BClass
                 'models_statistics' => $this->_modelsStatistics
             ]
         ], 'info');
+
+        if ($origImportStatus == true) {
+            $this->_importInProcessing = $origImportStatus;
+            $this->BEvents->fire(self::$_origClass . "::afterImport");
+        }
 
         return true;
     }
@@ -781,6 +823,7 @@ class FCom_Core_ImportExport extends BClass
             }
         }
         $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->_changedModels]);
+        $this->BEvents->fire(__METHOD__ . ':afterBatch', ['records' => $this->_changedModels, 'modelName' => $cm]);
     }
     protected function _isArrayAssoc(array $arr)
     {

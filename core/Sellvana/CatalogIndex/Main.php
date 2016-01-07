@@ -8,6 +8,7 @@
  * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
  * @property Sellvana_CatalogIndex_Model_Field $Sellvana_CatalogIndex_Model_Field
  * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
+ * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  */
 
 class Sellvana_CatalogIndex_Main extends BClass
@@ -106,6 +107,22 @@ class Sellvana_CatalogIndex_Main extends BClass
         }
     }
 
+    /**
+     * Run indexing process for marked products
+     *
+     * @param $args
+     * @throws BException
+     */
+    public function onAfterCoreImport($args)
+    {
+        $this->getIndexer()->indexPendingProducts();
+    }
+
+    /**
+     * Mark imported products as required to reindex
+     *
+     * @param $args
+     */
     public function onProductAfterCoreImport($args){
         if (array_key_exists('import_id', $args)){
             $orm = $this->FCom_Core_Model_ImportExport_Id->orm('p');
@@ -132,6 +149,7 @@ class Sellvana_CatalogIndex_Main extends BClass
 
     public function onCategoryAfterSave($args)
     {
+        /** @var Sellvana_Catalog_Model_Category $cat */
         $cat = $args['model'];
         $addIds = explode(',', $cat->get('product_ids_add'));
         $removeIds = explode(',', $cat->get('product_ids_remove'));
@@ -143,6 +161,45 @@ class Sellvana_CatalogIndex_Main extends BClass
             $reindexIds += $removeIds;
         }
         $this->getIndexer()->indexProducts($reindexIds);
+    }
+
+    /**
+     * @param array $args
+     */
+    public function onBeforeRefreshDescendants($args)
+    {
+        /** @var FCom_Core_Model_TreeAbstract $model */
+        $model = $args['model'];
+        $resetUrl = $args['resetUrl'];
+        $oldValues = $model->old_values();
+        if ($resetUrl && array_key_exists('url_key', $oldValues) && $model->get('url_key') != $oldValues['url_key']) {
+            $subCategoriesIds = [$model->id()];
+            foreach ($model->descendants() as $descendant) {
+                $subCategoriesIds[] = $descendant->id();
+            }
+
+            $reindexIds = $this->Sellvana_Catalog_Model_Product->orm('p')
+                ->join('Sellvana_Catalog_Model_CategoryProduct', ['pc.product_id', '=', 'p.id'], 'pc')
+                ->where_in('pc.category_id', $subCategoriesIds)
+                ->group_by('p.id')
+                ->find_many_assoc('product_id', 'product_id');
+
+            $this->Sellvana_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1], ['id' => $reindexIds]);
+        }
+    }
+
+    /**
+     * @param array $args
+     * @throws BException
+     */
+    public function onAfterRefreshDescendants($args)
+    {
+        $model = $args['model'];
+        $resetUrl = $args['resetUrl'];
+        $oldValues = $model->old_values();
+        if ($resetUrl && array_key_exists('url_key', $oldValues) && $model->get('url_key') != $oldValues['url_key']) {
+            $this->getIndexer()->indexPendingProducts();
+        }
     }
 
     public function onCustomFieldAfterSave($args)

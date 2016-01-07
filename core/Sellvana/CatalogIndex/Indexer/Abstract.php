@@ -10,6 +10,7 @@
  * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
  */
 abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements Sellvana_CatalogIndex_Indexer_Interface
 {
@@ -19,6 +20,7 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
     protected static $_filterValues;
     protected static $_cnt_reindexed;
     protected static $_cnt_total;
+    protected static $_origClass = __CLASS__;
 
     /**
      * @var array
@@ -41,60 +43,120 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             $chunks = array_chunk($products, static::$_maxChunkSize);
             foreach ($chunks as $i => $chunk) {
                 $this->indexProducts($chunk);
-                echo 'DONE CHUNK ' . $i . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true) . "\n";
+                //echo 'DONE CHUNK ' . $i . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true) . "\n";
             }
             $this->indexGC();
             return;
         }
 
-        $pIds = [];
-        $loadIds = [];
-        /**
-         * @var int $i
-         * @var Sellvana_Catalog_Model_Product $p
-         */
-        foreach ($products as $i => $p) {
-            if (is_numeric($p)) {
-                $loadIds[$i] = (int)$p;
-                $pIds[] = (int)$p;
-            } else {
-                $pIds[] = $p->id();
-            }
-        }
-        if ($loadIds) {
-            $loadProducts = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $loadIds)->find_many_assoc();
-            foreach ($loadIds as $i => $p) {
-                if (!empty($loadProducts[$p])) {
-                    $products[$i] = $loadProducts[$p];
+        try {
+            $pIds = [];
+            $loadIds = [];
+            /**
+             * @var int $i
+             * @var Sellvana_Catalog_Model_Product $p
+             */
+            foreach ($products as $i => $p) {
+                if (is_numeric($p)) {
+                    $loadIds[$i] = (int)$p;
+                    $pIds[] = (int)$p;
                 } else {
+                    $pIds[] = $p->id();
+                }
+            }
+            if ($loadIds) {
+                $loadProducts = $this->Sellvana_Catalog_Model_Product->orm('p')->where_in('p.id', $loadIds)->find_many_assoc();
+                foreach ($loadIds as $i => $p) {
+                    if (!empty($loadProducts[$p])) {
+                        $products[$i] = $loadProducts[$p];
+                    } else {
+                        unset($products[$i]);
+                    }
+                }
+            }
+            if ($pIds) {
+                $this->indexDropDocs($pIds);
+            }
+            // TODO: Improve filtering out disabled products
+            foreach ($products as $i => $p) {
+                if ($p->isDisabled()) {
                     unset($products[$i]);
                 }
             }
+
+            //TODO: for less memory usage chunk the products data
+            $this->_indexFetchProductsData($products);
+            $this->_indexFetchVariantsData($products);
+            static::$_cnt_reindexed += count($products);
+            unset($products);
+
+            $this->_indexSaveData();
+
+            $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'reindexed' => static::$_cnt_reindexed]);
+            $this->BCache->save('index_progress_reindexed', static::$_cnt_reindexed);
+        } catch(PDOException $e) {
+            $this->BDebug->log($e->getMessage(), 'indexer_errors.log', true);
         }
-        if ($pIds) {
-            $this->indexDropDocs($pIds);
-        }
-        // TODO: Improve filtering out disabled products
-        foreach ($products as $i => $p) {
-            if ($p->isDisabled()) {
-                unset($products[$i]);
+    }
+
+    /**
+     * @return BORM
+     */
+    public function getProductOrm()
+    {
+        return $this->Sellvana_Catalog_Model_Product->orm('p')->select('p.*')
+            ->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx');
+    }
+
+    /**
+     * Find products that are missing from doc table and add them there
+     * @return bool
+     */
+    public function onBeforeIndexPendingProducts()
+    {
+        $this->BEvents->fire($this->origClass() . '::onBeforeIndexPendingProducts', ['self' => $this]);
+
+        $orm = $this->getProductOrm();
+        $orm->where_null('idx.id');
+
+        $now = $this->BDb->now();
+
+        $start = 0;
+        do {
+            $lostProducts = $orm
+                ->offset($start)
+                ->limit(static::$_maxChunkSize)
+                ->find_many()
+            ;
+            $start += static::$_maxChunkSize;
+
+            $lostData = [];
+            foreach ($lostProducts as $lostProduct) {
+                /** @var Sellvana_Catalog_Model_Product $lostProduct */
+                if ($lostProduct->isDisabled()){
+                    continue;
+                }
+                $lostData[] = [
+                    'id' => $lostProduct->get('id'),
+                    'last_indexed' => $now,
+                    'flag_reindex' => 1
+                ];
             }
-        }
 
-        //TODO: for less memory usage chunk the products data
-        $this->_indexFetchProductsData($products);
-        $this->_indexFetchVariantsData($products);
-        static::$_cnt_reindexed += count($products);
-        unset($products);
+            if (!empty($lostData)){
+                $this->Sellvana_CatalogIndex_Model_Doc->create_many($lostData);
+            }
+        } while (sizeof($lostProducts) == static::$_maxChunkSize);
 
-        $this->_indexSaveData();
-
-        $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'reindexed' => static::$_cnt_reindexed]);
-        $this->BCache->save('index_progress_reindexed', static::$_cnt_reindexed);
+        return true;
     }
 
     public function indexPendingProducts()
     {
+        if (!$this->onBeforeIndexPendingProducts()){
+            return $this;
+        }
+
         if ($this->BModuleRegistry->isLoaded('FCom_PushServer')) {
             /** @var FCom_PushServer_Model_Client $pushClient */
             $pushClient = $this->FCom_PushServer_Model_Client->sessionClient();
@@ -105,9 +167,10 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
         $i = 0;
         //$start = 0;
         $t = time();
-        $orm = $this->Sellvana_Catalog_Model_Product->orm('p')->select('p.*')
-            ->left_outer_join('Sellvana_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
-            ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']]);
+        $orm = $this->getProductOrm();
+        $orm->where('idx.flag_reindex', 1)
+            ->where_not_null('idx.id');
+
         if (empty(static::$_cnt_total)) {
             $count = clone $orm;
             static::$_cnt_total = $count->count();
@@ -117,7 +180,8 @@ abstract class Sellvana_CatalogIndex_Indexer_Abstract extends BClass implements 
             }
         }
         do {
-            $products = $orm
+            $limitOrm = clone $orm;
+            $products = $limitOrm
                 ->limit(static::$_maxChunkSize)
                 //->offset($start)
                 ->find_many();
