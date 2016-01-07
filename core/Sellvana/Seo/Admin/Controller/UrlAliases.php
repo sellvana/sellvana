@@ -43,7 +43,10 @@ class Sellvana_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abs
                 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
-            'new' => ['caption' => 'Add New Url Alias'],
+            'new' => [
+                'caption'  => 'New Url Alias',
+                'addClass' => '_modal'
+            ],
             'delete' => true
         ];
         $config['filters'] = [
