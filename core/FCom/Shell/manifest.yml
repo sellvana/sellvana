@@ -1,0 +1,7 @@
+modules:
+    FCom_Shell:
+        version: 0.5.0.0
+
+        areas:
+            FCom_Shell:
+                auto_use: [ bootstrap ]
