@@ -396,7 +396,7 @@ class FCom_Core_ImportExport extends BClass
         }
 
         if (empty($importData)) {
-            if ($origImportStatus == true) {
+            if ($origImportStatus != true) {
                 $this->_importInProcessing = $origImportStatus;
                 $this->BEvents->fire(self::$_origClass . "::afterImport");
             }
@@ -607,7 +607,7 @@ class FCom_Core_ImportExport extends BClass
             ]
         ], 'info');
 
-        if ($origImportStatus == true) {
+        if ($origImportStatus != true) {
             $this->_importInProcessing = $origImportStatus;
             $this->BEvents->fire(self::$_origClass . "::afterImport");
         }
