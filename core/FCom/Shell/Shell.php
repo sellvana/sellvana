@@ -13,8 +13,58 @@ class FCom_Shell_Shell extends BClass
      */
     protected $_params = null;
 
+    static protected $_colorCodes = [
+        'normal' => '0',
+        'reset' => '0',
+        'bold' => '1',
+        'underline' => '4',
+        'light' => '5',
+        'inverse' => '7',
+
+        'black' => '30',
+        'red' => '31',
+        'green' => '32',
+        'yellow' => '33',
+        'blue' => '34',
+        'purple' => '35',
+        'cyan' => '36',
+        'white' => '37',
+
+        'bg-black' => '40',
+        'bg-red' => '41',
+        'bg-green' => '42',
+        'bg-yellow' => '43',
+        'bg-blue' => '44',
+        'bg-purple' => '45',
+        'bg-cyan' => '46',
+        'bg-white' => '47',
+    ];
+
+    static protected $_shortMods = [
+        '.' => '0', // normal
+        '/' => '0', // reset (normal)
+        '*' => '1', // bold
+        '_' => '4', // underline
+        '^' => '5', // light background
+        '!' => '7', // inverse front and back colors
+    ];
+
+    static protected $_colorsRegex;
+
+    static protected $_colorsEnabled;
+
     public function run()
     {
+        static::$_colorsEnabled = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
+
+        $mods = [];
+        foreach (static::$_shortMods as $m => $_) {
+            $mods[] = preg_quote($m, '#');
+        }
+        $modsRe = '[' . join('', $mods) . ']*';
+        $colorsRe = '(' . join('|', array_keys(static::$_colorCodes)) . ')';
+        static::$_colorsRegex = "#\\{({$modsRe})({$colorsRe}(;{$colorsRe})*)?({$modsRe})\\}#";
+
         $this->BModuleRegistry->bootstrap();
 
         foreach ($this->_actionClasses as $class) {
@@ -27,6 +77,7 @@ class FCom_Shell_Shell extends BClass
             $name = 'help';
         }
         $this->_actions[$name]->run();
+
         return $this;
     }
 
@@ -97,61 +148,37 @@ class FCom_Shell_Shell extends BClass
      * Colorize a string for shell output
      *
      * Format examples:
-     *      "{black}{bg_white}Example{/}" - black on white
+     *      "{black;bg-white}Example{/}" - black on white
      *      "{yellow*}Example{/}" - yellow bold
-     *      "{cyan_}{bg/red^}Example{/}" - cyan underscored on bright red
+     *      "{yellow;bold}Example{/}" - yellow bold
+     *      "{_*blue;bg-red^}Example{/}" - blue bold and underscored on a bright red
      *
      * @param $string
      * @return mixed
      */
     public function colorize($string)
     {
-        static $colors = [
-            'black' => '30',
-            'red' => '31',
-            'green' => '32',
-            'yellow' => '33',
-            'blue' => '34',
-            'purple' => '35',
-            'cyan' => '36',
-            'white' => '37',
-            'bg/black' => '40',
-            'bg/red' => '41',
-            'bg/green' => '42',
-            'bg/yellow' => '43',
-            'bg/blue' => '44',
-            'bg/purple' => '45',
-            'bg/cyan' => '46',
-            'bg/white' => '47',
-            '/' => '0',
-        ];
-        static $modifiers = [
-            '.' => '0', // normal
-            '*' => '1', // bold
-            '_' => '4', // underline
-            '^' => '5', // light background
-            '!' => '7', // inverse front and back colors
-        ];
-        static $re = null;
-        if (!$re) {
-            $mods = [];
-            foreach ($modifiers as $m => $_) {
-                $mods[] = preg_quote($m, '#');
-            }
-            $re = '#\{(' . join('|', array_keys($colors)) . ')(' . join('|', $mods) . ')?\}#';
-        }
-        static $enabled = null;
-        if (null === $enabled) {
-            $enabled = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
-        }
-        $output = preg_replace_callback($re, function($m) use ($colors, $modifiers, $enabled) {
-            if (!$enabled) {
+        return preg_replace_callback(static::$_colorsRegex, function($m) {
+            if (!static::$_colorsEnabled) {
                 return '';
             }
-            $mod = !empty($m[2]) ? ($modifiers[$m[2]] . ';') : '';
-            $color = $colors[$m[1]];
-            return "\033[{$mod}{$color}m";
+            $colors = [];
+            if ($m[1]) {
+                foreach (str_split($m[1]) as $c) {
+                    $colors[] = static::$_shortMods[$c];
+                }
+            }
+            if ($m[2]) {
+                foreach (explode(';', $m[2]) as $c) {
+                    $colors[] = static::$_colorCodes[$c];
+                }
+            }
+            if (!empty($m[6])) {
+                foreach (str_split($m[6]) as $c) {
+                    $colors[] = static::$_shortMods[$c];
+                }
+            }
+            return "\033[" . join(';', $colors) . "m";
         }, $string);
-        return $output;
     }
 }

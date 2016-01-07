@@ -91,7 +91,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
     public function println($string, array $params = [])
     {
         if (!empty($params['ts'])) {
-            $string  = '{blue,bold}[' . $this->BDb->now() . ']{reset} ' . $string;
+            $string  = '{blue*}[' . $this->BDb->now() . ']{/} ' . $string;
         }
         echo $this->FCom_Shell_Shell->colorize($string) . "\r\n";
         return $this;
