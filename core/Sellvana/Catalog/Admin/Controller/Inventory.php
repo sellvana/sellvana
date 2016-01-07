@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  */
 class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -25,7 +26,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     public function gridConfig()
     {
         $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
-        $yesNo = [0 => 'no', 1 => 'YES'];
+//        $yesNo = [0 => 'no', 1 => 'YES'];
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
@@ -75,6 +76,113 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         ];
         #$config['grid_before_create'] = 'stockGridRegister';
         #$config['new_button'] = '#add_new_sku';
+        return $config;
+    }
+
+    /**
+     * @param Sellvana_Catalog_Model_InventorySku $model
+     * @return array
+     */
+    public function prodInventoryConfig($model = null)
+    {
+        $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
+        $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
+        $data = [];
+        if ($model) {
+            $data = $this->BDb->many_as_array($this->Sellvana_Catalog_Model_Product->orm('p')
+                ->join('Sellvana_Catalog_Model_ProductMedia', ['p.id', '=', 'pa.file_id'], 'pa')
+                ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
+                ->where('p.inventory_sku', $model->get('inventory_sku'))
+                ->where('pa.media_type', Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
+                ->where_raw('p.id = pa.product_id')
+                ->select(['p.*', 'pa.*', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size'])
+                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
+                ->find_many());
+        }
+
+        $config = [
+            'config' => [
+                'id' => 'product_inventory_sku',
+                'caption' => 'Product Inventory SKU',
+                'data_mode' => 'local',
+                'data' => $data,
+                'columns' => [
+                    ['type' => 'row_select', 'width' => 55],
+                    ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
+                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                        'print' => '"<a href=\''.$downloadUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
+                            . '<img src=\''.$thumbUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
+                            . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
+                        'sortable' => false],
+                    ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
+                    ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
+                    ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
+                    ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100],
+                    ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100],
+                ],
+                'filters' => [
+                    ['field' => 'product_name', 'type' => 'text'],
+                    ['field' => 'product_sku', 'type' => 'text'],
+                    ['field' => 'short_description', 'type' => 'text'],
+                    ['field' => 'create_at', 'type' => 'date-range'],
+                    ['field' => 'update_at', 'type' => 'date-range'],
+                    '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
+                ],
+                'callbacks' => [
+                    'componentDidMount' => 'prodInventoryRegister'
+                ],
+                'state' => [
+                    's' => 'product_name',
+                    'sd' => 'asc'
+                ]
+            ]
+        ];
+
+        return $config;
+    }
+
+    /**
+     * @param Sellvana_Catalog_Model_InventorySku $model
+     * @return array
+     */
+    public function variantInventoryConfig($model = null)
+    {
+        $data = [];
+        if ($model) {
+            $data = $this->BDb->many_as_array(
+                $this->Sellvana_CatalogFields_Model_ProductVariant->orm('pv')
+                    ->join('Sellvana_Catalog_Model_Product', ['pv.product_id', '=', 'p.id'], 'p')
+                    ->where('pv.inventory_sku', $model->get('inventory_sku'))
+                    ->select('pv.*')
+                    ->select_expr('p.product_name', 'product')
+                    ->find_many());
+        }
+
+        $config = [
+            'config' => [
+                'id' => 'variable-field-grid',
+                'caption' => 'Variable Field Grid',
+                'data_mode' => 'local',
+                'data' => $data,
+                'columns' => [
+                    ['type' => 'row_select'],
+                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
+                    ['name' => 'product', 'label' => 'Product', 'width' => 300, 'sortable' => false],
+                    ['name' => 'product_sku', 'label' => 'Product SKU', 'width' => 300],
+                    ['name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 300],
+                    ['name' => 'variant_price', 'label' => 'Price', 'width' => 300]
+                ],
+                'filters' => [
+                    ['field' => 'product_sku', 'type' => 'text'],
+                    ['field' => 'inventory_sku', 'type' => 'text'],
+                    ['field' => 'variant_price', 'type' => 'number-range']
+                ],
+                'callbacks' => [
+                    'componentDidMount' => 'variantInventoryRegister'
+                ]
+            ]
+        ];
+
         return $config;
     }
 
@@ -187,8 +295,10 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
                 $skus = $this->BUtil->arrayToOptions($models, 'sku');
                 $products = $this->Sellvana_Catalog_Model_Product->orm()->where_in('product_sku', $skus)->find_many_assoc('product_sku');
                 foreach ($models as $stock) {
+                    /** @var Sellvana_Catalog_Model_InventorySku $stock */
                     $stock->set('status', $data['status'])->save();
                     if (!empty($products[$stock->get('sku')])) {
+                        /** @var Sellvana_Catalog_Model_Product $prod */
                         $prod = $products[$stock->get('sku')];
                         $data_serialized = $this->BUtil->objectToArray(json_decode($prod->get('data_serialized')));
                         if (!isset($data_serialized['stock_policy']))  {

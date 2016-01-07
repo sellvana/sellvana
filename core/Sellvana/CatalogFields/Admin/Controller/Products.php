@@ -71,12 +71,14 @@ class Sellvana_CatalogFields_Admin_Controller_Products extends FCom_Admin_Contro
                 ->find_many_assoc();
             $options = [];
             foreach ($varFieldsOptions as $vfo) {
+                /** @var Sellvana_CatalogFields_Model_FieldOption $vfo */
                 $options[$vfo->get('field_id')][$vfo->id()] = $vfo->get('label');
             }
         }
 
         $data = [];
         foreach ($varFields as $vf) {
+            /** @var Sellvana_CatalogFields_Model_ProductVarfield $vf */
             $fId = $vf->get('field_id');
             $data[] = [
                 'id'          => $fId,

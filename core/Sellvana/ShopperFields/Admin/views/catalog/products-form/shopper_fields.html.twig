@@ -657,7 +657,7 @@
                                 },
                                 onLoad: function (modal) {
                                     shopperModalNode = $(modal.getDOMNode());
-                                    form = shopperModalNode.find('#frontend-field-grid_options_form');
+                                    form = shopperModalNode.find('#{{ frontendFieldGrid.config.id }}_options_form');
                                     shopperModalNode.find('.modal-dialog').css('width', '1280px')
                                 },
                                 onConfirm: window.saveShopperModal
