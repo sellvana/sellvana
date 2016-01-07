@@ -41,7 +41,7 @@ class Sellvana_ProductReviews_Admin_Dashboard extends FCom_Admin_Widget
     public function getLatestProductReviews()
     {
         $limitConfigPath = 'modules/Sellvana_ProductReviews/latest-product-reviews-limit';
-
+        /** @var BORM $orm */
         $orm = $this->{$this->_modelClass}->orm('pr')
             ->join($this->Sellvana_Catalog_Model_Product->table(), ['p.id', '=', 'pr.product_id'], 'p')
             ->left_outer_join($this->Sellvana_Customer_Model_Customer->table(), ['c.id', '=', 'pr.customer_id'], 'c')

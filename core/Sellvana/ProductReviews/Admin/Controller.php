@@ -39,9 +39,9 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
                 'editable' => true, 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'text', 'label' => 'Comment', 'addable' => true,
                 'editable' => true, 'editor' => 'textarea'],
-            ['type' => 'input', 'name' => 'rating', 'label' => 'Total Rating', 'addable' => true,
-                'editable' => true, 'element_print' => $this->inputRatingHtml('rating'),
-                'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
+            ['name' => 'rating', 'label' => 'Total Rating', 'addable' => true,
+                'editable' => true, 'display' => 'eval', 'element_print' => $this->inputRatingHtml('rating'),
+                'print' => '"<div class=\'rateit\' data-review=\'"+rc.row["id"]+"\' data-rateit-resetable=\'false\' data-rateit-min=\''.$reviewConfigs['min'].'\' data-rateit-max=\''.$reviewConfigs['max'].'\' data-rateit-readonly=\'false\' data-rateit-step=\''.$reviewConfigs['step'].'\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
                 /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))*/],
             ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'addable' => true,
                 'editable' => true, 'validation' => ['number' => true]],
@@ -131,11 +131,16 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             unset($config['columns'][6]['data']['edit']);
             $config['columns'][6]['data']['custom'] = ['caption' => 'Edit...'];
             $config['data'] = $data;
+
+            $config['callbacks'] = [
+                'componentDidMount' => 'prodReviewsRegister',
+                'componentDidUpdate' => 'prodReviewsUpdate'
+            ];
         } else {
             //$config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
             $config['id'] = 'products_reviews_grid';
-            $config['columns'][] = ['name' => 'product_name', 'label' => 'Product name', 'width' => 250];
-            $config['columns'][] = ['name' => 'customer', 'label' => 'Customer', 'width' => 250];
+            $config['columns'][] = ['name' => 'product_name', 'label' => 'Product name'];
+            $config['columns'][] = ['name' => 'customer', 'label' => 'Customer'];
             $config['columns'][] = ['name' => 'create_at', 'label' => 'Created'];
             $config['orm'] = $this->Sellvana_ProductReviews_Model_Review->orm('pr')->select('pr.*')
                 ->left_outer_join('Sellvana_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
@@ -143,6 +148,11 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
                 ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
 
 	        $config['filters'][] = ['field' => 'product_id', 'type' => 'multiselect'];
+
+            $config['callbacks'] = [
+                'componentDidMount' => 'catalogReviewsRegister',
+                'componentDidUpdate' => 'catalogReviewsUpdate'
+            ];
         }
 
         /*$config['columns'][] = ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
@@ -154,17 +164,8 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             ]
         ];
 
-        $callbacks = '$(".rateit").rateit();
+//        $callbacks = '$(".rateit").rateit(); $("#' . $config['id'] . '-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
 
-        $("#' . $config['id'] . '-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
-
-        $config['callbacks'] = [
-            'after_gridview_render' => $callbacks,
-            'componentDidMount' => 'prodReviewsRegister'
-        ];
-//        $config['new_button'] = '#add_new_product_review';
-
-        $config['grid_before_create'] = $config['id'] . '_register';
         return $config;
     }
 
