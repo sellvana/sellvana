@@ -1,4 +1,5 @@
 {% set products = APP.instance('Sellvana_Sales_Admin_Dashboard').getTopProducts() %}
+{% if products|length > 0 %}
 <div id="top-products-chart" style="width: 450px; height: 300px; "></div>
 
 <script>
@@ -30,3 +31,4 @@
         });
     });
 </script>
+{% endif %}

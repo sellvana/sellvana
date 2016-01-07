@@ -277,6 +277,8 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     }
 
     /**
+     * Wrapper for recursion
+     *
      * @param bool $save
      * @param bool $resetUrl
      * @return static
@@ -284,19 +286,36 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      */
     public function refreshDescendants($save = false, $resetUrl = false)
     {
+        $args = ['save' => $save, 'resetUrl' => $resetUrl, 'model' => $this];
+        $this->BEvents->fire(__METHOD__ . ':before', $args);
+        $this->_refreshDescendants($save, $resetUrl);
+        $this->BEvents->fire(__METHOD__ . ':after', $args);
+        return $this;
+    }
+
+    /**
+     * Recursive data refresh for descendants of the current model
+     *
+     * @param bool $save
+     * @param bool $resetUrl
+     * @return static
+     * @throws BException
+     */
+    protected function _refreshDescendants($save = false, $resetUrl = false)
+    {
         $children = $this->children();
         foreach ($children as $c) {
             $c->set([
-                    'id_path' => $this->get('id_path') . '/' . $c->id(),
-                    'full_name' => $this->get('full_name') . static::$_separator . $c->get('node_name'),
-                ]);
+                'id_path' => $this->get('id_path') . '/' . $c->id(),
+                'full_name' => $this->get('full_name') . static::$_separator . $c->get('node_name'),
+            ]);
             if ($resetUrl) {
                 $c->set('url_path', null);
             }
-            $c->refreshDescendants($save);
             if ($save) {
                 $c->save();
             }
+            $c->_refreshDescendants($save, $resetUrl);
         }
         return $this;
     }
@@ -578,10 +597,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         array_pop($pathArr);
         $parentPath = join('/', $pathArr);
         $parent = $this->load($parentPath, 'url_path');
-        if (!$parent) {
-            throw new BException('Parent identified by url_path is not found');
+        if ($parent) {
+            $this->set('parent_id', $parent->id());
+        } else {
+            #throw new BException('Parent identified by url_path is not found');
         }
-        $this->set('parent_id', $parent->id());
         return $this;
     }
 
