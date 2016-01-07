@@ -255,13 +255,12 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                     ['name' => 'label', 'type' => 'input', 'label' => 'Label', 'width' => 100, 'editable' => 'inline',
                         'sortable' => false, 'validation' => ['required' => true]],
                     ['name' => 'langs', 'label' => 'Multi Languages', 'width' => 300, 'editor' => 'select',
-                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'sortable' => false, 'options' => ['en_US' => 'en_US', 'de_DE' => 'de_DE', 'zh-CN' => 'zh-CN', 'fr-FR' => 'fr-FR', 'nl_NL' => 'nl_NL'], 'select2' => true, 'multiple' => true, 'placeholder' => 'Select some languages', 'callback' => 'addLangField'],
+                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'sortable' => false, 'options' => $this->BUtil->localesToSelect2Options(true), 'select2' => true, 'multiple' => true, 'placeholder' => 'Select some languages', 'callback' => 'addLangField'],
                     ['name' => 'lang_vals', 'type' => 'input', 'label' => 'Language Value', 'width' => 300, 'editable' => 'inline',
                         'sortable' => false],
                     ['type' => 'btn_group',
                         'buttons' => [['name' => 'delete', 'noconfirm' => true]]
                     ]
-
                 ],
                 'filters' => [
                     '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]

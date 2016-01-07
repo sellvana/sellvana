@@ -168,24 +168,9 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
         confirmEditLangs: function (modal) {
             var modalConfig = this.props.modalConfig;
 
-            this.props.tmpAvailLangs = _.clone(this.state.availLangs);
-            this.props.tmpDefaultLangs = _.clone(this.state.defaultLangs);
             if (modalConfig.onSaved && typeof modalConfig.onSaved === 'string') {
                 window[modalConfig.onSaved](modal, this.state.availLangs);
             }
-        },
-        cancelEditLangs: function (modal) {
-            this.setState({
-                availLangs: this.props.tmpAvailLangs,
-                defaultLangs: this.props.tmpDefaultLangs
-            });
-
-            var modalConfig = this.props.modalConfig;
-            if (modalConfig.onCanceled && typeof modalConfig.onCanceled === 'string') {
-                window[modalConfig.onCanceled](modal);
-            }
-
-            modal.close();
         },
         getModalNode: function () {
             return $('#' + this.props.id + '-modal');
@@ -248,13 +233,13 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 return;
             }
 
-            this.state.defaultLangs = this.getDefaultLangs();
-
             this.state.availLangs.push({
                 lang_code: this.state.selection,
                 input_type: this.props.inputType || 'text',
                 value: ''
             });
+
+            this.state.defaultLangs = this.getDefaultLangs();
 
             this.forceUpdate();
         },
@@ -283,7 +268,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                             className: "btn btn-xs multilang " + (langLabel ? 'btn-info' : '')}, !langLabel ?
                         React.createElement("i", {className: "icon icon-globe"}) : '', " ", langLabel || Locale._('Translate')
                     ), 
-                    React.createElement(Components.Modal, React.__spread({},  this.props.modalConfig), 
+                    React.createElement(Components.Modal, React.__spread({},  this.getModalConfig(), {cancel: null}), 
                         React.createElement("div", {className: "well"}, 
                             React.createElement("table", null, 
                                 React.createElement("tbody", null, 
@@ -300,7 +285,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 )
                             )
                         ), 
-                        React.createElement("div", {className: this.props.id + '-container'}, 
+                        React.createElement("div", {id: this.props.id + '-container'}, 
                             React.createElement(LangFields, {id: this.props.id, langs: this.state.availLangs || [], 
                                         removeField: this.removeLangField, 
                                         setLangVal: this.setLangVal})

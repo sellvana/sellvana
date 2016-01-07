@@ -1641,6 +1641,25 @@ define(fcomAdminDeps, function ($, Ladda) {
     };
 
     /**
+     * Temporary fix for modal validation
+     *
+     * @param container
+     * @returns {boolean}
+     *
+     */
+    $.fn.modalValidate = function (container) {
+        if (!container.parent('form').length) {
+            container.wrap('<form>');
+        }
+
+        if (!container.parent('form').valid()) return false;
+
+        container.unwrap();
+
+        return true;
+    };
+
+    /**
      * resize width window
      * @param options
      */
@@ -1719,7 +1738,7 @@ define(fcomAdminDeps, function ($, Ladda) {
             $.post(FCom.Admin.personalize_href, postData, function (response, status, xhr) {
                 FCom.Admin.log(response);
             });
-        })
+        });
         $('.nav-group header').click(function (ev) {
             $(ev.currentTarget).parent('li').find('ul').animate({
                 opacity: 'toggle',

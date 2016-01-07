@@ -340,9 +340,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                     React.createElement("div", {className: "modal-dialog"}, 
                         React.createElement("div", {className: "modal-content"}, 
                             React.createElement("div", {className: "modal-header"}, 
-                                React.createElement("button", {type: "button", className: "close", onClick: this.handleCancel}, 
+                                cancelButton ? React.createElement("button", {type: "button", className: "close", onClick: this.handleCancel}, 
                                     "×"
-                                ), 
+                                ) : null, 
                                 React.createElement("h4", {className: "modal-title"}, this.props.title)
                             ), 
                             React.createElement("div", {className: "modal-body"}, 

@@ -16,11 +16,11 @@
 {% set fieldsConfig = setCtrl.fieldsGridConfig() %}
 {% set fieldsConfigCompiled = THIS.view('core/griddle').set('grid', fieldsConfig).getGridConfig() %}
 {% set initialData = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products').getInitialData(model) %}
-{% set locales = CONFIG.get('modules/Sellvana_MultiLanguage/allowed_locales') %}
 
 <script type="text/javascript">
     require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'sortable', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage, Sortable) {
         var APP = {},
+            $mainForm = $('#catalog-products-form'),
             initData = {{ UTIL.toJson(initialData) | raw }},
             fieldsModalNode,
             fieldsForm,
@@ -298,14 +298,6 @@
                 var $input = $(e.target);
                 this.refreshChanged($input.data('code'), $input.val());
             },
-            parseDefaultLangs: function (langs) {
-                if (!langs.length) return [];
-                return _(langs).map(function (lang) {
-                    return {
-                        id: lang, text: lang
-                    };
-                });
-            },
             parseLangs: function (data) {
                 var langs = data ? JSON.parse(data) : data;
                 if (!langs || !langs.frontend_label_translation) {
@@ -369,16 +361,11 @@
                                                                     }
 
                                                                     if (_.contains(this.props.inputWithLangs, field.admin_input_type)) {
-                                                                        var defaultLangs = {{ UTIL.toJson(locales) | raw }};
-                                                                        if (defaultLangs.length) {
-                                                                            var locales = this.parseDefaultLangs(defaultLangs);
-                                                                        }
-
                                                                         langField = React.createElement(FComMultiLanguage, {
                                                                             id: field.field_code + '_lang_field_' + field.id,
                                                                             availLangs: this.parseLangs(field.languages),
                                                                             inputType: field.admin_input_type,
-                                                                            defaultLangs: locales,
+                                                                            defaultLangs: {{ UTIL.toJson(UTIL.localesToSelect2Options()) | raw }},
                                                                             modalConfig: {
                                                                                 fieldCode: field.field_code,
                                                                                 onSaved: field.field_code + 'ModalSaveChange'
@@ -387,6 +374,11 @@
                                                                         });
 
                                                                         window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
+                                                                            var modalNode = $(modal.getDOMNode());
+                                                                            var container = modalNode.find('div[id$="-container"]');
+                                                                            if (!$.fn.modalValidate(container))
+                                                                                return;
+
                                                                             var code = modal.props.fieldCode;
                                                                             $(APP).trigger('refreshLangs', [code, langs]);
                                                                             modal.close();

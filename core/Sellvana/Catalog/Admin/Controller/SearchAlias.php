@@ -60,7 +60,10 @@ class Sellvana_Catalog_Admin_Controller_SearchAlias extends FCom_Admin_Controlle
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 's.update_at', 'width' => 100],
         ];
         $config['actions'] = [
-            'new' => ['caption' => 'New Search Term'],
+            'new' => [
+                'caption'  => 'New Search Term',
+                'addClass' => '_modal'
+            ],
             'delete' => true,
         ];
         $config['filters'] = [

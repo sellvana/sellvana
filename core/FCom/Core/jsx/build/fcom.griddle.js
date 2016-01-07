@@ -533,7 +533,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
         handleClick: function(event) {
             var that = this;
             var gridId = that.props.getConfig('id');
-            if ($(event.target).hasClass('_modal')) {
+            if ($(event.currentTarget).hasClass('_modal')) {
                 var modalEleContainer = document.getElementById(gridId + '-modal');
                 React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                 React.render(
@@ -567,7 +567,7 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var actionKey = gridId + '-fcom-settings-action-' + name;
                     var actionProps = {
                         key: gridId + '-fcom-settings-action-' + name,
-                        className: action.class
+                        className: action.class + ' ' + (action.addClass ? action.addClass : '')
                     };
                     switch (name) {
                         case 'refresh':

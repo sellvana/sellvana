@@ -1267,7 +1267,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         
         // Process delete product prices
         if (!empty($data['prices']['delete'])) {
-            $this->_deletePrices($data['prices']['delete']);
+            $this->Sellvana_Catalog_Model_ProductPrice->delete_many(['id' => $data['prices']['delete']]);
         }
     }
 
@@ -1295,16 +1295,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             // Process delete variant prices
             if (!empty($variantPrices['delete'])) {
                 $deletedPrices = $this->BUtil->fromJson($variantPrices['delete']);
-                $this->_deletePrices($deletedPrices);
-            }
-        }
-    }
-
-    protected function _deletePrices($delPrices) {
-        foreach ($delPrices as $delPrice) {
-            $price = $this->Sellvana_Catalog_Model_ProductPrice->load($delPrice);
-            if($price){
-                $price->delete();
+                $this->Sellvana_Catalog_Model_ProductPrice->delete_many(['id' => $deletedPrices]);
             }
         }
     }
