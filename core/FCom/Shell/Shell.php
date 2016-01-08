@@ -256,6 +256,47 @@ class FCom_Shell_Shell extends BClass
     }
 
     /**
+     * ANSI cursor operations
+     *
+     * Commands:
+     *  - pos:     move cursor to $p1: Line, $p2: Column
+     *  - up:      move up $p1 lines
+     *  - down:    move down $p1 lines
+     *  - fwd:     move forward $p1 lines
+     *  - back:    move backward $p1 lines
+     *  - clear:   clear the screen, move to (0, 0)
+     *  - erase:   erase to end of line
+     *  - save:    save cursor position
+     *  - restore: restore cursor position
+     *
+     * @param $cmd
+     * @param int $p1
+     * @param int $p2
+     * @return string
+     */
+    public function cursor($cmd, $p1 = null, $p2 = null)
+    {
+        if (!static::$_colorsEnabled) {
+            return '';
+        }
+
+        $out = '';
+        switch ($cmd) {
+            case 'pos':     $out = "{$p1};{$p2}H"; break; // line;column
+            case 'up':      $out = "{$p1}A"; break;
+            case 'down':    $out = "{$p1}B"; break;
+            case 'fwd':     $out = "{$p1}C"; break;
+            case 'back':    $out = "{$p1}D"; break;
+            case 'clear':   $out = "2J"; break;
+            case 'erase':   $out = "K"; break;
+            case 'save':    $out = "s"; break;
+            case 'restore': $out = "u"; break;
+        }
+
+        return "\033[{$out}";
+    }
+
+    /**
      * Strip a string of ansi-control codes.
      *
      * @param string $string String to strip
@@ -263,7 +304,7 @@ class FCom_Shell_Shell extends BClass
      */
     public function strip($string)
     {
-        return preg_replace('/\033\[(\d+)(;\d+)*m/', '', $string);
+        return preg_replace('/\033\[(\d+)(;\d+)*[a-zA-Z]/', '', $string);
     }
 
     /**
