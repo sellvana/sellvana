@@ -1,43 +1,6 @@
 {#{{ dump(uploadConfig) }}#}
 {% set defaultFileSizeConfig = CONFIG.get('modules/FCom_Admin/default_media_file_size') | default('1') %}
-<div id='{{ config.id }}-media-upload'>
-    {# <div class='box-content'>
-        <div class='row fileupload-buttonbar'>
-            <div class='col-sm-12'>
-                <span class='btn btn-success fileinput-button'>
-                    <i class='icon-plus icon-white'></i>
-                    <span>Add files...</span>
-                    <input data-bfi-disabled='' multiple='' name='upload[]' type='file'>
-                </span>
-                <button class='btn btn-primary start' type='submit'>
-                    <i class='icon-upload icon-white'></i>
-                    <span>Start upload</span>
-                </button>
-                <button class='btn btn-warning cancel' type='reset'>
-                    <i class='icon-ban-circle icon-white'></i>
-                    <span>Cancel upload</span>
-                </button>
-            </div>
-            <div class='col-sm-5 fileupload-progress fade'>
-                <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active'
-                     role='progressbar'>
-                    <div class='bar' style='width:0%;'></div>
-                </div>
-                <div class='progress-extended'></div>
-            </div>
-        </div>
-        <div class='fileupload-loading'></div>
-        <br>
-        <table class='table table-striped' role='presentation'>
-            <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
-        </table>
-    </div> #}
-    <script>
-        var uploadTr = '{{ 'Upload'|_ }}';
-        var errorTr = '{{ 'Error'|_ }}';
-        var cancelTr = '{{ 'Cancel'|_ }}';
-    </script>
-</div>
+<div id='{{ config.id }}-media-upload'></div>
 
 <script type="text/javascript">
     MediaApp = {};
@@ -129,39 +92,37 @@
                 $(MediaApp).off('onMounted');
             },
             render: function() {
-                var node = React.DOM.div({ id: 'box-content' },
-                        React.DOM.div({ className: 'row fileupload-buttonbar' },
-                            React.DOM.div({ className: 'col-sm-12' },
-                                React.DOM.span({ className: 'btn btn-success fileinput-button' },
-                                    React.DOM.i({ className: 'icon-plus icon-white' }),
-                                    React.DOM.span(null, "{{ 'Add files...' |_ }}"),
-                                    React.DOM.input({ 'data-bfi-disabled': '', multiple: '', name: 'upload[]', type: 'file' })
-                                ),
-                                React.DOM.button({ className: 'btn btn-primary start', type: 'submit' },
-                                    React.DOM.i({ className: 'icon-upload icon-white' }),
-                                    React.DOM.span(null, "{{ 'Start upload' |_ }}")
-                                ),
-                                React.DOM.button({ className: 'btn btn-warning cancel', type: 'reset' },
-                                    React.DOM.i({ className: 'icon-ban-circle icon-white' }),
-                                    React.DOM.span(null, "{{ 'Cancel upload'|_ }}")
-                                )
+                return React.DOM.div({ id: 'box-content' },
+                    React.DOM.div({ className: 'row fileupload-buttonbar' },
+                        React.DOM.div({ className: 'col-sm-12' },
+                            React.DOM.span({ className: 'btn btn-success fileinput-button' },
+                                React.DOM.i({ className: 'icon-plus icon-white' }),
+                                React.DOM.span(null, "{{ 'Add files...' |_ }}"),
+                                React.DOM.input({ 'data-bfi-disabled': '', multiple: '', name: 'upload[]', type: 'file' })
                             ),
-                            React.DOM.div({ className: 'col-sm-5 fileupload-progress fade' },
-                                React.DOM.div({ 'aria-valuemax': '100', 'aria-valuemin': '0', className: 'progress progress-success progress-striped active',
-                 role: 'progressbar' },
-                                    React.DOM.div({ className: 'bar', style: { width: '0%' } })
-                                ),
-                                React.DOM.div({ className: 'progress-extended' })
+                            React.DOM.button({ className: 'btn btn-primary start', type: 'submit' },
+                                React.DOM.i({ className: 'icon-upload icon-white' }),
+                                React.DOM.span(null, "{{ 'Start upload' |_ }}")
+                            ),
+                            React.DOM.button({ className: 'btn btn-warning cancel', type: 'reset' },
+                                React.DOM.i({ className: 'icon-ban-circle icon-white' }),
+                                React.DOM.span(null, "{{ 'Cancel upload'|_ }}")
                             )
                         ),
-                        React.DOM.div({ className: 'fileupload-loading' }),
-                        React.DOM.br(),
-                        React.DOM.table({ className: 'table table-striped', role: 'presentation' },
-                            React.DOM.tbody({ className: 'files', 'data-target': '#modal-gallery', 'data-toggle': 'modal-gallery' })
+                        React.DOM.div({ className: 'col-sm-5 fileupload-progress fade' },
+                            React.DOM.div({ 'aria-valuemax': '100', 'aria-valuemin': '0', className: 'progress progress-success progress-striped active',
+             role: 'progressbar' },
+                                React.DOM.div({ className: 'bar', style: { width: '0%' } })
+                            ),
+                            React.DOM.div({ className: 'progress-extended' })
                         )
-                    );
-
-                return node;
+                    ),
+                    React.DOM.div({ className: 'fileupload-loading' }),
+                    React.DOM.br(),
+                    React.DOM.table({ className: 'table table-striped', role: 'presentation' },
+                        React.DOM.tbody({ className: 'files', 'data-target': '#modal-gallery', 'data-toggle': 'modal-gallery' })
+                    )
+                );
             }
         });
 

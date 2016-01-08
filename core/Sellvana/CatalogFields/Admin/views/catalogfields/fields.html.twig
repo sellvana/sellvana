@@ -96,9 +96,9 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             React.createElement(Components.Modal, {
                     id: "addFieldModal",
                     show: true,
-                    title: row ? "{{ 'Edit Field' | _ }}" : "{{ 'Add Field' | _ }}",
-                    confirm: "{{ 'Save Change' | _ }}",
-                    cancel: "{{ 'Close' | _ }}",
+                    title: row ? "{{ 'Edit Field: '|_ }}" + row.field_code + ' - ' + row.field_name: "{{ 'Add Field'|_ }}",
+                    confirm: "{{ 'Save Changes' | _ }}",
+                    cancel: "{{ 'Cancel' | _ }}",
                     onLoad: function(modal) {
                         var node = $(modal.getDOMNode());
                         node.find('.modal-dialog').css('width', '960px');
@@ -130,6 +130,13 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
         var attachGridContainerEle = document.getElementById('{{ fieldsConfig.config.id }}_options_form');
 
         if (typeof row !== 'undefined' && typeof row === 'object') {
+            if (row.multilanguage == '0') {
+                optionsConfigCompiled.columns = _(optionsConfigCompiled.columns).filter(function (col, i) {
+                    if (col.name == 0) return true;
+                    return !(col.name == 'langs' || col.name == 'lang_vals');
+                });
+            }
+
             var getUrl = optionsConfigCompiled.dataUrl + row.id;
             $.get(getUrl, function(data) {
                 if (typeof data[1] !== 'undefined') {

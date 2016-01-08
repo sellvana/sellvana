@@ -514,13 +514,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             var $select2 = this.createSelect2();
         },
         setPlaceholderTo: function ($elem, placeholder) {
-            if (!placeholder) {
-                placeholder = "";
-            }
             var currData = $elem.select2("data");
-
-            // Set placeholder to new placeholder
-            $elem.attr("placeholder", placeholder);
 
             // Now workaround the fact that Select2 doesn't pick up on this
             // ..First assign null
@@ -528,7 +522,6 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
 
             // ..Then assign dummy value in case that currData is null since
             //   that won't do anything.
-
             $elem.select2("data", {});
 
             // ..Then put original data back
@@ -542,18 +535,22 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             }
 
             var $select2 = this.getElement();
+            var options = {
+                data: this.props.options,
+                multiple: this.props.multiple,
+                val: val
+            };
+
+            if (!this.props.multiple)
+                options['placeholder'] = this.props.placeholder;
+
             $select2.attr({
                 'name': this.props.name,
                 'class': this.props.className,
                 'data-col': this.props['data-col']
             })
             .val(val)
-            .select2({
-                data: this.props.options,
-                multiple: this.props.multiple,
-                val: val,
-                placeholder: this.props.placeholder
-            })
+            .select2(options)
             .on("change", this.handleChange)
             .on("select2-open", this.handleErrorState)
             .select2("enable", this.props.enabled);

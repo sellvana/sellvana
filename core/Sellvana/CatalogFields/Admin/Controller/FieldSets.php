@@ -242,7 +242,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
     {
         $config = [
             'config' => [
-                'id' => 'options-grid',
+                'id' => 'fields_options',
                 'caption' => 'Fields',
                 'dataUrl' => $this->BApp->href('catalogfields/fieldsets/field_option_grid_data?field_id='),
                 'data_url' => $this->BApp->href('catalogfields/fieldsets/field_grid_data'),
@@ -252,9 +252,9 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['name' => 'label', 'type' => 'input', 'label' => 'Label', 'width' => 100, 'editable' => 'inline',
+                    ['name' => 'label', 'type' => 'input', 'label' => 'Label', 'editable' => 'inline',
                         'sortable' => false, 'validation' => ['required' => true]],
-                    ['name' => 'langs', 'label' => 'Multi Languages', 'width' => 300, 'editor' => 'select',
+                    ['name' => 'langs', 'label' => 'Multi Languages', 'width' => 400, 'editor' => 'select',
                         'editable' => 'inline', 'type' => 'input', 'addable' => true, 'sortable' => false, 'options' => $this->BUtil->localesToSelect2Options(true), 'select2' => true, 'multiple' => true, 'placeholder' => 'Select some languages', 'callback' => 'addLangField'],
                     ['name' => 'lang_vals', 'type' => 'input', 'label' => 'Language Value', 'width' => 300, 'editable' => 'inline',
                         'sortable' => false],
