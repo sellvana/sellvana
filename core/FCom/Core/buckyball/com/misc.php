@@ -3443,6 +3443,14 @@ class BDebug extends BClass
         static::dumpLog();
         //$args['content'] = str_replace('</body>', static::dumpLog(true).'</body>', $args['content']);
     }
+
+    public function disableAllLogging()
+    {
+        $this->mode('PRODUCTION');
+        BORM::configure('logging', 0);
+        $this->BConfig->set('db/logging', 0);
+        return $this;
+    }
 }
 
 /**
@@ -4448,12 +4456,17 @@ class BValidate extends BClass
         if (!isset($data[$args['field']])) {
             return true;
         }
-        $value = $data[$args['field']];
+        return $this->validateEmail($data[$args['field']]);
+    }
+
+    /**
+     * @param string $email
+     * @return bool
+     */
+    public function validateEmail($email)
+    {
         $re = '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/';
-        if (strlen($value) > 255 || !preg_match($re, $value)) {
-            return false;
-        }
-        return true;
+        return strlen($email) < 255 && preg_match($re, $email);
     }
 }
 

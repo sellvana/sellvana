@@ -26,14 +26,15 @@ class FCom_Core_Shell_Migrate extends FCom_Shell_Action_Abstract
     public function getLongHelp()
     {
         return <<<EOT
+
 Run pending DB migration scripts.
 
 Options:
     {white*}-f
-    --force{.}     Force migration for all modules
+    --force{/}     Force migration for all modules
 
     {white*}-m
-    --modules{.}   Specify which modules to migrate
+    --modules{/}   Specify which modules to migrate
 
 EOT;
     }

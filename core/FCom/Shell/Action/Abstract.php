@@ -56,6 +56,11 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         return 'Help for this action is not available';
     }
 
+    public function getAvailOptions()
+    {
+        return static::$_availOptions;
+    }
+
     public function run()
     {
         $this->_collectOptions();
@@ -88,7 +93,8 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         $this->_options = [];
         $this->_optionErrors = [];
 
-        if (!static::$_availOptions) {
+        $availOptions = $this->getAvailOptions();
+        if (!$availOptions) {
             return $this;
         }
 
@@ -100,7 +106,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
             $curOpt = 'unknown'; // unknown option
             $value = null;
             $o = null;
-            foreach (static::$_availOptions as $opt => $longOpt) { // iterate over available options
+            foreach ($availOptions as $opt => $longOpt) { // iterate over available options
                 $o = $opt[0]; // actual short option name
                 $ro = !empty($opt[1]) ? $opt[1] : false; // required/optional
                 if (!empty($p[1]) && $p[1] === $o) { // this is the current short opt
@@ -127,7 +133,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
                     $value = true;
                     break;
                 } elseif ($ro && $value === null) { // expecting a value and don't have one yet
-                    if (!empty($params[$i + 1]) && $params[$i + 1][0] !== '-') { // next param is a valid value
+                    if (isset($params[$i + 1]) && $params[$i + 1][0] !== '-') { // next param is a valid value
                         $value = $params[$i + 1];
                         unset($params[$i + 1]); // remove value from params
                     } elseif ($ro === '?') { // value is optional
@@ -166,6 +172,11 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         return $this;
     }
 
+    public function getParam($num)
+    {
+        return $this->FCom_Shell_Shell->getParam($num);
+    }
+
     /**
      * Get command line option by option key (can request for multiple keys, as in short and long)
      *
@@ -174,7 +185,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
      */
     public function getOption($key)
     {
-        return !empty($this->_options[$key]) ? $this->_options[$key] : null;
+        return isset($this->_options[$key]) ? $this->_options[$key] : null;
     }
 
     public function out($string)

@@ -16,6 +16,8 @@ class Sellvana_CatalogIndex_Shell_Reindex extends FCom_Shell_Action_Abstract
 
     protected function _run()
     {
+        $this->BDebug->disableAllLogging();
+
         $this->println('Starting reindexing...');
 
         if ($this->getOption('f')) {
@@ -38,11 +40,12 @@ class Sellvana_CatalogIndex_Shell_Reindex extends FCom_Shell_Action_Abstract
     public function getLongHelp()
     {
         return <<<EOT
+
 Reindex catalog
 
 Options:
     {white*}-f
-    --force{.}     Force reindex the whole catalog
+    --force{/}     Force reindex the whole catalog
 
 EOT;
     }

@@ -107,6 +107,11 @@ modules:
                         permission: upload/images
                         filetype: jpeg,jpg,tiff,gif,png,bmp
                         folder: media/images
+
+            FCom_Shell:
+                custom:
+                    actions: [ FCom_Admin_Shell_User ]
+
         default_config:
             modules:
                 FCom_Admin:

@@ -34,4 +34,4 @@ modules:
 
             FCom_Shell:
                 custom:
-                    actions: [ Sellvana_CatalogIndex_Shell_Reindex ]
+                    actions: [ Sellvana_CatalogIndex_Shell_Reindex, Sellvana_CatalogIndex_Shell_Populate ]

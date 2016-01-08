@@ -39,7 +39,7 @@ modules:
         areas:
             FCom_Shell:
                 custom:
-                    actions: [ FCom_Core_Shell_Migrate ]
+                    actions: [ FCom_Core_Shell_Migrate, FCom_Core_Shell_Cache, FCom_Core_Shell_Module ]
 
         default_config:
             db:
