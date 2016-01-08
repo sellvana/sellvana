@@ -214,7 +214,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         $percent = ceil($done / $total * 100);
         $pos = ceil($percent / 100 * $size);
         $out = $start . str_pad('', $pos, $pass) . $head . str_pad('', $size - $pos, $fill) . $end .
-               ' {blue*}' . $done . '/' . $total . ' ' . $percent . '%';
+               ' {blue*}' . $done . '/' . $total . ' ' . $percent . '%{/}';
         $this->println($out);
         $this->out($this->FCom_Shell_Shell->cursor('up', 1));
         return $this;
