@@ -30,9 +30,16 @@ abstract class FCom_Shell_Action_Abstract extends BClass
     /**
      * Calculated options
      *
-     * @var array|null
+     * @var array
      */
-    protected $_options = null;
+    protected $_options = [];
+
+    /**
+     * Option errors, such as missing required values
+     *
+     * @var array
+     */
+    protected $_optionErrors = [];
 
     public function getActionName()
     {
@@ -49,37 +56,125 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         return 'Help for this action is not available';
     }
 
-    /**
-     * Get a command line option (starts with - or --)
-     *
-     * @param $opt
-     * @param null $longOpt
-     * @return null
-     */
-    public function getOption($opt, $longOpt = null)
+    public function run()
     {
-        if (null === $this->_options) {
-            $availOptions = '';
-            $availLongOptions = [];
-            foreach (static::$_availOptions as $opt => $longOpt) {
-                $mod = '';
-                if (!empty($opt[1])) {
-                    if ($opt[1] === '!') {
-                        $mod = ':';
-                    } elseif ($opt[1] === '?') {
-                        $mod = '::';
-                    }
-                }
-                $availOptions .= $opt[0] . $mod;
-                $availLongOptions[] = $longOpt . $mod;
+        $this->_collectOptions();
+
+        if (!empty($this->_optionErrors)) {
+            $this->println('');
+            $this->println('Execution stopped due to errors above.');
+            return $this;
+        }
+
+        $this->_run();
+
+        return $this;
+    }
+
+    protected function _run()
+    {
+        $this->println('{red*}Not implemented{/}');
+    }
+
+    /**
+     * Get a command line option (starts with - or --), allows '=' separated long option values
+     *
+     * @return $this
+     */
+    protected function _collectOptions()
+    {
+        $params =& $this->FCom_Shell_Shell->getAllParams();
+
+        $this->_options = [];
+        $this->_optionErrors = [];
+
+        if (!static::$_availOptions) {
+            return $this;
+        }
+
+        foreach ($params as $i => $p) { // iterate over cli parameters
+            $curOpt = null; // reset
+            if ($p[0] !== '-') { // this parameter is not an option
+                continue;
             }
-            $this->_options = getopt($availOptions, $availLongOptions);
+            $curOpt = 'unknown'; // unknown option
+            $value = null;
+            $o = null;
+            foreach (static::$_availOptions as $opt => $longOpt) { // iterate over available options
+                $o = $opt[0]; // actual short option name
+                $ro = !empty($opt[1]) ? $opt[1] : false; // required/optional
+                if (!empty($p[1]) && $p[1] === $o) { // this is the current short opt
+                    $curOpt = 'short';
+                    if (!empty($p[2])) {
+                        $value = substr($p, 2);
+                        break; // no need to proceed
+                    }
+                } elseif (!empty($p[1]) && $p[1] === '-') { // this is a long opt
+                    $pArr = explode('=', $p, 2);
+                    if (substr($pArr[0], 2) === $longOpt) { // this is the current long opt
+                        $curOpt = 'long';
+                        if (!empty($pArr[1])) { // has value separated by '='
+                            $value = $pArr[1];
+                            break; // no need to proceed
+                        }
+                    } else { // not current long opt
+                        continue;
+                    }
+                } else { // not current opt
+                    continue;
+                }
+                if (!$ro) { // not expecting a value
+                    $value = true;
+                    break;
+                } elseif ($ro && $value === null) { // expecting a value and don't have one yet
+                    if (!empty($params[$i + 1]) && $params[$i + 1][0] !== '-') { // next param is a valid value
+                        $value = $params[$i + 1];
+                        unset($params[$i + 1]); // remove value from params
+                    } elseif ($ro === '?') { // value is optional
+                        $value = true;
+                    } else { // value is required and missing, add to errors
+                        $optName = $curOpt === 'short' ? '-' . $o : '--' . $longOpt;
+                        $this->_optionErrors[$o] = [
+                            'error' => 'required_value',
+                            'type' => $curOpt,
+                            'key' => $optName,
+                        ];
+                        $this->println('Missing value required for option: {red*}' . $optName . '{/}');
+                    }
+                    break;
+                }
+            }
+            if ($curOpt === false) {
+                continue;
+            } elseif ($curOpt === 'unknown') {
+                $this->_optionErrors[$p] = [
+                    'error' => 'unknown_option',
+                    'key' => $p,
+                ];
+                $this->println('Unknown option: {red*}' . $p . '{/}');
+            }
+            if (empty($this->_options[$o])) { // option doesn't have values yet
+                $this->_options[$o] = $value; // set as scalar
+            } elseif (!is_array($this->_options[$o])) { // option already has 1 value
+                $this->_options[$o] = [$this->_options[$o], $value]; // convert to array
+            } else { // option already has multiple values
+                $this->_options[$o][] = $value; // add to array
+            }
+            unset($params[$i]); // remove option from params
         }
-        $value = isset($this->_options[$opt]) ? $this->_options[$opt] : null;
-        if (null === $value) {
-            $value = isset($this->_options[$longOpt]) ? $this->_options[$longOpt] : null;
-        }
-        return $value;
+
+        return $this;
+    }
+
+    /**
+     * Get command line option by option key (can request for multiple keys, as in short and long)
+     *
+     * @param string $key
+     * @return string|array
+     */
+    public function getOption($key)
+    {
+        return !empty($this->_options[$key]) ? $this->_options[$key] : null;
     }
 
     public function out($string)

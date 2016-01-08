@@ -31,3 +31,7 @@ modules:
                 observe:
                     - [ "Sellvana_Catalog_Frontend_Controller_Category::action_index:products_data", Sellvana_CatalogIndex_Frontend.onCategoryProductsData ]
                     - [ "Sellvana_Catalog_Frontend_Controller_Search::action_index:products_data", Sellvana_CatalogIndex_Frontend.onSearchProductsData ]
+
+            FCom_Shell:
+                custom:
+                    actions: [ Sellvana_CatalogIndex_Shell_Reindex ]

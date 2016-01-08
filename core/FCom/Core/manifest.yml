@@ -36,6 +36,11 @@ modules:
             - [ "FCom_LibTwig_Main::init", FCom_Core_Main.onTwigInit ]
             - [ "FCom_Core_LayoutEditor::fetchLibrary", "FCom_Core_LayoutEditor.onFetchLibrary" ]
 
+        areas:
+            FCom_Shell:
+                custom:
+                    actions: [ FCom_Core_Shell_Migrate ]
+
         default_config:
             db:
                 dbname: sellvana

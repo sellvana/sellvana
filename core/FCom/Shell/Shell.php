@@ -11,7 +11,7 @@ class FCom_Shell_Shell extends BClass
      *
      * @var array|null
      */
-    protected $_params = null;
+    protected $_params = [];
 
     static protected $_colorCodes = [
         'normal' => '0',
@@ -55,8 +55,10 @@ class FCom_Shell_Shell extends BClass
 
     public function run()
     {
+        // colorize?
         static::$_colorsEnabled = strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN';
 
+        // calculate colors regex
         $mods = [];
         foreach (static::$_shortMods as $m => $_) {
             $mods[] = preg_quote($m, '#');
@@ -65,25 +67,36 @@ class FCom_Shell_Shell extends BClass
         $colorsRe = '(' . join('|', array_keys(static::$_colorCodes)) . ')';
         static::$_colorsRegex = "#\\{({$modsRe})({$colorsRe}(;{$colorsRe})*)?({$modsRe})\\}#";
 
+        // collect parameters and options from cli
+        $this->_params = $GLOBALS['argv'];
+
+        // bootstrap all modules
         $this->BModuleRegistry->bootstrap();
 
+        // register all actions from manifests
+        foreach ($this->BModuleRegistry->getAllModules() as $mod) {
+            if (!empty($mod->custom['actions'])) {
+                $this->registerAction($mod->custom['actions']);
+            }
+        }
+
+        // collect action classes and convert to instances
         foreach ($this->_actionClasses as $class) {
             /** @var FCom_Shell_Action_Abstract $inst */
             $inst = $this->{$class};
             $this->_actions[$inst->getActionName()] = $inst;
         }
+
+        // get correct current action name
         $name = $this->getParam(1) ?: 'help';
         if (empty($this->_actions[$name])) {
             $name = 'help';
         }
+
+        // run action logic
         $this->_actions[$name]->run();
 
         return $this;
-    }
-
-    public function bootstrap()
-    {
-        $this->registerAction('FCom_Shell_Action_Help');
     }
 
     public function getAction($name)
@@ -104,15 +117,17 @@ class FCom_Shell_Shell extends BClass
      */
     public function getParam($num)
     {
-        if (null === $this->_params) {
-            $this->_params = [];
-            foreach ($GLOBALS['argv'] as $p) {
-                if ($p[0] !== '-') {
-                    $this->_params[] = $p;
-                }
-            }
-        }
         return isset($this->_params[$num]) ? $this->_params[$num] : null;
+    }
+
+    /**
+     * Get all parameters (used for retrieving action specific options, and removing them from params)
+     *
+     * @return array
+     */
+    public function &getAllParams()
+    {
+        return $this->_params;
     }
 
     /**

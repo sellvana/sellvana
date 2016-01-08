@@ -4,4 +4,5 @@ modules:
 
         areas:
             FCom_Shell:
-                auto_use: [ bootstrap ]
+                custom:
+                    actions: [ FCom_Shell_Action_Help ]

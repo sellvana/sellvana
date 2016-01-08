@@ -9,7 +9,11 @@ class FCom_Shell_Action_Help extends FCom_Shell_Action_Abstract
 {
     static protected $_actionName = 'help';
 
-    public function run()
+    static protected $_availOptions = [
+        't!' => 'test',
+    ];
+
+    protected function _run()
     {
         $shellHlp = $this->FCom_Shell_Shell;
 
@@ -47,7 +51,7 @@ class FCom_Shell_Action_Help extends FCom_Shell_Action_Abstract
             }
             ksort($actionHelps);
             foreach ($actionHelps as $name => $help) {
-                $this->println("\t{white*}" . str_pad($name, $maxLen, ' ', STR_PAD_LEFT) . "{/}\t" . $help);
+                $this->println("\t{white*}" . str_pad($name, $maxLen, ' ', STR_PAD_RIGHT) . "{/}\t" . $help);
             }
         }
         return $this;
