@@ -202,4 +202,21 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         echo $this->FCom_Shell_Shell->colorize($string) . "\r\n";
         return $this;
     }
+
+    public function progress($done, $total = 100, array $params = [])
+    {
+        $size = isset($params['size']) ? $params['size'] : 50;
+        $start = isset($params['start']) ? $params['start'] : '{white*}[{.}';
+        $pass = isset($params['pass']) ? $params['pass'] : '=';
+        $head = isset($params['head']) ? $params['head'] : '{green*}>';
+        $fill = isset($params['fill']) ? $params['fill'] : ' ';
+        $end = isset($params['end']) ? $params['end'] : '{white*}]{/}';
+        $percent = ceil($done / $total * 100);
+        $pos = ceil($percent / 100 * $size);
+        $out = $start . str_pad('', $pos, $pass) . $head . str_pad('', $size - $pos, $fill) . $end .
+               ' {blue*}' . $done . '/' . $total . ' ' . $percent . '%';
+        $this->println($out);
+        $this->out($this->FCom_Shell_Shell->cursor('up', 1));
+        return $this;
+    }
 }
