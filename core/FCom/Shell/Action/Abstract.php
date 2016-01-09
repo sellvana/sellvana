@@ -206,7 +206,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
     public function progress($done, $total = 100, array $params = [])
     {
         $size = isset($params['size']) ? $params['size'] : 50;
-        $start = isset($params['start']) ? $params['start'] : '{white*}[{.}';
+        $start = isset($params['start']) ? $params['start'] : '{white*}[{.green}';
         $pass = isset($params['pass']) ? $params['pass'] : '=';
         $head = isset($params['head']) ? $params['head'] : '{green*}>';
         $fill = isset($params['fill']) ? $params['fill'] : ' ';

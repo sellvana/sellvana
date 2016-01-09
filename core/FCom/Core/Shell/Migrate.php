@@ -2,7 +2,7 @@
 
 class FCom_Core_Shell_Migrate extends FCom_Shell_Action_Abstract
 {
-    static protected $_actionName = 'core:migrate';
+    static protected $_actionName = 'migrate';
 
     static protected $_availOptions = [
         'f' => 'force',

@@ -43,7 +43,8 @@ class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
         if (!$r) {
             return null;
         }
-        $role = $this->FCom_Admin_Model_Role->orm()->where(['OR' => ['role_name' => $r, 'id' => $r]])->find_one();
+        $role = $this->FCom_Admin_Model_Role->orm()
+            ->where(['OR' => ['role_name' => (string)$r, 'id' => (int)$r]])->find_one();
         return $role ? $role->id() : null;
     }
 
@@ -124,7 +125,8 @@ class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
         $userHlp = $this->FCom_Admin_Model_User;
 
         /** @var FCom_Admin_Model_User $user */
-        $user = $userHlp->orm()->where(['OR' => ['username' => $username, 'email' => $email]])->find_one();
+        $user = $userHlp->orm()
+            ->where(['OR' => ['username' => (string)$username, 'email' => (string)$email]])->find_one();
         if (!$user) {
             $this->println('{red*}ERROR:{/} User not found');
             return;
@@ -198,7 +200,8 @@ class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
         $userHlp = $this->FCom_Admin_Model_User;
 
         /** @var FCom_Admin_Model_User $user */
-        $user = $userHlp->orm()->where(['OR' => ['username' => $username, 'email' => $email]])->find_one();
+        $user = $userHlp->orm()
+            ->where(['OR' => ['username' => (string)$username, 'email' => (string)$email]])->find_one();
         if (!$user) {
             $this->println('{red*}ERROR:{/} User not found');
             return;

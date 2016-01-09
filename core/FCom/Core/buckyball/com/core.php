@@ -723,10 +723,13 @@ class BConfig extends BClass
         } else {
             $node =& $this->_config;
         }
-        if ($this->shouldBeEncrypted($path)) {
-
-        }
+        #if ($this->shouldBeEncrypted($path)) {
+            //TODO: need encrypted values in config?
+        #}
         foreach (explode('/', $path) as $key) {
+            if (!is_array($node)) {
+                $node = [];
+            }
             $node =& $node[$key];
         }
         if ($merge) {

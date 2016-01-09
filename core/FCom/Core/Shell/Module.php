@@ -2,7 +2,7 @@
 
 class FCom_Core_Shell_Module extends FCom_Shell_Action_Abstract
 {
-    static protected $_actionName = 'core:module';
+    static protected $_actionName = 'module';
 
     static protected $_availOptions = [
         'e!' => 'enable',
