@@ -113,6 +113,9 @@ modules:
                     actions:
                         - [ FCom_Admin_Shell_User ]
                         - [ FCom_Admin_Shell_Import ]
+                observe:
+                    - [ "FCom_Core_ImportExport::import:beforeModel", "FCom_Admin_Shell_Import.onBeforeModel" ]
+                    - [ "FCom_Core_ImportExport::_importBatch:afterBatch", "FCom_Admin_Shell_Import.onAfterBatch" ]
 
         default_config:
             modules:

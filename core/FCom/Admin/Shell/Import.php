@@ -112,8 +112,8 @@ EOT;
     {
         $fileName = $this->getOption(self::OPTION_FILE);
         $external = false;
-        if (is_string($fileName)){
-            if (is_file($fileName)){
+        if (is_string($fileName)) {
+            if (is_file($fileName)) {
                 $external = true;
                 if (!preg_match('#\.json$#', $fileName)) {
                     $this->println('{red*}ERROR:{/} Unsupported file extension: {red*}' . $fileName . '{/}');
@@ -123,7 +123,7 @@ EOT;
                 $path = dirname($this->FCom_Core_ImportExport->getFullPath('import', 'import'));
                 $fileName = $path . '/' . $fileName;
 
-                if (!is_file($fileName)){
+                if (!is_file($fileName)) {
                     $this->println('{red*}ERROR:{/} Unknown file: {red*}' . $fileName . '{/}');
                     return;
                 }
@@ -132,7 +132,7 @@ EOT;
         } else {
             $files = $this->getAllAvailableFiles();
 
-            if (!$files){
+            if (!$files) {
                 $this->println('{green*}INFO:{/} No files to import.');
                 return;
             }
@@ -158,13 +158,13 @@ EOT;
         try {
             $importer = $this->FCom_Core_ImportExport;
 
-            if (!$importer->validateImportFile($file, !$external)){
+            if (!$importer->validateImportFile($file, !$external)) {
                 $this->println('{red*}ERROR:{/} Invalid import file.');
                 return;
             }
             $importer->importFile($file);
 
-        } catch(Exception $e){
+        } catch (Exception $e) {
             $this->BDebug->logException($e);
             $this->println('{red*}FATAL ERROR:{/} ' . $e->getMessage());
         }
@@ -203,5 +203,17 @@ EOT;
         $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
         $exponent = (int)floor(log($size, 1024));
         return @round($size / pow(1024, $exponent), 2) . ' ' . $unit[$exponent];
+    }
+
+    public function onBeforeModel($args)
+    {
+        //var_dump($args["modelName"]);
+    }
+
+    public function onAfterBatch($args)
+    {
+        var_dump($this->convertSize(memory_get_usage()));
+        return;
+        var_dump(array_keys($args));
     }
 }

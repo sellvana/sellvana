@@ -827,7 +827,11 @@ class FCom_Core_ImportExport extends BClass
             }
         }
         $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->_changedModels]);
-        $this->BEvents->fire(__METHOD__ . ':afterBatch', ['records' => $this->_changedModels, 'modelName' => $cm]);
+        $this->BEvents->fire(__METHOD__ . ':afterBatch', [
+            'records' => $this->_changedModels,
+            'modelName' => $cm,
+            'statistic' => $this->_modelsStatistics[$cm]
+        ]);
     }
     protected function _isArrayAssoc(array $arr)
     {
