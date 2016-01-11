@@ -8,6 +8,8 @@
  */
 class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
 {
+    const PARAM_COMMAND = 2;
+
     static protected $_actionName = 'admin:user';
 
     static protected $_availOptions = [
@@ -24,7 +26,7 @@ class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
 
     protected function _run()
     {
-        $cmd = $this->getParam(2);
+        $cmd = $this->getParam(self::PARAM_COMMAND);
         if (!$cmd) {
             $this->println('{red*}ERROR:{/} No command specified.');
             return;
@@ -232,7 +234,7 @@ class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
 
 Admin user management.
 
-Syntax: {white*}{$this->FCom_Shell_Shell->getParam(0)} admin:user {green*}<command> [parameters]{/}
+Syntax: {white*}{$this->getParam(self::PARAM_SELF)} admin:user {green*}<command> [parameters]{/}
 
 Commands:
 

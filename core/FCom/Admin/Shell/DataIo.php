@@ -6,18 +6,18 @@
  * @property FCom_Shell_Shell $FCom_Shell_Shell
  * @property FCom_Core_ImportExport $FCom_Core_ImportExport
  */
-class FCom_Admin_Shell_Import extends FCom_Shell_Action_Abstract
+class FCom_Admin_Shell_DataIo extends FCom_Shell_Action_Abstract
 {
-    const PARAM_SELF = 0;
-    const PARAM_ACTION = 1;
     const PARAM_COMMAND = 2;
 
     const OPTION_FILE = 'f';
+    const OPTION_VERBOSE = 'u';
 
-    static protected $_actionName = 'admin:import';
+    static protected $_actionName = 'data-io';
 
     static protected $_availOptions = [
-        'f?' => 'file'
+        'f?' => 'file',
+        'u' => 'verbose'
     ];
 
     /**
@@ -27,7 +27,7 @@ class FCom_Admin_Shell_Import extends FCom_Shell_Action_Abstract
      */
     public function getShortHelp()
     {
-        return 'Admin import management';
+        return 'Import management';
     }
 
     /**
@@ -39,9 +39,9 @@ class FCom_Admin_Shell_Import extends FCom_Shell_Action_Abstract
     {
         return <<<EOT
 
-Admin import management.
+Import management.
 
-Syntax: {white*}{$this->FCom_Shell_Shell->getParam(self::PARAM_SELF)} admin:import {green*}<command> [parameters]{/}
+Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {green*}<command> [parameters]{/}
 
 Commands:
 
@@ -186,23 +186,14 @@ EOT;
             $data[] = [
                 'fullpath' => $file,
                 'name' => (substr($file, (strrpos($file, '/') + 1))),
-                'file_size' => $this->convertSize(filesize($file))
+                'file_size' => $this->BUtil->convertFileSize(filesize($file))
             ];
         }
 
         return empty($data) ? false : $data;
     }
 
-    /**
-     * @param $size
-     * @return string
-     */
-    public function convertSize($size)
-    {
-        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
-        $exponent = (int)floor(log($size, 1024));
-        return @round($size / pow(1024, $exponent), 2) . ' ' . $unit[$exponent];
-    }
+
 
     /**
      * @param $args
@@ -210,17 +201,19 @@ EOT;
     public function onBeforeImport($args)
     {
         $this->println("");
-        $keys = ["Unchanged", "New", "Updated", "Total", "Name"];
-        $str = '';
-        $str2 = '';
+        if ($this->getOption(self::OPTION_VERBOSE)) {
+            $keys = ["Unchanged", "New", "Updated", "Total", "Name"];
+            $str = '';
+            $str2 = '';
 
-        foreach ($keys as $item) {
-            $str .= "| {green}" . str_pad($item, 10) . '{/}';
-            $str2 .= "| " . str_pad('', 9, '-') . ' ';
+            foreach ($keys as $item) {
+                $str .= "| {green}" . str_pad($item, 10) . '{/}';
+                $str2 .= "| " . str_pad('', 9, '-') . ' ';
+            }
+
+            $this->println($str);
+            $this->println($str2);
         }
-
-        $this->println($str);
-        $this->println($str2);
     }
 
     /**
@@ -237,6 +230,12 @@ EOT;
     public function onAfterBatch($args)
     {
         echo $this->FCom_Shell_Shell->cursor('up', 1);
+
+        if (!$this->getOption(self::OPTION_VERBOSE)) {
+            $this->println($args['modelName']);
+            return;
+        }
+
         $statistic = $args["statistic"];
 
         $keys = ["not_changed", "new_models", "updated_models"];
