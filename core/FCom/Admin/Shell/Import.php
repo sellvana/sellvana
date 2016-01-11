@@ -210,7 +210,7 @@ EOT;
     public function onBeforeImport($args)
     {
         $this->println("");
-        $keys = ["Changed", "New", "Updated", "Total", "Name"];
+        $keys = ["Unchanged", "New", "Updated", "Total", "Name"];
         $str = '';
         $str2 = '';
 
