@@ -2910,6 +2910,8 @@ class BDebug extends BClass
      */
     static protected $_errorHandlerLog = [];
 
+    static protected $_disableAllLogging = false;
+
     /**
     * Constructor, remember script start time for delta timestamps
     *
@@ -3123,6 +3125,9 @@ class BDebug extends BClass
      */
     static public function trigger($level, $msg, $stackPop = 0, $backtrace = false)
     {
+        if (static::$_disableAllLogging) {
+            return null;
+        }
         if ($level !== static::DEBUG) {
             static::$_collectedErrors[$level][] = $msg;
         }
@@ -3459,6 +3464,7 @@ class BDebug extends BClass
 
     public function disableAllLogging()
     {
+        static::$_disableAllLogging = true;
         $this->mode('PRODUCTION');
         BORM::configure('logging', 0);
         $this->BConfig->set('db/logging', 0);
