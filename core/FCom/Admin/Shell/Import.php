@@ -194,7 +194,6 @@ EOT;
     }
 
     /**
-     *
      * @param $size
      * @return string
      */
@@ -205,15 +204,64 @@ EOT;
         return @round($size / pow(1024, $exponent), 2) . ' ' . $unit[$exponent];
     }
 
-    public function onBeforeModel($args)
+    /**
+     * @param $args
+     */
+    public function onBeforeImport($args)
     {
-        //var_dump($args["modelName"]);
+        $this->println("");
+        $keys = ["Changed", "New", "Updated", "Total", "Name"];
+        $str = '';
+        $str2 = '';
+
+        foreach ($keys as $item) {
+            $str .= "| {green}" . str_pad($item, 10) . '{/}';
+            $str2 .= "| " . str_pad('', 9, '-') . ' ';
+        }
+
+        $this->println($str);
+        $this->println($str2);
     }
 
+    /**
+     * @param $args
+     */
+    public function onBeforeModel($args)
+    {
+        $this->println('');
+    }
+
+    /**
+     * @param $args
+     */
     public function onAfterBatch($args)
     {
-        var_dump($this->convertSize(memory_get_usage()));
+        echo $this->FCom_Shell_Shell->cursor('up', 1);
+        $statistic = $args["statistic"];
+
+        $keys = ["not_changed", "new_models", "updated_models"];
+
+        $total = 0;
+        $statistic['total'] = $total;
+        foreach ($keys as $key) {
+            $total += (int)$statistic[$key];
+        }
+        $statistic['total'] = $total;
+
+        $maxLength = 9;
+        foreach ($statistic as $item) {
+            $maxLength = strlen($item['name']) > $maxLength ? strlen($item['name']) : $maxLength;
+        }
+        $maxLength += 1;
+
+        $str = '';
+        foreach ($statistic as $item) {
+            $str .= "| {cyan}" . str_pad($item, $maxLength) . '{/}';
+        }
+        $str .= "| " . $args['modelName'];
+
+        $this->println($str);
+
         return;
-        var_dump(array_keys($args));
     }
 }
