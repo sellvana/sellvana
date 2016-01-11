@@ -74,7 +74,7 @@ class FCom_Core_Main extends BClass
         if (!$rootDir) {
             // not FULLERON_ROOT_DIR, but actual called entry point dir
             if (PHP_SAPI === 'cli') {
-                $rootDir = str_replace(['\\', 'core/FCom/Core'], ['/', ''], __DIR__);
+                $rootDir = str_replace(['\\', '/core/FCom/Core'], ['/', ''], __DIR__);
             } else {
                 $rootDir = $req->scriptDir();
             }
