@@ -53,6 +53,7 @@ require_once $comDir . 'import.php';
 * @deprecated Is there a point for that?
 */
 
+/*
 if (getopt('c')) {
     $minified = [];
     foreach (['core', 'misc', 'locale', 'lib/idiorm', 'lib/paris', 'db', 'cache', 'module', 'controller', 'layout', 'cache'] as $f) {
@@ -61,3 +62,4 @@ if (getopt('c')) {
     $contents = "<?php define('BUCKYBALL_VERSION', '" . BUCKYBALL_VERSION . "'); " . join(' ', $minified);
     file_put_contents('buckyball.min.php', $contents);
 }
+*/
