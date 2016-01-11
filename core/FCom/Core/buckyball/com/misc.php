@@ -3128,9 +3128,9 @@ class BDebug extends BClass
         if (static::$_disableAllLogging) {
             return null;
         }
-        if ($level !== static::DEBUG) {
-            static::$_collectedErrors[$level][] = $msg;
-        }
+//        if ($level !== static::DEBUG) {
+//            static::$_collectedErrors[$level][] = $msg;
+//        }
         if (is_scalar($msg)) {
             $e = ['msg' => $msg];
         } elseif (is_object($msg) && $msg instanceof Exception) {
