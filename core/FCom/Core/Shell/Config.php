@@ -42,7 +42,7 @@ class FCom_Core_Shell_Config extends FCom_Shell_Action_Abstract
 
 Configuration Management
 
-Syntax: {$this->getParam(0)} config -s {green*}<path>{/}={green*}<value>{/} ...
+Syntax: {$this->getParam(self::PARAM_SELF)} config -s {green*}<path>{/}={green*}<value>{/} ...
 
 Options:
     {white*}-s {green*}<path>{/}={green*}<value>{/}
