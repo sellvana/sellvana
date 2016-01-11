@@ -2206,6 +2206,19 @@ class BUtil extends BClass
     {
         return version_compare($v1, $v2, $op);
     }
+
+    /**
+     * Converts bytes into human readable file size.
+     *
+     * @param $size
+     * @return string
+     */
+    public function convertFileSize($size)
+    {
+        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        $exponent = (int)floor(log($size, 1024));
+        return @round($size / pow(1024, $exponent), 2) . ' ' . $unit[$exponent];
+    }
 }
 
 /**
