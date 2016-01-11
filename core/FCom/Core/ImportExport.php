@@ -94,7 +94,11 @@ class FCom_Core_ImportExport extends BClass
     public function getUser()
     {
         if (empty($this->_user)) {
-            $this->_user = $this->FCom_Admin_Model_User->sessionUser();
+            if ($this->BRequest->area() == 'FCom_Shell') {
+                $this->_user = $this->FCom_Admin_Model_User->create(['is_superadmin' => true]);
+            } else {
+                $this->_user = $this->FCom_Admin_Model_User->sessionUser();
+            }
         }
         return $this->_user;
     }
@@ -972,18 +976,21 @@ class FCom_Core_ImportExport extends BClass
 
     /**
      * @param string $file
+     * @param string $type
      * @return string
      */
-    public function getFullPath($file)
+    public function getFullPath($file ,$type = 'export')
     {
+        if (!in_array($type, ['export', 'import'])){
+            $type = 'export';
+        }
         if (!$file) {
             $file = $this->_defaultExportFile;
         }
         if ($this->BUtil->isPathAbsolute($file)) {
             return $file;
         }
-        $path = $this->BApp->storageRandomDir() . '/export';
-
+        $path = $this->BApp->storageRandomDir() . '/' . $type;
         $this->BUtil->ensureDir($path);
         $file = $path . '/' . trim($file, '\\/');
         $realpath = str_replace('\\', '/', realpath(dirname($file)));
@@ -1224,9 +1231,10 @@ class FCom_Core_ImportExport extends BClass
     protected $_allowedExtensions = ['json' => 1];
     /**
      * @param string $fullFileName
+     * @param bool $unlink
      * @return bool
      */
-    public function validateImportFile($fullFileName)
+    public function validateImportFile($fullFileName, $unlink = true)
     {
         $ext   = pathinfo($fullFileName, PATHINFO_EXTENSION);
         $valid = true;
@@ -1249,7 +1257,7 @@ class FCom_Core_ImportExport extends BClass
             fclose($rh);
         }
 
-        if (!$valid) {
+        if (!$valid && $unlink) {
             @unlink($fullFileName); // make sure invalid files are removed from the system;
         }
         return $valid;

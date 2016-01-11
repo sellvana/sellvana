@@ -110,7 +110,9 @@ modules:
 
             FCom_Shell:
                 custom:
-                    actions: [ FCom_Admin_Shell_User ]
+                    actions:
+                        - [ FCom_Admin_Shell_User ]
+                        - [ FCom_Admin_Shell_Import ]
 
         default_config:
             modules:
