@@ -217,6 +217,50 @@ class BRequest extends BClass
     }
 
     /**
+     * Get all mime types accepted by client browser, or return the preferred type
+     *
+     * @param array|string|null $supportedTypes
+     * @return array|null
+     */
+    public function acceptTypes($supportedTypes = null)
+    {
+        if (empty($_SERVER['HTTP_ACCEPT'])) {
+            return [];
+        }
+        static $acceptTypes = null;
+        if (null === $acceptTypes) {
+            $accept = [];
+            $acceptTypes = [];
+            foreach (preg_split('#\s*,\s*#', $_SERVER['HTTP_ACCEPT']) as $i => $part) {
+                if (preg_match("#^(\S+)\s*;\s*(?:q|level)=([0-9\.]+)#i", $part, $m)) {
+                    $accept[] = ['pos' => $i, 'type' => $m[1], 'q' => (double)$m[2]];
+                } else {
+                    $accept[] = ['pos' => $i, 'type' => $part, 'q' => 1];
+                }
+            }
+            usort($accept, function ($a, $b) {
+                return ($a['q'] === $b['q']) ? ($a['pos'] - $b['pos']) : ($b['q'] - $a['q']);
+            });
+            foreach ($accept as $a) {
+                $acceptTypes[$a['type']] = $a['type'];
+            }
+        }
+        if (null === $supportedTypes) {
+            return $acceptTypes;
+        }
+        $supportedTypes = (array)$supportedTypes;
+        foreach ($acceptTypes as $type) {
+            if (in_array($type, $supportedTypes)) {
+                return $type;
+            }
+        }
+        if (!empty($acceptTypes['*/*'])) {
+            return $supportedTypes[0];
+        }
+        return false;
+    }
+
+    /**
      * Retrieve language based on HTTP_ACCEPT_LANGUAGE
      * @return string
      */
