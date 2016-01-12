@@ -2206,6 +2206,19 @@ class BUtil extends BClass
     {
         return version_compare($v1, $v2, $op);
     }
+
+    /**
+     * Converts bytes into human readable file size.
+     *
+     * @param $size
+     * @return string
+     */
+    public function convertFileSize($size)
+    {
+        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        $exponent = (int)floor(log($size, 1024));
+        return @round($size / pow(1024, $exponent), 2) . ' ' . $unit[$exponent];
+    }
 }
 
 /**
@@ -2897,6 +2910,8 @@ class BDebug extends BClass
      */
     static protected $_errorHandlerLog = [];
 
+    static protected $_disableAllLogging = false;
+
     /**
     * Constructor, remember script start time for delta timestamps
     *
@@ -3110,9 +3125,12 @@ class BDebug extends BClass
      */
     static public function trigger($level, $msg, $stackPop = 0, $backtrace = false)
     {
-        if ($level !== static::DEBUG) {
-            static::$_collectedErrors[$level][] = $msg;
+        if (static::$_disableAllLogging) {
+            return null;
         }
+//        if ($level !== static::DEBUG) {
+//            static::$_collectedErrors[$level][] = $msg;
+//        }
         if (is_scalar($msg)) {
             $e = ['msg' => $msg];
         } elseif (is_object($msg) && $msg instanceof Exception) {
@@ -3446,6 +3464,7 @@ class BDebug extends BClass
 
     public function disableAllLogging()
     {
+        static::$_disableAllLogging = true;
         $this->mode('PRODUCTION');
         BORM::configure('logging', 0);
         $this->BConfig->set('db/logging', 0);

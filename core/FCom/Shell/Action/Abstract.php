@@ -7,6 +7,9 @@
  */
 abstract class FCom_Shell_Action_Abstract extends BClass
 {
+    const PARAM_SELF = 0;
+    const PARAM_ACTION = 1;
+
     /**
      * Action name, separated with ':'
      *
