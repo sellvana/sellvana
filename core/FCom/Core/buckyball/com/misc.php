@@ -3465,7 +3465,7 @@ class BDebug extends BClass
     public function disableAllLogging()
     {
         static::$_disableAllLogging = true;
-        $this->mode('PRODUCTION');
+        //$this->mode('PRODUCTION'); //For example in MODE_IMPORT also need disable all logging.
         BORM::configure('logging', 0);
         $this->BConfig->set('db/logging', 0);
         return $this;

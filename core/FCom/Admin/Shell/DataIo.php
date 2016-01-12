@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class FCom_Admin_Shell_Import
+ * Class FCom_Admin_Shell_DataIo
  *
  * @property FCom_Shell_Shell $FCom_Shell_Shell
  * @property FCom_Core_ImportExport $FCom_Core_ImportExport
@@ -11,13 +11,15 @@ class FCom_Admin_Shell_DataIo extends FCom_Shell_Action_Abstract
     const PARAM_COMMAND = 2;
 
     const OPTION_FILE = 'f';
-    const OPTION_VERBOSE = 'u';
+    const OPTION_VERBOSE = 'v';
+    const OPTION_SILENT = 's';
 
     static protected $_actionName = 'data-io';
 
     static protected $_availOptions = [
         'f?' => 'file',
-        'u' => 'verbose'
+        'v' => 'verbose',
+        's' => 'silent'
     ];
 
     /**
@@ -45,13 +47,23 @@ Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {gr
 
 Commands:
 
-    {white*}list{/}     List of available files for import
-    {white*}import{/}   Import file
+    {green*}list{/}     List of available files for import
+    {green*}import{/}   Import file
+
+    {green*}help{/}     This help
 
 Options:
 
-    {white*}-f {green*}<file>{white*}
-    --file={green*}<file>{/}     File to import
+  Device selection and switching:
+    {green*}-f {/}{cyan*}<file>{/}
+    {green*}--file={/}{cyan*}<file>{/}     File to import
+
+  Informative output:
+    {green*}-v, --verbose{/}     Verbose output of the process
+    {green*}-s, --silent{/}      Disable all output of the process
+
+Examples:
+
 
 EOT;
     }
@@ -64,7 +76,7 @@ EOT;
         $cmd = $this->getParam(self::PARAM_COMMAND);
         if (!$cmd) {
             $this->println('{red*}ERROR:{/} No command specified.');
-            return;
+            $cmd = 'help';
         }
         $method = '_' . $cmd . 'Cmd';
         if (!method_exists($this, $method)) {
@@ -156,6 +168,9 @@ EOT;
             $file = $files[$ids[$fileId]]['fullpath'];
         }
         try {
+            //Fix of memory leak
+            $this->BDebug->disableAllLogging();
+
             $importer = $this->FCom_Core_ImportExport;
 
             if (!$importer->validateImportFile($file, !$external)) {
@@ -168,6 +183,11 @@ EOT;
             $this->BDebug->logException($e);
             $this->println('{red*}FATAL ERROR:{/} ' . $e->getMessage());
         }
+    }
+
+    protected function _helpCmd()
+    {
+        $this->println($this->getLongHelp());
     }
 
     /**
@@ -200,8 +220,11 @@ EOT;
      */
     public function onBeforeImport($args)
     {
+        if ($this->getOption(self::OPTION_SILENT) === true){
+            return;
+        }
         $this->println("");
-        if ($this->getOption(self::OPTION_VERBOSE)) {
+        if ($this->getOption(self::OPTION_VERBOSE) === true) {
             $keys = ["Unchanged", "New", "Updated", "Total", "Name"];
             $str = '';
             $str2 = '';
@@ -221,6 +244,9 @@ EOT;
      */
     public function onBeforeModel($args)
     {
+        if ($this->getOption(self::OPTION_SILENT) === true){
+            return;
+        }
         $this->println('');
     }
 
@@ -229,9 +255,12 @@ EOT;
      */
     public function onAfterBatch($args)
     {
-        echo $this->FCom_Shell_Shell->cursor('up', 1);
+        if ($this->getOption(self::OPTION_SILENT) === true){
+            return;
+        }
+        echo $this->FCom_Shell_Shell->cursor('up', 2);
 
-        if (!$this->getOption(self::OPTION_VERBOSE)) {
+        if ($this->getOption(self::OPTION_VERBOSE) !== true) {
             $this->println($args['modelName']);
             return;
         }
@@ -260,6 +289,7 @@ EOT;
         $str .= "| " . $args['modelName'];
 
         $this->println($str);
+        $this->println($this->BUtil->convertFileSize(memory_get_usage()));
 
         return;
     }
