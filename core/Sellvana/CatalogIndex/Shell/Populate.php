@@ -9,6 +9,8 @@
  */
 class Sellvana_CatalogIndex_Shell_Populate extends FCom_Shell_Action_Abstract
 {
+    static protected $_origClass = __CLASS__;
+
     static protected $_actionName = 'catalog:populate';
 
     static protected $_availOptions = [

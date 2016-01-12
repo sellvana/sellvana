@@ -8,6 +8,8 @@
  */
 class Sellvana_CatalogIndex_Shell_Reindex extends FCom_Shell_Action_Abstract
 {
+    static protected $_origClass = __CLASS__;
+
     static protected $_actionName = 'catalog:reindex';
 
     static protected $_availOptions = [

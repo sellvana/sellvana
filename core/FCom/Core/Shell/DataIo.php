@@ -1,23 +1,25 @@
 <?php
 
 /**
- * Class FCom_Admin_Shell_Import
+ * Class FCom_Core_Shell_Import
  *
  * @property FCom_Shell_Shell $FCom_Shell_Shell
  * @property FCom_Core_ImportExport $FCom_Core_ImportExport
  */
-class FCom_Admin_Shell_DataIo extends FCom_Shell_Action_Abstract
+class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
 {
-    const PARAM_COMMAND = 2;
+    static protected $_origClass = __CLASS__;
 
     const OPTION_FILE = 'f';
     const OPTION_VERBOSE = 'u';
+    const OPTION_QUIET = 'q';
 
     static protected $_actionName = 'data-io';
 
     static protected $_availOptions = [
         'f?' => 'file',
-        'u' => 'verbose'
+        'v' => 'verbose',
+        'q' => 'quiet',
     ];
 
     /**
@@ -39,7 +41,7 @@ class FCom_Admin_Shell_DataIo extends FCom_Shell_Action_Abstract
     {
         return <<<EOT
 
-Import management.
+Data import/export.
 
 Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {green*}<command> [parameters]{/}
 
@@ -50,8 +52,15 @@ Commands:
 
 Options:
 
-    {white*}-f {green*}<file>{white*}
-    --file={green*}<file>{/}     File to import
+  Device selection and switching:
+    {green*}-f {/}{cyan*}<file>{/}
+    {green*}--file={/}{cyan*}<file>{/}     File to import
+
+  Informative output:
+    {green*}-v, --verbose{/}     Verbose output of the process
+    {green*}-s, --silent{/}      Disable all output of the process
+
+Examples:
 
 EOT;
     }
@@ -61,18 +70,7 @@ EOT;
      */
     protected function _run()
     {
-        $cmd = $this->getParam(self::PARAM_COMMAND);
-        if (!$cmd) {
-            $this->println('{red*}ERROR:{/} No command specified.');
-            return;
-        }
-        $method = '_' . $cmd . 'Cmd';
-        if (!method_exists($this, $method)) {
-            $this->println('{red*}ERROR:{/} Unknown command: {red*}' . $cmd . '{/}');
-            return;
-        }
-
-        $this->{$method}();
+        $this->_processCommand();
     }
 
     /**
@@ -156,6 +154,10 @@ EOT;
             $file = $files[$ids[$fileId]]['fullpath'];
         }
         try {
+            //Fix of memory leak
+            $this->BDebug->disableAllLogging();
+            $this->BDebug->mode(BDebug::MODE_IMPORT);
+
             $importer = $this->FCom_Core_ImportExport;
 
             if (!$importer->validateImportFile($file, !$external)) {
@@ -193,15 +195,20 @@ EOT;
         return empty($data) ? false : $data;
     }
 
-
+    public $astart  = 0;
+    public $start  = 0;
 
     /**
      * @param $args
      */
     public function onBeforeImport($args)
     {
+        $this->astart = microtime(true);
+        if ($this->getOption(self::OPTION_QUIET) === true){
+            return;
+        }
         $this->println("");
-        if ($this->getOption(self::OPTION_VERBOSE)) {
+        if ($this->getOption(self::OPTION_VERBOSE) === true) {
             $keys = ["Unchanged", "New", "Updated", "Total", "Name"];
             $str = '';
             $str2 = '';
@@ -221,6 +228,10 @@ EOT;
      */
     public function onBeforeModel($args)
     {
+        $this->start = microtime(true);
+        if ($this->getOption(self::OPTION_QUIET) === true){
+            return;
+        }
         $this->println('');
     }
 
@@ -229,12 +240,17 @@ EOT;
      */
     public function onAfterBatch($args)
     {
-        echo $this->FCom_Shell_Shell->cursor('up', 1);
+        if ($this->getOption(self::OPTION_QUIET) === true){
+            return;
+        }
 
-        if (!$this->getOption(self::OPTION_VERBOSE)) {
+        if ($this->getOption(self::OPTION_VERBOSE) !== true) {
+            echo $this->FCom_Shell_Shell->cursor('up', 1);
             $this->println($args['modelName']);
             return;
         }
+
+        echo $this->FCom_Shell_Shell->cursor('up', 2);
 
         $statistic = $args["statistic"];
 
@@ -260,6 +276,11 @@ EOT;
         $str .= "| " . $args['modelName'];
 
         $this->println($str);
+        $this->println(str_pad($this->BUtil->convertFileSize(memory_get_usage()), 10)
+                       . str_pad(sprintf('%2.5f', microtime(true) - $this->start),10)
+                       . str_pad(sprintf('%2.5f', microtime(true) - $this->astart),10)
+        );
+        $this->start = microtime(true);
 
         return;
     }
