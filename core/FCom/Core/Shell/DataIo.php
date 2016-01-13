@@ -11,7 +11,7 @@ class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
     static protected $_origClass = __CLASS__;
 
     const OPTION_FILE = 'f';
-    const OPTION_VERBOSE = 'u';
+    const OPTION_VERBOSE = 'v';
     const OPTION_QUIET = 'q';
 
     static protected $_actionName = 'data-io';
@@ -21,6 +21,10 @@ class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
         'v' => 'verbose',
         'q' => 'quiet',
     ];
+
+    protected $_importStarted = 0;
+    protected $_bachStarted = 0;
+    protected $_memoryStarted = 0;
 
     /**
      * Short help.
@@ -43,7 +47,7 @@ class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
 
 Data import/export.
 
-Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {green*}<command> [parameters]{/}
+Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {green*}<command>{/} {red*}[parameters]{/}
 
 Commands:
 
@@ -95,7 +99,7 @@ EOT;
             $i = 1;
             foreach ($files as $file) {
                 $str = '  [' . $i++ . '] '
-                    . '{^purple}' . str_pad($file['name'], $maxLength) . '{/}'
+                    . '{purple*}' . str_pad($file['name'], $maxLength) . '{/}'
                     . $file['file_size'];
 
                 $this->println($str);
@@ -143,7 +147,7 @@ EOT;
             $i = 1;
             foreach ($files as $key => $file) {
                 $ids[$i] = $key;
-                $this->println('  [' . $i++ . '] {^purple}' . $file['name'] . '{/}');
+                $this->println('  [' . $i++ . '] {purple*}' . $file['name'] . '{/}');
             }
 
             $fileId = null;
@@ -167,6 +171,8 @@ EOT;
                 $this->println('{red*}ERROR:{/} Invalid import file.');
                 return;
             }
+
+            $this->_memoryStarted = memory_get_usage();
             $importer->importFile($file);
 
         } catch (Exception $e) {
@@ -198,16 +204,13 @@ EOT;
         return empty($data) ? false : $data;
     }
 
-    public $astart  = 0;
-    public $start  = 0;
-
     /**
      * @param $args
      */
     public function onBeforeImport($args)
     {
-        $this->astart = microtime(true);
-        if ($this->getOption(self::OPTION_QUIET) === true){
+        $this->_importStarted = microtime(true);
+        if ($this->getOption(self::OPTION_QUIET) === true) {
             return;
         }
         $this->println("");
@@ -223,6 +226,7 @@ EOT;
 
             $this->println($str);
             $this->println($str2);
+            $this->println('');
         }
     }
 
@@ -231,8 +235,8 @@ EOT;
      */
     public function onBeforeModel($args)
     {
-        $this->start = microtime(true);
-        if ($this->getOption(self::OPTION_QUIET) === true){
+        $this->_bachStarted = microtime(true);
+        if ($this->getOption(self::OPTION_QUIET) === true) {
             return;
         }
         $this->println('');
@@ -243,7 +247,7 @@ EOT;
      */
     public function onAfterBatch($args)
     {
-        if ($this->getOption(self::OPTION_QUIET) === true){
+        if ($this->getOption(self::OPTION_QUIET) === true) {
             return;
         }
 
@@ -279,11 +283,17 @@ EOT;
         $str .= "| " . $args['modelName'];
 
         $this->println($str);
-        $this->println(str_pad($this->BUtil->convertFileSize(memory_get_usage()), 10)
-                       . str_pad(sprintf('%2.5f', microtime(true) - $this->start),10)
-                       . str_pad(sprintf('%2.5f', microtime(true) - $this->astart),10)
-        );
-        $this->start = microtime(true);
+        $str2 =  '{red*}Debug:{/} {white}'
+            . str_pad($this->BUtil->convertFileSize(memory_get_usage() - $this->_memoryStarted), 10)
+            . str_pad(sprintf('%2.5f', microtime(true) - $this->_bachStarted) . 's', 10)
+            . str_pad(sprintf('%2.5f', microtime(true) - $this->_importStarted) . 's', 10)
+            . str_pad($this->BUtil->convertFileSize(memory_get_usage()), 10)
+            . '{/}'
+        ;
+        $this->println($str2);
+        $this->BDebug->log($str, 'importdebug.log');
+        $this->BDebug->log($str2, 'importdebug.log');
+        $this->_bachStarted = microtime(true);
 
         return;
     }

@@ -2913,7 +2913,7 @@ class BModel extends Model
         }
 
         if (static::$_cacheAuto) {
-            $this->cacheStore();
+            //$this->cacheStore();
         }
         return $this;
     }
