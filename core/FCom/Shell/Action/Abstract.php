@@ -9,6 +9,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
 {
     const PARAM_SELF = 0;
     const PARAM_ACTION = 1;
+    const PARAM_COMMAND = 2;
 
     /**
      * Action name, separated with ':'
@@ -82,6 +83,27 @@ abstract class FCom_Shell_Action_Abstract extends BClass
     protected function _run()
     {
         $this->println('{red*}Not implemented{/}');
+    }
+
+    protected function _processCommand()
+    {
+        $cmd = $this->getParam(self::PARAM_COMMAND);
+        if (!$cmd) {
+            $this->println('{red*}ERROR:{/} No command specified.');
+            $cmd = 'help';
+        }
+        $method = '_' . $cmd . 'Cmd';
+        if (!method_exists($this, $method)) {
+            $this->println('{red*}ERROR:{/} Unknown command: {red*}' . $cmd . '{/}');
+            $method = '_helpCmd';
+        }
+
+        $this->{$method}();
+    }
+
+    protected function _helpCmd()
+    {
+        $this->println($this->getLongHelp());
     }
 
     /**
