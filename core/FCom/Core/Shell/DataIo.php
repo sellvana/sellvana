@@ -283,13 +283,13 @@ EOT;
         $str .= "| " . $args['modelName'];
 
         $this->println($str);
-        $str2 =  '{red*}Debug:{/} {white}'
+        $this->println('{red*}Debug:{/} {white}'
             . str_pad($this->BUtil->convertFileSize(memory_get_usage() - $this->_memoryStarted), 10)
             . str_pad(sprintf('%2.5f', microtime(true) - $this->_bachStarted) . 's', 10)
             . str_pad(sprintf('%2.5f', microtime(true) - $this->_importStarted) . 's', 10)
             . str_pad($this->BUtil->convertFileSize(memory_get_usage()), 10)
             . '{/}'
-        ;
+        );
         $this->_bachStarted = microtime(true);
 
         return;
