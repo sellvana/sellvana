@@ -64,6 +64,6 @@ class FCom_Shell_Action_Help extends FCom_Shell_Action_Abstract
 
     public function getLongHelp()
     {
-        return 'Syntax: {white*}' . $this->FCom_Shell_Shell->getParam(0) . '{/} {green*}help{/} {red*}[command]{/}';
+        return 'Syntax: {white*}' . $this->getParam(self::PARAM_SELF) . '{/} {green*}help{/} {red*}[command]{/}';
     }
 }

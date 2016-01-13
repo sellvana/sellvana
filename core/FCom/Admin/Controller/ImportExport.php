@@ -236,7 +236,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 }
                 $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
 
-                $fullFileName = $importer->getFullPath($fileName);
+                $fullFileName = $importer->getFullPath($fileName, 'import');
                 $this->BUtil->ensureDir(dirname($fullFileName));
                 $fileSize = 0;
                 if ($uploads['error'][$i]) {
