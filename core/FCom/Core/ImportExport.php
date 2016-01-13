@@ -620,8 +620,6 @@ class FCom_Core_ImportExport extends BClass
         return true;
     }
 
-    public $as = 0;
-
     /**
      * @param array $batchData
      * @throws BException
@@ -679,7 +677,6 @@ class FCom_Core_ImportExport extends BClass
         }
 
         foreach ($batchData as $id => $data) {
-            $this->as = microtime(true);
             if (!isset($data[$this->_currentModelIdField])) {
                 $this->_errors++;
                 $this->log([
@@ -832,7 +829,6 @@ class FCom_Core_ImportExport extends BClass
                     ]
                 ], 'error');
             }
-            $this->BDebug->log(sprintf('%2.5f', microtime(true) - $this->as), 'timing1.log');
         }
         $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, [
             'import_id' => $this->_importCode,

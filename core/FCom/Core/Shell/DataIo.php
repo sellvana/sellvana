@@ -290,9 +290,6 @@ EOT;
             . str_pad($this->BUtil->convertFileSize(memory_get_usage()), 10)
             . '{/}'
         ;
-        $this->println($str2);
-        $this->BDebug->log($str, 'importdebug.log');
-        $this->BDebug->log($str2, 'importdebug.log');
         $this->_bachStarted = microtime(true);
 
         return;

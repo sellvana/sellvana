@@ -2912,8 +2912,8 @@ class BModel extends Model
             $this->onAfterSave();
         }
 
-        if (static::$_cacheAuto) {
-            //$this->cacheStore();
+        if (static::$_cacheAuto && !$this->BDebug->is(BDebug::MODE_IMPORT)) {
+            $this->cacheStore();
         }
         return $this;
     }
