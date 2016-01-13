@@ -2,6 +2,8 @@
 
 class FCom_Core_Shell_Cache extends FCom_Shell_Action_Abstract
 {
+    static protected $_origClass = __CLASS__;
+
     static protected $_actionName = 'cache';
 
     static protected $_availOptions = [

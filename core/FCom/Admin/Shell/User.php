@@ -8,6 +8,8 @@
  */
 class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
 {
+    static protected $_origClass = __CLASS__;
+
     const PARAM_COMMAND = 2;
 
     static protected $_actionName = 'admin:user';
@@ -26,18 +28,7 @@ class FCom_Admin_Shell_User extends FCom_Shell_Action_Abstract
 
     protected function _run()
     {
-        $cmd = $this->getParam(self::PARAM_COMMAND);
-        if (!$cmd) {
-            $this->println('{red*}ERROR:{/} No command specified.');
-            return;
-        }
-        $method = '_' . $cmd . 'Cmd';
-        if (!method_exists($this, $method)) {
-            $this->println('{red*}ERROR:{/} Unknown command: {red*}' . $cmd . '{/}');
-            return;
-        }
-
-        $this->{$method}();
+        $this->_processCommand();
     }
 
     protected function _getRoleId($r)
