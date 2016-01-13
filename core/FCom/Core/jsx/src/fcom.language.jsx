@@ -263,7 +263,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 }).join(',') : null;
 
             return (
-                <div>
+                <div className={this.props.cClass || ''}>
                     <button type="button" style={{marginBottom: '10px'}} onClick={this.showModal}
                             className={"btn btn-xs multilang " + (langLabel ? 'btn-info' : '')}>{!langLabel ?
                         <i className="icon icon-globe"/> : ''} {langLabel || Locale._('Translate')}

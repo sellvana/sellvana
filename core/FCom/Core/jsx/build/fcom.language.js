@@ -263,7 +263,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 }).join(',') : null;
 
             return (
-                React.createElement("div", null, 
+                React.createElement("div", {className: this.props.cClass || ''}, 
                     React.createElement("button", {type: "button", style: {marginBottom: '10px'}, onClick: this.showModal, 
                             className: "btn btn-xs multilang " + (langLabel ? 'btn-info' : '')}, !langLabel ?
                         React.createElement("i", {className: "icon icon-globe"}) : '', " ", langLabel || Locale._('Translate')

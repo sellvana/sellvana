@@ -143,6 +143,63 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         }
     };
 
+    FCom.Components.MultiSite = React.createClass({
+        displayName: "MultiSite",
+        getDefaultProps: function () {
+            return {
+                defaultValue: [''],
+                sites: []
+            };
+        },
+        getInitialState: function () {
+            return {
+                selections: []
+            };
+        },
+        componentWillMount: function () {
+            this.setState({ sites: this.getSites() });
+        },
+        getSites: function () {
+            var sites = this.props.sites;
+            sites[''] = Locale._('Default configuration');
+            sites = _(sites).map(function (site, id) {
+                return {
+                    id: id, text: site
+                }
+            });
+
+            return _.sortBy(sites, 'id');
+        },
+        initSelect2: function () {
+            return {
+                id: 'multisite',
+                className: '',
+                multiple: false
+            };
+        },
+        handleSelections: function (e, sites) {
+            this.setState({sites: sites});
+
+            if (this.props.onChange) {
+                this.props.onChange(e, this.props.callback, this.state.sites);
+            }
+        },
+        shouldComponentUpdate: function (nextProps, nextState) {
+            return nextState.selections !== this.state.selections || nextProps.sites !== this.props.sites;
+        },
+        render: function () {
+            return (
+                <div className={this.props.cClass || 'col-md-5'}>
+                    <input type="hidden" id="site_values" name="site_values" />
+                    <FCom.Components.Select2 {...this.initSelect2()}
+                                        options={this.getSites()}
+                                        onSelection={this.handleSelections}
+                                        multiple={this.props.multiple || false} val={this.props.defaultValue}/>
+                </div>
+            );
+        }
+    });
+
     FCom.Components.ControlLabel = React.createClass({
         render: function () {
             var cl = "control-label " + this.props.label_class + (this.props.required ? ' required' : '');
@@ -450,7 +507,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 removeFieldButton = (<button key={this.props.key}
                                              className="btn box-remove btn-xs btn-link btn-remove remove-field icon-remove"
                                              type="button" onClick={this.props.removeFieldHandle}
-                                             data-field={column.name}></button>);
+                                             data-field={column.name} />);
             }
 
             return (
@@ -477,7 +534,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                     witdh: "100%"
                 },
                 enabled: true,
-                options: []
+                options: [],
+                attrs: {}
             };
         },
         componentDidUpdate: function (prevProps, prevState) {
@@ -541,14 +599,19 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 val: val
             };
 
-            if (!this.props.multiple)
-                options['placeholder'] = this.props.placeholder;
-
-            $select2.attr({
+            var attrs = {
                 'name': this.props.name,
                 'class': this.props.className,
                 'data-col': this.props['data-col']
-            })
+            };
+
+            if (this.props.attrs)
+                attrs = _.extend({}, attrs, this.props.attrs);
+
+            if (!this.props.multiple)
+                options['placeholder'] = this.props.placeholder;
+
+            $select2.attr(attrs)
             .val(val)
             .select2(options)
             .on("change", this.handleChange)
@@ -586,7 +649,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         render: function () {
             return (
                 <div>
-                    <input id={this.props.id} type='hidden' style={this.props.style}/>
+                    <input id={this.props.id} {...this.props.attrs} type='hidden' style={this.props.style}/>
                 </div>
             );
         }

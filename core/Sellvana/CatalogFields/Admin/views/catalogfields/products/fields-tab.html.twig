@@ -14,6 +14,7 @@
 {% set ctrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products') %}
 {% set setCtrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_FieldSets') %}
 {% set fieldsConfig = setCtrl.fieldsGridConfig() %}
+{% set sites = APP.instance('Sellvana_MultiSite_Model_Site').siteOptions() %}
 {% set fieldsConfigCompiled = THIS.view('core/griddle').set('grid', fieldsConfig).getGridConfig() %}
 {% set initialData = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products').getInitialData(model) %}
 
@@ -22,6 +23,7 @@
         var APP = {},
             $mainForm = $('#catalog-products-form'),
             initData = {{ UTIL.toJson(initialData) | raw }},
+            sites = {{ UTIL.toJson(sites) | raw }},
             fieldsModalNode,
             fieldsForm,
             fields = [],
@@ -52,20 +54,25 @@
             getDefaultProps: function () {
                 return {
                     fieldSets: {},
-                    availFields: [],
-                    inputWithLangs: ['text', 'textarea', 'wysiwyg']
+                    avail_fields: [],
+                    input_with_langs: ['text', 'textarea', 'wysiwyg']
                 };
             },
             getInitialState: function () {
                 return {
                     fieldSets: {},
                     inputTypes: {},
-                    editors: {}
+                    editors: {},
+                    sites: {},
+                    is_default_site: true,
+                    site_values: {},
+                    site_id: ''
                 };
             },
             componentWillMount: function () {
                 this.setState({
-                    fieldSets: this.props.fieldSets
+                    fieldSets: this.props.fieldSets,
+                    sites: this.props.site_values || { default: {} }
                 });
             },
             componentDidMount: function () {
@@ -87,8 +94,7 @@
                             if (!langs.length) {
                                 sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields = [];
                             } else {
-                                var index = _.indexOf(fieldCodes, code);
-                                sets[i].fields[index].lang_fields = langs;
+                                sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields = langs;
                             }
                         }
                     });
@@ -98,14 +104,27 @@
                 this.refreshSortable();
                 this.initSpecialInput(this.state.inputTypes);
                 // Reset input type
-                this.props.availFields = [];
+                this.props.avail_fields = [];
+            },
+            componentWillReceiveProps: function (nextProps) {
+                var sites = this.state.sites;
+                // if current site is not `default` and does not exist then initialize it
+                if (nextProps.site.id !== '' && !sites[nextProps.site.id]) {
+                    sites[nextProps.site.id] = {};
+                }
+                this.setState({
+                    sites: sites,
+                    is_default_site: nextProps.site.id === '',
+                    is_multisite_changed: true,
+                    site_id: nextProps.site.id
+                });
             },
             componentWillUpdate: function (nextProps, nextState) {
                 this.clearCKEDITORIntances();
             },
             componentDidUpdate: function () {
                 this.refreshSortable();
-                this.props.availFields = [];
+                this.props.avail_fields = [];
                 this.initSpecialInput(this.state.inputTypes);
                 this.refreshData();
             },
@@ -116,7 +135,7 @@
             },
             clearCKEDITORIntances: function () {
                 var that = this;
-                if (CKEDITOR.instances) {
+                if (CKEDITOR.instances.length) {
                     _(CKEDITOR.instances).each(function (editor, id) {
                         if (that.state.editors[id]) {
                             editor.destroy(true);
@@ -127,6 +146,9 @@
             },
             initSpecialInput: function (types) {
                 var that = this;
+                var sites = this.state.sites;
+                var siteId = this.state.site_id;
+
                 _(types).each(function (type, code) {
                     switch (type) {
                         case 'boolean':
@@ -144,7 +166,9 @@
                             break;
                         case 'wysiwyg':
                             if (!code) return;
-                            var id = $('textarea.field-ckeditor[data-code="' + code + '"]').prop('id');
+                            var $textarea = $('textarea.field-ckeditor[data-code="' + code + '"]');
+                            var id = $textarea.prop('id');
+                            var fieldId = $textarea.data('field-id');
 
                             if (id && CKEDITOR !== undefined && !CKEDITOR.instances[id]) {
                                 that.state.editors[id] = true;
@@ -152,6 +176,11 @@
                                 CKEDITOR.replace(id, {
                                     startupMode: 'wysiwyg'
                                 });
+
+                                if (that.props.multisite) {
+                                    var data = sites[siteId || 'default'][fieldId] || '';
+                                    CKEDITOR.instances[id].setData(data);
+                                }
 
                                 CKEDITOR.instances[id].on('blur', function (e) {
                                     e.editor.updateElement();
@@ -166,22 +195,45 @@
                 });
             },
             refreshData: function () {
-                var sets = this.state.fieldSets;
-                var data = [];
+                var that = this,
+                    sets = this.state.fieldSets,
+                    sites = this.state.sites,
+                    data = [];
+
+                var site_values = sites[this.state.site_id || 'default'];
                 _(sets).each(function (set, i) {
-                    if (!set.deleted) {
-                        data.push(set);
-                    }
+                    _(set.fields).each(function (f, fi) {
+                        var $inputField = $('[data-code="'+ f.field_code+'"]');
+                        // if multi-site is enabled then we need to update field after site change
+                        if (that.props.multisite) {
+                            switch (f.admin_input_type) {
+                                case 'boolean':
+                                    $inputField.bootstrapSwitch('state', (site_values[f.id] == '1'));
+                                    break;
+                                default:
+                                    $inputField.val(site_values[f.id] || '');
+                                    break;
+                            }
+                        }
+                    });
+
+                    if (!set.deleted) data.push(set);
                 });
 
-                if (_.isEmpty(data)) {
-                    data.push(this.props.defaultOptions);
+                if (this.props.multisite) {
+                    $siteHiddenInput.val(JSON.stringify(sites));
                 }
 
-                $customInput.val(JSON.stringify(data));
+                if (_.isEmpty(data)) {
+                    data.push(sites);
+                }
+
+                $customHiddenInput.val(JSON.stringify(data));
             },
             refreshSortable: function () {
                 var that = this;
+                var sets = that.state.fieldSets;
+                var multisite = that.props.multisite
                 $('.prod-fieldset').find('.box-content').each(function () {
                     Sortable.create(this, {
                         revert: true,
@@ -190,20 +242,40 @@
                         group: "additional-field-sorting",
                         handle: '.control-handle',
                         // Element is dropped into the list from another list
+                        onStart: function(e) {
+                            console.log('onStart', e);
+                        },
+                        onEnd: function(e) {
+                            console.log('onEnd', e);
+                        },
                         onAdd: function (e) {
+                            console.log('onAdd', e);
                             var $ele = $(e.item),
-                                    $parent = $(e.item.offsetParent),
-                                    fieldId = $ele.prop('id'),
-                                    setId = $parent.prop('id'),
-                                    tmpField = null,
-                                    setIndex = null;
+                                $parent = $(e.item.offsetParent),
+                                fieldId = $ele.prop('id'),
+                                setId = $parent.prop('id'),
+                                tmpField = null,
+                                setIndex = null,
+                                tmpFields = [];
 
-                            var sets = that.state.fieldSets;
                             _(sets).each(function (set, i) {
                                 var fIndex = _.findIndex(sets[i].fields, {id: fieldId});
                                 if (fIndex !== -1) {
                                     tmpField = sets[i].fields[fIndex];
                                     sets[i].fields.splice(fIndex, 1);
+
+                                    // if multisite is enabled then search same fields and move all to new drop place
+                                    if (multisite) {
+                                        set.fields = _(set.fields).filter(function (f, fi) {
+                                            if (f.id != tmpField.id) {
+                                                return true;
+                                            } else {
+                                                tmpFields.push(f);
+                                                return false;
+                                            }
+                                        });
+
+                                    }
                                 }
 
                                 if (set.id == setId) setIndex = i;
@@ -214,6 +286,12 @@
                                 sets[setIndex].fields.push(tmpField);
                             }
 
+                            if (multisite && tmpFields.length) {
+                                _(tmpFields).each(function (f) {
+                                    sets[setIndex].fields.push(f)
+                                });
+                            }
+
                             that.refreshData();
                         }
                     });
@@ -222,11 +300,18 @@
             initSelect2: function () {
                 return $.extend({}, {
                     id: guid(),
+                    name: guid(),
                     className: '',
                     placeholder: "{{ 'Select field options' |_ }}",
                     multiple: false,
                     callback: 'chooseFieldOptions'
                 }, this.props.select2Config);
+            },
+            initMultiSite: function () {
+                return {
+                    className: 'site-value',
+                    multiple: false
+                };
             },
             getOptions: function (id, i) {
                 var options = this.state.fieldSets[id].fields[i].options;
@@ -243,12 +328,20 @@
             removeSet: function (e) {
                 var $target = $(e.currentTarget);
                 var setId = $target.data('set-id').toString();
+                var sites = this.state.sites;
 
                 var sets = this.state.fieldSets;
                 sets[setId].deleted = true;
                 var fieldIds = _.pluck(sets[setId].fields, 'id');
 
-                this.setState({fieldSets: sets});
+                // If has many sites then clear fields when remove set
+                _(fieldIds).each(function (id, fi) {
+                    _(sites).each(function (site, si) {
+                        delete sites[si][id];
+                    })
+                });
+
+                this.setState({fieldSets: sets, sites: sites});
 
                 $(APP).trigger('removeSet', [setId]);
                 $(APP).trigger('reloadFields', [null, fieldIds]);
@@ -257,32 +350,47 @@
                 var $target = $(e.currentTarget),
                     fieldId = $target.data('field-id'),
                     fieldName = $target.data('field-value'),
-                    sets = this.state.fieldSets;
+                    sets = this.state.fieldSets,
+                    sites = this.state.sites;
+
                 _(sets).each(function (set, i) {
-                    _(set.fields).each(function (f, j) {
-                        if (f && f.id == fieldId) sets[i].fields.splice(j, 1);
+                    set.fields = _(set.fields).filter(function (f, j) {
+                        return !(f && f.id == fieldId);
                     });
                 });
 
-                this.setState({fieldSets: sets});
+                // If has many sites then clear fields when remove field
+                _(sites).each(function (site, si) {
+                    delete sites[si][fieldId];
+                });
+
+                this.setState({fieldSets: sets, sites: sites});
 
                 $(APP).trigger('removeField', [fieldId.toString(), fieldName.toString()]);
                 this.refreshData();
             },
             refreshChanged: function (code, value, type) {
-                var sets = this.state.fieldSets;
+                var that = this,
+                    sets = this.state.fieldSets,
+                    sites = this.state.sites,
+                    site_id = this.state.site_id || 'default';
+
                 _(sets).each(function (set, i) {
                     _(set.fields).each(function (f, j) {
                         switch (type) {
                             case 'select':
                             case 'multiselect':
                                 _(f.options).each(function (opt, key) {
-                                    if (key == code) sets[i].fields[j].value = value;
+                                    if (key == code) {
+                                        sets[i].fields[j].value = value;
+                                        if (sites[site_id]) sites[site_id][f.id] = value;
+                                    }
                                 });
                                 break;
                             default:
                                 if (f.field_code == code) {
                                     sets[i].fields[j].value = value;
+                                    if (sites[site_id]) sites[site_id][f.id] = value;
                                 }
                                 break;
                         }
@@ -298,6 +406,29 @@
                 var $input = $(e.target);
                 this.refreshChanged($input.data('code'), $input.val());
             },
+            handleMultiSitesChange: function (e, callback, selection) {
+                var that = this,
+                    $target = $(e.currentTarget),
+                    fieldId = $target.data('field-id'),
+                    sets = this.state.fieldSets,
+                    sites = this.state.sites,
+                    siteId = this.state.site_id;
+
+                var siteValues = this.state.site_values;
+                siteValues[fieldId] = selection;
+
+                // Use default value
+                if (selection.id == '0') {
+                    sites[siteId][fieldId] = sites['default'][fieldId];
+                    _(sets).each(function (set, si) {
+                        var fi = _.findIndex(set.fields, { id: fieldId });
+                        if (fi != -1) sets[si].fields[fi].value = sites['default'][fieldId];
+                    });
+                }
+
+                this.setState({ site_values: siteValues, fieldSets: sets });
+                this.refreshData();
+            },
             parseLangs: function (data) {
                 var langs = data ? JSON.parse(data) : data;
                 if (!langs || !langs.frontend_label_translation) {
@@ -308,217 +439,246 @@
             },
             render: function () {
                 return (
-                        React.DOM.div(null,
-                                _(this.state.fieldSets).map(function (fieldSet, id) {
-                                    if (fieldSet && !fieldSet.deleted) {
-                                        var fields = fieldSet.fields || {};
-                                        return React.DOM.div({
-                                                    key: id,
-                                                    id: id,
-                                                    className: 'box box-borderd green-border box-nomargin prod-fieldset'
+                    React.DOM.div({ key: 'additional-fields' },
+                        _(this.state.fieldSets).map(function (fieldSet, id) {
+                            if (fieldSet && !fieldSet.deleted) {
+                                var fields = fieldSet.fields || {};
+                                return React.DOM.div({
+                                        key: id,
+                                        id: id,
+                                        className: 'box box-borderd green-border box-nomargin prod-fieldset'
+                                    },
+                                    React.DOM.div({className: 'box-header box-header-small'},
+                                        React.DOM.div({className: 'title'}, fieldSet.set_name),
+                                        React.DOM.div({className: 'actions'},
+                                            React.DOM.button({
+                                                    type: 'button',
+                                                    className: 'btn box-remove btn-xs btn-link btn-remove',
+                                                    onClick: this.removeSet,
+                                                    'data-set-id': fieldSet.id
                                                 },
-                                                React.DOM.div({className: 'box-header box-header-small'},
-                                                        React.DOM.div({className: 'title'}, fieldSet.set_name),
-                                                        React.DOM.div({className: 'actions'},
-                                                                React.DOM.button({
-                                                                            type: 'button',
-                                                                            className: 'btn box-remove btn-xs btn-link btn-remove',
-                                                                            onClick: this.removeSet,
-                                                                            'data-set-id': fieldSet.id
-                                                                        },
-                                                                        React.DOM.i({className: 'icon-remove'})
-                                                                ),
-                                                                React.DOM.button({
-                                                                            className: 'btn box-collapse btn-xs btn-link btn-edit',
-                                                                            type: 'button'
-                                                                        },
-                                                                        React.DOM.i({className: 'icon-chevron-down'})
-                                                                )
-                                                        )
-                                                ),
-                                                React.DOM.div({className: 'box-content ui-sortable'},
-                                                        fields ?
-                                                                _(fields).map(function (field, i) {
-                                                                    var inlineProps = this.initSelect2(),
-                                                                            options = this.getOptions(id, i),
-                                                                            defaultOption = '',
-                                                                            inputField = null,
-                                                                            langField = null;
-
-                                                                    if (!_.contains(this.props.availFields, field.id)) {
-                                                                        this.props.availFields.push(field.id);
-                                                                    } else {
-                                                                        return null;
-                                                                    }
-
-                                                                    if (options) {
-                                                                        var optionsText = _.pluck(options, 'text');
-                                                                        _(this.props.defaultOptions).each(function (option) {
-                                                                            if (_.contains(optionsText, option)) {
-                                                                                defaultOption = option;
-                                                                            }
-                                                                        });
-                                                                    }
-
-                                                                    if (_.contains(this.props.inputWithLangs, field.admin_input_type)) {
-                                                                        langField = React.createElement(FComMultiLanguage, {
-                                                                            id: field.field_code + '_lang_field_' + field.id,
-                                                                            availLangs: this.parseLangs(field.languages),
-                                                                            inputType: field.admin_input_type,
-                                                                            defaultLangs: {{ UTIL.toJson(UTIL.localesToSelect2Options()) | raw }},
-                                                                            modalConfig: {
-                                                                                fieldCode: field.field_code,
-                                                                                onSaved: field.field_code + 'ModalSaveChange'
-                                                                            },
-                                                                            select2Config: this.getSelect2Config || {}
-                                                                        });
-
-                                                                        window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
-                                                                            var modalNode = $(modal.getDOMNode());
-                                                                            var container = modalNode.find('div[id$="-container"]');
-                                                                            if (!$.fn.modalValidate(container))
-                                                                                return;
-
-                                                                            var code = modal.props.fieldCode;
-                                                                            $(APP).trigger('refreshLangs', [code, langs]);
-                                                                            modal.close();
-                                                                        };
-                                                                    }
-
-                                                                    switch (field.admin_input_type) {
-                                                                        case 'textarea':
-                                                                            inputField = React.DOM.textarea({
-                                                                                id: guid(),
-                                                                                name: guid(),
-                                                                                'data-rule-required': field.required || 'false',
-                                                                                className: 'form-control',
-                                                                                'data-code': field.field_code,
-                                                                                onBlur: this.handleInputChange,
-                                                                                defaultValue: field.value
-                                                                            });
-                                                                            break;
-                                                                        case 'wysiwyg':
-                                                                            inputField = React.DOM.textarea({
-                                                                                id: guid(),
-                                                                                name: guid(),
-                                                                                className: 'form-control field-ckeditor',
-                                                                                'data-rule-required': field.required || 'false',
-                                                                                'data-code': field.field_code,
-                                                                                defaultValue: field.value
-                                                                            });
-                                                                            this.state.inputTypes[field.field_code] = 'wysiwyg';
-                                                                            break;
-                                                                        case 'select':
-                                                                        case 'multiselect':
-                                                                            inputField = React.createElement(FComSelect2, React.__spread({}, inlineProps, {
-                                                                                options: options,
-                                                                                defaultValue: [defaultOption],
-                                                                                onChange: this.handleSelect2Change
-                                                                            }));
-                                                                            break;
-                                                                        case 'boolean':
-                                                                            inputField = React.DOM.div(null,
-                                                                                    React.DOM.input({
-                                                                                        type: 'hidden',
-                                                                                        name: guid(),
-                                                                                        defaultValue: field.value
-                                                                                    }),
-                                                                                    React.DOM.div({
-                                                                                                className: 'make-switch switch has-switch',
-                                                                                                'data-off-label': '<i class="icon-remove"></i>',
-                                                                                                'data-on-label': '<i class="icon-ok"></i>',
-                                                                                                'data-on': 'primary'
-                                                                                            },
-                                                                                            React.DOM.input({
-                                                                                                type: 'checkbox',
-                                                                                                className: 'switch-cbx',
-                                                                                                id: guid(),
-                                                                                                name: guid(),
-                                                                                                defaultValue: field.value,
-                                                                                                defaultChecked: !!(field.value === undefined || field.value === '1'),
-                                                                                                'data-code': field.field_code
-                                                                                            })
-                                                                                    )
-                                                                            );
-                                                                            this.state.inputTypes[field.field_code] = 'boolean';
-                                                                            break;
-                                                                        default:
-                                                                            inputField = React.DOM.input({
-                                                                                type: 'text',
-                                                                                name: guid(),
-                                                                                defaultValue: field.value,
-                                                                                className: 'form-control',
-                                                                                'data-rule-required': (field.required || 'false'),
-                                                                                'data-code': field.field_code,
-                                                                                onBlur: this.handleInputChange
-                                                                            });
-                                                                            break;
-                                                                    }
-
-                                                                    return (
-                                                                            React.DOM.div({
-                                                                                        key: field.field_code,
-                                                                                        id: field.id,
-                                                                                        className: 'form-group'
-                                                                                    },
-                                                                                    React.DOM.div({className: 'col-md-9 col-lg-push-3'},
-                                                                                            React.DOM.label({
-                                                                                                        className: 'col-md-2 control-label dd-handle control-handle',
-                                                                                                        htmlFor: 'prod-review-text',
-                                                                                                        'data-field-id': field.id
-                                                                                                    },
-                                                                                                    React.DOM.div({className: 'icon-ellipsis-vertical dd-handle dd3-handle'}),
-                                                                                                    React.DOM.span(null, field.field_name)
-                                                                                            ),
-                                                                                            React.DOM.div({className: 'col-md-3'},
-                                                                                                    inputField
-                                                                                            ),
-                                                                                            React.DOM.div({className: 'col-md-6'},
-                                                                                                    React.DOM.button({
-                                                                                                                className: 'btn btn-danger btn-xs field-remove',
-                                                                                                                style: {
-                                                                                                                    float: 'left',
-                                                                                                                    marginRight: '5px'
-                                                                                                                },
-                                                                                                                type: 'button',
-                                                                                                                onClick: this.removeField,
-                                                                                                                'data-field-id': field.id,
-                                                                                                                'data-field-value': field.field_name
-                                                                                                            },
-                                                                                                            React.DOM.i({className: 'icon-remove'})
-                                                                                                    ), langField
-                                                                                            )
-                                                                                    )
-                                                                            )
-                                                                    )
-                                                                }.bind(this))
-                                                                : null
-                                                )
+                                                React.DOM.i({className: 'icon-remove'})
+                                            ),
+                                            React.DOM.button({
+                                                    className: 'btn box-collapse btn-xs btn-link btn-edit',
+                                                    type: 'button'
+                                                },
+                                                React.DOM.i({className: 'icon-chevron-down'})
+                                            )
                                         )
-                                    } else return null;
-                                }.bind(this))
-                        )
+                                    ),
+                                    React.DOM.div({className: 'box-content ui-sortable'},
+                                        fields ?
+                                        _(fields).map(function (field, i) {
+                                            var that = this,
+                                                inlineProps = null,
+                                                options = this.getOptions(id, i),
+                                                inputField = null,
+                                                langField = null,
+                                                multiSite = null,
+                                                sites = this.state.sites,
+                                                siteValues = this.state.site_values,
+                                                siteId = this.state.site_id || 'default',
+                                                defaultValues = sites[siteId] || {},
+                                                disabled = false;
+
+                                            if (siteId !== 'default') {
+
+                                            }
+
+                                            if (!_.contains(this.props.avail_fields, field.id)) {
+                                                this.props.avail_fields.push(field.id);
+                                            } else {
+                                                return null;
+                                            }
+
+                                            if (!this.state.is_default_site) {
+                                                inlineProps = this.initMultiSite();
+                                                multiSite = React.createElement(FComSelect2, React.__spread({}, inlineProps, {
+                                                    id: guid(),
+                                                    options: [
+                                                        { id: '0', text: "{{ 'Use Default Value'|_ }}" },
+                                                        { id: '1', text: "{{ 'Use Site Specific Value'|_ }}" }
+                                                    ],
+                                                    defaultValue: [(defaultValues && defaultValues[field.id] == sites['default'][field.id]) ? 0 : 1],
+                                                    attrs: {
+                                                        'data-field-id': field.id
+                                                    },
+                                                    onChange: this.handleMultiSitesChange
+                                                }));
+                                            }
+
+                                            if (_.contains(this.props.input_with_langs, field.admin_input_type)) {
+                                                langField = React.createElement(FComMultiLanguage, {
+                                                    id: field.field_code + '_lang_field_' + field.id,
+                                                    availLangs: this.parseLangs(field.languages),
+                                                    inputType: field.admin_input_type,
+                                                    defaultLangs: {{ UTIL.toJson(UTIL.localesToSelect2Options()) | raw }},
+                                                    cClass: 'col-sm-3',
+                                                    modalConfig: {
+                                                        fieldCode: field.field_code,
+                                                        onSaved: field.field_code + 'ModalSaveChange'
+                                                    },
+                                                    select2Config: this.getSelect2Config || {}
+                                                });
+
+                                                window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
+                                                    var modalNode = $(modal.getDOMNode());
+                                                    var container = modalNode.find('div[id$="-container"]');
+                                                    if (!$.fn.modalValidate(container))
+                                                        return;
+
+                                                    var code = modal.props.fieldCode;
+                                                    $(APP).trigger('refreshLangs', [code, langs]);
+                                                    modal.close();
+                                                };
+                                            }
+
+                                            switch (field.admin_input_type) {
+                                                case 'textarea':
+                                                    inputField = React.DOM.textarea({
+                                                        id: guid(),
+                                                        name: guid(),
+                                                        disabled: disabled,
+                                                        className: 'form-control',
+                                                        'data-rule-required': field.required || 'false',
+                                                        'data-code': field.field_code,
+                                                        'data-field-id': field.id,
+                                                        onBlur: this.handleInputChange,
+                                                        defaultValue: defaultValues[field.id] || ''
+                                                    });
+                                                    break;
+                                                case 'wysiwyg':
+                                                    inputField = React.DOM.textarea({
+                                                        id: guid(),
+                                                        name: guid(),
+                                                        disabled: disabled,
+                                                        className: 'form-control field-ckeditor',
+                                                        'data-rule-required': field.required || 'false',
+                                                        'data-code': field.field_code,
+                                                        'data-field-id': field.id,
+                                                        defaultValue: defaultValues[field.id] || ''
+                                                    });
+                                                    this.state.inputTypes[field.field_code] = 'wysiwyg';
+                                                    break;
+                                                case 'select':
+                                                case 'multiselect':
+                                                    inlineProps = this.initSelect2();
+                                                    inputField = React.createElement(FComSelect2, React.__spread({}, inlineProps, {
+                                                        options: options,
+                                                        enabled: !disabled,
+                                                        'data-field-id': field.id,
+                                                        onChange: this.handleSelect2Change,
+                                                        defaultValue: [defaultValues[field.id] || '']
+                                                    }));
+                                                    break;
+                                                case 'boolean':
+                                                    inputField = React.DOM.div(null,
+                                                        React.DOM.input({
+                                                            type: 'hidden',
+                                                            name: guid(),
+                                                            defaultValue: defaultValues[field.id] || '0'
+                                                        }),
+                                                        React.DOM.div({
+                                                                className: 'make-switch switch has-switch',
+                                                                'data-off-label': '<i class="icon-remove"></i>',
+                                                                'data-on-label': '<i class="icon-ok"></i>',
+                                                                'data-on': 'primary'
+                                                            },
+                                                            React.DOM.input({
+                                                                type: 'checkbox',
+                                                                className: 'switch-cbx',
+                                                                id: guid(),
+                                                                name: guid(),
+                                                                disabled: disabled,
+                                                                defaultChecked: !!(field.value === undefined || field.value === '1'),
+                                                                'data-code': field.field_code,
+                                                                'data-field-id': field.id,
+                                                                defaultValue: defaultValues[field.id] || '0'
+                                                            })
+                                                        )
+                                                    );
+                                                    this.state.inputTypes[field.field_code] = 'boolean';
+                                                    break;
+                                                default:
+                                                    inputField = React.DOM.input({
+                                                        type: 'text',
+                                                        name: guid(),
+                                                        disabled: disabled,
+                                                        className: 'form-control',
+                                                        'data-rule-required': (field.required || 'false'),
+                                                        'data-code': field.field_code,
+                                                        'data-field-id': field.id,
+                                                        onBlur: this.handleInputChange,
+                                                        defaultValue: defaultValues[field.id] || ''
+                                                    });
+                                                    break;
+                                            }
+
+                                            return (
+                                                React.DOM.div({
+                                                        key: field.field_code,
+                                                        id: field.id,
+                                                        className: 'form-group'
+                                                    },
+                                                    React.DOM.div({className: 'col-md-9 col-lg-push-3'},
+                                                        React.DOM.label({
+                                                                className: 'col-md-2 control-label dd-handle control-handle',
+                                                                htmlFor: 'prod-review-text',
+                                                                'data-field-id': field.id
+                                                            },
+                                                            React.DOM.div({className: 'icon-ellipsis-vertical dd-handle dd3-handle'}),
+                                                            React.DOM.span(null, field.field_name)
+                                                        ),
+                                                        React.DOM.div({className: 'col-md-3'},
+                                                            inputField
+                                                        ),
+                                                        React.DOM.div({className: 'col-md-6'},
+                                                            React.DOM.button({
+                                                                    className: 'btn btn-danger btn-xs field-remove',
+                                                                    style: {
+                                                                        float: 'left',
+                                                                        marginRight: '5px'
+                                                                    },
+                                                                    type: 'button',
+                                                                    onClick: this.removeField,
+                                                                    'data-field-id': field.id,
+                                                                    'data-field-value': field.field_name
+                                                                },
+                                                                React.DOM.i({className: 'icon-remove'})
+                                                            ), langField, multiSite
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        }.bind(this))
+                                        : null
+                                    )
+                                )
+                            } else return null;
+                        }.bind(this))
+                    )
                 )
             }
         });
 
-        if (initData) {
+        if (initData !== -1) {
             _(initData).each(function (fieldSet, i) {
                 if (!isNaN(i)) {
                     fieldSets[i] = fieldSet;
                     fields.push(fieldSet.fields);
                 }
             });
-            var defaultOptions = initData.site_values ? initData.site_values.default : {};
         }
 
         var fieldsListContainer = document.getElementById('fields_list');
         React.unmountComponentAtNode(fieldsListContainer);
-        React.render(
-                React.createElement(fieldsListGrid, {
-                    fieldSets: fieldSets || {},
-                    defaultOptions: defaultOptions
-                }), fieldsListContainer
+        var FieldsListComponent = React.render(
+            React.createElement(fieldsListGrid, {
+                fieldSets: fieldSets || {},
+                site_values: initData['site_values'],
+                multisite: !_.isEmpty(sites)
+            }), fieldsListContainer
         );
 
         var FieldsSetGrid = React.createClass({
@@ -621,12 +781,9 @@
 
             },
             render: function () {
-                var inlineProps = this.initSelect2();
-                var options = this.getOptions();
-
                 return React.DOM.div({className: ""},
-                        React.createElement(FComSelect2, React.__spread({}, inlineProps, {
-                            options: options,
+                        React.createElement(FComSelect2, React.__spread({}, this.initSelect2(), {
+                            options: this.getOptions(),
                             onChange: this.handleSelect2Change
                         })),
                         React.DOM.button({
@@ -901,32 +1058,41 @@
         var fieldsContainer = document.getElementById('fields-container');
         React.unmountComponentAtNode(fieldsContainer);
         React.render(
-                React.DOM.div({className: 'well'},
-                        React.DOM.div({className: 'row'},
-                                React.DOM.input({
-                                    type: 'hidden',
-                                    id: 'custom_fields',
-                                    name: 'custom_fields',
-                                    defaultValue: ''
-                                }),
-                                React.DOM.div({className: 'col-sm-6', id: 'fieldSet'},
-                                        React.createElement(FieldsSetGrid, {
-                                            fieldSets: fieldSets,
-                                            options: fieldSetOptions
-                                        })
-                                ),
-                                React.DOM.div({className: 'col-sm-6', id: 'field'},
-                                        React.createElement(FieldsGrid, {
-                                            fields: fields,
-                                            fieldSets: fieldSets,
-                                            options: fieldsOptions
-                                        })
-                                )
-                        )
-                ), fieldsContainer
+            React.DOM.div({className: 'well'},
+                React.DOM.div({className: 'row'},
+                    React.DOM.input({
+                        type: 'hidden',
+                        id: 'custom_fields',
+                        name: 'custom_fields',
+                        defaultValue: ''
+                    }),
+                    sites ? React.DOM.div({className: 'col-sm-3', id: 'multisite'},
+                        React.createElement(Components.MultiSite, {
+                            sites: sites,
+                            onChange: function (event, callback, selection) {
+                                FieldsListComponent.setProps({ site: selection });
+                            }
+                        })
+                    ) : null,
+                    React.DOM.div({className: 'col-sm-4', id: 'fieldSet'},
+                        React.createElement(FieldsSetGrid, {
+                            fieldSets: fieldSets,
+                            options: fieldSetOptions
+                        })
+                    ),
+                    React.DOM.div({className: 'col-sm-5', id: 'field'},
+                        React.createElement(FieldsGrid, {
+                            fields: fields,
+                            fieldSets: fieldSets,
+                            options: fieldsOptions
+                        })
+                    )
+                )
+            ), fieldsContainer
         );
 
-        var $customInput = $('#custom_fields');
+        var $customHiddenInput = $('#custom_fields');
+        var $siteHiddenInput = $('#site_values');
         var data = [];
         if (initData !== -1) {
             for (var i in initData) {
@@ -935,8 +1101,11 @@
                     data.push(set);
                 }
             }
-            $customInput.val(JSON.stringify(data));
+            $customHiddenInput.val(JSON.stringify(data));
         }
+        console.log('initData', initData);
+
+        if (sites) $siteHiddenInput.val(JSON.stringify(initData['site_values']));
     });
 </script>
 
