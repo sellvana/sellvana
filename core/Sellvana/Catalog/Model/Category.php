@@ -310,20 +310,24 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
      * @param $args
      * @throws BException
      */
-    public function onImportAfterModel($args)
+    public function onImportAfterBatch($args)
     {
         $importId = $args['import_id'];
         $importSite = $this->FCom_Core_Model_ImportExport_Site->load($importId, 'site_code');
         if (!$importSite) {
             return;
         }
-        if (isset($args['models'])) {
-            $toUpdate = $args['models'];
+        $toUpdate = $this->orm();
+        if (isset($args['records']) && count($args['records'])) {
+            $ids = array_keys($args['records']);
+            $toUpdate->where_in('id', $ids);
         } else {
-            $toUpdate = $this->orm()
-                  ->where(['OR' => ['parent_id IS NULL', 'id_path IS NULL']])
-                  ->find_many_assoc();
+            $toUpdate->where(['OR' => ['parent_id IS NULL', 'id_path IS NULL']]);
+
         }
+
+        $toUpdate = $toUpdate->find_many_assoc();
+
         if (empty($toUpdate)) {
             return;
         }

@@ -295,7 +295,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $saveAgain = true;
         }
         if ($saveAgain) {
-            $this->save();
+            $this->save(false);
         }
         $this->Sellvana_Catalog_Model_ProductPrice->parseAndSaveDefaultPrices($this);
 

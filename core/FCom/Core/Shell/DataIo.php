@@ -1,26 +1,30 @@
 <?php
 
 /**
- * Class FCom_Admin_Shell_DataIo
+ * Class FCom_Core_Shell_Import
  *
  * @property FCom_Shell_Shell $FCom_Shell_Shell
  * @property FCom_Core_ImportExport $FCom_Core_ImportExport
  */
-class FCom_Admin_Shell_DataIo extends FCom_Shell_Action_Abstract
+class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
 {
-    const PARAM_COMMAND = 2;
+    static protected $_origClass = __CLASS__;
 
     const OPTION_FILE = 'f';
     const OPTION_VERBOSE = 'v';
-    const OPTION_SILENT = 's';
+    const OPTION_QUIET = 'q';
 
     static protected $_actionName = 'data-io';
 
     static protected $_availOptions = [
         'f?' => 'file',
         'v' => 'verbose',
-        's' => 'silent'
+        'q' => 'quiet',
     ];
+
+    protected $_importStarted = 0;
+    protected $_bachStarted = 0;
+    protected $_memoryStarted = 0;
 
     /**
      * Short help.
@@ -41,9 +45,9 @@ class FCom_Admin_Shell_DataIo extends FCom_Shell_Action_Abstract
     {
         return <<<EOT
 
-Import management.
+Data import/export.
 
-Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {green*}<command> [parameters]{/}
+Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {green*}<command>{/} {red*}[parameters]{/}
 
 Commands:
 
@@ -73,18 +77,7 @@ EOT;
      */
     protected function _run()
     {
-        $cmd = $this->getParam(self::PARAM_COMMAND);
-        if (!$cmd) {
-            $this->println('{red*}ERROR:{/} No command specified.');
-            $cmd = 'help';
-        }
-        $method = '_' . $cmd . 'Cmd';
-        if (!method_exists($this, $method)) {
-            $this->println('{red*}ERROR:{/} Unknown command: {red*}' . $cmd . '{/}');
-            return;
-        }
-
-        $this->{$method}();
+        $this->_processCommand();
     }
 
     /**
@@ -106,7 +99,7 @@ EOT;
             $i = 1;
             foreach ($files as $file) {
                 $str = '  [' . $i++ . '] '
-                    . '{^purple}' . str_pad($file['name'], $maxLength) . '{/}'
+                    . '{purple*}' . str_pad($file['name'], $maxLength) . '{/}'
                     . $file['file_size'];
 
                 $this->println($str);
@@ -154,7 +147,7 @@ EOT;
             $i = 1;
             foreach ($files as $key => $file) {
                 $ids[$i] = $key;
-                $this->println('  [' . $i++ . '] {^purple}' . $file['name'] . '{/}');
+                $this->println('  [' . $i++ . '] {purple*}' . $file['name'] . '{/}');
             }
 
             $fileId = null;
@@ -170,6 +163,7 @@ EOT;
         try {
             //Fix of memory leak
             $this->BDebug->disableAllLogging();
+            $this->BDebug->mode(BDebug::MODE_IMPORT);
 
             $importer = $this->FCom_Core_ImportExport;
 
@@ -177,17 +171,14 @@ EOT;
                 $this->println('{red*}ERROR:{/} Invalid import file.');
                 return;
             }
+
+            $this->_memoryStarted = memory_get_usage();
             $importer->importFile($file);
 
         } catch (Exception $e) {
             $this->BDebug->logException($e);
             $this->println('{red*}FATAL ERROR:{/} ' . $e->getMessage());
         }
-    }
-
-    protected function _helpCmd()
-    {
-        $this->println($this->getLongHelp());
     }
 
     /**
@@ -213,14 +204,13 @@ EOT;
         return empty($data) ? false : $data;
     }
 
-
-
     /**
      * @param $args
      */
     public function onBeforeImport($args)
     {
-        if ($this->getOption(self::OPTION_SILENT) === true){
+        $this->_importStarted = microtime(true);
+        if ($this->getOption(self::OPTION_QUIET) === true) {
             return;
         }
         $this->println("");
@@ -236,6 +226,7 @@ EOT;
 
             $this->println($str);
             $this->println($str2);
+            $this->println('');
         }
     }
 
@@ -244,7 +235,8 @@ EOT;
      */
     public function onBeforeModel($args)
     {
-        if ($this->getOption(self::OPTION_SILENT) === true){
+        $this->_bachStarted = microtime(true);
+        if ($this->getOption(self::OPTION_QUIET) === true) {
             return;
         }
         $this->println('');
@@ -255,15 +247,17 @@ EOT;
      */
     public function onAfterBatch($args)
     {
-        if ($this->getOption(self::OPTION_SILENT) === true){
+        if ($this->getOption(self::OPTION_QUIET) === true) {
             return;
         }
-        echo $this->FCom_Shell_Shell->cursor('up', 2);
 
         if ($this->getOption(self::OPTION_VERBOSE) !== true) {
+            echo $this->FCom_Shell_Shell->cursor('up', 1);
             $this->println($args['modelName']);
             return;
         }
+
+        echo $this->FCom_Shell_Shell->cursor('up', 2);
 
         $statistic = $args["statistic"];
 
@@ -289,7 +283,14 @@ EOT;
         $str .= "| " . $args['modelName'];
 
         $this->println($str);
-        $this->println($this->BUtil->convertFileSize(memory_get_usage()));
+        $this->println('{red*}Debug:{/} {white}'
+            . str_pad($this->BUtil->convertFileSize(memory_get_usage() - $this->_memoryStarted), 10)
+            . str_pad(sprintf('%2.5f', microtime(true) - $this->_bachStarted) . 's', 10)
+            . str_pad(sprintf('%2.5f', microtime(true) - $this->_importStarted) . 's', 10)
+            . str_pad($this->BUtil->convertFileSize(memory_get_usage()), 10)
+            . '{/}'
+        );
+        $this->_bachStarted = microtime(true);
 
         return;
     }
