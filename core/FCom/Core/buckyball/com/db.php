@@ -1320,8 +1320,10 @@ class BORM extends ORMWrapper
     public function find_one($id = null)
     {
         $class = $this->_origClass();
+        BEvents::i()->fire(__METHOD__ . ':orm', ['orm' => $this, 'class' => $class, 'id' => $id]);
         BEvents::i()->fire($class . '::find_one:orm', ['orm' => $this, 'class' => $class, 'id' => $id]);
         $result = parent::find_one($id);
+        BEvents::i()->fire(__METHOD__ . ':after', ['result' => &$result, 'class' => $class, 'id' => $id]);
         BEvents::i()->fire($class . '::find_one:after', ['result' => &$result, 'class' => $class, 'id' => $id]);
         return $result;
     }
@@ -1334,8 +1336,10 @@ class BORM extends ORMWrapper
     public function find_many()
     {
         $class = $this->_origClass();
+        BEvents::i()->fire(__METHOD__ . ':orm', ['orm' => $this, 'class' => $class]);
         BEvents::i()->fire($class . '::find_many:orm', ['orm' => $this, 'class' => $class]);
         $result = parent::find_many();
+        BEvents::i()->fire(__METHOD__ . ':after', ['result' => &$result, 'orm' => $this, 'class' => $class]);
         BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'orm' => $this, 'class' => $class]);
         return $result;
     }

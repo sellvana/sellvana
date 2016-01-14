@@ -617,4 +617,24 @@ FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
         $limit = !empty($conf['limit_countries']) ? $conf['allowed_countries'] : null;
         return $this->BLocale->getAvailableRegions('name', $limit);
     }
+
+    public function onFindOneAfter($args)
+    {
+        if (!empty($args['result']) && $args['result'] instanceof FCom_Core_Model_Abstract && $args['result']->id()) {
+            $args['result']->mapDataFields();
+        }
+    }
+
+    public function onFindManyAfter($args)
+    {
+        if (!empty($args['result']) && is_array($args['result'])) {
+            /** @var FCom_Core_Model_Abstract $model */
+            foreach ($args['result'] as $key => $model) {
+                if (!($model instanceof FCom_Core_Model_Abstract) || !$model->id()) {
+                    continue;
+                }
+                $model->mapDataFields();
+            }
+        }
+    }
 }
