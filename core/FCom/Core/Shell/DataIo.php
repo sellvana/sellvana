@@ -264,7 +264,7 @@ EOT;
             $offset = strlen($fileIds);
 
             $fileIds = preg_replace('/\s+/', '', $fileIds);
-            $fileIds = explode(',', str_replace([',', ';', ':'], ',', $fileIds));
+            $fileIds = explode(',', str_replace([';', ':'], ',', $fileIds));
 
             $processedIds = [];
             foreach ($fileIds as $fileId) {
