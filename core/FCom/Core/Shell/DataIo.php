@@ -114,6 +114,54 @@ EOT;
     }
 
     /**
+     * Import file
+     */
+    protected function _importCmd()
+    {
+        $files = $this->_getFilesForImport();
+
+        if (!count($files)){
+            $this->println(PHP_EOL . '{green*}INFO:{/} No files to import.');
+            return;
+        }
+
+        try {
+            //Fix of memory leak
+            $this->BDebug->disableAllLogging();
+            $this->BDebug->mode(BDebug::MODE_IMPORT);
+
+            $this->_memoryStarted = memory_get_usage();
+
+            if ($this->getOption(self::OPTION_VERBOSE)) {
+                $this->println(PHP_EOL . '{green}Files in the queue for importing:{/}');
+                foreach ($files as $file) {
+                    $this->println('  {purple*}' . $file['name']);
+                }
+            }
+
+            $importer = $this->FCom_Core_ImportExport;
+            foreach ($files as $file) {
+                $file = $file['fullpath'];
+
+                $this->println(PHP_EOL . '{green*}START FILE: {/}{purple*}' . $file . '{/}');
+
+                $external = (strpos($file, FULLERON_ROOT_DIR) ===  false);
+                if (!$importer->validateImportFile($file, !$external)) {
+                    $this->println('{blue*}NOTICE:{/} Invalid import file. Will be skipped.');
+                    continue;
+                }
+                $importer->importFile($file);
+
+                $this->println(PHP_EOL . '{green*}END FILE: {/}{purple*}' . $file . '{/}');
+            }
+        } catch (Exception $e) {
+            $this->BDebug->logException($e);
+            $this->println('{red*}FATAL ERROR:{/} ' . $e->getMessage());
+            die;
+        }
+    }
+
+    /**
      * Get file list for import process;
      *
      * @return array
@@ -251,54 +299,6 @@ EOT;
         }
 
         return $fileList;
-    }
-
-    /**
-     * Import file
-     */
-    protected function _importCmd()
-    {
-        $files = $this->_getFilesForImport();
-
-        if (!count($files)){
-            $this->println(PHP_EOL . '{green*}INFO:{/} No files to import.');
-            return;
-        }
-
-        try {
-            //Fix of memory leak
-            $this->BDebug->disableAllLogging();
-            $this->BDebug->mode(BDebug::MODE_IMPORT);
-
-            $this->_memoryStarted = memory_get_usage();
-
-            if ($this->getOption(self::OPTION_VERBOSE)) {
-                $this->println(PHP_EOL . '{green}Files in the queue for importing:{/}');
-                foreach ($files as $file) {
-                    $this->println('  {purple*}' . $file['name']);
-                }
-            }
-
-            $importer = $this->FCom_Core_ImportExport;
-            foreach ($files as $file) {
-                $file = $file['fullpath'];
-
-                $this->println(PHP_EOL . '{green*}START FILE: {/}{purple*}' . $file . '{/}');
-
-                $external = (strpos($file, FULLERON_ROOT_DIR) ===  false);
-                if (!$importer->validateImportFile($file, !$external)) {
-                    $this->println('{blue*}NOTICE:{/} Invalid import file. Will be skipped.');
-                    continue;
-                }
-                $importer->importFile($file);
-
-                $this->println(PHP_EOL . '{green*}END FILE: {/}{purple*}' . $file . '{/}');
-            }
-        } catch (Exception $e) {
-            $this->BDebug->logException($e);
-            $this->println('{red*}FATAL ERROR:{/} ' . $e->getMessage());
-            die;
-        }
     }
 
     /**
