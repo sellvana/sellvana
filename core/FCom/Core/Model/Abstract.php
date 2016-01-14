@@ -119,18 +119,6 @@ class FCom_Core_Model_Abstract extends BModel
         return $this;
     }
 
-    public function onAfterLoad()
-    {
-        parent::onAfterLoad();
-
-        foreach (static::$_dataFieldsMap as $k => $v) {
-            if (is_numeric($k)) {
-                $k = $v;
-            }
-            $this->set($k, $this->getData($v));
-        }
-    }
-
     public function setReadOnly($flag = true)
     {
         $this->_readOnly = $flag;
@@ -214,5 +202,22 @@ class FCom_Core_Model_Abstract extends BModel
         }
 
         return $this;
+    }
+
+    public function getDataFieldsMap()
+    {
+        return static::$_dataFieldsMap;
+    }
+
+    public function mapDataFields()
+    {
+        $fieldMap = $this->getDataFieldsMap();
+
+        foreach ($fieldMap as $k => $v) {
+            if (is_numeric($k)) {
+                $k = $v;
+            }
+            $this->set($k, $this->getData($v));
+        }
     }
 }
