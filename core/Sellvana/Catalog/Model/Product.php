@@ -105,6 +105,12 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         'custom_data' => true,
     ];
 
+    protected static $_dataFieldsMap = [
+        'product_name_lang_fields' => 'name_lang_fields',
+        'short_description_lang_fields' => 'short_desc_lang_fields',
+        'description_lang_fields' => 'desc_lang_fields',
+    ];
+
     protected $_importErrors = null;
     protected $_dataImport = [];
 
@@ -1361,34 +1367,19 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $itemPrice;
     }
 
-    public function _getLanguageValue($staticField, $dataField)
-    {
-        $langValuesJson = $this->getData($dataField);
-        if ($langValuesJson) {
-            $langValues = $this->BUtil->fromJson($langValuesJson);
-            $curLocale = str_replace('_', '-', $this->BLocale->getCurrentLocale());
-            foreach ($langValues as $lv) {
-                if ($lv['lang_code'] === $curLocale) {
-                    return $lv['value'];
-                }
-            }
-        }
-        return $this->get($staticField);
-    }
-
     public function getName()
     {
-        return $this->_getLanguageValue('product_name', 'name_lang_fields');
+        return $this->get('product_name');
     }
 
     public function getDescription()
     {
-        return $this->_getLanguageValue('description', 'desc_lang_fields');
+        return $this->get('description');
     }
 
     public function getShortDescription()
     {
-        return $this->_getLanguageValue('short_description', 'short_desc_lang_fields');
+        return $this->get('short_description');
     }
 
     public function __destruct()
