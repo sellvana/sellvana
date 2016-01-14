@@ -88,7 +88,7 @@ EOT;
      */
     protected function _listCmd()
     {
-        $files = $this->getAllAvailableFilesForImpor();
+        $files = $this->getAllAvailableFilesForImport();
 
         if ($files) {
             $this->println("\n{green}Available files for import:{/}");
@@ -187,7 +187,7 @@ EOT;
      */
     public function askImportFiles()
     {
-        $files = $this->getAllAvailableFilesForImpor();
+        $files = $this->getAllAvailableFilesForImport();
 
         if (!$files) {
             return [];
@@ -306,7 +306,7 @@ EOT;
      *
      * @return array|bool
      */
-    public function getAllAvailableFilesForImpor()
+    public function getAllAvailableFilesForImport()
     {
         $path = $this->FCom_Core_ImportExport->getFullPath('import', 'import');
 
