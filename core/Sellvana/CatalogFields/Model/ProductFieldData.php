@@ -6,7 +6,10 @@
  * @property int $id
  * @property int $product_id
  * @property int $set_id
- * @property int $value_id
+ * @property int $field_id
+ * @property int $position
+ * @property int $site_id
+ * @property string $locale
  * @property int $value_int
  * @property float $value_dec
  * @property string $value_var
@@ -261,6 +264,7 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
 
                 $field = [
                     'id' => $fieldId,
+                    'site_id' => $row->get('site_id') ?: '',
                     'field_code' => $row->get('field_code'),
                     'field_name' => $row->get('field_name'),
                     'admin_input_type' => $row->get('admin_input_type'),

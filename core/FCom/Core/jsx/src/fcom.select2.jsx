@@ -10,7 +10,8 @@ define(['underscore', 'react', 'fcom.components', 'fcom.locale'], function (_, R
         getDefaultProps: function () {
             return {
                 defaultValue: [],
-                options: []
+                options: [],
+                enabled: true
             };
         },
         getInitialState: function () {
@@ -25,17 +26,16 @@ define(['underscore', 'react', 'fcom.components', 'fcom.locale'], function (_, R
                 this.props.onChange(e, this.props.callback, this.state.selections);
             }
         },
-        componentDidUpdate: function () {
-
-        },
         shouldComponentUpdate: function (nextProps, nextState) {
             return nextState.selections !== this.state.selections || nextProps.options !== this.props.options;
         },
         render: function () {
             return (<Components.Select2 id={this.props.id}
                                         className={this.props.className}
+                                        attrs={this.props.attrs || {}}
                                         data-col={this.props['data-col'] || ''}
                                         name={this.props.name}
+                                        enabled={this.props.enabled}
                                         options={this.props.options}
                                         onSelection={this.handleSelections}
                                         placeholder={this.props.placeholder || Locale._('Select some options')}

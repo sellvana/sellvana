@@ -270,7 +270,7 @@
                 ]
             },
 
-            {'name': 'validation', 'label': 'Validation', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['text', 'textarea', 'wysiwyg', 'number', 'email', 'url', 'image', 'file', 'date', 'tel', 'time', 'password'], 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group validation -rte-field -hidden-field -select-field -select-multi-field -radio-field -checkbox-field'},
+            {'name': 'validation', 'label': 'Validation', 'labelClass': 'col-sm-2', 'hidden': true, 'addable': true, 'editable': true, 'managable': ['text', 'textarea', 'wysiwyg', 'number', 'email', 'url', 'image', 'file', 'date', 'tel', 'time', 'password'], 'cssClass': 'col-sm-9', 'formGroupClass': 'form-group validation -rte-field -hidden-field -select-field -select-multi-field -radio-field -checkbox-field'}
         ];
         var FormFieldModalForm = React.createClass({
             displayName: "FormFieldModalForm",
@@ -436,7 +436,7 @@
             render: function() {
                 var that = this;
                 var column = this.props.column;
-                console.log(column);
+//                console.log(column);
                 if (column.editor == 'clearfix') {
                     return React.createElement('div', {className: 'clearfix', style: column.style});
                 }
@@ -553,16 +553,14 @@
                             },
                             onConfirm: window.addFormField
                         },
-                        React.createElement('div', {className: 'f-grid-wrapper', id: formFieldsGrid.getConfig('id')+'-wrap'})
+                        React.createElement('div', {className: 'f-grid-wrapper', id: formFieldsGrid.getConfig('id')+'-wrap'},
+                            React.DOM.form({ id: "{{ grid.config.id }}-modal-form", className: 'form form-horizontal validate-form' },
+                                React.createElement(FormFieldModalForm, {columnMetadata: formColumns, id: formFieldsGrid.getConfig('id')})
+                            )
+                        )
                 ), modalContainerEle);
 
-            var modalWrapEle = $('#{{ grid.config.id }}-wrap');
-            modalWrapEle.append('<form id="{{ grid.config.id }}-modal-form" class="form form-horizontal validate-form"></form>');
             var modalFormEle = document.getElementById('{{ grid.config.id }}-modal-form');
-            React.unmountComponentAtNode(modalFormEle);
-            React.render(
-                React.createElement(FormFieldModalForm, {columnMetadata: formColumns, id: formFieldsGrid.getConfig('id')}), modalFormEle
-            );
             setValidateForm($(modalFormEle));
         }
     });
@@ -862,9 +860,9 @@
         });
     </script>
     <input type='hidden' id='block_form_fields_data' name='model[form_fields]'/>
-</div> #}
-{#<div class='' id='frontend-field-grid-modal' tabindex='-1'>#}
-{# <div id="{{grid.config.id}}-custom-modal">
+</div>
+div class='' id='frontend-field-grid-modal' tabindex='-1'>
+<div id="{{grid.config.id}}-custom-modal">
     <div class='modal fade in' id='{{grid.config.id}}-custom-form' tabindex='-1'>
     <div class='modal-dialog'>
     <div class='modal-content'>

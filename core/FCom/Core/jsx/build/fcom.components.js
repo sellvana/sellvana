@@ -1,5 +1,5 @@
 //noinspection JSPotentiallyInvalidUsageOfThis
-define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'], function (React, $, Locale) {
+define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore', 'select2'], function (React, $, Locale, Sortable) {
     FCom.Components = {};
 
     /**
@@ -142,6 +142,63 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             return rules;
         }
     };
+
+    FCom.Components.MultiSite = React.createClass({
+        displayName: "MultiSite",
+        getDefaultProps: function () {
+            return {
+                defaultValue: [''],
+                sites: []
+            };
+        },
+        getInitialState: function () {
+            return {
+                selections: []
+            };
+        },
+        componentWillMount: function () {
+            this.setState({ sites: this.getSites() });
+        },
+        getSites: function () {
+            var sites = this.props.sites;
+            sites[''] = Locale._('Default configuration');
+            sites = _(sites).map(function (site, id) {
+                return {
+                    id: id, text: site
+                }
+            });
+
+            return _.sortBy(sites, 'id');
+        },
+        initSelect2: function () {
+            return {
+                id: 'multisite',
+                className: '',
+                multiple: false
+            };
+        },
+        handleSelections: function (e, sites) {
+            this.setState({sites: sites});
+
+            if (this.props.onChange) {
+                this.props.onChange(e, this.props.callback, this.state.sites);
+            }
+        },
+        shouldComponentUpdate: function (nextProps, nextState) {
+            return nextState.selections !== this.state.selections || nextProps.sites !== this.props.sites;
+        },
+        render: function () {
+            return (
+                React.createElement("div", {className: this.props.cClass || 'col-md-5'}, 
+                    React.createElement("input", {type: "hidden", id: "site_values", name: "site_values"}), 
+                    React.createElement(FCom.Components.Select2, React.__spread({},  this.initSelect2(), 
+                                        {options: this.getSites(), 
+                                        onSelection: this.handleSelections, 
+                                        multiple: this.props.multiple || false, val: this.props.defaultValue}))
+                )
+            );
+        }
+    });
 
     FCom.Components.ControlLabel = React.createClass({displayName: "ControlLabel",
         render: function () {
@@ -383,6 +440,173 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         }
     });
 
+    FCom.Components.ControlInput = React.createClass({displayName: "ControlInput",
+        mixins: [FCom.Mixin, FCom.FormMixin],
+        getDefaultProps: function () {
+            return {
+                value: '',
+                input_type: 'input',
+                attrs: {}
+            }
+        },
+        getInitialState: function () {
+            return {
+                value: this.props.value
+            };
+        },
+        componentWillReceiveProps: function (nextProps) {
+            this.setState({ value: nextProps.value });
+        },
+        handleChange: function (e) {
+            this.setState({ value: e.target.value });
+        },
+        render: function () {
+            var node = null;
+            switch (this.props.input_type) {
+                case 'textarea':
+                    node = React.createElement("textarea", React.__spread({},  this.props.attrs, {onChange: this.handleChange, onBlur: this.props.callback, value: this.state.value}));
+                    break;
+                case 'select':
+                    break;
+                default:
+                    node = React.createElement("input", React.__spread({},  this.props.attrs, {onChange: this.handleChange, onBlur: this.props.callback, value: this.state.value}));
+                    break;
+            }
+            return node;
+        }
+    });
+
+    var _nextSibling;
+
+    var _activeComponent;
+
+    var _defaultOptions = {
+        ref: 'list',
+        model: 'items',
+
+        animation: 100,
+        onStart: 'handleStart',
+        onEnd: 'handleEnd',
+        onAdd: 'handleAdd',
+        onUpdate: 'handleUpdate',
+        onRemove: 'handleRemove',
+        onSort: 'handleSort',
+        onFilter: 'handleFilter',
+        onMove: 'handleMove'
+    };
+
+
+    function _getModelName(component) {
+        return component.sortableOptions && component.sortableOptions.model || _defaultOptions.model;
+    }
+
+
+    function _getModelItems(component) {
+        var name = _getModelName(component),
+            items = component.state && component.state[name] || component.props[name];
+
+        return items.slice();
+    }
+
+
+    function _extend(dst, src) {
+        for (var key in src) {
+            if (src.hasOwnProperty(key)) {
+                dst[key] = src[key];
+            }
+        }
+
+        return dst;
+    }
+
+    FCom.Components.SortableMixin = {
+        sortableMixinVersion: '0.1.1',
+
+        /**
+         * @type {Sortable}
+         * @private
+         */
+        _sortableInstance: null,
+
+
+        componentDidMount: function () {
+            var DOMNode, options = _extend(_extend({}, _defaultOptions), this.sortableOptions || {}),
+                copyOptions = _extend({}, options),
+
+                emitEvent = function (/** string */type, /** Event */evt) {
+                    var method = this[options[type]];
+                    method && method.call(this, evt, this._sortableInstance);
+                }.bind(this);
+
+            // Bind callbacks so that "this" refers to the component
+            'onStart onEnd onAdd onSort onUpdate onRemove onFilter onMove'.split(' ').forEach(function (/** string */name) {
+                copyOptions[name] = function (evt) {
+                    if (name === 'onStart') {
+                        _nextSibling = evt.item.nextElementSibling;
+                        _activeComponent = this;
+                    }
+                    else if (name === 'onAdd' || name === 'onUpdate') {
+                        evt.from.insertBefore(evt.item, _nextSibling);
+
+                        var newState = {},
+                            remoteState = {},
+                            oldIndex = evt.oldIndex,
+                            newIndex = evt.newIndex,
+                            items = _getModelItems(this),
+                            remoteItems,
+                            item;
+
+                        if (name === 'onAdd') {
+                            remoteItems = _getModelItems(_activeComponent);
+                            item = remoteItems.splice(oldIndex, 1)[0];
+                            items.splice(newIndex, 0, item);
+
+                            remoteState[_getModelName(_activeComponent)] = remoteItems;
+                        }
+                        else {
+                            items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
+                        }
+
+                        newState[_getModelName(this)] = items;
+
+                        if (copyOptions.stateHandler) {
+                            this[copyOptions.stateHandler](newState);
+                        } else {
+                            this.setState(newState);
+                        }
+
+                        (this !== _activeComponent) && _activeComponent.setState(remoteState);
+                    }
+
+                    setTimeout(function () {
+                        emitEvent(name, evt);
+                    }, 0);
+                }.bind(this);
+            }, this);
+
+            DOMNode = this.getDOMNode() ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
+
+            /** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
+            this._sortableInstance = Sortable.create(DOMNode, copyOptions);
+        },
+
+        componentWillReceiveProps: function (nextProps) {
+            var newState = {},
+                modelName = _getModelName(this),
+                items = nextProps[modelName];
+
+            if (items) {
+                newState[modelName] = items;
+                this.setState(newState);
+            }
+        },
+
+        componentWillUnmount: function () {
+            this._sortableInstance.destroy();
+            this._sortableInstance = null;
+        }
+    };
+
     /**
      * render modal elements, only support for fcom grid
      */
@@ -477,7 +701,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                     witdh: "100%"
                 },
                 enabled: true,
-                options: []
+                options: [],
+                attrs: {}
             };
         },
         componentDidUpdate: function (prevProps, prevState) {
@@ -514,13 +739,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             var $select2 = this.createSelect2();
         },
         setPlaceholderTo: function ($elem, placeholder) {
-            if (!placeholder) {
-                placeholder = "";
-            }
             var currData = $elem.select2("data");
-
-            // Set placeholder to new placeholder
-            $elem.attr("placeholder", placeholder);
 
             // Now workaround the fact that Select2 doesn't pick up on this
             // ..First assign null
@@ -528,7 +747,6 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
 
             // ..Then assign dummy value in case that currData is null since
             //   that won't do anything.
-
             $elem.select2("data", {});
 
             // ..Then put original data back
@@ -542,18 +760,27 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             }
 
             var $select2 = this.getElement();
-            $select2.attr({
+            var options = {
+                data: this.props.options,
+                multiple: this.props.multiple,
+                val: val
+            };
+
+            var attrs = {
                 'name': this.props.name,
                 'class': this.props.className,
                 'data-col': this.props['data-col']
-            })
+            };
+
+            if (this.props.attrs)
+                attrs = _.extend({}, attrs, this.props.attrs);
+
+            if (!this.props.multiple)
+                options['placeholder'] = this.props.placeholder;
+
+            $select2.attr(attrs)
             .val(val)
-            .select2({
-                data: this.props.options,
-                multiple: this.props.multiple,
-                val: val,
-                placeholder: this.props.placeholder
-            })
+            .select2(options)
             .on("change", this.handleChange)
             .on("select2-open", this.handleErrorState)
             .select2("enable", this.props.enabled);
@@ -589,7 +816,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         render: function () {
             return (
                 React.createElement("div", null, 
-                    React.createElement("input", {id: this.props.id, type: "hidden", style: this.props.style})
+                    React.createElement("input", React.__spread({id: this.props.id},  this.props.attrs, {type: "hidden", style: this.props.style}))
                 )
             );
         }

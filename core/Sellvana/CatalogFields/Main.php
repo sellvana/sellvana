@@ -107,7 +107,7 @@ class Sellvana_CatalogFields_Main extends BClass
                         }
                         $row->set([
                             'set_id' => $set['id'] ?: null,
-                            'position' => $field['position'],
+                            'position' => $this->BUtil->arrayGet($field, 'position'),
                         ])->save();
                     }
                 }
@@ -121,6 +121,9 @@ class Sellvana_CatalogFields_Main extends BClass
      */
     public function onProductAfterSave($args)
     {
+        if ($this->BDebug->is(BDebug::MODE_IMPORT)) {
+            return;
+        }
         $this->_processProductCustom($args['model']);
     }
 

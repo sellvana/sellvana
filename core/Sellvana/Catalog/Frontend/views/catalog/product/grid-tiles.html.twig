@@ -87,25 +87,24 @@
     require(['jquery', 'jquery-ui'], function ($) {
         var $imgs = $('.f-prod-img');
         // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
-        var effect = '{{ rolloverEffect?:'fade' }}';
+        var effect = '{{ rolloverEffect ?: 'fade' }}';
+
         $imgs.hover(function (e) {
-            e.preventDefault();
             var $cont = $(this);
             var $over = $cont.find('.f-prod-img-over');
             if ($over.length) {
                 var h = $cont.height();
                 $cont.height(h);
-                $cont.find('.f-prod-img-base').stop(true, true).hide(effect);
+                $cont.find('.f-prod-img-base').stop(true, true).hide();
                 $over.stop(true, true).show(effect, function () {
                     $over.css('position', 'inherit');
                 });
             }
         }, function (e) {
-            e.preventDefault();
             var $cont = $(this);
             var $over = $cont.find('.f-prod-img-over');
             if ($over.length) {
-                $over.css('position', 'absolute').stop(true, true).hide(effect);
+                $over.css('position', 'inherit').stop(true, true).hide();
                 $cont.find('.f-prod-img-base').stop(true, true).show(effect);
             }
         });

@@ -2,9 +2,24 @@
 
 class FCom_Shell_Shell extends BClass
 {
+    const CURSOR_CMD_POS     = 'pos';
+    const CURSOR_CMD_UP      = 'up';
+    const CURSOR_CMD_DOWN    = 'down';
+    const CURSOR_CMD_FWD     = 'fwd';
+    const CURSOR_CMD_BACK    = 'back';
+    const CURSOR_CMD_CLEAR   = 'clear';
+    const CURSOR_CMD_ERASE   = 'erase';
+    const CURSOR_CMD_SAVE    = 'save';
+    const CURSOR_CMD_RESTORE = 'restore';
+
+    const OUT_MODE_NORMAL = 'normal';
+    const OUT_MODE_QUIET = 'quiet';
+
     protected $_actionClasses = [];
 
     protected $_actions = [];
+
+    protected $_outMode = self::OUT_MODE_NORMAL;
 
     /**
      * Calculated parameters
@@ -282,15 +297,15 @@ class FCom_Shell_Shell extends BClass
 
         $out = '';
         switch ($cmd) {
-            case 'pos':     $out = "{$p1};{$p2}H"; break; // line;column
-            case 'up':      $out = "{$p1}A"; break;
-            case 'down':    $out = "{$p1}B"; break;
-            case 'fwd':     $out = "{$p1}C"; break;
-            case 'back':    $out = "{$p1}D"; break;
-            case 'clear':   $out = "2J"; break;
-            case 'erase':   $out = "K"; break;
-            case 'save':    $out = "s"; break;
-            case 'restore': $out = "u"; break;
+            case self::CURSOR_CMD_POS:     $out = "{$p1};{$p2}H"; break; // line;column
+            case self::CURSOR_CMD_UP:      $out = "{$p1}A"; break;
+            case self::CURSOR_CMD_DOWN:    $out = "{$p1}B"; break;
+            case self::CURSOR_CMD_FWD:     $out = "{$p1}C"; break;
+            case self::CURSOR_CMD_BACK:    $out = "{$p1}D"; break;
+            case self::CURSOR_CMD_CLEAR:   $out = "2J"; break;
+            case self::CURSOR_CMD_ERASE:   $out = "K"; break;
+            case self::CURSOR_CMD_SAVE:    $out = "s"; break;
+            case self::CURSOR_CMD_RESTORE: $out = "u"; break;
         }
 
         return "\033[{$out}";
@@ -318,6 +333,15 @@ class FCom_Shell_Shell extends BClass
         return $raw ? fgets(STDIN) : rtrim(fgets(STDIN), PHP_EOL);
     }
 
+    public function setOutMode($mode)
+    {
+        $this->_outMode = $mode;
+    }
+
+    public function outMode(){
+        return $this->_outMode;
+    }
+
     /**
      * Print to STDOUT.
      *
@@ -328,6 +352,9 @@ class FCom_Shell_Shell extends BClass
      */
     public function stdout($string, $raw = false, $eol = PHP_EOL)
     {
+        if ($this->_outMode == self::OUT_MODE_QUIET){
+            return;
+        }
         $string .= $eol;
         if ($raw) {
             return fwrite(STDOUT, $string);

@@ -47,7 +47,8 @@ class FCom_Core_ImportExport extends BClass
     protected $_notChanged = 0;
     protected $_newModels = 0;
     protected $_updatedModels = 0;
-    protected $_changedModels;
+    protected $_changedModelsIds;
+    protected $_batchChangedModelsIds;
     protected $_errors = 0;
     protected $_warnings = 0;
     protected $_modelsStatistics = array();
@@ -422,7 +423,7 @@ class FCom_Core_ImportExport extends BClass
         $importID = $this->_prepareImportMeta($importData);
 
         $batchData = [];
-        $cnt = 1;
+        $cnt = 0;
         foreach ($importData as $data) {
             $cnt++;
             $isHeading = false;
@@ -438,12 +439,12 @@ class FCom_Core_ImportExport extends BClass
                 if ($this->_currentModel) {
                     $this->BEvents->fire(
                         __METHOD__ . ':afterModel:' . $this->_currentModel,
-                        ['import_id' => $importID, 'models' => $this->_changedModels]
+                        ['import_id' => $importID, 'models' => $this->_changedModelsIds]
                     );
                     $this->BEvents->fire(
                         __METHOD__ . ':afterModel',
                         ['import_id' => $importID, 'modelName' => $this->_currentModel,
-                            'models' => $this->_changedModels]
+                            'models' => $this->_changedModelsIds]
                     );
                 }
 
@@ -480,7 +481,7 @@ class FCom_Core_ImportExport extends BClass
                 } else {
                     $this->_canImport = true;
                 }
-                $this->_changedModels = [];
+                $this->_changedModelsIds = [];
                 $this->log([
                     'signal' => 'info',
                     'msg' => "Importing: {$cm}",
@@ -592,12 +593,12 @@ class FCom_Core_ImportExport extends BClass
 
         $this->BEvents->fire(
             __METHOD__ . ':afterModel:' . $this->_currentModel,
-            ['import_id' => $importID, 'models' => $this->_changedModels]
+            ['import_id' => $importID, 'models' => $this->_changedModelsIds]
         );
 
         $this->BEvents->fire(
             __METHOD__ . ':afterModel',
-            ['import_id' => $importID, 'modelName' => $this->_currentModel, 'models' => $this->_changedModels]
+            ['import_id' => $importID, 'modelName' => $this->_currentModel, 'models' => $this->_changedModelsIds]
         );
 
         $this->log([
@@ -626,6 +627,7 @@ class FCom_Core_ImportExport extends BClass
      */
     protected function _importBatch($batchData)
     {
+        $this->_batchChangedModelsIds = [];
         /** @var FCom_Core_Model_ImportExport_Id $ieHelperId */
         $ieHelperId = $this->FCom_Core_Model_ImportExport_Id;
         $cm = $this->_currentModel;
@@ -814,7 +816,9 @@ class FCom_Core_ImportExport extends BClass
                 if ($modified) {
                     $ieData['local_id'] = $model->id();
                     $ieHelperId->create($ieData)->save(true, true);
-                    $this->_changedModels[$model->id()] = $model;
+                    $this->_changedModelsIds[$model->id()] = $model->id();
+//                    $this->_changedModelsIds[$model->id()] = $model;
+                    $this->_batchChangedModelsIds[$model->id()] = $model->id();
                 }
             } else {
                 $this->log([
@@ -826,12 +830,17 @@ class FCom_Core_ImportExport extends BClass
                 ], 'error');
             }
         }
-        $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->_changedModels]);
+        $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, [
+            'import_id' => $this->_importCode,
+            'records' => $this->_batchChangedModelsIds
+        ]);
         $this->BEvents->fire(__METHOD__ . ':afterBatch', [
-            'records' => $this->_changedModels,
+            'import_id' => $this->_importCode,
+            'records' => $this->_batchChangedModelsIds,
             'modelName' => $cm,
             'statistic' => $this->_modelsStatistics[$cm]
         ]);
+        $this->_currentRelated = [];
     }
     protected function _isArrayAssoc(array $arr)
     {

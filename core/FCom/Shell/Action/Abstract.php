@@ -215,7 +215,8 @@ abstract class FCom_Shell_Action_Abstract extends BClass
 
     public function out($string)
     {
-        echo $this->FCom_Shell_Shell->colorize($string);
+        $shell = $this->FCom_Shell_Shell;
+        $shell->stdout($shell->colorize($string), false, '');
         return $this;
     }
 
@@ -224,7 +225,8 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         if (!empty($params['ts'])) {
             $string  = '{blue*}[' . $this->BDb->now() . ']{/} ' . $string;
         }
-        echo $this->FCom_Shell_Shell->colorize($string) . "\r\n";
+        $shell = $this->FCom_Shell_Shell;
+        $shell->stdout($shell->colorize($string));
         return $this;
     }
 
@@ -241,7 +243,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
         $out = $start . str_pad('', $pos, $pass) . $head . str_pad('', $size - $pos, $fill) . $end .
                ' {blue*}' . $done . '/' . $total . ' ' . $percent . '%{/}';
         $this->println($out);
-        $this->out($this->FCom_Shell_Shell->cursor('up', 1));
+        $this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
         return $this;
     }
 }

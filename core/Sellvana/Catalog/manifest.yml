@@ -9,7 +9,7 @@ modules:
         description: "Categories and products management, admin and frontend"
         auto_use: [ bootstrap, views, layout ]
         observe:
-            - [ "FCom_Core_ImportExport::import:afterModel:Sellvana_Catalog_Model_Category", "Sellvana_Catalog_Model_Category.onImportAfterModel" ]
+            - [ "FCom_Core_ImportExport::_importBatch:afterBatch:Sellvana_Catalog_Model_Category", "Sellvana_Catalog_Model_Category.onImportAfterBatch" ]
             - [ "FCom_Core_LayoutEditor::fetchLibrary", "Sellvana_Catalog_Main.onLayoutEditorFetchLibrary" ]
 
         default_config:

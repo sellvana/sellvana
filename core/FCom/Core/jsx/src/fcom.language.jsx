@@ -7,13 +7,23 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
 
     var LangFields = React.createClass({
         mixins: [FCom.Mixin],
-        getInitialState: function () {
+        getDefaultProps: function () {
             return {
-                inputTypes: {},
                 editors: {}
             };
         },
+        getInitialState: function () {
+            return {
+                inputTypes: {}
+            };
+        },
+        componentWillUnmount: function () {
+            _(this.props.langs).map(function (lang, key) {
+                React.unmountComponentAtNode(this.refs['lang_field_' + ++key].getDOMNode());
+            }.bind(this));
+        },
         componentDidMount: function () {
+            this.renderLangFields();
             this.initSpecialInput(this.state.inputTypes);
         },
         componentWillUpdate: function () {
@@ -21,16 +31,18 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
         },
         clearCKEDITORIntances: function () {
             var that = this;
-            if (CKEDITOR.instances) {
-                _(CKEDITOR.instances).each(function (editor, id) {
-                    if (that.state.editors[id]) {
-                        editor.destroy(true);
-                        delete that.state.editors[id];
+            var editors = this.props.editors;
+            if (editors) {
+                _(editors).each(function (editor, id) {
+                    if (CKEDITOR.instances[id]) {
+                        CKEDITOR.instances[id].destroy(true);
+                        delete that.props.editors[id];
                     }
                 });
             }
         },
         componentDidUpdate: function () {
+            this.renderLangFields();
             this.initSpecialInput(this.state.inputTypes);
         },
         initSpecialInput: function (types) {
@@ -40,7 +52,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                     case 'wysiwyg':
                         var id = $('textarea.lang-ckeditor[data-code="' + code + '"]').prop('id');
                         if (id && CKEDITOR !== undefined && !CKEDITOR.instances[id]) {
-                            that.state.editors[id] = true;
+                            that.props.editors[id] = true;
 
                             CKEDITOR.replace(id, {
                                 startupMode: 'wysiwyg'
@@ -58,6 +70,37 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 }
             });
         },
+        renderLangFields: function () {
+            _(this.props.langs).map(function (lang, key) {
+                var extNode =null, node = null;
+                switch (lang.input_type) {
+                    case 'textarea':
+                        node = <textarea id={guid()} name={this.props.id + '_' + lang.lang_code}
+                                         data-type={this.props.id}
+                                         data-code={lang.lang_code} className="form-control lang-field"
+                                         data-rule-required="true" defaultValue={lang.value}
+                                         onBlur={this.handleChange}/>;
+                        break;
+                    case 'wysiwyg':
+                        node = <textarea id={guid()} name={this.props.id + '_' + lang.lang_code}
+                                         data-type={this.props.id}
+                                         data-code={lang.lang_code}
+                                         className="form-control lang-ckeditor lang-field"
+                                         rows="5" defaultValue={lang.value}/>;
+                        this.state.inputTypes[lang.lang_code] = lang.input_type;
+                        break;
+                    default:
+                        node = <input type="text" id={guid()} className="form-control lang-field"
+                                      data-type={this.props.id}
+                                      onBlur={this.handleChange}
+                                      data-code={lang.lang_code} data-rule-required="true"
+                                      name={this.props.id + '_' + lang.lang_code}
+                                      defaultValue={lang.value}/>;
+                        break;
+                }
+                React.render(node, this.refs['lang_field_' + ++key].getDOMNode());
+            }.bind(this));
+        },
         removeLangField: function (e) {
             this.props.removeField($(e.currentTarget).data('code'));
         },
@@ -66,41 +109,16 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.props.setLangVal($input.data('code'), $input.val());
         },
         render: function () {
-            var that = this, node;
+            var that = this;
             return (
                 <div>
                     {_(this.props.langs).map(function (lang, key) {
-                        switch (lang.input_type) {
-                            case 'textarea':
-                                node = <textarea id={guid()} name={that.props.id + '_' + lang.lang_code}
-                                                 data-type={that.props.id}
-                                                 data-code={lang.lang_code} className="form-control lang-field"
-                                                 data-rule-required="true" defaultValue={lang.value}/>;
-                                break;
-                            case 'wysiwyg':
-                                node = <textarea id={guid()} name={that.props.id + '_' + lang.lang_code}
-                                                 data-type={that.props.id}
-                                                 data-code={lang.lang_code}
-                                                 className="form-control lang-ckeditor lang-field"
-                                                 rows="5" defaultValue={lang.value}/>;
-                                that.state.inputTypes[lang.lang_code] = lang.input_type;
-                                break;
-                            default:
-                                node = <input type="text" id={guid()} className="form-control lang-field"
-                                              data-type={that.props.id}
-                                              onBlur={that.handleChange}
-                                              data-code={lang.lang_code} data-rule-required="true"
-                                              name={that.props.id + '_' + lang.lang_code}
-                                              defaultValue={lang.value}/>;
-                                break;
-                        }
-
                         return (
                             <div key={that.props.id + lang.lang_code} className="form-group">
                                 <div className="col-md-3 control-label">
                                     <span className="badge badge-default">{lang.lang_code}</span>
                                 </div>
-                                <div className="col-md-6">{node}</div>
+                                <div className="col-md-6" ref={'lang_field_' + ++key}></div>
                                 <div className="col-md-3">
                                     <button type="button" onClick={that.removeLangField} data-code={lang.lang_code}
                                             className="btn btn-danger btn-sm field-remove">
@@ -161,7 +179,6 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 id: this.props.id + '-modal',
                 onLoad: null,
                 onConfirm: this.confirmEditLangs,
-                onCancel: this.cancelEditLangs,
                 ref: this.props.id + '-modal'
             }, this.props.modalConfig);
         },
@@ -258,12 +275,12 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             var inlineProps = this.getSelect2Config(),
                 defaultLangs = this.getDefaultLangs(),
                 langIds = _.pluck(this.state.availLangs, 'lang_code'),
-                langLabel = langIds ? langIds.filter(function (item) {
+                langLabel = langIds ? langIds.length < 6 ? langIds.filter(function (item) {
                     return item != undefined
-                }).join(',') : null;
+                }).join(',') : Locale._('Multi Languages ...') : null;
 
             return (
-                <div>
+                <div className={this.props.cClass || ''}>
                     <button type="button" style={{marginBottom: '10px'}} onClick={this.showModal}
                             className={"btn btn-xs multilang " + (langLabel ? 'btn-info' : '')}>{!langLabel ?
                         <i className="icon icon-globe"/> : ''} {langLabel || Locale._('Translate')}
