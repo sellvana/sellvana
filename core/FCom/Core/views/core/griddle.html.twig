@@ -7,7 +7,7 @@
 <div id="{{ config.id }}-modal"></div>
 
 <script type="text/javascript">
-	var APP = {};
+	var Griddle = {};
     require(['react', 'fcom.griddle'], function(React, FComGriddleComponent) {
         var gridCallback = "{{ config.callbacks.componentDidMount ? config.callbacks.componentDidMount : config.id }}";
         if (typeof window[gridCallback] === 'undefined') {
@@ -43,15 +43,12 @@
         		return _.extend({ pending_state: false }, this.props.config);
         	},
         	componentDidMount: function() {
-                $(APP).on('onMounted', function(e, config) {
+                $(Griddle).on('on{{ config.id }}Mounted', function(e, config) {
                 	this.setState(config);
                 }.bind(this));
         	},
-            shouldComponentUpdate: function(nextProps, nextState) {
-                return this.state.pending_state !== nextState.pending_state;
-            },
         	componentWillUnmount: function() {
-        		$(APP).off('onMounted');
+        		$(Griddle).off('on{{ config.id }}Mounted');
         	},
         	render: function() {
         		if (!this.state.pending_state) {

@@ -72,6 +72,7 @@ class Sellvana_MultiSite_Main extends BClass
         }
         foreach ($products as $product) { // go over products
 #echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>"; var_dump($product->as_array());
+            /** @var Sellvana_Catalog_Model_Product $product */
             $pId = $product->id();
             $pData = $product->as_array();
             $siteValues = $product->get('multisite_fields');

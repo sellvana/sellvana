@@ -75,6 +75,28 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             hash = { oper: id ? 'edit' : 'add' },
             linkedRows = {};
 
+        var selectedRows = fieldsAttachGrid.getSelectedRows();
+        if (selectedRows.length) {
+            var addRows = [];
+            selectedRows.forEach(function(attachRow, i) {
+                if (_.findWhere(fieldsAttachGrid.getRows(), {id: attachRow.id})) {
+                    addRows.push(attachRow);
+                }
+            });
+            if (addRows.length) {
+                selectedAttachGrid.addRows(addRows);
+                fieldsAttachGrid.removeRows(addRows);
+                if (selectedAttachGrid.getRows().length) {
+                    selectedAttachGrid.addSelectedRows(addRows);
+                }
+            }
+        }
+
+        if (!form.valid()) {
+            $('#{{ fieldSetsConfig.config.id }}_form_tab').click();
+            return;
+        }
+
         if (hash.oper === 'edit') {
             linkedRows = selectedAttachGrid.getRows();
         } else {
@@ -129,8 +151,8 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                     id: "addFieldModal",
                     show: true,
                     title: row ? "{{ 'Edit Fieldset' | _ }}" : "{{ 'Add Fieldset' | _ }}",
-                    confirm: "{{ 'Save Change' | _ }}",
-                    cancel: "{{ 'Close' | _ }}",
+                    confirm: "{{ 'Save Changes' | _ }}",
+                    cancel: "{{ 'Cancel' | _ }}",
                     onLoad: function(modal) {
                         var node = $(modal.getDOMNode());
                         node.find('.modal-dialog').css('width', '900px');
@@ -141,13 +163,13 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                     React.DOM.div({ className: "tabbable" },
                         React.DOM.ul({ className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
                             React.DOM.li(null,
-                                React.DOM.a({ "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_form_tab', href: "#{{ fieldSetsConfig.config.id }}_form_content" }, "{{ 'Field Sets' | _ }}")
+                                React.DOM.a({ "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_form_tab', href: "#{{ fieldSetsConfig.config.id }}_form_content" }, "{{ 'Fieldset' | _ }}")
                             ),
                             React.DOM.li(null,
                                 React.DOM.a({ "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_selected_tab', href: "#{{ fieldSetsConfig.config.id }}_selected_content" }, "{{ 'Linked Fields' | _ }}")
                             ),
                             React.DOM.li({ className: "active" },
-                                React.DOM.a({ "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_fields_tab', href: "#{{ fieldSetsConfig.config.id }}_fields_content" }, "{{ 'Fields' | _ }}")
+                                React.DOM.a({ "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_fields_tab', href: "#{{ fieldSetsConfig.config.id }}_fields_content" }, "{{ 'Add New Fields' | _ }}")
                             )
                         ),
                         React.DOM.div({ className: "tab-content" },
@@ -192,6 +214,9 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                 selectedAttachGrid.addRows(initRows);
             }
         }
+
+        // Initialize validation to validate your hidden fields
+        $('#fieldsets-modal-form').validate({ ignore: [] });
     }
 
 });

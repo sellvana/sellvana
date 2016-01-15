@@ -1366,7 +1366,8 @@ define(fcomAdminDeps, function ($, Ladda) {
                             if (window.history !== undefined) {
                                 window.history.replaceState({}, data.title, options.url_get);
                             }
-                            form.find('.btn-group').html(data.buttons);
+                            //TODO: Should not use `find('.btn-group')` because it's very general, We need more details here
+                            //form.find('.btn-group').html(data.buttons);
                             var textNodes = form.find('.f-page-title').contents().filter(function () {
                                 return this.nodeType == 3;
                             });

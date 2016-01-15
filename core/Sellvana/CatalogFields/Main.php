@@ -107,7 +107,7 @@ class Sellvana_CatalogFields_Main extends BClass
                         }
                         $row->set([
                             'set_id' => $set['id'] ?: null,
-                            'position' => $field['position'],
+                            'position' => $this->BUtil->arrayGet($field, 'position'),
                         ])->save();
                     }
                 }

@@ -369,6 +369,10 @@ class Sellvana_CatalogFields_Admin extends BClass
             ->find_many_assoc('field_id', 'field_id');
 
         foreach ($customFieldsData as $fieldSetData) {
+            if (empty($fieldSetData['fields'])) {
+                continue;
+            }
+
             foreach ($fieldSetData['fields'] as $fieldData) {
                 if (in_array($fieldData['id'], $productFields)) {
                     unset($productFields[$fieldData['id']]);

@@ -3,20 +3,56 @@
 <!--{ model_new_hide: true }-->
 <!--{ async: true }-->
 
+<style type="text/css">
+    div.rateit div.rateit-selected
+    {
+        background: url({{ APP.src('@FCom_LibJsCommon/js/images/rateit/star.gif') }}) left -32px;
+    }
+</style>
+
 {% set m = THIS.get('model') %}
 {% set ctrl = APP.instance('Sellvana_ProductReviews_Admin_Controller') %}
 {% set gridConfig = ctrl.gridConfig(m) %}
 
 <script>
-    require(["jquery", "underscore", 'react', 'fcom.components', 'griddle.fcomModalForm', "jquery.validate", "fcom.admin", "bootstrap"], function ($, _, React, Components, FComModalForm) {
+    require(["jquery", "underscore", 'react', 'fcom.components', 'griddle.fcomModalForm', 'fcom.locale', "jquery.validate", "fcom.admin", "bootstrap"], function ($, _, React, Components, FComModalForm, Locale) {
         var prodReviewGrid = null, prodReviewNode = null;
-        var prodReviewModalNode = null, prodModalForm = null;
+        var prodReviewModalNode = null, prodModalForm = null, $rateEle = null;
         adminForm.createSwitchButton();
         adminForm.wysiwygInit();
 
         window.prodReviewsRegister = function (grid) {
             prodReviewGrid = grid;
             prodReviewNode = $(prodReviewGrid.getDOMNode());
+            var rateTitle = ['Bad', 'Poor', 'Ok', 'Good', 'Very good'];
+            $('.rateit').rateit()
+                .bind('rated', function (e) {
+                    var id = $(this).data('review');
+                    var rate = $(this).rateit('value');
+                    var review = _(grid.getRows()).find(function (row) {
+                        if (row.id == id) return row;
+                    });
+
+                    if (review) {
+                        var hash = review;
+
+                        hash['oper'] = 'edit';
+                        hash['rating'] = rate.toString();
+
+                        $.post(grid.getConfig('edit_url'), hash, function (r) {
+                            if (r) {
+                                grid.refresh();
+
+                                $.bootstrapGrowl("{{ 'Rating successful.' | _ }}", {type: 'success', align: 'center', width: 'auto'});
+                            }
+                        });
+                    }
+                })
+                .bind('over', function (event, value) { $(this).attr('title', Locale._(rateTitle[value-1])); });
+        };
+
+        window.prodReviewsUpdate = function (grid) {
+            $('.rateit').rateit();
         };
 
         window.showModalToEditReview = function (row) {
