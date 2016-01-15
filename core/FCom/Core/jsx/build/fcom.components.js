@@ -454,6 +454,9 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                 value: this.props.value
             };
         },
+        componentWillReceiveProps: function (nextProps) {
+            this.setState({ value: nextProps.value });
+        },
         handleChange: function (e) {
             this.setState({ value: e.target.value });
         },
