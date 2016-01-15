@@ -470,7 +470,7 @@
         });
 
         var fieldGrid = React.createClass({
-//            mixins: [Components.SortableMixin],
+            mixins: [Components.SortableMixin],
             sortableOptions: {
                 ref: "list",
                 group: "sorting",
@@ -499,7 +499,7 @@
             },
             render: function () {
                 var that = this;
-
+                var availFields = {};
                 var fields = _.uniq(_.clone(this.props.fields, true), 'id');
                 var fieldItems = _(fields).map(function (field) {
                     return React.createElement(fieldItem, React.__spread({}, that.props, {
@@ -876,10 +876,23 @@
 
                 var fieldIds = [];
                 $.get('{{ APP.href('/catalogfields/products/get_fieldset?id=') | raw }}' + setId, function (r) {
+                    if (!r) return;
                     var sets = that.props.fieldSets;
+
+                    // Remove new set fields if duplicate with available fields
+                    _(sets).each(function (set, si) {
+                        _(set.fields).each(function (field, fi) {
+                            var ri = _.findIndex(r.fields, {id: field.id});
+                            if (ri != -1) r.fields.splice(ri, 1);
+                        });
+                    });
+
+                    // Update fields list component
                     sets[r.id] = r;
+                    FieldsListComponent.setProps({sets: sets});
+
+                    // Update fields component
                     fieldIds = _.pluck(sets[r.id].fields, 'id');
-                    FieldsListComponent.setProps({ sets: sets });
                     FieldComponent.setProps({ id: fieldIds, state: 'add' });
                 });
 
