@@ -18,9 +18,22 @@
 {% set fieldsConfigCompiled = THIS.view('core/griddle').set('grid', fieldsConfig).getGridConfig() %}
 {% set initialData = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products').getInitialData(model) %}
 
+<div id="fields-container">
+    <div class="well">
+        <div class="row">
+            <input type="hidden" name="custom_fields" id="custom_fields" />
+            <div id="multisite" class="{{ sites ? 'col-sm-3' : '' }}"></div>
+            <div id="fieldsets" class="col-sm-5"></div>
+            <div id="fields" class="col-sm-4"></div>
+        </div>
+    </div>
+</div>
+<div id='fields_list'></div>
+
 <script type="text/javascript">
     require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'sortable', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage, Sortable) {
         var APP = {},
+            collection = {},
             $mainForm = $('#catalog-products-form'),
             initData = {{ UTIL.toJson(initialData) | raw }},
             sites = {{ UTIL.toJson(sites) | raw }},
@@ -30,6 +43,91 @@
             fieldsOptions = {{ UTIL.toJson(APP.instance('Sellvana_CatalogFields_Model_Field').as_values('field_name')) | raw }},
             fieldSets = {},
             fieldSetOptions = {{ UTIL.toJson(fieldSetModel.as_values('set_name')) | raw }};
+
+        function populateTreeIds(sets) {
+
+            var startId = 1;
+
+            walk(sets, function(node, parent) {
+                node.node_id = startId;
+                if(parent) {
+                    node.parent_id = parent.id;
+                } else {
+                    node.parent_id = 0
+                }
+                collection[startId] = node;
+                startId++;
+                return node;
+            });
+
+            return sets;
+
+        }
+
+        function walk(sets, fn, parent) {
+            _(sets).each(function(set, si) {
+
+                collection[si] = set;
+
+                var node = fn(set, parent);
+
+                if(node.fields) {
+                    walk(node.fields, fn, node);
+                } else {
+                    node.fields = [];
+                }
+            });
+        }
+
+        // Removes a node from collection
+        // returns the node itself
+        function _remove(id) {
+            // Get the node we're moving
+            var node = collection[id];
+
+            var index = collection[node.parent_id].children.indexOf(node);
+            // Remove node from it's current position
+            collection[node.parent_id].children.splice(index, 1);
+            return node;
+        }
+
+        // Inserts a node before another
+        // node and updates it's parent
+        // references
+        function _insertBefore(node, dest) {
+            // Get parent of the node we're inserting before
+            var to = collection[dest].parent_id;
+            // Find index of node we're inserting before
+            var index = collection[to].children.indexOf(collection[dest]);
+            _insert(node, to, index);
+
+        }
+
+        // Inserts a node after another
+        // node and updates it's parent
+        // references
+        function _insertAfter(node, dest) {
+            // Get parent of the node we're inserting before
+            var to = collection[dest].parent_id;
+            // Find index of node we're inserting before
+            var index = collection[to].children.indexOf(collection[dest]);
+            _insert(node, to, index + 1);
+        }
+
+        // Inserts node at new location
+        // called internally by _insertBefore
+        // and _insertAfter
+        function _insert(node, to, index) {
+            // Update parent reference
+            node.parent_id = to;
+            // Insert at new location
+            collection[to].children.splice(index,0,node);
+        }
+
+        // Prepend node as first child
+        function _prepend(node, dest) {
+            _insert(node, dest, 0);
+        }
 
         window.saveFieldsModal = function (modal) {
             if (!fieldsForm.valid())
@@ -44,159 +142,520 @@
             });
 
             $.post('{{ APP.href('/catalogfields/fieldsets/field_grid_data') | raw }}', hash, function (r) {
-                $(APP).trigger('reloadFields', [r]);
+                FieldComponent.setProps({ field_added: r });
                 modal.close();
             });
         };
 
-        var fieldsListGrid = React.createClass({
-            displayName: "fieldsListGrid",
+        var fieldItem = React.createClass({
             getDefaultProps: function () {
                 return {
-                    fieldSets: {},
-                    avail_fields: [],
-                    input_with_langs: ['text', 'textarea', 'wysiwyg']
+                    default_lang_fields: ['text', 'textarea', 'wysiwyg'],
+                    editors: {}
                 };
             },
             getInitialState: function () {
                 return {
-                    fieldSets: {},
-                    inputTypes: {},
-                    editors: {},
-                    sites: {},
-                    is_default_site: true,
-                    site_values: {},
-                    site_id: ''
+                    field: this.props.field
                 };
             },
-            componentWillMount: function () {
-                this.setState({
-                    fieldSets: this.props.fieldSets,
-                    sites: this.props.site_values || { default: {} }
-                });
-            },
             componentDidMount: function () {
-                var that = this;
-
-                $(APP).on('addField', function (e, sets, types) {
-                    that.setState({fieldSets: sets, inputTypes: types});
-                });
-
-                $(APP).on('addSet', function (e, sets) {
-                    that.setState({fieldSets: sets});
-                });
-
-                $(APP).on('refreshLangs', function (e, code, langs) {
-                    var sets = that.state.fieldSets;
-                    _(sets).each(function (set, i) {
-                        var fieldCodes = _.pluck(set.fields, 'field_code');
-                        if (_.contains(fieldCodes, code)) {
-                            if (!langs.length) {
-                                sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields = [];
-                            } else {
-                                sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields = langs;
-                            }
-                        }
-                    });
-                    that.refreshData();
-                });
-
-                this.refreshSortable();
-                this.initSpecialInput(this.state.inputTypes);
-                // Reset input type
-                this.props.avail_fields = [];
-            },
-            componentWillReceiveProps: function (nextProps) {
-                var sites = this.state.sites;
-                // if current site is not `default` and does not exist then initialize it
-                if (nextProps.site.id !== '' && !sites[nextProps.site.id]) {
-                    sites[nextProps.site.id] = {};
-                }
-                this.setState({
-                    sites: sites,
-                    is_default_site: nextProps.site.id === '',
-                    is_multisite_changed: true,
-                    site_id: nextProps.site.id
-                });
+                this.renderField();
+                this.initializeSpecialInput();
             },
             componentWillUpdate: function (nextProps, nextState) {
                 this.clearCKEDITORIntances();
             },
             componentDidUpdate: function () {
-                this.refreshSortable();
-                this.props.avail_fields = [];
-                this.initSpecialInput(this.state.inputTypes);
-                this.refreshData();
+                this.renderField();
+                this.initializeSpecialInput();
             },
             componentWillUnmount: function () {
-                $(APP).off('addField');
-                $(APP).off('addSet');
-                $(APP).off('refreshLangs');
+                React.unmountComponentAtNode(this.refs['field_' + this.state.field.id].getDOMNode());
+                if (this.refs['lang_' + this.state.field.id])
+                    React.unmountComponentAtNode(this.refs['lang_' + this.state.field.id].getDOMNode());
+                if (this.refs['site_value_' + this.state.field.id])
+                    React.unmountComponentAtNode(this.refs['site_value_' + this.state.field.id].getDOMNode());
             },
             clearCKEDITORIntances: function () {
                 var that = this;
                 if (CKEDITOR.instances.length) {
                     _(CKEDITOR.instances).each(function (editor, id) {
-                        if (that.state.editors[id]) {
+                        if (that.props.editors[id]) {
                             editor.destroy(true);
-                            delete that.state.editors[id];
+                            delete that.props.editors[id];
                         }
                     });
                 }
             },
-            initSpecialInput: function (types) {
-                var that = this;
-                var sites = this.state.sites;
-                var siteId = this.state.site_id;
+            getOptions: function (id) {
+                var options = this.state.field.options || [];
+                return _(options).map(function (option, id) {
+                    return {
+                        id: id,
+                        text: option
+                    };
+                });
+            },
+            parseLangs: function (data) {
+                var langs = data ? JSON.parse(data) : data;
+                if (!langs || !langs.frontend_label_translation) {
+                    return [];
+                }
 
-                _(types).each(function (type, code) {
-                    switch (type) {
-                        case 'boolean':
-                            var $switchCbx = $('.switch-cbx');
-                            $switchCbx.each(function () {
-                                $(this).bootstrapSwitch({
-                                    onText: '<i class="icon-ok" />',
-                                    offText: '<i class="icon-remove" />',
-                                    onSwitchChange: function (e, state) {
-                                        var s = state ? '1' : '0';
-                                        that.refreshChanged(code, s);
-                                    }
-                                });
-                            });
-                            break;
-                        case 'wysiwyg':
-                            if (!code) return;
-                            var $textarea = $('textarea.field-ckeditor[data-code="' + code + '"]');
-                            var id = $textarea.prop('id');
-                            var fieldId = $textarea.data('field-id');
+                return langs.frontend_label_translation;
+            },
+            handleSelect2Change: function (e, callback, selection) {
+                this.props.refreshChanges(selection.id, selection.text, 'select');
+            },
+            handleInputChange: function (e) {
+                var $input = $(e.target);
+                this.props.refreshChanges($input.data('code'), $input.val());
+            },
+            handleSiteValueChange: function (e, callback, selection) {
 
-                            if (id && CKEDITOR !== undefined && !CKEDITOR.instances[id]) {
-                                that.state.editors[id] = true;
-
-                                CKEDITOR.replace(id, {
-                                    startupMode: 'wysiwyg'
-                                });
-
-                                if (that.props.multisite) {
-                                    var data = sites[siteId || 'default'][fieldId] || '';
-                                    CKEDITOR.instances[id].setData(data);
-                                }
-
-                                CKEDITOR.instances[id].on('blur', function (e) {
-                                    e.editor.updateElement();
-                                    var data = e.editor.getData();
-                                    that.refreshChanged(code, data);
-                                });
-                            }
-                            break;
-                        default:
-                            break;
+            },
+            createTextarea: function (field) {
+                return React.createElement(Components.ControlInput, {
+                    input_type: 'textarea',
+                    value: field.default_value,
+                    callback: this.handleInputChange,
+                    attrs: {
+                        id: guid(),
+                        type: 'text',
+                        name: guid(),
+                        disabled: false,
+                        className: 'form-control',
+                        'data-rule-required': (field.required || 'false'),
+                        'data-code': field.field_code,
+                        'data-field-id': field.id
                     }
                 });
             },
+            createWysiwyg: function (field) {
+                return React.DOM.textarea({
+                    id: guid(),
+                    name: guid(),
+                    disabled: false,
+                    className: 'form-control field-ckeditor',
+                    'data-rule-required': field.required || 'false',
+                    'data-code': field.field_code,
+                    'data-field-id': field.id,
+                    defaultValue: field.default_value
+                });
+            },
+            createSelect2: function (field) {
+                return React.createElement(FComSelect2, {
+                    id: guid(),
+                    name: guid(),
+                    className: '',
+                    placeholder: "{{ 'Select field options' |_ }}",
+                    multiple: false,
+                    options: this.getOptions(field.id),
+                    enabled: true,
+                    'data-field-id': field.id,
+                    onChange: this.handleSelect2Change,
+                    defaultValue: [field.default_value]
+                });
+            },
+            createSwitchBox: function (field) {
+                return React.DOM.div(null,
+                    React.DOM.input({
+                        type: 'hidden',
+                        name: guid(),
+                        defaultValue: '0'
+                    }),
+                    React.DOM.div({
+                            className: 'make-switch switch has-switch',
+                            'data-off-label': '<i class="icon-remove"></i>',
+                            'data-on-label': '<i class="icon-ok"></i>',
+                            'data-on': 'primary'
+                        },
+                        React.DOM.input({
+                            type: 'checkbox',
+                            className: 'switch-cbx',
+                            id: guid(),
+                            name: guid(),
+                            disabled: false,
+                            defaultChecked: !!(field.value === undefined || field.value === '1'),
+                            'data-code': field.field_code,
+                            'data-field-id': field.id,
+                            defaultValue: field.default_value
+                        })
+                    )
+                );
+            },
+            createInput: function (field) {
+                return React.createElement(Components.ControlInput, {
+                    input_type: 'input',
+                    value: field.default_value,
+                    callback: this.handleInputChange,
+                    attrs: {
+                        type: 'text',
+                        name: guid(),
+                        disabled: false,
+                        className: 'form-control',
+                        'data-rule-required': (field.required || 'false'),
+                        'data-code': field.field_code,
+                        'data-field-id': field.id
+                    }
+                });
+            },
+            createLanguageComponent: function (field) {
+                return React.createElement(FComMultiLanguage, {
+                    id: field.field_code + '_lang_field_' + field.id,
+                    availLangs: this.parseLangs(field.languages),
+                    inputType: field.admin_input_type,
+                    defaultLangs: {{ UTIL.toJson(UTIL.localesToSelect2Options()) | raw }},
+                    cClass: 'col-sm-3',
+                    modalConfig: {
+                        fieldCode: field.field_code,
+                        onSaved: field.field_code + 'ModalSaveChange'
+                    },
+                    select2Config: this.getSelect2Config() || {}
+                });
+            },
+            createMultiSiteComponent: function (field) {
+                return React.createElement(FComSelect2, {
+                    id: guid(),
+                    className: 'site-value',
+                    multiple: false,
+                    options: [
+                        { id: '0', text: "{{ 'Use Default Value'|_ }}" },
+                        { id: '1', text: "{{ 'Use Site Specific Value'|_ }}" }
+                    ],
+                    defaultValue: [0],
+                    attrs: {
+                        'data-field-id': field.id
+                    },
+                    onChange: this.handleSiteValueChange
+                });
+            },
+            getSelect2Config: function () {
+
+            },
+            initializeSpecialInput: function () {
+                var that = this,
+                    field = this.state.field;
+
+                switch (field.admin_input_type) {
+                    case 'boolean':
+                        var $switchCbx = $('.switch-cbx');
+                        $switchCbx.bootstrapSwitch({
+                            onText: '<i class="icon-ok" />',
+                            offText: '<i class="icon-remove" />',
+                            onSwitchChange: function (e, state) {
+                                var s = state ? '1' : '0';
+                                that.props.refreshChanges(code, data);
+                            },
+                            setState: field.default_value
+                        });
+                        break;
+                    case 'wysiwyg':
+                        var $wysiwyg = $('textarea.field-ckeditor[data-code="' + field.field_code + '"]');
+                        var id = $wysiwyg.prop('id');
+                        var fieldId = $wysiwyg.data('id');
+
+                        if (id && CKEDITOR !== undefined && !CKEDITOR.instances[id]) {
+                            that.props.editors[id] = true;
+
+                            CKEDITOR.replace(id, {
+                                startupMode: 'wysiwyg'
+                            });
+
+                            if (that.props.multisite) {
+                                CKEDITOR.instances[id].setData(field.default_value);
+                            }
+
+                            CKEDITOR.instances[id].on('blur', function (e) {
+                                e.editor.updateElement();
+                                var data = e.editor.getData();
+                                that.props.refreshChanges(field.field_code, data);
+                            });
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            },
+            renderField: function () {
+                var that = this;
+                var field = this.props.field;
+                React.render(this.createField(field), this.refs['field_' + field.id].getDOMNode());
+
+                // If admin_input_type in ['text', 'textarea', 'wysiwyg'] then render multi-langs component
+                if (_.contains(this.props.default_lang_fields, field.admin_input_type)) {
+                    React.render(this.createLanguageComponent(field), this.refs['lang_' + field.id].getDOMNode());
+                    window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
+                        var modalNode = $(modal.getDOMNode());
+                        if (field.admin_input_type != 'wysiwyg') {
+                            var container = modalNode.find('div[id$="-container"]');
+                            if (!$.fn.modalValidate(container))
+                                return;
+                        }
+
+                        var code = modal.props.fieldCode;
+                        that.props.refreshLangs(code, langs);
+                        modal.close();
+                    };
+                }
+
+                // If multisite is enabled && not default then render multisite field
+                if (this.props.multisite && !this.props.is_default_site) {
+                    React.render(this.createMultiSiteComponent(field), this.refs['site_value_' + field.id].getDOMNode());
+                }
+            },
+            createField: function (field) {
+                var sites = this.props.sites;
+                var siteId = this.props.site_id || 'default';
+                field.default_value = sites[siteId] ? sites[siteId][field.id] ? sites[siteId][field.id] : '' : field.value;
+                switch (field.admin_input_type) {
+                    case 'textarea':
+                        return this.createTextarea(field);
+                        break;
+                    case 'wysiwyg':
+                        return this.createWysiwyg(field);
+                        break;
+                    case 'select':
+                    case 'multiselect':
+                        return this.createSelect2(field);
+                        break;
+                    case 'boolean':
+                        return this.createSwitchBox(field);
+                        break;
+                    default:
+                        return this.createInput(field);
+                        break;
+                }
+            },
+            render: function () {
+                var field = this.props.field;
+                return React.DOM.div({
+                        key: field.id,
+                        id: field.field_code + '_field',
+                        'data-field-id': field.id,
+                        className: 'form-group'
+                    },
+                    React.DOM.div({className: 'col-md-9 col-lg-push-3'},
+                        React.DOM.label({
+                                className: 'col-md-2 control-label dd-handle control-handle',
+                                htmlFor: 'prod-review-text',
+                                'data-field-id': field.id
+                            },
+                            React.DOM.div({className: 'icon-ellipsis-vertical dd-handle dd3-handle'}),
+                            React.DOM.span(null, field.field_name)
+                        ),
+                        React.DOM.div({className: 'col-md-3', key: 'field_' + field.id, ref: 'field_' + field.id}),
+                        React.DOM.div({className: 'col-md-6'},
+                            React.DOM.button({
+                                    className: 'btn btn-danger btn-xs field-remove',
+                                    style: {
+                                        float: 'left',
+                                        marginRight: '5px'
+                                    },
+                                    type: 'button',
+                                    onClick: this.props.removeField,
+                                    'data-field-id': field.id,
+                                    'data-field-value': field.field_name
+                                },
+                                React.DOM.i({className: 'icon-remove'})
+                            ),
+                            React.DOM.div({ key: 'lang_' + field.id, ref: 'lang_' + field.id, className: 'col-md-5' }),
+                            React.DOM.div({ key: 'site_value_' + field.id, ref: 'site_value_' + field.id, className: 'col-md-5' })
+                        )
+                    )
+                )
+            }
+        });
+
+        var fieldGrid = React.createClass({
+            mixins: [Components.SortableMixin],
+            sortableOptions: {
+                ref: "list",
+                group: "sorting",
+                model: "fields",
+                revert: true,
+                axis: 'y',
+                handle: '.control-handle'
+            },
+            removeField: function (e) {
+                var $target = $(e.currentTarget),
+                    fieldId = $target.data('field-id');
+
+                var index = _.findIndex(this.props.fields, { id: fieldId.toString() });
+                if (index != -1) this.props.fields.splice(index, 1);
+
+                FieldComponent.setProps({ state: 'remove', id: fieldId });
+//                FieldsListComponent.setProps({ state: 'remove', id: fieldId });
+
+                this.forceUpdate();
+                this.props.refreshData();
+            },
+            render: function () {
+                var that = this;
+                var fieldItems = _(this.props.fields).map(function (field) {
+
+                    if (!_.contains(that.props.avail_fields, field.id)) {
+                        that.props.avail_fields.push(field.id);
+                    } else {
+                        return null;
+                    }
+
+                    return React.createElement(fieldItem, React.__spread({}, that.props, {
+                        field: field,
+                        key: field.id,
+                        multisite: !_.isEmpty(that.props.sites),
+                        removeField: that.removeField
+                    }));
+                });
+
+                return React.DOM.div({
+                        id: 'sort-list-' + this.props.set_id,
+                        className: 'sort-item',
+                        ref: 'list'
+                    }, fieldItems
+                );
+            }
+        });
+
+        var setGrid = React.createClass({
+            displayName: "fieldsListGrid",
+            getInitialState: function () {
+                return {
+                    sets: this.props.sets
+                };
+            },
+            componentDidMount: function() {
+                this.renderSets();
+            },
+            componentDidUpdate: function() {
+                this.renderSets();
+            },
+            componentWillUnmount: function() {
+                _(this.state.sets).map(function(set, id) {
+                    React.unmountComponentAtNode(this.refs['set_' + set.id].getDOMNode());
+                }.bind(this));
+            },
+            renderSets: function () {
+                _(this.state.sets).each(function(set, id) {
+                    if (set.deleted) return null;
+                    React.render(
+                        React.createElement(fieldGrid, React.__spread({}, this.props, {
+                            set_id: set.id,
+                            fields: set.fields
+                        })), this.refs['set_' + set.id].getDOMNode()
+                    );
+                }.bind(this));
+            },
+            removeSet: function (e) {
+                var $target = $(e.currentTarget);
+                var setId = $target.data('set-id').toString();
+                var sets = this.state.sets;
+
+                sets[setId].deleted = true;
+                var fieldIds = _.pluck(sets[setId].fields, 'id');
+
+                FieldsetComponent.setProps({ id: setId });
+                FieldComponent.setProps({ id: fieldIds, state: 'remove' });
+
+                this.setState({sets: sets});
+            },
+            render: function () {
+                var that = this;
+                return (
+                    React.DOM.div({ className: 'sets-container', key: 'sets-container' },
+                        _(this.state.sets).map(function (set, id) {
+                            if (set.deleted) return null;
+                            return React.DOM.div({
+                                key: set.id,
+                                'data-set-id': set.id,
+                                className: 'box box-borderd green-border box-nomargin prod-fieldset'
+                            },
+                                React.DOM.div({className: 'box-header box-header-small'},
+                                    React.DOM.div({className: 'title'}, set.set_name),
+                                    React.DOM.div({className: 'actions'},
+                                        React.DOM.button({
+                                                type: 'button',
+                                                className: 'btn box-remove btn-xs btn-link btn-remove',
+                                                onClick: that.removeSet,
+                                                'data-set-id': set.id
+                                            },
+                                            React.DOM.i({className: 'icon-remove'})
+                                        ),
+                                        React.DOM.button({
+                                                className: 'btn box-collapse btn-xs btn-link btn-edit',
+                                                type: 'button'
+                                            },
+                                            React.DOM.i({className: 'icon-chevron-down'})
+                                        )
+                                    )
+                                ),
+                                React.DOM.div({
+                                    id: 'set_' + id,
+                                    ref: 'set_' + id,
+                                    className: 'box-content ui-sortable'
+                                })
+                            )
+                        })
+                    )
+                )
+            }
+        });
+
+        var FieldsListGrid = React.createClass({
+            displayName: "FieldsListGrid",
+            getDefaultProps: function () {
+                return {
+                    sets: {},
+                    avail_fields: []
+                };
+            },
+            getInitialState: function () {
+                return {
+                    sets: this.props.sets,
+                    inputTypes: {},
+                    editors: {},
+                    sites: this.props.site_values || { default: {} },
+                    is_default_site: true,
+                    site_values: {},
+                    site_id: ''
+                };
+            },
+            componentWillMount: function () {},
+            componentDidMount: function () {
+                // Reset input type
+                this.props.avail_fields = [];
+//                this.loadSortable();
+            },
+            componentWillReceiveProps: function (nextProps) {
+                var sites = this.state.sites;
+                var siteId = '';
+
+                // if current site is not `default` and does not exist then initialize it
+                if (nextProps.site
+                        && nextProps.site.id !== ''
+                        && !sites[nextProps.site.id]
+                ) {
+                    sites[nextProps.site.id] = {};
+                }
+
+                this.setState({
+                    sets: nextProps.sets,
+                    sites: sites,
+                    is_default_site: nextProps.site.id === '',
+                    is_multisite_changed: true,
+                    site_id: nextProps.site.id || ''
+                });
+            },
+            componentDidUpdate: function () {
+                this.props.avail_fields = [];
+//                this.loadSortable();
+                this.refreshData();
+            },
+            componentWillUnmount: function () {},
             refreshData: function () {
                 var that = this,
-                    sets = this.state.fieldSets,
+                    sets = this.state.sets,
                     sites = this.state.sites,
                     data = [];
 
@@ -230,148 +689,9 @@
 
                 $customHiddenInput.val(JSON.stringify(data));
             },
-            refreshSortable: function () {
-                var that = this;
-                var sets = that.state.fieldSets;
-                var multisite = that.props.multisite
-                $('.prod-fieldset').find('.box-content').each(function () {
-                    Sortable.create(this, {
-                        revert: true,
-                        axis: 'y',
-                        connectWith: ".prod-fieldset .box-content",
-                        group: "additional-field-sorting",
-                        handle: '.control-handle',
-                        // Element is dropped into the list from another list
-                        onStart: function(e) {
-                            console.log('onStart', e);
-                        },
-                        onEnd: function(e) {
-                            console.log('onEnd', e);
-                        },
-                        onAdd: function (e) {
-                            console.log('onAdd', e);
-                            var $ele = $(e.item),
-                                $parent = $(e.item.offsetParent),
-                                fieldId = $ele.prop('id'),
-                                setId = $parent.prop('id'),
-                                tmpField = null,
-                                setIndex = null,
-                                tmpFields = [];
-
-                            _(sets).each(function (set, i) {
-                                var fIndex = _.findIndex(sets[i].fields, {id: fieldId});
-                                if (fIndex !== -1) {
-                                    tmpField = sets[i].fields[fIndex];
-                                    sets[i].fields.splice(fIndex, 1);
-
-                                    // if multisite is enabled then search same fields and move all to new drop place
-                                    if (multisite) {
-                                        set.fields = _(set.fields).filter(function (f, fi) {
-                                            if (f.id != tmpField.id) {
-                                                return true;
-                                            } else {
-                                                tmpFields.push(f);
-                                                return false;
-                                            }
-                                        });
-
-                                    }
-                                }
-
-                                if (set.id == setId) setIndex = i;
-                            });
-
-
-                            if (tmpField && setIndex) {
-                                sets[setIndex].fields.push(tmpField);
-                            }
-
-                            if (multisite && tmpFields.length) {
-                                _(tmpFields).each(function (f) {
-                                    sets[setIndex].fields.push(f)
-                                });
-                            }
-
-                            that.refreshData();
-                        }
-                    });
-                });
-            },
-            initSelect2: function () {
-                return $.extend({}, {
-                    id: guid(),
-                    name: guid(),
-                    className: '',
-                    placeholder: "{{ 'Select field options' |_ }}",
-                    multiple: false,
-                    callback: 'chooseFieldOptions'
-                }, this.props.select2Config);
-            },
-            initMultiSite: function () {
-                return {
-                    className: 'site-value',
-                    multiple: false
-                };
-            },
-            getOptions: function (id, i) {
-                var options = this.state.fieldSets[id].fields[i].options;
-                if (options) {
-                    return _(options).map(function (option, id) {
-                        return {
-                            id: id,
-                            text: option
-                        };
-                    });
-                }
-                return [];
-            },
-            removeSet: function (e) {
-                var $target = $(e.currentTarget);
-                var setId = $target.data('set-id').toString();
-                var sites = this.state.sites;
-
-                var sets = this.state.fieldSets;
-                sets[setId].deleted = true;
-                var fieldIds = _.pluck(sets[setId].fields, 'id');
-
-                // If has many sites then clear fields when remove set
-                _(fieldIds).each(function (id, fi) {
-                    _(sites).each(function (site, si) {
-                        delete sites[si][id];
-                    })
-                });
-
-                this.setState({fieldSets: sets, sites: sites});
-
-                $(APP).trigger('removeSet', [setId]);
-                $(APP).trigger('reloadFields', [null, fieldIds]);
-            },
-            removeField: function (e) {
-                var $target = $(e.currentTarget),
-                    fieldId = $target.data('field-id'),
-                    fieldName = $target.data('field-value'),
-                    sets = this.state.fieldSets,
-                    sites = this.state.sites;
-
-                _(sets).each(function (set, i) {
-                    set.fields = _(set.fields).filter(function (f, j) {
-                        return !(f && f.id == fieldId);
-                    });
-                });
-
-                // If has many sites then clear fields when remove field
-                _(sites).each(function (site, si) {
-                    delete sites[si][fieldId];
-                });
-
-                this.setState({fieldSets: sets, sites: sites});
-
-                $(APP).trigger('removeField', [fieldId.toString(), fieldName.toString()]);
-                this.refreshData();
-            },
-            refreshChanged: function (code, value, type) {
+            refreshChanges: function (code, value, type) {
                 var that = this,
-                    sets = this.state.fieldSets,
+                    sets = this.state.sets,
                     sites = this.state.sites,
                     site_id = this.state.site_id || 'default';
 
@@ -396,269 +716,112 @@
                         }
                     });
                 });
-
+                console.log('sets', sets);
                 this.refreshData();
+            },
+            refreshLangs: function (code, langs) {
+                var sets = this.state.sets;
+                _(sets).each(function (set, i) {
+                    var fieldCodes = _.pluck(set.fields, 'field_code');
+                    if (_.contains(fieldCodes, code)) {
+                        if (!langs.length) {
+                            sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields = [];
+                        } else {
+                            sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields = langs;
+                        }
+                    }
+                });
+                this.refreshData();
+            },
+            loadSortable: function () {
+                var that = this,
+                    sets = this.state.fieldSets,
+                    sites = this.state.sites,
+                    siteId = this.state.site_id,
+                    multisite = this.props.multisite,
+                    $sortElements = $(this.refs.sortable.getDOMNode()).find('.sortable-item');
+
+                $sortElements.sortable({
+                    revert: true,
+                    axis: 'y',
+                    connectWith: ".prod-fieldset .sortable-item",
+                    group: "additional-field-sorting",
+                    handle: '.control-handle',
+                    // Element is dropped into the list from another list
+                    stop: function (e, ele) {
+                        var $ele = $(ele.item),
+                            fieldId = $ele.data('field-id'),
+                            setId = $ele.parents('.prod-fieldset').data('set-id'),
+                            tmpField = null,
+                            setIndex = null,
+                            tmpFields = [];
+
+                        _(sets).each(function (set, i) {
+                            var fIndex = _.findIndex(sets[i].fields, {id: fieldId.toString()});
+                            if (fIndex != -1) {
+                                tmpField = sets[i].fields[fIndex];
+                                sets[i].fields.splice(fIndex, 1);
+
+                                // if multisite is enabled then search same fields and move all to new drop place
+                                if (multisite) {
+                                    set.fields = _(set.fields).filter(function (f, fi) {
+                                        if (f.id != tmpField.id) {
+                                            return true;
+                                        } else {
+                                            tmpFields.push(f);
+                                            return false;
+                                        }
+                                    });
+                                }
+                            }
+
+                            if (set.id == setId) setIndex = i;
+                        });
+
+                        if (tmpField && setIndex) {
+                            sets[setIndex].fields.push(tmpField);
+                        }
+
+                        if (multisite && tmpFields.length) {
+                            _(tmpFields).each(function (f) {
+                                sets[setIndex].fields.push(f)
+                            });
+                        }
+                    }
+                });
             },
             handleSelect2Change: function (e, callback, selection) {
                 this.refreshChanged(selection.id, selection.text, 'select');
             },
-            handleInputChange: function (e) {
-                var $input = $(e.target);
-                this.refreshChanged($input.data('code'), $input.val());
+            update: function(to) {
+                var data = this.props.data;
+                data.dragging = dragging;
+                this.setState({data: data})
             },
-            handleMultiSitesChange: function (e, callback, selection) {
-                var that = this,
-                    $target = $(e.currentTarget),
-                    fieldId = $target.data('field-id'),
-                    sets = this.state.fieldSets,
-                    sites = this.state.sites,
-                    siteId = this.state.site_id;
+            sort: function(to, from, placement) {
 
-                var siteValues = this.state.site_values;
-                siteValues[fieldId] = selection;
+                dragging = from;
 
-                // Use default value
-                if (selection.id == '0') {
-                    sites[siteId][fieldId] = sites['default'][fieldId];
-                    _(sets).each(function (set, si) {
-                        var fi = _.findIndex(set.fields, { id: fieldId });
-                        if (fi != -1) sets[si].fields[fi].value = sites['default'][fieldId];
-                    });
+                if(from != to) {
+                    var node = _remove(from);
+                    if(placement == "before") {
+                        _insertBefore(node,to);
+                    } else if(placement == "after") {
+                        _insertAfter(node, to);
+                    } else if(placement == "append") {
+                        _prepend(node,to);
+                    }
                 }
 
-                this.setState({ site_values: siteValues, fieldSets: sets });
-                this.refreshData();
-            },
-            parseLangs: function (data) {
-                var langs = data ? JSON.parse(data) : data;
-                if (!langs || !langs.frontend_label_translation) {
-                    return [];
-                }
-
-                return langs.frontend_label_translation;
+                this.update();
             },
             render: function () {
-                return (
-                    React.DOM.div({ key: 'additional-fields' },
-                        _(this.state.fieldSets).map(function (fieldSet, id) {
-                            if (fieldSet && !fieldSet.deleted) {
-                                var fields = fieldSet.fields || {};
-                                return React.DOM.div({
-                                        key: id,
-                                        id: id,
-                                        className: 'box box-borderd green-border box-nomargin prod-fieldset'
-                                    },
-                                    React.DOM.div({className: 'box-header box-header-small'},
-                                        React.DOM.div({className: 'title'}, fieldSet.set_name),
-                                        React.DOM.div({className: 'actions'},
-                                            React.DOM.button({
-                                                    type: 'button',
-                                                    className: 'btn box-remove btn-xs btn-link btn-remove',
-                                                    onClick: this.removeSet,
-                                                    'data-set-id': fieldSet.id
-                                                },
-                                                React.DOM.i({className: 'icon-remove'})
-                                            ),
-                                            React.DOM.button({
-                                                    className: 'btn box-collapse btn-xs btn-link btn-edit',
-                                                    type: 'button'
-                                                },
-                                                React.DOM.i({className: 'icon-chevron-down'})
-                                            )
-                                        )
-                                    ),
-                                    React.DOM.div({className: 'box-content ui-sortable'},
-                                        fields ?
-                                        _(fields).map(function (field, i) {
-                                            var that = this,
-                                                inlineProps = null,
-                                                options = this.getOptions(id, i),
-                                                inputField = null,
-                                                langField = null,
-                                                multiSite = null,
-                                                sites = this.state.sites,
-                                                siteValues = this.state.site_values,
-                                                siteId = this.state.site_id || 'default',
-                                                defaultValues = sites[siteId] || {},
-                                                disabled = false;
-
-                                            if (siteId !== 'default') {
-
-                                            }
-
-                                            if (!_.contains(this.props.avail_fields, field.id)) {
-                                                this.props.avail_fields.push(field.id);
-                                            } else {
-                                                return null;
-                                            }
-
-                                            if (!this.state.is_default_site) {
-                                                inlineProps = this.initMultiSite();
-                                                multiSite = React.createElement(FComSelect2, React.__spread({}, inlineProps, {
-                                                    id: guid(),
-                                                    options: [
-                                                        { id: '0', text: "{{ 'Use Default Value'|_ }}" },
-                                                        { id: '1', text: "{{ 'Use Site Specific Value'|_ }}" }
-                                                    ],
-                                                    defaultValue: [(defaultValues && defaultValues[field.id] == sites['default'][field.id]) ? 0 : 1],
-                                                    attrs: {
-                                                        'data-field-id': field.id
-                                                    },
-                                                    onChange: this.handleMultiSitesChange
-                                                }));
-                                            }
-
-                                            if (_.contains(this.props.input_with_langs, field.admin_input_type)) {
-                                                langField = React.createElement(FComMultiLanguage, {
-                                                    id: field.field_code + '_lang_field_' + field.id,
-                                                    availLangs: this.parseLangs(field.languages),
-                                                    inputType: field.admin_input_type,
-                                                    defaultLangs: {{ UTIL.toJson(UTIL.localesToSelect2Options()) | raw }},
-                                                    cClass: 'col-sm-3',
-                                                    modalConfig: {
-                                                        fieldCode: field.field_code,
-                                                        onSaved: field.field_code + 'ModalSaveChange'
-                                                    },
-                                                    select2Config: this.getSelect2Config || {}
-                                                });
-
-                                                window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
-                                                    var modalNode = $(modal.getDOMNode());
-                                                    var container = modalNode.find('div[id$="-container"]');
-                                                    if (!$.fn.modalValidate(container))
-                                                        return;
-
-                                                    var code = modal.props.fieldCode;
-                                                    $(APP).trigger('refreshLangs', [code, langs]);
-                                                    modal.close();
-                                                };
-                                            }
-
-                                            switch (field.admin_input_type) {
-                                                case 'textarea':
-                                                    inputField = React.DOM.textarea({
-                                                        id: guid(),
-                                                        name: guid(),
-                                                        disabled: disabled,
-                                                        className: 'form-control',
-                                                        'data-rule-required': field.required || 'false',
-                                                        'data-code': field.field_code,
-                                                        'data-field-id': field.id,
-                                                        onBlur: this.handleInputChange,
-                                                        defaultValue: defaultValues[field.id] || ''
-                                                    });
-                                                    break;
-                                                case 'wysiwyg':
-                                                    inputField = React.DOM.textarea({
-                                                        id: guid(),
-                                                        name: guid(),
-                                                        disabled: disabled,
-                                                        className: 'form-control field-ckeditor',
-                                                        'data-rule-required': field.required || 'false',
-                                                        'data-code': field.field_code,
-                                                        'data-field-id': field.id,
-                                                        defaultValue: defaultValues[field.id] || ''
-                                                    });
-                                                    this.state.inputTypes[field.field_code] = 'wysiwyg';
-                                                    break;
-                                                case 'select':
-                                                case 'multiselect':
-                                                    inlineProps = this.initSelect2();
-                                                    inputField = React.createElement(FComSelect2, React.__spread({}, inlineProps, {
-                                                        options: options,
-                                                        enabled: !disabled,
-                                                        'data-field-id': field.id,
-                                                        onChange: this.handleSelect2Change,
-                                                        defaultValue: [defaultValues[field.id] || '']
-                                                    }));
-                                                    break;
-                                                case 'boolean':
-                                                    inputField = React.DOM.div(null,
-                                                        React.DOM.input({
-                                                            type: 'hidden',
-                                                            name: guid(),
-                                                            defaultValue: defaultValues[field.id] || '0'
-                                                        }),
-                                                        React.DOM.div({
-                                                                className: 'make-switch switch has-switch',
-                                                                'data-off-label': '<i class="icon-remove"></i>',
-                                                                'data-on-label': '<i class="icon-ok"></i>',
-                                                                'data-on': 'primary'
-                                                            },
-                                                            React.DOM.input({
-                                                                type: 'checkbox',
-                                                                className: 'switch-cbx',
-                                                                id: guid(),
-                                                                name: guid(),
-                                                                disabled: disabled,
-                                                                defaultChecked: !!(field.value === undefined || field.value === '1'),
-                                                                'data-code': field.field_code,
-                                                                'data-field-id': field.id,
-                                                                defaultValue: defaultValues[field.id] || '0'
-                                                            })
-                                                        )
-                                                    );
-                                                    this.state.inputTypes[field.field_code] = 'boolean';
-                                                    break;
-                                                default:
-                                                    inputField = React.DOM.input({
-                                                        type: 'text',
-                                                        name: guid(),
-                                                        disabled: disabled,
-                                                        className: 'form-control',
-                                                        'data-rule-required': (field.required || 'false'),
-                                                        'data-code': field.field_code,
-                                                        'data-field-id': field.id,
-                                                        onBlur: this.handleInputChange,
-                                                        defaultValue: defaultValues[field.id] || ''
-                                                    });
-                                                    break;
-                                            }
-
-                                            return (
-                                                React.DOM.div({
-                                                        key: field.field_code,
-                                                        id: field.id,
-                                                        className: 'form-group'
-                                                    },
-                                                    React.DOM.div({className: 'col-md-9 col-lg-push-3'},
-                                                        React.DOM.label({
-                                                                className: 'col-md-2 control-label dd-handle control-handle',
-                                                                htmlFor: 'prod-review-text',
-                                                                'data-field-id': field.id
-                                                            },
-                                                            React.DOM.div({className: 'icon-ellipsis-vertical dd-handle dd3-handle'}),
-                                                            React.DOM.span(null, field.field_name)
-                                                        ),
-                                                        React.DOM.div({className: 'col-md-3'},
-                                                            inputField
-                                                        ),
-                                                        React.DOM.div({className: 'col-md-6'},
-                                                            React.DOM.button({
-                                                                    className: 'btn btn-danger btn-xs field-remove',
-                                                                    style: {
-                                                                        float: 'left',
-                                                                        marginRight: '5px'
-                                                                    },
-                                                                    type: 'button',
-                                                                    onClick: this.removeField,
-                                                                    'data-field-id': field.id,
-                                                                    'data-field-value': field.field_name
-                                                                },
-                                                                React.DOM.i({className: 'icon-remove'})
-                                                            ), langField, multiSite
-                                                        )
-                                                    )
-                                                )
-                                            )
-                                        }.bind(this))
-                                        : null
-                                    )
-                                )
-                            } else return null;
-                        }.bind(this))
-                    )
-                )
+                return React.createElement(setGrid, React.__spread({}, this.state, {
+                    avail_fields: this.props.avail_fields,
+                    refreshLangs: this.refreshLangs,
+                    refreshChanges: this.refreshChanges,
+                    refreshData: this.refreshData
+                }));
             }
         });
 
@@ -674,56 +837,48 @@
         var fieldsListContainer = document.getElementById('fields_list');
         React.unmountComponentAtNode(fieldsListContainer);
         var FieldsListComponent = React.render(
-            React.createElement(fieldsListGrid, {
-                fieldSets: fieldSets || {},
+            React.createElement(FieldsListGrid, {
+                sets: fieldSets || {},
                 site_values: initData['site_values'],
                 multisite: !_.isEmpty(sites)
             }), fieldsListContainer
         );
 
-        var FieldsSetGrid = React.createClass({
-            displayName: "FieldsSetGrid",
+        var FieldSetsGrid = React.createClass({
+            displayName: "FieldSetsGrid",
+            getDefaultProps: function () {
+                return {
+                    sets: {},
+                    options: {}
+                };
+            },
             getInitialState: function () {
                 return {
-                    options: {},
+                    sets: {},
                     removedOptions: [],
                     selection: null
                 };
             },
-            getDefaultProps: function () {
-                return {
-                    options: {},
-                    fieldSets: {},
-                    select2Config: {}
-                };
-            },
-            componentDidMount: function () {
-                var that = this;
-
-                $(APP).on('removeSet', function (e, id) {
-                    var removeIds = that.state.removedOptions;
-                    if (_.contains(removeIds, id)) {
-                        removeIds.splice(_.indexOf(removeIds, id), 1);
-                    }
-
-                    that.setState({removedOptions: removeIds});
-                });
-            },
+            componentDidMount: function () {},
             componentWillMount: function () {
                 var sets = this.props.fieldSets;
-                var rOptions = [];
+                var removedOptions = [];
                 _(sets).each(function (set) {
-                    rOptions.push(set.id);
+                    removedOptions.push(set.id);
                 });
 
                 this.setState({
-                    removedOptions: rOptions,
-                    options: this.props.options
+                    sets: sets,
+                    removedOptions: removedOptions
                 });
             },
-            componentWillUnmount: function () {
-                $(APP).off('removeSet');
-                $(APP).off('reloadSet');
+            componentWillReceiveProps: function (nextProps) {
+                this.reloadSets(nextProps.id);
+            },
+            componentWillUnmount: function () {},
+            reloadSets: function (id) {
+                var removedOptions = _.without(this.state.removedOptions, id.toString());
+                this.setState({removedOptions: removedOptions});
             },
             handleSelect2Change: function (event, callback, selection) {
                 this.state.selection = selection.id;
@@ -738,9 +893,9 @@
                 }, this.props.select2Config);
             },
             getOptions: function () {
-                if (this.state.options) {
+                if (this.props.options) {
                     var os = [];
-                    _(this.state.options).each(function (option, id) {
+                    _(this.props.options).each(function (option, id) {
                         if (!_.contains(this.state.removedOptions, id)) {
                             os.push({id: id, text: option});
                         }
@@ -768,124 +923,112 @@
                     var sets = that.props.fieldSets;
                     sets[r.id] = r;
                     fieldIds = _.pluck(sets[r.id].fields, 'id');
-                    $(APP).trigger('addSet', [sets, r.id]);
-                    $(APP).trigger('reloadFields', [null, fieldIds, 'add']);
+                    FieldsListComponent.setProps({ sets: sets });
+                    FieldComponent.setProps({ id: fieldIds, state: 'add' });
                 });
 
-                var rIds = this.state.removedOptions;
-                if (!_.contains(rIds, setId)) {
-                    rIds.push(setId);
+                var removedOptions = this.state.removedOptions;
+                if (!_.contains(removedOptions, setId)) {
+                    removedOptions.push(setId);
                 }
 
-                this.setState({removedOptions: rIds});
+                this.setState({removedOptions: removedOptions});
 
             },
             render: function () {
                 return React.DOM.div({className: ""},
-                        React.createElement(FComSelect2, React.__spread({}, this.initSelect2(), {
-                            options: this.getOptions(),
-                            onChange: this.handleSelect2Change
-                        })),
-                        React.DOM.button({
-                            type: "button",
-                            className: "btn btn-primary btn-sm",
-                            id: "btn_add_set",
-                            onClick: this.addSet
-                        }, "{{ 'Add a Field Set'|_ }}")
+                    React.createElement(FComSelect2, React.__spread({}, this.initSelect2(), {
+                        options: this.getOptions(),
+                        onChange: this.handleSelect2Change
+                    })),
+                    React.DOM.button({
+                        type: "button",
+                        className: "btn btn-primary btn-sm",
+                        id: "btn_add_set",
+                        onClick: this.addSet
+                    }, "{{ 'Add a Field Set'|_ }}")
                 );
             }
         });
 
+        var fieldsetsContainer = document.getElementById('fieldsets');
+        React.unmountComponentAtNode(fieldsetsContainer);
+        var FieldsetComponent = React.render(
+            React.createElement(FieldSetsGrid, {
+                fieldSets: fieldSets,
+                options: fieldSetOptions
+            }), fieldsetsContainer
+        );
+
         var FieldsGrid = React.createClass({
             displayName: "FieldsGrid",
-            getInitialState: function () {
-                return {
-                    options: {},
-                    removedOptions: [],
-                    selection: null
-                };
-            },
             getDefaultProps: function () {
                 return {
                     fields: [],
-                    select2Config: {}
+                    options: {}
+                };
+            },
+            getInitialState: function () {
+                return {
+                    fields: [],
+                    selection: null,
+                    removedOptions: []
                 };
             },
             componentWillMount: function () {
                 var fields = this.props.fields;
 
-                var rOptions = [];
+                var removedOptions = [];
                 _(fields).each(function (f) {
                     if (f.length) {
                         _(f).each(function (item) {
-                            rOptions.push(item.id);
+                            removedOptions.push(item.id);
                         });
-                    } else rOptions.push(f.id);
+                    } else removedOptions.push(f.id);
                 });
 
                 this.setState({
-                    removedOptions: rOptions,
-                    options: this.props.options
+                    fields: fields,
+                    removedOptions: removedOptions
                 });
             },
-            componentDidMount: function () {
-                var that = this;
-
-                $(APP).on('reloadFields', function (e, field, removedIds, type) {
-                    var options = that.state.options;
-                    if (field) {
-                        if (!_.contains(options, field.id)) {
-                            options[field.id] = field.field_name;
-                        }
-                    } else if (removedIds) {
-                        var rIds = that.state.removedOptions;
-                        switch (type) {
-                            case 'add':
-                                _(options).each(function (opt, i) {
-                                    if (_.contains(removedIds, i)) {
-                                        rIds.push(i);
-                                    }
-                                });
-                                break;
-                            default:
-                                _(removedIds).each(function (id) {
-                                    if (_.contains(rIds, id)) {
-                                        rIds.splice(id, 1);
-                                    }
-                                });
-                                break;
-                        }
-                    } else {
-                        rIds = [];
-                    }
-
-                    that.setState({options: options, removedOptions: rIds});
-                });
-
-                $(APP).on('removeField', function (e, id, text) {
-                    var removeIds = that.state.removedOptions;
-                    _(removeIds).each(function (num, i) {
-                        if (id == num) removeIds.splice(i, 1);
-                    });
-
-                    var options = that.state.options;
-                    if (!_.contains(options, id)) {
-                        options[id] = text;
-                    }
-
-                    that.setState({
-                        options: options,
-                        removedOptions: removeIds
-                    });
-                });
+            componentDidMount: function () {},
+            componentWillReceiveProps: function (nextProps) {
+                this.reloadFields(nextProps);
             },
             componentDidUpdate: function (prevProps, prevState) {
                 // Reset selection
                 this.state.selection = null;
+                if (this.props.id) delete this.props.id;
+                if (this.props.state) delete this.props.state;
+                if (this.props.field_added) delete this.props.field_added;
             },
-            componentWillUnmount: function () {
-                $(APP).off('removeField');
-                $(APP).off('reloadFields');
+            componentWillUnmount: function () {},
+            reloadFields: function (props) {
+                var options = this.state.options;
+                var removedOptions = [];
+
+                if (props.field_added) {
+                    if (!_.contains(options, field_added.id)) {
+                        options[field_added.id] = field_added.field_name;
+                    }
+                }
+
+                if ($.isArray(props.id)) {
+                    if (props.state && props.state == 'add') {
+                        removedOptions = this.state.removedOptions.concat(props.id);
+                    } else {
+                        removedOptions = _.difference(this.state.removedOptions, props.id);
+                    }
+                } else {
+                    if (props.state && props.state == 'add') {
+                        removedOptions = this.state.removedOptions.concat(props.id.toString());
+                    } else {
+                        removedOptions = _.without(this.state.removedOptions, props.id.toString());
+                    }
+                }
+
+                this.setState({removedOptions: removedOptions});
             },
             handleSelect2Change: function (event, callback, selection) {
                 this.state.selection = selection.id;
@@ -894,15 +1037,14 @@
                 return $.extend({}, {
                     id: 'sel_fields',
                     className: '',
-                    placeholder: "{{ 'Select fields' |_ }}",
-                    multiple: false,
-                    callback: 'chooseFieldsCallback'
+                    placeholder: "{{ 'Select field' |_ }}",
+                    multiple: false
                 }, this.props.select2Config);
             },
             getOptions: function () {
-                if (this.state.options) {
+                if (this.props.options) {
                     var os = [];
-                    _(this.state.options).each(function (option, id) {
+                    _(this.props.options).each(function (option, id) {
                         if (!_.contains(this.state.removedOptions, id)) {
                             os.push({id: id, text: option});
                         }
@@ -941,50 +1083,51 @@
                 React.unmountComponentAtNode(modalContainer);
                 var config = {{ UTIL.toJson(fieldsConfigCompiled) | raw }};
                 React.render(
-                        React.createElement(Components.Modal, {
-                                    id: "editFieldsModal",
-                                    show: true,
-                                    title: "{{ 'Add Fields' |_ }}",
-                                    confirm: "{{ 'Save changes' |_ }}",
-                                    cancel: "{{ 'Close' |_ }}",
-                                    onLoad: function (modal) {
-                                        fieldsModalNode = $(modal.getDOMNode());
-                                        fieldsForm = fieldsModalNode.find('#fields-modal-form');
-                                        fieldsModalNode.find('.modal-dialog').css('width', '600px');
-                                        that.setValidateForm(fieldsForm);
-                                        fieldsForm.find('#field_code').rules("add", {
-                                            onfocusout: false,
-                                            onkeyup: false,
-                                            remote: {
-                                                url: '{{ APP.href('/catalogfields/fields/unique_field') | raw }}',
-                                                type: 'post',
-                                                data: {
-                                                    _name: 'field_code'
-                                                },
-                                                dataFilter: function (responseString) {
-                                                    var response = jQuery.parseJSON(responseString);
-                                                    currentMessage = response.Message;
-                                                    return response.unique;
-                                                }
-                                            },
-                                            messages: {
-                                                remote: "{{ 'This field code is already taken place.' |_ }}"
-                                            }
-                                        });
+                    React.createElement(Components.Modal, {
+                        id: "editFieldsModal",
+                        show: true,
+                        title: "{{ 'Add Fields' |_ }}",
+                        confirm: "{{ 'Save changes' |_ }}",
+                        cancel: "{{ 'Close' |_ }}",
+                        onLoad: function (modal) {
+                            fieldsModalNode = $(modal.getDOMNode());
+                            fieldsForm = fieldsModalNode.find('#fields-modal-form');
+                            fieldsModalNode.find('.modal-dialog').css('width', '600px');
+                            that.setValidateForm(fieldsForm);
+                            fieldsForm.find('#field_code').rules("add", {
+                                onfocusout: false,
+                                onkeyup: false,
+                                remote: {
+                                    url: '{{ APP.href('/catalogfields/fields/unique_field') | raw }}',
+                                    type: 'post',
+                                    data: {
+                                        _name: 'field_code'
                                     },
-                                    onConfirm: window.saveFieldsModal
+                                    dataFilter: function (responseString) {
+                                        var response = jQuery.parseJSON(responseString);
+                                        currentMessage = response.Message;
+                                        return response.unique;
+                                    }
                                 },
-                                React.DOM.div({className: "row f-grid-wrapper"},
-                                        React.createElement(FComModalForm, {
-                                            columnMetadata: config.columns,
-                                            id: config.id
-                                        })
-                                )
-                        ), modalContainer);
+                                messages: {
+                                    remote: "{{ 'This field code is already taken place.' |_ }}"
+                                }
+                            });
+                        },
+                        onConfirm: window.saveFieldsModal
+                    },
+                    React.DOM.div({className: "row f-grid-wrapper"},
+                        React.createElement(FComModalForm, {
+                            columnMetadata: config.columns,
+                            id: config.id
+                        })
+                    )
+                ), modalContainer);
             },
             addField: function () {
                 var that = this;
                 var id = this.state.selection;
+                var sets = that.props.sets;
 
                 if (!id) {
                     $.bootstrapGrowl("{{ 'Please choose field.' |_ }}", {
@@ -996,7 +1139,6 @@
                     return;
                 }
 
-                var sets = that.props.fieldSets;
                 var firstId = _.pluck(sets, 'id')[0];
                 if (!firstId) {
                     $.bootstrapGrowl("{{ 'Please add field set before insert field.' |_ }}", {
@@ -1010,86 +1152,56 @@
 
                 var inputType = {};
                 $.get('{{ APP.href('/catalogfields/products/get_field?id=') | raw }}' + id, function (r) {
-                    switch (r.admin_input_type) {
-                        case 'boolean':
-                            r.value = (r.value || '1');
-                            inputType[r.field_code] = r.admin_input_type;
-                            break;
-                        case 'wysiwyg':
-                            inputType[r.field_code] = r.admin_input_type;
-                            break;
-                    }
-                    sets[firstId].fields[sets[firstId].fields.length++] = r;
-                    $(APP).trigger('addField', [sets, inputType]);
+                    var index = _.findIndex(sets[firstId].fields, { id: r.id.toString() });
+                    if (index == -1) sets[firstId].fields[sets[firstId].fields.length++] = r;
+                    that.reloadFields(r.id, 'add');
+                    FieldsListComponent.setProps({ sets: sets });
                 });
-
-                var options = this.state.options;
-                if (options[this.state.selection]) {
-                    delete options[this.state.selection];
-                }
-
-                this.setState({options: options});
             },
             render: function () {
-                var inlineProps = this.initSelect2();
-                var options = this.getOptions();
-
                 return React.DOM.div({className: ""},
-                        React.createElement(FComSelect2, React.__spread({}, inlineProps, {
-                            options: options,
-                            onChange: this.handleSelect2Change
-                        })),
-                        React.DOM.button({
-                            type: 'button',
-                            className: 'btn btn-primary btn-sm',
-                            id: 'btn_add_field',
-                            onClick: this.addField
-                        }, "{{ 'Add a Field'|_ }}"),
-                        React.DOM.button({
-                            type: 'button',
-                            className: 'btn btn-sm btn-warning',
-                            id: 'btn_new_field',
-                            onClick: this.showAddFieldsModal
-                        }, "{{ 'New Field'|_ }}")
+                    React.createElement(FComSelect2, React.__spread({}, this.initSelect2(), {
+                        options: this.getOptions(),
+                        onChange: this.handleSelect2Change
+                    })),
+                    React.DOM.button({
+                        type: 'button',
+                        className: 'btn btn-primary btn-sm',
+                        id: 'btn_add_field',
+                        onClick: this.addField
+                    }, "{{ 'Add a Field'|_ }}"),
+                    React.DOM.button({
+                        type: 'button',
+                        className: 'btn btn-sm btn-warning',
+                        id: 'btn_new_field',
+                        onClick: this.showAddFieldsModal
+                    }, "{{ 'New Field'|_ }}")
                 );
             }
         });
 
-        var fieldsContainer = document.getElementById('fields-container');
+        var fieldsContainer = document.getElementById('fields');
         React.unmountComponentAtNode(fieldsContainer);
-        React.render(
-            React.DOM.div({className: 'well'},
-                React.DOM.div({className: 'row'},
-                    React.DOM.input({
-                        type: 'hidden',
-                        id: 'custom_fields',
-                        name: 'custom_fields',
-                        defaultValue: ''
-                    }),
-                    sites ? React.DOM.div({className: 'col-sm-3', id: 'multisite'},
-                        React.createElement(Components.MultiSite, {
-                            sites: sites,
-                            onChange: function (event, callback, selection) {
-                                FieldsListComponent.setProps({ site: selection });
-                            }
-                        })
-                    ) : null,
-                    React.DOM.div({className: 'col-sm-4', id: 'fieldSet'},
-                        React.createElement(FieldsSetGrid, {
-                            fieldSets: fieldSets,
-                            options: fieldSetOptions
-                        })
-                    ),
-                    React.DOM.div({className: 'col-sm-5', id: 'field'},
-                        React.createElement(FieldsGrid, {
-                            fields: fields,
-                            fieldSets: fieldSets,
-                            options: fieldsOptions
-                        })
-                    )
-                )
-            ), fieldsContainer
+        var FieldComponent = React.render(
+            React.createElement(FieldsGrid, {
+                fields: fields,
+                sets: fieldSets,
+                options: fieldsOptions
+            }), fieldsContainer
         );
+
+        if (sites) {
+            var multisiteContainer = document.getElementById('multisite');
+            React.unmountComponentAtNode(multisiteContainer);
+            var MultisiteComponent = React.render(
+                React.createElement(Components.MultiSite, {
+                    sites: sites,
+                    onChange: function (event, callback, selection) {
+                        FieldsListComponent.setProps({ site: selection });
+                    }
+                }), multisiteContainer
+            );
+        }
 
         var $customHiddenInput = $('#custom_fields');
         var $siteHiddenInput = $('#site_values');
@@ -1103,11 +1215,7 @@
             }
             $customHiddenInput.val(JSON.stringify(data));
         }
-        console.log('initData', initData);
-
+console.log('initData', initData)
         if (sites) $siteHiddenInput.val(JSON.stringify(initData['site_values']));
     });
 </script>
-
-<div id="fields-container"></div>
-<div id='fields_list'></div>
