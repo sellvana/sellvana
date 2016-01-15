@@ -249,7 +249,7 @@
                     placeholder: "{{ 'Select field options' |_ }}",
                     multiple: false,
                     options: this.getOptions(field.id),
-                    enabled: field.disable || true,
+                    enabled: !field.disable,
                     'data-field-id': field.id,
                     onChange: this.handleSelect2Change,
                     defaultValue: [field.default_value]
@@ -313,6 +313,7 @@
                 });
             },
             createMultiSiteComponent: function (field) {
+                var siteValues = this.props.site_values || null;
                 return React.createElement(FComSelect2, {
                     id: guid(),
                     className: 'site-value',
@@ -321,7 +322,7 @@
                         { id: '0', text: "{{ 'Use Default Value'|_ }}" },
                         { id: '1', text: "{{ 'Use Site Specific Value'|_ }}" }
                     ],
-                    defaultValue: [1],
+                    defaultValue: ['1'],
                     attrs: {
                         'data-field-id': field.id
                     },
@@ -375,6 +376,11 @@
             renderField: function () {
                 var that = this;
                 var field = this.props.field;
+                var sites = this.props.sites;
+                var siteId = this.props.site_id || 'default';
+                field.default_value = sites[siteId] ? sites[siteId][field.id] ? sites[siteId][field.id] : '' : field.value;
+                field.disable = false;
+
                 React.render(this.createField(field), this.refs['field_' + field.id].getDOMNode());
 
                 // If admin_input_type in ['text', 'textarea', 'wysiwyg'] then render multi-langs component
@@ -400,9 +406,6 @@
                 }
             },
             createField: function (field) {
-                var sites = this.props.sites;
-                var siteId = this.props.site_id || 'default';
-                field.default_value = sites[siteId] ? sites[siteId][field.id] ? sites[siteId][field.id] : '' : field.value;
                 switch (field.admin_input_type) {
                     case 'textarea':
                         return this.createTextarea(field);
@@ -430,7 +433,7 @@
                         'data-field-id': field.id,
                         className: 'form-group'
                     },
-                    React.DOM.div({className: 'col-md-9 col-lg-push-3'},
+                        React.DOM.div({className: 'col-md-9 col-lg-push-2'},
                         React.DOM.label({
                                 className: 'col-md-2 control-label dd-handle control-handle',
                                 htmlFor: 'prod-review-text',
@@ -454,7 +457,11 @@
                                 },
                                 React.DOM.i({className: 'icon-remove'})
                             ),
-                            React.DOM.div({ key: 'lang_' + field.id, ref: 'lang_' + field.id, className: 'col-md-4' }),
+                                React.DOM.div({
+                                    key: 'lang_' + field.id,
+                                    ref: 'lang_' + field.id,
+                                    className: 'col-md-6'
+                                }),
                             React.DOM.div({ key: 'site_value_' + field.id, ref: 'site_value_' + field.id, className: 'col-md-4' })
                         )
                     )
@@ -492,6 +499,7 @@
             },
             render: function () {
                 var that = this;
+
                 var fields = _.uniq(_.clone(this.props.fields, true), 'id');
                 var fieldItems = _(fields).map(function (field) {
                     return React.createElement(fieldItem, React.__spread({}, that.props, {
@@ -629,15 +637,14 @@
             },
             componentWillReceiveProps: function (nextProps) {
                 var sites = this.state.sites;
-                var siteId = '';
+                var siteId = nextProps.site ? nextProps.site.id : '';
 
                 // if current site is not `default` and does not exist then initialize it
                 if (nextProps.site
-                        && nextProps.site.id !== ''
+                        && nextProps.site.id != ''
                         && !sites[nextProps.site.id]
                 ) {
                     sites[nextProps.site.id] = {};
-                    siteId = nextProps.site.id;
                 }
 
                 this.setState({
@@ -649,10 +656,9 @@
                 });
             },
             componentDidUpdate: function () {
-                this.refreshData();
             },
             componentWillUnmount: function () {},
-            refreshData: function () {console.log('refresh data');
+            refreshData: function () {
                 var that = this,
                     sets = this.state.sets,
                     sites = this.state.sites,
@@ -704,7 +710,6 @@
                         }
                     });
                 });
-                console.log('sets', sets);
                 this.refreshData();
             },
             refreshLangs: function (code, langs) {

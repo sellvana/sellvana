@@ -275,7 +275,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             var inlineProps = this.getSelect2Config(),
                 defaultLangs = this.getDefaultLangs(),
                 langIds = _.pluck(this.state.availLangs, 'lang_code'),
-                langLabel = langIds ? langIds.length < 3 ? langIds.filter(function (item) {
+                langLabel = langIds ? langIds.length < 6 ? langIds.filter(function (item) {
                     return item != undefined
                 }).join(',') : Locale._('Multi Languages ...') : null;
 
