@@ -221,6 +221,131 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         }
     });
 
+    FCom.Components.ControlInput = React.createClass({
+        mixins: [FCom.Mixin, FCom.FormMixin],
+        getDefaultProps: function () {
+            return {
+                value: '',
+                input_type: 'input',
+                attrs: {},
+                validation: {}
+            }
+        },
+        getInitialState: function () {
+            return {
+                value: this.props.value
+            };
+        },
+        componentWillReceiveProps: function (nextProps) {
+            this.setState({ value: nextProps.value });
+        },
+        handleChange: function (e) {
+            this.setState({ value: e.target.value });
+        },
+        render: function () {
+            var node = null;
+            var validationRules = this.validationRules(this.props.validation);
+            switch (this.props.input_type) {
+                case 'textarea':
+                    node = <textarea {...this.props.attrs} {...validationRules}
+                        className="form-control"
+                        onChange={this.handleChange}
+                        onBlur={this.props.callback}
+                        value={this.state.value}/>;
+                    break;
+                case 'select':
+                    var options = [];
+                    _(this.props.options).each(function (text, value) {
+                        options.push(<option value={value} key={value}>{text}</option>);
+                    });
+                    node = <select {...this.props.attrs} {...validationRules}
+                        className="form-control"
+                        onChange={this.handleChange}
+                        value={this.state.value}>{options}</select>;
+                    break;
+                default:
+                    node = <input {...this.props.attrs} {...validationRules}
+                        onChange={this.handleChange}
+                        onBlur={this.props.callback}
+                        value={this.state.value}/>;
+                    break;
+            }
+            return node;
+        }
+    });
+
+    FCom.Components.SpecialInput = React.createClass({
+        getDefaultProps: function () {
+            return {
+                input_type: '',
+                disabled: false,
+                attrs: {}
+            };
+        },
+        getInitialState: function () {
+            return {
+                value: this.props.value
+            };
+        },
+        componentDidMount: function () {
+            switch (this.props.input_type) {
+                case 'switch':
+                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch({
+                        state: parseInt(this.state.value) == 1,
+                        onSwitchChange: this.props.onChange
+                    });
+                    break;
+                case 'wysiwyg':
+                    adminForm.wysiwygInit(null, this.state.value, this.props.onChange);
+                    break;
+            }
+        },
+        componentWillReceiveProps: function (nextProps) {
+            this.setState({ value: nextProps.value });
+        },
+        componentWillUnmount: function () {
+            if (this.refs['switch-cbx-' + this.props.id])
+                React.unmountComponentAtNode(this.refs['switch-cbx-' + this.props.id]);
+            if (this.refs['wysiwyg-' + this.props.id])
+                React.unmountComponentAtNode(this.refs['wysiwyg-' + this.props.id]);
+        },
+        handleChange: function (e, state) {
+            this.setState({ value: state });
+        },
+        createSwitchBox: function () {
+            return <input type="checkbox" id={this.props.id ? 'switch_' + this.props.id : guid()}
+                          name={this.props.name ? 'switch_' + this.props.name : guid()}
+                          className={"switch-cbx " + this.props.className}
+                          defaultChecked={!!(this.state.value === undefined || this.state.value === '1')}
+                          value={this.state.value}
+                          onChange={this.handleChange}
+                          ref={'switch-cbx-' + this.props.id} {...this.props.attrs} />;
+        },
+        createWysiwyg: function () {
+            return <textarea id={this.props.id ? 'wysiwyg_' + this.props.id : guid()}
+                             className={'form-control ' + this.props.className}
+                             name={this.props.name ? 'wysiwyg_' + this.props.name : guid()}
+                             defaultValue={this.state.value}
+                             onChange={this.handleChange}
+                             ref={'wysiwyg-' + this.props.id} {...this.props.attrs} />;
+        },
+        renderNode: function () {
+            switch (this.props.input_type) {
+                case 'switch':
+                    return this.createSwitchBox();
+                    break;
+                case 'wysiwyg':
+                    return this.createWysiwyg();
+                    break;
+            }
+        },
+        render: function () {
+            return (
+                <div>{this.renderNode()}</div>
+            );
+        }
+    });
+
     FCom.Components.HelpBlock = React.createClass({
         render: function () {
             return (<span className={"help-block "+ this.props.helpBlockClass}>{ this.props.text }</span>);
@@ -440,59 +565,6 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                 id: 'fcom-modal-form-wrapper',
                 show: false //show modal after render
             }
-        }
-    });
-
-    FCom.Components.ControlInput = React.createClass({
-        mixins: [FCom.Mixin, FCom.FormMixin],
-        getDefaultProps: function () {
-            return {
-                value: '',
-                input_type: 'input',
-                attrs: {},
-                validation: {}
-            }
-        },
-        getInitialState: function () {
-            return {
-                value: this.props.value
-            };
-        },
-        componentWillReceiveProps: function (nextProps) {
-            this.setState({ value: nextProps.value });
-        },
-        handleChange: function (e) {
-            this.setState({ value: e.target.value });
-        },
-        render: function () {
-            var node = null;
-            var validationRules = this.validationRules(this.props.validation);
-            switch (this.props.input_type) {
-                case 'textarea':
-                    node = <textarea {...this.props.attrs} {...validationRules}
-                        className="form-control"
-                        onChange={this.handleChange}
-                        onBlur={this.props.callback}
-                        value={this.state.value}/>;
-                    break;
-                case 'select':
-                    var options = [];
-                    _(this.props.options).each(function (text, value) {
-                        options.push(<option value={value} key={value}>{text}</option>);
-                    });
-                    node = <select {...this.props.attrs} {...validationRules}
-                        className="form-control"
-                        onChange={this.handleChange}
-                        value={this.state.value}>{options}</select>;
-                    break;
-                default:
-                    node = <input {...this.props.attrs} {...validationRules}
-                        onChange={this.handleChange}
-                        onBlur={this.props.callback}
-                        value={this.state.value}/>;
-                    break;
-            }
-            return node;
         }
     });
 

@@ -33,9 +33,9 @@
 <div id='fields_list'></div>
 
 <script type="text/javascript">
-    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'sortable', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage, Sortable) {
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage) {
         var APP = {},
-                dragging,
+            dragging,
             collection = {},
             $mainForm = $('#catalog-products-form'),
             initData = {{ UTIL.toJson(initialData) | raw }},
@@ -67,7 +67,6 @@
             },
             componentDidMount: function () {
                 this.renderField();
-                this.initializeSpecialInput();
             },
             componentDidUpdate: function () {
                 this.renderField();
@@ -130,6 +129,10 @@
             handleSelect2Change: function (e, callback, selection) {
                 this.props.refreshChanges(selection.id, selection.text, 'select');
             },
+            handleSwitchBoxChange: function (e, state) {
+                var s = state ? '1' : '0';
+                this.props.refreshChanges(this.state.field.field_code, s);
+            },
             handleInputChange: function (e) {
                 var $input = $(e.target);
                 this.props.refreshChanges($input.data('code'), $input.val());
@@ -154,16 +157,17 @@
                     }
                 });
             },
-            createWysiwyg: function (field) {
-                return React.DOM.textarea({
-                    id: guid(),
-                    name: guid(),
-                    disabled: field.disable || false,
-                    className: 'form-control field-ckeditor',
-                    'data-rule-required': field.required || 'false',
-                    'data-code': field.field_code,
-                    'data-field-id': field.id,
-                    defaultValue: field.default_value
+            createWysiwyg: function (field) {//handleWysiwygChange
+                return React.createElement(Components.SpecialInput, {
+                    input_type: 'wysiwyg',
+                    value: field.default_value,
+                    className: 'ckeditor',
+                    disable: field.disable,
+                    attrs: {
+                        'data-rule-required': field.required || 'false',
+                        'data-field-id': field.id
+                    },
+                    onChange: this.handleWysiwygChange
                 });
             },
             createSelect2: function (field) {
@@ -181,31 +185,18 @@
                 });
             },
             createSwitchBox: function (field) {
-                return React.DOM.div(null,
-                    React.DOM.input({
-                        type: 'hidden',
-                        name: guid(),
-                        defaultValue: '0'
-                    }),
-                    React.DOM.div({
-                            className: 'make-switch switch has-switch',
-                            'data-off-label': '<i class="icon-remove"></i>',
-                            'data-on-label': '<i class="icon-ok"></i>',
-                            'data-on': 'primary'
-                        },
-                        React.DOM.input({
-                            type: 'checkbox',
-                            className: 'switch-cbx',
-                            id: guid(),
-                            name: guid(),
-                            disabled: false,
-                            defaultChecked: !!(field.value === undefined || field.value === '1'),
-                            'data-code': field.field_code,
-                            'data-field-id': field.id,
-                            defaultValue: field.default_value
-                        })
-                    )
-                );
+                return React.createElement(Components.SpecialInput, {
+                    input_type: 'switch',
+                    id: field.id,
+                    value: field.default_value,
+                    disable: field.disable,
+                    attrs: {
+                        'data-on-text': '<i class="icon-ok" />',
+                        'data-off-text': '<i class="icon-ok" />',
+                        'data-field-id': field.id
+                    },
+                    onChange: this.handleSwitchBoxChange
+                });
             },
             createInput: function (field) {
                 return React.createElement(Components.ControlInput, {
@@ -253,37 +244,6 @@
                     },
                     onChange: this.props.handleSiteValueChange
                 });
-            },
-            initializeSpecialInput: function () {
-                var field = this.state.field;
-                switch (field.admin_input_type) {
-                    case 'boolean':
-                        var $switchCbx = $('.switch-cbx');
-                        $switchCbx.bootstrapSwitch({
-                            onText: '<i class="icon-ok" />',
-                            offText: '<i class="icon-remove" />',
-                            onSwitchChange: function (e, state) {
-                                var s = state ? '1' : '0';
-                                this.props.refreshChanges(field.field_code, s);
-                            }.bind(this),
-                            state: parseInt(field.default_value) == 1
-                        });
-                        break;
-                    case 'wysiwyg':
-                        var target = 'textarea.field-ckeditor[data-code="' + field.field_code + '"]',
-                                value = '';
-
-                        if (_.keys(this.props.sites).length > 1) {
-                            var sites = this.props.sites;
-                            var siteId = this.props.site_id;
-                            value = sites[siteId || 'default'][field.id] || '';
-                        }
-
-                        adminForm.wysiwygInit(target, value, this.handleWysiwygChange);
-                        break;
-                    default:
-                        break;
-                }
             },
             renderField: function () {
                 var that = this;
