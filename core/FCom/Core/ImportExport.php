@@ -748,19 +748,29 @@ class FCom_Core_ImportExport extends BClass
                             $import[$k] = $v;
                         }
                     }
-                    if (!empty($import)) {
-                        if (!empty($import[static::CUSTOM_DATA_KEY])) {
-                            $cData = (array)$import[static::CUSTOM_DATA_KEY];
-                            $merge = true;
-                            if (isset($cData['_merge'])) {
-                                $merge = $cData['_merge'];
-                                unset($cData['_merge']);
-                            }
-                            foreach ($cData as $cdk => $cdkData) {
-                                $model->setData($cdk, $cdkData, $merge);
-                            }
-                            unset($import[static::CUSTOM_DATA_KEY]);
+
+                    $customDataUpdate = false;
+                    if (!empty($import[static::CUSTOM_DATA_KEY])) {
+                        $cData = (array)$import[static::CUSTOM_DATA_KEY];
+                        $merge = true;
+                        if (isset($cData['_merge'])) {
+                            $merge = $cData['_merge'];
+                            unset($cData['_merge']);
                         }
+                        if ($merge) {
+                            $customDataUpdate = true;
+                        }
+                        foreach ($cData as $cdk => $cdkData) {
+                            if (!($merge && $customDataUpdate)) {
+                                if ($cdkData != $model->getData($cdk)) {
+                                    $customDataUpdate = true;
+                                }
+                            }
+                            $model->setData($cdk, $cdkData, $merge);
+                        }
+                        unset($import[static::CUSTOM_DATA_KEY]);
+                    }
+                    if (!empty($import) || $customDataUpdate) {
                         $model->set($import)->save();
                         $modified = true;
                         $this->_updatedModels++;
