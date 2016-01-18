@@ -15,7 +15,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             return $('<div/>').text(val).html();
         },
         fileSizeFormat: function (size) {
-            var size = parseInt(size);
+            size = parseInt(size);
             if (size / (1024 * 1024) > 1) {
                 size = size / (1024 * 1024);
                 size = size.toFixed(2) + ' MB';
@@ -30,13 +30,11 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         },
         dateTimeNow: function () {
             var d = new Date();
-            var dateTime = d.getFullYear() + '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate()) + ' ' + toString(d.getHours()) + ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
+            return d.getFullYear() + '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate()) + ' ' + toString(d.getHours()) + ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
 
             function toString(val) {
                 return (val < 10) ? '0' + val : val;
             }
-
-            return dateTime;
         },
         updateModalWidth: function (modal) {
             //todo: add css class to modal to pre-define width, eg: large, medium, small
@@ -88,6 +86,11 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             }
             return name;
         },
+        /**
+         * Set validation rules for input element
+         *
+         * @param {object} data
+         */
         validationRules: function (data) {
             var rules = {};
             for (var key in data) {
@@ -172,7 +175,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         },
         initSelect2: function () {
             return {
-                id: 'multisite',
+                id: 'multisite_list',
                 className: '',
                 multiple: false
             };
@@ -446,7 +449,8 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             return {
                 value: '',
                 input_type: 'input',
-                attrs: {}
+                attrs: {},
+                validation: {}
             }
         },
         getInitialState: function () {
@@ -462,14 +466,30 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         },
         render: function () {
             var node = null;
+            var validationRules = this.validationRules(this.props.validation);
             switch (this.props.input_type) {
                 case 'textarea':
-                    node = React.createElement("textarea", React.__spread({},  this.props.attrs, {onChange: this.handleChange, onBlur: this.props.callback, value: this.state.value}));
+                    node = React.createElement("textarea", React.__spread({},  this.props.attrs,  validationRules, 
+                        {className: "form-control", 
+                        onChange: this.handleChange, 
+                        onBlur: this.props.callback, 
+                        value: this.state.value}));
                     break;
                 case 'select':
+                    var options = [];
+                    _(this.props.options).each(function (text, value) {
+                        options.push(React.createElement("option", {value: value, key: value}, text));
+                    });
+                    node = React.createElement("select", React.__spread({},  this.props.attrs,  validationRules, 
+                        {className: "form-control", 
+                        onChange: this.handleChange, 
+                        value: this.state.value}), options);
                     break;
                 default:
-                    node = React.createElement("input", React.__spread({},  this.props.attrs, {onChange: this.handleChange, onBlur: this.props.callback, value: this.state.value}));
+                    node = React.createElement("input", React.__spread({},  this.props.attrs,  validationRules, 
+                        {onChange: this.handleChange, 
+                        onBlur: this.props.callback, 
+                        value: this.state.value}));
                     break;
             }
             return node;
@@ -527,7 +547,6 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
          * @private
          */
         _sortableInstance: null,
-
 
         componentDidMount: function () {
             var DOMNode, options = _extend(_extend({}, _defaultOptions), this.sortableOptions || {}),
