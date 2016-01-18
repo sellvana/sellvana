@@ -22,7 +22,9 @@
     <div class="well">
         <div class="row">
             <input type="hidden" name="custom_fields" id="custom_fields" />
-            <div id="multisite" class="{{ sites ? 'col-sm-3' : '' }}"></div>
+            {% if sites %}
+                <div id="multisite" class="col-sm-3"></div>
+            {% endif %}
             <div id="fieldsets" class="col-sm-5"></div>
             <div id="fields" class="col-sm-4"></div>
         </div>
@@ -86,7 +88,7 @@
             sortStart: function (e) {
                 this.dragged = e.currentTarget.dataset.id;
                 e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData("text/html", null);
+                e.dataTransfer.setData("text/html", e.target.id);
             },
             handleDrop: function (e) {
                 e.preventDefault();
@@ -106,9 +108,6 @@
                 e.stopPropagation();
                 e.preventDefault();
                 var over = e.currentTarget;
-                var relY = e.clientY - over.getBoundingClientRect().top;
-                var height = over.offsetHeight / 2;
-
                 var placement = 'append';
 
                 this.move(over, placement);
@@ -367,8 +366,8 @@
             render: function () {
                 var field = this.props.field;
                 return React.DOM.div(React.__spread({}, this.state.sortable, {
-                        id: field.field_code + '_field',
-                        'data-field-id': field.id,
+                            id: field.field_code + '_field',
+                            'data-field-id': field.id,
                             'data-parent': field.parent,
                             className: 'form-group sort-item'
                         }),
@@ -444,15 +443,15 @@
                     });
                 });
 
-                return React.DOM.div({
+                return React.DOM.div(React.__spread({}, {}, {
                     id: 'field_list_' + this.props.id,
                     className: 'field-list',
                     'data-id': this.props.node
-                }, fieldItems);
+                }), fieldItems);
             }
         });
 
-        var setGrid = React.createClass({
+        var SetGrid = React.createClass({
             displayName: "fieldsListGrid",
             getInitialState: function () {
                 return {
@@ -472,6 +471,23 @@
                     if (this.refs['set_' + set.id])
                         React.unmountComponentAtNode(this.refs['set_' + set.id].getDOMNode());
                 }.bind(this));
+            },
+            move: function (over, placement) {
+                var to = Number(over.dataset.id);
+                var from = dragging || Number(this.dragged);
+                this.props.sort(to, from, placement);
+            },
+            allowDrop: function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            },
+            drop: function (e) {
+                e.dataTransfer.setData("text/html", e.target.id);
+                this.dragged = e.currentTarget.dataset.id;
+                var over = e.currentTarget;
+                var placement = 'append';
+
+                this.move(over, placement);
             },
             renderSets: function () {
                 _(this.state.sets).each(function(set, id) {
@@ -519,7 +535,9 @@
                                 key: set.id,
                                 'data-set-id': set.id,
                                         'data-id': set.node,
-                                className: 'box box-borderd green-border box-nomargin prod-fieldset'
+                                        className: 'box box-borderd green-border box-nomargin prod-fieldset',
+                                        onDrop: that.drop,
+                                        onDragOver: that.allowDrop
                             },
                                 React.DOM.div({className: 'box-header box-header-small'},
                                     React.DOM.div({className: 'title'}, set.set_name),
@@ -776,7 +794,7 @@
                 this.forceUpdate();
             },
             render: function () {
-                return React.createElement(setGrid, React.__spread({}, this.state, {
+                return React.createElement(SetGrid, React.__spread({}, this.state, {
                     key: this.state.site_id,
                     refreshLangs: this.refreshLangs,
                     refreshChanges: this.refreshChanges,
