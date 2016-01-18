@@ -15,7 +15,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             return $('<div/>').text(val).html();
         },
         fileSizeFormat: function (size) {
-            var size = parseInt(size);
+            size = parseInt(size);
             if (size / (1024 * 1024) > 1) {
                 size = size / (1024 * 1024);
                 size = size.toFixed(2) + ' MB';
@@ -30,13 +30,11 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         },
         dateTimeNow: function () {
             var d = new Date();
-            var dateTime = d.getFullYear() + '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate()) + ' ' + toString(d.getHours()) + ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
+            return d.getFullYear() + '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate()) + ' ' + toString(d.getHours()) + ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
 
             function toString(val) {
                 return (val < 10) ? '0' + val : val;
             }
-
-            return dateTime;
         },
         updateModalWidth: function (modal) {
             //todo: add css class to modal to pre-define width, eg: large, medium, small
@@ -88,6 +86,11 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             }
             return name;
         },
+        /**
+         * Set validation rules for input element
+         *
+         * @param {object} data
+         */
         validationRules: function (data) {
             var rules = {};
             for (var key in data) {
@@ -172,7 +175,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         },
         initSelect2: function () {
             return {
-                id: 'multisite',
+                id: 'multisite_list',
                 className: '',
                 multiple: false
             };
@@ -215,6 +218,140 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                 required: false,
                 input_id: ''
             };
+        }
+    });
+
+    FCom.Components.ControlInput = React.createClass({displayName: "ControlInput",
+        mixins: [FCom.Mixin, FCom.FormMixin],
+        getDefaultProps: function () {
+            return {
+                value: '',
+                type: '',
+                attrs: {},
+                validation: {}
+            }
+        },
+        getInitialState: function () {
+            return {
+                value: this.props.value
+            };
+        },
+        componentWillReceiveProps: function (nextProps) {
+            this.setState({ value: nextProps.value });
+        },
+        handleChange: function (e) {
+            this.setState({ value: e.target.value });
+        },
+        render: function () {
+            var node = null;
+            var validationRules = this.validationRules(this.props.validation);
+            switch (this.props.type) {
+                case 'textarea':
+                    node = React.createElement("textarea", React.__spread({id: this.props.id || guid(), 
+                                    name: this.props.name || guid(), 
+                                    className: "form-contro l" + this.props.className, 
+                                    onChange: this.handleChange, 
+                                    onBlur: this.props.callback, 
+                                    value: this.state.value},  this.props.attrs,  validationRules));
+                    break;
+                case 'select':
+                    var options = [];
+                    _(this.props.options).each(function (text, value) {
+                        options.push(React.createElement("option", {value: value, key: value}, text));
+                    });
+                    node = React.createElement("select", React.__spread({
+                            id: this.props.id || guid(), 
+                            name: this.props.name || guid(), 
+                            className: "form-control " + this.props.className, 
+                            onChange: this.handleChange, 
+                            value: this.state.value},  this.props.attrs,  validationRules), options);
+                    break;
+                default:
+                    node = React.createElement("input", React.__spread({type: this.props.type, 
+                                  id: this.props.id || guid(), 
+                                  name: this.props.name || guid(), 
+                                  className: "form-control " + this.props.className, 
+                                  onChange: this.handleChange, 
+                                  onBlur: this.props.callback, 
+                                  value: this.state.value},  this.props.attrs,  validationRules));
+                    break;
+            }
+            return node;
+        }
+    });
+
+    FCom.Components.SpecialInput = React.createClass({displayName: "SpecialInput",
+        getDefaultProps: function () {
+            return {
+                type: '',
+                disabled: false,
+                attrs: {}
+            };
+        },
+        getInitialState: function () {
+            return {
+                value: this.props.value
+            };
+        },
+        componentDidMount: function () {
+            switch (this.props.type) {
+                case 'switch':
+                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch({
+                        state: parseInt(this.state.value) == 1,
+                        onSwitchChange: this.props.onChange
+                    });
+                    break;
+                case 'wysiwyg':
+                    adminForm.wysiwygInit(null, this.state.value, this.props.onChange);
+                    break;
+            }
+        },
+        componentWillReceiveProps: function (nextProps) {
+            this.setState({ value: nextProps.value });
+        },
+        componentWillUnmount: function () {
+            if (this.refs['switch-cbx-' + this.props.id])
+                React.unmountComponentAtNode(this.refs['switch-cbx-' + this.props.id]);
+            if (this.refs['wysiwyg-' + this.props.id])
+                React.unmountComponentAtNode(this.refs['wysiwyg-' + this.props.id]);
+        },
+        handleSwitch: function (e, state) {
+            this.setState({ value: state });
+        },
+        handleChange: function (e) {
+            this.setState({ value: e.target.value });
+        },
+        createSwitchBox: function () {
+            return React.createElement("input", React.__spread({type: "checkbox", id: this.props.id || guid(), 
+                          name: this.props.name || guid(), 
+                          className: "switch-cbx " + this.props.className, 
+                          defaultChecked: !!(this.state.value === undefined || this.state.value === '1'), 
+                          value: this.state.value, 
+                          onChange: this.handleSwitch, 
+                          ref: 'switch-cbx-' + this.props.id},  this.props.attrs));
+        },
+        createWysiwyg: function () {
+            return React.createElement("textarea", React.__spread({id: this.props.id || guid(), 
+                             name: this.props.name || guid(), 
+                             className: 'form-control ' + this.props.className, 
+                             defaultValue: this.state.value, 
+                             onChange: this.handleChange, 
+                             ref: 'wysiwyg-' + this.props.id},  this.props.attrs));
+        },
+        renderNode: function () {
+            switch (this.props.type) {
+                case 'switch':
+                    return this.createSwitchBox();
+                    break;
+                case 'wysiwyg':
+                    return this.createWysiwyg();
+                    break;
+            }
+        },
+        render: function () {
+            return (
+                React.createElement("div", null, this.renderNode())
+            );
         }
     });
 
@@ -440,42 +577,6 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         }
     });
 
-    FCom.Components.ControlInput = React.createClass({displayName: "ControlInput",
-        mixins: [FCom.Mixin, FCom.FormMixin],
-        getDefaultProps: function () {
-            return {
-                value: '',
-                input_type: 'input',
-                attrs: {}
-            }
-        },
-        getInitialState: function () {
-            return {
-                value: this.props.value
-            };
-        },
-        componentWillReceiveProps: function (nextProps) {
-            this.setState({ value: nextProps.value });
-        },
-        handleChange: function (e) {
-            this.setState({ value: e.target.value });
-        },
-        render: function () {
-            var node = null;
-            switch (this.props.input_type) {
-                case 'textarea':
-                    node = React.createElement("textarea", React.__spread({},  this.props.attrs, {onChange: this.handleChange, onBlur: this.props.callback, value: this.state.value}));
-                    break;
-                case 'select':
-                    break;
-                default:
-                    node = React.createElement("input", React.__spread({},  this.props.attrs, {onChange: this.handleChange, onBlur: this.props.callback, value: this.state.value}));
-                    break;
-            }
-            return node;
-        }
-    });
-
     var _nextSibling;
 
     var _activeComponent;
@@ -527,7 +628,6 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
          * @private
          */
         _sortableInstance: null,
-
 
         componentDidMount: function () {
             var DOMNode, options = _extend(_extend({}, _defaultOptions), this.sortableOptions || {}),

@@ -1140,11 +1140,13 @@ define(fcomAdminDeps, function ($, Ladda) {
 
         /**
          * convert textarea to wysiwyg with ckeditor
-         * @param id
+         * @param {string} id
+         * @param {string} value
+         * @param callback
          */
-        function wysiwygCreate(id) {
+        function wysiwygCreate(id, value, callback) {
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
-                FCom.Admin.log(id, 'wysiwygcreate');
+                //FCom.Admin.log(id, 'wysiwygcreate');
                 editors[id] = true; // prevent double loading
 
                 CKEDITOR.replace(id, {
@@ -1157,6 +1159,17 @@ define(fcomAdminDeps, function ($, Ladda) {
                     //allowedContent: true,
                     startupMode: 'wysiwyg'
                 });
+
+                if (value) CKEDITOR.instances[id].setData(value);
+
+                CKEDITOR.instances[id].on('blur', function (e) {
+                    e.editor.updateElement();
+                    if (typeof callback === 'function') {
+                        callback(e.editor, e.editor.getData());
+                    } else if (typeof callback === 'string') {
+                        window[callback](e.editor, e.editor.getData());
+                    }
+                });
 //
 //                $('#'+id).ckeditor(function() {
 //                    this.dataProcessor.writer.indentationChars = '  ';
@@ -1168,16 +1181,17 @@ define(fcomAdminDeps, function ($, Ladda) {
         /**
          * this function almost use to init ckeditor after load ajax form
          */
-        function wysiwygInit() {
+        function wysiwygInit(target, value, callback) {
             var form = this;
-            $('textarea.ckeditor').each(function () {
+            if (!target) target = 'textarea.ckeditor';
+            $(target).each(function () {
                 var id = $(this).attr('id');
                 if (!id) {
                     var cntEditors = editors.length;
                     id = cntEditors + 1;
                     $(this).attr('id', 'textarea-ckeditor-' + id);
                 }
-                form.wysiwygCreate(id);
+                form.wysiwygCreate(id, value, callback);
             });
         }
 
