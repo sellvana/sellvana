@@ -3163,11 +3163,28 @@ class BDebug extends BClass
         $e['mem'] = memory_get_usage();
 
         if ($backtrace || !empty(static::$_verboseBacktrace[$e['msg']])) {
+            if (PHP_SAPI === 'cli') {
+                $e['msg'] = '{white*}' . $e['msg'] . '{/}';
+                $e['msg'] .= PHP_EOL . PHP_EOL . '{cyan*}Backtrace:{/}';
+                $fileIndex = 0;
+            }
             foreach ($bt as $t) {
-                if (!empty($t['file'])) {
-                    $e['msg'] .= "\n" . $t['file'] . ':' . $t['line'];
-                } elseif (!empty($t['class'])) {
-                    $e['msg'] .= "\n" . $t['class'] . $t['type'] . $t['function'];
+                if (PHP_SAPI !== 'cli') {
+                    if (!empty($t['file'])) {
+                        $e['msg'] .= "\n" . $t['file'] . ':' . $t['line'];
+                    } elseif (!empty($t['class'])) {
+                        $e['msg'] .= "\n" . $t['class'] . $t['type'] . $t['function'];
+                    }
+                } else {
+                    $index = '{white}#' . $fileIndex . '{/}';
+                    if (!empty($t['file'])) {
+                        $e['msg'] .= PHP_EOL . '  ' . $index . ' {purple*}'
+                                . $t['file'] . '{/}:{white}' . $t['line'] . '{/}';
+                    } elseif (!empty($t['class'])) {
+                        $e['msg'] .= PHP_EOL . '  ' . $index . ' {purple*}'
+                                . $t['class'] . $t['type'] . $t['function'] . '{/}';
+                    }
+                    $fileIndex++;
                 }
             }
         }
@@ -3219,9 +3236,20 @@ class BDebug extends BClass
 
         $l = static::$_level[static::OUTPUT];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
-            echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
-            echo static::cleanBacktrace($message);
-            echo '</xmp>';
+            if (PHP_SAPI !== 'cli') {
+                echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
+                echo static::cleanBacktrace($message);
+                echo '</xmp>';
+            } else {
+                $shellOut = PHP_EOL . '{red*}' . $e['level'] . ':{/} ' . $e['msg'] . PHP_EOL;
+                if (isset($e['file'])) {
+                    $shellOut .= '{red*}Called from: {/}' . $e['file'] . ':' . $e['line'];
+                }
+
+                /** @var FCom_Shell_Shell $shell */
+                $shell = FCom_Shell_Shell::i();
+                $shell->stdout($shell->colorize($shellOut));
+            }
         }
 /*
         $l = static::$_level[static::EXCEPTION];
@@ -3235,7 +3263,9 @@ class BDebug extends BClass
 */
         $l = static::$_level[static::STOP];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
-            static::i()->dumpLog();
+            if (PHP_SAPI !== 'cli') {
+                static::i()->dumpLog();
+            }
             die;
         }
 
