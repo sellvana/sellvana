@@ -2085,7 +2085,7 @@ class BUtil extends BClass
      */
     public function getMemoryLimit()
     {
-        preg_match('#^([0-9]+)([GMK]?)$#', ini_get('memory_limit'), $val);
+        preg_match('#^([0-9]+)([GMK]?)$#', strtoupper(ini_get('memory_limit')), $val);
         $mult = ['G' => 1073741824, 'M' => 1048576, 'K' => 1024];
         return $val[1] * (!empty($mult[$val[2]]) ? $mult[$val[2]] : 1);
     }
@@ -2215,7 +2215,7 @@ class BUtil extends BClass
      */
     public function convertFileSize($size)
     {
-        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        $unit = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
         $exponent = (int)floor(log($size, 1024));
         return @round($size / pow(1024, $exponent), 2) . ' ' . $unit[$exponent];
     }
@@ -3624,19 +3624,7 @@ class BFtpClient extends BClass
 }
 
 /**
- * Class BHttpClient
- */
-class BHttpClient extends BClass
-{
-    public function getContent($url){
-        throw new BErrorException('Not available at this moment');
-    }
-}
-
-/**
  * Class BFile
- *
- * @property BHttpClient $BHttpClient
  */
 class BFile extends BClass
 {
@@ -3670,53 +3658,73 @@ class BFile extends BClass
 
     /**
      * @param $path
-     * @return mixed
-     * @throws BErrorException
+     * @return BFile|void
+     * @throws BException
      */
     public function load($path)
     {
         if (!is_string($path)) {
-            throw new BErrorException('Support only string path of file');
+            throw new BException('Support only string path of file');
         }
+        /** @var BFile $file */
+        $file = self::i(true);
         if (filter_var($path, FILTER_VALIDATE_URL) !== false) {
-            return self::i()->_loadRemoteFile($path);
+            return $file->_loadRemoteFile($path);
         } else {
-            return self::i()->_loadLocalFile($path);
+            return $file->_loadLocalFile($path);
         }
     }
 
     /**
      * @param $url
      * @return $this
-     * @throws BErrorException
+     * @throws BException
      */
     private function _loadRemoteFile($url)
     {
-        if (ini_get('allow_url_fopen')) {
-            $file = @file_get_contents($url);
-        } else {
-            $file = $this->BHttpClient->getContent($url);
+        $headers = get_headers($url, 1);
+        if (false === $headers) {
+            throw new BException('Can\'t get headers of url:' . $url);
         }
+
+        $responseCode = substr($headers[0], 9, 3);
+        if ($responseCode != 200) {
+            throw new BException('Unsupported response code: ' . $responseCode);
+        }
+
+        $memoryLimit = $this->BUtil->getMemoryLimit() - memory_get_usage();
+        if ($memoryLimit <= ($headers['Content-Length'])) {
+            throw new BException('Can\'t get file. It\'s to big. URL:' . $url);
+        }
+
+        $file = $this->BUtil->remoteHttp('get', $url);
 
         $this->_fileInfo['remote_url'] = $url;
 
         $urlPath = parse_url($url, PHP_URL_PATH);
         $urlPath = explode('/', $urlPath);
         $fullFileName = array_pop($urlPath);
+
         if ($fullFileName === '') {
-            //TODO: generate file name;
+            $fullFileName = $this->BUtil->randomString();
         }
+
         $fileName = explode('.', $fullFileName);
         if (count($fileName) >= 2) {
             $fileExtension = array_pop($fileName);
         } else {
             $fileExtension = null;
         }
-        $fileName = implode('.', $fileName);
+        $fileName = $fileName[0];
 
         $this->_fileInfo['full_file_name'] = $fullFileName;
         $this->_fileInfo['file_extension'] = $fileExtension;
         $this->_fileInfo['file_name'] = $fileName;
+
+        $fInfo = new finfo(FILEINFO_MIME_TYPE);
+        $this->_fileInfo['file_mime_type'] = $fInfo->buffer($file);
+
+        $this->_fileInfo['file_size'] = $headers['Content-Length'];
 
         if ($this->keepContent) {
             $this->_fileContent = $file;
@@ -3730,10 +3738,13 @@ class BFile extends BClass
 
     /**
      * @param $path
+     * @throws BException
      */
     private function _loadLocalFile($path)
     {
         $this->_currentStatus = self::STATUS_LOCAL_FILE;
+
+        throw new BException('Not supported at this moment');
     }
 
     /**
@@ -3746,9 +3757,8 @@ class BFile extends BClass
             mkdir($this->_currentTmpDir, 0777, true);
         }
         $this->_fileInfo['file_path'] = $this->_currentTmpDir;
-        $fullPath =  $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
+        $fullPath = $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
 
-        $this->_fileInfo['file_size'] = 0;
         if (@file_put_contents($fullPath, $file)
         ) {
             $this->_fileInfo['file_size'] = filesize($fullPath);
@@ -3762,9 +3772,30 @@ class BFile extends BClass
      */
     public function save($name, $path)
     {
+        if ($this->_currentStatus == self::STATUS_LOCAL_FILE) {
+            return $this;
+        }
+
+        if (!is_file($this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'])) {
+            return false;
+        }
+
         if (@rename($this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'],
             $path . DIRECTORY_SEPARATOR . $name)
         ) {
+            $fileName = explode('.', $name);
+            if (count($fileName) >= 2) {
+                $fileExtension = array_pop($fileName);
+            } else {
+                $fileExtension = null;
+            }
+            $fileName = $fileName[0];
+
+            $this->_fileInfo['full_file_name'] = $name;
+            $this->_fileInfo['file_extension'] = $fileExtension;
+            $this->_fileInfo['file_name'] = $fileName;
+            $this->_fileInfo['file_path'] = $path;
+
             $this->_previousStatus = $this->_currentStatus;
             $this->_currentStatus = self::STATUS_LOCAL_FILE;
         }
@@ -3774,12 +3805,14 @@ class BFile extends BClass
     /**
      * @return mixed
      */
-    public function getFileInfo(){
+    public function getFileInfo()
+    {
         return $this->_fileInfo;
     }
 
     /**
      * The file is stored on a this server
+     *
      * @return bool
      */
     public function isLocal()
@@ -3789,6 +3822,7 @@ class BFile extends BClass
 
     /**
      * The file is stored on a remote server
+     *
      * @return bool
      */
     public function isRemote()
