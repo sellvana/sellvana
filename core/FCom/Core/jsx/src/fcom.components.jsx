@@ -226,7 +226,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         getDefaultProps: function () {
             return {
                 value: '',
-                input_type: 'input',
+                type: '',
                 attrs: {},
                 validation: {}
             }
@@ -245,29 +245,35 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         render: function () {
             var node = null;
             var validationRules = this.validationRules(this.props.validation);
-            switch (this.props.input_type) {
+            switch (this.props.type) {
                 case 'textarea':
-                    node = <textarea {...this.props.attrs} {...validationRules}
-                        className="form-control"
-                        onChange={this.handleChange}
-                        onBlur={this.props.callback}
-                        value={this.state.value}/>;
+                    node = <textarea id={this.props.id || guid()}
+                                    name={this.props.name || guid()}
+                                    className={"form-contro l" + this.props.className}
+                                    onChange={this.handleChange}
+                                    onBlur={this.props.callback}
+                                    value={this.state.value} {...this.props.attrs} {...validationRules} />;
                     break;
                 case 'select':
                     var options = [];
                     _(this.props.options).each(function (text, value) {
                         options.push(<option value={value} key={value}>{text}</option>);
                     });
-                    node = <select {...this.props.attrs} {...validationRules}
-                        className="form-control"
-                        onChange={this.handleChange}
-                        value={this.state.value}>{options}</select>;
+                    node = <select
+                            id={this.props.id || guid()}
+                            name={this.props.name || guid()}
+                            className={"form-control " + this.props.className}
+                            onChange={this.handleChange}
+                            value={this.state.value} {...this.props.attrs} {...validationRules}>{options}</select>;
                     break;
                 default:
-                    node = <input {...this.props.attrs} {...validationRules}
-                        onChange={this.handleChange}
-                        onBlur={this.props.callback}
-                        value={this.state.value}/>;
+                    node = <input type={this.props.type}
+                                  id={this.props.id || guid()}
+                                  name={this.props.name || guid()}
+                                  className={"form-control " + this.props.className}
+                                  onChange={this.handleChange}
+                                  onBlur={this.props.callback}
+                                  value={this.state.value} {...this.props.attrs} {...validationRules} />;
                     break;
             }
             return node;
@@ -277,7 +283,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
     FCom.Components.SpecialInput = React.createClass({
         getDefaultProps: function () {
             return {
-                input_type: '',
+                type: '',
                 disabled: false,
                 attrs: {}
             };
@@ -288,7 +294,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             };
         },
         componentDidMount: function () {
-            switch (this.props.input_type) {
+            switch (this.props.type) {
                 case 'switch':
                     $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch({
                         state: parseInt(this.state.value) == 1,
@@ -309,28 +315,31 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             if (this.refs['wysiwyg-' + this.props.id])
                 React.unmountComponentAtNode(this.refs['wysiwyg-' + this.props.id]);
         },
-        handleChange: function (e, state) {
+        handleSwitch: function (e, state) {
             this.setState({ value: state });
         },
+        handleChange: function (e) {
+            this.setState({ value: e.target.value });
+        },
         createSwitchBox: function () {
-            return <input type="checkbox" id={this.props.id ? 'switch_' + this.props.id : guid()}
-                          name={this.props.name ? 'switch_' + this.props.name : guid()}
+            return <input type="checkbox" id={this.props.id || guid()}
+                          name={this.props.name || guid()}
                           className={"switch-cbx " + this.props.className}
                           defaultChecked={!!(this.state.value === undefined || this.state.value === '1')}
                           value={this.state.value}
-                          onChange={this.handleChange}
+                          onChange={this.handleSwitch}
                           ref={'switch-cbx-' + this.props.id} {...this.props.attrs} />;
         },
         createWysiwyg: function () {
-            return <textarea id={this.props.id ? 'wysiwyg_' + this.props.id : guid()}
+            return <textarea id={this.props.id || guid()}
+                             name={this.props.name || guid()}
                              className={'form-control ' + this.props.className}
-                             name={this.props.name ? 'wysiwyg_' + this.props.name : guid()}
                              defaultValue={this.state.value}
                              onChange={this.handleChange}
                              ref={'wysiwyg-' + this.props.id} {...this.props.attrs} />;
         },
         renderNode: function () {
-            switch (this.props.input_type) {
+            switch (this.props.type) {
                 case 'switch':
                     return this.createSwitchBox();
                     break;

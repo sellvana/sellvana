@@ -192,9 +192,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     window.saveDescFieldLang = function (modal) {
         var modalNode = $(modal.getDOMNode());
-        var container = modalNode.find('div[id$="-container"]');
-        if (!$.fn.modalValidate(container)) return;
-
         _saveLangs(modalNode, $descContainer, 'wysiwyg');
         modal.close();
     };

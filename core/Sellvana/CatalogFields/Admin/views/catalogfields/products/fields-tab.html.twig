@@ -142,16 +142,14 @@
             },
             createTextarea: function (field) {
                 return React.createElement(Components.ControlInput, {
-                    input_type: 'textarea',
+                    type: 'textarea',
                     value: field.default_value,
                     callback: this.handleInputChange,
+                    validation: {
+                        required: (field.required || 'false')
+                    },
                     attrs: {
-                        id: guid(),
-                        type: 'text',
-                        name: guid(),
                         disabled: field.disable || false,
-                        className: 'form-control',
-                        'data-rule-required': (field.required || 'false'),
                         'data-code': field.field_code,
                         'data-field-id': field.id
                     }
@@ -159,7 +157,7 @@
             },
             createWysiwyg: function (field) {//handleWysiwygChange
                 return React.createElement(Components.SpecialInput, {
-                    input_type: 'wysiwyg',
+                    type: 'wysiwyg',
                     value: field.default_value,
                     className: 'ckeditor',
                     disable: field.disable,
@@ -186,7 +184,7 @@
             },
             createSwitchBox: function (field) {
                 return React.createElement(Components.SpecialInput, {
-                    input_type: 'switch',
+                    type: 'switch',
                     id: field.id,
                     value: field.default_value,
                     disable: field.disable,
@@ -200,15 +198,13 @@
             },
             createInput: function (field) {
                 return React.createElement(Components.ControlInput, {
-                    input_type: 'input',
                     value: field.default_value,
                     callback: this.handleInputChange,
+                    validation: {
+                        required: (field.required || 'false')
+                    },
                     attrs: {
-                        type: 'text',
-                        name: guid(),
                         disabled: field.disable || false,
-                        className: 'form-control',
-                        'data-rule-required': (field.required || 'false'),
                         'data-code': field.field_code,
                         'data-field-id': field.id
                     }

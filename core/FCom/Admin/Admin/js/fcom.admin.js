@@ -1146,7 +1146,7 @@ define(fcomAdminDeps, function ($, Ladda) {
          */
         function wysiwygCreate(id, value, callback) {
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
-                FCom.Admin.log(id, 'wysiwygcreate');
+                //FCom.Admin.log(id, 'wysiwygcreate');
                 editors[id] = true; // prevent double loading
 
                 CKEDITOR.replace(id, {
