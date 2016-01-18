@@ -50,8 +50,7 @@
         var SortableFieldItem = React.createClass({
             getDefaultProps: function () {
                 return {
-                    default_lang_fields: ['text', 'textarea', 'wysiwyg'],
-                    editors: {}
+                    default_lang_fields: ['text', 'textarea', 'wysiwyg']
                 }
             },
             getInitialState: function () {
@@ -70,12 +69,8 @@
                 this.renderField();
                 this.initializeSpecialInput();
             },
-            componentWillUpdate: function (nextProps, nextState) {
-                this.clearCKEDITORIntances();
-            },
             componentDidUpdate: function () {
                 this.renderField();
-                this.initializeSpecialInput();
             },
             componentWillUnmount: function () {
                 if (this.refs['field_' + this.state.field.id])
@@ -115,17 +110,6 @@
             getClassName: function () {
                 return this.state.field.id == dragging ? "dragging" : "";
             },
-            clearCKEDITORIntances: function () {
-                var that = this;
-                if (CKEDITOR.instances.length) {
-                    _(CKEDITOR.instances).each(function (editor, id) {
-                        if (that.props.editors[id]) {
-                            editor.destroy(true);
-                            delete that.props.editors[id];
-                        }
-                    });
-                }
-            },
             getOptions: function (id) {
                 var options = this.state.field.options || [];
                 return _(options).map(function (option, id) {
@@ -149,6 +133,9 @@
             handleInputChange: function (e) {
                 var $input = $(e.target);
                 this.props.refreshChanges($input.data('code'), $input.val());
+            },
+            handleWysiwygChange: function (editor, data) {
+                this.props.refreshChanges(this.state.field.field_code, data);
             },
             createTextarea: function (field) {
                 return React.createElement(Components.ControlInput, {
@@ -176,7 +163,7 @@
                     'data-rule-required': field.required || 'false',
                     'data-code': field.field_code,
                     'data-field-id': field.id,
-                    defaultValue: field.default_value || '0'
+                    defaultValue: field.default_value
                 });
             },
             createSelect2: function (field) {
@@ -268,9 +255,7 @@
                 });
             },
             initializeSpecialInput: function () {
-                var that = this,
-                    field = this.state.field;
-
+                var field = this.state.field;
                 switch (field.admin_input_type) {
                     case 'boolean':
                         var $switchCbx = $('.switch-cbx');
@@ -279,33 +264,22 @@
                             offText: '<i class="icon-remove" />',
                             onSwitchChange: function (e, state) {
                                 var s = state ? '1' : '0';
-                                that.props.refreshChanges(field.field_code, s);
-                            },
+                                this.props.refreshChanges(field.field_code, s);
+                            }.bind(this),
                             state: parseInt(field.default_value) == 1
                         });
                         break;
                     case 'wysiwyg':
-                        var $wysiwyg = $('textarea.field-ckeditor[data-code="' + field.field_code + '"]');
-                        var id = $wysiwyg.prop('id');
-                        var fieldId = $wysiwyg.data('id');
+                        var target = 'textarea.field-ckeditor[data-code="' + field.field_code + '"]',
+                                value = '';
 
-                        if (id && CKEDITOR !== undefined && !CKEDITOR.instances[id]) {
-                            that.props.editors[id] = true;
-
-                            CKEDITOR.replace(id, {
-                                startupMode: 'wysiwyg'
-                            });
-
-                            if (that.props.multisite) {
-                                CKEDITOR.instances[id].setData(field.default_value);
-                            }
-
-                            CKEDITOR.instances[id].on('blur', function (e) {
-                                e.editor.updateElement();
-                                var data = e.editor.getData();
-                                that.props.refreshChanges(field.field_code, data);
-                            });
+                        if (_.keys(this.props.sites).length > 1) {
+                            var sites = this.props.sites;
+                            var siteId = this.props.site_id;
+                            value = sites[siteId || 'default'][field.id] || '';
                         }
+
+                        adminForm.wysiwygInit(target, value, this.handleWysiwygChange);
                         break;
                     default:
                         break;
@@ -474,8 +448,10 @@
             },
             move: function (over, placement) {
                 var to = Number(over.dataset.id);
-                var from = dragging || Number(this.dragged);
-                this.props.sort(to, from, placement);
+                if (to) {
+                    var from = dragging || Number(this.dragged);
+                    this.props.sort(to, from, placement);
+                }
             },
             allowDrop: function (e) {
                 e.stopPropagation();
