@@ -77,8 +77,7 @@ class Sellvana_CatalogFields_Main extends BClass
                     continue;
                 }
                 foreach ($set['fields'] as $field) {
-                    #var_dump($field);
-                    $p->set($field['field_code'], $field['value']);
+                    $p->set($field['field_code'], $this->BUtil->arrayGet($field, 'value'));
                 }
             }
         } else {
