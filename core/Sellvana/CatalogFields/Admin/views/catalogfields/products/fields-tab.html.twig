@@ -269,7 +269,7 @@
                 }
 
                 // If multisite is enabled && not default then render multisite field
-                if (_.keys(sites).length > 1 && !this.props.is_default_site) {
+                if (_.keys(sites).length > 1 && this.props.site_id != '') {
                     React.render(this.createMultiSiteComponent(field), this.refs['site_value_' + field.id].getDOMNode());
                 }
             },

@@ -8,8 +8,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
     var LangFields = React.createClass({
         componentWillUnmount: function () {
             _(this.props.langs).map(function (lang, key) {
-                if (this.refs['lang_field_' + ++key])
-                    React.unmountComponentAtNode(this.refs['lang_field_' + ++key].getDOMNode());
+                if (this.refs['lang_field_' + lang.lang_code])
+                    React.unmountComponentAtNode(this.refs['lang_field_' + lang.lang_code].getDOMNode());
             }.bind(this));
         },
         componentDidMount: function () {
@@ -62,7 +62,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                         break;
                 }
 
-                React.render(node, this.refs['lang_field_' + ++key].getDOMNode());
+                React.render(node, this.refs['lang_field_' + lang.lang_code].getDOMNode());
             }.bind(this));
         },
         removeLangField: function (e) {
@@ -82,7 +82,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 <div className="col-md-3 control-label">
                                     <span className="badge badge-default">{lang.lang_code}</span>
                                 </div>
-                                <div className="col-md-6" ref={'lang_field_' + ++key}></div>
+                                <div className="col-md-6" ref={'lang_field_' + lang.lang_code}></div>
                                 <div className="col-md-3">
                                     <button type="button" onClick={that.removeLangField} data-code={lang.lang_code}
                                             className="btn btn-danger btn-sm field-remove">

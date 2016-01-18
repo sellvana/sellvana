@@ -8,8 +8,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
     var LangFields = React.createClass({displayName: "LangFields",
         componentWillUnmount: function () {
             _(this.props.langs).map(function (lang, key) {
-                if (this.refs['lang_field_' + ++key])
-                    React.unmountComponentAtNode(this.refs['lang_field_' + ++key].getDOMNode());
+                if (this.refs['lang_field_' + lang.lang_code])
+                    React.unmountComponentAtNode(this.refs['lang_field_' + lang.lang_code].getDOMNode());
             }.bind(this));
         },
         componentDidMount: function () {
@@ -62,7 +62,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                         break;
                 }
 
-                React.render(node, this.refs['lang_field_' + ++key].getDOMNode());
+                React.render(node, this.refs['lang_field_' + lang.lang_code].getDOMNode());
             }.bind(this));
         },
         removeLangField: function (e) {
@@ -82,7 +82,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 React.createElement("div", {className: "col-md-3 control-label"}, 
                                     React.createElement("span", {className: "badge badge-default"}, lang.lang_code)
                                 ), 
-                                React.createElement("div", {className: "col-md-6", ref: 'lang_field_' + ++key}), 
+                                React.createElement("div", {className: "col-md-6", ref: 'lang_field_' + lang.lang_code}), 
                                 React.createElement("div", {className: "col-md-3"}, 
                                     React.createElement("button", {type: "button", onClick: that.removeLangField, "data-code": lang.lang_code, 
                                             className: "btn btn-danger btn-sm field-remove"}, 
@@ -255,7 +255,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                             React.createElement("table", null, 
                                 React.createElement("tbody", null, 
                                 React.createElement("tr", null, 
-                                    React.createElement("td", null, React.createElement(FComSelect2, React.__spread({},  inlineProps, {options: defaultLangs, 
+                                    React.createElement("td", null, 
+                                        React.createElement(FComSelect2, React.__spread({},  inlineProps, {options: defaultLangs, 
                                                                       onChange: this.handleSelect2Change, 
                                                                       defaultValue: []}))
                                     ), 
