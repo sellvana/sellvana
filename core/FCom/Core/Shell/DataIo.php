@@ -13,6 +13,7 @@ class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
     const OPTION_FILE = 'f';
     const OPTION_VERBOSE = 'v';
     const OPTION_QUIET = 'q';
+    const OPTION_ALL = 'all';
 
     static protected $_actionName = 'data-io';
 
@@ -20,6 +21,8 @@ class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
         'f?' => 'file',
         'v' => 'verbose',
         'q' => 'quiet',
+        'm' => 'model',
+        'all'
     ];
 
     protected $_importStarted = 0;
@@ -33,7 +36,7 @@ class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
      */
     public function getShortHelp()
     {
-        return 'Import management';
+        return 'Import\Export management';
     }
 
     /**
@@ -52,15 +55,22 @@ Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {gr
 Commands:
 
     {green*}list{/}     List of available files for import
-    {green*}import{/}   Import file
+    {green*}import{/}   Import file(s)
+    {green*}export{/}   Export to file
 
     {green*}help{/}     This help
 
 Options:
 
-  Device selection and switching:
+  File/Model selection:
     {green*}-f {/}{cyan*}<file>{/}
-    {green*}--file={/}{cyan*}<file>{/}     File to import
+    {green*}--file={/}{cyan*}<file>{/}     File(s) to import / File to export
+
+    {green*}-m {/}{cyan*}<model>{/}
+    {green*}--model={/}{cyan*}<model>{/}   Model(s) to export({red}Only for export{/})
+
+  Overwrite control:
+    {green*}    --all{/}         Export all models ({red}Only for export{/})
 
   Informative output:
     {green*}-v, --verbose{/}     Verbose output of the process
@@ -162,7 +172,7 @@ EOT;
     }
 
     /**
-     * Get file list for import process;
+     * Get file list for import process
      *
      * @return array
      */
@@ -414,5 +424,72 @@ EOT;
         $this->_bachStarted = microtime(true);
 
         return;
+    }
+
+
+    /**
+     * Export to file
+     */
+    public function _exportCmd()
+    {
+        $file = $this->_getFileForExport();
+
+        var_dump($this->getOption(self::OPTION_ALL));
+        exit();
+        $data                           = $this->FCom_Core_ImportExport->collectExportableModels();
+        ksort($data);
+        $default         = [
+            'model'    => '',
+            'parent'   => null,
+            'children' => []
+        ];
+        $fcom            = $default;
+        $fcom['id']    = 'FCom';
+        $fcom['model'] = 'FCom';
+        //$gridData        = ['FCom' => $fcom];
+        foreach ($data as $id => $d) {
+            $module = explode('_', $id, 3);
+            array_splice($module, 2);
+            $module = join('_', $module);
+            if (!isset($gridData[$module])) {
+                //$mod                                 = $default;
+                //$mod['id']                         = $module;
+                //$mod['model']                      = $module;
+                //$mod['parent']                     = 'FCom';
+                $gridData[$module]                 = true;
+                //$gridData['FCom']['children'][] = $module;
+            }
+            //$obj                                  = $default;
+            //$obj['id']                          = $id;
+            //$obj['model']                       = $id;
+            //$obj['parent']                      = $module;
+            //$gridData[$id]                      = true;//$obj;
+            //$gridData[$module]['children'][] = $id;
+        }
+
+        var_dump($gridData);
+
+        exit('zzz');
+    }
+
+    /**
+     * Get fileName for export process.
+     *
+     * @return null|string
+     */
+    protected function _getFileForExport()
+    {
+        $file = $this->getOption(self::OPTION_FILE);
+        if (is_array($file)) {
+            throw new BException('Option \'--file\' can be used only once in a single command.');
+        }
+
+        if (!is_string($file)) {
+            throw new BException('Option \'--file\' is required.');
+        }
+
+        if (!preg_match('/^[\.\-\w]*$/', $file)) {
+            throw new BException('Filename is invalid.');
+        }
     }
 }
