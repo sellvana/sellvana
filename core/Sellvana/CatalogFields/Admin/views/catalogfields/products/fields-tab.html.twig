@@ -33,7 +33,7 @@
 <div id='fields_list'></div>
 
 <script type="text/javascript">
-    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage) {
+    require(['react', 'underscore', 'jquery', 'fcom.components', 'griddle.fcomModalForm', 'griddle.fcomSelect2', 'griddle.fcomLanguage', 'sortable', 'ckeditor', 'jquery.validate', 'unique'], function (React, _, $, Components, FComModalForm, FComSelect2, FComMultiLanguage, Sortable) {
         var APP = {},
             dragging,
             collection = {},
@@ -95,16 +95,13 @@
             },
             move: function (over, placement) {
                 var to = Number(over.dataset.parent);
-                var from = dragging || Number(this.dragged);
+                var from = Number(this.dragged) || dragging;
                 this.props.sort(to, from, placement);
             },
             dragOver: function (e) {
                 e.stopPropagation();
                 e.preventDefault();
-                var over = e.currentTarget;
-                var placement = 'append';
-
-                this.move(over, placement);
+                this.move(e.currentTarget, 'append');
             },
             getClassName: function () {
                 return this.state.field.id == dragging ? "dragging" : "";
@@ -296,12 +293,12 @@
             render: function () {
                 var field = this.props.field;
                 return React.DOM.div(React.__spread({}, this.state.sortable, {
-                            id: field.field_code + '_field',
-                            'data-field-id': field.id,
-                            'data-parent': field.parent,
-                            className: 'form-group sort-item'
-                        }),
-                        React.DOM.div({className: 'col-md-9 col-lg-push-2'},
+                        id: field.field_code + '_field',
+                        'data-field-id': field.id,
+                        'data-parent': field.parent,
+                        className: 'form-group sort-item'
+                    }),
+                    React.DOM.div({className: 'col-md-9 col-lg-push-2'},
                         React.DOM.label({
                                 className: 'col-md-2 control-label dd-handle control-handle',
                                 htmlFor: 'prod-review-text',
@@ -325,8 +322,8 @@
                                 },
                                 React.DOM.i({className: 'icon-remove'})
                             ),
-                                React.DOM.div({ref: 'lang_' + field.id, className: 'col-md-6'}),
-                                React.DOM.div({ref: 'site_value_' + field.id, className: 'col-md-4'})
+                            React.DOM.div({ref: 'lang_' + field.id, className: 'col-md-6'}),
+                            React.DOM.div({ref: 'site_value_' + field.id, className: 'col-md-4'})
                         )
                     )
                 )
@@ -334,6 +331,25 @@
         });
 
         var SortableFieldList = React.createClass({
+            handleSiteValueChange: function (e, callback, selection) {
+                var $target = $(e.currentTarget),
+                    fieldId = $target.data('field-id'),
+                    sets = this.props.sets,
+                    sites = this.props.sites,
+                    siteId = this.props.site_id;
+
+                // Use default value
+                if (selection.id == '0') {
+                    sites[siteId][fieldId] = sites['default'][fieldId];
+                    _(sets).each(function (set, si) {
+                        var fi = _.findIndex(set.fields, { id: fieldId });
+                        if (fi != -1) sets[si].fields[fi].value = sites['default'][fieldId];
+                    });
+                }
+
+                FieldsListComponent.setProps({ sets: sets });
+                this.props.refreshData();
+            },
             removeField: function (e) {
                 var $target = $(e.currentTarget),
                         fieldId = $target.data('field-id').toString(),
@@ -363,11 +379,10 @@
                         sites: that.props.sites,
                         node: field.node,
                         site_id: that.props.site_id,
-                        multisite: !_.keys(that.props.sites).length,
                         refreshChanges: that.props.refreshChanges,
                         refreshData: that.props.refreshData,
                         refreshLangs: that.props.refreshLangs,
-                        handleSiteValueChange: that.props.handleSiteValueChange,
+                        handleSiteValueChange: that.handleSiteValueChange,
                         removeField: that.removeField,
                         sort: that.props.sort
                     });
@@ -466,10 +481,10 @@
                             return React.DOM.div({
                                 key: set.id,
                                 'data-set-id': set.id,
-                                        'data-id': set.node,
-                                        className: 'box box-borderd green-border box-nomargin prod-fieldset',
-                                        onDrop: that.drop,
-                                        onDragOver: that.allowDrop
+                                'data-id': set.node,
+                                className: 'box box-borderd green-border box-nomargin prod-fieldset',
+                                onDrop: that.drop,
+                                onDragOver: that.allowDrop
                             },
                                 React.DOM.div({className: 'box-header box-header-small'},
                                     React.DOM.div({className: 'title'}, set.set_name),
@@ -542,7 +557,6 @@
                 return {
                     sets: populateTreeIds(this.props.sets),
                     sites: this.props.site_values || { default: {} },
-                    is_default_site: true,
                     site_values: {},
                     site_id: ''
                 };
@@ -565,8 +579,6 @@
                 this.setState({
                     sets: nextProps.sets,
                     sites: sites,
-                    is_default_site: siteId === '',
-                    is_multisite_changed: true,
                     site_id: siteId
                 });
             },
@@ -577,7 +589,6 @@
                     sites = this.state.sites,
                     data = [];
 
-                var site_values = sites[this.state.site_id || 'default'];
                 _(sets).each(function (set, i) {
                     _(set.fields).each(function (f, fi) {
                         var $inputField = $('[data-code="'+ f.field_code+'"]');
@@ -586,7 +597,7 @@
                     if (!set.deleted) data.push(set);
                 });
 
-                if (this.props.multisite) {
+                if (_.keys(sites).length > 1) {
                     $siteHiddenInput.val(JSON.stringify(sites));
                 }
 
@@ -639,29 +650,6 @@
                 });
                 this.refreshData();
             },
-            handleSiteValueChange: function (e, callback, selection) {
-                var that = this,
-                    $target = $(e.currentTarget),
-                    fieldId = $target.data('field-id'),
-                    sets = this.state.fieldSets,
-                    sites = this.state.sites,
-                    siteId = this.state.site_id;
-
-                var siteValues = this.state.site_values;
-                siteValues[fieldId] = selection;
-
-                // Use default value
-                if (selection.id == '0') {
-                    sites[siteId][fieldId] = sites['default'][fieldId];
-                    _(sets).each(function (set, si) {
-                        var fi = _.findIndex(set.fields, { id: fieldId });
-                        if (fi != -1) sets[si].fields[fi].value = sites['default'][fieldId];
-                    });
-                }
-
-                this.setState({site_values: siteValues, sets: sets});
-                this.refreshData();
-            },
             // Removes a node from collection
             // returns the node itself
             remove: function (id) {
@@ -698,7 +686,6 @@
             // called internally by _insertBefore
             // and _insertAfter
             insert: function (node, to, index) {
-//                console.log(node, to, index)
                 // Update parent reference
                 node.parent = to;
                 // Insert at new location
@@ -731,7 +718,6 @@
                     refreshLangs: this.refreshLangs,
                     refreshChanges: this.refreshChanges,
                     refreshData: this.refreshData,
-                    handleSiteValueChange: this.handleSiteValueChange,
                     sort: this.sort
                 }));
             }
@@ -1100,8 +1086,7 @@
         var FieldsListComponent = React.render(
                 React.createElement(FieldsListGrid, {
                     sets: fieldSets || {},
-                    site_values: initData['site_values'],
-                    multisite: !_.isEmpty(sites)
+                    site_values: initData['site_values']
                 }), fieldsListContainer
         );
 
