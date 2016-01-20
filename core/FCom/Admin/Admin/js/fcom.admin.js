@@ -1680,7 +1680,7 @@ define(fcomAdminDeps, function ($, Ladda) {
      * @param obj
      * @returns {*}
      */
-    $.fn.clone = function (obj) {
+    $.fn.deepClone = function (obj) {
         var copy;
 
         // Handle the 3 simple types, and null or undefined
@@ -1697,7 +1697,7 @@ define(fcomAdminDeps, function ($, Ladda) {
         if (obj instanceof Array) {
             copy = [];
             for (var i = 0, len = obj.length; i < len; i++) {
-                copy[i] = clone(obj[i]);
+                copy[i] = $.fn.deepClone(obj[i]);
             }
             return copy;
         }
@@ -1706,7 +1706,7 @@ define(fcomAdminDeps, function ($, Ladda) {
         if (obj instanceof Object) {
             copy = {};
             for (var attr in obj) {
-                if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+                if (obj.hasOwnProperty(attr)) copy[attr] = $.fn.deepClone(obj[attr]);
             }
             return copy;
         }
