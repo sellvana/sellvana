@@ -1024,6 +1024,14 @@ class FCom_Core_ImportExport extends BClass
     }
 
     /**
+     * @return string
+     */
+    public function getDefaultExportFile()
+    {
+        return $this->_defaultExportFile;
+    }
+
+    /**
      * @param $modelName
      * @param $modelKeyConditions
      * @throws BException
