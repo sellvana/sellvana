@@ -926,7 +926,8 @@
                                             href: '#shopper-tab',
                                             'aria-controls': 'shopper-tab',
                                             role: 'tab',
-                                            'data-toggle': 'tab'
+                                            'data-toggle': 'tab',
+                                            onClick: window.applyPricesForAllFields
                                         }, 'Price rule')
                                 )
                         ),
@@ -1118,31 +1119,31 @@
                     }
 
                     var navTab = React.DOM.li({
-                                className: className,
-                                role: 'presentation',
-                                key: option,
-                                id: option + '-tab'
-                            },
-                            React.DOM.a({
-                                        id: 'btn' + _capitalizeFirstLetter(option) + 'Tab',
-                                        href: '#' + option,
-                                        role: 'tab',
-                                        'data-toggle': 'tab',
-                                        'aria-controls': option,
-                                        onClick: (function (event) {
-                                            // TODO: Re-rendering price grid if needed when tab changed or something like that
-                                        }).bind(this)
-                                    }, _capitalizeFirstLetter(_toggleSpace(option, true))
-                            )
+                            className: className,
+                            role: 'presentation',
+                            key: option,
+                            id: option + '-tab'
+                        },
+                        React.DOM.a({
+                                id: 'btn' + _capitalizeFirstLetter(option) + 'Tab',
+                                href: '#' + option,
+                                role: 'tab',
+                                'data-toggle': 'tab',
+                                'aria-controls': option,
+                                onClick: (function (event) {
+                                    // TODO: Re-rendering price grid if needed when tab changed or something like that
+                                }).bind(this)
+                            }, _capitalizeFirstLetter(_toggleSpace(option, true))
+                        )
                     );
 
                     var tabPane = React.DOM.div({
-                                role: 'tabpanel',
-                                className: 'tab-pane ' + className,
-                                id: option,
-                                key: option
-                            },
-                            React.createElement(Price, {key: option, id: option, options: priceOptions})
+                            role: 'tabpanel',
+                            className: 'tab-pane ' + className,
+                            id: option,
+                            key: option
+                        },
+                        React.createElement(Price, {key: option, id: option, options: priceOptions})
                     );
 
                     navTabs.push(navTab);

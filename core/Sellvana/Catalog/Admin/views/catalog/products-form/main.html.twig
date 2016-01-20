@@ -174,18 +174,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     window.saveNameFieldLang = function (modal) {
         var modalNode = $(modal.getDOMNode());
-        var container = modalNode.find('div[id$="-container"]');
-        if (!$.fn.modalValidate(container)) return;
-
         _saveLangs(modalNode, $nameLangContainer);
         modal.close();
     };
 
     window.saveShortDescFieldLang = function (modal) {
         var modalNode = $(modal.getDOMNode());
-        var container = modalNode.find('div[id$="-container"]');
-        if (!$.fn.modalValidate(container)) return;
-
         _saveLangs(modalNode, $shortDescContainer, 'textarea');
         modal.close();
     };

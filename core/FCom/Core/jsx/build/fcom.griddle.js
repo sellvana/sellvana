@@ -442,8 +442,15 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        React.createElement(Components.Modal, {show: true, title: "Mass Edit Form", confirm: "Save changes", cancel: "Close", onConfirm: this.modalSaveMassChanges, isLocalMode: isLocalMode, formType: this.getMassEditFormType()}, 
-                            React.createElement(FComModalMassEditForm, {editUrl: editUrl, columnMetadata: this.props.columnMetadata, id: gridId, isLocalMode: isLocalMode, formType: this.getMassEditFormType()})
+                        React.createElement(Components.Modal, {show: true, title: "Mass Edit Form", confirm: "Save changes", 
+                                          cancel: "Close", 
+                                          onConfirm: this.modalSaveMassChanges, 
+                                          isLocalMode: isLocalMode, 
+                                          formType: this.getMassEditFormType()}, 
+                            React.createElement(FComModalMassEditForm, {editUrl: editUrl, columnMetadata: this.props.columnMetadata, 
+                                                   id: gridId, 
+                                                   isLocalMode: isLocalMode, 
+                                                   formType: this.getMassEditFormType()})
                         ),
                         modalEleContainer
                     );
@@ -537,7 +544,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 var modalEleContainer = document.getElementById(gridId + '-modal');
                 React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                 React.render(
-                    React.createElement(Components.Modal, {show: true, title: "Create Form", confirm: "Save changes", cancel: "Close", onConfirm: that.props.saveModalForm}, 
+                    React.createElement(Components.Modal, {show: true, title: "Create Form", 
+                                      confirm: "Save changes", 
+                                      cancel: "Close", 
+                                      onConfirm: that.props.saveModalForm}, 
                         React.createElement(FComModalForm, {columnMetadata: that.props.columnMetadata, id: gridId})
                     ),
                     modalEleContainer
@@ -556,7 +566,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var gridId = this.props.getConfig('id');
 
             //quick search
-            var quickSearch = React.createElement("input", {type: "text", className: "f-grid-quick-search form-control", placeholder: "Search within results", id: gridId + '-quick-search', onChange: this.quickSearch});
+            var quickSearch = React.createElement("input", {type: "text", className: "f-grid-quick-search form-control", 
+                                     placeholder: "Search within results", 
+                                     id: gridId + '-quick-search', 
+                                     onChange: this.quickSearch});
 
             var disabledClass = !this.props.getSelectedRows().length ? ' disabled' : '';
             var configActions = this.props.getConfig('actions');
@@ -601,8 +614,12 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                                     default:
                                         //compatibility with old backbone grid
                                         
-                                        node = React.createElement("button", {className: action.class + (action.isMassAction ? disabledClass : ''), key: actionKey, id: action.id, 
-                                            type: "button", onClick: that.handleCustom.bind(null, action.callback)}, action.caption);
+                                        node = React.createElement("button", {className: action.class + (action.isMassAction ? disabledClass : ''), 
+                                                       key: actionKey, id: action.id, 
+                                                       type: "button", 
+                                                       onClick: that.handleCustom.bind(null, action.callback)}, 
+                                                    action.caption
+                                                );
                                         break;
                                 }
                             } else if (action.html) {
@@ -634,7 +651,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                         React.createElement("div", {className: "icon-ellipsis-vertical dd-handle dd3-handle"}), 
                         React.createElement("div", {className: "dd3-content"}, 
                             React.createElement("label", null, 
-                                React.createElement("input", {type: "checkbox", defaultChecked: checked, "data-id": column, "data-name": column, className: "showhide_column", onChange: that.toggleColumn}), 
+                                React.createElement("input", {type: "checkbox", defaultChecked: checked, "data-id": column, 
+                                       "data-name": column, 
+                                       className: "showhide_column", 
+                                       onChange: that.toggleColumn}), 
                                 colInfo ?  colInfo.label : column
                             )
                         )
@@ -748,10 +768,11 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 fieldDropDownNodes.unshift(React.createElement("option", {value: ""}));
 
                 fieldDropdownDiv = (
-                    React.createElement("div", { className: "well" },
-                        React.createElement("div", { className: "row" },
-                            React.createElement("div", { className: "col-sm-12" },
-                                React.createElement("select", { className: "select2 form-control", id: gridId + '-form-select', style: { width: '150px' } },
+                    React.createElement("div", {className: "well"}, 
+                        React.createElement("div", {className: "row"}, 
+                            React.createElement("div", {className: "col-sm-12"}, 
+                                React.createElement("select", {id: gridId + '-form-select', style: { width: '150px'}, 
+                                        className: "select2 form-control"}, 
                                     fieldDropDownNodes
                                 )
                             )

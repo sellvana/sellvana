@@ -1,5 +1,5 @@
 //noinspection JSPotentiallyInvalidUsageOfThis
-define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore', 'select2'], function (React, $, Locale, Sortable) {
+define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore', 'select2', 'jquery.validate'], function (React, $, Locale, Sortable) {
     FCom.Components = {};
 
     /**
@@ -47,6 +47,14 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         removeSpecialChars: function (str) { //todo: put this function to global utilities object
             var label = str.substr(0, str.lastIndexOf('.'));
             return label.replace(/[^A-Z0-9]/ig, ' ');
+        },
+        doesSupportTouchEvents: function () {
+            try {
+                document.createEventObject('TouchEvent');
+                return true;
+            } catch (e) {
+                return false;
+            }
         }
     };
 
@@ -249,7 +257,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                 case 'textarea':
                     node = React.createElement("textarea", React.__spread({id: this.props.id || guid(), 
                                     name: this.props.name || guid(), 
-                                    className: "form-contro l" + this.props.className, 
+                                    className: "form-control " + this.props.className, 
                                     onChange: this.handleChange, 
                                     onBlur: this.props.callback, 
                                     value: this.state.value},  this.props.attrs,  validationRules));
@@ -259,8 +267,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                     _(this.props.options).each(function (text, value) {
                         options.push(React.createElement("option", {value: value, key: value}, text));
                     });
-                    node = React.createElement("select", React.__spread({
-                            id: this.props.id || guid(), 
+                    node = React.createElement("select", React.__spread({id: this.props.id || guid(), 
                             name: this.props.name || guid(), 
                             className: "form-control " + this.props.className, 
                             onChange: this.handleChange, 
@@ -322,8 +329,8 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             this.setState({ value: e.target.value });
         },
         createSwitchBox: function () {
-            return React.createElement("input", React.__spread({type: "checkbox", id: this.props.id || guid(), 
-                          name: this.props.name || guid(), 
+            return React.createElement("input", React.__spread({type: "checkbox", id: this.props.id, 
+                          name: this.props.name, 
                           className: "switch-cbx " + this.props.className, 
                           defaultChecked: !!(this.state.value === undefined || this.state.value === '1'), 
                           value: this.state.value, 
@@ -331,12 +338,17 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                           ref: 'switch-cbx-' + this.props.id},  this.props.attrs));
         },
         createWysiwyg: function () {
-            return React.createElement("textarea", React.__spread({id: this.props.id || guid(), 
-                             name: this.props.name || guid(), 
+            if (!this.props.id) {
+                this.props.id = guid();
+            }
+            return React.createElement("div", null, React.createElement("textarea", React.__spread({id: this.props.id, 
+                             name: this.props.name, 
                              className: 'form-control ' + this.props.className, 
                              defaultValue: this.state.value, 
                              onChange: this.handleChange, 
-                             ref: 'wysiwyg-' + this.props.id},  this.props.attrs));
+                             ref: 'wysiwyg-' + this.props.id},  this.props.attrs)), 
+                        React.createElement("label", {htmlFor: this.props.id, className: "error", style: { display: 'none'}})
+                    );
         },
         renderNode: function () {
             switch (this.props.type) {
@@ -917,6 +929,169 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             return (
                 React.createElement("div", null, 
                     React.createElement("input", React.__spread({id: this.props.id},  this.props.attrs, {type: "hidden", style: this.props.style}))
+                )
+            );
+        }
+    });
+
+    var cx = React.addons.classSet;
+    var RatingStep = React.createClass({displayName: "RatingStep",
+        getDefaultProps: function () {
+            return {
+                type: 'empty',
+                temporaryRating: false,
+                stepTitle: {1: 'Bad', 2: 'Poor', 3: 'Ok', 4: 'Good', 5: 'Very good'}
+            };
+        },
+        handleClick: function(e) {
+            this.props.onClick(this.props.step, e);
+        },
+        handleMouseMove: function(e) {
+            this.props.onMouseMove(this.props.step, e);
+        },
+        render: function () {
+            var classes = {
+                'rating-widget-step': true,
+                'rating-widget-step-css': true,
+                'rating-widget-step-hover': this.props.temporaryRating
+            };
+            classes['rating-widget-step-' + this.props.type] = true;
+
+            return (
+                React.createElement("span", {
+                    className: cx(classes), 
+                    onClick: this.handleClick, 
+                    onMouseMove: this.handleMouseMove, 
+                    title: this.props.stepTitle[this.props.step]}
+                )
+            );
+        }
+    });
+
+    FCom.Components.RatingWidget = React.createClass({displayName: "RatingWidget",
+        mixins: [FCom.Mixin],
+        mouseLastX: 0,
+        mouseLastY: 0,
+        getDefaultProps: function () {
+            return {
+                size: 5,
+                disabled: false,
+                initialRating: 0,
+                halfRating: false,
+                hover: true,
+                className: '',
+                onChange: function () {}
+            };
+        },
+        getInitialState: function () {
+            return {
+                rating: this.props.initialRating,
+                tempRating: null
+            };
+        },
+        handleClick: function(newRating, e) {
+            if (this.props.disabled) {
+                return;
+            }
+
+            newRating = this.calcHalfRating(newRating, e);
+            if (newRating === this.state.rating) {
+                newRating = 0;
+            }
+
+            this.setState({rating: newRating, tempRating: null});
+            this.props.onChange(newRating);
+        },
+        handleOnMouseMove: function(newTempRating, e) {
+            if (
+                this.doesSupportTouchEvents
+                || this.props.disabled
+                || !this.props.hover
+            ) {
+                return;
+            }
+
+            // Make sure the mouse has really moved. IE8 thinks the mouse is
+            // always moving
+            if (
+                e.clientX == this.mouseLastX &&
+                e.clientY == this.mouseLastY
+            ) {
+                return;
+            }
+            this.mouseLastX = e.clientX;
+            this.mouseLastY = e.clientY;
+
+            newTempRating = this.calcHalfRating(newTempRating, e);
+            this.setState({tempRating: newTempRating})
+        },
+        handleOnMouseLeave: function() {
+            this.setState({tempRating: null});
+        },
+        calcHalfRating: function(newRating, e) {
+            if (!this.props.halfRating) {
+                return newRating;
+            }
+
+            var stepClicked = e.target;
+            var stepWidth = stepClicked.offsetWidth;
+            var halfWidth = stepWidth / 2;
+
+            var stepClickedRect = stepClicked.getBoundingClientRect();
+            var clickPos = e.pageX - (stepClickedRect.left + document.body.scrollLeft);
+
+            if (clickPos <= halfWidth) {
+                newRating -= .5;
+            }
+
+            return newRating;
+        },
+        renderSteps: function() {
+            var ratingSteps = [];
+            var rating = this.state.tempRating || this.state.rating;
+
+            var roundRating = Math.round(rating);
+            var ceilRating = Math.ceil(rating);
+
+            for (var i = 1; i <= this.props.size; i++) {
+                var type = 'empty';
+
+                if (i <= rating) {
+                    type = 'whole';
+                } else if(
+                    roundRating == i &&
+                    roundRating == ceilRating &&
+                    this.props.halfRating
+                ) {
+                    type = 'half';
+                }
+
+                ratingSteps.push(
+                    React.createElement(RatingStep, {
+                        step: i, 
+                        type: type, 
+                        temporaryRating: this.state.tempRating !== null, 
+                        onClick: this.handleClick, 
+                        onMouseMove: this.handleOnMouseMove, 
+                        key: "rating-step-" + i}
+                    )
+                );
+            }
+
+            return ratingSteps;
+        },
+        render: function () {
+            var ratingSteps = this.renderSteps();
+
+            var classes = {
+                'rating-widget': true,
+                'rating-widget-disabled': this.props.disabled
+            };
+            classes = cx(classes) + ' ' + this.props.className;
+
+            return (
+                React.createElement("div", {className: classes, onMouseLeave: this.handleOnMouseLeave}, 
+                    ratingSteps
                 )
             );
         }

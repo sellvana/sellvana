@@ -252,13 +252,6 @@
                 if (_.contains(this.props.default_lang_fields, field.admin_input_type)) {
                     React.render(this.createLanguageComponent(field), this.refs['lang_' + field.id].getDOMNode());
                     window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
-                        var modalNode = $(modal.getDOMNode());
-                        if (field.admin_input_type != 'wysiwyg') {
-                            var container = modalNode.find('div[id$="-container"]');
-                            if (!$.fn.modalValidate(container))
-                                return;
-                        }
-
                         var code = modal.props.fieldCode;
                         that.props.refreshLangs(code, langs);
                         modal.close();

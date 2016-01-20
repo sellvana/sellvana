@@ -442,8 +442,15 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                     var modalEleContainer = document.getElementById(gridId + '-modal');
                     React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                     React.render(
-                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" cancel="Close" onConfirm={this.modalSaveMassChanges} isLocalMode={isLocalMode} formType={this.getMassEditFormType()}>
-                            <FComModalMassEditForm editUrl={editUrl} columnMetadata={this.props.columnMetadata} id={gridId} isLocalMode={isLocalMode} formType={this.getMassEditFormType()} />
+                        <Components.Modal show={true} title="Mass Edit Form" confirm="Save changes" 
+                                          cancel="Close" 
+                                          onConfirm={this.modalSaveMassChanges} 
+                                          isLocalMode={isLocalMode} 
+                                          formType={this.getMassEditFormType()}>
+                            <FComModalMassEditForm editUrl={editUrl} columnMetadata={this.props.columnMetadata} 
+                                                   id={gridId} 
+                                                   isLocalMode={isLocalMode} 
+                                                   formType={this.getMassEditFormType()} />
                         </Components.Modal>,
                         modalEleContainer
                     );
@@ -537,7 +544,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                 var modalEleContainer = document.getElementById(gridId + '-modal');
                 React.unmountComponentAtNode(modalEleContainer); //un-mount current modal
                 React.render(
-                    <Components.Modal show={true} title="Create Form" confirm="Save changes" cancel="Close" onConfirm={that.props.saveModalForm}>
+                    <Components.Modal show={true} title="Create Form" 
+                                      confirm="Save changes" 
+                                      cancel="Close" 
+                                      onConfirm={that.props.saveModalForm}>
                         <FComModalForm columnMetadata={that.props.columnMetadata} id={gridId} />
                     </Components.Modal>,
                     modalEleContainer
@@ -556,7 +566,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             var gridId = this.props.getConfig('id');
 
             //quick search
-            var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder="Search within results" id={gridId + '-quick-search'} onChange={this.quickSearch} />;
+            var quickSearch = <input type="text" className="f-grid-quick-search form-control" 
+                                     placeholder="Search within results" 
+                                     id={gridId + '-quick-search'} 
+                                     onChange={this.quickSearch} />;
 
             var disabledClass = !this.props.getSelectedRows().length ? ' disabled' : '';
             var configActions = this.props.getConfig('actions');
@@ -601,8 +614,12 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                                     default:
                                         //compatibility with old backbone grid
                                         
-                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} key={actionKey} id={action.id}
-                                            type="button" onClick={that.handleCustom.bind(null, action.callback)}>{action.caption}</button>;
+                                        node = <button className={action.class + (action.isMassAction ? disabledClass : '')} 
+                                                       key={actionKey} id={action.id} 
+                                                       type="button" 
+                                                       onClick={that.handleCustom.bind(null, action.callback)}>
+                                                    {action.caption}
+                                                </button>;
                                         break;
                                 }
                             } else if (action.html) {
@@ -634,7 +651,10 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                         <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                         <div className="dd3-content">
                             <label>
-                                <input type="checkbox" defaultChecked={checked} data-id={column} data-name={column} className="showhide_column" onChange={that.toggleColumn} />
+                                <input type="checkbox" defaultChecked={checked} data-id={column} 
+                                       data-name={column} 
+                                       className="showhide_column" 
+                                       onChange={that.toggleColumn} />
                                 {colInfo ?  colInfo.label : column}
                             </label>
                         </div>
@@ -741,22 +761,23 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
             if (!oneField) {
                 var fieldDropDownNodes = this.state.fields.map(function(column) {
                     if (!_.contains(that.state.shownFields, column.name)) {
-                        return React.createElement("option", {value: column.name}, column.label);
+                        return <option value={column.name}>{column.label}</option>;
                     }
                     return null;
                 });
-                fieldDropDownNodes.unshift(React.createElement("option", {value: ""}));
+                fieldDropDownNodes.unshift(<option value="" />);
 
                 fieldDropdownDiv = (
-                    React.createElement("div", { className: "well" },
-                        React.createElement("div", { className: "row" },
-                            React.createElement("div", { className: "col-sm-12" },
-                                React.createElement("select", { className: "select2 form-control", id: gridId + '-form-select', style: { width: '150px' } },
-                                    fieldDropDownNodes
-                                )
-                            )
-                        )
-                    )
+                    <div className="well">
+                        <div className="row">
+                            <div className="col-sm-12">
+                                <select id={gridId + '-form-select'} style={{ width: '150px' }}
+                                        className="select2 form-control">
+                                    {fieldDropDownNodes}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 );
             }
 

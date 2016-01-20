@@ -3,7 +3,7 @@
  *
  * FCom Multi Languages Component
  */
-define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale', 'ckeditor'], function (_, React, $, FComGriddleComponent, Components, FComSelect2, Locale) {
+define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale', 'ckeditor', 'jquery.validate'], function (_, React, $, FComGriddleComponent, Components, FComSelect2, Locale) {
 
     var LangFields = React.createClass({
         componentWillUnmount: function () {
@@ -36,6 +36,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                     case 'wysiwyg':
                         dataAttrs['rows'] = 5;
                         node = <Components.SpecialInput type='wysiwyg'
+                                                        id={this.props.id + '_' + lang.lang_code + '_' + key}
                                                         name={this.props.id + '_' + lang.lang_code}
                                                         value={lang.value}
                                                         className='ckeditor lang-field'
@@ -148,9 +149,35 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
         },
         confirmEditLangs: function (modal) {
             var modalConfig = this.props.modalConfig;
+            var $container = $(this.refs.container.getDOMNode());
+            var valid = true;
 
-            if (modalConfig.onSaved && typeof modalConfig.onSaved === 'string') {
+            if (this.props.inputType == 'wysiwyg') {
+                $container.find('textarea.ckeditor').each(function (index, ele) {
+                    var content = $('#cke_' + ele.id + ' iframe').contents().find("body").text();
+                    if (!content.length) {
+                        valid = false;
+                        $(this).next().next('label.error')
+                            .html(Locale._('This field is required.'))
+                            .show();
+                    } else {
+                        $(this).next().next('label.error').empty().hide();
+                    }
+                });
+            } else {
+                if (!$container.parent('form').length) {
+                    $container.wrap('<form />');
+                }
+
+                if (!$container.parent('form').valid())
+                    valid = false;
+                $container.unwrap();
+            }
+
+            if (valid && modalConfig.onSaved && typeof modalConfig.onSaved === 'string') {
                 window[modalConfig.onSaved](modal, this.state.availLangs);
+            } else if (valid) {
+                modal.close();
             }
         },
         getModalNode: function () {
@@ -261,7 +288,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                                                       defaultValue={[]}/>
                                     </td>
                                     <td>
-                                        <Components.Button type="button" className='btn-sm btn-primary' onClick={this.addLocaleField}>
+                                        <Components.Button type="button" className='btn-sm btn-primary'
+                                                           onClick={this.addLocaleField}>
                                             {Locale._('Add Locale')}
                                         </Components.Button>
                                     </td>
@@ -269,7 +297,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 </tbody>
                             </table>
                         </div>
-                        <div id={this.props.id + '-container'}>
+                        <div id={this.props.id + '-container'} ref='container'>
                             <LangFields id={this.props.id} langs={this.state.availLangs || []}
                                         removeField={this.removeLangField}
                                         setLangVal={this.setLangVal}/>

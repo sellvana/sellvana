@@ -39,10 +39,11 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
                 'editable' => true, 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'text', 'label' => 'Comment', 'addable' => true,
                 'editable' => true, 'editor' => 'textarea'],
-            ['name' => 'rating', 'label' => 'Total Rating', 'addable' => true,
+            /*['name' => 'rating', 'label' => 'Total Rating', 'addable' => true,
                 'editable' => true, 'display' => 'eval', 'element_print' => $this->inputRatingHtml('rating'),
                 'print' => '"<div class=\'rateit\' data-review=\'"+rc.row["id"]+"\' data-rateit-resetable=\'false\' data-rateit-min=\''.$reviewConfigs['min'].'\' data-rateit-max=\''.$reviewConfigs['max'].'\' data-rateit-readonly=\'false\' data-rateit-step=\''.$reviewConfigs['step'].'\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
-                /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))*/],
+                /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))]*/
+            ['type' => 'input', 'name' => 'rating', 'label' => 'Total Rating', 'editable' => 'inline', 'editor' => 'rating'],
             ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'addable' => true,
                 'editable' => true, 'validation' => ['number' => true]],
             ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
@@ -133,8 +134,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
             $config['data'] = $data;
 
             $config['callbacks'] = [
-                'componentDidMount' => 'prodReviewsRegister',
-                'componentDidUpdate' => 'prodReviewsUpdate'
+                'componentDidMount' => 'prodReviewsRegister'
             ];
         } else {
             //$config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
@@ -150,8 +150,7 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
 	        $config['filters'][] = ['field' => 'product_id', 'type' => 'multiselect'];
 
             $config['callbacks'] = [
-                'componentDidMount' => 'catalogReviewsRegister',
-                'componentDidUpdate' => 'catalogReviewsUpdate'
+                'componentDidMount' => 'catalogReviewsRegister'
             ];
         }
 
