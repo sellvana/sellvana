@@ -1140,11 +1140,13 @@ define(fcomAdminDeps, function ($, Ladda) {
 
         /**
          * convert textarea to wysiwyg with ckeditor
-         * @param id
+         * @param {string} id
+         * @param {string} value
+         * @param callback
          */
-        function wysiwygCreate(id) {
+        function wysiwygCreate(id, value, callback) {
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
-                FCom.Admin.log(id, 'wysiwygcreate');
+                //FCom.Admin.log(id, 'wysiwygcreate');
                 editors[id] = true; // prevent double loading
 
                 CKEDITOR.replace(id, {
@@ -1157,6 +1159,17 @@ define(fcomAdminDeps, function ($, Ladda) {
                     //allowedContent: true,
                     startupMode: 'wysiwyg'
                 });
+
+                if (value) CKEDITOR.instances[id].setData(value);
+
+                CKEDITOR.instances[id].on('blur', function (e) {
+                    e.editor.updateElement();
+                    if (typeof callback === 'function') {
+                        callback(e.editor, e.editor.getData());
+                    } else if (typeof callback === 'string') {
+                        window[callback](e.editor, e.editor.getData());
+                    }
+                });
 //
 //                $('#'+id).ckeditor(function() {
 //                    this.dataProcessor.writer.indentationChars = '  ';
@@ -1168,16 +1181,17 @@ define(fcomAdminDeps, function ($, Ladda) {
         /**
          * this function almost use to init ckeditor after load ajax form
          */
-        function wysiwygInit() {
+        function wysiwygInit(target, value, callback) {
             var form = this;
-            $('textarea.ckeditor').each(function () {
+            if (!target) target = 'textarea.ckeditor';
+            $(target).each(function () {
                 var id = $(this).attr('id');
                 if (!id) {
                     var cntEditors = editors.length;
                     id = cntEditors + 1;
                     $(this).attr('id', 'textarea-ckeditor-' + id);
                 }
-                form.wysiwygCreate(id);
+                form.wysiwygCreate(id, value, callback);
             });
         }
 
@@ -1658,6 +1672,46 @@ define(fcomAdminDeps, function ($, Ladda) {
         container.unwrap();
 
         return true;
+    };
+
+    /**
+     * Deep clone Object|Array|Date
+     *
+     * @param obj
+     * @returns {*}
+     */
+    $.fn.deepClone = function (obj) {
+        var copy;
+
+        // Handle the 3 simple types, and null or undefined
+        if (null == obj || "object" != typeof obj) return obj;
+
+        // Handle Date
+        if (obj instanceof Date) {
+            copy = new Date();
+            copy.setTime(obj.getTime());
+            return copy;
+        }
+
+        // Handle Array
+        if (obj instanceof Array) {
+            copy = [];
+            for (var i = 0, len = obj.length; i < len; i++) {
+                copy[i] = $.fn.deepClone(obj[i]);
+            }
+            return copy;
+        }
+
+        // Handle Object
+        if (obj instanceof Object) {
+            copy = {};
+            for (var attr in obj) {
+                if (obj.hasOwnProperty(attr)) copy[attr] = $.fn.deepClone(obj[attr]);
+            }
+            return copy;
+        }
+
+        throw new Error("Unable to copy obj! Its type isn't supported.");
     };
 
     /**
