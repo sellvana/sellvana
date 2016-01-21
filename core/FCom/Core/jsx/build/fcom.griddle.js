@@ -587,18 +587,21 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                             node = React.createElement("a", React.__spread({href: "#"},  actionProps), action.caption);
                             break;
                         case 'export':
-                            node = React.createElement("button", React.__spread({},  actionProps, {"data-action": "export", onClick: that.doMassAction}), action.caption);
+                            node = React.createElement("button", React.__spread({},  actionProps, {"data-action": "export", 
+                                                            onClick: that.doMassAction}), action.caption);
                             break;
                         case 'link_to_page':
                             node = React.createElement("a", React.__spread({href: "#"},  actionProps), action.caption);
                             break;
                         case 'edit':
                             actionProps.disabled = disabledClass;
-                            node = React.createElement("a", React.__spread({href: "#"},  actionProps, {"data-action": "mass-edit", onClick: that.doMassAction, role: "button"}), action.caption);
+                            node = React.createElement("button", React.__spread({type: "button"},  actionProps, {"data-action": "mass-edit", 
+                                           onClick: that.doMassAction, role: "button"}), action.caption);
                             break;
                         case 'delete':
                             actionProps.disabled = disabledClass;
-                            node = React.createElement("button", React.__spread({type: "button"},  actionProps, {"data-action": "mass-delete", onClick: that.doMassAction}), action.caption);
+                            node = React.createElement("button", React.__spread({type: "button"},  actionProps, {"data-action": "mass-delete", 
+                                           onClick: that.doMassAction}), action.caption);
                             break;
                         //todo: checking again new and add type
                         case 'add':

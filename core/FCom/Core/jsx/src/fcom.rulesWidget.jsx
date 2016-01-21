@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2', 'jquery.bootstrap-growl'], function (React, $, Components, Locale, store) {
+define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap-ladda', 'select2', 'jquery.bootstrap-growl', 'bootstrap-ladda-spin'], function (React, $, Components, Locale, store, Ladda) {
     function conditions(React, $, Components, Locale, Common) {
         // what type of condition we have, total amount or quantity
         var ConditionsType = React.createClass({
@@ -3475,11 +3475,14 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             React.render(<CouponApp.App {...callBacks} mode={mode} options={options} onUpdate={this.onCouponsUpdate}/>, appContainer);
             React.render(
                 <div className="modals-container">
-                    <Components.Modal title="Coupon grid" onLoad={this.addShowCodes.bind(this)} onConfirm={this.onModalSaveChange.bind(this)}/>
-                    <Components.Modal title="Generate coupons" onLoad={this.addGenerateCodes.bind(this)} onConfirm={this.postGenerate.bind(this)}>
+                    <Components.Modal id="coupons_grid" title="Coupon grid" onLoad={this.addShowCodes.bind(this)} onConfirm={this.onModalSaveChange.bind(this)}/>
+                    <Components.Modal id='generate_coupon_grid' title="Generate coupons" onLoad={this.addGenerateCodes.bind(this)}
+                                      onConfirm={this.postGenerate.bind(this)}
+                                      confirmClass='ladda-button'
+                                      confirmAttrs={{ 'data-style': 'expand-left' }}>
                         <CouponApp.GenerateForm onSubmit={this.postGenerate.bind(this)}/>
                     </Components.Modal>
-                    <Components.Modal title="Import coupons" onLoad={this.addImportCodes.bind(this)}/>
+                    <Components.Modal id="import_coupon_grid" title="Import coupons" onLoad={this.addImportCodes.bind(this)}/>
                 </div>, modalContainer);
         },
         options: {
@@ -3573,51 +3576,62 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             var url = this.options['generateCouponsUrl'];
             var $progress = $formContainer.find('.loading');
             var $result = $formContainer.find('.result').hide();
+            var loader = Ladda.create(e.getDOMNode().querySelector('.ladda-button'));
             $progress.show();
-            //$button.click(function (e) {
 
             var $meta = $('meta[name="csrf-token"]');
             var data = {};
             if ($meta.length) {
                 data["X-CSRF-TOKEN"] = $meta.attr('content');
             }
+
             $formContainer.find('input').each(function () {
                 var $self = $(this);
                 var name = $self.attr('name');
                 data[name] = $self.val();
             });
+
             // show indication that something happens?
-            $.post(url, data)
-                .done(function (result) {
-                    var status = result.status;
-                    var message = result.message;
-                    $.bootstrapGrowl(message, {type: 'success', align: 'center', width: 'auto'});
-                    $result.text(message);
-                    if (status != 'error') {
-                        var newRows = result['codes'].map(function (e, i) {
-                            //console.log(e, i);
-                            return {
-                                code: e,
-                                total_used: 0
-                            }
-                        });
-                        //console.log(newRows);
-                        var grid_id = result['grid_id'];
-                        RulesWidget.updateGrid(grid_id, newRows);
-                    }
-                })
-                .always(function (r) {
-                    $progress.hide();
-                    $result.show();
-                    if ($.isFunction(e.close)) {
-                        // e is the modal object
-                        setTimeout(e.close, 2000);
-                        //e.close();//close it
-                    }
-                    // hide notification
-                    RulesWidget.log(r);
-                });
-            //});
+            $.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                data: data,
+                beforeSend: function () {
+                    loader.start();
+                }
+            })
+            .done(function (result) {
+                var status = result.status;
+                var message = result.message;
+                $.bootstrapGrowl(message, {type: 'success', align: 'center', width: 'auto'});
+                $result.text(message);
+                if (status != 'error') {
+                    var newRows = result['codes'].map(function (e, i) {
+                        //console.log(e, i);
+                        return {
+                            code: e,
+                            total_used: 0
+                        }
+                    });
+                    //console.log(newRows);
+                    var grid_id = result['grid_id'];
+                    RulesWidget.updateGrid(grid_id, newRows);
+                }
+            })
+            .always(function (r) {
+                $progress.hide();
+                $result.show();
+                if ($.isFunction(e.close)) {
+                    // e is the modal object
+                    setTimeout(e.close, 2000);
+                    //e.close();//close it
+                }
+                // hide notification
+                RulesWidget.log(r);
+                loader.stop();
+            });
+
             if ($.isFunction(e.preventDefault)) {
                 e.preventDefault();
             }
@@ -3716,7 +3730,6 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             }
         },
         addGridRows: function (grid, rows) {
-            //var gridRows = grid.getRows();
             var gridRows = grid.getRows();
             var newRows = rows.filter(function (row, idx) {
                 row.id = row.code; // instead of worrying for duplicate codes, make the code the id and effectively update the duplicates instead of detecting them

@@ -85,8 +85,9 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 ), 
                                 React.createElement("div", {className: "col-md-6", ref: 'lang_field_' + lang.lang_code}), 
                                 React.createElement("div", {className: "col-md-3"}, 
-                                    React.createElement("button", {type: "button", onClick: that.removeLangField, "data-code": lang.lang_code, 
-                                            className: "btn btn-danger btn-sm field-remove"}, 
+                                    React.createElement(Components.Button, {type: "button", className: "btn-sm btn-danger field-remove", 
+                                                       "data-code": lang.lang_code, 
+                                                       onClick: this.removeLangField}, 
                                         React.createElement("i", {className: "icon-remove"})
                                     )
                                 )

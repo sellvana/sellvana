@@ -6,6 +6,7 @@
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
+ * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
  */
 class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -85,19 +86,19 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
      */
     public function prodInventoryConfig($model = null)
     {
-        $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
-        $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
-        $data = [];
+        $products = [];
+        $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
         if ($model) {
-            $data = $this->BDb->many_as_array($this->Sellvana_Catalog_Model_Product->orm('p')
-                ->join('Sellvana_Catalog_Model_ProductMedia', ['p.id', '=', 'pa.file_id'], 'pa')
-                ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
-                ->where('p.inventory_sku', $model->get('inventory_sku'))
-                ->where('pa.media_type', Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
-                ->where_raw('p.id = pa.product_id')
-                ->select(['p.*', 'pa.*', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size'])
-                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
-                ->find_many());
+            $products = $this->Sellvana_Catalog_Model_Product->orm('p')
+                        ->where('p.inventory_sku', $model->get('inventory_sku'))
+                        ->select(['p.id', 'p.product_name', 'p.product_sku', 'p.short_description', 'p.create_at', 'p.update_at'])
+                        ->find_many();
+
+            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
+            foreach ($products as $product) {
+                /** @var Sellvana_Catalog_Model_Product $product */
+                $product->set('thumb_path', $this->FCom_Core_Main->resizeUrl($mediaUrl . '/' . $product->getThumbPath(), ['s' => 50]));
+            }
         }
 
         $config = [
@@ -105,15 +106,12 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
                 'id' => 'product_inventory_sku',
                 'caption' => 'Product Inventory SKU',
                 'data_mode' => 'local',
-                'data' => $data,
+                'data' => $products,
                 'columns' => [
                     ['type' => 'row_select', 'width' => 55],
                     ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
-                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
-                        'print' => '"<a href=\''.$downloadUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
-                            . '<img src=\''.$thumbUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
-                            . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
-                        'sortable' => false],
+                    ['display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
+                        'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"'],
                     ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
                     ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
                     ['name' => 'short_description', 'label' => 'Description',  'width' => 200],

@@ -528,7 +528,8 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
 
             if (this.props.confirm) {
                 confirmButton = (
-                    <FCom.Components.Button onClick={this.handleConfirm} className={"btn-primary " + (this.props.confirmClass || '')} type="button">
+                    <FCom.Components.Button type="button" onClick={this.handleConfirm}
+                                            className={"btn-primary " + (this.props.confirmClass || '')} {...this.props.confirmAttrs}>
                         {this.props.confirm}
                     </FCom.Components.Button>
                 );
@@ -584,7 +585,10 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                 cancel: Locale._("Cancel"),
                 title: Locale._("Title"),
                 id: 'fcom-modal-form-wrapper',
-                show: false //show modal after render
+                show: false, //show modal after render
+                confirmClass: '',
+                confirmAttrs: {},
+                cancelClass: ''
             }
         }
     });

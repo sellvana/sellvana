@@ -587,18 +587,21 @@ function (_, React, $, FComGridBody, FComModalForm, FComFilter, Components, Grid
                             node = <a href="#" {...actionProps}>{action.caption}</a>;
                             break;
                         case 'export':
-                            node = <button {...actionProps} data-action='export' onClick={that.doMassAction}>{action.caption}</button>;
+                            node = <button {...actionProps} data-action='export'
+                                                            onClick={that.doMassAction}>{action.caption}</button>;
                             break;
                         case 'link_to_page':
                             node = <a href="#" {...actionProps}>{action.caption}</a>;
                             break;
                         case 'edit':
                             actionProps.disabled = disabledClass;
-                            node = <a href='#' {...actionProps} data-action="mass-edit" onClick={that.doMassAction} role="button">{action.caption}</a>;
+                            node = <button type="button" {...actionProps} data-action="mass-edit"
+                                           onClick={that.doMassAction} role="button">{action.caption}</button>;
                             break;
                         case 'delete':
                             actionProps.disabled = disabledClass;
-                            node = <button type="button" {...actionProps} data-action="mass-delete" onClick={that.doMassAction}>{action.caption}</button>;
+                            node = <button type="button" {...actionProps} data-action="mass-delete"
+                                           onClick={that.doMassAction}>{action.caption}</button>;
                             break;
                         //todo: checking again new and add type
                         case 'add':

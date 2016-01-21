@@ -85,10 +85,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 </div>
                                 <div className="col-md-6" ref={'lang_field_' + lang.lang_code}></div>
                                 <div className="col-md-3">
-                                    <button type="button" onClick={that.removeLangField} data-code={lang.lang_code}
-                                            className="btn btn-danger btn-sm field-remove">
+                                    <Components.Button type="button" className='btn-sm btn-danger field-remove'
+                                                       data-code={lang.lang_code}
+                                                       onClick={this.removeLangField}>
                                         <i className="icon-remove"/>
-                                    </button>
+                                    </Components.Button>
                                 </div>
                             </div>
                         );
