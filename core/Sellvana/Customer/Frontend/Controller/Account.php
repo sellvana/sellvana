@@ -72,9 +72,9 @@ class Sellvana_Customer_Frontend_Controller_Account extends FCom_Frontend_Contro
 
             //set rule email unique if customer update email
             $expandRules = $customer->getAccountEditRules(false);
-            if ($customer->get('email') != $r['email']) {
-                $expandRules = [['email', 'Sellvana_Customer_Model_Customer::ruleEmailUnique', 'Email is exist']];
-            }
+
+            $r['is_new'] = false;
+            $r['old_email'] = $customer->get('email');
 
             if ($customer->validate($r, $expandRules, $formId)) {
                 if (empty($r['current_password']) || !$this->Bcrypt->verify($r['current_password'], $customer->get('password_hash'))) {
