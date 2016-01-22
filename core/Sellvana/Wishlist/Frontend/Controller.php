@@ -308,7 +308,11 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             }
             if ($wishlist) {
                 $wishlist->addItem($id);
-                $this->message('Product was added to wishlist.');
+                $messageText = 'Product was added to wishlist.';
+                if (!$this->Sellvana_Customer_Model_Customer->isLoggedIn()) {
+                    $messageText .= "\nPlease note that your wishlist will be stored permanently only after you sign in.";
+                }
+                $this->message($messageText);
             }
         }
         $this->BResponse->redirect('wishlist');
