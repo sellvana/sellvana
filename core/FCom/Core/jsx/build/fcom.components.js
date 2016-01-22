@@ -234,7 +234,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         getDefaultProps: function () {
             return {
                 value: '',
-                type: '',
+                type: 'text',
                 attrs: {},
                 validation: {}
             }
