@@ -594,6 +594,7 @@ class Sellvana_Catalog_Migrate extends BClass
                 'qty_warn_customer' => 'int unsigned null',
                 'qty_notify_admin' => 'int unsigned null',
                 'qty_cart_min' => 'int unsigned null',
+                'qty_cart_max' => 'int unsigned null',
                 'qty_cart_inc' => 'int unsigned not null default 1',
                 'qty_buffer' => 'int unsigned not null',
                 'create_at' => 'datetime not null',
@@ -926,5 +927,15 @@ class Sellvana_Catalog_Migrate extends BClass
         if ($this->BMigrate->isModuleVersion('Sellvana_MultiSite', '0.5.2.0~')) {
             $this->after__Sellvana_MultiSite__0_5_2_0();
         }
+    }
+
+    public function upgrade__0_5_7_0__0_5_8_0()
+    {
+        $tInv = $this->Sellvana_Catalog_Model_InventorySku->table();
+        $this->BDb->ddlTableDef($tInv, [
+            BDb::COLUMNS => [
+                'qty_cart_max' => 'int unsigned null after qty_cart_min',
+            ],
+        ]);
     }
 }

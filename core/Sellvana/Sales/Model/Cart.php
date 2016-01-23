@@ -945,10 +945,20 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function hasUnavailableItems()
+    {
+        $this->loadProducts();
+        foreach ($this->items() as $item) {
+            if (!$item->getProduct()->canOrder($item->getQty())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function __destruct()
     {
         parent::__destruct();
         unset($this->_addresses, $this->items, $this->totals);
     }
-
 }

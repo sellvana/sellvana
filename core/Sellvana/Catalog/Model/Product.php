@@ -529,9 +529,9 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         // Remove default width and height for responsive
         foreach ($mediaItems as $k => $media) {
-            if (!empty($media->data_serialized)) {
-                $mediaItems[$k]->data_serialized = preg_replace('/(width=\\\"\d+\\\")|(height=\\\"\d+\\\")/', '',
-                    $media->data_serialized);
+            $html = $media->getData('html');
+            if ($html) {
+                $mediaItems[$k]->setData('html', preg_replace('/(width=\\\"\d+\\\")|(height=\\\"\d+\\\")/', '', $html));
             }
         }
 
@@ -1425,5 +1425,10 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['default']*/);
         }
         return $this->_images['default'];
+    }
+
+    public function canOrder($qty = 1)
+    {
+        return !$this->get('manage_inventory') || $this->getInventoryModel()->canOrder($qty);
     }
 }

@@ -966,8 +966,8 @@ class BRequest extends BClass
     *
     * Syntax: $this->BRequest->sanitize($post, array(
     *   'var1' => 'alnum', // return only alphanumeric components, default null
-    *   'var2' => array('trim|ucwords', 'default'), // trim and capitalize, default 'default'
-    *   'var3' => array('regex:/[^0-9.]/', '0'), // remove anything not number or .
+    *   'var2' => ['trim|ucwords', 'default'], // trim and capitalize, default 'default'
+    *   'var3' => ['regex:/[^0-9.]/', '0'], // remove anything not number or .
     * ));
     *
     * @todo replace with filter_var_array
