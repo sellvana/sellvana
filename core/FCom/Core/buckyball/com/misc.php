@@ -1115,27 +1115,66 @@ class BUtil extends BClass
             $url .= (strpos($url, '?') === false ? '?' : '&') . $request;
         }
 
-        $found = false;
-        foreach ($headers as $h) {
-            if (stripos($h, 'expect:') === 0) {
-                $found = true;
-                break;
+        $multipart = false;
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                if (is_string($v) && $v[0] === '@') {
+                    $multipart = true;
+                    break;
+                }
             }
         }
-        if (!$found) {
-            $headers += ['Expect:']; //Fixes the HTTP/1.1 417 Expectation Failed
-        }
-        $found = false;
-        foreach ($headers as $h) {
-            if (stripos($h, 'referer:') === 0) {
-                $found = true;
-                break;
+        $contentType = null;
+        $postContent = null;
+        if ($method === 'POST' || $method === 'PUT') {
+            if (!$multipart) {
+                $contentType = 'application/x-www-form-urlencoded';
+                $postContent = is_array($data) ? http_build_query($data) : $data;
+            } else {
+                $boundary = '--------------------------' . microtime(true);
+                $contentType = 'multipart/form-data; boundary=' . $boundary;
+                $postContent = '';
+                //TODO: implement recursive forms
+                foreach ($data as $k => $v) {
+                    if (is_string($v) && $v[0] === '@') {
+                        $filename     = substr($v, 1);
+                        $fileContents = file_get_contents($filename);
+                        $postContent .= "--{$boundary}\r\n" .
+                             "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename($filename) . "\"\r\n" .
+                             "Content-Type: application/zip\r\n" .
+                             "\r\n" .
+                             "{$fileContents}\r\n";
+                    } else {
+                        $postContent .= "--{$boundary}\r\n" .
+                             "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
+                             "\r\n" .
+                             "{$v}\r\n";
+                    }
+                }
+                $postContent .= "--{$boundary}--\r\n";
             }
         }
-        if (!$found) {
-            $headers += ['Referer: ' . $this->BRequest->currentUrl()];
+
+        foreach ([
+            'Expect' => '', //Fixes the HTTP/1.1 417 Expectation Failed
+            'Referer' => $this->BRequest->currentUrl(),
+            'Accept' => '*/*',
+            'Content-Type' => $contentType,
+            'Content-Length' => $postContent ? strlen($postContent) : null,
+        ] as $header => $value) {
+            $found = false;
+            foreach ($headers as $h) {
+                if (stripos($h, $header . ':') === 0) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found && $value !== null) {
+                $headers[] = $header . ': ' . $value;
+            }
         }
-        
+
+
         if ($useCurl && function_exists('curl_init') || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
@@ -1165,21 +1204,14 @@ class BUtil extends BClass
                 ];
             }
 
-            if (is_array($data)) {
-                foreach ($data as $k => $v) {
-                    if (is_string($v) && $v[0] === '@') {
-                        $data[$k] = new CURLFile(substr($v, 1));
-                    }
-                }
-            }
             if ($method === 'POST') {
                 $curlOpt += [
-                    CURLOPT_POSTFIELDS => $data,
+                    CURLOPT_POSTFIELDS => $postContent,
                     CURLOPT_POST => 1,
                 ];
             } elseif ($method === 'PUT') {
                 $curlOpt += [
-                    CURLOPT_POSTFIELDS => $data,
+                    CURLOPT_POSTFIELDS => $postContent,
                     CURLOPT_PUT => 1,
                 ];
             }
@@ -1214,7 +1246,7 @@ class BUtil extends BClass
 #var_dump(__METHOD__, $rawResponse);
             list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
-#var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt);
+#echo '<xmp>'; var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt); echo '</xmp>';
             $respHeaders = explode("\r\n", $headers);
             if (curl_errno($ch) != 0) {
                 static::$_lastRemoteHttpInfo['errno'] = curl_errno($ch);
@@ -1238,55 +1270,21 @@ class BUtil extends BClass
                 $streamOptions['http']['proxy'] = $options['proxy'];
             }
             if ($method === 'POST' || $method === 'PUT') {
-                $multipart = false;
-                if (is_array($data)) {
-                    foreach ($data as $k => $v) {
-                        if (is_string($v) && $v[0] === '@') {
-                            $multipart = true;
-                            break;
-                        }
-                    }
-                }
-                if (!$multipart) {
-                    $contentType = 'application/x-www-form-urlencoded';
-                    $streamOptions['http']['content'] = is_array($data) ? http_build_query($data) : $data;
-                } else {
-                    $boundary = '--------------------------' . microtime(true);
-                    $contentType = 'multipart/form-data; boundary=' . $boundary;
-                    $streamOptions['http']['content'] = '';
-                    //TODO: implement recursive forms
-                    foreach ($data as $k => $v) {
-                        if (is_string($v) && $v[0] === '@') {
-                            $filename = substr($v, 1);
-                            $fileContents = file_get_contents($filename);
-                            $streamOptions['http']['content'] .= "--{$boundary}\r\n" .
-                                "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename($filename) . "\"\r\n" .
-                                "Content-Type: application/zip\r\n" .
-                                "\r\n" .
-                                "{$fileContents}\r\n";
-                        } else {
-                            $streamOptions['http']['content'] .= "--{$boundary}\r\n" .
-                                "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
-                                "\r\n" .
-                                "{$v}\r\n";
-                        }
-                    }
-                    $streamOptions['http']['content'] .= "--{$boundary}--\r\n";
-                }
-                $streamOptions['http']['header'][] = "Content-Type: {$contentType}";
-                    //."Content-Length: ".strlen($request)."\r\n";
+                $streamOptions['http']['content'] = $postContent;
+                $streamOptions['http']['header'][] = "Content-Type: {$contentType}"
+                    . "\r\nContent-Length: " . strlen($postContent) . "\r\n";
 
-                if (!empty($options['auth'])) {
-                    $streamOptions['http']['header'][] = sprintf("Authorization: Basic %s", base64_encode($options['auth']));
-                }
+            }
+            if (!empty($options['auth'])) {
+                $streamOptions['http']['header'][] = sprintf("Authorization: Basic %s", base64_encode($options['auth']));
+            }
 
-                if (preg_match('#^(ssl|ftps|https):#', $url)) {
-                    $streamOptions['ssl'] = [
-                        'verify_peer' => true,
-                        'cafile' => dirname(__DIR__) . '/ssl/ca-bundle.crt',
-                        'verify_depth' => 5,
-                    ];
-                }
+            if (preg_match('#^(ssl|ftps|https):#', $url)) {
+                $streamOptions['ssl'] = [
+                    'verify_peer' => true,
+                    'cafile' => dirname(__DIR__) . '/ssl/ca-bundle.crt',
+                    'verify_depth' => 5,
+                ];
             }
             if (empty($options['debug'])) {
                 $oldErrorReporting = error_reporting(0);
