@@ -33,7 +33,8 @@ class Sellvana_PaymentOgone_CheckoutMethod extends Sellvana_Sales_Method_Checkou
             return false;
         }
 
-        if ($this->Sellvana_Sales_Model_Cart->sessionCart()->hasUnavailableItems()) {
+        $cart = $this->Sellvana_Sales_Model_Cart->sessionCart();
+        if ($cart && $cart->hasUnavailableItems()) {
             return false;
         }
 
