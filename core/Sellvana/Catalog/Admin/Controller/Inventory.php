@@ -17,6 +17,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     protected $_recordName = 'Inventory SKU';
     protected $_mainTableAlias = 's';
     protected $_navPath = 'catalog/inventory';
+    protected $_formTitleField = 'inventory_sku';
     #protected $_gridLayoutName = '/catalog/inventory';
 
     #protected $_defaultGridLayoutName = 'default_grid';
@@ -90,11 +91,10 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         $data = [];
         if ($model) {
             $data = $this->BDb->many_as_array($this->Sellvana_Catalog_Model_Product->orm('p')
-                ->join('Sellvana_Catalog_Model_ProductMedia', ['p.id', '=', 'pa.file_id'], 'pa')
-                ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
+                ->left_outer_join('Sellvana_Catalog_Model_ProductMedia', "p.id=pa.product_id and pa.media_type='" .
+                      Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG . "'", 'pa')
+                ->left_outer_join('FCom_Core_Model_MediaLibrary', 'a.id=pa.file_id', 'a')
                 ->where('p.inventory_sku', $model->get('inventory_sku'))
-                ->where('pa.media_type', Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
-                ->where_raw('p.id = pa.product_id')
                 ->select(['p.*', 'pa.*', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size'])
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ->find_many());

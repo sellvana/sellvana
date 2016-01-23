@@ -3238,7 +3238,7 @@ class BDebug extends BClass
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
             if (PHP_SAPI !== 'cli') {
                 echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
-                echo static::cleanBacktrace($message);
+                echo static::cleanBacktrace(print_r($message, 1));
                 echo '</xmp>';
             } else {
                 $shellOut = PHP_EOL . '{red*}' . $e['level'] . ':{/} ' . $e['msg'] . PHP_EOL;
