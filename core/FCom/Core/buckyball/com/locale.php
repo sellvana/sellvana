@@ -1271,6 +1271,31 @@ class BLocale extends BClass
     }
 
     /**
+     * Parse default allowed languages to select2 options
+     *
+     * @param bool $griddle
+     * @param array $locales
+     * @return array
+     */
+    public function parseAllowedLocalesToOptions($griddle = false, $locales = [])
+    {
+        if (empty($locales)) {
+            $locales = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales');
+            if (empty($locales)) {
+                return [];
+            }
+        }
+
+        $result = [];
+
+        foreach ($locales as $locale) {
+            $griddle ? $result[$locale] = $locale : $result[] = ['id' => $locale, 'text' => $locale];
+        }
+
+        return $result;
+    }
+
+    /**
     * Convert DB datetime (GMT) to local
     *
     * @param string $value
