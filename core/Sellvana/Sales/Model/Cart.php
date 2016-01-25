@@ -949,7 +949,7 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         $this->loadProducts();
         foreach ($this->items() as $item) {
-            if (!$item->getProduct()->canOrder($item->getQty())) {
+            if ($item->getQty() == 0 || !$item->getProduct()->canOrder($item->getQty())) {
                 return true;
             }
         }
