@@ -1573,12 +1573,14 @@ class BMigrate extends BClass
             $this->BConfig->writeConfigFiles('core');
         }
 
-        $this->BResponse->startLongResponse();
+        if (PHP_SAPI !== 'cli') {
+            $this->BResponse->startLongResponse();
+        }
 
         $this->BDebug->mode(BDebug::MODE_INSTALLATION);
 
         $view = $this->BView;
-        echo '<html><body><h1>Migrating modules DB structure...</h1><pre>';
+        $this->printLn('<html><body><h1>Migrating modules DB structure...</h1><pre>');
         $i = 0;
         $error = false;
         try {
@@ -1592,16 +1594,16 @@ class BMigrate extends BClass
                         continue;
                     }
 
-                    echo '<br>[' . (++$i) . '/' . $num . '] ';
+                    $this->printLn('<br>[' . (++$i) . '/' . $num . '] ');
                     $action = null;
                     if (empty($mod['schema_version'])) {
-                        echo 'Installing <strong>' . $view->q($modName . ': ' . $mod['code_version']) . '</strong> ... ';
+                        $this->printLn('Installing <strong>' . $view->q($modName . ': ' . $mod['code_version']) . '</strong> ... ');
                         $action = 'install_upgrade';
                     } elseif (version_compare($mod['schema_version'], $mod['code_version'], '<')) {
-                        echo 'Upgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ';
+                        $this->printLn('Upgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ');
                         $action = 'install_upgrade';
                     } elseif (version_compare($mod['schema_version'], $mod['code_version'], '>')) {
-                        echo 'Downgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ';
+                        $this->printLn('Downgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ');
                         $action = 'downgrade';
                     }
                     if (empty($action)) {
@@ -1681,30 +1683,41 @@ class BMigrate extends BClass
                     break;
                 }
             }
-            echo "\n\n" . $e->getMessage();
+            $this->printLn("\n\n" . $e->getMessage());
             if (!static::$_lastQuery) {
                 static::$_lastQuery = BORM::get_last_query();
             }
             if (static::$_lastQuery) {
-                echo "\n\nQUERY: " . static::$_lastQuery;
+                $this->printLn("\n\nQUERY: " . static::$_lastQuery);
             }
-            echo "\n\nLOCATION: " . $traceStep['file'] . ':' . $traceStep['line'];
+            $this->printLn("\n\nLOCATION: " . $traceStep['file'] . ':' . $traceStep['line']);
             $error = true;
         }
         $modReg->currentModule(null);
         static::$_migratingModule = null;
 
         $url = null !== $redirectUrl ? $redirectUrl : $this->BRequest->currentUrl();
-        echo '</pre>';
+        $this->printLn('</pre>');
         if (!$error) {
-            echo '<script>location.href="' . $url . '";</script>';
-            echo '<p>ALL DONE. <a href="' . $url . '">Click here to continue</a></p>';
+            $this->printLn('<script>location.href="' . $url . '";</script>');
+            $this->printLn('<p>ALL DONE. <a href="' . $url . '">Click here to continue</a></p>');
         } else {
-            echo '<p>There was an error, please check the output or log file and try again.</p>';
-            echo '<p><a href="' . $url . '">Click here to continue</a></p>';
+            $this->printLn('<p>There was an error, please check the output or log file and try again.</p>');
+            $this->printLn('<p><a href="' . $url . '">Click here to continue</a></p>');
         }
-        echo '</body></html>';
+        $this->printLn('</body></html>');
         exit;
+    }
+
+    /**
+     * @param $string
+     */
+    public function printLn($string)
+    {
+        if (PHP_SAPI !== 'cli')
+        {
+            echo $string;
+        }
     }
 
     protected function _runInstallUpgradeClassMethods($modName, $class)
@@ -1818,7 +1831,7 @@ class BMigrate extends BClass
             return true;
         }
 
-        echo '*' . $version . '; ';
+        $this->printLn('*' . $version . '; ');
 
 BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
 
@@ -1905,7 +1918,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         if (version_compare($schemaVersion, $fromVersion, '>')) {
             return true;
         }
-        echo '^' . $toVersion . '; ';
+        $this->printLn('^' . $toVersion . '; ');
 
         if (!$module) {
             $module = $this->BDbModule->load($mod['module_name'], 'module_name');
@@ -1989,7 +2002,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         if (version_compare($schemaVersion, $fromVersion, '<')) {
             return true;
         }
-        echo 'v' . $toVersion . '; ';
+        $this->printLn('v' . $toVersion . '; ');
 
         if (!$module) {
             $module = $this->BDbModule->load($mod['module_name'], 'module_name');
@@ -2074,7 +2087,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
             $singleton = $this->{$class};
             $method = "{$when}__{$modName}__" . str_replace('.', '_', $version);
             if (method_exists($singleton, $method)) {
-                echo "+{$iterModName}:{$when}; ";
+                $this->printLn("+{$iterModName}:{$when}; ");
                 $result = call_user_func([$singleton, $method], $mod, $version);
                 if (false === $result) {
                     return false;

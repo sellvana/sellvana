@@ -3,6 +3,9 @@ modules:
         version: 0.5.0.0
 
         areas:
+            FCom_Install:
+                custom:
+                    actions: [ FCom_Shell_Action_Help ]
             FCom_Shell:
                 custom:
                     actions: [ FCom_Shell_Action_Help ]
