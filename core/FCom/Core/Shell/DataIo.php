@@ -450,6 +450,8 @@ EOT;
 
     /**
      * Export to file
+     *
+     * @throws BException
      */
     protected function _exportCmd()
     {
@@ -459,8 +461,20 @@ EOT;
             $this->println('{green*}INFO:{/} No models for export.');
             return;
         }
+        try {
+            //Fix of memory leak
+            $this->BDebug->disableAllLogging();
 
-        var_dump($this->FCom_Core_ImportExport->export($models,$file));
+            $this->println(PHP_EOL . '{green*}Export in progress.{/}');
+            $this->FCom_Core_ImportExport->export($models, $file);
+            $this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+            $this->println('{green*}Export finished.   {/}');
+
+        } catch (Exception $e) {
+            $this->BDebug->logException($e);
+            $this->println('{red*}FATAL ERROR:{/} ' . $e->getMessage());
+            die;
+        }
     }
 
     /**
@@ -595,10 +609,13 @@ EOT;
             if (!count($models)) {
                 return false;
             }
-
-            $this->println(PHP_EOL . '{green}You have selected the following models:{/}');
-            foreach ($models as $model) {
-                $this->println('  {purple*}' . $model . '{/}');
+            if ($this->getOption(self::OPTION_VERBOSE)) {
+                $this->println(PHP_EOL . '{green}You have selected the following models:{/}');
+                foreach ($models as $model) {
+                    $this->println('  {purple*}' . $model . '{/}');
+                }
+            } else {
+                $this->println(PHP_EOL . '{green}You have selected ' . count($models) . ' model(s).{/}');
             }
             return $this->askYesNo('Start Export?') ? $models : false;
         }
