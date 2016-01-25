@@ -25,6 +25,8 @@ abstract class FCom_Shell_Action_Abstract extends BClass
      *    'v' => 'verbose',   // no option value accepted
      *    'o?' => 'optional', // optional value ( -o OR -o "value")
      *    'r!' => 'required', // required value ( -r "value")
+     *    'optional?', // optional value ( -o OR -o "value")
+     *    'required?', // required value ( -r "value")
      * ];
      *
      * @var array
@@ -123,29 +125,38 @@ abstract class FCom_Shell_Action_Abstract extends BClass
             return $this;
         }
 
-        foreach ($params as $i => $p) { // iterate over cli parameters
-            $curOpt = null; // reset
-            if ($p[0] !== '-') { // this parameter is not an option
+        foreach ($params as $paramIndex => $param) { // iterate over cli parameters
+            $curOptType = null; // reset
+            if ($param[0] !== '-') { // this parameter is not an option
                 continue;
             }
-            $curOpt = 'unknown'; // unknown option
-            $value = null;
-            $o = null;
-            foreach ($availOptions as $opt => $longOpt) { // iterate over available options
-                $o = $opt[0]; // actual short option name
-                $ro = !empty($opt[1]) ? $opt[1] : false; // required/optional
-                if (!empty($p[1]) && $p[1] === $o) { // this is the current short opt
-                    $curOpt = 'short';
-                    if (!empty($p[2])) {
-                        $value = substr($p, 2);
+            $curOptType = 'unknown'; // unknown option
+            $optionValue = null;
+            $shortOptName = null;
+            $optName = null;
+            foreach ($availOptions as $shortOpt => $longOpt) { // iterate over available options
+                $shortOptName = $shortOpt[0]; // actual short option name
+                if (gettype($shortOpt) == 'integer'){
+                    $shortOptName = false;
+                    $optName = $longOpt;
+                }
+                if ($shortOptName) {
+                    $isRequired = !empty($shortOpt[1]) ? $shortOpt[1] : false; // required/optional
+                } else {
+                    $isRequired = in_array(substr($longOpt, -1), ['!','?']) ? substr($longOpt, -1) : false;
+                }
+                if (!empty($param[1]) && $param[1] === $shortOptName) { // this is the current short opt
+                    $curOptType = 'short';
+                    if (!empty($param[2])) {
+                        $optionValue = substr($param, 2);
                         break; // no need to proceed
                     }
-                } elseif (!empty($p[1]) && $p[1] === '-') { // this is a long opt
-                    $pArr = explode('=', $p, 2);
+                } elseif (!empty($param[1]) && $param[1] === '-') { // this is a long opt
+                    $pArr = explode('=', $param, 2);
                     if (substr($pArr[0], 2) === $longOpt) { // this is the current long opt
-                        $curOpt = 'long';
+                        $curOptType = 'long';
                         if (!empty($pArr[1])) { // has value separated by '='
-                            $value = $pArr[1];
+                            $optionValue = $pArr[1];
                             break; // no need to proceed
                         }
                     } else { // not current long opt
@@ -154,20 +165,20 @@ abstract class FCom_Shell_Action_Abstract extends BClass
                 } else { // not current opt
                     continue;
                 }
-                if (!$ro) { // not expecting a value
-                    $value = true;
+                if (!$isRequired) { // not expecting a value
+                    $optionValue = true;
                     break;
-                } elseif ($ro && $value === null) { // expecting a value and don't have one yet
-                    if (isset($params[$i + 1]) && $params[$i + 1][0] !== '-') { // next param is a valid value
-                        $value = $params[$i + 1];
-                        unset($params[$i + 1]); // remove value from params
-                    } elseif ($ro === '?') { // value is optional
-                        $value = true;
+                } elseif ($isRequired && $optionValue === null) { // expecting a value and don't have one yet
+                    if (isset($params[$paramIndex + 1]) && $params[$paramIndex + 1][0] !== '-') { // next param is a valid value
+                        $optionValue = $params[$paramIndex + 1];
+                        unset($params[$paramIndex + 1]); // remove value from params
+                    } elseif ($isRequired === '?') { // value is optional
+                        $optionValue = true;
                     } else { // value is required and missing, add to errors
-                        $optName = $curOpt === 'short' ? '-' . $o : '--' . $longOpt;
-                        $this->_optionErrors[$o] = [
+                        $optName = $curOptType === 'short' ? '-' . $shortOptName : '--' . $longOpt;
+                        $this->_optionErrors[$shortOptName] = [
                             'error' => 'required_value',
-                            'type' => $curOpt,
+                            'type' => $curOptType,
                             'key' => $optName,
                         ];
                         $this->println('Missing value required for option: {red*}' . $optName . '{/}');
@@ -175,23 +186,26 @@ abstract class FCom_Shell_Action_Abstract extends BClass
                     break;
                 }
             }
-            if ($curOpt === false) {
+            if ($curOptType === false) {
                 continue;
-            } elseif ($curOpt === 'unknown') {
-                $this->_optionErrors[$p] = [
+            } elseif ($curOptType === 'unknown') {
+                $this->_optionErrors[$param] = [
                     'error' => 'unknown_option',
-                    'key' => $p,
+                    'key' => $param,
                 ];
-                $this->println('Unknown option: {red*}' . $p . '{/}');
+                $this->println('Unknown option: {red*}' . $param . '{/}');
             }
-            if (empty($this->_options[$o])) { // option doesn't have values yet
-                $this->_options[$o] = $value; // set as scalar
-            } elseif (!is_array($this->_options[$o])) { // option already has 1 value
-                $this->_options[$o] = [$this->_options[$o], $value]; // convert to array
+            if (!$shortOptName) {
+                $shortOptName = $optName;
+            }
+            if (empty($this->_options[$shortOptName])) { // option doesn't have values yet
+                $this->_options[$shortOptName] = $optionValue; // set as scalar
+            } elseif (!is_array($this->_options[$shortOptName])) { // option already has 1 value
+                $this->_options[$shortOptName] = [$this->_options[$shortOptName], $optionValue]; // convert to array
             } else { // option already has multiple values
-                $this->_options[$o][] = $value; // add to array
+                $this->_options[$shortOptName][] = $optionValue; // add to array
             }
-            unset($params[$i]); // remove option from params
+            unset($params[$paramIndex]); // remove option from params
         }
 
         return $this;

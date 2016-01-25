@@ -10,16 +10,20 @@ class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
 {
     static protected $_origClass = __CLASS__;
 
-    const OPTION_FILE = 'f';
+    const OPTION_FILE    = 'f';
     const OPTION_VERBOSE = 'v';
-    const OPTION_QUIET = 'q';
+    const OPTION_QUIET   = 'q';
+    const OPTION_MODEL   = 'm';
+    const OPTION_ALL     = 'all';
 
     static protected $_actionName = 'data-io';
 
     static protected $_availOptions = [
         'f?' => 'file',
-        'v' => 'verbose',
-        'q' => 'quiet',
+        'v'  => 'verbose',
+        'q'  => 'quiet',
+        'm?' => 'model',
+        'all'
     ];
 
     protected $_importStarted = 0;
@@ -33,7 +37,7 @@ class FCom_Core_Shell_DataIo extends FCom_Shell_Action_Abstract
      */
     public function getShortHelp()
     {
-        return 'Import management';
+        return 'Import\Export management';
     }
 
     /**
@@ -52,15 +56,22 @@ Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {gr
 Commands:
 
     {green*}list{/}     List of available files for import
-    {green*}import{/}   Import file
+    {green*}import{/}   Import file(s)
+    {green*}export{/}   Export to file
 
     {green*}help{/}     This help
 
 Options:
 
-  Device selection and switching:
+  File/Model selection:
     {green*}-f {/}{cyan*}<file>{/}
-    {green*}--file={/}{cyan*}<file>{/}     File to import
+    {green*}--file={/}{cyan*}<file>{/}     File(s) to import / File to export
+
+    {green*}-m {/}{cyan*}<model>{/}
+    {green*}--model={/}{cyan*}<model>{/}   Model(s) to export({red}Only for export{/})
+
+  Overwrite control:
+    {green*}    --all{/}         Export all models ({red}Only for export, ignore "--model" option{/})
 
   Informative output:
     {green*}-v, --verbose{/}     Verbose output of the process
@@ -70,6 +81,58 @@ Examples:
 
 
 EOT;
+    }
+
+    /**
+     * Shell GUI of Yes/No
+     *
+     * @param $question
+     * @return bool
+     */
+    public function askYesNo($question)
+    {
+        $answer = false;
+        $offset = 0;
+        while (true) {
+            $shell = $this->FCom_Shell_Shell;
+            $this->out('{yellow}' . $question . '{/} [Y/N] ' . str_pad('', $offset));
+            if ($offset) {
+                $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
+            }
+            $answer = strtolower($shell->stdin());
+            $offset = strlen($answer);
+            if (in_array($answer, ['y', 'n'])) {
+                $answer = ($answer == 'y' ? true : false);
+                break;
+            }
+            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+        }
+        return $answer;
+    }
+
+    /**
+     * @param $string
+     * @return array
+     */
+    public function strToIntArray($string)
+    {
+        $string = preg_replace('/\s+/', '', $string);
+        $string = explode(',', str_replace([';', ':'], ',', $string));
+
+        $processed = [];
+        foreach ($string as $fileId) {
+            if (preg_match('/^[0-9]*$/', $fileId)) {
+                $processed[] = (int)$fileId;
+                continue;
+            }
+            $range = explode('-', $fileId);
+            if (count($range) == 2) {
+                $range = range($range[0], $range[1]);
+                $processed = array_merge($processed, $range);
+            }
+        }
+
+        return array_unique($processed);
     }
 
     /**
@@ -118,7 +181,7 @@ EOT;
      */
     protected function _importCmd()
     {
-        $files = $this->_getFilesForImport();
+        $files = $this->getFilesForImport();
 
         if (!count($files)){
             $this->println(PHP_EOL . '{green*}INFO:{/} No files to import.');
@@ -162,11 +225,11 @@ EOT;
     }
 
     /**
-     * Get file list for import process;
+     * Get file list for import process
      *
      * @return array
      */
-    protected function _getFilesForImport()
+    public function getFilesForImport()
     {
         $files = $this->getOption(self::OPTION_FILE);
 
@@ -200,22 +263,7 @@ EOT;
                 foreach ($files as $file) {
                     $this->println('  {purple*}' . $file['name'] . '{/}');
                 }
-                $answer = false;
-                $offset = 0;
-                while (true) {
-                    $shell = $this->FCom_Shell_Shell;
-                    $this->out('{yellow}Start import?{/} [Y/N] ' . str_pad('', $offset));
-                    if ($offset) {
-                        $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
-                    }
-                    $answer = strtoupper($shell->stdin());
-                    $offset = strlen($answer);
-                    if (in_array($answer, ['Y', 'N'])) {
-                        $answer = ($answer == 'Y' ? true : false);
-                        break;
-                    }
-                    $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
-                }
+                $answer = $this->askYesNo('Start import?');
 
                 $files = ($answer == true ? $files : []);
             }
@@ -263,24 +311,7 @@ EOT;
 
             $offset = strlen($fileIds);
 
-            $fileIds = preg_replace('/\s+/', '', $fileIds);
-            $fileIds = explode(',', str_replace([';', ':'], ',', $fileIds));
-
-            $processedIds = [];
-            foreach ($fileIds as $fileId) {
-                if (preg_match('/^[0-9]*$/', $fileId)){
-                    $processedIds[] = (int)$fileId;
-                    continue;
-                }
-                $range = explode('-', $fileId);
-                if (count($range) == 2) {
-                    $range = range($range[0], $range[1]);
-                    $processedIds = array_merge($processedIds, $range);
-                }
-            }
-
-            $processedIds = array_unique($processedIds);
-            $processedIds = array_intersect($processedIds, array_keys($ids));
+            $processedIds = array_intersect($this->strToIntArray($fileIds), array_keys($ids));
 
             if (count($processedIds)){
                 break;
@@ -414,5 +445,277 @@ EOT;
         $this->_bachStarted = microtime(true);
 
         return;
+    }
+
+
+    /**
+     * Export to file
+     *
+     * @throws BException
+     */
+    protected function _exportCmd()
+    {
+        $file = $this->getFileForExport();
+        $models = $this->getModelsForExport();
+        if ($models === false) {
+            $this->println('{green*}INFO:{/} No models for export.');
+            return;
+        }
+        try {
+            //Fix of memory leak
+            $this->BDebug->disableAllLogging();
+
+            $this->println(PHP_EOL . '{green*}Export in progress.{/}');
+            $this->FCom_Core_ImportExport->export($models, $file);
+            $this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+            $this->println('{green*}Export finished.   {/}');
+
+        } catch (Exception $e) {
+            $this->BDebug->logException($e);
+            $this->println('{red*}FATAL ERROR:{/} ' . $e->getMessage());
+            die;
+        }
+    }
+
+    /**
+     * Get fileName for export process.
+     *
+     * @return string
+     * @throws BException
+     */
+    public function getFileForExport()
+    {
+        $filename = $this->getOption(self::OPTION_FILE);
+        if (is_array($filename)) {
+            throw new BException('Option \'--file\' can be used only once in a single command.');
+        }
+
+        if (empty($filename)) {
+            if ($this->getOption(self::OPTION_QUIET)) {
+                $filename = $this->FCom_Core_ImportExport->getDefaultExportFile();
+            } else {
+                $filename = $this->askExportFile();
+            }
+        } elseif (!preg_match('/^[\.\-\w]*$/', $filename)) {
+            throw new BException('Filename is invalid.');
+        }
+
+        return $filename;
+    }
+
+    /**
+     * Shell GUI of getting filename
+     *
+     * @return string
+     */
+    public function askExportFile()
+    {
+        $this->println('');
+
+        $defaultName = $this->FCom_Core_ImportExport->getDefaultExportFile();
+        $tryCount = 1;
+        $offset = 0;
+        $error = false;
+        while (true) {
+            $error = false;
+            $shell = $this->FCom_Shell_Shell;
+            $this->out(
+                '{yellow}Please enter filename for export:{/}{white} ['
+                . $defaultName . '] {/}'
+                . str_pad('', $offset)
+            );
+            if ($offset) {
+                $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
+            }
+            $filename = $shell->stdin();
+
+            $offset = strlen($filename);
+
+            if (empty($filename)) {
+                break;
+            }
+
+            if (!preg_match('/^[\.\-\w]*$/', $filename)) {
+                $this->println('{red*}ERROR:{/} Filename is invalid.');
+                $error = true;
+            }
+
+            if ($tryCount == 3) {
+                break;
+            }
+
+            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 2));
+
+            $tryCount++;
+        }
+        if ($error) {
+            $this->println('{purple*}NOTICE:{/} Filename set to default - "' . $defaultName . '"');
+        }
+
+        if (empty($filename) || $error) {
+            $filename = $defaultName;
+        }
+
+        return $filename;
+    }
+
+    /**
+     * Get model list for export process
+     *
+     * @return array
+     */
+    public function getModelsForExport()
+    {
+        if ($this->getOption(self::OPTION_ALL)) {
+            //empty array means "all available models"
+            return [];
+        }
+
+        $models = (array)$this->getOption(self::OPTION_MODEL);
+        foreach ($models as $key => $model) {
+            if(!is_string($model) || empty($model)) {
+                unset($models[$key]);
+            }
+        }
+
+        if(!empty($models)) {
+            $allModels = [];
+            foreach ($this->getAllAvailableModelsForExport() as $module) {
+                $allModels = array_merge($allModels, $module);
+            }
+
+            $processedModels = array_map(function ($value) use ($models) {
+                foreach ($models as $model) {
+                    if (empty($model) || !is_string($model)) {
+                        continue;
+                    }
+                    if (substr($model, -1) == '*' && strpos($value, substr($model, 0, -1)) === 0) {
+                        return $value;
+                    }
+                    if ($model == $value) {
+                        return $value;
+                    }
+                }
+                return null;
+            }, $allModels);
+
+            $models = array_filter($processedModels);
+
+            return empty($models) ? false : $models;
+        }
+
+        if (!$this->getOption(self::OPTION_QUIET)) {
+            $models = $this->askExportModels();
+            if (!count($models)) {
+                return false;
+            }
+            if ($this->getOption(self::OPTION_VERBOSE)) {
+                $this->println(PHP_EOL . '{green}You have selected the following models:{/}');
+                foreach ($models as $model) {
+                    $this->println('  {purple*}' . $model . '{/}');
+                }
+            } else {
+                $this->println(PHP_EOL . '{green}You have selected ' . count($models) . ' model(s).{/}');
+            }
+            return $this->askYesNo('Start Export?') ? $models : false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get array of modules with models which have IE profile
+     * @return array
+     */
+    public function getAllAvailableModelsForExport()
+    {
+        $data = $this->FCom_Core_ImportExport->collectExportableModels();
+        ksort($data);
+
+        $modules = [];
+        foreach ($data as $id => $d) {
+            $module = explode('_', $id, 3);
+            array_splice($module, 2);
+            $module = join('_', $module);
+            if (!isset($modules[$module])) {
+                $modules[$module] = [];
+            }
+            $modules[$module][] = $id;
+        }
+
+        return $modules;
+    }
+
+    /**
+     * Shell GUI of getting module list
+     *
+     * @return array
+     */
+    public function askExportModels()
+    {
+        $modules = $this->getAllAvailableModelsForExport();
+        $moduleList = [];
+        foreach ($modules as $modelCount => $children) {
+            $moduleList[$modelCount] = count($children);
+        }
+
+        if (empty($moduleList)) {
+            return false;
+        }
+
+        $this->println(PHP_EOL . '{green}Please select modules from allowed:{/}');
+        $ids = array();
+        $i = 1;
+        foreach ($moduleList as $key => $modelCount) {
+            $ids[$i] = $key;
+            $this->println(
+                '  ' . str_pad('[' . $i++ . ']', 5)
+                . '{blue*}models ' . str_pad($modelCount, 3) . '{/} '
+                . '{purple*}' . $key . '{/}'
+            );
+        }
+
+        $processedIds = [];
+        $tryCount = 1;
+        $offset = 0;
+        while (true) {
+            $shell = $this->FCom_Shell_Shell;
+            $this->out('{yellow}Module ids: {/} [All] '  . str_pad('', $offset));
+            if ($offset) {
+                $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
+            }
+            $moduleIds = $shell->stdin();
+
+            $offset = strlen($moduleIds);
+
+            if (empty($moduleIds) || strtolower($moduleIds) == 'all') {
+                $moduleIds = '1-' . ($i - 1);
+            }
+
+            $processedIds = array_intersect($this->strToIntArray($moduleIds), array_keys($ids));
+
+            if (count($processedIds)){
+                break;
+            }
+
+            if ($tryCount == 3) {
+                break;
+            }
+            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+            $tryCount++;
+        }
+
+        $modelList = [];
+        foreach ($processedIds as $processedId) {
+            $modelList[] = $modules[$ids[$processedId]];
+        }
+
+        $tmp = [];
+        foreach ($modelList as $models) {
+            $tmp = array_merge($tmp, $models);
+        }
+        $modelList = $tmp;
+
+        return $modelList;
     }
 }
