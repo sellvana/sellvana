@@ -11,13 +11,13 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 <h2>{{ "Catalog Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-Sellvana_Catalog'}) }}
-    {{ forms.accordion_panel_start({label:'Stock Management'|_, id:'settings-Sellvana_Catalog-group0', in:1}) }}
+    {{ forms.accordion_panel_start({label:'Default Stock Management Configuration'|_, id:'settings-Sellvana_Catalog-group0', in:1}) }}
         {{ forms.boolean(fieldData, {field:'separate_inventory_sku', label:'Use Separate Inventory SKU'|_ }) }}
-        {{ forms.boolean(fieldData, {field:'manage_stock', label:'Manage Stock'|_ }) }}
-        {{ forms.select(fieldData, {field:'back_order', label:'Back Orders'|_, options: backOrders }) }}
-        {{ forms.input(fieldValidate, {field:'maximum_quantity_shopping', label:'Maximum Quantity Allowed in Shopping'|_ }) }}
-        {{ forms.input(fieldValidate, {field:'quantity_items_status', label:'Quantity for Item\'s Status to Become Out of Stock'|_}) }}
-        {{ forms.input(fieldValidate, {field:'notify_administrator_quantity', label:'Notify Administrator for Quantity Below'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'manage_inventory', label:'Manage Inventory'|_ }) }}
+        {{ forms.select(fieldData, {field:'allow_backorder', label:'Back Orders'|_, options: backOrders }) }}
+        {{ forms.input(fieldValidate, {field:'qty_cart_max', label:'Maximum Quantity Allowed in Cart'|_ }) }}
+        {{ forms.input(fieldValidate, {field:'qty_buffer', label:'Quantity for Item\'s Status to Become Out of Stock'|_}) }}
+        {{ forms.input(fieldValidate, {field:'qty_notify_admin', label:'Notify Administrator for Quantity Below'|_ }) }}
         {{ forms.select(fieldData, {field:'default_origin_country', label:'Default Country Of Origin'|_, options: countries }) }}
     {{ forms.accordion_panel_end }}
     {{ forms.accordion_panel_start({label:'Top Navigation'|_, id:'settings-Sellvana_Catalog-group1', in:1}) }}

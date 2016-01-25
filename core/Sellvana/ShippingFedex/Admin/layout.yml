@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, Sellvana_ShippingFedex, { label: FedEx, group: shipping_methods, async: true, permission: settings/Sellvana_ShippingFedex } ]

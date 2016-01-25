@@ -110,6 +110,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     protected function _processConfig($config)
     {
+        foreach ($config['columns'] as &$col) {
+            if (!empty($col['multirow_edit']) && empty($col['editor']) && !empty($col['options'])) {
+                $col['editor'] = 'select';
+            }
+        }
+        unset($col);
         return $config;
     }
 

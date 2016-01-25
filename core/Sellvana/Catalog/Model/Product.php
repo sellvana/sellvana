@@ -529,9 +529,9 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         // Remove default width and height for responsive
         foreach ($mediaItems as $k => $media) {
-            if (!empty($media->data_serialized)) {
-                $mediaItems[$k]->data_serialized = preg_replace('/(width=\\\"\d+\\\")|(height=\\\"\d+\\\")/', '',
-                    $media->data_serialized);
+            $html = $media->getData('html');
+            if ($html) {
+                $mediaItems[$k]->setData('html', preg_replace('/(width=\\\"\d+\\\")|(height=\\\"\d+\\\")/', '', $html));
             }
         }
 
@@ -1176,11 +1176,16 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getInventoryModel()
     {
+        $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
+        if (!$this->get('manage_inventory')) {
+            $invModel = $invHlp->create();
+            $this->set('inventory_model', $invModel);
+            return $invModel;
+        }
         $invModel = $this->get('inventory_model');
         if ($invModel !== null) {
             return $invModel;
         }
-        $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
         // get inventory SKU from inventory SKU or product SKU if not specified
         $invSku = $this->get('inventory_sku');
         if (null === $invSku || '' === $invSku) {
@@ -1190,7 +1195,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $this->set('inventory_model', $invModel);
                 return $invModel;
             }
-            $this->set('inventory_sku', $invSku);
+            $this->set('inventory_sku', $invSku)->save();
         }
         // find inventory model
         $invModel = $invHlp->load($invSku, 'inventory_sku');
@@ -1420,5 +1425,10 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['default']*/);
         }
         return $this->_images['default'];
+    }
+
+    public function canOrder($qty = 1)
+    {
+        return !$this->get('manage_inventory') || $this->getInventoryModel()->canOrder($qty);
     }
 }

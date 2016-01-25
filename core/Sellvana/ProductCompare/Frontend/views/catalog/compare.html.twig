@@ -44,7 +44,7 @@
     {% if THIS.get('products')[i] %}{% set p = THIS.get('products')[i] %}
 
         {% set inventory = p.getInventoryModel() %}
-        {% set canOrder = inventory.canOrder() %}
+        {% set canOrder = p.canOrder() %}
 
         <div class="f-prod-select">
 
@@ -54,7 +54,7 @@
 
                 {{ THIS.view('catalog/product/variants').set('product', p) | raw }}
 
-                {{ THIS.view('catalog/product/shopper_fields').set('product', p) | raw }}
+                {{ THIS.view('catalog/product/shopper-fields').set('product', p) | raw }}
 
                 <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
 

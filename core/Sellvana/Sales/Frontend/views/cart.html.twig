@@ -75,7 +75,9 @@
                             {% if button.html %}
                                 {{ button.html | raw }}
                             {% else %}
-                                <a href="{{ button.href }}" class="btn btn-primary"><span>{{ button.label |_ }}</span></a>
+                                <a href="{{ button.disabled ? 'javascript:void' : button.href }}" class="btn btn-primary" {{ button.disabled ? 'disabled' }}>
+                                    <span>{{ button.label |_ }}</span>
+                                </a>
                             {% endif %}
                         </li>
                     {% endif %}

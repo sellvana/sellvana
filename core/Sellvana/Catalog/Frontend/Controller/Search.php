@@ -66,9 +66,11 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
             ]);
         }
 
-        $history = $this->Sellvana_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
-        if ($history !== null){
-            $this->Sellvana_Catalog_Model_SearchHistoryLog->addSearchHit($history->id());
+        if ($q) {
+            $history = $this->Sellvana_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
+            if ($history) {
+                $this->Sellvana_Catalog_Model_SearchHistoryLog->addSearchHit($history->id());
+            }
         }
 
         $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($productsData['rows']);

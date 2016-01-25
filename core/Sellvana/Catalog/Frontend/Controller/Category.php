@@ -99,7 +99,17 @@ class Sellvana_Catalog_Frontend_Controller_Category extends FCom_Frontend_Contro
         $head = $layout->view('head');
         $crumbs = ['home'];
         $activeCatIds = [$category->id()];
+        $rootCategoryId = $this->BConfig->get('modules/FCom_Frontend/nav_top/root_category');
+        $hide = (bool)$rootCategoryId;
         foreach ($category->ascendants() as $c) {
+            if ($hide) { // hide ascendants of the root category
+                if ($c->id() == $rootCategoryId) {
+                    $hide = false;
+                }
+
+                continue;
+            }
+
             $nodeName = $c->get('node_name');
             if ($nodeName) {
                 $activeCatIds[] = $c->id();

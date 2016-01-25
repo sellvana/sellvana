@@ -53,27 +53,26 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
 
     public function onAfterCreate()
     {
-        parent::onBeforeSave();
+        parent::onAfterCreate();
+
         if (!$this->BDebug->is(BDebug::MODE_IMPORT)) {
             return $this;
         }
-        $data = @unserialize($this->data_serialized);
 
+        $link = $this->getData('downloadLink');
         //TODO: in future need check to media type.
-        if ($data === false || !array_key_exists('downloadLink', $data)){
+        if (!$link) {
             throw new PDOException($this->BLocale->_('Model does not have link to file'));
         }
 
-        $link = $data['downloadLink'];
-
         /** @var BFile $file */
         $file = $this->BFile->load($link);
-        $file->save($this->file_name, $this->FCom_Core_Main->dir($this->folder));
+        $file->save($this->get('file_name'), $this->FCom_Core_Main->dir($this->folder));
         $fileInfo = $file->getFileInfo();
         unset($file);
 
-        $this->file_size = $fileInfo['file_size'];
-        $this->data_serialized = null;
+        $this->set('file_size', $fileInfo['file_size']);
+        $this->setData('downloadLink', false);
 
         return $this;
     }

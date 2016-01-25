@@ -1,16 +1,20 @@
 {% set m = THIS.get('model') %}
 {% set images = m.gallery() %}
 {% set inventory = m.getInventoryModel() %}
-{% set canOrder = inventory.canOrder() %}
+{% set canOrder = m.canOrder() %}
 
 <div class="row js-product-container">
     <!-- Product Image Column -->
     <div class="f-col-prod-img col-sm-6">
         <div class="f-rslides-container">
             <ul class="thumbnails f-rslides f-prod-imgs" id="quickview-rslides">
-                {% for img in images %}
-                    <li><img class="f-prod-img img-responsive" src="{{ img.thumbUrl(254) }}{#{ img.imageUrl(1) }#}" alt=""/></li>
-                {% endfor %}
+                {% if images %}
+                    {% for img in images %}
+                        <li><img class="f-prod-img img-responsive" src="{{ img.thumbUrl(269) }}{#{ img.imageUrl(1) }#}" alt=""/></li>
+                    {% endfor %}
+                {% else %}
+                    <li><img class="f-prod-img img-responsive" src="{{ m.thumbUrl(269) }}" alt="" itemprop="image"/></li>
+                {% endif %}
             </ul>
             <a href="#" hidden id="display-all-images"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
         </div>
