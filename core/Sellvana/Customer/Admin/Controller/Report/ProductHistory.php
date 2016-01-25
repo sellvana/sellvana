@@ -38,7 +38,7 @@ class Sellvana_Customer_Admin_Controller_Report_ProductHistory extends FCom_Admi
         ];
         $config['filters'] = [
             ['field' => 'order_date', 'type' => 'date-range'],
-            ['field' => 'customer_id', 'type' => 'multiselect'],
+            ['field' => 'customer_id', 'type' => 'multiselect', 'min_input_length' => 1],
         ];
 
         return $config;
