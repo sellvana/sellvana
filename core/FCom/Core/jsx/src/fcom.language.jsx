@@ -63,7 +63,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                         break;
                 }
 
-                React.render(node, this.refs['lang_field_' + lang.lang_code].getDOMNode());
+                React.render(node, this.refs['lang_field_' + key].getDOMNode());
             }.bind(this));
         },
         removeLangField: function (e) {
@@ -83,7 +83,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 <div className="col-md-3 control-label">
                                     <span className="badge badge-default">{lang.lang_code}</span>
                                 </div>
-                                <div className="col-md-6" ref={'lang_field_' + lang.lang_code}></div>
+                                <div className="col-md-6" ref={'lang_field_' + key}></div>
                                 <div className="col-md-3">
                                     <Components.Button type="button" className='btn-sm btn-danger field-remove'
                                                        data-code={lang.lang_code}
@@ -93,7 +93,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 </div>
                             </div>
                         );
-                    })}
+                    }.bind(this))}
                 </div>
             );
         }

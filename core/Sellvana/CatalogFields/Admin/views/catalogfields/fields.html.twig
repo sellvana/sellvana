@@ -1,16 +1,21 @@
 {% set fieldSetsCtrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_FieldSets') %}
 {% set fieldsConfig = fieldSetsCtrl.fieldsGridConfig() %}
 {% set optionsGridConfig = fieldSetsCtrl.optionsGridConfig() %}
+{% set langsGridConfig = fieldSetsCtrl.fieldLangsGridConfig() %}
 {% set optionsConfigCompiled = THIS.view('core/griddle').set('grid', optionsGridConfig).getGridConfig() %}
+{% set langsConfigCompiled = THIS.view('core/griddle').set('grid', langsGridConfig).getGridConfig() %}
 
 <script>
 require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm', 'fcom.components', 'unique'], function ($, _, React, FComGriddleComponent, FComModalForm, Components) {
     var optionsGrid,
         optionsNode,
-        optionsForm,
-        optionsRows,
-        originOptionIds,
-        removedOptionIds;
+        langsGrid,
+        langsNode,
+        originOptionIds = [],
+        removedOptionIds,
+        isSelect = false;
+
+    var OptionsComponent, LangsComponent;
 
     var fieldsGrid, fieldsNode, fieldsForm;
     window.fieldsGridRegister = function(grid) {
@@ -21,6 +26,11 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
     window.optionsModalGridRegister = function(grid) {
         optionsGrid = grid;
         optionsNode = $(optionsGrid.getDOMNode());
+    };
+
+    window.langsModalGridRegister = function (grid) {
+        langsGrid = grid;
+        langsNode = $(grid.getDOMNode());
     };
 
     window.showModalToEditFields = function(row) {
@@ -40,7 +50,8 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             optionsForm = $(modal.getDOMNode()).find('form#fields_options_form'),
             id = fieldsForm.find('#id').val(),
             hash = { oper: id ? 'edit' : 'add', id: id },
-            url = fieldsGrid.getConfig('edit_url');
+            url = fieldsGrid.getConfig('edit_url'),
+            grid = isSelect ? optionsGrid : langsGrid;
 
         fieldsForm.find('textarea, input, select').each(function() {
             var key = $(this).attr('id');
@@ -48,38 +59,44 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
             hash[key] = fieldsGrid.html2text(val);
         });
 
-        currentOptionIds = _.pluck(optionsGrid.getRows(), 'id');
-        removedOptionIds = _.difference(originOptionIds, currentOptionIds);
-        hash['rows'] = optionsGrid.getRows();
-        hash['rowsDelete'] = removedOptionIds;
 
-        hash['rows'] = _(optionsGrid.getRows()).map(function (row, i) {
-            if (row.langs && row.lang_vals) {
-                var langs = row.langs.split(',');
-                var lang_vals = row.lang_vals.split(',');
+        if (isSelect) {
+            var currentOptionIds = _.pluck(grid.getRows(), 'id');
+            removedOptionIds = _.difference(originOptionIds, currentOptionIds);
+            hash['rowsDelete'] = removedOptionIds;
+            hash['rows'] = _(grid.getRows()).map(function (row, i) {
+                if (row.langs && row.lang_vals) {
+                    var langs = row.langs.split(',');
+                    var lang_vals = row.lang_vals.split(',');
 
-                delete row.langs;
-                delete row.lang_vals;
+                    delete row.langs;
+                    delete row.lang_vals;
 
-                row.data_serialized = _(langs).map(function (lang, i) {
-                    return {
-                        value: lang_vals[i],
-                        lang_code: lang
-                    };
-                });
-            }
+                    row.languages = _(langs).map(function (lang, i) {
+                        return {
+                            value: lang_vals[i],
+                            lang_code: lang
+                        };
+                    });
+                }
 
-            return row;
-        });
+                return row;
+            });
+        } else {
+            var langs = [];
+            _(grid.getRows()).each(function (row) {
+                 langs.push({ lang_code: row.lang_code, value: row.value, input_type: hash['admin_input_type'] });
+            });
+            hash['data_serialized'] = JSON.stringify({ frontend_label_translation: langs });
+        }
 
         if (fieldsForm.valid() && optionsForm.valid()) {
             $.post(url, hash, function(data) {
-                $.bootstrapGrowl("{{ 'Saved succeeded.' | _ }}", { type: 'success', align: 'center', width: 'auto', delay: 3000 });
+                $.bootstrapGrowl("{{ 'Saved succeeded.'|_ }}", { type: 'success', align: 'center', width: 'auto', delay: 3000 });
                 fieldsGrid.refresh();
                 modal.close();
             }, 'json');
         } else {
-            //error
             return false;
         }
     };
@@ -89,7 +106,12 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
      * callback function for render modal to add / edit fieldset
      * @param row|null
      */
-    function modalRender(row) {
+    function modalRender(row) {console.log('row', row);
+        isSelect = false;
+        if (row && $.inArray(row.admin_input_type, ['select', 'multiselect']) != -1) {
+            isSelect = true;
+        }
+
         var modalContainerEle = document.getElementById('{{ fieldsConfig.config.id }}-modal');
         React.unmountComponentAtNode(modalContainerEle);
         React.render(
@@ -97,8 +119,8 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                     id: "addFieldModal",
                     show: true,
                     title: row ? "{{ 'Edit Field: '|_ }}" + row.field_code + ' - ' + row.field_name: "{{ 'Add Field'|_ }}",
-                    confirm: "{{ 'Save Changes' | _ }}",
-                    cancel: "{{ 'Cancel' | _ }}",
+                    confirm: "{{ 'Save Changes'|_ }}",
+                    cancel: "{{ 'Cancel'|_ }}",
                     onLoad: function(modal) {
                         var node = $(modal.getDOMNode());
                         node.find('.modal-dialog').css('width', '960px');
@@ -111,66 +133,87 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                             React.DOM.li({ className: "active" },
                                 React.DOM.a({ "data-toggle": "tab", href: "#{{ fieldsConfig.config.id }}_form_tab" }, "{{ 'Field' | _ }}")
                             ),
-                            React.DOM.li(null,
-                                React.DOM.a({ "data-toggle": "tab", href: "#{{ fieldsConfig.config.id }}_options_tab" }, "{{ 'Options' | _ }}")
-                            )
+                            row ? React.DOM.li(null,
+                                React.DOM.a({
+                                    "data-toggle": "tab",
+                                    href: "#{{ fieldsConfig.config.id }}_options_tab"
+                                }, isSelect ? "{{ 'Options' | _ }}" : "{{ 'Language Values' }}")
+                            ) : null
                         ),
                         React.DOM.div({ className: "tab-content" },
                             React.DOM.div({ className: "tab-pane active", id: '{{ fieldsConfig.config.id }}_form_tab' },
                                 React.createElement(FComModalForm, {columnMetadata: fieldsGrid.props.columnMetadata, id: fieldsGrid.getConfig('id'), row: row})
                             ),
-                            React.DOM.div({ className: "tab-pane", id: '{{ fieldsConfig.config.id }}_options_tab' },
+                            row ? React.DOM.div({ className: "tab-pane", id: '{{ fieldsConfig.config.id }}_options_tab' },
                                 React.DOM.form({id:'{{ fieldsConfig.config.id }}_options_form'})
-                            )
+                            ) : null
                         )
                     )
                 )
             ), modalContainerEle);
-        var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
+
         var attachGridContainerEle = document.getElementById('{{ fieldsConfig.config.id }}_options_form');
+        if (row) {
+            if (isSelect) {
+                var optionsConfigCompiled = {{ UTIL.toJson(optionsConfigCompiled) | raw }};
+                if (row.multilanguage == '0') {
+                    optionsConfigCompiled.columns = _(optionsConfigCompiled.columns).filter(function (col, i) {
+                        if (col.name == 0) return true;
+                        return !(col.name == 'langs' || col.name == 'lang_vals');
+                    });
+                }
 
-        if (typeof row !== 'undefined' && typeof row === 'object') {
-            if (row.multilanguage == '0') {
-                optionsConfigCompiled.columns = _(optionsConfigCompiled.columns).filter(function (col, i) {
-                    if (col.name == 0) return true;
-                    return !(col.name == 'langs' || col.name == 'lang_vals');
-                });
-            }
+                var getUrl = optionsConfigCompiled.dataUrl + row.id;
+                $.get(getUrl, function(data) {
+                    if (typeof data[1] !== 'undefined') {
+                        originOptionIds = _.pluck(data[1], 'id');
 
-            var getUrl = optionsConfigCompiled.dataUrl + row.id;
-            $.get(getUrl, function(data) {
-                if (typeof data[1] !== 'undefined') {
-                    originOptionIds = _.pluck(data[1], 'id');
+                        var rows = _(data[1]).map(function(row, i) {
+                            if (row.data_serialized) {
+                                var serialized = JSON.parse(row.data_serialized)['frontend_label_translation'];
+                                var langs = [], lang_vals = [];
+                                _(serialized).each(function(lang, code) {
+                                    langs.push(code);
+                                    lang_vals.push(lang);
+                                });
 
-                    var rows = _(data[1]).map(function(row, i) {
-                        if (row.data_serialized) {
-                            var serialized = JSON.parse(row.data_serialized)['frontend_label_translation'];
-                            var langs = [], lang_vals = [];
-                            _(serialized).each(function(lang, code) {
-                                langs.push(code);
-                                lang_vals.push(lang);
-                            });
+                                row['langs'] = langs.join(',');
+                                row['lang_vals'] = lang_vals.join(',');
+                            }
 
-                            row['langs'] = langs.join(',');
-                            row['lang_vals'] = lang_vals.join(',');
-                        }
+                            return row;
+                        });
 
-                        return row;
+                        optionsGrid.addRows(rows);
+                    }
+                }, 'json');
+
+                OptionsComponent = React.render(
+                        React.createElement(FComGriddleComponent, { config: optionsConfigCompiled}), attachGridContainerEle
+                );
+
+                if (row && _.contains(['select', 'multiselect'], row.admin_input_type)) {
+                    optionsNode.find('button#add_new_field').prop('disabled', false);
+                } else {
+                    optionsNode.find('button#add_new_field').prop('disabled', true);
+                }
+            } else {
+                var langsConfigCompiled = {{ UTIL.toJson(langsConfigCompiled) | raw }};
+                LangsComponent = React.render(
+                        React.createElement(FComGriddleComponent, { config: langsConfigCompiled }), attachGridContainerEle
+                );
+
+                var data = row.data_serialized && typeof row.data_serialized === 'string' ? JSON.parse(row.data_serialized) : row.data_serialized;
+                var rows = data['frontend_label_translation'];
+                if (rows) {
+                    _(rows).each(function (row, i) {
+                        rows[i].id = i;
+                        originOptionIds.push(i);
                     });
 
-                    optionsGrid.addRows(rows);
+                    langsGrid.addRows(rows);
                 }
-            }, 'json');
-        }
-
-        React.render(
-            React.createElement(FComGriddleComponent, { config: optionsConfigCompiled}), attachGridContainerEle
-        );
-
-        if (row && _.contains(['select', 'multiselect'], row.admin_input_type)) {
-            optionsNode.find('button#add_new_field').prop('disabled', false);
-        } else {
-            optionsNode.find('button#add_new_field').prop('disabled', true);
+            }
         }
     }
 
@@ -184,9 +227,12 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
     });
 
     window.insertNewOption = function(grid) {
-        optionsGrid.addRows([{id:guid()}]);
-    }
+        optionsGrid.addRows([{id: guid()}]);
+    };
 
+    window.insertNewLang = function (grid) {
+        langsGrid.addRows([{id: guid()}]);
+    };
 });
 </script>
 <div class="f-admin-main-view">

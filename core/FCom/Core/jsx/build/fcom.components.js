@@ -47,14 +47,6 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         removeSpecialChars: function (str) { //todo: put this function to global utilities object
             var label = str.substr(0, str.lastIndexOf('.'));
             return label.replace(/[^A-Z0-9]/ig, ' ');
-        },
-        doesSupportTouchEvents: function () {
-            try {
-                document.createEventObject('TouchEvent');
-                return true;
-            } catch (e) {
-                return false;
-            }
         }
     };
 
@@ -1007,10 +999,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             this.props.onChange(newRating);
         },
         handleOnMouseMove: function(newTempRating, e) {
-            if (
-                this.doesSupportTouchEvents
-                || this.props.disabled
-                || !this.props.hover
+            if (this.props.disabled || !this.props.hover
             ) {
                 return;
             }
