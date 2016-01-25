@@ -273,6 +273,7 @@ class Sellvana_SalesTax_Main extends BClass
                 foreach ($itemRules as $rId => $rule) {
                     if ($rule->get('fpt_amount')) {
                         $itemRuleAmount = $rule->get('fpt_amount');
+                        $rate = null;
                     } else {
                         $rate                =
                             (float)($rule->get('rule_rate_percent') ?: $rule->get('zone')->get('zone_rate_percent'));

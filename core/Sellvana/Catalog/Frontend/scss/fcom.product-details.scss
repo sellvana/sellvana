@@ -1,0 +1,138 @@
+.zoom {
+  &:after {
+    content: '';
+    display: block;
+    width: 33px;
+    height: 33px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: url("{{ APP.src('@FCom_Core/img/zoom-corner.png') }}");
+  }
+  img {
+    display: block;
+    &::selection {
+      background-color: transparent;
+    }
+  }
+}
+
+.btn-wishlist {
+  background-color: #EE8371 !important;
+  color: #fff;
+}
+
+.external_thumb {
+  height: 43px;
+}
+
+.external_link {
+  padding: 0 !important;
+}
+
+@media screen and (min-width: 320px) and (max-width: 359px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 280px !important;
+    height: 160px !important;
+  }
+  .external_thumb, .video_thumb {
+    height: 33px;
+  }
+}
+
+@media screen and (min-width: 360px) and (max-width: 413px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 340px !important;
+    height: 200px !important;
+  }
+  .external_thumb, .video_thumb {
+    height: 33px;
+  }
+}
+
+@media screen and (min-width: 414px) and (max-width: 500px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 410px !important;
+    height: 230px !important;
+  }
+  .external_thumb, .video_thumb {
+    height: 42px;
+  }
+}
+
+@media screen and (min-width: 501px) and (max-width: 600px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 530px !important;
+    height: 310px !important;
+  }
+  .external_thumb, .video_thumb {
+    height: 50px;
+  }
+}
+
+@media screen and (min-width: 601px) and (max-width: 700px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 640px !important;
+    height: 370px !important;
+  }
+  .external_thumb, .video_thumb {
+    height: 57px;
+  }
+}
+
+@media screen and (min-width: 701px) and (max-width: 750px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 690px !important;
+    height: 390px !important;
+  }
+  .external_thumb, .video_thumb {
+    height: 69px;
+  }
+}
+
+@media screen and (min-width: 751px) and (max-width: 800px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 700px !important;
+    height: 370px !important;
+  }
+  .external_thumb {
+    height: 66px;
+  }
+}
+
+@media screen and (min-width: 801px) and (max-width: 901px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 720px !important;
+    height: 390px !important;
+  }
+  .external_thumb {
+    height: 66px;
+  }
+}
+
+@media screen and (min-width: 901px) and (max-width: 991px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 720px !important;
+    height: 410px !important;
+  }
+  .external_thumb {
+    height: 66px;
+  }
+}
+
+@media screen and (min-width: 992px) and (max-width: 1200px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 375px !important;
+    height: 210px !important;
+  }
+  .external_thumb {
+    height: 36px;
+  }
+}
+
+@media screen and (min-width: 1201px) {
+  .product-video, .mejs-overlay-play, iframe {
+    width: 460px !important;
+    height: 265px !important;
+  }
+}

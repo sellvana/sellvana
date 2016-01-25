@@ -332,6 +332,7 @@ class Sellvana_CatalogIndex_Main extends BClass
                     'product_name' => 'Product ' . $maxId,
                     'short_description' => 'Short Description ' . $maxId,
                     'description' => 'Long Description ' . $maxId,
+                    'manage_inventory' => 1,
                     'price.cost' => $cost,
                     'price.base' => $basePrice,
                     'price.sale' => $salePrice,
