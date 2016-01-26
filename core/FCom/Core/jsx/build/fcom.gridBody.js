@@ -104,11 +104,20 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
             /*console.log('FComGridBody.columnMetadata', this.props.columnMetadata);
             console.log('FComGridBody.columns', this.props.columns);*/
 
-            var title = React.createElement(FComGridTitle, {columns: this.props.columns, changeSort: this.props.changeSort, sortColumn: this.props.sortColumn, getConfig: this.props.getConfig, 
-                sortAscending: this.props.sortAscending, columnMetadata: this.props.columnMetadata, data: this.props.data, 
-                originalData: this.props.originalData, setHeaderSelection: this.props.setHeaderSelection, getHeaderSelection: this.props.getHeaderSelection, 
-                addSelectedRows: this.props.addSelectedRows, getSelectedRows: this.props.getSelectedRows, clearSelectedRows: this.props.clearSelectedRows, 
-                removeSelectedRows: this.props.removeSelectedRows, saveLocalState: this.saveLocalState, 
+            var title = React.createElement(FComGridTitle, {columns: this.props.columns, changeSort: this.props.changeSort, 
+                                       sortColumn: this.props.sortColumn, 
+                                       getConfig: this.props.getConfig, 
+                                       sortAscending: this.props.sortAscending, 
+                                       columnMetadata: this.props.columnMetadata, 
+                                       data: this.props.data, 
+                                       originalData: this.props.originalData, 
+                                       setHeaderSelection: this.props.setHeaderSelection, 
+                                       getHeaderSelection: this.props.getHeaderSelection, 
+                                       addSelectedRows: this.props.addSelectedRows, 
+                                       getSelectedRows: this.props.getSelectedRows, 
+                                       clearSelectedRows: this.props.clearSelectedRows, 
+                                       removeSelectedRows: this.props.removeSelectedRows, 
+                                       saveLocalState: this.saveLocalState, 
                 ref: 'gridTitle'}
             );
 
@@ -141,9 +150,16 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     });
                 }
 
-                return React.createElement(FComRow, {ref: 'row'+row.id, row: row, key: 'row-' + row.id, index: index, columns: that.props.columns, columnMetadata: that.props.columnMetadata, defaultValues: defaultValues, 
-                    getConfig: that.props.getConfig, doRowAction: that.doRowAction, removeSelectedRows: that.props.removeSelectedRows, 
-                    addSelectedRows: that.props.addSelectedRows, getSelectedRows: that.props.getSelectedRows});
+                return React.createElement(FComRow, {ref: 'row'+row.id, row: row, key: 'row-' + row.id, 
+                                index: index, columns: that.props.columns, 
+                                columnMetadata: that.props.columnMetadata, 
+                                defaultValues: defaultValues, 
+                                getConfig: that.props.getConfig, 
+                                doRowAction: that.doRowAction, 
+                                removeSelectedRows: that.props.removeSelectedRows, 
+                                addSelectedRows: that.props.addSelectedRows, 
+                                getSelectedRows: that.props.getSelectedRows, 
+                                refresh: that.props.refresh});
             });
 
             return (

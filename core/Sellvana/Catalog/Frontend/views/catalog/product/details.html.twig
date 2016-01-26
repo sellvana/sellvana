@@ -1,30 +1,6 @@
 <style>
     .zoom:after {
-        content: '';
-        display: block;
-        width: 33px;
-        height: 33px;
-        position: absolute;
-        top: 0;
-        right: 0;
         background: url("{{ APP.src('@FCom_Core/img/zoom-corner.png') }}");
-    }
-
-    .zoom img {
-        display: block;
-    }
-
-    .zoom img::selection {
-        background-color: transparent;
-    }
-
-    .btn-wishlist {
-        background-color: #EE8371 !important;
-        color: #fff;
-    }
-
-    .external_thumb {
-        height: 43px;
     }
 </style>
 
@@ -35,7 +11,7 @@
 
 {% set productLinks = prod.getProductLinks() %}
 
-{% set canOrder = inventory.canOrder() %}
+{% set canOrder = prod.canOrder() %}
 
 {{ THIS.view('breadcrumbs') | raw }}
 
@@ -47,24 +23,28 @@
         <div class="col-md-5 f-col-prod-img">
             <div class="f-rslides-container">
                 <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
-                    {% for media in mediaItems %}
-                        {% if media.get('media_type') == 'V' %}
-                            {% if media.get('file_size') %}
-                                <li class="product-video-item" style="padding: 80px 0;">
-                                    <video id="product-video" width="480" height="320" poster="" controls="controls" preload="true">
-                                        <source type="video/{{ media.get('file_name')[-3: 3] }}" src="{{ media.getUrl() }}" />
-                                    </video>
-                                </li>
-                            {% else %}
-                                {% set data = UTIL.fromJson(media.get('data_serialized')) | raw %}
-                                {% if data %}
-                                    <li class="product-video-item external_link" style="padding: 80px 0;">{{ data.html | raw }}</li>
+                    {% if mediaItems %}
+                        {% for media in mediaItems %}
+                            {% if media.get('media_type') == 'V' %}
+                                {% if media.get('file_size') %}
+                                    <li class="product-video-item">
+                                        <video class="product-video" preload="metadata" src="{{ media.getUrl() }}">
+                                            <source type="video/{{ media.get('file_name')[-3: 3] }}" src="{{ media.getUrl() }}" />
+                                        </video>
+                                    </li>
+                                {% else %}
+                                    {% set html = media.getData('html') %}
+                                    {% if html %}
+                                        <li class="product-video-item external_link" style="padding: 80px 0;">{{ html | raw }}</li>
+                                    {% endif %}
                                 {% endif %}
+                            {% else %}
+                                <li><img data-id="{{ media.id() }}" class="f-prod-img img-responsive" src="{{ media.thumbUrl(458) }}{#{ img.imageUrl(1) }#}" alt="" itemprop="image"/></li>
                             {% endif %}
-                        {% else %}
-                            <li><img data-id="{{ media.id() }}" class="f-prod-img img-responsive" src="{{ media.thumbUrl(458) }}{#{ img.imageUrl(1) }#}" alt="" itemprop="image"/></li>
-                        {% endif %}
-                    {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <li><img class="f-prod-img img-responsive" src="{{ prod.thumbUrl(458) }}" alt="" itemprop="image"/></li>
+                    {% endif %}
                 </ul>
             </div>
             <p class="text-center">
@@ -75,19 +55,18 @@
                     {% if media.get('media_type') == 'V' %}
                         {% if media.get('file_size') %}
                             <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 0;">
-                                <a href="javascript:void(0)"><img src="{{ CONFIG.get('web/media_dir') ~ '/video-default.jpg' }}" title="There's no image for this video"></a>
+                                <a href="javascript:void(0)"><img src="{{ APP.src('@FCom_Admin/Admin/theme1/assets/images/video-default.jpg') }}" title="There's no image for this video" class="video_thumb"></a>
                             </li>
                         {% else %}
-                            {% set data = UTIL.fromJson(media.get('data_serialized')) | raw %}
-                            {% if data %}
+                            {% if media.getData('title') %}
                                 <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}" style="padding: 15px 3px;">
-                                    <a href="javascript:void(0)"><img class="external_thumb" src="{{ data.thumbnail_url | raw }}" title="{{ data.title | raw }}"></a>
+                                    <a href="javascript:void(0)"><img class="external_thumb img-responsive" src="{{ media.getData('thumbnail_url')|escape('url') }}" title="{{ media.getData('title') }}"></a>
                                 </li>
                             {% endif %}
                         {% endif %}
-                        
+
                     {% else %}
-                        <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}"><a href="#"><img src="{{ media.thumbUrl(90) }}" alt="" title=""></a></li>
+                        <li class="col-md-2 col-xs-2" data-id="{{ media.id() }}"><a href="#"><img src="{{ media.thumbUrl(90) }}" alt="" class="img-responsive" title=""></a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -105,17 +84,7 @@
                 <h1 class="f-prod-name" itemprop="name">{{ prod.getName() }}</h1>
                 <p class="f-sku" itemprop="identifier" content="sku:{{ prod.get('product_sku') }}">{{ prod.get('product_sku') }}</p>
 
-                {% if prod.getAverageStars() %}
-                    <div class="f-prod-avg-rating" itemprop="review" itemscope itemtype="http://data-vocabulary.org/Review-aggregate">
-                        <meta itemprop="rating" content="{{ prod.getAverageStars() }}"/>
-                        <meta itemprop="count" content="{{ prod.getNumReviews() }}"/>
-                        <div class="glyphicon f-rating-stars f-sm-stars">
-                            <span class="f-filled-stars" style="width:{{ prod.getAverageRatingPercent() }}%;"></span>
-                            <span class="f-empty-stars"></span>
-                        </div>
-                        <a href="#f-prod-tab-reviews">{{ '%s Review(s)'|_(prod.getNumReviews()) }}</a>
-                    </div>
-                {% endif %}
+                {{ THIS.view('prodreviews/product-details-summary').set('product', prod) | raw }}
 
                 {{ THIS.view('catalog/product/price').set('product', prod) | raw }}
 
@@ -124,16 +93,20 @@
                     {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
 
                     <div class="f-prod-add-cart">
-
+                        {{ THIS.view('catalog/product/custom-fields').set('product', prod) | raw }}
                         {{ THIS.view('catalog/product/variants').set('product', prod) | raw }}
+                        {{ THIS.view('catalog/product/shopper-fields').set('product', prod) | raw }}
 
-                        {{ THIS.view('catalog/product/shopper_fields').set('product', prod) | raw }}
-
-                        <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>{{ 'In Stock.'|_ }}</p>
+                        <p class="f-stock-notice f-in-stock" {{ not canOrder ? 'hidden' }}>
+                            {{ 'In Stock.'|_ }}
+                            {% if inventory.getWarnCustomerQty() %}
+                                {{ '(Only %s left in stock)'|_(inventory.getWarnCustomerQty()) }}
+                            {% endif %}
+                        </p>
 
                         <p class="f-stock-notice f-out-of-stock" {{ canOrder ? 'hidden' }}>{{ 'Out Of Stock.'|_ }}</p>
 
-                        <div class="form-group overflow-hidden">
+                        <div class="form-group row overflow-hidden">
                             <label class="col-md-3 control-label">{{ 'Quantity:' |_ }}</label>
 
                             <div class="col-md-2">
@@ -197,7 +170,7 @@
 {{ THIS.view('catalog/product/quickview') | raw }}
 
 <script>
-    require(['jquery', 'underscore', 'responsiveslides', 'jquery.zoom', 'jquery.media-element'], function ($, _s) {
+    require(['jquery', 'underscore', 'responsiveslides', 'jquery.zoom', 'jquery.media-element'], function ($, _) {
         var pager = $('#product-rslides-pager');
         $("#product-rslides").responsiveSlides({
             auto: false,
@@ -207,13 +180,10 @@
             manualControls: '#product-rslides-pager'
         });
 
-        $('#product-rslides li:not(.product-video-item)').addClass('zoom').zoom();
+        $('#product-rslides li:not(".product-video-item")').addClass('zoom').zoom();
 
         // Fix external video size
         var $externalVideoNode = $('.external_link').children('iframe');
-        if ($externalVideoNode.length) {
-            $externalVideoNode.prop('width', '460');
-        }
 
         $('video').mediaelementplayer({
             features: ['playpause','progress','current','duration','tracks','volume','fullscreen']

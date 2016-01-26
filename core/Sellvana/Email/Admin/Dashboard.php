@@ -39,7 +39,7 @@ class Sellvana_Email_Admin_Dashboard extends FCom_Admin_Widget
      * @return array
      */
     public function getLatestNewsletterSubscriptions(){
-
+        /** @var BORM $orm */
         $orm = $this->{$this->_modelClass}->orm('p')
             ->select([
                 'p.email'

@@ -5,6 +5,7 @@
  *
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_CatalogFields_Model_ProductVariant $Sellvana_CatalogFields_Model_ProductVariant
  */
 class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -16,6 +17,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     protected $_recordName = 'Inventory SKU';
     protected $_mainTableAlias = 's';
     protected $_navPath = 'catalog/inventory';
+    protected $_formTitleField = 'inventory_sku';
     #protected $_gridLayoutName = '/catalog/inventory';
 
     #protected $_defaultGridLayoutName = 'default_grid';
@@ -25,8 +27,11 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     public function gridConfig()
     {
         $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
-        $yesNo = [0 => 'no', 1 => 'YES'];
+//        $yesNo = [0 => 'no', 1 => 'YES'];
         $config = parent::gridConfig();
+        #$manInvOptions = $invHlp->fieldOptions('manage_inventory');
+        $backorderOptions = $invHlp->fieldOptions('allow_backorder');
+        $packOptions = $invHlp->fieldOptions('pack_separate');
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'buttons' => [
@@ -36,20 +41,21 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
             ['name' => 'id', 'label' => 'ID', 'width' => 50],
             ['name' => 'title', 'label' => 'Title'],
             ['name' => 'inventory_sku', 'label' => 'SKU'],
-            ['name' => 'manage_inventory', 'label' => 'Manage', 'options' => $invHlp->fieldOptions('manage_inventory')],
-            ['name' => 'allow_backorder', 'label' => 'Allow Backorder', 'options' => $invHlp->fieldOptions('allow_backorder')],
-            ['name' => 'qty_in_stock', 'label' => 'Quantity In Stock'],
-            ['name' => 'qty_reserved', 'label' => 'Qty Reserved'],
-            ['name' => 'qty_buffer', 'label' => 'Qty Buffer'],
-            ['name' => 'unit_cost', 'label' => 'Unit Cost'],
-            ['name' => 'net_weight', 'label' => 'Net Weight'],
-            ['name' => 'shipping_weight', 'label' => 'Ship Weight'],
-            ['name' => 'shipping_size', 'label' => 'Ship Size'],
-            ['name' => 'pack_separate', 'label' => 'Pack Separate', 'options' => $invHlp->fieldOptions('pack_separate')],
-            ['name' => 'qty_warn_customer', 'label' => 'Qty to Warn Customer'],
-            ['name' => 'qty_notify_admin', 'label' => 'Qty to Notify Admin'],
-            ['name' => 'qty_cart_min', 'label' => 'Min Qty in Cart'],
-            ['name' => 'qty_cart_inc', 'label' => 'Cart Increment'],
+            #['name' => 'manage_inventory', 'label' => 'Manage', 'options' => $manInvOptions, 'multirow_edit' => true],
+            ['name' => 'allow_backorder', 'label' => 'Allow Backorder', 'options' => $backorderOptions, 'multirow_edit' => true],
+            ['name' => 'pack_separate', 'label' => 'Pack Separate', 'options' => $packOptions, 'multirow_edit' => true],
+            ['name' => 'qty_in_stock', 'label' => 'Quantity In Stock', 'multirow_edit' => true],
+            ['name' => 'qty_reserved', 'label' => 'Qty Reserved', 'multirow_edit' => true],
+            ['name' => 'qty_buffer', 'label' => 'Qty Buffer', 'multirow_edit' => true],
+            ['name' => 'qty_warn_customer', 'label' => 'Qty to Warn Customer', 'multirow_edit' => true],
+            ['name' => 'qty_notify_admin', 'label' => 'Qty to Notify Admin', 'multirow_edit' => true],
+            ['name' => 'qty_cart_min', 'label' => 'Min Qty in Cart', 'multirow_edit' => true],
+            ['name' => 'qty_cart_max', 'label' => 'Max Qty in Cart', 'multirow_edit' => true],
+            ['name' => 'qty_cart_inc', 'label' => 'Cart Increment', 'multirow_edit' => true],
+            ['name' => 'unit_cost', 'label' => 'Unit Cost', 'multirow_edit' => true],
+            ['name' => 'net_weight', 'label' => 'Net Weight', 'multirow_edit' => true],
+            ['name' => 'shipping_weight', 'label' => 'Ship Weight', 'multirow_edit' => true],
+            ['name' => 'shipping_size', 'label' => 'Ship Size', 'multirow_edit' => true],
         ];
         $config['actions'] = [
             'edit' => true,
@@ -57,7 +63,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         ];
         $config['filters'] = [
             ['field' => 'id', 'type' => 'number-range'],
-            ['field' => 'manage_inventory', 'type' => 'multiselect'],
+            #['field' => 'manage_inventory', 'type' => 'multiselect'],
             ['field' => 'allow_backorder', 'type' => 'multiselect'],
             ['field' => 'title', 'type' => 'text'],
             ['field' => 'inventory_sku', 'type' => 'text'],
@@ -70,6 +76,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
             ['field' => 'qty_warn_customer', 'type' => 'number-range'],
             ['field' => 'qty_notify_admin', 'type' => 'number-range'],
             ['field' => 'qty_cart_min', 'type' => 'number-range'],
+            ['field' => 'qty_cart_max', 'type' => 'number-range'],
             ['field' => 'qty_cart_inc', 'type' => 'number-range'],
             ['field' => 'pack_separate', 'type' => 'multiselect'],
         ];
@@ -78,46 +85,67 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         return $config;
     }
 
-    public function productStockPolicy($model)
+    /**
+     * @param Sellvana_Catalog_Model_InventorySku $model
+     * @return array
+     */
+    public function prodInventoryConfig($model = null)
     {
-        $stock_policy = [
-            'manage_stock' => 0,
-            'stock_qty' => '',
-            'out_stock' => 'keep_selling',
-            'maximum_quantity_shopping' => '',
-            'quantity_items_status' => '',
-            'notify_administrator_quantity' => '',
-        ];
-        if (isset($model->data_serialized)) {
-            $data = $this->BUtil->objectToArray(json_decode($model->data_serialized));
-            if (isset($data['stock_policy'])) {
-                $stock_policy = $data['stock_policy'];
-            }
+        $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
+        $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 80]);
+        $data = [];
+        if ($model) {
+            $data = $this->BDb->many_as_array($this->Sellvana_Catalog_Model_Product->orm('p')
+                ->left_outer_join('Sellvana_Catalog_Model_ProductMedia', "p.id=pa.product_id and pa.media_type='" .
+                    Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG . "'", 'pa')
+                ->left_outer_join('FCom_Core_Model_MediaLibrary', 'a.id=pa.file_id', 'a')
+                ->where('p.inventory_sku', $model->get('inventory_sku'))
+                ->select(['p.*', 'pa.*', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size'])
+                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
+                ->find_many());
         }
-        return $stock_policy;
+
+        $config = [
+            'config' => [
+                'id' => 'product_inventory_sku',
+                'caption' => 'Product Inventory SKU',
+                'data_mode' => 'local',
+                'data' => $data,
+                'columns' => [
+                    ['type' => 'row_select', 'width' => 55],
+                    ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
+                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                        'print' => '"<a href=\''.$downloadUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
+                            . '<img src=\''.$thumbUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
+                            . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
+                        'sortable' => false],
+                    ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
+                    ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
+                    ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
+                    ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100],
+                    ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100],
+                ],
+                'filters' => [
+                    ['field' => 'product_name', 'type' => 'text'],
+                    ['field' => 'product_sku', 'type' => 'text'],
+                    ['field' => 'short_description', 'type' => 'text'],
+                    ['field' => 'create_at', 'type' => 'date-range'],
+                    ['field' => 'update_at', 'type' => 'date-range'],
+                    '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
+                ],
+                'callbacks' => [
+                    'componentDidMount' => 'prodInventoryRegister'
+                ],
+                'state' => [
+                    's' => 'product_name',
+                    'sd' => 'asc'
+                ]
+            ]
+        ];
+
+        return $config;
     }
 
-    public function action_restore_stock_policy()
-    {
-        $post = $this->BRequest->post();
-        $config = $this->BConfig->get('modules/Sellvana_Catalog');
-        $result = '';
-        if (isset($post['restore'])) {
-            switch($post['restore']) {
-                case 'maximum_quantity_shopping':case 'quantity_items_status':case 'notify_administrator_quantity':
-                    if ($config) {
-                        $result = $config[$post['restore']];
-                    }
-                     break;
-                case 'out_stock':
-                    $result = 'back_order';
-                    break;
-                default:
-                    break;
-            }
-        }
-        $this->BResponse->json(['result' => $result]);
-    }
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
@@ -149,58 +177,29 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
 
     public function action_grid_data__POST()
     {
-        $r = $this->BRequest;
-        $p = $r->post();
-        switch ($p['oper']) {
-            case 'edit':
-                // avoid error when edit
-                $p['tmp_cost'] = $p['cost'];
-                unset($p['oper']);
-                if (isset($p['sku'])) {
-                    $prod = $this->Sellvana_Catalog_Model_Product->load($p['sku'], 'product_sku');
-                    $this->Sellvana_Catalog_Model_InventorySku->load($p['id'])->set('status', $p['status'])->save();
-                    if ($prod) {
-                        $data_serialized = $this->BUtil->objectToArray(json_decode($prod->get('data_serialized')));
-                        if (!isset($data_serialized['stock_policy']))  {
-                            $data_serialized['stock_policy'] = ['stock_qty' => $p['stock_qty'], 'out_stock' => $p['out_stock'], 'manage_stock' => $p['manage_stock']];
-                        } else {
-                            $data_serialized['stock_policy']['stock_qty'] = $p['stock_qty'];
-                            $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
-                            $data_serialized['stock_policy']['manage_stock'] = $p['status'];
-                        }
-                        $prod->setData('stock_policy', $data_serialized['stock_policy']);
-                        $prod->set('cost', $p['cost']);
-                        $prod->save();
-                    }
-                }
-                if ($p['cost'] != '') {
-                    $p['cost'] = $this->BLocale->currency($p['cost']);
-                }
-                $this->BResponse->json($p);
-                break;
+        switch ($this->BRequest->post('oper')) {
             case 'mass-edit':
-                $id = $p['id'];
-                $args['ids'] = explode(',', $id);
-                $data = $p;
-                $hlp = $this->Sellvana_Catalog_Model_InventorySku;
-                $models = $hlp->orm()->where_in('id', $args['ids'])->find_many_assoc();
-                $skus = $this->BUtil->arrayToOptions($models, 'sku');
-                $products = $this->Sellvana_Catalog_Model_Product->orm()->where_in('product_sku', $skus)->find_many_assoc('product_sku');
-                foreach ($models as $stock) {
-                    $stock->set('status', $data['status'])->save();
-                    if (!empty($products[$stock->get('sku')])) {
-                        $prod = $products[$stock->get('sku')];
-                        $data_serialized = $this->BUtil->objectToArray(json_decode($prod->get('data_serialized')));
-                        if (!isset($data_serialized['stock_policy']))  {
-                            $data_serialized['stock_policy'] = ['out_stock' => $p['out_stock'], 'manage_stock' => $p['status']];
-                        } else {
-                            $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
-                            $data_serialized['stock_policy']['manage_stock'] = $p['status'];
-                        }
-                        $prod->setData('stock_policy', $data_serialized['stock_policy']);
-                        $prod->save();
-                    }
-                }
+                $p = $this->BRequest->post();
+                $ids = $this->BUtil->arrayCleanInt(explode(',', $p['id']));
+                $data = $this->BRequest->sanitize($p, [
+                    'unit_cost' => 'float',
+                    'net_weight' => 'float',
+                    'shipping_weight' => 'float',
+                    'shipping_size' => 'alnum',
+                    'pack_separate' => 'int',
+                    'qty_in_stock' => 'int',
+                    'qty_warn_customer' => 'int',
+                    'qty_notify_admin' => 'int',
+                    'qty_cart_min' => 'int',
+                    'qty_cart_max' => 'int',
+                    'qty_cart_inc' => 'int',
+                    'qty_buffer' => 'int',
+                    'qty_reserved' => 'int',
+                    'allow_backorder' => 'int',
+                    #'manage_inventory' => 'int',
+                    'origin_country' => 'alnum',
+                ]);
+                $this->Sellvana_Catalog_Model_InventorySku->update_many($data, $ids);
                 $this->BResponse->json(['success' => true]);
                 break;
             default:

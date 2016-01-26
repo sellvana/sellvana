@@ -18,5 +18,7 @@
 <h4>{{ "Order Items" |_ }}</h4>
 
 {% for item in cart.items() %}
-    {{ THIS.view('checkout-simple/partial/summary-item').set({'item': item, 'product': p}) | raw }}
+    {% if (item.get('qty') > 0) %}
+        {{ THIS.view('checkout-simple/partial/summary-item').set({'item': item, 'product': p}) | raw }}
+    {% endif %}
 {% endfor %}

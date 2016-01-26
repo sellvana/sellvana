@@ -47,8 +47,9 @@ catalog/product/pager:
 
 /catalog/product:
     - { include: base }
-    - { hook: main, views: catalog/product/details }
     - { view: root, do: [[ addBodyClass, f-page-product-view ]] }
+    - { view: head, do: [[ scss, "@Sellvana_Catalog/Frontend/scss/fcom.product-details.scss" ]] }
+    - { hook: main, views: catalog/product/details }
     - { hook: before_body_end, views: custom-tags }
     - { view: custom-tags, set: { config: modules/FCom_Frontend/custom_tags_product } }
 

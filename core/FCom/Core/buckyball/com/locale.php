@@ -353,7 +353,7 @@ class BLocale extends BClass
         return $result;
     }
 
-    public function getAvailableCountries($format = 'name', $limitCountries = null)
+    public function getAvailableCountries($format = 'name', $limitCountries = null, $showEmpty = false)
     {
         static $countries = [
             ['AD', 'Andorra', 'AND', '20'],
@@ -634,6 +634,9 @@ class BLocale extends BClass
 
             default:
                 throw new BException('Invalid label type');
+        }
+        if ($showEmpty) {
+            $result = ['' => ''] + $result;
         }
         return $result;
     }
@@ -1264,6 +1267,31 @@ class BLocale extends BClass
             }
             if ($isObject) $result->$k = $r; else $result[$k] = $r;
         }
+        return $result;
+    }
+
+    /**
+     * Parse default allowed languages to select2 options
+     *
+     * @param bool $griddle
+     * @param array $locales
+     * @return array
+     */
+    public function parseAllowedLocalesToOptions($griddle = false, $locales = [])
+    {
+        if (empty($locales)) {
+            $locales = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales');
+            if (empty($locales)) {
+                return [];
+            }
+        }
+
+        $result = [];
+
+        foreach ($locales as $locale) {
+            $griddle ? $result[$locale] = $locale : $result[] = ['id' => $locale, 'text' => $locale];
+        }
+
         return $result;
     }
 

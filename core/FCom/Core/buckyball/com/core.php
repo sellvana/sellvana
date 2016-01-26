@@ -723,10 +723,13 @@ class BConfig extends BClass
         } else {
             $node =& $this->_config;
         }
-        if ($this->shouldBeEncrypted($path)) {
-
-        }
+        #if ($this->shouldBeEncrypted($path)) {
+            //TODO: need encrypted values in config?
+        #}
         foreach (explode('/', $path) as $key) {
+            if (!is_array($node)) {
+                $node = [];
+            }
             $node =& $node[$key];
         }
         if ($merge) {
@@ -814,7 +817,7 @@ class BConfig extends BClass
     {
         //TODO: make more flexible, to account for other (custom) file names
         if (null === $files) {
-            $files = ['core', 'db', 'local'];
+            $files = ['core', 'db', 'local', 'codecept'];
         }
         if (is_string($files)) {
             $files = explode(',', strtolower($files));
@@ -847,6 +850,39 @@ class BConfig extends BClass
                 'db,install_status,module_run_levels,recovery,mode_by_ip,cache,core',
                 true);
             $this->writeFile('local.php', $local);
+        }
+        if (in_array('codecept', $files)) {
+            $codecept = [
+                'codecept_sites' => [
+                    'FCom_Test' => FULLERON_ROOT_DIR . '/core/FCom/Test/Test/codeception.yml'
+                ],
+                'codecept_executable' => FULLERON_ROOT_DIR . '/codecept.phar',
+                'codecept_executable_url' => 'http://codeception.com/codecept.phar',
+                'php_executable' => '',
+                'codecept_tests' => [
+                    'acceptance' => false,
+                    'functional' => false,
+                    'unit' => true
+                ],
+                'codecept_ignore' => [
+                    'WebGuy.php',
+                    'TestGuy.php',
+                    'CodeGuy.php',
+                    '_bootstrap.php',
+                    '.DS_Store'
+                ],
+                'codecept_bootstrap' => [
+                    FULLERON_ROOT_DIR . '/core/FCom/Test/bootstrap.php',
+                    FULLERON_ROOT_DIR . '/core/FCom/Test/Core/Db.php'
+                ],
+                'codecept_test_db' => [
+                    'host' => '127.0.0.1',
+                    'dbname' => 'dbname',
+                    'username' => 'user',
+                    'password' => 'pass'
+                ]
+            ];
+            $this->writeFile('codecept.php', $codecept);
         }
         return $this;
     }
@@ -1703,6 +1739,8 @@ class BEvents extends BClass
      */
     protected $_events = [];
 
+    protected $_regexObservers = [];
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -1746,9 +1784,10 @@ class BEvents extends BClass
      * observe|watch|on|sub|subscribe ?
      *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
+     *          if starts with ^ will be processed as regular expression
      * @param mixed $callback
      * @param array|object $args
-     * @param arary $params - alias, insert (function, 0=skip, -1=before, 1=after)
+     * @param arary $params - alias, insert (function, 0=skip, -1=before, 1=after), regex (true, false)
      * @return BEvents
      */
     public function on($eventName, $callback = null, $args = [], $params = null)
@@ -1761,6 +1800,9 @@ class BEvents extends BClass
         }
         if (is_string($params)) {
             $params = ['alias' => $params];
+        }
+        if (strpos($eventName, '^') === 0 || !empty($params['regex'])) {
+            return $this->onRegex($eventName, $callback, $args, $params);
         }
         if (empty($params['alias']) && is_string($callback)) {
             $params['alias'] = $callback;
@@ -1792,6 +1834,27 @@ class BEvents extends BClass
             }
         }
         BDebug::debug('SUBSCRIBE ' . $eventName, 1);
+        return $this;
+    }
+
+    /**
+     * @param $eventPattern can start with ^ or a regex delimiter for full pattern
+     * @param $callback
+     * @param array $args
+     * @param null $params
+     * @return $this
+     */
+    public function onRegex($eventPattern, $callback, $args = [], $params = null)
+    {
+        if (strpos($eventPattern, '^') === 0) {
+            $eventPattern = '#' . $eventPattern . '#';
+        }
+        $this->_regexObservers[] = [
+            'event_pattern' => $eventPattern,
+            'callback' => $callback,
+            'args' => $args,
+            'params' => $params,
+        ];
         return $this;
     }
 
@@ -1862,6 +1925,17 @@ class BEvents extends BClass
      */
     public function fire($eventName, $args = [])
     {
+        if (!empty($this->_regexObservers)) {
+            foreach ($this->_regexObservers as $i => &$reObs) {
+                foreach ($this->_events as $eventName => $event) {
+                    if (empty($reObs['events_tested'][$eventName]) && preg_match($reObs['event_pattern'], $eventName)) {
+                        $this->on($eventName, $reObs['callback'], $reObs['args'], $reObs['params']);
+                    }
+                    $reObs['events_tested'][$eventName] = 1;
+                }
+            }
+            unset($reObs);
+        }
         $eventName    = strtolower($eventName);
         $profileStart =
             BDebug::debug('FIRE ' . $eventName . (empty($this->_events[$eventName]) ? ' (NO SUBSCRIBERS)' : ''), 1);
@@ -1950,6 +2024,7 @@ class BEvents extends BClass
             if (preg_match($eventRegexp, $eventName)) {
                 $results += (array)$this->fire($eventName, $args);
             }
+
         }
         return $results;
     }

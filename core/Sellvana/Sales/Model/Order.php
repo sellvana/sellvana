@@ -144,6 +144,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function addHistoryEvent($type, $description, $params = null)
     {
+        /** @var Sellvana_Sales_Model_Order_History $history */
         $history = $this->Sellvana_Sales_Model_Order_History->create([
             'order_id' => $this->id(),
             'entity_type' => 'order',
@@ -194,6 +195,7 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $result = [];
         foreach ($orders as $i => $order) {
+            /** @var Sellvana_Sales_Model_Order $order */
             $result[$i] = [
                 'id'               => $order->id,
                 'customer_id'      => $order->customer_id,
@@ -310,6 +312,10 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $cart = $this->_cart;
         foreach ($cart->items() as $item) {
+            if ($item->get('qty') == 0) {
+                continue;
+            }
+
             $product = $item->getProduct();
             if (!$product) {
                 throw new BException('Can not order product that does not exist');
@@ -554,6 +560,23 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     public function accountExistsForGuestEmail()
     {
         return $this->Sellvana_Customer_Model_Customer->load($this->get('customer_email'), 'email');
+    }
+
+    public function markAsPaid()
+    {
+        /** @var Sellvana_Sales_Model_Order_Payment $payment */
+        foreach ($this->payments() as $payment) {
+            $payment->markAsPaid();
+        }
+
+        /** @var Sellvana_Sales_Model_Order_Item $item */
+        foreach ($this->items() as $item) {
+            $item->markAsPaid();
+        }
+
+        $this->addHistoryEvent('processing', 'Admin user has marked the order as paid');
+        $this->state()->calcAllStates();
+        $this->saveAllDetails();
     }
 
     public function __destruct()

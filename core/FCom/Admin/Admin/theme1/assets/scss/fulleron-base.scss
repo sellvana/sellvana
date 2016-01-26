@@ -4560,3 +4560,99 @@ body {
 		}
 	}
 }
+
+$stepDefault: #9F9F9F;
+$stepActive: #FA9E49;
+$stepHover: #2354ac;
+$stepSize: 16px;
+$stepSizeLarge: 27px;
+
+@mixin stepSize($size) {
+	font-size: $size;
+	width: $size;
+	height: $size;
+	line-height: $size;
+}
+
+@mixin smallScreen() {
+	@media (max-width: 736px)  {
+		@content;
+	}
+}
+
+.rating-widget {
+	display: inline-block;
+	cursor: pointer;
+}
+
+.rating-widget-disabled {
+	cursor: default;
+}
+
+.rating-widget-step {
+	position: relative;
+	display: inline-block;
+	margin-right: 2px;
+
+	@include stepSize($stepSize);
+
+	@include smallScreen() {
+		@include stepSize($stepSizeLarge);
+
+		margin-left: 10px;
+
+		&:first-child {
+			margin-left: 0;
+		}
+	}
+
+	.rating-widget-large & {
+		@include stepSize($stepSizeLarge);
+
+		margin-left: 10px;
+
+		&:first-child {
+			margin-left: 0;
+		}
+	}
+}
+
+.rating-widget-step-css {
+	&:before,
+	&:after {
+		position: absolute;
+		left: 0;
+		top: 0;
+		overflow: hidden;
+		content: '\2605';
+	}
+
+	&:before {
+		color: $stepActive;
+		z-index: 10;
+		width: 0;
+	}
+
+	&:after {
+		color: $stepDefault;
+		z-index: 5;
+	}
+}
+
+.rating-widget-step-hover {
+	&:before {
+		color: $stepHover;
+	}
+}
+
+.rating-widget-step-whole {
+	&:before {
+		width: 100%;
+	}
+}
+
+.rating-widget-step-half {
+	&:before {
+		width: 50%;
+	}
+}

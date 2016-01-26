@@ -1123,6 +1123,7 @@ define(fcomAdminDeps, function ($, Ladda) {
         } */
         var tabs, panes, curLi, curPane, editors = {};
         var ajaxPassed = false;
+        var loader;
 
         /**
          *
@@ -1139,11 +1140,13 @@ define(fcomAdminDeps, function ($, Ladda) {
 
         /**
          * convert textarea to wysiwyg with ckeditor
-         * @param id
+         * @param {string} id
+         * @param {string} value
+         * @param callback
          */
-        function wysiwygCreate(id) {
+        function wysiwygCreate(id, value, callback) {
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
-                FCom.Admin.log(id, 'wysiwygcreate');
+                //FCom.Admin.log(id, 'wysiwygcreate');
                 editors[id] = true; // prevent double loading
 
                 CKEDITOR.replace(id, {
@@ -1156,6 +1159,17 @@ define(fcomAdminDeps, function ($, Ladda) {
                     //allowedContent: true,
                     startupMode: 'wysiwyg'
                 });
+
+                if (value) CKEDITOR.instances[id].setData(value);
+
+                CKEDITOR.instances[id].on('blur', function (e) {
+                    e.editor.updateElement();
+                    if (typeof callback === 'function') {
+                        callback(e.editor, e.editor.getData());
+                    } else if (typeof callback === 'string') {
+                        window[callback](e.editor, e.editor.getData());
+                    }
+                });
 //
 //                $('#'+id).ckeditor(function() {
 //                    this.dataProcessor.writer.indentationChars = '  ';
@@ -1167,16 +1181,17 @@ define(fcomAdminDeps, function ($, Ladda) {
         /**
          * this function almost use to init ckeditor after load ajax form
          */
-        function wysiwygInit() {
+        function wysiwygInit(target, value, callback) {
             var form = this;
-            $('textarea.ckeditor').each(function () {
+            if (!target) target = 'textarea.ckeditor';
+            $(target).each(function () {
                 var id = $(this).attr('id');
                 if (!id) {
                     var cntEditors = editors.length;
                     id = cntEditors + 1;
                     $(this).attr('id', 'textarea-ckeditor-' + id);
                 }
-                form.wysiwygCreate(id);
+                form.wysiwygCreate(id, value, callback);
             });
         }
 
@@ -1267,6 +1282,28 @@ define(fcomAdminDeps, function ($, Ladda) {
             return false;
         }
 
+        function _processSessionTimeout(event, data, el, saveAndContinue) {
+            if ($.inArray(event.status, [401, 403]) || data.error == 'login') {
+                $.get(options.url_get, function(data) {
+                    if (data.form !== undefined) {
+                        if ($('#login_modal_form').length == 0) {
+                            $('body').append(data.form);
+                            $('#login_modal_form').modal({keyboard: false}).on('hidden.bs.modal', function() {
+                                loader.stop();
+                                $(this).data('bs.modal', null).remove();
+                            });
+                        }
+                        $('#login_modal_form_btn').click(function() {
+                            $('#login-form').on('login:modal_form:result', function() {
+                                $("#login_modal_form").modal('hide');
+                                saveAll(el, saveAndContinue);
+                            }).submit();
+                        });
+                    }
+                });
+            }
+        }
+
         /**
          *
          * @param el
@@ -1274,21 +1311,22 @@ define(fcomAdminDeps, function ($, Ladda) {
          * @returns {boolean}
          */
         function saveAll(el, saveAndContinue) {
-            //TODO
             ajaxPassed = true;
             var form = $(el).closest('form');
-            var loader = Ladda.create(el);
-            loader.start();
             $(form).submit(function(event) {
                 if (ajaxPassed) {
                     event.preventDefault();
                 }
             });
+
+            loader = Ladda.create(el);
             $(form).trigger('submit');
             if (!form.validate().checkForm()) {
+                loader.stop();
                 return false;
             }
 
+            loader.start();
             var btnId = form.attr('id') + '-do';
             var isNew = options.is_new;
             if (saveAndContinue) {
@@ -1298,50 +1336,67 @@ define(fcomAdminDeps, function ($, Ladda) {
             var url_post = options.url_get + (options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post + 'tabs=ALL&mode=view', postData, function (data, status, req) {
                 FCom.Admin.log(data);
-                for (var msgId in data.messages) {
+                if (typeof data == 'string') {
                     sysMessages.push({
-                        msg: data.messages[msgId].text || 'The form has been saved',
-                        type: data.status == 'error' ? 'danger' : 'success'
+                        msg: data,
+                        type: 'error'
                     });
-                }
-                if (data.redirect) {
-                    document.location = data.redirect;
-                } else {
                     loader.stop();
-                    var actionUrl = form.attr('action');
-                    var urlInfo = actionUrl.split('?');
-                    if (urlInfo[1]) {
-                        var params = urlInfo[1].split('&');
-                        var newParams = [];
-                        for (var paramId = 0; paramId < params.length; paramId++) {
-                            var pair = params[paramId].split('=');
-                            if (pair[0] == 'id') {
-                                pair[1] = data.id;
-                            }
-                            newParams.push(pair.join('='));
-                        }
-                        actionUrl = urlInfo[0] + '?' + newParams.join('&');
-                    } else {
-                        actionUrl = urlInfo[0] + '?id=' + data.id;
+                } else {
+                    if (data.error == 'login') {
+                        _processSessionTimeout({status: status}, data, el, saveAndContinue);
+                        return;
                     }
-                    options.url_get = actionUrl;
-                    form.attr('action', actionUrl);
-                    if (isNew && saveAndContinue && data.status == 'success') {
-                        if (window.history !== undefined) {
-                            window.history.replaceState({}, data.title, options.url_get);
-                        }
-                        form.find('.btn-group').html(data.buttons);
-                        var textNodes = form.find('.f-page-title').contents().filter(function () {
-                            return this.nodeType == 3;
+
+                    for (var msgId in data.messages) {
+                        sysMessages.push({
+                            msg: data.messages[msgId].text || 'The form has been saved',
+                            type: data.status == 'error' ? 'error' : 'success'
                         });
-                        textNodes[textNodes.length-1].nodeValue = data.title;
-                        $('title').text(data.title);
-                        form.find('#tabs li.hidden').removeClass('hidden');
                     }
-                    $('#' + btnId).remove();
-                    $('#tabs .icon-pencil, #tabs .icon-warning-sign.error').remove();
-                    ajaxPassed = false;
+                    if (data.redirect) {
+                        document.location = data.redirect;
+                    } else {
+                        loader.stop();
+                        var actionUrl = form.attr('action');
+                        var urlInfo = actionUrl.split('?');
+                        if (urlInfo[1]) {
+                            var params = urlInfo[1].split('&');
+                            var newParams = [];
+                            for (var paramId = 0; paramId < params.length; paramId++) {
+                                var pair = params[paramId].split('=');
+                                if (pair[0] == 'id') {
+                                    pair[1] = data.id;
+                                }
+                                newParams.push(pair.join('='));
+                            }
+                            actionUrl = urlInfo[0] + '?' + newParams.join('&');
+                        } else {
+                            actionUrl = urlInfo[0] + '?id=' + data.id;
+                        }
+                        options.url_get = actionUrl;
+                        form.attr('action', actionUrl);
+                        if (isNew && saveAndContinue && data.status == 'success') {
+                            if (window.history !== undefined) {
+                                window.history.replaceState({}, data.title, options.url_get);
+                            }
+                            //TODO: Should not use `find('.btn-group')` because it's very general, We need more details here
+                            //form.find('.btn-group').html(data.buttons);
+                            var textNodes = form.find('.f-page-title').contents().filter(function () {
+                                return this.nodeType == 3;
+                            });
+                            textNodes[textNodes.length-1].nodeValue = data.title;
+                            $('title').text(data.title);
+                            form.find('#tabs li.hidden').removeClass('hidden');
+                        }
+                        $('#' + btnId).remove();
+                        $('#tabs .icon-pencil, #tabs .icon-warning-sign.error').remove();
+                        ajaxPassed = false;
+                    }
                 }
+            }).fail(function(event, data) {
+                loader.stop();
+                _processSessionTimeout(event, data, el, saveAndContinue);
             });
             return false;
         }
@@ -1601,6 +1656,65 @@ define(fcomAdminDeps, function ($, Ladda) {
     };
 
     /**
+     * Temporary fix for modal validation
+     *
+     * @param container
+     * @returns {boolean}
+     *
+     */
+    $.fn.modalValidate = function (container) {
+        if (!container.parent('form').length) {
+            container.wrap('<form>');
+        }
+
+        if (!container.parent('form').valid()) return false;
+
+        container.unwrap();
+
+        return true;
+    };
+
+    /**
+     * Deep clone Object|Array|Date
+     *
+     * @param obj
+     * @returns {*}
+     */
+    $.fn.deepClone = function (obj) {
+        var copy;
+
+        // Handle the 3 simple types, and null or undefined
+        if (null == obj || "object" != typeof obj) return obj;
+
+        // Handle Date
+        if (obj instanceof Date) {
+            copy = new Date();
+            copy.setTime(obj.getTime());
+            return copy;
+        }
+
+        // Handle Array
+        if (obj instanceof Array) {
+            copy = [];
+            for (var i = 0, len = obj.length; i < len; i++) {
+                copy[i] = $.fn.deepClone(obj[i]);
+            }
+            return copy;
+        }
+
+        // Handle Object
+        if (obj instanceof Object) {
+            copy = {};
+            for (var attr in obj) {
+                if (obj.hasOwnProperty(attr)) copy[attr] = $.fn.deepClone(obj[attr]);
+            }
+            return copy;
+        }
+
+        throw new Error("Unable to copy obj! Its type isn't supported.");
+    };
+
+    /**
      * resize width window
      * @param options
      */
@@ -1670,7 +1784,7 @@ define(fcomAdminDeps, function ($, Ladda) {
             if (request.responseText[0]==='{' && (data = $.parseJSON(request.responseText))) {
                 if (data.error == 'login') {
 //                    location.href = FCom.base_href;
-                    location.reload(true);
+                    //location.reload(true);
                 }
             }
         });
@@ -1679,7 +1793,7 @@ define(fcomAdminDeps, function ($, Ladda) {
             $.post(FCom.Admin.personalize_href, postData, function (response, status, xhr) {
                 FCom.Admin.log(response);
             });
-        })
+        });
         $('.nav-group header').click(function (ev) {
             $(ev.currentTarget).parent('li').find('ul').animate({
                 opacity: 'toggle',

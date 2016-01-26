@@ -43,7 +43,10 @@ class Sellvana_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abs
                 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
-            'new' => ['caption' => 'Add New Url Alias'],
+            'new' => [
+                'caption'  => 'New Url Alias',
+                'addClass' => '_modal'
+            ],
             'delete' => true
         ];
         $config['filters'] = [
@@ -64,8 +67,9 @@ class Sellvana_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abs
         parent::gridViewBefore($args);
         $gridView = $args['page_view'];
         $actions = $gridView->get('actions');
-        $actions['new'] = '<button type="button" id="add_new_index_alias" class="btn grid-new btn-primary _modal">'
-            . $this->BLocale->_('Add New URL Alias') . '</button>';
+        /*$actions['new'] = '<button type="button" id="add_new_index_alias" class="btn grid-new btn-primary _modal">'
+            . $this->BLocale->_('Add New URL Alias') . '</button>';*/
+        $actions['new'] = '';
         $gridView->set('actions', $actions);
     }
 

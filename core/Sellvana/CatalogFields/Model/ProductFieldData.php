@@ -6,7 +6,10 @@
  * @property int $id
  * @property int $product_id
  * @property int $set_id
- * @property int $value_id
+ * @property int $field_id
+ * @property int $position
+ * @property int $site_id
+ * @property string $locale
  * @property int $value_int
  * @property float $value_dec
  * @property string $value_var
@@ -16,6 +19,7 @@
  * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  * @property Sellvana_CatalogFields_Model_Set $Sellvana_CatalogFields_Model_Set
+ * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
  *
  * @property Sellvana_MultiSite_Main $Sellvana_MultiSite_Main
  */
@@ -77,6 +81,10 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
      */
     public function saveProductsFieldData($products)
     {
+        if ($this->Sellvana_CatalogFields_Main->isDisabled()) {
+            return $this;
+        }
+
         $defaultSet = $this->Sellvana_CatalogFields_Model_Set->loadWhere([
             'set_code' => 'default',
             'set_type' => 'product',
@@ -212,11 +220,11 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
             ->join('Sellvana_CatalogFields_Model_Field', ['f.id', '=', 'pf.field_id'], 'f')
             ->left_outer_join('Sellvana_CatalogFields_Model_FieldOption', ['fo.id', '=', 'pf.value_id'], 'fo')
             ->left_outer_join('Sellvana_CatalogFields_Model_Set', ['fs.id', '=', 'pf.set_id'], 'fs')
-            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.table_field_type', 'fs.set_name'])
+            ->select(['pf.*', 'f.field_code', 'f.field_name', 'f.admin_input_type', 'f.frontend_show', 'f.multilanguage', 'f.data_serialized', 'f.table_field_type', 'fs.set_name'])
             ->where_in('pf.product_id', $productIds);
 
         $this->BEvents->fire(__METHOD__, ['orm' => $orm]);
-
+        /** @var BORM $orm */
         return $orm->find_many_assoc(['product_id', 'id']);
     }
 
@@ -256,9 +264,12 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
 
                 $field = [
                     'id' => $fieldId,
+                    'site_id' => $row->get('site_id') ?: '',
                     'field_code' => $row->get('field_code'),
                     'field_name' => $row->get('field_name'),
                     'admin_input_type' => $row->get('admin_input_type'),
+                    'frontend_show' => $row->get('frontend_show'),
+                    'multilanguage' => $row->get('multilanguage'),
                     'value' => $value,
                     'position' => $row->get('position'),
                     'required' => $row->get('required'),
@@ -311,20 +322,24 @@ class Sellvana_CatalogFields_Model_ProductFieldData extends FCom_Core_Model_Abst
                 continue;
             }
             foreach ($fieldsData[$product->id()] as $row) {
-//                if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')
-//                    && $this->Sellvana_MultiSite_Main->isFieldDataBelongsToThisSite($row)
-//                ) {
-//                    continue;
-//                }
+                if ($this->BModuleRegistry->isLoaded('Sellvana_MultiSite')
+                    && !$this->Sellvana_MultiSite_Main->isFieldDataBelongsToThisSite($row)
+                ) {
+                    continue;
+                }
                 $column = static::$_fieldTypeColumns[$row->get('table_field_type')];
                 $value  = $row->get($column);
+                //if ($row->get('admin_input_type') === 'multiselect') {
                 if ($row->get('table_field_type') === 'options') {
                     $options = $this->Sellvana_CatalogFields_Model_FieldOption->getFieldOptions($row->get('field_id'));
                     if (!empty($options[$value])) {
                         $value = $options[$value];
                     }
                     if ($oldValue = $product->get($row->get('field_code'))) {
-                        $value = $oldValue . ',' . $value;
+                        $oldValues = explode(',', $oldValue);
+                        if (!in_array($value, $oldValues)) {
+                            $value = $oldValue . ',' . $value;
+                        }
                     }
                 }
                 $product->set($row->get('field_code'), $value);

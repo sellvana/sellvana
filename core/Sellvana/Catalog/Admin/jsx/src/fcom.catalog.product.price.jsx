@@ -102,7 +102,7 @@ define(['jquery', 'underscore', 'react', 'fcom.locale', 'daterangepicker'], func
                         </thead>
                         <tbody>
                             {_.map(this.props.prices, function (price) {
-                                if (this.props.deleted && price.deleted && _.contains(this.props.deleted, price.id)) {
+                                if (this.props.deleted && price.deleted && _.contains(this.props.deleted, parseInt(price.id))) {
                                     return <input key={'delete-' + price.id} type="hidden" name={"prices[delete][]"} value={price.id}/>
                                 }
 

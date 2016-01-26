@@ -770,6 +770,51 @@ class BUtil extends BClass
     }
 
     /**
+     * Get an item from an array using "dot" or "slash" notation.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return mixed
+     */
+    public function arrayGet($array, $key, $default = null)
+    {
+        if (is_null($key)) {
+            return $array;
+        }
+
+        if (isset($array[$key])) {
+            return $array[$key];
+        }
+
+        foreach (preg_split('#[./]#', $key) as $segment) {
+            if (! is_array($array) || ! array_key_exists($segment, $array)) {
+                return $default;
+            }
+
+            $array = $array[$segment];
+        }
+
+        return $array;
+    }
+
+    /**
+     * Convert xml object to array
+     *
+     * @param $xmlObject
+     * @param array $out
+     * @return array
+     */
+    public function arrayFromXml($xmlObject, $out = [])
+    {
+        foreach ((array)$xmlObject as $index => $node) {
+            $out[$index] = is_object($node) ? $this->arrayFromXml($node) : $node;
+        }
+
+        return $out;
+    }
+
+    /**
     * Create IV for mcrypt operations
     *
     * @return string
@@ -1049,27 +1094,66 @@ class BUtil extends BClass
             $url .= (strpos($url, '?') === false ? '?' : '&') . $request;
         }
 
-        $found = false;
-        foreach ($headers as $h) {
-            if (stripos($h, 'expect:') === 0) {
-                $found = true;
-                break;
+        $multipart = false;
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                if (is_string($v) && $v[0] === '@') {
+                    $multipart = true;
+                    break;
+                }
             }
         }
-        if (!$found) {
-            $headers += ['Expect:']; //Fixes the HTTP/1.1 417 Expectation Failed
-        }
-        $found = false;
-        foreach ($headers as $h) {
-            if (stripos($h, 'referer:') === 0) {
-                $found = true;
-                break;
+        $contentType = null;
+        $postContent = null;
+        if ($method === 'POST' || $method === 'PUT') {
+            if (!$multipart) {
+                $contentType = 'application/x-www-form-urlencoded';
+                $postContent = is_array($data) ? http_build_query($data) : $data;
+            } else {
+                $boundary = '--------------------------' . microtime(true);
+                $contentType = 'multipart/form-data; boundary=' . $boundary;
+                $postContent = '';
+                //TODO: implement recursive forms
+                foreach ($data as $k => $v) {
+                    if (is_string($v) && $v[0] === '@') {
+                        $filename     = substr($v, 1);
+                        $fileContents = file_get_contents($filename);
+                        $postContent .= "--{$boundary}\r\n" .
+                             "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename($filename) . "\"\r\n" .
+                             "Content-Type: application/zip\r\n" .
+                             "\r\n" .
+                             "{$fileContents}\r\n";
+                    } else {
+                        $postContent .= "--{$boundary}\r\n" .
+                             "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
+                             "\r\n" .
+                             "{$v}\r\n";
+                    }
+                }
+                $postContent .= "--{$boundary}--\r\n";
             }
         }
-        if (!$found) {
-            $headers += ['Referer: ' . $this->BRequest->currentUrl()];
+
+        foreach ([
+            'Expect' => '', //Fixes the HTTP/1.1 417 Expectation Failed
+            'Referer' => $this->BRequest->currentUrl(),
+            'Accept' => '*/*',
+            'Content-Type' => $contentType,
+            'Content-Length' => $postContent ? strlen($postContent) : null,
+        ] as $header => $value) {
+            $found = false;
+            foreach ($headers as $h) {
+                if (stripos($h, $header . ':') === 0) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found && $value !== null) {
+                $headers[] = $header . ': ' . $value;
+            }
         }
-        
+
+
         if ($useCurl && function_exists('curl_init') || ini_get('safe_mode') || !ini_get('allow_url_fopen')) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
@@ -1099,21 +1183,14 @@ class BUtil extends BClass
                 ];
             }
 
-            if (is_array($data)) {
-                foreach ($data as $k => $v) {
-                    if (is_string($v) && $v[0] === '@') {
-                        $data[$k] = new CURLFile(substr($v, 1));
-                    }
-                }
-            }
             if ($method === 'POST') {
                 $curlOpt += [
-                    CURLOPT_POSTFIELDS => $data,
+                    CURLOPT_POSTFIELDS => $postContent,
                     CURLOPT_POST => 1,
                 ];
             } elseif ($method === 'PUT') {
                 $curlOpt += [
-                    CURLOPT_POSTFIELDS => $data,
+                    CURLOPT_POSTFIELDS => $postContent,
                     CURLOPT_PUT => 1,
                 ];
             }
@@ -1148,7 +1225,7 @@ class BUtil extends BClass
 #var_dump(__METHOD__, $rawResponse);
             list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2) + ['', ''];
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
-#var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt);
+#echo '<xmp>'; var_dump(__METHOD__, $rawResponse, static::$_lastRemoteHttpInfo, $curlOpt); echo '</xmp>';
             $respHeaders = explode("\r\n", $headers);
             if (curl_errno($ch) != 0) {
                 static::$_lastRemoteHttpInfo['errno'] = curl_errno($ch);
@@ -1172,55 +1249,21 @@ class BUtil extends BClass
                 $streamOptions['http']['proxy'] = $options['proxy'];
             }
             if ($method === 'POST' || $method === 'PUT') {
-                $multipart = false;
-                if (is_array($data)) {
-                    foreach ($data as $k => $v) {
-                        if (is_string($v) && $v[0] === '@') {
-                            $multipart = true;
-                            break;
-                        }
-                    }
-                }
-                if (!$multipart) {
-                    $contentType = 'application/x-www-form-urlencoded';
-                    $streamOptions['http']['content'] = is_array($data) ? http_build_query($data) : $data;
-                } else {
-                    $boundary = '--------------------------' . microtime(true);
-                    $contentType = 'multipart/form-data; boundary=' . $boundary;
-                    $streamOptions['http']['content'] = '';
-                    //TODO: implement recursive forms
-                    foreach ($data as $k => $v) {
-                        if (is_string($v) && $v[0] === '@') {
-                            $filename = substr($v, 1);
-                            $fileContents = file_get_contents($filename);
-                            $streamOptions['http']['content'] .= "--{$boundary}\r\n" .
-                                "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename($filename) . "\"\r\n" .
-                                "Content-Type: application/zip\r\n" .
-                                "\r\n" .
-                                "{$fileContents}\r\n";
-                        } else {
-                            $streamOptions['http']['content'] .= "--{$boundary}\r\n" .
-                                "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
-                                "\r\n" .
-                                "{$v}\r\n";
-                        }
-                    }
-                    $streamOptions['http']['content'] .= "--{$boundary}--\r\n";
-                }
-                $streamOptions['http']['header'][] = "Content-Type: {$contentType}";
-                    //."Content-Length: ".strlen($request)."\r\n";
+                $streamOptions['http']['content'] = $postContent;
+                $streamOptions['http']['header'][] = "Content-Type: {$contentType}"
+                    . "\r\nContent-Length: " . strlen($postContent) . "\r\n";
 
-                if (!empty($options['auth'])) {
-                    $streamOptions['http']['header'][] = sprintf("Authorization: Basic %s", base64_encode($options['auth']));
-                }
+            }
+            if (!empty($options['auth'])) {
+                $streamOptions['http']['header'][] = sprintf("Authorization: Basic %s", base64_encode($options['auth']));
+            }
 
-                if (preg_match('#^(ssl|ftps|https):#', $url)) {
-                    $streamOptions['ssl'] = [
-                        'verify_peer' => true,
-                        'cafile' => dirname(__DIR__) . '/ssl/ca-bundle.crt',
-                        'verify_depth' => 5,
-                    ];
-                }
+            if (preg_match('#^(ssl|ftps|https):#', $url)) {
+                $streamOptions['ssl'] = [
+                    'verify_peer' => true,
+                    'cafile' => dirname(__DIR__) . '/ssl/ca-bundle.crt',
+                    'verify_depth' => 5,
+                ];
             }
             if (empty($options['debug'])) {
                 $oldErrorReporting = error_reporting(0);
@@ -2019,7 +2062,7 @@ class BUtil extends BClass
      */
     public function getMemoryLimit()
     {
-        preg_match('#^([0-9]+)([GMK]?)$#', ini_get('memory_limit'), $val);
+        preg_match('#^([0-9]+)([GMK]?)$#', strtoupper(ini_get('memory_limit')), $val);
         $mult = ['G' => 1073741824, 'M' => 1048576, 'K' => 1024];
         return $val[1] * (!empty($mult[$val[2]]) ? $mult[$val[2]] : 1);
     }
@@ -2111,11 +2154,47 @@ class BUtil extends BClass
     }
 
     /**
+     * Given a file name, remove any file extension from the string.
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function removeFileExtension($string)
+    {
+        return preg_replace("/\\.[^.\\s]{3,4}$/", "", $string);
+    }
+
+    /**
+     * Take a camel cased string and turn it into a word seperated sentance.
+     * e.g. 'ThisIsASentance' would turn into 'This Is A Sentance'
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function camelToSentance($string)
+    {
+        return trim(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $string));
+    }
+
+    /**
      * Alias of version_compare for use in Twig templates
      */
     public function versionCompare($v1, $v2, $op = null)
     {
         return version_compare($v1, $v2, $op);
+    }
+
+    /**
+     * Converts bytes into human readable file size.
+     *
+     * @param $size
+     * @return string
+     */
+    public function convertFileSize($size)
+    {
+        $unit = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
+        $exponent = (int)floor(log($size, 1024));
+        return @round($size / pow(1024, $exponent), 2) . ' ' . $unit[$exponent];
     }
 }
 
@@ -2726,13 +2805,13 @@ class BDebug extends BClass
             self::STOP      => false,
         ],
         self::MODE_IMPORT => [
-            self::MEMORY    => self::DEBUG,
+            self::MEMORY    => false,//self::DEBUG,
             self::SYSLOG    => false,
-            self::FILE      => self::WARNING,
+            self::FILE      => false,//self::WARNING,
             self::EMAIL     => false, //self::CRITICAL,
-            self::OUTPUT    => self::NOTICE,
-            self::EXCEPTION => self::ERROR,
-            self::STOP      => self::CRITICAL,
+            self::OUTPUT    => false,//self::NOTICE,
+            self::EXCEPTION => false,//self::ERROR,
+            self::STOP      => false,//self::CRITICAL,
         ],
     ];
 
@@ -2807,6 +2886,8 @@ class BDebug extends BClass
      * @var array
      */
     static protected $_errorHandlerLog = [];
+
+    static protected $_disableAllLogging = false;
 
     /**
     * Constructor, remember script start time for delta timestamps
@@ -3021,9 +3102,12 @@ class BDebug extends BClass
      */
     static public function trigger($level, $msg, $stackPop = 0, $backtrace = false)
     {
-        if ($level !== static::DEBUG) {
-            static::$_collectedErrors[$level][] = $msg;
+        if (static::$_disableAllLogging) {
+            return null;
         }
+//        if ($level !== static::DEBUG) {
+//            static::$_collectedErrors[$level][] = $msg;
+//        }
         if (is_scalar($msg)) {
             $e = ['msg' => $msg];
         } elseif (is_object($msg) && $msg instanceof Exception) {
@@ -3056,11 +3140,28 @@ class BDebug extends BClass
         $e['mem'] = memory_get_usage();
 
         if ($backtrace || !empty(static::$_verboseBacktrace[$e['msg']])) {
+            if (PHP_SAPI === 'cli') {
+                $e['msg'] = '{white*}' . $e['msg'] . '{/}';
+                $e['msg'] .= PHP_EOL . PHP_EOL . '{cyan*}Backtrace:{/}';
+                $fileIndex = 0;
+            }
             foreach ($bt as $t) {
-                if (!empty($t['file'])) {
-                    $e['msg'] .= "\n" . $t['file'] . ':' . $t['line'];
-                } elseif (!empty($t['class'])) {
-                    $e['msg'] .= "\n" . $t['class'] . $t['type'] . $t['function'];
+                if (PHP_SAPI !== 'cli') {
+                    if (!empty($t['file'])) {
+                        $e['msg'] .= "\n" . $t['file'] . ':' . $t['line'];
+                    } elseif (!empty($t['class'])) {
+                        $e['msg'] .= "\n" . $t['class'] . $t['type'] . $t['function'];
+                    }
+                } else {
+                    $index = '{white}#' . $fileIndex . '{/}';
+                    if (!empty($t['file'])) {
+                        $e['msg'] .= PHP_EOL . '  ' . $index . ' {purple*}'
+                                . $t['file'] . '{/}:{white}' . $t['line'] . '{/}';
+                    } elseif (!empty($t['class'])) {
+                        $e['msg'] .= PHP_EOL . '  ' . $index . ' {purple*}'
+                                . $t['class'] . $t['type'] . $t['function'] . '{/}';
+                    }
+                    $fileIndex++;
                 }
             }
         }
@@ -3112,9 +3213,20 @@ class BDebug extends BClass
 
         $l = static::$_level[static::OUTPUT];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
-            echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
-            echo static::cleanBacktrace($message);
-            echo '</xmp>';
+            if (PHP_SAPI !== 'cli') {
+                echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
+                echo static::cleanBacktrace(print_r($message, 1));
+                echo '</xmp>';
+            } else {
+                $shellOut = PHP_EOL . '{red*}' . $e['level'] . ':{/} ' . $e['msg'] . PHP_EOL;
+                if (isset($e['file'])) {
+                    $shellOut .= '{red*}Called from: {/}' . $e['file'] . ':' . $e['line'];
+                }
+
+                /** @var FCom_Shell_Shell $shell */
+                $shell = FCom_Shell_Shell::i();
+                $shell->stdout($shell->colorize($shellOut));
+            }
         }
 /*
         $l = static::$_level[static::EXCEPTION];
@@ -3128,7 +3240,9 @@ class BDebug extends BClass
 */
         $l = static::$_level[static::STOP];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
-            static::i()->dumpLog();
+            if (PHP_SAPI !== 'cli') {
+                static::i()->dumpLog();
+            }
             die;
         }
 
@@ -3304,7 +3418,7 @@ class BDebug extends BClass
         }
 ?></tbody></table></div><script>
 
-        if (typeof require !== 'undefined') {
+        if (typeof require !== 'undefined' && require.defined("jquery.tablesorter")) {
             require(['jquery.tablesorter'], function() {
                 $('#buckyball-debug-table').tablesorter();
             })
@@ -3353,6 +3467,15 @@ class BDebug extends BClass
     {
         static::dumpLog();
         //$args['content'] = str_replace('</body>', static::dumpLog(true).'</body>', $args['content']);
+    }
+
+    public function disableAllLogging()
+    {
+        static::$_disableAllLogging = true;
+        //$this->mode('PRODUCTION'); //For example in MODE_IMPORT also need disable all logging.
+        BORM::configure('logging', 0);
+        $this->BConfig->set('db/logging', 0);
+        return $this;
     }
 }
 
@@ -3478,19 +3601,7 @@ class BFtpClient extends BClass
 }
 
 /**
- * Class BHttpClient
- */
-class BHttpClient extends BClass
-{
-    public function getContent($url){
-        throw new BErrorException('Not available at this moment');
-    }
-}
-
-/**
  * Class BFile
- *
- * @property BHttpClient $BHttpClient
  */
 class BFile extends BClass
 {
@@ -3524,53 +3635,73 @@ class BFile extends BClass
 
     /**
      * @param $path
-     * @return mixed
-     * @throws BErrorException
+     * @return BFile|void
+     * @throws BException
      */
     public function load($path)
     {
         if (!is_string($path)) {
-            throw new BErrorException('Support only string path of file');
+            throw new BException('Support only string path of file');
         }
+        /** @var BFile $file */
+        $file = self::i(true);
         if (filter_var($path, FILTER_VALIDATE_URL) !== false) {
-            return self::i()->_loadRemoteFile($path);
+            return $file->_loadRemoteFile($path);
         } else {
-            return self::i()->_loadLocalFile($path);
+            return $file->_loadLocalFile($path);
         }
     }
 
     /**
      * @param $url
      * @return $this
-     * @throws BErrorException
+     * @throws BException
      */
     private function _loadRemoteFile($url)
     {
-        if (ini_get('allow_url_fopen')) {
-            $file = @file_get_contents($url);
-        } else {
-            $file = $this->BHttpClient->getContent($url);
+        $headers = get_headers($url, 1);
+        if (false === $headers) {
+            throw new BException('Can\'t get headers of url:' . $url);
         }
+
+        $responseCode = substr($headers[0], 9, 3);
+        if ($responseCode != 200) {
+            throw new BException('Unsupported response code: ' . $responseCode);
+        }
+
+        $memoryLimit = $this->BUtil->getMemoryLimit() - memory_get_usage();
+        if ($memoryLimit <= ($headers['Content-Length'])) {
+            throw new BException('Can\'t get file. It\'s to big. URL:' . $url);
+        }
+
+        $file = $this->BUtil->remoteHttp('get', $url);
 
         $this->_fileInfo['remote_url'] = $url;
 
         $urlPath = parse_url($url, PHP_URL_PATH);
         $urlPath = explode('/', $urlPath);
         $fullFileName = array_pop($urlPath);
+
         if ($fullFileName === '') {
-            //TODO: generate file name;
+            $fullFileName = $this->BUtil->randomString();
         }
+
         $fileName = explode('.', $fullFileName);
         if (count($fileName) >= 2) {
             $fileExtension = array_pop($fileName);
         } else {
             $fileExtension = null;
         }
-        $fileName = implode('.', $fileName);
+        $fileName = $fileName[0];
 
         $this->_fileInfo['full_file_name'] = $fullFileName;
         $this->_fileInfo['file_extension'] = $fileExtension;
         $this->_fileInfo['file_name'] = $fileName;
+
+        $fInfo = new finfo(FILEINFO_MIME_TYPE);
+        $this->_fileInfo['file_mime_type'] = $fInfo->buffer($file);
+
+        $this->_fileInfo['file_size'] = $headers['Content-Length'];
 
         if ($this->keepContent) {
             $this->_fileContent = $file;
@@ -3584,10 +3715,13 @@ class BFile extends BClass
 
     /**
      * @param $path
+     * @throws BException
      */
     private function _loadLocalFile($path)
     {
         $this->_currentStatus = self::STATUS_LOCAL_FILE;
+
+        throw new BException('Not supported at this moment');
     }
 
     /**
@@ -3600,7 +3734,7 @@ class BFile extends BClass
             mkdir($this->_currentTmpDir, 0777, true);
         }
         $this->_fileInfo['file_path'] = $this->_currentTmpDir;
-        $fullPath =  $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
+        $fullPath = $this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'];
 
         if (@file_put_contents($fullPath, $file)
         ) {
@@ -3615,9 +3749,30 @@ class BFile extends BClass
      */
     public function save($name, $path)
     {
+        if ($this->_currentStatus == self::STATUS_LOCAL_FILE) {
+            return $this;
+        }
+
+        if (!is_file($this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'])) {
+            return false;
+        }
+
         if (@rename($this->_currentTmpDir . DIRECTORY_SEPARATOR . $this->_fileInfo['full_file_name'],
             $path . DIRECTORY_SEPARATOR . $name)
         ) {
+            $fileName = explode('.', $name);
+            if (count($fileName) >= 2) {
+                $fileExtension = array_pop($fileName);
+            } else {
+                $fileExtension = null;
+            }
+            $fileName = $fileName[0];
+
+            $this->_fileInfo['full_file_name'] = $name;
+            $this->_fileInfo['file_extension'] = $fileExtension;
+            $this->_fileInfo['file_name'] = $fileName;
+            $this->_fileInfo['file_path'] = $path;
+
             $this->_previousStatus = $this->_currentStatus;
             $this->_currentStatus = self::STATUS_LOCAL_FILE;
         }
@@ -3627,12 +3782,14 @@ class BFile extends BClass
     /**
      * @return mixed
      */
-    public function getFileInfo(){
+    public function getFileInfo()
+    {
         return $this->_fileInfo;
     }
 
     /**
      * The file is stored on a this server
+     *
      * @return bool
      */
     public function isLocal()
@@ -3642,6 +3799,7 @@ class BFile extends BClass
 
     /**
      * The file is stored on a remote server
+     *
      * @return bool
      */
     public function isRemote()
@@ -4358,12 +4516,17 @@ class BValidate extends BClass
         if (!isset($data[$args['field']])) {
             return true;
         }
-        $value = $data[$args['field']];
+        return $this->validateEmail($data[$args['field']]);
+    }
+
+    /**
+     * @param string $email
+     * @return bool
+     */
+    public function validateEmail($email)
+    {
         $re = '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/';
-        if (strlen($value) > 255 || !preg_match($re, $value)) {
-            return false;
-        }
-        return true;
+        return strlen($email) < 255 && preg_match($re, $email);
     }
 }
 

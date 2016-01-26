@@ -14,7 +14,7 @@
     require(['react', 'underscore', 'jquery', 'fcom.components', 'select2'], function (React, _, $, Components) {
         var formDataGrid, formDataNode, formDataModalNode;
 
-        window.formFieldGridRegister = function (grid) {
+        window.formDataGridRegister = function (grid) {
             formDataGrid = grid;
             formDataNode = $(formDataGrid.getDOMNode());
         };
@@ -54,7 +54,8 @@
                 )
             }
         });
-        window.showModalToAddFormField = function (row) {
+
+        window.showModalDetailsFormField = function (row) {
             var grid = formDataGrid;
             var modalContainerEle = document.getElementById('{{ grid.config.id }}-modal');
             var data = {};

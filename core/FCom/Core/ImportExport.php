@@ -15,6 +15,7 @@ class FCom_Core_ImportExport extends BClass
     const STORE_UNIQUE_ID_KEY = '_store_unique_id';
     const DEFAULT_FIELDS_KEY = '_default_fields';
     const DEFAULT_MODEL_KEY = '_default_model';
+    const CUSTOM_DATA_KEY = '_custom_data';
     const AUTO_MODEL_ID = 'auto_increment';
     const DEFAULT_STORE_ID = 'default';
     
@@ -46,10 +47,14 @@ class FCom_Core_ImportExport extends BClass
     protected $_notChanged = 0;
     protected $_newModels = 0;
     protected $_updatedModels = 0;
-    protected $_changedModels;
+    protected $_changedModelsIds;
+    protected $_batchChangedModelsIds;
     protected $_errors = 0;
     protected $_warnings = 0;
     protected $_modelsStatistics = array();
+
+    /** @var bool Import status */
+    protected $_importInProcessing = false;
 
     protected $_defaultExportBatchSize = 1000;
     protected $_defaultImportBatchSize = 1000;
@@ -90,7 +95,11 @@ class FCom_Core_ImportExport extends BClass
     public function getUser()
     {
         if (empty($this->_user)) {
-            $this->_user = $this->FCom_Admin_Model_User->sessionUser();
+            if ($this->BRequest->area() == 'FCom_Shell') {
+                $this->_user = $this->FCom_Admin_Model_User->create(['is_superadmin' => true]);
+            } else {
+                $this->_user = $this->FCom_Admin_Model_User->sessionUser();
+            }
         }
         return $this->_user;
     }
@@ -116,26 +125,18 @@ class FCom_Core_ImportExport extends BClass
                 $this->_errors++;
                 break;
         }
-        #$this->_log[] = ['type' => $type, 'message' => $message];
+        if (is_string($message)) {
+            $message = ['msg' => $message];
+        }
+
         if (empty($message['signal']) && ($type === 'warning' || $type === 'error')) {
             $message['signal'] = 'problem';
         }
         $this->_sendMessage($message);
-//        $this->_log[] = $message;
-//        if (time() - $this->_lastLogSentAt > 1) {
-//            $this->_lastLogSentAt = time();
-//            foreach ($this->_log as $msg) {
-//                $this->_sendMessage($msg);
-//            }
-//            $this->_log = [];
-//        }
+
 
         if ($type === 'warning' || $type === 'error') {
             $this->BDebug->log($message, 'ie.log');
-        }
-        #echo "<hr><pre>"; print_r($message); echo "</pre>";
-        if ($type === 'error') {
-            #exit;
         }
         return $this;
     }
@@ -182,7 +183,7 @@ class FCom_Core_ImportExport extends BClass
      * @param null  $batch
      * @return bool
      */
-    public function export( $models = [], $toFile = null, $batch = null )
+    public function export($models = [], $toFile = null, $batch = null)
     {
         $fe = $this->_getWriteHandle($toFile);
 
@@ -217,7 +218,7 @@ class FCom_Core_ImportExport extends BClass
 
         foreach ($sorted as $s) {
             /** @var FCom_Core_Model_Abstract $model */
-            $model   = $s[ 'model' ];
+            $model   = $s['model'];
             $user = $this->getUser();
             if ($user && $user->getPermission($model) == false) {
                 $this->log([
@@ -234,8 +235,8 @@ class FCom_Core_ImportExport extends BClass
                 ], 'error');
                 break;
             }
-            if ( !isset( $s[ 'skip' ] ) ) {
-                $s[ 'skip' ] = [];
+            if (!isset($s['skip'])) {
+                $s['skip'] = [];
             }
             if ($model == 'Sellvana_Catalog_Model_Product' && $this->BModuleRegistry->isLoaded('Sellvana_CatalogFields')) {
                 // disable custom fields to avoid them adding bunch of fields to export
@@ -258,14 +259,22 @@ class FCom_Core_ImportExport extends BClass
             $idField = $this->{$model}->getIdField();
             $heading = [static::DEFAULT_MODEL_KEY => $model, static::DEFAULT_FIELDS_KEY => []];
             foreach ($sample as $key => $value) {
+                if (!empty($s['custom_data']) && $key == 'data_serialized') {
+                    continue;
+                }
                 if (!in_array($key, $s['skip']) || $idField == $key) {
                     // always export id column
                     $heading[static::DEFAULT_FIELDS_KEY][] = $key;
                 }
             }
+            $dbFields = $heading[static::DEFAULT_FIELDS_KEY];
+            if (!empty($s['custom_data'])) {
+                $heading[static::DEFAULT_FIELDS_KEY][] = static::CUSTOM_DATA_KEY;
+                $dbFields[] = 'data_serialized';
+            }
             $offset = 0;
             $records = $this->{$model}->orm()
-                ->select($heading[static::DEFAULT_FIELDS_KEY])
+                ->select($dbFields)
                 ->limit($bs)
                 ->offset($offset)
                 ->find_many();
@@ -277,15 +286,29 @@ class FCom_Core_ImportExport extends BClass
 
                         /** @var FCom_Core_Model_Abstract $r */
                         $data = $r->as_array();
+                        unset($data['data_serialized']);
                         $data = array_values($data);
-
+                        if (!empty($s['custom_data'])) {
+                            if (is_array($s['custom_data'])) {
+                                foreach ($s['custom_data'] as $cdk) {
+                                    $cData[$cdk] = $r->getData($cdk);
+                                }
+                            } else {
+                                $cData = $r->getData();
+                                $cdks = array_keys($cData);
+                                foreach ($cdks as $cdk) {
+                                    $cData[$cdk] = $r->getData($cdk);
+                                }
+                            }
+                            $data[] = $cData;
+                        }
                         $json = $this->BUtil->toJson($data);
                         $this->_writeLine($fe, ',' . $json);
                     }
                     $offset += $bs;
                     $records = $this->{$model}
                         ->orm()
-                        ->select($heading[static::DEFAULT_FIELDS_KEY])
+                        ->select($dbFields)
                         ->limit($bs)
                         ->offset($offset)
                         ->find_many();
@@ -331,6 +354,11 @@ class FCom_Core_ImportExport extends BClass
             'msg' => $this->BLocale->_("Import started."),
             'data' => ['file_name' => $fromFile]
         ], 'info');
+
+        $this->_importInProcessing = true;
+
+        $this->BEvents->fire(self::$_origClass . "::beforeImport");
+
         while(($line = fgets($fi)) !== false) {
             $cnt++;
             $lineData     = (array)json_decode(trim($line, ","));
@@ -344,6 +372,9 @@ class FCom_Core_ImportExport extends BClass
         }
 
         $this->import($batchData, $bs);
+
+        $this->BEvents->fire(self::$_origClass . "::afterImport");
+
         if (!feof($fi)) {
             $this->log([
                 'msg' => $this->BLocale->_("Error: unexpected file fail"),
@@ -362,7 +393,18 @@ class FCom_Core_ImportExport extends BClass
     {
         $start = microtime(true);
 
+        $origImportStatus = $this->_importInProcessing;
+
+        if ($origImportStatus != true) {
+            $this->_importInProcessing = true;
+            $this->BEvents->fire(self::$_origClass . "::beforeImport");
+        }
+
         if (empty($importData)) {
+            if ($origImportStatus != true) {
+                $this->_importInProcessing = $origImportStatus;
+                $this->BEvents->fire(self::$_origClass . "::afterImport");
+            }
             return true;
         }
 //        $this->log([
@@ -381,7 +423,7 @@ class FCom_Core_ImportExport extends BClass
         $importID = $this->_prepareImportMeta($importData);
 
         $batchData = [];
-        $cnt = 1;
+        $cnt = 0;
         foreach ($importData as $data) {
             $cnt++;
             $isHeading = false;
@@ -397,7 +439,12 @@ class FCom_Core_ImportExport extends BClass
                 if ($this->_currentModel) {
                     $this->BEvents->fire(
                         __METHOD__ . ':afterModel:' . $this->_currentModel,
-                        ['import_id' => $importID, 'models' => $this->_changedModels]
+                        ['import_id' => $importID, 'models' => $this->_changedModelsIds]
+                    );
+                    $this->BEvents->fire(
+                        __METHOD__ . ':afterModel',
+                        ['import_id' => $importID, 'modelName' => $this->_currentModel,
+                            'models' => $this->_changedModelsIds]
                     );
                 }
 
@@ -406,6 +453,16 @@ class FCom_Core_ImportExport extends BClass
                     $this->_currentModel = null;
                     continue; // model does not have import/export configuration
                 }
+                $this->BEvents->fire(
+                    __METHOD__ . ':beforeModel:' . $this->_currentModel,
+                    ['import_id' => $importID]
+                );
+
+                $this->BEvents->fire(
+                    __METHOD__ . ':beforeModel',
+                    ['import_id' => $importID, 'modelName' => $this->_currentModel]
+                );
+
                 $this->_modelsStatistics[$cm] = [
                     'not_changed' => 0,
                     'new_models' => 0,
@@ -424,7 +481,7 @@ class FCom_Core_ImportExport extends BClass
                 } else {
                     $this->_canImport = true;
                 }
-                $this->_changedModels = [];
+                $this->_changedModelsIds = [];
                 $this->log([
                     'signal' => 'info',
                     'msg' => "Importing: {$cm}",
@@ -536,7 +593,12 @@ class FCom_Core_ImportExport extends BClass
 
         $this->BEvents->fire(
             __METHOD__ . ':afterModel:' . $this->_currentModel,
-            ['import_id' => $importID, 'models' => $this->_changedModels]
+            ['import_id' => $importID, 'models' => $this->_changedModelsIds]
+        );
+
+        $this->BEvents->fire(
+            __METHOD__ . ':afterModel',
+            ['import_id' => $importID, 'modelName' => $this->_currentModel, 'models' => $this->_changedModelsIds]
         );
 
         $this->log([
@@ -550,6 +612,11 @@ class FCom_Core_ImportExport extends BClass
             ]
         ], 'info');
 
+        if ($origImportStatus != true) {
+            $this->_importInProcessing = $origImportStatus;
+            $this->BEvents->fire(self::$_origClass . "::afterImport");
+        }
+
         return true;
     }
 
@@ -560,6 +627,7 @@ class FCom_Core_ImportExport extends BClass
      */
     protected function _importBatch($batchData)
     {
+        $this->_batchChangedModelsIds = [];
         /** @var FCom_Core_Model_ImportExport_Id $ieHelperId */
         $ieHelperId = $this->FCom_Core_Model_ImportExport_Id;
         $cm = $this->_currentModel;
@@ -591,6 +659,7 @@ class FCom_Core_ImportExport extends BClass
             $oldModels = $this->_getExistingModels($cm, $existing);
         }
 
+        $ieAbsentIds = [];
         if (!empty($oldModels)){
             $oldModelsIds = [];
             foreach($oldModels as $key => $model){
@@ -647,7 +716,7 @@ class FCom_Core_ImportExport extends BClass
                     && !empty($this->_currentConfig['unique_key_not_null'])
                 ) {
                     foreach ((array)$this->_currentConfig['unique_key_not_null'] as $k) {
-                        if (empty($data[$k])) {
+                        if (!(array_key_exists($k, $data) && $data[$k] !== null)) {
                             /*
                             $this->BDebug->log($this->BLocale->_("Empty primary key fields: %s",
                                 print_r(['id' => $id, 'data' => $data, 'config' => $this->_currentConfig], 1)), 'ie.log');
@@ -679,28 +748,68 @@ class FCom_Core_ImportExport extends BClass
                             $import[$k] = $v;
                         }
                     }
-                    if (!empty($import)) {
+
+                    $customDataUpdate = false;
+                    if (!empty($import[static::CUSTOM_DATA_KEY])) {
+                        $cData = (array)$import[static::CUSTOM_DATA_KEY];
+                        $merge = true;
+                        if (isset($cData['_merge'])) {
+                            $merge = $cData['_merge'];
+                            unset($cData['_merge']);
+                        }
+                        if ($merge) {
+                            $customDataUpdate = true;
+                        }
+                        foreach ($cData as $cdk => $cdkData) {
+                            if (!($merge && $customDataUpdate)) {
+                                if ($cdkData != $model->getData($cdk)) {
+                                    $customDataUpdate = true;
+                                }
+                            }
+                            $model->setData($cdk, $cdkData, $merge);
+                        }
+                        unset($import[static::CUSTOM_DATA_KEY]);
+                    }
+                    if (!empty($import) || $customDataUpdate) {
                         $model->set($import)->save();
                         $modified = true;
                         $this->_updatedModels++;
                         $this->_modelsStatistics[$this->_currentModel]['updated_models']++;
                     } else {
-                        if (in_array($model->id(),$ieAbsentIds)){
+                        if (in_array($model->id(), $ieAbsentIds)){
                             $modified = true;
                         }
                         $this->_notChanged++;
                         $this->_modelsStatistics[$this->_currentModel]['not_changed']++;
                     }
                 } else {
+                    $cData = null;
+                    if (!empty($data[static::CUSTOM_DATA_KEY])) {
+                        $cData = (array)$data[static::CUSTOM_DATA_KEY];
+                        unset($data[static::CUSTOM_DATA_KEY]);
+                    }
                     /** @var FCom_Core_Model_Abstract $model */
                     $model = $this->{$cm}->create($data);
-                    $model->save(false);
+                    if (!empty($cData)) {
+                        $merge = true;
+                        if(isset($cData['_merge'])) {
+                            $merge = $cData['_merge'];
+                            unset($cData['_merge']);
+                        }
+                        foreach ($cData as $cdk => $cdkData) {
+                            if ($cdkData == '[]') {
+                                $cdkData = null;
+                            }
+                            $model->setData($cdk, $cdkData, $merge);
+                        }
+                    }
+                    $model->saveImport();
                     $modified = true;
                     $this->_newModels++;
                     $this->_modelsStatistics[$this->_currentModel]['new_models']++;
                 }
             } catch (PDOException $e) {
-                $this->BDebug->logException($e);
+                //$this->BDebug->logException($e);
                 $this->log([
                     'msg' => $this->BLocale->_("Exception during batch process"),
                     'data' => [
@@ -717,7 +826,9 @@ class FCom_Core_ImportExport extends BClass
                 if ($modified) {
                     $ieData['local_id'] = $model->id();
                     $ieHelperId->create($ieData)->save(true, true);
-                    $this->_changedModels[$model->id()] = $model;
+                    $this->_changedModelsIds[$model->id()] = $model->id();
+//                    $this->_changedModelsIds[$model->id()] = $model;
+                    $this->_batchChangedModelsIds[$model->id()] = $model->id();
                 }
             } else {
                 $this->log([
@@ -729,7 +840,17 @@ class FCom_Core_ImportExport extends BClass
                 ], 'error');
             }
         }
-        $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->_changedModels]);
+        $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, [
+            'import_id' => $this->_importCode,
+            'records' => $this->_batchChangedModelsIds
+        ]);
+        $this->BEvents->fire(__METHOD__ . ':afterBatch', [
+            'import_id' => $this->_importCode,
+            'records' => $this->_batchChangedModelsIds,
+            'modelName' => $cm,
+            'statistic' => $this->_modelsStatistics[$cm]
+        ]);
+        $this->_currentRelated = [];
     }
     protected function _isArrayAssoc(array $arr)
     {
@@ -878,18 +999,21 @@ class FCom_Core_ImportExport extends BClass
 
     /**
      * @param string $file
+     * @param string $type
      * @return string
      */
-    public function getFullPath($file)
+    public function getFullPath($file ,$type = 'export')
     {
+        if (!in_array($type, ['export', 'import'])){
+            $type = 'export';
+        }
         if (!$file) {
             $file = $this->_defaultExportFile;
         }
         if ($this->BUtil->isPathAbsolute($file)) {
             return $file;
         }
-        $path = $this->BApp->storageRandomDir() . '/export';
-
+        $path = $this->BApp->storageRandomDir() . '/' . $type;
         $this->BUtil->ensureDir($path);
         $file = $path . '/' . trim($file, '\\/');
         $realpath = str_replace('\\', '/', realpath(dirname($file)));
@@ -897,6 +1021,14 @@ class FCom_Core_ImportExport extends BClass
             return false;
         }
         return $file;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultExportFile()
+    {
+        return $this->_defaultExportFile;
     }
 
     /**
@@ -1130,9 +1262,10 @@ class FCom_Core_ImportExport extends BClass
     protected $_allowedExtensions = ['json' => 1];
     /**
      * @param string $fullFileName
+     * @param bool $unlink
      * @return bool
      */
-    public function validateImportFile($fullFileName)
+    public function validateImportFile($fullFileName, $unlink = true)
     {
         $ext   = pathinfo($fullFileName, PATHINFO_EXTENSION);
         $valid = true;
@@ -1155,7 +1288,7 @@ class FCom_Core_ImportExport extends BClass
             fclose($rh);
         }
 
-        if (!$valid) {
+        if (!$valid && $unlink) {
             @unlink($fullFileName); // make sure invalid files are removed from the system;
         }
         return $valid;

@@ -73,7 +73,11 @@ class FCom_Core_Main extends BClass
         }
         if (!$rootDir) {
             // not FULLERON_ROOT_DIR, but actual called entry point dir
-            $rootDir = $req->scriptDir();
+            if (PHP_SAPI === 'cli') {
+                $rootDir = str_replace(['\\', '/core/FCom/Core'], ['/', ''], __DIR__);
+            } else {
+                $rootDir = $req->scriptDir();
+            }
         }
         $localConfig['fs']['root_dir'] = $rootDir = str_replace('\\', '/', $rootDir);
 
@@ -207,6 +211,11 @@ class FCom_Core_Main extends BClass
         $coreConfigFile = $config->get('fs/config_file_core', $configDir . '/' . 'core.php');
         if (file_exists($coreConfigFile)) {
             $config->addFile($coreConfigFile, true);
+        }
+
+        $codeceptConfigFile = sprintf('%s/codecept.php', $config->get('fs/config_dir'));
+        if (!file_exists($codeceptConfigFile)) {
+            $config->writeConfigFiles('codecept');
         }
 
         $randomDirName = $config->get('core/storage_random_dir');
@@ -607,5 +616,25 @@ FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
         $conf = $this->BConfig->get('modules/FCom_Core');
         $limit = !empty($conf['limit_countries']) ? $conf['allowed_countries'] : null;
         return $this->BLocale->getAvailableRegions('name', $limit);
+    }
+
+    public function onFindOneAfter($args)
+    {
+        if (!empty($args['result']) && $args['result'] instanceof FCom_Core_Model_Abstract && $args['result']->id()) {
+            $args['result']->mapDataFields();
+        }
+    }
+
+    public function onFindManyAfter($args)
+    {
+        if (!empty($args['result']) && is_array($args['result'])) {
+            /** @var FCom_Core_Model_Abstract $model */
+            foreach ($args['result'] as $key => $model) {
+                if (!($model instanceof FCom_Core_Model_Abstract) || !$model->id()) {
+                    continue;
+                }
+                $model->mapDataFields();
+            }
+        }
     }
 }

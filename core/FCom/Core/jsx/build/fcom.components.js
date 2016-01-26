@@ -1,5 +1,5 @@
 //noinspection JSPotentiallyInvalidUsageOfThis
-define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'], function (React, $, Locale) {
+define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore', 'select2', 'jquery.validate'], function (React, $, Locale, Sortable) {
     FCom.Components = {};
 
     /**
@@ -9,13 +9,13 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
     FCom.Mixin = {
         text2html: function (val) {
             var text = $.parseHTML(val);
-            return (text !== null) ? text[0].data: null;
+            return (text !== null) ? text[0].data : null;
         },
         html2text: function (val) {
             return $('<div/>').text(val).html();
         },
         fileSizeFormat: function (size) {
-            var size = parseInt(size);
+            size = parseInt(size);
             if (size / (1024 * 1024) > 1) {
                 size = size / (1024 * 1024);
                 size = size.toFixed(2) + ' MB';
@@ -23,22 +23,20 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 size = size / 1024;
                 size = size.toFixed(2) + ' KB';
             } else {
-                size = size + ' Byte';
+                size = size ? size + ' Byte' : '';
             }
 
             return size;
         },
         dateTimeNow: function () {
             var d = new Date();
-            var dateTime = d.getFullYear() + '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate()) + ' ' + toString(d.getHours()) + ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
+            return d.getFullYear() + '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate()) + ' ' + toString(d.getHours()) + ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
 
             function toString(val) {
                 return (val < 10) ? '0' + val : val;
             }
-
-            return dateTime;
         },
-        updateModalWidth: function(modal) {
+        updateModalWidth: function (modal) {
             //todo: add css class to modal to pre-define width, eg: large, medium, small
             $(modal.getDOMNode()).find('.modal-dialog').css('width', '900px');
         },
@@ -46,7 +44,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
          * remove special chars
          * @param {string} str
          */
-        removeSpecialChars: function(str) { //todo: put this function to global utilities object
+        removeSpecialChars: function (str) { //todo: put this function to global utilities object
             var label = str.substr(0, str.lastIndexOf('.'));
             return label.replace(/[^A-Z0-9]/ig, ' ');
         }
@@ -88,7 +86,12 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             }
             return name;
         },
-        validationRules: function(data) {
+        /**
+         * Set validation rules for input element
+         *
+         * @param {object} data
+         */
+        validationRules: function (data) {
             var rules = {};
             for (var key in data) {
                 if (!data.hasOwnProperty(key)) {
@@ -143,12 +146,69 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         }
     };
 
+    FCom.Components.MultiSite = React.createClass({
+        displayName: "MultiSite",
+        getDefaultProps: function () {
+            return {
+                defaultValue: [''],
+                sites: []
+            };
+        },
+        getInitialState: function () {
+            return {
+                selections: []
+            };
+        },
+        componentWillMount: function () {
+            this.setState({ sites: this.getSites() });
+        },
+        getSites: function () {
+            var sites = this.props.sites;
+            sites[''] = Locale._('Default configuration');
+            sites = _(sites).map(function (site, id) {
+                return {
+                    id: id, text: site
+                }
+            });
+
+            return _.sortBy(sites, 'id');
+        },
+        initSelect2: function () {
+            return {
+                id: 'multisite_list',
+                className: '',
+                multiple: false
+            };
+        },
+        handleSelections: function (e, sites) {
+            this.setState({sites: sites});
+
+            if (this.props.onChange) {
+                this.props.onChange(e, this.props.callback, this.state.sites);
+            }
+        },
+        shouldComponentUpdate: function (nextProps, nextState) {
+            return nextState.selections !== this.state.selections || nextProps.sites !== this.props.sites;
+        },
+        render: function () {
+            return (
+                React.createElement("div", {className: this.props.cClass || 'col-md-5'}, 
+                    React.createElement("input", {type: "hidden", id: "site_values", name: "site_values"}), 
+                    React.createElement(FCom.Components.Select2, React.__spread({},  this.initSelect2(), 
+                                        {options: this.getSites(), 
+                                        onSelection: this.handleSelections, 
+                                        multiple: this.props.multiple || false, val: this.props.defaultValue}))
+                )
+            );
+        }
+    });
+
     FCom.Components.ControlLabel = React.createClass({displayName: "ControlLabel",
         render: function () {
             var cl = "control-label " + this.props.label_class + (this.props.required ? ' required' : '');
             return (
                 React.createElement("label", {className: cl, 
-                    htmlFor:  this.props.input_id}, this.props.children)
+                       htmlFor:  this.props.input_id}, this.props.children)
             );
         },
         getDefaultProps: function () {
@@ -161,6 +221,144 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         }
     });
 
+    FCom.Components.ControlInput = React.createClass({displayName: "ControlInput",
+        mixins: [FCom.Mixin, FCom.FormMixin],
+        getDefaultProps: function () {
+            return {
+                value: '',
+                type: 'text',
+                attrs: {},
+                validation: {}
+            }
+        },
+        getInitialState: function () {
+            return {
+                value: this.props.value
+            };
+        },
+        componentWillReceiveProps: function (nextProps) {
+            this.setState({ value: nextProps.value });
+        },
+        handleChange: function (e) {
+            this.setState({ value: e.target.value });
+        },
+        render: function () {
+            var node = null;
+            var validationRules = this.validationRules(this.props.validation);
+            switch (this.props.type) {
+                case 'textarea':
+                    node = React.createElement("textarea", React.__spread({id: this.props.id || guid(), 
+                                    name: this.props.name || guid(), 
+                                    className: "form-control " + this.props.className, 
+                                    onChange: this.handleChange, 
+                                    onBlur: this.props.callback, 
+                                    value: this.state.value},  this.props.attrs,  validationRules));
+                    break;
+                case 'select':
+                    var options = [];
+                    _(this.props.options).each(function (text, value) {
+                        options.push(React.createElement("option", {value: value, key: value}, text));
+                    });
+                    node = React.createElement("select", React.__spread({id: this.props.id || guid(), 
+                            name: this.props.name || guid(), 
+                            className: "form-control " + this.props.className, 
+                            onChange: this.handleChange, 
+                            value: this.state.value},  this.props.attrs,  validationRules), options);
+                    break;
+                default:
+                    node = React.createElement("input", React.__spread({type: this.props.type, 
+                                  id: this.props.id || guid(), 
+                                  name: this.props.name || guid(), 
+                                  className: "form-control " + this.props.className, 
+                                  onChange: this.handleChange, 
+                                  onBlur: this.props.callback, 
+                                  value: this.state.value},  this.props.attrs,  validationRules));
+                    break;
+            }
+            return node;
+        }
+    });
+
+    FCom.Components.SpecialInput = React.createClass({displayName: "SpecialInput",
+        getDefaultProps: function () {
+            return {
+                type: '',
+                disabled: false,
+                attrs: {}
+            };
+        },
+        getInitialState: function () {
+            return {
+                value: this.props.value
+            };
+        },
+        componentDidMount: function () {
+            switch (this.props.type) {
+                case 'switch':
+                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch({
+                        state: parseInt(this.state.value) == 1,
+                        onSwitchChange: this.props.onChange
+                    });
+                    break;
+                case 'wysiwyg':
+                    adminForm.wysiwygInit(null, this.state.value, this.props.onChange);
+                    break;
+            }
+        },
+        componentWillReceiveProps: function (nextProps) {
+            this.setState({ value: nextProps.value });
+        },
+        componentWillUnmount: function () {
+            if (this.refs['switch-cbx-' + this.props.id])
+                React.unmountComponentAtNode(this.refs['switch-cbx-' + this.props.id]);
+            if (this.refs['wysiwyg-' + this.props.id])
+                React.unmountComponentAtNode(this.refs['wysiwyg-' + this.props.id]);
+        },
+        handleSwitch: function (e, state) {
+            this.setState({ value: state });
+        },
+        handleChange: function (e) {
+            this.setState({ value: e.target.value });
+        },
+        createSwitchBox: function () {
+            return React.createElement("input", React.__spread({type: "checkbox", id: this.props.id, 
+                          name: this.props.name, 
+                          className: "switch-cbx " + this.props.className, 
+                          defaultChecked: !!(this.state.value === undefined || this.state.value === '1'), 
+                          value: this.state.value, 
+                          onChange: this.handleSwitch, 
+                          ref: 'switch-cbx-' + this.props.id},  this.props.attrs));
+        },
+        createWysiwyg: function () {
+            if (!this.props.id) {
+                this.props.id = guid();
+            }
+            return React.createElement("div", null, React.createElement("textarea", React.__spread({id: this.props.id, 
+                             name: this.props.name, 
+                             className: 'form-control ' + this.props.className, 
+                             defaultValue: this.state.value, 
+                             onChange: this.handleChange, 
+                             ref: 'wysiwyg-' + this.props.id},  this.props.attrs)), 
+                        React.createElement("label", {htmlFor: this.props.id, className: "error", style: { display: 'none'}})
+                    );
+        },
+        renderNode: function () {
+            switch (this.props.type) {
+                case 'switch':
+                    return this.createSwitchBox();
+                    break;
+                case 'wysiwyg':
+                    return this.createWysiwyg();
+                    break;
+            }
+        },
+        render: function () {
+            return (
+                React.createElement("div", null, this.renderNode())
+            );
+        }
+    });
+
     FCom.Components.HelpBlock = React.createClass({displayName: "HelpBlock",
         render: function () {
             return (React.createElement("span", {className: "help-block "+ this.props.helpBlockClass},  this.props.text));
@@ -168,7 +366,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
     });
 
     FCom.Components.Input = React.createClass({displayName: "Input",
-        mixins:[FCom.FormMixin],
+        mixins: [FCom.FormMixin],
         render: function () {
             var formGroupClass = this.props.formGroupClass,
                 inputDivClass = this.props.inputDivClass,
@@ -176,19 +374,19 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 inputValue = this.props.inputValue,
                 other = _.omit(this.props, ['formGroupClass', 'inputDivClass', 'inputClass', 'inputValue']);
             var className = "form-control";
-            if(inputClass) {
+            if (inputClass) {
                 className += " " + inputClass;
             }
-            if(this.props.required) {
+            if (this.props.required) {
                 className += " required";
             }
             var helpBlock = React.createElement("span", null);
-            if(this.props['helpBlockText']) {
+            if (this.props['helpBlockText']) {
                 helpBlock = React.createElement(FCom.Components.HelpBlock, {text: this.props['helpBlockText']});
             }
-        var inputId = this.getInputId();
+            var inputId = this.getInputId();
 
-        return (
+            return (
                 React.createElement("div", {className: "form-group " + formGroupClass}, 
                     React.createElement(FCom.Components.ControlLabel, React.__spread({},  other, {input_id: inputId}), 
                         this.props.label
@@ -206,7 +404,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 )
             );
         },
-        getDefaultProps: function() {
+        getDefaultProps: function () {
             // component default properties
             return {
                 formGroupClass: '',
@@ -214,7 +412,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 type: 'text',
                 inputId: '',
                 inputName: '',
-                inputClass:''
+                inputClass: ''
             };
         }
     });
@@ -223,8 +421,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         render: function () {
             return (
                 React.createElement("a", {id: this.props.id, className: "pull-right", href: "#", ref: "icon", 
-                    "data-toggle": "popover", "data-trigger": "focus", tabIndex: "-1", 
-                    "data-content": this.props.content, "data-container": "body"}, 
+                   "data-toggle": "popover", "data-trigger": "focus", tabIndex: "-1", 
+                   "data-content": this.props.content, "data-container": "body"}, 
                     React.createElement("span", {className: "icon-question-sign"})
                 )
             );
@@ -250,8 +448,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
         render: function () {
             return (
                 React.createElement("select", {name: this.props.name, id: this.props.id, 
-                    className: "form-control to-select2 " + this.props.className, style: this.props.style, 
-                    defaultValue: this.props.value}, 
+                        className: "form-control to-select2 " + this.props.className, style: this.props.style, 
+                        defaultValue: this.props.value}, 
                     React.createElement("option", {value: "0"}, this.props.optNo), 
                     React.createElement("option", {value: "1"}, this.props.optYes)
                 )
@@ -322,14 +520,15 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
 
             if (this.props.confirm) {
                 confirmButton = (
-                    React.createElement(FCom.Components.Button, {onClick: this.handleConfirm, className: "btn-primary", type: "button"}, 
+                    React.createElement(FCom.Components.Button, React.__spread({type: "button", onClick: this.handleConfirm, 
+                                            className: "btn-primary " + (this.props.confirmClass || '')},  this.props.confirmAttrs), 
                         this.props.confirm
                     )
                 );
             }
             if (this.props.cancel) {
                 cancelButton = (
-                    React.createElement(FCom.Components.Button, {onClick: this.handleCancel, className: "btn-default", type: "button"}, 
+                    React.createElement(FCom.Components.Button, {onClick: this.handleCancel, className: "btn-default " + (this.props.cancelClass || ''), type: "button"}, 
                         this.props.cancel
                     )
                 );
@@ -340,17 +539,17 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                     React.createElement("div", {className: "modal-dialog"}, 
                         React.createElement("div", {className: "modal-content"}, 
                             React.createElement("div", {className: "modal-header"}, 
-                                React.createElement("button", {type: "button", className: "close", onClick: this.handleCancel}, 
-                                "×"
-                                ), 
+                                cancelButton ? React.createElement("button", {type: "button", className: "close", onClick: this.handleCancel}, 
+                                    "×"
+                                ) : null, 
                                 React.createElement("h4", {className: "modal-title"}, this.props.title)
                             ), 
                             React.createElement("div", {className: "modal-body"}, 
                                 this.props.children
                             ), 
                             React.createElement("div", {className: "modal-footer"}, 
-                                  cancelButton, 
-                                  confirmButton
+                                cancelButton, 
+                                confirmButton
                             )
                         )
                     )
@@ -378,17 +577,150 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 cancel: Locale._("Cancel"),
                 title: Locale._("Title"),
                 id: 'fcom-modal-form-wrapper',
-                show: false //show modal after render
+                show: false, //show modal after render
+                confirmClass: '',
+                confirmAttrs: {},
+                cancelClass: ''
             }
         }
     });
+
+    var _nextSibling;
+
+    var _activeComponent;
+
+    var _defaultOptions = {
+        ref: 'list',
+        model: 'items',
+
+        animation: 100,
+        onStart: 'handleStart',
+        onEnd: 'handleEnd',
+        onAdd: 'handleAdd',
+        onUpdate: 'handleUpdate',
+        onRemove: 'handleRemove',
+        onSort: 'handleSort',
+        onFilter: 'handleFilter',
+        onMove: 'handleMove'
+    };
+
+
+    function _getModelName(component) {
+        return component.sortableOptions && component.sortableOptions.model || _defaultOptions.model;
+    }
+
+
+    function _getModelItems(component) {
+        var name = _getModelName(component),
+            items = component.state && component.state[name] || component.props[name];
+
+        return items.slice();
+    }
+
+
+    function _extend(dst, src) {
+        for (var key in src) {
+            if (src.hasOwnProperty(key)) {
+                dst[key] = src[key];
+            }
+        }
+
+        return dst;
+    }
+
+    FCom.Components.SortableMixin = {
+        sortableMixinVersion: '0.1.1',
+
+        /**
+         * @type {Sortable}
+         * @private
+         */
+        _sortableInstance: null,
+
+        componentDidMount: function () {
+            var DOMNode, options = _extend(_extend({}, _defaultOptions), this.sortableOptions || {}),
+                copyOptions = _extend({}, options),
+
+                emitEvent = function (/** string */type, /** Event */evt) {
+                    var method = this[options[type]];
+                    method && method.call(this, evt, this._sortableInstance);
+                }.bind(this);
+
+            // Bind callbacks so that "this" refers to the component
+            'onStart onEnd onAdd onSort onUpdate onRemove onFilter onMove'.split(' ').forEach(function (/** string */name) {
+                copyOptions[name] = function (evt) {
+                    if (name === 'onStart') {
+                        _nextSibling = evt.item.nextElementSibling;
+                        _activeComponent = this;
+                    }
+                    else if (name === 'onAdd' || name === 'onUpdate') {
+                        evt.from.insertBefore(evt.item, _nextSibling);
+
+                        var newState = {},
+                            remoteState = {},
+                            oldIndex = evt.oldIndex,
+                            newIndex = evt.newIndex,
+                            items = _getModelItems(this),
+                            remoteItems,
+                            item;
+
+                        if (name === 'onAdd') {
+                            remoteItems = _getModelItems(_activeComponent);
+                            item = remoteItems.splice(oldIndex, 1)[0];
+                            items.splice(newIndex, 0, item);
+
+                            remoteState[_getModelName(_activeComponent)] = remoteItems;
+                        }
+                        else {
+                            items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
+                        }
+
+                        newState[_getModelName(this)] = items;
+
+                        if (copyOptions.stateHandler) {
+                            this[copyOptions.stateHandler](newState);
+                        } else {
+                            this.setState(newState);
+                        }
+
+                        (this !== _activeComponent) && _activeComponent.setState(remoteState);
+                    }
+
+                    setTimeout(function () {
+                        emitEvent(name, evt);
+                    }, 0);
+                }.bind(this);
+            }, this);
+
+            DOMNode = this.getDOMNode() ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
+
+            /** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
+            this._sortableInstance = Sortable.create(DOMNode, copyOptions);
+        },
+
+        componentWillReceiveProps: function (nextProps) {
+            var newState = {},
+                modelName = _getModelName(this),
+                items = nextProps[modelName];
+
+            if (items) {
+                newState[modelName] = items;
+                this.setState(newState);
+            }
+        },
+
+        componentWillUnmount: function () {
+            this._sortableInstance.destroy();
+            this._sortableInstance = null;
+        }
+    };
 
     /**
      * render modal elements, only support for fcom grid
      */
     FCom.Components.ModalElement = React.createClass({displayName: "ModalElement",
         mixins: [FCom.Mixin, FCom.FormMixin],
-        getDefaultProps: function() {
+        getDefaultProps: function () {
             return {
                 'value': '', //default value
                 'column': {}, //column info and option,
@@ -396,12 +728,12 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
                 'removeFieldHandle': null
             }
         },
-        render: function() {
+        render: function () {
             var that = this;
             var column = this.props.column;
 
             var label = '';
-            var iconRequired =(typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
+            var iconRequired = (typeof column['validation'] != 'undefined' && column['validation'].hasOwnProperty('required')) ? '*' : '';
             if (typeof(column['form_hidden_label']) === 'undefined' || !column['form_hidden_label']) {
                 label = (
                     React.createElement("div", {className: "control-label col-sm-3", key: this.props.key}, 
@@ -416,53 +748,69 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             var input = '';
             if (typeof column['element_print'] != 'undefined') { //custom html for element_print
                 if (typeof(column['form_hidden_label']) === 'undefined' || !column['form_hidden_label']) {
-                    input = '<div class="control-label col-sm-3"><label for='+column.name+'>'+column.label+'</label></div>';
+                    input = '<div class="control-label col-sm-3"><label for=' + column.name + '>' + column.label + '</label></div>';
                 }
                 input += '<div class="controls col-sm-8">' + column['element_print'] + '</div>';
-                return React.createElement("div", {key: this.props.key, className: "form-group element_print", dangerouslySetInnerHTML: {__html: input}})
+                return React.createElement("div", {key: this.props.key, className: "form-group element_print", 
+                            dangerouslySetInnerHTML: {__html: input}})
             } else {
                 switch (column.editor) {
                     case 'select':
                         var options = [];
-                        _.forEach(column.options, function(text, value) {
+                        _.forEach(column.options, function (text, value) {
                             options.push(React.createElement("option", {value: value, key: value}, text));
                         });
-                        input = React.createElement("select", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control " + (column.className ? column.className : ''), defaultValue: this.props.value},  validationRules), options);
+                        input = React.createElement("select", React.__spread({key: this.props.key, name: column.name, id: column.name, 
+                                        className: "form-control " + (column.className ? column.className : ''), 
+                                        defaultValue: this.props.value},  validationRules), options);
                         break;
                     case 'textarea':
-                        input = React.createElement("textarea", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control " + (column.className ? column.className : ''), rows: "5", defaultValue: this.props.value},  validationRules));
+                        input = React.createElement("textarea", React.__spread({key: this.props.key, name: column.name, id: column.name, 
+                                          className: "form-control " + (column.className ? column.className : ''), 
+                                          rows: "5", defaultValue: this.props.value},  validationRules));
                         break;
                     default:
-                        input = React.createElement("input", React.__spread({key: this.props.key, name: column.name, id: column.name, className: "form-control " + (column.className ? column.className : ''), defaultValue: this.props.value},  column.attributes,  validationRules));
+                        input = React.createElement("input", React.__spread({key: this.props.key, name: column.name, id: column.name, 
+                                       className: "form-control " + (column.className ? column.className : ''), 
+                                       defaultValue: this.props.value},  column.attributes,  validationRules));
                         break;
                 }
             }
 
             var removeFieldButton = '';
             if (this.props.removeFieldDisplay) {
-                removeFieldButton = (React.createElement("button", {key: this.props.key, className: "btn box-remove btn-xs btn-link btn-remove remove-field icon-remove", type: "button", onClick: this.props.removeFieldHandle, "data-field": column.name}));
+                removeFieldButton = (React.createElement("button", {key: this.props.key, 
+                                             className: "btn box-remove btn-xs btn-link btn-remove remove-field icon-remove", 
+                                             type: "button", onClick: this.props.removeFieldHandle, 
+                                             "data-field": column.name}));
             }
 
             return (
                 React.createElement("div", {className: "form-group"}, 
-                    label, React.createElement("div", {className: "controls col-sm-8"}, input), removeFieldButton
+                    label, 
+                    React.createElement("div", {className: "controls col-sm-8"}, input), 
+                    removeFieldButton
                 )
             )
         }
     });
 
+    /**
+     * Render select2 element
+     */
     FCom.Components.Select2 = React.createClass({displayName: "Select2",
         getDefaultProps: function () {
             return {
                 hasError: false,
+                errorClass: "has-error",  // default to Bootstrap 3's error class
                 multiple: false,
-                placeholder: "Select Options",
                 val: [],
                 style: {
                     witdh: "100%"
                 },
                 enabled: true,
-                options: []
+                options: [],
+                attrs: {}
             };
         },
         componentDidUpdate: function (prevProps, prevState) {
@@ -498,14 +846,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             // Set up Select2
             var $select2 = this.createSelect2();
         },
-        setPlaceholderTo: function($elem, placeholder) {
-            if (!placeholder) {
-                placeholder = "";
-            }
+        setPlaceholderTo: function ($elem, placeholder) {
             var currData = $elem.select2("data");
-
-            // Set placeholder to new placeholder
-            $elem.attr("placeholder", placeholder);
 
             // Now workaround the fact that Select2 doesn't pick up on this
             // ..First assign null
@@ -513,7 +855,6 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
 
             // ..Then assign dummy value in case that currData is null since
             //   that won't do anything.
-
             $elem.select2("data", {});
 
             // ..Then put original data back
@@ -527,21 +868,47 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             }
 
             var $select2 = this.getElement();
-            $select2.attr({
-                'name': this.props.name,
-                'class': this.props.className,
-                'data-col': this.props['data-col']
-            })
-            .val(val)
-            .select2({
+            var options = {
                 data: this.props.options,
                 multiple: this.props.multiple,
                 val: val
-            })
+            };
+
+            var attrs = {
+                'name': this.props.name,
+                'class': this.props.className,
+                'data-col': this.props['data-col']
+            };
+
+            if (this.props.attrs)
+                attrs = _.extend({}, attrs, this.props.attrs);
+
+            if (!this.props.multiple)
+                options['placeholder'] = this.props.placeholder;
+
+            $select2.attr(attrs)
+            .val(val)
+            .select2(options)
             .on("change", this.handleChange)
+            .on("select2-open", this.handleErrorState)
             .select2("enable", this.props.enabled);
 
             this.setPlaceholderTo($select2, this.props.placeholder);
+        },
+        handleErrorState: function () {
+            var $dropNode = $('#select2-drop');
+            var classNames = $dropNode[0].className.split(/\s+/);
+
+            if (this.props.hasError) {
+                var hasErrorClass = $.inArray(this.props.errorClass, classNames);
+
+                if (hasErrorClass == -1) {
+                    $dropNode.addClass(this.props.errorClass);
+                }
+
+            } else {
+                $dropNode.removeClass(this.props.errorClass);
+            }
         },
         handleChange: function (e) {
             if (this.props.onSelection) {
@@ -552,14 +919,172 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap', 'underscore', 'select2'],
             return $("#" + this.props.id);
         },
         _isOptionsUpdated: function (oldOptions) {
-            if (oldOptions.length != this.props.options.length)
-                return true;
-            return false;
+            return oldOptions.length != this.props.options.length || false;
         },
         render: function () {
             return (
                 React.createElement("div", null, 
-                    React.createElement("input", {id: this.props.id, type: "hidden", style: this.props.style})
+                    React.createElement("input", React.__spread({id: this.props.id},  this.props.attrs, {type: "hidden", style: this.props.style}))
+                )
+            );
+        }
+    });
+
+    var cx = React.addons.classSet;
+    var RatingStep = React.createClass({displayName: "RatingStep",
+        getDefaultProps: function () {
+            return {
+                type: 'empty',
+                temporaryRating: false,
+                stepTitle: {1: 'Bad', 2: 'Poor', 3: 'Ok', 4: 'Good', 5: 'Very good'}
+            };
+        },
+        handleClick: function(e) {
+            this.props.onClick(this.props.step, e);
+        },
+        handleMouseMove: function(e) {
+            this.props.onMouseMove(this.props.step, e);
+        },
+        render: function () {
+            var classes = {
+                'rating-widget-step': true,
+                'rating-widget-step-css': true,
+                'rating-widget-step-hover': this.props.temporaryRating
+            };
+            classes['rating-widget-step-' + this.props.type] = true;
+
+            return (
+                React.createElement("span", {
+                    className: cx(classes), 
+                    onClick: this.handleClick, 
+                    onMouseMove: this.handleMouseMove, 
+                    title: this.props.stepTitle[this.props.step]}
+                )
+            );
+        }
+    });
+
+    FCom.Components.RatingWidget = React.createClass({displayName: "RatingWidget",
+        mixins: [FCom.Mixin],
+        mouseLastX: 0,
+        mouseLastY: 0,
+        getDefaultProps: function () {
+            return {
+                size: 5,
+                disabled: false,
+                initialRating: 0,
+                halfRating: false,
+                hover: true,
+                className: '',
+                onChange: function () {}
+            };
+        },
+        getInitialState: function () {
+            return {
+                rating: this.props.initialRating,
+                tempRating: null
+            };
+        },
+        handleClick: function(newRating, e) {
+            if (this.props.disabled) {
+                return;
+            }
+
+            newRating = this.calcHalfRating(newRating, e);
+            if (newRating === this.state.rating) {
+                newRating = 0;
+            }
+
+            this.setState({rating: newRating, tempRating: null});
+            this.props.onChange(newRating);
+        },
+        handleOnMouseMove: function(newTempRating, e) {
+            if (this.props.disabled || !this.props.hover
+            ) {
+                return;
+            }
+
+            // Make sure the mouse has really moved. IE8 thinks the mouse is
+            // always moving
+            if (
+                e.clientX == this.mouseLastX &&
+                e.clientY == this.mouseLastY
+            ) {
+                return;
+            }
+            this.mouseLastX = e.clientX;
+            this.mouseLastY = e.clientY;
+
+            newTempRating = this.calcHalfRating(newTempRating, e);
+            this.setState({tempRating: newTempRating})
+        },
+        handleOnMouseLeave: function() {
+            this.setState({tempRating: null});
+        },
+        calcHalfRating: function(newRating, e) {
+            if (!this.props.halfRating) {
+                return newRating;
+            }
+
+            var stepClicked = e.target;
+            var stepWidth = stepClicked.offsetWidth;
+            var halfWidth = stepWidth / 2;
+
+            var stepClickedRect = stepClicked.getBoundingClientRect();
+            var clickPos = e.pageX - (stepClickedRect.left + document.body.scrollLeft);
+
+            if (clickPos <= halfWidth) {
+                newRating -= .5;
+            }
+
+            return newRating;
+        },
+        renderSteps: function() {
+            var ratingSteps = [];
+            var rating = this.state.tempRating || this.state.rating;
+
+            var roundRating = Math.round(rating);
+            var ceilRating = Math.ceil(rating);
+
+            for (var i = 1; i <= this.props.size; i++) {
+                var type = 'empty';
+
+                if (i <= rating) {
+                    type = 'whole';
+                } else if(
+                    roundRating == i &&
+                    roundRating == ceilRating &&
+                    this.props.halfRating
+                ) {
+                    type = 'half';
+                }
+
+                ratingSteps.push(
+                    React.createElement(RatingStep, {
+                        step: i, 
+                        type: type, 
+                        temporaryRating: this.state.tempRating !== null, 
+                        onClick: this.handleClick, 
+                        onMouseMove: this.handleOnMouseMove, 
+                        key: "rating-step-" + i}
+                    )
+                );
+            }
+
+            return ratingSteps;
+        },
+        render: function () {
+            var ratingSteps = this.renderSteps();
+
+            var classes = {
+                'rating-widget': true,
+                'rating-widget-disabled': this.props.disabled
+            };
+            classes = cx(classes) + ' ' + this.props.className;
+
+            return (
+                React.createElement("div", {className: classes, onMouseLeave: this.handleOnMouseLeave}, 
+                    ratingSteps
                 )
             );
         }

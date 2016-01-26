@@ -1,3 +1,8 @@
+<style type="text/css">
+    .f-prod-img-base img {
+        width: 100%;
+    }
+</style>
 {% set lgColumns = THIS.get('lg_columns') ?: 4 %}
 {% set mdColumns = THIS.get('md_columns') ?: 4 %}
 {% set smColumns = THIS.get('sm_columns') ?: 3 %}
@@ -82,24 +87,25 @@
     require(['jquery', 'jquery-ui'], function ($) {
         var $imgs = $('.f-prod-img');
         // fade,clip,blind, drop, fold, highlight, puff, pulsate,slide
-        var effect = '{{ rolloverEffect?:'fade' }}';
-        $imgs.hover(function () {
+        var effect = '{{ rolloverEffect ?: 'fade' }}';
+
+        $imgs.hover(function (e) {
             var $cont = $(this);
             var $over = $cont.find('.f-prod-img-over');
             if ($over.length) {
                 var h = $cont.height();
                 $cont.height(h);
-                $cont.find('.f-prod-img-base').hide(effect);
-                $over.show(effect, function () {
+                $cont.find('.f-prod-img-base').stop(true, true).hide();
+                $over.stop(true, true).show(effect, function () {
                     $over.css('position', 'inherit');
                 });
             }
-        }, function () {
+        }, function (e) {
             var $cont = $(this);
             var $over = $cont.find('.f-prod-img-over');
             if ($over.length) {
-                $over.css('position', 'absolute').hide(effect);
-                $cont.find('.f-prod-img-base').show(effect);
+                $over.css('position', 'inherit').stop(true, true).hide();
+                $cont.find('.f-prod-img-base').stop(true, true).show(effect);
             }
         });
     });

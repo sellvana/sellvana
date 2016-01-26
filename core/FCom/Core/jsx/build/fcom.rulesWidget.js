@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2', 'jquery.bootstrap-growl'], function (React, $, Components, Locale, store) {
+define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap-ladda', 'select2', 'jquery.bootstrap-growl', 'bootstrap-ladda-spin'], function (React, $, Components, Locale, store, Ladda) {
     function conditions(React, $, Components, Locale, Common) {
         // what type of condition we have, total amount or quantity
         var ConditionsType = React.createClass({displayName: "ConditionsType",
@@ -437,7 +437,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             },
             componentWillMount: function () {
                 // load fields from data, they come in form of plain js object
-                console.log(this.props.data);
+                //console.log(this.props.data);
                 var state = {values: this.props.data || {}};
                 for (var field in this.props.data) {
                     if (this.props.data.hasOwnProperty(field)) {
@@ -565,7 +565,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 return (
                     React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
                         React.createElement("div", {className: "col-md-4"}, 
-                            React.createElement(Common.Compare, {opts: opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
+                            React.createElement(Common.Compare, {opts:  opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
                                 ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
                         ), 
                         React.createElement("div", {className: "col-md-5"}, input)
@@ -877,7 +877,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                         var val = el.val();
 
                         $.get(self.url, {cats: val}).done(function (result) {
-                            console.log(result);
+                            //console.log(result);
                             callback(result.items);
                         });
 
@@ -1206,7 +1206,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             },
             componentWillMount: function () {
                 // load fields from data, they come in form of plain js object
-                console.log(this.props.data);
+                //console.log(this.props.data);
                 this.setState({values: this.props.data || {}});
                 for (var field in this.props.data) {
                     if (this.props.data.hasOwnProperty(field)) {
@@ -1446,7 +1446,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                                 }
                             })
                         } else {
-                            console.log(rules, "is not an array");
+                            //console.log(rules, "is not an array");
                         }
                     }
                 }
@@ -1501,7 +1501,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                         delete data.rules[rule];
                     }
                 } else {
-                    console.log("wrong condition id: " + conditionId);
+                    //console.log("wrong condition id: " + conditionId);
                 }
                 //data = data.filter(function (field) {
                 //    return field.id != conditionId;
@@ -1512,7 +1512,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             },
             conditionUpdate: function (data) {
                 //todo
-                console.log(data);
+                //console.log(data);
                 var localData = this.state.data;
                 for (var type in data) {
                     if (data.hasOwnProperty(type)) {
@@ -1521,7 +1521,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                             var rule = condArray[0], idx = condArray[1];
                             localData.rules[rule][idx] = data[type];
                         } else {
-                            console.log("wrong condition id: " + type);
+                            //console.log("wrong condition id: " + type);
                         }
                     }
                 }
@@ -1874,7 +1874,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             },
             componentWillMount: function () {
                 // load fields from data, they come in form of plain js object
-                console.log(this.props.data);
+                //console.log(this.props.data);
                 var state = {values: this.props.data || {}};
                 for (var field in this.props.data) {
                     if (this.props.data.hasOwnProperty(field)) {
@@ -2002,7 +2002,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 return (
                     React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
                         React.createElement("div", {className: "col-md-4"}, 
-                            React.createElement(Common.Compare, {opts: opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
+                            React.createElement(Common.Compare, {opts:  opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
                                 ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
                         ), 
                         React.createElement("div", {className: "col-md-5"}, input)
@@ -2758,7 +2758,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                                 }
                             })
                         } else {
-                            console.log(actions, "is not an array");
+                            //console.log(actions, "is not an array");
                         }
                     }
                 }
@@ -2785,7 +2785,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                         data = JSON.parse($conditionsSerialized.val());
                         this.setProps({data: data});
                     } catch (e) {
-                        console.log(e);
+                        //console.log(e);
                     }
                 }
 
@@ -2826,14 +2826,14 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                         delete data.rules[rule];
                     }
                 } else {
-                    console.log("wrong condition id: " + actionId);
+                    //console.log("wrong condition id: " + actionId);
                 }
                 this.setState({data: data}, function () {
                     this.props.onUpdate(this.state.data);
                 });
             },
             actionUpdate: function (data) {
-                console.log(data);
+                //console.log(data);
                 var localData = this.state.data;
                 for (var type in data) {
                     if (data.hasOwnProperty(type)) {
@@ -2842,7 +2842,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                             var rule = actionArray[0], idx = actionArray[1];
                             localData.rules[rule][idx] = data[type];
                         } else {
-                            console.log("wrong condition id: " + type);
+                            //console.log("wrong condition id: " + type);
                         }
                     }
                 }
@@ -3063,7 +3063,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                                 test = regex.test(val['sku']);
                             }
                             if (test) {
-//                                    console.log(term + ' matches ' + val.text);
+                                //console.log(term + ' matches ' + val.text);
                                 counted++; // up the counter
                             }
                         } else {
@@ -3349,8 +3349,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             }
         });
 
-        var CouponApp = {App: App, GenerateForm: GenerateForm};
-        return CouponApp;
+        return {App: App, GenerateForm: GenerateForm};
     }
 
     var Common = common(React, Components);
@@ -3359,7 +3358,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
     var ConditionsApp = conditions(React, $, Components, Locale, Common);
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {minimumResultsForSearch: 15, dropdownAutoWidth: true});
-    var Promo = {
+    var RulesWidget = {
         $modalContainerCoupons: null,
         $modalContainerConditions: null,
         $modalContainerActions: null,
@@ -3373,11 +3372,13 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                     try {
                         this.options.promoOptions = JSON.parse(val);
                     } catch (e) {
-                        console.log(e);
+                        //console.log(e);
                     }
                 }
                 this.options.promoOptionsEl = $promoOptions;
             }
+
+            this.options.promoOptionsRemoveEl = $('#' + this.options.removed_serialized);
 
             if (this.options['promo_type_id']) {
                 var $promoType = $("#" + this.options['promo_type_id']);
@@ -3413,7 +3414,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
         initActionsApp: function (selector, $modalContainer) {
             var $actionsSelector = $('#' + selector);
             if ($actionsSelector.length == 0) {
-                Promo.log("Actions drop-down not found");
+                RulesWidget.log("Actions drop-down not found");
                 return;
             }
             var $container = $("#" + this.options.actions_container_id);
@@ -3474,11 +3475,14 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             React.render(React.createElement(CouponApp.App, React.__spread({},  callBacks, {mode: mode, options: options, onUpdate: this.onCouponsUpdate})), appContainer);
             React.render(
                 React.createElement("div", {className: "modals-container"}, 
-                    React.createElement(Components.Modal, {title: "Coupon grid", onLoad: this.addShowCodes.bind(this)}), 
-                    React.createElement(Components.Modal, {title: "Generate coupons", onLoad: this.addGenerateCodes.bind(this), onConfirm: this.postGenerate.bind(this)}, 
+                    React.createElement(Components.Modal, {id: "coupons_grid", title: "Coupon grid", onLoad: this.addShowCodes.bind(this), onConfirm: this.onModalSaveChange.bind(this)}), 
+                    React.createElement(Components.Modal, {id: "generate_coupon_grid", title: "Generate coupons", onLoad: this.addGenerateCodes.bind(this), 
+                                      onConfirm: this.postGenerate.bind(this), 
+                                      confirmClass: "ladda-button", 
+                                      confirmAttrs: { 'data-style': 'expand-left'}}, 
                         React.createElement(CouponApp.GenerateForm, {onSubmit: this.postGenerate.bind(this)})
                     ), 
-                    React.createElement(Components.Modal, {title: "Import coupons", onLoad: this.addImportCodes.bind(this)})
+                    React.createElement(Components.Modal, {id: "import_coupon_grid", title: "Import coupons", onLoad: this.addImportCodes.bind(this)})
                 ), modalContainer);
         },
         options: {
@@ -3534,10 +3538,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 this.log("Modal not loaded");
                 return;
             }
-            this.log("showCodes");
-            modal.open();
+            //this.log("showCodes");
             var $modalBody = $('.modal-body', modal.getDOMNode());
-            this.loadModalContent($modalBody, this.options.showCouponsUrl)
+            this.loadModalContent($modalBody, this.options.showCouponsUrl);
+            modal.open();
         },
         generateCodes: function () {
             var modal = this.generateCodesModal;
@@ -3546,7 +3550,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 return;
             }
             // component default properties
-            this.log("generateCodes");
+            //this.log("generateCodes");
             //this.refs.generateModal.open();
             modal.open();
             var $formContainer = $('#coupon-generate-container');
@@ -3556,7 +3560,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 $codeLength.prop('disabled', false);
             }
             $codePattern.change(function (e) {
-                Promo.log(e);
+                RulesWidget.log(e);
                 var val = $.trim($codePattern.val());
                 if (val == '') {
                     $codeLength.prop('disabled', false);
@@ -3572,51 +3576,62 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             var url = this.options['generateCouponsUrl'];
             var $progress = $formContainer.find('.loading');
             var $result = $formContainer.find('.result').hide();
+            var loader = Ladda.create(e.getDOMNode().querySelector('.ladda-button'));
             $progress.show();
-            //$button.click(function (e) {
 
             var $meta = $('meta[name="csrf-token"]');
             var data = {};
             if ($meta.length) {
                 data["X-CSRF-TOKEN"] = $meta.attr('content');
             }
+
             $formContainer.find('input').each(function () {
                 var $self = $(this);
                 var name = $self.attr('name');
                 data[name] = $self.val();
             });
+
             // show indication that something happens?
-            $.post(url, data)
-                .done(function (result) {
-                    var status = result.status;
-                    var message = result.message;
-                    $.bootstrapGrowl(message, {type: 'success', align: 'center', width: 'auto'});
-                    $result.text(message);
-                    if (status != 'error') {
-                        var newRows = result['codes'].map(function (e, i) {
-                            console.log(e, i);
-                            return {
-                                code: e,
-                                total_used: 0
-                            }
-                        });
-                        console.log(newRows);
-                        var grid_id = result['grid_id'];
-                        Promo.updateGrid(grid_id, newRows);
-                    }
-                })
-                .always(function (r) {
-                    $progress.hide();
-                    $result.show();
-                    if ($.isFunction(e.close)) {
-                        // e is the modal object
-                        setTimeout(e.close, 2000);
-                        //e.close();//close it
-                    }
-                    // hide notification
-                    Promo.log(r);
-                });
-            //});
+            $.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                data: data,
+                beforeSend: function () {
+                    loader.start();
+                }
+            })
+            .done(function (result) {
+                var status = result.status;
+                var message = result.message;
+                $.bootstrapGrowl(message, {type: 'success', align: 'center', width: 'auto'});
+                $result.text(message);
+                if (status != 'error') {
+                    var newRows = result['codes'].map(function (e, i) {
+                        //console.log(e, i);
+                        return {
+                            code: e,
+                            total_used: 0
+                        }
+                    });
+                    //console.log(newRows);
+                    var grid_id = result['grid_id'];
+                    RulesWidget.updateGrid(grid_id, newRows);
+                }
+            })
+            .always(function (r) {
+                $progress.hide();
+                $result.show();
+                if ($.isFunction(e.close)) {
+                    // e is the modal object
+                    setTimeout(e.close, 2000);
+                    //e.close();//close it
+                }
+                // hide notification
+                RulesWidget.log(r);
+                loader.stop();
+            });
+
             if ($.isFunction(e.preventDefault)) {
                 e.preventDefault();
             }
@@ -3634,8 +3649,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             var $modalBody = $('.modal-body', modal.getDOMNode());
             this.loadModalContent($modalBody, this.options['importCouponsUrl']);
             $(document).on("coupon_import", function (event) {
-                console.log(event.codes);
-                Promo.updateGrid(event.grid_id, event.codes);
+                //console.log(event.codes);
+                RulesWidget.updateGrid(event.grid_id, event.codes);
             });
         },
         log: function (msg) {
@@ -3682,7 +3697,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
                 $.get(url, {page: params.page, q: params.q, o: params.o})
                     .done(function (result) {
                         if (result.hasOwnProperty('total_count')) {
-                            console.log(result['total_count']);
+                            //console.log(result['total_count']);
                             var more = params.page * params.o < result['total_count'];
                             params.searchedTerms[params.term].loaded = (more) ? 1 : 2; // 1 means more results to be fetched, 2 means all fetched
                             params.searchedTerms[params.term].page = params.page; // 1 means more results to be fetched, 2 means all fetched
@@ -3702,10 +3717,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             var grid = window[grid_id];
             this.onCouponsUpdate(newRows);
             if (grid) {
-                console.log("grid found, adding to grid");
-                Promo.addGridRows(grid, newRows)
+                //console.log("grid found, adding to grid");
+                RulesWidget.addGridRows(grid, newRows)
             } else {
-                console.log("grid not loaded yet, adding to store");
+                //console.log("grid not loaded yet, adding to store");
                 var codes = store.get('promo.coupons'); // check of there are other codes stored and if yes, merge them
                 if (codes) {
                     codes = JSON.parse(codes);
@@ -3715,27 +3730,39 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             }
         },
         addGridRows: function (grid, rows) {
-            /** @type Backbone.Collection */
             var gridRows = grid.getRows();
-            //var lastId = 0;
-            //if(gridRows.size()) {
-            //    lastId = gridRows.at(gridRows.size() - 1).get('id') - 0;
-            //}
-            //lastId++;
-            var newRows = rows.map(function (row, idx) {
-                //row._new = true;
-                //row.id = lastId + idx;
+            var newRows = rows.filter(function (row, idx) {
                 row.id = row.code; // instead of worrying for duplicate codes, make the code the id and effectively update the duplicates instead of detecting them
                 return row;
             });
-            gridRows.add(newRows, {merge: true}).trigger('build');
+            //gridRows.add(newRows, {merge: true}).trigger('build');
+            grid.addRows(newRows);
             $(document).trigger({ // trigger event which will upgrade the grid
                 type: "grid_count_update",
-                numCodes: gridRows.size()
+                numCodes: gridRows.length
             });
         },
+        removeGridRows: function (grid, rows) {
+            if (this.options.promoOptions['coupons_removed'] == undefined) {
+                this.options.promoOptions['coupons_removed'] = [];
+            }
+
+            this.options.promoOptions['coupons_removed'] = _.pluck(rows, 'id');
+
+            $(document).trigger({ // trigger event which will upgrade the grid
+                type: "grid_count_update",
+                numCodes: grid.getRows().length
+            });
+        },
+        onModalSaveChange: function (modal) {
+            var values = this.options.promoOptions;
+            if (values['coupons_removed'] !== undefined && values['coupons_removed'].length) {
+                this.updatePromoOptions();
+            }
+            modal.close();
+        },
         onActionsUpdate: function (e) {
-            console.log(e);
+            //console.log(e);
             if (this.options.promoOptions['actions'] == undefined) {
                 this.options.promoOptions['actions'] = {};
             }
@@ -3743,7 +3770,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             this.updatePromoOptions();
         },
         onConditionsUpdate: function (e) {
-            console.log(e);
+            //console.log(e);
             if (this.options.promoOptions['conditions'] == undefined) {
                 this.options.promoOptions['conditions'] = {};
             }
@@ -3751,7 +3778,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             this.updatePromoOptions();
         },
         onCouponsUpdate: function (newRows) {
-            console.log(newRows);
+            //console.log(newRows);
             if (this.options.promoOptions['coupons'] == undefined) {
                 this.options.promoOptions['coupons'] = [];
             }
@@ -3759,24 +3786,35 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'select2',
             this.updatePromoOptions();
         },
         updatePromoOptions: function () {
-            if (this.options.promoOptionsEl) {
-                var values = this.options.promoOptions;
-                this.options.promoOptionsEl.val(JSON.stringify(values));
-            } else {
-                console.error("Cannot find serialized options element");
-            }
+            var coupons_added = [], coupons_removed = [];
+            var values = this.options.promoOptions;
+            if (!this.options.promoOptionsEl) return;
+
+            if (values['coupons']) coupons_added = values['coupons'];
+            if (values['coupons_removed']) coupons_removed = values['coupons_removed'];
+
+            this.options.promoOptionsEl.val(JSON.stringify({ coupons: coupons_added, coupons_removed: coupons_removed }));
         }
     };
+
     window.couponsGridRegister = function (grid) {
-        //console.log(grid);
-        window[grid.id] = grid;
+        window[grid.getConfig('id')] = grid;
         var newRows = store.get('promo.coupons');
         store.remove('promo.coupons');
-        //console.log(newRows);
         if (newRows) {
             newRows = JSON.parse(newRows);
-            Promo.addGridRows(grid, newRows);
+            RulesWidget.addGridRows(grid, newRows);
         }
+
+        $(grid.getDOMNode())
+            .on('removedRows.griddle', function (e, rows) {
+                // Removed rows on coupon grid
+                RulesWidget.removeGridRows(grid, rows);
+            })
+            .on('addedRows.griddle', function (e, rows) {
+                // Added rows on coupon grid
+            });
     };
-    return Promo;
+
+    return RulesWidget;
 });

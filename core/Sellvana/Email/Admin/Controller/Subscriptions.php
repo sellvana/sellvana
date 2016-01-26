@@ -49,10 +49,12 @@ class Sellvana_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controlle
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(['actions' => [
-            'new' => '<button type="button" id="add_new_email_subscription" class="btn grid-new btn-primary _modal">'
-                . $this->BLocale->_('New Email Subscription') . '</button>'
-        ]]);
+
+        /** @var FCom_Admin_View_Grid $view */
+        $view = $args['page_view'];
+        $actions = (array)$view->get('actions');
+        unset($actions['new']);
+        $view->set('actions', $actions);
     }
 
     public function action_unique__POST()

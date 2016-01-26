@@ -5,6 +5,7 @@
  *
  * @property Sellvana_MultiSite_Model_Site $Sellvana_MultiSite_Model_Site
  * @property Sellvana_MultiSite_Frontend $Sellvana_MultiSite_Frontend
+ * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
  * @property Sellvana_CatalogFields_Model_FieldOption $Sellvana_CatalogFields_Model_FieldOption
  */
@@ -12,6 +13,10 @@ class Sellvana_MultiSite_Main extends BClass
 {
     public function isFieldDataBelongsToThisSite($row)
     {
+        if ($this->BRequest->area() !== 'FCom_Frontend') {
+            return true;
+        }
+
         $siteId = $this->Sellvana_MultiSite_Frontend->getCurrentSite();
         return ($row->get('site_id') == $siteId || is_null($row->get('site_id')));
     }
@@ -67,6 +72,7 @@ class Sellvana_MultiSite_Main extends BClass
         }
         foreach ($products as $product) { // go over products
 #echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>"; var_dump($product->as_array());
+            /** @var Sellvana_Catalog_Model_Product $product */
             $pId = $product->id();
             $pData = $product->as_array();
             $siteValues = $product->get('multisite_fields');

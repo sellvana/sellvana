@@ -16,6 +16,7 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
  * @property Sellvana_Catalog_Model_SearchHistoryLog $Sellvana_Catalog_Model_SearchHistoryLog
+ * @property Sellvana_CatalogFields_Model_Field $Sellvana_CatalogFields_Model_Field
  */
 class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -354,7 +355,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                             . '<img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
                             . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
                         'sortable' => false],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'file_size'],
+                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 80, 'display' => 'file_size'],
                     ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline'],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
@@ -423,6 +424,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         return $config;
     }
 
+    /**
+     * @param Sellvana_Catalog_Model_Product $model
+     * @return array
+     */
     public function productVideosGridConfig($model)
     {
         $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/videos&file=');
@@ -433,6 +438,22 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
             ->find_many());
 
+        $fileSizeEle = '
+            rc.row["file_sieze"] ? rc.row["file_sieze"] : ""
+        ';
+
+        $isDefaultEle = '
+            "<input class=\'is-default\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+            . ' "+(rc.row["is_default"]==1 ? checked=\'checked\' : \'\')+" '
+            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos[is_default]\' '
+            . 'data-is-default=\'"+rc.row["is_default"]+"\'/>"
+        ';
+
+        $inGalleryEle = '"<input class=\'in-gallery\' value=\'1\' type=\'checkbox\' '
+            . ' "+(rc.row["in_gallery"]==1 ? checked=\'checked\' : \'\')+" '
+            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos["+rc.row["id"]+"][in_gallery]\' '
+            . 'data-in-gallery=\'"+rc.row["in_gallery"]+"\'/>"';
+
         $config =  [
             'config' => [
                 'id' => 'product_videos',
@@ -441,7 +462,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'data' => $this->_processMediaLink($data),
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                    ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'width' => 60, 'sortable' => false,
                         'buttons' => [
                             ['name' => 'edit-custom', 'callback' => 'showModalToPreviewVideo', 'cssClass' => " btn-xs btn-edit ", "icon" => " icon-eye-open ", 'title' => 'Preview'],
                             ['name' => 'delete']
@@ -451,26 +472,17 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'file_id',  'hidden' => true],
                     ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
                     ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
-                    // ['name' => 'file_name', 'label' => 'File Name'],
-                    ['type' => 'link', 'name' => 'file_name', 'label' => 'File Name', 'width' => 80,
-                        'addable' => true, 'action' => 'showModalToPreviewVideo', 'editable' => true, 'className' => 'valid-video-name'
-                    ],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'file_size'],
+                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 180],
+                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 80, 'display' => 'eval', 'print' => $fileSizeEle],
                     ['type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline', 'attributes' => ['required' => true]],
                     ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
                         'editable' => 'inline', 'validation' => ['number' => true]],
                     ['name' => 'is_default', 'label' => 'Default', 'width' => 50, 'display' => 'eval',
-                        'print' => '"<input class=\'is-default\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
-                            . ' "+(rc.row["is_default"]==1 ? checked=\'checked\' : \'\')+" '
-                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos[is_default]\' '
-                            . 'data-is-default=\'"+rc.row["is_default"]+"\'/>"'],
+                        'print' => $isDefaultEle],
                     ['name' => 'in_gallery', 'label' => 'In Gallery', 'width' => 50, 'display' => 'eval',
-                        'print' => '"<input class=\'in-gallery\' value=\'1\' type=\'checkbox\' '
-                            . ' "+(rc.row["in_gallery"]==1 ? checked=\'checked\' : \'\')+" '
-                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_videos["+rc.row["id"]+"][in_gallery]\' '
-                            . 'data-in-gallery=\'"+rc.row["in_gallery"]+"\'/>"'],
-                    ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
-                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 200]
+                        'print' => $inGalleryEle],
+                    ['name' => 'create_at', 'label' => 'Created', 'width' => 130],
+                    ['name' => 'update_at', 'label' => 'Updated', 'width' => 130]
                 ],
                 'actions' => [
                     'refresh' => true,
@@ -744,6 +756,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
         parent::formPostAfter($args);
 
+        /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         $data = $this->BRequest->post();
 
@@ -998,8 +1011,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $model->setData('name_lang_fields', $data['name_lang_fields']);
         $model->setData('short_desc_lang_fields', $data['short_desc_lang_fields']);
         $model->setData('desc_lang_fields', $data['desc_lang_fields']);
-        //$model->save();
-
     }
 
     /**
@@ -1243,7 +1254,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         
         // Process delete product prices
         if (!empty($data['prices']['delete'])) {
-            $this->_deletePrices($data['prices']['delete']);
+            $this->Sellvana_Catalog_Model_ProductPrice->delete_many(['id' => $data['prices']['delete']]);
         }
     }
 
@@ -1271,20 +1282,16 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             // Process delete variant prices
             if (!empty($variantPrices['delete'])) {
                 $deletedPrices = $this->BUtil->fromJson($variantPrices['delete']);
-                $this->_deletePrices($deletedPrices);
+                $this->Sellvana_Catalog_Model_ProductPrice->delete_many(['id' => $deletedPrices]);
             }
         }
     }
 
-    protected function _deletePrices($delPrices) {
-        foreach ($delPrices as $delPrice) {
-            $price = $this->Sellvana_Catalog_Model_ProductPrice->load($delPrice);
-            if($price){
-                $price->delete();
-            }
-        }
-    }
-
+    /**
+     * @param $model Sellvana_Catalog_Model_Product
+     * @param array $pricesData
+     * @throws BException
+     */
     protected function _savePrices($model, $pricesData) {
         foreach ($pricesData as $id => $priceData) {
             foreach ($priceData as $field => $pf) {
