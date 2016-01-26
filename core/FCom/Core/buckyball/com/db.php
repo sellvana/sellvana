@@ -1015,7 +1015,7 @@ class BORM extends ORMWrapper
             $password = static::$_config['password'];
             $driver_options = static::$_config['driver_options'];
             if (empty($driver_options[PDO::MYSQL_ATTR_INIT_COMMAND])) { //ADDED
-                $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8";
+                $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8, SESSION sql_mode = TRADITIONAL";//;SET SESSION sql_mode = 'TRADITIONAL';
             }
             if (empty($driver_options[PDO::ATTR_TIMEOUT])) {
                 $driver_options[PDO::ATTR_TIMEOUT] = 5;
