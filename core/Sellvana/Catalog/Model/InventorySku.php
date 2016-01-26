@@ -43,6 +43,10 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
             return false;
         }
 
+        if (!$this->get('inventory_sku')) {
+            return false;
+        }
+
         $this->set('qty_buffer', 0, 'IFNULL');
 
         if (null === $this->get('pack_separate')) {
