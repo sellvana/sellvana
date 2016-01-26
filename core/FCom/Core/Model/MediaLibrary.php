@@ -19,23 +19,16 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_media_library';
     protected static $_origClass = __CLASS__;
     protected static $_importExportProfile = [
-        'skip'       => ['id', 'create_at', 'update_at'],
-        'unique_key' => ['folder', 'subfolder', 'file_name']
+        'skip'        => ['id', 'create_at', 'update_at', 'file_size'],
+        'unique_key'  => ['folder', 'subfolder', 'file_name'],
+        'custom_data' => true
     ];
     public function onAfterLoad()
     {
         parent::onAfterLoad();
 
         $size = $this->file_size;
-        if ($size / (1024 * 1024) > 1) {
-            $size = round($size / (1024 * 1024), 2) . ' MB';
-        } else if ($size / 1024 > 1) {
-            $size = round($size / 1024, 2) . ' KB';
-        } else {
-            $size = $size . ' Bytes';
-        }
-        $this->file_size = $size;
-
+        $this->file_size = $this->BUtil->convertFileSize($size);
         return $this;
     }
 
@@ -51,28 +44,38 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function onAfterCreate()
+    public function onBeforeSave()
     {
-        parent::onAfterCreate();
-
+        parent::onBeforeSave();
         if (!$this->BDebug->is(BDebug::MODE_IMPORT)) {
             return $this;
         }
 
-        $link = $this->getData('downloadLink');
-        //TODO: in future need check to media type.
-        if (!$link) {
-            throw new PDOException($this->BLocale->_('Model does not have link to file'));
+        $link = $this->getData('import_download_link');
+
+        if ($link === null){
+            throw new PDOException($this->BLocale->_('Model does not have link to file for download it'));
         }
 
-        /** @var BFile $file */
-        $file = $this->BFile->load($link);
-        $file->save($this->get('file_name'), $this->FCom_Core_Main->dir($this->folder));
-        $fileInfo = $file->getFileInfo();
-        unset($file);
+        $this->file_size = 0;
 
-        $this->set('file_size', $fileInfo['file_size']);
-        $this->setData('downloadLink', false);
+        if (!empty($this->file_name)) {
+            /** @var BFile $file */
+            try {
+                $file = $this->BFile->load($link);
+                $file->save($this->file_name, $this->FCom_Core_Main->dir($this->folder));
+                $fileInfo = $file->getFileInfo();
+
+                //TODO: in future need check to media type.
+                //if (strpos($file['file_mime_type'], 'image/') === 0) {}
+
+                $this->file_size = $fileInfo['file_size'];
+
+                unset($file);
+            } catch (BException $e) {
+                //TODO: what to do, when we can't get file?
+            }
+        }
 
         return $this;
     }
