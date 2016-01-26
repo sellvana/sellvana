@@ -91,19 +91,18 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
      */
     public function prodInventoryConfig($model = null)
     {
-        $products = [];
-        $mediaUrl = $this->BConfig->get('web/media_dir') ?: 'media';
+        $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
+        $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 80]);
+        $data = [];
         if ($model) {
-            $products = $this->Sellvana_Catalog_Model_Product->orm('p')
+            $data = $this->BDb->many_as_array($this->Sellvana_Catalog_Model_Product->orm('p')
+                ->left_outer_join('Sellvana_Catalog_Model_ProductMedia', "p.id=pa.product_id and pa.media_type='" .
+                    Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG . "'", 'pa')
+                ->left_outer_join('FCom_Core_Model_MediaLibrary', 'a.id=pa.file_id', 'a')
                 ->where('p.inventory_sku', $model->get('inventory_sku'))
-                ->select(['p.id', 'p.product_name', 'p.product_sku', 'p.short_description', 'p.create_at', 'p.update_at'])
-                ->find_many();
-
-            $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages($products);
-            foreach ($products as $product) {
-                /** @var Sellvana_Catalog_Model_Product $product */
-                $product->set('thumb_path', $this->FCom_Core_Main->resizeUrl($mediaUrl . '/' . $product->getThumbPath(), ['s' => 50]));
-            }
+                ->select(['p.*', 'pa.*', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size'])
+                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
+                ->find_many());
         }
 
         $config = [
@@ -111,12 +110,15 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
                 'id' => 'product_inventory_sku',
                 'caption' => 'Product Inventory SKU',
                 'data_mode' => 'local',
-                'data' => $products,
+                'data' => $data,
                 'columns' => [
                     ['type' => 'row_select', 'width' => 55],
                     ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
-                    ['display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
-                        'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"'],
+                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                        'print' => '"<a href=\''.$downloadUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
+                            . '<img src=\''.$thumbUrl.'"+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
+                            . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
+                        'sortable' => false],
                     ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
                     ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
                     ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
