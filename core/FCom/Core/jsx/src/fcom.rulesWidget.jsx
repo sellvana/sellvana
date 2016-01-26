@@ -3739,7 +3739,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             grid.addRows(newRows);
             $(document).trigger({ // trigger event which will upgrade the grid
                 type: "grid_count_update",
-                numCodes: gridRows.length
+                numCodes: grid.getRows().length
             });
         },
         removeGridRows: function (grid, rows) {
