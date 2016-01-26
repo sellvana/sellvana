@@ -14,7 +14,7 @@
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_name_lang_' ~ m.get('id'),
                     availLangs: m.getData('name_lang_fields'),
-                    defaultLangs: UTIL.localesToSelect2Options(),
+                    defaultLangs: LOCALE.parseAllowedLocalesToOptions(),
                     modalConfig: {
                         onSaved: 'saveNameFieldLang'
                     }
@@ -38,7 +38,7 @@
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_shortdesc_lang_' ~ m.get('id'),
                     availLangs: m.getData('short_desc_lang_fields'),
-                    defaultLangs: UTIL.localesToSelect2Options(),
+                    defaultLangs: LOCALE.parseAllowedLocalesToOptions(),
                     inputType: 'textarea',
                     modalConfig: {
                         onSaved: 'saveShortDescFieldLang'
@@ -57,7 +57,7 @@
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_desc_lang_' ~ m.get('id'),
                     availLangs: m.getData('desc_lang_fields'),
-                    defaultLangs: UTIL.localesToSelect2Options(),
+                    defaultLangs: LOCALE.parseAllowedLocalesToOptions(),
                     inputType: 'wysiwyg',
                     modalConfig: {
                         onSaved: 'saveDescFieldLang'
@@ -174,18 +174,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 
     window.saveNameFieldLang = function (modal) {
         var modalNode = $(modal.getDOMNode());
-        var container = modalNode.find('div[id$="-container"]');
-        if (!$.fn.modalValidate(container)) return;
-
         _saveLangs(modalNode, $nameLangContainer);
         modal.close();
     };
 
     window.saveShortDescFieldLang = function (modal) {
         var modalNode = $(modal.getDOMNode());
-        var container = modalNode.find('div[id$="-container"]');
-        if (!$.fn.modalValidate(container)) return;
-
         _saveLangs(modalNode, $shortDescContainer, 'textarea');
         modal.close();
     };

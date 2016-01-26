@@ -162,22 +162,22 @@ require(['jquery', 'underscore', 'react', 'fcom.griddle', 'griddle.fcomModalForm
                 React.DOM.div({ className: "row f-grid-wrapper" },
                     React.DOM.div({ className: "tabbable" },
                         React.DOM.ul({ className: "nav nav-tabs prod-type f-horiz-nav-tabs" },
-                            React.DOM.li(null,
+                            React.DOM.li({ className: 'active' },
                                 React.DOM.a({ "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_form_tab', href: "#{{ fieldSetsConfig.config.id }}_form_content" }, "{{ 'Fieldset' | _ }}")
                             ),
                             React.DOM.li(null,
                                 React.DOM.a({ "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_selected_tab', href: "#{{ fieldSetsConfig.config.id }}_selected_content" }, "{{ 'Linked Fields' | _ }}")
                             ),
-                            React.DOM.li({ className: "active" },
+                            React.DOM.li(null,
                                 React.DOM.a({ "data-toggle": "tab", id: '{{ fieldSetsConfig.config.id }}_fields_tab', href: "#{{ fieldSetsConfig.config.id }}_fields_content" }, "{{ 'Add New Fields' | _ }}")
                             )
                         ),
                         React.DOM.div({ className: "tab-content" },
-                            React.DOM.div({ className: "tab-pane", id: '{{ fieldSetsConfig.config.id }}_form_content' },
+                            React.DOM.div({ className: "tab-pane active", id: '{{ fieldSetsConfig.config.id }}_form_content' },
                                 React.createElement(FComModalForm, {columnMetadata: mainGrid.props.columnMetadata, row: row, id: mainGrid.getConfig('id')})
                             ),
                             React.DOM.div({ className: "tab-pane", id: '{{ fieldSetsConfig.config.id }}_selected_content' }),
-                            React.DOM.div({ className: "tab-pane active", id: '{{ fieldSetsConfig.config.id }}_fields_content' })
+                            React.DOM.div({ className: "tab-pane", id: '{{ fieldSetsConfig.config.id }}_fields_content' })
                         )
                     )
                 )

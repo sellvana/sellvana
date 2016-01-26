@@ -250,7 +250,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         parent::formViewBefore($args);
         $adminUsers = $args['model']->get('form_notify_admin_user');
         if ($adminUsers) {
-            $adminUsers = explode(',', $adminUsers);
+            $adminUsers = !is_array($adminUsers) ? explode(',', $adminUsers) : $adminUsers;
             $args['model']->set('form_notify_admin_user', $adminUsers);
         }
     }
