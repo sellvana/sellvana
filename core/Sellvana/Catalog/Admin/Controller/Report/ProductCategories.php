@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Admin_Controller_Report_ProductCategories

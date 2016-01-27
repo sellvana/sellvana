@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * @property Sellvana_Promo_Model_PromoCoupon    $Sellvana_Promo_Model_PromoCoupon

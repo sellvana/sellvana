@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Catalog_Model_InventorySkuHistory extends FCom_Core_Model_Abstract
 {

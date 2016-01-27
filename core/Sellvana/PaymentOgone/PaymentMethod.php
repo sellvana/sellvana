@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_PaymentOgone_PaymentMethod extends Sellvana_Sales_Method_Payment_Abstract
 {

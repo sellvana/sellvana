@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_CatalogIndex_Model_DocSort extends FCom_Core_Model_Abstract
 {

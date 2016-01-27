@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class FCom_ApiTest_ApiServer_V1_Test extends FCom_ApiServer_Controller_Abstract
 {

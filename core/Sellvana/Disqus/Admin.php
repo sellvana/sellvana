@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role

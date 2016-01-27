@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 interface Sellvana_Sales_Method_Shipping_Interface
 {

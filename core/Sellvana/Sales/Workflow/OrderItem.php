@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Workflow_OrderItem extends Sellvana_Sales_Workflow_Abstract
 {

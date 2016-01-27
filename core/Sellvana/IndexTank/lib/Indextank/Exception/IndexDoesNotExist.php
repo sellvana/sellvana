@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Author:: Diego Buthay (<dbuthay@gmail.com>)

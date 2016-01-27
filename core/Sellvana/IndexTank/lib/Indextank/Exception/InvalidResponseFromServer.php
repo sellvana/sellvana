@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Author:: Gilles Devaux (<gilles.devaux@gmail.com>)

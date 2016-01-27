@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 $s = $this->state;
 ?>
 <div class="panel panel-filter">

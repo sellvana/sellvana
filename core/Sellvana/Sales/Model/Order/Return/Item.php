@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_Return_Item extends FCom_Core_Model_Abstract
 {

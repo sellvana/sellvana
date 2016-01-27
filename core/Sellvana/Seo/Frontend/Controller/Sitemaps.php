@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Seo_Frontend_Controller_Sitemaps

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class BLayoutTest extends \Codeception\TestCase\Test
 {

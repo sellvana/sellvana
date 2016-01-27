@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 trait Sellvana_Sales_Model_Trait_OrderChild
 {
