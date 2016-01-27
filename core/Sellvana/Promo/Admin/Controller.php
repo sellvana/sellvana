@@ -232,13 +232,17 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     /**
      * @return FCom_Core_View_BackboneGrid
      */
-    protected function _couponGridView()
+    protected function _couponGridView($promoId = null)
     {
         $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
-        $config = [
+        $orm         = $this->Sellvana_Promo_Model_PromoCoupon->orm('pc');
+        if(null !== $promoId){
+            $orm->where('promo_id', $promoId);
+        }
+        $config      = [
             'id' => $this->getCouponGridId(),
             'data_mode' => 'local',
-            'data' => $this->BDb->many_as_array($this->Sellvana_Promo_Model_PromoCoupon->orm('pc')->find_many()),
+            'data' => $this->BDb->many_as_array($orm->find_many()),
             /*'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,*/
             'grid_url' => null,
@@ -269,14 +273,14 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     public function action_coupons_grid()
     {
         $r = $this->BRequest;
-        //$id = $r->get('id');
+        $id = $r->get('id');
         //if(!$id){
         //    $html = $this->_("Promotion id not found");
         //    $status = 'error';
         //    $this->BResponse->status(400, $html, false);
         //} else {
             $status = "success";
-            $html = $this->_couponGridView()->render();
+            $html = $this->_couponGridView($id)->render();
         //}
         $this->BResponse->json(['status' => $status, 'html' => $html]);
     }

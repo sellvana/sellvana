@@ -3739,7 +3739,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             grid.addRows(newRows);
             $(document).trigger({ // trigger event which will upgrade the grid
                 type: "grid_count_update",
-                numCodes: gridRows.length
+                numCodes: grid.getRows().length
             });
         },
         removeGridRows: function (grid, rows) {
@@ -3790,10 +3790,12 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             var values = this.options.promoOptions;
             if (!this.options.promoOptionsEl) return;
 
-            if (values['coupons']) coupons_added = values['coupons'];
-            if (values['coupons_removed']) coupons_removed = values['coupons_removed'];
-
-            this.options.promoOptionsEl.val(JSON.stringify({ coupons: coupons_added, coupons_removed: coupons_removed }));
+            // Not really clear why saving just coupon data???
+            //if (values['coupons']) coupons_added = values['coupons'];
+            //if (values['coupons_removed']) coupons_removed = values['coupons_removed'];
+            //
+            //this.options.promoOptionsEl.val(JSON.stringify({ coupons: coupons_added, coupons_removed: coupons_removed }));
+            this.options.promoOptionsEl.val(JSON.stringify(values));
         }
     };
 
