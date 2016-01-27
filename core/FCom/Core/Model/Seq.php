@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
 {

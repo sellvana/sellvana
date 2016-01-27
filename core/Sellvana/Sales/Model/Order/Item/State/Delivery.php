@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Order_Item_State_Delivery extends Sellvana_Sales_Model_Order_State_Abstract
 {

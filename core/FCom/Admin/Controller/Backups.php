@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class FCom_Admin_Controller_Backups extends FCom_Admin_Controller_Abstract_GridForm
 {

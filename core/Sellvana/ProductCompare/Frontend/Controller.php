@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * @property Sellvana_ProductCompare_Model_Set Sellvana_ProductCompare_Model_Set
