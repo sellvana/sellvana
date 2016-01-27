@@ -162,6 +162,12 @@ class FCom_Core_Main extends BClass
             $config->set('fs/local_dir', $localDir);
         }
 
+        $devDir = $config->get('fs/dev_dir');
+        if (!$devDir) {
+            $devDir = $rootDir . '/dev';
+            $config->set('fs/dev_dir', $devDir);
+        }
+
         $storageDir = $config->get('fs/storage_dir');
         if (!$storageDir) {
             $storageDir = $rootDir . '/storage';
@@ -392,6 +398,7 @@ class FCom_Core_Main extends BClass
             $manifestsLoaded = false;
             $modReg->deleteManifestCache();
         }
+        $loadCoreDev = $this->BConfig->get('core/dev/load');
         if (!$manifestsLoaded) {
             // if (defined('BUCKYBALL_ROOT_DIR')) {
                 // $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
@@ -401,6 +408,9 @@ class FCom_Core_Main extends BClass
             $this->_modulesDirs[] = $dirConf['local_dir'] . '/*/*'; // Local modules
             $this->_modulesDirs[] = $dirConf['dlc_dir'] . '/*/*'; // Downloaded modules
             $this->_modulesDirs[] = $dirConf['core_dir'] . '/*/*'; // Core modules
+            if ($loadCoreDev) {
+                $this->_modulesDirs[] = $dirConf['dev_dir'] . '/*/*'; // Dev modules
+            }
 
             $addModuleDirs = $config->get('core/module_dirs');
             if ($addModuleDirs && is_array($addModuleDirs)) {
@@ -439,6 +449,10 @@ class FCom_Core_Main extends BClass
         $this->BClassAutoload->addPath($dirConf['local_dir']);
         $this->BClassAutoload->addPath($dirConf['dlc_dir']);
         $this->BClassAutoload->addPath($dirConf['core_dir']);
+        if ($loadCoreDev) {
+            $this->BClassAutoload->addPath($dirConf['dev_dir']);
+        }
+
         #$this->BClassAutoload->addPath($modReg->module('FCom_Core')->root_dir . '/lib');
 
         return $this;
@@ -471,7 +485,7 @@ class FCom_Core_Main extends BClass
     {
         $dir = $this->BConfig->get('fs/config_dir');
         $hash = '';
-        foreach (['core', 'db', 'local'] as $f) {
+        foreach (['core', 'db', 'local', 'dev'] as $f) {
             $hash += filemtime($dir . '/' . $f);
         }
         return $hash;

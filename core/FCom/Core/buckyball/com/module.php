@@ -1475,13 +1475,15 @@ class BMigrate extends BClass
     }
 
     /**
-    * Run declared migration scripts to install or upgrade module DB scheme
-    *
-    * @param mixed $limitModules
-    *   - false: migrate ALL declared modules (including disabled)
-    *   - true: migrate only enabled modules in current request
-    *   - array or comma separated string: migrate only specified modules
-    */
+     * Run declared migration scripts to install or upgrade module DB scheme
+     *
+     * @param mixed $limitModules
+     *   - false: migrate ALL declared modules (including disabled)
+     *   - true: migrate only enabled modules in current request
+     *   - array or comma separated string: migrate only specified modules
+     * @param boolean $force
+     * @param string $redirectUrl
+     */
     public function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
     {
         if (!$force) {
