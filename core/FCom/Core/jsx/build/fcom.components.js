@@ -301,7 +301,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                     });
                     break;
                 case 'wysiwyg':
-                    adminForm.wysiwygInit(null, this.state.value, this.props.onChange);
+                    adminForm.wysiwygInit(null, this.state.value, this.handleWysiwygChange);
                     break;
             }
         },
@@ -316,6 +316,12 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         },
         handleSwitch: function (e, state) {
             this.setState({ value: state });
+        },
+        handleWysiwygChange: function (editor, data) {
+            if (this.props.onChange) {
+                this.props.onChange(editor, data);
+            }
+            this.setState({ value: data });
         },
         handleChange: function (e) {
             this.setState({ value: e.target.value });
@@ -337,7 +343,6 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                              name: this.props.name, 
                              className: 'form-control ' + this.props.className, 
                              defaultValue: this.state.value, 
-                             onChange: this.handleChange, 
                              ref: 'wysiwyg-' + this.props.id},  this.props.attrs)), 
                         React.createElement("label", {htmlFor: this.props.id, className: "error", style: { display: 'none'}})
                     );

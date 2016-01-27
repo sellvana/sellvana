@@ -1162,7 +1162,7 @@ define(fcomAdminDeps, function ($, Ladda) {
 
                 if (value) CKEDITOR.instances[id].setData(value);
 
-                CKEDITOR.instances[id].on('blur', function (e) {
+                CKEDITOR.instances[id].on('change', function (e) {
                     e.editor.updateElement();
                     if (typeof callback === 'function') {
                         callback(e.editor, e.editor.getData());
