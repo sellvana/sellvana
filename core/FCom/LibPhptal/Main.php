@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 require_once __DIR__ . '/lib/PHPTAL.php';
 

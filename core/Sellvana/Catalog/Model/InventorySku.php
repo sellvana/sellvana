@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
 {
@@ -28,6 +28,7 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         'qty_in_stock' => 0,
         'qty_buffer' => 0,
         'qty_cart_inc' => 1,
+        'pack_separate' => 0,
     ];
 
     protected static $_importExportProfile = [
@@ -39,6 +40,10 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) {
+            return false;
+        }
+
+        if (!$this->get('inventory_sku')) {
             return false;
         }
 

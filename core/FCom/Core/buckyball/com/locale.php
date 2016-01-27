@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Facility to handle l10n and i18n
@@ -1267,6 +1267,31 @@ class BLocale extends BClass
             }
             if ($isObject) $result->$k = $r; else $result[$k] = $r;
         }
+        return $result;
+    }
+
+    /**
+     * Parse default allowed languages to select2 options
+     *
+     * @param bool $griddle
+     * @param array $locales
+     * @return array
+     */
+    public function parseAllowedLocalesToOptions($griddle = false, $locales = [])
+    {
+        if (empty($locales)) {
+            $locales = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales');
+            if (empty($locales)) {
+                return [];
+            }
+        }
+
+        $result = [];
+
+        foreach ($locales as $locale) {
+            $griddle ? $result[$locale] = $locale : $result[] = ['id' => $locale, 'text' => $locale];
+        }
+
         return $result;
     }
 

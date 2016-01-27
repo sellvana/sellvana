@@ -3,7 +3,7 @@
 /**
  * FCom Row Component
  */
-define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComSelect2) {
+define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], function (_, React, Components, FComSelect2) {
     /*
      var React = require('react/addons');
      var _ = require('underscore');
@@ -44,6 +44,22 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                 return window[callback](event, selections);
             }
         },
+        handleRating: function (callback, newRating) {
+            var row = this.props.row;
+            if (Number(newRating) !== Number(row.rating)) {
+                row.rating = newRating;
+                $.post(this.props.getConfig('edit_url'), {
+                    oper: 'mass-edit',
+                    id: row.id,
+                    rating: newRating
+                }, function(r) {
+                    if (r.success) {
+                        $.bootstrapGrowl("Successfully Rating.", {type: 'success', align: 'center', width: 'auto'});
+                        this.props.refresh();
+                    }
+                }.bind(this));
+            }
+        },
         render: function () {
             var that = this;
             var id   = this.props.getConfig('id');
@@ -63,7 +79,10 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         if (_.findWhere(that.props.getSelectedRows(), {id: row.id})) {
                             defaultChecked = true;
                         }
-                        node = <input type="checkbox" name={id + "[checked][" + row.id + "]"} className="select-row" checked={defaultChecked} onChange={that.selectRow} />;
+                        node = <input type="checkbox" name={id + "[checked][" + row.id + "]"}
+                                      className="select-row"
+                                      checked={defaultChecked}
+                                      onChange={that.selectRow} />;
                         break;
                     case 'btn_group':
                         var actions = col.buttons.map(function(btn, index) {
@@ -74,8 +93,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                         className={"btn btn-link " + (btn.cssClass ? btn.cssClass : "")}
                                         title={btn.title ? btn.title : ""}
                                         href={btn.href + row[btn.col]}
-                                        target={btn.target ? btn.target : ""}
-                                    >
+                                        target={btn.target ? btn.target : ""}>
                                         <i className={btn.icon} />
                                         {btn.caption}
                                     </a>
@@ -118,11 +136,8 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         } else { //inline mode
 
                             var validationRules = that.validationRules(col.validation);
-                            
                             var defaultValue    = (typeof row[col.name] !== 'undefined') ? row[col.name] : "";
-
                             var isSelect2       = col.select2 || false;
-
                             var inlineProps = {
                                 id: id + '-' + col.name + '-' + row.id,
                                 name: id + '[' + row.id + '][' + col.name + ']',
@@ -159,10 +174,27 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                         }
                                     }
 
-                                    node = isSelect2 ? <FComSelect2 {...inlineProps} options={selectOptions} onChange={that.handleSelect2Change} defaultValue={[defaultValue]} multiple={col.multiple || false} placeholder={col.placeholder || "Select some options"} callback={col.callback} /> : <select key={col.name} defaultValue={defaultValue} {...inlineProps} {...validationRules} onChange={that.handleChange.bind(null, col.callback)}>{selectOptions}</select>;
+                                    node = isSelect2 ?
+                                        <FComSelect2 {...inlineProps} options={selectOptions}
+                                                                      onChange={that.handleSelect2Change}
+                                                                      defaultValue={[defaultValue]}
+                                                                      multiple={col.multiple || false}
+                                                                      placeholder={col.placeholder || "Select some options"}
+                                                                      callback={col.callback} />
+                                        : <select key={col.name} defaultValue={defaultValue}
+                                                  onChange={that.handleChange.bind(null, col.callback)}
+                                                  {...inlineProps}
+                                                  {...validationRules}>{selectOptions}</select>;
+                                    break;
+                                case 'rating':
+                                    node  = <Components.RatingWidget initialRating={row.rating}
+                                                                     onChange={that.handleRating.bind(null, col.callback)} />;
                                     break;
                                 default:
-                                    node = <input key={col.name} type="text" {...inlineProps} {...col.attrs} {...validationRules} defaultValue={defaultValue} onChange={that.handleChange.bind(null, col.callback)} />;
+                                    node = <input key={col.name} type="text"
+                                                  defaultValue={defaultValue}
+                                                  onChange={that.handleChange.bind(null, col.callback)}
+                                                {...inlineProps} {...col.attrs} {...validationRules}  />;
                                     break;
                             }
                             /*var inlineColValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";

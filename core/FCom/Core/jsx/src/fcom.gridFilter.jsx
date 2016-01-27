@@ -28,7 +28,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         getDefaultProps: function() {
             return {
                 "placeholderText": "Quick Search"
-            }
+            };
         },
         componentDidMount: function() {
             var that = this;
@@ -225,7 +225,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var filterSettings = (
                 <div className={id + ' dropdown'} style={{"display" : "inline-block"}}>
                     <a data-toggle="dropdown" className="btn dropdown-toggle showhide_columns">
-                        Filters <b className="caret"></b>
+                        Filters <b className="caret" />
                     </a>
                     <div id={id + "-list-filters-setting"}>
                         <ul className={id + " dd-list dropdown-menu filters ui-sortable"}>
@@ -330,7 +330,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         handleEnter: function(event) {
             if (event.which == 13) {
                 var filter = this.state.filter;
-                var isClear = false
+                var isClear = false;
                 filter.submit = !isClear;
                 this.setState({filter: filter});
                 this.props.setFilter(filter, isClear);
@@ -382,7 +382,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     <button className="btn dropdown-toggle filter-text-main" data-toggle="dropdown">
                         <span className="f-grid-filter-field">{filter.label}</span>:
                         <span className="f-grid-filter-value"> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
-                        <span className="caret"></span>
+                        <span className="caret" />
                     </button>
                     <ul className="dropdown-menu filter-box">
                         <li>
@@ -390,7 +390,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                 <div className="input-group-btn dropdown">
                                     <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
                                         {filter.opLabel}
-                                        <span className="caret"></span>
+                                        <span className="caret" />
                                     </button>
                                     <ul className="dropdown-menu filter-sub">
                                         {operations}
@@ -399,13 +399,13 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                 <input type="text" className="form-control" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
                                 <div className="input-group-btn">
                                     <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        <i className="icon-check-sign"></i> Update
+                                        <i className="icon-check-sign" /> Update
                                     </button>
                                 </div>
                             </div>
                         </li>
                     </ul>
-                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter} />
                 </div>
             );
         }
@@ -483,7 +483,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     <button className="btn dropdown-toggle filter-text-main" data-toggle='dropdown'>
                         <span className='f-grid-filter-field'>{filter.label}</span>:
                         <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
-                        <span className="caret"></span>
+                        <span className="caret" />
                     </button>
 
                     <ul className="dropdown-menu filter-box">
@@ -492,7 +492,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                 <div className="input-group-btn dropdown">
                                     <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
                                         {filter.opLabel}
-                                        <span className="caret"></span>
+                                        <span className="caret" />
                                     </button>
                                     <ul className="dropdown-menu filter-sub">
                                         {operations}
@@ -501,24 +501,24 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                 <div className="input-group range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
                                     <input id={'date-range-text-' + filter.field} type="text" placeholder="Select date range" className="form-control daterange" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
                                     <span id="daterange2" className="input-group-addon filter-date-range" data-input={'date-range-text-' + filter.field}>
-                                        <i className="icon-calendar"></i>
+                                        <i className="icon-calendar" />
                                     </span>
                                 </div>
                                 <div className="datepicker input-group not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
                                     <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" className="form-control" onChange={this.setStateValue} onKeyUp={this.handleEnter} />
                                     <span className="input-group-addon">
-                                        <span data-time-icon="icon-time" data-date-icon="icon-calendar" className="icon-calendar"></span>
+                                        <span data-time-icon="icon-time" data-date-icon="icon-calendar" className="icon-calendar" />
                                     </span>
                                 </div>
                                 <div className="input-group-btn">
                                     <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        <i className="icon-check-sign"></i> Update
+                                        <i className="icon-check-sign" /> Update
                                     </button>
                                 </div>
                             </div>
                         </li>
                     </ul>
-                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter} />
                 </div>
             );
         }
@@ -572,7 +572,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     <button className="btn dropdown-toggle filter-text-main" data-toggle='dropdown'>
                         <span className='f-grid-filter-field'>{filter.label}</span>:
                         <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + "\"" + filter.val + "\"" : 'All'} </span>
-                        <span className="caret"></span>
+                        <span className="caret" />
                     </button>
 
                     <ul className="dropdown-menu filter-box">
@@ -581,7 +581,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                 <div className="input-group-btn dropdown">
                                     <button className="btn btn-default dropdown-toggle filter-text-sub" data-toggle="dropdown">
                                         {filter.opLabel}
-                                        <span className="caret"></span>
+                                        <span className="caret" />
                                     </button>
                                     <ul className="dropdown-menu filter-sub">
                                         {operations}
@@ -589,7 +589,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                 </div>
                                 <div className="input-group-btn range" style={!filter.range ? {display: 'none'} : {display: 'table'}}>
                                     <input type="text" data-type="from" placeholder="From" className="form-control js-number1" style={{width: '45%'}} onChange={this.setStateRangeValue} onKeyUp={this.handleEnter} />
-                                    &nbsp;<i className="icon-resize-horizontal"></i>&nbsp;
+                                    &nbsp;<i className="icon-resize-horizontal" />&nbsp;
                                     <input type="text" data-type="to" placeholder="To" className="form-control js-number2" style={{width: '45%'}} onChange={this.setStateRangeValue} onKeyUp={this.handleEnter} />
                                 </div>
                                 <div className="input-group-btn not_range" style={filter.range ? {display: 'none'} : {display: 'table'}}>
@@ -597,13 +597,13 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                 </div>
                                 <div className="input-group-btn">
                                     <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        <i className="icon-check-sign"></i> Update
+                                        <i className="icon-check-sign" /> Update
                                     </button>
                                 </div>
                             </div>
                         </li>
                     </ul>
-                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter} />
                 </div>
             );
         }
@@ -642,15 +642,21 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var that = this;
             var filter = this.state.filter;
             var filterContainer = $('#f-grid-filter-' + filter.field);
+            var $multiselect = filterContainer.find('#multi_hidden');
 
-            filterContainer.find('#multi_hidden').select2({
+            var config = {
                 multiple: true,
                 data: this.state.filterData,
                 placeholder: 'All'
-                //closeOnSelect: true
-            });
+            };
 
-            filterContainer.find('#multi_hidden').on('change', function(e) {
+            if (this.props.filter.min_input_length) {
+                config['minimumInputLength'] = this.props.filter.min_input_length;
+            }
+
+            $multiselect.select2(config);
+
+            $multiselect.on('change', function(e) {
                 filter.val = e.val.join(',');
                 var valName = [];
                 _.forEach(e.val, function(value) {
@@ -671,7 +677,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                     <button className='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
                         <span className='f-grid-filter-field'> {filter.label}: </span>
                         <span className='f-grid-filter-value'> {filter.submit ? filter.opLabel + " " + filter.valName : 'All'} </span>
-                        <span className="caret"></span>
+                        <span className="caret" />
                     </button>
                     <ul className="dropdown-menu filter-box">
                         <li>
@@ -679,13 +685,13 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
                                 <input type="hidden" id="multi_hidden" style={{width: '100%', minWidth: '120px'}} />
                                 <div className="input-group-btn">
                                     <button type="button" className="btn btn-primary update" onClick={this.submitFilter}>
-                                        <i className="icon-check-sign"></i> Update
+                                        <i className="icon-check-sign" /> Update
                                     </button>
                                 </div>
                             </div>
                         </li>
                     </ul>
-                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter}></abbr>
+                    <abbr className="select2-search-choice-close" data-clear="1" style={filter.submit ? {display: 'block'} : {display: 'none'}} onClick={this.submitFilter} />
                 </div>
             );
         }

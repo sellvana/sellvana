@@ -13,7 +13,7 @@
             add_compare: 1,
             products: THIS.get('products_data').rows,
             category: THIS.get('category'),
-            list_name: THIS.get('category') ? 'Category' : 'Search Results',
+            list_name: THIS.get('category') ? 'Category'|_ : 'Search Results'|_,
           }) | raw }}
       </div>
 

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 //require_once "PHPUnit/Extensions/Database/TestCase.php";//use autoloading or remove temporary includes/requires
 

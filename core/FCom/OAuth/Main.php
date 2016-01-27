@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 include_once __DIR__ . '/lib/OAuthSimple.php';
 

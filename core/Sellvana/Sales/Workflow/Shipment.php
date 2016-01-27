@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Workflow_Shipment extends Sellvana_Sales_Workflow_Abstract
 {

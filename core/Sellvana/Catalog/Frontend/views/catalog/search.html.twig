@@ -3,7 +3,7 @@
     {{ THIS.view('breadcrumbs') | raw }}
     <header class="f-page-header visible-xs">
       <span class="f-page-title">{{ 'Search: %s' | _(THIS.get('query')) }}</span>
-      <a href="javascript:void(null);" id="button" class="f-btn-prod-listing-filter-toggle btn btn-default">Filters</a>
+      <a href="javascript:void(null);" id="button" class="f-btn-prod-listing-filter-toggle btn btn-default">{{ 'Filters'|_ }}</a>
     </header>
     <div class="row">
       <!-- Sidebar Start -->
@@ -20,7 +20,7 @@
         {% if THIS.get('data').correct %}
           {{ 'Did you mean:'|_ }}
           {% for wrong, correct in THIS.get('data').correct %}
-            <strike>{{ wrong }}</strike> <strong>{{ correct }}</strong>
+            <span>{{ wrong }}</span> <strong>{{ correct }}</strong>
           {% endfor %}
         {% endif %}
 

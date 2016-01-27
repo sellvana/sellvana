@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Copyright 2014 Boris Gurvich
@@ -812,27 +812,6 @@ class BUtil extends BClass
         }
 
         return $out;
-    }
-
-    /**
-     * Parse default locales to select2 options
-     *
-     * @param bool $griddle
-     * @param array $locales
-     * @return array
-     */
-    public function localesToSelect2Options($griddle = false, $locales = []) {
-        if (empty($locales)) {
-            $locales = $this->BConfig->get('modules/Sellvana_MultiLanguage/allowed_locales');
-        }
-
-        $result = [];
-
-        foreach($locales as $locale) {
-            $griddle ? $result[$locale] = $locale : $result[] = ['id' => $locale, 'text' => $locale];
-        }
-
-        return $result;
     }
 
     /**

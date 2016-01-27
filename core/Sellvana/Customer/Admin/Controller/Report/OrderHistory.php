@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Customer_Admin_Controller_Report_OrderHistory
@@ -39,7 +39,7 @@ class Sellvana_Customer_Admin_Controller_Report_OrderHistory extends FCom_Admin_
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'period_type', 'type' => 'multiselect', 'callback' => 'periodTypeCallback'],
-            ['field' => 'customer_id', 'type' => 'multiselect'],
+            ['field' => 'customer_id', 'type' => 'multiselect', 'min_input_length' => 1],
         ];
 
         return $config;

@@ -13,35 +13,6 @@
         window.catalogReviewsRegister = function (grid) {
             prodReviewGrid = grid;
             prodReviewNode = $(prodReviewGrid.getDOMNode());
-            var rateTitle = ['Bad', 'Poor', 'Ok', 'Good', 'Very good'];
-            $('.rateit').rateit()
-                .bind('rated', function (e) {
-                    var id = $(this).data('review');
-                    var rate = $(this).rateit('value');
-                    var review = _(grid.getRows()).find(function (row) {
-                        if (row.id == id) return row;
-                    });
-
-                    if (review) {
-                        var hash = review;
-
-                        hash['oper'] = 'edit';
-                        hash['rating'] = rate.toString();
-
-                        $.post(grid.getConfig('edit_url'), hash, function (r) {
-                            if (r) {
-                                grid.refresh();
-
-                                $.bootstrapGrowl("{{ 'Rating successful.' | _ }}", {type: 'success', align: 'center', width: 'auto'});
-                            }
-                        });
-                    }
-                })
-                .bind('over', function (event, value) { $(this).attr('title', Locale._(rateTitle[value-1])); });
-        };
-
-        window.catalogReviewsUpdate = function (grid) {
-            $('.rateit').rateit();
         };
 
         window.approveReviews = function (grid) {

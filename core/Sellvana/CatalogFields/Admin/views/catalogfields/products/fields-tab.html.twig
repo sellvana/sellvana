@@ -208,11 +208,12 @@
                 });
             },
             createLanguageComponent: function (field) {
+                var serialized = JSON.parse(field.serialized);
                 return React.createElement(FComMultiLanguage, {
                     id: field.field_code + '_lang_field_' + field.id,
-                    availLangs: this.parseLangs(field.languages),
+                    availLangs: this.parseLangs(serialized.data_serialized),
                     inputType: field.admin_input_type,
-                    defaultLangs: {{ UTIL.toJson(UTIL.localesToSelect2Options()) | raw }},
+                    defaultLangs: {{ UTIL.toJson(LOCALE.parseAllowedLocalesToOptions()) | raw }},
                     cClass: 'col-sm-3',
                     modalConfig: {
                         fieldCode: field.field_code,
@@ -252,13 +253,6 @@
                 if (_.contains(this.props.default_lang_fields, field.admin_input_type)) {
                     React.render(this.createLanguageComponent(field), this.refs['lang_' + field.id].getDOMNode());
                     window[field.field_code + 'ModalSaveChange'] = function (modal, langs) {
-                        var modalNode = $(modal.getDOMNode());
-                        if (field.admin_input_type != 'wysiwyg') {
-                            var container = modalNode.find('div[id$="-container"]');
-                            if (!$.fn.modalValidate(container))
-                                return;
-                        }
-
                         var code = modal.props.fieldCode;
                         that.props.refreshLangs(code, langs);
                         modal.close();

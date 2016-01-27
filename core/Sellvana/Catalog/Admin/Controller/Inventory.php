@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Admin_Controller_Inventory
@@ -92,12 +92,12 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
     public function prodInventoryConfig($model = null)
     {
         $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
-        $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
+        $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 80]);
         $data = [];
         if ($model) {
             $data = $this->BDb->many_as_array($this->Sellvana_Catalog_Model_Product->orm('p')
                 ->left_outer_join('Sellvana_Catalog_Model_ProductMedia', "p.id=pa.product_id and pa.media_type='" .
-                      Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG . "'", 'pa')
+                    Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG . "'", 'pa')
                 ->left_outer_join('FCom_Core_Model_MediaLibrary', 'a.id=pa.file_id', 'a')
                 ->where('p.inventory_sku', $model->get('inventory_sku'))
                 ->select(['p.*', 'pa.*', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size'])

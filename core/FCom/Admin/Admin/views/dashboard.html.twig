@@ -157,7 +157,7 @@
 </div>
 
 <script>
-require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], function($) {
+require(['jquery', 'underscore', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], function($, _) {
 
     FCom.Admin.Dashboard = function () {
 
@@ -170,6 +170,10 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
         //var widgetTemplate = _.template($('#dashboard-widget-template').html());
         var select = $('#add-widget-selection');
         var addWidgetModal = $('#add-widget-modal');
+        var widgetOpts = {};
+        _({{ UTIL.toJson(widgets) | raw }}).each(function (w) {
+            widgetOpts[w.key] = w.title;
+        });
 
         function init() {
             checkAddWigetAvailableStatus();
@@ -331,30 +335,6 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                         $('#dashboard-widget__' + widget.key + ' .widget-contents').html(widget.html);
                     }
                 });
-                /*if (Object.keys(response.filter).length !== 0) {
-                    switch (response.filter.date) {
-                        case 'last-month':
-                            $('button[data-date="month"]').click();
-                            break;
-                        case 'last-week':
-                            $('button[data-date="week"]').click();
-                            break;
-                        case 'today':
-                            $('button[data-date="today"]').click();
-                            break;
-                        case 'all':
-                            $('button[data-date="all"]').click();
-                            break;
-                        default:
-                            $('a[data-id="' + response.filter.type + '"]').click();
-                            var range = (response.filter.range == 'range') ? $('div.range') : $('div.not_range');
-                            range.find('input.date-filter').val(response.filter.date);
-                            $('.update').click();
-                            break;
-                    }
-                } else {
-                    $('button[data-date="all"]').click();
-                }*/
             });
         }
 
@@ -402,25 +382,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                 var $el = $(this);
                 var postData = { do:'dashboard.widget.close', key:$el.parents('li').data('id') };
                 $.post(personalizeUrl, postData, function(response, status, xhr) {
-                    var option = '';
-                    switch (response.r.key) {
-                        case 'orders-list':
-                            option = "<option value='orders-list'>Recent Orders</option>";
-                            break;
-                        case 'customers-list':
-                            option = "<option value='customers-list'>Recent Customers</option>";
-                            break;
-                        case 'visitors-totals':
-                            option = "<option value='visitors-totals'>Visitors</option>";
-                            break;
-                        case 'orders-totals':
-                            $('.date-filter').val('');
-                            option = "<option value='orders-totals'>Order Totals</option>";
-                            break;
-                        default :break;
-                    }
-                    select.append(option);
-
+                    select.append('<option value="'+response.r.key+'">'+widgetOpts[response.r.key]+'</option>');
                     checkAddWigetAvailableStatus();
                 });
             });

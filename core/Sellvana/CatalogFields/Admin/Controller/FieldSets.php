@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_CatalogFields_Admin_Controller_FieldSets
@@ -169,7 +169,6 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                             'cssClass' => 'btn-custom',
                             'callback' => 'showModalToEditFields'
                         ],
-                        //['name' => 'edit'],
                         ['name' => 'delete']
                     ]],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
@@ -232,9 +231,55 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 'callbacks' => [
                     'componentDidMount' => 'fieldsGridRegister'
                 ]
-                //'new_button' => '#add_new_field'
             ]
         ];
+        return $config;
+    }
+
+    public function fieldLangsGridConfig()
+    {
+        $config = [
+            'config' => [
+                'id' => 'fields_options',
+                'caption' => $this->_('Fields'),
+                'dataUrl' => $this->BApp->href('catalogfields/fieldsets/field_option_grid_data?field_id='),
+                'data_url' => $this->BApp->href('catalogfields/fieldsets/field_grid_data'),
+                'edit_url' => $this->BApp->href('catalogfields/fieldsets/field_grid_data'),
+                'data' => [],
+                'data_mode' => 'local',
+                'columns' => [
+                    ['type' => 'row_select'],
+                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
+                    ['name' => 'lang_code', 'label' => $this->_('Language'), 'width' => 200, 'editor' => 'select',
+                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'sortable' => false,
+                        'options' => $this->BLocale->parseAllowedLocalesToOptions(true),
+                        'select2' => true, 'placeholder' => $this->_('Select language')],
+                    ['name' => 'value', 'type' => 'input', 'label' => $this->_('Value'),
+                        'width' => 300, 'editable' => 'inline', 'sortable' => false],
+                    ['type' => 'btn_group',
+                        'buttons' => [['name' => 'delete', 'noconfirm' => true]]
+                    ]
+                ],
+                'filters' => [
+                    '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
+                ],
+                'actions' => [
+                    //'new' => ['caption' => 'Insert New Option'],
+                    'add-options' => [
+                        'caption' => $this->_('Insert Language'),
+                        'type' => 'button',
+                        'id' => 'add_new_lang',
+                        'class' => 'btn-primary',
+                        'callback' => 'insertNewLang',
+                    ],
+                    'delete' => ['caption' => $this->_('Remove'), 'confirm' => false]
+                ],
+                'callbacks' => [
+                    'componentDidMount' => 'langsModalGridRegister'
+                ]
+            ]
+        ];
+
         return $config;
     }
 
@@ -255,7 +300,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                     ['name' => 'label', 'type' => 'input', 'label' => 'Label', 'editable' => 'inline',
                         'sortable' => false, 'validation' => ['required' => true]],
                     ['name' => 'langs', 'label' => 'Multi Languages', 'width' => 400, 'editor' => 'select',
-                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'sortable' => false, 'options' => $this->BUtil->localesToSelect2Options(true), 'select2' => true, 'multiple' => true, 'placeholder' => 'Select some languages', 'callback' => 'addLangField'],
+                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'sortable' => false, 'options' => $this->BLocale->parseAllowedLocalesToOptions(true), 'select2' => true, 'multiple' => true, 'placeholder' => 'Select some languages', 'callback' => 'addLangField'],
                     ['name' => 'lang_vals', 'type' => 'input', 'label' => 'Language Value', 'width' => 300, 'editable' => 'inline',
                         'sortable' => false],
                     ['type' => 'btn_group',
@@ -278,9 +323,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 ],
                 'callbacks' => [
                     'componentDidMount' => 'optionsModalGridRegister'
-                ],
-                'grid_before_create' => 'optionsGridRegister',
-                //'after_modalForm_render' => 'optionsGridRendered'
+                ]
             ]
         ];
 
@@ -461,8 +504,8 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
                 foreach ($data['rows'] as $row) {
                     if (!in_array($row['id'], $rowDeleteIds)) { //make sure this row is not in rows will be deleted
                         if (!empty($models[$row['id']])) { //update option
-                            if (!empty($row['data_serialized'])) {
-                                foreach($row['data_serialized'] as $lang) {
+                            if (!empty($row['languages'])) {
+                                foreach($row['languages'] as $lang) {
                                     $models[$row['id']]->setData(sprintf('frontend_label_translation/%s', $lang['lang_code']), $lang['value']);
                                 }
                             }

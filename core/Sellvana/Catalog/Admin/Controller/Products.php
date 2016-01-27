@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Admin_Controller_Products
@@ -1011,23 +1011,6 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $model->setData('name_lang_fields', $data['name_lang_fields']);
         $model->setData('short_desc_lang_fields', $data['short_desc_lang_fields']);
         $model->setData('desc_lang_fields', $data['desc_lang_fields']);
-
-        // Process saving language for custom fields
-        if (!empty($model->custom_fields)) {
-            foreach($model->custom_fields as $cField) {
-                $fields = $cField['fields'];
-                foreach($fields as $field) {
-                    if (!$langFields = $this->BUtil->arrayGet($field, 'lang_fields')) {
-                        continue;
-                    }
-
-                    $fieldModel = $this->Sellvana_CatalogFields_Model_Field->load($field['id']);
-                    if ($fieldModel && !in_array($field['admin_input_type'], ['select', 'multiselect'])) {
-                        $fieldModel->setData('frontend_label_translation', $langFields)->save();
-                    }
-                }
-            }
-        }
     }
 
     /**

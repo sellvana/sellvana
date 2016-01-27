@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Order
@@ -312,6 +312,10 @@ class Sellvana_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $cart = $this->_cart;
         foreach ($cart->items() as $item) {
+            if ($item->get('qty') == 0) {
+                continue;
+            }
+
             $product = $item->getProduct();
             if (!$product) {
                 throw new BException('Can not order product that does not exist');

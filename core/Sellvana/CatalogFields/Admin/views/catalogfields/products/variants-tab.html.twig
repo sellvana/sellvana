@@ -361,7 +361,7 @@
 
                     $(this.listId).on('click', this.btnRemoveFieldClass, function() {
                         //todo: use modal to display more details message
-                        if (confirm('Deleting this field will remove all associated variants of this product. Are you sure you want to delete?')) {
+                        if (confirm("{{ 'Deleting this field will remove all associated variants of this product. Are you sure you want to delete?'|_ }}")) {
                             var fieldCode = $(this).attr('data-code');
 
                             //re-display in select
@@ -492,7 +492,7 @@
                             var val = $(this).val();
                             var field = _.findWhere(variantFields.customFields, { field_code: name });
                             if (val != '' && field && !_.contains(field.options, val)) {
-                                var confirm = window.confirm("A new field value will be created. Are you sure?");
+                                var confirm = window.confirm("{{ 'A new field value will be created. Are you sure?'|_ }}");
                                 if (confirm) {
                                     field.options[val] = val;
                                     variantGrid.forceUpdate();
@@ -732,7 +732,7 @@
         }
 
         //add custom validate to jquery validator
-        $.validator.addMethod('variantUnique', variantUnique , 'Same variant is already taken place.');
+        $.validator.addMethod('variantUnique', variantUnique , "{{ 'Same variant is already taken place.'|_ }}");
         $.validator.addClassRules("variantUnique", {
             variantUnique: true
         });
