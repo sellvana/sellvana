@@ -13,22 +13,22 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
     const OPTION_VERBOSE = 'v';
     const OPTION_QUIET   = 'q';
 
-    const OPTION_FIELD_DB_HOST           = 'db_host';
-    const OPTION_FIELD_DB_PORT           = 'db_port';
-    const OPTION_FIELD_DB_NAME           = 'db_name';
-    const OPTION_FIELD_DB_USER           = 'db_user';
-    const OPTION_FIELD_DB_PASSWORD       = 'db_password';
-    const OPTION_FIELD_DB_PREFIX         = 'db_prefix';
+    const OPTION_FIELD_DB_HOST           = 'db-host';
+    const OPTION_FIELD_DB_PORT           = 'db-port';
+    const OPTION_FIELD_DB_NAME           = 'db-name';
+    const OPTION_FIELD_DB_USER           = 'db-user';
+    const OPTION_FIELD_DB_PASSWORD       = 'db-password';
+    const OPTION_FIELD_DB_PREFIX         = 'db-prefix';
 
-    const OPTION_FIELD_ADMIN_USERNAME    = 'admin_username';
-    const OPTION_FIELD_ADMIN_PASSWORD    = 'admin_password';
-    const OPTION_FIELD_ADMIN_EMAIL       = 'admin_email';
-    const OPTION_FIELD_ADMIN_FIRSTNAME   = 'admin_firstname';
-    const OPTION_FIELD_ADMIN_LASTNAME    = 'admin_lastname';
+    const OPTION_FIELD_ADMIN_USERNAME    = 'admin-username';
+    const OPTION_FIELD_ADMIN_PASSWORD    = 'admin-password';
+    const OPTION_FIELD_ADMIN_EMAIL       = 'admin-email';
+    const OPTION_FIELD_ADMIN_FIRSTNAME   = 'admin-firstname';
+    const OPTION_FIELD_ADMIN_LASTNAME    = 'admin-lastname';
 
-    const OPTION_FIELD_RUN_MODE_ADMIN    = 'run_mode_admin';
-    const OPTION_FIELD_RUN_MODE_FRONTEND = 'run_mode_frontend';
-    const OPTION_FIELD_RUN_LEVEL_BUNDLE  = 'run_level_bundle';
+    const OPTION_FIELD_RUN_MODE_ADMIN    = 'run-mode-admin';
+    const OPTION_FIELD_RUN_MODE_FRONTEND = 'run-mode-frontend';
+    const OPTION_FIELD_RUN_LEVEL_BUNDLE  = 'run-level-bundle';
 
     static protected $_actionName = 'install';
 
@@ -36,22 +36,22 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
         'v'  => 'verbose',
         'q'  => 'quiet',
 
-        'db_host?',
-        'db_port?',
-        'db_name?',
-        'db_user?',
-        'db_password?',
-        'db_prefix?',
+        'db-host?',
+        'db-port?',
+        'db-name?',
+        'db-user?',
+        'db-password?',
+        'db-prefix?',
 
-        'admin_username?',
-        'admin_password?',
-        'admin_email?',
-        'admin_firstname?',
-        'admin_lastname?',
+        'admin-username?',
+        'admin-password?',
+        'admin-email?',
+        'admin-firstname?',
+        'admin-lastname?',
 
-        'run_mode_admin?',
-        'run_mode_frontend?',
-        'run_level_bundle?',
+        'run-mode-admin?',
+        'run-mode-frontend?',
+        'run-level-bundle?',
     ];
 
     /**
@@ -59,7 +59,7 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
      *
      * @var array
      */
-    protected $_quiet_required = [
+    protected $_quietRequired = [
         self::OPTION_FIELD_DB_HOST,
         //self::OPTION_FIELD_DB_PORT,
         self::OPTION_FIELD_DB_NAME,
@@ -78,16 +78,16 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
         //self::OPTION_FIELD_RUN_LEVEL_BUNDLE,
     ];
 
-    protected $_default_values = [
-        self::OPTION_FIELD_DB_HOST           => '127.0.0.1',
+    protected $_defaultValues = [
+        self::OPTION_FIELD_DB_HOST           => null,//'127.0.0.1',
         self::OPTION_FIELD_DB_PORT           => 3306,
-        self::OPTION_FIELD_DB_NAME           => 'sellvana',
-        self::OPTION_FIELD_DB_USER           => 'root',
-        self::OPTION_FIELD_DB_PASSWORD       => '',
+        self::OPTION_FIELD_DB_NAME           => null,//'sellvana',
+        self::OPTION_FIELD_DB_USER           => null,//'root',
+        self::OPTION_FIELD_DB_PASSWORD       => null,//'',
         self::OPTION_FIELD_DB_PREFIX         => '',
 
-        self::OPTION_FIELD_ADMIN_USERNAME    => 'admin',
-        self::OPTION_FIELD_ADMIN_PASSWORD    => '',
+        self::OPTION_FIELD_ADMIN_USERNAME    => null,//'admin',
+        self::OPTION_FIELD_ADMIN_PASSWORD    => null,//'',
         self::OPTION_FIELD_ADMIN_EMAIL       => '',
         self::OPTION_FIELD_ADMIN_FIRSTNAME   => 'admin',
         self::OPTION_FIELD_ADMIN_LASTNAME    => 'admin',
@@ -97,7 +97,7 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
         self::OPTION_FIELD_RUN_LEVEL_BUNDLE  => 'all',
     ];
 
-    protected $_option_map = [
+    protected $_optionMap = [
         self::OPTION_FIELD_DB_HOST           => ['db', 'host'],
         self::OPTION_FIELD_DB_PORT           => ['db', 'port'],
         self::OPTION_FIELD_DB_NAME           => ['db', 'dbname'],
@@ -128,6 +128,20 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
         self::OPTION_FIELD_ADMIN_EMAIL       => ['@required', '@email'],
         self::OPTION_FIELD_ADMIN_FIRSTNAME   => '@required',
         self::OPTION_FIELD_ADMIN_LASTNAME    => '@required',
+
+
+        self::OPTION_FIELD_DB_HOST           => [
+            [
+                '@required', //rule
+                'custom error message', //message
+                ['arg1'=>'val1']
+            ],
+            [
+                '/^[A-Za-z0-9.\[\]:-]+$/', //rule
+                'custom error message', //message
+                ['arg1'=>'val1']
+            ]
+        ],
     ];
 
     /**
@@ -137,7 +151,7 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
      */
     public function getShortHelp()
     {
-        return '';
+        return 'Run installation wizard';
     }
 
     /**
@@ -149,6 +163,41 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
     {
         return <<<EOT
 
+Run installation wizard.
+
+Syntax: {white*}{$this->getParam(self::PARAM_SELF)} {$this->getActionName()} {green*}[command]{/} {red*}[parameters]{/}
+
+Commands:
+
+    {green*}help{/}     This help
+
+Options:
+
+  Informative output:
+    {green*}-v, --verbose{/}     Verbose output of the process
+    {green*}-q, --quiet{/}       Disable all output of the process
+
+  Database configuration:
+    {green*}    --db-host{/}             Database hostname ({red}required{/})
+    {green*}    --db-port{/}             Database hostname port ({purple}default: 3306{/})
+    {green*}    --db-name{/}             Database name ({red}required{/})
+    {green*}    --db-user{/}             Database username ({red}required{/})
+    {green*}    --db-password{/}         Database user password
+    {green*}    --db-prefix{/}           Database table prefix
+
+  Admin configuration:
+    {green*}    --admin-username{/}      Admin username ({red}required{/})
+    {green*}    --admin-password{/}      Admin password ({red}required{/})
+    {green*}    --admin-email{/}         Admin email ({red}required{/})
+    {green*}    --admin-firstname{/}     Admin firstname ({purple}default: admin{/})
+    {green*}    --admin-lastname{/}      Admin lastname {purple}default: admin{/}
+
+  Initial configuration:
+    {green*}    --run-mode-admin{/}      Run Mode for Admin ({purple}default: DEBUG{/})
+    {green*}    --run-mode-frontend{/}   Run Mode for Frontend ({purple}default: DEBUG{/})
+    {green*}    --run-level-bundle{/}    Run Levels Bundle({purple}default: all{/})
+
+
 EOT;
     }
 
@@ -157,97 +206,122 @@ EOT;
      */
     protected function _run()
     {
-        $options = $this->getOptionFields();
+        $cmd = $this->getParam(self::PARAM_COMMAND);
+        if ($cmd && $cmd == 'help') {
+            $this->_helpCmd();
+            exit;
+        }
+        $options = $this->_getOptionFields();
 
         if ($this->getOption(self::OPTION_QUIET)) {
             $this->FCom_Shell_Shell->setOutMode(FCom_Shell_Shell::OUT_MODE_QUIET);
             $error = false;
-            foreach ($this->_quiet_required as $item) {
+            foreach ($this->_quietRequired as $item) {
                 if (!is_string($this->getOption($item))) {
                     $error[$item] = true;
                 }
             }
             if ($error) {
-                exit();
+                exit;
             }
         }
 
-        $options = array_merge($this->_default_values, $options);
+        //TODO: make GUI ask logic
+
+        $options = array_merge($this->_defaultValues, $options);
 
         $validator = $this->BValidate;
         if (!$validator->validateInput($options, $this->_getValidateRules())) {
-            var_dump($validator->validateErrors());
-            exit();
+            foreach ($validator->validateErrors() as $validateError) {
+                foreach ((array)$validateError as $error) {
+                    $this->println('{red*}ERROR:{/} ' . $error);
+                }
+            }
+            exit;
         } else {
             //logic
 
-            //Transform options to config data;
-            $configData = [];
-            foreach ($this->_option_map as $field => $configMap) {
-                $configData[$configMap[0]][$configMap[1]] = $options[$field];
-            }
-
-            //DB Config;
-            $this->BConfig->add(['db' => $configData['db']], true);
             try {
+                //Transform options to config data;
+                $config = $this->BConfig;
+                $configData = [];
+                foreach ($this->_optionMap as $field => $configMap) {
+                    $configData[$configMap[0]][$configMap[1]] = $options[$field];
+                }
+
+                //DB Config;
+                $config->add(['db' => $configData['db']], true);
                 $this->BDb->connect(null, true);
-            } catch (PDOException $e) {
-                var_dump($e->getMessage());
-                exit();
-            }
+                $config->writeConfigFiles();
 
-            //Create admin
-            $this->BMigrate->migrateModules('FCom_Admin', true);
-            exit();
-            try {
-                $this->FCom_Admin_Model_User
+                //Create admin
+                $migrate = $this->BMigrate;
+                $migrate->migrateModules('FCom_Admin', true);
+
+                $adminUser = $this->FCom_Admin_Model_User;
+                $adminUser = $adminUser
                     ->create($configData['admin'])
                     ->set('is_superadmin', 1)
                     ->save()
-                    ->login();
-            } catch (Exception $e) {
-                var_dump($e->getMessage());
-                exit();
-            }
+                ;
+                $adminUser->login();
 
-            //Prepare another config before run migrate
-            $runLevels = [];
-            if (!empty($configData['config']['run_levels_bundle'])) {
-                switch ($configData['config']['run_levels_bundle']) {
-                    case 'min':
-                        $runLevels = [
-                            'Sellvana_MarketClient' => 'REQUESTED',
-                            'Sellvana_FrontendThemeBootSimple' => 'REQUESTED',
-                        ];
-                        break;
+                //Prepare another config before run migrate
+                $runLevels = [];
+                $runConfig = $configData['config'];
+                if (!empty($runConfig['run_levels_bundle'])) {
+                    switch ($runConfig['run_levels_bundle']) {
+                        case 'min':
+                            $runLevels = [
+                                'Sellvana_MarketClient' => 'REQUESTED',
+                                'Sellvana_FrontendThemeBootSimple' => 'REQUESTED',
+                            ];
+                            break;
 
-                    case 'all':
-                        $runLevels = [
-                            'Sellvana_VirtPackCoreEcom' => 'REQUESTED',
-                        ];
-                        break;
+                        case 'all':
+                            $runLevels = [
+                                'Sellvana_VirtPackCoreEcom' => 'REQUESTED',
+                            ];
+                            break;
+                    }
                 }
-            }
-            $this->BConfig->add([
-                'install_status' => 'installed',
-                'db' => ['implicit_migration' => 1/*, 'currently_migrating' => 0*/],
-                'module_run_levels' => ['FCom_Core' => $runLevels],
-                'mode_by_ip' => [
-                    'FCom_Frontend' => !empty($configData['config']['run_mode_frontend']) ? $configData['config']['run_mode_frontend'] : 'DEBUG',
-                    'FCom_Admin' => !empty($configData['config']['run_mode_admin']) ? $configData['config']['run_mode_admin'] : 'DEBUG',
-                ],
-                'modules' => [
-                    'FCom_Frontend' => [
-                        'theme' => 'Sellvana_FrontendThemeBootSimple',
+
+                $runModeFrontend = !empty($runConfig['run_mode_frontend']) ? $runConfig['run_mode_frontend'] : 'DEBUG';
+                $runModeBackend = !empty($runConfig['run_mode_admin']) ? $runConfig['run_mode_admin'] : 'DEBUG';
+                $config->add([
+                    'install_status' => 'installed',
+                    'db' => ['implicit_migration' => 1/*, 'currently_migrating' => 0*/],
+                    'module_run_levels' => ['FCom_Core' => $runLevels],
+                    'mode_by_ip' => [
+                        'FCom_Frontend' => $runModeFrontend,
+                        'FCom_Admin' => $runModeBackend,
                     ],
-                ],
-                'cache' => [
-                    'default_backend' => $this->BCache->getFastestAvailableBackend(),
-                ],
-            ], true);
+                    'modules' => [
+                        'FCom_Frontend' => [
+                            'theme' => 'Sellvana_FrontendThemeBootSimple',
+                        ],
+                    ],
+                    'cache' => [
+                        'default_backend' => $this->BCache->getFastestAvailableBackend(),
+                    ],
+                ], true);
 
+                $config->writeConfigFiles();
 
-            $this->BEvents->fire(static::$_origClass . '::install:after', ['data' => $configData]);
+                //Start migrations
+                $this->println(PHP_EOL . '{purple*}Installation in progress.{/}');
+
+                $migrate->migrateModules(false);
+
+                $this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+                $this->println('{green*}Installation finished.   {/}');
+
+                $this->BEvents->fire(static::$_origClass . '::install:after', ['data' => $configData]);
+            } catch (Exception $e) {
+                $this->BDebug->logException($e);
+                $this->println('{red*}FATAL ERROR:{/} ' . $e->getMessage());
+                exit;
+            }
         }
     }
 
@@ -268,7 +342,11 @@ EOT;
         $rules = [];
         foreach ($validateRules as $field => $rule) {
             foreach ((array)$rule as $item) {
-                $rules[] = [$field, $item];
+                if (is_array($item)){
+
+                } else {
+                    $rules[] = [$field, $item];
+                }
             }
         }
         return $rules;
@@ -277,9 +355,9 @@ EOT;
     /**
      * @return array
      */
-    public function getOptionFields(){
+    protected function _getOptionFields(){
         $optionFields = [];
-        foreach ($this->_option_map as $key => $item) {
+        foreach ($this->_optionMap as $key => $item) {
             if (is_string($this->getOption($key))) {
                 $optionFields[$key] = $this->getOption($key);
             }

@@ -1706,7 +1706,9 @@ class BMigrate extends BClass
             $this->printLn('<p><a href="' . $url . '">Click here to continue</a></p>');
         }
         $this->printLn('</body></html>');
-        exit;
+        if (PHP_SAPI !== 'cli') {
+            exit;
+        }
     }
 
     /**

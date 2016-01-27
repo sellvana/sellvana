@@ -51,7 +51,6 @@ modules:
                         - FCom_Core_Shell_DataIo
                         - FCom_Core_Shell_Migrate
                         - FCom_Core_Shell_Module
-                        - FCom_Core_Shell_Install
                 observe:
                     - [ "FCom_Core_ImportExport::beforeImport", "FCom_Core_Shell_DataIo.onBeforeImport" ]
                     - [ "FCom_Core_ImportExport::import:beforeModel", "FCom_Core_Shell_DataIo.onBeforeModel" ]
