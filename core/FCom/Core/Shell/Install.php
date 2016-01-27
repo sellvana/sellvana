@@ -83,12 +83,12 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
         self::OPTION_FIELD_DB_PORT           => 3306,
         self::OPTION_FIELD_DB_NAME           => null,//'sellvana',
         self::OPTION_FIELD_DB_USER           => null,//'root',
-        self::OPTION_FIELD_DB_PASSWORD       => null,//'',
+        self::OPTION_FIELD_DB_PASSWORD       => '',
         self::OPTION_FIELD_DB_PREFIX         => '',
 
         self::OPTION_FIELD_ADMIN_USERNAME    => null,//'admin',
         self::OPTION_FIELD_ADMIN_PASSWORD    => null,//'',
-        self::OPTION_FIELD_ADMIN_EMAIL       => '',
+        self::OPTION_FIELD_ADMIN_EMAIL       => null,//'',
         self::OPTION_FIELD_ADMIN_FIRSTNAME   => 'admin',
         self::OPTION_FIELD_ADMIN_LASTNAME    => 'admin',
 
@@ -128,20 +128,6 @@ class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
         self::OPTION_FIELD_ADMIN_EMAIL       => ['@required', '@email'],
         self::OPTION_FIELD_ADMIN_FIRSTNAME   => '@required',
         self::OPTION_FIELD_ADMIN_LASTNAME    => '@required',
-
-
-        self::OPTION_FIELD_DB_HOST           => [
-            [
-                '@required', //rule
-                'custom error message', //message
-                ['arg1'=>'val1']
-            ],
-            [
-                '/^[A-Za-z0-9.\[\]:-]+$/', //rule
-                'custom error message', //message
-                ['arg1'=>'val1']
-            ]
-        ],
     ];
 
     /**
@@ -224,12 +210,24 @@ EOT;
             if ($error) {
                 exit;
             }
+        } else {
+            $this->println('');
+            foreach ($this->_optionMap as $option => $field) {
+                if (isset($options[$option])) {
+                    continue;
+                }
+                //TODO: in future maybe will need _askFieldsOptions();
+                //switch ($option) {
+                //    default:
+                        $options[$option] = $this->_askFieldString($option,
+                            '{yellow}Please enter a value for the field{/} {green}"--'
+                            . $option . '"{/}: ',
+                            true);
+                //}
+            }
         }
 
-        //TODO: make GUI ask logic
-
         $options = array_merge($this->_defaultValues, $options);
-
         $validator = $this->BValidate;
         if (!$validator->validateInput($options, $this->_getValidateRules())) {
             foreach ($validator->validateErrors() as $validateError) {
@@ -252,6 +250,7 @@ EOT;
                 //DB Config;
                 $config->add(['db' => $configData['db']], true);
                 $this->BDb->connect(null, true);
+
                 $config->writeConfigFiles();
 
                 //Create admin
@@ -262,8 +261,7 @@ EOT;
                 $adminUser = $adminUser
                     ->create($configData['admin'])
                     ->set('is_superadmin', 1)
-                    ->save()
-                ;
+                    ->save();
                 $adminUser->login();
 
                 //Prepare another config before run migrate
@@ -314,7 +312,12 @@ EOT;
                 //$migrate->migrateModules(false);
 
                 //$this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
-                $this->println('{green*}Installation finished.   {/}');
+                $this->println(PHP_EOL . '{green*}Installation configuration finished.{/}');
+                $this->println(
+                    '{green*}Please run {/}{red*}`' . $this->getParam(self::PARAM_SELF)
+                    . ' migrate`{/}{green*} to complete installation.{/}'
+                    . PHP_EOL
+                );
 
                 $this->BEvents->fire(static::$_origClass . '::install:after', ['data' => $configData]);
             } catch (Exception $e) {
@@ -342,7 +345,7 @@ EOT;
         $rules = [];
         foreach ($validateRules as $field => $rule) {
             foreach ((array)$rule as $item) {
-                if (is_array($item)){
+                if (is_array($item)) {
 
                 } else {
                     $rules[] = [$field, $item];
@@ -355,7 +358,8 @@ EOT;
     /**
      * @return array
      */
-    protected function _getOptionFields(){
+    protected function _getOptionFields()
+    {
         $optionFields = [];
         foreach ($this->_optionMap as $key => $item) {
             if (is_string($this->getOption($key))) {
@@ -363,5 +367,73 @@ EOT;
             }
         }
         return $optionFields;
+    }
+
+    /**
+     * Shell GUI of asking value
+     *
+     * @param string $field
+     * @param string $question
+     * @param bool $colorized
+     * @return string
+     */
+    protected function _askFieldString($field, $question, $colorized = false)
+    {
+        $answer = '';
+        $offset = 0;
+        $tryCount = 3;
+        $iteration = 0;
+        while (true) {
+            $shell = $this->FCom_Shell_Shell;
+
+            $defaultValue = null;
+            $defaultValueStr = '';
+            if (isset($this->_defaultValues[$field]) && null !== $this->_defaultValues[$field]) {
+                $defaultValue = $this->_defaultValues[$field];
+                $defaultValueStr = '[default: "' . $defaultValue . '"] ';
+            }
+            if (!$colorized) {
+                $question = '{yellow}' . $question . '{/}';
+            }
+            $this->out($question . $defaultValueStr . str_pad('', $offset));
+            if ($offset) {
+                $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_BACK, $offset));
+            }
+            $answer = $shell->stdin();
+            $offset = strlen($answer);
+
+            if (empty($answer) && null !== $defaultValue) {
+                $answer = $defaultValue;
+            } elseif (empty($answer)) {
+                $answer = null;
+            }
+
+            $error = false;
+            $errorOffset = 0;
+            $rules = $this->_getValidateRules($field);
+            if(!empty($rules)) {
+                $validator = $this->BValidate;
+                $validationData = [$field => $answer];
+                if ($validator->validateInput($validationData, $rules)) {
+                    break;
+                } else {
+                    $error = true;
+                    foreach ($validator->validateErrors() as $validateError) {
+                        foreach ((array)$validateError as $error) {
+                            $errorOffset++;
+                            $this->println('{red*}ERROR:{/} ' . $error);
+                        }
+                    }
+                }
+            }
+
+            if (($iteration == $tryCount || null !== $answer) && !$error) {
+                break;
+            }
+
+            $this->out($shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1 + $errorOffset));
+            $iteration++;
+        }
+        return $answer;
     }
 }
