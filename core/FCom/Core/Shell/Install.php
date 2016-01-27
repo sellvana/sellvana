@@ -309,11 +309,11 @@ EOT;
                 $config->writeConfigFiles();
 
                 //Start migrations
-                $this->println(PHP_EOL . '{purple*}Installation in progress.{/}');
+                //$this->println(PHP_EOL . '{purple*}Installation in progress.{/}');
 
-                $migrate->migrateModules(false);
+                //$migrate->migrateModules(false);
 
-                $this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
+                //$this->out($this->FCom_Shell_Shell->cursor(FCom_Shell_Shell::CURSOR_CMD_UP, 1));
                 $this->println('{green*}Installation finished.   {/}');
 
                 $this->BEvents->fire(static::$_origClass . '::install:after', ['data' => $configData]);
