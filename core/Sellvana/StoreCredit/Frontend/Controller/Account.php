@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_StoreCredit_Frontend_Controller_Account extends FCom_Frontend_Controller_Abstract
 {

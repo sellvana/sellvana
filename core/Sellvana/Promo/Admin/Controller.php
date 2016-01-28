@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Promo_Admin_Controller
@@ -142,7 +142,13 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 $args['model']->set("__multi_codes", $couponCodes);
 
             }
+            $couponCodesRemoved = isset($serializedData['coupons_removed'])? $serializedData['coupons_removed']: null;
+            if (isset($args['data']['coupon_type']) && $args['data']['coupon_type'] == 2 && $couponCodesRemoved) {
+                $args['model']->set("__multi_codes_removed", $couponCodesRemoved);
+
+            }
             unset($serializedData['coupons']);
+            unset($serializedData['coupons_removed']);
             $args['data']['data_serialized'] = $this->BUtil->toJson($serializedData);
         }
 
@@ -226,13 +232,17 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     /**
      * @return FCom_Core_View_BackboneGrid
      */
-    protected function _couponGridView()
+    protected function _couponGridView($promoId = null)
     {
         $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
-        $config = [
+        $orm         = $this->Sellvana_Promo_Model_PromoCoupon->orm('pc');
+        if(null !== $promoId){
+            $orm->where('promo_id', $promoId);
+        }
+        $config      = [
             'id' => $this->getCouponGridId(),
             'data_mode' => 'local',
-            'data' => $this->BDb->many_as_array($this->Sellvana_Promo_Model_PromoCoupon->orm('pc')->find_many()),
+            'data' => $this->BDb->many_as_array($orm->find_many()),
             /*'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,*/
             'grid_url' => null,
@@ -240,9 +250,9 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             'columns' => [
                 ['type' => 'row_select', 'width'=>40],
                 ['name' => 'id', 'label' => 'ID', 'hidden' => true],
-                ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 400, 'sorttype' => 'string'],
-                ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number', 'width'=>40],
                 ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
+                ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 400, 'sorttype' => 'string'],
+                ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number', 'width'=>40]
             ],
             'actions' => [
                 'delete' => true,
@@ -251,7 +261,10 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
                 ['field' => 'code', 'type' => 'text'],
                 ['field' => 'total_used', 'type' => 'number-range'],
             ],
-            'grid_after_built' => 'couponsGridRegister'
+            // 'grid_after_built' => 'couponsGridRegister',
+            'callbacks' => [
+                'componentDidMount' => 'couponsGridRegister'
+            ]
         ];
         $view = $this->view($this->_gridViewName)->set('grid',['config' => $config]);
         return $view;
@@ -260,14 +273,14 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     public function action_coupons_grid()
     {
         $r = $this->BRequest;
-        //$id = $r->get('id');
+        $id = $r->get('id');
         //if(!$id){
         //    $html = $this->_("Promotion id not found");
         //    $status = 'error';
         //    $this->BResponse->status(400, $html, false);
         //} else {
             $status = "success";
-            $html = $this->_couponGridView()->render();
+            $html = $this->_couponGridView($id)->render();
         //}
         $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
@@ -500,6 +513,11 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
      */
     protected function _processMultiCoupons($model)
     {
+        $couponRemovedIds = $model->get('__multi_codes_removed');
+        if ($couponRemovedIds) {
+            $this->Sellvana_Promo_Model_PromoCoupon->delete_many(['id' => $couponRemovedIds]);
+        }
+
         $couponData = $model->get('__multi_codes');
         if (!$couponData) {
             return null;
@@ -509,6 +527,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         foreach ($couponData as $cd) {
             $codes[] = $cd['code'];
         }
+
         try {
             $created = $this->Sellvana_Promo_Model_PromoCoupon->createCouponCodes($codes, $model->id());
             $this->message($this->_("Created %d coupon codes.", $created));

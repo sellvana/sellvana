@@ -1,11 +1,11 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Model class for table "fcom_product".
  *
  * The followings are the available columns in table 'fcom_product':
  *
-*@property string  $id
+ * @property string  $id
  * @property string  $product_sku
  * @property string  $product_name
  * @property string  $short_description
@@ -101,7 +101,14 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'indextank_indexed',
             'indextank_indexed_at',
         ],
-        'unique_key' => 'product_sku'
+        'unique_key' => 'product_sku',
+        'custom_data' => true,
+    ];
+
+    protected static $_dataFieldsMap = [
+        'product_name_lang_fields' => 'name_lang_fields',
+        'short_description_lang_fields' => 'short_desc_lang_fields',
+        'description_lang_fields' => 'desc_lang_fields',
     ];
 
     protected $_importErrors = null;
@@ -288,7 +295,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $saveAgain = true;
         }
         if ($saveAgain) {
-            $this->save();
+            $this->save(false);
         }
         $this->Sellvana_Catalog_Model_ProductPrice->parseAndSaveDefaultPrices($this);
 
@@ -486,8 +493,9 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (is_array($type)) {
             list($I, $V) = $type;
             // $orm->where_raw("pa.media_type = '$I' OR (pa.media_type = '$V' AND pa.is_default = 1)")
-            $orm->where_raw("pa.media_type = '$I' OR pa.media_type = '$V'")
-                ->order_by_desc('pa.media_type');
+            $orm->where_raw("(pa.media_type = '$I' OR pa.media_type = '$V')")
+                ->order_by_desc('pa.media_type')
+                ->order_by_asc('position');
         } else {
             $orm->where('pa.media_type', $type)
                 ->order_by_asc('position');
@@ -505,6 +513,9 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->mediaORM($type)->find_many_assoc();
     }
 
+    /**
+     * @param bool|false $isVideoIncluded
+     */
     public function gallery($isVideoIncluded = false)
     {
         $type = 'I';
@@ -512,9 +523,19 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $type = ['I', 'V'];
         }
 
-        return $this->mediaORM($type)
-                    ->where(["pa.in_gallery" => 1])
-                    ->find_many_assoc();
+        $mediaItems = $this->mediaORM($type)
+            ->where(["pa.in_gallery" => 1])
+            ->find_many_assoc();
+
+        // Remove default width and height for responsive
+        foreach ($mediaItems as $k => $media) {
+            $html = $media->getData('html');
+            if ($html) {
+                $mediaItems[$k]->setData('html', preg_replace('/(width=\\\"\d+\\\")|(height=\\\"\d+\\\")/', '', $html));
+            }
+        }
+
+        return $mediaItems;
     }
 
     /**
@@ -941,7 +962,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getProductLinks()
     {
-        $arrProduct = $this->Sellvana_Catalog_Model_Product->orm('p')->select('pl.link_type')
+        $arrProduct = $this->Sellvana_Catalog_Model_Product->orm('p')->select(['p.*', 'pl.link_type'])
             ->left_outer_join('Sellvana_Catalog_Model_ProductLink', ['p.id', '=', 'pl.linked_product_id'], 'pl')
             ->where('pl.product_id', $this->id)->find_many();
         $productLink = [
@@ -1155,11 +1176,16 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function getInventoryModel()
     {
+        $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
+        if (!$this->get('manage_inventory')) {
+            $invModel = $invHlp->create();
+            $this->set('inventory_model', $invModel);
+            return $invModel;
+        }
         $invModel = $this->get('inventory_model');
         if ($invModel !== null) {
             return $invModel;
         }
-        $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
         // get inventory SKU from inventory SKU or product SKU if not specified
         $invSku = $this->get('inventory_sku');
         if (null === $invSku || '' === $invSku) {
@@ -1169,7 +1195,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $this->set('inventory_model', $invModel);
                 return $invModel;
             }
-            $this->set('inventory_sku', $invSku);
+            $this->set('inventory_sku', $invSku)->save();
         }
         // find inventory model
         $invModel = $invHlp->load($invSku, 'inventory_sku');
@@ -1346,34 +1372,19 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $itemPrice;
     }
 
-    public function _getLanguageValue($staticField, $dataField)
-    {
-        $langValuesJson = $this->getData($dataField);
-        if ($langValuesJson) {
-            $langValues = $this->BUtil->fromJson($langValuesJson);
-            $curLocale = str_replace('_', '-', $this->BLocale->getCurrentLocale());
-            foreach ($langValues as $lv) {
-                if ($lv['lang_code'] === $curLocale) {
-                    return $lv['value'];
-                }
-            }
-        }
-        return $this->get($staticField);
-    }
-
     public function getName()
     {
-        return $this->_getLanguageValue('product_name', 'name_lang_fields');
+        return $this->get('product_name');
     }
 
     public function getDescription()
     {
-        return $this->_getLanguageValue('description', 'desc_lang_fields');
+        return $this->get('description');
     }
 
     public function getShortDescription()
     {
-        return $this->_getLanguageValue('short_description', 'short_desc_lang_fields');
+        return $this->get('short_description');
     }
 
     public function __destruct()
@@ -1414,5 +1425,10 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $this->Sellvana_Catalog_Model_ProductMedia->collectProductsImages([$this]/*, ['default']*/);
         }
         return $this->_images['default'];
+    }
+
+    public function canOrder($qty = 1)
+    {
+        return !$this->get('manage_inventory') || $this->getInventoryModel()->canOrder($qty);
     }
 }

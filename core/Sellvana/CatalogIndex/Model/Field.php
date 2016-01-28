@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_CatalogIndex_Model_Field
@@ -217,6 +217,11 @@ class Sellvana_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             $data[$p->id()] = $v;
         }
         return $data;
+    }
+
+    public function relevance($products, $field)
+    {
+        return [];
     }
 
     public function getSortMethod()

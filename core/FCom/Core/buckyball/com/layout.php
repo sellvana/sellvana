@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Copyright 2014 Boris Gurvich
@@ -380,7 +380,7 @@ class BLayout extends BClass
                 $viewParams = [
                     'template' => $file,
                     'file_ext' => $m[3],
-                    'module_name' => $curModule->name,
+                    'module_name' => $curModule ? $curModule->name : null,
                     'renderer' => static::$_extRenderers[$m[3]]['callback'],
                 ];
                 $this->addView($prefix . $m[2], $viewParams);
@@ -1896,7 +1896,7 @@ class BView extends BClass
      */
     public function clear()
     {
-        unset($this->_params);
+        $this->_params = null;
     }
 
     /**

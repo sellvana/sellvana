@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Model_Category
@@ -162,30 +162,44 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $this->is_top_menu;
     }
 
+    public function getRootCategories()
+    {
+        $rootCats = $this->orm()->where('parent_id', null)->find_many_assoc('id', 'node_name');
+        foreach ($rootCats as $id => $name) {
+            if (!$name) {
+                $rootCats[$id] = $this->BLocale->_('Default');
+            }
+        }
+        return $rootCats;
+    }
+
     /**
-     * @param int $maxLevel
+     * @param int $maxLevel 1 or 2
      * @return array
      */
     public function getTopNavCategories($maxLevel = 1)
     {
         /** @var BORM $orm */
-        $orm = $this->orm()->order_by_asc('sort_order');
-        if ($this->BConfig->get('modules/FCom_Frontend/nav_top/type') == 'categories_root') {
+        $orm = $this->orm()->order_by_asc('sort_order')->where('is_enabled', 1);
+        $navType = $this->BConfig->get('modules/FCom_Frontend/nav_top/type');
+        $whereOr = [];
+        if ($navType === 'root_only' || $navType === 'root_selected' || $navType === 'categories_root') {
             $rootId = $this->BConfig->get('modules/FCom_Frontend/nav_top/root_category');
             if (!$rootId) {
                 $rootId = 1;
             }
-            $orm->where('parent_id', $rootId);
-        } else {
-            $orm->where('top_menu', 1);
+            $whereOr['parent_id'] = (int)$rootId;
+        } elseif ($navType === 'selected' || $navType === 'root_selected') {
+            $whereOr['is_top_menu'] = 1;
         }
+        $orm->where_complex(['OR' => $whereOr]);
         $categories = $orm->find_many_assoc();
         if ($maxLevel === 2) {
             if (sizeof($categories) === 0) {
                 $subcats = [];
             } else {
                 $subcats = $this->orm()->where_in('parent_id', array_keys($categories))
-                    ->order_by_asc('parent_id')->order_by_asc('sort_order')->find_many();
+                    ->where('is_enabled', 1)->order_by_asc('parent_id')->order_by_asc('sort_order')->find_many();
             }
             $children = [];
             foreach ($subcats as $sc) {
@@ -296,20 +310,24 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
      * @param $args
      * @throws BException
      */
-    public function onImportAfterModel($args)
+    public function onImportAfterBatch($args)
     {
         $importId = $args['import_id'];
         $importSite = $this->FCom_Core_Model_ImportExport_Site->load($importId, 'site_code');
         if (!$importSite) {
             return;
         }
-        if (isset($args['models'])) {
-            $toUpdate = $args['models'];
+        $toUpdate = $this->orm();
+        if (isset($args['records']) && count($args['records'])) {
+            $ids = array_keys($args['records']);
+            $toUpdate->where_in('id', $ids);
         } else {
-            $toUpdate = $this->orm()
-                  ->where(['OR' => ['parent_id IS NULL', 'id_path IS NULL']])
-                  ->find_many_assoc();
+            $toUpdate->where(['OR' => ['parent_id IS NULL', 'id_path IS NULL']]);
+
         }
+
+        $toUpdate = $toUpdate->find_many_assoc();
+
         if (empty($toUpdate)) {
             return;
         }
@@ -374,8 +392,7 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
         foreach ($toUpdate as $model) {
             /** @var Sellvana_Catalog_Model_Category $model */
-            $model->generateIdPath()->save();
+            $model->generateIdPath()->recalculateNumDescendants()->save();
         }
-
     }
 }

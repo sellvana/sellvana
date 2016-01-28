@@ -28,6 +28,7 @@
                 </tr>
               </thead>
                 {% for order in orders  %}
+                    {% set orderCurrency = order.get('store_currency_code') %}
                     <tr>
                         <td>
                             <a href="{{ APP.href('orders/view') }}?id={{ order.get('unique_id') }}">
@@ -37,8 +38,8 @@
                         <td>{{ order.state().overall().getValueLabel()|_ }} </td>
                         <td>{{ order.getShippingMethod().getName()|_ }} ({{ order.state().delivery().getValueLabel()|_ }})</td>
                         <td>{{ order.getPaymentMethod().getName()|_ }} ({{ order.state().payment().getValueLabel()|_ }})</td>
-                        <td class="text-right">{{ order.get('grand_total') | currency }} </td>
-                        <td class="text-right">{{ order.get('amount_due') | currency  }} </td>
+                        <td class="text-right">{{ order.get('grand_total') | currency(orderCurrency) }} </td>
+                        <td class="text-right">{{ order.get('amount_due') | currency(orderCurrency)  }} </td>
                     </tr>
                 {% endfor %}
             </table>

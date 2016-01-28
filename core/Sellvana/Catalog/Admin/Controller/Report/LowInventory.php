@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Admin_Controller_Report_LowInventory
@@ -93,7 +93,7 @@ class Sellvana_Catalog_Admin_Controller_Report_LowInventory extends FCom_Admin_C
             $orm->select_expr("IFNULL(stat{$dayCount}d.qty, 0)", "qty_sold_{$dayCount}d");
         }
 
-        $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/notify_administrator_quantity');
+        $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/qty_notify_admin');
         if (!$defaultMinQty) {
             $orm->where_not_null('i.qty_notify_admin')
                 ->where_raw('i.qty_in_stock <= i.qty_notify_admin');

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_CatalogFields_Model_Field
@@ -33,9 +33,9 @@ class Sellvana_CatalogFields_Model_Field extends FCom_Core_Model_Abstract
             'product'     => 'Products',
         ],
         'table_field_type' => [
-            'options'      => 'Options',
             'varchar'      => 'Short Text',
             'text'         => 'Long Text',
+            'options'      => 'Options',
             'int'          => 'Integer',
             'tinyint'      => 'Tiny Integer',
             'decimal'      => 'Decimal',

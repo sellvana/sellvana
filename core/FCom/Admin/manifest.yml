@@ -1,7 +1,7 @@
 modules:
     FCom_Admin:
-        version: 0.5.1.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         description: Admin Panel base functionality and platform
         custom:
             status:
@@ -9,7 +9,14 @@ modules:
                 todo:
                     - AJAX Save and Save and continue
 
-        require: { module: { FCom_Core: 0.5.0.0, FCom_LibJsCommon: 0.5.0.0, FCom_LibTwig: 0.5.0.0, FCom_Frontend: 0.5.0.0, FCom_LibScssPhp: 0.5.0.0 } }
+        require:
+            module:
+                FCom_Core: 0.5.0.0
+                FCom_LibJsCommon: 0.5.0.0
+                FCom_LibTwig: 0.5.0.0
+                FCom_Frontend: 0.5.0.0
+                FCom_LibScssPhp: 0.5.0.0
+                FCom_LibJsCkeditor: 0.5.0.0
 
         translations:
             de: de.php
@@ -100,6 +107,12 @@ modules:
                         permission: upload/images
                         filetype: jpeg,jpg,tiff,gif,png,bmp
                         folder: media/images
+
+            FCom_Shell:
+                custom:
+                    actions:
+                        - FCom_Admin_Shell_User
+
         default_config:
             modules:
                 FCom_Admin:

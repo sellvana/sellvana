@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Workflow_Order
@@ -6,6 +6,7 @@
  * @property Sellvana_Sales_Model_Order $Sellvana_Sales_Model_Order
  * @property Sellvana_Sales_Model_Order_Shipment $Sellvana_Sales_Model_Order_Shipment
  * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
+ * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  */
 class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
 {
@@ -140,5 +141,21 @@ class Sellvana_Sales_Workflow_Order extends Sellvana_Sales_Workflow_Abstract
         $label = $newState->getValueLabel();
         $args['order']->addHistoryEvent('custom_state', 'Admin user has changed custom order state to "' . $label . '"');
         $args['order']->save();
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order[] $args
+     */
+    public function action_adminMarksOrderAsPaid($args)
+    {
+        $args['order']->markAsPaid();
+    }
+
+    /**
+     * @param Sellvana_Sales_Model_Order[] $args
+     */
+    public function action_adminMarksOrderAsShipped($args)
+    {
+        $args['order']->shipAllShipments();
     }
 }

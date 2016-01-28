@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Customer_Admin_Controller_Addresses
@@ -100,7 +100,14 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
             ]
         ];
         $config['actions'] = [
-            'new'    => ['caption' => 'Add New Address', 'modal' => true],
+            // 'new'    => ['caption' => 'Add New Address', 'modal' => true],
+            'add-address' => [
+                'caption'  => 'Add New Address',
+                'type'     => 'button',
+                'id'       => 'add-address-from-grid',
+                'class'    => 'btn-primary',
+                'callback' => 'showModalToAddAddress'
+            ],
             'delete' => true
         ];
         $config['filters'] = [
@@ -114,31 +121,12 @@ class Sellvana_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller
         $config['orm'] = $this->Sellvana_Customer_Model_Address->orm($this->_mainTableAlias)
             ->select($this->_mainTableAlias . '.*')->where('customer_id', $customer->id);
         $config['data_url'] = $config['data_url'] . '?customer_id='.$customer->id;
-        $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress'];
-        $config['grid_before_create'] = 'customer_address_grid';
-        return ['config' => $config];
-    }
-
-    public function getCustomerAddressesGridConfigForGriddle($customer) {
-        $config = $this->getCustomerAddressesGridConfig($customer);
-
-        unset($config['config']['actions']['new']);
-        $config['config']['actions']['add-address'] = [
-            'caption'  => 'Add New Address',
-            'type'     => 'button',
-            'id'       => 'add-address-from-grid',
-            'class'    => 'btn-primary',
-            'callback' => 'showModalToAddAddress'
-        ];
-
-        unset($config['config']['callbacks']);
-        $config['config']['callbacks'] = [
+        // $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress'];
+        // $config['grid_before_create'] = 'customer_address_grid';
+        $config['callbacks'] = [
             'componentDidMount' => 'addressGridRegister'
         ];
-
-        unset($config['config']['grid_before_create']);
-        $config['config']['grid_before_create'] = 'addressGridRegister';
-        return $config;
+        return ['config' => $config];
     }
 
     public function gridOrmConfig($orm) {

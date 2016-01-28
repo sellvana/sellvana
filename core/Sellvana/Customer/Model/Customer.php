@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Model class for table 'fcom_customer'
@@ -686,6 +686,13 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
+
+        $isNew = isset($data['is_new']) ? (bool)$data['is_new'] : true;
+        $emailChanged = isset($data['old_email']) ? ($data['old_email'] != $data[$args['field']]) : true;
+        if (!$isNew && !$emailChanged) {
+            return true;
+        }
+
         $orm = $this->orm('c')->where('c.email', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('c.id', $data['id']);

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_Abstract
@@ -46,7 +46,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = $this->BRequest;
         if ($r->xhr()) {
             $this->BSession->set('admin_login_orig_url', $r->referrer());
-            $this->BResponse->json(['error' => 'login']);
+            $loginForm = $this->BLayout->getView('login')->render();
+            $this->BResponse->json([
+                'error' => 'login',
+                'form' => $this->BLayout->getView('login/modal_form')->set('loginForm', $loginForm)->render()
+            ]);
         } else {
             $this->BSession->set('admin_login_orig_url', $r->currentUrl());
             $this->layout('/login');
@@ -308,37 +312,51 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         switch ($args['oper']) {
         case 'add':
             //fix Undefined variable: set
-            $set = $args['model'] = $hlp->create($data)->save();
-            $result = $set->as_array();
+            $model = $args['model'] = $hlp->create($data)->save();
+            $result = $model->as_array();
             break;
 
         case 'edit':
-            //fix Undefined variable: set
-            $set = $args['model'] = $hlp->load($id)->set($data)->save();
-            $result = $set->as_array();
+            $model = $hlp->load($id);
+            if ($model) {
+                $args['model'] = $model->set($data)->save();
+                $result = $model->as_array();
+            } else {
+                $result = ['error' => true];
+            }
             break;
 
         case 'del':
-            $args['model'] = $hlp->load($id)->delete();
-            $result = ['success' => true];
+            $model = $hlp->load($id);
+            if ($model) {
+                $args['model'] = $model->delete();
+                $result = ['success' => true];
+            } else {
+                $result = ['error' => true];
+            }
             break;
 
         case 'mass-delete':
-            $args['ids'] = explode(",", $id);
+            $args['ids'] = $this->BUtil->arrayCleanInt(explode(",", $id));
             foreach ($args['ids'] as $id) {
-                $hlp->load($id)->delete();
+                $model = $hlp->load($id);
+                if ($model) {
+                    $model->delete();
+                }
             }
             $result = ['success' => true];
             break;
 
         case 'mass-edit':
-            $args['ids'] = explode(',', $id);
+            $args['ids'] = $this->BUtil->arrayCleanInt(explode(",", $id));
             foreach ($args['ids'] as $id) {
-                if (isset($data['_new'])) {
-                    unset($data['_new']);
+                $model = $hlp->load($id);
+                unset($data['_new']);
+                //if (isset($data['_new'])) {
+                if (!$model) {
                     $args['models'][] = $hlp->create($data)->save();
                 } else {
-                    $args['models'][] = $hlp->load($id)->set($data)->save();
+                    $args['models'][] = $model->set($data)->save();
                 }
             }
             $result = ['success' => true];

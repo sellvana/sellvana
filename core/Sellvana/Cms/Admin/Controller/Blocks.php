@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Cms_Admin_Controller_Blocks
@@ -107,7 +107,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         $config['callbacks'] = [
             'componentDidMount' => 'formFieldGridRegister'
         ];
-        $config['grid_before_create'] = 'formFieldGridRegister';
+//        $config['grid_before_create'] = 'formFieldGridRegister';
         //$config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');
         //$config['edit_url_required'] = true;
 
@@ -150,7 +150,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         $config['callbacks']          = [
             'componentDidMount' => 'formDataGridRegister'
         ];
-        $config['grid_before_create'] = 'formDataGridRegister';
+//        $config['grid_before_create'] = 'formDataGridRegister';
         //$config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');
         //$config['edit_url_required'] = true;
 
@@ -250,7 +250,7 @@ class Sellvana_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstrac
         parent::formViewBefore($args);
         $adminUsers = $args['model']->get('form_notify_admin_user');
         if ($adminUsers) {
-            $adminUsers = explode(',', $adminUsers);
+            $adminUsers = !is_array($adminUsers) ? explode(',', $adminUsers) : $adminUsers;
             $args['model']->set('form_notify_admin_user', $adminUsers);
         }
     }

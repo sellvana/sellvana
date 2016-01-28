@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_MultiCurrency_RateProvider_OpenExchangeRates extends Sellvana_MultiCurrency_RateProvider_Abstract
     implements Sellvana_MultiCurrency_RateProvider_Interface

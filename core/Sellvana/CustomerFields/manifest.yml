@@ -1,7 +1,7 @@
 modules:
     Sellvana_CustomerFields:
-        version: 0.5.2.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { Sellvana_Customer: 0.5.0.0 } }
         auto_use: [ bootstrap, views ]
         observe:

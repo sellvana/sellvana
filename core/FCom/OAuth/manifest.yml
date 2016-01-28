@@ -1,7 +1,7 @@
 modules:
     FCom_OAuth:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
 
         areas:
             FCom_Admin:

@@ -1,0 +1,11 @@
+<!--{ label: {{ 'Products SKU'|_ }} }-->
+<!--{ position: 12 }-->
+
+{% set m = THIS.get('model') %}
+{% set hlp = APP.instance('Sellvana_Catalog_Admin_Controller_Inventory') %}
+{% set gridConfig = hlp.prodInventoryConfig(m) %}
+<div class="row">
+    <div class="col-sm-10">
+        {{ THIS.view('core/griddle').set('grid', gridConfig) | raw }}
+    </div>
+</div>

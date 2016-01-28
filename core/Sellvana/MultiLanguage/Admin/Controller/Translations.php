@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Controller_Abstract_GridForm
 {

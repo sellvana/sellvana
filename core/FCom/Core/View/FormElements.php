@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Core_View_FormElements
@@ -16,6 +16,19 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
             return $p1;
         }
         return array_merge_recursive($p1, $p2);
+    }
+
+    /**
+     * @param array $p
+     * @return array
+     */
+    public function getOptions(array $p)
+    {
+        $options = !empty($p['options']) ? $p['options'] : [];
+        if (!empty($p['add_empty'])) {
+            $options = ['' => ''] + $options;
+        }
+        return $options;
     }
 
     /**

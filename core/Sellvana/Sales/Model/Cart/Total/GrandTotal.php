@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_Sales_Model_Cart_Total_GrandTotal extends Sellvana_Sales_Model_Cart_Total_Abstract
 {

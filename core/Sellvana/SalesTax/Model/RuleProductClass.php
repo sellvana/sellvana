@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 class Sellvana_SalesTax_Model_RuleProductClass extends FCom_Core_Model_Abstract
 {

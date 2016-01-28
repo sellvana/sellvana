@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_Modules
@@ -273,5 +273,15 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             $this->message($e->getMessage(), 'error');
         }
         $this->BResponse->redirect('modules');
+    }
+
+    public function action_reset_cache()
+    {
+        $this->BCache->deleteAll();
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+        echo "DONE";
+        die;
     }
 }

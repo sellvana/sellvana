@@ -73,9 +73,9 @@
                     React.createElement(Components.Modal, {
                                 id: "addUserModal",
                                 show: true,
-                                title: 'Add User',
-                                confirm: 'Add',
-                                cancel: 'Close',
+                                title: "{{ 'Users List'|_ }}",
+                                confirm: "{{ 'Add User'|_ }}",
+                                cancel: "{{ 'Cancel'|_ }}",
                                 onLoad: function(modal) {
                                     var node = $(modal.getDOMNode());
                                     node.find('.modal-dialog').css('width', '900px');
@@ -116,7 +116,7 @@
                 });
                 modal.close();
             } else {
-                alert('please choose at least one product');
+                alert("{{ 'please choose at least one user.'|_ }}");
             }
         };
 

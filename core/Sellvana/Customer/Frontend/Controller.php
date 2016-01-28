@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Customer_Frontend_Controller
@@ -192,8 +192,7 @@ class Sellvana_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $a = $this->BRequest->post('address');
             $customerModel = $this->Sellvana_Customer_Model_Customer;
             $formId = 'register-form';
-            $emailUniqueRules = [['email', 'Sellvana_Customer_Model_Customer::ruleEmailUnique', 'An account with this email address already exists']];
-            if ($customerModel->validate($r, $emailUniqueRules, $formId)) {
+            if ($customerModel->validate($r, [], $formId)) {
                 $customer = $customerModel->register($r);
                 if ($a) {
                     $this->Sellvana_Customer_Model_Address->import($a, $customer);

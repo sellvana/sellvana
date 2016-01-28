@@ -4,7 +4,7 @@
  * Created by pp
  * @project sellvana_core
  */
-abstract class FCom_Test_Model_TestCase extends PHPUnit_Framework_TestCase
+abstract class FCom_Test_Model_TestCase extends \Codeception\TestCase\Test
 {
     /**
      * Maximum time in milliseconds a test should run
@@ -52,10 +52,10 @@ abstract class FCom_Test_Model_TestCase extends PHPUnit_Framework_TestCase
         parent::assertPostConditions();
     }
 
-    protected function tearDown()
+    protected function _after()
     {
         $this->_timeOut = null;
-        return parent::tearDown();
+        return parent::_after();
     }
 
 }

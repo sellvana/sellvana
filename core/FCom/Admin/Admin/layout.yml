@@ -51,7 +51,7 @@ base:
             - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
             #- [ addNav, system/emails, { label: System Emails, href: /systememails  } ]
             - [ addNav, system/templates, { label: Templates, href: /templates  } ]
-            - [ addNav, system/backups, { label: Backups, href: /backups  } ]
+            #- [ addNav, system/backups, { label: Backups, href: /backups  } ]
             - [ addNav, system/importexport, { label: Import/Export, href: /importexport  } ]
             - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
             - [ addNav, system/media_library, { label: "Media Library", href: /media_library, class: media-library } ]
@@ -118,6 +118,7 @@ common_js_libs:
             - [ requireJs, griddle.fcomModalForm, @FCom_Core/jsx/build/fcom.modalForm, { deps : [ react, griddle.custom ]} ]
             - [ requireJs, griddle.fcomMediaLib, @FCom_Core/jsx/build/fcom.medialib, { deps : [ react, fcom.griddle ]} ]
             - [ requireJs, griddle.fcomSelect2, @FCom_Core/jsx/build/fcom.select2, { deps : [ react ]} ]
+            - [ requireJs, griddle.fcomLanguage, @FCom_Core/jsx/build/fcom.language, { deps : [ react ]} ]
 
 
 lib_admin_theme1:

@@ -1,5 +1,6 @@
 {% set order = THIS.get('order') %}
 {% set orderItems = order.items() %}
+{% set orderCurrency = order.get('store_currency_code') %}
 
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set mergeFieldData = { id_prefix:'merge', name_prefix:'merge' } %}
@@ -39,7 +40,7 @@
                             <td>{{ item.get('id') }}</td>
                             <td>{{ THIS.view('orders/item').set('item', item) | raw }} </td>
                             <td>{{ item.get('qty_ordered') }} </td>
-                            <td>{{ item.get('row_total') | currency }} </td>
+                            <td>{{ item.get('row_total') | currency(orderCurrency) }} </td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -91,10 +92,10 @@
                 </tr>
                 </thead>
                 <tr>
-                    <td>{{ order.get('subtotal') | currency }} </td>
-                    <td>{{ order.get('grand_total') | currency }} </td>
-                    <td>{{ order.get('amount_paid') | currency }} </td>
-                    <td>{{ order.get('amount_due') | currency }} </td>
+                    <td>{{ order.get('subtotal') | currency(orderCurrency) }} </td>
+                    <td>{{ order.get('grand_total') | currency(orderCurrency) }} </td>
+                    <td>{{ order.get('amount_paid') | currency(orderCurrency) }} </td>
+                    <td>{{ order.get('amount_due') | currency(orderCurrency) }} </td>
                 </tr>
             </table>
         </div>

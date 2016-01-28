@@ -5,7 +5,6 @@ define(['jquery', 'react'], function ($, React) {
             return Object.prototype.toString.call(arg) === '[object Array]';
         };
     }
-    var Messages;
 
     var FcomMessages = React.createClass({
         displayName: "FcomMessagesQueue",
@@ -13,6 +12,9 @@ define(['jquery', 'react'], function ($, React) {
             return {
                 "messages": []
             }
+        },
+        push: function (message){
+            this.pushMessage(message);
         },
         pushMessage: function (messages) {
             if (undefined === messages) {
@@ -47,7 +49,6 @@ define(['jquery', 'react'], function ($, React) {
                 if (messagesQueue.hasOwnProperty(index)) {
 
                     var messageConfig = {};
-                    //debugger;
                     if (undefined !== messagesQueue[index].type) {
                         messageConfig.type = messagesQueue[index].type;
                     }
@@ -140,26 +141,24 @@ define(['jquery', 'react'], function ($, React) {
         ;
 
     function init(messagesDomId, messages) {
-        var messagesDom = document.getElementById(messagesDomId);
+        var messagesDom = document.getElementById(messagesDomId),
+            messagesController;
+
+        this.id = messagesDomId;
 
         if (null !== messagesDom) {
-            Messages = React.render(
-                React.createElement(FcomMessages, {key: 'messages'}),
+            messagesController = React.render(
+                React.createElement(FcomMessages, {key: 'messages-' + messagesDomId}),
                 messagesDom
             );
 
-            Messages.pushMessage(messages);
+            messagesController.props.messages = [];
+            messagesController.pushMessage(messages);
         }
-    }
-
-    function push(messages) {
-        if (undefined !== messages) {
-            Messages.pushMessage(messages);
-        }
+        return messagesController;
     }
 
     return {
-        init: init,
-        push: push
+        init: init
     }
 });

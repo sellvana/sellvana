@@ -2,7 +2,6 @@
 <script type="text/javascript">
     var sysMessages;
     require(['jquery', 'fcom.message'], function ($, Message) {
-        sysMessages = Message;
-        sysMessages.init('systemMessages', {{ THIS.getMessages()|json_encode|raw }});
+        sysMessages = Message.init('systemMessages', {{ THIS.getMessages()|json_encode|raw }});
     });
 </script>

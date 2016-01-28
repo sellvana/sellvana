@@ -1,7 +1,7 @@
 modules:
     FCom_Core:
-        version: 0.5.0.1
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         before_bootstrap: { callback: "FCom_Core_Main::onBeforeBootstrap" }
         run_level: REQUIRED
         description: "Base Sellvana classes and JS libraries"
@@ -35,6 +35,22 @@ modules:
         observe:
             - [ "FCom_LibTwig_Main::init", FCom_Core_Main.onTwigInit ]
             - [ "FCom_Core_LayoutEditor::fetchLibrary", "FCom_Core_LayoutEditor.onFetchLibrary" ]
+            - [ "BORM::find_one:after", FCom_Core_Main.onFindOneAfter ]
+            - [ "BORM::find_many:after", FCom_Core_Main.onFindManyAfter ]
+
+        areas:
+            FCom_Shell:
+                custom:
+                    actions:
+                        - FCom_Core_Shell_Cache
+                        - FCom_Core_Shell_Config
+                        - FCom_Core_Shell_DataIo
+                        - FCom_Core_Shell_Migrate
+                        - FCom_Core_Shell_Module
+                observe:
+                    - [ "FCom_Core_ImportExport::beforeImport", "FCom_Core_Shell_DataIo.onBeforeImport" ]
+                    - [ "FCom_Core_ImportExport::import:beforeModel", "FCom_Core_Shell_DataIo.onBeforeModel" ]
+                    - [ "FCom_Core_ImportExport::_importBatch:afterBatch", "FCom_Core_Shell_DataIo.onAfterBatch" ]
 
         default_config:
             db:

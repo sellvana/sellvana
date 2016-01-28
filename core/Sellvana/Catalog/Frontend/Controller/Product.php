@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Catalog_Frontend_Controller_Product
@@ -56,7 +56,17 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
 
             $layout->view($viewName)->set('category', $category);
             $head->canonical($product->url());
+            $rootCategoryId = $this->BConfig->get('modules/FCom_Frontend/nav_top/root_category');
+            $hide = (bool)$rootCategoryId;
             foreach ($category->ascendants() as $c) {
+                if ($hide) { // hide ascendants of the root category
+                    if ($c->id() == $rootCategoryId) {
+                        $hide = false;
+                    }
+
+                    continue;
+                }
+
                 if ($c->get('node_name')) {
                     $crumbs[] = ['label' => $c->get('node_name'), 'href' => $c->url()];
                     $head->addTitle($c->get('node_name'));

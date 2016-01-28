@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Copyright 2014 Boris Gurvich
@@ -214,7 +214,7 @@ class BImport extends BClass
 
         $dataBatch = [];
         while (($r = fgetcsv($fp, 0, $config['delim']))) {
-            if (count($r) != count($config['columns'])) {
+            if (empty($config['columns']) || count($r) != count($config['columns'])) {
                 continue;
             }
             $row = array_combine($config['columns'], $r);

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_ProductReviews_Model_Review
@@ -25,7 +25,7 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
     protected static $_config = [
        'max' => 5,
-       'min' => 1,
+       'min' => 0,
        'step' => 1,
     ];
     protected static $_importExportProfile = [

@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_CatalogFields_Admin
@@ -75,6 +75,8 @@ class Sellvana_CatalogFields_Admin extends BClass
 
     public function onProductFormPostAfterValidate($args)
     {
+        $this->Sellvana_CatalogFields_Main->disable();
+
         /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         $data = &$args['data'];
@@ -367,6 +369,10 @@ class Sellvana_CatalogFields_Admin extends BClass
             ->find_many_assoc('field_id', 'field_id');
 
         foreach ($customFieldsData as $fieldSetData) {
+            if (empty($fieldSetData['fields'])) {
+                continue;
+            }
+
             foreach ($fieldSetData['fields'] as $fieldData) {
                 if (in_array($fieldData['id'], $productFields)) {
                     unset($productFields[$fieldData['id']]);

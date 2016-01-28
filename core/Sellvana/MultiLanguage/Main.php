@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_MultiLanguage_Main
@@ -9,8 +9,9 @@
 class Sellvana_MultiLanguage_Main extends BClass
 {
     const ENTITY_TYPE_CATEGORY = 'category';
-
     const ENTITY_TYPE_PRODUCT = 'product';
+
+    const LANG_FIELD_SUFFIX = '_lang_fields';
 
     public function bootstrap()
     {
@@ -32,7 +33,11 @@ class Sellvana_MultiLanguage_Main extends BClass
      */
     protected function _getLanguage()
     {
-        return $this->BRequest->request("lang", $this->BLocale->getCurrentLanguage());
+        $lang = $this->BRequest->request("lang");
+        if (!$lang) {
+            $lang = $this->BLocale->getCurrentLocale();
+        }
+        return $lang;
     }
 
     /**
@@ -74,26 +79,10 @@ class Sellvana_MultiLanguage_Main extends BClass
      * @param $args
      * @param $entityType
      * @return bool
-     * @throws BException
      */
     public function modelLoadLocale($args, $entityType)
     {
-        $lang = $this->_getLanguage();
-        if (!$lang || !($args['result'] instanceof BModel)) { // should instance check be more strict?
-            return false;
-        }
-        /* @var $model FCom_Core_Model_Abstract */
-        $model = $args['result'];
-        $id      = $model->id();
-
-        $localized = $this->_getTranslations($id, $entityType, $lang);
-
-        foreach ($localized as $locale) {
-            /* @var Sellvana_MultiLanguage_Model_Translation $locale */
-            $field = $locale->get('field');
-            $model->set($field, $locale->get('value'));
-        }
-        return true;
+        return $this->_replaceLangData([$args['result']]);
     }
 
     /**
@@ -103,59 +92,60 @@ class Sellvana_MultiLanguage_Main extends BClass
      * @throws BException
      */
     public function modelCollectionLoadLocale($args, $entityType) {
-        $lang = $this->_getLanguage();
-        if (!$lang || count($args['result']) == 0) {
-            return false;
-        }
-        $result  = $args['result'];
-        $modelIds   = [];
-        $modelIdIdx = [];
-        foreach ($result as $idx => $model) {
-            /* @var FCom_Core_Model_Abstract $model */
-            $id = $model->get('id');
-            if (!$id) {
-                continue;
-            }
-            $modelIds[]      = $id;
-            $modelIdIdx[$id] = $idx;
-        }
-        if (empty($modelIds)) {
-            return false;
-        }
-        // todo, filter by actual fields selected in model
-        $localized = $this->_getTranslations($modelIds, $entityType, $lang);
-        // localized fields for current product ids and language
-
-        foreach ($localized as $locale) {
-            /* @var Sellvana_MultiLanguage_Model_Translation $locale */
-            $id      = $locale->get('entity_id');
-            $model = & $result[$modelIdIdx[$id]];
-            $field   = $locale->get('field');
-            $model->set($field, $locale->get('value'));
-        }
-        return true;
+        return $this->_replaceLangData($args['result']);
     }
 
     /**
      * Get translations for entity type
      *
-     * @param string|int|array $id either single id in string or integer form or an array of ids
-     * @param string           $entityId string representing entity type (product, category etc.)
-     * @param string           $lang string representing current language (de, nl etc.)
-     * @param array            $fields
+     * @param FCom_Core_Model_Abstract $model model needed to translate
+     * @param string                   $lang string representing current language (de, nl etc.)
+     * @param array                    $fields
      * @return array
      */
-    protected function _getTranslations($id, $entityId, $lang, $fields = [])
+    protected function _getTranslations($model, $lang, $fields = [])
     {
-        /* @var $orm BORM */
-        $orm = $this->Sellvana_MultiLanguage_Model_Translation
-            ->orm('ml')
-            ->select(['entity_id', 'field', 'value', 'data_serialized'], 'ml')
-            ->where(['entity_id' => (int)$id, 'entity_type' => (string)$entityId, 'locale' => (string)$lang]);
-        if (!empty($fields)) {
-            $orm->where(['field' => $fields]);
+        $localized = [];
+        foreach ($model->as_array() as $key => $data) {
+            if (strpos($key, self::LANG_FIELD_SUFFIX) !== false) {
+                $key = substr($key, 0, -strlen(self::LANG_FIELD_SUFFIX));
+                $data = json_decode($data, true);
+                if (!is_array($data)) {
+                    continue;
+                }
+                foreach ($data as $langData) {
+                    if (array_key_exists('lang_code', $langData) && $langData['lang_code'] == $lang) {
+                        $localized[$key] = $langData['value'];
+                        break;
+                    }
+                }
+            }
         }
-        $localized = $orm->find_many();
+
         return $localized;
+    }
+
+    /**
+     * @param array $models
+     * @return bool
+     */
+    protected function _replaceLangData(array $models)
+    {
+        $lang = $this->_getLanguage();
+        if (!$lang) {
+            return false;
+        }
+
+        /* @var $model FCom_Core_Model_Abstract */
+        foreach ($models as $model) {
+            if ($model instanceof FCom_Core_Model_Abstract) {
+                $localized = $this->_getTranslations($model, $lang);
+                foreach ($localized as $field => $value) {
+                    $model->set($field, $value);
+                }
+            }
+        }
+
+        return true;
     }
 }

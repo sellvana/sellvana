@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_CatalogIndex_Indexer
@@ -46,7 +46,10 @@ class Sellvana_CatalogIndex_Indexer extends Sellvana_CatalogIndex_Indexer_Abstra
             $row = ['id' => $pId, 'last_indexed' => $now];
 
             foreach ($sortColumn as $fName => $field) {
-                $row['sort_' . $fName] = substr((string)$pData[$fName], 0, 50);
+                if (!array_key_exists($fName, $pData)) {
+                    continue;
+                }
+                $row['sort_' . $fName] = null !== $pData[$fName] ? substr((string)$pData[$fName], 0, 50) : null;
             }
 
             $docHlp->create($row)->save();
@@ -220,7 +223,7 @@ DELETE FROM {$tTerm} WHERE NOT EXISTS (SELECT dt.term_id FROM {$tDocTerm} dt whe
         if ($this->_bus['request']['query']) {
             $terms = $this->_retrieveTerms($this->_bus['request']['query']);
             //TODO: put weight for `position` in search relevance
-            $tDocTerm = $tDocTerm = $this->Sellvana_CatalogIndex_Model_DocTerm->table();
+            $tDocTerm = $this->Sellvana_CatalogIndex_Model_DocTerm->table();
             $orm = $this->Sellvana_CatalogIndex_Model_Term->orm();
             //$orm->where_in('term', $terms);
             $orm->where_in('term', $terms);
@@ -233,6 +236,7 @@ DELETE FROM {$tTerm} WHERE NOT EXISTS (SELECT dt.term_id FROM {$tDocTerm} dt whe
                     }
                     $func = "(levenshtein(term, {$orm->get_db()->quote($term)}))";
                     $correct = $this->Sellvana_CatalogIndex_Model_Term->orm()
+                        ->where_like('term', $term[0] . '%')
                         ->where_raw($func)
                         ->order_by_asc($func)
                         ->find_one();

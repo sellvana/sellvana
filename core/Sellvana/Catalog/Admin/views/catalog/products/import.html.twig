@@ -26,7 +26,7 @@ require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
             var filename = selectedRows.at(0).get('file_name');
 
             importConfigEle.prev().find('a').trigger('click');
-            importConfigEle.html('Please wait loading file configuration...');
+            importConfigEle.html("{{ 'Please wait loading file configuration...'|_ }}");
             $.getJSON('{{APP.href('catalog/products/import/config')}}?file='+encodeURIComponent(filename),
                         function(data, status, xhr) { importConfigEle.html(data.html); }
 
@@ -35,7 +35,7 @@ require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
 
         importAccordionEle.on('click', '#step2-next', function(ev) {
             importStatusEle.prev().find('a').trigger('click');
-            importStatusEle.html('Please wait starting import...');
+            importStatusEle.html("{{ 'Please wait starting import...'|_ }}");
             $.post('{{APP.href('catalog/products/import/config')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
                 importStatusEle.html(data);
             });

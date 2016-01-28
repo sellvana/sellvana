@@ -13,7 +13,7 @@
           <h1 class="f-page-title">{{ category.get('node_name') }}</h1>
         </header>
         {% for part, label in parts %}
-          {% if part == 'sub_cat' %}
+          {% if part == 'sub_cat' and category.get('show_sub_cat') %}
 
               {% set subCategories = category.children() %}
               <div class="f-catalog-sub-cats">
@@ -26,13 +26,13 @@
               {% endif %}
               </div>
 
-          {% elseif part == 'content' %}
+          {% elseif part == 'content' and category.get('show_content') %}
 
             <div class="f-category-content">
                 {{ category.get('content') | raw }}
             </div>
 
-          {% elseif part == 'view' %}
+          {% elseif part == 'view' and category.get('show_view') %}
 
             {% set viewInfo = category.get('view_name') | split(':') %}
             {% if viewInfo[0] == 'view' %}
@@ -46,7 +46,7 @@
 
             {% endif %}
 
-          {% elseif part == 'products' %}
+          {% elseif part == 'products' and category.get('show_products') %}
 
             {{ THIS.hook('main_products') | raw }}
 

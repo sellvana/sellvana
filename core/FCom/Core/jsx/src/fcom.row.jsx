@@ -3,7 +3,7 @@
 /**
  * FCom Row Component
  */
-define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComSelect2) {
+define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], function (_, React, Components, FComSelect2) {
     /*
      var React = require('react/addons');
      var _ = require('underscore');
@@ -44,6 +44,22 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                 return window[callback](event, selections);
             }
         },
+        handleRating: function (callback, newRating) {
+            var row = this.props.row;
+            if (Number(newRating) !== Number(row.rating)) {
+                row.rating = newRating;
+                $.post(this.props.getConfig('edit_url'), {
+                    oper: 'mass-edit',
+                    id: row.id,
+                    rating: newRating
+                }, function(r) {
+                    if (r.success) {
+                        $.bootstrapGrowl("Successfully Rating.", {type: 'success', align: 'center', width: 'auto'});
+                        this.props.refresh();
+                    }
+                }.bind(this));
+            }
+        },
         render: function () {
             var that = this;
             var id   = this.props.getConfig('id');
@@ -52,7 +68,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
             var nodes = this.props.columns.map(function(column, index){
                 var col = _.findWhere(that.props.columnMetadata, {name: column});
                 if (!col) {
-                    return <td></td>;
+                    return <td />;
                 }
 
                 var node = "";
@@ -63,7 +79,10 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         if (_.findWhere(that.props.getSelectedRows(), {id: row.id})) {
                             defaultChecked = true;
                         }
-                        node = <input type="checkbox" name={id + "[checked][" + row.id + "]"} className="select-row" checked={defaultChecked} onChange={that.selectRow} />;
+                        node = <input type="checkbox" name={id + "[checked][" + row.id + "]"}
+                                      className="select-row"
+                                      checked={defaultChecked}
+                                      onChange={that.selectRow} />;
                         break;
                     case 'btn_group':
                         var actions = col.buttons.map(function(btn, index) {
@@ -74,9 +93,8 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                         className={"btn btn-link " + (btn.cssClass ? btn.cssClass : "")}
                                         title={btn.title ? btn.title : ""}
                                         href={btn.href + row[btn.col]}
-                                        target={btn.target ? btn.target : ""}
-                                    >
-                                        <i className={btn.icon}></i>
+                                        target={btn.target ? btn.target : ""}>
+                                        <i className={btn.icon} />
                                         {btn.caption}
                                     </a>
                                 );
@@ -91,7 +109,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                             data-folder={row.folder ? row.folder : null}
                                             {...btn.attrs}
                                             onClick={that.props.doRowAction.bind(null, btn.callback)}>
-                                        <i className={btn.icon}></i>
+                                        <i className={btn.icon} />
                                         {btn.caption}
                                     </button>
                                 );
@@ -118,11 +136,8 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         } else { //inline mode
 
                             var validationRules = that.validationRules(col.validation);
-                            
                             var defaultValue    = (typeof row[col.name] !== 'undefined') ? row[col.name] : "";
-                            
                             var isSelect2       = col.select2 || false;
-
                             var inlineProps = {
                                 id: id + '-' + col.name + '-' + row.id,
                                 name: id + '[' + row.id + '][' + col.name + ']',
@@ -148,7 +163,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                         selectOptions = col.options.map(function(opt, index) {
                                             if (isSelect2)
                                                 return { id: index, text: opt };
-                                            else return <option key={index} value={opt.value}></option>;
+                                            else return <option key={index} value={opt.value} />;
                                         });
                                     } else {
                                         for(var key in col.options) {
@@ -159,10 +174,27 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                                         }
                                     }
 
-                                    node = isSelect2 ? <FComSelect2 {...inlineProps} options={selectOptions} onChange={that.handleSelect2Change} defaultValue={isSelect2 ? [defaultValue] : defaultValue} callback={col.callback} /> : <select key={col.name} defaultValue={defaultValue} {...inlineProps} {...validationRules} onChange={that.handleChange.bind(null, col.callback)}>{selectOptions}</select>;
+                                    node = isSelect2 ?
+                                        <FComSelect2 {...inlineProps} options={selectOptions}
+                                                                      onChange={that.handleSelect2Change}
+                                                                      defaultValue={[defaultValue]}
+                                                                      multiple={col.multiple || false}
+                                                                      placeholder={col.placeholder || "Select some options"}
+                                                                      callback={col.callback} />
+                                        : <select key={col.name} defaultValue={defaultValue}
+                                                  onChange={that.handleChange.bind(null, col.callback)}
+                                                  {...inlineProps}
+                                                  {...validationRules}>{selectOptions}</select>;
+                                    break;
+                                case 'rating':
+                                    node  = <Components.RatingWidget initialRating={row.rating}
+                                                                     onChange={that.handleRating.bind(null, col.callback)} />;
                                     break;
                                 default:
-                                    node = <input key={col.name} type="text" {...inlineProps} {...col.attrs} {...validationRules} defaultValue={defaultValue} onChange={that.handleChange.bind(null, col.callback)} />;
+                                    node = <input key={col.name} type="text"
+                                                  defaultValue={defaultValue}
+                                                  onChange={that.handleChange.bind(null, col.callback)}
+                                                {...inlineProps} {...col.attrs} {...validationRules}  />;
                                     break;
                             }
                             /*var inlineColValue = (typeof row[col.name] != 'undefined') ? row[col.name] : "";
@@ -170,9 +202,8 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                         }
                         break;
                     case 'link':
-                        var defaultValue = col.defaultValue ? col.defaultValue : (typeof row[col.name] != 'undefined') ? row[col.name] : "";
-                        
-                        var inlineProps = {
+                        var options = row && row.options ? row.options.split(',') : [];
+                        inlineProps = {
                             href: col.href ? col.href : 'javascript:void(0)',
                             id: id + '-' + col.name + '-' + row.id,
                             name: id + '[' + row.id + '][' + col.name + ']',
@@ -183,7 +214,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                             'data-row': row.id
                         };
 
-                        node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{defaultValue}</a>;
+                        node = <a key={col.name} {...inlineProps} onClick={col.action ? that.props.doRowAction.bind(null, col.action) : null}>{options.length + " " + col.label}</a>;
                         break;
                     default:
                         if (col.display == 'eval') {
@@ -206,7 +237,7 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
                 }
 
                 if (customNodeHtml) {
-                    return <td key={col.name} style={col.tdStyle} data-col={col.name} dangerouslySetInnerHTML={{__html: node}}></td>;
+                    return <td key={col.name} style={col.tdStyle} data-col={col.name} dangerouslySetInnerHTML={{__html: node}} />;
                 }
                 return <td data-col={col.name} style={col.tdStyle} key={col.name}>{node}</td>;
             });
@@ -221,4 +252,4 @@ define(['underscore', 'react', 'griddle.fcomSelect2'], function (_, React, FComS
 
     //module.exports = CustomRow;
     return FComRow;
-})
+});

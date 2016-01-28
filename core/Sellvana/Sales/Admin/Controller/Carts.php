@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Admin_Controller_Carts
@@ -42,7 +42,7 @@ class Sellvana_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstra
         $config['columns'] = [
             ['type' => 'row_select'],
             ['type' => 'btn_group', 'buttons' => [
-                ['name' => 'edit'],
+                //['name' => 'edit'],
             ]],
 
             ['name' => 'id', 'index' => 'c.id', 'label' => 'ID', 'width' => 70],

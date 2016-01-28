@@ -1,7 +1,7 @@
 modules:
     Sellvana_Catalog:
-        version: 0.5.7.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         before: [ Sellvana_MultiSite ]
         categories: [ Catalog, Products ]
@@ -9,7 +9,7 @@ modules:
         description: "Categories and products management, admin and frontend"
         auto_use: [ bootstrap, views, layout ]
         observe:
-            - [ "FCom_Core_ImportExport::import:afterModel:Sellvana_Catalog_Model_Category", "Sellvana_Catalog_Model_Category.onImportAfterModel" ]
+            - [ "FCom_Core_ImportExport::_importBatch:afterBatch:Sellvana_Catalog_Model_Category", "Sellvana_Catalog_Model_Category.onImportAfterBatch" ]
             - [ "FCom_Core_LayoutEditor::fetchLibrary", "Sellvana_Catalog_Main.onLayoutEditorFetchLibrary" ]
 
         default_config:
@@ -24,6 +24,11 @@ modules:
                     products_without_images_limit: 25
                     searches_recent_terms_limit: 25
                     searches_recent_top_limit: 25
+                    default_origin_country: US
+                FCom_Frontend:
+                    nav_top:
+                        type: root_selected
+                        root_category: 1
 
         areas:
             FCom_Admin:
@@ -69,7 +74,7 @@ modules:
                         folder: media/product/images
                     product-attachments:
                         permission: catalog/product/attachements
-                        filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt
+                        filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt,zip
                         folder: media/product/attachment
                     product-videos:
                         permission: catalog/product/videos

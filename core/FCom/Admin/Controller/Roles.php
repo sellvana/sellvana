@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_Roles
@@ -77,7 +77,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
             ]
         ];
         $permissions = $this->FCom_Admin_Model_Role->getAllPermissions();
-        $rolePermissions = $model->get('permissions');
+        $rolePermissions = $model->get('permissions') ?: [];
 
         ksort($permissions);
 

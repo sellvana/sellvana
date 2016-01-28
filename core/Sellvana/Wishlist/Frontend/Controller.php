@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Wishlist_Frontend_Controller
@@ -206,7 +206,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
     {
         $post       = $this->BRequest->post();
         $wishlists  = $post['Wishlist'];
-        $deletedIds = $post['delete'];
+        $deletedIds = isset($post['delete']) ? $post['delete'] : [];
         $error      = false;
         $locale     = BLocale::i();
         $r          = [];
@@ -233,10 +233,8 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         if ($this->BRequest->xhr()) {
             if ($error) {
                 $r = ['success' => false, 'title' => $locale->_('Update wishlists failure deal to system error.')];
-                $this->message('Update wishlists failure deal to system error.');
             } else {
                 $r = ['success' => true, 'title' => $locale->_('Update wishlists successfull.')];
-                $this->message('Update wishlists successfull.');
             }
 
             $this->BResponse->json($r);
@@ -310,7 +308,11 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             }
             if ($wishlist) {
                 $wishlist->addItem($id);
-                $this->message('Product was added to wishlist.');
+                $messageText = 'Product was added to wishlist.';
+                if (!$this->Sellvana_Customer_Model_Customer->isLoggedIn()) {
+                    $messageText .= "\nPlease note that your wishlist will be stored permanently only after you sign in.";
+                }
+                $this->message($messageText);
             }
         }
         $this->BResponse->redirect('wishlist');

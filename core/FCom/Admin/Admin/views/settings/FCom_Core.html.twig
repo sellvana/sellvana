@@ -58,10 +58,15 @@
         {{ forms.select(fieldData, { field:'view_files', label:'View Template Files Cache'|_ }) }}
         {{ forms.select(fieldData, { field:'twig', label:'Twig Cache'|_ }) }}
     {{ forms.accordion_panel_end }}
+
+    {% set fieldData = { model:c, name_prefix: 'config[core][dev]', id_prefix: 'config-core-dev', get_prefix:'core/dev' } %}
+    {{ forms.accordion_panel_start({ label:'Developer'|_, id:'settings-FCom_Core-group6'}) }}
+        {{ forms.boolean(fieldData, { field:'load', label:'Load Core Dev Modules'|_ }) }}
+    {{ forms.accordion_panel_end }}
 {% endif %}
 
     {% set fieldData = { model: c, id_prefix:'web', name_prefix:'config[web]', get_prefix:'web' } %}
-    {{ forms.accordion_panel_start({label:'Web Settings'|_, id:'settings-FCom_Core-group6'}) }}
+    {{ forms.accordion_panel_start({label:'Web Settings'|_, id:'settings-FCom_Core-group7'}) }}
         {{ forms.select(fieldData, { field:'hide_script_name', label:'Hide script file name in URL'|_, options:{'':'', 0:'No', 1:'Automatic', 2:'FORCE'} }) }}
         {{ forms.input(fieldData,   { field:'http_host_whitelist', label:'HTTP Host Whitelist (comma separated)'|_ }) }}
         {{ forms.input(fieldData,   { field:'force_domain', label:'Force Domain Name'|_ }) }}
@@ -72,12 +77,13 @@
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, id_prefix:'staging', name_prefix:'config[staging]', get_prefix:'staging' } %}
-    {{ forms.accordion_panel_start({label:'Staging Environment'|_, id:'settings-FCom_Core-group7'}) }}
+    {{ forms.accordion_panel_start({label:'Staging Environment'|_, id:'settings-FCom_Core-group8'}) }}
         {{ forms.boolean(fieldData, { field:'email_to_override', label:'Override All Emails Destination'|_ }) }}
         {{ forms.input(fieldData,   { field:'email_to_override_address', label:'Emails Destination Address'|_ }) }}
         {{ forms.boolean(fieldData, { field:'email_subject_prepend', label:'Prepend All Emails Subject'|_ }) }}
         {{ forms.input(fieldData,   { field:'email_subject_prepend_prefix', label:'Emails Subject Prefix'|_ }) }}
     {{ forms.accordion_panel_end }}
+
 
 
 {{ forms.accordion_end }}

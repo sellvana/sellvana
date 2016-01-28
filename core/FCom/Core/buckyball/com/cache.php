@@ -1,26 +1,26 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
-* Copyright 2014 Boris Gurvich
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-* @package BuckyBall
-* @link http://github.com/unirgy/buckyball
-* @author Boris Gurvich <boris@sellvana.com>
-* @copyright (c) 2010-2014 Boris Gurvich
-* @license http://www.apache.org/licenses/LICENSE-2.0.html
-*/
+ * Copyright 2014 Boris Gurvich
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @package BuckyBall
+ * @link http://github.com/unirgy/buckyball
+ * @author Boris Gurvich <boris@sellvana.com>
+ * @copyright (c) 2010-2014 Boris Gurvich
+ * @license http://www.apache.org/licenses/LICENSE-2.0.html
+ */
 
 class BCache extends BClass
 {
@@ -29,10 +29,10 @@ class BCache extends BClass
     protected $_defaultBackend;
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BCache
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @return BCache
+     */
     static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
@@ -203,7 +203,7 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     {
         $md5 = md5($key);
         return $this->_config['dir'] . '/' . substr($md5, 0, 2) . '/'
-            . $this->BUtil->simplifyString($key) . '.' . substr($md5, 0, 10) . '.' . $this->_config['file_type'];
+        . $this->BUtil->simplifyString($key) . '.' . substr($md5, 0, 10) . '.' . $this->_config['file_type'];
     }
 
     public function load($key)
@@ -281,13 +281,13 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     }
 
     /**
-    * Load many items found by pattern
-    *
-    * @todo implement regexp pattern
-    *
-    * @param mixed $pattern
-    * @return array
-    */
+     * Load many items found by pattern
+     *
+     * @todo implement regexp pattern
+     *
+     * @param mixed $pattern
+     * @return array
+     */
     public function loadMany($pattern)
     {
         $files = glob($this->_config['dir'] . '/*/*' . $this->BUtil->simplifyString($pattern) . '*');
@@ -479,6 +479,16 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
     {
         return true;
     }
+
+    public function deleteAll()
+    {
+        $items = new APCIterator('user');
+        $prefix = $this->_config['prefix'];
+        foreach ($items as $item) {
+            apc_delete($item['key']);
+        }
+        return true;
+    }
 }
 
 class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
@@ -542,6 +552,11 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
     }
 
     public function gc()
+    {
+        return false; // not implemented
+    }
+
+    public function deleteAll()
     {
         return false; // not implemented
     }
@@ -612,6 +627,11 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
         return true;
     }
 
+    public function deleteAll()
+    {
+        return false; // not implemented
+    }
+
     public function migrate()
     {
         $t = BCache_Backend_Db_Model_Cache::table();
@@ -651,38 +671,42 @@ class BCache_Backend_Shmop extends BClass implements BCache_Backend_Interface
 
     public function init($config = [])
     {
-
+        return false; // not implemented
     }
 
     public function load($key)
     {
-
+        return false; // not implemented
     }
 
     public function save($key, $data, $ttl = null)
     {
-
+        return false; // not implemented
     }
-
 
     public function delete($key)
     {
-
+        return false; // not implemented
     }
 
     public function loadMany($pattern)
     {
-
+        return false; // not implemented
     }
 
     public function deleteMany($pattern)
     {
-
+        return false; // not implemented
     }
 
     public function gc()
     {
+        return false; // not implemented
+    }
 
+    public function deleteAll()
+    {
+        return false; // not implemented
     }
 }
 

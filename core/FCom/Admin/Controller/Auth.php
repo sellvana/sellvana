@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class FCom_Admin_Controller_Auth
@@ -32,10 +32,20 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             }
 
             $url = $this->BSession->get('admin_login_orig_url');
+            $result = 'success';
         } catch (Exception $e) {
             $this->BDebug->logException($e);
-            $this->message($e->getMessage(), 'error');
+            if (!$this->BRequest->xhr()) {
+                $this->message($e->getMessage(), 'error');
+            }
+            $result = 'error';
         }
+
+        if ($this->BRequest->xhr()) {
+            $this->BResponse->json(['result' => $result]);
+            return;
+        }
+
         $this->BResponse->redirect(!empty($url) ? $url : $this->BApp->href());
     }
 

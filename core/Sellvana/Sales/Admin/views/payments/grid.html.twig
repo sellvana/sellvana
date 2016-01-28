@@ -1,0 +1,26 @@
+<script>
+require(["jquery", "underscore", "jquery.validate"], function($, _) {
+    window.markAsPaid = function(grid) {
+        var selectedRows = grid.getSelectedRows();
+        var editUrl = grid.getConfig('edit_url');
+
+        if (editUrl) {
+            var post = {
+                oper: 'mass-edit',
+                id: (_.pluck(selectedRows, 'id')).join(','),
+                state_overall: 'paid'
+            };
+
+            $.post(editUrl, post, function(resp) {
+                if (resp.success) {
+                    $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+                    grid.refresh(); //re-render grid
+                } else {
+                    $.bootstrapGrowl("Fail saved.", { type: 'danger', align: 'center', width: 'auto' });
+                }
+            })
+        }
+    };
+});
+
+</script>

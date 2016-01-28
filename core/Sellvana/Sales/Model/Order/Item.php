@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_Sales_Model_Order_Item
@@ -96,6 +96,20 @@ class Sellvana_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     public function getQtyCanRefund()
     {
         return $this->get('qty_paid') - $this->get('qty_refunded');
+    }
+
+    /**
+     * @param float|null $qty
+     */
+    public function markAsPaid($qty = null)
+    {
+        if ($qty === null) {
+            $qty = $this->get('qty_ordered');
+        } else {
+            $qty = min($this->get('qty_paid') + $qty, $this->get('qty_ordered'));
+        }
+
+        $this->set('qty_paid', $qty);
     }
 
     public function __destruct()

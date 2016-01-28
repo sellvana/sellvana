@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
 * Copyright 2014 Boris Gurvich
@@ -1015,7 +1015,7 @@ class BORM extends ORMWrapper
             $password = static::$_config['password'];
             $driver_options = static::$_config['driver_options'];
             if (empty($driver_options[PDO::MYSQL_ATTR_INIT_COMMAND])) { //ADDED
-                $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8";
+                $driver_options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8, SESSION sql_mode = TRADITIONAL";//;SET SESSION sql_mode = 'TRADITIONAL';
             }
             if (empty($driver_options[PDO::ATTR_TIMEOUT])) {
                 $driver_options[PDO::ATTR_TIMEOUT] = 5;
@@ -1320,8 +1320,10 @@ class BORM extends ORMWrapper
     public function find_one($id = null)
     {
         $class = $this->_origClass();
+        BEvents::i()->fire(__METHOD__ . ':orm', ['orm' => $this, 'class' => $class, 'id' => $id]);
         BEvents::i()->fire($class . '::find_one:orm', ['orm' => $this, 'class' => $class, 'id' => $id]);
         $result = parent::find_one($id);
+        BEvents::i()->fire(__METHOD__ . ':after', ['result' => &$result, 'class' => $class, 'id' => $id]);
         BEvents::i()->fire($class . '::find_one:after', ['result' => &$result, 'class' => $class, 'id' => $id]);
         return $result;
     }
@@ -1334,8 +1336,10 @@ class BORM extends ORMWrapper
     public function find_many()
     {
         $class = $this->_origClass();
+        BEvents::i()->fire(__METHOD__ . ':orm', ['orm' => $this, 'class' => $class]);
         BEvents::i()->fire($class . '::find_many:orm', ['orm' => $this, 'class' => $class]);
         $result = parent::find_many();
+        BEvents::i()->fire(__METHOD__ . ':after', ['result' => &$result, 'orm' => $this, 'class' => $class]);
         BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'orm' => $this, 'class' => $class]);
         return $result;
     }
@@ -2912,7 +2916,7 @@ class BModel extends Model
             $this->onAfterSave();
         }
 
-        if (static::$_cacheAuto) {
+        if (static::$_cacheAuto && !$this->BDebug->is(BDebug::MODE_IMPORT)) {
             $this->cacheStore();
         }
         return $this;

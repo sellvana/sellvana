@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Copyright 2015 Sellvana Inc
@@ -67,7 +67,7 @@ class Sellvana_Catalog_Admin_Dashboard extends FCom_Admin_Widget
      */
     public function getLowStockProducts()
     {
-        $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/notify_administrator_quantity');
+        $defaultMinQty = $this->BConfig->get('modules/Sellvana_Catalog/qty_notify_admin');
 
         $orm = $this->Sellvana_Catalog_Model_InventorySku->orm('i')
             ->select(['i.inventory_sku', 'i.title', 'i.qty_in_stock'])

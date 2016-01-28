@@ -1,4 +1,4 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 /**
  * Class Sellvana_CatalogFields_Main
@@ -77,8 +77,13 @@ class Sellvana_CatalogFields_Main extends BClass
                     continue;
                 }
                 foreach ($set['fields'] as $field) {
-                    #var_dump($field);
-                    $p->set($field['field_code'], $field['value']);
+                    $p->set($field['field_code'], $this->BUtil->arrayGet($field, 'value'));
+                    if ($langFields = $this->BUtil->arrayGet($field, 'lang_fields')) {
+                        $fieldModel = $this->Sellvana_CatalogFields_Model_Field->load($field['id']);
+                        if ($fieldModel && !in_array($field['admin_input_type'], ['select', 'multiselect'])) {
+                            $fieldModel->setData('frontend_label_translation', $langFields)->save();
+                        }
+                    }
                 }
             }
         } else {
@@ -107,7 +112,7 @@ class Sellvana_CatalogFields_Main extends BClass
                         }
                         $row->set([
                             'set_id' => $set['id'] ?: null,
-                            'position' => $field['position'],
+                            'position' => $this->BUtil->arrayGet($field, 'position'),
                         ])->save();
                     }
                 }
@@ -121,6 +126,9 @@ class Sellvana_CatalogFields_Main extends BClass
      */
     public function onProductAfterSave($args)
     {
+        if ($this->BDebug->is(BDebug::MODE_IMPORT)) {
+            return;
+        }
         $this->_processProductCustom($args['model']);
     }
 

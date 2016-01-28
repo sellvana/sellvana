@@ -28,7 +28,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         getDefaultProps: function() {
             return {
                 "placeholderText": "Quick Search"
-            }
+            };
         },
         componentDidMount: function() {
             var that = this;
@@ -330,7 +330,7 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
         handleEnter: function(event) {
             if (event.which == 13) {
                 var filter = this.state.filter;
-                var isClear = false
+                var isClear = false;
                 filter.submit = !isClear;
                 this.setState({filter: filter});
                 this.props.setFilter(filter, isClear);
@@ -642,15 +642,21 @@ define(['underscore', 'react', 'select2', 'daterangepicker', 'datetimepicker'], 
             var that = this;
             var filter = this.state.filter;
             var filterContainer = $('#f-grid-filter-' + filter.field);
+            var $multiselect = filterContainer.find('#multi_hidden');
 
-            filterContainer.find('#multi_hidden').select2({
+            var config = {
                 multiple: true,
                 data: this.state.filterData,
                 placeholder: 'All'
-                //closeOnSelect: true
-            });
+            };
 
-            filterContainer.find('#multi_hidden').on('change', function(e) {
+            if (this.props.filter.min_input_length) {
+                config['minimumInputLength'] = this.props.filter.min_input_length;
+            }
+
+            $multiselect.select2(config);
+
+            $multiselect.on('change', function(e) {
                 filter.val = e.val.join(',');
                 var valName = [];
                 _.forEach(e.val, function(value) {
