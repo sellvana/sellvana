@@ -48,7 +48,7 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
                 'width' => 80, 'editor' => 'select', 'addable' => true, 'editable' => true,
                 'options' => $fieldHlp->fieldOptions('filter_show_empty')],
             ['type' => 'input', 'name' => 'filter_order', 'label' => 'Facet Order', 'index' => 'idxf.filter_order',
-                'addable' => true, 'editable' => true],
+                'addable' => true, 'editable' => true, 'default', 'default_value' => '0'],
             ['name' => 'filter_custom_view', 'label' => 'Facet Custom View', 'index' => 'idxf.filter_custom_view',
                 'width' => 80, 'hidden' => true, 'editable' => true, 'display' => 'eval', 'editor' => 'none',
                 'element_print' => '<input readonly name="filter_custom_view" id="filter_custom_view" type="text" class="form-control">'],
@@ -60,7 +60,7 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
             ['type' => 'input', 'name' => 'sort_label', 'label' => 'Sort Label', 'index' => 'idxf.sort_label',
                 'width' => 80, 'addable' => true, 'editable' => true],
             ['name' => 'sort_order', 'label' => 'Sort Order', 'index' => 'idxf.sort_order', 'width' => 80,
-                'addable' => true, 'editable' => true],
+                'addable' => true, 'editable' => true, 'default_value' => '0'],
             ['type' => 'input', 'name' => 'source_type', 'label' => 'Source', 'index' => 'idxf.source_type',
                 'options' => $fieldHlp->fieldOptions('source_type'),
                 'editor' => 'select', 'width' => 80, 'addable' => true, 'editable' => true],
@@ -106,10 +106,9 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
         $actions['reindex_force'] = [
             'button',
             [
-                'class' => ['btn', 'btn-primary', 'btn-progress', '_modal'],
-                'data-toggle' => 'modal',
-                'data-target' => '#progress',
+                'class' => ['btn', 'btn-primary', 'btn-progress', 'ladda-button'],
                 'type' => 'button',
+                'data-style' => 'expand-left'
             ],
             [
                 ['span', null, $this->BLocale->_('Force Reindex')]

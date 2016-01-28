@@ -188,7 +188,8 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], functi
                                     break;
                                 case 'rating':
                                     node  = <Components.RatingWidget initialRating={row.rating}
-                                                                     onChange={that.handleRating.bind(null, col.callback)} />;
+                                                                     disabled={col.disabled}
+                                                                     onChange={col.disabled ? that.handleRating.bind(null, col.callback) : null} />;
                                     break;
                                 default:
                                     node = <input key={col.name} type="text"

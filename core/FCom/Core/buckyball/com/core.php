@@ -1787,7 +1787,7 @@ class BEvents extends BClass
      *          if starts with ^ will be processed as regular expression
      * @param mixed $callback
      * @param array|object $args
-     * @param arary $params - alias, insert (function, 0=skip, -1=before, 1=after), regex (true, false)
+     * @param array $params - alias, insert (function, 0=skip, -1=before, 1=after), regex (true, false)
      * @return BEvents
      */
     public function on($eventName, $callback = null, $args = [], $params = null)
