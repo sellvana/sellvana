@@ -1,7 +1,7 @@
 modules:
     FCom_Test:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0 }, class: [ PHPUnit ] }
         description: PHPUnit tests integration
         noexport: 1

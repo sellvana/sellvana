@@ -1,7 +1,7 @@
 modules:
     Sellvana_ShopperFields:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { Sellvana_Catalog: 0.3.2 } }
 
         areas:

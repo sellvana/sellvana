@@ -1,4 +1,4 @@
 modules:
     FCom_LibRecaptcha:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta

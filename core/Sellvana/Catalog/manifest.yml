@@ -1,7 +1,7 @@
 modules:
     Sellvana_Catalog:
-        version: 0.5.8.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         before: [ Sellvana_MultiSite ]
         categories: [ Catalog, Products ]

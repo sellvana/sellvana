@@ -1,8 +1,8 @@
 modules:
     Sellvana_ShippingFedex:
-        version: 0.5.0.0
+        version: 0.6.0.0
 
-        channel: alpha
+        channel: beta
         require: { module: { Sellvana_Checkout: 0.2.1 } }
         description: "Fedex shipping module"
         auto_use: [ bootstrap ]

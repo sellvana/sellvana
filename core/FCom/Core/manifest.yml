@@ -1,7 +1,7 @@
 modules:
     FCom_Core:
-        version: 0.5.0.1
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         before_bootstrap: { callback: "FCom_Core_Main::onBeforeBootstrap" }
         run_level: REQUIRED
         description: "Base Sellvana classes and JS libraries"
