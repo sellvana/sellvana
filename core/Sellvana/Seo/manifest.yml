@@ -1,7 +1,7 @@
 modules:
     Sellvana_Seo:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         description: "SEO related goodies, such as sitemaps and URL aliases"
         require: { module: { FCom_Core: 0.1.0 } }
 
