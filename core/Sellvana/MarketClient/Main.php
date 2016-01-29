@@ -116,6 +116,18 @@ class Sellvana_MarketClient_Main extends BClass
                 ],
             ]);
 
+            /**
+             * TODO: implement the following process:
+             * 1. Unpack files from module package into tmp folder
+             * 2. Validate CRC for unpacked files
+             * 2a. If there's a problem, abort and error
+             * 3. Backup existing module files
+             * 4. Copy new files from tmp folder into dlc module location, overwriting old files
+             * 5. Check that files in dlc module location matching files in tmp folder
+             * 5a. If there's a problem, restore files from backup, abort and error
+             * 6. Delete old files from dlc module location that are not in the new package
+             * 7. Clear cache and run migrations
+             */
             if (!$this->BUtil->zipExtract($filename, $targetDir)) {
                 $this->progress([
                     'errors' => [

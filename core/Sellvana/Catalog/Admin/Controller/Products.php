@@ -36,6 +36,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function gridConfig()
     {
         $config = parent::gridConfig();
+        $bool = [0 => 'no', 1 => 'Yes'];
         $config['columns'] = [
             ['type' => 'row_select', 'width' => 55],
             ['type' => 'btn_group', 'buttons' => [
@@ -48,6 +49,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
             ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
+            ['name' => 'is_hidden', 'label' => 'Hidden?', 'width' => 50, 'options' => $bool],
+            ['name' => 'manage_inventory', 'label' => 'Manage Inv?', 'width' => 50, 'options' => $bool],
             //['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
             //['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
             ['name' => 'net_weight', 'label' => 'Net Weight',  'width' => 100, 'hidden' => true],
