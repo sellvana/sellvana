@@ -50,20 +50,22 @@
           <ul class="dropdown-menu">
             {% for group, items in notifications.groups %}
               {% for item in items %}
-                <li>
-                  <a href="{{ item.href }}" title="{{ item.title }}">
-                    <div class="widget-body">
-                      <div class="pull-left icon">
-                        <i class="{{ item.icon_class }}"></i>
+                {% if item.status == 'new' %}
+                  <li id="notification-item-header{{ '-' ~ item.event_code | default('') }}">
+                    <a href="{{ item.href }}" title="{{ item.title }}">
+                      <div class="widget-body">
+                        <div class="pull-left icon">
+                          <i class="{{ item.icon_class }}"></i>
+                        </div>
+                        <div class="pull-left text">
+                          {{ item.content | safehtml | raw }}
+                        </div>
+                          <small class="pull-right text-muted timeago" title="{{ item.ts }}">{{ item.ts }}</small>
                       </div>
-                      <div class="pull-left text">
-                        {{ item.content | safehtml | raw }}
-                      </div>
-                        <small class="pull-right text-muted timeago" title="{{ item.ts }}">{{ item.ts }}</small>
-                    </div>
-                  </a>
-                </li>
-                <li class="divider"></li>
+                    </a>
+                  </li>
+                  <li class="divider"></li>
+                {% endif %}
               {% endfor %}
             {% endfor %}
               {#

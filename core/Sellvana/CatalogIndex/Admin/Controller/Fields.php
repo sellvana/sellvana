@@ -106,7 +106,7 @@ class Sellvana_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controlle
         $actions['reindex_force'] = [
             'button',
             [
-                'class' => ['btn', 'btn-primary', 'btn-progress', 'ladda-button'],
+                'class' => ['btn', 'btn-primary', 'btn-reindex', 'ladda-button'],
                 'type' => 'button',
                 'data-style' => 'expand-left'
             ],

@@ -3,6 +3,7 @@
 /**
  * Class Sellvana_CatalogIndex_Admin_Controller
  *
+ * @property FCom_Admin_Model_Activity $FCom_Admin_Model_Activity
  * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
@@ -40,6 +41,17 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
             'total'     => $this->BCache->load('index_progress_total'),
             'reindexed' => $this->BCache->load('index_progress_reindexed')
         ]);
+    }
+
+    public function action_activity__POST()
+    {
+        $hlp = $this->FCom_Admin_Model_Activity->loadWhere(['event_code' => 'catalog_indexing']);
+        if (!$hlp) {
+            $this->BResponse->json(['success' => false]);
+            return;
+        }
+        $hlp->set('status', $this->BRequest->post('status'))->save();
+        $this->BResponse->json(['success' => true, 'message' => 'Activity updated.']);
     }
 
     public function action_cat()

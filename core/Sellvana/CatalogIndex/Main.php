@@ -392,4 +392,19 @@ class Sellvana_CatalogIndex_Main extends BClass
         }
 
     }
+
+    public function onGetHeaderNotifications($args)
+    {
+        $total = $this->BCache->load('index_progress_total');
+        $reIndexed = $this->BCache->load('index_progress_reindexed');
+        if ($total > $reIndexed) {
+            $args['items'][] = [
+                'feed' => 'local',
+                'type' => 'progress',
+                'group' => 'catalog_indexing',
+                'content' => 'Task Running',
+                'code' => "catalog_indexing",
+            ];
+        }
+    }
 }

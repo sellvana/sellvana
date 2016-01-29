@@ -1,59 +1,111 @@
+<li id="notification-item-header-catalog_indexing">
+    <a href="javascript:void(0)">
+        <div class="widget-body">
+            <div class="pull-left icon">
+                <i class="fa fa-tasks"></i>
+            </div>
+            <div class="pull-left text">
+                {{ 'Task Running'|_ }}
+            </div>
+        </div>
+    </a>
+</li>
+<li class="reindex-item" style="padding: 10px;">
+    <span>Reindexing:</span>
+    <div class="progress progress-striped active" style="margin-bottom: 0; width: 100%;">
+        <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="1"
+             aria-valuemin="0" aria-valuemax="100" style="width: 1%">
+            <span id="progress-label"></span>
+        </div>
+    </div>
+</li>
 <script>
-    require(['jquery', 'react', 'bootstrap-ladda', 'jquery.validate', 'unique', 'bootstrap-ladda-spin'], function($, React, Ladda) {
-        $(document).on('click', '.btn-progress', function (e) {
-            var that = this,
-                    url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}',
-                    progressUrl = '{{ APP.href('/catalogindex/progress') }}',
-                    $progressBar = $('<div class="progress progress-striped active" style="margin-bottom: 0; width: 100%;"><div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 1%"></div></div>'),
-                    $localNoti = $('#header-notifications-local').show(),
-                    $localNotiDropdown = $localNoti.find('.dropdown-menu').html('');
+    require(['jquery', 'react', 'bootstrap-ladda', 'jstorage', 'jquery.validate', 'unique', 'bootstrap-ladda-spin'], function($, React, Ladda) {
+        var url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}',
+            activityUrl = '{{ APP.href('/catalogindex/activity?status=') }}',
+            progressUrl = '{{ APP.href('/catalogindex/progress') }}';
 
-            var loader = Ladda.create(this);
+        var $localNoti = $('#header-notifications-local');
+        var $localNotiDropdown = $localNoti.find('.dropdown-menu');
+        var $notiHeader = $('#notification-header-catalog_indexing');
+        var $reindexItem = $('.reindex-item');
 
-            $localNoti.find('#header-notifications-local-count').html('1');
-            $localNoti.find('i.icon-bell').css('color', 'red');
+        var $btnReindex = $('.btn-reindex');
+        var loader = Ladda.create($btnReindex[0]);
 
-            loader.start();
-            this.querySelector('.ladda-label').innerHTML = "{{ 'Indexing'|_ }}";
+        function task_runner() {
+            if (!loader.isLoading()) loader.start();
+            if ($notiHeader.length > 1) {
+                $notiHeader[1].remove();
+            }
+            if (!$localNoti.find('reindex-item').length) {
+                $localNotiDropdown.append($reindexItem[0]);
+            }
 
-            var $msgBoard = $('<span/>');
-
-            $progressBar.children('#progress-bar').append($msgBoard);
-            $localNotiDropdown
-                    .append('<li class="task" style="padding: 10px;"><h4>{{ 'Running Tasks'|_ }}:</h4><span>{{ 'Reindexing'|_ }}:</span></li>')
-                    .children('li.task')
-                    .append($progressBar[0]);
-
+            var $progressBar = $('#progress-bar').css('width', '0%');
+            var $msgBoard = $('#progress-label').html('');
             function channel_index_progress() {
                 $.get(progressUrl, function (msg) {
                     if (msg.total && msg.reindexed != undefined && msg.total != 0) {
                         var reindexed = parseInt(msg.reindexed);
                         var total = parseInt(msg.total);
                         var percentComplete = (reindexed * 100 / total);
-                        $progressBar.find('#progress-bar').css('width', percentComplete + '%');
-                        $msgBoard.text(reindexed + ' / ' + total);
+                        console.log('channel_index_progress', total, reindexed);
+                        $progressBar.css('width', percentComplete + '%');
+                        $msgBoard.html(reindexed + ' / ' + total);
                     }
                 });
             }
 
             var updateInterval = setInterval(channel_index_progress, 3000);
-
             $.ajax({
                 type: 'POST',
                 url: url,
-                data: {CLEAR: 1},
-                complete: function (data) {
-                    clearInterval(updateInterval);
-                    $progressBar.find('#progress-bar').css('width', '100%');
-                    $msgBoard.html('{{ "Reindexing completed."|_ }}');
+                data: {CLEAR: 1}
+            })
+            .complete(function (r) {
+                clearInterval(updateInterval);
+                $progressBar.css('width', '100%');
+                $msgBoard.html('{{ "Reindexing completed."|_ }}');
+                if (r.status == 200) {
+                    $.post(activityUrl, { status: 'archived' }, function (r) {
+                        $.bootstrapGrowl("{{ 'Indexing Completed'|_ }}", {
+                            type: 'success',
+                            align: 'center',
+                            width: 'auto'
+                        });
+                    });
                 }
-            }).always(function () {
-                $localNoti.find('.dropdown-toggle').dropdown('toggle');
-                $localNoti.find('#header-notifications-local-count').html('0');
-                $localNoti.find('i.icon-bell').css('color', '');
+            })
+            .always(function () {
                 loader.stop();
-                that.querySelector('.ladda-label').innerHTML = "{{ 'Force Reindex'|_ }}";
+                $localNoti.find('#header-notifications-local-count').html('0');
+            });
+        }
+
+        $(document).on('click', '.btn-reindex', function (e) {
+            loader.start();
+            $.post(activityUrl, { status: 'new' }, function (r) {
+                $localNoti.show();
+                $localNoti.find('#header-notifications-local-count').html('1');
+                if ($localNotiDropdown[0].childNodes.length > 0) {
+                    $localNotiDropdown
+                            .append($notiHeader[0])
+                            .append('<li class="divider"/>')
+                            .append($reindexItem[0]);
+                }
+
+                task_runner();
             });
         });
+
+        window.onload = function() {
+            $.get(progressUrl, function (msg) {
+                console.log('onload', msg.total, msg.reindexed);
+                if (msg.total && msg.reindexed < msg.total) {
+                    task_runner();
+                }
+            })
+        };
     });
 </script>
