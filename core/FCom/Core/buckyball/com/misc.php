@@ -3108,8 +3108,8 @@ class BDebug extends BClass
 //        if ($level !== static::DEBUG) {
 //            static::$_collectedErrors[$level][] = $msg;
 //        }
-        if (is_scalar($msg)) {
-            $e = ['msg' => $msg];
+        if (is_scalar($msg) || is_object($msg) && method_exists($msg, '__toString')) {
+            $e = ['msg' => (string)$msg];
         } elseif (is_object($msg) && $msg instanceof Exception) {
             $bt = $msg->getTrace();
             $msgStr = $msg->getMessage();
@@ -3133,6 +3133,7 @@ class BDebug extends BClass
         //$o = $bt[$stackPop]['object'];
         //$e['object'] = is_object($o) ? get_class($o) : $o;
 
+        $e['msg'] = (string)$e['msg'];
         $e['ts'] = BDb::i()->now();
         $e['t'] = microtime(true) - static::$_startTime;
         $e['d'] = null;

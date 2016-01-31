@@ -15,8 +15,8 @@ class FCom_ApiServer_Main extends BClass
         ;
         */
         $this->FCom_Admin_Model_Role->createPermission([
-            'apiserver' => BLocale::i()->_('Remote API Server'),
-            'settings/FCom_ApiServer' => BLocale::i()->_('Remote API Server Settings'),
+            'apiserver' => 'Remote API Server',
+            'settings/FCom_ApiServer' => 'Remote API Server Settings',
         ]);
     }
 }

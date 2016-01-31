@@ -44,13 +44,13 @@ class FCom_Core_View_Messages extends FCom_Core_View_Abstract
         foreach ((array)$messages as $m) {
             $out[] = [
                 'type' => $m['type'],
-                'msg' => !empty($m['msg']) ? $m['msg'] : null,
+                'msg' => !empty($m['msg']) ? (string)$m['msg'] : null,
                 'msgs' => !empty($m['msgs']) ? $m['msgs'] : null,
                 'class' => !empty($this->_classes[$m['type']]) ? $this->_classes[$m['type']] : $m['type'],
-                'title' => isset($m['title']) ? $m['title'] :
-                    (!empty($this->_titles[$m['type']]) ? $this->BLocale->_($this->_titles[$m['type']]) : null),
+                'title' => isset($m['title']) ? (string)$m['title'] :
+                    (!empty($this->_titles[$m['type']]) ? (string)$this->BLocale->_($this->_titles[$m['type']]) : null),
                 'icon' => isset($m['icon']) ? $m['icon'] :
-                    (!empty($this->_icons[$m['type']]) ? $this->BLocale->_($this->_icons[$m['type']]) : $m['type']),
+                    (!empty($this->_icons[$m['type']]) ? (string)$this->BLocale->_($this->_icons[$m['type']]) : $m['type']),
             ];
         }
         return $out;

@@ -20,7 +20,7 @@ class FCom_Test_Model_Log_Json extends PHPUnit_Util_Log_JSON
         $parts = [];
         foreach ($this->msgs as &$buffer) {
             array_walk_recursive($buffer, function (&$input) {
-                if (is_string($input)) {
+                if (is_string($input) || is_object($input) && method_exists($input, '__toString')) {
                     $input = PHPUnit_Util_String::convertToUtf8($input);
                 }
             });

@@ -67,7 +67,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $post     = $this->BRequest->post();
         $wishlist = $this->Sellvana_Wishlist_Model_Wishlist->create();
         $customer = $this->Sellvana_Customer_Model_Customer->sessionUser();
-        $locale   = BLocale::i();
+        $locale   = $this->BLocale;
         $error    = false;
 
         // Set model attributes
@@ -105,7 +105,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $wishlistHref = $this->BApp->href('wishlist');
         $post         = $this->BRequest->post();
         $wishlist     = $this->Sellvana_Wishlist_Model_Wishlist->sessionWishlist(true);
-        $locale       = BLocale::i();
+        $locale       = $this->BLocale;
 
         if ($this->BRequest->xhr()) {
             $result = [];
@@ -208,7 +208,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $wishlists  = $post['Wishlist'];
         $deletedIds = isset($post['delete']) ? $post['delete'] : [];
         $error      = false;
-        $locale     = BLocale::i();
+        $locale     = $this->BLocale;
         $r          = [];
 
         foreach ($wishlists as $id => $wishlist) {
