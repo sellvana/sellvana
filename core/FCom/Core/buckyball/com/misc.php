@@ -305,6 +305,16 @@ class BUtil extends BClass
         return $map;
     }
 
+    public function arrayWalkToString($array)
+    {
+        array_walk_recursive($array, function(&$node) {
+            if (is_object($node) && method_exists($node, '__toString')) {
+                $node = (string)$node;
+            }
+        });
+        return $array;
+    }
+
     /**
      * version of sprintf for cases where named arguments are desired (php syntax)
      *
