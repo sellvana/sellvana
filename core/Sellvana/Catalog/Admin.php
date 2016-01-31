@@ -60,6 +60,7 @@ class Sellvana_Catalog_Admin extends BClass
             'settings/Sellvana_Catalog' => 'Catalog Settings',
             'catalog' => 'Catalog',
             'catalog/products' => 'Manage Products',
+            'catalog/products-quick-add' => 'Quick Add Products',
             'catalog/categories' => 'Manage Categories',
             'catalog/families' => 'Manage Families',
             'catalog/stocks' => 'Manage Stocks',

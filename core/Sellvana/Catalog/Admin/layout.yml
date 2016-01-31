@@ -4,6 +4,7 @@ base:
             - [ addNav, catalog, { label: Catalog, pos: 200, icon_class: icon-barcode } ]
             - [ addNav, catalog/categories, { label: Navigation, href: /catalog/categories } ]
             - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
+            - [ addNav, catalog/products_quickadd, { label: Quick Add Products, href: /catalog/products/quick-add } ]
             - [ addNav, catalog/inventory, { label: Inventory, href: /catalog/inventory } ]
             - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
             - [ addNav, catalog/searchalias, { label: Search Terms, href: /catalog/searchalias } ]
@@ -52,6 +53,12 @@ catalog_product_form_tabs:
     - { include: form }
     - { hook: main, views: catalog/products/import-griddle }
     - { view: admin/nav, do: [[ setNav, catalog/products_import ]] }
+
+/catalog/products/quick-add:
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: catalog/products/quick-add }
+    - { view: admin/nav, do: [[ setNav, catalog/products_quickadd ]] }
 
 /catalog/categories:
     - { include: base }
