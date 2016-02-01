@@ -28,7 +28,7 @@
  *
  * @property Sellvana_Email_Model_Pref $Sellvana_Email_Model_Pref
  */
-class Sellvana_Email_Admin_Dashboard extends FCom_Admin_Widget
+class Sellvana_Email_Admin_Dashboard extends FCom_Admin_Dashboard_Abstract
 {
     static protected $_origClass      = __CLASS__;
     protected        $_modelClass     = 'Sellvana_Email_Model_Pref';

@@ -1,7 +1,7 @@
 modules:
     Sellvana_MultiSite:
-        version: 0.5.2.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         translations: { en: en.php }
         description: "Enable multiple website management from the same instance"
         require: { module: { FCom_Core: 0.1.0 } }

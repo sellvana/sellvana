@@ -995,6 +995,14 @@ class BLocale extends BClass
 
     public function _($string, $params = [], $module = null)
     {
+        if ($string instanceof BTranslated) {
+            return $string;
+        }
+        return new BTranslated($string, $params, $module);
+    }
+
+    public function translateToString($string, $params, $module)
+    {
         if (empty(static::$_tr[$string])) { // if no translation at all
             $tr = null;
             foreach (static::$_customTranslators as $translator) {
@@ -1068,43 +1076,6 @@ class BLocale extends BClass
         }
 
         return $this->BUtil->sprintfn($tr, $params);
-    }
-
-    public function tr_choice($choices, $property, array $params)
-    {
-        if (!isset($params[$property])) {
-            throw new BException('Parameter is not set: ' . $property);
-        }
-        if (!is_int($params[$property])) {
-            throw new BException('Invalid qualifier parameter: ' . $params[$property]);
-        }
-        $value = (int)$params[$property];
-        $defaultString = '';
-        foreach ($choices as $condition => $string) {
-            if ($condition === '*') { // if star, this is default
-                $defaultString = $string;
-                continue;
-            }
-            if (!preg_match('/^(\*)?([0-9]+)?(\.\.)?([0-9]+)?$/', $condition, $m) || ($m[2] === '' && $m[4] === '')) {
-                throw new BException('Invalid condition: ' . $condition);
-            }
-            $condValue = empty($m[1]) ? $value : ($value % 10); // if starts with star, modulo 10
-            $valid = true;
-            if (!empty($m[3])) { // range
-                if ($m[2] !== '' && $condValue < (int)$m[2]) { // lower bound breached
-                    $valid = false;
-                }
-                if (isset($m[4]) && $condValue > (int)$m[4]) { // upper bound breached
-                    $valid = false;
-                }
-            } elseif ($condValue !== (int)$m[2]) { // single number matches
-                $valid = false;
-            }
-            if ($valid) {
-                return $this->_($string, $params);
-            }
-        }
-        return $this->_($defaultString, $params);
     }
 
     public function translations($sources)
@@ -1360,5 +1331,30 @@ class BLocale extends BClass
         //TODO: currency specific number of digits
         $precision = pow(10, $decimals);
         return round($value * $precision) / $precision;
+    }
+}
+
+class BTranslated extends BClass
+{
+    /** @var BLocale */
+    protected static $_locale;
+
+    protected $_string;
+    protected $_params = [];
+    protected $_module = null;
+
+    public function __construct($string, $params, $module)
+    {
+        $this->_string = $string;
+        $this->_params = $params;
+        $this->_module = $module;
+    }
+
+    public function __toString()
+    {
+        if (!static::$_locale) {
+            static::$_locale = $this->BLocale;
+        }
+        return static::$_locale->translateToString($this->_string, $this->_params, $this->_module);
     }
 }

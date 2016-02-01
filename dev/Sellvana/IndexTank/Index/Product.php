@@ -342,7 +342,7 @@ class Sellvana_IndexTank_Index_Product extends Sellvana_IndexTank_Index_Abstract
         }
         foreach ($categories as $cat) {
             $pId = $cat->product_id;
-            $products[$pId]['categories'][self::i()->getCategoryKey($cat)] = $cat->node_name;
+            $products[$pId]['categories'][$this->getCategoryKey($cat)] = $cat->node_name;
             if (empty($products[$pId]['fields']['ct_categories'])) {
                 $products[$pId]['fields']['ct_categories'] = '';
             }

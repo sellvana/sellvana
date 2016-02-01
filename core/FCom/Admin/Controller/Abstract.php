@@ -337,7 +337,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             break;
 
         case 'mass-delete':
-            $args['ids'] = $this->BUtil->arrayCleanInt(explode(",", $id));
+            $args['ids'] = $this->BUtil->arrayCleanInt($id);
             foreach ($args['ids'] as $id) {
                 $model = $hlp->load($id);
                 if ($model) {
@@ -348,7 +348,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             break;
 
         case 'mass-edit':
-            $args['ids'] = $this->BUtil->arrayCleanInt(explode(",", $id));
+            $args['ids'] = $this->BUtil->arrayCleanInt($id);
             foreach ($args['ids'] as $id) {
                 $model = $hlp->load($id);
                 unset($data['_new']);

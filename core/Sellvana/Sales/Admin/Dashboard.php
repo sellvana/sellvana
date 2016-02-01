@@ -33,7 +33,7 @@
  * @property Sellvana_Sales_Model_Order_Item $Sellvana_Sales_Model_Order_Item
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
  */
-class Sellvana_Sales_Admin_Dashboard extends FCom_Admin_Widget
+class Sellvana_Sales_Admin_Dashboard extends FCom_Admin_Dashboard_Abstract
 {
     static protected $_origClass      = __CLASS__;
     protected        $_modelClass     = 'Sellvana_Sales_Model_Order';

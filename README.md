@@ -3,7 +3,7 @@ Sellvana
 
 [![Join the chat at https://gitter.im/sellvana/sellvana](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sellvana/sellvana?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Current state: public alpha.
+Current state: public beta.
 
 Installation
 ------------

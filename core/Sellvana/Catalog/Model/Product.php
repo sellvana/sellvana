@@ -75,6 +75,10 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         ],
     ];
 
+    protected static $_fieldDefaults = [
+        'base_price' => 0,
+    ];
+
     protected static $_validationRules = [
         ['product_name', '@required'],
         //['base_price', '@required'],
@@ -257,7 +261,13 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!parent::onBeforeSave()) return false;
 
         //todo: check out for unique url_key before save
-        if (!$this->get('url_key')) $this->generateUrlKey();
+        if (!$this->get('url_key')) {
+            $this->generateUrlKey();
+        }
+
+        if (empty($this->get('description'))) {
+            $this->set('description', $this->get('short_description'));
+        }
 
         // Cleanup possible bad input
         //if ($this->get('sale_price') === '') {

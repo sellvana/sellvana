@@ -9,7 +9,7 @@ class Sellvana_Feedback_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/feedback' => BLocale::i()->_('Feedback Settings'),
+            'settings/feedback' => 'Feedback Settings',
         ]);
     }
 }

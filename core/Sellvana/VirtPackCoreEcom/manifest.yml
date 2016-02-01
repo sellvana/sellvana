@@ -1,16 +1,16 @@
 modules:
     Sellvana_VirtPackCoreEcom:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
 
         require:
             module:
                 FCom_Admin: 0.5.0.0
                 FCom_AdminChat: 0.5.0.0
+                FCom_AutoTranslate: 0.5.0.0
                 FCom_Cron: 0.5.0.0
                 FCom_Frontend: 0.5.0.0
                 FCom_PushServer: 0.5.0.0
-                Sellvana_AdapterExcel: 0.5.0.0
                 Sellvana_Blog: 0.5.0.0
                 Sellvana_Catalog: 0.5.0.0
                 Sellvana_CatalogFields: 0.5.0.0
@@ -29,7 +29,6 @@ modules:
                 Sellvana_MultiLanguage: 0.5.0.0
                 Sellvana_MultiSite: 0.5.0.0
                 Sellvana_MultiVendor: 0.5.0.0
-                Sellvana_MultiWarehouse: 0.5.0.0
                 Sellvana_PaymentAuthorizeNet: 0.5.0.0
                 Sellvana_PaymentOgone: 0.5.0.0
                 Sellvana_PaymentBasic: 0.5.0.0

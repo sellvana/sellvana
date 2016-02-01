@@ -17,7 +17,7 @@ class FCom_AutoTranslate_Main extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/FCom_AutoTranslate' => BLocale::i()->_('Auto Translate Settings'),
+            'settings/FCom_AutoTranslate' => 'Auto Translate Settings',
         ]);
 
         $this->_apiKey = $this->BConfig->get('modules/FCom_AutoTranslate/google_api_key');

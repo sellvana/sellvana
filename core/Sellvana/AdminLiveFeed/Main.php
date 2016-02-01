@@ -14,7 +14,7 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_AdminLiveFeed' => BLocale::i()->_('Admin Live Feed Settings'),
+            'settings/Sellvana_AdminLiveFeed' => 'Admin Live Feed Settings',
         ]);
     }
 

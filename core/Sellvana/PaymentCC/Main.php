@@ -1,18 +1,16 @@
 <?php
 
 /**
- * Class Sellvana_Wishlist_Admin
+ * Class Sellvana_PaymentCC_Main
  *
  * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
-class Sellvana_Wishlist_Admin extends BClass
+class Sellvana_PaymentCC_Main extends BClass
 {
-
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'wishlist' => 'Wishlist',
-            'settings/Sellvana_Wishlist' => 'Wishlist Settings',
+            'settings/payment_cc' => 'Payment CC Settings',
         ]);
     }
 }

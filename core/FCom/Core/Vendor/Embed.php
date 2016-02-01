@@ -309,7 +309,9 @@ class FCom_Core_Vendor_Embed extends BClass
                     break;
                 }
 
-                $title = !empty($data->title) && is_string($data->title) ? $data->title : '';
+                $title = $data->title;
+                $title = !empty($title) && (is_string($title)
+                                            || is_object($title) && method_exists($title, '__toString')) ? $title : '';
 
                 $return = '<a href="' . $this->escUrl($url) . '"><img src="' . htmlspecialchars($data->url, ENT_QUOTES,
                         'UTF-8') . '" alt="' . htmlspecialchars($title, ENT_QUOTES,
@@ -323,8 +325,9 @@ class FCom_Core_Vendor_Embed extends BClass
                 }
                 break;
             case 'link':
-                if (!empty($data->title) && is_string($data->title)) {
-                    $return = '<a href="' . $this->escUrl($url) . '">' . htmlspecialchars($data->title, ENT_QUOTES,
+                $title = $data->title;
+                if (!empty($title) && (is_string($title) || is_object($title) && method_exists($title, '__toString'))) {
+                    $return = '<a href="' . $this->escUrl($url) . '">' . htmlspecialchars($title, ENT_QUOTES,
                             'UTF-8') . '</a>';
                 }
                 break;

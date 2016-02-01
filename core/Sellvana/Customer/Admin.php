@@ -10,15 +10,14 @@ class Sellvana_Customer_Admin extends BClass
 {
     public function bootstrap()
     {
-        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'api/customers' => $locale->_('Customers'),
-            'api/customers/view' => $locale->_('View'),
-            'api/customers/update' => $locale->_('Update'),
-            'settings/Sellvana_Customers' => $locale->_('Customers Settings'),
-            'customers' => $locale->_('Customers'),
-            'customers/manage' => $locale->_('Manage'),
-            'customers/import' => $locale->_('Import'),
+            'api/customers' => 'Customers',
+            'api/customers/view' => 'View',
+            'api/customers/update' => 'Update',
+            'settings/Sellvana_Customers' => 'Customers Settings',
+            'customers' => 'Customers',
+            'customers/manage' => 'Manage',
+            'customers/import' => 'Import',
         ]);
 
         $this->FCom_Admin_Controller_MediaLibrary->allowFolder('{random}/import/customers');

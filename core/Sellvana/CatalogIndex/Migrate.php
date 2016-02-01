@@ -44,7 +44,7 @@ class Sellvana_CatalogIndex_Migrate extends BClass
                 'field_name' => 'varchar(50) not null',
                 'field_label' => 'varchar(50) not null',
                 'field_type' => "enum('int','decimal','varchar','text','category') not null",
-                'weight' => 'int unsigned not null',
+                'weight' => 'int unsigned not null default 0',
                 'fcom_field_id' => 'int(10) unsigned default null',
                 'source_type' => "enum('field','method','callback') not null default 'field'",
                 'source_callback' => 'varchar(255) null',

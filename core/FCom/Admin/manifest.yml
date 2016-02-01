@@ -1,7 +1,7 @@
 modules:
     FCom_Admin:
-        version: 0.5.1.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         description: Admin Panel base functionality and platform
         custom:
             status:

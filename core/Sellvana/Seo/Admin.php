@@ -11,8 +11,8 @@ class Sellvana_Seo_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'seo/urlaliases' => BLocale::i()->_('Seo Url Aliases'),
-            'settings/Sellvana_Seo'   => BLocale::i()->_('Seo Settings'),
+            'seo/urlaliases' => 'Seo Url Aliases',
+            'settings/Sellvana_Seo'   => 'Seo Settings',
         ]);
     }
 }

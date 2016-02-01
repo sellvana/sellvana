@@ -305,6 +305,16 @@ class BUtil extends BClass
         return $map;
     }
 
+    public function arrayWalkToString($array)
+    {
+        array_walk_recursive($array, function(&$node) {
+            if (is_object($node) && method_exists($node, '__toString')) {
+                $node = (string)$node;
+            }
+        });
+        return $array;
+    }
+
     /**
      * version of sprintf for cases where named arguments are desired (php syntax)
      *
@@ -3108,8 +3118,8 @@ class BDebug extends BClass
 //        if ($level !== static::DEBUG) {
 //            static::$_collectedErrors[$level][] = $msg;
 //        }
-        if (is_scalar($msg)) {
-            $e = ['msg' => $msg];
+        if (is_scalar($msg) || is_object($msg) && method_exists($msg, '__toString')) {
+            $e = ['msg' => (string)$msg];
         } elseif (is_object($msg) && $msg instanceof Exception) {
             $bt = $msg->getTrace();
             $msgStr = $msg->getMessage();
@@ -3133,6 +3143,7 @@ class BDebug extends BClass
         //$o = $bt[$stackPop]['object'];
         //$e['object'] = is_object($o) ? get_class($o) : $o;
 
+        $e['msg'] = (string)$e['msg'];
         $e['ts'] = BDb::i()->now();
         $e['t'] = microtime(true) - static::$_startTime;
         $e['d'] = null;
