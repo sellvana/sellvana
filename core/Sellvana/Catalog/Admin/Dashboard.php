@@ -33,7 +33,7 @@
  * @property Sellvana_Catalog_Model_SearchHistory $Sellvana_Catalog_Model_SearchHistory
  * @property Sellvana_Catalog_Model_SearchHistoryLog $Sellvana_Catalog_Model_SearchHistoryLog
  */
-class Sellvana_Catalog_Admin_Dashboard extends FCom_Admin_Widget
+class Sellvana_Catalog_Admin_Dashboard extends FCom_Admin_Dashboard_Abstract
 {
     static protected $_origClass = __CLASS__;
     protected        $_modelClass = 'Sellvana_Catalog_Model_Product';

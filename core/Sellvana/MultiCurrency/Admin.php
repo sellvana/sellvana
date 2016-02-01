@@ -10,7 +10,7 @@ class Sellvana_MultiCurrency_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_MultiCurrency' => BLocale::i()->_('Multi Currency Settings'),
+            'settings/Sellvana_MultiCurrency' => 'Multi Currency Settings',
         ]);
     }
 }

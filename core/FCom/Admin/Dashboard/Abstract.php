@@ -26,7 +26,7 @@
 /**
  * Base class for all Admin Dashboard widgets
  */
-abstract class FCom_Admin_Widget extends BClass
+abstract class FCom_Admin_Dashboard_Abstract extends BClass
 {
     const            DEFAULT_LIMIT_CONFIG_PATH = 'modules/FCom_Admin/default_dashboard_widget_limit';
 

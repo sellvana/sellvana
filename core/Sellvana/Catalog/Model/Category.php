@@ -395,4 +395,18 @@ class Sellvana_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             $model->generateIdPath()->recalculateNumDescendants()->save();
         }
     }
+
+    public function getFlatCategories($separator = ' > ', $rootCategory = null)
+    {
+        if (null === $rootCategory) {
+            $rootCategory = $this->BConfig->get('modules/FCom_Frontend/nav_top/root_category', 1);
+        }
+        $categories = $this->orm()->select('id')->select('full_name')->order_by_asc('full_name')
+            ->find_many_assoc('id', 'full_name');
+        foreach ($categories as $id => &$name) {
+            $name = str_replace('|', $separator, $name);
+        }
+        unset($name);
+        return $categories;
+    }
 }

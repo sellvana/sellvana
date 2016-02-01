@@ -565,7 +565,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->_processFiltersConfig();
         $this->_processActionsConfig();
         $this->_processPersonalization();
-
         $grid = $this->grid;
         $this->BEvents->fire(__METHOD__ . ':after', ['grid' => &$grid]);
         $grid['_processed'] = true;
@@ -676,7 +675,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         unset($column);
 
-        $this->grid = $grid;
+        $this->grid = $this->BUtil->arrayWalkToString($grid);
         return $grid;
     }
 

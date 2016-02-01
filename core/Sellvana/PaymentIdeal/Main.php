@@ -14,7 +14,7 @@ class Sellvana_PaymentIdeal_Main extends BClass
             $this->Sellvana_Sales_Main->addPaymentMethod('ideal', 'Sellvana_PaymentIdeal_PaymentMethod');
         }
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_PaymentIdeal' => BLocale::i()->_('Payment IDEAL Settings'),
+            'settings/Sellvana_PaymentIdeal' => 'Payment IDEAL Settings',
         ]);
     }
 }

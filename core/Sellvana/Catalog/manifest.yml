@@ -39,6 +39,8 @@ modules:
                     - [ /catalog/products, Sellvana_Catalog_Admin_Controller_Products.index ]
                     - [ /catalog/products/.action, Sellvana_Catalog_Admin_Controller_Products ]
 
+                    - [ /catalog/products/quick-add/?.action, Sellvana_Catalog_Admin_Controller_ProductsAdd ]
+
                     - [ /catalog/products/import/.action, Sellvana_Catalog_Admin_Controller_ProductsImport ]
 
                     - [ /catalog/searchalias, Sellvana_Catalog_Admin_Controller_SearchAlias.index ]

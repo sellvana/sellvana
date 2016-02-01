@@ -1,0 +1,118 @@
+{% set categories = APP.instance('Sellvana_Catalog_Model_Category').getFlatCategories() %}
+
+<form action="{{ APP.href('catalog/products/quick-add') }}" method="post">
+    <div class="f-admin-main-view">
+        <div class="page-header f-admin-page-header">
+            <h1 class="f-page-title">
+                {{ "Quick Add Products" |_ }}
+            </h1>
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary btn-large">{{ 'Create Products'|_ }}</button>
+            </div>
+        </div>
+
+        <div class="f-admin-main f-grid-wrapper">
+
+            {{ THIS.view('core/messages') | raw }}
+
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <!--<th></th>-->
+                        <th>{{ 'Basic Info'|_ }}</th>
+                        <th>{{ 'More Info'|_ }}</th>
+                        <th>{{ 'Stock'|_ }}</th>
+                        <th>{{ 'Long Description'|_ }}</th>
+                        <th>{{ 'Images'|_ }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for i in range(0,9) %}
+                    <tr>
+                        <!--<td>
+                            <div class="table-actions-btns-group">
+                                <button type="button" class="btn btn-link"><i class="icon-caret-down"></i></button>
+                            </div>
+                        </td>-->
+                        <td>
+                            <div class="form-group">
+                                <label class="control-label required">{{ 'Product SKU' }}</label>
+                                <input type="text" name="products[{{ i }}][product_sku]" class="form-control" style="width:80px">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label required">{{ 'Product name' }}</label>
+                                <input type="text" name="products[{{ i }}][product_name]" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label required">{{ 'Short Description' }}</label>
+                                <textarea name="products[{{ i }}][short_description]" class="form-control" style="min-height:100px"></textarea>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label class="control-label required">{{ 'Price' }}</label>
+                                <input type="text" name="products[{{ i }}][price.base]" class="form-control" style="width:80px">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">{{ 'Hidden?' }}</label>
+                                <select name="products[{{ i }}][is_hidden]" class="form-control" style="width:80px"><option value="0">no</option><option value="1">YES</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">{{ 'Categories' }}</label>
+                                <br>
+                                <select name="categories[{{ i }}][]" class="form-control select2" multiple style="width:250px">
+                                    {{ UTIL.optionsHtml(categories) | raw }}
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label class="control-label">{{ 'Manage?'|_ }}</label>
+                                <select name="products[{{ i }}][manage_inventory]" class="form-control"><option value="0">no</option><option value="1" selected>YES</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">{{ 'Inventory SKU' }}</label>
+                                <input type="text" name="products[{{ i }}][inventory_sku]" class="form-control" style="width:80px">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">{{ 'Qty In Stock'|_ }}</label>
+                                <input type="text" name="inventory[{{ i }}][qty_in_stock]" class="form-control" style="width:80px">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">{{ 'Ship Weight'|_ }}</label>
+                                <input type="text" name="inventory[{{ i }}][shipping_weight]" class="form-control" style="width:80px">
+                            </div>
+                        </td>
+                        <td>
+                            <textarea name="products[{{ i }}][description]" class="form-control ckeditor"></textarea>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-default">{{ 'UPLOAD'|_ }}</button>
+                        </td>
+                        <td>
+                            <div class="table-actions-btns-group">
+                                <button type="button" class="btn btn-link btn-delete " onclick="return confirm('{{ "Are you sure?"|_ }}')"><i class="icon-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td></td><td></td><td></td>
+                    <td>
+                        <button type="submit" class="btn btn-primary btn-lg">{{ 'Create Products'|_ }}</button>
+                    </td>
+                    <td></td><td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</form>
+
+<script>
+    require(['jquery', 'select2', 'ckeditor'], function($) {
+        $('.select2').select2();
+    });
+</script>

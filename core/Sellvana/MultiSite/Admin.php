@@ -14,8 +14,8 @@ class Sellvana_MultiSite_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'multi_site' => BLocale::i()->_('Multi Site'),
-            'settings/Sellvana_MultiSite' => BLocale::i()->_('Multi Site Settings'),
+            'multi_site' => 'Multi Site',
+            'settings/Sellvana_MultiSite' => 'Multi Site Settings',
         ]);
     }
 
