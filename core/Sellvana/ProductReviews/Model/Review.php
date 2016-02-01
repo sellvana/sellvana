@@ -28,6 +28,11 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
        'min' => 0,
        'step' => 1,
     ];
+
+    protected static $_fieldDefaults = [
+        'verified_purchase' => 0,
+    ];
+
     protected static $_importExportProfile = [
         'skip'       => ['id'],
         'unique_key' => ['product_id', 'customer_id', 'create_at'],
