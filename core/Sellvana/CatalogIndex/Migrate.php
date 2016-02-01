@@ -399,6 +399,7 @@ EOT
             'source_type' => 'callback',
             'source_callback' => 'Sellvana_CatalogIndex_Model_Field::relevance',
             'sort_type' => 'asc',
+            'weight' => 0,
         ])->save();
     }
 }
