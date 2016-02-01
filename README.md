@@ -1,21 +1,19 @@
-Sellvana
-========
+# Sellvana
 
 [![Join the chat at https://gitter.im/sellvana/sellvana](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sellvana/sellvana?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Current state: public beta.
 
-Installation
-------------
+## Installation
 
 1. Checkout from bitbucket into web accessible folder e.g. `{webroot}/sellvana`:
 
         git clone git@bitbucket.org:sellvana/core.git
 
     * If you did not setup public key authentication with bitbucket, use HTTPS link:
-     
+
         git clone https://your_bitbucket_user@bitbucket.org/sellvana/core.git
-    
+
 2. Make sure `dlc/`, `storage/` and `media/` folders are recursively writable for web service
 3. Create database and db user for sellvana (make sure db collation is utf8_general_ci)
 4. Open the selvana folder in browser
@@ -24,8 +22,34 @@ Installation
 7. Open **admin** at `{webroot}/sellvana/admin` (should be already logged in with user info from the wizard)
 8. Go to **Modules > Manage Modules**, set modules you'd like to use to `REQUESTED` run level, click **Save**
 
-Test Data
----------
+## Isolating Sellvana in one subfolder under website root
+
+Sometimes you'd want to keep Sellvana within one subfolder in your web root, instead of mixing Sellvana's files and folders with other applications. Also, this helps if you use git for updates.
+
+1. Follow the installation instructions above, and you can install in a subfolder with any name you choose. For the
+current instructions and to avoid confusion we'll use "SELLVANA" as subfolder name.
+
+2. Create `index.php` in website root with the following contents:
+
+
+    <?php
+    require_once __DIR__ . '/SELLVANA/core/FCom/Core/Main.php';
+    BConfig::i()->set('fs/root_dir', 'SELLVANA')->set('web/base_src', 'SELLVANA');
+    FCom_Core_Main::i()->run('FCom_Frontend');
+
+3. Copy `.htaccess` file from sellvana root into your website root.
+
+4. If you will be using API, edit `.htaccess` to add the following into `<IfModule mod_rewrite.c>` section:
+
+
+    RewriteRule ^api(.*)$ SELLVANA/api/index.php/$1 [L]
+
+    # BEFORE THIS LINE:    RewriteRule ^(.*)$ index.php/$1 [L]
+
+5. Now you should be able to access Sellvana by browsing your website root. To access admin section, you'll need to add SELLVANA to your URL: `https://mysite.com/SELLVANA/admin`
+
+
+## Test Data
 
 If you'd like to generate test catalog data, please open this URL (replace 127.0.0.1/sellvana with your location):
 
@@ -33,8 +57,22 @@ If you'd like to generate test catalog data, please open this URL (replace 127.0
 
 This is a simple test script and should be ran only once.
 
-Fastest Performance Configuration
----------------------
+
+## Shell commands
+
+Sellvana allows to be installed and control some aspects via command line interface.
+To see available options, please run:
+
+`$ php shell.php`
+
+
+## Experimental and unfinished modules
+ 
+This repo includes modules that are not fit for production use exist in this repo only for development and feedback purposes. 
+These modules live in `dev` folder 
+
+
+## Fastest Performance Configuration
 
 To test fastest configuration timing and best memory consumption, set the following configuration:
 
@@ -65,8 +103,7 @@ Since the project is still in rapid development, restore the configuration to al
     * Optimizations > **All settings** = Enable in staging or production modes
 
 
-Issues
--------
+## Issues
 
 To report a bug, go to [Sellvana's Bug Tracker](https://bitbucket.org/sellvana/core/issues).
 
@@ -89,20 +126,17 @@ To report a bug, go to [Sellvana's Bug Tracker](https://bitbucket.org/sellvana/c
 
 **NOTE**: For general questions, peer support or working with Sellvana should be shared on the [community board](http://sellvana.com/community/).
 
-Documentation
--------------
+## Documentation
 
 We have put together a [quick guide](http://sellvana.com/fdoc/fulleron) to get you started. As a community member, we also invite you to collaborate, improve and submit new articles on [https://bitbucket.org/sellvana/sellvanadoc](https://bitbucket.org/sellvana/sellvanadoc).
 
-PHP-FPM support
----------------
+## PHP-FPM support
 
 A .user.ini is included in the installation, setting parameters for php-fpm
 installations. Please review the settings to match your machine and security
 policies.
 
-NGINX support
--------------
+## NGINX support
 
 Nginx will require the
 [headers-more](http://wiki.nginx.org/HttpHeadersMoreModule) module to remove
@@ -141,8 +175,7 @@ some headers. The following is an example configuration:
         }
     }
 
-Contributing
-------------
+## Contributing
 
 1. Before starting work on a new contribution, take a moment and search the commits for similar proposals.
 2. Fork the Sellvana repository into your account according to [BitBucket's Fork a Repo](https://confluence.atlassian.com/display/BITBUCKET/Fork+a+Repo,+Compare+Code,+and+Create+a+Pull+Request).
@@ -152,8 +185,23 @@ Contributing
 
 Note: You must agree to [Sellvana's Contributor License Agreement](http://sellvana.com/cla) before pulling any requests. You only need to sign the agreement once.
 
-Versioning
-----------
+## Built-in SCSS and LESS processors
+
+Sellvana has built-in libraries to compile SCSS and LESS files into CSS, so no external server setup and watchers are necessary.
+
+To declare SCSS or LESS file, add the following lines to your `layout.yml` file:
+ 
+    
+    - [ view: head, do: [[ scss, "@My_Module/Frontend/scss/mystyles.scss" ]] }
+    - [ view: head, do: [[ less, "@My_Module/Frontend/less/mystyles.less" ]] }
+    
+The resulting built CSS files will be added `.build.css` to their name and saved within the same folder as the original files during page rendering (in `DEBUG` and `DEVELOPMENT` modes), so make sure they are writable for web service user in your dev environment. 
+
+## Setting up crontab
+
+Use `cron.php` to run cron tasks from your shell, crontab setup or web.
+
+## Versioning
 
 Since all the functionality is contained in modules, the global Sellvana version is only an initial download package version.
 All the issue reports will require full list of currently installed module versions. If using built-in reporting, this will be done automatically.
