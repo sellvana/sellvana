@@ -62,4 +62,19 @@ class FCom_Core_View_Messages extends FCom_Core_View_Abstract
         }
         return $out;
     }
+
+    /**
+     * @return string
+     */
+    public function twigName()
+    {
+        $namespace = $this->get('namespace');
+        if ($namespace == 'admin') {
+            $this->_params['view_name'] = 'admin/messages';
+        }
+
+        return parent::twigName();
+    }
+
+
 }
