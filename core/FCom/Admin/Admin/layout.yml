@@ -134,6 +134,7 @@ lib_admin_theme1:
 
             - [ css, "@FCom_Admin/Admin/theme1/assets/css/bootstrap/bootstrap.css" ]
             - [ css, "@FCom_Admin/Admin/theme1/assets/css/bootstrap/fontawesome.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/css/plugins/dropzone/dropzone.min.css" ]
 
             #- [ css, "@FCom_LibJsCommon/js/bootstrap-3.3.5/css/bootstrap" ]
 
@@ -190,6 +191,7 @@ lib_admin_theme1:
             #- [ requireJs, typeahead, "@FCom_Admin/Admin/theme1/assets/js/plugins/typeahead/typeahead", { deps: [ jquery ] } ]
             - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/js/plugins/validate/jquery.validate.min", { deps: [ jquery ] } ]
 #            - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/js/plugins/validate/jquery.validate", { deps: [ jquery ] } ]
+            - [ requireJs, dropzone, "@FCom_Admin/Admin/theme1/assets/js/plugins/dropzone/dropzone-amd-module.min", { deps: [ jquery ] } ]
 
             - [ js, "@FCom_Admin/Admin/theme1/assets/js/jquery/jquery.min.js", { alias: jquery } ]
 #            - [ js, "@FCom_Admin/Admin/theme1/assets/js/jquery/jquery.js", { alias: jquery } ]
@@ -204,7 +206,6 @@ lib_admin_theme1:
             - [ requireJs, admin.demo, "@FCom_Admin/Admin/theme1/assets/js/demo", { deps: [ jquery ] } ]
 
             - [ requireRun, [ jquery-mobile, jquery-migrate, jquery-ui, bootstrap, admin.theme, admin.demo] ]
-
 
 jstree:
     - view: head

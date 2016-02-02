@@ -39,7 +39,8 @@ define(['underscore', 'react', 'fcom.components', 'fcom.locale'], function (_, R
                                         options={this.props.options}
                                         onSelection={this.handleSelections}
                                         placeholder={this.props.placeholder || Locale._('Select some options')}
-                                        multiple={this.props.multiple || false} val={this.props.defaultValue}/>
+                                        multiple={this.props.multiple || false}
+                                        val={this.props.defaultValue}/>
             );
         }
     });

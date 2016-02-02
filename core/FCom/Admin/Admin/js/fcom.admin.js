@@ -1714,6 +1714,31 @@ define(fcomAdminDeps, function ($, Ladda) {
         throw new Error("Unable to copy obj! Its type isn't supported.");
     };
 
+    $.fn.setValidateForm = function (selector) {
+        if (selector == null) {
+            selector = $(".validate-form");
+        }
+        if ($().validate) {
+            return selector.each(function (i, elem) {
+                return $(elem).validate({
+                    errorElement: "span",
+                    errorClass: "help-block has-error",
+                    errorPlacement: function (e, t) {
+                        return t.parents(".controls").first().append(e);
+                    },
+                    highlight: function (e) {
+                        $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
+                        return $(e).closest('span.help-block').css('display', 'block');
+                    },
+                    success: function (e) {
+                        e.closest(".form-group").removeClass("has-error");
+                        return e.closest("span.help-block").css('display', 'none');
+                    }
+                });
+            });
+        }
+    };
+
     /**
      * resize width window
      * @param options

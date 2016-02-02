@@ -1,118 +1,482 @@
-{% set categories = APP.instance('Sellvana_Catalog_Model_Category').getFlatCategories() %}
+<style type="text/css">
+    .dropzone, .dropzone * {
+        box-sizing: border-box;
+    }
 
-<form action="{{ APP.href('catalog/products/quick-add') }}" method="post">
+    .dropzone {
+        position: relative;
+        text-align: center;
+        border: 2px dashed #b4b9be;
+        border-radius: 5px;
+        min-height: 255px;
+    }
+
+    .dropzone.dz-clickable {
+        cursor: pointer;
+    }
+
+    .dropzone .dz-message .note {
+        font-size: 0.8em;
+        font-weight: 200;
+        display: block;
+        margin-top: 1.4rem;
+    }
+
+    .dropzone .dz-preview {
+        position: relative;
+        display: inline-block;
+        width: 120px;
+        margin: 0.5em;
+    }
+    .dropzone .dz-preview .dz-progress {
+        display: block;
+        height: 15px;
+        border: 1px solid #aaa;
+    }
+    .dropzone .dz-preview .dz-progress .dz-upload {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: green;
+    }
+    .dropzone .dz-preview .dz-error-message {
+        color: red;
+        display: none;
+    }
+    .dropzone .dz-preview.dz-error .dz-error-message, .dropzone .dz-preview.dz-error .dz-error-mark {
+        display: block;
+    }
+    .dropzone .dz-preview.dz-success .dz-success-mark {
+        display: block;
+    }
+    .dropzone .dz-preview .dz-error-mark, .dropzone .dz-preview .dz-success-mark {
+        position: absolute;
+        display: none;
+        left: 30px;
+        top: 30px;
+        width: 54px;
+        height: 58px;
+        left: 50%;
+        margin-left: -27px;
+    }
+
+    .select2-container {
+        width: 200px;
+    }
+</style>
+{% set categories = APP.instance('Sellvana_Catalog_Model_Category').getFlatCategories() %}
+{% set defaultFileSizeConfig = CONFIG.get('modules/FCom_Admin/default_media_file_size') | default('1') %}
+
+<form id="products-quick-add-form" action="{{ APP.href('catalog/products/quick-add') }}" method="post">
     <div class="f-admin-main-view">
         <div class="page-header f-admin-page-header">
             <h1 class="f-page-title">
                 {{ "Quick Add Products" |_ }}
             </h1>
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary btn-large">{{ 'Create Products'|_ }}</button>
+            <div class="input-group pull-right col-sm-3">
+                <input id="product_no" type="text" placeholder="Set adding products" class="form-control" />
+                <div class="input-group-btn">
+                    <!-- Buttons -->
+                    <button type="button" disabled id="btn_add_products" style="padding: 8px 15px;" class="btn btn-danger"><i class="fa fa-plus fa-fw"></i></button>
+                    <button type="submit" class="btn btn-primary ladda-button" style="padding: 8px 15px;" data-style="expand-left">{{ 'Create Products'|_ }}</button>
+                </div>
             </div>
         </div>
 
         <div class="f-admin-main f-grid-wrapper">
-
             {{ THIS.view('core/messages') | raw }}
-
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <!--<th></th>-->
-                        <th>{{ 'Basic Info'|_ }}</th>
-                        <th>{{ 'More Info'|_ }}</th>
-                        <th>{{ 'Stock'|_ }}</th>
-                        <th>{{ 'Long Description'|_ }}</th>
-                        <th>{{ 'Images'|_ }}</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for i in range(0,9) %}
-                    <tr>
-                        <!--<td>
-                            <div class="table-actions-btns-group">
-                                <button type="button" class="btn btn-link"><i class="icon-caret-down"></i></button>
-                            </div>
-                        </td>-->
-                        <td>
-                            <div class="form-group">
-                                <label class="control-label required">{{ 'Product SKU' }}</label>
-                                <input type="text" name="products[{{ i }}][product_sku]" class="form-control" style="width:80px">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label required">{{ 'Product name' }}</label>
-                                <input type="text" name="products[{{ i }}][product_name]" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label required">{{ 'Short Description' }}</label>
-                                <textarea name="products[{{ i }}][short_description]" class="form-control" style="min-height:100px"></textarea>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group">
-                                <label class="control-label required">{{ 'Price' }}</label>
-                                <input type="text" name="products[{{ i }}][price.base]" class="form-control" style="width:80px">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">{{ 'Hidden?' }}</label>
-                                <select name="products[{{ i }}][is_hidden]" class="form-control" style="width:80px"><option value="0">no</option><option value="1">YES</option></select>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">{{ 'Categories' }}</label>
-                                <br>
-                                <select name="categories[{{ i }}][]" class="form-control select2" multiple style="width:250px">
-                                    {{ UTIL.optionsHtml(categories) | raw }}
-                                </select>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group">
-                                <label class="control-label">{{ 'Manage?'|_ }}</label>
-                                <select name="products[{{ i }}][manage_inventory]" class="form-control"><option value="0">no</option><option value="1" selected>YES</option></select>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">{{ 'Inventory SKU' }}</label>
-                                <input type="text" name="products[{{ i }}][inventory_sku]" class="form-control" style="width:80px">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">{{ 'Qty In Stock'|_ }}</label>
-                                <input type="text" name="inventory[{{ i }}][qty_in_stock]" class="form-control" style="width:80px">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">{{ 'Ship Weight'|_ }}</label>
-                                <input type="text" name="inventory[{{ i }}][shipping_weight]" class="form-control" style="width:80px">
-                            </div>
-                        </td>
-                        <td>
-                            <textarea name="products[{{ i }}][description]" class="form-control ckeditor"></textarea>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-default">{{ 'UPLOAD'|_ }}</button>
-                        </td>
-                        <td>
-                            <div class="table-actions-btns-group">
-                                <button type="button" class="btn btn-link btn-delete " onclick="return confirm('{{ "Are you sure?"|_ }}')"><i class="icon-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-                <tr>
-                    <td></td><td></td><td></td>
-                    <td>
-                        <button type="submit" class="btn btn-primary btn-lg">{{ 'Create Products'|_ }}</button>
-                    </td>
-                    <td></td><td></td>
-                </tr>
-                </tbody>
-            </table>
+            <div id="products-quick-add-container"></div>
         </div>
-
     </div>
 </form>
 
 <script>
-    require(['jquery', 'select2', 'ckeditor'], function($) {
-        $('.select2').select2();
+    require(['jquery', 'underscore', 'react', 'fcom.components', 'dropzone', 'fcom.admin', 'unique'], function($, _, React, Components, Dropzone) {
+        Dropzone.autoDiscover = false;
+        var _mainForm = $('#products-quick-add-form');
+        window.adminForm = FCom.Admin.form({
+            form: 'products-quick-add-form',
+            url_get: '{{ APP.href('catalog/products/quick-add') }}',
+            url_post: '{{ APP.href('catalog/products/quick-add') }}'
+        });
+
+        $.fn.setValidateForm(_mainForm);
+
+        _mainForm.on('submit', function () {
+            if (!$(this).valid()) return false;
+        });
+
+        $(document).on('keyup', '#product_no', function (e) {
+            if (e.target.value != '' && e.target.value != '0') {
+                $('button#btn_add_products').prop('disabled', false);
+            } else {
+                $('button#btn_add_products').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '#btn_add_products', function (e) {
+            e.preventDefault();
+            var $proNo = $('#product_no');
+            $proNo.prop('disabled', true);
+            $(this).prop('disabled', true);
+            BlockFormComponent.setProps({ block_count: $proNo.val() });
+        });
+
+        var Blocks = React.createClass({
+            getDefaultProps: function () {
+                return {
+                    block_count: 0
+                };
+            },
+            getInitialState: function () {
+                return {
+                    block_count: this.props.block_count
+                };
+            },
+            componentWillReceiveProps: function (nextProps) {
+                this.setState({ block_count: nextProps.block_count });
+            },
+            componentDidUpdate: function () {
+                this.init();
+            },
+            componentDidMount: function () {
+                this.init();
+            },
+            removeProduct: function (e) {
+                var id = e.target.dataset.id;
+            },
+            init: function () {
+                var that = this, index;
+                for (var i = 1; i <= this.state.block_count; i++) {
+                    index = i;
+                    var flag = true;
+                    $('#product_sku_' + index).rules("add", {
+                        onfocusout: false,
+                        onkeyup: false,
+                        remote: {
+                            url: '{{ APP.href('/catalog/products/quick-add/unique_sku') | raw }}',
+                            type: 'post',
+                            data: {
+                                _key: index,
+                                _sku: 'product_sku'
+                            },
+                            dataFilter: function (responseString) {
+                                var response = jQuery.parseJSON(responseString);
+                                currentMessage = response.Message;
+                                return response.unique;
+                            }
+                        },
+                        messages: {
+                            remote: "{{ 'This sku is already taken place.' |_ }}"
+                        }
+                    });
+
+                    var id = 'dropzone-' + index;
+                    new Dropzone('div#' + id, {
+                        url: "{{ APP.href('/media/grid/upload?type=') | raw }}" + encodeURIComponent('product-images') + '&folder=' + encodeURIComponent('media/product/images'),
+                        autoProcessQueue: false,
+                        uploadMultiple: true,
+                        paramName: 'upload',
+                        addRemoveLinks: true,
+                        maxFilesize: "{{ defaultFileSizeConfig | raw }}",
+                        maxFiles: 3,
+                        init: function () {
+                            var _this = this;
+                            this.element.querySelector("button#btnUpload" + index).addEventListener("click", function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                _this.processQueue();
+                            });
+
+                            this.element.querySelector("button#btnCancel" + index).addEventListener("click", function () {
+                                _this.removeAllFiles(true);
+                            });
+
+                            this.on("success", function(file, responseText) {
+                                var $input = $(_this.element.querySelector('input#product_images_' + index));
+                                if ($input.length) {
+                                    var values = $input.val() ? $input.val().split(',') : [];
+                                    var uIds = _.pluck(responseText['files'], 'id');
+                                    _(uIds).each(function (id) {
+                                        values.push(id);
+                                    });
+                                    $input.val(values.join(','));
+                                }
+                            });
+                        }
+                    });
+                }
+
+                $('.select2').select2({
+                    multiple: true,
+                    ajax: {
+                        url: '{{ APP.href('/catalog/products/quick-add/categories') | raw }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (param) {
+                            return {
+                                q: param
+                            };
+                        },
+                        results: function (data) {
+                            return {
+                                results: $.map(data, function (item, id) {
+                                    return {
+                                        text: item,
+                                        id: id
+                                    }
+                                })
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1
+                });
+            },
+            getBlockGrid: function () {
+                var blocks = [];
+                if (this.state.block_count < 1) return blocks;
+                for (var i = 1; i <= this.state.block_count; i++) {
+                    blocks.push(
+                        React.createElement(BlockForm, {
+                            index: i,
+                            key: i,
+                            actions: {
+                                removeProduct: this.removeProduct
+                            }
+                        })
+                    );
+                }
+                return blocks;
+            },
+            render: function () {
+                return React.DOM.table({ className: 'table table-bordered table-striped' },
+                    React.DOM.thead(null,
+                        React.DOM.tr(null,
+                            React.DOM.th(null, "{{ 'Basic Info'|_ }}"),
+                            React.DOM.th(null, "{{ 'More Info'|_ }}"),
+                            React.DOM.th(null, "{{ 'Stock'|_ }}"),
+                            React.DOM.th(null, "{{ 'Long Description'|_ }}"),
+                            React.DOM.th(null, "{{ 'Images'|_ }}"),
+                            React.DOM.th(null, "{{ 'Actions'|_ }}")
+                        ),
+                        React.DOM.tbody({ref: 'table-body'}, this.getBlockGrid())
+                    )
+                );
+            }
+        });
+
+        var BlockForm = React.createClass({
+            getInitialState: function () {
+                return {
+                    id: this.props.index
+                };
+            },
+            render: function () {
+                return React.DOM.tr(null,
+                    React.DOM.td(null,
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                required: true,
+                                label_class: '',
+                                input_id: 'products['+this.state.id+'][product_sku]'}, "{{ 'Product SKU'|_ }}"
+                            ),
+                            React.createElement(Components.ControlInput, {
+                                value: '',
+                                id: 'product_sku_' + this.state.id,
+                                name: 'products['+this.state.id+'][product_sku]',
+                                validation: { required: true },
+                                attrs: {
+                                    style: {width: "80px"},
+                                    'data-id': this.state.id
+                                }
+                            })
+                        ),
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                required: true,
+                                label_class: '',
+                                input_id: 'products['+this.state.id+'][product_name]'}, "{{ 'Product name'|_ }}"
+                            ),
+                            React.createElement(Components.ControlInput, {
+                                value: '',
+                                className: 'product_name',
+                                id: 'products['+this.state.id+'][product_name]',
+                                name: 'products['+this.state.id+'][product_name]',
+                                validation: { required: true }}
+                            )
+                        ),
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                required: true,
+                                label_class: '',
+                                input_id: 'products['+this.state.id+'][short_description]'}, "{{ 'Short Description'|_ }}"
+                            ),
+                            React.createElement(Components.ControlInput, {
+                                type: 'textarea',
+                                id: 'products['+this.state.id+'][short_description]',
+                                className: 'short_description',
+                                name: 'products['+this.state.id+'][short_description]',
+                                value: '',
+                                validation: { required: true },
+                                attrs: {
+                                    style: {minWidth: "100px"}
+                                }
+                            })
+                        )
+                    ),
+                    React.DOM.td(null,
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                required: true,
+                                label_class: '',
+                                input_id: 'products['+this.state.id+'][price.base]'}, "{{ 'Price'|_ }}"
+                            ),
+                            React.createElement(Components.ControlInput, {
+                                value: '',
+                                id: 'products['+this.state.id+'][price.base]',
+                                name: 'products['+this.state.id+'][price.base]',
+                                validation: { required: true },
+                                attrs: {
+                                    style: {width: "80px"}
+                                }
+                            })
+                        ),
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: '',
+                                input_id: 'products['+this.state.id+'][is_hidden]'}, "{{ 'Hidden?'|_ }}"
+                            ),
+                            React.createElement(Components.ControlInput, {
+                                type: 'select',
+                                value: 0,
+                                className: 'is_hidden',
+                                id: 'products['+this.state.id+'][is_hidden]',
+                                name: 'products['+this.state.id+'][is_hidden]',
+                                options: {
+                                    0: "{{ 'no'|_ }}", 1: "{{ 'Yes'|_ }}"
+                                },
+                                attrs: {
+                                    style: {width: "80px"}
+                                }
+                            })
+                        ),
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: '',
+                                input_id: 'categories['+this.state.id+']'}, "{{ 'Categories'|_ }}"
+                            ),
+                            React.DOM.input({ type: 'hidden', name: 'categories['+this.state.id+'][]', className: 'form-control select2' })
+                        )
+                    ),
+                    React.DOM.td(null,
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                required: true,
+                                label_class: '',
+                                input_id: 'products['+this.state.id+'][manage_inventory]'}, "{{ 'Manage?'|_ }}"
+                            ),
+                            React.createElement(Components.ControlInput, {
+                                type: 'select',
+                                value: 0,
+                                options: {
+                                    0: "{{ 'no'|_ }}", 1: "{{ 'Yes'|_ }}"
+                                },
+                                className: 'manage_inventory',
+                                id: 'products['+this.state.id+'][manage_inventory]',
+                                name: 'products['+this.state.id+'][manage_inventory]',
+                                attrs: {
+                                    style: {width: "80px"}
+                                }
+                            })
+                        ),
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: '',
+                                input_id: 'products['+this.state.id+'][inventory_sku]'}, "{{ 'Inventory SKU'|_ }}"
+                            ),
+                            React.createElement(Components.ControlInput, {
+                                value: '',
+                                className: 'inventory_sku',
+                                id: 'products['+this.state.id+'][inventory_sku]',
+                                name: 'products['+this.state.id+'][inventory_sku]',
+                                attrs: {
+                                    style: {width: "80px"}
+                                }
+                            })
+                        ),
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: '',
+                                input_id: 'inventory['+this.state.id+'][qty_in_stock]'}, "{{ 'Qty In Stock'|_ }}"
+                            ),
+                            React.createElement(Components.ControlInput, {
+                                value: '',
+                                className: 'qty_in_stock',
+                                id: 'inventory['+this.state.id+'][qty_in_stock]',
+                                name: 'inventory['+this.state.id+'][qty_in_stock]',
+                                attrs: {
+                                    style: {width: "80px"}
+                                }
+                            })
+                        ),
+                        React.DOM.div({ className: 'form-group controls' },
+                            React.createElement(Components.ControlLabel, {
+                                label_class: '',
+                                input_id: 'inventory['+this.state.id+'][shipping_weight]'}, "{{ 'Ship Weight'|_ }}"
+                            ),
+                            React.createElement(Components.ControlInput, {
+                                value: '',
+                                id: 'inventory['+this.state.id+'][shipping_weight]',
+                                name: 'inventory['+this.state.id+'][shipping_weight]',
+                                attrs: {
+                                    style: {width: "80px"}
+                                }
+                            })
+                        )
+                    ),
+                    React.DOM.td({ style: { width: '300px' } },
+                        React.createElement(Components.SpecialInput, {
+                            type: 'wysiwyg',
+                            id: 'products['+this.state.id+'][description]',
+                            name: 'products['+this.state.id+'][description]',
+                            className: 'ckeditor',
+                            value: ''
+                        })
+                    ),
+                    React.DOM.td({ style: { width: '500px' } },
+                        React.DOM.div({ className: 'dropzone', id: 'dropzone-' + this.state.id },
+                            React.DOM.input({ type: 'hidden', name: 'products['+this.state.id+'][images]', id: 'product_images_' + this.state.id, className: 'product_images' }),
+                            React.DOM.button({ type: 'button', className: 'btn btn-success btn-xs', id: 'btnUpload' + this.state.id }, "{{ 'Start Upload'|_ }}"),
+                            React.DOM.button({ type: 'button', className: 'btn btn-default btn-xs', id: 'btnCancel' + this.state.id }, "{{ 'Cancel'|_ }}"),
+                            React.DOM.br(null)
+                        )
+                    ),
+                    React.DOM.td(null,
+                        React.DOM.div({ className: 'table-actions-btns-group' },
+                            React.createElement(Components.Button, {
+                                    className: 'btn btn-link btn-delete',
+                                    onClick: this.props.actions.removeProduct,
+                                    'data-id': this.state.id
+                                },
+                                React.DOM.i({ className: 'icon-trash' })
+                            )
+                        )
+                    )
+                );
+            }
+        });
+
+        var container = document.getElementById('products-quick-add-container');
+        React.unmountComponentAtNode(container);
+
+        var BlockFormComponent = React.render(
+            React.createElement(Blocks), container
+        );
+
+        // Prevent the default action when a file is dropped on the window
+        $(document).on('drop dragover', function (e) {
+            e.preventDefault();
+        });
     });
 </script>

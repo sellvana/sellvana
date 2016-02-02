@@ -1,5 +1,5 @@
 //noinspection JSPotentiallyInvalidUsageOfThis
-define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore', 'select2', 'jquery.validate'], function (React, $, Locale, Sortable) {
+define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'bootstrap', 'select2', 'jquery.validate'], function ($, React, _, Locale, Sortable) {
     FCom.Components = {};
 
     /**
@@ -284,12 +284,14 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             return {
                 type: '',
                 disabled: false,
-                attrs: {}
+                attrs: {},
+                className: ''
             };
         },
         getInitialState: function () {
             return {
-                value: this.props.value
+                value: this.props.value,
+                selections: []
             };
         },
         componentDidMount: function () {
@@ -333,6 +335,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                           defaultChecked={!!(this.state.value === undefined || this.state.value === '1')}
                           value={this.state.value}
                           onChange={this.handleSwitch}
+                          placeholder={this.props.placeholder}
                           ref={'switch-cbx-' + this.props.id} {...this.props.attrs} />;
         },
         createWysiwyg: function () {
@@ -347,6 +350,29 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                         <label htmlFor={this.props.id} className="error" style={{ display: 'none' }} />
                     </div>;
         },
+        handleSelections: function () {
+            this.setState({selections: selections});
+
+            if (this.props.onChange) {
+                this.props.onChange(e, this.props.callback, this.state.selections);
+            }
+        },
+        getSelect2Config: function () {
+            return {
+                name: this.props.name,
+                className: this.props.className || '',
+                placeholder: this.props.placeholder || Locale._('Select some options'),
+                multiple: this.props.multiple || false,
+                options: this.props.options,
+                enabled: this.props.enabled || true,
+                onSelection: this.handleSelections,
+                val: this.props.defaultValue,
+                attrs: this.props.attrs || {}
+            };
+        },
+        createSelect2: function () {
+            return React.createElement(FCom.Components.Select2, this.getSelect2Config());
+        },
         renderNode: function () {
             switch (this.props.type) {
                 case 'switch':
@@ -354,6 +380,9 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                     break;
                 case 'wysiwyg':
                     return this.createWysiwyg();
+                    break;
+                case 'select2':
+                    return this.createSelect2();
                     break;
             }
         },
@@ -929,7 +958,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         render: function () {
             return (
                 <div>
-                    <input id={this.props.id} {...this.props.attrs} type='hidden' style={this.props.style}/>
+                    <input id={this.props.id} name={this.props.name} {...this.props.attrs} type='hidden' style={this.props.style}/>
                 </div>
             );
         }
