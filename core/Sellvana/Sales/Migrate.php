@@ -34,7 +34,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_5_2_0()
+    public function install__0_6_1_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);
@@ -485,6 +485,10 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_custom' => "varchar(20) default null",
                 'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'rma_at' => 'datetime',
+                'received_at' => 'datetime',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
@@ -522,6 +526,9 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_custom' => "varchar(20) default null",
                 'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'refunded_at' => 'datetime',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
@@ -558,6 +565,9 @@ class Sellvana_Sales_Migrate extends BClass
                 'state_overall' => "varchar(20) not null default 'new'",
                 'state_custom' => "varchar(20) default null",
                 'data_serialized' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'canceled_at' => 'datetime',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
@@ -2104,7 +2114,8 @@ class Sellvana_Sales_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_5_2_0__0_5_3_0(){
+    public function upgrade__0_5_2_0__0_5_3_0()
+    {
         $tOrderShipment = $this->Sellvana_Sales_Model_Order_Shipment->table();
 
         $this->BDb->ddlTableDef($tOrderShipment, [
@@ -2114,13 +2125,46 @@ class Sellvana_Sales_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_5_3_0__0_5_4_0(){
+    public function upgrade__0_5_3_0__0_5_4_0()
+    {
         $tCart = $this->Sellvana_Sales_Model_Cart->table();
 
         $this->BDb->ddlTableDef($tCart, [
             BDb::COLUMNS => [
                 'service_code' => "varchar(50)"
             ]
+        ]);
+    }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $tOrderCancel = $this->Sellvana_Sales_Model_Order_Cancel->table();
+        $tOrderReturn = $this->Sellvana_Sales_Model_Order_Return->table();
+        $tOrderRefund = $this->Sellvana_Sales_Model_Order_Refund->table();
+
+        $this->BDb->ddlTableDef($tOrderCancel, [
+            BDb::COLUMNS => [
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'canceled_at' => 'datetime',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturn, [
+            BDb::COLUMNS => [
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'rma_at' => 'datetime',
+                'received_at' => 'datetime',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefund, [
+            BDb::COLUMNS => [
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'refunded_at' => 'datetime',
+            ],
         ]);
     }
 }
