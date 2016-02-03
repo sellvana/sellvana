@@ -114,17 +114,16 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
         $q = explode(' ', $r->get('q'));
 
         /** @var BORM $orm */
-        $orm = $this->Sellvana_Catalog_Model_Category->orm('c')
+        $orm = $this->Sellvana_Catalog_Model_Category->orm()
             ->select(['id', 'full_name', 'sort_order', 'is_enabled'])
-            ->order_by_asc('sort_order')
-            ->where_raw('is_enabled = 1');
+            ->order_by_asc('sort_order');
 
         if (is_array($q)) {
             foreach($q as $value) {
-                $orm->where_raw("full_name LIKE '%" . $value . "%'");
+                $orm->where_like('full_name', '%' . $value . '%');
             }
         } else {
-            $orm->where_raw("full_name LIKE '%" . $q . "%'");
+            $orm->where_like('full_name', '%' . $q . '%');
         }
 
         $categories = $orm->find_many_assoc('id', 'full_name');

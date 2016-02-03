@@ -92,7 +92,6 @@
 
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'fcom.admin', 'unique'], function($, _, React, Components, FComSelect2) {
-        Dropzone.autoDiscover = false;
         var _mainForm = $('#products-quick-add-form');
         var imageList = {};
 
@@ -170,7 +169,7 @@
 
                 _this.element.querySelector("button.btn-cancel").addEventListener("click", function () {
                     _this.removeAllFiles(true);
-                    var values = $input.val() ? $input.val().split(',') : [];
+                    var values = that.hiddenInput.val() ? that.hiddenInput.val().split(',') : [];
                     if (values.length) {
                         that.unlink(values);
                     }
