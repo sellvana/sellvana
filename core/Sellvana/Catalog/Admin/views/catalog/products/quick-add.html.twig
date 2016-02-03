@@ -77,7 +77,7 @@
                 <input id="product_no" type="text" placeholder="Set adding products" class="form-control" />
                 <div class="input-group-btn">
                     <!-- Buttons -->
-                    <button type="button" disabled id="btn_add_products" style="padding: 8px 15px;" class="btn btn-danger"><i class="fa fa-plus fa-fw"></i></button>
+                    <button type="button" {#disabled#} id="btn_add_products" style="padding: 8px 15px;" class="btn btn-danger"><i class="fa fa-plus fa-fw"></i></button>
                     <button type="submit" class="btn btn-primary ladda-button" style="padding: 8px 15px;" data-style="expand-left">{{ 'Create Products'|_ }}</button>
                 </div>
             </div>
@@ -91,9 +91,11 @@
 </form>
 
 <script>
-    require(['jquery', 'underscore', 'react', 'fcom.components', 'dropzone', 'fcom.admin', 'unique'], function($, _, React, Components, Dropzone) {
+    require(['jquery', 'underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'fcom.admin', 'unique'], function($, _, React, Components, FComSelect2) {
         Dropzone.autoDiscover = false;
         var _mainForm = $('#products-quick-add-form');
+        var imageList = {};
+
         window.adminForm = FCom.Admin.form({
             form: 'products-quick-add-form',
             url_get: '{{ APP.href('catalog/products/quick-add') }}',
@@ -106,35 +108,35 @@
             if (!$(this).valid()) return false;
         });
 
-        $(document).on('keyup', '#product_no', function (e) {
-            if (e.target.value != '' && e.target.value != '0') {
-                $('button#btn_add_products').prop('disabled', false);
-            } else {
-                $('button#btn_add_products').prop('disabled', true);
-            }
-        });
-
         $(document).on('click', '#btn_add_products', function (e) {
-            e.preventDefault();
-            var $proNo = $('#product_no');
-            $proNo.prop('disabled', true);
-            $(this).prop('disabled', true);
-            BlockFormComponent.setProps({ block_count: $proNo.val() });
+            BlockFormComponent.setProps({ blocks: $('#product_no').val() });
         });
 
         var Blocks = React.createClass({
             getDefaultProps: function () {
                 return {
-                    block_count: 0
+                    blocks: 1,
+                    djsComponentConfig: {
+                        showButtons: true,
+                        postUrl: "{{ APP.href('/media/grid/upload?type=') | raw }}" + encodeURIComponent('product-images') + '&folder=' + encodeURIComponent('media/product/images')
+                    },
+                    djsConfig: {
+                        addRemoveLinks: true,
+                        paramName: "upload",
+                        autoProcessQueue: false,
+                        uploadMultiple: true,
+                        maxFilesize: "{{ defaultFileSizeConfig | raw }}",
+                        maxFiles: 3
+                    }
                 };
             },
             getInitialState: function () {
                 return {
-                    block_count: this.props.block_count
+                    blocks: this.props.blocks
                 };
             },
             componentWillReceiveProps: function (nextProps) {
-                this.setState({ block_count: nextProps.block_count });
+                this.setState({ blocks: nextProps.blocks });
             },
             componentDidUpdate: function () {
                 this.init();
@@ -143,21 +145,79 @@
                 this.init();
             },
             removeProduct: function (e) {
-                var id = e.target.dataset.id;
+                this.setState({ blocks: this.state.blocks - 1 });
+            },
+            unlink: function(id) {
+                $.post("{{ APP.href('/media/grid/mass-delete') }}", { oper: 'mass-delete', id: id },
+                        function (r) {
+                            if (r.success) {
+                                $.bootstrapGrowl("{{ 'Image removed from media library' }}", {
+                                    type: 'success',
+                                    align: 'center',
+                                    width: 'auto'
+                                });
+                            }
+                        });
+            },
+            djsInit: function(dj) {
+                var that = this, _this = dj;
+                this.hiddenInput = $(_this.element.querySelector('input.images'));
+                _this.element.querySelector("button.btn-upload").addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    _this.processQueue();
+                });
+
+                _this.element.querySelector("button.btn-cancel").addEventListener("click", function () {
+                    _this.removeAllFiles(true);
+                    var values = $input.val() ? $input.val().split(',') : [];
+                    if (values.length) {
+                        that.unlink(values);
+                    }
+                    that.hiddenInput.val('');
+                });
+            },
+            uploadSucceeded: function (file, responseText) {
+                var key = this.hiddenInput.data('key');
+                var values = this.hiddenInput.val() ? this.hiddenInput.val().split(',') : [];
+                _(responseText['files']).each(function (f) {
+                    var index = _.indexOf(values, f.id);
+                    if (index == -1) {
+                        values.push(f.id);
+                        if (!imageList[key]) imageList[key] = [];
+                        imageList[key].push({
+                            id: f.id,
+                            name: f.file_name
+                        });
+                    }
+                });
+                this.hiddenInput.val(values.join(','));
+            },
+            removedfile: function (file) {
+                var that = this;
+                var key = this.hiddenInput.data('key');
+                var values = this.hiddenInput.val() ? this.hiddenInput.val().split(',') : [];
+                if (values.length) {
+                    var images = imageList[key];
+                    _(images).each(function (image) {
+                        if (file.name == image.name) {
+                            values.splice(_.indexOf(values, image.id), 1);
+                            that.unlink(image.id);
+                        }
+                    });
+                }
+                this.hiddenInput.val(values.join(','));
             },
             init: function () {
-                var that = this, index;
-                for (var i = 1; i <= this.state.block_count; i++) {
-                    index = i;
-                    var flag = true;
-                    $('#product_sku_' + index).rules("add", {
+                $('.product-sku').each(function () {
+                    $(this).rules("add", {
                         onfocusout: false,
                         onkeyup: false,
                         remote: {
                             url: '{{ APP.href('/catalog/products/quick-add/unique_sku') | raw }}',
                             type: 'post',
                             data: {
-                                _key: index,
+                                _key: $(this).data('id'),
                                 _sku: 'product_sku'
                             },
                             dataFilter: function (responseString) {
@@ -170,77 +230,23 @@
                             remote: "{{ 'This sku is already taken place.' |_ }}"
                         }
                     });
-
-                    var id = 'dropzone-' + index;
-                    new Dropzone('div#' + id, {
-                        url: "{{ APP.href('/media/grid/upload?type=') | raw }}" + encodeURIComponent('product-images') + '&folder=' + encodeURIComponent('media/product/images'),
-                        autoProcessQueue: false,
-                        uploadMultiple: true,
-                        paramName: 'upload',
-                        addRemoveLinks: true,
-                        maxFilesize: "{{ defaultFileSizeConfig | raw }}",
-                        maxFiles: 3,
-                        init: function () {
-                            var _this = this;
-                            this.element.querySelector("button#btnUpload" + index).addEventListener("click", function (e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                _this.processQueue();
-                            });
-
-                            this.element.querySelector("button#btnCancel" + index).addEventListener("click", function () {
-                                _this.removeAllFiles(true);
-                            });
-
-                            this.on("success", function(file, responseText) {
-                                var $input = $(_this.element.querySelector('input#product_images_' + index));
-                                if ($input.length) {
-                                    var values = $input.val() ? $input.val().split(',') : [];
-                                    var uIds = _.pluck(responseText['files'], 'id');
-                                    _(uIds).each(function (id) {
-                                        values.push(id);
-                                    });
-                                    $input.val(values.join(','));
-                                }
-                            });
-                        }
-                    });
-                }
-
-                $('.select2').select2({
-                    multiple: true,
-                    ajax: {
-                        url: '{{ APP.href('/catalog/products/quick-add/categories') | raw }}',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function (param) {
-                            return {
-                                q: param
-                            };
-                        },
-                        results: function (data) {
-                            return {
-                                results: $.map(data, function (item, id) {
-                                    return {
-                                        text: item,
-                                        id: id
-                                    }
-                                })
-                            };
-                        },
-                        cache: true
-                    },
-                    minimumInputLength: 1
                 });
             },
-            getBlockGrid: function () {
+            renderBlocks: function () {
                 var blocks = [];
-                if (this.state.block_count < 1) return blocks;
-                for (var i = 1; i <= this.state.block_count; i++) {
+                if (this.state.blocks < 1) return blocks;
+                for (var i = 1; i <= this.state.blocks; i++) {
                     blocks.push(
                         React.createElement(BlockForm, {
                             index: i,
                             key: i,
+                            djsComponentConfig: this.props.djsComponentConfig,
+                            djsConfig: this.props.djsConfig,
+                            eventHandlers: {
+                                init: this.djsInit,
+                                success: this.uploadSucceeded,
+                                removedfile: this.removedfile
+                            },
                             actions: {
                                 removeProduct: this.removeProduct
                             }
@@ -260,7 +266,7 @@
                             React.DOM.th(null, "{{ 'Images'|_ }}"),
                             React.DOM.th(null, "{{ 'Actions'|_ }}")
                         ),
-                        React.DOM.tbody({ref: 'table-body'}, this.getBlockGrid())
+                        React.DOM.tbody({ref: 'table-body'}, this.renderBlocks())
                     )
                 );
             }
@@ -285,6 +291,7 @@
                                 value: '',
                                 id: 'product_sku_' + this.state.id,
                                 name: 'products['+this.state.id+'][product_sku]',
+                                className: 'product-sku',
                                 validation: { required: true },
                                 attrs: {
                                     style: {width: "80px"},
@@ -303,8 +310,8 @@
                                 className: 'product_name',
                                 id: 'products['+this.state.id+'][product_name]',
                                 name: 'products['+this.state.id+'][product_name]',
-                                validation: { required: true }}
-                            )
+                                validation: { required: true }
+                            })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
                             React.createElement(Components.ControlLabel, {
@@ -366,7 +373,14 @@
                                 label_class: '',
                                 input_id: 'categories['+this.state.id+']'}, "{{ 'Categories'|_ }}"
                             ),
-                            React.DOM.input({ type: 'hidden', name: 'categories['+this.state.id+'][]', className: 'form-control select2' })
+                            React.createElement(FComSelect2, {
+                                id: guid(),
+                                name: 'categories['+this.state.id+'][]',
+                                placeholder: "{{ 'Select Categories' |_ }}",
+                                multiple: true,
+                                url: '{{ APP.href('/catalog/products/quick-add/categories_search') | raw }}',
+                                onChange: this.handleSelect2Change
+                            })
                         )
                     ),
                     React.DOM.td(null,
@@ -411,7 +425,7 @@
                                 input_id: 'inventory['+this.state.id+'][qty_in_stock]'}, "{{ 'Qty In Stock'|_ }}"
                             ),
                             React.createElement(Components.ControlInput, {
-                                value: '',
+                                value: '0',
                                 className: 'qty_in_stock',
                                 id: 'inventory['+this.state.id+'][qty_in_stock]',
                                 name: 'inventory['+this.state.id+'][qty_in_stock]',
@@ -426,7 +440,7 @@
                                 input_id: 'inventory['+this.state.id+'][shipping_weight]'}, "{{ 'Ship Weight'|_ }}"
                             ),
                             React.createElement(Components.ControlInput, {
-                                value: '',
+                                value: '0',
                                 id: 'inventory['+this.state.id+'][shipping_weight]',
                                 name: 'inventory['+this.state.id+'][shipping_weight]',
                                 attrs: {
@@ -445,12 +459,13 @@
                         })
                     ),
                     React.DOM.td({ style: { width: '500px' } },
-                        React.DOM.div({ className: 'dropzone', id: 'dropzone-' + this.state.id },
-                            React.DOM.input({ type: 'hidden', name: 'products['+this.state.id+'][images]', id: 'product_images_' + this.state.id, className: 'product_images' }),
-                            React.DOM.button({ type: 'button', className: 'btn btn-success btn-xs', id: 'btnUpload' + this.state.id }, "{{ 'Start Upload'|_ }}"),
-                            React.DOM.button({ type: 'button', className: 'btn btn-default btn-xs', id: 'btnCancel' + this.state.id }, "{{ 'Cancel'|_ }}"),
-                            React.DOM.br(null)
-                        )
+                        React.createElement(Components.Dropzone, {
+                            key: this.state.id,
+                            name: 'products['+this.state.id+'][images]',
+                            config: this.props.djsComponentConfig,
+                            djsConfig: this.props.djsConfig,
+                            eventHandlers: this.props.eventHandlers
+                        })
                     ),
                     React.DOM.td(null,
                         React.DOM.div({ className: 'table-actions-btns-group' },
@@ -470,9 +485,7 @@
         var container = document.getElementById('products-quick-add-container');
         React.unmountComponentAtNode(container);
 
-        var BlockFormComponent = React.render(
-            React.createElement(Blocks), container
-        );
+        var BlockFormComponent = React.render(React.createElement(Blocks), container);
 
         // Prevent the default action when a file is dropped on the window
         $(document).on('drop dragover', function (e) {

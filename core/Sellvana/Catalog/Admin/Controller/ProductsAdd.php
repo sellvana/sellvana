@@ -44,7 +44,7 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
                 $this->BDb->transaction();
                 $product = $prodHlp->create($prodData)->save();
 
-                if ($prodData['images']) {
+                if (!empty($prodData['images'])) {
                     $prodMediaData = [];
                     $mediaIds = explode(',', $prodData['images']);
                     foreach($mediaIds as $mediaId) {
@@ -108,7 +108,7 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
         $this->BResponse->json($result);
     }
 
-    public function action_categories()
+    public function action_categories_search()
     {
         $r = $this->BRequest;
         $q = explode(' ', $r->get('q'));
@@ -117,14 +117,14 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
         $orm = $this->Sellvana_Catalog_Model_Category->orm('c')
             ->select(['id', 'full_name', 'sort_order', 'is_enabled'])
             ->order_by_asc('sort_order')
-            ->where('is_enabled', 1);
+            ->where_raw('is_enabled = 1');
 
         if (is_array($q)) {
             foreach($q as $value) {
-                $orm->where_like("full_name", "'%".$value."%'");
+                $orm->where_raw("full_name LIKE '%" . $value . "%'");
             }
         } else {
-            $orm->where_like("full_name", "'%".$q."%'");
+            $orm->where_raw("full_name LIKE '%" . $q . "%'");
         }
 
         $categories = $orm->find_many_assoc('id', 'full_name');
@@ -132,64 +132,4 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
         $this->BResponse->json($categories);
         exit;
     }
-
-    /*public function action_upload__POST()
-    {
-        $r = $this->BRequest;
-        $ds = DIRECTORY_SEPARATOR;
-
-        if ( !isset($_FILES['upload']['error']) || is_array($_FILES['upload']['error']) ) {
-            $this->BResponse->status(500, 'Invalid parameters.', 'Invalid parameters.');
-        }
-
-        switch ($_FILES['upload']['error']) {
-            case UPLOAD_ERR_NO_FILE:
-                $this->BResponse->status(500, 'No file sent.', 'No file sent.');
-                break;
-
-            case UPLOAD_ERR_INI_SIZE:
-            case UPLOAD_ERR_FORM_SIZE:
-                $this->BResponse->status(500, 'Exceeded filesize limit.', 'Exceeded filesize limit.');
-                break;
-        }
-
-        $acceptMIMEType = [
-            // images
-            'png' => 'image/png',
-            'jpe' => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'jpg' => 'image/jpeg',
-            'gif' => 'image/gif',
-            'bmp' => 'image/bmp'
-        ];
-
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        if ( false === $ext = array_search($finfo->file($_FILES['upload']['tmp_name']),$acceptMIMEType, true)) {
-            $this->BResponse->status(500, 'Invalid file format.', 'Invalid file format.');
-        }
-
-        // Cheking file size.
-        if ($_FILES['upload']['size'] > 3e+6 ) { // 3 MB
-            $this->BResponse->status(500, 'Exceeded filesize limit.', 'Exceeded filesize limit.');
-        }
-
-        if (!empty($_FILES)) {
-
-            $tempFile = $_FILES['upload']['tmp_name'];
-            $targetPath = FULLERON_ROOT_DIR . sprintf('/media/product/temp');
-            if (!file_exists($targetPath)) {
-                mkdir($targetPath, 0777, true);
-            }
-
-            $targetPath = $targetPath . $ds . md5($r->get('id'));
-            if (!file_exists($targetPath)) {
-                mkdir($targetPath, 0777, true);
-            }
-
-            $targetFile =  $targetPath . $ds . $_FILES['upload']['name'];
-
-            move_uploaded_file($tempFile, $targetFile);
-
-        }
-    }*/
 }

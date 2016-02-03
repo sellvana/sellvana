@@ -4,7 +4,7 @@
 <script type="text/javascript">
 
     require(['backbone', 'underscore', 'jquery', 'fcom.ipmode', 'jquery.validate', 'fcom.validate.ext', 'bootstrap', 'fcom.admin', 'switch', 'jquery.bootstrap-growl',  'select2'], function(Backbone, _, $, ipMode) {
-        var selected_id = null;
+        var selected_input_id = null;
         $(function() {
             function onSortableStop(event, ui) {
                 var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
@@ -157,7 +157,7 @@
                     FCom.Admin.Accordion('settings-'+i);
                     FCom.Admin.initCodeEditors();
 
-                    if (selected_id !== null) {
+                    if (selected_input_id !== null) {
                         hightlight();
                     }
 
@@ -166,7 +166,7 @@
             });
 
             function hightlight(id) {
-                var target = id ? id : selected_id;
+                var target = id ? id : selected_input_id;
                 $input = $(target);
                 $input.parents('.form-group').children('.control-label').wrapInner('<mark class="search-mark"/>');
                 $input.parents('.form-group').on('mouseover', function () {
@@ -208,7 +208,7 @@
                 minimumInputLength: 1,
                 escapeMarkup: function (markup) { return markup; }
             }).on('change', function(ev) {
-                selected_id = null;
+                selected_input_id = null;
                 var v = ev.target.value.split('|');
                 var $tab = $('a[href="'+v[0]+'"]');
                 if ($tab.length) {
@@ -219,7 +219,7 @@
                     if ($input.length) {
                         hightlight(v[2]);
                     } else {
-                        selected_id = v[2];
+                        selected_input_id = v[2];
                     }
                 }
             });
