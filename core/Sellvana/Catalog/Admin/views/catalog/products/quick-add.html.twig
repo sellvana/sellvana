@@ -125,7 +125,10 @@
                         autoProcessQueue: false,
                         uploadMultiple: true,
                         maxFilesize: "{{ defaultFileSizeConfig | raw }}",
-                        maxFiles: 3
+                        maxFiles: 3,
+                        headers: {
+                            'X-CSRF-TOKEN': $('input[name="X-CSRF-TOKEN"]').val()
+                        }
                     }
                 };
             },
