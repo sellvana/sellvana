@@ -92,6 +92,72 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         }
     }
 
+    public function indexSettingsLabels()
+    {
+        $cacheKey = 'settings-index-' . $this->FCom_Admin_Model_User->sessionUserId();
+        $cached = $this->BCache->load($cacheKey);
+        if ($cached) {
+            return $cached;
+        }
+        $this->layout('/settings');
+        $tabViews = $this->BLayout->findViewsRegex('#^settings/#');
+
+        $index = [];
+        foreach ($tabViews as $tabViewName => $tabView) {
+            $tabName = preg_replace('#^settings/#', '', $tabViewName);
+            $parts = explode('/', $tabName, 2);
+            if (sizeof($parts) === 2) {
+                $tabName = $parts[1];
+            }
+            $contents = $tabView->render();
+            $re = '~(<div\s+class="panel-heading">\s*<a\s+.*\s+href="(.*?)"[^>]*>\s*(.*?)\s*</a>|<label\s+.*\s+for="(.*?)"[^>]*>\s*(.*?)\s*</label>)~m';
+            if (preg_match_all($re, $contents, $matches, PREG_SET_ORDER)) {
+#echo "<xmp>"; var_dump($matches); echo "</xmp>"; exit;
+                $curPanelId = null;
+                $curPanelLabel = null;
+                foreach ($matches as $m) {
+                    if (!empty($m[3])) {
+                        $curPanelId = $m[2];
+                        $curPanelLabel = strip_tags(str_replace('&nbsp;', '', $m[3]));
+                    } elseif (!empty($m[5])) {
+                        $fieldId = $m[4];
+                        $fieldLabel = strip_tags(str_replace('&nbsp;', '', $m[5]));
+                        $index[] = [
+                            'tab_id' => '#tab-' . $tabName,
+                            'tab_label' => str_replace('_', ' ', $tabName),
+                            'panel_id' => $curPanelId,
+                            'panel_label' => $curPanelLabel,
+                            'field_id' => '#' . $fieldId,
+                            'field_label' => $fieldLabel,
+                        ];
+                    }
+                }
+            }
+        }
+        $this->BCache->save($cacheKey, $index);
+        return $index;
+    }
+
+    public function action_search()
+    {
+        $q = $this->BRequest->get('q');
+        if (!$q) {
+            $this->BResponse->json([]);
+            return;
+        }
+        $index = $this->indexSettingsLabels();
+
+        $result = [];
+        foreach ($index as $id => $item) {
+            $label = $item['tab_label'] . '|' . $item['panel_label'] . '|' . $item['field_label'];
+            if (stripos($label, $q) !== false) {
+                $result[] = $item;
+            }
+        }
+
+        $this->BResponse->json($result);
+    }
+
     public function action_dismiss() {
         $code = $this->BRequest->get('code');
         $conf      = $this->BConfig;

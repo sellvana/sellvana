@@ -73,11 +73,9 @@ modules:
 
                     - [ "/media/grid/:do", FCom_Admin_Controller_MediaLibrary.grid_data ]
 
-                    - [ /settings, FCom_Admin_Controller_Settings.index ]
+                    - [ "/settings/?.action", FCom_Admin_Controller_Settings ]
 
                     - [ "/modules/?.action" , FCom_Admin_Controller_Modules ]
-
-                    - [ /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
 
                     - [ /media_library, FCom_Admin_Controller_MediaLibrary.index ]
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]

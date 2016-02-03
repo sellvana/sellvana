@@ -170,6 +170,35 @@
             loadSwitchButtons();
 
 
+            $('#search-settings').select2({
+                ajax: {
+                    url: '{{ APP.href('/settings/search') | raw }}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (param) {
+                        return {
+                            q: param
+                        };
+                    },
+                    results: function (data) {
+                        return {
+                            results: $.map(data, function (item, id) {
+                                return {
+                                    text: '<strong>' + item.field_label + '</strong><br><small>' + item.tab_label + ' > ' + item.panel_label + '</small>',
+                                    id: item.tab_id + '|' + item.panel_id + '|' + item.field_id
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                escapeMarkup: function (markup) { return markup; }
+            }).on('change', function(ev) {
+                var v = ev.target.value.split('|');
+                console.log(v);
+                $(v[0]).tab('show');
+            });
         });
     })
 </script>
@@ -212,6 +241,9 @@
                 <i class="fa fa-cog"></i>
                 <span>{{ "Settings" |_ }}</span>
                 {{ THIS.hook('settings_header_title') | raw }}
+
+                <input type="text" id="search-settings" class="form-control" style="width:300px"/>
+
             </h1>
             <div class="btn-group">
                 <button class="btn btn-primary" type="submit">{{ "Save All" |_ }}</button>
