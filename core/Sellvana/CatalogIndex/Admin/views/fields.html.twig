@@ -1,286 +1,90 @@
-<div class='modal fade' id='index-field-grid-modal' tabindex='-1'>
-    <div class='modal-dialog' style='width:800px;'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>{{ "Fields"|_ }}</h4>
-            </div>
-            <div class='modal-body'>
-                <div class='row'>
-                    <div class='col-sm-12'>
-                        <div class='tabbable'>
-                            <ul class='nav nav-tabs prod-type f-horiz-nav-tabs'>
-                                <li class='active'>
-                                    <a data-toggle='tab' href='#edit_fields_visible' id='fields_visible_tab'>
-                                        {{ "Visibility Fields"|_ }}
-
-                                    </a>
-                                </li>
-                                <li>
-                                    <a data-toggle='tab' href='#edit_fields_hide' id='fields_hide_tab'>
-                                        {{ "Hidden Fields"|_ }}
-                                    </a>
-                                </li>
-                            </ul>
-                            <form class="form form-horizontal validate-form" id="index-field-modal-form" novalidate="novalidate">
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class='modal-footer'>
-                <button class='btn btn-primary index-field-modal-save' type='button'>{{ "Save"|_ }}</button>
-                <button class='btn btn-default btn-close index-field-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal -->
-<div class='modal fade' id="progress" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div class="progress progress-striped active" style="margin-bottom: 0;">
-                    <div id="progress-bar" class="progress-bar"  role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 1%">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!--End Modal -->
 <script>
-    require(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'jquery.validate', 'unique'], function($, _, Backbone, PushClient) {
-        var indexFieldGrid = null;
-        var BackboneGrid = null;
-        var rowsCollection = null;
-        var modalForm = null;
-        var cols = null;
-        var elFieldHide = null;
-        var elFieldVisible = null;
-        window.indexFieldGridRegister = function(grid) {
+    require(['jquery', 'react', 'bootstrap-ladda', 'jquery.validate', 'unique', 'bootstrap-ladda-spin'], function($, React, Ladda) {
+        var url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}',
+            activityUrl = '{{ APP.href('/catalogindex/activity?status=') }}',
+            progressUrl = '{{ APP.href('/catalogindex/progress') }}';
 
-            BackboneGrid = grid.getGridSkeleton();
-            indexFieldGrid = grid;
+        var $localNoti = $('#header-notifications-local');
+        var $localNotiDropdown = $localNoti.find('.dropdown-menu');
+        var $notiHeader = $('<li id="notification-item-header-catalog_indexing"><a href="javascript:void(0)"><div class="widget-body"><div class="pull-left icon"><i class="fa fa-tasks"></i></div><div class="pull-left text">{{ 'Task Running'|_ }}</div></div></a></li>');
+        var $reindexItem = $('<li class="reindex-item" style="padding: 10px;"><span>Reindexing:</span><div class="progress progress-striped active" style="margin-bottom: 0; width: 100%;"><div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 1%"><span id="progress-label"></span></div></div></li>');
 
-            BackboneGrid.Views.RowView.prototype._editModal = function() {
-                modalForm.modalType = 'editable';
-                BackboneGrid.currentRow = this.model;
-                modalForm.render();
-                $('#index-field-grid-modal').modal('show');
-                return true;
-            };
+        var $btnReindex = $('.btn-reindex');
+        var loader = Ladda.create($btnReindex[0]);
 
-            BackboneGrid.Views.ModalForm.prototype.render = function () {
-                var header;
-                switch (this.modalType) {
-                    case 'addable':
-                    default:
-                        header = 'Create Form';
-                        BackboneGrid.currentRow = false;
-                        break;
-                    case 'multirow_edit':
-                        BackboneGrid.currentRow = false;
-                        header = 'Mass Edit Form';
-                        break;
-                    case 'editable':
-                        this.$el = $('#index-field-modal-form');
-                        header = 'Edit Form';
-                        break;
-                }
-                this.$el.html('');
-                $(BackboneGrid.modalFormId).find('.well').parent().remove();
-                if (this.modalType == 'editable') {
-
-                    $('#fields_visible_tab').click();
-                    this.$el.append("<div class='tab-content'></div>");
-                    this.$el.find('.tab-content').append("<div class='tab-pane active' id='edit_fields_visible'></div>");
-                    var flag = true;
-                    cols.each(function (obj) {
-                        if (obj.get('editable') == true && obj.get('hidden') == true) {
-                            flag = false;
-                        }
-                    });
-                    if (flag) {
-                        $('#fields_hide_tab').parent().remove();
-                    } else {
-                        this.$el.find('.tab-content').append("<div class='tab-pane' id='edit_fields_hide'></div>");
-                    }
-                    elFieldHide = $('#edit_fields_hide');
-                    elFieldVisible = $('#edit_fields_visible');
-                }
-
-                $(BackboneGrid.modalFormId).find('h4').html(header);
-                BackboneGrid.modalElementVals = {};
-                if (this.modalType === 'multirow_edit') {
-                    var elementView = new BackboneGrid.Views.ModalMassGridElement({collection: this.collection});
-                    $(BackboneGrid.modalFormId).find('.modal-header').after(elementView.render({ modalType: this.modalType}).el);
-                    $(BackboneGrid.modalFormId).find('.well select').select2({
-                        placeholder: "Select a Field",
-                        allowClear: true
-                    });
-                } else {
-                    this.collection.each(this.addElementDiv, this);
-                }
-
-                if (this.modalType === 'multirow_edit') {
-                    $(BackboneGrid.modalFormId).find('select').val('');
-                }
-                if (this.$el.is("form")) {
-                    this.formEl = this.$el;
-                } else {
-                    this.formEl = this.$el.parents('form:first');
-                }
-
-
-                this.formEl.validate({});
-                if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_modalForm_render']) !== 'undefined') {
-                    var func = BackboneGrid.callbacks['after_modalForm_render'];
-                    var script = func + '(this.$el, rowsCollection.toJSON(), BackboneGrid.currentRow);';
-                    eval(script);
-                }
-                this.collection.each(function (col) {
-                    if (typeof(col.get('validation')) !== 'undefined' && typeof(col.get('validation').unique) !== 'undefined') {
-                        if (modalForm.$el.find('#' + col.get('name')).length) {
-                            validateUnique(modalForm.$el.find('#' + col.get('name')), col, false);
-                        }
-                    }
-                });
-
-                return this;
-            };
-
-            BackboneGrid.Views.ModalForm.prototype.addElementDiv = function(model) {
-                if (model.has(this.modalType) && model.get(this.modalType)) {
-                    var elementView = null;
-                    if (this.modalType == 'editable') {
-                        var el = elFieldVisible;
-                        var flag = false;
-                        if (model.get('hidden') == true) {
-                            model.set('hidden', false);
-                            el = elFieldHide;
-                            flag = true;
-                        }
-                        elementView = new BackboneGrid.Views.ModalElement({model: model});
-                        model.set('hidden', flag);
-                        el.append(elementView.render().el);
-                    } else {
-                        elementView = new BackboneGrid.Views.ModalElement({model: model});
-                        this.$el.append(elementView.render().el)
-                    }
-
-                    if (BackboneGrid.currentRow) {
-                        var name = model.get('name');
-                        var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
-                        elementView.$el.find('#' + name).val(text2html(val));
-                    }
-                }
-            };
-
-            function text2html(val) {
-                var text = $.parseHTML(val);
-                return (text != null) ? text[0].data: null;
+        function task_runner() {
+            if (!loader.isLoading()) loader.start();
+            if ($notiHeader.length) {
+                $notiHeader[0].remove();
+            }
+            if (!$localNoti.find('reindex-item').length) {
+                $localNotiDropdown.append($reindexItem[0]);
             }
 
-            indexFieldGrid.build();
-
-            modalForm = indexFieldGrid.getModalForm();
-            cols = indexFieldGrid.getCols();
-            rowsCollection = indexFieldGrid.getRows();
-
-        };
-
-        function validateUnique(element, model ,editInline) {
-            var url = model.get('validation').unique;
-            element.rules("add", {
-                onfocusout: false,
-                onkeyup: false,
-                remote: {
-                    url: url,
-                    type: 'post',
-                    data: {
-                        _name: model.get('name')
-                    },
-                    dataFilter: function (responseString) {
-                        var response = jQuery.parseJSON(responseString);
-                        var currentMessage = response.Message;
-                        if ((modalForm.modalType === 'editable' || editInline) && BackboneGrid.currentRow.get('id') === response.id){
-                            return true;
-                        }
-                        return response.unique;
-                    },
-                    async:false
-                },
-                messages: {
-                    remote: "This " + model.get('label') + " is already taken place"
-                }
-            });
-        }
-        $('button.index-field-modal-save').click(function () {
-            if (modalForm.saveChanges()) {
-                $('.index-field-modal-close').trigger('click');
-            }
-
-        });
-
-        $('.btn-progress').on('click', function () {
-            var url = '{{ APP.href('/catalogindex/reindex?CLEAR=1') }}';
-            var progressUrl = '{{ APP.href('/catalogindex/progress') }}';
-            $('#progress-bar').css('width', 0);
-//            PushClient.listen({channel: 'index', callback: channel_index_progress});
-
-            var total = 0;
-            var $msgBoard = $('<span/>');
-            $('#progress-bar').append($msgBoard);
+            var $progressBar = $('#progress-bar').css('width', '0%');
+            var $msgBoard = $('#progress-label').html('');
             function channel_index_progress() {
                 $.get(progressUrl, function (msg) {
-                    console.log(msg);
                     if (msg.total && msg.reindexed != undefined && msg.total != 0) {
                         var reindexed = parseInt(msg.reindexed);
                         var total = parseInt(msg.total);
                         var percentComplete = (reindexed * 100 / total);
-                        $('#progress-bar').css({
-                            width: percentComplete + '%'
-                        });
-                        $msgBoard.text(reindexed + ' / ' + total);
+                        console.log('channel_index_progress', total, reindexed);
+                        $progressBar.css('width', percentComplete + '%');
+                        $msgBoard.html(reindexed + ' / ' + total);
                     }
                 });
             }
 
             var updateInterval = setInterval(channel_index_progress, 3000);
-
             $.ajax({
-               /* xhr: function () {
-                    var xhr = new window.XMLHttpRequest();
-                     xhr.upload.addEventListener("progress", function(evt){
-                     if (evt.lengthComputable) {
-                     var percentComplete = 100 * evt.loaded / evt.total;
-                     $('#progress-bar').css({
-                     width:  percentComplete + '%'
-                     });
-                     }
-                     }, false);
-                    return xhr;
-                },*/
                 type: 'POST',
                 url: url,
-                data: {CLEAR: 1},
-                complete: function (data) {
-                    clearInterval(updateInterval);
-                    $('#progress-bar').css({
-                        width: '100%'
+                data: {CLEAR: 1}
+            })
+            .complete(function (r) {
+                clearInterval(updateInterval);
+                $progressBar.css('width', '100%');
+                $msgBoard.html('{{ "Reindexing completed."|_ }}');
+                if (r.status == 200) {
+                    $.post(activityUrl, { status: 'archived' }, function (r) {
+                        $.bootstrapGrowl("{{ 'Indexing Completed'|_ }}", {
+                            type: 'success',
+                            align: 'center',
+                            width: 'auto'
+                        });
                     });
-                    $msgBoard.html('{{ "Reindexing completed."|_ }}');
                 }
+            })
+            .always(function () {
+                loader.stop();
+                $localNoti.find('#header-notifications-local-count').html('0');
             });
+        }
 
+        $(document).on('click', '.btn-reindex', function (e) {
+            loader.start();
+            $.post(activityUrl, { status: 'new' }, function (r) {
+                $localNoti.show();
+                $localNoti.find('#header-notifications-local-count').html('1');
+                if ($localNotiDropdown[0].childNodes.length > 0) {
+                    $localNotiDropdown
+                            .append($notiHeader[0])
+                            .append('<li class="divider"/>')
+                            .append($reindexItem[0]);
+                }
+
+                task_runner();
+            });
         });
+
+        window.onload = function() {
+            $.get(progressUrl, function (msg) {
+                console.log('onload', msg.total, msg.reindexed);
+                if (msg.total && msg.reindexed < msg.total) {
+                    task_runner();
+                }
+            })
+        };
     });
-
 </script>
-
-
-
-
-
-

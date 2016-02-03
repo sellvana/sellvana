@@ -529,27 +529,25 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
 
         $config = parent::gridConfig();
-        //$config['id'] = 'category_all_prods_grid-'.$model->id;
+        unset($config['orm']);
+        $data = $this->Sellvana_Catalog_Model_Product->orm('p')->select(['p.id', 'p.product_name', 'p.product_sku'])->find_many();
         $config['id'] = 'category_all_prods_grid_' . $model->id;
+        $config['data'] = $data;
+        $config['data_mode'] = 'local';
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 250],
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
         ];
-        $config['actions'] = [
-            #'add' => ['caption' => 'Add selected products']
-        ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'product_sku', 'type' => 'text'],
-            '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
+            ['field' => 'product_sku', 'type' => 'text']
         ];
 
-        $config['grid_before_create'] = 'allProdGridRegister';
-        /*$config['_callbacks'] = "{
-            'add':'categoryProdsMng.addSelectedProds'
-        }";*/
+        $config['callbacks'] = [
+            'componentDidMount' => 'allProdGridRegister'
+        ];
 
         return ['config' => $config];
     }

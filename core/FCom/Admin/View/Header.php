@@ -69,6 +69,7 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
             ],
         ];
         foreach ($activity as $a) {
+            /** @var FCom_Admin_Model_Activity $a */
             $item = $a->getData() + $a->as_array();
             if ($dismissed && in_array($item['code'], $dismissed)) {
                 continue;
@@ -90,6 +91,9 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
                         break;
                     case 'warning':
                         $item['icon_class'] = 'icon_warning';
+                        break;
+                    case 'progress':
+                        $item['icon_class'] = 'fa fa-tasks';
                         break;
                     default:
                         $item['icon_class'] = 'icon_info';
