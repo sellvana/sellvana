@@ -28,6 +28,7 @@ class Sellvana_Sales_Workflow_Cancel extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Cancel $cancelModel */
         $cancelModel = $this->Sellvana_Sales_Model_Order_Cancel->create([
             'order_id' => $args['order']->id(),
+            'canceled_at' => $this->BDb->now(),
         ]);
         $cancelModel->state()->overall()->setDefaultState();
         $cancelModel->state()->custom()->setDefaultState();

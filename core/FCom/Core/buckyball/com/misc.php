@@ -1894,6 +1894,16 @@ class BUtil extends BClass
     }
 
     /**
+     * Helper for Twig templates
+     *
+     * @return float
+     */
+    public function microtime()
+    {
+        return microtime(true);
+    }
+
+    /**
      * Simplify string to allowed characters only
      *
      * @param string $str input string

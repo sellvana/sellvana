@@ -71,7 +71,7 @@ abstract class Sellvana_Sales_Model_Cart_Total_Abstract extends BClass implement
      */
     public function getLabel()
     {
-        return $this->BLocale->_($this->_label);
+        return (string)$this->BLocale->_($this->_label);
     }
 
     /**

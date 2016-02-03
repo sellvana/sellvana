@@ -204,6 +204,9 @@ class Sellvana_PaymentAuthorizeNet_Model_Settings extends BClass
     public function gatewayUrl($config)
     {
         $url = static::$_gatewayUrl;
+        if (!$config) {
+            $config = $this->BConfig;
+        }
         if ($config->get('modules/Sellvana_PaymentAuthorizeNet/cgi_url')) {
             $url = $config->get('modules/Sellvana_PaymentAuthorizeNet/cgi_url');
         }

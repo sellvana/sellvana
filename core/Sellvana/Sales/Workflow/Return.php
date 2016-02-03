@@ -27,6 +27,7 @@ class Sellvana_Sales_Workflow_Return extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Return $returnModel */
         $returnModel = $this->Sellvana_Sales_Model_Order_Return->create([
             'order_id' => $args['order']->id(),
+            'rma_at' => $this->BDb->now(),
         ]);
         $returnModel->state()->overall()->setDefaultState();
         $returnModel->state()->custom()->setDefaultState();

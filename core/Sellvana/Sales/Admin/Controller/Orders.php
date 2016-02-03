@@ -614,18 +614,18 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'rma_at', 'label' => 'RMA at'],
+                ['name' => 'received_at', 'label' => 'Received at'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add return'],
-                'delete' => ['caption' => 'Remove']
+                #'add' => ['caption' => 'Add return'],
+                #'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
                 ['field' => 'state_overall', 'type' => 'multiselect'],
                 ['field' => 'state_custom', 'type' => 'multiselect'],
-                ['field' => 'create_at', 'type' => 'date-range'],
-                ['field' => 'update_at', 'type' => 'date-range'],
+                ['field' => 'rma_at', 'type' => 'date-range'],
+                ['field' => 'received_at', 'type' => 'date-range'],
             ],
             'events' => ['init', 'add', 'mass-delete'],
             'grid_before_create' => 'order_returns_register',
@@ -643,7 +643,7 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
             ->select('s.*')->where('order_id', $model->id());
 
         $config = [
-            'id' => 'order_returns',
+            'id' => 'order_cancellations',
             'orm' => $orm,
             'data_mode' => 'local',
             //'caption'      =>$caption,
@@ -655,18 +655,16 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'id', 'label' => 'ID'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'canceled_at', 'label' => 'Timestamp'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add cancellation'],
-                'delete' => ['caption' => 'Remove']
+                #'add' => ['caption' => 'Add cancellation'],
+                #'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
                 ['field' => 'state_overall', 'type' => 'multiselect'],
                 ['field' => 'state_custom', 'type' => 'multiselect'],
-                ['field' => 'create_at', 'type' => 'date-range'],
-                ['field' => 'update_at', 'type' => 'date-range'],
+                ['field' => 'canceled_at', 'type' => 'date-range'],
             ],
             'events' => ['init', 'add', 'mass-delete'],
             'grid_before_create' => 'order_cancellations_register',
@@ -697,19 +695,17 @@ class Sellvana_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstr
                 ['name' => 'amount', 'label' => 'Amount'],
                 ['name' => 'state_overall', 'label' => 'Overall Status', 'options' => $stateOverallOptions],
                 ['name' => 'state_custom', 'label' => 'Custom Status', 'options' => $stateCustomOptions],
-                ['name' => 'create_at', 'label' => 'Created'],
-                ['name' => 'update_at', 'label' => 'Updated'],
+                ['name' => 'refunded_at', 'label' => 'Timestamp'],
             ],
             'actions' => [
-                'add' => ['caption' => 'Add refund'],
-                'delete' => ['caption' => 'Remove']
+                #'add' => ['caption' => 'Add refund'],
+                #'delete' => ['caption' => 'Remove']
             ],
             'filters' => [
                 ['field' => 'state_overall', 'type' => 'multiselect'],
                 ['field' => 'state_custom', 'type' => 'multiselect'],
                 ['field' => 'amount', 'type' => 'number-range'],
-                ['field' => 'create_at', 'type' => 'date-range'],
-                ['field' => 'update_at', 'type' => 'date-range'],
+                ['field' => 'refunded_at', 'type' => 'date-range'],
             ],
             'events' => ['init', 'add', 'mass-delete'],
             'grid_before_create' => 'order_refunds_register',

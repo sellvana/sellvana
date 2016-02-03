@@ -7,12 +7,12 @@ class FCom_Core_Shell_Cache extends FCom_Shell_Action_Abstract
     static protected $_actionName = 'cache';
 
     static protected $_availOptions = [
-        'c' => 'clean',
+        'f' => 'flush',
     ];
 
     protected function _run()
     {
-        if ($this->getOption('c')) {
+        if ($this->getOption('f')) {
             $this->println('Starting flushing cache...');
             $this->BCache->deleteAll();
             $this->println('Flushing complete');
