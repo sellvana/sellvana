@@ -297,10 +297,8 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         componentDidMount: function () {
             switch (this.props.type) {
                 case 'switch':
-                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch({
-                        state: parseInt(this.state.value) == 1,
-                        onSwitchChange: this.props.onChange
-                    });
+                    this.props.options['state'] = parseInt(this.state.value) == 1;
+                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch(this.props.options);
                     break;
                 case 'wysiwyg':
                     adminForm.wysiwygInit(null, this.state.value, this.handleWysiwygChange);
