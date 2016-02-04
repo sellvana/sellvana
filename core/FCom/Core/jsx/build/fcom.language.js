@@ -125,13 +125,6 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 defaultLangs: this.props.defaultLangs
             });
         },
-        componentDidMount: function () {
-            this.props.tmpAvailLangs = _.clone(this.state.availLangs);
-            this.props.tmpDefaultLangs = _.clone(this.state.defaultLangs);
-        },
-        componentWillUnmount: function () {
-            //
-        },
         componentDidUpdate: function (prevProps, prevState) {
             // Reset selection
             this.state.selection = null;

@@ -188,7 +188,8 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], functi
                                     break;
                                 case 'rating':
                                     node  = React.createElement(Components.RatingWidget, {initialRating: row.rating, 
-                                                                     onChange: that.handleRating.bind(null, col.callback)});
+                                                                     disabled: col.disabled, 
+                                                                     onChange: col.disabled ? that.handleRating.bind(null, col.callback) : null});
                                     break;
                                 default:
                                     node = React.createElement("input", React.__spread({key: col.name, type: "text", 
