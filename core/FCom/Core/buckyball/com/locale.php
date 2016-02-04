@@ -995,6 +995,7 @@ class BLocale extends BClass
 
     public function _($string, $params = [], $module = null)
     {
+/*
         if ($string instanceof BTranslated) {
             return $string;
         }
@@ -1003,6 +1004,7 @@ class BLocale extends BClass
 
     public function translateToString($string, $params, $module)
     {
+*/
         if (empty(static::$_tr[$string])) { // if no translation at all
             $tr = null;
             foreach (static::$_customTranslators as $translator) {
