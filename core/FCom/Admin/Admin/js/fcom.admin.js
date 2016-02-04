@@ -1656,25 +1656,6 @@ define(fcomAdminDeps, function ($, Ladda) {
     };
 
     /**
-     * Temporary fix for modal validation
-     *
-     * @param container
-     * @returns {boolean}
-     *
-     */
-    $.fn.modalValidate = function (container) {
-        if (!container.parent('form').length) {
-            container.wrap('<form>');
-        }
-
-        if (!container.parent('form').valid()) return false;
-
-        container.unwrap();
-
-        return true;
-    };
-
-    /**
      * Deep clone Object|Array|Date
      *
      * @param obj

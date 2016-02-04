@@ -122,7 +122,7 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
         exit;
     }
 
-    private function _indexCategories($q)
+    protected function _indexCategories($q)
     {
         $cacheKey = 'categories-index-'
             . $this->FCom_Admin_Model_User->sessionUserId()

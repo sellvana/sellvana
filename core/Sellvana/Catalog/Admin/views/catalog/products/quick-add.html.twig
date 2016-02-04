@@ -91,7 +91,7 @@
 </form>
 
 <script>
-    require(['jquery', 'underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'fcom.admin', 'unique'], function($, _, React, Components, FComSelect2) {
+    require(['jquery', 'underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'jquery.validate', 'fcom.admin', 'unique'], function($, _, React, Components, FComSelect2) {
         var _mainForm = $('#products-quick-add-form');
         var imageList = {}, products = [];
 
@@ -111,10 +111,38 @@
             BlockFormComponent.setProps({ NOP: $('#NOP').val() });
         });
 
+        /**
+         * Validate unique product sku
+         *
+         * @return boolean
+         */
+        function validateUniqueSku(value, elem) {
+            var valid = true;
+            if (typeof elem !== 'undefined') {
+                var $parent = $(elem).parents('tr');
+
+                var items = _mainForm.find('tr');
+                items.each(function () {
+                    if (!valid) {
+                        return;
+                    }
+
+                    var item = $(this);
+                    if (this === $parent[0]) {
+                        return;
+                    }
+
+                    valid = value !== item.find('.product-sku').val();
+                });
+                return valid;
+            }
+        }
+
         var Blocks = React.createClass({
             getDefaultProps: function () {
                 return {
                     product: {
+                        id: '',
                         product_sku: '',
                         product_name: '',
                         short_description: '',
@@ -148,8 +176,10 @@
                 };
             },
             getInitialState: function () {
+                var p = $.fn.deepClone(this.props.product);
+                p['id'] = guid();
                 return {
-                    products: [$.fn.deepClone(this.props.product)]
+                    products: [p]
                 };
             },
             componentWillReceiveProps: function (nextProps) {
@@ -157,7 +187,9 @@
 
                 if (nextProps.NOP && nextProps.NOP !== '0') {
                     for (var i = 0; i < nextProps.NOP; i++) {
-                        products.push($.fn.deepClone(this.props.product));
+                        var product = $.fn.deepClone(this.props.product);
+                        product['id'] = guid();
+                        products.push(product);
                     }
                 }
 
@@ -171,14 +203,14 @@
             },
             removeProduct: function (e) {
                 var products = this.state.products;
-                products.splice(e.currentTarget.dataset.id, 1);
+                products.splice(_.findIndex(products, { id: e.currentTarget.dataset.id }), 1);
                 this.setState({ products: products });
             },
             unlink: function(id) {
                 $.post("{{ APP.href('/media/grid/mass-delete') }}", { oper: 'mass-delete', id: id },
                         function (r) {
                             if (r.success) {
-                                $.bootstrapGrowl("{{ 'Image removed from media library' }}", {
+                                $.bootstrapGrowl("{{ 'Images had removed from media library'|_ }}", {
                                     type: 'success',
                                     align: 'center',
                                     width: 'auto'
@@ -236,20 +268,26 @@
                 this.hiddenInput.val(values.join(','));
             },
             handleInputChange: function (e) {
+                var id = e.target.dataset.id;
                 var type = e.target.dataset.type;
+                var pi = _.findIndex(this.state.products, {id: id});
                 if (type == 'price.base') {
-                    this.state.products[e.target.dataset.id]['price']['base'] = e.target.value;
+                    this.state.products[pi]['price']['base'] = e.target.value;
                 } else {
-                    this.state.products[e.target.dataset.id][e.target.dataset.type] = e.target.value;
+                    this.state.products[pi][type] = e.target.value;
                 }
             },
             handleWysiwygChange: function (editor, data) {
                 var id = editor.element.$.dataset.id;
                 var type = editor.element.$.dataset.type;
-                this.state.products[id][type] = data;
+                var pi = _.findIndex(this.state.products, {id: id});
+                this.state.products[pi][type] = data;
             },
             handleSwitchChange: function (e, state) {
-                this.state.products[e.target.dataset.id][e.target.dataset.type] = state ? 1 : 0;
+                var id = e.target.dataset.id;
+                var type = e.target.dataset.type;
+                var pi = _.findIndex(this.state.products, {id: id});
+                this.state.products[pi][type] = state ? 1 : 0;
             },
             init: function () {
                 $('.product-sku').each(function () {
@@ -274,6 +312,11 @@
                         }
                     });
                 });
+
+                $.validator.addMethod('validateUniqueSku', validateUniqueSku, '{{ "Product sku already exists."|_ }}');
+                $.validator.addClassRules('unique-sku', {
+                    validateUniqueSku: true
+                });
             },
             render: function () {
                 return React.DOM.table({ className: 'table table-bordered table-striped' },
@@ -289,7 +332,6 @@
                         React.DOM.tbody({ref: 'table-body'},
                             _(this.state.products).map(function (p, i) {
                                 return React.createElement(BlockForm, {
-                                    index: i,
                                     key: i,
                                     product: p,
                                     djsComponentConfig: this.props.djsComponentConfig,
@@ -314,11 +356,6 @@
         });
 
         var BlockForm = React.createClass({
-            getInitialState: function () {
-                return {
-                    id: this.props.index
-                };
-            },
             render: function () {
                 var p = this.props.product;
                 return React.DOM.tr(null,
@@ -327,17 +364,17 @@
                             React.createElement(Components.ControlLabel, {
                                 required: true,
                                 label_class: '',
-                                input_id: 'products['+this.state.id+'][product_sku]'}, "{{ 'Product SKU'|_ }}"
+                                input_id: 'products['+p.id+'][product_sku]'}, "{{ 'Product SKU'|_ }}"
                             ),
                             React.createElement(Components.ControlInput, {
                                 value: p.product_sku,
-                                id: 'product_sku_' + this.state.id,
-                                name: 'products['+this.state.id+'][product_sku]',
-                                className: 'product-sku',
+                                id: 'product_sku_' + p.id,
+                                name: 'products['+p.id+'][product_sku]',
+                                className: 'product-sku unique-sku',
                                 validation: { required: true },
                                 attrs: {
                                     style: {width: "80px"},
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'product_sku'
                                 },
                                 callback: this.props.actions.handleInputChange
@@ -347,16 +384,16 @@
                             React.createElement(Components.ControlLabel, {
                                 required: true,
                                 label_class: '',
-                                input_id: 'products['+this.state.id+'][product_name]'}, "{{ 'Product name'|_ }}"
+                                input_id: 'products['+ p.id+'][product_name]'}, "{{ 'Product name'|_ }}"
                             ),
                             React.createElement(Components.ControlInput, {
                                 value: p.product_name,
                                 className: 'product_name',
-                                id: 'products['+this.state.id+'][product_name]',
-                                name: 'products['+this.state.id+'][product_name]',
+                                id: 'products['+ p.id+'][product_name]',
+                                name: 'products['+ p.id+'][product_name]',
                                 validation: { required: true },
                                 attrs: {
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'product_name'
                                 },
                                 callback: this.props.actions.handleInputChange
@@ -366,18 +403,18 @@
                             React.createElement(Components.ControlLabel, {
                                 required: true,
                                 label_class: '',
-                                input_id: 'products['+this.state.id+'][short_description]'}, "{{ 'Short Description'|_ }}"
+                                input_id: 'products['+ p.id+'][short_description]'}, "{{ 'Short Description'|_ }}"
                             ),
                             React.createElement(Components.ControlInput, {
                                 type: 'textarea',
-                                id: 'products['+this.state.id+'][short_description]',
+                                id: 'products['+ p.id+'][short_description]',
                                 className: 'short_description',
-                                name: 'products['+this.state.id+'][short_description]',
+                                name: 'products['+ p.id+'][short_description]',
                                 value: p.short_description,
                                 validation: { required: true },
                                 attrs: {
                                     style: {minWidth: "100px"},
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'short_description'
                                 },
                                 callback: this.props.actions.handleInputChange
@@ -389,16 +426,16 @@
                             React.createElement(Components.ControlLabel, {
                                 required: true,
                                 label_class: '',
-                                input_id: 'products['+this.state.id+'][price.base]'}, "{{ 'Price'|_ }}"
+                                input_id: 'products['+ p.id+'][price.base]'}, "{{ 'Price'|_ }}"
                             ),
                             React.createElement(Components.ControlInput, {
                                 value: p.price.base,
-                                id: 'products['+this.state.id+'][price.base]',
-                                name: 'products['+this.state.id+'][price.base]',
+                                id: 'products['+ p.id+'][price.base]',
+                                name: 'products['+ p.id+'][price.base]',
                                 validation: { required: true },
                                 attrs: {
                                     style: {width: "80px"},
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'price.base'
                                 },
                                 callback: this.props.actions.handleInputChange
@@ -407,12 +444,12 @@
                         React.DOM.div({ className: 'form-group controls' },
                             React.createElement(Components.ControlLabel, {
                                 label_class: '',
-                                input_id: 'products['+this.state.id+'][is_hidden]'}, "{{ 'Hidden?'|_ }}"
+                                input_id: 'products['+ p.id+'][is_hidden]'}, "{{ 'Hidden?'|_ }}"
                             ),
                             React.createElement(Components.SpecialInput, {
                                 type: 'switch',
-                                id: 'products['+this.state.id+'][is_hidden]',
-                                name: 'products['+this.state.id+'][is_hidden]',
+                                id: 'products['+ p.id+'][is_hidden]',
+                                name: 'products['+ p.id+'][is_hidden]',
                                 value: p.is_hidden,
                                 options: {
                                     size: 'normal',
@@ -421,7 +458,7 @@
                                 attrs: {
                                     'data-on-text': '<i class="fa fa-check" />',
                                     'data-off-text': '<i class="fa fa-close" />',
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'is_hidden'
                                 }
                             })
@@ -429,14 +466,14 @@
                                 type: 'select',
                                 value: p.is_hidden,
                                 className: 'is_hidden',
-                                id: 'products['+this.state.id+'][is_hidden]',
-                                name: 'products['+this.state.id+'][is_hidden]',
+                                id: 'products['+p.id+'][is_hidden]',
+                                name: 'products['+p.id+'][is_hidden]',
                                 options: {
                                     0: "{{ 'no'|_ }}", 1: "{{ 'Yes'|_ }}"
                                 },
                                 attrs: {
                                     style: {width: "80px"},
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'price.base'
                                 }
                             })*/
@@ -444,18 +481,18 @@
                         React.DOM.div({ className: 'form-group controls' },
                             React.createElement(Components.ControlLabel, {
                                 label_class: '',
-                                input_id: 'categories['+this.state.id+']'}, "{{ 'Categories'|_ }}"
+                                input_id: 'categories['+ p.id+']'}, "{{ 'Categories'|_ }}"
                             ),
                             React.createElement(FComSelect2, {
                                 id: guid(),
-                                name: 'categories['+this.state.id+'][]',
+                                name: 'categories['+ p.id+'][]',
                                 placeholder: "{{ 'Select Categories' |_ }}",
                                 multiple: true,
                                 url: '{{ APP.href('/catalog/products/quick-add/categories_search') | raw }}',
                                 onChange: this.props.actions.handleInputChange,
                                 defaultValue: p.categories,
                                 attrs: {
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'categories'
                                 }
                             })
@@ -466,12 +503,12 @@
                             React.createElement(Components.ControlLabel, {
                                 required: true,
                                 label_class: '',
-                                input_id: 'products['+this.state.id+'][manage_inventory]'}, "{{ 'Manage?'|_ }}"
+                                input_id: 'products['+ p.id+'][manage_inventory]'}, "{{ 'Manage?'|_ }}"
                             ),
                             React.createElement(Components.SpecialInput, {
                                 type: 'switch',
-                                id: 'products['+this.state.id+'][manage_inventory]',
-                                name: 'products['+this.state.id+'][manage_inventory]',
+                                id: 'products['+ p.id+'][manage_inventory]',
+                                name: 'products['+ p.id+'][manage_inventory]',
                                 value: p.manage_inventory,
                                 options: {
                                     size: 'normal',
@@ -480,7 +517,7 @@
                                 attrs: {
                                     'data-on-text': '<i class="fa fa-check" />',
                                     'data-off-text': '<i class="fa fa-close" />',
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'manage_inventory'
                                 }
                             })
@@ -491,11 +528,11 @@
                                     0: "{{ 'no'|_ }}", 1: "{{ 'Yes'|_ }}"
                                 },
                                 className: 'manage_inventory',
-                                id: 'products['+this.state.id+'][manage_inventory]',
-                                name: 'products['+this.state.id+'][manage_inventory]',
+                                id: 'products['+p.id+'][manage_inventory]',
+                                name: 'products['+p.id+'][manage_inventory]',
                                 attrs: {
                                     style: {width: "80px"},
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'manage_inventory'
                                 },
                                 callback: this.props.actions.handleInputChange
@@ -504,16 +541,16 @@
                         React.DOM.div({ className: 'form-group controls' },
                             React.createElement(Components.ControlLabel, {
                                 label_class: '',
-                                input_id: 'products['+this.state.id+'][inventory_sku]'}, "{{ 'Inventory SKU'|_ }}"
+                                input_id: 'products['+ p.id+'][inventory_sku]'}, "{{ 'Inventory SKU'|_ }}"
                             ),
                             React.createElement(Components.ControlInput, {
                                 value: p.inventory_sku,
                                 className: 'inventory_sku',
-                                id: 'products['+this.state.id+'][inventory_sku]',
-                                name: 'products['+this.state.id+'][inventory_sku]',
+                                id: 'products['+ p.id+'][inventory_sku]',
+                                name: 'products['+ p.id+'][inventory_sku]',
                                 attrs: {
                                     style: {width: "80px"},
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'inventory_sku'
                                 },
                                 callback: this.props.actions.handleInputChange
@@ -522,16 +559,16 @@
                         React.DOM.div({ className: 'form-group controls' },
                             React.createElement(Components.ControlLabel, {
                                 label_class: '',
-                                input_id: 'inventory['+this.state.id+'][qty_in_stock]'}, "{{ 'Qty In Stock'|_ }}"
+                                input_id: 'inventory['+ p.id+'][qty_in_stock]'}, "{{ 'Qty In Stock'|_ }}"
                             ),
                             React.createElement(Components.ControlInput, {
                                 value: p.qty_in_stock,
                                 className: 'qty_in_stock',
-                                id: 'inventory['+this.state.id+'][qty_in_stock]',
-                                name: 'inventory['+this.state.id+'][qty_in_stock]',
+                                id: 'inventory['+ p.id+'][qty_in_stock]',
+                                name: 'inventory['+ p.id+'][qty_in_stock]',
                                 attrs: {
                                     style: {width: "80px"},
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'qty_in_stock'
                                 },
                                 callback: this.props.actions.handleInputChange
@@ -540,15 +577,15 @@
                         React.DOM.div({ className: 'form-group controls' },
                             React.createElement(Components.ControlLabel, {
                                 label_class: '',
-                                input_id: 'inventory['+this.state.id+'][shipping_weight]'}, "{{ 'Ship Weight'|_ }}"
+                                input_id: 'inventory['+ p.id+'][shipping_weight]'}, "{{ 'Ship Weight'|_ }}"
                             ),
                             React.createElement(Components.ControlInput, {
                                 value: p.shipping_weight,
-                                id: 'inventory['+this.state.id+'][shipping_weight]',
-                                name: 'inventory['+this.state.id+'][shipping_weight]',
+                                id: 'inventory['+ p.id+'][shipping_weight]',
+                                name: 'inventory['+ p.id+'][shipping_weight]',
                                 attrs: {
                                     style: {width: "80px"},
-                                    'data-id': this.state.id,
+                                    'data-id': p.id,
                                     'data-type': 'shipping_weight'
                                 },
                                 callback: this.props.actions.handleInputChange
@@ -558,12 +595,12 @@
                     React.DOM.td({ style: { width: '300px' } },
                         React.createElement(Components.SpecialInput, {
                             type: 'wysiwyg',
-                            id: 'products['+this.state.id+'][description]',
-                            name: 'products['+this.state.id+'][description]',
+                            id: 'products['+ p.id+'][description]',
+                            name: 'products['+ p.id+'][description]',
                             className: 'ckeditor',
                             value: p.description,
                             attrs: {
-                                'data-id': this.state.id,
+                                'data-id': p.id,
                                 'data-type': 'description'
                             },
                             onChange: this.props.actions.handleWysiwygChange
@@ -571,8 +608,8 @@
                     ),
                     React.DOM.td({ style: { width: '500px' } },
                         React.createElement(Components.Dropzone, {
-                            key: this.state.id,
-                            name: 'products['+this.state.id+'][images]',
+                            key: p.id,
+                            name: 'products['+ p.id+'][images]',
                             config: this.props.djsComponentConfig,
                             djsConfig: this.props.djsConfig,
                             eventHandlers: this.props.eventHandlers
@@ -584,7 +621,7 @@
                                     type: 'button',
                                     className: 'btn btn-link btn-delete',
                                     onClick: this.props.actions.removeProduct,
-                                    'data-id': this.state.id
+                                    'data-id': p.id
                                 },
                                 React.DOM.i({ className: 'icon-trash' })
                             )
