@@ -16,6 +16,7 @@
             <h1 class="f-page-title">{{ "Orders" | _ }} #{{ order.get('unique_id') }} <span class="badge">{{ order.state().overall().getValueLabel()|_ }}</span></h1>
             <div class="pull-right">
                 <form method="post" action="{{ APP.href('orders/repeat?id=' ~ order.get('unique_id')) }}">
+                    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
                     <button type="submit" class="btn btn-primary">{{ 'Repeat Order'|_ }}</button>
                 </form>
             </div>
