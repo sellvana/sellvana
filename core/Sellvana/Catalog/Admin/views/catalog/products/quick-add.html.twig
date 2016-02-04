@@ -170,7 +170,9 @@
                 this.init();
             },
             removeProduct: function (e) {
-                this.setState({ blocks: this.state.blocks - 1 });
+                var products = this.state.products;
+                products.splice(e.currentTarget.dataset.id, 1);
+                this.setState({ products: products });
             },
             unlink: function(id) {
                 $.post("{{ APP.href('/media/grid/mass-delete') }}", { oper: 'mass-delete', id: id },
@@ -450,7 +452,7 @@
                                 placeholder: "{{ 'Select Categories' |_ }}",
                                 multiple: true,
                                 url: '{{ APP.href('/catalog/products/quick-add/categories_search') | raw }}',
-                                onChange: this.props.actions.handleSelect2Change,
+                                onChange: this.props.actions.handleInputChange,
                                 defaultValue: p.categories,
                                 attrs: {
                                     'data-id': this.state.id,
@@ -579,6 +581,7 @@
                     React.DOM.td(null,
                         React.DOM.div({ className: 'table-actions-btns-group' },
                             React.createElement(Components.Button, {
+                                    type: 'button',
                                     className: 'btn btn-link btn-delete',
                                     onClick: this.props.actions.removeProduct,
                                     'data-id': this.state.id
