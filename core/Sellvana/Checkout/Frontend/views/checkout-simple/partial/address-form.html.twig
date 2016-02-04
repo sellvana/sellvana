@@ -45,7 +45,7 @@
         <div class="form-group col-sm-6">
             {% set field = type ~ '_country' %}
             <label for="{{ field }}" class="control-label required">{{ "Country" |_ }}</label>
-            {% set countries = THIS.get('countries') %}
+            {% set countries = APP.instance('BLocale').getAvailableCountries() %}
             {% set defC = validator.fieldValue(field) %}
             <select required class="geo-country required {{ validator.fieldClass(field) }} form-control" name="{{ type }}[country]" id="{{ field }}">
                 <option value="">{{ "Select an option" |_ }}</option>
