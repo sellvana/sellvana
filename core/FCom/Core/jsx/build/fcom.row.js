@@ -186,11 +186,6 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], functi
                                                   inlineProps, 
                                                   validationRules), selectOptions);
                                     break;
-                                case 'rating':
-                                    node  = React.createElement(Components.RatingWidget, {initialRating: row.rating, 
-                                                                     disabled: col.disabled, 
-                                                                     onChange: col.disabled ? that.handleRating.bind(null, col.callback) : null});
-                                    break;
                                 default:
                                     node = React.createElement("input", React.__spread({key: col.name, type: "text", 
                                                   defaultValue: defaultValue, 
@@ -202,20 +197,10 @@ define(['underscore', 'react', 'fcom.components', 'griddle.fcomSelect2'], functi
                             node = (<input type="text" data-col={col.name} onChange={that.handleChange} defaultValue={inlineColValue} className="form-control js-draggable" name={id + "[" + row.id + "][" + col.name + "]"} />);*/
                         }
                         break;
-                    case 'link':
-                        var options = row && row.options ? row.options.split(',') : [];
-                        inlineProps = {
-                            href: col.href ? col.href : 'javascript:void(0)',
-                            id: id + '-' + col.name + '-' + row.id,
-                            name: id + '[' + row.id + '][' + col.name + ']',
-                            className: (col.cssClass ? col.cssClass : ''),
-                            style: (col.style ? col.style : {}),
-                            "data-col": col.name,
-                            'data-action': col.name,
-                            'data-row': row.id
-                        };
-
-                        node = React.createElement("a", React.__spread({key: col.name},  inlineProps, {onClick: col.action ? that.props.doRowAction.bind(null, col.action) : null}), options.length + " " + col.label);
+                    case 'rating':
+                        node  = React.createElement(Components.RatingWidget, {initialRating: row.rating, 
+                                                         disabled: col.disabled, 
+                                                         onChange: col.disabled ? that.handleRating.bind(null, col.callback) : null});
                         break;
                     default:
                         if (col.display == 'eval') {

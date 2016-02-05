@@ -60,7 +60,7 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
                     $prodMediaHlp->create_many($prodMediaData);
                 }
 
-                if ($prodData['manage_inventory']) {
+                if (!empty($prodData['manage_inventory'])) {
                     $postInventory[$i]['inventory_sku'] = $prodData['inventory_sku'];
                     $postInventory[$i]['title'] = $prodData['product_name'];
                     $invHlp->create(['product_id' => $product->id()])->set($postInventory[$i])->save();
@@ -110,9 +110,30 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
 
     public function action_categories_search()
     {
-        $r = $this->BRequest;
-        $q = explode(' ', $r->get('q'));
+        $q = $this->BRequest->get('q');
+        if (!$q) {
+            $this->BResponse->json([]);
+            return;
+        }
 
+        $index = $this->_indexCategories($q);
+
+        $this->BResponse->json($index);
+        exit;
+    }
+
+    protected function _indexCategories($q)
+    {
+        $cacheKey = 'categories-index-'
+            . $this->FCom_Admin_Model_User->sessionUserId()
+            . '-' . str_replace(' ', '-', trim($q));
+
+        $cached = $this->BCache->load($cacheKey);
+        if ($cached) {
+            return $cached;
+        }
+
+        $q = explode(' ', $q);
         /** @var BORM $orm */
         $orm = $this->Sellvana_Catalog_Model_Category->orm()
             ->select(['id', 'full_name', 'sort_order', 'is_enabled'])
@@ -129,7 +150,7 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
 
         $categories = $orm->find_many_assoc('id', 'full_name');
 
-        $this->BResponse->json($categories);
-        exit;
+        $this->BCache->save($cacheKey, $categories);
+        return $categories;
     }
 }

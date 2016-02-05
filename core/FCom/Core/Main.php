@@ -219,11 +219,6 @@ class FCom_Core_Main extends BClass
             $config->addFile($coreConfigFile, true);
         }
 
-        $codeceptConfigFile = sprintf('%s/codecept.php', $config->get('fs/config_dir'));
-        if (!file_exists($codeceptConfigFile)) {
-            $config->writeConfigFiles('codecept');
-        }
-
         $randomDirName = $config->get('core/storage_random_dir');
         if (!$randomDirName || strpos($randomDirName, 'storage/') !== false) {
             $randomDirGlob = glob($storageDir . '/random-*');
