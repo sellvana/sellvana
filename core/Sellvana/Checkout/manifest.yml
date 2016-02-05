@@ -21,4 +21,6 @@ modules:
                     #- [ /checkout/shipping, Sellvana_Checkout_Frontend_Controller_Checkout.shipping ]
                     #- [ /checkout/success, Sellvana_Checkout_Frontend_Controller_Checkout.success ]
                     #- [ /checkout/address, Sellvana_Checkout_Frontend_Controller_Address.address ]
+                observe:
+                    - [ "Sellvana_Customer_Model_Customer::logout:before", Sellvana_Checkout_Frontend.onCustomerLogout ]
 
