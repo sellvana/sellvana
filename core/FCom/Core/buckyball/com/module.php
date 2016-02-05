@@ -56,6 +56,8 @@ class BModuleRegistry extends BClass
     */
     protected $_currentModuleStack = [];
 
+    protected $_bootstrapFinished = false;
+
     public function __construct()
     {
         //$this->BEvents->on('BFrontController::dispatch:before', array($this, 'onBeforeDispatch'));
@@ -627,11 +629,17 @@ class BModuleRegistry extends BClass
             $this->popModule();
         }
 
-        $this->BLayout->collectAllViewsFiles(); // TODO: refactor, decide on a better place
+        $this->_bootstrapFinished = true;
+        #$this->BLayout->collectAllViewsFiles(); // TODO: refactor, decide on a better place
 
         $this->BEvents->fire('BModuleRegistry::bootstrap:after');
 
         return $this;
+    }
+
+    public function isBootstrapFinished()
+    {
+        return $this->_bootstrapFinished;
     }
 }
 

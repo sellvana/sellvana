@@ -3288,7 +3288,7 @@ class BDebug extends BClass
         if ($textBefore) {
             echo htmlspecialchars($textBefore) . "\n";
         }
-        debug_print_backtrace();
+        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $output = ob_get_clean();
         $output = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $output);
         return $output;

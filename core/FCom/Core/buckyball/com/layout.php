@@ -63,6 +63,20 @@ class BLayout extends BClass
     protected $_addViewsFiles = [];
 
     /**
+     * Flags whether views were collected automatically for each area
+     *
+     * @var array
+     */
+    protected $_areViewsCollectedInArea = [];
+
+    /**
+     * Area for the current layout object
+     *
+     * @var string
+     */
+    protected $_area;
+
+    /**
      * Layouts declarations registry
      *
      * @var array
@@ -270,12 +284,20 @@ class BLayout extends BClass
         return $this;
     }
 
-    public function collectAllViewsFiles($area = null)
+    public function collectAllViewsFiles($area = null, $force = false)
     {
-        $t = BDebug::debug(__METHOD__);
-        if (null === $area) {
-            $area = $this->BRequest->area();
+        if (!$this->_area) {
+            if (null === $area) {
+                $area = $this->BRequest->area();
+            }
+            $this->_area = $area;
         }
+        if (false === $force && !empty($this->_areViewsCollectedInArea[$area])
+            || !$this->BModuleRegistry->isBootstrapFinished()
+        ) {
+            return $this;
+        }
+        $t = BDebug::debug(__METHOD__);
         $cacheKey = 'ALL_VIEWS-' . $area;
         $cacheConfig = $this->BConfig->get('core/cache/view_files');
         $useCache = !$cacheConfig && $this->BDebug->is(['STAGING', 'PRODUCTION']) || $cacheConfig === 'enable';
@@ -335,6 +357,7 @@ class BLayout extends BClass
             $this->addView($viewName, $viewParams);
         }
         $this->_addViewsFiles = [];
+        $this->_areViewsCollectedInArea[$area] = true;
         return $this;
     }
 
@@ -393,12 +416,15 @@ class BLayout extends BClass
     }
 
     /**
-    * Get all views in this layout or filtered by pattern
-    *
-    * @return BView[]
-    */
+     * Get all views in this layout or filtered by pattern
+     *
+     * @return BView[]
+     */
     public function getAllViews()
     {
+        if (!$this->_area || empty($this->_areViewsCollectedInArea[$this->_area])) {
+            $this->collectAllViewsFiles($this->_area);
+        }
         return $this->_views;
     }
 
@@ -437,7 +463,12 @@ class BLayout extends BClass
      */
     public function getView($viewName)
     {
-        return isset($this->_views[$viewName]) ? $this->_views[$viewName]
+        if (!$this->_area || empty($this->_areViewsCollectedInArea[$this->_area])) {
+            $views = $this->getAllViews();
+        } else {
+            $views = $this->_views;
+        }
+        return isset($views[$viewName]) ? $views[$viewName]
             : $this->BViewEmpty->i(true)->setParam('view_name', $viewName);
     }
 
@@ -517,7 +548,7 @@ class BLayout extends BClass
     public function findViewsRegex($re)
     {
         $views = [];
-        foreach ($this->_views as $viewName => $view) {
+        foreach ($this->getAllViews() as $viewName => $view) {
             if (preg_match($re, $viewName)) {
                 $views[$viewName] = $view;
             }
@@ -563,13 +594,14 @@ class BLayout extends BClass
      */
     public function cloneView($from, $to = null)
     {
+        $views = $this->getAllViews();
         if (null === $to) {
             $to = $from . '-copy';
-            for ($i = 2; !empty($this->_views[$to]); $i++) {
+            for ($i = 2; !empty($views[$to]); $i++) {
                 $to = $from . '-copy' . $i;
             }
         }
-        $this->_views[$to] = clone $this->_views[$from];
+        $this->_views[$to] = clone $views[$from];
         $this->_views[$to]->setParam('view_name', $to);
 
         return $this->_views[$to];
@@ -815,6 +847,8 @@ class BLayout extends BClass
             return $this;
         }
         BDebug::debug('LAYOUT.APPLY ' . $layoutName);
+
+        $this->BLayout->collectAllViewsFiles();
 
         // collect callbacks
         $callbacks = [];
@@ -1349,7 +1383,7 @@ class BLayout extends BClass
      */
     public function debugPrintViews()
     {
-        foreach ($this->_views as $viewName => $view) {
+        foreach ($this->getAllViews() as $viewName => $view) {
             echo $viewName . ':<pre>';
             print_r($view);
             echo '</pre><hr>';
