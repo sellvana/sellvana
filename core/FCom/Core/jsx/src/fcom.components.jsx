@@ -1389,9 +1389,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             if (!this.props.config.postUrl && this.props.action) {
                 return (
                     <form action={this.props.action} className={className}>
-                        <input type="hidden" name={this.props.name}/>
+                        <input type="hidden"
+                               name={this.props.name}
+                               value={this.props.defaultValue || ''}
+                               className="images"
+                            {...this.props.attrs}/>
                         {buttons}
-                        {icons}
                         <br/>
                         {this.props.children}
                     </form>
@@ -1399,9 +1402,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             } else {
                 return (
                     <div className={className}>
-                        <input type="hidden" name={this.props.name} className="images"/>
+                        <input type="hidden"
+                               name={this.props.name}
+                               value={this.props.defaultValue || ''}
+                               className="images"
+                               {...this.props.attrs}/>
                         {buttons}
-                        {icons}
                         <br/>
                         {this.props.children}
                     </div>

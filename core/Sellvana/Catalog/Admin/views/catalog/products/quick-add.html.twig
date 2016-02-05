@@ -65,7 +65,7 @@
     }
 </style>
 {% set categories = APP.instance('Sellvana_Catalog_Model_Category').getFlatCategories() %}
-{% set defaultFileSizeConfig = CONFIG.get('modules/FCom_Admin/default_media_file_size') | default('1') %}
+{% set defaultFileSizeConfig = CONFIG.get('modules/FCom_Admin/default_media_file_size') | default('10') %}
 
 <form id="products-quick-add-form" action="{{ APP.href('catalog/products/quick-add') }}" method="post">
     <div class="f-admin-main-view">
@@ -98,7 +98,7 @@
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'jquery.validate', 'fcom.admin', 'unique'], function($, _, React, Components, FComSelect2) {
         var _mainForm = $('#products-quick-add-form');
-        var imageList = {}, products = [];
+        var imageList = {};
 
         window.adminForm = FCom.Admin.form({
             form: 'products-quick-add-form',
@@ -165,15 +165,15 @@
                         images: ''
                     },
                     djsComponentConfig: {
-                        showButtons: true,
+//                        showButtons: true,
                         postUrl: "{{ APP.href('/media/grid/upload?type=') | raw }}" + encodeURIComponent('product-images') + '&folder=' + encodeURIComponent('media/product/images')
                     },
                     djsConfig: {
                         addRemoveLinks: true,
                         paramName: "upload",
-                        autoProcessQueue: false,
+//                        autoProcessQueue: false,
                         uploadMultiple: true,
-                        maxFilesize: "{{ defaultFileSizeConfig | raw }}",
+                        maxFilesize: "10",
                         maxFiles: 3,
                         headers: {
                             'X-CSRF-TOKEN': $('input[name="X-CSRF-TOKEN"]').val()
@@ -224,7 +224,7 @@
                 $.post("{{ APP.href('/media/grid/mass-delete') }}", { oper: 'mass-delete', id: id },
                         function (r) {
                             if (r.success) {
-                                $.bootstrapGrowl("{{ 'Images had removed from media library'|_ }}", {
+                                $.bootstrapGrowl("{{ 'Image had removed from media library'|_ }}", {
                                     type: 'success',
                                     align: 'center',
                                     width: 'auto'
@@ -233,53 +233,71 @@
                         });
             },
             djsInit: function(dj) {
-                var that = this, _this = dj;
-                this.hiddenInput = $(_this.element.querySelector('input.images'));
-                _this.element.querySelector("button.btn-upload").addEventListener("click", function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    _this.processQueue();
-                });
-
-                _this.element.querySelector("button.btn-cancel").addEventListener("click", function () {
-                    _this.removeAllFiles(true);
-                    var values = that.hiddenInput.val() ? that.hiddenInput.val().split(',') : [];
-                    if (values.length) {
-                        that.unlink(values);
-                    }
-                    that.hiddenInput.val('');
-                });
-            },
-            djsSuccess: function (file, responseText) {
-                var key = this.hiddenInput.data('key');
-                var values = this.hiddenInput.val() ? this.hiddenInput.val().split(',') : [];
-                _(responseText['files']).each(function (f) {
-                    var index = _.indexOf(values, f.id);
-                    if (index == -1) {
-                        values.push(f.id);
-                        if (!imageList[key]) imageList[key] = [];
-                        imageList[key].push({
-                            id: f.id,
-                            name: f.file_name
-                        });
-                    }
-                });
-                this.hiddenInput.val(values.join(','));
-            },
-            djsRemovedFile: function (file) {
                 var that = this;
-                var key = this.hiddenInput.data('key');
-                var values = this.hiddenInput.val() ? this.hiddenInput.val().split(',') : [];
-                if (values.length) {
-                    var images = imageList[key];
-                    _(images).each(function (image) {
-                        if (file.name == image.name) {
-                            values.splice(_.indexOf(values, image.id), 1);
-                            that.unlink(image.id);
-                        }
+                var hiddenInput = dj.element.querySelector('input[data-type="images"]');
+                var id = hiddenInput.getAttribute('data-id');
+                var type = hiddenInput.getAttribute('data-type');
+
+                var btnUpload = dj.element.querySelector("button.btn-upload");
+                if (btnUpload) {
+                    btnUpload.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dj.processQueue();
                     });
                 }
-                this.hiddenInput.val(values.join(','));
+
+                var btnCancel = dj.element.querySelector("button.btn-cancel");
+                if (btnCancel) {
+                    btnCancel.addEventListener("click", function () {
+                        dj.removeAllFiles(true);
+                        if (imageList[id].length) {
+                            that.unlink(_.pluck(imageList[id], 'id').join(','));
+                        }
+                        hiddenInput.value = '';
+                        that.state.products[_.findIndex(that.state.products, {id: id})][type] = '';
+                    });
+                }
+
+                dj.on("success", function(file, responseText) {
+                    _(responseText['files']).each(function (f) {
+                        if (!imageList[id]) imageList[id] = [];
+                        var index = _.findIndex(imageList[id], {id: f.id});
+                        if (index == -1) {
+                            imageList[id].push({
+                                id: f.id,
+                                name: f.file_name
+                            });
+                        }
+                    });
+
+                    var values = _.pluck(imageList[id], 'id').join(',');
+                    hiddenInput.value = values;
+                    that.state.products[_.findIndex(that.state.products, {id: id})][type] = values;
+                });
+
+                dj.on('removedfile', function (file) {
+                    if (imageList[id].length) {
+                        _(imageList[id]).each(function (image, mi) {
+                            if (file.name == image.name) {
+                                imageList[id][mi].deleted = true;
+                                that.unlink(image.id);
+                                var prevIndex = mi - 1;
+                                if (prevIndex != -1 && imageList[id][prevIndex].deleted)
+                                    imageList[id].splice(prevIndex, 1);
+                            }
+                        });
+
+                        // Remove last image if deleted
+                        var lastIndex = imageList[id].length - 1;
+                        if (lastIndex != -1 && imageList[id][lastIndex].deleted)
+                            imageList[id].splice(lastIndex, 1);
+                    }
+
+                    var values = _.pluck(imageList[id], 'id').join(',');
+                    hiddenInput.value = values;
+                    that.state.products[_.findIndex(that.state.products, {id: id})][type] = values;
+                });
             },
             handleInputChange: function (e) {
                 var id = e.target.dataset.id;
@@ -351,9 +369,9 @@
                                     djsComponentConfig: this.props.djsComponentConfig,
                                     djsConfig: this.props.djsConfig,
                                     eventHandlers: {
-                                        init: this.djsInit,
-                                        success: this.djsSuccess,
-                                        removedfile: this.djsRemovedFile
+                                        init: this.djsInit
+//                                        success: this.djsSuccess,
+//                                        removedfile: this.djsRemovedFile
                                     },
                                     actions: {
                                         handleInputChange: this.handleInputChange,
@@ -632,9 +650,14 @@
                         React.createElement(Components.Dropzone, {
                             key: p.id,
                             name: 'products['+ p.id+'][images]',
+                            defaultValue: p.images,
                             config: this.props.djsComponentConfig,
                             djsConfig: this.props.djsConfig,
-                            eventHandlers: this.props.eventHandlers
+                            eventHandlers: this.props.eventHandlers,
+                            attrs: {
+                                'data-id': p.id,
+                                'data-type': 'images'
+                            }
                         })
                     ),
                     React.DOM.td(null,

@@ -65,16 +65,13 @@
 <script>
     /*==========  React section  ==========*/
     require(['jquery', 'underscore', 'react'], function($, _, React) {
-        var modelsGrid, modelsNode;
         window.modelsGridRegister = function (grid) {
-            modelsGrid = grid;
-            var modelsNode = $(modelsGrid.getDOMNode());
-            modelsNode.find('input[type=checkbox]').on('click', function(){
+            $(grid.getDOMNode()).find('input[type=checkbox]').on('click', function(){
                 var isChecked = this.checked;
                 var addRows = [];
-                var id = this.name.replace(modelsGrid.getConfig('id') + '[checked][','').replace(']','');
+                var id = this.name.replace(grid.getConfig('id') + '[checked][','').replace(']','');
 
-                var rowsCol = modelsGrid.getRows();
+                var rowsCol = grid.getRows();
                 var tRow = _.find(rowsCol, function(row) {
                     if (row.id === id) return row;
                 });
@@ -93,16 +90,16 @@
                             }
                         }
                         if (isChecked) {
-                            modelsGrid.addSelectedRows(addRows);
+                            grid.addSelectedRows(addRows);
                             addRows.push(_.findWhere(rowsCol, {id: id}));
                         } else {
-                            modelsGrid.removeSelectedRows(addRows);
+                            grid.removeSelectedRows(addRows);
                         }
                     });
                 }
             });
 
-            $('#btn_export_start').click(function(e){
+            $(document).on('click', '#btn_export_start', function(e){
                 e.preventDefault();
                 var url = '{{ APP.href('importexport/export') }}';
                 var data = $('input[name^=ie_export_grid]').serializeArray();

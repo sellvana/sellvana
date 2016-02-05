@@ -1389,9 +1389,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             if (!this.props.config.postUrl && this.props.action) {
                 return (
                     React.createElement("form", {action: this.props.action, className: className}, 
-                        React.createElement("input", {type: "hidden", name: this.props.name}), 
+                        React.createElement("input", React.__spread({type: "hidden", 
+                               name: this.props.name, 
+                               value: this.props.defaultValue || '', 
+                               className: "images"}, 
+                            this.props.attrs)), 
                         buttons, 
-                        icons, 
                         React.createElement("br", null), 
                         this.props.children
                     )
@@ -1399,9 +1402,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             } else {
                 return (
                     React.createElement("div", {className: className}, 
-                        React.createElement("input", {type: "hidden", name: this.props.name, className: "images"}), 
+                        React.createElement("input", React.__spread({type: "hidden", 
+                               name: this.props.name, 
+                               value: this.props.defaultValue || '', 
+                               className: "images"}, 
+                               this.props.attrs)), 
                         buttons, 
-                        icons, 
                         React.createElement("br", null), 
                         this.props.children
                     )
