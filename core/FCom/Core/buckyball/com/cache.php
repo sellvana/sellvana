@@ -493,15 +493,23 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
 
 class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 {
+    protected $_type;
     protected $_config;
     protected $_conn;
+    protected $_flags;
 
     public function info()
     {
-        return ['available' => false];
+        #return ['available' => false];
 
         //TODO: explicit configuration
-        return ['available' => class_exists('Memcache', false) && $this->init(), 'rank' => 10];
+        if (class_exists('Memcache', false)) {
+            $type = 'Memcache';
+        } elseif (class_exists('Memcached', false)) {
+            $type = 'Memcached';
+        }
+
+        return ['available' => $type && $this->init(), 'rank' => 10];
     }
 
     public function init($config = [])
@@ -519,9 +527,16 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
             $config['port'] = 11211;
         }
         $this->_config = $config;
-        $this->_flags = !empty($config['compress']) ? MEMCACHE_COMPRESSED : 0;
-        $this->_conn = new Memcache;
-        return @$this->_conn->pconnect($config['host'], $config['port']);
+        #$this->_flags = !empty($config['compress']) ? MEMCACHE_COMPRESSED : 0;
+        switch ($this->_type) {
+            case 'Memcache':
+                $this->_conn = new Memcache;
+                return @$this->_conn->pconnect($config['host'], $config['port']);
+
+            case 'Memcached':
+                $this->_conn = new Memcached('sellvana');
+                return $this->_conn->addServer($config['host'], $config['port']);
+        }
     }
 
     public function load($key)
@@ -531,9 +546,15 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 
     public function save($key, $data, $ttl = null)
     {
-        $flag = !empty($this->_config['compress']) ? MEMCACHE_COMPRESSED : 0;
-        $ttl1 = is_null($ttl) ? 0 : time() + $ttl;
-        return $this->_conn->set($this->_config['prefix'] . $key, $data, $flag, $ttl1);
+        switch ($this->_type) {
+            case 'Memcache':
+                $flag = 0;#!empty($this->_config['compress']) ? MEMCACHE_COMPRESSED : 0;
+                $ttl1 = is_null($ttl) ? 0 : time() + $ttl;
+                return $this->_conn->set($this->_config['prefix'] . $key, $data, $flag, $ttl1);
+
+            case 'Memcached':
+                return $this->_conn->set($this->_config['prefix'] . $key, $data, $ttl);
+        }
     }
 
     public function delete($key)
@@ -553,12 +574,13 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 
     public function gc()
     {
-        return false; // not implemented
+        return true; // not needed, ttl handled internally
     }
 
     public function deleteAll()
     {
-        return false; // not implemented
+        $this->_conn->flush();
+        return true;
     }
 }
 
