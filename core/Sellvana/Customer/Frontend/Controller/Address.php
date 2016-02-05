@@ -75,10 +75,10 @@ class Sellvana_Customer_Frontend_Controller_Address extends FCom_Frontend_Contro
         $crumbs[] = array('label'=>'View Addresses', 'href'=>$this->BApp->href('customer/address'));
         $crumbs[] = array('label'=>'Edit Address', 'active'=>true);
         $this->view('breadcrumbs')->crumbs = $crumbs;
-        $layout->view('customer/address/edit')->countries = $this->FCom_Geo_Model_Country->options($countriesList);
-        $layout->view('customer/address/edit')->address = $address;
-        $layout->view('customer/address/edit')->default_shipping = $defaultShipping;
-        $layout->view('customer/address/edit')->default_billing = $defaultBilling;*/
+        $layout->getView('customer/address/edit')->countries = $this->FCom_Geo_Model_Country->options($countriesList);
+        $layout->getView('customer/address/edit')->address = $address;
+        $layout->getView('customer/address/edit')->default_shipping = $defaultShipping;
+        $layout->getView('customer/address/edit')->default_billing = $defaultBilling;*/
 
         //$this->view('geo/embed')->set('countries', $countriesList);
         $varSet = [

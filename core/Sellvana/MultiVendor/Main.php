@@ -85,7 +85,7 @@ class Sellvana_MultiVendor_Main extends BClass
                 }
             }
             if ($items) {
-                $this->BLayout->view('email/multivendor_vendor_notify')->set([
+                $this->BLayout->getView('email/multivendor_vendor_notify')->set([
                     'order' => $order,
                     'vendor' => $vendor,
                     'items' => $items,

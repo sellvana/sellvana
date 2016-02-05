@@ -102,7 +102,7 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         }
         if (!empty($pool[$value])) {
             foreach ((array)$pool[$value] as $emailViewName) {
-                $view = $this->BLayout->view($emailViewName);
+                $view = $this->BLayout->getView($emailViewName);
                 if (!$view instanceof BViewEmpty) {
                     $view->set(['context' => $this->_context, 'type' => $this->_type, 'options' => $this->_options])
                         ->email();

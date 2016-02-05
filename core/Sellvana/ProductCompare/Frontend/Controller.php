@@ -40,9 +40,9 @@ class Sellvana_ProductCompare_Frontend_Controller extends FCom_Frontend_Controll
         } else {
             $this->layout('/catalog/compare');
         }
-        $layout->view('catalog/compare')->set('products', array_values($products));
+        $layout->getView('catalog/compare')->set('products', array_values($products));
         if (!$xhr) {
-            $layout->view('breadcrumbs')->set('crumbs', ['home',
+            $layout->getView('breadcrumbs')->set('crumbs', ['home',
                 ['label' => 'Compare ' . sizeof($products) . ' products', 'active' => true]
             ]);
         }

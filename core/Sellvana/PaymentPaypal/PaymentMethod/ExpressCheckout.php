@@ -43,7 +43,7 @@ class Sellvana_PaymentPaypal_PaymentMethod_ExpressCheckout extends Sellvana_Sale
      */
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('paypal/form');
+        return $this->BLayout->getView('paypal/form');
     }
 
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)

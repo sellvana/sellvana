@@ -5,7 +5,7 @@ class FCom_LibScssPhp_Main extends BClass
     public function bootstrap()
     {
         /** @var BViewHead $head */
-        $head = $this->BLayout->view('head');
+        $head = $this->BLayout->getView('head');
         $head->addDefaultTag('scss', [$this, 'tagCallback']);
     }
 

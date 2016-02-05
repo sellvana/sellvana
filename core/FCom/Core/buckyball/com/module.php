@@ -630,7 +630,7 @@ class BModuleRegistry extends BClass
         }
 
         $this->_bootstrapFinished = true;
-        #$this->BLayout->collectAllViewsFiles(); // TODO: refactor, decide on a better place
+        $this->BLayout->collectAllViewsFiles(); // TODO: refactor, decide on a better place
 
         $this->BEvents->fire('BModuleRegistry::bootstrap:after');
 

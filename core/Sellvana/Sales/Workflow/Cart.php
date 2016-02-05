@@ -376,6 +376,6 @@ class Sellvana_Sales_Workflow_Cart extends Sellvana_Sales_Workflow_Abstract
         $cart = $this->_getCart($args);
         $cart->state()->overall()->setAbandoned();
         $cart->save();
-        $this->BLayout->view('email/sales/cart-state-abandoned.html.twig')->email();
+        $this->BLayout->getView('email/sales/cart-state-abandoned.html.twig')->email();
     }
 }

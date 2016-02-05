@@ -14,7 +14,7 @@ class Sellvana_ProductReviews_Frontend extends BClass
         $productReviews = $this->Sellvana_ProductReviews_Model_Review->orm()
             ->where("product_id", $product->id())->find_many();
 
-        return $this->BLayout->view('prodreviews/reviews')
+        return $this->BLayout->getView('prodreviews/reviews')
             ->set(['product' => $product, 'product_reviews' => $productReviews])
             ->render();
     }

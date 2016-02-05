@@ -206,8 +206,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     /*
     public function action_index()
     {
-        $this->BLayout->view('modules')->set('form_url', $this->BApp->href('modules').($this->BRequest->get('RECOVERY')==='' ? '?RECOVERY' : ''));
-        $grid = $this->BLayout->view('core/backgrid')->set('grid', $this->gridConfig());
+        $this->BLayout->getView('modules')->set('form_url', $this->BApp->href('modules').($this->BRequest->get('RECOVERY')==='' ? '?RECOVERY' : ''));
+        $grid = $this->BLayout->getView('core/backgrid')->set('grid', $this->gridConfig());
         $this->BEvents->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
         $this->layout('/modules');
     }*/

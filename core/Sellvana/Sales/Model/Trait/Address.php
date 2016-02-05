@@ -39,7 +39,7 @@ trait Sellvana_Sales_Model_Trait_Address
 
     public function addressAsHtml($atype)
     {
-        return $this->BLayout->view('sales/address-card')->set(['model' => $this, 'atype' => $atype])->render();
+        return $this->BLayout->getView('sales/address-card')->set(['model' => $this, 'atype' => $atype])->render();
     }
 
     public function addressAsArray($atype)

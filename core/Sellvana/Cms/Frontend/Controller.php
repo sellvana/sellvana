@@ -35,12 +35,12 @@ class Sellvana_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $viewName = $view->param('view_name');
         $this->BLayout->hookView('main', $viewName);
 
-        if (($root = $this->BLayout->view('root'))) {
+        if (($root = $this->BLayout->getView('root'))) {
             $root->addBodyClass('cms-' . $block->handle)
                  ->addBodyClass('page-' . $block->handle);
         }
 
-        if (($head = $this->BLayout->view('head'))) {
+        if (($head = $this->BLayout->getView('head'))) {
             /** @var BViewHead $head */
             $head->addTitle($block->page_title);
             foreach (['title', 'description', 'keywords'] as $f) {
@@ -97,15 +97,15 @@ class Sellvana_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         $this->layout('cms_nav');
 
-        $this->BLayout->view('cms/nav-content')->set('nav', $nav);
+        $this->BLayout->getView('cms/nav-content')->set('nav', $nav);
 
-        if (($root = $this->BLayout->view('root'))) {
+        if (($root = $this->BLayout->getView('root'))) {
             $htmlClass = $this->BUtil->simplifyString($nav->url_path);
             $root->addBodyClass('cms-' . $htmlClass)
                  ->addBodyClass('page-' . $htmlClass);
         }
 
-        if (($head = $this->BLayout->view('head'))) {
+        if (($head = $this->BLayout->getView('head'))) {
             $head->addTitle($nav->title);
             foreach (['title', 'description', 'keywords'] as $f) {
                 if (($v = $nav->get('meta_' . $f))) {

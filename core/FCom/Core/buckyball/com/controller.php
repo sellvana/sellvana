@@ -2501,7 +2501,7 @@ class BActionController extends BClass
     */
     public function view($viewname)
     {
-        return $this->BLayout->view($viewname);
+        return $this->BLayout->getView($viewname);
     }
 
     /**
@@ -2757,7 +2757,7 @@ class BActionController extends BClass
         $this->BLayout->applyLayout('view-proxy')->applyLayout($viewPrefix . $page);
         $view->useMetaData();
 
-        if (($root = $this->BLayout->view('root'))) {
+        if (($root = $this->BLayout->getView('root'))) {
             $root->addBodyClass('page-' . $page);
         }
 

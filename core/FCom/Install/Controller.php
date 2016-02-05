@@ -46,7 +46,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         $this->BLayout->applyLayout('/');
 
         $errors = $this->BDebug->getCollectedErrors();
-        $this->BLayout->view('index')->errors = $errors;
+        $this->BLayout->getView('index')->errors = $errors;
     }
 
     public function action_index__POST()

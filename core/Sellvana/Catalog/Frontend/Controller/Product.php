@@ -33,8 +33,8 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
         $this->BApp->set('current_product', $product);
 
         $viewName = 'catalog/product/details';
-        $layout->view($viewName)->set('product', $product);
-        $head = $layout->view('head');
+        $layout->getView($viewName)->set('product', $product);
+        $head = $layout->getView('head');
 
         $categoryPath = $this->BRequest->param('category');
         
@@ -54,7 +54,7 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
 
             $this->BApp->set('current_category', $category);
 
-            $layout->view($viewName)->set('category', $category);
+            $layout->getView($viewName)->set('category', $category);
             $head->canonical($product->url());
             $rootCategoryId = $this->BConfig->get('modules/FCom_Frontend/nav_top/root_category');
             $hide = (bool)$rootCategoryId;
@@ -81,13 +81,13 @@ class Sellvana_Catalog_Frontend_Controller_Product extends FCom_Frontend_Control
         $head->addTitle($product->getName());
         $crumbs[] = ['label' => $product->getName(), 'active' => true];
 
-        $layout->view('breadcrumbs')->set('crumbs', $crumbs);
+        $layout->getView('breadcrumbs')->set('crumbs', $crumbs);
 
         $user = false;
         if ($this->BApp->m('Sellvana_Customer')) {
             $user = $this->Sellvana_Customer_Model_Customer->sessionUser();
         }
-        $layout->view($viewName)->set('user', $user);
+        $layout->getView($viewName)->set('user', $user);
 
         $layoutData = $product->getData('layout');
         if ($layoutData) {

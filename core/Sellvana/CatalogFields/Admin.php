@@ -52,7 +52,7 @@ class Sellvana_CatalogFields_Admin extends BClass
     public function onProductsFormViewBefore()
     {
         $id = $this->BRequest->param('id', true);
-        $p = $this->BLayout->view('admin/form')->get('model');
+        $p = $this->BLayout->getView('admin/form')->get('model');
         #$p = $this->Sellvana_Catalog_Model_Product->load($id);
 
         if (!$p) {
@@ -69,7 +69,7 @@ class Sellvana_CatalogFields_Admin extends BClass
                 $fieldsOptions[$option->get('field_id')][] = $option;
             }
         }
-        $view = $this->BLayout->view('catalogfields/products/fields-partial');
+        $view = $this->BLayout->getView('catalogfields/products/fields-partial');
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 

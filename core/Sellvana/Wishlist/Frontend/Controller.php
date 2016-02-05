@@ -22,7 +22,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $this->BResponse->nocache();
         $layout = $this->BLayout;
         $this->layout('/wishlist');
-        $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
+        $layout->getView('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
         $isMultiWishlist = (bool)$this->BConfig->get('modules/Sellvana_Wishlist/multiple_wishlist');
 
         $wishlistsOrm = $this->Sellvana_Wishlist_Model_Wishlist->orm()
@@ -51,7 +51,7 @@ class Sellvana_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abs
             }
         }
 
-        $layout->view('wishlist')->set([
+        $layout->getView('wishlist')->set([
                 'wishlists'       => $wishlists,
                 'isMultiWishlist' => $isMultiWishlist
             ]);

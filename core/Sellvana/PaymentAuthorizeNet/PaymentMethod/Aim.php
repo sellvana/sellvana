@@ -22,7 +22,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Aim extends Sellvana_Sales_Meth
 
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('authorizenet/aim')->set('key', static::$_methodKey);
+        return $this->BLayout->getView('authorizenet/aim')->set('key', static::$_methodKey);
     }
 
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)

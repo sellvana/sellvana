@@ -19,9 +19,9 @@ class Sellvana_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Co
     {
         try {
             $status = $this->Sellvana_IndexTank_Index_Product->status();
-            $this->BLayout->view('indextank/product_functions')->set('status', $status);
+            $this->BLayout->getView('indextank/product_functions')->set('status', $status);
         } catch (Exception $e) {
-            $this->BLayout->view('indextank/product_functions')->set('status', false);
+            $this->BLayout->getView('indextank/product_functions')->set('status', false);
         }
 
         $config = parent::gridConfig();

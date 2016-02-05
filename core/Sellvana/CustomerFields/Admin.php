@@ -28,7 +28,7 @@ class Sellvana_CustomerFields_Admin extends BClass
     public function onCustomerFormViewBefore()
     {
         /** @var Sellvana_Customer_Model_Customer $c */
-        $c = $this->BLayout->view('admin/form')->get('model');
+        $c = $this->BLayout->getView('admin/form')->get('model');
 
         if (!$c) {
             return;
@@ -45,7 +45,7 @@ class Sellvana_CustomerFields_Admin extends BClass
                 $fieldsOptions[$option->get('field_id')][] = $option;
             }
         }
-        $view = $this->BLayout->view('customerfields/customers/fields-partial');
+        $view = $this->BLayout->getView('customerfields/customers/fields-partial');
         $view->set('model', $c)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 

@@ -147,9 +147,9 @@ class Sellvana_CustomerFields_Main extends BClass
         if (empty($groups) && empty($currentFilter)) {
             return null;
         }
-        $this->BLayout->view('customerfields/filters')->set(['selected_filters' => $currentFilter, 'groups' => $groups]);
+        $this->BLayout->getView('customerfields/filters')->set(['selected_filters' => $currentFilter, 'groups' => $groups]);
 
-        return $this->BLayout->view('customerfields/filters')->render();
+        return $this->BLayout->getView('customerfields/filters')->render();
     }
 
     public function onCustomerImportRow($args)
