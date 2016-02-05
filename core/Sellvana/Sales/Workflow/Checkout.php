@@ -60,6 +60,9 @@ class Sellvana_Sales_Workflow_Checkout extends Sellvana_Sales_Workflow_Abstract
             }
             if (isset($args['post']['address_id'])) {
                 $this->BSession->set('shipping_address_id', $args['post']['address_id']);
+                if ($same) {
+                    $this->BSession->set('billing_address_id', $args['post']['address_id']);
+                }
             }
         }
     }

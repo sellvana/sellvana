@@ -36,6 +36,7 @@
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_Catalog_Model_InventorySku $Sellvana_Catalog_Model_InventorySku
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
+ * @property Sellvana_Customer_Model_Address $Sellvana_Customer_Model_Address
  * @property Sellvana_Sales_Main $Sellvana_Sales_Main
  * @property Sellvana_Sales_Model_Cart $Sellvana_Sales_Model_Cart
  * @property Sellvana_Sales_Model_Cart_Item $Sellvana_Sales_Model_Cart_Item
@@ -647,19 +648,30 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function importAddressesFromCustomer(Sellvana_Customer_Model_Customer $customer)
     {
-        $defBilling = $customer->getDefaultBillingAddress();
-        if ($defBilling) {
-            $this->importAddressFromObject($defBilling, 'billing');
-            $this->BSession->set('billing_address_id', $defBilling->get('id'));
+        $billingAddressId = $this->BSession->get('billing_address_id');
+        if ($billingAddressId) {
+            $billingAddress = $this->Sellvana_Customer_Model_Address->load($billingAddressId);
+        } else {
+            $billingAddress = $customer->getDefaultBillingAddress();
         }
-        $defShipping = $customer->getDefaultShippingAddress();
-        if ($defShipping) {
-            $this->importAddressFromObject($defShipping, 'shipping');
-            $this->BSession->set('shipping_address_id', $defShipping->get('id'));
+        if ($billingAddress) {
+            $this->importAddressFromObject($billingAddress, 'billing');
+            $this->BSession->set('billing_address_id', $billingAddress->get('id'));
+        }
+
+        $shippingAddressId = $this->BSession->get('shipping_address_id');
+        if ($shippingAddressId) {
+            $shippingAddress = $this->Sellvana_Customer_Model_Address->load($shippingAddressId);
+        } else {
+            $shippingAddress = $customer->getDefaultShippingAddress();
+        }
+        if ($shippingAddress) {
+            $this->importAddressFromObject($shippingAddress, 'shipping');
+            $this->BSession->set('shipping_address_id', $shippingAddress->get('id'));
         }
 
         $this->set([
-            'same_address' => (int)($defBilling && $defShipping && $defBilling->id() == $defShipping->id()),
+            'same_address' => (int)($billingAddress && $shippingAddress && $billingAddress->id() == $shippingAddress->id()),
             'recalc_shipping_rates' => 1,
         ]);
 
