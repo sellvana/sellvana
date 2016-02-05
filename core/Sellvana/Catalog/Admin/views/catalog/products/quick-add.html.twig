@@ -212,6 +212,14 @@
                 products.splice(_.findIndex(products, { id: e.currentTarget.dataset.id }), 1);
                 this.setState({ products: products });
             },
+            duplicateProduct: function (e) {
+                var products = this.state.products;
+                var dProduct = $.fn.deepClone(products[_.findIndex(products, { id: e.currentTarget.dataset.id })]);
+                dProduct['id'] = guid();
+                products.push(dProduct);
+
+                this.setState({ products: products });
+            },
             unlink: function(id) {
                 $.post("{{ APP.href('/media/grid/mass-delete') }}", { oper: 'mass-delete', id: id },
                         function (r) {
@@ -351,7 +359,8 @@
                                         handleInputChange: this.handleInputChange,
                                         handleSwitchChange: this.handleSwitchChange,
                                         handleWysiwygChange: this.handleWysiwygChange,
-                                        removeProduct: this.removeProduct
+                                        removeProduct: this.removeProduct,
+                                        duplicateProduct: this.duplicateProduct
                                     }
                                 })
                             }.bind(this)),
@@ -637,6 +646,15 @@
                                     'data-id': p.id
                                 },
                                 React.DOM.i({ className: 'icon-trash' })
+                            ),
+                            React.createElement(Components.Button, {
+                                    type: 'button',
+                                    className: 'btn btn-link btn-delete',
+                                    onClick: this.props.actions.duplicateProduct,
+                                    title: 'Duplicate',
+                                    'data-id': p.id
+                                },
+                                React.DOM.i({ className: 'icon-copy' })
                             )
                         )
                     )
