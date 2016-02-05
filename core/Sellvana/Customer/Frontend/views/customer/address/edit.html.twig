@@ -59,7 +59,7 @@
                     })
                 </script>
                 <label for="address-country" class="control-label required">{{ "Country" | _ }}</label>
-                {% set countries = THIS.get('countries') %}
+                {% set countries = APP.instance('BLocale').getAvailableCountries() %}
                 {% set defC = validator.fieldValue('country') %}
                   {#{{ dump(countries) }}#}
                 <select class="geo-country select2 form-control required" name="country" id="address-country">
