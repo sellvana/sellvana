@@ -4421,8 +4421,7 @@ class BValidate extends BClass
             $this->BSession->set('validator-data:' . $formName, $data);
             foreach ($this->_validateErrors as $field => $errors) {
                 foreach ($errors as $error) {
-                    $msg = ['error' => $error, 'field' => $field];
-                    $this->BSession->addMessage($msg, 'error', 'validator-errors:' . $formName);
+                    $this->BSession->addMessage($error, 'error', 'validator-errors:' . $formName);
                 }
             }
         }
