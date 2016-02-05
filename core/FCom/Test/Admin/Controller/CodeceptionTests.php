@@ -13,7 +13,13 @@ class FCom_Test_Admin_Controller_CodeceptionTests extends FCom_Admin_Controller_
 
     public function __construct()
     {
-        $this->config = include sprintf('%s/codecept.php', $this->BConfig->get('fs/config_dir'));
+
+        $codeceptConfigFile = sprintf('%s/codecept.php', $this->BConfig->get('fs/config_dir'));
+        if (!file_exists($codeceptConfigFile)) {
+            $this->BConfig->writeConfigFiles('codecept');
+        }
+
+        $this->config = include $codeceptConfigFile;
         $this->ensureCodeception($this->getCodecetionExecutable());
         // Register to app
         $site = $this->initSite($this->config['codecept_sites']);

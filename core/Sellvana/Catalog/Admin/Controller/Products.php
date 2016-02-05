@@ -838,38 +838,38 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     protected function _processLinkedProductsPost($model, $data)
     {
-        //echo "<pre>"; print_r($data); echo "</pre>";die;
         $hlp = $this->Sellvana_Catalog_Model_ProductLink;
         foreach (['related', 'similar', 'cross_sell'] as $type) {
             $typeName = 'linked_products_' . $type;
-            if (!empty($data['grid'][$typeName]['del'])) {
+            $deletedIds = $this->BUtil->arrayGet($data, "grid.{$typeName}.del");
+            if ($deletedIds) {
                 $hlp->delete_many([
-                    'product_id' => $model->id,
+                    'product_id' => $model->id(),
                     'link_type' => $type,
-                    'linked_product_id' => explode(',', $data['grid'][$typeName]['del']),
+                    'linked_product_id' => explode(',', $deletedIds),
                 ]);
             }
-            if (isset($data[$typeName])) {
-                //echo "<pre>"; print_r($data[$typeName]); echo "</pre>";die;
-                foreach ($data[$typeName] as $key => $arr) {
+            $linkedIds = $this->BUtil->arrayGet($data, "grid.{$typeName}.add");
+            if ($linkedIds) {
+                $linkedIds = explode(',', $linkedIds);
+                foreach ($linkedIds as $lid) {
                     $productLink = $hlp->loadWhere([
                         'product_id' => $model->id(),
-                        'linked_product_id' => (int)$key,
+                        'linked_product_id' => (int)$lid,
                         'link_type' => (string)$type
                     ]);
-                    $position = (is_numeric($data[$typeName][$key]['product_link_position']))
-                        ? (int) $data[$typeName][$key]['product_link_position'] : 0;
+                    $position = (!empty($data[$typeName][$lid]['product_link_position']))
+                        ? (int) $data[$typeName][$lid]['product_link_position'] : 0;
                     if ($productLink) {
                         $productLink->set('position', $position)->save();
                     } else {
                         $hlp->create([
-                            'product_id' => $model->id,
+                            'product_id' => $model->id(),
                             'link_type' => $type,
-                            'linked_product_id' => $key,
+                            'linked_product_id' => $lid,
                             'position' => $position
                         ])->save();
                     }
-
                 }
             }
         }

@@ -297,10 +297,8 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         componentDidMount: function () {
             switch (this.props.type) {
                 case 'switch':
-                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch({
-                        state: parseInt(this.state.value) == 1,
-                        onSwitchChange: this.props.onChange
-                    });
+                    this.props.options['state'] = parseInt(this.state.value) == 1;
+                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch(this.props.options);
                     break;
                 case 'wysiwyg':
                     adminForm.wysiwygInit(null, this.state.value, this.handleWysiwygChange);
@@ -1391,9 +1389,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             if (!this.props.config.postUrl && this.props.action) {
                 return (
                     React.createElement("form", {action: this.props.action, className: className}, 
-                        React.createElement("input", {type: "hidden", name: this.props.name}), 
+                        React.createElement("input", React.__spread({type: "hidden", 
+                               name: this.props.name, 
+                               value: this.props.defaultValue || '', 
+                               className: "images"}, 
+                            this.props.attrs)), 
                         buttons, 
-                        icons, 
                         React.createElement("br", null), 
                         this.props.children
                     )
@@ -1401,9 +1402,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             } else {
                 return (
                     React.createElement("div", {className: className}, 
-                        React.createElement("input", {type: "hidden", name: this.props.name, className: "images"}), 
+                        React.createElement("input", React.__spread({type: "hidden", 
+                               name: this.props.name, 
+                               value: this.props.defaultValue || '', 
+                               className: "images"}, 
+                               this.props.attrs)), 
                         buttons, 
-                        icons, 
                         React.createElement("br", null), 
                         this.props.children
                     )

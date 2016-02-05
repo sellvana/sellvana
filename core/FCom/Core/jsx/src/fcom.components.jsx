@@ -297,10 +297,8 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         componentDidMount: function () {
             switch (this.props.type) {
                 case 'switch':
-                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch({
-                        state: parseInt(this.state.value) == 1,
-                        onSwitchChange: this.props.onChange
-                    });
+                    this.props.options['state'] = parseInt(this.state.value) == 1;
+                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch(this.props.options);
                     break;
                 case 'wysiwyg':
                     adminForm.wysiwygInit(null, this.state.value, this.handleWysiwygChange);
@@ -1391,9 +1389,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             if (!this.props.config.postUrl && this.props.action) {
                 return (
                     <form action={this.props.action} className={className}>
-                        <input type="hidden" name={this.props.name}/>
+                        <input type="hidden"
+                               name={this.props.name}
+                               value={this.props.defaultValue || ''}
+                               className="images"
+                            {...this.props.attrs}/>
                         {buttons}
-                        {icons}
                         <br/>
                         {this.props.children}
                     </form>
@@ -1401,9 +1402,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             } else {
                 return (
                     <div className={className}>
-                        <input type="hidden" name={this.props.name} className="images"/>
+                        <input type="hidden"
+                               name={this.props.name}
+                               value={this.props.defaultValue || ''}
+                               className="images"
+                               {...this.props.attrs}/>
                         {buttons}
-                        {icons}
                         <br/>
                         {this.props.children}
                     </div>

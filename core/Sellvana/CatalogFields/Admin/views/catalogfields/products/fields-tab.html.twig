@@ -190,7 +190,10 @@
                         'data-off-text': '<i class="icon-ok" />',
                         'data-field-id': field.id
                     },
-                    onChange: this.handleSwitchBoxChange
+                    options: {
+                        size: this.props.size || 'normal',
+                        onSwitchChange: this.handleSwitchBoxChange
+                    }
                 });
             },
             createInput: function (field) {
