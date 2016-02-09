@@ -507,6 +507,8 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
             $type = 'Memcache';
         } elseif (class_exists('Memcached', false)) {
             $type = 'Memcached';
+        } else {
+            return ['available' => false];
         }
 
         return ['available' => $type && $this->init(), 'rank' => 10];
