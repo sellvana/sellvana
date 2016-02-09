@@ -97,11 +97,23 @@ class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart
             }
             $selService = null; // request to find cheapest service for selected method
 
-        } elseif (empty($rates[$selMethod][$selService])) { // if selected service is not available
-
-            $selService = null; // request to find cheapest service for selected method
-
         }
+// WTFPHP???
+//        elseif (empty($rates[$selMethod][$selService])) { // if selected service is not available
+//            var_dump($selMethod, $selService, array_key_exists($selService, $rates[$selMethod]), $rates[$selMethod][(string)$selService]['price']); exit;
+//            $selService = null; // request to find cheapest service for selected method
+//
+//        }
+        $found = false;
+        foreach ($rates[$selMethod] as $svc => $svcData) {
+            if ($svc === $selService) {
+                $found = true;
+            }
+        }
+        if (!$found) {
+            $selService = null;
+        }
+
 
         if (!$selService && $selMethod && !empty($minRates[$selMethod])) { // if service is not set or was reset, set to cheapest
             $selService = $minRates[$selMethod]['service'];

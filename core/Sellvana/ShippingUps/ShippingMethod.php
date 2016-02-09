@@ -13,6 +13,20 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
     protected function _fetchRates($data)
     {
+        if ($data['weight'] == 0) {
+            $result = [
+                'error' => 1,
+                'message' => 'Can not ship without weight',
+            ];
+            return $result;
+        }
+        if (empty($data['to_postcode']) || empty($data['to_country'])) {
+            $result = [
+                'error' => 1,
+                'message' => 'Destination zipcode and country are required',
+            ];
+            return $result;
+        }
         $config = $this->BConfig->get('modules/Sellvana_ShippingUps');
         $data = array_merge($config, $data);
 
@@ -106,7 +120,7 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 </RatingServiceSelectionRequest>";
 
         $response = $this->BUtil->remoteHttp('POST', $data['rate_api_url'], $request, [], ['timeout' => 2]);
-#echo "<xmp>"; print_r($response); echo "</xmp>";
+#echo "<xmp>"; print_r($request); print_r($response); echo "</xmp>"; exit;
         //echo '<!-- '. $response. ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
 if (strpos($response, '<') !== 0) {
     echo "<xmp>"; echo $response; echo "</xmp>"; exit;
