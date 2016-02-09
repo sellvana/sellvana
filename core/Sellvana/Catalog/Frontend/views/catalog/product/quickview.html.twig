@@ -27,6 +27,8 @@
             $loader = $qv.find('.f-ajax-loading'),
             $container = $qv.find('.f-prod-quickview-container');
 
+        $('.f-prod-quickview-btn').css({visibility:'visible'});
+
         $(document).on('click', '.f-prod-quickview-btn', function() {
             var qvUrl = "{{ APP.href('catalog/quickview') }}?id=" + $(this).data('id');
             $container.load(qvUrl, function() {

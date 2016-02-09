@@ -18,7 +18,7 @@
         <span class="sale tooltip-test">{{ 'Sale'|_ }}</span>
     {% endif %}
     <div class="f-col-listing-prod-img col-sm-4">
-      <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>
+      <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" style="visibility:hidden" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>
       <a href="{{ productUrl }}" class="f-prod-img js-ga-product-view-trigger">
           {% if useRollover and productImg != productRollover %}
               <div style="display: none; position: absolute;" class="f-prod-img-over">
