@@ -128,7 +128,7 @@ class Sellvana_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             }
         }
 
-        if (!empty($args['data']['customer_group_ids']) && is_array($args['data']['customer_group_ids'])) {
+        if (isset($args['data']['customer_group_ids']) && is_array($args['data']['customer_group_ids'])) {
             $args['data']['customer_group_ids'] = implode(",", $args['data']['customer_group_ids']);
         }
 

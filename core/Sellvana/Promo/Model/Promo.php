@@ -321,34 +321,36 @@ class Sellvana_Promo_Model_Promo extends FCom_Core_Model_Abstract
         $ppsToCreate = [];
         $actions = $promo->getData('actions/rules/discount');
         $action = $actions[0];
-        $sortOrder = $promo->get('priority_order');
-        $fromDate = $promo->get('from_date');
-        $toDate = $promo->get('to_date');
+        if ($action) {
+            $sortOrder = $promo->get('priority_order');
+            $fromDate = $promo->get('from_date');
+            $toDate = $promo->get('to_date');
 
-        foreach ($data['products'] as $pId => $r) {
-            $r['qty'] = $sortOrder;
-            $r['amount'] = $action['value'];
-            $r['operation'] = $action['type'];
-            $r['valid_from'] = $fromDate;
-            $r['valid_to'] = $toDate;
-            if (empty($existing[$pId])) {
-                $r['product_id'] = $pId;
-                $r['promo_id'] = $promoId;
-                unset($r['data']);
-                $r['data_serialized'] = !empty($r['data']) ? $this->BUtil->toJson($r['data']) : '';
-                $ppsToCreate[] = $r;
-            } else {
-                $existing[$pId]->set($r);
-                if (!empty($r['data'])) {
-                    $existing[$pId]->setData($r['data']);
+            foreach ($data['products'] as $pId => $r) {
+                $r['qty'] = $sortOrder;
+                $r['amount'] = $action['value'];
+                $r['operation'] = $action['type'];
+                $r['valid_from'] = $fromDate;
+                $r['valid_to'] = $toDate;
+                if (empty($existing[$pId])) {
+                    $r['product_id'] = $pId;
+                    $r['promo_id'] = $promoId;
+                    unset($r['data']);
+                    $r['data_serialized'] = !empty($r['data']) ? $this->BUtil->toJson($r['data']) : '';
+                    $ppsToCreate[] = $r;
+                } else {
+                    $existing[$pId]->set($r);
+                    if (!empty($r['data'])) {
+                        $existing[$pId]->setData($r['data']);
+                    }
+                    $existing[$pId]->save();
                 }
-                $existing[$pId]->save();
             }
-        }
-        if ($ppsToCreate) {
-            //echo "<pre>"; var_dump($ppsToCreate); exit;
-            $priceHlp->create_many($ppsToCreate); #$this
-            //TODO: run onAfterCreate?
+            if ($ppsToCreate) {
+                //echo "<pre>"; var_dump($ppsToCreate); exit;
+                $priceHlp->create_many($ppsToCreate); #$this
+                //TODO: run onAfterCreate?
+            }
         }
         return $this;
     }

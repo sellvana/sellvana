@@ -831,6 +831,9 @@ EOT
         $isObject = is_object($data);
         $result = [];
         foreach ($data as $k => $v) {
+            if (is_array($v) || is_object($v)) {
+                continue;
+            }
             $fieldInfo = BDb::ddlFieldInfo($table, $k, $connectionName);
             if ($fieldInfo) {
                 $result[$k] = $isObject ? $data->get($k) : $data[$k];
