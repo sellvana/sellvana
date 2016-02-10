@@ -814,8 +814,9 @@ EOT
         if (static::ddlTableExists($fullTableName, $connectionName)) {
             $result = BORM::i()->raw_query("DROP TABLE {$fullTableName}")->execute();
             static::ddlClearCache(null, $connectionName);
+            return $result;
         }
-        return $result;
+        return false;
     }
 
     /**

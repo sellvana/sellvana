@@ -12,6 +12,7 @@
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_AdminLiveFeed_Main $Sellvana_AdminLiveFeed_Main
  */
 class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
@@ -86,6 +87,9 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
         $this->BDebug->disableAllLogging();
         $this->Sellvana_CatalogIndex_Main->autoReindex(false);
         $this->Sellvana_Catalog_Model_Product->setFlag('skip_duplicate_checks', true);
+        if ($this->BModuleRegistry->isLoaded('Sellvana_AdminLiveFeed')) {
+            $this->Sellvana_AdminLiveFeed_Main->disable();
+        }
 
         $this->Sellvana_CatalogIndex_Main->generateTestData();
 
