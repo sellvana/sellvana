@@ -92,6 +92,9 @@ class Sellvana_CustomerFields_Migrate extends BClass
             ]
         ]);
 
+        $this->BDb->ddlDropTable($tCustomerField); // workaround for the `after` bug that was fixed
+        // bug involved running `(before|after)__*` migration scripts for modules that weren't enabled
+
         $this->BDb->ddlTableDef($tCustomerField, [
             BDb::COLUMNS     => [
                 'id'               => 'int unsigned not null auto_increment',
@@ -103,7 +106,6 @@ class Sellvana_CustomerFields_Migrate extends BClass
                 'customer' => ['customer_id', $tCustomer],
             ],
         ]);
-
     }
 
     public function upgrade__0_5_1_0__0_5_1_1()

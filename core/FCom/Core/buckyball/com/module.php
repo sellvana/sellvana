@@ -2080,6 +2080,9 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
     {
         $modName = $mod['module_name'];
         foreach (static::$_migrationData as $iterModName => $iterMod) {
+            if ($iterMod['run_status'] !== BModule::LOADED) {
+                continue;
+            }
             $class = "{$iterModName}_Migrate";
             $singleton = $this->{$class};
             $method = "{$when}__{$modName}__" . str_replace('.', '_', $version);
