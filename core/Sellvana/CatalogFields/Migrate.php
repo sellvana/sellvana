@@ -693,4 +693,14 @@ class Sellvana_CatalogFields_Migrate extends BClass
             'set_code' => 'default',
         ])->save();
     }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $tProdVariantImage = $this->Sellvana_CatalogFields_Model_ProductVariantImage->table();
+        $this->BDb->ddlTableDef($tProdVariantImage, [
+            BDb::COLUMNS => [
+                'product_media_id' => BDb::DROP,
+            ],
+        ]);
+    }
 }
