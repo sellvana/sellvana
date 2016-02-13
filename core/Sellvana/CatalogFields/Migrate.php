@@ -17,6 +17,7 @@
  * @property Sellvana_Catalog_Model_ProductPrice              $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
  * @property Sellvana_MultiSite_Model_Site                    $Sellvana_MultiSite_Model_Site
+ * @property Sellvana_Catalog_Model_ProductMedia              $Sellvana_Catalog_Model_ProductMedia
  */
 class Sellvana_CatalogFields_Migrate extends BClass
 {
@@ -692,5 +693,17 @@ class Sellvana_CatalogFields_Migrate extends BClass
             'set_name' => 'Default',
             'set_code' => 'default',
         ])->save();
+    }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $tProductVariantImage = $this->Sellvana_CatalogFields_Model_ProductVariantImage->table();
+        $tProductMedia = $this->Sellvana_Catalog_Model_ProductMedia->table();
+
+        $this->BDb->ddlTableDef($tProductVariantImage, [
+            BDb::CONSTRAINTS => [
+                'product_media' => ['product_media_id', $tProductMedia],
+            ],
+        ]);
     }
 }
