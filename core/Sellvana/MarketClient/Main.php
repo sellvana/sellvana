@@ -167,6 +167,10 @@ class Sellvana_MarketClient_Main extends BClass
 
     public function onGetHeaderNotifications($args)
     {
+        if (!$this->BConfig->get('modules/Sellvana_MarketClient/auto_check_enable')) {
+            return;
+        }
+
         $updates = $this->Sellvana_MarketClient_RemoteApi->fetchUpdatesFeed();
 
         if (!empty($updates['items'])) {
