@@ -13,12 +13,24 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
     protected function _fetchRates($data)
     {
+        $config = $this->BConfig->get('modules/Sellvana_ShippingUps');
+        $data = array_merge($config, $data);
+
+        $data = $this->_applyDefaultPackageConfig($data);
+
         if ($data['weight'] == 0) {
             $result = [
                 'error' => 1,
                 'message' => 'Can not ship without weight',
             ];
             return $result;
+        }
+        if (empty($data['from_postcode']) || empty($data['from_country'])) {
+            $result = [
+                'error' => 1,
+                'message' => 'Origin Postcode and Country are required',
+            ];
+            return $result;        
         }
         if (empty($data['to_postcode']) || empty($data['to_country'])) {
             $result = [
@@ -27,11 +39,6 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             ];
             return $result;
         }
-        $config = $this->BConfig->get('modules/Sellvana_ShippingUps');
-        $data = array_merge($config, $data);
-
-        $data = $this->_applyDefaultPackageConfig($data);
-
         if (empty($data['access_key']) || empty($data['user_id']) || empty($data['password'])) {
             $result = [
                 'error' => 1,
