@@ -77,6 +77,9 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         }
         $services = [];
         foreach ($enabled as $svc) {
+            if ($svc[0] !== '_') {
+                $svc = '_' . $svc;
+            }
             $services[$svc] = (!empty($allServices[$svc])) ? $allServices[$svc] : $svc;
         }
         return $services;
@@ -93,9 +96,16 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
         $cartRates = [];
         foreach ($packages as $package) {
             $package['services'] = array_keys($ratedServices);
-            $packageRates = $this->fetchPackageRates($package);
-            if (!empty($packageRates['error'])) {
-                return $packageRates; // if for any package there's an error, return immediately
+            $packageRatesResult = $this->fetchPackageRates($package);
+            if (!empty($packageRatesResult['error'])) {
+                return $packageRatesResult; // if for any package there's an error, return immediately
+            }
+            $packageRates = [];
+            foreach ($packageRatesResult as $code => $rate) {
+                if ($code[0] !== '_') {
+                    $code = '_' . $code;
+                }
+                $packageRates[$code] = $rate;
             }
             foreach ($ratedServices as $code => $label) {
                 if (empty($packageRates['rates'][$code])) {

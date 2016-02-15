@@ -24,8 +24,8 @@ class Sellvana_ShippingPlain_ShippingMethod extends Sellvana_Sales_Method_Shippi
         return [
             'success' => 1,
             'rates' => [
-                '01' => ['price' => 10, 'max_days' => 2],
-                '02' => ['price' => 0, 'max_days' => 5],
+                '_01' => ['price' => 10, 'max_days' => 2],
+                '_12' => ['price' => 0, 'max_days' => 5],
             ],
         ];
     }
@@ -36,8 +36,8 @@ class Sellvana_ShippingPlain_ShippingMethod extends Sellvana_Sales_Method_Shippi
     public function getServices()
     {
         return [
-            '01' => 'Air',
-            '02' => 'Ground',
+            '_01' => 'Air',
+            '_12' => 'Ground',
         ];
     }
 }

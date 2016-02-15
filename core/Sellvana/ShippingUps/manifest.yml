@@ -14,6 +14,7 @@ modules:
             modules:
                 Sellvana_ShippingUps:
                     enabled: 1
+                    rate_api_url: "https://wwwcie.ups.com/ups.app/xml/Rate"
                     label: UPS
                     max_package_weight: 150
                     production_mode: 0

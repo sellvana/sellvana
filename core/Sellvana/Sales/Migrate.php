@@ -2154,7 +2154,7 @@ class Sellvana_Sales_Migrate extends BClass
         ]);
     }
 
-    public function upgade__0_6_1_0__0_6_2_0()
+    public function upgrade__0_6_1_0__0_6_2_0()
     {
         $tCartItem = $this->Sellvana_Sales_Model_Cart_Item->table();
 
@@ -2164,6 +2164,18 @@ class Sellvana_Sales_Migrate extends BClass
                 'promo_id_get' => "DROP",
                 'promo_qty_used' => "DROP",
                 'promo_amt_used' => "DROP",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_2_0__0_6_3_0()
+    {
+        $this->upgrade__0_6_1_0__0_6_2_0();
+
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'shipping_service' => 'varchar(50)',
             ],
         ]);
     }

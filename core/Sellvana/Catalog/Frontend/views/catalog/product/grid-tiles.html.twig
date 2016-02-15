@@ -1,8 +1,3 @@
-<style type="text/css">
-    .f-prod-img-base img {
-        width: 100%;
-    }
-</style>
 {% set lgColumns = THIS.get('lg_columns') ?: 4 %}
 {% set mdColumns = THIS.get('md_columns') ?: 4 %}
 {% set smColumns = THIS.get('sm_columns') ?: 3 %}
@@ -19,13 +14,22 @@
 {% set useRollover = CONFIG.get('modules/Sellvana_Catalog/enable_rollover') %}
 {% set rolloverEffect = CONFIG.get('modules/Sellvana_Catalog/rollover_effect') %}
 
+{% set thumbWidth = 350 %}
+{% set thumbHeight = 350 %}
+
+<style type="text/css">
+    .f-prod-img-base img {
+        width: 100%;
+    }
+</style>
+
 <div class="row js-ga-product-list" id="{{ listId }}">
     {% set count = 0 %}
     {% for p in THIS.get('products') %}
         {% set productName = p.getName() %}
         {% set productUrl = p.url(THIS.get('category')) %}
-        {% set productImg = p.thumbUrl(350, 350) %}
-        {% set productRollover = p.rolloverUrl(350, 350) %}
+        {% set productImg = p.thumbUrl(thumbWidth, thumbHeight) %}
+        {% set productRollover = p.rolloverUrl(thumbWidth, thumbHeight) %}
         <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }} js-ga-product-container" data-product-id="{{ p.id() }}">
           <div class="thumbnail">
             {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}

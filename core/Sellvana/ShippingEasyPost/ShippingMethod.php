@@ -62,7 +62,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
                     $result['rates'][$rate->carrier] = [];
                 }
 
-                $result['rates'][$rate->carrier][$rate->service] = [
+                $result['rates'][$rate->carrier]['_' . $rate->service] = [
                     'id' => $rate->id,
                     'shipment_id' => $rate->shipment_id,
                     'price' => $rate->rate,
@@ -297,7 +297,7 @@ class Sellvana_ShippingEasyPost_ShippingMethod extends Sellvana_Sales_Method_Shi
         \EasyPost\EasyPost::setApiKey($config['access_key']);
         $accounts = \EasyPost\CarrierAccount::all();
         foreach ($accounts as $account) {
-            $services[$account->readable] = $account->readable;
+            $services['_' . $account->readable] = $account->readable;
         }
 
         return $services;
