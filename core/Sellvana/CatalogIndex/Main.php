@@ -327,9 +327,12 @@ class Sellvana_CatalogIndex_Main extends BClass
                 $basePrice = 'cost+50%';
                 $salePrice = 'base-20%';
                 $tiers = '5:sale-5%;10:sale-10%';
+                $sku = 'test-' . $maxId;
+                $name = 'Product ' . $maxId;
                 $product = $this->Sellvana_Catalog_Model_Product->create([
-                    'product_sku' => 'test-' . $maxId,
-                    'product_name' => 'Product ' . $maxId,
+                    'product_sku' => $sku,
+                    'inventory_sku' => $sku,
+                    'product_name' => $name,
                     'short_description' => 'Short Description ' . $maxId,
                     'description' => 'Long Description ' . $maxId,
                     'manage_inventory' => 1,
@@ -339,6 +342,12 @@ class Sellvana_CatalogIndex_Main extends BClass
                     'price.tier' => $tiers,
                     'color' => $colors[rand(0, sizeof($colors)-1)],
                     'size' => $sizes[rand(0, sizeof($sizes)-1)],
+                ])->save();
+                $inv = $this->Sellvana_Catalog_Model_InventorySku->create([
+                    'inventory_sku' => $sku,
+                    'title' => $name,
+                    'qty_in_stock' => 100,
+                    'shipping_weight' => 1,
                 ])->save();
                 $exists = [];
 //                $pId = $product->id;
