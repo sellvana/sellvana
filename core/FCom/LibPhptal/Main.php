@@ -99,7 +99,7 @@ class FCom_LibPhptal_Main extends BClass
 
     public function onLayoutLoadThemeBefore($args)
     {
-        $root = $this->BLayout->view('root');
+        $root = $this->BLayout->getView('root');
         if ($root) {
             $root->xmlns('tal', 'http://xml.zope.org/namespaces/tal')
                 ->xmlns('metal', 'http://xml.zope.org/namespaces/metal')
@@ -111,7 +111,7 @@ class FCom_LibPhptal_Main extends BClass
 
     public function talesView($src)
     {
-        $view = $this->BLayout->view($src);
+        $view = $this->BLayout->getView($src);
         if (!$view) {
             $this->BDebug->warning('Invalid view name: ' . $src);
             return '';

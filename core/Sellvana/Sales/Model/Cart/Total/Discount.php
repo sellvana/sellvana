@@ -86,7 +86,7 @@ class Sellvana_Sales_Model_Cart_Total_Discount extends Sellvana_Sales_Model_Cart
     public function getLabelFormatted()
     {
         $label = parent::getLabelFormatted();
-        $view = $this->BLayout->view('cart/total/discount');
+        $view = $this->BLayout->getView('cart/total/discount');
         if (!$view) {
             return $label;
         }

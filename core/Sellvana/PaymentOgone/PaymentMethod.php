@@ -9,7 +9,7 @@ class Sellvana_PaymentOgone_PaymentMethod extends Sellvana_Sales_Method_Payment_
 
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('ogone/form');
+        return $this->BLayout->getView('ogone/form');
     }
 
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)

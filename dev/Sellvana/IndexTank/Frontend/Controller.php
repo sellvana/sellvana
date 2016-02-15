@@ -54,21 +54,21 @@ class Sellvana_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Ab
         }
         $crumbs[] = ['label' => $category->node_name, 'active' => true];
         $head->addTitle($category->node_name);
-        $layout->view('breadcrumbs')->crumbs = $crumbs;
+        $layout->getView('breadcrumbs')->crumbs = $crumbs;
 
-        $layout->view('catalog/search')->query = $q;
-        $layout->view('catalog/search')->public_api_url = $this->Sellvana_IndexTank_Search->publicApiUrl();
-        $layout->view('catalog/search')->index_name = $this->Sellvana_IndexTank_Search->indexName();
+        $layout->getView('catalog/search')->query = $q;
+        $layout->getView('catalog/search')->public_api_url = $this->Sellvana_IndexTank_Search->publicApiUrl();
+        $layout->getView('catalog/search')->index_name = $this->Sellvana_IndexTank_Search->indexName();
 
         $rowsViewName = 'catalog/product/' . ($this->BRequest->get('view') == 'list' ? 'list' : 'grid');
-        $rowsView = $layout->view($rowsViewName);
+        $rowsView = $layout->getView($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('catalog/product/pager')->sort_options = $this->Sellvana_IndexTank_Model_ProductFunction->getSortingArray();
-        $layout->view('indextank/product/filters')->state = $productsData['state'];
+        $layout->getView('catalog/product/pager')->sort_options = $this->Sellvana_IndexTank_Model_ProductFunction->getSortingArray();
+        $layout->getView('indextank/product/filters')->state = $productsData['state'];
 
 
     }
@@ -101,19 +101,19 @@ class Sellvana_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Ab
         $this->FCom_Core_Main->lastNav(true);
         $layout = $this->BLayout;
         $this->layout('/catalog/search');
-        $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Search: ' . $q, 'active' => true]];
-        $layout->view('catalog/search')->query = $q;
-        $layout->view('catalog/search')->public_api_url = $this->Sellvana_IndexTank_Search->publicApiUrl();
-        $layout->view('catalog/search')->index_name = $this->Sellvana_IndexTank_Search->indexName();
+        $layout->getView('breadcrumbs')->crumbs = ['home', ['label' => 'Search: ' . $q, 'active' => true]];
+        $layout->getView('catalog/search')->query = $q;
+        $layout->getView('catalog/search')->public_api_url = $this->Sellvana_IndexTank_Search->publicApiUrl();
+        $layout->getView('catalog/search')->index_name = $this->Sellvana_IndexTank_Search->indexName();
 
         $rowsViewName = 'catalog/product/' . ($this->BRequest->get('view') == 'list' ? 'list' : 'grid');
-        $rowsView = $layout->view($rowsViewName);
+        $rowsView = $layout->getView($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('catalog/product/pager')->sort_options = $this->Sellvana_IndexTank_Model_ProductFunction->getSortingArray();
-        $layout->view('indextank/product/filters')->state = $productsData['state'];
+        $layout->getView('catalog/product/pager')->sort_options = $this->Sellvana_IndexTank_Model_ProductFunction->getSortingArray();
+        $layout->getView('indextank/product/filters')->state = $productsData['state'];
 
     }
 

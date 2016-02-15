@@ -6,6 +6,7 @@
  * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
+ * @property Sellvana_AdminLiveFeed_Main $Sellvana_AdminLiveFeed_Main
  */
 class Sellvana_CatalogIndex_Shell_Populate extends FCom_Shell_Action_Abstract
 {
@@ -26,6 +27,9 @@ class Sellvana_CatalogIndex_Shell_Populate extends FCom_Shell_Action_Abstract
         $this->BDebug->disableAllLogging();
         $this->Sellvana_CatalogIndex_Main->autoReindex(false);
         $this->Sellvana_Catalog_Model_Product->setFlag('skip_duplicate_checks', true);
+        if ($this->BModuleRegistry->isLoaded('Sellvana_AdminLiveFeed')) {
+            $this->Sellvana_AdminLiveFeed_Main->disable();
+        }
 
         $this->println('Starting populating catalog with random sample data...');
 

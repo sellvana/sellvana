@@ -374,7 +374,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function recoverPassword()
     {
         $this->set(['token' => $this->BUtil->randomString(), 'token_at' => $this->BDb->now()])->save();
-        $this->BLayout->view('email/admin/user-password-recover')->set('user', $this)->email();
+        $this->BLayout->getView('email/admin/user-password-recover')->set('user', $this)->email();
         return $this;
     }
 
@@ -412,7 +412,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         $this->BSession->regenerateId();
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
-        $this->BLayout->view('email/admin/user-password-reset')->set('user', $this)->email();
+        $this->BLayout->getView('email/admin/user-password-reset')->set('user', $this)->email();
         return $this;
     }
 

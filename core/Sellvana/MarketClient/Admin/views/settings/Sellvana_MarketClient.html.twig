@@ -5,6 +5,8 @@
 <h2>{{ "MarketClient Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-Sellvana_Disqus'}) }}
      {{ forms.accordion_panel_start({label:'API information'|_, id:'settings-Sellvana_MarketClient-group0', in:1}) }}
+          {{ forms.boolean(fieldData, {label:'Enable Auto Check'|_, field:'auto_check_enable'}) }}
+          {{ forms.input(fieldData, {label:'Auto Check Frequency (days)'|_, field:'auto_check_days'}) }}
      {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

@@ -59,15 +59,15 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
     public function notify()
     {
-        $this->BLayout->view('email/prodreview-new-admin')->email();
-        $this->BLayout->view('email/prodreview-new-customer')->email();
+        $this->BLayout->getView('email/prodreview-new-admin')->email();
+        $this->BLayout->getView('email/prodreview-new-customer')->email();
         return $this;
     }
 
     public function confirm()
     {
         $this->set('approved', 1)->save();
-        $this->BLayout->view('email/prodreview-confirm-customer')->email();
+        $this->BLayout->getView('email/prodreview-confirm-customer')->email();
         return $this;
     }
 

@@ -208,7 +208,7 @@ class FCom_Core_Main extends BClass
             $this->BLayout
                 ->addView('core/errors', ['template' => __DIR__ . '/views/core/errors.php'])
                 ->setRootView('core/errors');
-            $this->BLayout->view('core/errors')->set('errors', $errors);
+            $this->BLayout->getView('core/errors')->set('errors', $errors);
             $this->BResponse->output();
             exit;
         }
@@ -576,10 +576,10 @@ class FCom_Core_Main extends BClass
         $cookieConfig = $this->BConfig->get('cookie');
 
         /** @var FCom_Core_View_Head $head */
-        $head = $this->BLayout->view('head');
+        $head = $this->BLayout->getView('head');
 
         /** @var FCom_Core_View_Text $script */
-        $script = $this->BLayout->view('head_script');
+        $script = $this->BLayout->getView('head_script');
 
         $head->csrf_token();
 
@@ -598,7 +598,7 @@ FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
     {
         $fa = $args['file_adapter'];
         $fa->addFunction(new Twig_SimpleFunction('fcom_htmlgrid', function($config) {
-            return $this->BLayout->view('core/htmlgrid-wrapper')->set('config', $config);
+            return $this->BLayout->getView('core/htmlgrid-wrapper')->set('config', $config);
         }));
     }
 

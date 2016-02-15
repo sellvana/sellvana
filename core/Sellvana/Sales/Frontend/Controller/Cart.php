@@ -24,19 +24,19 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
         $layout = $this->BLayout;
 
         $this->layout('/cart');
-        $layout->view('cart')->set('redirectLogin', false);
+        $layout->getView('cart')->set('redirectLogin', false);
         if ($this->BApp->m('Sellvana_Customer') && $this->Sellvana_Customer_Model_Customer->isLoggedIn() == false) {
-            $layout->view('cart')->set('redirectLogin', true);
+            $layout->getView('cart')->set('redirectLogin', true);
         }
 
-        $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
+        $layout->getView('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Cart', 'active' => true]]);
 
         $cart = $this->Sellvana_Sales_Model_Cart->sessionCart(true);
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
         $shippingEstimate = $cart->getData('shipping_estimate');
-        $layout->view('cart')->set(['cart' => $cart, 'shipping_estimate' => $shippingEstimate]);
+        $layout->getView('cart')->set(['cart' => $cart, 'shipping_estimate' => $shippingEstimate]);
     }
 
     public function action_add__POST()
@@ -87,7 +87,7 @@ class Sellvana_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_A
                             . htmlspecialchars($p->product_name)
                             . (!empty($post['qty']) && $post['qty'] > 1 ? ' (' . $post['qty'] . ')' : '')
                             . '<br><br><a href="' . $cartHref . '" class="button">Go to cart</a>',
-                        'minicart_html' => $this->BLayout->view('checkout/cart/block')->render(),
+                        'minicart_html' => $this->BLayout->getView('checkout/cart/block')->render(),
                         'cnt' => $cart->itemQty(),
                         'subtotal' => $cart->subtotal,
                     ];

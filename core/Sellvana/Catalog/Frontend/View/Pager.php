@@ -48,7 +48,7 @@ class Sellvana_Catalog_Frontend_View_Pager extends FCom_Core_View_Abstract
     public function setCanonicalPrevNext()
     {
         /** @var BViewHead $head */
-        $head = $this->BLayout->view('head');
+        $head = $this->BLayout->getView('head');
         if (!$head) {
             return;
         }

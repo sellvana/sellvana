@@ -82,6 +82,9 @@ Using custom id/name:
     <div class="form-group {{ p.form_group_class }}">
         {{ forms.label(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
+            {% if p.multiple %}
+                <input type="hidden" name="{{ view.getInputName(p) }}" value="PLACEHOLDER~TO~REMOVE">
+            {% endif %}
             <select
                 id="{{ view.getInputId(p) }}"
                 name="{{ view.getInputName(p) }}"

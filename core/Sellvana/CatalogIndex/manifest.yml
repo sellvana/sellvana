@@ -27,6 +27,8 @@ modules:
                     - [ /catalogindex/?.action, Sellvana_CatalogIndex_Admin_Controller ]
                     - [ /catalogindex/fields, Sellvana_CatalogIndex_Admin_Controller_Fields.index ]
                     - [ /catalogindex/fields/.action, Sellvana_CatalogIndex_Admin_Controller_Fields ]
+                observe:
+                    - [ "Sellvana_Catalog_Admin_Controller_ProductsAdd::action_index__POST:after", "Sellvana_CatalogIndex_Main.onProductsQuickAdd" ]
 
             FCom_Frontend:
                 observe:

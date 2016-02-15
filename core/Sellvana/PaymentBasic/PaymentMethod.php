@@ -19,7 +19,7 @@ class Sellvana_PaymentBasic_PaymentMethod extends Sellvana_Sales_Method_Payment_
      */
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('check_mo/form');
+        return $this->BLayout->getView('check_mo/form');
     }
 
     /**

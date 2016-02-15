@@ -17,18 +17,18 @@ class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart
         $cart = $this->_cart;
         if ($cart->get('recalc_shipping_rates')) {
             $methods = $this->Sellvana_Sales_Main->getShippingMethods();
-            $weight = 0;
+//            $weight = 0;
             $rates = [];
             if ($methods) {
                 foreach ($methods as $methodCode => $method) {
                     $rates[$methodCode] = $method->fetchCartRates($cart);
-                    if (!empty($rates[$methodCode]['weight'])) {
-                        $weight = $rates[$methodCode]['weight'];
-                    }
+//                    if (!empty($rates[$methodCode]['weight'])) {
+//                        $weight = $rates[$methodCode]['weight'];
+//                    }
                 }
             }
             $cart->set([
-                'shipping_weight' => $weight,
+//                'shipping_weight' => $weight,
                 'recalc_shipping_rates' => 0,
             ])->setData('shipping_rates', $rates);
         } else {
@@ -42,7 +42,8 @@ class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart
             $selService = null;
         }
 
-        $this->_value = $selMethod && $selService ? $rates[$selMethod][$selService]['price'] : 0;
+        $this->_value = $selMethod && $selService && !empty($rates[$selMethod][$selService]['price'])
+            ? $rates[$selMethod][$selService]['price'] : 0;
         $this->_storeCurrencyValue = $this->_cart->convertToStoreCurrency($this->_value);
 
         $cart->set([

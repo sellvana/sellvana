@@ -48,7 +48,7 @@ abstract class FCom_Core_Model_Abstract_State_Custom extends FCom_Core_Model_Abs
             $value = $this->_value;
         }
         if (!empty($pool[$value])) {
-            $this->BLayout->view($pool[$value])
+            $this->BLayout->getView($pool[$value])
                 ->set(['context' => $this->_context, 'type' => $this->_type, 'options' => $this->_options])
                 ->email();
         }

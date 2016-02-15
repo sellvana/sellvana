@@ -334,7 +334,7 @@ class FCom_Core_ImportExport extends BClass
      */
     public function importFile($fromFile = null, $batch = null)
     {
-        $fi = $this->_getReadHandle($fromFile);
+        $fi = $this->_getReadHandle($fromFile, 'import');
 
         if (!$fi) {
             $this->log([
@@ -1002,7 +1002,7 @@ class FCom_Core_ImportExport extends BClass
      * @param string $type
      * @return string
      */
-    public function getFullPath($file ,$type = 'export')
+    public function getFullPath($file, $type = 'export')
     {
         if (!in_array($type, ['export', 'import'])){
             $type = 'export';
@@ -1187,9 +1187,10 @@ class FCom_Core_ImportExport extends BClass
 
     /**
      * @param $fromFile
+     * @param $type
      * @return resource|false
      */
-    protected function _getReadHandle($fromFile)
+    protected function _getReadHandle($fromFile, $type = 'export')
     {
         if (is_resource($fromFile)) {
             return $fromFile;
@@ -1198,7 +1199,7 @@ class FCom_Core_ImportExport extends BClass
         if (strpos($fromFile, '://') !== false) {
             $path = $fromFile; // allow stream readers
         } else {
-            $path = $this->getFullPath($fromFile);
+            $path = $this->getFullPath($fromFile, $type);
         }
         if (!is_readable($path)) {
             return false;
@@ -1273,7 +1274,7 @@ class FCom_Core_ImportExport extends BClass
             $valid = false;
         }
 
-        $rh = $this->_getReadHandle($fullFileName);
+        $rh = $this->_getReadHandle($fullFileName, 'import');
         if (!$rh) {
             $valid = false;
         } else {

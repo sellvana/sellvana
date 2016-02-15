@@ -1151,7 +1151,9 @@ class BRequest extends BClass
             if (is_array($v)) {
                 $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
             } elseif (!empty($v) && !is_numeric($v)) {
-                if (!mb_check_encoding($v)) {
+                if ($v === 'PLACEHOLDER~TO~REMOVE') {
+                    unset($data[$k]);
+                } elseif (!mb_check_encoding($v)) {
                     $v = null;
                 } elseif (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
                     $v = strip_tags($v);
@@ -2501,7 +2503,7 @@ class BActionController extends BClass
     */
     public function view($viewname)
     {
-        return $this->BLayout->view($viewname);
+        return $this->BLayout->getView($viewname);
     }
 
     /**
@@ -2757,7 +2759,7 @@ class BActionController extends BClass
         $this->BLayout->applyLayout('view-proxy')->applyLayout($viewPrefix . $page);
         $view->useMetaData();
 
-        if (($root = $this->BLayout->view('root'))) {
+        if (($root = $this->BLayout->getView('root'))) {
             $root->addBodyClass('page-' . $page);
         }
 

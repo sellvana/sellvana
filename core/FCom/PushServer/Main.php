@@ -46,9 +46,9 @@ class FCom_PushServer_Main extends BCLass
     public function layoutInit()
     {
         /** @var FCom_Core_View_Head $head */
-        $head = $this->BLayout->view('head');
+        $head = $this->BLayout->getView('head');
         /** @var FCom_Core_View_Text $script */
-        $script = $this->BLayout->view('head_script');
+        $script = $this->BLayout->getView('head_script');
 
         $onlyAdmin = $this->BConfig->get('modules/FCom_PushServer/only_admin');
         if (!$onlyAdmin || $this->BRequest->area() === 'FCom_Admin' && $this->FCom_Admin_Model_User->isLoggedIn()) {

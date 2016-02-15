@@ -312,7 +312,7 @@ class Sellvana_SalesTax_Main extends BClass
         if ($existingTaxIds) {
             $deleteIds = [];
             foreach ($existingTaxIds as $tcId => $tId) {
-                if ($newTaxIds && !in_array($tcId, $newTaxIds)) {
+                if (null !== $newTaxIds && !in_array($tcId, $newTaxIds)) {
                     $deleteIds[] = $tId;
                 }
             }
@@ -321,7 +321,7 @@ class Sellvana_SalesTax_Main extends BClass
             }
         }
 
-        if ($newTaxIds) {
+        if (null !== $newTaxIds) {
             foreach ($newTaxIds as $tcId) {
                 if (empty($existingTaxIds[$tcId])) {
                     $hlp->create(['product_id' => $pId, 'product_class_id' => $tcId])->save();

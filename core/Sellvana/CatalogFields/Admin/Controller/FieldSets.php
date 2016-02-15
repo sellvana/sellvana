@@ -572,7 +572,7 @@ class Sellvana_CatalogFields_Admin_Controller_FieldSets extends FCom_Admin_Contr
             $model = $this->Sellvana_CatalogFields_Model_Set->create();
         }
         $this->layout('/catalogfields/fieldsets/form');
-        $view = $this->BLayout->view('catalogfields/fieldsets/form');
+        $view = $this->BLayout->getView('catalogfields/fieldsets/form');
         $this->initFormTabs($view, $model, $model->id ? 'view' : 'create', $model->id ? null : 'main');
     }
 

@@ -47,7 +47,7 @@ class Sellvana_CustomerFields_Frontend extends BClass
             $data[$fn] = ['value' => $value, 'field' => $field];
         }
 
-        return $this->BLayout->view('customer/hook/customer-edit')
+        return $this->BLayout->getView('customer/hook/customer-edit')
                              ->set(['customer' => $customer, 'data' => $data])
                              ->render();
     }
@@ -58,7 +58,7 @@ class Sellvana_CustomerFields_Frontend extends BClass
             ->orm()
             ->where("register_form", 1)->find_many();
 
-        $render = $this->BLayout->view('customer/hook/customer-register')
+        $render = $this->BLayout->getView('customer/hook/customer-register')
                                 ->set(['fields' => $customerFields])
                                 ->render();
 

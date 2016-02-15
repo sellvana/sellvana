@@ -82,6 +82,17 @@ class Sellvana_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Co
         $this->processFormTabs($view, $model, 'edit');
     }
 
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+
+        /** @var FCom_Admin_View_Grid $view */
+        $view = $args['page_view'];
+        $actions = (array)$view->get('actions');
+        unset($actions['new']);
+        $view->set('actions', $actions);
+    }
+
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);

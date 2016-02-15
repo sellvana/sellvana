@@ -170,7 +170,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function recoverPassword()
     {
         $this->set(['token' => $this->BUtil->randomString(20), 'token_at' => $this->BDb->now()])->save();
-        $this->BLayout->view('email/customer-password-recover')->set('customer', $this)->email();
+        $this->BLayout->getView('email/customer-password-recover')->set('customer', $this)->email();
         return $this;
     }
 
@@ -229,7 +229,7 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $this->BSession->regenerateId();
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
-        $this->BLayout->view('email/customer-password-reset')->set('customer', $this)->email();
+        $this->BLayout->getView('email/customer-password-reset')->set('customer', $this)->email();
         return $this;
     }
 
@@ -498,8 +498,8 @@ class Sellvana_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $r['status'] = 'active';
         }
         $customer = $this->create($r)->save();
-        $this->BLayout->view('email/new-customer')->set('customer', $customer)->email();
-        $this->BLayout->view('email/new-customer-admin')->set('customer', $customer)->email();
+        $this->BLayout->getView('email/new-customer')->set('customer', $customer)->email();
+        $this->BLayout->getView('email/new-customer-admin')->set('customer', $customer)->email();
         return $customer;
     }
 

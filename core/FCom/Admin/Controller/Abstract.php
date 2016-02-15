@@ -151,7 +151,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     $tab['async'] = false;
                 }
                 if (!empty($tab['view'])) {
-                    $tabView = $layout->view($tab['view']);
+                    $tabView = $layout->getView($tab['view']);
                     if ($tabView) {
                         $tabView->set([
                             'model' => $model,
@@ -276,7 +276,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                 if ($outTabs !== 'ALL' && !in_array($k, $outTabs)) {
                     continue;
                 }
-                $view = $layout->view($tab['view']);
+                $view = $layout->getView($tab['view']);
                 if (!$view) {
                     $this->BDebug->error('MISSING VIEW: ' . $tabs[$k]['view']);
                     continue;

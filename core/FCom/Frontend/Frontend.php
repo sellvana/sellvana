@@ -19,11 +19,11 @@ class FCom_Frontend_Frontend extends BClass
     public function layout()
     {
         /** @var FCom_Core_View_Head $head */
-        $head = $this->BLayout->view('head');
+        $head = $this->BLayout->getView('head');
         /** @var FCom_Core_View_Text $script */
-        $script = $this->BLayout->view('head_script');
+        $script = $this->BLayout->getView('head_script');
         /** @var FCom_Core_View_Text $css */
-        $css = $this->BLayout->view('head_css');
+        $css = $this->BLayout->getView('head_css');
 
         $text = '
 FCom.Frontend = {}

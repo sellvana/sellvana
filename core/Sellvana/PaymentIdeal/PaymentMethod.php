@@ -101,7 +101,7 @@ class Sellvana_PaymentIdeal_PaymentMethod extends Sellvana_Sales_Method_Payment_
     public function getCheckoutFormView()
     {
         $banks = $this->_getBanks();
-        return $this->BLayout->view('ideal/form')
+        return $this->BLayout->getView('ideal/form')
                ->set('banks', $banks)
                ->set('key', 'ideal');
     }
