@@ -925,8 +925,9 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 options['query'] = function (options) {
                     if (options.term) {
                         $.ajax({
-                            url: _this.props.url + '?q=' + options.term,
+                            url: _this.props.url,
                             dataType: 'json',
+                            data: {q: options.term},
                             success: function (data) {
                                 options.callback({ results: _this._parseDataToSelect2Options(data) });
                             },
