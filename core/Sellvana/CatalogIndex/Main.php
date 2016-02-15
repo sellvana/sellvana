@@ -407,4 +407,9 @@ class Sellvana_CatalogIndex_Main extends BClass
             ];
         }
     }
+
+    public function onProductsQuickAdd($args)
+    {
+        $this->Sellvana_CatalogIndex_Main->getIndexer()->indexProducts($args['products']);
+    }
 }
