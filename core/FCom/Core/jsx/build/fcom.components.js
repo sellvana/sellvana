@@ -241,6 +241,9 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         },
         handleChange: function (e) {
             this.setState({ value: e.target.value });
+            if (typeof this.props.callback === 'function') {
+                this.props.callback(e, this.state.value);
+            }
         },
         render: function () {
             var node = null;
@@ -892,7 +895,17 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             // ..Then put original data back
             $elem.select2("data", currData);
         },
+        _parseDataToSelect2Options: function ( data) {
+            if (_.isArray(data)) return data;
+            return $.map(data, function (item, id) {
+                return {
+                    id: id,
+                    text: item ? item : Locale._('Unamed Category')
+                };
+            });
+        },
         createSelect2: function () {
+            var _this = this;
             // Get inital value
             var val = null;
             if (this.props.val.length > 0) {
@@ -901,12 +914,28 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
 
             var $select2 = this.getElement();
             var options = {
+                minimumInputLength: this.props.minInputLength || 0,
                 multiple: this.props.multiple,
                 val: val
             };
 
-            if (this.props.options.length) {
-                options['data'] = this.props.options;
+            if (this.props.dataMode == 'local') {
+                options['data'] = _this._parseDataToSelect2Options(this.props.options);
+            } else if (this.props.dataMode == 'server' && !_.isEmpty(this.props.options)) {
+                options['query'] = function (options) {
+                    if (options.term) {
+                        $.ajax({
+                            url: _this.props.url + '?q=' + options.term,
+                            dataType: 'json',
+                            success: function (data) {
+                                options.callback({ results: _this._parseDataToSelect2Options(data) });
+                            },
+                            cache: true
+                        });
+                    } else {
+                        options.callback({ results: _this._parseDataToSelect2Options(_this.props.options) });
+                    }
+                };
             } else {
                 options['ajax'] = {
                     url: this.props.url,
@@ -918,18 +947,10 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                         };
                     },
                     results: function (data) {
-                        return {
-                            results: $.map(data, function (item, id) {
-                                return {
-                                    text: item,
-                                    id: id
-                                }
-                            })
-                        };
+                        return {results: _this._parseDataToSelect2Options(data)};
                     },
                     cache: true
                 };
-                options['minimumInputLength'] = 1;
             }
 
             var attrs = {
@@ -1176,7 +1197,8 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             return options;
         },
         componentDidMount: function () {
-            var options = this.getDjsConfig();
+            var options = this.getDjsConfig();false
+            options['replication'] = this.props.replication;
 
             Dropzone.autoDiscover = false;
 
@@ -1376,7 +1398,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             });
         },
         render: function () {
-            var icons = [], buttons = [],
+            var buttons = [], hiddenInput = null,
                 files = this.state.files,
                 config = this.props.config,
                 className = (this.props.className) ? 'filepicker dropzone ' + this.props.className : 'filepicker dropzone';
@@ -1386,29 +1408,26 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 buttons.push(React.createElement("button", {key: 'btn-cancel' + this.props.id, type: "button", className: "btn btn-default btn-xs btn-cancel"}, "Cancel"));
             }
 
+            if (config.showHiddenInput) {
+                var inputAttrs = this.props.attrs || {};
+                hiddenInput = React.createElement("input", React.__spread({type: "hidden", name: this.props.name},  inputAttrs));
+            }
+
             if (!this.props.config.postUrl && this.props.action) {
                 return (
                     React.createElement("form", {action: this.props.action, className: className}, 
-                        React.createElement("input", React.__spread({type: "hidden", 
-                               name: this.props.name, 
-                               value: this.props.defaultValue || '', 
-                               className: "images"}, 
-                            this.props.attrs)), 
+                        hiddenInput, 
                         buttons, 
-                        React.createElement("br", null), 
+                        buttons.length ? React.createElement("br", null) : null, 
                         this.props.children
                     )
                 );
             } else {
                 return (
                     React.createElement("div", {className: className}, 
-                        React.createElement("input", React.__spread({type: "hidden", 
-                               name: this.props.name, 
-                               value: this.props.defaultValue || '', 
-                               className: "images"}, 
-                               this.props.attrs)), 
+                        hiddenInput, 
                         buttons, 
-                        React.createElement("br", null), 
+                        buttons.length ? React.createElement("br", null) : null, 
                         this.props.children
                     )
                 );
