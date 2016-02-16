@@ -112,7 +112,7 @@
 
         $(document).on('click', '#btn_add_products', function (e) {
             var value = $('#NOP').val();
-            ProductsComponent.setProps({ NOP: value });
+            ProductsComponent.setProps({ NoP: value });
         });
 
         /**
@@ -192,8 +192,8 @@
             componentWillReceiveProps: function (nextProps) {
                 var products = this.state.products;
 
-                if (nextProps.NOP && nextProps.NOP !== '0') {
-                    for (var i = 0; i < nextProps.NOP; i++) {
+                if (nextProps.NoP && nextProps.NoP !== '0') {
+                    for (var i = 0; i < nextProps.NoP; i++) {
                         var product = $.fn.deepClone(this.props.product);
                         product['id'] = guid();
                         products.push(product);

@@ -3624,12 +3624,15 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 $result.show();
                 if ($.isFunction(e.close)) {
                     // e is the modal object
-                    setTimeout(e.close, 2000);
+                    var modal = e;
+                    setTimeout(function () {
+                        modal.close();
+                        loader.stop();
+                    }, 2000);
                     //e.close();//close it
                 }
                 // hide notification
                 RulesWidget.log(r);
-                loader.stop();
             });
 
             if ($.isFunction(e.preventDefault)) {
@@ -3718,7 +3721,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             this.onCouponsUpdate(newRows);
             if (grid) {
                 //console.log("grid found, adding to grid");
-                RulesWidget.addGridRows(grid, newRows)
+                RulesWidget.addGridRows(grid, newRows);
             } else {
                 //console.log("grid not loaded yet, adding to store");
                 var codes = store.get('promo.coupons'); // check of there are other codes stored and if yes, merge them
@@ -3742,12 +3745,19 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 numCodes: grid.getRows().length
             });
         },
-        removeGridRows: function (grid, rows) {
-            if (this.options.promoOptions['coupons_removed'] == undefined) {
-                this.options.promoOptions['coupons_removed'] = [];
-            }
-
-            this.options.promoOptions['coupons_removed'] = _.pluck(rows, 'id');
+        removeGridRows: function (grid, removedRows) {
+            var addedCoupons = this.options.promoOptions['coupons'];
+            _(removedRows).each(function (row) {
+                var index = _.findIndex(addedCoupons, {code: row.id});
+                if (index != -1) {
+                    this.options.promoOptions['coupons'].splice(index, 1);
+                } else {
+                    if (!this.options.promoOptions['coupons_removed']) {
+                        this.options.promoOptions['coupons_removed'] = [];
+                    }
+                    this.options.promoOptions['coupons_removed'].push(row.id);
+                }
+            }.bind(this));
 
             $(document).trigger({ // trigger event which will upgrade the grid
                 type: "grid_count_update",
@@ -3755,10 +3765,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             });
         },
         onModalSaveChange: function (modal) {
-            var values = this.options.promoOptions;
-            if (values['coupons_removed'] !== undefined && values['coupons_removed'].length) {
-                this.updatePromoOptions();
-            }
+            this.updatePromoOptions();
             modal.close();
         },
         onActionsUpdate: function (e) {
@@ -3786,15 +3793,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             this.updatePromoOptions();
         },
         updatePromoOptions: function () {
-            var coupons_added = [], coupons_removed = [];
             var values = this.options.promoOptions;
             if (!this.options.promoOptionsEl) return;
-
-            // Not really clear why saving just coupon data???
-            //if (values['coupons']) coupons_added = values['coupons'];
-            //if (values['coupons_removed']) coupons_removed = values['coupons_removed'];
-            //
-            //this.options.promoOptionsEl.val(JSON.stringify({ coupons: coupons_added, coupons_removed: coupons_removed }));
             this.options.promoOptionsEl.val(JSON.stringify(values));
         }
     };
@@ -3809,11 +3809,11 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
         }
 
         $(grid.getDOMNode())
-            .on('removedRows.griddle', function (e, rows) {
+            .on('removedRows.griddle', function (e, removedRows) {
                 // Removed rows on coupon grid
-                RulesWidget.removeGridRows(grid, rows);
+                RulesWidget.removeGridRows(grid, removedRows);
             })
-            .on('addedRows.griddle', function (e, rows) {
+            .on('addedRows.griddle', function (e, addedRows) {
                 // Added rows on coupon grid
             });
     };
