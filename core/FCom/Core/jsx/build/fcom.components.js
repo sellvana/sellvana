@@ -895,15 +895,6 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             // ..Then put original data back
             $elem.select2("data", currData);
         },
-        _parseDataToSelect2Options: function ( data) {
-            if (_.isArray(data)) return data;
-            return $.map(data, function (item, id) {
-                return {
-                    id: id,
-                    text: item
-                };
-            });
-        },
         createSelect2: function () {
             var _this = this;
             // Get inital value
@@ -954,6 +945,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 };
             }
 
+            options['initSelection'] = function (element, callback) {
+                var data = _this.props.localData || [];
+                if (typeof data === 'string') data = JSON.parse(data);
+                callback(_this._parseDataToSelect2Options(data));
+            };
+
             var attrs = {
                 'name': this.props.name,
                 'class': this.props.className,
@@ -1000,6 +997,15 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         },
         _isOptionsUpdated: function (oldOptions) {
             return oldOptions.length != this.props.options.length || false;
+        },
+        _parseDataToSelect2Options: function ( data) {
+            if (_.isArray(data)) return data;
+            return $.map(data, function (item, id) {
+                return {
+                    id: id,
+                    text: item
+                };
+            });
         },
         render: function () {
             return (
@@ -1195,11 +1201,12 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 options = defaults;
             }
 
+            options['replication'] = this.props.replication || false;
+
             return options;
         },
         componentDidMount: function () {
-            var options = this.getDjsConfig();false
-            options['replication'] = this.props.replication;
+            var options = this.getDjsConfig();
 
             Dropzone.autoDiscover = false;
 

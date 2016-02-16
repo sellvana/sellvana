@@ -98,7 +98,6 @@
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'jquery.validate', 'fcom.admin', 'unique'], function($, _, React, Components, FComSelect2) {
         var _mainForm = $('#products-quick-add-form');
-        var imagesList = {};
         window.adminForm = FCom.Admin.form({
             form: 'products-quick-add-form',
             url_get: '{{ APP.href('catalog/products/quick-add') }}',
@@ -144,6 +143,8 @@
         }
 
         var Products = React.createClass({
+            imagesList: {},
+            categories: {},
             getDefaultProps: function () {
                 return {
                     product: {
@@ -247,7 +248,7 @@
 
                 if (dj.options.replication) {
                     var parentId = dj.options.replication;
-                    var images = imagesList[parentId];
+                    var images = _this.imagesList[parentId];
                     var product = products[_.findIndex(products, {id: id})];
 
                     // Process default images thumbnail for cloning product
@@ -275,8 +276,8 @@
                 if (btnCancel) {
                     btnCancel.addEventListener("click", function () {
                         dj.removeAllFiles(true);
-                        if (imagesList[id].length) {
-                            _this._handleUnlinkImages(_.pluck(imagesList[id], 'id').join(','));
+                        if (_this.imagesList[id].length) {
+                            _this._handleUnlinkImages(_.pluck(_this.imagesList[id], 'id').join(','));
                         }
                         hiddenInput.value = '';
                         products[_.findIndex(products, {id: id})][type] = '';
@@ -285,10 +286,10 @@
 
                 dj.on("success", function(file, responseText) {
                     _(responseText['files']).each(function (f, fi) {
-                        if (!imagesList[id]) imagesList[id] = [];
-                        var index = _.findIndex(imagesList[id], {id: f.id});
+                        if (!_this.imagesList[id]) _this.imagesList[id] = [];
+                        var index = _.findIndex(_this.imagesList[id], {id: f.id});
                         if (index == -1) {
-                            imagesList[id].push({
+                            _this.imagesList[id].push({
                                 id: f.id,
                                 name: f.file_name,
                                 size: f.file_size,
@@ -297,21 +298,21 @@
                         }
                     });
 
-                    var values = _.pluck(imagesList[id], 'id').join(',');
+                    var values = _.pluck(_this.imagesList[id], 'id').join(',');
                     hiddenInput.value = values;
                     _this.state.products[_.findIndex(_this.state.products, {id: id})][type] = values;
                 });
 
                 dj.on('removedfile', function (file) {
-                    var index = _.findIndex(imagesList[id], {name: file.name});
+                    var index = _.findIndex(_this.imagesList[id], {name: file.name});
                     if (index != -1) {
-                        var image = imagesList[id][index];
+                        var image = _this.imagesList[id][index];
                         //TODO: Is necessarily to unlink image from media library
-                        _this._handleUnlinkImages(image.id);
-                        imagesList[id].splice(index, 1);
+//                        _this._handleUnlinkImages(image.id);
+                        _this.imagesList[id].splice(index, 1);
                     }
 
-                    var values = _.pluck(imagesList[id], 'id').join(',');
+                    var values = _.pluck(_this.imagesList[id], 'id').join(',');
                     hiddenInput.value = values;
                     products[_.findIndex(products, {id: id})][type] = values;
                 });
@@ -337,6 +338,13 @@
                     this.state.products[pi][type] = e.target.value;
                 }
             },
+            _handleSelect2Change: function (e, callback, selections) {
+                var id = e.target.dataset.id;
+                var type = e.target.dataset.type;
+                this.categories[id] = selections;
+                this.state.products[_.findIndex(this.state.products, {id: id})][type] = e.target.value;
+                this.state.products[_.findIndex(this.state.products, {id: id})]['localData'] = this.categories[id];
+            },
             _handleWysiwygChange: function (editor, data) {
                 var id = editor.element.$.dataset.id;
                 var type = editor.element.$.dataset.type;
@@ -355,12 +363,12 @@
             },
             _handleDuplicateProduct: function (e) {
                 var id = e.currentTarget.dataset.id;
-                this.id = guid();
+                var newId = guid();
                 var products = this.state.products;
 
-                imagesList[this.id] = $.fn.deepClone(imagesList[id]);
+                this.imagesList[newId] = $.fn.deepClone(this.imagesList[id]);
                 var dProduct = $.fn.deepClone(products[_.findIndex(products, { id: id })]);
-                dProduct['id'] = this.id;
+                dProduct['id'] = newId;
                 dProduct['replication'] = id;
                 products.push(dProduct);
 
@@ -391,6 +399,7 @@
                                     _handleDuplicateProduct: this._handleDuplicateProduct,
                                     _handleInputChange: this._handleInputChange,
                                     _handleSwitchChange: this._handleSwitchChange,
+                                    _handleSelect2Change: this._handleSelect2Change,
                                     _handleWysiwygChange: this._handleWysiwygChange
                                 })
                             }.bind(this)),
@@ -545,10 +554,11 @@
                                 placeholder: "{{ 'Select Categories' |_ }}",
                                 multiple: true,
                                 url: '{{ APP.href('/catalog/products/quick-add/categories_search') | raw }}',
-                                onChange: this.props._handleInputChange,
+                                onChange: this.props._handleSelect2Change,
                                 defaultValue: p.categories,
                                 options: {{ UTIL.toJson(categories) | raw }},
                                 dataMode: 'server',
+                                localData: p.localData || [],
                                 attrs: {
                                     'data-id': p.id,
                                     'data-type': 'categories'
