@@ -30,6 +30,8 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
         $invHlp = $this->Sellvana_Catalog_Model_InventorySku;
         $created = 0;
         $errors = 0;
+        $products = [];
+
         foreach ($postProducts as $i => $prodData) {
             if (empty($prodData['product_sku'])) {
                 continue;
@@ -42,7 +44,11 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
                     continue;
                 }
                 $this->BDb->transaction();
+                if ($prodData['manage_inventory'] && $prodData['inventory_sku'] === '') {
+                    $prodData['inventory_sku'] = $prodData['product_sku'];
+                }
                 $product = $prodHlp->create($prodData)->save();
+                $products[] = $product;
 
                 if (!empty($prodData['images'])) {
                     $prodMediaData = [];
@@ -59,11 +65,10 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
 
                     $prodMediaHlp->create_many($prodMediaData);
                 }
-
                 if (!empty($prodData['manage_inventory'])) {
                     $postInventory[$i]['inventory_sku'] = $prodData['inventory_sku'];
                     $postInventory[$i]['title'] = $prodData['product_name'];
-                    $invHlp->create(['product_id' => $product->id()])->set($postInventory[$i])->save();
+                    $invHlp->create($postInventory[$i])->save();
                 }
 
                 if (!empty($postCategories[$i])) {
@@ -81,6 +86,9 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
                 $errors++;
             }
         }
+
+        $this->BEvents->fire(__METHOD__ . ':after', ['products' => $products]);
+
         $this->message($this->BLocale->_('Total %s product(s) created, with %s error(s)', [$created, $errors]));
         $this->BResponse->redirect('/catalog/products/quick-add');
     }

@@ -30,3 +30,9 @@ modules:
                     - [ "/marketclient/download/?.action", Sellvana_MarketClient_Controller_Download ]
                 observe:
                     - [ "FCom_Install_Controller::action_step3__POST:after", Sellvana_MarketClient_Main.onInstallStep3Post ]
+
+      default_config:
+          modules:
+              Sellvana_MarketClient:
+                  auto_check_enable: 0
+                  auto_check_days: 1

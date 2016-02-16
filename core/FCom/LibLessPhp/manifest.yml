@@ -2,4 +2,4 @@ modules:
     FCom_LibLessPhp:
         version: 0.6.0.0
         channel: beta
-        auto_use: [ bootstrap, layout]
+        auto_use: [ bootstrap ]

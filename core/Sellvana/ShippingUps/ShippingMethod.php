@@ -13,12 +13,24 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
 
     protected function _fetchRates($data)
     {
+        $config = $this->BConfig->get('modules/Sellvana_ShippingUps');
+        $data = array_merge($config, $data);
+
+        $data = $this->_applyDefaultPackageConfig($data);
+
         if ($data['weight'] == 0) {
             $result = [
                 'error' => 1,
                 'message' => 'Can not ship without weight',
             ];
             return $result;
+        }
+        if (empty($data['from_postcode']) || empty($data['from_country'])) {
+            $result = [
+                'error' => 1,
+                'message' => 'Origin Postcode and Country are required',
+            ];
+            return $result;        
         }
         if (empty($data['to_postcode']) || empty($data['to_country'])) {
             $result = [
@@ -27,11 +39,6 @@ class Sellvana_ShippingUps_ShippingMethod extends Sellvana_Sales_Method_Shipping
             ];
             return $result;
         }
-        $config = $this->BConfig->get('modules/Sellvana_ShippingUps');
-        $data = array_merge($config, $data);
-
-        $data = $this->_applyDefaultPackageConfig($data);
-
         if (empty($data['access_key']) || empty($data['user_id']) || empty($data['password'])) {
             $result = [
                 'error' => 1,
@@ -132,7 +139,7 @@ if (strpos($response, '<') !== 0) {
             $result['success'] = 1;
             foreach ($parsed->RatedShipment as $rate) {
                 $code = (string)$rate->Service->Code;
-                $result['rates'][$code] = [
+                $result['rates']['_' . $code] = [
                     'price' => (float)$rate->TotalCharges->MonetaryValue,
                     'max_days' => (int)$rate->GuaranteedDaysToDelivery,
                 ];
@@ -154,18 +161,18 @@ if (strpos($response, '<') !== 0) {
     public function getServices()
     {
         return [
-            '01' => 'UPS Next Day Air',
-            '02' => 'UPS Second Day Air',
-            '03' => 'UPS Ground',
-            '07' => 'UPS Worldwide Express',
-            '08' => 'UPS Worldwide Expedited',
-            '11' => 'UPS Standard',
-            '12' => 'UPS Three-Day Select',
-            '13' => 'Next Day Air Saver',
-            '14' => 'UPS Next Day Air Early AM',
-            '54' => 'UPS Worldwide Express Plus',
-            '59' => 'UPS Second Day Air AM',
-            '65' => 'UPS Saver'
+            '_01' => 'UPS Next Day Air',
+            '_02' => 'UPS Second Day Air',
+            '_03' => 'UPS Ground',
+            '_07' => 'UPS Worldwide Express',
+            '_08' => 'UPS Worldwide Expedited',
+            '_11' => 'UPS Standard',
+            '_12' => 'UPS Three-Day Select',
+            '_13' => 'Next Day Air Saver',
+            '_14' => 'UPS Next Day Air Early AM',
+            '_54' => 'UPS Worldwide Express Plus',
+            '_59' => 'UPS Second Day Air AM',
+            '_65' => 'UPS Saver',
         ];
     }
 }

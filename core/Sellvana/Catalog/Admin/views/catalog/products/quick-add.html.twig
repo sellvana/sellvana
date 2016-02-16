@@ -486,6 +486,7 @@
                                 label_class: '',
                                 input_id: 'products['+ p.id+'][is_hidden]'}, "{{ 'Hidden?'|_ }}"
                             ),
+                            /*
                             React.createElement(Components.SpecialInput, {
                                 type: 'switch',
                                 id: 'products['+ p.id+'][is_hidden]',
@@ -501,22 +502,22 @@
                                     'data-id': p.id,
                                     'data-type': 'is_hidden'
                                 }
-                            })
-                            /*React.createElement(Components.ControlInput, {
+                            })*/
+                            React.createElement(Components.ControlInput, {
                                 type: 'select',
                                 value: p.is_hidden,
                                 className: 'is_hidden',
                                 id: 'products['+p.id+'][is_hidden]',
                                 name: 'products['+p.id+'][is_hidden]',
                                 options: {
-                                    0: "{{ 'no'|_ }}", 1: "{{ 'Yes'|_ }}"
+                                    0: "{{ 'no'|_ }}", 1: "{{ 'YES'|_ }}"
                                 },
                                 attrs: {
                                     style: {width: "80px"},
                                     'data-id': p.id,
                                     'data-type': 'price.base'
                                 }
-                            })*/
+                            })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
                             React.createElement(Components.ControlLabel, {
@@ -545,7 +546,7 @@
                                 label_class: '',
                                 input_id: 'products['+ p.id+'][manage_inventory]'}, "{{ 'Manage?'|_ }}"
                             ),
-                            React.createElement(Components.SpecialInput, {
+                            /*React.createElement(Components.SpecialInput, {
                                 type: 'switch',
                                 id: 'products['+ p.id+'][manage_inventory]',
                                 name: 'products['+ p.id+'][manage_inventory]',
@@ -560,12 +561,12 @@
                                     'data-id': p.id,
                                     'data-type': 'manage_inventory'
                                 }
-                            })
-                            /*React.createElement(Components.ControlInput, {
+                            })*/
+                            React.createElement(Components.ControlInput, {
                                 type: 'select',
                                 value: p.manage_inventory,
                                 options: {
-                                    0: "{{ 'no'|_ }}", 1: "{{ 'Yes'|_ }}"
+                                    0: "{{ 'no'|_ }}", 1: "{{ 'YES'|_ }}"
                                 },
                                 className: 'manage_inventory',
                                 id: 'products['+p.id+'][manage_inventory]',
@@ -576,7 +577,7 @@
                                     'data-type': 'manage_inventory'
                                 },
                                 callback: this.props.actions.handleInputChange
-                            })*/
+                            })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
                             React.createElement(Components.ControlLabel, {

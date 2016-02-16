@@ -34,7 +34,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_6_1_0()
+    public function install__0_6_2_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);
@@ -163,11 +163,6 @@ class Sellvana_Sales_Migrate extends BClass
                 'row_discount' => "decimal(12,2) NOT NULL default 0",
                 'row_discount_percent' => 'decimal(5,2) not null default 0',
                 'auto_added' => 'tinyint not null default 0',
-
-                'promo_id_buy' => "VARCHAR(50) default NULL",
-                'promo_id_get' => "INT(10) UNSIGNED default NULL",
-                'promo_qty_used' => "decimal(12,2) DEFAULT NULL",
-                'promo_amt_used' => "decimal(12,2) DEFAULT NULL",
 
                 'parent_item_id' => 'int unsigned default null',
                 'shipping_size' => 'varchar(30)',
@@ -804,11 +799,6 @@ class Sellvana_Sales_Migrate extends BClass
                 'price' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
                 'rowtotal' => "decimal(12,2) NULL",
 
-                'promo_id_buy' => "VARCHAR(50) NOT NULL",
-                'promo_id_get' => "INT(10) UNSIGNED NOT NULL",
-                'promo_qty_used' => "decimal(12,2) DEFAULT NULL",
-                'promo_amt_used' => "decimal(12,2) DEFAULT NULL",
-
                 'create_dt' => "DATETIME NOT NULL",
                 'update_dt' => "DATETIME NOT NULL",
             ],
@@ -1087,10 +1077,6 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($this->Sellvana_Sales_Model_Cart->table(), [
             BDb::COLUMNS => [
                 'coupon_code' => 'varchar(50) DEFAULT NULL',
-                'promo_id_buy' => 'VARCHAR(50) DEFAULT NULL',
-                'promo_id_get' => 'INT(10) UNSIGNED DEFAULT NULL',
-                'promo_qty_used' => 'decimal(12,2) DEFAULT NULL',
-                'promo_amt_used' => 'decimal(12,2) DEFAULT NULL',
             ],
         ]);
     }
@@ -2164,6 +2150,32 @@ class Sellvana_Sales_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
                 'refunded_at' => 'datetime',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_1_0__0_6_2_0()
+    {
+        $tCartItem = $this->Sellvana_Sales_Model_Cart_Item->table();
+
+        $this->BDb->ddlTableDef($tCartItem, [
+            BDb::COLUMNS => [
+                'promo_id_buy' => "DROP",
+                'promo_id_get' => "DROP",
+                'promo_qty_used' => "DROP",
+                'promo_amt_used' => "DROP",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_2_0__0_6_3_0()
+    {
+        $this->upgrade__0_6_1_0__0_6_2_0();
+
+        $tCart = $this->Sellvana_Sales_Model_Cart->table();
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'shipping_service' => 'varchar(50)',
             ],
         ]);
     }

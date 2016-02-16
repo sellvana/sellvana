@@ -2,7 +2,7 @@ modules:
     Sellvana_CatalogFields:
         version: 0.6.1.0
         channel: beta
-        require: { module: { Sellvana_Catalog: 0.2.1 } }
+        require: { module: { Sellvana_Catalog: 0.6.0.0 } }
         translations: { en: en.php }
         before: [ Sellvana_MultiSite ]
         after: [ Sellvana_Customer ]

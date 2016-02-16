@@ -17,24 +17,23 @@ class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart
         $cart = $this->_cart;
         if ($cart->get('recalc_shipping_rates')) {
             $methods = $this->Sellvana_Sales_Main->getShippingMethods();
-            $weight = 0;
+//            $weight = 0;
             $rates = [];
             if ($methods) {
                 foreach ($methods as $methodCode => $method) {
                     $rates[$methodCode] = $method->fetchCartRates($cart);
-                    if (!empty($rates[$methodCode]['weight'])) {
-                        $weight = $rates[$methodCode]['weight'];
-                    }
+//                    if (!empty($rates[$methodCode]['weight'])) {
+//                        $weight = $rates[$methodCode]['weight'];
+//                    }
                 }
             }
             $cart->set([
-                'shipping_weight' => $weight,
+//                'shipping_weight' => $weight,
                 'recalc_shipping_rates' => 0,
             ])->setData('shipping_rates', $rates);
         } else {
             $rates = $cart->getData('shipping_rates');
         }
-
         if ($rates) {
             list($selMethod, $selService) = $this->_findSelectedMethodService($rates);
         } else {
@@ -42,7 +41,8 @@ class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart
             $selService = null;
         }
 
-        $this->_value = $selMethod && $selService ? $rates[$selMethod][$selService]['price'] : 0;
+        $this->_value = $selMethod && $selService && !empty($rates[$selMethod][$selService]['price'])
+            ? $rates[$selMethod][$selService]['price'] : 0;
         $this->_storeCurrencyValue = $this->_cart->convertToStoreCurrency($this->_value);
 
         $cart->set([
@@ -97,23 +97,11 @@ class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart
             }
             $selService = null; // request to find cheapest service for selected method
 
-        }
-// WTFPHP???
-//        elseif (empty($rates[$selMethod][$selService])) { // if selected service is not available
-//            var_dump($selMethod, $selService, array_key_exists($selService, $rates[$selMethod]), $rates[$selMethod][(string)$selService]['price']); exit;
-//            $selService = null; // request to find cheapest service for selected method
-//
-//        }
-        $found = false;
-        foreach ($rates[$selMethod] as $svc => $svcData) {
-            if ($svc === $selService) {
-                $found = true;
-            }
-        }
-        if (!$found) {
-            $selService = null;
-        }
+        } elseif (empty($rates[$selMethod][$selService])) { // if selected service is not available
 
+            $selService = null; // request to find cheapest service for selected method
+
+        }
 
         if (!$selService && $selMethod && !empty($minRates[$selMethod])) { // if service is not set or was reset, set to cheapest
             $selService = $minRates[$selMethod]['service'];
