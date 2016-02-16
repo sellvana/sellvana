@@ -945,11 +945,13 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 };
             }
 
-            options['initSelection'] = function (element, callback) {
-                var data = _this.props.localData || [];
-                if (typeof data === 'string') data = JSON.parse(data);
-                callback(_this._parseDataToSelect2Options(data));
-            };
+            if (this.props.dataMode !== 'local') {
+                options['initSelection'] = function (element, callback) {
+                    var data = _this.props.localData || [];
+                    if (typeof data === 'string') data = JSON.parse(data);
+                    callback(_this._parseDataToSelect2Options(data));
+                };
+            }
 
             var attrs = {
                 'name': this.props.name,
