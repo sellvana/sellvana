@@ -51,19 +51,18 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
                 $products[] = $product;
 
                 if (!empty($prodData['images'])) {
-                    $prodMediaData = [];
-                    $mediaIds = explode(',', $prodData['images']);
-                    foreach($mediaIds as $mediaId) {
-                        $prodMediaData[] = [
+                    $mediaIds = $this->BUtil->arrayCleanInt($prodData['images']);
+                    foreach($mediaIds as $k => $mediaId) {
+                        $prodMediaHlp->create([
                             'product_id' => $product->id(),
                             'media_type' => Sellvana_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG,
                             'file_id' => $mediaId,
+                            'is_thumb' => (int)$k === 0 ? 1 : 0,
+                            'is_default' => (int)$k === 0 ? 1 : 0,
+                            'is_rollover' => (int)$k === 0 ? 1 : 0,
                             'in_gallery' => 1,
-                            'create_at' => date('Y-m-d H:i:s')
-                        ];
+                        ])->save();
                     }
-
-                    $prodMediaHlp->create_many($prodMediaData);
                 }
                 if (!empty($prodData['manage_inventory'])) {
                     $postInventory[$i]['inventory_sku'] = $prodData['inventory_sku'];
@@ -121,12 +120,12 @@ class Sellvana_Catalog_Admin_Controller_ProductsAdd extends FCom_Admin_Controlle
         $q = $this->BRequest->get('q');
         if (!$q) {
             $this->BResponse->json([]);
-            return;
+            exit;
         }
 
-        $index = $this->_indexCategories($q);
+        $categories = $this->_indexCategories($q);
 
-        $this->BResponse->json($index);
+        $this->BResponse->json($categories);
         exit;
     }
 

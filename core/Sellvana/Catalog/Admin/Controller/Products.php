@@ -389,7 +389,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'refresh' => true,
                     // 'add' => ['caption' => 'Add images'],
                     'quick_add' => [
-                        'html' => '<span class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
+                        'html' => '<span id="dropzone" class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
                                      <i class="icon-plus icon-white"></i>
                                      <span>' . $this->BLocale->_('Quick add images') . '</span>
                                      <input type="file" name="upload[]" id="quick-add-images" multiple="">

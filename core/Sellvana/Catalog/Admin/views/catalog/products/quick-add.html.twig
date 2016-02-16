@@ -64,7 +64,7 @@
         width: 200px;
     }
 </style>
-{% set categories = APP.instance('Sellvana_Catalog_Model_Category').getFlatCategories() %}
+{% set categories = APP.instance('Sellvana_Catalog_Model_Category').getFlatCategories(10) %}
 {% set defaultFileSizeConfig = CONFIG.get('modules/FCom_Admin/default_media_file_size') | default('10') %}
 
 <form id="products-quick-add-form" action="{{ APP.href('catalog/products/quick-add') }}" method="post">
@@ -98,8 +98,6 @@
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'jquery.validate', 'fcom.admin', 'unique'], function($, _, React, Components, FComSelect2) {
         var _mainForm = $('#products-quick-add-form');
-        var imageList = {};
-
         window.adminForm = FCom.Admin.form({
             form: 'products-quick-add-form',
             url_get: '{{ APP.href('catalog/products/quick-add') }}',
@@ -114,7 +112,7 @@
 
         $(document).on('click', '#btn_add_products', function (e) {
             var value = $('#NOP').val();
-            BlockFormComponent.setProps({ NOP: value });
+            ProductsComponent.setProps({ NoP: value });
         });
 
         /**
@@ -144,7 +142,9 @@
             }
         }
 
-        var Blocks = React.createClass({
+        var Products = React.createClass({
+            imagesList: {},
+            categories: {},
             getDefaultProps: function () {
                 return {
                     product: {
@@ -152,9 +152,7 @@
                         product_sku: '',
                         product_name: '',
                         short_description: '',
-                        price: {
-                            base: ''
-                        },
+                        price: { base: '' },
                         is_hidden: 0,
                         categories: '',
                         manage_inventory: 0,
@@ -166,6 +164,7 @@
                     },
                     djsComponentConfig: {
 //                        showButtons: true,
+                        showHiddenInput: true,
                         postUrl: "{{ APP.href('/media/grid/upload?type=') | raw }}" + encodeURIComponent('product-images') + '&folder=' + encodeURIComponent('media/product/images')
                     },
                     djsConfig: {
@@ -174,7 +173,9 @@
 //                        autoProcessQueue: false,
                         uploadMultiple: true,
                         maxFilesize: "10",
-                        maxFiles: 3,
+//                        maxFiles: 3,
+                        acceptedFiles: 'image/*',
+//                        hiddenInputContainer: '#products-quick-add-container',
                         headers: {
                             'X-CSRF-TOKEN': $('input[name="X-CSRF-TOKEN"]').val()
                         }
@@ -182,17 +183,17 @@
                 };
             },
             getInitialState: function () {
-                var p = $.fn.deepClone(this.props.product);
-                p['id'] = guid();
+                var product = $.fn.deepClone(this.props.product);
+                product['id'] = guid();
                 return {
-                    products: [p]
+                    products: [product]
                 };
             },
             componentWillReceiveProps: function (nextProps) {
                 var products = this.state.products;
 
-                if (nextProps.NOP && nextProps.NOP !== '0') {
-                    for (var i = 0; i < nextProps.NOP; i++) {
+                if (nextProps.NoP && nextProps.NoP !== '0') {
+                    for (var i = 0; i < nextProps.NoP; i++) {
                         var product = $.fn.deepClone(this.props.product);
                         product['id'] = guid();
                         products.push(product);
@@ -207,122 +208,9 @@
             componentDidMount: function () {
                 this.init();
             },
-            removeProduct: function (e) {
-                var products = this.state.products;
-                products.splice(_.findIndex(products, { id: e.currentTarget.dataset.id }), 1);
-                this.setState({ products: products });
-            },
-            duplicateProduct: function (e) {
-                var products = this.state.products;
-                var dProduct = $.fn.deepClone(products[_.findIndex(products, { id: e.currentTarget.dataset.id })]);
-                dProduct['id'] = guid();
-                products.push(dProduct);
-
-                this.setState({ products: products });
-            },
-            unlink: function(id) {
-                $.post("{{ APP.href('/media/grid/mass-delete') }}", { oper: 'mass-delete', id: id },
-                        function (r) {
-                            if (r.success) {
-                                $.bootstrapGrowl("{{ 'Image had removed from media library'|_ }}", {
-                                    type: 'success',
-                                    align: 'center',
-                                    width: 'auto'
-                                });
-                            }
-                        });
-            },
-            djsInit: function(dj) {
-                var that = this;
-                var hiddenInput = dj.element.querySelector('input[data-type="images"]');
-                var id = hiddenInput.getAttribute('data-id');
-                var type = hiddenInput.getAttribute('data-type');
-
-                var btnUpload = dj.element.querySelector("button.btn-upload");
-                if (btnUpload) {
-                    btnUpload.addEventListener("click", function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        dj.processQueue();
-                    });
-                }
-
-                var btnCancel = dj.element.querySelector("button.btn-cancel");
-                if (btnCancel) {
-                    btnCancel.addEventListener("click", function () {
-                        dj.removeAllFiles(true);
-                        if (imageList[id].length) {
-                            that.unlink(_.pluck(imageList[id], 'id').join(','));
-                        }
-                        hiddenInput.value = '';
-                        that.state.products[_.findIndex(that.state.products, {id: id})][type] = '';
-                    });
-                }
-
-                dj.on("success", function(file, responseText) {
-                    _(responseText['files']).each(function (f) {
-                        if (!imageList[id]) imageList[id] = [];
-                        var index = _.findIndex(imageList[id], {id: f.id});
-                        if (index == -1) {
-                            imageList[id].push({
-                                id: f.id,
-                                name: f.file_name
-                            });
-                        }
-                    });
-
-                    var values = _.pluck(imageList[id], 'id').join(',');
-                    hiddenInput.value = values;
-                    that.state.products[_.findIndex(that.state.products, {id: id})][type] = values;
-                });
-
-                dj.on('removedfile', function (file) {
-                    if (imageList[id].length) {
-                        _(imageList[id]).each(function (image, mi) {
-                            if (file.name == image.name) {
-                                imageList[id][mi].deleted = true;
-                                that.unlink(image.id);
-                                var prevIndex = mi - 1;
-                                if (prevIndex != -1 && imageList[id][prevIndex].deleted)
-                                    imageList[id].splice(prevIndex, 1);
-                            }
-                        });
-
-                        // Remove last image if deleted
-                        var lastIndex = imageList[id].length - 1;
-                        if (lastIndex != -1 && imageList[id][lastIndex].deleted)
-                            imageList[id].splice(lastIndex, 1);
-                    }
-
-                    var values = _.pluck(imageList[id], 'id').join(',');
-                    hiddenInput.value = values;
-                    that.state.products[_.findIndex(that.state.products, {id: id})][type] = values;
-                });
-            },
-            handleInputChange: function (e) {
-                var id = e.target.dataset.id;
-                var type = e.target.dataset.type;
-                var pi = _.findIndex(this.state.products, {id: id});
-                if (type == 'price.base') {
-                    this.state.products[pi]['price']['base'] = e.target.value;
-                } else {
-                    this.state.products[pi][type] = e.target.value;
-                }
-            },
-            handleWysiwygChange: function (editor, data) {
-                var id = editor.element.$.dataset.id;
-                var type = editor.element.$.dataset.type;
-                var pi = _.findIndex(this.state.products, {id: id});
-                this.state.products[pi][type] = data;
-            },
-            handleSwitchChange: function (e, state) {
-                var id = e.target.dataset.id;
-                var type = e.target.dataset.type;
-                var pi = _.findIndex(this.state.products, {id: id});
-                this.state.products[pi][type] = state ? 1 : 0;
-            },
             init: function () {
                 $('.product-sku').each(function () {
+                    // Add rule for checking unique sku from db
                     $(this).rules("add", {
                         onfocusout: false,
                         onkeyup: false,
@@ -340,15 +228,151 @@
                             }
                         },
                         messages: {
-                            remote: "{{ 'This sku is already taken place.' |_ }}"
+                            remote: "{{ 'This sku is already taken place.'|_ }}"
                         }
                     });
                 });
 
+                // Validate unique products sku
                 $.validator.addMethod('validateUniqueSku', validateUniqueSku, '{{ "Product sku already exists."|_ }}');
                 $.validator.addClassRules('unique-sku', {
                     validateUniqueSku: true
                 });
+            },
+            djsInit: function(dj) {
+                var _this = this;
+                var products = this.state.products;
+                var hiddenInput = dj.element.querySelector('input[data-type="images"]');
+                var id = hiddenInput.getAttribute('data-id');
+                var type = hiddenInput.getAttribute('data-type');
+
+                if (dj.options.replication) {
+                    var parentId = dj.options.replication;
+                    var images = _this.imagesList[parentId];
+                    var product = products[_.findIndex(products, {id: id})];
+
+                    // Process default images thumbnail for cloning product
+                    _(images).each(function (image) {
+                        var mockFile = { name: image.name, size: image.size };
+                        dj.options.addedfile.call(dj, mockFile);
+                        dj.options.thumbnail.call(dj, mockFile, image.thumb);
+                        dj.emit("complete", mockFile);
+                    });
+
+                    // Update images post data for new cloning product
+                    hiddenInput.value = product.images;
+                }
+
+                var btnUpload = dj.element.querySelector("button.btn-upload");
+                if (btnUpload) {
+                    btnUpload.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dj.processQueue();
+                    });
+                }
+
+                var btnCancel = dj.element.querySelector("button.btn-cancel");
+                if (btnCancel) {
+                    btnCancel.addEventListener("click", function () {
+                        dj.removeAllFiles(true);
+                        if (_this.imagesList[id].length) {
+                            _this._handleUnlinkImages(_.pluck(_this.imagesList[id], 'id').join(','));
+                        }
+                        hiddenInput.value = '';
+                        products[_.findIndex(products, {id: id})][type] = '';
+                    });
+                }
+
+                dj.on("success", function(file, responseText) {
+                    _(responseText['files']).each(function (f, fi) {
+                        if (!_this.imagesList[id]) _this.imagesList[id] = [];
+                        var index = _.findIndex(_this.imagesList[id], {id: f.id});
+                        if (index == -1) {
+                            _this.imagesList[id].push({
+                                id: f.id,
+                                name: f.file_name,
+                                size: f.file_size,
+                                thumb: $(dj.files[fi].previewElement).find('.dz-image').children('img').prop('src')
+                            });
+                        }
+                    });
+
+                    var values = _.pluck(_this.imagesList[id], 'id').join(',');
+                    hiddenInput.value = values;
+                    _this.state.products[_.findIndex(_this.state.products, {id: id})][type] = values;
+                });
+
+                dj.on('removedfile', function (file) {
+                    var index = _.findIndex(_this.imagesList[id], {name: file.name});
+                    if (index != -1) {
+                        var image = _this.imagesList[id][index];
+                        //TODO: Is necessarily to unlink image from media library
+//                        _this._handleUnlinkImages(image.id);
+                        _this.imagesList[id].splice(index, 1);
+                    }
+
+                    var values = _.pluck(_this.imagesList[id], 'id').join(',');
+                    hiddenInput.value = values;
+                    products[_.findIndex(products, {id: id})][type] = values;
+                });
+            },
+            _handleUnlinkImages: function(id) {
+                $.post("{{ APP.href('/media/grid/mass-delete') }}", { id: id }, function (r) {
+                    if (r.success) {
+                        $.bootstrapGrowl("{{ 'Image had removed from media library'|_ }}", {
+                            type: 'success',
+                            align: 'center',
+                            width: 'auto'
+                        });
+                    }
+                });
+            },
+            _handleInputChange: function (e) {
+                var id = e.target.dataset.id;
+                var type = e.target.dataset.type;
+                var pi = _.findIndex(this.state.products, {id: id});
+                if (type == 'price.base') {
+                    this.state.products[pi]['price']['base'] = e.target.value;
+                } else {
+                    this.state.products[pi][type] = e.target.value;
+                }
+            },
+            _handleSelect2Change: function (e, callback, selections) {
+                var id = e.target.dataset.id;
+                var type = e.target.dataset.type;
+                this.categories[id] = selections;
+                this.state.products[_.findIndex(this.state.products, {id: id})][type] = e.target.value;
+                this.state.products[_.findIndex(this.state.products, {id: id})]['localData'] = this.categories[id];
+            },
+            _handleWysiwygChange: function (editor, data) {
+                var id = editor.element.$.dataset.id;
+                var type = editor.element.$.dataset.type;
+                this.state.products[_.findIndex(this.state.products, {id: id})][type] = data;
+            },
+            _handleSwitchChange: function (e, state) {
+                var id = e.target.dataset.id;
+                var type = e.target.dataset.type;
+                e.currentTarget.value = state ? 1 : 0;
+                this.state.products[_.findIndex(this.state.products, {id: id})][type] = state ? 1 : 0;
+            },
+            _handleRemoveProduct: function (e) {
+                var products = this.state.products;
+                products.splice(_.findIndex(products, { id: e.currentTarget.dataset.id }), 1);
+                this.setState({ products: products });
+            },
+            _handleDuplicateProduct: function (e) {
+                var id = e.currentTarget.dataset.id;
+                var newId = guid();
+                var products = this.state.products;
+
+                this.imagesList[newId] = $.fn.deepClone(this.imagesList[id]);
+                var dProduct = $.fn.deepClone(products[_.findIndex(products, { id: id })]);
+                dProduct['id'] = newId;
+                dProduct['replication'] = id;
+                products.push(dProduct);
+
+                this.setState({ products: products });
             },
             render: function () {
                 return React.DOM.table({ className: 'table table-bordered table-striped' },
@@ -362,30 +386,30 @@
                             React.DOM.th(null, "{{ 'Actions'|_ }}")
                         ),
                         React.DOM.tbody({ref: 'table-body'},
-                            _(this.state.products).map(function (p, i) {
-                                return React.createElement(BlockForm, {
+                            _(this.state.products).map(function (product, i) {
+                                return React.createElement(Product, {
                                     key: i,
-                                    product: p,
+                                    product: product,
                                     djsComponentConfig: this.props.djsComponentConfig,
                                     djsConfig: this.props.djsConfig,
                                     eventHandlers: {
                                         init: this.djsInit
-//                                        success: this.djsSuccess,
-//                                        removedfile: this.djsRemovedFile
                                     },
-                                    actions: {
-                                        handleInputChange: this.handleInputChange,
-                                        handleSwitchChange: this.handleSwitchChange,
-                                        handleWysiwygChange: this.handleWysiwygChange,
-                                        removeProduct: this.removeProduct,
-                                        duplicateProduct: this.duplicateProduct
-                                    }
+                                    _handleRemoveProduct: this._handleRemoveProduct,
+                                    _handleDuplicateProduct: this._handleDuplicateProduct,
+                                    _handleInputChange: this._handleInputChange,
+                                    _handleSwitchChange: this._handleSwitchChange,
+                                    _handleSelect2Change: this._handleSelect2Change,
+                                    _handleWysiwygChange: this._handleWysiwygChange
                                 })
                             }.bind(this)),
                             React.DOM.tr(null,
                                 React.DOM.td({ colSpan: 4 }),
                                 React.DOM.td(null,
-                                    React.DOM.button({ type: 'submit', className: 'btn btn-primary pull-right' }, "{{ 'Create Products'|_ }}")
+                                    React.DOM.button({
+                                        type: 'submit',
+                                        className: 'btn btn-primary pull-right'
+                                    }, "{{ 'Create Products'|_ }}")
                                 ),
                                 React.DOM.td(null)
                             )
@@ -395,7 +419,7 @@
             }
         });
 
-        var BlockForm = React.createClass({
+        var Product = React.createClass({
             render: function () {
                 var p = this.props.product;
                 return React.DOM.tr(null,
@@ -417,7 +441,7 @@
                                     'data-id': p.id,
                                     'data-type': 'product_sku'
                                 },
-                                callback: this.props.actions.handleInputChange
+                                callback: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -436,7 +460,7 @@
                                     'data-id': p.id,
                                     'data-type': 'product_name'
                                 },
-                                callback: this.props.actions.handleInputChange
+                                callback: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -457,7 +481,7 @@
                                     'data-id': p.id,
                                     'data-type': 'short_description'
                                 },
-                                callback: this.props.actions.handleInputChange
+                                callback: this.props._handleInputChange
                             })
                         )
                     ),
@@ -478,7 +502,7 @@
                                     'data-id': p.id,
                                     'data-type': 'price.base'
                                 },
-                                callback: this.props.actions.handleInputChange
+                                callback: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -486,8 +510,7 @@
                                 label_class: '',
                                 input_id: 'products['+ p.id+'][is_hidden]'}, "{{ 'Hidden?'|_ }}"
                             ),
-                            /*
-                            React.createElement(Components.SpecialInput, {
+                            /*React.createElement(Components.SpecialInput, {
                                 type: 'switch',
                                 id: 'products['+ p.id+'][is_hidden]',
                                 name: 'products['+ p.id+'][is_hidden]',
@@ -515,8 +538,9 @@
                                 attrs: {
                                     style: {width: "80px"},
                                     'data-id': p.id,
-                                    'data-type': 'price.base'
-                                }
+                                    'data-type': 'is_hidden'
+                                },
+                                callback: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -526,12 +550,15 @@
                             ),
                             React.createElement(FComSelect2, {
                                 id: guid(),
-                                name: 'categories['+ p.id+'][]',
+                                name: 'categories['+p.id+'][]',
                                 placeholder: "{{ 'Select Categories' |_ }}",
                                 multiple: true,
                                 url: '{{ APP.href('/catalog/products/quick-add/categories_search') | raw }}',
-                                onChange: this.props.actions.handleInputChange,
+                                onChange: this.props._handleSelect2Change,
                                 defaultValue: p.categories,
+                                options: {{ UTIL.toJson(categories) | raw }},
+                                dataMode: 'server',
+                                localData: p.localData || [],
                                 attrs: {
                                     'data-id': p.id,
                                     'data-type': 'categories'
@@ -544,7 +571,7 @@
                             React.createElement(Components.ControlLabel, {
                                 required: true,
                                 label_class: '',
-                                input_id: 'products['+ p.id+'][manage_inventory]'}, "{{ 'Manage?'|_ }}"
+                                input_id: 'products['+p.id+'][manage_inventory]'}, "{{ 'Manage?'|_ }}"
                             ),
                             /*React.createElement(Components.SpecialInput, {
                                 type: 'switch',
@@ -576,7 +603,7 @@
                                     'data-id': p.id,
                                     'data-type': 'manage_inventory'
                                 },
-                                callback: this.props.actions.handleInputChange
+                                callback: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -594,7 +621,7 @@
                                     'data-id': p.id,
                                     'data-type': 'inventory_sku'
                                 },
-                                callback: this.props.actions.handleInputChange
+                                callback: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -612,7 +639,7 @@
                                     'data-id': p.id,
                                     'data-type': 'qty_in_stock'
                                 },
-                                callback: this.props.actions.handleInputChange
+                                callback: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -629,7 +656,7 @@
                                     'data-id': p.id,
                                     'data-type': 'shipping_weight'
                                 },
-                                callback: this.props.actions.handleInputChange
+                                callback: this.props._handleInputChange
                             })
                         )
                     ),
@@ -644,17 +671,18 @@
                                 'data-id': p.id,
                                 'data-type': 'description'
                             },
-                            onChange: this.props.actions.handleWysiwygChange
+                            onChange: this.props._handleWysiwygChange
                         })
                     ),
                     React.DOM.td({ style: { width: '500px' } },
                         React.createElement(Components.Dropzone, {
                             key: p.id,
                             name: 'products['+ p.id+'][images]',
-                            defaultValue: p.images,
+//                            defaultValue: p.images,
                             config: this.props.djsComponentConfig,
                             djsConfig: this.props.djsConfig,
                             eventHandlers: this.props.eventHandlers,
+                            replication: p.replication || false,
                             attrs: {
                                 'data-id': p.id,
                                 'data-type': 'images'
@@ -664,21 +692,21 @@
                     React.DOM.td(null,
                         React.DOM.div({ className: 'table-actions-btns-group' },
                             React.createElement(Components.Button, {
-                                    type: 'button',
-                                    className: 'btn btn-link btn-delete',
-                                    onClick: this.props.actions.removeProduct,
-                                    'data-id': p.id
-                                },
-                                React.DOM.i({ className: 'icon-trash' })
+                                        type: 'button',
+                                        className: 'btn btn-link btn-delete',
+                                        onClick: this.props._handleDuplicateProduct,
+                                        title: 'Duplicate this product',
+                                        'data-id': p.id
+                                    },
+                                    React.DOM.i({ className: 'icon-copy' })
                             ),
                             React.createElement(Components.Button, {
                                     type: 'button',
                                     className: 'btn btn-link btn-delete',
-                                    onClick: this.props.actions.duplicateProduct,
-                                    title: 'Duplicate',
+                                    onClick: this.props._handleRemoveProduct,
                                     'data-id': p.id
                                 },
-                                React.DOM.i({ className: 'icon-copy' })
+                                React.DOM.i({ className: 'icon-trash' })
                             )
                         )
                     )
@@ -689,7 +717,7 @@
         var container = document.getElementById('products-quick-add-container');
         React.unmountComponentAtNode(container);
 
-        var BlockFormComponent = React.render(React.createElement(Blocks), container);
+        var ProductsComponent = React.render(React.createElement(Products), container);
 
         // Prevent the default action when a file is dropped on the window
         $(document).on('drop dragover', function (e) {

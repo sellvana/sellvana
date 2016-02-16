@@ -241,6 +241,9 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         },
         handleChange: function (e) {
             this.setState({ value: e.target.value });
+            if (typeof this.props.callback === 'function') {
+                this.props.callback(e, this.state.value);
+            }
         },
         render: function () {
             var node = null;
@@ -893,6 +896,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             $elem.select2("data", currData);
         },
         createSelect2: function () {
+            var _this = this;
             // Get inital value
             var val = null;
             if (this.props.val.length > 0) {
@@ -901,12 +905,29 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
 
             var $select2 = this.getElement();
             var options = {
+                minimumInputLength: this.props.minInputLength || 0,
                 multiple: this.props.multiple,
                 val: val
             };
 
-            if (this.props.options.length) {
-                options['data'] = this.props.options;
+            if (this.props.dataMode == 'local') {
+                options['data'] = _this._parseDataToSelect2Options(this.props.options);
+            } else if (this.props.dataMode == 'server' && !_.isEmpty(this.props.options)) {
+                options['query'] = function (options) {
+                    if (options.term) {
+                        $.ajax({
+                            url: _this.props.url,
+                            dataType: 'json',
+                            data: {q: options.term},
+                            success: function (data) {
+                                options.callback({ results: _this._parseDataToSelect2Options(data) });
+                            },
+                            cache: true
+                        });
+                    } else {
+                        options.callback({ results: _this._parseDataToSelect2Options(_this.props.options) });
+                    }
+                };
             } else {
                 options['ajax'] = {
                     url: this.props.url,
@@ -918,18 +939,18 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                         };
                     },
                     results: function (data) {
-                        return {
-                            results: $.map(data, function (item, id) {
-                                return {
-                                    text: item,
-                                    id: id
-                                }
-                            })
-                        };
+                        return {results: _this._parseDataToSelect2Options(data)};
                     },
                     cache: true
                 };
-                options['minimumInputLength'] = 1;
+            }
+
+            if (this.props.dataMode !== 'local') {
+                options['initSelection'] = function (element, callback) {
+                    var data = _this.props.localData || [];
+                    if (typeof data === 'string') data = JSON.parse(data);
+                    callback(_this._parseDataToSelect2Options(data));
+                };
             }
 
             var attrs = {
@@ -978,6 +999,15 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         },
         _isOptionsUpdated: function (oldOptions) {
             return oldOptions.length != this.props.options.length || false;
+        },
+        _parseDataToSelect2Options: function ( data) {
+            if (_.isArray(data)) return data;
+            return $.map(data, function (item, id) {
+                return {
+                    id: id,
+                    text: item
+                };
+            });
         },
         render: function () {
             return (
@@ -1172,6 +1202,8 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             } else {
                 options = defaults;
             }
+
+            options['replication'] = this.props.replication || false;
 
             return options;
         },
@@ -1376,7 +1408,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             });
         },
         render: function () {
-            var icons = [], buttons = [],
+            var buttons = [], hiddenInput = null,
                 files = this.state.files,
                 config = this.props.config,
                 className = (this.props.className) ? 'filepicker dropzone ' + this.props.className : 'filepicker dropzone';
@@ -1386,29 +1418,26 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 buttons.push(<button key={'btn-cancel' + this.props.id} type="button" className="btn btn-default btn-xs btn-cancel">Cancel</button>);
             }
 
+            if (config.showHiddenInput) {
+                var inputAttrs = this.props.attrs || {};
+                hiddenInput = <input type="hidden" name={this.props.name} {...inputAttrs}/>;
+            }
+
             if (!this.props.config.postUrl && this.props.action) {
                 return (
                     <form action={this.props.action} className={className}>
-                        <input type="hidden"
-                               name={this.props.name}
-                               value={this.props.defaultValue || ''}
-                               className="images"
-                            {...this.props.attrs}/>
+                        {hiddenInput}
                         {buttons}
-                        <br/>
+                        {buttons.length ? <br/> : null}
                         {this.props.children}
                     </form>
                 );
             } else {
                 return (
                     <div className={className}>
-                        <input type="hidden"
-                               name={this.props.name}
-                               value={this.props.defaultValue || ''}
-                               className="images"
-                               {...this.props.attrs}/>
+                        {hiddenInput}
                         {buttons}
-                        <br/>
+                        {buttons.length ? <br/> : null}
                         {this.props.children}
                     </div>
                 );

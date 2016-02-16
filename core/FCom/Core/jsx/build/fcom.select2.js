@@ -37,6 +37,8 @@ define(['underscore', 'react', 'fcom.components', 'fcom.locale'], function (_, R
                                         name: this.props.name, 
                                         enabled: this.props.enabled, 
                                         options: this.props.options, 
+                                        dataMode: this.props.dataMode || 'local', 
+                                        localData: this.props.localData || [], 
                                         url: this.props.url, 
                                         onSelection: this.handleSelections, 
                                         placeholder: this.props.placeholder || Locale._('Select some options'), 
