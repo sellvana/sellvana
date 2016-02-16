@@ -900,7 +900,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             return $.map(data, function (item, id) {
                 return {
                     id: id,
-                    text: item ? item : Locale._('Unamed Category')
+                    text: item
                 };
             });
         },
