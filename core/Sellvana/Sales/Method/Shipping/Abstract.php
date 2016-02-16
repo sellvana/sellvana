@@ -101,11 +101,11 @@ abstract class Sellvana_Sales_Method_Shipping_Abstract extends BClass implements
                 return $packageRatesResult; // if for any package there's an error, return immediately
             }
             $packageRates = [];
-            foreach ($packageRatesResult as $code => $rate) {
+            foreach ($packageRatesResult['rates'] as $code => $rate) {
                 if ($code[0] !== '_') {
                     $code = '_' . $code;
                 }
-                $packageRates[$code] = $rate;
+                $packageRates['rates'][$code] = $rate;
             }
             foreach ($ratedServices as $code => $label) {
                 if (empty($packageRates['rates'][$code])) {

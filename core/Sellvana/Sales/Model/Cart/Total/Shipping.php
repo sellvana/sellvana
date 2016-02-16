@@ -34,7 +34,6 @@ class Sellvana_Sales_Model_Cart_Total_Shipping extends Sellvana_Sales_Model_Cart
         } else {
             $rates = $cart->getData('shipping_rates');
         }
-
         if ($rates) {
             list($selMethod, $selService) = $this->_findSelectedMethodService($rates);
         } else {
