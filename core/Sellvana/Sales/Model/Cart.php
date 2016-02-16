@@ -868,6 +868,13 @@ class Sellvana_Sales_Model_Cart extends FCom_Core_Model_Abstract
             }
             $servicesArr = $ratesArr[$methodCode];
             if (!empty($servicesArr['error'])) {
+                if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT'])) {
+                    $result[$methodCode] = [
+                        'title' => $method->getDescription(),
+                        'error' => $servicesArr['error'],
+                        'message' => $servicesArr['message'],
+                    ];
+                }
                 continue;
             }
             $allServices = $method->getServices();
