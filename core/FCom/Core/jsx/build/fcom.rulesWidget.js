@@ -3571,6 +3571,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             });
         },
         postGenerate: function (e) {
+            var self = this;
             var $formContainer = $('#coupon-generate-container');
             //Promo.log(e, $formContainer);
             var url = this.options['generateCouponsUrl'];
@@ -3617,6 +3618,13 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     //console.log(newRows);
                     var grid_id = result['grid_id'];
                     RulesWidget.updateGrid(grid_id, newRows);
+
+                    // Update NoC after coupons is generated
+                    self.options.numCodes = parseInt(self.options.numCodes) + newRows.length;
+                    $(document).trigger({ // trigger event which will upgrade the grid
+                        type: "grid_count_update",
+                        numCodes: self.options.numCodes
+                    });
                 }
             })
             .always(function (r) {
@@ -3759,6 +3767,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 }
             }.bind(this));
 
+            // Update NoC when coupons removed
+            this.options.numCodes = parseInt(this.options.numCodes) - removedRows.length;
             $(document).trigger({ // trigger event which will upgrade the grid
                 type: "grid_count_update",
                 numCodes: grid.getRows().length
