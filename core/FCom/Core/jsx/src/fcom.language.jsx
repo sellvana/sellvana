@@ -3,7 +3,7 @@
  *
  * FCom Multi Languages Component
  */
-define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale', 'ckeditor', 'jquery.validate'], function (_, React, $, FComGriddleComponent, Components, FComSelect2, Locale) {
+define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale', 'store', 'ckeditor', 'jquery.validate'], function (_, React, $, FComGriddleComponent, Components, FComSelect2, Locale, Store) {
 
     var LangFields = React.createClass({
         componentWillUnmount: function () {
@@ -13,15 +13,22 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             }.bind(this));
         },
         componentDidMount: function () {
-            this.renderLangFields();
+            this.createField();
         },
         componentDidUpdate: function () {
-            this.renderLangFields();
+            this.createField();
         },
-        handleWysiwygChange: function (editor, data) {
+        _handleWysiwygChange: function (editor, data) {
             this.props.setLangVal(editor.element.$.dataset.code, data);
         },
-        renderLangFields: function () {
+        _handleRemoveField: function (e) {
+            this.props.removeField($(e.currentTarget).data('code'));
+        },
+        _handleChange: function (e) {
+            var $input = $(e.currentTarget);
+            this.props.setLangVal($input.data('code'), $input.val());
+        },
+        createField: function () {
             _(this.props.langs).map(function (lang, key) {
                 var node = null,
                     dataAttrs = {
@@ -40,7 +47,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                                         name={this.props.id + '_' + lang.lang_code}
                                                         value={lang.value}
                                                         className='ckeditor lang-field'
-                                                        onChange={this.handleWysiwygChange}
+                                                        onChange={this._handleWysiwygChange}
                                                         attrs={dataAttrs} />;
                         break;
                     case 'textarea':
@@ -48,7 +55,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                                         name={this.props.id + '_' + lang.lang_code}
                                                         value={lang.value}
                                                         className="form-control lang-field"
-                                                        callback={this.handleChange}
+                                                        callback={this._handleChange}
                                                         validation={validation}
                                                         attrs={dataAttrs} />;
                         break;
@@ -57,7 +64,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                                         name={this.props.id + '_' + lang.lang_code}
                                                         value={lang.value}
                                                         className="form-control lang-field"
-                                                        callback={this.handleChange}
+                                                        callback={this._handleChange}
                                                         validation={validation}
                                                         attrs={dataAttrs} />;
                         break;
@@ -65,13 +72,6 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
 
                 React.render(node, this.refs['lang_field_' + key].getDOMNode());
             }.bind(this));
-        },
-        removeLangField: function (e) {
-            this.props.removeField($(e.currentTarget).data('code'));
-        },
-        handleChange: function (e) {
-            var $input = $(e.currentTarget);
-            this.props.setLangVal($input.data('code'), $input.val());
         },
         render: function () {
             var that = this;
@@ -87,7 +87,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 <div className="col-md-3">
                                     <Components.Button type="button" className='btn-sm btn-danger field-remove'
                                                        data-code={lang.lang_code}
-                                                       onClick={this.removeLangField}>
+                                                       onClick={this._handleRemoveField}>
                                         <i className="icon-remove"/>
                                     </Components.Button>
                                 </div>
@@ -102,32 +102,47 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
     var FComMultiLanguage = React.createClass({
         displayName: "FComMultiLanguage",
         mixins: [FCom.Mixin],
-        getInitialState: function () {
-            return {
-                availLangs: [],
-                defaultLangs: [],
-                selection: null
-            };
-        },
         getDefaultProps: function () {
             return {
-                availLangs: [],
+                data: [],
+                locales: [],
                 select2Config: {},
-                modalConfig: {},
-                defaultLangs: []
+                modalConfig: {}
+            };
+        },
+        getInitialState: function () {
+            return {
+                data: this.props.data,
+                locales: this.props.locales,
+                selection: null
             };
         },
         componentWillMount: function () {
             this.props.modalConfig = this.getModalConfig();
 
+            this.setStoreData(this.getKey('data'), this.state.data);
+            this.setStoreData(this.getKey('locales'), this.state.locales);
+
             this.setState({
-                availLangs: this.props.availLangs,
-                defaultLangs: this.props.defaultLangs
+                data: this.props.data,
+                locales: this.props.locales
             });
         },
         componentDidUpdate: function (prevProps, prevState) {
             // Reset selection
             this.state.selection = null;
+        },
+        getStoreData: function (key) {
+            return Store.get(key);
+        },
+        setStoreData: function (key, value) {
+            if (value === undefined) return false;
+            Store.set(key, value);
+        },
+        getKey: function (key) {
+            if (!_.isString(key))
+                return this.props.id;
+            return this.props.id + '.' + key;
         },
         getModalConfig: function () {
             return $.extend({}, {
@@ -137,11 +152,64 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 show: false,
                 id: this.props.id + '-modal',
                 onLoad: null,
-                onConfirm: this.confirmEditLangs,
+                onConfirm: this._handleModalConfirm,
+                onCancel: this._handleModalCancel,
                 ref: this.props.id + '-modal'
             }, this.props.modalConfig);
         },
-        confirmEditLangs: function (modal) {
+        getModalNode: function () {
+            return $('#' + this.props.id + '-modal');
+        },
+        getSelect2Config: function () {
+            return $.extend({}, {
+                id: 'multilang-' + this.props.id,
+                name: 'multilang-' + this.props.id,
+                className: '',
+                placeholder: Locale._("Select languages"),
+                multiple: false
+            }, this.props.select2Config);
+        },
+        getLocales: function () {
+            var that = this;
+            var locales = [];
+
+            var diff = _.difference(_.pluck(this.state.locales, 'id'), _.pluck(this.state.data, 'lang_code'));
+
+            _(this.state.locales).each(function (lang) {
+                if (_.contains(diff, lang.id)) locales.push(lang);
+            });
+
+            return _.sortBy(locales, 'id');
+        },
+        _handleSelect2Change: function (event, callback, selection) {
+            if (typeof window[callback] === 'function') {
+                window[callback](e, selection);
+            }
+
+            this.state.selection = selection.text;
+        },
+        _handleAddField: function (e) {
+            if (null === this.state.selection) {
+                $.bootstrapGrowl(Locale._("Please choose language."), {
+                    type: 'warning',
+                    align: 'center',
+                    width: 'auto',
+                    delay: 3000
+                });
+                return;
+            }
+
+            this.state.data.push({
+                lang_code: this.state.selection,
+                input_type: this.props.inputType || 'text',
+                value: ''
+            });
+
+            this.state.locales = this.getLocales();
+
+            this.forceUpdate();
+        },
+        _handleModalConfirm: function (modal) {
             var modalConfig = this.props.modalConfig;
             var $container = $(this.refs.container.getDOMNode());
             var valid = true;
@@ -169,97 +237,65 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             }
 
             if (valid && modalConfig.onSaved && typeof modalConfig.onSaved === 'string') {
-                window[modalConfig.onSaved](modal, this.state.availLangs);
+                window[modalConfig.onSaved](modal, this.state.data);
+
+                // Update storage data
+                this.setStoreData(this.getKey('data'), this.state.data);
+                this.setStoreData(this.getKey('locales'), this.state.locales);
+
             } else if (valid) {
                 modal.close();
             }
         },
-        getModalNode: function () {
-            return $('#' + this.props.id + '-modal');
+        _handleModalCancel: function (modal) {
+            setTimeout(function () {
+                this.setState({
+                    data: this.getStoreData(this.getKey('data')),
+                    locales: this.getStoreData(this.getKey('locales'))
+                });
+            }.bind(this), 300);
+            modal.close();
         },
-        getSelect2Config: function () {
-            return $.extend({}, {
-                id: 'multilang-' + this.props.id,
-                name: 'multilang-' + this.props.id,
-                className: '',
-                placeholder: Locale._("Select languages"),
-                multiple: false
-            }, this.props.select2Config);
-        },
-        handleSelect2Change: function (event, callback, selection) {
-            if (typeof window[callback] === 'function') {
-                window[callback](e, selection);
-            }
-
-            this.state.selection = selection.text;
-        },
-        getDefaultLangs: function () {
-            var that = this;
-            var defaultLangs = [];
-
-            var diff = _.difference(_.pluck(this.state.defaultLangs, 'id'), _.pluck(this.state.availLangs, 'lang_code'));
-
-            _(this.state.defaultLangs).each(function (lang) {
-                if (_.contains(diff, lang.id)) defaultLangs.push(lang);
-            });
-
-            return _.sortBy(defaultLangs, 'id');
-        },
-        removeLangField: function (code) {
-            var defaultLangs = this.getDefaultLangs();
-            var defaultIds = _.pluck(defaultLangs, 'id');
+        handleRemoveField: function (code) {
+            var locales = this.getLocales();
+            var defaultIds = _.pluck(locales, 'id');
             if (!_.contains(defaultIds, code)) {
-                defaultLangs.push({
+                locales.push({
                     id: code, text: code
                 });
             }
 
-            var availLangs = this.state.availLangs;
-            _(availLangs).each(function (lang, i) {
-                if (lang && lang.lang_code == code) availLangs.splice(i, 1);
+            var data = this.state.data;
+            _(data).each(function (lang, i) {
+                if (lang && lang.lang_code == code) data.splice(i, 1);
             });
 
             this.setState({
-                defaultLangs: defaultLangs,
-                availLangs: availLangs
+                data: data,
+                locales: locales
             });
-        },
-        addLocaleField: function (e) {
-            if (null === this.state.selection) {
-                $.bootstrapGrowl(Locale._("Please choose language."), {
-                    type: 'warning',
-                    align: 'center',
-                    width: 'auto',
-                    delay: 3000
-                });
-                return;
-            }
-
-            this.state.availLangs.push({
-                lang_code: this.state.selection,
-                input_type: this.props.inputType || 'text',
-                value: ''
-            });
-
-            this.state.defaultLangs = this.getDefaultLangs();
-
-            this.forceUpdate();
         },
         setLangVal: function (code, value) {
             var that = this;
-            var langs = this.state.availLangs;
+            var langs = this.state.data;
             _(langs).each(function (lang, i) {
                 if (lang && lang.lang_code == code)
-                    that.state.availLangs[i].value = value;
+                    that.state.data[i].value = value;
             });
         },
         showModal: function () {
             this.getModalNode().modal('show');
         },
+        log: function (value) {
+            console.log(value);
+        },
+        warn: function (value) {
+            console.warn(value);
+        },
         render: function () {
             var inlineProps = this.getSelect2Config(),
-                defaultLangs = this.getDefaultLangs(),
-                langIds = _.pluck(this.state.availLangs, 'lang_code'),
+                locales = this.getLocales(),
+                langIds = _.pluck(this.state.data, 'lang_code'),
                 langLabel = langIds ? langIds.length < 6 ? langIds.filter(function (item) {
                     return item != undefined
                 }).join(',') : Locale._('Multi Languages ...') : null;
@@ -271,19 +307,19 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                        onClick={this.showModal}>
                         {!langLabel ? <i className="icon icon-globe"/> : ''} {langLabel || Locale._('Translate')}
                     </Components.Button>
-                    <Components.Modal {...this.getModalConfig()} cancel={null}>
+                    <Components.Modal {...this.getModalConfig()}>
                         <div className="well">
                             <table>
                                 <tbody>
                                 <tr>
                                     <td>
-                                        <FComSelect2 {...inlineProps} options={defaultLangs}
-                                                                      onChange={this.handleSelect2Change}
-                                                                      defaultValue={[]}/>
+                                        <FComSelect2 options={locales}
+                                                     onChange={this._handleSelect2Change}
+                                                     defaultValue={[]} {...inlineProps}/>
                                     </td>
                                     <td>
                                         <Components.Button type="button" className='btn-sm btn-primary'
-                                                           onClick={this.addLocaleField}>
+                                                           onClick={this._handleAddField}>
                                             {Locale._('Add Locale')}
                                         </Components.Button>
                                     </td>
@@ -292,9 +328,10 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                             </table>
                         </div>
                         <div id={this.props.id + '-container'} ref='container'>
-                            <LangFields id={this.props.id} langs={this.state.availLangs || []}
-                                        removeField={this.removeLangField}
-                                        setLangVal={this.setLangVal}/>
+                            <LangFields id={this.props.id}
+                                        langs={this.state.data || []}
+                                        removeField={this.handleRemoveField}
+                                        setLangVal={this.setLangVal} />
                         </div>
                     </Components.Modal>
                 </div>

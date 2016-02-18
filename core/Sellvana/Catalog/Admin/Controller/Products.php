@@ -815,16 +815,16 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             }
         }
         if (!empty($categories)) {
-            $cat_product = $this->Sellvana_Catalog_Model_CategoryProduct;
-            $category_model = $this->Sellvana_Catalog_Model_Category;
+            $catProduct = $this->Sellvana_Catalog_Model_CategoryProduct;
+            // $categoryModel = $this->Sellvana_Catalog_Model_Category; // Unused model
 
-            foreach ($categories as $cat_id => $value) {
-                $product = $cat_product->orm()->where('product_id', $model->id())->where('category_id', $cat_id)->find_one();
+            foreach ($categories as $catId => $value) {
+                $product = $catProduct->orm()->where('product_id', $model->id())->where('category_id', $catId)->find_one();
                 if (0 == $value && $product) {
                     $product->delete();
                 } elseif (false == $product) {
-                    $data = ['product_id' => $model->id(), 'category_id' => $cat_id];
-                    $this->Sellvana_Catalog_Model_CategoryProduct->create($data)->save();
+                    $data = ['product_id' => $model->id(), 'category_id' => $catId];
+                    $catProduct->create($data)->save();
                 }
             }
         }
@@ -888,57 +888,50 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $hlp = $this->Sellvana_Catalog_Model_ProductMedia;
         foreach (['A' => 'attachments', 'I' => 'images', 'V' => 'videos'] as $type => $typeName) {
 
-            if (!empty($data['grid'][$typeName]['del'])) {
+            if ($del = $this->BUtil->arrayGet($data, "grid.{$typeName}.del")) {
                 $hlp->delete_many([
                     'product_id' => $model->id,
                     'media_type' => $type,
-                    'id'   => explode(',', $data['grid'][$typeName]['del']),
+                    'id' => $this->BUtil->arrayCleanInt($del),
                 ]);
             }
-            $rows = array();
-            if (isset($data['grid'][$typeName]['rows']) && $data['grid'][$typeName]['rows'] != '') {
-                $rows = $this->BUtil->fromJson($data['grid'][$typeName]['rows']);
-            }
+
+            $rows = $this->BUtil->fromJson(
+                $this->BUtil->arrayGet($data, "grid.{$typeName}.rows", '')
+            );
+
             if (!empty($rows)) {
                 foreach ($rows as $media) {
                     $key = $media['id'];
                     unset($media['id']);
                     if (!in_array($key, ['is_thumb', 'is_default', 'is_rollover'])) {
-                        $mediaModel =  $hlp->load($key);
+                        $mediaModel = $hlp->load($key);
                         $is_thumb = $is_default = $is_rollover = $in_gallery = 0;
                         if ($type == 'I' || $type == 'V') {
-                            if (isset($data['product_' . $typeName]['is_thumb'])
-                                && $data['product_' . $typeName]['is_thumb'] == $key
-                            ) {
+                            if ($key == $this->BUtil->arrayGet($data, "product_{$typeName}.is_thumb")) {
                                 $is_thumb = 1;
                             }
                             $media['is_thumb'] = $is_thumb;
 
-                            if (isset($data['product_' . $typeName]['is_default'])
-                                && $data['product_' . $typeName]['is_default'] == $key
-                            ) {
+                            if ($key == $this->BUtil->arrayGet($data, "product_{$typeName}.is_default")) {
                                 $is_default = 1;
                             }
                             $media['is_default'] = $is_default;
 
-                            if (isset($data['product_' . $typeName]['is_rollover'])
-                                && $data['product_' . $typeName]['is_rollover'] == $key
-                            ) {
+                            if ($key == $this->BUtil->arrayGet($data, "product_{$typeName}.is_rollover")) {
                                 $is_rollover = 1;
                             }
                             $media['is_rollover'] = $is_rollover;
 
-                            if(isset($data['product_' . $typeName][$key]['in_gallery'])){
-                                $in_gallery = $data['product_' . $typeName][$key]['in_gallery'];
-                            }
-                            if($media['is_default']){
+                            $in_gallery = $this->BUtil->arrayGet($data, "product_{$typeName}.{$key}.in_gallery", 0);
+                            if ($media['is_default']) {
                                 $in_gallery = 1;
                             }
                             $media['in_gallery'] = $in_gallery;
                         }
 
                         if (isset($media['position'])) {
-                            $media['position'] = (is_numeric($media['position'])) ? (int) $media['position'] : 0;
+                            $media['position'] = (is_numeric($media['position'])) ? (int)$media['position'] : 0;
                         }
 
                         if ($mediaModel) {
@@ -947,7 +940,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                             $productMediaModel = $hlp->orm()->where('product_id', $model->id)
                                 ->where('file_id', $media['file_id'])->find_one();
                             if (!$productMediaModel) {
-                                $media['file_id'] = (int) $media['file_id'];
+                                $media['file_id'] = (int)$media['file_id'];
                                 $media['product_id'] = $model->id;
                                 $media['media_type'] = $type;
 
@@ -1009,9 +1002,9 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     protected function _processSystemLangFieldsPost($model, $data)
     {
-        $model->setData('name_lang_fields', $data['name_lang_fields']);
-        $model->setData('short_desc_lang_fields', $data['short_desc_lang_fields']);
-        $model->setData('desc_lang_fields', $data['desc_lang_fields']);
+        $model->setData('product_name_lang_fields', $this->BUtil->arrayGet($data, 'name_lang_fields'));
+        $model->setData('short_description_lang_fields', $this->BUtil->arrayGet($data, 'short_desc_lang_fields'));
+        $model->setData('description_lang_fields', $this->BUtil->arrayGet($data, 'desc_lang_fields'));
     }
 
     /**
@@ -1126,6 +1119,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             $categoryIds = [];
             //todo: request Boris for same function _.pluck in BUtil
             foreach ($categories as $category) {
+                /** @var Sellvana_Catalog_Model_Category $category */
                 $categoryIds[] = $category->id();
             }
             $new->addToCategories($categoryIds);
@@ -1142,6 +1136,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
         //todo: does we need add product link similar between old and new product
         $hlp = $this->Sellvana_Catalog_Model_ProductLink;
+        /** @var Sellvana_Catalog_Model_ProductLink $links */
         $links = $hlp->orm('pl')->where('product_id', $old->id())->find_many();
         if ($links) {
             foreach ($links as $link) {
@@ -1272,29 +1267,31 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         // Process variant prices
         if (!empty($data['variantPrice'])) {
-            $variantPrices = $data['variantPrice'];
-            if (!empty($variantPrices['prices'])) {
-                foreach ($variantPrices['prices'] as $vId => $data) {
-                    parse_str($data, $prices);
-                    $this->_savePrices($model, $prices['variantPrice']);
-                }
-            }
+            $vpData = $data['variantPrice'];
 
             // Process delete variant prices
-            if (!empty($variantPrices['delete'])) {
-                $deletedPrices = $this->BUtil->fromJson($variantPrices['delete']);
-                $this->Sellvana_Catalog_Model_ProductPrice->delete_many(['id' => $deletedPrices]);
+            if ($deletedPrices = $this->BUtil->arrayGet($vpData, 'delete')) {
+                $this->Sellvana_Catalog_Model_ProductPrice->delete_many([
+                    'id' => $this->BUtil->fromJson($deletedPrices)
+                ]);
+            }
+
+            if ($prices = $this->BUtil->arrayGet($vpData, 'prices')) {
+                foreach ($prices as $vId => $price) {
+                    parse_str($price, $vPrice);
+                    $this->_savePrices($model, $this->BUtil->arrayGet($vPrice, 'variantPrice'));
+                }
             }
         }
     }
 
     /**
      * @param $model Sellvana_Catalog_Model_Product
-     * @param array $pricesData
+     * @param array $data
      * @throws BException
      */
-    protected function _savePrices($model, $pricesData) {
-        foreach ($pricesData as $id => $priceData) {
+    protected function _savePrices($model, $data) {
+        foreach ($data as $id => $priceData) {
             foreach ($priceData as $field => $pf) {
                 if (in_array($field, ['customer_group_id', 'site_id']) && !is_numeric($pf)) {
                     $priceData[$field] = null;
@@ -1307,11 +1304,11 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
 
             $priceData['product_id'] = $model->id();
             if (is_numeric($id)) {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
+                $ppModel = $this->Sellvana_Catalog_Model_ProductPrice->load($id);
             } else {
-                $price = $this->Sellvana_Catalog_Model_ProductPrice->create();
+                $ppModel = $this->Sellvana_Catalog_Model_ProductPrice->create();
             }
-            $price->set($priceData)->save();
+            $ppModel->set($priceData)->save();
         }
     }
 
