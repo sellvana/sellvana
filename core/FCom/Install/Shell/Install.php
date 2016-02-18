@@ -5,7 +5,7 @@
  *
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
-class FCom_Core_Shell_Install extends FCom_Shell_Action_Abstract
+class FCom_Install_Shell_Install extends FCom_Shell_Action_Abstract
 {
 
     static protected $_origClass = __CLASS__;

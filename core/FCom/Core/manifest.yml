@@ -39,10 +39,6 @@ modules:
             - [ "BORM::find_many:after", FCom_Core_Main.onFindManyAfter ]
 
         areas:
-            FCom_Install:
-                custom:
-                    actions:
-                        - FCom_Core_Shell_Install
             FCom_Shell:
                 custom:
                     actions:
