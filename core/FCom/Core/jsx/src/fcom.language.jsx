@@ -21,8 +21,22 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
         _handleWysiwygChange: function (editor, data) {
             this.props.setLangVal(editor.element.$.dataset.code, data);
         },
+        _clearCKEDITORIntance: function (code) {
+            // Clear  ckeditor instance
+            _(this.props.langs).map(function (lang, key) {
+                if (lang.lang_code == code) {
+                    adminForm.wysiwygDestroy(this.props.id + '_' + lang.lang_code);
+                }
+            }.bind(this));
+        },
         _handleRemoveField: function (e) {
-            this.props.removeField($(e.currentTarget).data('code'));
+            var code = e.currentTarget.dataset.code;
+
+            if (this.props.inputType === 'wysiwyg') {
+                this._clearCKEDITORIntance(code);
+            }
+
+            this.props.removeField(code);
         },
         _handleChange: function (e) {
             var $input = $(e.currentTarget);
@@ -43,7 +57,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                     case 'wysiwyg':
                         dataAttrs['rows'] = 5;
                         node = <Components.SpecialInput type='wysiwyg'
-                                                        id={this.props.id + '_' + lang.lang_code + '_' + key}
+                                                        id={this.props.id + '_' + lang.lang_code}
                                                         name={this.props.id + '_' + lang.lang_code}
                                                         value={lang.value}
                                                         className='ckeditor lang-field'
@@ -127,6 +141,9 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 data: this.props.data,
                 locales: this.props.locales
             });
+        },
+        shouldComponentUpdate: function (nextProps, nextState) {
+            return nextState.data != this.state.data || nextState.locales != this.state.locales;
         },
         componentDidUpdate: function (prevProps, prevState) {
             // Reset selection
@@ -328,7 +345,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                             </table>
                         </div>
                         <div id={this.props.id + '-container'} ref='container'>
-                            <LangFields id={this.props.id}
+                            <LangFields id={this.props.id}related
+                                        inputType={this.props.inputType}
                                         langs={this.state.data || []}
                                         removeField={this.handleRemoveField}
                                         setLangVal={this.setLangVal} />

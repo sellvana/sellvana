@@ -304,7 +304,11 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                     $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch(this.props.options);
                     break;
                 case 'wysiwyg':
-                    adminForm.wysiwygInit(null, this.state.value, this.handleWysiwygChange);
+                    adminForm.wysiwygInit(
+                        this.refs['wysiwyg-' + this.props.id].getDOMNode(),
+                        this.state.value,
+                        this.handleWysiwygChange
+                    );
                     break;
             }
         },
@@ -313,9 +317,9 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         },
         componentWillUnmount: function () {
             if (this.refs['switch-cbx-' + this.props.id])
-                React.unmountComponentAtNode(this.refs['switch-cbx-' + this.props.id]);
+                React.unmountComponentAtNode(this.refs['switch-cbx-' + this.props.id].getDOMNode());
             if (this.refs['wysiwyg-' + this.props.id])
-                React.unmountComponentAtNode(this.refs['wysiwyg-' + this.props.id]);
+                React.unmountComponentAtNode(this.refs['wysiwyg-' + this.props.id].getDOMNode());
         },
         handleSwitch: function (e, state) {
             this.setState({ value: state });
