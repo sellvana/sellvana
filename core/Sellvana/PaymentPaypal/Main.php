@@ -16,7 +16,7 @@ class Sellvana_PaymentPaypal_Main extends BClass
         ;
 
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_PaymentPaypal' => BLocale::i()->_('Payment PayPal Settings'),
+            'settings/Sellvana_PaymentPaypal' => 'Payment PayPal Settings',
         ]);
     }
 }

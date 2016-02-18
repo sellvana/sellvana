@@ -15,6 +15,7 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
         /** @var Sellvana_Sales_Model_Order_Refund $refundModel */
         $refundModel = $this->Sellvana_Sales_Model_Order_Refund->create([
             'order_id' => $args['order']->id(),
+            'refunded_at' => $this->BDb->now(),
         ]);
         $refundModel->state()->overall()->setDefaultState();
         $refundModel->state()->custom()->setDefaultState();
@@ -24,11 +25,11 @@ class Sellvana_Sales_Workflow_Refund extends Sellvana_Sales_Workflow_Abstract
         foreach ($args['items'] as $item) {
             $qtyToRefund = min($item->getQtyCanRefund(), $item->get('qty_to_refund'));
 
-            $item->add('qty_returned', $qtyToRefund);
+            $item->add('qty_refunded', $qtyToRefund);
 
             $this->Sellvana_Sales_Model_Order_Refund_Item->create([
                 'order_id' => $args['order']->id(),
-                'return_id' => $refundModel->id(),
+                'refund_id' => $refundModel->id(),
                 'order_item_id' => $item->id(),
                 'qty' => $qtyToRefund,
             ])->save();

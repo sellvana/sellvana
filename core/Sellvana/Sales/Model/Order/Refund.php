@@ -30,7 +30,7 @@ class Sellvana_Sales_Model_Order_Refund extends FCom_Core_Model_Abstract
 
     public function refundOrderItems(Sellvana_Sales_Model_Order $order, $itemsData)
     {
-        if (!preg_match_all('#^\s*([^\s]+)(\s*:\s*([^\s]+))?\s*$#', $itemsData, $matches, PREG_SET_ORDER)) {
+        if (!preg_match_all('#^\s*([^\s:]+)(\s*:\s*([^\s]+))?\s*$#m', $itemsData, $matches, PREG_SET_ORDER)) {
             return $this;
         }
         $qtys = [];

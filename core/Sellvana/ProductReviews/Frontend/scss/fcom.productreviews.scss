@@ -168,3 +168,83 @@
 #f-prod-review-form-container {
   max-width: 500px;
 }
+
+//colors
+$color_alto_approx: #ddd;
+$color_pink_swan_approx: #bbb;
+$color_storm_dust_approx: #666;
+$black_50: rgba(0,0,0,.5);
+$color_flush_orange_approx: #f70;
+$color_red_stage_approx: #c60;
+$color_oregon_approx: #940;
+$gold: gold;
+$color_copper_approx: #b57340;
+$golden_grass:  goldenrod;
+$color_yellow_sea_approx: #ea0;
+
+.rating {
+  float: left;
+  > label {
+    &:active {
+      position: relative;
+      top: 2px;
+      left: 2px;
+    }
+    &:hover ~ input:checked ~ label {
+      color: $color_yellow_sea_approx;
+      text-shadow: 1px 1px $golden_grass, 2px 2px $color_copper_approx, .1em .1em .2em $black_50;
+    }
+  }
+  &:not(:checked) {
+    > input {
+      position: absolute;
+      top: -9999px;
+      clip: rect(0,0,0,0);
+    }
+    > label {
+      float: right;
+      width: 1em;
+      padding: 0 .1em;
+      overflow: hidden;
+      white-space: nowrap;
+      cursor: pointer;
+      font-size: 200%;
+      line-height: 1.2;
+      color: $color_alto_approx;
+      text-shadow: 1px 1px $color_pink_swan_approx, 2px 2px $color_storm_dust_approx, .1em .1em .2em $black_50;
+      &:before {
+        content: '★ ';
+      }
+      &:hover {
+        color: $gold;
+        text-shadow: 1px 1px $golden_grass, 2px 2px $color_copper_approx, .1em .1em .2em $black_50;
+        ~ label {
+          color: $gold;
+          text-shadow: 1px 1px $golden_grass, 2px 2px $color_copper_approx, .1em .1em .2em $black_50;
+        }
+      }
+    }
+  }
+  > input:checked {
+    ~ label {
+      color: $color_flush_orange_approx;
+      text-shadow: 1px 1px $color_red_stage_approx, 2px 2px $color_oregon_approx, .1em .1em .2em $black_50;
+      &:hover {
+        color: $color_yellow_sea_approx;
+        text-shadow: 1px 1px $golden_grass, 2px 2px $color_copper_approx, .1em .1em .2em $black_50;
+        ~ label {
+          color: $color_yellow_sea_approx;
+          text-shadow: 1px 1px $golden_grass, 2px 2px $color_copper_approx, .1em .1em .2em $black_50;
+        }
+      }
+    }
+    + label:hover {
+      color: $color_yellow_sea_approx;
+      text-shadow: 1px 1px $golden_grass, 2px 2px $color_copper_approx, .1em .1em .2em $black_50;
+      ~ label {
+        color: $color_yellow_sea_approx;
+        text-shadow: 1px 1px $golden_grass, 2px 2px $color_copper_approx, .1em .1em .2em $black_50;
+      }
+    }
+  }
+}

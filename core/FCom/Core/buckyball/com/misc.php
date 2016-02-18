@@ -305,6 +305,16 @@ class BUtil extends BClass
         return $map;
     }
 
+    public function arrayWalkToString($array)
+    {
+        array_walk_recursive($array, function(&$node) {
+            if (is_object($node) && method_exists($node, '__toString')) {
+                $node = (string)$node;
+            }
+        });
+        return $array;
+    }
+
     /**
      * version of sprintf for cases where named arguments are desired (php syntax)
      *
@@ -1884,6 +1894,16 @@ class BUtil extends BClass
     }
 
     /**
+     * Helper for Twig templates
+     *
+     * @return float
+     */
+    public function microtime()
+    {
+        return microtime(true);
+    }
+
+    /**
      * Simplify string to allowed characters only
      *
      * @param string $str input string
@@ -3108,8 +3128,8 @@ class BDebug extends BClass
 //        if ($level !== static::DEBUG) {
 //            static::$_collectedErrors[$level][] = $msg;
 //        }
-        if (is_scalar($msg)) {
-            $e = ['msg' => $msg];
+        if (is_scalar($msg) || is_object($msg) && method_exists($msg, '__toString')) {
+            $e = ['msg' => (string)$msg];
         } elseif (is_object($msg) && $msg instanceof Exception) {
             $bt = $msg->getTrace();
             $msgStr = $msg->getMessage();
@@ -3133,6 +3153,7 @@ class BDebug extends BClass
         //$o = $bt[$stackPop]['object'];
         //$e['object'] = is_object($o) ? get_class($o) : $o;
 
+        $e['msg'] = (string)$e['msg'];
         $e['ts'] = BDb::i()->now();
         $e['t'] = microtime(true) - static::$_startTime;
         $e['d'] = null;
@@ -3267,7 +3288,7 @@ class BDebug extends BClass
         if ($textBefore) {
             echo htmlspecialchars($textBefore) . "\n";
         }
-        debug_print_backtrace();
+        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $output = ob_get_clean();
         $output = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $output);
         return $output;
@@ -4400,8 +4421,7 @@ class BValidate extends BClass
             $this->BSession->set('validator-data:' . $formName, $data);
             foreach ($this->_validateErrors as $field => $errors) {
                 foreach ($errors as $error) {
-                    $msg = ['error' => $error, 'field' => $field];
-                    $this->BSession->addMessage($msg, 'error', 'validator-errors:' . $formName);
+                    $this->BSession->addMessage($error, 'error', 'validator-errors:' . $formName);
                 }
             }
         }

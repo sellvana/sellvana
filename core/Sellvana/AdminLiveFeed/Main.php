@@ -10,12 +10,22 @@
  */
 class Sellvana_AdminLiveFeed_Main extends BCLass
 {
+    /**
+     * @var bool
+     */
+    protected $_disabled = false;
 
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'settings/Sellvana_AdminLiveFeed' => BLocale::i()->_('Admin Live Feed Settings'),
+            'settings/Sellvana_AdminLiveFeed' => 'Admin Live Feed Settings',
         ]);
+    }
+
+    public function disable($flag = true)
+    {
+        $this->_disabled = $flag;
+        return $this;
     }
 
     public function onGetHeaderNotifications()
@@ -27,6 +37,9 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onProductAfterSave($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         if ($model->isNewRecord()) {
@@ -44,6 +57,9 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onPrefAfterSave($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_Email_Model_Pref $model */
         $model = $args['model'];
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_newsletter')) {
@@ -55,6 +71,9 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onCustomerAfterSave($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_Customer_Model_Customer $model */
         $model = $args['model'];
         if ($model->isNewRecord()) {
@@ -72,6 +91,9 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onReviewsAfterSave($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_ProductReviews_Model_Review $model */
         $model = $args['model'];
         $pCustomerId = $model->customer_id;
@@ -89,6 +111,9 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onOrderPlaced($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         if (!$this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_sales')) {
             return;
         }
@@ -110,7 +135,10 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onSearch($args)
     {
-        if ( $this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_catalog')) {
+        if ($this->_disabled) {
+            return;
+        }
+        if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_catalog')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                 'content' => $this->BLocale->_('The term %s has been searched', $args['query']),
             ]);
@@ -119,6 +147,9 @@ class Sellvana_AdminLiveFeed_Main extends BCLass
 
     public function onWishlistAfterAdd($args)
     {
+        if ($this->_disabled) {
+            return;
+        }
         /** @var Sellvana_Catalog_Model_Product $model */
         $model = $args['model'];
         if ($this->BConfig->get('modules/Sellvana_AdminLiveFeed/enable_wishlist')) {

@@ -36,6 +36,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function gridConfig()
     {
         $config = parent::gridConfig();
+        $bool = [0 => 'no', 1 => 'Yes'];
         $config['columns'] = [
             ['type' => 'row_select', 'width' => 55],
             ['type' => 'btn_group', 'buttons' => [
@@ -48,6 +49,8 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
             ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
+            ['name' => 'is_hidden', 'label' => 'Hidden?', 'width' => 50, 'options' => $bool],
+            ['name' => 'manage_inventory', 'label' => 'Manage Inv?', 'width' => 50, 'options' => $bool],
             //['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
             //['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
             ['name' => 'net_weight', 'label' => 'Net Weight',  'width' => 100, 'hidden' => true],
@@ -386,7 +389,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'refresh' => true,
                     // 'add' => ['caption' => 'Add images'],
                     'quick_add' => [
-                        'html' => '<span class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
+                        'html' => '<span id="dropzone" class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
                                      <i class="icon-plus icon-white"></i>
                                      <span>' . $this->BLocale->_('Quick add images') . '</span>
                                      <input type="file" name="upload[]" id="quick-add-images" multiple="">
@@ -526,27 +529,25 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     {
 
         $config = parent::gridConfig();
-        //$config['id'] = 'category_all_prods_grid-'.$model->id;
+        unset($config['orm']);
+        $data = $this->Sellvana_Catalog_Model_Product->orm('p')->select(['p.id', 'p.product_name', 'p.product_sku'])->find_many();
         $config['id'] = 'category_all_prods_grid_' . $model->id;
+        $config['data'] = $data;
+        $config['data_mode'] = 'local';
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 250],
             ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
         ];
-        $config['actions'] = [
-            #'add' => ['caption' => 'Add selected products']
-        ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'product_sku', 'type' => 'text'],
-            '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
+            ['field' => 'product_sku', 'type' => 'text']
         ];
 
-        $config['grid_before_create'] = 'allProdGridRegister';
-        /*$config['_callbacks'] = "{
-            'add':'categoryProdsMng.addSelectedProds'
-        }";*/
+        $config['callbacks'] = [
+            'componentDidMount' => 'allProdGridRegister'
+        ];
 
         return ['config' => $config];
     }
@@ -837,38 +838,38 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     protected function _processLinkedProductsPost($model, $data)
     {
-        //echo "<pre>"; print_r($data); echo "</pre>";die;
         $hlp = $this->Sellvana_Catalog_Model_ProductLink;
         foreach (['related', 'similar', 'cross_sell'] as $type) {
             $typeName = 'linked_products_' . $type;
-            if (!empty($data['grid'][$typeName]['del'])) {
+            $deletedIds = $this->BUtil->arrayGet($data, "grid.{$typeName}.del");
+            if ($deletedIds) {
                 $hlp->delete_many([
-                    'product_id' => $model->id,
+                    'product_id' => $model->id(),
                     'link_type' => $type,
-                    'linked_product_id' => explode(',', $data['grid'][$typeName]['del']),
+                    'linked_product_id' => explode(',', $deletedIds),
                 ]);
             }
-            if (isset($data[$typeName])) {
-                //echo "<pre>"; print_r($data[$typeName]); echo "</pre>";die;
-                foreach ($data[$typeName] as $key => $arr) {
+            $linkedIds = $this->BUtil->arrayGet($data, "grid.{$typeName}.add");
+            if ($linkedIds) {
+                $linkedIds = explode(',', $linkedIds);
+                foreach ($linkedIds as $lid) {
                     $productLink = $hlp->loadWhere([
                         'product_id' => $model->id(),
-                        'linked_product_id' => (int)$key,
+                        'linked_product_id' => (int)$lid,
                         'link_type' => (string)$type
                     ]);
-                    $position = (is_numeric($data[$typeName][$key]['product_link_position']))
-                        ? (int) $data[$typeName][$key]['product_link_position'] : 0;
+                    $position = (!empty($data[$typeName][$lid]['product_link_position']))
+                        ? (int) $data[$typeName][$lid]['product_link_position'] : 0;
                     if ($productLink) {
                         $productLink->set('position', $position)->save();
                     } else {
                         $hlp->create([
-                            'product_id' => $model->id,
+                            'product_id' => $model->id(),
                             'link_type' => $type,
-                            'linked_product_id' => $key,
+                            'linked_product_id' => $lid,
                             'position' => $position
                         ])->save();
                     }
-
                 }
             }
         }

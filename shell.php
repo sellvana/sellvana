@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 
 $t = microtime(true);
@@ -6,8 +6,8 @@ $t = microtime(true);
 require_once __DIR__ . '/core/FCom/Core/Main.php';
 
 if (PHP_SAPI !== 'cli') {
-    #echo "Available only for CLI.";
-    #die;
+    echo "Available only for CLI.";
+    die;
 }
 
 #BConfig::i()->set('fs/root_dir', __DIR__);

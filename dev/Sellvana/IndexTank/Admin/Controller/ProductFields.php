@@ -18,9 +18,9 @@ class Sellvana_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Contr
     {
         try {
             $status = $this->Sellvana_IndexTank_Index_Product->status();
-            $this->BLayout->view('indextank/product_fields')->set('status', $status);
+            $this->BLayout->getView('indextank/product_fields')->set('status', $status);
         } catch (Exception $e) {
-            $this->BLayout->view('indextank/product_fields')->set('status', false);
+            $this->BLayout->getView('indextank/product_fields')->set('status', false);
         }
 
         $fld = $this->Sellvana_IndexTank_Model_ProductField;

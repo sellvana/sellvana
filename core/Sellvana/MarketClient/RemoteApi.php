@@ -275,9 +275,10 @@ final class Sellvana_MarketClient_RemoteApi extends BClass
     {
         $cacheKey = 'marketclient_updates_last_fetch_at';
         if ($this->BCache->load($cacheKey)) {
-            return;
+            return [];
         }
-        $this->BCache->save($cacheKey, $this->BDb->now(), 3600);
+        $ttlDays = $this->BConfig->get('modules/Sellvana_MarketClient/auto_check_days', 1);
+        $this->BCache->save($cacheKey, $this->BDb->now(), $ttlDays * 86400);
 
         $siteKey = $this->BConfig->get('modules/Sellvana_MarketClient/site_key');
         $url = $this->getUrl('v1/market/site/updates', [

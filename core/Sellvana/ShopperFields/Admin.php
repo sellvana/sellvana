@@ -8,7 +8,7 @@ class Sellvana_ShopperFields_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'shopper_fields' => BLocale::i()->_('Product Shopper Fields'),
+            'shopper_fields' => 'Product Shopper Fields',
         ]);
     }
 

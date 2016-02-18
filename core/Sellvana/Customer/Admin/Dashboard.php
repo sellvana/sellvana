@@ -28,7 +28,7 @@
  *
  * @property Sellvana_Customer_Model_Customer $Sellvana_Customer_Model_Customer
  */
-class Sellvana_Customer_Admin_Dashboard extends FCom_Admin_Widget
+class Sellvana_Customer_Admin_Dashboard extends FCom_Admin_Dashboard_Abstract
 {
     static protected $_origClass      = __CLASS__;
     protected        $_modelClass     = 'Sellvana_Customer_Model_Customer';

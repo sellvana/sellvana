@@ -3,6 +3,7 @@
 /**
  * Class Sellvana_CatalogIndex_Admin_Controller
  *
+ * @property FCom_Admin_Model_Activity $FCom_Admin_Model_Activity
  * @property Sellvana_CatalogIndex_Model_Doc $Sellvana_CatalogIndex_Model_Doc
  * @property Sellvana_CatalogIndex_Main $Sellvana_CatalogIndex_Main
  * @property Sellvana_Catalog_Model_Product $Sellvana_Catalog_Model_Product
@@ -11,6 +12,7 @@
  * @property Sellvana_Catalog_Model_CategoryProduct $Sellvana_Catalog_Model_CategoryProduct
  * @property Sellvana_Catalog_Model_ProductPrice $Sellvana_Catalog_Model_ProductPrice
  * @property Sellvana_CatalogFields_Model_ProductFieldData $Sellvana_CatalogFields_Model_ProductFieldData
+ * @property Sellvana_AdminLiveFeed_Main $Sellvana_AdminLiveFeed_Main
  */
 class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
@@ -40,6 +42,17 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
             'total'     => $this->BCache->load('index_progress_total'),
             'reindexed' => $this->BCache->load('index_progress_reindexed')
         ]);
+    }
+
+    public function action_activity__POST()
+    {
+        $hlp = $this->FCom_Admin_Model_Activity->loadWhere(['event_code' => 'catalog_indexing']);
+        if (!$hlp) {
+            $this->BResponse->json(['success' => false]);
+            return;
+        }
+        $hlp->set('status', $this->BRequest->post('status'))->save();
+        $this->BResponse->json(['success' => true, 'message' => 'Activity updated.']);
     }
 
     public function action_cat()
@@ -74,6 +87,9 @@ class Sellvana_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstr
         $this->BDebug->disableAllLogging();
         $this->Sellvana_CatalogIndex_Main->autoReindex(false);
         $this->Sellvana_Catalog_Model_Product->setFlag('skip_duplicate_checks', true);
+        if ($this->BModuleRegistry->isLoaded('Sellvana_AdminLiveFeed')) {
+            $this->Sellvana_AdminLiveFeed_Main->disable();
+        }
 
         $this->Sellvana_CatalogIndex_Main->generateTestData();
 

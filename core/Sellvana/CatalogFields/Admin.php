@@ -15,6 +15,7 @@
  * @property Sellvana_CatalogFields_Model_ProductFieldData    $Sellvana_CatalogFields_Model_ProductFieldData
  * @property Sellvana_CatalogFields_Main $Sellvana_CatalogFields_Main
  * @property Sellvana_MultiSite_Admin $Sellvana_MultiSite_Admin
+ * @property Sellvana_Catalog_Model_ProductMedia $Sellvana_Catalog_Model_ProductMedia
  */
 class Sellvana_CatalogFields_Admin extends BClass
 {
@@ -52,7 +53,7 @@ class Sellvana_CatalogFields_Admin extends BClass
     public function onProductsFormViewBefore()
     {
         $id = $this->BRequest->param('id', true);
-        $p = $this->BLayout->view('admin/form')->get('model');
+        $p = $this->BLayout->getView('admin/form')->get('model');
         #$p = $this->Sellvana_Catalog_Model_Product->load($id);
 
         if (!$p) {
@@ -69,7 +70,7 @@ class Sellvana_CatalogFields_Admin extends BClass
                 $fieldsOptions[$option->get('field_id')][] = $option;
             }
         }
-        $view = $this->BLayout->view('catalogfields/products/fields-partial');
+        $view = $this->BLayout->getView('catalogfields/products/fields-partial');
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
@@ -301,11 +302,13 @@ class Sellvana_CatalogFields_Admin extends BClass
             foreach ($prodVariantImageModels as $m) {
                 $prodVariantImages[$m->get('variant_id')][$m->get('file_id')] = $m;
             }
+            $prodMediaIds = $this->Sellvana_Catalog_Model_ProductMedia->orm()->where('product_id', $pId)
+                ->find_many_assoc('file_id', 'id');
 
             // update and create variant images
             $fileIdsToDelete = [];
             foreach ($variantsData as $i => $vd) {
-                $dataFileIds = !empty($vd['variant_file_id']) ? explode(',', $vd['variant_file_id']) : [];
+                $dataFileIds = $this->BUtil->arrayCleanInt($vd['variant_file_id']);
                 $vId = $matchedVariants[$i];
                 if (!empty($prodVariantImages[$vId])) {
                     foreach ($prodVariantImages[$vId] as $fileId => $m) {
@@ -319,17 +322,18 @@ class Sellvana_CatalogFields_Admin extends BClass
                         $prodVariantImages[$vId][$fileId]->set('position', $pos)->save();
                     } else {
                         $prodVariantImageHlp->create([
-                            'product_id' => $pId,
-                            'variant_id' => $vId,
-                            'file_id'    => $fileId,
-                            'position'   => $pos,
+                            'product_id'       => $pId,
+                            'variant_id'       => $vId,
+                            'file_id'          => $fileId,
+                            'product_media_id' => $prodMediaIds[$fileId],
+                            'position'         => $pos,
                         ])->save();
                     }
                 }
             }
             // delete unused variant images
             if ($fileIdsToDelete) {
-                $prodVariantImageHlp->delete_many(['product_id' => $pId, 'id' => $fileIdsToDelete]);
+                $prodVariantImageHlp->delete_many(['product_id' => (int)$pId, 'id' => $fileIdsToDelete]);
             }
         }
     }

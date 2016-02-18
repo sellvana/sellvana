@@ -212,9 +212,9 @@ class Sellvana_CatalogFields_Main extends BClass
         if (empty($groups) && empty($currentFilter)) {
             return;
         }
-        $this->BLayout->view('catalogfields/filters')->selected_filters = $currentFilter;
-        $this->BLayout->view('catalogfields/filters')->groups = $groups;
-        return $this->BLayout->view('catalogfields/filters')->render();
+        $this->BLayout->getView('catalogfields/filters')->selected_filters = $currentFilter;
+        $this->BLayout->getView('catalogfields/filters')->groups = $groups;
+        return $this->BLayout->getView('catalogfields/filters')->render();
     }
 
     public function onProductImportRow($args)

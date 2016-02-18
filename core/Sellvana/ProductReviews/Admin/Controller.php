@@ -43,8 +43,9 @@ class Sellvana_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abs
                 'editable' => true, 'display' => 'eval', 'element_print' => $this->inputRatingHtml('rating'),
                 'print' => '"<div class=\'rateit\' data-review=\'"+rc.row["id"]+"\' data-rateit-resetable=\'false\' data-rateit-min=\''.$reviewConfigs['min'].'\' data-rateit-max=\''.$reviewConfigs['max'].'\' data-rateit-readonly=\'false\' data-rateit-step=\''.$reviewConfigs['step'].'\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
                 /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))]*/
-            ['type' => 'input', 'name' => 'rating', 'label' => 'Total Rating', 'addable' => true,
-                'editable' => 'inline', 'editor' => 'rating', 'element_print' => $this->inputRatingHtml('rating'),
+            ['type' => 'rating', 'name' => 'rating', 'label' => 'Total Rating',
+                /*'editable' => 'inline', 'editor' => 'rating',*/ 'disabled' => true,
+                /*'element_print' => $this->inputRatingHtml('rating'),*/
                 'validation' => [
                     'required' => true, 'number' => true,
                     'range' => [$reviewConfigs['min'], $reviewConfigs['max']]

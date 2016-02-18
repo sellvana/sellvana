@@ -12,7 +12,7 @@ class Sellvana_CatalogIndex_Frontend extends BClass
     public function layoutSetSortOptions()
     {
         $sortOptions = $this->Sellvana_CatalogIndex_Model_Field->getSortingArray();
-        $this->BLayout->view('catalog/product/pager')->set('sort_options', $sortOptions);
+        $this->BLayout->getView('catalog/product/pager')->set('sort_options', $sortOptions);
     }
 
     public function onCategoryProductsData($args)
@@ -26,7 +26,7 @@ class Sellvana_CatalogIndex_Frontend extends BClass
         $this->BEvents->fire('Sellvana_Catalog_Frontend_Controller_Category::action_index:products_orm', ['orm' => $productsOrm]);
 
         /** @var Sellvana_Catalog_Frontend_View_Pager $pagerView */
-        $pagerView = $this->BLayout->view('catalog/product/pager');
+        $pagerView = $this->BLayout->getView('catalog/product/pager');
 
         $paginated = $productsOrm->paginate($this->BRequest->get(), [
             'ps' => $pagerView->default_page_size,
@@ -37,7 +37,7 @@ class Sellvana_CatalogIndex_Frontend extends BClass
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
 
-        $this->BLayout->view('catalog/category/sidebar')->set('products_data', $productsData);
+        $this->BLayout->getView('catalog/category/sidebar')->set('products_data', $productsData);
 
         $args['data'] = $productsData;
     }
@@ -45,7 +45,7 @@ class Sellvana_CatalogIndex_Frontend extends BClass
     public function onSearchProductsData($args)
     {
         /** @var Sellvana_Catalog_Frontend_View_Pager $pagerView */
-        $pagerView = $this->BLayout->view('catalog/product/pager');
+        $pagerView = $this->BLayout->getView('catalog/product/pager');
 
         $pagerView->set('sort_options', $this->Sellvana_CatalogIndex_Model_Field->getSortingArray());
 
@@ -64,7 +64,7 @@ class Sellvana_CatalogIndex_Frontend extends BClass
         ]);
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
-        $this->BLayout->view('catalog/category/sidebar')->set('products_data', $productsData);
+        $this->BLayout->getView('catalog/category/sidebar')->set('products_data', $productsData);
 
         $args['data'] = $productsData;
     }

@@ -190,7 +190,10 @@
                         'data-off-text': '<i class="icon-ok" />',
                         'data-field-id': field.id
                     },
-                    onChange: this.handleSwitchBoxChange
+                    options: {
+                        size: this.props.size || 'normal',
+                        onSwitchChange: this.handleSwitchBoxChange
+                    }
                 });
             },
             createInput: function (field) {
@@ -346,7 +349,7 @@
             },
             removeField: function (e) {
                 var $target = $(e.currentTarget),
-                        fieldId = $target.data('field-id').toString(),
+                    fieldId = $target.data('field-id').toString(),
                     sites = this.props.sites;
 
                 var index = _.findIndex(this.props.fields, {id: fieldId});
@@ -585,7 +588,7 @@
 
                 _(sets).each(function (set, i) {
                     _(set.fields).each(function (f, fi) {
-                        var $inputField = $('[data-code="'+ f.field_code+'"]');
+                        set.fields[fi].position = ++fi;
                     });
 
                     if (!set.deleted) data.push(set);
@@ -634,12 +637,8 @@
                 var sets = this.state.sets;
                 _(sets).each(function (set, i) {
                     var fieldCodes = _.pluck(set.fields, 'field_code');
-                    if (_.contains(fieldCodes, code)) {
-                        if (!langs.length) {
-                            sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields = [];
-                        } else {
-                            sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields = langs;
-                        }
+                    if (_.contains(fieldCodes, code) && langs.length) {
+                        sets[i].fields[_.indexOf(fieldCodes, code)].lang_fields = langs;
                     }
                 });
                 this.refreshData();
@@ -1048,7 +1047,7 @@
             _(initData).each(function (set, si) {
                 if (!isNaN(si)) {
                     fieldSets[si] = set;
-                    fieldSets[si].fields = _.uniq(set.fields, 'id');
+                    fieldSets[si].fields = _.sortBy(_.uniq(set.fields, 'id'), 'position');
                     _(fieldSets[si].fields).each(function (f, fi) {
                         fields.push(f);
                     })

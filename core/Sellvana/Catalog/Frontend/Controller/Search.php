@@ -49,7 +49,7 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
         $layout = $this->BLayout;
 
         /** @var Sellvana_Catalog_Frontend_View_Pager $pagerView */
-        $pagerView = $layout->view('catalog/product/pager');
+        $pagerView = $layout->getView('catalog/product/pager');
 
         $productsData = null;
         $this->BEvents->fire(__METHOD__ . ':products_data', ['data' => &$productsData, 'query' => $q]);
@@ -86,7 +86,7 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
 
         $rowsViewName = 'catalog/product/' . $pagerView->getViewAs();
         $layout->hookView('main_products', $rowsViewName);
-        $rowsView = $layout->view($rowsViewName);
+        $rowsView = $layout->getView($rowsViewName);
         $rowsView->set([
             'products_data' => $productsData,
             'products' => $productsData['rows'],
@@ -94,9 +94,9 @@ class Sellvana_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controll
         $pagerView->set(['state' => $productsData['state'], 'query' => $q])
             ->setCanonicalPrevNext();
 
-        $layout->view('header-top')->set('query', $q);
-        $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
-        $layout->view('catalog/search')->set('query', $q)->set('data', $productsData);
+        $layout->getView('header-top')->set('query', $q);
+        $layout->getView('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
+        $layout->getView('catalog/search')->set('query', $q)->set('data', $productsData);
 
         $this->FCom_Core_Main->lastNav(true);
     }

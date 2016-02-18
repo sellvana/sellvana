@@ -67,12 +67,12 @@ class Sellvana_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
                 ->hookView('main', 'cms_nav')
             ;
 
-            if (($root = $this->BLayout->view('root'))) {
+            if (($root = $this->BLayout->getView('root'))) {
                 $root->addBodyClass('cms-' . str_replace('/', '-', $this->url_path))
                     ->addBodyClass('page-' . str_replace('/', '-', $this->url_path));
             }
 
-            if (($head = $this->BLayout->view('head'))) {
+            if (($head = $this->BLayout->getView('head'))) {
                 $head->title($this->full_name);
                 foreach (['title', 'description', 'keywords'] as $f) {
                     if (($v = $this->get('meta_' . $f))) {

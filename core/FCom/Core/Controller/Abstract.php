@@ -21,7 +21,7 @@ class FCom_Core_Controller_Abstract extends BActionController
             $this->BResponse->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
         }
 
-        if (($root = $this->BLayout->view('root'))) {
+        if (($root = $this->BLayout->getView('root'))) {
             $root->body_class = $this->BRequest->path(0, 1);
         }
         return parent::onBeforeDispatch();

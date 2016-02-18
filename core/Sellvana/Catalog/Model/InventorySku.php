@@ -13,6 +13,7 @@ class Sellvana_Catalog_Model_InventorySku extends FCom_Core_Model_Abstract
         ['qty_warn_customer', '@integer'],
         ['qty_notify_admin', '@integer'],
         ['qty_cart_min', '@integer'],
+        ['qty_cart_max', '@integer'],
         ['qty_cart_inc', '@integer'],
         ['qty_buffer', '@integer'],
     ];

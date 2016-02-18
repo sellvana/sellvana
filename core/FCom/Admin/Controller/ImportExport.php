@@ -178,7 +178,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             $nav->setNav($this->_navPath);
         }
 
-        $this->BLayout->view('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
+        $this->BLayout->getView('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
         if ($this->_useDefaultLayout) {
             $this->BLayout->applyLayout('default_form');
         }

@@ -1,6 +1,6 @@
 modules:
     FCom_LibGanon:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         observe:
             - [ "BLayout::render:after", FCom_LibGanon_Main.onLayoutRenderAfter ]

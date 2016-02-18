@@ -1787,7 +1787,7 @@ class BEvents extends BClass
      *          if starts with ^ will be processed as regular expression
      * @param mixed $callback
      * @param array|object $args
-     * @param arary $params - alias, insert (function, 0=skip, -1=before, 1=after), regex (true, false)
+     * @param array $params - alias, insert (function, 0=skip, -1=before, 1=after), regex (true, false)
      * @return BEvents
      */
     public function on($eventName, $callback = null, $args = [], $params = null)
@@ -2425,15 +2425,25 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $this->setDirty();
         $message = ['type' => $type];
         if (is_array($msg) && !empty($msg[0])) {
-            $message['msgs'] = $msg;
+            $msgs = [];
+            foreach ($msg as $m) {
+                if (is_string($m) || is_object($m) && method_exists($m, '__toString')) {
+                    $msgs[] = (string)$m;
+                } elseif (is_array($m)) {
+                    $m['title'] = !empty($m['title']) ? (string)$m['title'] : null;
+                    $m['msg'] = !empty($m['msg']) ? (string)$m['msg'] : null;
+                    $msgs[] = $m;
+                }
+            }
+            $message['msgs'] = $msgs;
         } else {
-            $message['msg'] = $msg;
+            $message['msg'] = (string)$msg;
         }
         if (isset($options['title'])) {
-            $message['title'] = $options['title'];
+            $message['title'] = (string)$options['title'];
         }
         if (isset($options['icon'])) {
-            $message['icon'] = $options['icon'];
+            $message['icon'] = (string)$options['icon'];
         }
         if (null === $tag) {
             $tag = '_';

@@ -814,8 +814,9 @@ EOT
         if (static::ddlTableExists($fullTableName, $connectionName)) {
             $result = BORM::i()->raw_query("DROP TABLE {$fullTableName}")->execute();
             static::ddlClearCache(null, $connectionName);
+            return $result;
         }
-        return $result;
+        return false;
     }
 
     /**
@@ -831,6 +832,9 @@ EOT
         $isObject = is_object($data);
         $result = [];
         foreach ($data as $k => $v) {
+            if (is_array($v) || is_object($v)) {
+                continue;
+            }
             $fieldInfo = BDb::ddlFieldInfo($table, $k, $connectionName);
             if ($fieldInfo) {
                 $result[$k] = $isObject ? $data->get($k) : $data[$k];

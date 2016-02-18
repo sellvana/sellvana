@@ -10,11 +10,10 @@ class Sellvana_MarketClient_Admin extends BClass
 {
     public function bootstrap()
     {
-        $locale = BLocale::i();
         $this->FCom_Admin_Model_Role->createPermission([
-            'market_client' => $locale->_('Market Client'),
-            'market_client/public' => $locale->_('Public'),
-            'market_client/remote' => $locale->_('Remote'),
+            'market_client' => 'Market Client',
+            'market_client/public' => 'Public',
+            'market_client/remote' => 'Remote',
         ]);
     }
 

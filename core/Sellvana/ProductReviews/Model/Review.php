@@ -28,6 +28,11 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
        'min' => 0,
        'step' => 1,
     ];
+
+    protected static $_fieldDefaults = [
+        'verified_purchase' => 0,
+    ];
+
     protected static $_importExportProfile = [
         'skip'       => ['id'],
         'unique_key' => ['product_id', 'customer_id', 'create_at'],
@@ -54,15 +59,15 @@ class Sellvana_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
     public function notify()
     {
-        $this->BLayout->view('email/prodreview-new-admin')->email();
-        $this->BLayout->view('email/prodreview-new-customer')->email();
+        $this->BLayout->getView('email/prodreview-new-admin')->email();
+        $this->BLayout->getView('email/prodreview-new-customer')->email();
         return $this;
     }
 
     public function confirm()
     {
         $this->set('approved', 1)->save();
-        $this->BLayout->view('email/prodreview-confirm-customer')->email();
+        $this->BLayout->getView('email/prodreview-confirm-customer')->email();
         return $this;
     }
 

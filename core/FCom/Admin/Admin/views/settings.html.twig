@@ -4,6 +4,7 @@
 <script type="text/javascript">
 
     require(['backbone', 'underscore', 'jquery', 'fcom.ipmode', 'jquery.validate', 'fcom.validate.ext', 'bootstrap', 'fcom.admin', 'switch', 'jquery.bootstrap-growl',  'select2'], function(Backbone, _, $, ipMode) {
+        var accordion_id = null, selected_input_id = null;
         $(function() {
             function onSortableStop(event, ui) {
                 var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
@@ -99,11 +100,11 @@
                 submitHandler: function (form) {
                     var data = mainForm.serializeArray();
                     var arr = [ 'config[mode_by_ip][FCom_Admin]',
-                                'config[mode_by_ip][FCom_ApiServer]',
-                                'config[mode_by_ip][FCom_Frontend]',
-                                'config[mode_by_ip][FCom_Cron]',
-                                'config[mode_by_ip][FCom_Test]'
-                              ];
+                        'config[mode_by_ip][FCom_ApiServer]',
+                        'config[mode_by_ip][FCom_Frontend]',
+                        'config[mode_by_ip][FCom_Cron]',
+                        'config[mode_by_ip][FCom_Test]'
+                    ];
                     data.forEach(function (obj) {
                         if ($.inArray(obj.name, arr) > -1) {
                             obj.value = getIpModeValue(mainForm.find('input[name="'+ obj.name +'"]').parents('.group-ip-mode'));
@@ -133,7 +134,7 @@
                 return result.substr(0, result.length -1);
             }
 
-            $("body").on('change', elem, function () {
+            $(document).on('change', elem, function () {
                 $(text).find('li.active').each(function () {
                     if ($(this).children('a').find('i.icon-pencil').length === 0) {
                         if ($(this).children('a').children('i.error').length !== 0) {
@@ -144,7 +145,7 @@
                     }
                 })
             });
-            $('body').on('click', '.add-ip-mode', function () {
+            $(document).on('click', '.add-ip-mode', function () {
                 var ip = new ipMode.ipMode.Views();
                 $(this).parents('.group-ip-mode').append(ip.render().el);
 
@@ -156,20 +157,88 @@
                     FCom.Admin.Accordion('settings-'+i);
                     FCom.Admin.initCodeEditors();
 
+                    if (accordion_id !== null) {
+                        loadAccordion();
+                    }
+
+                    if (selected_input_id !== null) {
+                        hightlight();
+                    }
+
                     loadSwitchButtons();
                 }
             });
 
+            function loadAccordion() {
+                var $accordion = $('a[href="'+accordion_id+'"]');
+                var $panel = $accordion.parents('.panel').children(accordion_id);
+                if (!$panel.hasClass('in')) {
+                    $accordion.trigger('click');
+                }
+            }
+
+            function hightlight(id) {
+                var target = id ? id : selected_input_id;
+                $input = $(target);
+                $input.parents('.form-group').children('.control-label').wrapInner('<mark class="search-mark"/>');
+                $input.parents('.form-group').on('mouseover', function () {
+                    $input.parents('.form-group').find('.search-mark').contents().unwrap();
+                });
+            }
 
             $('.accordion').each(function(i, el) {
                 FCom.Admin.Accordion(el.id);
             });
+
             FCom.Admin.initCodeEditors();
 
             // init switch buttons
             loadSwitchButtons();
 
+            $('#search-settings').select2({
+                ajax: {
+                    url: '{{ APP.href('/settings/search') | raw }}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (param) {
+                        return {
+                            q: param
+                        };
+                    },
+                    results: function (data) {
+                        return {
+                            results: $.map(data, function (item, id) {
+                                return {
+                                    text: '<strong>' + item.field_label + '</strong><br><small>' + item.tab_label + ' > ' + item.panel_label + '</small>',
+                                    id: item.tab_id + '|' + item.panel_id + '|' + item.field_id
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                escapeMarkup: function (markup) { return markup; }
+            }).on('change', function(ev) {
+                selected_input_id = null;
+                accordion_id = null;
+                var selectors = ev.target.value.split('|');
 
+                // Collapse all accordions
+                $('.panel-collapse').removeClass('in');
+
+                $('a[href="'+selectors[0]+'"]').trigger('click');
+                var $accordion = $('a[href="'+selectors[1]+'"]');
+                if ($accordion.length) {
+                    $accordion.trigger('click');
+                    var $selectedField = $(selectors[2]);
+                    if ($selectedField.length) hightlight(selectors[2]);
+                    else selected_input_id = selectors[2];
+                } else {
+                    accordion_id = selectors[1];
+                    selected_input_id = selectors[2];
+                }
+            });
         });
     })
 </script>
@@ -178,10 +247,10 @@
     <div  class="row ip-mode" style="margin-bottom: 15px">
         <div class="col-md-3 text-right">
             <% if (typeof (arguments[0].default_mode) !== 'undefined') { %>
-                <label class="control-label">{{ "Default"|_ }}</label>
-                <input type="hidden" class="default"  name="<%- arguments[0].name %>"/>
+            <label class="control-label">{{ "Default"|_ }}</label>
+            <input type="hidden" class="default"  name="<%- arguments[0].name %>"/>
             <% } else { %>
-                <input type="text" name="<%- arguments[0].name %>" class="form-control text-ip-mode" id="<%- arguments[0].name %>"/>
+            <input type="text" name="<%- arguments[0].name %>" class="form-control text-ip-mode" id="<%- arguments[0].name %>"/>
             <% } %>
         </div>
         <div class="col-md-3">
@@ -189,16 +258,16 @@
                 {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Controller_Settings').getAllModes())|raw }}
             </select>
         </div>
-	<div class="col-md-6">
+        <div class="col-md-6">
             <button class="btn  btn-xs <%- arguments[0].class_button  %>" style="margin-top: 5px;" type="button">
                 <% if (typeof (arguments[0].default_mode) !== 'undefined') { %>
-                    <i class="icon-plus"></i>
+                <i class="icon-plus"></i>
                 <% } else { %>
-                    <i class="icon-remove"></i> 
+                <i class="icon-remove"></i>
                 <% } %>
             </button>
         </div>
-        
+
     </div>
 
 </script>
@@ -212,6 +281,7 @@
                 <i class="fa fa-cog"></i>
                 <span>{{ "Settings" |_ }}</span>
                 {{ THIS.hook('settings_header_title') | raw }}
+                <input type="hidden" id="search-settings" class="form-control" style="width:250px; float: right; margin-left: 15px;"/>
             </h1>
             <div class="btn-group">
                 <button class="btn btn-primary" type="submit">{{ "Save All" |_ }}</button>

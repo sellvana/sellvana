@@ -19,7 +19,7 @@ class Sellvana_PaymentCC_PaymentMethod extends Sellvana_Sales_Method_Payment_Abs
      */
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('credit_card/form');
+        return $this->BLayout->getView('credit_card/form');
     }
 
     /**

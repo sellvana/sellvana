@@ -56,6 +56,8 @@ class BModuleRegistry extends BClass
     */
     protected $_currentModuleStack = [];
 
+    protected $_bootstrapFinished = false;
+
     public function __construct()
     {
         //$this->BEvents->on('BFrontController::dispatch:before', array($this, 'onBeforeDispatch'));
@@ -627,11 +629,17 @@ class BModuleRegistry extends BClass
             $this->popModule();
         }
 
+        $this->_bootstrapFinished = true;
         $this->BLayout->collectAllViewsFiles(); // TODO: refactor, decide on a better place
 
         $this->BEvents->fire('BModuleRegistry::bootstrap:after');
 
         return $this;
+    }
+
+    public function isBootstrapFinished()
+    {
+        return $this->_bootstrapFinished;
     }
 }
 
@@ -2087,6 +2095,9 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
     {
         $modName = $mod['module_name'];
         foreach (static::$_migrationData as $iterModName => $iterMod) {
+            if ($iterMod['run_status'] !== BModule::LOADED) {
+                continue;
+            }
             $class = "{$iterModName}_Migrate";
             $singleton = $this->{$class};
             $method = "{$when}__{$modName}__" . str_replace('.', '_', $version);

@@ -1,7 +1,7 @@
 modules:
     Sellvana_Checkout:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_Sales: 0.1.10 } }
         translations: { en: en.php }
         description: "Base checkout functionality"
@@ -21,4 +21,6 @@ modules:
                     #- [ /checkout/shipping, Sellvana_Checkout_Frontend_Controller_Checkout.shipping ]
                     #- [ /checkout/success, Sellvana_Checkout_Frontend_Controller_Checkout.success ]
                     #- [ /checkout/address, Sellvana_Checkout_Frontend_Controller_Address.address ]
+                observe:
+                    - [ "Sellvana_Customer_Model_Customer::logout:before", Sellvana_Checkout_Frontend.onCustomerLogout ]
 

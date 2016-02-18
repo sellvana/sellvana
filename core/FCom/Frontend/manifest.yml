@@ -1,7 +1,7 @@
 modules:
     FCom_Frontend:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { FCom_Core: 0.5.0.0, FCom_LibJsCommon: 0.5.0.0, FCom_LibTwig: 0.5.0.0, FCom_LibScssPhp: 0.5.0.0 } }
         description: "Base Frontend functionality"
 

@@ -1,6 +1,6 @@
 modules:
     FCom_LibJsCkeditor:
-        version: 0.5.0.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         auto_use: [ layout ]

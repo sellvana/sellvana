@@ -11,8 +11,8 @@ class Sellvana_Wishlist_Admin extends BClass
     public function bootstrap()
     {
         $this->FCom_Admin_Model_Role->createPermission([
-            'wishlist' => BLocale::i()->_('Wishlist'),
-            'settings/Sellvana_Wishlist' => BLocale::i()->_('Wishlist Settings'),
+            'wishlist' => 'Wishlist',
+            'settings/Sellvana_Wishlist' => 'Wishlist Settings',
         ]);
     }
 }

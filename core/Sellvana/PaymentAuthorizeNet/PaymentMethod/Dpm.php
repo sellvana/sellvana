@@ -18,7 +18,7 @@ class Sellvana_PaymentAuthorizeNet_PaymentMethod_Dpm extends Sellvana_PaymentAut
 
     public function getCheckoutFormView()
     {
-        return $this->BLayout->view('authorizenet/dpm')->set('key', static::$_methodKey);
+        return $this->BLayout->getView('authorizenet/dpm')->set('key', static::$_methodKey);
     }
 
     public function payOnCheckout(Sellvana_Sales_Model_Order_Payment $payment)

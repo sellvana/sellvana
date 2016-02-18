@@ -1,7 +1,7 @@
 modules:
     Sellvana_CatalogIndex:
-        version: 0.5.2.0
-        channel: alpha
+        version: 0.6.0.0
+        channel: beta
         require: { module: { Sellvana_Catalog: 0.2.1, Sellvana_CatalogFields: 0.1.4 } }
         description: "Catalog search and facets indexing engine"
         auto_use: [ bootstrap, views, layout ]
@@ -16,6 +16,7 @@ modules:
             - [ "FCom_Core_ImportExport::import:beforeModel:Sellvana_Catalog_Model_Product", "Sellvana_CatalogIndex_Main::onProductBeforeImport" ]
             - [ "FCom_Core_ImportExport::import:afterModel:Sellvana_Catalog_Model_Product", "Sellvana_CatalogIndex_Main::onProductAfterCoreImport" ]
             - [ "FCom_Core_ImportExport::afterImport", "Sellvana_CatalogIndex_Main::onAfterCoreImport" ]
+            - [ "FCom_Admin_View_Header::getAllNotifications", Sellvana_CatalogIndex_Main.onGetHeaderNotifications ]
         default_config:
             modules/Sellvana_CatalogIndex/show_root_categories: 1
             modules/Sellvana_CatalogIndex/show_sibling_categories: 1
@@ -26,6 +27,8 @@ modules:
                     - [ /catalogindex/?.action, Sellvana_CatalogIndex_Admin_Controller ]
                     - [ /catalogindex/fields, Sellvana_CatalogIndex_Admin_Controller_Fields.index ]
                     - [ /catalogindex/fields/.action, Sellvana_CatalogIndex_Admin_Controller_Fields ]
+                observe:
+                    - [ "Sellvana_Catalog_Admin_Controller_ProductsAdd::action_index__POST:after", "Sellvana_CatalogIndex_Main.onProductsQuickAdd" ]
 
             FCom_Frontend:
                 observe:

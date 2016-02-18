@@ -7,7 +7,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
 	/**
      * form content for modal
      */
-    var FComModalForm = React.createClass({
+    return React.createClass({
         mixins: [FCom.Mixin, FCom.FormMixin],
         getDefaultProps: function () {
             return {
@@ -40,7 +40,7 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
 
             var nodes = this.props.columnMetadata.map(function(column, index) {
                 if( (that.props.row && !column.editable) || (!that.props.row && !column.addable)) return null;
-                return <Components.ModalElement column={column} value={that.props.row[column.name]} key={index} />
+                return <Components.ModalElement column={column} value={that.props.row[column.name] || column.default_value || ''} key={index} />
             });
 
             //add id
@@ -53,6 +53,4 @@ define(['react', 'griddle.fcomRow', 'fcom.components', 'jquery-ui', 'jquery.vali
             )
         }
     });
-
-	return FComModalForm;
 });

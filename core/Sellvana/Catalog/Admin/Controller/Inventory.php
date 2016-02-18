@@ -180,7 +180,7 @@ class Sellvana_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_
         switch ($this->BRequest->post('oper')) {
             case 'mass-edit':
                 $p = $this->BRequest->post();
-                $ids = $this->BUtil->arrayCleanInt(explode(',', $p['id']));
+                $ids = $this->BUtil->arrayCleanInt($p['id']);
                 $data = $this->BRequest->sanitize($p, [
                     'unit_cost' => 'float',
                     'net_weight' => 'float',

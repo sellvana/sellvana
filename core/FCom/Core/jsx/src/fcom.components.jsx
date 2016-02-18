@@ -1,5 +1,5 @@
 //noinspection JSPotentiallyInvalidUsageOfThis
-define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore', 'select2', 'jquery.validate'], function (React, $, Locale, Sortable) {
+define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 'bootstrap', 'select2', 'jquery.validate'], function ($, React, _, Locale, Sortable, Dropzone) {
     FCom.Components = {};
 
     /**
@@ -241,6 +241,9 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         },
         handleChange: function (e) {
             this.setState({ value: e.target.value });
+            if (typeof this.props.callback === 'function') {
+                this.props.callback(e, this.state.value);
+            }
         },
         render: function () {
             var node = null;
@@ -284,24 +287,24 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             return {
                 type: '',
                 disabled: false,
-                attrs: {}
+                attrs: {},
+                className: ''
             };
         },
         getInitialState: function () {
             return {
-                value: this.props.value
+                value: this.props.value,
+                selections: []
             };
         },
         componentDidMount: function () {
             switch (this.props.type) {
                 case 'switch':
-                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch({
-                        state: parseInt(this.state.value) == 1,
-                        onSwitchChange: this.props.onChange
-                    });
+                    this.props.options['state'] = parseInt(this.state.value) == 1;
+                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch(this.props.options);
                     break;
                 case 'wysiwyg':
-                    adminForm.wysiwygInit(null, this.state.value, this.props.onChange);
+                    adminForm.wysiwygInit(null, this.state.value, this.handleWysiwygChange);
                     break;
             }
         },
@@ -317,6 +320,12 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         handleSwitch: function (e, state) {
             this.setState({ value: state });
         },
+        handleWysiwygChange: function (editor, data) {
+            if (this.props.onChange) {
+                this.props.onChange(editor, data);
+            }
+            this.setState({ value: data });
+        },
         handleChange: function (e) {
             this.setState({ value: e.target.value });
         },
@@ -327,6 +336,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                           defaultChecked={!!(this.state.value === undefined || this.state.value === '1')}
                           value={this.state.value}
                           onChange={this.handleSwitch}
+                          placeholder={this.props.placeholder}
                           ref={'switch-cbx-' + this.props.id} {...this.props.attrs} />;
         },
         createWysiwyg: function () {
@@ -337,10 +347,32 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                              name={this.props.name}
                              className={'form-control ' + this.props.className}
                              defaultValue={this.state.value}
-                             onChange={this.handleChange}
                              ref={'wysiwyg-' + this.props.id} {...this.props.attrs} />
                         <label htmlFor={this.props.id} className="error" style={{ display: 'none' }} />
                     </div>;
+        },
+        handleSelections: function () {
+            this.setState({selections: selections});
+
+            if (this.props.onChange) {
+                this.props.onChange(e, this.props.callback, this.state.selections);
+            }
+        },
+        getSelect2Config: function () {
+            return {
+                name: this.props.name,
+                className: this.props.className || '',
+                placeholder: this.props.placeholder || Locale._('Select some options'),
+                multiple: this.props.multiple || false,
+                options: this.props.options,
+                enabled: this.props.enabled || true,
+                onSelection: this.handleSelections,
+                val: this.props.defaultValue,
+                attrs: this.props.attrs || {}
+            };
+        },
+        createSelect2: function () {
+            return React.createElement(FCom.Components.Select2, this.getSelect2Config());
         },
         renderNode: function () {
             switch (this.props.type) {
@@ -349,6 +381,9 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                     break;
                 case 'wysiwyg':
                     return this.createWysiwyg();
+                    break;
+                case 'select2':
+                    return this.createSelect2();
                     break;
             }
         },
@@ -861,6 +896,7 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
             $elem.select2("data", currData);
         },
         createSelect2: function () {
+            var _this = this;
             // Get inital value
             var val = null;
             if (this.props.val.length > 0) {
@@ -869,10 +905,53 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
 
             var $select2 = this.getElement();
             var options = {
-                data: this.props.options,
+                minimumInputLength: this.props.minInputLength || 0,
                 multiple: this.props.multiple,
                 val: val
             };
+
+            if (this.props.dataMode == 'local') {
+                options['data'] = _this._parseDataToSelect2Options(this.props.options);
+            } else if (this.props.dataMode == 'server' && !_.isEmpty(this.props.options)) {
+                options['query'] = function (options) {
+                    if (options.term) {
+                        $.ajax({
+                            url: _this.props.url,
+                            dataType: 'json',
+                            data: {q: options.term},
+                            success: function (data) {
+                                options.callback({ results: _this._parseDataToSelect2Options(data) });
+                            },
+                            cache: true
+                        });
+                    } else {
+                        options.callback({ results: _this._parseDataToSelect2Options(_this.props.options) });
+                    }
+                };
+            } else {
+                options['ajax'] = {
+                    url: this.props.url,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (param) {
+                        return {
+                            q: param
+                        };
+                    },
+                    results: function (data) {
+                        return {results: _this._parseDataToSelect2Options(data)};
+                    },
+                    cache: true
+                };
+            }
+
+            if (this.props.dataMode !== 'local') {
+                options['initSelection'] = function (element, callback) {
+                    var data = _this.props.localData || [];
+                    if (typeof data === 'string') data = JSON.parse(data);
+                    callback(_this._parseDataToSelect2Options(data));
+                };
+            }
 
             var attrs = {
                 'name': this.props.name,
@@ -921,10 +1000,19 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
         _isOptionsUpdated: function (oldOptions) {
             return oldOptions.length != this.props.options.length || false;
         },
+        _parseDataToSelect2Options: function ( data) {
+            if (_.isArray(data)) return data;
+            return $.map(data, function (item, id) {
+                return {
+                    id: id,
+                    text: item
+                };
+            });
+        },
         render: function () {
             return (
                 <div>
-                    <input id={this.props.id} {...this.props.attrs} type='hidden' style={this.props.style}/>
+                    <input id={this.props.id} name={this.props.name} {...this.props.attrs} type='hidden' style={this.props.style}/>
                 </div>
             );
         }
@@ -1087,6 +1175,273 @@ define(['react', 'jquery', 'fcom.locale', 'sortable', 'bootstrap', 'underscore',
                     {ratingSteps}
                 </div>
             );
+        }
+    });
+
+    FCom.Components.Dropzone = React.createClass({
+        getDefaultProps: function () {
+            return {
+                djsConfig: {},
+                config: {},
+                eventHandlers: {}
+            }
+        },
+        getInitialState: function () {
+            return {
+                files: []
+            }
+        },
+        getDjsConfig: function () {
+            var options,
+                defaults = {
+                    url: this.props.config.postUrl ? this.props.config.postUrl : null
+                };
+
+            if (this.props.djsConfig) {
+                options = this.extend(true, {}, defaults, this.props.djsConfig);
+            } else {
+                options = defaults;
+            }
+
+            options['replication'] = this.props.replication || false;
+
+            return options;
+        },
+        componentDidMount: function () {
+            var options = this.getDjsConfig();
+
+            Dropzone.autoDiscover = false;
+
+            if (!this.props.config.postUrl && !this.props.eventHandlers.drop) {
+                console.info('Neither postUrl nor a "drop" eventHandler specified, the React-Dropzone component might misbehave.');
+            }
+
+            this.dropzone = new Dropzone(this.getDOMNode(), options);
+            this.setupEvents();
+        },
+        componentWillUnmount: function () {
+            if (this.dropzone) {
+                var files = this.dropzone.getActiveFiles();
+
+                if (files.length > 0) {
+                    // Well, seems like we still have stuff uploading.
+                    // This is dirty, but let's keep trying to get rid
+                    // of the dropzone until we're done here.
+                    this.queueDestroy = true;
+
+                    var destroyInterval = window.setInterval(() => {
+                        if (this.queueDestroy = false) {
+                            return window.clearInterval(destroyInterval);
+                        }
+
+                        if (this.dropzone.getActiveFiles().length === 0) {
+                            this.dropzone = this.dropzone.destroy();
+                            return window.clearInterval(destroyInterval);
+                        }
+                    }, 500);
+                } else {
+                    this.dropzone = this.dropzone.destroy();
+                }
+            }
+        },
+        componentDidUpdate: function () {
+            this.queueDestroy = false;
+
+            if (!this.dropzone) {
+                this.dropzone = new Dropzone(this.getDOMNode(), this.getDjsConfig());
+            }
+        },
+        componentWillUpdate: function() {
+            this.dropzone.options = this.extend(true, {}, this.props.djsConfig, this.dropzone.options);
+        },
+        extend: function () {
+            var options, name, src, copy, copyIsArray, clone, self = this,
+                target = arguments[0] || {},
+                i = 1,
+                length = arguments.length,
+                deep = false,
+            // helper which replicates the jquery internal functions
+                objectHelper = {
+                    hasOwn: Object.prototype.hasOwnProperty,
+                    class2type: {},
+                    type: function (obj) {
+                        return obj == null ?
+                            String(obj) :
+                        objectHelper.class2type[Object.prototype.toString.call(obj)] || 'object';
+                    },
+                    isPlainObject: function (obj) {
+                        var key;
+
+                        if (!obj || objectHelper.type(obj) !== 'object' || obj.nodeType || objectHelper.isWindow(obj)) {
+                            return false;
+                        }
+
+                        try {
+                            if (obj.constructor &&
+                                !objectHelper.hasOwn.call(obj, 'constructor') &&
+                                !objectHelper.hasOwn.call(obj.constructor.prototype, 'isPrototypeOf')) {
+                                return false;
+                            }
+                        } catch (e) {
+                            return false;
+                        }
+
+                        return key === undefined || objectHelper.hasOwn.call(obj, key);
+                    },
+
+                    isArray: Array.isArray || function (obj) {
+                        return objectHelper.type(obj) === 'array';
+                    },
+
+                    isFunction: function (obj) {
+                        return objectHelper.type(obj) === 'function';
+                    },
+
+                    isWindow: function (obj) {
+                        return obj != null && obj == obj.window;
+                    }
+                };
+
+            // Handle a deep copy situation
+            if (typeof target === 'boolean') {
+                deep = target;
+                target = arguments[1] || {};
+                // skip the boolean and the target
+                i = 2;
+            }
+
+            // Handle case when target is a string or something (possible in deep copy)
+            if (typeof target !== 'object' && !objectHelper.isFunction(target)) {
+                target = {};
+            }
+
+            // If no second argument is used then this can extend an object that is using this method
+            if (length === i) {
+                target = self;
+                --i;
+            }
+
+            for (; i < length; i = i + 1) {
+                if ((options = arguments[i]) != null) {
+                    for (name in options) {
+                        src = target[name];
+                        copy = options[name];
+
+                        if (target === copy) {
+                            continue;
+                        }
+
+                        if (deep && copy && (objectHelper.isPlainObject(copy) || (copyIsArray = objectHelper.isArray(copy)))) {
+                            if (copyIsArray) {
+                                copyIsArray = false;
+                                clone = src && objectHelper.isArray(src) ? src : [];
+                            } else {
+                                clone = src && objectHelper.isPlainObject(src) ? src : {};
+                            }
+
+                            target[name] = this.extend(deep, clone, copy);
+                        } else if (copy !== undefined) {
+                            target[name] = copy;
+                        }
+                    }
+                }
+            }
+
+            return target;
+        },
+        setupEvents: function () {
+            var eventHandlers = this.props.eventHandlers;
+            if (!this.dropzone || !eventHandlers) {
+                return;
+            }
+
+            for (var eventHandler in eventHandlers) {
+                if (eventHandlers.hasOwnProperty(eventHandler) && eventHandlers[eventHandler]) {
+                    // Check if there's an array of event handlers
+                    if (Object.prototype.toString.call(eventHandlers[eventHandler]) === '[object Array]') {
+                        for (var i = 0; i < eventHandlers[eventHandler].length; i = i + 1) {
+                            // Check if it's an init handler
+                            if (eventHandler === 'init') {
+                                eventHandlers[eventHandler][i](this.dropzone);
+                            } else {
+                                this.dropzone.on(eventHandler, eventHandlers[eventHandler][i]);
+                            }
+                        }
+                    } else {
+                        if (eventHandler === 'init') {
+                            eventHandlers[eventHandler](this.dropzone);
+                        } else {
+                            this.dropzone.on(eventHandler, eventHandlers[eventHandler]);
+                        }
+                    }
+                }
+            }
+
+            this.dropzone.on('addedfile', (file) => {
+                if (file) {
+                    var files = this.state.files;
+
+                    if (!files) {
+                        files = [];
+                    }
+
+                    files.push(file);
+
+                    this.setState({files: files});
+                }
+            });
+
+            this.dropzone.on('removedfile', (file) => {
+                if (file) {
+                    var files = this.state.files;
+
+                    if (files && files.length > 0) {
+                        for (var i = 0; i < files.length; i++) {
+                            if (files[i].name === file.name && files[i].size === file.size) {
+                                files.splice(i, 1);
+                            }
+                        }
+
+                        this.setState({files: files});
+                    }
+                }
+            });
+        },
+        render: function () {
+            var buttons = [], hiddenInput = null,
+                files = this.state.files,
+                config = this.props.config,
+                className = (this.props.className) ? 'filepicker dropzone ' + this.props.className : 'filepicker dropzone';
+
+            if (config.showButtons) {
+                buttons.push(<button key={'btn-upload' + this.props.id} type="button" className="btn btn-success btn-xs btn-upload">Start Upload</button>);
+                buttons.push(<button key={'btn-cancel' + this.props.id} type="button" className="btn btn-default btn-xs btn-cancel">Cancel</button>);
+            }
+
+            if (config.showHiddenInput) {
+                var inputAttrs = this.props.attrs || {};
+                hiddenInput = <input type="hidden" name={this.props.name} {...inputAttrs}/>;
+            }
+
+            if (!this.props.config.postUrl && this.props.action) {
+                return (
+                    <form action={this.props.action} className={className}>
+                        {hiddenInput}
+                        {buttons}
+                        {buttons.length ? <br/> : null}
+                        {this.props.children}
+                    </form>
+                );
+            } else {
+                return (
+                    <div className={className}>
+                        {hiddenInput}
+                        {buttons}
+                        {buttons.length ? <br/> : null}
+                        {this.props.children}
+                    </div>
+                );
+            }
         }
     });
 

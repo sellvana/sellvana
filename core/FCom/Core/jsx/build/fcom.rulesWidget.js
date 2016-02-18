@@ -13,12 +13,12 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     cls += this.props.className;
                 }
                 return (
-                    React.createElement("div", {className: this.props.containerClass},
-                        React.createElement("select", {className: cls, defaultValue: this.props.value},
+                    React.createElement("div", {className: this.props.containerClass}, 
+                        React.createElement("select", {className: cls, defaultValue: this.props.value}, 
                         this.props.totalType.map(function (type) {
                             return React.createElement("option", {value: type.id, key: type.id}, type.label)
                         })
-                        ),
+                        ), 
                     this.props.children
                     )
                 );
@@ -81,17 +81,17 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     productId = productId.join(",");
                 }
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement(ConditionsType, {ref: "skuCollectionType", id: "skuCollectionType", onChange: this.onChange,
-                            value: this.state.type, promoType: promoType}, " of "),
-                        React.createElement("div", {className: "col-md-2"},
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement(ConditionsType, {ref: "skuCollectionType", id: "skuCollectionType", onChange: this.onChange, 
+                            value: this.state.type, promoType: promoType}, " of "), 
+                        React.createElement("div", {className: "col-md-2"}, 
                             React.createElement("input", {type: "hidden", id: "skuCollectionIds", ref: "skuCollectionIds", className: "form-control", defaultValue: productId})
-                        ),
-                        React.createElement("div", {className: "col-md-2", style: display},
+                        ), 
+                        React.createElement("div", {className: "col-md-2", style: display}, 
                             React.createElement(Common.Compare, {ref: "skuCollectionCond", id: "skuCollectionCond", onChange: this.onChange, value: this.state.filter, disabled: disabled})
-                        ),
-                        React.createElement("div", {className: "col-md-1", style: display},
-                            React.createElement("input", {className: "form-control pull-left", ref: "skuCollectionValue", id: "skuCollectionValue",
+                        ), 
+                        React.createElement("div", {className: "col-md-1", style: display}, 
+                            React.createElement("input", {className: "form-control pull-left", ref: "skuCollectionValue", id: "skuCollectionValue", 
                                 defaultValue: this.state.value, type: "text", onChange: this.onChange, disabled: disabled})
                         )
                     )
@@ -171,13 +171,13 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             mixins: [Common.removeMixin],
             render: function () {
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement("div", {className: "col-md-5"},
-                            React.createElement("textarea", {ref: "attributesResume", id: "attributesResume",
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("textarea", {ref: "attributesResume", id: "attributesResume", 
                                 readOnly: "readonly", value: this.state.valueText, className: "form-control"})
-                        ),
-                        React.createElement("div", {className: "col-md-4"},
-                            React.createElement(Components.Button, {type: "button", className: "btn-primary", ref: this.props.configureId,
+                        ), 
+                        React.createElement("div", {className: "col-md-4"}, 
+                            React.createElement(Components.Button, {type: "button", className: "btn-primary", ref: this.props.configureId, 
                                 onClick: this.handleConfigure}, "Configure")
                         )
                     )
@@ -197,10 +197,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             modal: null,
             modalContent: null,
             handleConfigure: function () {
-                var modal = React.createElement(Components.Modal, {onConfirm: this.handleConditionsConfirm, onCancel: this.handleConditionsCancel,
-                    id: "modal-" + this.props.id, key: "modal-" + this.props.id,
-                    title: "Product Combination Configuration", onLoad: this.registerModal, onUpdate: this.registerModal},
-                    React.createElement(ConditionsAttributesModalContent, {baseUrl: this.props.options.base_url, data: this.state.value,
+                var modal = React.createElement(Components.Modal, {onConfirm: this.handleConditionsConfirm, onCancel: this.handleConditionsCancel, 
+                    id: "modal-" + this.props.id, key: "modal-" + this.props.id, 
+                    title: "Product Combination Configuration", onLoad: this.registerModal, onUpdate: this.registerModal}, 
+                    React.createElement(ConditionsAttributesModalContent, {baseUrl: this.props.options.base_url, data: this.state.value, 
                         onLoad: this.registerModalContent, key: "modal-content-" + this.props.id, promo_type: this.props.options.promo_type})
                 );
 
@@ -313,25 +313,25 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 var fieldUrl = this.props.baseUrl + this.props.urlField;
                 var paramObj = {};
                 return (
-                    React.createElement("div", {className: "attribute-combinations form-horizontal"},
-                        React.createElement("div", {className: "form-group"},
-                            React.createElement("div", {className: "col-md-6"},
-                                React.createElement("select", {ref: "combinationType", className: "form-control to-select2",
-                                    id: "attribute-combination-type", defaultValue: this.state.match},
-                                    React.createElement("option", {value: "all"}, "All Conditions Have to Match"),
+                    React.createElement("div", {className: "attribute-combinations form-horizontal"}, 
+                        React.createElement("div", {className: "form-group"}, 
+                            React.createElement("div", {className: "col-md-6"}, 
+                                React.createElement("select", {ref: "combinationType", className: "form-control to-select2", 
+                                    id: "attribute-combination-type", defaultValue: this.state.match}, 
+                                    React.createElement("option", {value: "all"}, "All Conditions Have to Match"), 
                                     React.createElement("option", {value: "any"}, "Any Condition Has to Match")
                                 )
-                            ),
-                            React.createElement("div", {className: "col-md-6"},
+                            ), 
+                            React.createElement("div", {className: "col-md-6"}, 
                                 React.createElement("input", {ref: "combinationField", className: "form-control"})
                             )
-                        ),
+                        ), 
                     this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         var data = field.value || [];
-                        return React.createElement(ConditionsAttributesModalField, {label: field.label, url: url, key: field.field,
-                            data: data, filter: field.filter,
+                        return React.createElement(ConditionsAttributesModalField, {label: field.label, url: url, key: field.field, 
+                            data: data, filter: field.filter, 
                             id: field.field, input: field.input, removeField: this.removeField, ref: field.field, onChange: this.elementChange})
                     }.bind(this))
                     )
@@ -519,12 +519,12 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                         value = this.props.data;
                     }
                 }
-                var input = React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId,
+                var input = React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, 
                     onChange: this.onChange, defaultValue: value});
                 if (this.props.numeric_inputs.indexOf(inputType) != -1) {
                     if (inputType == 'number') {
                         if (this.state.range === false) {
-                            input = React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId,
+                            input = React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId, 
                                 ref: fieldId, style: {width: "auto"}, onChange: this.onChange, defaultValue: value});
                         } else {
                             value = this.props.data;
@@ -536,10 +536,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                             if (value.length > 1) {
                                 max = value[1];
                             }
-                            input = React.createElement("div", {id: fieldId, ref: fieldId, className: "input-group"},
-                                React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId + ".min", ref: "min",
-                                    placeholder: "Min", style: {width: "50%"}, onChange: this.onChange, defaultValue: min}),
-                                React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId + ".max", ref: "max",
+                            input = React.createElement("div", {id: fieldId, ref: fieldId, className: "input-group"}, 
+                                React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId + ".min", ref: "min", 
+                                    placeholder: "Min", style: {width: "50%"}, onChange: this.onChange, defaultValue: min}), 
+                                React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId + ".max", ref: "max", 
                                     placeholder: "Max", style: {width: "50%"}, onChange: this.onChange, defaultValue: max})
                             );
                         }
@@ -548,26 +548,26 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                         if (this.state.range === true) {
                             singleMode = false;
                         }
-                        input = React.createElement("div", {className: "input-group"},
-                            React.createElement("span", {className: "input-group-addon"},
+                        input = React.createElement("div", {className: "input-group"}, 
+                            React.createElement("span", {className: "input-group-addon"}, 
                                 React.createElement("i", {className: "glyphicon glyphicon-calendar"})
-                            ),
-                            React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId,
+                            ), 
+                            React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, 
                                 dataMode: singleMode, onChange: this.onChange, defaultValue: value})
                         )
                     }
                 } else if (inputType == 'select') {
-                    input = React.createElement("input", {className: "form-control required", type: "hidden", id: fieldId, ref: fieldId,
+                    input = React.createElement("input", {className: "form-control required", type: "hidden", id: fieldId, ref: fieldId, 
                         defaultValue: value});
                 } else if (this.props.bool_inputs.indexOf(inputType) != -1) {
                     input = React.createElement(Components.YesNo, {id: fieldId, ref: fieldId, onChange: this.onChange, defaultValue: value});
                 }
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement("div", {className: "col-md-4"},
-                            React.createElement(Common.Compare, {opts:  opts, id: "fieldCompare." + this.props.id, value: this.props.filter,
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement("div", {className: "col-md-4"}, 
+                            React.createElement(Common.Compare, {opts:  opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
                                 ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
-                        ),
+                        ), 
                         React.createElement("div", {className: "col-md-5"}, input)
                     )
                 );
@@ -821,19 +821,19 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     categories = categories.join(",");
                 }
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement(ConditionsType, {ref: "catProductsType", id: "catProductsType", containerClass: "col-md-3", promoType: promoType,
-                            onChange: this.onChange, value: values.type}, " of products in "),
-                        React.createElement("input", {type: "hidden", id: "catProductsIds", ref: "catProductsIds", defaultValue: categories}),
-                        React.createElement("select", {id: "catProductInclude", ref: "catProductInclude", className: "to-select2", defaultValue: values.include},
-                            React.createElement("option", {value: "only_this"}, Locale._("Only This")),
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement(ConditionsType, {ref: "catProductsType", id: "catProductsType", containerClass: "col-md-3", promoType: promoType, 
+                            onChange: this.onChange, value: values.type}, " of products in "), 
+                        React.createElement("input", {type: "hidden", id: "catProductsIds", ref: "catProductsIds", defaultValue: categories}), 
+                        React.createElement("select", {id: "catProductInclude", ref: "catProductInclude", className: "to-select2", defaultValue: values.include}, 
+                            React.createElement("option", {value: "only_this"}, Locale._("Only This")), 
                             React.createElement("option", {value: "include_subcategories"}, Locale._("This and sub categories"))
-                        ),
-                        React.createElement("div", {style: display},
-                            React.createElement(Common.Compare, {ref: "catProductsCond", id: "catProductsCond", onChange: this.onChange,
+                        ), 
+                        React.createElement("div", {style: display}, 
+                            React.createElement(Common.Compare, {ref: "catProductsCond", id: "catProductsCond", onChange: this.onChange, 
                                 value: values.filter, disabled: disabled})
-                        ),
-                        React.createElement("input", {ref: "catProductsValue", id: "catProductsValue", type: "text", className: "", onChange: this.onChange,
+                        ), 
+                        React.createElement("input", {ref: "catProductsValue", id: "catProductsValue", type: "text", className: "", onChange: this.onChange, 
                             defaultValue: values.value, style: display, disabled: disabled})
                     )
                 );
@@ -917,9 +917,9 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             mixins: [Common.removeMixin],
             render: function () {
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement(ConditionsType, {ref: "cartTotalType", id: "cartTotalType", totalType: this.props.totalType, onChange: this.onChange, value: this.props.data.type}),
-                        React.createElement(Common.Compare, {ref: "cartTotalCond", id: "cartTotalCond", onChange: this.onChange, value: this.props.data.filter}),
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement(ConditionsType, {ref: "cartTotalType", id: "cartTotalType", totalType: this.props.totalType, onChange: this.onChange, value: this.props.data.type}), 
+                        React.createElement(Common.Compare, {ref: "cartTotalCond", id: "cartTotalCond", onChange: this.onChange, value: this.props.data.filter}), 
                         React.createElement("input", {ref: "cartTotalValue", id: "cartTotalValue", type: "text", className: "", onBlur: this.onChange, defaultValue: this.props.data.value})
                     )
                 );
@@ -954,13 +954,13 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             mixins: [Common.removeMixin],
             render: function () {
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement("div", {className: "col-md-5"},
-                            React.createElement("textarea", {ref: "shippingResume", id: "shippingResume",
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("textarea", {ref: "shippingResume", id: "shippingResume", 
                                 readOnly: "readonly", value: this.state.valueText, className: "form-control"})
-                        ),
-                        React.createElement("div", {className: "col-md-4"},
-                            React.createElement(Components.Button, {type: "button", className: "btn-primary pull-left", ref: this.props.configureId,
+                        ), 
+                        React.createElement("div", {className: "col-md-4"}, 
+                            React.createElement(Components.Button, {type: "button", className: "btn-primary pull-left", ref: this.props.configureId, 
                                 onClick: this.handleConfigure}, "Configure")
                         )
                     )
@@ -980,9 +980,9 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             modal: null,
             modalContent: null,
             handleConfigure: function () {
-                var modal = React.createElement(Components.Modal, {onConfirm: this.handleShippingConfirm, id: "modal-" + this.props.id, key: "modal-" + this.props.id,
-                    title: this.props.modalTitle, onLoad: this.openModal, onUpdate: this.openModal},
-                    React.createElement(ConditionsShippingModalContent, {baseUrl: this.props.options.base_url, onLoad: this.registerModalContent,
+                var modal = React.createElement(Components.Modal, {onConfirm: this.handleShippingConfirm, id: "modal-" + this.props.id, key: "modal-" + this.props.id, 
+                    title: this.props.modalTitle, onLoad: this.openModal, onUpdate: this.openModal}, 
+                    React.createElement(ConditionsShippingModalContent, {baseUrl: this.props.options.base_url, onLoad: this.registerModalContent, 
                         key: "modal-content-" + this.props.id, data: this.state.value})
                 );
 
@@ -1073,28 +1073,28 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 var paramObj = {};
                 //paramObj[this.props.idVar] = this.props.entityId;
                 return (
-                    React.createElement("div", {className: "shipping-combinations form-horizontal"},
-                        React.createElement("div", {className: "form-group"},
-                            React.createElement("div", {className: "col-md-5"},
-                                React.createElement("select", {ref: "combinationType", className: "form-control to-select2", defaultValue: this.state.match},
-                                    React.createElement("option", {value: "all"}, "All Conditions Have to Match"),
+                    React.createElement("div", {className: "shipping-combinations form-horizontal"}, 
+                        React.createElement("div", {className: "form-group"}, 
+                            React.createElement("div", {className: "col-md-5"}, 
+                                React.createElement("select", {ref: "combinationType", className: "form-control to-select2", defaultValue: this.state.match}, 
+                                    React.createElement("option", {value: "all"}, "All Conditions Have to Match"), 
                                     React.createElement("option", {value: "any"}, "Any Condition Has to Match")
                                 )
-                            ),
-                            React.createElement("div", {className: "col-md-5"},
-                                React.createElement("select", {ref: "combinationField", className: "form-control"},
-                                    React.createElement("option", {value: "-1"}, this.props.labelCombinationField),
+                            ), 
+                            React.createElement("div", {className: "col-md-5"}, 
+                                React.createElement("select", {ref: "combinationField", className: "form-control"}, 
+                                    React.createElement("option", {value: "-1"}, this.props.labelCombinationField), 
                                 this.props.fields.map(function (field) {
                                     return React.createElement("option", {value: field.field, key: field.field}, field.label)
                                 })
                                 )
                             )
-                        ),
+                        ), 
                     this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         var data = field.value || [];
-                        return React.createElement(ConditionsShippingModalField, {label: field.label, url: url, key: field.field, data: data, filter: field.filter,
+                        return React.createElement(ConditionsShippingModalField, {label: field.label, url: url, key: field.field, data: data, filter: field.filter, 
                             id: field.field, ref: field.field, removeField: this.removeField, onChange: this.elementChange, opts: ConditionsShippingModalField.opts()})
                     }.bind(this))
                     )
@@ -1282,11 +1282,11 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     helperBlock = React.createElement("span", {key: fieldId + '.help', className: "help-block"}, this.props.postHelperText);
                 }
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement("div", {className: "col-md-4"},
-                            React.createElement(Common.Compare, {opts: this.props.opts, id: "fieldCompare." + this.props.id, value: this.props.filter,
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement("div", {className: "col-md-4"}, 
+                            React.createElement(Common.Compare, {opts: this.props.opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
                                 ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
-                        ),
+                        ), 
                         React.createElement("div", {className: "col-md-5"}, [input, helperBlock])
                     )
                 );
@@ -1451,7 +1451,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     }
                 }
                 return (
-                    React.createElement("div", {className: "conditions col-md-offset-1", style: {display: this.props.hidden ? "none" : "block"}},
+                    React.createElement("div", {className: "conditions col-md-offset-1", style: {display: this.props.hidden ? "none" : "block"}}, 
                     children
                     )
                 );
@@ -1564,14 +1564,14 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
 
                 });
                 return (
-                    React.createElement("div", {className: this.props.containerClass},
-                        React.createElement("div", {className: "col-md-10"},
-                            React.createElement("select", {className: cls, onChange: this.onChange, defaultValue: this.props.value},
+                    React.createElement("div", {className: this.props.containerClass}, 
+                        React.createElement("div", {className: "col-md-10"}, 
+                            React.createElement("select", {className: cls, onChange: this.onChange, defaultValue: this.props.value}, 
                         types.map(function (type) {
                             return React.createElement("option", {value: type.id, key: type.id}, type.label)
                         })
                             )
-                        ),
+                        ), 
                     this.props.children
                     )
                 );
@@ -1608,14 +1608,14 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
         var DiscountDetailsCombination = React.createClass({displayName: "DiscountDetailsCombination",
             render: function () {
                 return (
-                    React.createElement("div", null,
-                        React.createElement("div", {className: "col-md-8"},
-                            React.createElement("input", {type: "text", readOnly: "readonly", ref: "attributesResume" + this.props.id,
-                                key: "attributesResume" + this.props.id, id: "attributesResume" + this.props.id,
+                    React.createElement("div", null, 
+                        React.createElement("div", {className: "col-md-8"}, 
+                            React.createElement("input", {type: "text", readOnly: "readonly", ref: "attributesResume" + this.props.id, 
+                                key: "attributesResume" + this.props.id, id: "attributesResume" + this.props.id, 
                                 className: "form-control", value: this.state.valueText})
-                        ),
-                        React.createElement("div", {className: "col-md-4"},
-                            React.createElement(Components.Button, {type: "button", className: "btn-primary",
+                        ), 
+                        React.createElement("div", {className: "col-md-4"}, 
+                            React.createElement(Components.Button, {type: "button", className: "btn-primary", 
                                 ref: this.props.configureId + this.props.id, onClick: this.handleConfigure}, "Configure")
                         )
                     )
@@ -1635,10 +1635,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             modal: null,
             modalContent: null,
             handleConfigure: function () {
-                var modal = React.createElement(Components.Modal, {onConfirm: this.handleConditionsConfirm, onCancel: this.handleConditionsCancel,
-                    id: "modal-" + this.props.id, key: "modal-" + this.props.id,
-                    title: "Product Combination Configuration", onLoad: this.registerModal, onUpdate: this.registerModal},
-                    React.createElement(DiscountDetailsCombinationsModalContent, {baseUrl: this.props.options.base_url, data: this.state.value,
+                var modal = React.createElement(Components.Modal, {onConfirm: this.handleConditionsConfirm, onCancel: this.handleConditionsCancel, 
+                    id: "modal-" + this.props.id, key: "modal-" + this.props.id, 
+                    title: "Product Combination Configuration", onLoad: this.registerModal, onUpdate: this.registerModal}, 
+                    React.createElement(DiscountDetailsCombinationsModalContent, {baseUrl: this.props.options.base_url, data: this.state.value, 
                         onLoad: this.registerModalContent, key: "modal-content-" + this.props.id, id: "modal-content-" + this.props.id})
                 );
 
@@ -1753,27 +1753,27 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 var paramObj = {};
                 var id = this.props.id;
                 return (
-                    React.createElement("div", {className: "attribute-combinations form-horizontal"},
-                        React.createElement("div", {className: "form-group"},
-                            React.createElement("div", {className: "col-md-5"},
-                                React.createElement("select", {ref: "combinationType" + id, id: "combinationType" + id,
-                                    key: "combinationType" + id, className: "form-control to-select2", defaultValue: this.state.match},
-                                    React.createElement("option", {value: "all"}, "All Conditions Have to Match"),
+                    React.createElement("div", {className: "attribute-combinations form-horizontal"}, 
+                        React.createElement("div", {className: "form-group"}, 
+                            React.createElement("div", {className: "col-md-5"}, 
+                                React.createElement("select", {ref: "combinationType" + id, id: "combinationType" + id, 
+                                    key: "combinationType" + id, className: "form-control to-select2", defaultValue: this.state.match}, 
+                                    React.createElement("option", {value: "all"}, "All Conditions Have to Match"), 
                                     React.createElement("option", {value: "any"}, "Any Condition Has to Match")
                                 )
-                            ),
-                            React.createElement("div", {className: "col-md-5"},
-                                React.createElement("input", {ref: "combinationField" + id, key: "combinationField" + id,
+                            ), 
+                            React.createElement("div", {className: "col-md-5"}, 
+                                React.createElement("input", {ref: "combinationField" + id, key: "combinationField" + id, 
                                     id: "combinationField" + id, className: "form-control"})
                             )
-                        ),
+                        ), 
                     this.state.fields.map(function (field) {
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         var data = field.value || [];
-                        return React.createElement(DiscountDetailsCombinationsModalField, {label: field.label, url: url,
-                            key: field.field + id, id: field.field + id, ref: field.field + id,
-                            data: data, filter: field.filter, field: field.field,
+                        return React.createElement(DiscountDetailsCombinationsModalField, {label: field.label, url: url, 
+                            key: field.field + id, id: field.field + id, ref: field.field + id, 
+                            data: data, filter: field.filter, field: field.field, 
                             input: field.input, removeField: this.removeField, onChange: this.elementChange})
                     }.bind(this))
                     )
@@ -1956,12 +1956,12 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                         value = this.props.data;
                     }
                 }
-                var input = React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, key: fieldId,
+                var input = React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, key: fieldId, 
                     onChange: this.onChange, defaultValue: value});
                 if (this.props.numeric_inputs.indexOf(inputType) != -1) {
                     if (inputType == 'number') {
                         if (this.state.range === false) {
-                            input = React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId,
+                            input = React.createElement("input", {className: "form-control required", type: "number", step: "any", id: fieldId, 
                                 ref: fieldId, key: fieldId, style: {width: "auto"}, onChange: this.onChange, defaultValue: value});
                         } else {
                             value = this.props.data;
@@ -1973,10 +1973,10 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                             if (value.length > 1) {
                                 max = value[1];
                             }
-                            input = React.createElement("div", {id: fieldId, ref: fieldId, key: fieldId, className: "input-group"},
-                                React.createElement("input", {className: "form-control required", type: "number", step: "any", placeholder: "Min",
-                                    style: {width: "50%"}, onChange: this.onChange, defaultValue: min, id: fieldId + ".min"}),
-                                React.createElement("input", {className: "form-control required", type: "number", step: "any", placeholder: "Max",
+                            input = React.createElement("div", {id: fieldId, ref: fieldId, key: fieldId, className: "input-group"}, 
+                                React.createElement("input", {className: "form-control required", type: "number", step: "any", placeholder: "Min", 
+                                    style: {width: "50%"}, onChange: this.onChange, defaultValue: min, id: fieldId + ".min"}), 
+                                React.createElement("input", {className: "form-control required", type: "number", step: "any", placeholder: "Max", 
                                     style: {width: "50%"}, onChange: this.onChange, defaultValue: max, id: fieldId + ".max"})
                             );
                         }
@@ -1985,26 +1985,26 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                         if (this.state.range === true) {
                             singleMode = false;
                         }
-                        input = React.createElement("div", {className: "input-group"},
-                            React.createElement("span", {className: "input-group-addon"},
+                        input = React.createElement("div", {className: "input-group"}, 
+                            React.createElement("span", {className: "input-group-addon"}, 
                                 React.createElement("i", {className: "glyphicon glyphicon-calendar"})
-                            ),
-                            React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, key: fieldId,
+                            ), 
+                            React.createElement("input", {className: "form-control required", type: "text", id: fieldId, ref: fieldId, key: fieldId, 
                                 dataMode: singleMode, onChange: this.onChange, defaultValue: value})
                         )
                     }
                 } else if (inputType == 'select') {
-                    input = React.createElement("input", {className: "form-control required", type: "hidden", id: fieldId, ref: fieldId, key: fieldId,
+                    input = React.createElement("input", {className: "form-control required", type: "hidden", id: fieldId, ref: fieldId, key: fieldId, 
                         defaultValue: value});
                 } else if (this.props.bool_inputs.indexOf(inputType) != -1) {
                     input = React.createElement(Components.YesNo, {id: fieldId, ref: fieldId, key: fieldId, onChange: this.onChange, defaultValue: value});
                 }
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement("div", {className: "col-md-4"},
-                            React.createElement(Common.Compare, {opts:  opts, id: "fieldCompare." + this.props.id, value: this.props.filter,
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement("div", {className: "col-md-4"}, 
+                            React.createElement(Common.Compare, {opts:  opts, id: "fieldCompare." + this.props.id, value: this.props.filter, 
                                 ref: "fieldCompare." + this.props.id, onChange: this.onCompareChange})
-                        ),
+                        ), 
                         React.createElement("div", {className: "col-md-5"}, input)
                     )
                 );
@@ -2256,7 +2256,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     }
                 }
                 return (
-                    React.createElement("input", {type: "hidden", id: "skuCollectionIds" + this.props.id, ref: "skuCollectionIds" + this.props.id,
+                    React.createElement("input", {type: "hidden", id: "skuCollectionIds" + this.props.id, ref: "skuCollectionIds" + this.props.id, 
                         key: "skuCollectionIds" + this.props.id, className: "form-control", defaultValue: value})
                 );
             },
@@ -2311,13 +2311,13 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             render: function () {
                 var details = React.createElement("span", null);
                 if (this.props.type == 'attr_combination') {
-                    details = React.createElement(DiscountDetailsCombination, {id: "attrCombination" + this.props.id,
-                        ref: "attrCombination" + this.props.id, key: "attrCombination" + this.props.id,
-                        options: this.props.options, modalContainer: this.props.modalContainer,
+                    details = React.createElement(DiscountDetailsCombination, {id: "attrCombination" + this.props.id, 
+                        ref: "attrCombination" + this.props.id, key: "attrCombination" + this.props.id, 
+                        options: this.props.options, modalContainer: this.props.modalContainer, 
                         data: this.props.data.combination, onChange: this.props.onChange})
                 } else if (this.props.type == 'other_prod') {
-                    details = React.createElement(DiscountSkuCombination, {id: "skuCombination" + this.props.id,
-                        ref: "skuCombination" + this.props.id, key: "skuCombination" + this.props.id,
+                    details = React.createElement(DiscountSkuCombination, {id: "skuCombination" + this.props.id, 
+                        ref: "skuCombination" + this.props.id, key: "skuCombination" + this.props.id, 
                         options: this.props.options, data: this.props.data.sku, onChange: this.props.onChange});
                 }
                 return details;
@@ -2345,38 +2345,38 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 var isCatalog = (promoType === 'catalog');
 
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement("div", {style: divStyle},
-                            React.createElement("input", {className: "form-control pull-left", ref: "discountValue" + this.props.id,
-                                   id: "discountValue" + this.props.id, key: "discountValue" + this.props.id,
-                                   type: "text", size: "6",
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement("div", {style: divStyle}, 
+                            React.createElement("input", {className: "form-control pull-left", ref: "discountValue" + this.props.id, 
+                                   id: "discountValue" + this.props.id, key: "discountValue" + this.props.id, 
+                                   type: "text", size: "6", 
                                    defaultValue: this.state.value, onBlur: this.onChange})
-                        ),
-                        React.createElement(Type, {ref: "discountType" + this.props.id, id: "discountType" + this.props.id, promoType: promoType,
-                            key: "discountType" + this.props.id, value: this.state.type, onChange: this.onTypeChange}),
-                        React.createElement("div", {style: $.extend({},divStyle, display)},
-                            React.createElement("select", {className: "to-select2 form-control", disabled: isCatalog,
-                                ref: "discountScope" + this.props.id, defaultValue: this.state.scope,
-                                id: "discountScope" + this.props.id, key: "discountScope" + this.props.id, onChange: this.onChange},
+                        ), 
+                        React.createElement(Type, {ref: "discountType" + this.props.id, id: "discountType" + this.props.id, promoType: promoType, 
+                            key: "discountType" + this.props.id, value: this.state.type, onChange: this.onTypeChange}), 
+                        React.createElement("div", {style: $.extend({},divStyle, display)}, 
+                            React.createElement("select", {className: "to-select2 form-control", disabled: isCatalog, 
+                                ref: "discountScope" + this.props.id, defaultValue: this.state.scope, 
+                                id: "discountScope" + this.props.id, key: "discountScope" + this.props.id, onChange: this.onChange}, 
                                 this.props.scopeOptions.map(function (type) {
                                     return React.createElement("option", {value: type.id, key: type.id}, type.label)
                                 })
                             )
-                        ),
-                        React.createElement("div", {style: $.extend({},divStyle, display)},
-                            React.createElement(DiscountDetails, {type: this.state.scope, options: this.props.options, ref: "discountDetails" + this.props.id,
-                                id: "discountDetails" + this.props.id, key: "discountDetails" + this.props.id,
-                                modalContainer: this.props.modalContainer, onChange: this.onChange,
+                        ), 
+                        React.createElement("div", {style: $.extend({},divStyle, display)}, 
+                            React.createElement(DiscountDetails, {type: this.state.scope, options: this.props.options, ref: "discountDetails" + this.props.id, 
+                                id: "discountDetails" + this.props.id, key: "discountDetails" + this.props.id, 
+                                modalContainer: this.props.modalContainer, onChange: this.onChange, 
                                 data: {
                                     sku: this.state.sku,
                                     combination: this.state.combination
                                 }, promoType: promoType})
-                        ),
+                        ), 
                          isCatalog && this.state.type != '=$'?
-                            React.createElement("div", {style: divStyle},
-                                React.createElement("select", {className: "form-control to-select2", ref: "base-field-" + this.props.id,
-                                        defaultValue: this.state.base_field,
-                                        id: "base-field-" + this.props.id, key: "base-field-" + this.props.id},
+                            React.createElement("div", {style: divStyle}, 
+                                React.createElement("select", {className: "form-control to-select2", ref: "base-field-" + this.props.id, 
+                                        defaultValue: this.state.base_field, 
+                                        id: "base-field-" + this.props.id, key: "base-field-" + this.props.id}, 
                                     this.props.options['base_fields']['promo'].map(function (p) {
 
                                         var opt = null;
@@ -2392,7 +2392,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                                 )
                             ):
                             null
-
+                        
                     )
                 );
             },
@@ -2506,28 +2506,28 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     }
                 }
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                        React.createElement("div", {style: this.props.divStyle},
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                        React.createElement("div", {style: this.props.divStyle}, 
                             React.createElement("input", {type: "hidden", className: "form-control", id: "productSku", ref: "productSku", defaultValue: skus})
-                        ),
-                        React.createElement("div", {style: this.props.divStyle},
-                            React.createElement("div", {style: this.props.divStyle},
-                                React.createElement(Components.ControlLabel, {input_id: "productQty",
+                        ), 
+                        React.createElement("div", {style: this.props.divStyle}, 
+                            React.createElement("div", {style: this.props.divStyle}, 
+                                React.createElement(Components.ControlLabel, {input_id: "productQty", 
                                     label_class: ""}, Locale._('Qty'))
-                            ),
-                            React.createElement("div", {style: {float: 'left', marginLeft: 5}},
-                                React.createElement("input", {type: "text", className: "form-control", id: "productQty", ref: "productQty",
+                            ), 
+                            React.createElement("div", {style: {float: 'left', marginLeft: 5}}, 
+                                React.createElement("input", {type: "text", className: "form-control", id: "productQty", ref: "productQty", 
                                     defaultValue: this.state.qty, onChange: this.onChange})
                             )
-                        ),
-                        React.createElement("div", {style: this.props.divStyle},
-                            React.createElement("div", {style: this.props.divStyle},
+                        ), 
+                        React.createElement("div", {style: this.props.divStyle}, 
+                            React.createElement("div", {style: this.props.divStyle}, 
                                 React.createElement(Components.ControlLabel, {input_id: "productTerms", label_class: ""}, Locale._('Terms'))
-                            ),
-                            React.createElement("div", {style: this.props.divStyle},
-                                React.createElement("select", {className: "form-control to-select2", id: "productTerms", ref: "productTerms",
-                                    multiple: "multiple", defaultValue: terms},
-                                    React.createElement("option", {value: "tax"}, Locale._("Charge tax")),
+                            ), 
+                            React.createElement("div", {style: this.props.divStyle}, 
+                                React.createElement("select", {className: "form-control to-select2", id: "productTerms", ref: "productTerms", 
+                                    multiple: "multiple", defaultValue: terms}, 
+                                    React.createElement("option", {value: "tax"}, Locale._("Charge tax")), 
                                     React.createElement("option", {value: "sah"}, Locale._("Charge S & H"))
                                 )
                             )
@@ -2611,7 +2611,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 if (this.state.type != 'free') {
                     amount = React.createElement("input", {type: "number", defaultValue: this.state.amount, id: "shippingAmount", ref: "shippingAmount", className: "form-control", onChange: this.onChange})
                 }
-                var type = React.createElement(Type, {ref: "shippingType", id: "shippingType", onChange: this.onTypeChange, value: this.state.type,
+                var type = React.createElement(Type, {ref: "shippingType", id: "shippingType", onChange: this.onTypeChange, value: this.state.type, 
                     totalType: this.props.fields, value: this.state.type});
                 var label = React.createElement(Components.ControlLabel, {label_class: "col-md-1", input_id: "shippingMethods"}, Locale._('For'));
                 var methods = this.state.methods;
@@ -2620,11 +2620,11 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 }
                 var input = React.createElement("input", {type: "hidden", className: "form-control", id: "shippingMethods", ref: "shippingMethods", defaultValue: methods});
                 return (
-                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove},
-                    type,
-                        React.createElement("div", {className: "col-md-7"},
-                            React.createElement("div", {className: amount ? "col-md-2" : ""}, amount),
-                        label,
+                    React.createElement(Common.Row, {rowClass: this.props.rowClass, label: this.props.label, onDelete: this.remove}, 
+                    type, 
+                        React.createElement("div", {className: "col-md-7"}, 
+                            React.createElement("div", {className: amount ? "col-md-2" : ""}, amount), 
+                        label, 
                             React.createElement("div", {className: amount ? "col-md-9" : "col-md-11"}, input)
                         /*if no amount field, make this wider*/
                         )
@@ -2731,15 +2731,15 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                                 var key = action + '-' + idx;
                                 switch (action) {
                                     case 'discount':
-                                        el = React.createElement(Discount, {label: Locale._("Discount"), options: options,
-                                            key: key, id: key, removeAction: ra, data: field,
+                                        el = React.createElement(Discount, {label: Locale._("Discount"), options: options, 
+                                            key: key, id: key, removeAction: ra, data: field, 
                                             modalContainer: mc, onUpdate: au});
                                         break;
                                     case 'free_product':
                                         if (promoType == 'catalog') {
                                             el = '';
                                         } else {
-                                            el = React.createElement(FreeProduct, {label: Locale._("Auto Add Product To Cart"), options: options,
+                                            el = React.createElement(FreeProduct, {label: Locale._("Auto Add Product To Cart"), options: options, 
                                                 key: key, id: key, removeAction: ra, onUpdate: au, data: field});
                                         }
                                         break;
@@ -2747,7 +2747,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                                         if (promoType == 'catalog') {
                                             el = '';
                                         } else {
-                                            el = React.createElement(Shipping, {label: Locale._("Shipping"), options: options,
+                                            el = React.createElement(Shipping, {label: Locale._("Shipping"), options: options, 
                                                 key: key, id: key, removeAction: ra, onUpdate: au, data: field});
                                         }
                                         break;
@@ -2763,7 +2763,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     }
                 }
                 return (
-                    React.createElement("div", {className: "actions col-md-offset-1"},
+                    React.createElement("div", {className: "actions col-md-offset-1"}, 
                     children
                     )
                 );
@@ -2875,8 +2875,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             DelBtn: React.createClass({displayName: "DelBtn",
                 render: function () {
                     return (
-                        React.createElement(Components.Button, {className: "btn-link btn-delete", onClick: this.props.onClick,
-                            type: "button", style:  {paddingRight: 10, paddingLeft: 10} },
+                        React.createElement(Components.Button, {className: "btn-link btn-delete", onClick: this.props.onClick, 
+                            type: "button", style:  {paddingRight: 10, paddingLeft: 10} }, 
                             React.createElement("span", {className: "icon-trash"})
                         )
                     );
@@ -2888,12 +2888,12 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                     if (this.props.rowClass) {
                         cls += " " + this.props.rowClass;
                     }
-                    return (React.createElement("div", {className: cls},
-                        React.createElement("div", {className: "col-md-3"},
-                            React.createElement(Components.ControlLabel, {label_class: "pull-right"}, this.props.label,
+                    return (React.createElement("div", {className: cls}, 
+                        React.createElement("div", {className: "col-md-3"}, 
+                            React.createElement(Components.ControlLabel, {label_class: "pull-right"}, this.props.label, 
                                 React.createElement(Common.DelBtn, {onClick: this.props.onDelete})
                             )
-                        ),
+                        ), 
                 this.props.children
                     ));
                 }
@@ -2901,8 +2901,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             Compare: React.createClass({displayName: "Compare",
                 render: function () {
                     return (
-                        React.createElement("select", {className: "to-select2", onChange: this.props.onChange, id: this.props.id,
-                            defaultValue: this.props.value, disabled: this.props.disabled, style: this.props.style},
+                        React.createElement("select", {className: "to-select2", onChange: this.props.onChange, id: this.props.id, 
+                            defaultValue: this.props.value, disabled: this.props.disabled, style: this.props.style}, 
                     this.props.opts.map(function (type) {
                         return React.createElement("option", {value: type.id, key: type.id}, type.label)
                     })
@@ -2931,7 +2931,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                         React.createElement(Components.Button, {onClick: this.props.onClick, className: "btn-link pull-left", type: "button", style:  {
                             paddingRight: 10,
                             paddingLeft: 10
-                        } },
+                        } }, 
                             React.createElement("span", {"aria-hidden": "true", className: "glyphicon glyphicon glyphicon-plus-sign"})
                         )
                     );
@@ -3102,13 +3102,13 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
         var SingleCoupon = React.createClass({displayName: "SingleCoupon",
             render: function () {
                 return (
-                    React.createElement("div", {className: "single-coupon form-group"},
-                        React.createElement(Components.ControlLabel, {input_id: this.props.id, label_class: this.props.labelClass},
-                        this.props.labelText,
+                    React.createElement("div", {className: "single-coupon form-group"}, 
+                        React.createElement(Components.ControlLabel, {input_id: this.props.id, label_class: this.props.labelClass}, 
+                        this.props.labelText, 
                             React.createElement(Components.HelpIcon, {id: "help-" + this.props.id, content: this.props.helpText})
-                        ),
-                        React.createElement("div", {className: "col-md-5"},
-                            React.createElement("input", {id: this.props.id, ref: this.props.name, name: this.props.name, className: "form-control", defaultValue: this.props.value}),
+                        ), 
+                        React.createElement("div", {className: "col-md-5"}, 
+                            React.createElement("input", {id: this.props.id, ref: this.props.name, name: this.props.name, className: "form-control", defaultValue: this.props.value}), 
                             React.createElement("span", {className: "help-block"}, this.props.helpText)
                         )
                     )
@@ -3133,44 +3133,44 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
         var GenerateForm = React.createClass({displayName: "GenerateForm",
             render: function () {
                 return (
-                    React.createElement("div", {className: "f-section", id: "coupon-generate-container"},
-                        React.createElement("div", {className: "well well-sm help-block", style: {fontSize: 12}},
-                            React.createElement("p", null, Locale._("You can have unique coupon codes generated for you automatically if you input simple patterns.")),
-                            React.createElement("p", null, Locale._("Pattern examples:")),
-                            React.createElement("p", null,
-                                React.createElement("code", null, "{U8}"), Locale._(" - 8 alpha chars - will result to something like "),
+                    React.createElement("div", {className: "f-section", id: "coupon-generate-container"}, 
+                        React.createElement("div", {className: "well well-sm help-block", style: {fontSize: 12}}, 
+                            React.createElement("p", null, Locale._("You can have unique coupon codes generated for you automatically if you input simple patterns.")), 
+                            React.createElement("p", null, Locale._("Pattern examples:")), 
+                            React.createElement("p", null, 
+                                React.createElement("code", null, "{U8}"), Locale._(" - 8 alpha chars - will result to something like "), 
                                 React.createElement("code", null, "DKABWJKQ")
-                            ),
-                            React.createElement("p", null,
-                                React.createElement("code", null, "{D4}"), Locale._(" - 4 digits - will result to something like "),
+                            ), 
+                            React.createElement("p", null, 
+                                React.createElement("code", null, "{D4}"), Locale._(" - 4 digits - will result to something like "), 
                                 React.createElement("code", null, "5640")
-                            ),
-                            React.createElement("p", null,
-                                React.createElement("code", null, "{UD5}"), Locale._(" - 5 alphanumeric - will result to something like "),
+                            ), 
+                            React.createElement("p", null, 
+                                React.createElement("code", null, "{UD5}"), Locale._(" - 5 alphanumeric - will result to something like "), 
                                 React.createElement("code", null, "GHG76")
-                            ),
-                            React.createElement("p", null,
-                                React.createElement("code", null, "CODE-{U4}-{UD6}"),
-                                "-",
+                            ), 
+                            React.createElement("p", null, 
+                                React.createElement("code", null, "CODE-{U4}-{UD6}"), 
+                                "-", 
                                 React.createElement("code", null, "CODE-HQNB-8A1NO3")
-                            ),
+                            ), 
                             React.createElement("p", null, "Locale._(\"Note: dynamic parts of the code MUST be enclosed in {}\")")
-                        ),
-                        React.createElement("div", {id: "coupon-generate-container", ref: "formContainer", className: "form-horizontal"},
-                            React.createElement(Components.Input, {field: "code_pattern", label: Locale._("Code Pattern"),
-                                helpBlockText: Locale._("(Leave empty to auto-generate)"),
-                                inputDivClass: "col-md-8", label_class: "col-md-4"}),
-                            React.createElement(Components.Input, {field: "code_length", label: Locale._("Coupon Code Length"),
-                                helpBlockText: Locale._("(Will be used only if auto-generating codes)"),
-                                inputDivClass: "col-md-8", label_class: "col-md-4"}),
-                            React.createElement(Components.Input, {field: "coupon_count", label: Locale._("How many to generate"),
-                                inputDivClass: "col-md-8", label_class: "col-md-4", inputValue: "1", required: true}),
-                            React.createElement("div", {className: this.props.groupClass},
-                                React.createElement("div", {className: "col-md-offset-4"},
+                        ), 
+                        React.createElement("div", {id: "coupon-generate-container", ref: "formContainer", className: "form-horizontal"}, 
+                            React.createElement(Components.Input, {field: "code_pattern", label: Locale._("Code Pattern"), 
+                                helpBlockText: Locale._("(Leave empty to auto-generate)"), 
+                                inputDivClass: "col-md-8", label_class: "col-md-4"}), 
+                            React.createElement(Components.Input, {field: "code_length", label: Locale._("Coupon Code Length"), 
+                                helpBlockText: Locale._("(Will be used only if auto-generating codes)"), 
+                                inputDivClass: "col-md-8", label_class: "col-md-4"}), 
+                            React.createElement(Components.Input, {field: "coupon_count", label: Locale._("How many to generate"), 
+                                inputDivClass: "col-md-8", label_class: "col-md-4", inputValue: "1", required: true}), 
+                            React.createElement("div", {className: this.props.groupClass}, 
+                                React.createElement("div", {className: "col-md-offset-4"}, 
                                     React.createElement("span", {style: {
                                         display: 'none',
                                         marginLeft: 20
-                                    }, className: "loading"}, "Loading ... "),
+                                    }, className: "loading"}, "Loading ... "), 
                                     React.createElement("span", {style: {display: 'none', marginLeft: 20}, className: "result"})
                                 )
                             )
@@ -3192,26 +3192,26 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
         var MultiCoupon = React.createClass({displayName: "MultiCoupon",
             render: function () {
                 return (
-                    React.createElement("div", {className: "multi-coupon form-group", style: {margin: "15px 0"}},
-                        React.createElement("div", {className: "form-group"},
-                            React.createElement(Components.ControlLabel, {input_id: "limit_per_coupon", label_class: "col-md-3"},
-                            Locale._("Limit Per Coupon Code"),
-                                React.createElement(Components.HelpIcon, {id: "help-limit_per_coupon",
+                    React.createElement("div", {className: "multi-coupon form-group", style: {margin: "15px 0"}}, 
+                        React.createElement("div", {className: "form-group"}, 
+                            React.createElement(Components.ControlLabel, {input_id: "limit_per_coupon", label_class: "col-md-3"}, 
+                            Locale._("Limit Per Coupon Code"), 
+                                React.createElement(Components.HelpIcon, {id: "help-limit_per_coupon", 
                                     content: Locale._("Maximum number of uses per coupon code")})
-                            ),
+                            ), 
 
-                            React.createElement("div", {className: "col-md-1"},
-                                React.createElement("input", {type: "text", id: "limit_per_coupon", ref: "limit_per_coupon",
-                                    name: "model[limit_per_coupon]", className: "form-control",
+                            React.createElement("div", {className: "col-md-1"}, 
+                                React.createElement("input", {type: "text", id: "limit_per_coupon", ref: "limit_per_coupon", 
+                                    name: "model[limit_per_coupon]", className: "form-control", 
                                     defaultValue: this.props.options['limit_per_coupon']})
                             )
-                        ),
-                        React.createElement("div", {className: "btn-group col-md-offset-3"},
-                            React.createElement(Components.Button, {onClick: this.props.onShowCodes, className: "btn-primary",
-                                type: "button"}, this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel),
-                            React.createElement(Components.Button, {onClick: this.props.onGenerateCodes, className: "btn-primary",
-                                type: "button"}, this.props.buttonGenerateLabel),
-                            React.createElement(Components.Button, {onClick: this.props.onImportCodes, className: "btn-primary",
+                        ), 
+                        React.createElement("div", {className: "btn-group col-md-offset-3"}, 
+                            React.createElement(Components.Button, {onClick: this.props.onShowCodes, className: "btn-primary", 
+                                type: "button"}, this.state.buttonViewLabel ? this.state.buttonViewLabel : this.props.buttonViewLabel), 
+                            React.createElement(Components.Button, {onClick: this.props.onGenerateCodes, className: "btn-primary", 
+                                type: "button"}, this.props.buttonGenerateLabel), 
+                            React.createElement(Components.Button, {onClick: this.props.onImportCodes, className: "btn-primary", 
                                 type: "button"}, this.props.buttonImportLabel)
                         )
                     )
@@ -3244,25 +3244,25 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
         var UsesBlock = React.createClass({displayName: "UsesBlock",
             render: function () {
                 return (
-                    React.createElement("div", {className: "uses-block form-group", style: {clear: 'both'}},
-                        React.createElement(Components.ControlLabel, {input_id: this.props.idUpc, label_class: this.props.labelClass},
-                        this.props.labelUpc,
+                    React.createElement("div", {className: "uses-block form-group", style: {clear: 'both'}}, 
+                        React.createElement(Components.ControlLabel, {input_id: this.props.idUpc, label_class: this.props.labelClass}, 
+                        this.props.labelUpc, 
                             React.createElement(Components.HelpIcon, {id: "help-" + this.props.idUpc, content: this.props.helpTextUpc})
-                        ),
-                        React.createElement("div", {className: "col-md-1"},
-                            React.createElement("input", {type: "text", id: this.props.idUpc, ref: this.props.idUpc,
-                                name: "model[" + this.props.idUpc + "]", className: "form-control",
+                        ), 
+                        React.createElement("div", {className: "col-md-1"}, 
+                            React.createElement("input", {type: "text", id: this.props.idUpc, ref: this.props.idUpc, 
+                                name: "model[" + this.props.idUpc + "]", className: "form-control", 
                                 defaultValue: this.state.valueUpc})
-                        ),
+                        ), 
 
-                        React.createElement(Components.ControlLabel, {input_id: this.props.idUt, label_class: this.props.labelClass},
-                        this.props.labelUt,
+                        React.createElement(Components.ControlLabel, {input_id: this.props.idUt, label_class: this.props.labelClass}, 
+                        this.props.labelUt, 
                             React.createElement(Components.HelpIcon, {id: "help-" + this.props.idUt, content: this.props.helpTextUt})
-                        ),
+                        ), 
 
-                        React.createElement("div", {className: "col-md-1"},
-                            React.createElement("input", {type: "text", id: this.props.idUt, ref: this.props.idUt,
-                                name: "model[" + this.props.idUt + "]", className: "form-control",
+                        React.createElement("div", {className: "col-md-1"}, 
+                            React.createElement("input", {type: "text", id: this.props.idUt, ref: this.props.idUt, 
+                                name: "model[" + this.props.idUt + "]", className: "form-control", 
                                 defaultValue: this.state.valueUt})
                         )
                     )
@@ -3304,19 +3304,19 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
 
                 if (this.state.mode == 1) {
                     child = [React.createElement(UsesBlock, {options: this.props.options, key: "uses-block", labelClass: this.props.labelClass}),
-                        React.createElement(SingleCoupon, {key: "single-coupon", options: this.props.options, labelClass: this.props.labelClass,
+                        React.createElement(SingleCoupon, {key: "single-coupon", options: this.props.options, labelClass: this.props.labelClass, 
                             name: this.props.options['single_coupon_name'], value: this.props.options['single_coupon_code']})];
                 } else if (this.state.mode == 2) {
                     var onShowCodes = this.onShowCodes || '',
                         onGenerateCodes = this.onGenerateCodes || '',
                         onImportCodes = this.onImportCodes || '';
-                    child = React.createElement(MultiCoupon, {key: "multi-coupon", options: this.props.options, onImportCodes: onImportCodes,
-                        onGenerateCodes: onGenerateCodes, onShowCodes: onShowCodes, labelClass: this.props.labelClass,
+                    child = React.createElement(MultiCoupon, {key: "multi-coupon", options: this.props.options, onImportCodes: onImportCodes, 
+                        onGenerateCodes: onGenerateCodes, onShowCodes: onShowCodes, labelClass: this.props.labelClass, 
                         buttonViewLabel: viewLabel});
                 }
                 return (
-                    React.createElement("div", {className: "coupon-app"},
-                        React.createElement("div", {className: "coupon-group"},
+                    React.createElement("div", {className: "coupon-app"}, 
+                        React.createElement("div", {className: "coupon-group"}, 
                         child
                         )
                     )
@@ -3419,7 +3419,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             }
             var $container = $("#" + this.options.actions_container_id);
             var promoActions = this.options.promoOptions['actions'] || {};
-            React.render(React.createElement(Actions, {actionType: $actionsSelector, actions: promoActions, onUpdate: this.onActionsUpdate.bind(this),
+            React.render(React.createElement(Actions, {actionType: $actionsSelector, actions: promoActions, onUpdate: this.onActionsUpdate.bind(this), 
                 options: this.options, modalContainer: $modalContainer}), $container.get(0));
         },
         initConditionsApp: function (selector, $modalContainer) {
@@ -3442,7 +3442,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 } else {
                     $conditionSelector.attr('disabled', false);
                 }
-                React.render(React.createElement(ConditionsApp, {conditionType: $conditionSelector, conditions: promoConditions, onUpdate: this.onConditionsUpdate.bind(this),
+                React.render(React.createElement(ConditionsApp, {conditionType: $conditionSelector, conditions: promoConditions, onUpdate: this.onConditionsUpdate.bind(this), 
                     options: this.options, modalContainer: $modalContainer, hidden: hidden}), $container.get(0));
             }
         },
@@ -3474,14 +3474,14 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
         createCouponApp: function (appContainer, modalContainer, callBacks, mode, options) {
             React.render(React.createElement(CouponApp.App, React.__spread({},  callBacks, {mode: mode, options: options, onUpdate: this.onCouponsUpdate})), appContainer);
             React.render(
-                React.createElement("div", {className: "modals-container"},
-                    React.createElement(Components.Modal, {id: "coupons_grid", title: "Coupon grid", onLoad: this.addShowCodes.bind(this), onConfirm: this.onModalSaveChange.bind(this)}),
-                    React.createElement(Components.Modal, {id: "generate_coupon_grid", title: "Generate coupons", onLoad: this.addGenerateCodes.bind(this),
-                                      onConfirm: this.postGenerate.bind(this),
-                                      confirmClass: "ladda-button",
-                                      confirmAttrs: { 'data-style': 'expand-left'}},
+                React.createElement("div", {className: "modals-container"}, 
+                    React.createElement(Components.Modal, {id: "coupons_grid", title: "Coupon grid", onLoad: this.addShowCodes.bind(this), onConfirm: this.onModalSaveChange.bind(this)}), 
+                    React.createElement(Components.Modal, {id: "generate_coupon_grid", title: "Generate coupons", onLoad: this.addGenerateCodes.bind(this), 
+                                      onConfirm: this.postGenerate.bind(this), 
+                                      confirmClass: "ladda-button", 
+                                      confirmAttrs: { 'data-style': 'expand-left'}}, 
                         React.createElement(CouponApp.GenerateForm, {onSubmit: this.postGenerate.bind(this)})
-                    ),
+                    ), 
                     React.createElement(Components.Modal, {id: "import_coupon_grid", title: "Import coupons", onLoad: this.addImportCodes.bind(this)})
                 ), modalContainer);
         },
@@ -3624,12 +3624,15 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 $result.show();
                 if ($.isFunction(e.close)) {
                     // e is the modal object
-                    setTimeout(e.close, 2000);
+                    var modal = e;
+                    setTimeout(function () {
+                        modal.close();
+                        loader.stop();
+                    }, 2000);
                     //e.close();//close it
                 }
                 // hide notification
                 RulesWidget.log(r);
-                loader.stop();
             });
 
             if ($.isFunction(e.preventDefault)) {
@@ -3718,7 +3721,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             this.onCouponsUpdate(newRows);
             if (grid) {
                 //console.log("grid found, adding to grid");
-                RulesWidget.addGridRows(grid, newRows)
+                RulesWidget.addGridRows(grid, newRows);
             } else {
                 //console.log("grid not loaded yet, adding to store");
                 var codes = store.get('promo.coupons'); // check of there are other codes stored and if yes, merge them
@@ -3742,12 +3745,19 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
                 numCodes: grid.getRows().length
             });
         },
-        removeGridRows: function (grid, rows) {
-            if (this.options.promoOptions['coupons_removed'] == undefined) {
-                this.options.promoOptions['coupons_removed'] = [];
-            }
-
-            this.options.promoOptions['coupons_removed'] = _.pluck(rows, 'id');
+        removeGridRows: function (grid, removedRows) {
+            var addedCoupons = this.options.promoOptions['coupons'];
+            _(removedRows).each(function (row) {
+                var index = _.findIndex(addedCoupons, {code: row.id});
+                if (index != -1) {
+                    this.options.promoOptions['coupons'].splice(index, 1);
+                } else {
+                    if (!this.options.promoOptions['coupons_removed']) {
+                        this.options.promoOptions['coupons_removed'] = [];
+                    }
+                    this.options.promoOptions['coupons_removed'].push(row.id);
+                }
+            }.bind(this));
 
             $(document).trigger({ // trigger event which will upgrade the grid
                 type: "grid_count_update",
@@ -3755,10 +3765,7 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             });
         },
         onModalSaveChange: function (modal) {
-            var values = this.options.promoOptions;
-            if (values['coupons_removed'] !== undefined && values['coupons_removed'].length) {
-                this.updatePromoOptions();
-            }
+            this.updatePromoOptions();
             modal.close();
         },
         onActionsUpdate: function (e) {
@@ -3786,15 +3793,8 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
             this.updatePromoOptions();
         },
         updatePromoOptions: function () {
-            var coupons_added = [], coupons_removed = [];
             var values = this.options.promoOptions;
             if (!this.options.promoOptionsEl) return;
-
-            // Not really clear why saving just coupon data???
-            //if (values['coupons']) coupons_added = values['coupons'];
-            //if (values['coupons_removed']) coupons_removed = values['coupons_removed'];
-            //
-            //this.options.promoOptionsEl.val(JSON.stringify({ coupons: coupons_added, coupons_removed: coupons_removed }));
             this.options.promoOptionsEl.val(JSON.stringify(values));
         }
     };
@@ -3809,11 +3809,11 @@ define(['react', 'jquery', 'fcom.components', 'fcom.locale', 'store', 'bootstrap
         }
 
         $(grid.getDOMNode())
-            .on('removedRows.griddle', function (e, rows) {
+            .on('removedRows.griddle', function (e, removedRows) {
                 // Removed rows on coupon grid
-                RulesWidget.removeGridRows(grid, rows);
+                RulesWidget.removeGridRows(grid, removedRows);
             })
-            .on('addedRows.griddle', function (e, rows) {
+            .on('addedRows.griddle', function (e, addedRows) {
                 // Added rows on coupon grid
             });
     };

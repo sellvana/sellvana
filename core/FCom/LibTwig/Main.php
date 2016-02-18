@@ -56,7 +56,6 @@ class FCom_LibTwig_Main extends BClass
 
         foreach ([
             '_' => [$this->BLocale, '_'],
-            'tr_choice' => [$this->BLocale, 'tr_choice'],
             'currency' => [$this->BLocale, 'currency'],
             'safehtml' => [$this->BResponse, 'safeHtml'],
             'min' => 'min',

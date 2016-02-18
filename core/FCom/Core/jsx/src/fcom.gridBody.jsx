@@ -216,7 +216,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
             var personalizeUrl = this.props.getConfig('personalize_url');
 
             //resize and callback to personalize
-            $(this.getDOMNode()).find("th").resizable({
+            $(this.getDOMNode()).find("th[data-id!='0']").resizable({
                 handles: 'e',
                 minWidth: 20,
                 stop: function (ev, ui) {
@@ -253,7 +253,6 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
 
                 //checkbox
                 if (col == '0') {
-
                     var selectionButtonText = (
                         <button data-toggle="dropdown" type="button" className="btn btn-default btn-sm dropdown-toggle">
                             <span className="icon-placeholder">
@@ -291,7 +290,7 @@ define(['react', 'griddle.fcomModalForm', 'griddle.fcomRow', 'fcom.components', 
                     });
 
                     return (
-                        <th className={columnClass} data-id="0" key={col}>
+                        <th style={{ width: '80px' }} data-id="0" key={col}>
                             <div className="dropdown f-grid-display-type">
                                 {selectionButtonText}
                                 <ul className="dropdown-menu js-sel">{headerSelectionNodes}</ul>

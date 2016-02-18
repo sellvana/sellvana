@@ -15,7 +15,7 @@ class Sellvana_PaymentOgone_CheckoutMethod extends Sellvana_Sales_Method_Checkou
 
         if ($this->_validateSettings()) {
             $result = [
-                'html' => $this->BLayout->view('ogone/checkout-button')
+                'html' => $this->BLayout->getView('ogone/checkout-button')
                     ->set($this->Sellvana_PaymentOgone_RemoteApi->prepareRequestData())->render(),
             ];
         }

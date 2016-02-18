@@ -1162,7 +1162,7 @@ define(fcomAdminDeps, function ($, Ladda) {
 
                 if (value) CKEDITOR.instances[id].setData(value);
 
-                CKEDITOR.instances[id].on('blur', function (e) {
+                CKEDITOR.instances[id].on('change', function (e) {
                     e.editor.updateElement();
                     if (typeof callback === 'function') {
                         callback(e.editor, e.editor.getData());
@@ -1656,25 +1656,6 @@ define(fcomAdminDeps, function ($, Ladda) {
     };
 
     /**
-     * Temporary fix for modal validation
-     *
-     * @param container
-     * @returns {boolean}
-     *
-     */
-    $.fn.modalValidate = function (container) {
-        if (!container.parent('form').length) {
-            container.wrap('<form>');
-        }
-
-        if (!container.parent('form').valid()) return false;
-
-        container.unwrap();
-
-        return true;
-    };
-
-    /**
      * Deep clone Object|Array|Date
      *
      * @param obj
@@ -1712,6 +1693,31 @@ define(fcomAdminDeps, function ($, Ladda) {
         }
 
         throw new Error("Unable to copy obj! Its type isn't supported.");
+    };
+
+    $.fn.setValidateForm = function (selector) {
+        if (selector == null) {
+            selector = $(".validate-form");
+        }
+        if ($().validate) {
+            return selector.each(function (i, elem) {
+                return $(elem).validate({
+                    errorElement: "span",
+                    errorClass: "help-block has-error",
+                    errorPlacement: function (e, t) {
+                        return t.parents(".controls").first().append(e);
+                    },
+                    highlight: function (e) {
+                        $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
+                        return $(e).closest('span.help-block').css('display', 'block');
+                    },
+                    success: function (e) {
+                        e.closest(".form-group").removeClass("has-error");
+                        return e.closest("span.help-block").css('display', 'none');
+                    }
+                });
+            });
+        }
     };
 
     /**
