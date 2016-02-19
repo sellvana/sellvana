@@ -1,7 +1,7 @@
 base:
     - view: head
         do:
-            - [ requireJs, fcom.adminlivefeed, "@Sellvana_AdminLiveFeed/js/fcom.adminlivefeed" ]
+            - [ requireJs, fcom.adminlivefeed, "@Sellvana_AdminLiveFeed/Admin/js/fcom.adminlivefeed" ]
             - [ requireRun, fcom.adminlivefeed]
 /settings:
     - view: settings

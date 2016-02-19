@@ -96,7 +96,7 @@ class FCom_Shell_Shell extends BClass
 
         // register all actions from manifests
         foreach ($this->BModuleRegistry->getAllModules() as $mod) {
-            if (!empty($mod->areas['FCom_Shell']['custom']['actions'])) {
+            if (!empty($mod->areas['FCom_Shell']['custom']['actions']) && $this->BModuleRegistry->isLoaded($mod->name)) {
                 $this->registerAction($mod->areas['FCom_Shell']['custom']['actions']);
             }
         }

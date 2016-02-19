@@ -75,7 +75,7 @@ Options:
 
   Informative output:
     {green*}-v, --verbose{/}     Verbose output of the process
-    {green*}-s, --silent{/}      Disable all output of the process
+    {green*}-q, --quiet{/}       Disable all output of the process
 
 Examples:
 

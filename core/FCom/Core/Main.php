@@ -347,6 +347,7 @@ class FCom_Core_Main extends BClass
             $config->set('module_run_levels', []);
             $runLevels = [
                 'FCom_Install' => 'REQUIRED',
+                'FCom_Shell' => 'REQUESTED',
                 'FCom_LibTwig' => 'REQUESTED',
                 'Sellvana_MarketClient' => 'REQUESTED', //TODO: move out to MarketClient module
             ];
