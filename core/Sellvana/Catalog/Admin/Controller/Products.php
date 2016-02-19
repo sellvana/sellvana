@@ -1115,15 +1115,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function duplicateProductCategories($old, $new)
     {
         $categories = $old->categories(true);
-        if ($categories) {
-            $categoryIds = [];
-            //todo: request Boris for same function _.pluck in BUtil
-            foreach ($categories as $category) {
-                /** @var Sellvana_Catalog_Model_Category $category */
-                $categoryIds[] = $category->id();
-            }
-            $new->addToCategories($categoryIds);
-        }
+        $new->addToCategories($this->BUtil->arrayPluck($categories, 'id'));
         return true;
     }
 
