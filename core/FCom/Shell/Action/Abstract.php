@@ -26,7 +26,7 @@ abstract class FCom_Shell_Action_Abstract extends BClass
      *    'o?' => 'optional', // optional value ( -o OR -o "value")
      *    'r!' => 'required', // required value ( -r "value")
      *    'optional?', // optional value ( -o OR -o "value")
-     *    'required?', // required value ( -r "value")
+     *    'required!', // required value ( -r "value")
      * ];
      *
      * @var array
@@ -138,12 +138,13 @@ abstract class FCom_Shell_Action_Abstract extends BClass
                 $shortOptName = $shortOpt[0]; // actual short option name
                 if (gettype($shortOpt) == 'integer'){
                     $shortOptName = false;
-                    $optName = $longOpt;
+                    $optName = in_array(substr($longOpt, -1), ['!','?']) ? substr($longOpt, 0, -1): $longOpt;
                 }
                 if ($shortOptName) {
                     $isRequired = !empty($shortOpt[1]) ? $shortOpt[1] : false; // required/optional
                 } else {
                     $isRequired = in_array(substr($longOpt, -1), ['!','?']) ? substr($longOpt, -1) : false;
+                    $longOpt = $optName;
                 }
                 if (!empty($param[1]) && $param[1] === $shortOptName) { // this is the current short opt
                     $curOptType = 'short';

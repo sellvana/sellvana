@@ -34,7 +34,7 @@
 class Sellvana_Sales_Migrate extends BClass
 {
 
-    public function install__0_6_2_0()
+    public function install__0_6_4_0()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
             $this->BMigrate->migrateModules('FCom_Admin', true);
@@ -89,7 +89,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'customer_id' => "int unsigned default NULL",
                 'customer_email' => "varchar(100) NULL",
                 'shipping_method' => "VARCHAR(50)  NULL ",
-                'shipping_service' => "CHAR(2)  NULL",
+                'shipping_service' => 'varchar(50)',
                 'shipping_price' => "DECIMAL(10, 2) NULL ",
                 'shipping_discount' => 'decimal(12,2) not null default 0',
                 'shipping_free' => 'tinyint not null default 0',
@@ -393,7 +393,7 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tOrderPayment, [
             BDb::COLUMNS => [
                 'id'               => 'int (10) unsigned not null auto_increment',
-                'order_id'         => 'int unsigned not null',
+                'order_id'         => 'int unsigned null',
                 'create_at'        => 'datetime not null',
                 'update_at'        => 'datetime null',
                 'payment_method'   => 'varchar(50) not null',
@@ -423,7 +423,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'IDX_transaction_token' => '(transaction_token)',
             ],
             BDb::CONSTRAINTS => [
-                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
 
@@ -1024,7 +1024,7 @@ class Sellvana_Sales_Migrate extends BClass
                 'transaction_type' => '(transaction_type)',
             ],
             BDb::CONSTRAINTS => [
-                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
     }
@@ -2176,6 +2176,21 @@ class Sellvana_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tCart, [
             BDb::COLUMNS => [
                 'shipping_service' => 'varchar(50)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_3_0__0_6_4_0()
+    {
+        $tOrder = $this->Sellvana_Sales_Model_Order->table();
+        $tOrderPayment = $this->Sellvana_Sales_Model_Order_Payment->table();
+
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'order_id' => 'int unsigned null',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
     }

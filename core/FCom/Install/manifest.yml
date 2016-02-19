@@ -11,6 +11,11 @@ modules:
             - [ /install, FCom_Install_Controller.index ]
             - [ /install/.action, FCom_Install_Controller ]
 
+        areas:
+            FCom_Shell:
+                custom:
+                    actions: [ FCom_Install_Shell_Install ]
+
         themes:
             FCom_Install:
                 layout_before: layout.yml
