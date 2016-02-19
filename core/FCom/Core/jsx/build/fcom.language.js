@@ -21,26 +21,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
         _handleWysiwygChange: function (editor, data) {
             this.props.setLangVal(editor.element.$.dataset.code, data);
         },
-        _clearCKEDITORIntance: function (code) {
-            // Clear  ckeditor instance
-            _(this.props.langs).map(function (lang, key) {
-                if (lang.lang_code == code) {
-                    adminForm.wysiwygDestroy(this.props.id + '_' + lang.lang_code);
-                }
-            }.bind(this));
-        },
         _handleRemoveField: function (e) {
-            var code = e.currentTarget.dataset.code;
-
-            if (this.props.inputType === 'wysiwyg') {
-                this._clearCKEDITORIntance(code);
-            }
-
-            this.props.removeField(code);
+            this.props.removeField(e.currentTarget.dataset.code);
         },
         _handleChange: function (e) {
-            var $input = $(e.currentTarget);
-            this.props.setLangVal($input.data('code'), $input.val());
+            this.props.setLangVal(e,currentTarget.dataset.code, e.currentTarget.value);
         },
         createField: function () {
             _(this.props.langs).map(function (lang, key) {
@@ -134,8 +119,8 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
         componentWillMount: function () {
             this.props.modalConfig = this.getModalConfig();
 
-            this.setStoreData(this.getKey('data'), this.state.data);
-            this.setStoreData(this.getKey('locales'), this.state.locales);
+            this.setStoreData('data', this.state.data);
+            this.setStoreData('locales', this.state.locales);
 
             this.setState({
                 data: this.props.data,
@@ -150,11 +135,11 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.state.selection = null;
         },
         getStoreData: function (key) {
-            return Store.get(key);
+            return Store.get(this.getKey(String(key)));
         },
         setStoreData: function (key, value) {
             if (value === undefined) return false;
-            Store.set(key, value);
+            Store.set(this.getKey(String(key)), value);
         },
         getKey: function (key) {
             if (!_.isString(key))
@@ -257,24 +242,32 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 window[modalConfig.onSaved](modal, this.state.data);
 
                 // Update storage data
-                this.setStoreData(this.getKey('data'), this.state.data);
-                this.setStoreData(this.getKey('locales'), this.state.locales);
+                this.setStoreData('data', this.state.data);
+                this.setStoreData('locales', this.state.locales);
 
             } else if (valid) {
                 modal.close();
             }
         },
         _handleModalCancel: function (modal) {
-            setTimeout(function () {
-                this.setState({
-                    data: this.getStoreData(this.getKey('data')),
-                    locales: this.getStoreData(this.getKey('locales'))
-                });
-            }.bind(this), 300);
+            var data = this.getStoreData('data');
+            if (!_.isEqual(this.state.data, data)) {
+                setTimeout(function () {
+                    this.setState({
+                        data: data,
+                        locales: this.getStoreData('locales')
+                    });
+                }.bind(this), 300);
+            }
             modal.close();
         },
         handleRemoveField: function (code) {
             var locales = this.getLocales();
+
+            if (this.props.inputType === 'wysiwyg') {
+                adminForm.wysiwygDestroy(this.props.id + '_' + code);
+            }
+
             var defaultIds = _.pluck(locales, 'id');
             if (!_.contains(defaultIds, code)) {
                 locales.push({
@@ -330,8 +323,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                                 React.createElement("tbody", null, 
                                 React.createElement("tr", null, 
                                     React.createElement("td", null, 
-                                        React.createElement(FComSelect2, React.__spread({options: locales, 
-                                                     onChange: this._handleSelect2Change, 
+                                        React.createElement(FComSelect2, React.__spread({options: locales, onChange: this._handleSelect2Change, 
                                                      defaultValue: []},  inlineProps))
                                     ), 
                                     React.createElement("td", null, 
@@ -345,8 +337,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                             )
                         ), 
                         React.createElement("div", {id: this.props.id + '-container', ref: "container"}, 
-                            React.createElement(LangFields, {id: this.props.id, related: true, 
-                                        inputType: this.props.inputType, 
+                            React.createElement(LangFields, {id: this.props.id, 
                                         langs: this.state.data || [], 
                                         removeField: this.handleRemoveField, 
                                         setLangVal: this.setLangVal})
