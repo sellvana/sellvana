@@ -13,8 +13,8 @@
             <div class="col-md-5">
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_name_lang_' ~ m.get('id'),
-                    availLangs: m.getData('name_lang_fields'),
-                    defaultLangs: LOCALE.parseAllowedLocalesToOptions(),
+                    data: m.getData('product_name_lang_fields'),
+                    locales: LOCALE.parseAllowedLocalesToOptions(),
                     modalConfig: {
                         onSaved: 'saveNameFieldLang'
                     }
@@ -37,8 +37,8 @@
             <div class="col-md-5">
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_shortdesc_lang_' ~ m.get('id'),
-                    availLangs: m.getData('short_desc_lang_fields'),
-                    defaultLangs: LOCALE.parseAllowedLocalesToOptions(),
+                    data: m.getData('short_description_lang_fields'),
+                    locales: LOCALE.parseAllowedLocalesToOptions(),
                     inputType: 'textarea',
                     modalConfig: {
                         onSaved: 'saveShortDescFieldLang'
@@ -56,8 +56,8 @@
             <div class="col-md-5">
                 {{ THIS.view('core/language-griddle').set('config', {
                     id: 'product_desc_lang_' ~ m.get('id'),
-                    availLangs: m.getData('desc_lang_fields'),
-                    defaultLangs: LOCALE.parseAllowedLocalesToOptions(),
+                    data: m.getData('description_lang_fields'),
+                    locales: LOCALE.parseAllowedLocalesToOptions(),
                     inputType: 'wysiwyg',
                     modalConfig: {
                         onSaved: 'saveDescFieldLang'
@@ -167,9 +167,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     var $descContainer = $('#desc_lang_fields');
 
     function initLangData() {
-        $nameLangContainer.val({{ UTIL.toJson(m.getData('name_lang_fields')) | raw }});
-        $shortDescContainer.val({{ UTIL.toJson(m.getData('short_desc_lang_fields')) | raw }});
-        $descContainer.val({{ UTIL.toJson(m.getData('desc_lang_fields')) | raw }});
+        $nameLangContainer.val({{ UTIL.toJson(m.getData('product_name_lang_fields')) | raw }});
+        $shortDescContainer.val({{ UTIL.toJson(m.getData('short_description_lang_fields')) | raw }});
+        $descContainer.val({{ UTIL.toJson(m.getData('description_lang_fields')) | raw }});
     }
 
     window.saveNameFieldLang = function (modal) {

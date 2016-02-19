@@ -681,7 +681,7 @@
                         className: "formFieldsModal",
                         show: true,
                         title: "{{ 'Fields Form'|_ }}",
-                        confirm: "{{ 'Add Field'|_ }}",
+                        confirm: row ? "{{ 'Update Field'|_ }}" : "{{ 'Add Field'|_ }}",
                         cancel: "{{ 'Cancel'|_ }}",
                         onLoad: function(modal) {
                             formFieldsModalNode = $(modal.getDOMNode());

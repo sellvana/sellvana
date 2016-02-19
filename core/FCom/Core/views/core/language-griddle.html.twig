@@ -18,10 +18,10 @@
             React.createElement(FComMultiLanguage, {
                 id: config.id,
                 inputType: config.inputType,
-                availLangs: config.availLangs ? JSON.parse(config.availLangs) : [],
+                data: config.data ? JSON.parse(config.data) : [],
+                locales: config.locales,
                 modalConfig: config.modalConfig,
-                select2Config: config.select2Config || {},
-                defaultLangs: config.defaultLangs
+                select2Config: config.select2Config || {}
             }), containerEle
         );
     });

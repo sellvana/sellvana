@@ -780,6 +780,17 @@ class BUtil extends BClass
     }
 
     /**
+     * Return the default value of the given value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected static function _value($value)
+    {
+        return $value instanceof Closure ? $value() : $value;
+    }
+
+    /**
      * Get an item from an array using "dot" or "slash" notation.
      *
      * @param  array   $array
@@ -799,7 +810,7 @@ class BUtil extends BClass
 
         foreach (preg_split('#[./]#', $key) as $segment) {
             if (! is_array($array) || ! array_key_exists($segment, $array)) {
-                return $default;
+                return static::_value($default);
             }
 
             $array = $array[$segment];
