@@ -104,7 +104,7 @@ class Sellvana_Catalog_Model_ProductPrice
         ],
     ];
 
-    protected $_fieldDefaults = [
+    protected static $_fieldDefaults = [
         'amount' => 0,
     ];
 
