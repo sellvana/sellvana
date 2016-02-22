@@ -123,25 +123,25 @@
 
                 return langs.frontend_label_translation;
             },
-            handleSelect2Change: function (e, callback, selection) {
+            _handleSelect2Change: function (e, callback, selection) {
                 this.props.refreshChanges(selection.id, selection.text, 'select');
             },
-            handleSwitchBoxChange: function (e, state) {
+            _handleSwitchBoxChange: function (e, state) {
                 var s = state ? '1' : '0';
                 this.props.refreshChanges(this.state.field.field_code, s);
             },
-            handleInputChange: function (e) {
+            _handleInputChange: function (e) {
                 var $input = $(e.target);
                 this.props.refreshChanges($input.data('code'), $input.val());
             },
-            handleWysiwygChange: function (editor, data) {
+            _handleWysiwygChange: function (editor, data) {
                 this.props.refreshChanges(this.state.field.field_code, data);
             },
             createTextarea: function (field) {
                 return React.createElement(Components.ControlInput, {
                     type: 'textarea',
                     value: field.default_value,
-                    callback: this.handleInputChange,
+                    onChange: this._handleInputChange,
                     validation: {
                         required: (field.required || 'false')
                     },
@@ -152,7 +152,7 @@
                     }
                 });
             },
-            createWysiwyg: function (field) {//handleWysiwygChange
+            createWysiwyg: function (field) {
                 return React.createElement(Components.SpecialInput, {
                     type: 'wysiwyg',
                     value: field.default_value,
@@ -162,7 +162,7 @@
                         'data-rule-required': field.required || 'false',
                         'data-field-id': field.id
                     },
-                    onChange: this.handleWysiwygChange
+                    onChange: this._handleWysiwygChange
                 });
             },
             createSelect2: function (field) {
@@ -175,7 +175,7 @@
                     options: this.getOptions(field.id),
                     enabled: !field.disable,
                     'data-field-id': field.id,
-                    onChange: this.handleSelect2Change,
+                    onChange: this._handleSelect2Change,
                     defaultValue: [field.default_value]
                 });
             },
@@ -185,21 +185,16 @@
                     id: field.id,
                     value: field.default_value,
                     disable: field.disable,
+                    onChange: this._handleSwitchBoxChange,
                     attrs: {
-                        'data-on-text': '<i class="icon-ok" />',
-                        'data-off-text': '<i class="icon-ok" />',
                         'data-field-id': field.id
-                    },
-                    options: {
-                        size: this.props.size || 'normal',
-                        onSwitchChange: this.handleSwitchBoxChange
                     }
                 });
             },
             createInput: function (field) {
                 return React.createElement(Components.ControlInput, {
                     value: field.default_value,
-                    callback: this.handleInputChange,
+                    onChange: this._handleInputChange,
                     validation: {
                         required: (field.required || 'false')
                     },
@@ -744,7 +739,7 @@
                 var removedOptions = _.without(this.state.removedOptions, id.toString());
                 this.setState({removedOptions: removedOptions});
             },
-            handleSelect2Change: function (event, callback, selection) {
+            _handleSelect2Change: function (event, callback, selection) {
                 this.state.selection = selection.id;
             },
             initSelect2: function () {
@@ -814,7 +809,7 @@
                 return React.DOM.div({className: ""},
                     React.createElement(FComSelect2, React.__spread({}, this.initSelect2(), {
                         options: this.getOptions(),
-                        onChange: this.handleSelect2Change
+                        onChange: this._handleSelect2Change
                     })),
                     React.DOM.button({
                         type: "button",
@@ -875,10 +870,10 @@
 
                 this.setState({removedOptions: removedOptions});
             },
-            handleSelect2Change: function (event, callback, selection) {
+            _handleSelect2Change: function (event, callback, selection) {
                 this.state.selection = selection.id;
             },
-            handleModalLoad: function (modal) {
+            _handleModalLoad: function (modal) {
                 fieldsModalNode = $(modal.getDOMNode());
                 fieldsForm = fieldsModalNode.find('#fields-modal-form');
                 fieldsModalNode.find('.modal-dialog').css('width', '600px');
@@ -903,7 +898,7 @@
                     }
                 });
             },
-            handleModalConfirm: function (modal) {
+            _handleModalConfirm: function (modal) {
                 if (!fieldsForm.valid())
                     return;
 
@@ -964,7 +959,7 @@
                     });
                 }
             },
-            showAddFieldsModal: function (grid) {
+            _handleShowAddFieldModal: function (grid) {
                 var that = this;
                 var modalContainer = document.getElementById('fcom_append_form');
                 React.unmountComponentAtNode(modalContainer);
@@ -975,9 +970,9 @@
                         show: true,
                         title: "{{ 'Add Fields' |_ }}",
                         confirm: "{{ 'Save changes' |_ }}",
-                                cancel: "{{ 'Cancel' |_ }}",
-                                onLoad: that.handleModalLoad,
-                                onConfirm: that.handleModalConfirm
+                        cancel: "{{ 'Cancel' |_ }}",
+                        onLoad: that._handleModalLoad,
+                        onConfirm: that._handleModalConfirm
                     },
                     React.DOM.div({className: "row f-grid-wrapper"},
                         React.createElement(FComModalForm, {
@@ -987,7 +982,7 @@
                     )
                 ), modalContainer);
             },
-            addField: function () {
+            _handleAddField: function () {
                 var that = this;
                 var id = this.state.selection;
                 var sets = that.props.sets;
@@ -1025,19 +1020,19 @@
                 return React.DOM.div({className: ""},
                     React.createElement(FComSelect2, React.__spread({}, this.initSelect2(), {
                         options: this.getOptions(),
-                        onChange: this.handleSelect2Change
+                        onChange: this._handleSelect2Change
                     })),
                     React.DOM.button({
                         type: 'button',
                         className: 'btn btn-primary btn-sm',
                         id: 'btn_add_field',
-                        onClick: this.addField
+                        onClick: this._handleAddField
                     }, "{{ 'Add a Field'|_ }}"),
                     React.DOM.button({
                         type: 'button',
                         className: 'btn btn-sm btn-warning',
                         id: 'btn_new_field',
-                        onClick: this.showAddFieldsModal
+                        onClick: this._handleShowAddFieldModal
                     }, "{{ 'New Field'|_ }}")
                 );
             }

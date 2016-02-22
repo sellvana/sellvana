@@ -97,6 +97,8 @@
 
 <script>
     require(['jquery', 'underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'jquery.validate', 'fcom.admin', 'unique'], function($, _, React, Components, FComSelect2) {
+        'use strict';
+
         var _mainForm = $('#products-quick-add-form');
         window.adminForm = FCom.Admin.form({
             form: 'products-quick-add-form',
@@ -223,7 +225,6 @@
                             },
                             dataFilter: function (responseString) {
                                 var response = jQuery.parseJSON(responseString);
-                                currentMessage = response.Message;
                                 return response.unique;
                             }
                         },
@@ -341,9 +342,10 @@
             _handleSelect2Change: function (e, callback, selections) {
                 var id = e.target.dataset.id;
                 var type = e.target.dataset.type;
+                var pi = _.findIndex(this.state.products, {id: id});
                 this.categories[id] = selections;
-                this.state.products[_.findIndex(this.state.products, {id: id})][type] = e.target.value;
-                this.state.products[_.findIndex(this.state.products, {id: id})]['localData'] = this.categories[id];
+                this.state.products[pi][type] = e.target.value;
+                this.state.products[pi]['localData'] = this.categories[id];
             },
             _handleWysiwygChange: function (editor, data) {
                 var id = editor.element.$.dataset.id;
@@ -441,7 +443,7 @@
                                     'data-id': p.id,
                                     'data-type': 'product_sku'
                                 },
-                                callback: this.props._handleInputChange
+                                onChange: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -460,7 +462,7 @@
                                     'data-id': p.id,
                                     'data-type': 'product_name'
                                 },
-                                callback: this.props._handleInputChange
+                                onChange: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -481,7 +483,7 @@
                                     'data-id': p.id,
                                     'data-type': 'short_description'
                                 },
-                                callback: this.props._handleInputChange
+                                onChange: this.props._handleInputChange
                             })
                         )
                     ),
@@ -502,7 +504,7 @@
                                     'data-id': p.id,
                                     'data-type': 'price.base'
                                 },
-                                callback: this.props._handleInputChange
+                                onChange: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -510,22 +512,6 @@
                                 label_class: '',
                                 input_id: 'products['+ p.id+'][is_hidden]'}, "{{ 'Hidden?'|_ }}"
                             ),
-                            /*React.createElement(Components.SpecialInput, {
-                                type: 'switch',
-                                id: 'products['+ p.id+'][is_hidden]',
-                                name: 'products['+ p.id+'][is_hidden]',
-                                value: p.is_hidden,
-                                options: {
-                                    size: 'normal',
-                                    onSwitchChange: this.props.actions.handleSwitchChange
-                                },
-                                attrs: {
-                                    'data-on-text': '<i class="fa fa-check" />',
-                                    'data-off-text': '<i class="fa fa-close" />',
-                                    'data-id': p.id,
-                                    'data-type': 'is_hidden'
-                                }
-                            })*/
                             React.createElement(Components.ControlInput, {
                                 type: 'select',
                                 value: p.is_hidden,
@@ -540,7 +526,7 @@
                                     'data-id': p.id,
                                     'data-type': 'is_hidden'
                                 },
-                                callback: this.props._handleInputChange
+                                onChange: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -573,22 +559,6 @@
                                 label_class: '',
                                 input_id: 'products['+p.id+'][manage_inventory]'}, "{{ 'Manage?'|_ }}"
                             ),
-                            /*React.createElement(Components.SpecialInput, {
-                                type: 'switch',
-                                id: 'products['+ p.id+'][manage_inventory]',
-                                name: 'products['+ p.id+'][manage_inventory]',
-                                value: p.manage_inventory,
-                                options: {
-                                    size: 'normal',
-                                    onSwitchChange: this.props.actions.handleSwitchChange
-                                },
-                                attrs: {
-                                    'data-on-text': '<i class="fa fa-check" />',
-                                    'data-off-text': '<i class="fa fa-close" />',
-                                    'data-id': p.id,
-                                    'data-type': 'manage_inventory'
-                                }
-                            })*/
                             React.createElement(Components.ControlInput, {
                                 type: 'select',
                                 value: p.manage_inventory,
@@ -603,7 +573,7 @@
                                     'data-id': p.id,
                                     'data-type': 'manage_inventory'
                                 },
-                                callback: this.props._handleInputChange
+                                onChange: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -621,7 +591,7 @@
                                     'data-id': p.id,
                                     'data-type': 'inventory_sku'
                                 },
-                                callback: this.props._handleInputChange
+                                onChange: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -639,7 +609,7 @@
                                     'data-id': p.id,
                                     'data-type': 'qty_in_stock'
                                 },
-                                callback: this.props._handleInputChange
+                                onChange: this.props._handleInputChange
                             })
                         ),
                         React.DOM.div({ className: 'form-group controls' },
@@ -656,7 +626,7 @@
                                     'data-id': p.id,
                                     'data-type': 'shipping_weight'
                                 },
-                                callback: this.props._handleInputChange
+                                onChange: this.props._handleInputChange
                             })
                         )
                     ),

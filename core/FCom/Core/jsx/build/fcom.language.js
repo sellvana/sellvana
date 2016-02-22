@@ -249,24 +249,35 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
                 modal.close();
             }
         },
+        clearCKEditorInstances: function (data) {
+            if ($.isArray(data)) {
+                _(this.state.data).each(function (f, i) {
+                    var fi = _.findIndex(data, {lang_code: f.lang_code});
+                    if (fi == -1) {
+                        adminForm.wysiwygDestroy(this.props.id + '_' + f.lang_code);
+                    }
+                }.bind(this));
+            } else {
+                adminForm.wysiwygDestroy(this.props.id + '_' + data);
+            }
+        },
         _handleModalCancel: function (modal) {
             var data = this.getStoreData('data');
             if (!_.isEqual(this.state.data, data)) {
                 setTimeout(function () {
+                    this.clearCKEditorInstances(data);
+
                     this.setState({
                         data: data,
                         locales: this.getStoreData('locales')
                     });
-                }.bind(this), 300);
+                }.bind(this), 500);
             }
             modal.close();
         },
         handleRemoveField: function (code) {
             var locales = this.getLocales();
-
-            if (this.props.inputType === 'wysiwyg') {
-                adminForm.wysiwygDestroy(this.props.id + '_' + code);
-            }
+            this.clearCKEditorInstances(code);
 
             var defaultIds = _.pluck(locales, 'id');
             if (!_.contains(defaultIds, code)) {
