@@ -197,7 +197,9 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                     React.createElement(FCom.Components.Select2, React.__spread({},  this.initSelect2(), 
                                         {options: this.getSites(), 
                                         onSelection: this._handleSelections, 
-                                        multiple: this.props.multiple || false, val: this.props.defaultValue}))
+                                        multiple: this.props.multiple || false, 
+                                        val: this.props.defaultValue, 
+                                        dataMode: "local"}))
                 )
             );
         }
@@ -315,6 +317,13 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                         this.state.value,
                         this._handleWysiwygChange
                     );
+                    break;
+            }
+        },
+        componentDidUpdate: function () {
+            switch (this.props.type) {
+                case 'switch':
+                    $(this.refs['switch-cbx-' + this.props.id].getDOMNode()).bootstrapSwitch('state', this.state.value);
                     break;
             }
         },

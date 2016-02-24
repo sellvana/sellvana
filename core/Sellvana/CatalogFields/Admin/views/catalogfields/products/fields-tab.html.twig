@@ -123,19 +123,30 @@
 
                 return langs.frontend_label_translation;
             },
+            reloadSiteValue: function (value) {
+                if (this.props.site_id == '') return;
+                var field = this.props.field;
+                var defaultSiteValue = this.props.sites['default'][field.id];
+                field.site_values[this.props.site_id] = Number(value != defaultSiteValue).toString();
+                this.setState({ field: field });
+            },
             _handleSelect2Change: function (e, callback, selection) {
                 this.props.refreshChanges(selection.id, selection.text, 'select');
+                this.reloadSiteValue(selection.text);
             },
             _handleSwitchBoxChange: function (e, state) {
-                var s = state ? '1' : '0';
-                this.props.refreshChanges(this.state.field.field_code, s);
+                state = Number(state).toString();
+                this.props.refreshChanges(this.state.field.field_code, state);
+                this.reloadSiteValue(state);
             },
             _handleInputChange: function (e) {
                 var $input = $(e.target);
                 this.props.refreshChanges($input.data('code'), $input.val());
+                this.reloadSiteValue($input.val());
             },
             _handleWysiwygChange: function (editor, data) {
                 this.props.refreshChanges(this.state.field.field_code, data);
+                this.reloadSiteValue(data);
             },
             createTextarea: function (field) {
                 return React.createElement(Components.ControlInput, {
@@ -183,7 +194,7 @@
                 return React.createElement(Components.SpecialInput, {
                     type: 'switch',
                     id: field.id,
-                    value: field.default_value,
+                    value: Boolean(Number(field.default_value)),
                     disable: field.disable,
                     onChange: this._handleSwitchBoxChange,
                     attrs: {
@@ -221,7 +232,9 @@
                 });
             },
             createMultiSiteComponent: function (field) {
-                var siteValues = this.props.site_values || null;
+                if (!field.site_values) field.site_values = {};
+                var defaultSiteValue = this.props.sites['default'][field.id];
+                field.site_values[this.props.site_id] = Number(defaultSiteValue != field.default_value).toString();
                 return React.createElement(FComSelect2, {
                     id: guid(),
                     className: 'site-value',
@@ -230,7 +243,7 @@
                         { id: '0', text: "{{ 'Use Default Value'|_ }}" },
                         { id: '1', text: "{{ 'Use Site Specific Value'|_ }}" }
                     ],
-                    defaultValue: ['1'],
+                    defaultValue: [field.site_values[this.props.site_id]],
                     attrs: {
                         'data-field-id': field.id
                     },
@@ -330,14 +343,22 @@
                     sites = this.props.sites,
                     siteId = this.props.site_id;
 
-                // Use default value
-                if (selection.id == '0') {
-                    sites[siteId][fieldId] = sites['default'][fieldId];
-                    _(sets).each(function (set, si) {
-                        var fi = _.findIndex(set.fields, { id: fieldId });
-                        if (fi != -1) sets[si].fields[fi].value = sites['default'][fieldId];
-                    });
-                }
+                _(sets).each(function (set, si) {
+                    var fi = _.findIndex(set.fields, { id: String(fieldId) });
+                    if (fi != -1) {
+                        var field = sets[si].fields[fi];
+                        field.site_values[siteId] = selection.id;
+
+                        // Use default value
+                        if (selection.id == '0') {
+                            sites[siteId][field.id] = sites['default'][field.id];
+                            field.value = sites['default'][field.id];
+                        } else {
+                            sites[siteId][field.id] = '';
+                            field.value = '';
+                        }
+                    }
+                });
 
                 FieldsListComponent.setProps({ sets: sets });
                 this.props.refreshData();
@@ -523,7 +544,7 @@
                 startId++;
                 return node;
             });
-            console.log('collection', collection);
+//            console.log('collection', collection);
             return sets;
 
         }
