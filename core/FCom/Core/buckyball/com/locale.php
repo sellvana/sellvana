@@ -55,6 +55,14 @@ class BLocale extends BClass
 
     protected static $_customTranslators = [];
 
+    protected $_defaultLocaleSettings = [
+        'currency_format' => '%1$s%2$s',
+        'decimal_mark' => '.',
+        'thousands_separator' => ',',
+    ];
+
+    static protected $_localeSettings = [];
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -76,6 +84,7 @@ class BLocale extends BClass
         date_default_timezone_set($this->_defaultTz);
         setlocale(LC_ALL, $this->_defaultLocale);
         $this->_tzCache['UTC'] = new DateTimeZone('UTC');
+        self::$_localeSettings = $this->_defaultLocaleSettings;
     }
 
     public function transliterate($str, $filler = '-')
@@ -808,6 +817,21 @@ class BLocale extends BClass
             if (!$found) {
                 $this->BDebug->warning('Invalid locale: ' . $locale);
                 $locale = $this->_defaultLocale;
+            } else {
+                $localeSetup = $this->BConfig->get('modules/Sellvana_MultiLanguage/setup_string_' . $locale, []);
+                $localeSetup = explode("\n", $localeSetup);
+                foreach ($localeSetup as $setupString) {
+                    if (!trim($setupString)) {
+                        continue;
+                    }
+                    list($setting, $value) = explode(':', $setupString, 2) + [null];
+                    if (!array_key_exists($setting, self::$_localeSettings)) {
+                        continue;
+                    }
+                    $value = str_replace('"', '', trim($value));
+                    self::$_localeSettings[$setting] = $value;
+                }
+                self::$_localeSettings = array_merge($this->_defaultLocaleSettings, self::$_localeSettings);
             }
         }
         $this->_currentLocale = $locale;
@@ -1318,14 +1342,48 @@ class BLocale extends BClass
         return !empty(static::$_currencySymbolMap[$currency]) ? static::$_currencySymbolMap[$currency] : false;
     }
 
+    public function getCurrencyFormat($currency = null)
+    {
+        $format = self::$_localeSettings['currency_format'];
+        $this->BEvents->fire(__METHOD__, ['format' => &$format, 'currency' => $currency]);
+
+        return $format;
+    }
+
+    public function getDecimalMark($currency = null)
+    {
+        $mark = self::$_localeSettings['decimal_mark'];
+        $this->BEvents->fire(__METHOD__, ['mark' => &$mark, 'currency' => $currency]);
+
+        return $mark;
+    }
+
+    public function getThousandsSeparator($currency = null)
+    {
+        $mark = self::$_localeSettings['thousands_separator'];
+        $this->BEvents->fire(__METHOD__, ['separator' => &$mark, 'currency' => $currency]);
+
+        return $mark;
+    }
+
     public function currency($value, $currency = null, $decimals = 2)
     {
         if ($currency) {
-            $symbol = $this->getSymbol($currency);
+            $symbol = $this->getSymbol($currency) ?: $currency;
         } else {
             $symbol = static::$_currencySymbol;
         }
-        return sprintf('%s%s', $symbol, number_format($value, $decimals));
+        $this->BEvents->fire(__METHOD__, ['value' => &$value, 'currency' => $currency]);
+        $value = number_format(
+            $value,
+            $decimals,
+            $this->getDecimalMark($currency),
+            $this->getThousandsSeparator($currency)
+        );
+        $format = $this->getCurrencyFormat($currency);
+        $value = sprintf($format, $symbol, $value);
+
+        return $value;
     }
 
     public function roundCurrency($value, $decimals = 2)
