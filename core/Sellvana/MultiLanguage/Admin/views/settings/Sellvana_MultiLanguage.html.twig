@@ -24,6 +24,14 @@
             {{ forms.textarea(fieldData, {label: locale, field: fieldName,
                 value: validator.fieldValue(fieldName),label_class: labelClass,
                 help_icon: 1, help_text: locale }) }}
+            <div class="form-group">
+                <label class="control-label col-md-2">Default values for {{ locale }}</label>
+                <ul class="list-unstyled col-md-5">
+                    {% for type,format in LOCALE.getLocaleDefaultFormats(locale) %}
+                        <li><strong>{{ type }}:</strong>"{{ format }}"</li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endfor %}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
