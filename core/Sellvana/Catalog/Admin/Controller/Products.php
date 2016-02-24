@@ -1175,7 +1175,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function duplicateProductMedia($old, $new)
     {
         $hlp = $this->Sellvana_Catalog_Model_ProductMedia;
-        $medias = $hlp->orm('pa')->where('pa.product_id', $old->id)->select('pa.*')->find_many();
+        $medias = $hlp->orm('pa')->where('pa.product_id', $old->id())->select('pa.*')->find_many();
         if ($medias) {
             foreach ($medias as $media) {
                 $data = $media->as_array();
@@ -1201,7 +1201,7 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         if ($this->BModuleRegistry->isLoaded('Sellvana_ProductReviews')) {
             //todo: confirm need duplicate product review or not
             $hlp = $this->Sellvana_ProductReviews_Model_Review;
-            $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
+            $reviews = $hlp->orm('pr')->where('product_id', $old->id())->find_many();
             if ($reviews) {
                 foreach ($reviews as $r) {
                     $data = $r->as_array();

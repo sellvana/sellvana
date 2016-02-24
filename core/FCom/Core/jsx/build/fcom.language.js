@@ -3,11 +3,11 @@
  *
  * FCom Multi Languages Component
  */
-define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale', 'store', 'ckeditor', 'jquery.validate'], function (_, React, $, FComGriddleComponent, Components, FComSelect2, Locale, Store) {
+define(['jquery', 'react', 'underscore', 'fcom.components', 'griddle.fcomSelect2', 'fcom.locale', 'store', 'ckeditor', 'jquery.validate'], function ($, React, _, Components, FComSelect2, Locale, Store) {
 
     var LangFields = React.createClass({displayName: "LangFields",
         componentWillUnmount: function () {
-            _(this.props.langs).map(function (lang, key) {
+            _(this.props.langs).each(function (lang, key) {
                 if (this.refs['lang_field_' + lang.lang_code])
                     React.unmountComponentAtNode(this.refs['lang_field_' + lang.lang_code].getDOMNode());
             }.bind(this));
@@ -28,7 +28,7 @@ define(['underscore', 'react', 'jquery', 'fcom.griddle', 'fcom.components', 'gri
             this.props.setLangVal(e,currentTarget.dataset.code, e.currentTarget.value);
         },
         createField: function () {
-            _(this.props.langs).map(function (lang, key) {
+            _(this.props.langs).each(function (lang, key) {
                 var node = null,
                     dataAttrs = {
                         'data-code': lang.lang_code,

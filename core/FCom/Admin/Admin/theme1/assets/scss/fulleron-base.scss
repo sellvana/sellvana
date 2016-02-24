@@ -1719,7 +1719,7 @@ fieldset[disabled] {
 	border: 1px solid #e5e5e5;
 	position: relative;
 	&.box-collapsed {
-		.box-content {
+		.box-content, .widget-contents {
 			display: none;
 		}
 		.box-header .actions .box-collapse i:before {
