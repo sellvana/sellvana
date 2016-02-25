@@ -96,7 +96,7 @@
 </form>
 
 <script>
-    require(['jquery', 'underscore', 'react', 'fcom.components', 'griddle.fcomSelect2', 'jquery.validate', 'fcom.admin', 'unique'], function($, _, React, Components, FComSelect2) {
+    require(['jquery', 'underscore', 'react', 'fcom.components', 'jquery.validate', 'fcom.admin', 'unique'], function($, _, React, Components) {
         'use strict';
 
         var _mainForm = $('#products-quick-add-form');
@@ -347,7 +347,7 @@
                 var pi = _.findIndex(this.state.products, {id: id});
                 this.categories[id] = selections;
                 this.state.products[pi][type] = e.target.value;
-                this.state.products[pi]['localData'] = this.categories[id];
+                this.state.products[pi]['initData'] = this.categories[id];
             },
             _handleWysiwygChange: function (editor, data) {
                 var id = editor.element.$.dataset.id;
@@ -539,20 +539,24 @@
                                 label_class: '',
                                 input_id: 'categories['+p.id+']'}, "{{ 'Categories'|_ }}"
                             ),
-                            React.createElement(FComSelect2, {
+                            React.createElement(Components.SpecialInput, {
+                                type: 'select2',
                                 id: guid(),
                                 name: 'categories['+p.id+'][]',
                                 placeholder: "{{ 'Select Categories' |_ }}",
                                 multiple: true,
                                 url: '{{ APP.href('/catalog/products/quick-add/categories_search') | raw }}',
                                 onChange: this.props._handleSelect2Change,
-                                defaultValue: p.categories,
+                                value: p.categories,
                                 options: {{ UTIL.toJson(categories) | raw }},
                                 dataMode: 'server',
-                                localData: p.localData || [],
+                                initData: p.initData || [],
                                 attrs: {
                                     'data-id': p.id,
                                     'data-type': 'categories'
+                                },
+                                style: {
+                                    width: '200px'
                                 }
                             })
                         )

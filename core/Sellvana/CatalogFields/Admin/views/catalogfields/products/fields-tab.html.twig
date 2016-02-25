@@ -1,15 +1,3 @@
-<style>
-    #tab-fields #fields-container .select2-container .select2-choice,
-    #tab-fields div.modal .select2-container .select2-choice {
-        height: 28px;
-        width: 150px;
-        font-size: 0.8em;
-    }
-
-    #tab-fields .select2-container .select2-choice {
-        width: 200px;
-    }
-</style>
 {% set fieldSetModel = APP.instance('Sellvana_CatalogFields_Model_Set') %}
 {% set ctrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_Products') %}
 {% set setCtrl = APP.instance('Sellvana_CatalogFields_Admin_Controller_FieldSets') %}
@@ -247,7 +235,10 @@
                     attrs: {
                         'data-field-id': field.id
                     },
-                    onChange: this.props.handleSiteValueChange
+                    onChange: this.props.handleSiteValueChange,
+                    style: {
+                        width: '170px'
+                    }
                 });
             },
             renderField: function () {
@@ -328,7 +319,7 @@
                                 React.DOM.i({className: 'icon-remove'})
                             ),
                             React.DOM.div({ref: 'lang_' + field.id, className: 'col-md-6'}),
-                            React.DOM.div({ref: 'site_value_' + field.id, className: 'col-md-4'})
+                            React.DOM.div({ref: 'site_value_' + field.id, className: 'col-md-5'})
                         )
                     )
                 )
@@ -830,7 +821,12 @@
                 return React.DOM.div({className: ""},
                     React.createElement(FComSelect2, React.__spread({}, this.initSelect2(), {
                         options: this.getOptions(),
-                        onChange: this._handleSelect2Change
+                        onChange: this._handleSelect2Change,
+                        style: {
+                            height: '28px',
+                            width: '150px',
+                            fontSize: '0.8em'
+                        }
                     })),
                     React.DOM.button({
                         type: "button",
@@ -1041,7 +1037,12 @@
                 return React.DOM.div({className: ""},
                     React.createElement(FComSelect2, React.__spread({}, this.initSelect2(), {
                         options: this.getOptions(),
-                        onChange: this._handleSelect2Change
+                        onChange: this._handleSelect2Change,
+                        style: {
+                            height: '28px',
+                            width: '150px',
+                            fontSize: '0.8em'
+                        }
                     })),
                     React.DOM.button({
                         type: 'button',
@@ -1104,9 +1105,16 @@
             React.unmountComponentAtNode(multisiteContainer);
             var MultisiteComponent = React.render(
                 React.createElement(Components.MultiSite, {
-                    sites: sites,
+                    id: 'multisite_list',
+                    placeholder: "{{ 'Select site'|_ }}",
+                    options: sites,
                     onChange: function (event, callback, selection) {
                         FieldsListComponent.setProps({ site: selection });
+                    },
+                    style: {
+                        height: '28px',
+                        width: '150px',
+                        fontSize: '0.8em'
                     }
                 }), multisiteContainer
             );
