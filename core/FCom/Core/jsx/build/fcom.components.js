@@ -799,6 +799,8 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
             var options = {
                 minimumInputLength: this.props.minInputLength || 0,
                 multiple: this.props.multiple,
+                cacheDataSource: {},
+                width: this.props.width || '',
                 val: val
             };
 
@@ -806,19 +808,26 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 options['data'] = _this._parseDataToSelect2Options(this.props.options);
             } else if (this.props.dataMode === 'server') {
                 if (!_.isEmpty(this.props.options)) {
-                    options['query'] = function (options) {
-                        if (options.term) {
+                    options['query'] = function (query) {
+                        var self = this;
+                        var key = query.term;
+                        var cachedData = self.cacheDataSource[key] || '';
+                        if(cachedData) {
+                            query.callback({results: cachedData});
+                        } else if (query.term) {
                             $.ajax({
                                 url: _this.props.url,
                                 dataType: 'json',
-                                data: {q: options.term},
+                                data: {q: query.term},
                                 success: function (data) {
-                                    options.callback({ results: _this._parseDataToSelect2Options(data) });
+                                    data = _this._parseDataToSelect2Options(data);
+                                    self.cacheDataSource[key] = data;
+                                    query.callback({ results: data });
                                 },
                                 cache: true
                             });
                         } else {
-                            options.callback({ results: _this._parseDataToSelect2Options(_this.props.options) });
+                            query.callback({ results: _this._parseDataToSelect2Options(_this.props.options) });
                         }
                     };
                 } else {
