@@ -22,3 +22,8 @@ modules:
                 routing:
                     - [ /translations, Sellvana_MultiLanguage_Admin_Controller_Translations.index ]
                     - [ /translations/.action, Sellvana_MultiLanguage_Admin_Controller_Translations ]
+
+        default_config:
+            modules:
+                Sellvana_MultiLanguage:
+                    allowed_locales: [ en_US, fr_FR, de_DE, it_IT ]

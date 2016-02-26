@@ -14,7 +14,7 @@
 
 class FCom_Admin_Migrate extends BClass
 {
-    public function install__0_5_1_0()
+    public function install__0_6_1_0()
     {
         $tRole = $this->FCom_Admin_Model_Role->table();
         $this->BDb->run("
@@ -44,7 +44,7 @@ class FCom_Admin_Migrate extends BClass
             `status` char(1) NOT NULL DEFAULT 'A',
             `tz` varchar(50) NOT NULL DEFAULT 'America/Los_Angeles',
             `locale` varchar(50) NOT NULL DEFAULT 'en_US',
-            `create_at` datetime NOT NULL,
+            `create_at` datetime DEFAULT NULL,
             `update_at` datetime DEFAULT NULL,
             `token` varchar(20) DEFAULT NULL,
             `token_at` datetime DEFAULT NULL,
@@ -325,6 +325,16 @@ class FCom_Admin_Migrate extends BClass
             ],
             BDb::KEYS => [
                 'UNQ_unique_hash' => '(`unique_hash`)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_6_0_0__0_6_1_0()
+    {
+        $tUser = $this->FCom_Admin_Model_User->table();
+        $this->BDb->ddlTableDef($tUser, [
+            BDb::COLUMNS => [
+                'create_at' => 'datetime default null',
             ],
         ]);
     }

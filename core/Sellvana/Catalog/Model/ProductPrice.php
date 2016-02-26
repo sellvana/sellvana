@@ -20,6 +20,7 @@ class Sellvana_Catalog_Model_ProductPrice
 {
     protected static $_table     = "fcom_product_price";
     protected static $_origClass = __CLASS__;
+
     protected static $_importExportProfile = [
         'skip'       => ['id'],
         'unique_key' => ['product_id', 'price_type', 'customer_group_id', 'site_id', 'currency_code','qty','variant_id','promo_id'],
@@ -31,6 +32,7 @@ class Sellvana_Catalog_Model_ProductPrice
             'promo_id' => 'Sellvana_Promo_Model_Promo.id'
         ],
     ];
+
     const TYPE_BASE = "base",
         TYPE_MAP = "map",
         TYPE_MSRP = "msrp",
@@ -101,6 +103,11 @@ class Sellvana_Catalog_Model_ProductPrice
             ['value' => '-%', 'label' => "Subtract % from"],
         ],
     ];
+
+    protected static $_fieldDefaults = [
+        'amount' => 0,
+    ];
+
     const SALE_DATE_SEPARATOR = ' / ';
 
     /**

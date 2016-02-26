@@ -265,7 +265,7 @@ class Sellvana_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $this->generateUrlKey();
         }
 
-        if (empty($this->get('description'))) {
+        if (!$this->get('description')) {
             $this->set('description', $this->get('short_description'));
         }
 
