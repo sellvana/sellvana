@@ -260,7 +260,7 @@
 
                     var savePriceLabel = data.price.save ? data.price.save.label : "{{ 'You Save' | _ }}";
                     var savePrice = data.price.save ? data.price.save.formatted : '';
-                    return '<div class="tt-suggestion tt-selectable"><a href="{{ APP.frontendHref() }}'+data.url_key+'" class="search-product-item"><img class="search-product-item-img" src="'+data.thumb_url+'" title="'+data.product_name+'" /><span class="typeahead-product-info"><strong>' + data.product_name + '</strong><i onmouseover="window.showPreviewProduct(this)" onmouseout="window.hidePreviewProduct(this)" class="btn-search-preview fa fa-search text-right"></i></span><span class="short-desc"><em>'+data.short_description+'</em></span></a><div class="product-preview-modal" style="display: none;"><div class="preview-body"><div class="product-preview-left"><img src="'+data.thumb_url+'"/></div><div class="product-preview-right"><h4 class="preview-header-title">'+data.product_name+'</h4><p class="product-preview-price">'+basePriceLabel+': <span class="'+(typeof basePrice === 'string' ? 'text-danger' : 'base-price')+'">'+basePrice+'</span></p><p class="product-preview-sale">'+salePriceLabel+': <span class="text-danger">'+salePrice+'</span></p><p>'+savePriceLabel+': <span class="text-danger">'+savePrice+'</span></p><p class="product-preview-desc">'+data.description.replace(/<[^>]*>?/g, '')+'</p></div></div></div></div>';
+                    return '<div class="tt-suggestion tt-selectable"><a href="{{ APP.frontendHref() }}'+data.url_key+'" class="search-product-item"><img class="search-product-item-img" src="'+data.thumb_url+'" title="'+data.product_name+'" /><span class="typeahead-product-info"><strong>' + data.product_name + '</strong><i onmouseover="window.showPreviewProduct(this)" onmouseout="window.hidePreviewProduct(this)" class="btn-search-preview fa fa-search text-right"></i></span><span class="short-desc"><em>'+readMore(data.short_description)+'</em></span></a><div class="product-preview-modal" style="display: none;"><div class="preview-body"><div class="product-preview-left"><img src="'+data.thumb_url+'"/></div><div class="product-preview-right"><h4 class="preview-header-title">'+data.product_name+'</h4><p class="product-preview-price">'+basePriceLabel+': <span class="'+(typeof basePrice === 'string' ? 'text-danger' : 'base-price')+'">'+basePrice+'</span></p><p class="product-preview-sale">'+salePriceLabel+': <span class="text-danger">'+salePrice+'</span></p><p>'+savePriceLabel+': <span class="text-danger">'+savePrice+'</span></p><p class="product-preview-desc">'+data.description.replace(/<[^>]*>?/g, '')+'</p></div></div></div></div>';
                 },
                 empty: '<div class="empty-message">{{ "No matches." | _ }}</div>',
                 pending: "<div class='waiting' style='text-align: center;'><img width='30px' src='{{ APP.src('@FCom_Admin/Admin/img/waiting.gif') }}'></div>",
@@ -282,10 +282,23 @@
         window.showPreviewProduct = function(target) {
             var $container = $(target).parents('.tt-suggestion');
             $container.find('.product-preview-modal').fadeIn('200');
-        }
+        };
         window.hidePreviewProduct = function(target) {
             var $container = $(target).parents('.tt-suggestion');
             $container.find('.product-preview-modal').fadeOut('100');
+        };
+
+        function readMore (content, showChar) {
+            if (!showChar) showChar = 100; // How many characters are shown by default
+            var ellipsesText = "...";
+
+            if(content.length > showChar) {
+
+                var c = content.substr(0, showChar);
+
+                return c + '<span>' + ellipsesText + '&nbsp;</span>';
+            }
+            return content;
         }
     });
   </script>

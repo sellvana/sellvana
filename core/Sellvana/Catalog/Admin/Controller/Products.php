@@ -855,39 +855,48 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
         $hlp = $this->Sellvana_Catalog_Model_ProductLink;
         foreach (['related', 'similar', 'cross_sell'] as $type) {
             $typeName = 'linked_products_' . $type;
-            if ($deletedIds = $this->BUtil->arrayGet($data, "grid.{$typeName}.del")) {
-                $hlp->delete_many([
-                    'product_id' => $model->id(),
-                    'link_type' => $type,
-                    'linked_product_id' => $this->BUtil->arrayCleanInt($deletedIds),
-                ]);
-            }
-            $linkedIds = $this->BUtil->arrayGet($data, "grid.{$typeName}.add");
-            if ($linkedIds) {
-                $linkedIds = explode(',', $linkedIds);
-                foreach ($linkedIds as $lid) {
-                    $productLink = $hlp->loadWhere([
+            if ($linkedData = $this->BUtil->arrayGet($data, $typeName)) {
+                if ($deletedIds = $this->BUtil->arrayGet($linkedData, "del")) {
+                    $hlp->delete_many([
                         'product_id' => $model->id(),
-                        'linked_product_id' => (int)$lid,
-                        'link_type' => (string)$type
+                        'link_type' => $type,
+                        'linked_product_id' => $this->BUtil->arrayCleanInt($deletedIds),
                     ]);
+                }
+                unset($linkedData['del']);
 
-                    $position = $this->BUtil->arrayGet($data, "{$typeName}.{$lid}.product_link_position", 0);
-
-                    if ($productLink) {
-                        $productLink->set('position', $position)->save();
-                    } else {
+                // Process for new rows
+                if ($linkedIds = $this->BUtil->arrayGet($linkedData, "add")) {
+                    $linkedIds = $this->BUtil->arrayCleanInt($linkedIds);
+                    foreach ($linkedIds as $lid) {
+                        $position = (int)$this->BUtil->arrayGet($linkedData, "{$lid}.product_link_position", 0);
                         $hlp->create([
                             'product_id' => $model->id(),
                             'link_type' => $type,
                             'linked_product_id' => $lid,
                             'position' => $position
                         ])->save();
+                        unset($linkedData[$lid]);
+                    }
+                }
+                unset($linkedData['add']);
+
+                if (!empty($linkedData)) {
+                    foreach ($linkedData as $lid => $arr) {
+                        $productLink = $hlp->loadWhere([
+                            'product_id' => $model->id(),
+                            'linked_product_id' => (int)$lid,
+                            'link_type' => (string)$type
+                        ]);
+
+                        if ($productLink) {
+                            $position = (int)$this->BUtil->arrayGet($arr, "product_link_position", 0);
+                            $productLink->set('position', $position)->save();
+                        }
                     }
                 }
             }
         }
-//exit;
         return $this;
     }
 
