@@ -77,10 +77,10 @@ class Sellvana_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['field' => 'update_at', 'type' => 'date-range'],
             '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
         ];
-        $config['state'] = [
+        /*$config['state'] = [
             's' => 'product_name',
             'sd' => 'asc'
-        ];
+        ];*/
         $config['page_models_callback'] = [$this, 'onPageModelsCallback'];
         return $config;
     }

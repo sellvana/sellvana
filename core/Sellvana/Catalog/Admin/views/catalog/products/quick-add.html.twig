@@ -542,7 +542,7 @@
                             React.createElement(Components.SpecialInput, {
                                 type: 'select2',
                                 id: guid(),
-                                name: 'categories['+p.id+'][]',
+                                name: 'categories['+p.id+']',
                                 placeholder: "{{ 'Select Categories' |_ }}",
                                 multiple: true,
                                 url: '{{ APP.href('/catalog/products/quick-add/categories_search') | raw }}',

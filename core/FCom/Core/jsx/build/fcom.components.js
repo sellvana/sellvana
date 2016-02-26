@@ -756,20 +756,22 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
                 }
 
                 // Handle val prop
-                var updateVal = false;
-                if (prevProps.val.length === this.props.val.length) {
-                    $.each(prevProps.val, function (index, value) {
-                        if (this.props.val[index] != value) {
-                            updateVal = true;
-                        }
-                    }.bind(this));
+                if (!this.props.multiple) {
+                    var updateVal = false;
+                    if (prevProps.val.length === this.props.val.length) {
+                        $.each(prevProps.val, function (index, value) {
+                            if (this.props.val[index] != value) {
+                                updateVal = true;
+                            }
+                        }.bind(this));
 
-                } else {
-                    updateVal = true;
+                    } else {
+                        updateVal = true;
+                    }
+
+                    // ...update our val if we need to
+                    if (updateVal) this.getElement().select2("val", this.props.val);
                 }
-
-                // ...update our val if we need to
-                if (updateVal) this.getElement().select2("val", this.props.val);
 
                 // Enable/disable
                 if (prevProps.enabled != this.props.enabled) this.getElement().select2("enable", this.props.enabled);
@@ -777,7 +779,7 @@ define(['jquery', 'react', 'underscore', 'fcom.locale', 'sortable', 'dropzone', 
         },
         componentDidMount: function () {
             // Set up Select2
-            var $select2 = this.createSelect2();
+            this.createSelect2();
         },
         setPlaceholderTo: function ($elem, placeholder) {
             var currData = $elem.select2("data");
